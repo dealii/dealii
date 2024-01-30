@@ -464,7 +464,8 @@ namespace LinearAlgebra
        * of the matrix.
        */
       void
-      vmult(Vector<Number> &dst, const Vector<Number> &src) const;
+      vmult(Vector<Number, MemorySpace>       &dst,
+            const Vector<Number, MemorySpace> &src) const;
 
       /*
        * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
@@ -474,7 +475,8 @@ namespace LinearAlgebra
        * Source and destination must not be the same vector.
        */
       void
-      Tvmult(Vector<Number> &dst, const Vector<Number> &src) const;
+      Tvmult(Vector<Number, MemorySpace>       &dst,
+             const Vector<Number, MemorySpace> &src) const;
 
       /**
        * Adding matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i>
@@ -483,7 +485,8 @@ namespace LinearAlgebra
        * Source and destination must not be the same vector.
        */
       void
-      vmult_add(Vector<Number> &dst, const Vector<Number> &src) const;
+      vmult_add(Vector<Number, MemorySpace>       &dst,
+                const Vector<Number, MemorySpace> &src) const;
 
 
       /**
@@ -494,7 +497,8 @@ namespace LinearAlgebra
        * Source and destination must not be the same vector.
        */
       void
-      Tvmult_add(Vector<Number> &dst, const Vector<Number> &src) const;
+      Tvmult_add(Vector<Number, MemorySpace>       &dst,
+                 const Vector<Number, MemorySpace> &src) const;
       /** @} */
 
       /**

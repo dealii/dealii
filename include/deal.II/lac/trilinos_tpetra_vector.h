@@ -125,7 +125,7 @@ namespace LinearAlgebra
        *
        * @ingroup TpetraWrappers
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpace>
       class VectorReference
       {
       private:
@@ -133,7 +133,8 @@ namespace LinearAlgebra
          * Constructor. It is made private so as to only allow the actual vector
          * class to create it.
          */
-        VectorReference(Vector<Number> &vector, const size_type index);
+        VectorReference(Vector<Number, MemorySpace> &vector,
+                        const size_type              index);
 
       public:
         /**
@@ -209,7 +210,7 @@ namespace LinearAlgebra
         /**
          * Point to the vector we are referencing.
          */
-        Vector<Number> &vector;
+        Vector<Number, MemorySpace> &vector;
 
         /**
          * Index of the referenced element of the vector.
@@ -218,7 +219,7 @@ namespace LinearAlgebra
 
         // Make the vector class a friend, so that it can create objects of the
         // present type.
-        friend class Vector<Number>;
+        friend class Vector<Number, MemorySpace>;
       }; // class VectorReference
 
     } // namespace internal
@@ -232,38 +233,40 @@ namespace LinearAlgebra
      * class Tpetra::Vector. This class requires Trilinos to be
      * compiled with MPI support.
      *
-     * Tpetra uses Kokkos for thread-parallelism and chooses the execution and
-     * memory space automatically depending on Kokkos configuration. The
-     * priority is ranked from highest to lowest:
-     * - GPU backend
-     * - host parallel backend
-     * - Kokkos::Serial
-     *
-     * In case Kokkos was configured with GPU support, this class performs its
-     * actions on the GPU. In particular, there is no need for manually
-     * synchronizing memory between host and @ref GlossDevice "device".
+     * Moreover, this class takes an optional template argument for
+     * the memory space used. By default, all memory is allocated on the CPU.
      *
      * @ingroup TpetraWrappers
      * @ingroup Vectors
      */
-    template <typename Number>
+    template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
     class Vector : public ReadVector<Number>, public Subscriptor
     {
     public:
       /**
        * Declare some of the standard types used in all containers.
        */
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
+      using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
+        typename MemorySpace::kokkos_space::execution_space,
+        typename MemorySpace::kokkos_space>;
+#  else
+      using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
+        typename MemorySpace::kokkos_space::execution_space,
+        typename MemorySpace::kokkos_space>;
+#  endif
       using value_type = Number;
       using real_type  = typename numbers::NumberTraits<Number>::real_type;
       using size_type  = types::global_dof_index;
-      using reference  = internal::VectorReference<Number>;
-      using MapType = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
-      using VectorType =
-        Tpetra::Vector<Number, int, dealii::types::signed_global_dof_index>;
+      using reference  = internal::VectorReference<Number, MemorySpace>;
+      using MapType =
+        Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
+      using VectorType = Tpetra::
+        Vector<Number, int, dealii::types::signed_global_dof_index, NodeType>;
       using ExportType =
-        Tpetra::Export<int, dealii::types::signed_global_dof_index>;
+        Tpetra::Export<int, dealii::types::signed_global_dof_index, NodeType>;
       using ImportType =
-        Tpetra::Import<int, dealii::types::signed_global_dof_index>;
+        Tpetra::Import<int, dealii::types::signed_global_dof_index, NodeType>;
 
       /**
        * @name 1: Basic Object-handling
@@ -352,7 +355,8 @@ namespace LinearAlgebra
        * copied.
        */
       void
-      reinit(const Vector<Number> &V, const bool omit_zeroing_entries = false);
+      reinit(const Vector<Number, MemorySpace> &V,
+             const bool                         omit_zeroing_entries = false);
 
       /**
        * Extract a range of elements all at once.
@@ -494,20 +498,20 @@ namespace LinearAlgebra
        * Add the vector @p V to the present one.
        */
       Vector &
-      operator+=(const Vector<Number> &V);
+      operator+=(const Vector<Number, MemorySpace> &V);
 
       /**
        * Subtract the vector @p V from the present one.
        */
       Vector &
-      operator-=(const Vector<Number> &V);
+      operator-=(const Vector<Number, MemorySpace> &V);
 
       /**
        * Return the scalar product of two vectors. The vectors need to have the
        * same layout.
        */
       Number
-      operator*(const Vector<Number> &V) const;
+      operator*(const Vector<Number, MemorySpace> &V) const;
 
       /**
        * Add @p a to all components. Note that @p is a scalar not a vector.
@@ -520,17 +524,17 @@ namespace LinearAlgebra
        * a*V</tt>. The vectors need to have the same layout.
        */
       void
-      add(const Number a, const Vector<Number> &V);
+      add(const Number a, const Vector<Number, MemorySpace> &V);
 
       /**
        * Multiple addition of multiple of a vector, i.e. <tt>*this> +=
        * a*V+b*W</tt>. The vectors need to have the same layout.
        */
       void
-      add(const Number          a,
-          const Vector<Number> &V,
-          const Number          b,
-          const Vector<Number> &W);
+      add(const Number                       a,
+          const Vector<Number, MemorySpace> &V,
+          const Number                       b,
+          const Vector<Number, MemorySpace> &W);
 
       /**
        * A collective add operation: This function adds a whole set of values
@@ -556,7 +560,9 @@ namespace LinearAlgebra
        * = s*(*this)+a*V</tt>.
        */
       void
-      sadd(const Number s, const Number a, const Vector<Number> &V);
+      sadd(const Number                       s,
+           const Number                       a,
+           const Vector<Number, MemorySpace> &V);
 
       /**
        * A collective set operation: instead of setting individual elements of a
@@ -576,13 +582,13 @@ namespace LinearAlgebra
        * vectors need to have the same layout.
        */
       void
-      scale(const Vector<Number> &scaling_factors);
+      scale(const Vector<Number, MemorySpace> &scaling_factors);
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
       void
-      equ(const Number a, const Vector<Number> &V);
+      equ(const Number a, const Vector<Number, MemorySpace> &V);
 
       /**
        * Return whether the vector contains only elements with value zero.
@@ -648,9 +654,9 @@ namespace LinearAlgebra
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
       Number
-      add_and_dot(const Number          a,
-                  const Vector<Number> &V,
-                  const Vector<Number> &W);
+      add_and_dot(const Number                       a,
+                  const Vector<Number, MemorySpace> &V,
+                  const Vector<Number, MemorySpace> &W);
 
       /** @} */
 
@@ -903,34 +909,34 @@ namespace LinearAlgebra
         tpetra_comm_pattern;
 
       // Make the reference class a friend.
-      friend class internal::VectorReference<Number>;
+      friend class internal::VectorReference<Number, MemorySpace>;
     };
 
 
     /* ------------------------- Inline functions ---------------------- */
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline bool
-    Vector<Number>::has_ghost_elements() const
+    Vector<Number, MemorySpace>::has_ghost_elements() const
     {
       return has_ghost;
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline bool
-    Vector<Number>::is_compressed() const
+    Vector<Number, MemorySpace>::is_compressed() const
     {
       return compressed;
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline void
-    Vector<Number>::add(const std::vector<size_type>      &indices,
-                        const std::vector<TrilinosScalar> &values)
+    Vector<Number, MemorySpace>::add(const std::vector<size_type>      &indices,
+                                     const std::vector<TrilinosScalar> &values)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
@@ -941,11 +947,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline void
-    Vector<Number>::add(const size_type  n_elements,
-                        const size_type *indices,
-                        const Number    *values)
+    Vector<Number, MemorySpace>::add(const size_type  n_elements,
+                                     const size_type *indices,
+                                     const Number    *values)
     {
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
@@ -1021,11 +1027,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline void
-    Vector<Number>::set(const size_type  n_elements,
-                        const size_type *indices,
-                        const Number    *values)
+    Vector<Number, MemorySpace>::set(const size_type  n_elements,
+                                     const size_type *indices,
+                                     const Number    *values)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
@@ -1078,23 +1084,23 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    inline internal::VectorReference<Number>
-    Vector<Number>::operator()(const size_type index)
+    template <typename Number, typename MemorySpace>
+    inline internal::VectorReference<Number, MemorySpace>
+    Vector<Number, MemorySpace>::operator()(const size_type index)
     {
       return internal::VectorReference(*this, index);
     }
 
-    template <typename Number>
-    inline internal::VectorReference<Number>
-    Vector<Number>::operator[](const size_type index)
+    template <typename Number, typename MemorySpace>
+    inline internal::VectorReference<Number, MemorySpace>
+    Vector<Number, MemorySpace>::operator[](const size_type index)
     {
       return operator()(index);
     }
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline Number
-    Vector<Number>::operator[](const size_type index) const
+    Vector<Number, MemorySpace>::operator[](const size_type index) const
     {
       return operator()(index);
     }
@@ -1104,18 +1110,20 @@ namespace LinearAlgebra
     // VectorReference
     namespace internal
     {
-      template <typename Number>
-      inline VectorReference<Number>::VectorReference(Vector<Number> &vector,
-                                                      const size_type index)
+      template <typename Number, typename MemorySpace>
+      inline VectorReference<Number, MemorySpace>::VectorReference(
+        Vector<Number, MemorySpace> &vector,
+        const size_type              index)
         : vector(vector)
         , index(index)
       {}
 
 
 
-      template <typename Number>
-      inline const VectorReference<Number> &
-      VectorReference<Number>::operator=(const VectorReference<Number> &r) const
+      template <typename Number, typename MemorySpace>
+      inline const VectorReference<Number, MemorySpace> &
+      VectorReference<Number, MemorySpace>::operator=(
+        const VectorReference<Number, MemorySpace> &r) const
       {
         // as explained in the class
         // documentation, this is not the copy
@@ -1128,9 +1136,10 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
-      inline VectorReference<Number> &
-      VectorReference<Number>::operator=(const VectorReference<Number> &r)
+      template <typename Number, typename MemorySpace>
+      inline VectorReference<Number, MemorySpace> &
+      VectorReference<Number, MemorySpace>::operator=(
+        const VectorReference<Number, MemorySpace> &r)
       {
         // as above
         *this = static_cast<Number>(r);
@@ -1140,9 +1149,9 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
-      inline const VectorReference<Number> &
-      VectorReference<Number>::operator=(const Number &value) const
+      template <typename Number, typename MemorySpace>
+      inline const VectorReference<Number, MemorySpace> &
+      VectorReference<Number, MemorySpace>::operator=(const Number &value) const
       {
         vector.set(1, &index, &value);
         return *this;
@@ -1150,9 +1159,10 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
-      inline const VectorReference<Number> &
-      VectorReference<Number>::operator+=(const Number &value) const
+      template <typename Number, typename MemorySpace>
+      inline const VectorReference<Number, MemorySpace> &
+      VectorReference<Number, MemorySpace>::operator+=(
+        const Number &value) const
       {
         vector.add(1, &index, &value);
         return *this;
@@ -1160,9 +1170,10 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
-      inline const VectorReference<Number> &
-      VectorReference<Number>::operator-=(const Number &value) const
+      template <typename Number, typename MemorySpace>
+      inline const VectorReference<Number, MemorySpace> &
+      VectorReference<Number, MemorySpace>::operator-=(
+        const Number &value) const
       {
         Number new_value = -value;
         vector.add(1, &index, &new_value);
@@ -1171,9 +1182,10 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
-      inline const VectorReference<Number> &
-      VectorReference<Number>::operator*=(const Number &value) const
+      template <typename Number, typename MemorySpace>
+      inline const VectorReference<Number, MemorySpace> &
+      VectorReference<Number, MemorySpace>::operator*=(
+        const Number &value) const
       {
         Number new_value = static_cast<Number>(*this) * value;
         vector.set(1, &index, &new_value);
@@ -1182,9 +1194,10 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
-      inline const VectorReference<Number> &
-      VectorReference<Number>::operator/=(const Number &value) const
+      template <typename Number, typename MemorySpace>
+      inline const VectorReference<Number, MemorySpace> &
+      VectorReference<Number, MemorySpace>::operator/=(
+        const Number &value) const
       {
         Number new_value = static_cast<Number>(*this) / value;
         vector.set(1, &index, &new_value);
@@ -1203,9 +1216,9 @@ namespace LinearAlgebra
 /**
  * Declare dealii::LinearAlgebra::TpetraWrappers::Vector as distributed vector.
  */
-template <typename Number>
-struct is_serial_vector<LinearAlgebra::TpetraWrappers::Vector<Number>>
-  : std::false_type
+template <typename Number, typename MemorySpace>
+struct is_serial_vector<
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>> : std::false_type
 {};
 
 DEAL_II_NAMESPACE_CLOSE
