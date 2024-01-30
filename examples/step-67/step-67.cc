@@ -206,7 +206,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0.;
       }
   }
@@ -615,7 +615,7 @@ namespace Euler_DG
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return {};
           }
       }
@@ -2011,7 +2011,7 @@ namespace Euler_DG
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     triangulation.refine_global(n_global_refinements);

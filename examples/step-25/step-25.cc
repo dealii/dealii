@@ -203,7 +203,7 @@ namespace Step25
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return -1e8;
         }
     }

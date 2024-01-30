@@ -553,7 +553,7 @@ void LaplaceProblem<dim, degree>::setup_system()
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -711,7 +711,7 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

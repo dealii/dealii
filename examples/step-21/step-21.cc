@@ -995,7 +995,7 @@ namespace Step21
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     DataOut<dim> data_out;

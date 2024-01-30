@@ -218,7 +218,7 @@ namespace Step51
             convection[2] = 1;
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return convection;
     }
@@ -1208,7 +1208,7 @@ namespace Step51
           filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     std::string face_out(filename);
@@ -1332,7 +1332,7 @@ namespace Step51
 
           default:
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
 

@@ -418,7 +418,7 @@ namespace Step33
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
     }
 
@@ -2054,7 +2054,7 @@ namespace Step33
           alpha = face_diameter / (2.0 * parameters.time_step);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           alpha = 1;
       }
 
@@ -2210,7 +2210,7 @@ namespace Step33
           }
       }
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return {0, 0};
   }
 

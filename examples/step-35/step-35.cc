@@ -1079,7 +1079,7 @@ namespace Step35
                     boundary_values);
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
               }
           }
         MatrixTools::apply_boundary_values(boundary_values,
@@ -1260,7 +1260,7 @@ namespace Step35
           pres_n += phi_n;
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       };
   }
 

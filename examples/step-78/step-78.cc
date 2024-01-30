@@ -675,7 +675,7 @@ namespace BlackScholesSolver
           conv_filename += "-q2";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     conv_filename += ".tex";
     std::ofstream table_file(conv_filename);
