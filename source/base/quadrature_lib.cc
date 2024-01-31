@@ -319,7 +319,7 @@ namespace internal
             break;
 
           default:
-            Assert(false, dealii::StandardExceptions::ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             break;
         }
       return weights;

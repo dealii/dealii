@@ -72,7 +72,7 @@ namespace CGALWrappers
     else if constexpr (cdim == 3)
       return CGALPointType(p[0], dim > 1 ? p[1] : 0, dim > 2 ? p[2] : 0);
     else
-      Assert(false, dealii::ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     return CGALPointType();
   }
 
@@ -93,7 +93,7 @@ namespace CGALWrappers
                                 cdim > 1 ? CGAL::to_double(p.y()) : 0,
                                 cdim > 2 ? CGAL::to_double(p.z()) : 0);
     else
-      Assert(false, dealii::ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
   }
 } // namespace CGALWrappers
 

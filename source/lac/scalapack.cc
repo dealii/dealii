@@ -39,7 +39,7 @@ template <typename number>
 inline hid_t
 hdf5_type_id(const number *)
 {
-  Assert(false, dealii::ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   // don't know what to put here; it does not matter
   return -1;
 }
