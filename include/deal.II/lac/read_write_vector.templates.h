@@ -586,7 +586,7 @@ namespace LinearAlgebra
 
     using size_type = std::decay_t<decltype(size)>;
 
-    Assert(size == 0 || values != nullptr, ExcInternalError("Import failed."));
+    Assert(size == 0 || !values.empty(), ExcInternalError("Import failed."));
     AssertDimension(size, stored_elements.n_elements());
 
     switch (operation)
