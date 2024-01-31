@@ -336,12 +336,14 @@ namespace LinearAlgebra
 
         // Translate the vector of row lengths into one that only stores
         // those entries that related to the locally stored rows of the matrix:
-        Kokkos::DualView<size_t *> local_entries_per_row(
-          "local_entries_per_row",
-          row_map->getMaxGlobalIndex() - row_map->getMinGlobalIndex());
+        Kokkos::DualView<size_t *, typename MemorySpace::kokkos_space>
+          local_entries_per_row("local_entries_per_row",
+                                row_map->getMaxGlobalIndex() -
+                                  row_map->getMinGlobalIndex());
 
         auto local_entries_per_row_host =
-          local_entries_per_row.view<Kokkos::DefaultHostExecutionSpace>();
+          local_entries_per_row
+            .template view<Kokkos::DefaultHostExecutionSpace>();
 
         std::uint64_t total_size = 0;
         for (unsigned int i = 0; i < local_entries_per_row.extent(0); ++i)
@@ -350,8 +352,10 @@ namespace LinearAlgebra
               n_entries_per_row[row_map->getMinGlobalIndex() + i];
             total_size += local_entries_per_row_host[i];
           }
-        local_entries_per_row.modify<Kokkos::DefaultHostExecutionSpace>();
-        local_entries_per_row.sync<Kokkos::DefaultExecutionSpace>();
+        local_entries_per_row
+          .template modify<Kokkos::DefaultHostExecutionSpace>();
+        local_entries_per_row
+          .template sync<typename MemorySpace::kokkos_space>();
 
         AssertThrow(
           total_size < static_cast<std::uint64_t>(
