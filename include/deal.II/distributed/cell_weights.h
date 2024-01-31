@@ -30,10 +30,14 @@ namespace parallel
   /**
    * Anytime a parallel::TriangulationBase is repartitioned, either upon request
    * or by refinement/coarsening, cells will be distributed amongst all
-   * subdomains to achieve an equally balanced workload. If the workload per
-   * cell varies, which is in general the case for DoFHandler objects with
-   * hp-capabilities, we can take that into account by introducing individual
-   * weights for different cells.
+   * subdomains to achieve an equally balanced workload. By default, if you
+   * don't do anything specific, the workload is assumed to be the same for
+   * every cell of the triangulation, and in that case a well-balanced mesh
+   * will have about the same number of cells on each process. But, if the
+   * workload per cell varies, which is in general the case for DoFHandler
+   * objects that hp-capabilities (i.e., where you use different finite elements
+   * on different cells), we can take that into account by introducing
+   * individual weights for different cells.
    *
    * This class allows computing these weights for load balancing by
    * consulting the FiniteElement that is associated with each cell of
