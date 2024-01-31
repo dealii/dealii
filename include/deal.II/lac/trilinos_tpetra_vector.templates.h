@@ -44,8 +44,8 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-    template <typename Number>
-    Vector<Number>::Vector()
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace>::Vector()
       : Subscriptor()
       , compressed(true)
       , has_ghost(false)
@@ -58,8 +58,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number>::Vector(const Vector<Number> &V)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace>::Vector(const Vector<Number, MemorySpace> &V)
       : Subscriptor()
       , compressed(V.compressed)
       , has_ghost(V.has_ghost)
@@ -74,8 +74,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number>::Vector(const Teuchos::RCP<VectorType> V)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace>::Vector(const Teuchos::RCP<VectorType> V)
       : Subscriptor()
       , compressed(true)
       , has_ghost(V->getMap()->isOneToOne() == false)
@@ -84,9 +84,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number>::Vector(const IndexSet &parallel_partitioner,
-                           const MPI_Comm  communicator)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace>::Vector(const IndexSet &parallel_partitioner,
+                                        const MPI_Comm  communicator)
       : Subscriptor()
       , compressed(true)
       , has_ghost(false)
@@ -96,11 +96,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number>::Vector(const IndexSet &locally_owned_entries,
-                           const IndexSet &ghost_entries,
-                           const MPI_Comm  communicator,
-                           const bool      vector_writable)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace>::Vector(const IndexSet &locally_owned_entries,
+                                        const IndexSet &ghost_entries,
+                                        const MPI_Comm  communicator,
+                                        const bool      vector_writable)
       : Subscriptor()
     {
       if (!vector_writable)
@@ -140,11 +140,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::reinit(const IndexSet &parallel_partitioner,
-                           const MPI_Comm  communicator,
-                           const bool /*omit_zeroing_entries*/)
+    Vector<Number, MemorySpace>::reinit(const IndexSet &parallel_partitioner,
+                                        const MPI_Comm  communicator,
+                                        const bool /*omit_zeroing_entries*/)
     {
       vector.reset();
       nonlocal_vector.reset();
@@ -157,12 +157,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::reinit(const IndexSet &locally_owned_entries,
-                           const IndexSet &ghost_entries,
-                           const MPI_Comm  communicator,
-                           const bool      vector_writable)
+    Vector<Number, MemorySpace>::reinit(const IndexSet &locally_owned_entries,
+                                        const IndexSet &ghost_entries,
+                                        const MPI_Comm  communicator,
+                                        const bool      vector_writable)
     {
       // release memory before reallocation
       nonlocal_vector.reset();
@@ -206,10 +206,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::reinit(const Vector<Number> &V,
-                           const bool            omit_zeroing_entries)
+    Vector<Number, MemorySpace>::reinit(const Vector<Number, MemorySpace> &V,
+                                        const bool omit_zeroing_entries)
     {
       reinit(V.locally_owned_elements(),
              V.get_mpi_communicator(),
@@ -218,9 +218,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::extract_subvector_to(
+    Vector<Number, MemorySpace>::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
       ArrayView<Number>                              &elements) const
     {
@@ -276,9 +276,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number> &
-    Vector<Number>::operator=(const Vector<Number> &V)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace> &
+    Vector<Number, MemorySpace>::operator=(const Vector<Number, MemorySpace> &V)
     {
       // Distinguish three cases:
       //  - First case: both vectors have the same layout.
@@ -365,9 +365,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number> &
-    Vector<Number>::operator=(const Number s)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace> &
+    Vector<Number, MemorySpace>::operator=(const Number s)
     {
       (void)s;
       Assert(s == Number(0.0),
@@ -387,9 +387,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::import_elements(
+    Vector<Number, MemorySpace>::import_elements(
       const ReadWriteVector<Number> &V,
       VectorOperation::values        operation,
       const Teuchos::RCP<const Utilities::MPI::CommunicationPatternBase>
@@ -464,9 +464,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::import_elements(
+    Vector<Number, MemorySpace>::import_elements(
       const ReadWriteVector<Number> &V,
       VectorOperation::values        operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)
@@ -476,10 +476,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::import_elements(const ReadWriteVector<Number> &V,
-                                    VectorOperation::values        operation)
+    Vector<Number, MemorySpace>::import_elements(
+      const ReadWriteVector<Number> &V,
+      VectorOperation::values        operation)
     {
       // Create an empty CommunicationPattern
       const Teuchos::RCP<const Utilities::MPI::CommunicationPatternBase>
@@ -490,9 +491,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number> &
-    Vector<Number>::operator*=(const Number factor)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace> &
+    Vector<Number, MemorySpace>::operator*=(const Number factor)
     {
       AssertIsFinite(factor);
       vector->scale(factor);
@@ -502,9 +503,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number> &
-    Vector<Number>::operator/=(const Number factor)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace> &
+    Vector<Number, MemorySpace>::operator/=(const Number factor)
     {
       AssertIsFinite(factor);
       Assert(factor != Number(0.), ExcZero());
@@ -515,9 +516,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number> &
-    Vector<Number>::operator+=(const Vector<Number> &V)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace> &
+    Vector<Number, MemorySpace>::operator+=(
+      const Vector<Number, MemorySpace> &V)
     {
       // If the maps are the same we can update right away.
       if (vector->getMap()->isSameAs(*(V.trilinos_vector().getMap())))
@@ -545,9 +547,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    Vector<Number> &
-    Vector<Number>::operator-=(const Vector<Number> &V)
+    template <typename Number, typename MemorySpace>
+    Vector<Number, MemorySpace> &
+    Vector<Number, MemorySpace>::operator-=(
+      const Vector<Number, MemorySpace> &V)
     {
       this->add(-1., V);
 
@@ -556,9 +559,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     Number
-    Vector<Number>::operator*(const Vector<Number> &V) const
+    Vector<Number, MemorySpace>::operator*(
+      const Vector<Number, MemorySpace> &V) const
     {
       Assert(this->size() == V.size(),
              ExcDimensionMismatch(this->size(), V.size()));
@@ -571,9 +575,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     Number
-    Vector<Number>::operator()(const size_type index) const
+    Vector<Number, MemorySpace>::operator()(const size_type index) const
     {
       // Get the local index
       const TrilinosWrappers::types::int_type local_index =
@@ -610,9 +614,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::add(const Number a)
+    Vector<Number, MemorySpace>::add(const Number a)
     {
       AssertIsFinite(a);
 
@@ -645,9 +649,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::add(const Number a, const Vector<Number> &V)
+    Vector<Number, MemorySpace>::add(const Number                       a,
+                                     const Vector<Number, MemorySpace> &V)
     {
       AssertIsFinite(a);
 
@@ -663,12 +668,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::add(const Number          a,
-                        const Vector<Number> &V,
-                        const Number          b,
-                        const Vector<Number> &W)
+    Vector<Number, MemorySpace>::add(const Number                       a,
+                                     const Vector<Number, MemorySpace> &V,
+                                     const Number                       b,
+                                     const Vector<Number, MemorySpace> &W)
     {
       AssertIsFinite(a);
       AssertIsFinite(b);
@@ -687,11 +692,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::sadd(const Number          s,
-                         const Number          a,
-                         const Vector<Number> &V)
+    Vector<Number, MemorySpace>::sadd(const Number                       s,
+                                      const Number                       a,
+                                      const Vector<Number, MemorySpace> &V)
     {
       AssertIsFinite(s);
       AssertIsFinite(a);
@@ -702,16 +707,17 @@ namespace LinearAlgebra
 
       *this *= s;
 
-      Vector<Number> tmp(V);
+      Vector<Number, MemorySpace> tmp(V);
       tmp *= a;
       *this += tmp;
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::scale(const Vector<Number> &scaling_factors)
+    Vector<Number, MemorySpace>::scale(
+      const Vector<Number, MemorySpace> &scaling_factors)
     {
       Assert(vector->getMap()->isSameAs(
                *(scaling_factors.trilinos_vector().getMap())),
@@ -726,9 +732,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::equ(const Number a, const Vector<Number> &V)
+    Vector<Number, MemorySpace>::equ(const Number                       a,
+                                     const Vector<Number, MemorySpace> &V)
     {
       AssertIsFinite(a);
 
@@ -748,9 +755,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     bool
-    Vector<Number>::all_zero() const
+    Vector<Number, MemorySpace>::all_zero() const
     {
       // get a representation of the vector and
       // loop over all the elements
@@ -779,9 +786,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     Number
-    Vector<Number>::mean_value() const
+    Vector<Number, MemorySpace>::mean_value() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
@@ -790,9 +797,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    typename Vector<Number>::real_type
-    Vector<Number>::l1_norm() const
+    template <typename Number, typename MemorySpace>
+    typename Vector<Number, MemorySpace>::real_type
+    Vector<Number, MemorySpace>::l1_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
@@ -801,9 +808,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    typename Vector<Number>::real_type
-    Vector<Number>::l2_norm() const
+    template <typename Number, typename MemorySpace>
+    typename Vector<Number, MemorySpace>::real_type
+    Vector<Number, MemorySpace>::l2_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
@@ -812,9 +819,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    typename Vector<Number>::real_type
-    Vector<Number>::linfty_norm() const
+    template <typename Number, typename MemorySpace>
+    typename Vector<Number, MemorySpace>::real_type
+    Vector<Number, MemorySpace>::linfty_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
@@ -823,11 +830,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     Number
-    Vector<Number>::add_and_dot(const Number          a,
-                                const Vector<Number> &V,
-                                const Vector<Number> &W)
+    Vector<Number, MemorySpace>::add_and_dot(
+      const Number                       a,
+      const Vector<Number, MemorySpace> &V,
+      const Vector<Number, MemorySpace> &W)
     {
       AssertIsFinite(a);
 
@@ -838,27 +846,27 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
-    typename Vector<Number>::size_type
-    Vector<Number>::size() const
+    template <typename Number, typename MemorySpace>
+    typename Vector<Number, MemorySpace>::size_type
+    Vector<Number, MemorySpace>::size() const
     {
       return vector->getGlobalLength();
     }
 
 
 
-    template <typename Number>
-    typename Vector<Number>::size_type
-    Vector<Number>::locally_owned_size() const
+    template <typename Number, typename MemorySpace>
+    typename Vector<Number, MemorySpace>::size_type
+    Vector<Number, MemorySpace>::locally_owned_size() const
     {
       return vector->getLocalLength();
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     MPI_Comm
-    Vector<Number>::get_mpi_communicator() const
+    Vector<Number, MemorySpace>::get_mpi_communicator() const
     {
       return Utilities::Trilinos::teuchos_comm_to_mpi_comm(
         vector->getMap()->getComm());
@@ -866,18 +874,19 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     IndexSet
-    Vector<Number>::locally_owned_elements() const
+    Vector<Number, MemorySpace>::locally_owned_elements() const
     {
       return IndexSet(vector->getMap());
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::compress(const VectorOperation::values operation)
+    Vector<Number, MemorySpace>::compress(
+      const VectorOperation::values operation)
     {
       Assert(has_ghost == false,
              ExcMessage(
@@ -907,49 +916,49 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     const Tpetra::Vector<Number, int, types::signed_global_dof_index> &
-    Vector<Number>::trilinos_vector() const
+    Vector<Number, MemorySpace>::trilinos_vector() const
     {
       return *vector;
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     Tpetra::Vector<Number, int, types::signed_global_dof_index> &
-    Vector<Number>::trilinos_vector()
+    Vector<Number, MemorySpace>::trilinos_vector()
     {
       return *vector;
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     Teuchos::RCP<Tpetra::Vector<Number, int, types::signed_global_dof_index>>
-    Vector<Number>::trilinos_rcp()
+    Vector<Number, MemorySpace>::trilinos_rcp()
     {
       return vector;
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     Teuchos::RCP<
       const Tpetra::Vector<Number, int, types::signed_global_dof_index>>
-    Vector<Number>::trilinos_rcp() const
+    Vector<Number, MemorySpace>::trilinos_rcp() const
     {
       return vector.getConst();
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::print(std::ostream      &out,
-                          const unsigned int precision,
-                          const bool         scientific,
-                          const bool         across) const
+    Vector<Number, MemorySpace>::print(std::ostream      &out,
+                                       const unsigned int precision,
+                                       const bool         scientific,
+                                       const bool         across) const
     {
       AssertThrow(out.fail() == false, ExcIO());
       boost::io::ios_flags_saver restore_flags(out);
@@ -1002,18 +1011,18 @@ namespace LinearAlgebra
     }
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     MPI_Comm
-    Vector<Number>::mpi_comm() const
+    Vector<Number, MemorySpace>::mpi_comm() const
     {
       return Utilities::Trilinos::teuchos_comm_to_mpi_comm(
         vector->getMap()->getComm());
     }
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     std::size_t
-    Vector<Number>::memory_consumption() const
+    Vector<Number, MemorySpace>::memory_consumption() const
     {
       return sizeof(*this) +
              vector->getLocalLength() *
@@ -1022,10 +1031,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
-    Vector<Number>::create_tpetra_comm_pattern(const IndexSet &source_index_set,
-                                               const MPI_Comm  mpi_comm)
+    Vector<Number, MemorySpace>::create_tpetra_comm_pattern(
+      const IndexSet &source_index_set,
+      const MPI_Comm  mpi_comm)
     {
       source_stored_elements = source_index_set;
 

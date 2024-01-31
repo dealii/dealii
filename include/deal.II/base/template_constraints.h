@@ -668,7 +668,7 @@ namespace LinearAlgebra
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   namespace TpetraWrappers
   {
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     class Vector;
 
     template <typename Number, typename MemorySpace>
