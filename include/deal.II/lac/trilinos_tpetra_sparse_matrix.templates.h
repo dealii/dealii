@@ -590,11 +590,11 @@ namespace LinearAlgebra
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(src.trilinos_rcp()->getMap()->isSameAs(*matrix->getDomainMap()),
+      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
              ExcColMapMissmatch());
-      Assert(dst.trilinos_rcp()->getMap()->isSameAs(*matrix->getRangeMap()),
+      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
              ExcDomainMapMissmatch());
-      matrix->apply(*src.trilinos_rcp(), *dst.trilinos_rcp());
+      matrix->apply(src.trilinos_vector(), dst.trilinos_vector());
     }
 
 
@@ -606,11 +606,13 @@ namespace LinearAlgebra
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(dst.trilinos_rcp()->getMap()->isSameAs(*matrix->getDomainMap()),
+      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
              ExcColMapMissmatch());
-      Assert(src.trilinos_rcp()->getMap()->isSameAs(*matrix->getRangeMap()),
+      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
              ExcDomainMapMissmatch());
-      matrix->apply(*src.trilinos_rcp(), *dst.trilinos_rcp(), Teuchos::TRANS);
+      matrix->apply(src.trilinos_vector(),
+                    dst.trilinos_vector(),
+                    Teuchos::TRANS);
     }
 
 
@@ -623,12 +625,12 @@ namespace LinearAlgebra
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(src.trilinos_rcp()->getMap()->isSameAs(*matrix->getDomainMap()),
+      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
              ExcColMapMissmatch());
-      Assert(dst.trilinos_rcp()->getMap()->isSameAs(*matrix->getRangeMap()),
+      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
              ExcDomainMapMissmatch());
-      matrix->apply(*src.trilinos_rcp(),
-                    *dst.trilinos_rcp(),
+      matrix->apply(src.trilinos_vector(),
+                    dst.trilinos_vector(),
                     Teuchos::NO_TRANS,
                     Teuchos::ScalarTraits<Number>::one(),
                     Teuchos::ScalarTraits<Number>::one());
@@ -644,12 +646,12 @@ namespace LinearAlgebra
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(dst.trilinos_rcp()->getMap()->isSameAs(*matrix->getDomainMap()),
+      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
              ExcColMapMissmatch());
-      Assert(src.trilinos_rcp()->getMap()->isSameAs(*matrix->getRangeMap()),
+      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
              ExcDomainMapMissmatch());
-      matrix->apply(*src.trilinos_rcp(),
-                    *dst.trilinos_rcp(),
+      matrix->apply(src.trilinos_vector(),
+                    dst.trilinos_vector(),
                     Teuchos::TRANS,
                     Teuchos::ScalarTraits<Number>::one(),
                     Teuchos::ScalarTraits<Number>::one());

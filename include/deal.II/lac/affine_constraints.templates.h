@@ -2671,7 +2671,7 @@ namespace internal
     parallel_partitioner.add_indices(needed_elements);
 
     const MPI_Comm mpi_comm = Utilities::Trilinos::teuchos_comm_to_mpi_comm(
-      vec.trilinos_rcp()->getMap()->getComm());
+      vec.trilinos_vector().getMap()->getComm());
 
     output.reinit(locally_owned_elements, needed_elements, mpi_comm);
 
