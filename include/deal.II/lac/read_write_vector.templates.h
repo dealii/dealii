@@ -210,52 +210,13 @@ namespace LinearAlgebra
   } // namespace internal
 
 
-  template <typename Number>
-  void
-  ReadWriteVector<Number>::resize_val(const size_type new_alloc_size)
-  {
-    if (new_alloc_size == 0)
-      {
-        values.reset();
-        thread_loop_partitioner =
-          std::make_shared<parallel::internal::TBBPartitioner>();
-      }
-    else
-      {
-        Number *new_values;
-        Utilities::System::posix_memalign(reinterpret_cast<void **>(
-                                            &new_values),
-                                          64,
-                                          sizeof(Number) * new_alloc_size);
-        values.reset(new_values);
-
-        if (new_alloc_size >= 4 * dealii::internal::VectorImplementation::
-                                    minimum_parallel_grain_size)
-          thread_loop_partitioner =
-            std::make_shared<parallel::internal::TBBPartitioner>();
-      }
-  }
-
-
 
   template <typename Number>
   void
   ReadWriteVector<Number>::reinit(const size_type size,
                                   const bool      omit_zeroing_entries)
   {
-    // check whether we need to reallocate
-    resize_val(size);
-
-    stored_elements = complete_index_set(size);
-    stored_elements.compress();
-
-    // set entries to zero if so requested
-    if (omit_zeroing_entries == false)
-      this->operator=(Number());
-
-    // reset the communication pattern
-    source_stored_elements.clear();
-    comm_pattern.reset();
+    reinit(complete_index_set(size), omit_zeroing_entries);
   }
 
 
@@ -266,7 +227,8 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::reinit(const ReadWriteVector<Number2> &v,
                                   const bool omit_zeroing_entries)
   {
-    resize_val(v.locally_owned_size());
+    thread_loop_partitioner = v.thread_loop_partitioner;
+    values.resize(v.locally_owned_size());
 
     stored_elements = v.get_stored_elements();
 
@@ -285,10 +247,10 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::reinit(const IndexSet &locally_stored_indices,
                                   const bool      omit_zeroing_entries)
   {
+    thread_loop_partitioner =
+      std::make_shared<parallel::internal::TBBPartitioner>();
     stored_elements = locally_stored_indices;
-
-    // set vector size and allocate memory
-    resize_val(stored_elements.n_elements());
+    values.resize(stored_elements.n_elements());
 
     // initialize to zero
     if (omit_zeroing_entries == false)
@@ -311,10 +273,7 @@ namespace LinearAlgebra
     // trilinos data but only if Number=double. Also update documentation that
     // the argument's lifetime needs to be longer then. If we do this, we need
     // to think about whether the view should be read/write.
-
-    stored_elements = IndexSet(trilinos_vec.trilinos_partitioner());
-
-    resize_val(stored_elements.n_elements());
+    reinit(IndexSet(trilinos_vec.trilinos_partitioner()), true);
 
     TrilinosScalar *start_ptr;
     int             leading_dimension;
@@ -322,11 +281,7 @@ namespace LinearAlgebra
                                                           &leading_dimension);
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
-    std::copy(start_ptr, start_ptr + leading_dimension, values.get());
-
-    // reset the communication pattern
-    source_stored_elements.clear();
-    comm_pattern.reset();
+    std::copy(start_ptr, start_ptr + leading_dimension, values.data());
   }
 #endif
 
@@ -360,7 +315,7 @@ namespace LinearAlgebra
     if (locally_owned_size() > 0)
       {
         dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
-          in_vector.values.get(), values.get());
+          in_vector.values.data(), values.data());
         dealii::internal::VectorOperations::parallel_for(
           copier, 0, locally_owned_size(), thread_loop_partitioner);
       }
@@ -382,7 +337,7 @@ namespace LinearAlgebra
     if (locally_owned_size() > 0)
       {
         dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
-          in_vector.values.get(), values.get());
+          in_vector.values.data(), values.data());
         dealii::internal::VectorOperations::parallel_for(
           copier, 0, locally_owned_size(), thread_loop_partitioner);
       }
@@ -404,7 +359,7 @@ namespace LinearAlgebra
     if (this_size > 0)
       {
         dealii::internal::VectorOperations::Vector_set<Number> setter(
-          Number(), values.get());
+          Number(), values.data());
         dealii::internal::VectorOperations::parallel_for(
           setter, 0, this_size, thread_loop_partitioner);
       }
@@ -739,7 +694,7 @@ namespace LinearAlgebra
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size == 0 || values.size() > 0,
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
@@ -754,7 +709,7 @@ namespace LinearAlgebra
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size == 0 || values.size() > 0,
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
@@ -769,7 +724,7 @@ namespace LinearAlgebra
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size == 0 || values.size() > 0,
                ExcInternalError("Import failed."));
 
         // To ensure that this code also compiles with complex
@@ -799,7 +754,7 @@ namespace LinearAlgebra
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
+        Assert(size == 0 || values.size() > 0,
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
@@ -895,7 +850,7 @@ namespace LinearAlgebra
     const unsigned int n_elements = stored_elements.n_elements();
     if (operation == VectorOperation::insert)
       {
-        cudaError_t error_code = cudaMemcpy(values.get(),
+        cudaError_t error_code = cudaMemcpy(values.data(),
                                             cuda_vec.get_values(),
                                             n_elements * sizeof(Number),
                                             cudaMemcpyDeviceToHost);

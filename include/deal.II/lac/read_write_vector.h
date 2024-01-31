@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
@@ -775,12 +776,6 @@ namespace LinearAlgebra
     unsigned int
     global_to_local(const types::global_dof_index global_index) const;
 
-    /**
-     * A helper function that is used to resize the val array.
-     */
-    void
-    resize_val(const size_type new_allocated_size);
-
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
@@ -818,10 +813,9 @@ namespace LinearAlgebra
     std::shared_ptr<Utilities::MPI::CommunicationPatternBase> comm_pattern;
 
     /**
-     * Pointer to the array of local elements of this vector.
+     * Locally stored elements.
      */
-    std::unique_ptr<Number[], /*decltype(std::free) * */ void (*)(void *)>
-      values;
+    AlignedVector<Number> values;
 
     /**
      * For parallel loops with TBB, this member variable stores the affinity
@@ -878,8 +872,6 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector()
-    : Subscriptor()
-    , values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -893,7 +885,6 @@ namespace LinearAlgebra
   inline ReadWriteVector<Number>::ReadWriteVector(
     const ReadWriteVector<Number> &v)
     : Subscriptor()
-    , values(nullptr, free)
   {
     this->operator=(v);
   }
@@ -902,8 +893,6 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(const size_type size)
-    : Subscriptor()
-    , values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -916,8 +905,6 @@ namespace LinearAlgebra
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(
     const IndexSet &locally_stored_indices)
-    : Subscriptor()
-    , values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -958,7 +945,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::begin()
   {
-    return values.get();
+    return values.begin();
   }
 
 
@@ -967,7 +954,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::begin() const
   {
-    return values.get();
+    return values.begin();
   }
 
 
@@ -976,7 +963,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::end()
   {
-    return values.get() + this->locally_owned_size();
+    return values.end();
   }
 
 
@@ -985,7 +972,7 @@ namespace LinearAlgebra
   inline typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::end() const
   {
-    return values.get() + this->locally_owned_size();
+    return values.end();
   }
 
 
