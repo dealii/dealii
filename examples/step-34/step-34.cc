@@ -505,7 +505,7 @@ namespace Step34
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     GridIn<dim - 1, dim> gi;

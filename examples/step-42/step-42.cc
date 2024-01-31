@@ -385,7 +385,7 @@ namespace Step42
             return 1000;
         }
 
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return 1e9; // an unreasonable value; ignored in debug mode because of the
                   // preceding Assert
     }
@@ -559,7 +559,7 @@ namespace Step42
             return z_surface + 0.999 - input_obstacle.get_value(p[0], p[1]);
         }
 
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return 1e9; // an unreasonable value; ignored in debug mode because of the
                   // preceding Assert
     }

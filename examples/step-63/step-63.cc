@@ -633,7 +633,7 @@ namespace Step63
               DoFRenumbering::random(dof_handler, level);
           }
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // The rest of the function just sets up data structures. The last

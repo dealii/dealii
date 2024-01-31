@@ -182,7 +182,7 @@ namespace Step46
           case 3:
             return std::sin(numbers::PI * p[0]) * std::sin(numbers::PI * p[1]);
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
     return 0;
@@ -306,7 +306,7 @@ namespace Step46
         else if (cell_is_in_solid_domain(cell))
           cell->set_active_fe_index(1);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 

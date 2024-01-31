@@ -193,7 +193,7 @@ namespace Step82
                          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_value;
   }
@@ -241,7 +241,7 @@ namespace Step82
           p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]) * p[2] * (1.0 - p[2]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_value;
   }
@@ -282,7 +282,7 @@ namespace Step82
           Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_gradient;
   }
@@ -339,7 +339,7 @@ namespace Step82
           Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return return_hessian;
   }
