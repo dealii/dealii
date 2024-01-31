@@ -33,7 +33,7 @@ namespace MGTransferGlobalCoarseningTools
         case PolynomialCoarseningSequenceType::go_to_one:
           return 1u;
         default:
-          Assert(false, StandardExceptions::ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 1u;
       }
   }
