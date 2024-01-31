@@ -514,8 +514,7 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   template <typename Dummy>
   std::enable_if_t<std::is_same_v<Dummy, Number> &&
@@ -569,26 +568,37 @@ namespace LinearAlgebra
 
     Tpetra::Vector<Number, int, types::signed_global_dof_index> target_vector(
       tpetra_export.getSourceMap());
-    target_vector.doImport(vector, tpetra_export, Tpetra::REPLACE);
 
-    const auto *new_values = target_vector.getData().get();
-    const auto  size       = target_vector.getLocalLength();
+    // Communicate the vector to the correct map.
+    // Remark: We use here doImport on an Export object since we have to use
+    //         the communication plan stored in the tpetra_comm_patern backward.
+    target_vector.doImport(vector, tpetra_export, Tpetra::INSERT);
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+    auto vector_2d = target_vector.template getLocalView<Kokkos::HostSpace>(
+      Tpetra::Access::ReadOnly);
+#  else
+    target_vector.template sync<Kokkos::HostSpace>();
+    auto vector_2d = target_vector.template getLocalView<Kokkos::HostSpace>();
+#  endif
+    auto new_values = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+    auto size       = target_vector.getLocalLength();
 
     using size_type = std::decay_t<decltype(size)>;
 
-    Assert(size == 0 || values != nullptr, ExcInternalError("Export failed."));
+    Assert(size == 0 || values != nullptr, ExcInternalError("Import failed."));
     AssertDimension(size, stored_elements.n_elements());
 
     switch (operation)
       {
         case VectorOperation::insert:
           for (size_type i = 0; i < size; ++i)
-            values[i] = new_values[i];
+            values[i] = new_values(i);
           break;
 
         case VectorOperation::add:
           for (size_type i = 0; i < size; ++i)
-            values[i] += new_values[i];
+            values[i] += new_values(i);
           break;
 
         case VectorOperation::min:
@@ -599,15 +609,15 @@ namespace LinearAlgebra
           for (size_type i = 0; i < size; ++i)
             {
               Assert(
-                std::imag(new_values[i]) == 0.,
+                std::imag(new_values(i)) == 0.,
                 ExcMessage(
                   "VectorOperation::min is not defined if there is an imaginary part!)"));
               Assert(
                 std::imag(values[i]) == 0.,
                 ExcMessage(
                   "VectorOperation::min is not defined if there is an imaginary part!)"));
-              if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
-                values[i] = new_values[i];
+              if (std::real(new_values(i)) - std::real(values[i]) < 0.0)
+                values[i] = new_values(i);
             }
           break;
 
@@ -615,15 +625,15 @@ namespace LinearAlgebra
           for (size_type i = 0; i < size; ++i)
             {
               Assert(
-                std::imag(new_values[i]) == 0.,
+                std::imag(new_values(i)) == 0.,
                 ExcMessage(
                   "VectorOperation::max is not defined if there is an imaginary part!)"));
               Assert(
                 std::imag(values[i]) == 0.,
                 ExcMessage(
                   "VectorOperation::max is not defined if there is an imaginary part!)"));
-              if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
-                values[i] = new_values[i];
+              if (std::real(new_values(i)) - std::real(values[i]) > 0.0)
+                values[i] = new_values(i);
             }
           break;
 
@@ -631,10 +641,11 @@ namespace LinearAlgebra
           AssertThrow(false, ExcNotImplemented());
       }
   }
-#  endif
+#endif
 
 
 
+#ifdef DEAL_II_WITH_TRILINOS
   template <typename Number>
   void
   ReadWriteVector<Number>::import_elements(
