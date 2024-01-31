@@ -1788,7 +1788,7 @@ namespace deal_II_exceptions
     __PRETTY_FUNCTION__,                                         \
     nullptr,                                                     \
     nullptr,                                                     \
-    ExcNotImplemented())
+    ::dealii::StandardExceptions::ExcNotImplemented())
 
 
 namespace deal_II_exceptions
