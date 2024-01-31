@@ -125,7 +125,8 @@ namespace LinearAlgebra
        *
        * @ingroup TpetraWrappers
        */
-      template <typename Number, typename MemorySpace>
+      template <typename Number,
+                typename MemorySpace = dealii::MemorySpace::Host>
       class VectorReference
       {
       private:
