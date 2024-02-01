@@ -1768,9 +1768,7 @@ namespace deal_II_exceptions
  * error in places where a piece of code is not yet implemented. If a code
  * runs into such a place, it will be aborted with an error message that
  * explains the situation, along with a backtrace of how the code ended
- * up in this place.
- *
- * Alternatively, if
+ * up in this place. Alternatively, if
  * deal_II_exceptions::internals::ExceptionHandling::abort_or_throw_on_exception
  * is set to ExceptionHandling::throw_on_exception, then the corresponding
  * error is thrown as a C++ exception that can be caught (though in
@@ -1778,6 +1776,32 @@ namespace deal_II_exceptions
  * to do).
  *
  * This macro is first used in step-8 of the tutorial.
+ *
+ * A typical case where it is used would look as follows: Assume that we want
+ * to implement a function that describes the right hand side of an equation
+ * that corresponds to a known solution (i.e., we want to use the "Method
+ * of manufactured solutions", see step-7). We have computed the right
+ * hand side that corresponds to the 1d and 2d solutions, but we have been
+ * too lazy so far to do the calculations for the 3d case, perhaps because
+ * we first want to test correctness in 1d and 2d before moving on to the 3d
+ * case. We could then write this right hand side as follows (the specific
+ * formulas in the `return` statements are not important):
+ * @code
+ *   template <int dim>
+ *   double right_hand_side (const Point<dim> &x)
+ *   {
+ *     if (dim==1)
+ *       return x[0]*std::sin(x[0]);
+ *     else if (dim==2)
+ *       return x[0]*std::sin(x[0])*std::sin(x[1];
+ *     else
+ *       DEAL_II_NOT_IMPLEMENTED();
+ *   }
+ * @endcode
+ * Here, the call to `DEAL_II_NOT_IMPLEMENTED()` simply indicates that we
+ * haven't gotten around to filling in this code block. If someone ends up
+ * running the program in 3d, execution will abort in the location with an
+ * error message that indicates where this happened and why.
  */
 #define DEAL_II_NOT_IMPLEMENTED()                                \
   ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
