@@ -109,35 +109,47 @@ namespace TriangulationDescription
          */
         void
         collect(
-          const std::vector<unsigned int>                   &relevant_processes,
+          const std::vector<unsigned int> &future_owners_of_locally_owned_cells,
           const std::vector<DescriptionTemp<dim, spacedim>> &description_temp,
           const MPI_Comm                                     comm,
           const bool vertices_have_unique_ids)
         {
+          // Use the some-to-some version of the consensus algorithm framework
+          // whereby we send requests to other processes that then deal with
+          // them but do not send anything back.
+          //
+          // Note that the input (description_temp) *may* contain an entry for
+          // the current process. As documented, the consensus algorithm will
+          // simply copy that into the output queue, i.e., it will call
+          // process_request() on it as well, and the data will simply come
+          // back out on the local process.
           const auto create_request = [&](const unsigned int other_rank) {
-            const auto ptr = std::find(relevant_processes.begin(),
-                                       relevant_processes.end(),
-                                       other_rank);
+            const auto ptr =
+              std::find(future_owners_of_locally_owned_cells.begin(),
+                        future_owners_of_locally_owned_cells.end(),
+                        other_rank);
 
-            Assert(ptr != relevant_processes.end(), ExcInternalError());
+            Assert(ptr != future_owners_of_locally_owned_cells.end(),
+                   ExcInternalError());
 
             const auto other_rank_index =
-              std::distance(relevant_processes.begin(), ptr);
+              std::distance(future_owners_of_locally_owned_cells.begin(), ptr);
 
             return description_temp[other_rank_index];
           };
 
           const auto process_request =
             [&](const unsigned int,
-                const DescriptionTemp<dim, spacedim> &request) {
-              this->merge(request, vertices_have_unique_ids);
-            };
+                const DescriptionTemp<dim, spacedim> &request) -> void {
+            this->merge(request, vertices_have_unique_ids);
+          };
 
           dealii::Utilities::MPI::ConsensusAlgorithms::selector<
-            DescriptionTemp<dim, spacedim>>(relevant_processes,
-                                            create_request,
-                                            process_request,
-                                            comm);
+            DescriptionTemp<dim, spacedim>>(
+            future_owners_of_locally_owned_cells,
+            create_request,
+            process_request,
+            comm);
         }
 
         /**
@@ -1013,27 +1025,66 @@ namespace TriangulationDescription
                                                        settings_in);
         }
 
+      // Update partitioner ghost elements because we will later want
+      // to ask also about the future owners of ghost cells.
       partition.update_ghost_values();
-
       for (const auto &partition : partitions_mg)
         partition.update_ghost_values();
 
-      // 1) determine processes owning locally owned cells
-      const std::vector<unsigned int> relevant_processes = [&]() {
-        std::set<unsigned int> relevant_processes;
+      // 1) Determine process ids that appear on locally owned cells. Create
+      //    a sorted vector by first creating a std::set and then copying
+      //    the result. (Note that we get only locally *owned* cells in
+      //    the output because we only loop over the locally *owned*
+      //    entries of the partitioning vector, even though
+      //    'partition.local_element(i)' could also return locally relevant
+      //    elements if 'i' were to exceed the number of locally owned
+      //    elements.)
+      const std::vector<unsigned int> future_owners_of_locally_owned_cells =
+        [&partition, &partitions_mg]() {
+          std::set<unsigned int> relevant_process_set;
 
-        for (unsigned int i = 0; i < partition.locally_owned_size(); ++i)
-          relevant_processes.insert(
-            static_cast<unsigned int>(partition.local_element(i)));
+          const unsigned int n_mpi_ranks =
+            dealii::Utilities::MPI::n_mpi_processes(
+              partition.get_mpi_communicator());
+          (void)n_mpi_ranks;
 
-        for (const auto &partition : partitions_mg)
           for (unsigned int i = 0; i < partition.locally_owned_size(); ++i)
-            relevant_processes.insert(
-              static_cast<unsigned int>(partition.local_element(i)));
+            {
+              Assert(static_cast<unsigned int>(partition.local_element(i)) ==
+                       partition.local_element(i),
+                     ExcMessage(
+                       "The elements of a partition vector must be integers."));
+              Assert(
+                partition.local_element(i) < n_mpi_ranks,
+                ExcMessage(
+                  "The elements of a partition vector must be between zero "
+                  "and the number of processes in the communicator "
+                  "to be used for partitioning the triangulation."));
+              relevant_process_set.insert(
+                static_cast<unsigned int>(partition.local_element(i)));
+            }
 
-        return std::vector<unsigned int>(relevant_processes.begin(),
-                                         relevant_processes.end());
-      }();
+          for (const auto &partition : partitions_mg)
+            for (unsigned int i = 0; i < partition.locally_owned_size(); ++i)
+              {
+                Assert(
+                  static_cast<unsigned int>(partition.local_element(i)) ==
+                    partition.local_element(i),
+                  ExcMessage(
+                    "The elements of a partition vector must be integers."));
+                Assert(
+                  partition.local_element(i) < n_mpi_ranks,
+                  ExcMessage(
+                    "The elements of a partition vector must be between zero "
+                    "and the number of processes in the communicator "
+                    "to be used for partitioning the triangulation."));
+                relevant_process_set.insert(
+                  static_cast<unsigned int>(partition.local_element(i)));
+              }
+
+          return std::vector<unsigned int>(relevant_process_set.begin(),
+                                           relevant_process_set.end());
+        }();
 
       const bool construct_multigrid = (partitions_mg.size() > 0);
 
@@ -1044,7 +1095,11 @@ namespace TriangulationDescription
                              construct_multigrid_hierarchy) :
            settings_in);
 
-      const auto subdomain_id_function =
+
+      // Set up a function that returns the future owner rank for a cell.
+      // Same then also for the level owner. These functions work for
+      // locally owned and ghost cells.
+      const auto cell_to_future_owner =
         [&partition](const auto &cell) -> types::subdomain_id {
         if ((cell->is_active() && (cell->is_artificial() == false)))
           return static_cast<types::subdomain_id>(
@@ -1053,7 +1108,7 @@ namespace TriangulationDescription
           return numbers::artificial_subdomain_id;
       };
 
-      const auto level_subdomain_id_function =
+      const auto mg_cell_to_future_owner =
         [&construct_multigrid,
          &partitions_mg](const auto &cell) -> types::subdomain_id {
         if (construct_multigrid && (cell->is_artificial_on_level() == false))
@@ -1063,10 +1118,13 @@ namespace TriangulationDescription
           return numbers::artificial_subdomain_id;
       };
 
-      // create a description (locally owned cell and a layer of ghost cells
-      // and all their parents)
+      // Create a description (locally owned cell and a layer of ghost cells
+      // and all their parents). We first create a description in the
+      // 'temporary' format (using class DescriptionTemp), which we will
+      // later convert to its final form.
       std::vector<DescriptionTemp<dim, spacedim>> descriptions_per_rank;
-      descriptions_per_rank.reserve(relevant_processes.size());
+      descriptions_per_rank.reserve(
+        future_owners_of_locally_owned_cells.size());
 
       std::map<unsigned int, std::vector<unsigned int>>
                                            coinciding_vertex_groups;
@@ -1075,23 +1133,23 @@ namespace TriangulationDescription
                                              coinciding_vertex_groups,
                                              vertex_to_coinciding_vertex_group);
 
-      for (const auto rank : relevant_processes)
+      for (const auto rank : future_owners_of_locally_owned_cells)
         descriptions_per_rank.emplace_back(
           create_description_for_rank<DescriptionTemp<dim, spacedim>>(
             tria,
-            subdomain_id_function,
-            level_subdomain_id_function,
+            cell_to_future_owner,
+            mg_cell_to_future_owner,
             coinciding_vertex_groups,
             vertex_to_coinciding_vertex_group,
             tria.get_communicator(),
             rank,
             settings));
 
-      // collect description from all processes that used to own locally-owned
+      // Collect description from all processes that used to own locally-owned
       // active cells of this process in a single description
       DescriptionTemp<dim, spacedim> description_merged;
       description_merged.collect(
-        relevant_processes,
+        future_owners_of_locally_owned_cells,
         descriptions_per_rank,
         partition.get_mpi_communicator(),
         dynamic_cast<
