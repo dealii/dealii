@@ -451,7 +451,7 @@ private:
 
 
 /**
- * The namespace collects convenience functions to setup
+ * The namespace collects convenience functions to set up
  * FERemoteEvaluationCommunicator for typical use cases.
  */
 namespace Utilities
@@ -461,10 +461,12 @@ namespace Utilities
    * point-to-point interpolation.
    *
    * @param[in] matrix_free MatrixFree object that is used to distribute
-   * quadrature points at non-matching faces.
+   * quadrature points at non-matching faces. In case of point-to-point
+   * interpolation standard quadrature rules are used on faces that are
+   * connected to non-matching interfaces.
    * @param[in] non_matching_faces_marked_vertices A vector of boundary face IDs
    * that relate to non-matching interfaces. Each boundary face ID is
-   * accompanied by a lambda that marks the vertices of cells which are
+   * accompanied by a lambda function that marks the vertices of cells to be
    * considered during the search of remote points (quadrature points of faces
    * with given boundary face ID).
    * @param[in] quad_no Quadrature number in @p matrix_free.
@@ -475,7 +477,7 @@ namespace Utilities
             typename Number,
             typename VectorizedArrayType = VectorizedArray<Number>>
   FERemoteEvaluationCommunicator<dim>
-  setup_remote_communicator_faces_point_to_point_interpolation(
+  compute_remote_communicator_faces_point_to_point_interpolation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
@@ -490,16 +492,17 @@ namespace Utilities
    * A factory function for the FERemoteEvaluationCommunicator in the case of
    * Nitsche-type mortaring.
    *
-   * @param[in] matrix_free MatrixFree object that is used to distribute
+   * @param[in] matrix_free MatrixFree object that holds the DoFHandler,
+   * associated with the non-matching grid.
    * @param[in] non_matching_faces_marked_vertices A vector of boundary face IDs
    * that relate to non-matching interfaces. Each boundary face ID is
-   * accompanied by a lambda that marks the vertices of cells which are
+   * accompanied by a lambda function that marks the vertices of cells to be
    * considered during the process of computing intersections.
    * @param[in] n_q_pnts_1D The number of 1D quadrature points per intersection.
    * @param[in] dof_no DoFHandler number in @p matrix_free.
    * distributed to each intersection (given for one coordinate direction).
    * @param[in] nm_mapping_info In case nm_mapping_info is not a `nullptr` it is
-   * setup for cell based loops, such that it can be used in combination with
+   * set up for cell based loops, such that it can be used in combination with
    * FERemoteEvaluation.
    * @param[in] tolerance Tolerance to find intersections.
    */
@@ -507,7 +510,7 @@ namespace Utilities
             typename Number,
             typename VectorizedArrayType = VectorizedArray<Number>>
   FERemoteEvaluationCommunicator<dim>
-  setup_remote_communicator_faces_nitsche_type_mortaring(
+  compute_remote_communicator_faces_nitsche_type_mortaring(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
@@ -537,7 +540,7 @@ class FERemoteEvaluation
 public:
   /**
    * The constructor needs a corresponding FERemoteEvaluationCommunicator
-   * which has to be setup outside of this class. This design choice is
+   * which has to be set up outside of this class. This design choice is
    * motivated since the same FERemoteEvaluationCommunicator can be used
    * for different MeshTypes and number of components.
    *
@@ -1077,7 +1080,7 @@ namespace Utilities
 {
   template <int dim, typename Number, typename VectorizedArrayType>
   FERemoteEvaluationCommunicator<dim>
-  setup_remote_communicator_faces_point_to_point_interpolation(
+  compute_remote_communicator_faces_point_to_point_interpolation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
@@ -1137,8 +1140,8 @@ namespace Utilities
         // Points that are searched by rpe.
         std::vector<Point<dim>> points;
 
-        // Temporarily setup FEFaceEvaluation to access the quadrature points at
-        // the faces on the non-matching interface.
+        // Temporarily set up FEFaceEvaluation to access the quadrature points
+        // at the faces on the non-matching interface.
         FEFaceEvaluation<dim, -1, 0, 1, Number> phi(matrix_free,
                                                     true,
                                                     dof_no,
@@ -1217,7 +1220,7 @@ namespace Utilities
 
   template <int dim, typename Number, typename VectorizedArrayType>
   FERemoteEvaluationCommunicator<dim>
-  setup_remote_communicator_faces_nitsche_type_mortaring(
+  compute_remote_communicator_faces_nitsche_type_mortaring(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
     const std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
@@ -1299,7 +1302,7 @@ namespace Utilities
         // 2) Create RPE.
         // In the Nitsche-type case we do not collect points for the setup
         // of RemotePointEvaluation. Instead we compute intersections between
-        // the faces and setup RemotePointEvaluation with the computed
+        // the faces and set up RemotePointEvaluation with the computed
         // intersections.
 
         // Build intersection requests. Intersection requests
