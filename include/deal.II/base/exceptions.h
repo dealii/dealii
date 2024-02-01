@@ -1815,6 +1815,86 @@ namespace deal_II_exceptions
     ::dealii::StandardExceptions::ExcNotImplemented())
 
 
+/**
+ * `DEAL_II_ASSERT_UNREACHABLE` is a macro (that looks like a function call
+ * when used as in `DEAL_II_ASSERT_UNREACHABLE();`) that is used to raise an
+ * error in places where the programmer believed that execution should
+ * never get to. If a code
+ * runs into such a place, it will be aborted with an error message that
+ * explains the situation, along with a backtrace of how the code ended
+ * up in this place. Alternatively, if
+ * deal_II_exceptions::internals::ExceptionHandling::abort_or_throw_on_exception
+ * is set to ExceptionHandling::throw_on_exception, then the corresponding
+ * error is thrown as a C++ exception that can be caught (though in
+ * many cases codes will then find it difficult to do what they wanted
+ * to do).
+ *
+ * A typical case where it is used would look as follows. In many cases,
+ * one has a finite enumeration of things that can happen, and one runs
+ * through those in a sequence of `if`-`else` blocks, or perhaps
+ * with a `switch` selection and a number of `case` statements. Of
+ * course, if the code is correct, if all possible cases are handled,
+ * nothing terrible can happen -- though perhaps it is worth making sure
+ * that we have really covered all cases by using `DEAL_II_ASSERT_UNREACHABLE()`
+ * as the *last* case. Here is an example:
+ * @code
+ *   enum OutputFormat { vtk, vtu };
+ *
+ *   void write_output (const OutputFormat format)
+ *   {
+ *     if (format == vtk)
+ *       {
+ *         ... write in VTK format ...
+ *       }
+ *     else // must not clearly be VTU format
+ *       {
+ *         ... write in VTU format ...
+ *       }
+ *   }
+ * @endcode
+ * The issue here is "Are we really sure it is VTU format if we end up in
+ * the `else` block"? There are two reasons that should make us suspicious.
+ * First, the authors of the code may later have expanded the list of options
+ * in the `OutputFormat` enum, but forgotten to also update the
+ * `write_output()` function. We may then end up in the `else` branch even
+ * though the argument indicates the now possible third option that was added
+ * to `OutputFormat`. The second possibility to consider is that enums are
+ * really just fancy ways of using integers; from a language perspective, it
+ * is allowed to pass *any* integer to `write_output()`, even values that do
+ * not match either `vtk` or `vtu`. This is then clearly a bug in the program,
+ * but one that we are better off if we catch it as early as possible.
+ *
+ * We can guard against both cases by writing the code as follows instead:
+ * @code
+ *   enum OutputFormat { vtk, vtu };
+ *
+ *   void write_output (const OutputFormat format)
+ *   {
+ *     if (format == vtk)
+ *       {
+ *         ... write in VTK format ...
+ *       }
+ *     else if (format == vtu)
+ *       {
+ *         ... write in VTU format ...
+ *       }
+ *     else // we shouldn't get here, but if we did, abort the program now!
+ *       DEAL_II_ASSERT_UNREACHABLE();
+ *   }
+ * @endcode
+ */
+#define DEAL_II_ASSERT_UNREACHABLE()                             \
+  ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+    ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+      abort_or_throw_on_exception,                               \
+    __FILE__,                                                    \
+    __LINE__,                                                    \
+    __PRETTY_FUNCTION__,                                         \
+    nullptr,                                                     \
+    nullptr,                                                     \
+    ::dealii::StandardExceptions::ExcInternalError())
+
+
 namespace deal_II_exceptions
 {
   namespace internals
