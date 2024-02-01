@@ -19,12 +19,16 @@
 
 #include <deal.II/base/mpi_remote_point_evaluation.h>
 
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
+
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/fe_point_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
+#include <algorithm>
 #include <variant>
 
 DEAL_II_NAMESPACE_OPEN
@@ -447,6 +451,79 @@ private:
 
 
 /**
+ * The namespace collects convenience functions to set up
+ * FERemoteEvaluationCommunicator for typical use cases.
+ */
+namespace Utilities
+{
+  /**
+   * A factory function for the FERemoteEvaluationCommunicator in the case of
+   * point-to-point interpolation.
+   *
+   * @param[in] matrix_free MatrixFree object that is used to distribute
+   * quadrature points at non-matching faces. In case of point-to-point
+   * interpolation standard quadrature rules are used on faces that are
+   * connected to non-matching interfaces.
+   * @param[in] non_matching_faces_marked_vertices A vector of boundary face IDs
+   * that relate to non-matching interfaces. Each boundary face ID is
+   * accompanied by a lambda function that marks the vertices of cells to be
+   * considered during the search of remote points (quadrature points of faces
+   * with given boundary face ID).
+   * @param[in] quad_no Quadrature number in @p matrix_free.
+   * @param[in] dof_no DoFHandler number in @p matrix_free.
+   * @param[in] tolerance Tolerance to find remote points.
+   */
+  template <int dim,
+            typename Number,
+            typename VectorizedArrayType = VectorizedArray<Number>>
+  FERemoteEvaluationCommunicator<dim>
+  compute_remote_communicator_faces_point_to_point_interpolation(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const std::vector<
+      std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
+                      &non_matching_faces_marked_vertices,
+    const unsigned int quad_no   = 0,
+    const unsigned int dof_no    = 0,
+    const double       tolerance = 1e-9);
+
+
+
+  /**
+   * A factory function for the FERemoteEvaluationCommunicator in the case of
+   * Nitsche-type mortaring.
+   *
+   * @param[in] matrix_free MatrixFree object that holds the DoFHandler,
+   * associated with the non-matching grid.
+   * @param[in] non_matching_faces_marked_vertices A vector of boundary face IDs
+   * that relate to non-matching interfaces. Each boundary face ID is
+   * accompanied by a lambda function that marks the vertices of cells to be
+   * considered during the process of computing intersections.
+   * @param[in] n_q_pnts_1D The number of 1D quadrature points per intersection.
+   * @param[in] dof_no DoFHandler number in @p matrix_free.
+   * distributed to each intersection (given for one coordinate direction).
+   * @param[in] nm_mapping_info In case nm_mapping_info is not a `nullptr` it is
+   * set up for cell based loops, such that it can be used in combination with
+   * FERemoteEvaluation.
+   * @param[in] tolerance Tolerance to find intersections.
+   */
+  template <int dim,
+            typename Number,
+            typename VectorizedArrayType = VectorizedArray<Number>>
+  FERemoteEvaluationCommunicator<dim>
+  compute_remote_communicator_faces_nitsche_type_mortaring(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const std::vector<
+      std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
+                      &non_matching_faces_marked_vertices,
+    const unsigned int n_q_pnts_1D,
+    const unsigned int dof_no                                   = 0,
+    NonMatching::MappingInfo<dim, dim, Number> *nm_mapping_info = nullptr,
+    const double                                tolerance       = 1e-9);
+} // namespace Utilities
+
+
+
+/**
  * Class to access data in a matrix-free loop for non-matching discretizations.
  * Interfaces are named with FEEvaluation in mind.
  * The main difference is, that `gather_evaluate()` updates and caches
@@ -463,7 +540,7 @@ class FERemoteEvaluation
 public:
   /**
    * The constructor needs a corresponding FERemoteEvaluationCommunicator
-   * which has to be setup outside of this class. This design choice is
+   * which has to be set up outside of this class. This design choice is
    * motivated since the same FERemoteEvaluationCommunicator can be used
    * for different MeshTypes and number of components.
    *
@@ -996,6 +1073,373 @@ FERemoteEvaluationCommunicator<dim>::CopyInstructions::copy_data_entries(
          ExcMessage(
            "copy_data_entries() not implemented for given arguments."));
 }
+
+
+
+namespace Utilities
+{
+  template <int dim, typename Number, typename VectorizedArrayType>
+  FERemoteEvaluationCommunicator<dim>
+  compute_remote_communicator_faces_point_to_point_interpolation(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const std::vector<
+      std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
+                      &non_matching_faces_marked_vertices,
+    const unsigned int quad_no,
+    const unsigned int dof_no,
+    const double       tolerance)
+  {
+    const auto &dof_handler = matrix_free.get_dof_handler(dof_no);
+    const auto &tria        = dof_handler.get_triangulation();
+    const auto &mapping     = *matrix_free.get_mapping_info().mapping;
+
+    // Communication objects know about the communication pattern. I.e.,
+    // they know about the cells and quadrature points that have to be
+    // evaluated at remote faces. This information is given via
+    // RemotePointEvaluation. Additionally, the communication objects
+    // have to be able to match the quadrature points of the remote
+    // points (that provide exterior information) to the quadrature points
+    // defined at the interior cell. In case of point-to-point interpolation
+    // a vector of pairs with face batch Ids and the number of faces in the
+    // batch is needed. @c FERemoteCommunicationObjectEntityBatches
+    // is a container to store this information.
+    //
+    // We need multiple communication objects (one for each non-matching face
+    // ID).
+    std::vector<FERemoteCommunicationObjectEntityBatches<dim>> comm_objects;
+
+    // Additionally to the communication objects we need a vector
+    // that stores quadrature rules for every face batch.
+    // The quadrature can be empty in case of non non-matching faces,
+    // i.e. boundary faces. Internally this information is needed to correctly
+    // access values over multiple communication objects.
+    std::vector<Quadrature<dim>> global_quadrature_vector(
+      matrix_free.n_boundary_face_batches());
+
+    // Get the range of face batches we have to look at during construction of
+    // the communication objects. We only have to look at boundary faces.
+    const auto face_batch_range =
+      std::make_pair(matrix_free.n_inner_face_batches(),
+                     matrix_free.n_inner_face_batches() +
+                       matrix_free.n_boundary_face_batches());
+
+    // Iterate over all non-matching face IDs.
+    for (const auto &[nm_face, marked_vertices] :
+         non_matching_faces_marked_vertices)
+      {
+        // Construct the communication object for every face ID:
+        // 1) RemotePointEvaluation with user specified function for marked
+        // vertices.
+        auto rpe = std::make_shared<Utilities::MPI::RemotePointEvaluation<dim>>(
+          tolerance, false, 0, marked_vertices);
+
+        // 2) Face batch IDs and number of faces in batch.
+        std::vector<std::pair<unsigned int, unsigned int>>
+          face_batch_id_n_faces;
+
+        // Points that are searched by rpe.
+        std::vector<Point<dim>> points;
+
+        // Temporarily set up FEFaceEvaluation to access the quadrature points
+        // at the faces on the non-matching interface.
+        FEFaceEvaluation<dim, -1, 0, 1, Number> phi(matrix_free,
+                                                    true,
+                                                    dof_no,
+                                                    quad_no);
+
+        // Iterate over the boundary faces.
+        for (unsigned int bface = 0;
+             bface < face_batch_range.second - face_batch_range.first;
+             ++bface)
+          {
+            const unsigned int face = face_batch_range.first + bface;
+
+            if (matrix_free.get_boundary_id(face) == nm_face)
+              {
+                phi.reinit(face);
+
+                // If @c face is on the current side of the non-matching
+                // interface. Add the face batch ID and the number of faces in
+                // the batch to the corresponding data structure.
+                const unsigned int n_faces =
+                  matrix_free.n_active_entries_per_face_batch(face);
+                face_batch_id_n_faces.emplace_back(
+                  std::make_pair(face, n_faces));
+
+                // Append the quadrature points to the points we need to search
+                // for.
+                for (unsigned int v = 0; v < n_faces; ++v)
+                  {
+                    for (unsigned int q : phi.quadrature_point_indices())
+                      {
+                        const auto point = phi.quadrature_point(q);
+                        Point<dim> temp;
+                        for (unsigned int i = 0; i < dim; ++i)
+                          temp[i] = point[i][v];
+
+                        points.push_back(temp);
+                      }
+                  }
+
+                // Insert a quadrature rule of correct size into the global
+                // quadrature vector. First check that each face is only
+                // considered once.
+                Assert(global_quadrature_vector[bface].size() == 0,
+                       ExcMessage(
+                         "Quadrature for given face already provided."));
+
+                global_quadrature_vector[bface] =
+                  Quadrature<dim>(phi.n_q_points);
+              }
+          }
+
+        // Reinit RPE and ensure all points are found.
+        rpe->reinit(points, tria, mapping);
+        Assert(rpe->all_points_found(),
+               ExcMessage("Not all remote points found."));
+
+        // Add communication object to the list of objects.
+        FERemoteCommunicationObjectEntityBatches<dim> co;
+        co.batch_id_n_entities = face_batch_id_n_faces;
+        co.rpe                 = rpe;
+        comm_objects.push_back(co);
+      }
+
+    // Reinit the communicator `FERemoteEvaluationCommunicator`
+    // with the communication objects.
+    FERemoteEvaluationCommunicator<dim> remote_communicator;
+
+    remote_communicator.reinit_faces(comm_objects,
+                                     face_batch_range,
+                                     global_quadrature_vector);
+
+    return remote_communicator;
+  }
+
+
+
+  template <int dim, typename Number, typename VectorizedArrayType>
+  FERemoteEvaluationCommunicator<dim>
+  compute_remote_communicator_faces_nitsche_type_mortaring(
+    const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+    const std::vector<
+      std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
+                      &non_matching_faces_marked_vertices,
+    const unsigned int n_q_pnts_1D,
+    const unsigned int dof_no,
+    NonMatching::MappingInfo<dim, dim, Number> *nm_mapping_info,
+    const double                                tolerance)
+  {
+    const auto &dof_handler = matrix_free.get_dof_handler(dof_no);
+    const auto &tria        = dof_handler.get_triangulation();
+    const auto &mapping     = *matrix_free.get_mapping_info().mapping;
+
+    constexpr unsigned int n_lanes = VectorizedArray<Number>::size();
+
+    std::pair<unsigned int, unsigned int> face_range =
+      std::make_pair(matrix_free.n_inner_face_batches(),
+                     matrix_free.n_inner_face_batches() +
+                       matrix_free.n_boundary_face_batches());
+
+    std::vector<Quadrature<dim - 1>> global_quadrature_vector(
+      (matrix_free.n_inner_face_batches() +
+       matrix_free.n_boundary_face_batches()) *
+      n_lanes);
+
+    // In case of Nitsche-type mortaring a vector of face indices is
+    // needed as communication object.
+    // @c FERemoteCommunicationObjectFaces is a container to store this
+    // information.
+    //
+    // We need multiple communication objects (one for each non-matching face
+    // ID).
+    std::vector<FERemoteCommunicationObject<dim>> comm_objects;
+
+    // Create bounding boxes and GridTools::Cache which is needed in
+    // the following loop.
+    std::vector<BoundingBox<dim>> local_boxes;
+    for (const auto &cell : tria.active_cell_iterators())
+      if (cell->is_locally_owned())
+        local_boxes.emplace_back(mapping.get_bounding_box(cell));
+
+    // Create r-tree of bounding boxes
+    const auto local_tree = pack_rtree(local_boxes);
+
+    // Compress r-tree to a minimal set of bounding boxes
+    std::vector<std::vector<BoundingBox<dim>>> global_bboxes(1);
+    global_bboxes[0] = extract_rtree_level(local_tree, 0);
+
+    const GridTools::Cache<dim, dim> cache(tria, mapping);
+
+    // Iterate over all sides of the non-matching interface.
+    for (const auto &[nm_face, marked_vertices] :
+         non_matching_faces_marked_vertices)
+      {
+        // 1) compute cell face pairs
+        std::vector<
+          std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>>
+          cell_face_pairs;
+
+        std::vector<unsigned int> indices;
+
+        for (unsigned int face = face_range.first; face < face_range.second;
+             ++face)
+          {
+            if (matrix_free.get_boundary_id(face) == nm_face)
+              {
+                for (unsigned int v = 0;
+                     v < matrix_free.n_active_entries_per_face_batch(face);
+                     ++v)
+                  {
+                    const auto &[c, f] = matrix_free.get_face_iterator(face, v);
+
+                    cell_face_pairs.emplace_back(std::make_pair(c, f));
+                    indices.push_back(face * n_lanes + v);
+                  }
+              }
+          }
+
+        // 2) Create RPE.
+        // In the Nitsche-type case we do not collect points for the setup
+        // of RemotePointEvaluation. Instead we compute intersections between
+        // the faces and set up RemotePointEvaluation with the computed
+        // intersections.
+
+        // Build intersection requests. Intersection requests
+        // correspond to vertices at faces.
+        std::vector<std::vector<Point<dim>>> intersection_requests;
+        for (const auto &[cell, f] : cell_face_pairs)
+          {
+            std::vector<Point<dim>> vertices(cell->face(f)->n_vertices());
+            std::copy_n(mapping.get_vertices(cell, f).begin(),
+                        cell->face(f)->n_vertices(),
+                        vertices.begin());
+            intersection_requests.emplace_back(vertices);
+          }
+
+        // Compute intersection data with user specified function for marked
+        // vertices.
+        auto intersection_data =
+          GridTools::internal::distributed_compute_intersection_locations<
+            dim - 1>(cache,
+                     intersection_requests,
+                     global_bboxes,
+                     marked_vertices(),
+                     tolerance);
+
+        // Convert to RPE.
+        std::vector<Quadrature<dim>> mapped_quadratures_recv_comp;
+
+        auto rpe =
+          std::make_shared<Utilities::MPI::RemotePointEvaluation<dim>>();
+        rpe->reinit(
+          intersection_data
+            .template convert_to_distributed_compute_point_locations_internal<
+              dim>(n_q_pnts_1D, tria, mapping, &mapped_quadratures_recv_comp),
+          tria,
+          mapping);
+
+        // 3) Fill global quadrature vector.
+        for (unsigned int i = 0; i < intersection_requests.size(); ++i)
+          {
+            const auto idx = indices[i];
+
+            // We do not use a structural binding here, since with
+            // C++17 caputuring structural bindings in lambdas leads
+            // to an ill formed program.
+            const auto &cell = std::get<0>(cell_face_pairs[i]);
+            const auto &f    = std::get<1>(cell_face_pairs[i]);
+
+            std::vector<Point<dim - 1>> q_points;
+            std::vector<double>         weights;
+            for (unsigned int ptr = intersection_data.recv_ptrs[i];
+                 ptr < intersection_data.recv_ptrs[i + 1];
+                 ++ptr)
+              {
+                const auto &quad = mapped_quadratures_recv_comp[ptr];
+
+                const auto &ps = quad.get_points();
+                std::transform(
+                  ps.begin(),
+                  ps.end(),
+                  std::back_inserter(q_points),
+                  [&](const Point<dim> &p) {
+                    return mapping.project_real_point_to_unit_point_on_face(
+                      cell, f, p);
+                  });
+
+                const auto &ws = quad.get_weights();
+                weights.insert(weights.end(), ws.begin(), ws.end());
+              }
+            Quadrature<dim - 1> quad(q_points, weights);
+
+            Assert(global_quadrature_vector[idx].size() == 0,
+                   ExcMessage("Quadrature for given face already provided."));
+
+            global_quadrature_vector[idx] = quad;
+          }
+
+        // Add communication object.
+        FERemoteCommunicationObject<dim> co;
+        co.indices = indices;
+        co.rpe     = rpe;
+        comm_objects.push_back(co);
+      }
+
+    // Reinit the communicator with the communication objects.
+    FERemoteEvaluationCommunicator<dim> remote_communicator;
+
+    remote_communicator.reinit_faces(
+      comm_objects,
+      std::make_pair(0, global_quadrature_vector.size()),
+      global_quadrature_vector);
+
+    if (nm_mapping_info != nullptr)
+      {
+        std::vector<
+          std::pair<typename DoFHandler<dim>::cell_iterator, unsigned int>>
+          vector_face_accessors;
+        vector_face_accessors.reserve((matrix_free.n_inner_face_batches() +
+                                       matrix_free.n_boundary_face_batches()) *
+                                      n_lanes);
+
+        // fill container for inner face batches
+        unsigned int face_batch = 0;
+        for (; face_batch < matrix_free.n_inner_face_batches(); ++face_batch)
+          {
+            for (unsigned int v = 0; v < n_lanes; ++v)
+              {
+                if (v < matrix_free.n_active_entries_per_face_batch(face_batch))
+                  vector_face_accessors.push_back(
+                    matrix_free.get_face_iterator(face_batch, v));
+                else
+                  vector_face_accessors.push_back(
+                    matrix_free.get_face_iterator(face_batch, 0));
+              }
+          }
+        // and boundary face batches
+        for (; face_batch < (matrix_free.n_inner_face_batches() +
+                             matrix_free.n_boundary_face_batches());
+             ++face_batch)
+          {
+            for (unsigned int v = 0; v < n_lanes; ++v)
+              {
+                if (v < matrix_free.n_active_entries_per_face_batch(face_batch))
+                  vector_face_accessors.push_back(
+                    matrix_free.get_face_iterator(face_batch, v));
+                else
+                  vector_face_accessors.push_back(
+                    matrix_free.get_face_iterator(face_batch, 0));
+              }
+          }
+
+        nm_mapping_info->reinit_faces(vector_face_accessors,
+                                      global_quadrature_vector);
+      }
+
+    return remote_communicator;
+  }
+} // namespace Utilities
 
 
 
