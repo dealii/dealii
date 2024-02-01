@@ -784,9 +784,10 @@ namespace concepts
         true;
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     inline constexpr bool is_dealii_vector_type<
-      dealii::LinearAlgebra::TpetraWrappers::Vector<Number>> = true;
+      dealii::LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>> =
+      true;
 #    endif
 #  endif
 
