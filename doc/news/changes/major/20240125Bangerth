@@ -6,4 +6,8 @@ the old way of indicating such a thing (namely, writing
 `Assert(false, ExcNotImplemented());`, the error is raised even in
 release mode.
 <br>
+Similarly, there is now also `DEAL_II_ASSERT_UNREACHABLE()` that is used
+in places that control flow really should not reach, but where it is
+best to abort a program if it does.
+<br>
 (Wolfgang Bangerth, 2024/01/24)
