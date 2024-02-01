@@ -1537,6 +1537,7 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   AssertIndexRange(i, dim);
+  DEAL_II_CXX23_ASSUME(i < dim);
 
   return values[i];
 }
@@ -1550,6 +1551,7 @@ constexpr DEAL_II_ALWAYS_INLINE
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   AssertIndexRange(i, dim);
+  DEAL_II_CXX23_ASSUME(i < dim);
 
   return values[i];
 }
