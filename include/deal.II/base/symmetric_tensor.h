@@ -304,7 +304,7 @@ namespace internal
                     previous_indices[2],
                     new_index};
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             return {};
         }
     }
@@ -2067,7 +2067,7 @@ namespace internal
                     return dim + c;
 
               // should never get here:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
               return 0;
             }
         }
@@ -2543,7 +2543,7 @@ namespace internal
                   return {d, e};
 
             // should never get here:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             return {0, 0};
         }
     }

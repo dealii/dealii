@@ -152,7 +152,7 @@ PersistentTriangulation<dim, spacedim>::create_triangulation(
 {
   (void)construction_data;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

@@ -2284,7 +2284,7 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
     }
 
   // we should not have gotten here
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return false;
 }
 

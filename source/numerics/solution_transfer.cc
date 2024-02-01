@@ -579,7 +579,7 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(
             }
           // undefined status
           else
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
     }
 

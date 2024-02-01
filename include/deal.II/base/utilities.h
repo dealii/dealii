@@ -1105,7 +1105,7 @@ namespace Utilities
                   // somehow? that
                   // shouldn't have
                   // happened
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
 
@@ -1179,7 +1179,7 @@ namespace Utilities
                                                   std::vector<char> &)
     {
       // We shouldn't get here:
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -1269,7 +1269,7 @@ namespace Utilities
       T &)
     {
       // We shouldn't get here:
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 

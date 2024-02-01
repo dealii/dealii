@@ -706,7 +706,7 @@ namespace
         return changed_grid;
       }
 
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return false;
   }
 
@@ -1164,7 +1164,7 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags()
   , wakeup_level_to_build_grid(0)
   , sleep_level_to_delete_grid(0)
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

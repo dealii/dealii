@@ -521,7 +521,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                             cells[i].manifold_id =
                               static_cast<types::manifold_id>(id);
                           else
-                            Assert(false, ExcInternalError());
+                            DEAL_II_ASSERT_UNREACHABLE();
                         }
 
                       if (dim == 3)
@@ -537,7 +537,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                 boundary_quad.manifold_id =
                                   static_cast<types::manifold_id>(id);
                               else
-                                Assert(false, ExcInternalError());
+                                DEAL_II_ASSERT_UNREACHABLE();
                             }
                           for (auto &boundary_line : subcelldata.boundary_lines)
                             {
@@ -550,7 +550,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                 boundary_line.manifold_id =
                                   static_cast<types::manifold_id>(id);
                               else
-                                Assert(false, ExcInternalError());
+                                DEAL_II_ASSERT_UNREACHABLE();
                             }
                         }
                       else if (dim == 2)
@@ -566,7 +566,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                 boundary_line.manifold_id =
                                   static_cast<types::manifold_id>(id);
                               else
-                                Assert(false, ExcInternalError());
+                                DEAL_II_ASSERT_UNREACHABLE();
                             }
                         }
                     }
@@ -1766,7 +1766,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                   cells.back().vertices = vertices_for_this_element;
                 }
               else
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
           else
             DEAL_II_NOT_IMPLEMENTED();
@@ -1825,7 +1825,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                     cells[cells.size() - n_elements + e].material_id =
                       geometric_entity_index;
                   else
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               else
                 DEAL_II_NOT_IMPLEMENTED();
@@ -4237,7 +4237,7 @@ GridIn<dim, spacedim>::read(std::istream &in, Format format)
       case Default:
         break;
     }
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

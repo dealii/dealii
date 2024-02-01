@@ -845,7 +845,7 @@ namespace
                   const Point<dim> & /*p*/,
                   const ReferenceCell /*reference_cell*/)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return std::make_pair(Point<dim>(),
                           std::numeric_limits<double>::signaling_NaN());
   }
@@ -1067,7 +1067,7 @@ ReferenceCell::closest_point(const Point<dim> &p) const
       switch (this->kind)
         {
           case ReferenceCells::Vertex:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             break;
             // the bounds for each dimension of a hypercube are mutually
             // independent:

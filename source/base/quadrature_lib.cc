@@ -1930,7 +1930,7 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
                 }
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         break;
       case 3:
@@ -1985,7 +1985,7 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
                 }
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         break;
       case 4:
@@ -2060,7 +2060,7 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
                 }
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         break;
       case 5:
@@ -2279,7 +2279,7 @@ namespace
   Quadrature<dim>
   setup_qiterated_1D(const Quadrature<dim> &, const unsigned int)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return Quadrature<dim>();
   }
 

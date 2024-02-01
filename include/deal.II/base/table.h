@@ -2873,7 +2873,7 @@ namespace MatrixTableIterators
           case Storage::column_major:
             return linear_index % container->n_rows();
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
       return {};
     }
@@ -2892,7 +2892,7 @@ namespace MatrixTableIterators
           case Storage::column_major:
             return linear_index / container->n_rows();
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
       return {};
     }

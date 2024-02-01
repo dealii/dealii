@@ -388,7 +388,7 @@ namespace CGALWrappers
             }
         else
           {
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
           }
       }
     else if constexpr (decltype(has_cells(cgal_triangulation)){})
@@ -439,7 +439,7 @@ namespace CGALWrappers
             }
         else
           {
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
           }
       }
     dealii_triangulation.create_triangulation(vertices, cells, subcell_data);

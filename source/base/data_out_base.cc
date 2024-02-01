@@ -1340,7 +1340,7 @@ namespace
     set_node_numbers(const unsigned int /*start*/,
                      const std::array<unsigned int, 0> & /*d1*/)
     {
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return {};
     }
 
@@ -2396,7 +2396,7 @@ namespace DataOutBase
     else
       // we shouldn't get here, since the parameter object should already have
       // checked that the given value is valid
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
   }
 
 
@@ -2590,7 +2590,7 @@ namespace DataOutBase
                   break;
 
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
       }
@@ -3740,7 +3740,7 @@ namespace DataOutBase
                   // There aren't any other reference cells in 2d than the
                   // quadrilateral and the triangle. So whatever we got here
                   // can't be any good
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
                 // end of patch
                 out << '\n';
 
@@ -5152,7 +5152,7 @@ namespace DataOutBase
                 default:
                   // VTK doesn't support anything else than vectors with 1, 2,
                   // or 3 components
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
       }
@@ -5934,7 +5934,7 @@ namespace DataOutBase
 
                     default:
                       // Anything else is not yet implemented
-                      Assert(false, ExcInternalError());
+                      DEAL_II_ASSERT_UNREACHABLE();
                   }
               }
             else
@@ -5972,7 +5972,7 @@ namespace DataOutBase
                   }
                 else
                   {
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                   }
 
                 // now put the tensor into data

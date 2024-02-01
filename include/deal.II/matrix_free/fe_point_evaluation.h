@@ -3509,7 +3509,7 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
               else if (dim == 2)
                 gradient[0] = interpolated_value[0];
               else
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
           else if (this->current_face_number / 2 == 2)
             {
@@ -3520,10 +3520,10 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
                   gradient[2] = interpolated_value[dim];
                 }
               else
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
           else
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
       else
         {
@@ -3700,7 +3700,7 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
               else if (dim == 2)
                 gradient_in_face[0] = gradient[0];
               else
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
           else if (this->current_face_number / 2 == 2)
             {
@@ -3711,10 +3711,10 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
                   gradient_in_face[1] = gradient[1];
                 }
               else
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
           else
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
 
           internal::integrate_tensor_product_value_and_gradient<
             is_linear,

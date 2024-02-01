@@ -224,7 +224,7 @@ namespace internal
                 break;
 
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
                 break;
             }
 
@@ -655,7 +655,7 @@ namespace internal
               break;
 
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
               break;
           }
 
@@ -4077,7 +4077,7 @@ namespace internal
             default:
               // only remaining case is
               // no_refinement, thus an error
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
               break;
           }
 
@@ -4479,7 +4479,7 @@ namespace internal
                   break;
 
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
                   break;
               }
           }
@@ -6085,7 +6085,7 @@ namespace internal
                     }
                   else
                     {
-                      Assert(false, ExcInternalError());
+                      DEAL_II_ASSERT_UNREACHABLE();
                     }
 
                   // Also check whether we have to refine any of the faces and
@@ -6146,7 +6146,7 @@ namespace internal
               }
             else
               {
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
               }
           }
 
@@ -7331,7 +7331,7 @@ namespace internal
                   else
                     {
                       // we should never get here
-                      Assert(false, ExcInternalError());
+                      DEAL_II_ASSERT_UNREACHABLE();
                     }
 
                   // mark all faces for refinement; checking locally
@@ -8582,7 +8582,7 @@ namespace internal
                         n_new_hexes = 8;
                         break;
                       default:
-                        Assert(false, ExcInternalError());
+                        DEAL_II_ASSERT_UNREACHABLE();
                         break;
                     }
 
@@ -11476,7 +11476,7 @@ namespace internal
                         // untreated enumeration value. However, in that
                         // case we should have aborted much
                         // earlier. thus we should never get here
-                        Assert(false, ExcInternalError());
+                        DEAL_II_ASSERT_UNREACHABLE();
                         break;
                     } // switch (ref_case)
 
@@ -13522,7 +13522,7 @@ namespace
   bool
   get_user_flag(const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return false;
   }
 
@@ -13541,7 +13541,7 @@ namespace
   void
   set_user_flag(const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
   }
 
 
@@ -13560,7 +13560,7 @@ namespace
   clear_user_flag(
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
   }
 } // namespace
 
@@ -13813,7 +13813,7 @@ namespace
   get_user_index(
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return numbers::invalid_unsigned_int;
   }
 
@@ -13834,7 +13834,7 @@ namespace
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &,
     const unsigned int)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
   }
 } // namespace
 
@@ -13959,7 +13959,7 @@ namespace
   get_user_pointer(
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return nullptr;
   }
 
@@ -13980,7 +13980,7 @@ namespace
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &,
     void *)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
   }
 } // namespace
 

@@ -2071,7 +2071,7 @@ namespace internal
                           const Point<0, Number> &,
                           const unsigned int)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
   }
 
 

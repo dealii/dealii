@@ -2336,7 +2336,7 @@ namespace Particles
           break;
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
       }
 
@@ -2485,7 +2485,7 @@ namespace Particles
           break;
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
       }
   }

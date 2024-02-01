@@ -262,7 +262,7 @@ namespace internal
           cell_extent = data->cell_extents[0];
         }
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 
       const unsigned int regularity      = fe_herm.get_regularity();
       const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
@@ -321,7 +321,7 @@ namespace internal
           cell_extents = data->cell_extents;
         }
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 
       const unsigned int regularity      = fe_herm.get_regularity();
       const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
@@ -395,7 +395,7 @@ namespace internal
           cell_extents = data->cell_extents;
         }
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 
       const unsigned int regularity      = fe_herm.get_regularity();
       const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();

@@ -236,7 +236,7 @@ DataOutStack<dim, spacedim>::add_data_vector(
   // we have either return or Assert
   // statements above, so shouldn't
   // get here!
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

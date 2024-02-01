@@ -365,7 +365,7 @@ TriaAccessorBase<structdim, dim, spacedim>::objects() const
   if (structdim == 2 && dim > 2)
     return this->tria->faces->quads;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 
   return this->tria->levels[this->present_level]->cells;
 }
@@ -867,7 +867,7 @@ namespace internal
         const unsigned int,
         const unsigned char)
       {
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
       }
 
 
@@ -893,7 +893,7 @@ namespace internal
                            const unsigned int,
                            const bool)
       {
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
       }
 
 
@@ -905,7 +905,7 @@ namespace internal
       {
         // quads in 2d have no
         // non-standard orientation
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
       }
 
 
@@ -994,7 +994,7 @@ namespace internal
       static std::array<unsigned int, 1>
       get_line_indices_of_cell(const TriaAccessor<1, dim, spacedim> &)
       {
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
         return {};
       }
 
@@ -1107,7 +1107,7 @@ namespace internal
       static std::array<unsigned char, 1>
       get_line_orientations_of_cell(const TriaAccessor<1, dim, spacedim> &)
       {
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
         return {};
       }
 
@@ -2953,7 +2953,7 @@ TriaAccessor<0, 1, spacedim>::copy_from(
   // We cannot convert from TriaAccessorBase to
   // TriaAccessor<0,1,spacedim> because the latter is not derived from
   // the former. We should never get here.
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 
@@ -3806,7 +3806,7 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
       case RefinementCase<3>::cut_xy:
         return dealii::internal::SubfaceCase<3>::case_xy;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
   // we should never get here
   return dealii::internal::SubfaceCase<3>::case_none;

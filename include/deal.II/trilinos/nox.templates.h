@@ -284,7 +284,7 @@ namespace TrilinosWrappers
           if (type == NOX::Abstract::Vector::NormType::MaxNorm)
             return vector->linfty_norm();
 
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
 
           return 0.0;
         }

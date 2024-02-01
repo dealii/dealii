@@ -1353,7 +1353,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
             out << cell->level_subdomain_id() + 32;
             break;
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
 
       // Depth, unused, fill
@@ -3923,7 +3923,7 @@ GridOut::write_msh_faces(const Triangulation<dim, spacedim> &tria,
                      (face->reference_cell() == ReferenceCells::Line))
               out << ' ' << face->vertex_index(vertex) + 1;
             else
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         out << '\n';
 
@@ -4711,7 +4711,7 @@ namespace internal
         {
           case 1:
             {
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
               break;
             }
 
@@ -5168,7 +5168,7 @@ GridOut::write(const Triangulation<dim, spacedim> &tria,
         return;
     }
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

@@ -129,7 +129,7 @@ namespace internal
               eta_translation = int(subface_no / 2) * 0.5;
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
               break;
           }
 
@@ -164,7 +164,7 @@ namespace internal
             case 7:
               return rotate(reflect(points), 8 - offset);
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         return {};
       }
@@ -386,7 +386,7 @@ QProjector<2>::project_to_face(const ReferenceCell   &reference_cell,
               q_points[p] = Point<dim>(0, 1 - quadrature.point(p)[0]);
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
     }
   else if (reference_cell == ReferenceCells::Quadrilateral)
@@ -407,12 +407,12 @@ QProjector<2>::project_to_face(const ReferenceCell   &reference_cell,
               q_points[p] = Point<dim>(quadrature.point(p)[0], 1);
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
     }
   else
     {
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 }
 
@@ -526,7 +526,7 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
                       Point<dim>(0.5 + quadrature.point(p)[0] / 2, 0);
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               break;
             case 1:
@@ -541,7 +541,7 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
                                              0.5 + quadrature.point(p)[0] / 2);
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               break;
             case 2:
@@ -555,11 +555,11 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
                       Point<dim>(0, 0.5 - quadrature.point(p)[0] / 2);
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
     }
   else if (reference_cell == ReferenceCells::Quadrilateral)
@@ -578,7 +578,7 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
                       Point<dim>(0, quadrature.point(p)[0] / 2 + 0.5);
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               break;
             case 1:
@@ -592,7 +592,7 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
                       Point<dim>(1, quadrature.point(p)[0] / 2 + 0.5);
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               break;
             case 2:
@@ -606,7 +606,7 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
                       Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 0);
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               break;
             case 3:
@@ -620,17 +620,17 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
                       Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 1);
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                 }
               break;
 
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
     }
   else
     {
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 }
 
@@ -1408,7 +1408,7 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell &reference_cell,
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
   return numbers::invalid_unsigned_int;
 }
@@ -1549,7 +1549,7 @@ QProjector<dim>::DataSetDescriptor::face(
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
   return numbers::invalid_unsigned_int;
 }

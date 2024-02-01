@@ -134,7 +134,7 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
       for (const auto &p : fe_quad.get_unit_support_points())
         this->unit_face_support_points[f].emplace_back(p[0], p[1]);
     else
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

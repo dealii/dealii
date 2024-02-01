@@ -406,7 +406,7 @@ IndexSet::get_view(const IndexSet &mask) const
                                           (own_it->end - own_it->begin));
               }
             else
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
 
       // We considered the overlap of these two intervals. It may of course
       // be that one of them overlaps with another one, but that can only

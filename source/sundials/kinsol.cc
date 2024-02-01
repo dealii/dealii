@@ -101,7 +101,7 @@ namespace SUNDIALS
       else if (value == "picard")
         strategy = picard;
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     });
     prm.add_parameter("Maximum number of nonlinear iterations",
                       maximum_non_linear_iterations);
@@ -149,7 +149,7 @@ namespace SUNDIALS
                        anderson_qr_orthogonalization =
                          delayed_classical_gram_schmidt;
                      else
-                       Assert(false, ExcInternalError());
+                       DEAL_II_ASSERT_UNREACHABLE();
                    });
     prm.leave_subsection();
   }

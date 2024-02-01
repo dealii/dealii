@@ -552,7 +552,7 @@ SparseBlockVanka<number>::compute_dof_masks(
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 }
 

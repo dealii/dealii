@@ -376,7 +376,7 @@ namespace internal
               }
             while (true);
 
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             return -1;
           }
         } // namespace RefineAndCoarsenFixedNumber
@@ -482,7 +482,7 @@ namespace internal
               }
             while (true);
 
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             return -1;
           }
         } // namespace RefineAndCoarsenFixedFraction

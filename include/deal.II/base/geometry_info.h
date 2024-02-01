@@ -2747,7 +2747,7 @@ template <int dim>
 inline RefinementCase<dim>
 RefinementCase<dim>::cut_axis(const unsigned int)
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return static_cast<std::uint8_t>(-1);
 }
 
@@ -3099,7 +3099,7 @@ GeometryInfo<2>::cell_to_child_coordinates(const Point<2>         &p,
         point -= unit_cell_vertex(child_index);
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return point;
@@ -3172,7 +3172,7 @@ GeometryInfo<3>::cell_to_child_coordinates(const Point<3>         &p,
         point -= unit_cell_vertex(child_index);
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return point;
@@ -3275,7 +3275,7 @@ GeometryInfo<3>::child_to_cell_coordinates(const Point<3>         &p,
         point *= 0.5;
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return point;
@@ -3309,7 +3309,7 @@ GeometryInfo<2>::child_to_cell_coordinates(const Point<2>         &p,
         point *= 0.5;
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return point;
@@ -3625,7 +3625,7 @@ GeometryInfo<2>::subface_ratio(const internal::SubfaceCase<2> &subface_case,
       default:
         // there should be no
         // cases left
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
         break;
     }
 
@@ -3682,7 +3682,7 @@ GeometryInfo<3>::subface_ratio(const internal::SubfaceCase<3> &subface_case,
       default:
         // there should be no
         // cases left
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
         break;
     }
 

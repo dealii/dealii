@@ -2459,7 +2459,7 @@ namespace FEValuesViews
             }
         }
     // should not end up here
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return curl_type();
   }
 

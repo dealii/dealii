@@ -3477,7 +3477,7 @@ namespace GridTools
           else
             {
               // We should not get here. Throw an error.
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
             }
         }
     // Now make sure we send out the rest of the points that we did not find.

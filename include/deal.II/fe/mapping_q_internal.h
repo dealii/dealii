@@ -178,7 +178,7 @@ namespace internal
         }
       // bogus return to placate compiler. It should not be possible to get
       // here.
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return {std::numeric_limits<double>::quiet_NaN(),
               std::numeric_limits<double>::quiet_NaN()};
     }
@@ -193,7 +193,7 @@ namespace internal
       const Point<spacedim> & /*p*/)
     {
       // It should not be possible to get here
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return {std::numeric_limits<double>::quiet_NaN(),
               std::numeric_limits<double>::quiet_NaN(),
               std::numeric_limits<double>::quiet_NaN()};

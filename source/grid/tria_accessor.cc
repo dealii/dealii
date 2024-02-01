@@ -224,7 +224,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
         return {};
       }
   }
@@ -1265,7 +1265,7 @@ namespace
         Assert(accessor.reference_cell() != ReferenceCells::Pyramid &&
                  accessor.reference_cell() != ReferenceCells::Wedge,
                ExcNotImplemented());
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 
         return {};
       }
@@ -2582,7 +2582,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // we should never get here,
           // since then we did not find
           // our way back...
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return std::make_pair(numbers::invalid_unsigned_int,
                                 numbers::invalid_unsigned_int);
         }
@@ -2675,7 +2675,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
 
           // we should never get here, since then we did not find our way
           // back...
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return std::make_pair(numbers::invalid_unsigned_int,
                                 numbers::invalid_unsigned_int);
         }
@@ -3429,7 +3429,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                           requested = mother_face->child(1);
                           break;
                         default:
-                          Assert(false, ExcInternalError());
+                          DEAL_II_ASSERT_UNREACHABLE();
                       }
                     break;
                   case internal::SubfaceCase<3>::case_x2y:
@@ -3444,11 +3444,11 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                           requested = mother_face->child(1)->child(subface - 1);
                           break;
                         default:
-                          Assert(false, ExcInternalError());
+                          DEAL_II_ASSERT_UNREACHABLE();
                       }
                     break;
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                     break;
                 }
               Assert(requested == neighbor_child->face(neighbor_neighbor),

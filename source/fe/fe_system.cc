@@ -1053,7 +1053,7 @@ FESystem<dim, spacedim>::face_to_cell_index(
     if (this->system_to_base_index(i) == target)
       return i;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return numbers::invalid_unsigned_int;
 }
 
@@ -1557,7 +1557,7 @@ FESystem<dim, spacedim>::build_interface_constraints()
               {
                 // we should never get here!  (in 1d, the constraints matrix
                 // should be of size zero)
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
                 break;
               }
 

@@ -597,7 +597,7 @@ namespace internal
     {
       return FineDoFHandlerViewCell(
         []() {
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return false;
         },
         [this, cell](auto &dof_indices) {
@@ -622,16 +622,16 @@ namespace internal
     get_cell_view(const typename DoFHandler<dim>::cell_iterator &,
                   const unsigned int) const override
     {
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
 
       return FineDoFHandlerViewCell(
         []() {
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return false;
         },
-        [](auto &) { Assert(false, ExcInternalError()); },
+        [](auto &) { DEAL_II_ASSERT_UNREACHABLE(); },
         []() {
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return 0;
         });
     }
@@ -715,7 +715,7 @@ namespace internal
     {
       return FineDoFHandlerViewCell(
         []() {
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return false;
         },
         [this, cell, c](auto &dof_indices) {
