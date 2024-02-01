@@ -1019,26 +1019,9 @@ namespace Step7
     // We augment the filename by a postfix denoting the finite element which
     // we have used in the computation. To this end, the finite element base
     // class stores the maximal polynomial degree of shape functions in each
-    // coordinate variable as a variable <code>degree</code>, and we use for
-    // the switch statement (note that the polynomial degree of bilinear shape
-    // functions is really 2, since they contain the term <code>x*y</code>;
-    // however, the polynomial degree in each coordinate variable is still
-    // only 1). We again use the same defensive programming technique to
-    // safeguard against the case that the polynomial degree has an unexpected
-    // value, using the <code>Assert (false, ExcNotImplemented())</code> idiom
-    // in the default branch of the switch statement:
-    switch (fe->degree)
-      {
-        case 1:
-          vtk_filename += "-q1";
-          break;
-        case 2:
-          vtk_filename += "-q2";
-          break;
-
-        default:
-          Assert(false, ExcNotImplemented());
-      }
+    // coordinate variable as a variable <code>degree</code>, which we append
+    // as "-q1", "-q2", etc., to the filename.
+    vtk_filename += "-q" + std::to_string(fe->degree);
 
     // Once we have the base name for the output file, we add an extension
     // appropriate for VTK output, open a file, and add the solution vector to
@@ -1131,10 +1114,10 @@ namespace Step7
     convergence_table.write_text(std::cout);
 
     // The table can also be written into a LaTeX file.  The (nicely)
-    // formatted table can be viewed at after calling `latex filename' and
-    // e.g. `xdvi filename', where filename is the name of the file to which
-    // we will write output now. We construct the file name in the same way as
-    // before, but with a different prefix "error":
+    // formatted table can be viewed after calling `latex filename.tex` and
+    // whatever output viewer you prefer, where filename is the name of the file
+    // to which we will write output. We construct the file name in the same way
+    // as before, but with a different prefix "error":
     std::string error_filename = "error";
     switch (refinement_mode)
       {
@@ -1148,18 +1131,7 @@ namespace Step7
           Assert(false, ExcNotImplemented());
       }
 
-    switch (fe->degree)
-      {
-        case 1:
-          error_filename += "-q1";
-          break;
-        case 2:
-          error_filename += "-q2";
-          break;
-        default:
-          Assert(false, ExcNotImplemented());
-      }
-
+    error_filename += "-q" + std::to_string(fe->degree);
     error_filename += ".tex";
     std::ofstream error_table_file(error_filename);
 
@@ -1233,17 +1205,7 @@ namespace Step7
             default:
               Assert(false, ExcNotImplemented());
           }
-        switch (fe->degree)
-          {
-            case 1:
-              conv_filename += "-q1";
-              break;
-            case 2:
-              conv_filename += "-q2";
-              break;
-            default:
-              Assert(false, ExcNotImplemented());
-          }
+        conv_filename += "-q" + std::to_string(fe->degree);
         conv_filename += ".tex";
 
         std::ofstream table_file(conv_filename);
