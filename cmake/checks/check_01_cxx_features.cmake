@@ -63,6 +63,7 @@ macro(_test_cxx23_support)
   # Strictly speaking "202100L" indicates support for a preliminary version
   # of the C++23 standard (which will have "202302L" when finalized). gcc-13
   # exports this version number when configured with C++23 support.
+  add_flags(CMAKE_REQUIRED_FLAGS "-Werror")
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <version>
@@ -75,9 +76,12 @@ macro(_test_cxx23_support)
       static void operator()() {}
     };
 
-    int main() {}
+    int main() {
+      [[assume(2 > 1)]];
+    }
     "
     DEAL_II_HAVE_CXX23_FEATURES)
+  reset_cmake_required()
 
   if(DEAL_II_HAVE_CXX23_FEATURES)
     message(STATUS "C++23 support is enabled.")
