@@ -1,9 +1,7 @@
 
 DEAL::
 DEAL::successful
-DEAL::The violated condition was: 
-    false
-Additional information: 
+DEAL::Additional information: 
     You can't ask for entry <Precison> you have not yet declared.
 --------------------------------------------------------
 
