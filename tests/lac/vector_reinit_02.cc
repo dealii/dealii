@@ -21,6 +21,7 @@
 
 #include <deal.II/base/mpi.h>
 
+#include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector_memory.h>
 
@@ -113,4 +114,9 @@ main(int argc, char **argv)
 
   do_test<TrilinosWrappers::MPI::Vector>();
   do_test<TrilinosWrappers::MPI::Vector>();
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  do_test<LinearAlgebra::TpetraWrappers::Vector<double>>();
+  do_test<LinearAlgebra::TpetraWrappers::Vector<double>>();
+#endif
 }
