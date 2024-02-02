@@ -657,6 +657,9 @@ namespace LinearAlgebra
       // pattern), and the second one is when the pattern is already fixed. In
       // the former case, we add the possibility to insert new values, and in
       // the second we just replace data.
+
+      // If the matrix is marked as compressed, we need to
+      // call resumeFill() first.
       if (compressed || matrix->isFillComplete())
         {
           matrix->resumeFill();
@@ -673,19 +676,6 @@ namespace LinearAlgebra
                                     n_columns,
                                     col_value_ptr,
                                     col_index_ptr);
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline void
-    SparseMatrix<Number, MemorySpace>::set(const size_type i,
-                                           const size_type j,
-                                           const Number    value)
-    {
-      AssertIsFinite(value);
-
-      set(i, 1, &j, &value, false);
     }
 
 
@@ -776,6 +766,84 @@ namespace LinearAlgebra
 
 
 
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::add(
+      const Number                             factor,
+      const SparseMatrix<Number, MemorySpace> &source)
+    {
+      AssertDimension(source.m(), m());
+      AssertDimension(source.n(), n());
+      AssertDimension(source.local_range().first, local_range().first);
+      AssertDimension(source.local_range().second, local_range().second);
+      Assert(matrix->getRowMap()->isSameAs(*source.matrix->getRowMap()),
+             ExcMessage(
+               "Can only add matrices with same distribution of rows"));
+      Assert(matrix->isFillComplete() && source.matrix->isFillComplete(),
+             ExcMessage("Addition of matrices only allowed if matrices are "
+                        "filled, i.e., compress() has been called"));
+
+      matrix->add(factor,
+                  *source.matrix,
+                  1.0,
+                  matrix->getDomainMap(),
+                  matrix->getRangeMap(),
+                  Teuchos::null);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::copy_from(
+      const SparseMatrix<Number, MemorySpace> &source)
+    {
+      if (this == &source)
+        return;
+
+      // release memory before reallocation
+      matrix.reset();
+      column_space_map.reset();
+
+      // TODO:
+      // If the source and the target matrix have the same structure, we do
+      // not need to perform a deep copy.
+
+      // Perform a deep copy
+      matrix =
+        Utilities::Trilinos::internal::make_rcp<MatrixType>(*source.matrix,
+                                                            Teuchos::Copy);
+      column_space_map = Teuchos::rcp_const_cast<MapType>(matrix->getColMap());
+      compressed       = source.compressed;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::clear()
+    {
+      // When we clear the matrix, reset
+      // the pointer and generate an
+      // empty matrix.
+      column_space_map = Utilities::Trilinos::internal::make_rcp<MapType>(
+        0, 0, Utilities::Trilinos::tpetra_comm_self());
+
+      // Prepare the graph
+      Teuchos::RCP<GraphType> graph =
+        Utilities::Trilinos::internal::make_rcp<GraphType>(column_space_map,
+                                                           column_space_map,
+                                                           0);
+      graph->fillComplete();
+
+      // Create the matrix from the graph
+      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(graph);
+
+      compressed = true;
+    }
+
+
+
     // Multiplications
 
     template <typename Number, typename MemorySpace>
@@ -853,6 +921,7 @@ namespace LinearAlgebra
                     Teuchos::ScalarTraits<Number>::one(),
                     Teuchos::ScalarTraits<Number>::one());
     }
+
 
 
     template <typename Number, typename MemorySpace>

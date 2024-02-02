@@ -40,6 +40,9 @@ template <typename Number>
 class SparseMatrix;
 
 #  ifndef DOXYGEN
+template <typename MatrixType>
+class BlockMatrixBase;
+
 namespace LinearAlgebra
 {
   namespace TpetraWrappers
@@ -101,6 +104,22 @@ namespace LinearAlgebra
        * Declare the type for container size.
        */
       using size_type = dealii::types::global_dof_index;
+
+      /**
+       * A structure that describes some of the traits of this class in terms of
+       * its run-time behavior. Some other classes (such as the block matrix
+       * classes) that take one or other of the matrix classes as its template
+       * parameters can tune their behavior based on the variables in this
+       * class.
+       */
+      struct Traits
+      {
+        /**
+         * It is safe to elide additions of zeros to individual elements of this
+         * matrix.
+         */
+        static const bool zero_addition_can_be_elided = true;
+      };
 
       /**
        * Declare an alias for the type used to store matrix elements, in analogy
@@ -443,6 +462,12 @@ namespace LinearAlgebra
       operator/=(const Number factor);
 
       /**
+       * Copy the given (Trilinos) matrix (sparsity pattern and entries).
+       */
+      void
+      copy_from(const SparseMatrix<Number, MemorySpace> &source);
+
+      /**
        * Add @p value to the element (<i>i,j</i>).
        * Just as the respective call in deal.II SparseMatrix<Number,
        * MemorySpace> class. Moreover, if <tt>value</tt> is not a finite number
@@ -474,6 +499,16 @@ namespace LinearAlgebra
           const Number    *values,
           const bool       elide_zero_values      = true,
           const bool       col_indices_are_sorted = false);
+
+      /**
+       * Add <tt>matrix</tt> scaled by <tt>factor</tt> to this matrix, i.e. the
+       * matrix <tt>factor*matrix</tt> is added to <tt>this</tt>. If the
+       * sparsity pattern of the calling matrix does not contain all the
+       * elements in the sparsity pattern of the input matrix, this function
+       * will throw an exception.
+       */
+      void
+      add(const Number factor, const SparseMatrix<Number, MemorySpace> &matrix);
 
       /**
        * Set the element (<i>i,j</i>) to @p value.
@@ -614,6 +649,16 @@ namespace LinearAlgebra
           const Number    *values,
           const bool       elide_zero_values = false);
 
+      /**
+       * Release all memory and return to a state just like after having called
+       * the default constructor.
+       *
+       * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
+       * processors in order to avoid a dead lock.
+       */
+      void
+      clear();
+
       /** @} */
       /**
        * @name Entry Access
@@ -710,6 +755,28 @@ namespace LinearAlgebra
       void
       Tvmult_add(Vector<Number, MemorySpace>       &dst,
                  const Vector<Number, MemorySpace> &src) const;
+
+      /**
+       * Compute the residual of an equation <i>Mx=b</i>, where the residual is
+       * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
+       * <i>l<sub>2</sub></i> norm of the residual vector is returned.
+       *
+       * Source <i>x</i> and destination <i>dst</i> must not be the same vector.
+       *
+       * The vectors @p dst and @p b have to be initialized with the same
+       * IndexSet that was used for the row indices of the matrix and the vector
+       * @p x has to be initialized with the same IndexSet that was used for the
+       * column indices of the matrix.
+       *
+       * In case of a localized Vector, this function will only work when
+       * running on one processor, since the matrix object is inherently
+       * distributed. Otherwise, an exception will be thrown.
+       */
+      Number
+      residual(Vector<Number, MemorySpace>       &dst,
+               const Vector<Number, MemorySpace> &x,
+               const Vector<Number, MemorySpace> &b) const;
+
       /** @} */
 
       /**
@@ -944,10 +1011,48 @@ namespace LinearAlgebra
        */
       bool compressed;
 
+      /**
+       * For some matrix storage formats, in particular for the PETSc
+       * distributed blockmatrices, set and add operations on individual
+       * elements can not be freely mixed. Rather, one has to synchronize
+       * operations when one wants to switch from setting elements to adding to
+       * elements.  BlockMatrixBase automatically synchronizes the access by
+       * calling this helper function for each block.  This function ensures
+       * that the matrix is in a state that allows adding elements; if it
+       * previously already was in this state, the function does nothing.
+       *
+       * This function is called from BlockMatrixBase.
+       */
+      void
+      prepare_add();
+
+      /**
+       * Same as prepare_add() but prepare the matrix for setting elements if
+       * the representation of elements in this class requires such an
+       * operation.
+       *
+       * This function is called from BlockMatrixBase.
+       */
+      void
+      prepare_set();
+
+      // To allow calling protected prepare_add() and prepare_set().
+      friend class BlockMatrixBase<SparseMatrix<Number, MemorySpace>>;
     }; // class SparseMatrix
 
 
     /* ------------------------- Inline functions ---------------------- */
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    SparseMatrix<Number, MemorySpace>::set(const size_type i,
+                                           const size_type j,
+                                           const Number    value)
+    {
+      set(i, 1, &j, &value, false);
+    }
+
+
 
     template <typename Number, typename MemorySpace>
     inline void
@@ -956,6 +1061,22 @@ namespace LinearAlgebra
                                            const Number    value)
     {
       add(i, 1, &j, &value, false);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline Number
+    SparseMatrix<Number, MemorySpace>::residual(
+      Vector<Number, MemorySpace>       &dst,
+      const Vector<Number, MemorySpace> &x,
+      const Vector<Number, MemorySpace> &b) const
+    {
+      vmult(dst, x);
+      dst -= b;
+      dst *= -1.;
+
+      return dst.l2_norm();
     }
 
 
@@ -987,6 +1108,24 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::is_compressed() const
     {
       return compressed;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    SparseMatrix<Number, MemorySpace>::prepare_add()
+    {
+      // nothing to do here
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    SparseMatrix<Number, MemorySpace>::prepare_set()
+    {
+      // nothing to do here
     }
 
 
