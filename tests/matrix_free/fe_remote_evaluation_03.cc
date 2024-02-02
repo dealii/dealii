@@ -15,8 +15,8 @@
 
 // This test checks the correct setup of FERemoteEvaluationCommunicator
 // via the factory functions
-// setup_remote_communicator_faces_point_to_point_interpolation()
-// and setup_remote_communicator_faces_nitsche_type_mortaring().
+// compute_remote_communicator_faces_point_to_point_interpolation()
+// and compute_remote_communicator_faces_nitsche_type_mortaring().
 
 #include <deal.II/base/mpi.h>
 
@@ -78,7 +78,7 @@ test_point_to_point(const MatrixFree<dim, Number> &matrix_free)
   }));
 
   auto remote_communicator =
-    Utilities::setup_remote_communicator_faces_point_to_point_interpolation(
+    Utilities::compute_remote_communicator_faces_point_to_point_interpolation(
       matrix_free, non_matching_faces_marked_vertices);
 
   // 1) Allocate vectors and interpolate grid coordinates in DoFs.
@@ -165,7 +165,7 @@ test_nitsche_type_mortaring(const MatrixFree<dim, Number> &matrix_free)
     additional_data);
 
   auto remote_communicator =
-    Utilities::setup_remote_communicator_faces_nitsche_type_mortaring(
+    Utilities::compute_remote_communicator_faces_nitsche_type_mortaring(
       matrix_free, non_matching_faces_marked_vertices, 4, 0, &nm_mapping_info);
 
   // 1) Allocate vectors and interpolate grid coordinates in DoFs.
