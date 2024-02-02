@@ -52,18 +52,6 @@ namespace LinearAlgebra
     BlockSparseMatrix<double>::Tvmult(
       TpetraWrappers::BlockVector<double> &,
       const TpetraWrappers::BlockVector<double> &) const;
-
-    template void
-    BlockSparseMatrix<double>::vmult(
-      ::dealii::BlockVector<double> &,
-      const ::dealii::BlockVector<double> &) const;
-
-    template void
-    BlockSparseMatrix<double>::Tvmult(
-      ::dealii::BlockVector<double> &,
-      const ::dealii::BlockVector<double> &) const;
-
-
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 #  endif // DOXYGEN
