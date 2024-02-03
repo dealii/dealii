@@ -55,8 +55,7 @@ Manifold<dim, spacedim>::get_intermediate_point(const Point<spacedim> &p1,
                                                 const double           w) const
 {
   const std::array<Point<spacedim>, 2> vertices{{p1, p2}};
-  return project_to_manifold(make_array_view(vertices.begin(), vertices.end()),
-                             w * p2 + (1 - w) * p1);
+  return project_to_manifold(make_array_view(vertices), w * p2 + (1 - w) * p1);
 }
 
 
@@ -133,9 +132,7 @@ Manifold<dim, spacedim>::get_new_points(
   for (unsigned int row = 0; row < weights.size(0); ++row)
     {
       new_points[row] =
-        get_new_point(make_array_view(surrounding_points.begin(),
-                                      surrounding_points.end()),
-                      make_array_view(weights, row));
+        get_new_point(surrounding_points, make_array_view(weights, row));
     }
 }
 
@@ -356,10 +353,8 @@ Manifold<dim, spacedim>::get_new_point_on_line(
   const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
   const auto points_weights = Manifolds::get_default_points_and_weights(line);
-  return get_new_point(make_array_view(points_weights.first.begin(),
-                                       points_weights.first.end()),
-                       make_array_view(points_weights.second.begin(),
-                                       points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first),
+                       make_array_view(points_weights.second));
 }
 
 
@@ -370,10 +365,8 @@ Manifold<dim, spacedim>::get_new_point_on_quad(
   const typename Triangulation<dim, spacedim>::quad_iterator &quad) const
 {
   const auto points_weights = Manifolds::get_default_points_and_weights(quad);
-  return get_new_point(make_array_view(points_weights.first.begin(),
-                                       points_weights.first.end()),
-                       make_array_view(points_weights.second.begin(),
-                                       points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first),
+                       make_array_view(points_weights.second));
 }
 
 
@@ -502,10 +495,8 @@ Manifold<3, 3>::get_new_point_on_hex(
 {
   const auto points_weights =
     Manifolds::get_default_points_and_weights(hex, true);
-  return get_new_point(make_array_view(points_weights.first.begin(),
-                                       points_weights.first.end()),
-                       make_array_view(points_weights.second.begin(),
-                                       points_weights.second.end()));
+  return get_new_point(make_array_view(points_weights.first),
+                       make_array_view(points_weights.second));
 }
 
 
@@ -520,8 +511,7 @@ Manifold<dim, spacedim>::get_tangent_vector(const Point<spacedim> &x1,
   const std::array<Point<spacedim>, 2> points{{x1, x2}};
   const std::array<double, 2>          weights{{epsilon, 1.0 - epsilon}};
   const Point<spacedim>                neighbor_point =
-    get_new_point(make_array_view(points.begin(), points.end()),
-                  make_array_view(weights.begin(), weights.end()));
+    get_new_point(make_array_view(points), make_array_view(weights));
   return (neighbor_point - x1) / epsilon;
 }
 #endif
@@ -1028,8 +1018,7 @@ ChartManifold<dim, spacedim, chartdim>::get_intermediate_point(
 {
   const std::array<Point<spacedim>, 2> points{{p1, p2}};
   const std::array<double, 2>          weights{{1. - w, w}};
-  return get_new_point(make_array_view(points.begin(), points.end()),
-                       make_array_view(weights.begin(), weights.end()));
+  return get_new_point(make_array_view(points), make_array_view(weights));
 }
 
 
@@ -1047,8 +1036,8 @@ ChartManifold<dim, spacedim, chartdim>::get_new_point(
   for (unsigned int i = 0; i < n_points; ++i)
     chart_points[i] = pull_back(surrounding_points[i]);
 
-  const Point<chartdim> p_chart = sub_manifold.get_new_point(
-    make_array_view(chart_points.begin(), chart_points.end()), weights);
+  const Point<chartdim> p_chart =
+    sub_manifold.get_new_point(chart_points, weights);
 
   return push_forward(p_chart);
 }
@@ -1073,10 +1062,7 @@ ChartManifold<dim, spacedim, chartdim>::get_new_points(
 
   boost::container::small_vector<Point<chartdim>, 200> new_points_on_chart(
     weights.size(0));
-  sub_manifold.get_new_points(
-    make_array_view(chart_points.begin(), chart_points.end()),
-    weights,
-    make_array_view(new_points_on_chart.begin(), new_points_on_chart.end()));
+  sub_manifold.get_new_points(chart_points, weights, new_points_on_chart);
 
   for (std::size_t row = 0; row < weights.size(0); ++row)
     new_points[row] = push_forward(new_points_on_chart[row]);
