@@ -1180,9 +1180,9 @@
  * 0...49 of a vector and processor one stores elements 50...99,
  * then processor one is out of luck accessing element 42 of this
  * vector: it is not stored here and the value can not be assessed.
- * This will result in an assertion.
+ * This will result in a failed assertion.
  *
- * On the other hand, there are many situations where one needs to
+ * On the other hand, there are many situations where one *needs* to
  * know vector elements that aren't locally owned, for example to
  * evaluate the solution on a locally owned cell (see
  * @ref GlossLocallyOwnedCell) for which one of the degrees of freedom
@@ -1191,7 +1191,7 @@
  * and for which the neighboring cell may be the owner -- in other
  * words, the degree of freedom is not a
  * @ref GlossLocallyOwnedDof "locally owned" but instead only a
- * @ref GlossLocallyActiveDof "locally active DoFs". The values of such
+ * @ref GlossLocallyActiveDof "locally active" DoF. The values of such
  * degrees of freedom are typically stored on the machine that owns the
  * degree of freedom and, consequently, would not be accessible on the
  * current machine.
@@ -1234,6 +1234,19 @@
  * somewhere else as well, but even if it is, the local element is not
  * a mirror value of a primary location as there is no owner of each
  * element.
+ *
+ * In the end, there are two key take-away messages from the separation between
+ * ghosted and non-ghosted vectors:
+ * - Ghosted vectors are read-only. You cannot write into them, or add
+ *   one such vector into another.
+ * - Even if every process participates in storing a vector with
+ *   ghost elements, not all elements of the vector may be stored anywhere;
+ *   some elements may be stored on multiple processes but no process may
+ *   be a designated "owner" of these elements. As a consequence, reduction
+ *   operations such as dot products or norms may not be computed on
+ *   vectors with ghost elements because in these storage schemes, it is
+ *   not possible to ensure that each entry of the vector is counted exactly
+ *   once.
  *
  * @note The @ref distributed documentation module provides a brief
  * overview of where the different kinds of vectors are typically
