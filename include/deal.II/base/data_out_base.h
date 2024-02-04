@@ -2738,16 +2738,18 @@ public:
    * Collective MPI call to write the solution from all participating nodes
    * (those in the given communicator) to a single compressed .vtu file on a
    * shared file system.  The communicator can be a sub communicator of the
-   * one used by the computation.  This routine uses MPI I/O to achieve high
-   * performance on parallel filesystems. Also see
-   * DataOutInterface::write_vtu().
+   * one used by the computation. This routine uses MPI I/O to achieve high
+   * performance on parallel filesystems. In order to use this function,
+   * you need to be using a file system that supports parallel MPI I/O,
+   * and you will get error messages about failed MPI calls if you do not.
+   * Also see DataOutInterface::write_vtu().
    */
   void
   write_vtu_in_parallel(const std::string &filename, const MPI_Comm comm) const;
 
   /**
-   * Some visualization programs, such as ParaView, can read several separate
-   * VTU files that all form part of the same simulation, in order to
+   * Some visualization programs, such as ParaView and VisIt, can read several
+   * separate VTU files that all form part of the same simulation, in order to
    * parallelize visualization. In that case, you need a
    * <code>.pvtu</code> file that describes which VTU files (written, for
    * example, through the DataOutInterface::write_vtu() function) form a group.
@@ -2823,7 +2825,10 @@ public:
    * default value of @p n_groups is 0, meaning that every MPI rank will write one
    * file. A value of 1 will generate one big file containing the solution over
    * the whole domain, while a larger value will create @p n_groups files (but not
-   * more than there are MPI ranks).
+   * more than there are MPI ranks). For all values other than `n_groups==0`,
+   * this function calls write_vtu_in_parallel(); for this function to work you
+   * need to be using a file system that supports parallel MPI I/O, and you will
+   * get error messages about failed MPI calls if you do not.
    *
    * Note that only one processor needs to
    * generate the .pvtu file, where processor zero is chosen to take over this
