@@ -603,6 +603,28 @@ namespace LinearAlgebra
       /** @} */
 
       /**
+       * @name Partitioners
+       */
+      /** @{ */
+
+      /**
+       * Return the partitioning of the domain space of this matrix, i.e., the
+       * partitioning of the vectors this matrix has to be multiplied with.
+       */
+      IndexSet
+      locally_owned_domain_indices() const;
+
+      /**
+       * Return the partitioning of the range space of this matrix, i.e., the
+       * partitioning of the vectors that are result from matrix-vector
+       * products.
+       */
+      IndexSet
+      locally_owned_range_indices() const;
+
+      /** @} */
+
+      /**
        * @addtogroup Exceptions
        */
       /** @{ */
@@ -762,6 +784,24 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::trilinos_rcp()
     {
       return matrix;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline IndexSet
+    SparseMatrix<Number, MemorySpace>::locally_owned_domain_indices() const
+    {
+      return IndexSet(matrix->getDomainMap());
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline IndexSet
+    SparseMatrix<Number, MemorySpace>::locally_owned_range_indices() const
+    {
+      return IndexSet(matrix->getRangeMap());
     }
 
   } // namespace TpetraWrappers

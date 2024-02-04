@@ -20,6 +20,8 @@
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include "../tests.h"
@@ -33,15 +35,27 @@ main(int argc, char *argv[])
   initlog();
   deallog << std::setprecision(10);
 
-  TrilinosWrappers::SparseMatrix a;
+  {
+    TrilinosWrappers::SparseMatrix a;
+    auto op_a  = linear_operator<TrilinosWrappers::MPI::Vector>(a);
+    auto op_a2 = linear_operator<TrilinosWrappers::MPI::Vector>(a);
+  }
 
-  auto op_a  = linear_operator<TrilinosWrappers::MPI::Vector>(a);
-  auto op_a2 = linear_operator<TrilinosWrappers::MPI::Vector>(a);
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  {
+    LinearAlgebra::TpetraWrappers::SparseMatrix<double> a;
+    auto                                                op_a =
+      linear_operator<LinearAlgebra::TpetraWrappers::Vector<double>>(a);
+    auto op_a2 =
+      linear_operator<LinearAlgebra::TpetraWrappers::Vector<double>>(a);
+  }
+#endif
 
-  TrilinosWrappers::BlockSparseMatrix b;
-
-  auto op_b  = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
-  auto op_b3 = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
+  {
+    TrilinosWrappers::BlockSparseMatrix b;
+    auto op_b  = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
+    auto op_b3 = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
+  }
 
   deallog << "OK" << std::endl;
 

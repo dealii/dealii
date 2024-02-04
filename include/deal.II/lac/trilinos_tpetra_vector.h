@@ -1214,6 +1214,51 @@ namespace LinearAlgebra
 
 } // namespace LinearAlgebra
 
+
+namespace internal
+{
+  namespace LinearOperatorImplementation
+  {
+    template <typename>
+    class ReinitHelper;
+
+    /**
+     * A helper class used internally in linear_operator.h. Specialization for
+     * LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>.
+     */
+    template <typename Number, typename MemorySpace>
+    class ReinitHelper<
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>>
+    {
+    public:
+      template <typename Matrix>
+      static void
+      reinit_range_vector(
+        const Matrix                                               &matrix,
+        LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &v,
+        bool omit_zeroing_entries)
+      {
+        v.reinit(matrix.locally_owned_range_indices(),
+                 matrix.get_mpi_communicator(),
+                 omit_zeroing_entries);
+      }
+
+      template <typename Matrix>
+      static void
+      reinit_domain_vector(
+        const Matrix                                               &matrix,
+        LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &v,
+        bool omit_zeroing_entries)
+      {
+        v.reinit(matrix.locally_owned_domain_indices(),
+                 matrix.get_mpi_communicator(),
+                 omit_zeroing_entries);
+      }
+    };
+
+  } // namespace LinearOperatorImplementation
+} /* namespace internal */
+
 /**
  * Declare dealii::LinearAlgebra::TpetraWrappers::Vector as distributed vector.
  */
