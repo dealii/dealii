@@ -463,26 +463,27 @@ namespace TriangulationDescription
         else
           (void)comm;
 
-        // helper function, which collects all vertices belonging to a cell
-        // (also taking into account periodicity)
+        // A helper function that marks the indices of all vertices belonging
+        // to a cell (also taking into account their periodic breathren) in
+        // the bit vector passed as second argument.
         const auto
           add_vertices_of_cell_to_vertices_owned_by_locally_owned_cells =
             [&coinciding_vertex_groups, &vertex_to_coinciding_vertex_group](
-              const auto        &cell,
-              std::vector<bool> &vertices_owned_by_locally_owned_cells) {
-              // add local vertices
-              for (const auto v : cell->vertex_indices())
+              const typename dealii::Triangulation<dim, spacedim>::cell_iterator
+                                &cell,
+              std::vector<bool> &vertices_on_locally_owned_cells) {
+              for (const unsigned int v : cell->vertex_indices())
                 {
-                  vertices_owned_by_locally_owned_cells[cell->vertex_index(v)] =
-                    true;
+                  const auto global_vertex_index = cell->vertex_index(v);
+                  vertices_on_locally_owned_cells[global_vertex_index] = true;
+
                   const auto coinciding_vertex_group =
-                    vertex_to_coinciding_vertex_group.find(
-                      cell->vertex_index(v));
+                    vertex_to_coinciding_vertex_group.find(global_vertex_index);
                   if (coinciding_vertex_group !=
                       vertex_to_coinciding_vertex_group.end())
                     for (const auto &co_vertex : coinciding_vertex_groups.at(
                            coinciding_vertex_group->second))
-                      vertices_owned_by_locally_owned_cells[co_vertex] = true;
+                      vertices_on_locally_owned_cells[co_vertex] = true;
                 }
             };
 
