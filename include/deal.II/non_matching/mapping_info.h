@@ -1317,7 +1317,6 @@ namespace NonMatching
     // fill unit points and mapping data for every face of all cells
     // resize data vectors
     resize_unit_points_faces(n_unit_points);
-    resize_unit_points(n_unit_points);
     resize_data_fields(n_data_points);
 
     MappingData  mapping_data;
@@ -1326,7 +1325,6 @@ namespace NonMatching
     bool         first_set            = false;
     unsigned int size_compressed_data = 0;
     cell_index                        = 0;
-    QProjector<dim> q_projector;
     for (const auto &cell : cell_iterator_range)
       {
         const auto &quadratures_on_faces = quadrature_vector[cell_index];
@@ -1340,11 +1338,6 @@ namespace NonMatching
             const auto &quadrature_on_face = quadratures_on_faces[f];
             const bool  empty              = quadrature_on_face.empty();
 
-            const auto quadrature_on_cell =
-              q_projector.project_to_face(cell->reference_cell(),
-                                          quadrature_on_face,
-                                          f);
-
             const unsigned int current_face_index =
               cell_index_offset[cell_index] + f;
 
@@ -1352,11 +1345,6 @@ namespace NonMatching
             const unsigned int n_q_points =
               compute_n_q_points<VectorizedArrayType>(
                 n_q_points_unvectorized[current_face_index]);
-            store_unit_points(unit_points_index[current_face_index],
-                              n_q_points,
-                              n_q_points_unvectorized[current_face_index],
-                              quadrature_on_cell.get_points());
-
             store_unit_points_faces(unit_points_index[current_face_index],
                                     n_q_points,
                                     n_q_points_unvectorized[current_face_index],
@@ -1548,7 +1536,6 @@ namespace NonMatching
     const unsigned int n_data_points = data_index_offsets.back();
 
     // resize data vectors
-    resize_unit_points(n_unit_points);
     resize_unit_points_faces(n_unit_points);
     resize_data_fields(n_data_points, true);
 
@@ -1558,7 +1545,6 @@ namespace NonMatching
     bool                       first_set            = false;
     unsigned int               size_compressed_data = 0;
     unsigned int               face_index           = 0;
-    QProjector<dim>            q_projector;
     for (const auto &cell_and_f : face_iterator_range_interior)
       {
         const auto &quadrature_on_face = quadrature_vector[face_index];
@@ -1584,19 +1570,9 @@ namespace NonMatching
           ExcMessage(
             "Non standard face orientation is currently not implemented."));
 
-        const auto quadrature_on_cell_m =
-          q_projector.project_to_face(cell_m->reference_cell(),
-                                      quadrature_on_face,
-                                      f_m);
-
         // store unit points
         const unsigned int n_q_points = compute_n_q_points<VectorizedArrayType>(
           n_q_points_unvectorized[face_index]);
-        store_unit_points(unit_points_index[face_index],
-                          n_q_points,
-                          n_q_points_unvectorized[face_index],
-                          quadrature_on_cell_m.get_points());
-
         store_unit_points_faces(unit_points_index[face_index],
                                 n_q_points,
                                 n_q_points_unvectorized[face_index],
