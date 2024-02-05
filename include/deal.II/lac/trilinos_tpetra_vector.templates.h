@@ -142,6 +142,19 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     void
+    Vector<Number, MemorySpace>::clear()
+    {
+      vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+        Utilities::Trilinos::internal::make_rcp<MapType>(
+          0, 0, Utilities::Trilinos::tpetra_comm_self()));
+      has_ghost  = false;
+      compressed = true;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
     Vector<Number, MemorySpace>::reinit(const IndexSet &parallel_partitioner,
                                         const MPI_Comm  communicator,
                                         const bool /*omit_zeroing_entries*/)

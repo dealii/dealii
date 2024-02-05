@@ -321,6 +321,13 @@ namespace LinearAlgebra
                       const bool      vector_writable = false);
 
       /**
+       * Release all memory and return to a state just like after having called
+       * the default constructor.
+       */
+      void
+      clear();
+
+      /**
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning. The flag
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be

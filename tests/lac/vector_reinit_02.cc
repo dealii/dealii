@@ -42,6 +42,7 @@ do_test()
     v1.reinit(set, communicator);
     deallog << "reinit: " << v1.size() << ' ';
 
+    v1.clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -56,6 +57,8 @@ do_test()
     v1.reinit(v2);
     deallog << v1.size() << std::endl;
 
+    v1.clear();
+    v2.clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -70,6 +73,8 @@ do_test()
     v1 = v2;
     deallog << v1.size() << std::endl;
 
+    v1.clear();
+    v2.clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -84,6 +89,8 @@ do_test()
     v3->reinit(v1);
     deallog << "reinit pool " << v1.size() << ' ' << v3->size() << ' ';
 
+    v1.clear();
+    v3->clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
@@ -98,6 +105,8 @@ do_test()
     v3->reinit(v1);
     deallog << "reinit pool " << v3->size() << std::endl;
 
+    v1.clear();
+    v3->clear();
 #ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
 #endif
