@@ -93,9 +93,17 @@ fail()
     }
   catch (const std::exception &exc)
     {
+      // Print everything after the "violated condition" part
+      // of the error message, assuming the condition is shown.
+      // If it isn't (because the condition was simply 'false' and
+      // so the error printing part suppresses this part), then
+      // show the part after "Additional information":
       std::string error = exc.what();
-      auto        start = error.find("The violated condition was:");
-      if (start != std::string::npos)
+      if (auto start = error.find("The violated condition was:");
+          start != std::string::npos)
+        deallog << error.substr(start) << std::endl;
+      else if (auto start = error.find("Additional information:");
+               start != std::string::npos)
         deallog << error.substr(start) << std::endl;
     }
 
@@ -106,9 +114,13 @@ fail()
     }
   catch (const std::exception &exc)
     {
+      // Same as above:
       std::string error = exc.what();
-      auto        start = error.find("The violated condition was:");
-      if (start != std::string::npos)
+      if (auto start = error.find("The violated condition was:");
+          start != std::string::npos)
+        deallog << error.substr(start) << std::endl;
+      else if (auto start = error.find("Additional information:");
+               start != std::string::npos)
         deallog << error.substr(start) << std::endl;
     }
 }

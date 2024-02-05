@@ -189,7 +189,13 @@ ExceptionBase::print_exc_data(std::ostream &out) const
   // condition, then output it. Not all exceptions do (e.g., when
   // creating an exception inside DEAL_II_NOT_IMPLEMENTED();), so
   // we have to check whether there is anything to print.
-  if (cond != nullptr)
+  //
+  // There are also places where the condition is not very interesting.
+  // Specifically, this is the case for places such as
+  //   Assert (false, ExcInternalError());
+  // Here, the condition is simply 'false'. This is not worth printing,
+  // so suppress this case.
+  if ((cond != nullptr) && (std::strcmp(cond, "false") != 0))
     out << "The violated condition was: " << std::endl
         << "    " << cond << std::endl;
 
