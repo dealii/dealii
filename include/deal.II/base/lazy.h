@@ -185,7 +185,7 @@ public:
    * Return a reference to the contained object.
    *
    * @pre The object has been initialized with a call to
-   * ensure_initialized() or value_or_initialized().
+   * ensure_initialized() or value_or_initialize().
    */
   T &
   value();
