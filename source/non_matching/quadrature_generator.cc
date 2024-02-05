@@ -1473,6 +1473,11 @@ namespace NonMatching
          * Check whether the shape functions are linear.
          */
         bool polynomials_are_hat_functions;
+
+        /**
+         * Linear FE_Q object for FE_Q_iso_Q1 path.
+         */
+        Lazy<std::unique_ptr<FE_Q<dim>>> fe_q1;
       };
 
 
@@ -1518,15 +1523,18 @@ namespace NonMatching
 
             const FiniteElement<dim> *fe = &dof_handler_cell->get_fe();
 
-            const FE_Q<dim> fe_q1(1);
-
             if (const FE_Q_iso_Q1<dim> *fe_q_iso_q1 =
                   dynamic_cast<const FE_Q_iso_Q1<dim> *>(
                     &dof_handler_cell->get_fe()))
               {
                 this->n_subdivisions_per_line = fe_q_iso_q1->get_degree();
-                fe                            = &fe_q1;
-                local_dof_values_subcell.resize(fe_q1.n_dofs_per_cell());
+
+                fe = fe_q1
+                       .value_or_initialize(
+                         []() { return std::make_unique<FE_Q<dim>>(1); })
+                       .get();
+                local_dof_values_subcell.resize(
+                  fe_q1.value()->n_dofs_per_cell());
               }
             else
               this->n_subdivisions_per_line = numbers::invalid_unsigned_int;
