@@ -1324,7 +1324,7 @@ namespace GridGenerator
                 // is on the boundary,
                 // but we could not find
                 // on which boundary.
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
 
       for (const auto &cell : tria.cell_iterators())
@@ -1524,7 +1524,7 @@ namespace GridGenerator
                       cell->face(f)->line(j)->set_boundary_id(1);
               }
             else
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
     }
 
@@ -2315,7 +2315,7 @@ namespace GridGenerator
             break;
           }
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
     (void)twisted_data; // make the static analyzer happy
     Assert(
@@ -5892,7 +5892,7 @@ namespace GridGenerator
               new_points[v][2] = -tria_copy.get_vertices()[v][2];
             }
         else
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
 
 
         // the cell data is exactly the same as before
@@ -7811,7 +7811,7 @@ namespace GridGenerator
             break;
           }
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     out_tria.create_triangulation(v, cells, subcelldata);

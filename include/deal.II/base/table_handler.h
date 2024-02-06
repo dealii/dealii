@@ -875,7 +875,7 @@ namespace internal
         ar &c              &p;
       }
     else
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
   }
 
 
@@ -934,7 +934,7 @@ namespace internal
           }
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
   }
 } // namespace internal

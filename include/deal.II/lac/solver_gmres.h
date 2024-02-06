@@ -1682,7 +1682,7 @@ SolverGMRES<VectorType>::criterion()
 {
   // dummy implementation. this function is not needed for the present
   // implementation of gmres
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0;
 }
 

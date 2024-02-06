@@ -165,7 +165,7 @@ namespace
                 c = 15 * 16;
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
           switch (s[i + 2])
             {
@@ -218,7 +218,7 @@ namespace
                 c += 15;
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
 
           u.push_back(static_cast<char>(c));

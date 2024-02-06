@@ -310,7 +310,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
   if (j == i + 1)
     return right[i];
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0;
 }
 
@@ -337,7 +337,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
   if (j == i + 1)
     return right[i];
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return diagonal[0];
 }
 

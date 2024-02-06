@@ -2204,7 +2204,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
               case 2:
                 return xi[std::min(1, dim - 1)];
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
         }
       // see also BarycentricPolynomials<3>::compute_value
@@ -2222,7 +2222,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
               case 3:
                 return xi[std::min(2, dim - 1)];
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
         }
       // see also ScalarLagrangePolynomialPyramid::compute_value()
@@ -2290,7 +2290,7 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
             case 2:
               return Point<dim>(+0.0, +1.0);
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
       default:
         DEAL_II_NOT_IMPLEMENTED();
@@ -2598,7 +2598,7 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
   else if (face_reference_cell(face_no) == ReferenceCells::Triangle)
     return 6;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return numbers::invalid_unsigned_int;
 }
 

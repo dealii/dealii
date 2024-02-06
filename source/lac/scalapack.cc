@@ -2664,7 +2664,7 @@ ScaLAPACKMatrix<NumberType>::save_serial(
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
   (void)chunk_size;
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 #  else
 
   /*
@@ -2821,7 +2821,7 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
   (void)chunk_size;
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 #  else
 
   const unsigned int n_mpi_processes(
@@ -3075,7 +3075,7 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 #  else
 
   /*
@@ -3253,10 +3253,10 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 #  else
 #    ifndef H5_HAVE_PARALLEL
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 #    else
 
   const unsigned int n_mpi_processes(

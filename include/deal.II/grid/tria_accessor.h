@@ -117,13 +117,13 @@ namespace internal
         void
         operator++() const
         {
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
         void
         operator--() const
         {
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
       };
     };

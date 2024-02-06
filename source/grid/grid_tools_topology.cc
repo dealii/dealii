@@ -1445,7 +1445,7 @@ namespace GridTools
                         starting_vertex_of_edge[3]))
                 origin_vertex_of_cell = starting_vertex_of_edge[1];
               else
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
 
               break;
             }

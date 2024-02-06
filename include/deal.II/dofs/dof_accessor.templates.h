@@ -481,7 +481,7 @@ namespace internal
       process_object_range(dealii::DoFInvalidAccessor<structdim, dim, spacedim>,
                            const unsigned int)
       {
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 
         return {0, 0};
       }
@@ -1177,7 +1177,7 @@ namespace internal
             vertex_index,
             fe_index,
             [](const auto d) {
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
               return d;
             },
             std::integral_constant<int, 0>(),

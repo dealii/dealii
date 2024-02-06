@@ -940,7 +940,7 @@ namespace DoFRenumbering
           }
 #else
         (void)tria;
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 #endif
       }
     else
@@ -1201,7 +1201,7 @@ namespace DoFRenumbering
           }
 #else
         (void)tria;
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
 #endif
       }
     else

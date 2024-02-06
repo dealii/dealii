@@ -327,7 +327,7 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell_internal(
   const Point<dim> &) const
 {
   // default implementation (should never be called)
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return {};
 }
 
@@ -543,7 +543,7 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
               default:
                 {
                   // we should get here, based on the if-condition at the top
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
                 }
             }
         }
@@ -1625,7 +1625,7 @@ MappingQ<dim, spacedim>::add_quad_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
   std::vector<Point<spacedim>> &) const
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

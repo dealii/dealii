@@ -326,7 +326,7 @@ namespace hp
             &dof_handler.get_triangulation()) == nullptr)
         {
 #ifndef DEAL_II_WITH_P4EST
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
 #else
           //
           // parallel implementation with distributed memory
@@ -776,7 +776,7 @@ namespace hp
                           {
                             // Siblings of locally owned cells are all
                             // either also locally owned or ghost cells.
-                            Assert(false, ExcInternalError());
+                            DEAL_II_ASSERT_UNREACHABLE();
                           }
                       }
                   }

@@ -85,7 +85,7 @@ namespace internal
               q_fine = std::make_unique<QGauss<dim>>(degree + 1);
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
 
         Assert(q_fine.get() != nullptr, ExcInternalError());

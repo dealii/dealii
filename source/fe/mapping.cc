@@ -186,7 +186,7 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
     }
 
   // We should never get here
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return {};
 }
 

@@ -2766,7 +2766,7 @@ namespace DoFTools
 
                     default:
                       // we shouldn't get here
-                      Assert(false, ExcInternalError());
+                      DEAL_II_ASSERT_UNREACHABLE();
                   }
               }
             else
@@ -3059,7 +3059,7 @@ namespace DoFTools
 
                         default:
                           // we shouldn't get here
-                          Assert(false, ExcInternalError());
+                          DEAL_II_ASSERT_UNREACHABLE();
                       }
                   }
               }

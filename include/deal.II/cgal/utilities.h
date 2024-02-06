@@ -593,7 +593,7 @@ namespace CGALWrappers
       }
     else
       {
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
       }
   }
 

@@ -1287,7 +1287,7 @@ namespace VectorTools
     {
       // dummy implementation of above function
       // for all other dimensions
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 

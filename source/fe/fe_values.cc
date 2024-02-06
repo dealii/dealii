@@ -945,7 +945,7 @@ FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
                   subface_index = cell->face(face_no)->child_index(1);
                   break;
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
             break;
           case internal::SubfaceCase<3>::case_x2y:
@@ -961,11 +961,11 @@ FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
                     cell->face(face_no)->child(1)->child_index(subface_no - 1);
                   break;
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
             break;
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             break;
         }
       Assert(subface_index != numbers::invalid_unsigned_int,

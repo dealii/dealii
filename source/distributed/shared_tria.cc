@@ -443,7 +443,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
       partition();
       this->update_number_cache();
@@ -459,7 +459,7 @@ namespace parallel
     {
       (void)construction_data;
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 

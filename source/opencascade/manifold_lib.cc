@@ -64,7 +64,7 @@ namespace OpenCASCADE
         return Handle(BRepAdaptor_Curve)(
           new BRepAdaptor_Curve(TopoDS::Edge(shape)));
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return Handle(BRepAdaptor_Curve)(new BRepAdaptor_Curve());
     }
 #  else
@@ -81,7 +81,7 @@ namespace OpenCASCADE
         return Handle(BRepAdaptor_HCurve)(
           new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve());
     }
 #  endif

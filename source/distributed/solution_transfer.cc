@@ -349,7 +349,7 @@ namespace parallel
                 }
 
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
                 break;
             }
         }
@@ -417,7 +417,7 @@ namespace parallel
                 }
 
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
                 break;
             }
         }

@@ -1793,7 +1793,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       Assert(
@@ -1819,7 +1819,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       this->update_periodic_face_map();
@@ -1836,7 +1836,7 @@ namespace parallel
     {
       (void)construction_data;
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -2165,7 +2165,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       // Load attached cell data, if any was stored.
@@ -2240,7 +2240,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       this->update_periodic_face_map();
@@ -2848,7 +2848,7 @@ namespace parallel
               {
                 // the underlying triangulation should not be checking for
                 // distorted cells
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
               }
           }
 
@@ -3003,7 +3003,7 @@ namespace parallel
             {
               // the underlying triangulation should not be checking for
               // distorted cells
-              Assert(false, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
             }
         }
       while (mesh_changed);
@@ -3468,7 +3468,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       // transfer data after triangulation got updated
@@ -3633,7 +3633,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       // transfer data after triangulation got updated
@@ -3919,7 +3919,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       // The range of ghost_owners might have changed so update that
@@ -3994,7 +3994,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       if (const dealii::parallel::distributed::Triangulation<dim, spacedim>
@@ -4044,7 +4044,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
         }
 
       this->update_periodic_face_map();
@@ -4321,7 +4321,7 @@ namespace parallel
                     break;
 
                   default:
-                    Assert(false, ExcInternalError());
+                    DEAL_II_ASSERT_UNREACHABLE();
                     break;
                 }
             }

@@ -628,7 +628,7 @@ namespace MeshWorker
             ps->get_quadrature(),
             ps->get_update_flags());
         else
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
   }
 #endif

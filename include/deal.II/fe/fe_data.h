@@ -765,7 +765,7 @@ namespace FiniteElementDomination
 
         default:
           // shouldn't get here
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     return neither_element_dominates;
@@ -891,7 +891,7 @@ FiniteElementData<dim>::n_dofs_per_object(const unsigned int i) const
       case 3:
         return n_dofs_per_hex();
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
   return numbers::invalid_unsigned_int;
 }

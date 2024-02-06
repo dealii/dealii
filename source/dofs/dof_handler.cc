@@ -2995,7 +2995,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::post_distributed_transfer_action()
 {
 #  ifndef DEAL_II_WITH_P4EST
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 #  else
   update_active_fe_table();
 

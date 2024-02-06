@@ -1165,7 +1165,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
       switch (dim)
         {
           case 1:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
             break;
 
           case 2:
@@ -1193,7 +1193,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
             break;
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
 
       return (this->get_first_line_index() +
@@ -1689,7 +1689,7 @@ FE_Q_Base<dim, spacedim>::has_support_on_face(
     }
 
   // we should not have gotten here
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return false;
 }
 

@@ -79,7 +79,7 @@ DoFInvalidAccessor<structdim, dim, spacedim>::dof_index(
   const unsigned int,
   const types::fe_index) const
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0;
 }
 
@@ -92,7 +92,7 @@ DoFInvalidAccessor<structdim, dim, spacedim>::set_dof_index(
   const types::global_dof_index,
   const types::fe_index) const
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
 }
 
 

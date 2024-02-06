@@ -1141,7 +1141,7 @@ namespace CUDAWrappers
     const LinearAlgebra::CUDAWrappers::Vector<Number> &,
     LinearAlgebra::CUDAWrappers::Vector<Number> &) const
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
   }
 #endif
 } // namespace CUDAWrappers

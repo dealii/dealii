@@ -74,7 +74,7 @@ PolynomialSpace<2>::compute_index(const unsigned int i) const
     else
       k += n_1d - iy;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 
@@ -104,7 +104,7 @@ PolynomialSpace<3>::compute_index(const unsigned int i) const
       else
         k += n_1d - iy - iz;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 

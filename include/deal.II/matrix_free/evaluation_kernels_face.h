@@ -1034,7 +1034,7 @@ namespace internal
           // This should never happen since the FE_RaviartThomasNodal is not
           // defined for dim = 1. It prevents compiler warnings of infinite
           // recursion.
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return;
         }
 
@@ -2859,7 +2859,7 @@ namespace internal
           {
             // We should not end up here, this should be caught by
             // FEFaceEvaluationImplGatherEvaluateSelector::supports()
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
           }
         temp1 += 3 * dofs_per_face;
       }

@@ -126,7 +126,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   // move right bound arbitrarily if
@@ -175,7 +175,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   // fill the other lists of intervals

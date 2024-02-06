@@ -1352,7 +1352,7 @@ namespace HDF5
         }
 
       // The function should not reach this point
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
       return {};
     }
 

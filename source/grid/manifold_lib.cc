@@ -2328,7 +2328,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         case 0:
         case 1:
         case 2:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
         case 3:
           return chart_points[1] + (chart_points[2] - chart_points[0]);
@@ -2341,7 +2341,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         case 7:
           return 0.5 * (chart_points[2] + chart_points[3]);
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     return {};
@@ -2537,7 +2537,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   // a valid inversion should have returned a point above. an invalid
   // inversion should have triggered the assertion, so we should never end up
   // here
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return typename Triangulation<dim, spacedim>::cell_iterator();
 }
 

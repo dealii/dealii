@@ -704,7 +704,7 @@ namespace internal
     {
       (void)kind;
 
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
 
       return v > 0; // should not be called
     }

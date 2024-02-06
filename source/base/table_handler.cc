@@ -275,7 +275,7 @@ TableHandler::add_column_to_supercolumn(const std::string &key,
       tex_supercaptions.insert(new_tex_supercaption);
     }
   else
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
 }
 
 
@@ -561,7 +561,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
 

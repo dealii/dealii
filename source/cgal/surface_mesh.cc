@@ -54,7 +54,7 @@ namespace
                    deal2cgal.at(face->vertex_index(2))};
       }
     else
-      Assert(false, ExcInternalError());
+      DEAL_II_ASSERT_UNREACHABLE();
 
     if (clockwise_ordering == true)
       std::reverse(indices.begin(), indices.end());

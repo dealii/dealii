@@ -233,12 +233,12 @@ namespace HDF5
           return std::string("H5D_MPIO_CONTIGUOUS_COLLECTIVE");
           break;
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           return std::string("Internal error");
           break;
       }
     // The function should not reach this line.
-    Assert(false, ExcInternalError());
+    DEAL_II_ASSERT_UNREACHABLE();
     return std::string("Internal error");
   }
 
@@ -356,7 +356,7 @@ namespace HDF5
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gcreate2"));
           break;
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
       }
   }
@@ -467,7 +467,7 @@ namespace HDF5
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fcreate"));
           break;
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
       }
 

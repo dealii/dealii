@@ -693,7 +693,7 @@ namespace internal
             return value.imag();
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_ASSERT_UNREACHABLE();
         }
 
       return numbers::signaling_nan<double>();
@@ -1173,7 +1173,7 @@ namespace internal
       else if (actual_type == DataVectorType::type_cell_data)
         create_cell_vector(*data, vector);
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
 
@@ -1926,7 +1926,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
                  deduced_names.size(), dof_handler->get_fe(0).n_components()));
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   const auto &data_component_interpretation =
@@ -2165,7 +2165,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_dataset_names()
                   }
 
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
       }

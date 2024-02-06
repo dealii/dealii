@@ -1071,7 +1071,7 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
       block_columns += sub_objects[row_index.first][b]->n_cols();
     }
 
-  Assert(false, ExcInternalError());
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0;
 }
 
