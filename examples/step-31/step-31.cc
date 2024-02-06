@@ -232,11 +232,17 @@ namespace Step31
     // where the exception was generated.
     //
     // So rather than letting the exception propagate freely up to
-    // <code>main()</code> we realize that there is little that an outer
-    // function can do if the inner solver fails and rather convert the
-    // run-time exception into an assertion that fails and triggers a call to
-    // <code>abort()</code>, allowing us to trace back in a debugger how we
-    // got to the current place.
+    // <code>main()</code>, we acknowledge that in the current context
+    // there is little that an outer function can do if the inner
+    // solver fails. As a consequence, we deal with the situation by
+    // catching the exception and letting the program fail by
+    // triggering an assertion with a `false` condition (which of
+    // course always fails) and that uses the error message associated
+    // with the caught exception (returned by calling `e.what()`) as
+    // error text. In other words, instead of letting the error
+    // message be produced by `main()`, we rather report it here where
+    // we can abort the program preserving information about where the
+    // problem happened.
     template <class MatrixType, class PreconditionerType>
     class InverseMatrix : public Subscriptor
     {

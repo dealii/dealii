@@ -88,12 +88,15 @@ namespace Step55
 
   namespace LinearSolvers
   {
-    // This class exposes the action of applying the inverse of a giving
-    // matrix via the function InverseMatrix::vmult(). Internally, the
-    // inverse is not formed explicitly. Instead, a linear solver with CG
-    // is performed. This class extends the InverseMatrix class in step-22
-    // with an option to specify a preconditioner, and to allow for different
-    // vector types in the vmult function.
+    // This class exposes the action of applying the inverse of a
+    // giving matrix via the function
+    // InverseMatrix::vmult(). Internally, the inverse is not formed
+    // explicitly. Instead, a linear solver with CG is performed. This
+    // class extends the InverseMatrix class in step-22 with an option
+    // to specify a preconditioner, and to allow for different vector
+    // types in the vmult function. We use the same mechanism as in
+    // step-31 to convert a run-time exception into a failed assertion
+    // should the inner solver not converge.
     template <class Matrix, class Preconditioner>
     class InverseMatrix : public Subscriptor
     {
