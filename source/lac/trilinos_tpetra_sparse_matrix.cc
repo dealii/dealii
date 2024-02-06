@@ -37,6 +37,9 @@ namespace LinearAlgebra
       const MPI_Comm                        communicator,
       const bool                            exchange_data);
 
+    template void
+    SparseMatrix<double>::reinit(const dealii::DynamicSparsityPattern &);
+
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 #  endif // DOXYGEN

@@ -21,6 +21,7 @@
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
+#  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 
@@ -512,6 +513,118 @@ namespace LinearAlgebra
       const Number factor = 1.0 / a;
       matrix->scale(factor);
       return *this;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::set(const size_type  row,
+                                           const size_type  n_cols,
+                                           const size_type *col_indices,
+                                           const Number    *values,
+                                           const bool       elide_zero_values)
+    {
+      AssertIndexRange(row, this->m());
+      const types::signed_global_dof_index *col_index_ptr;
+      const Number                         *col_value_ptr;
+      const types::signed_global_dof_index  trilinos_row = row;
+      types::signed_global_dof_index        n_columns;
+
+      boost::container::small_vector<Number, 200> local_value_array(
+        elide_zero_values ? n_cols : 0);
+      boost::container::small_vector<types::signed_global_dof_index, 200>
+        local_index_array(elide_zero_values ? n_cols : 0);
+
+      // If we don't elide zeros, the pointers are already available... need to
+      // cast to non-const pointers as that is the format taken by Trilinos (but
+      // we will not modify const data)
+      if (elide_zero_values == false)
+        {
+          col_index_ptr =
+            reinterpret_cast<const dealii::types::signed_global_dof_index *>(
+              col_indices);
+          col_value_ptr = values;
+          n_columns     = n_cols;
+        }
+      else
+        {
+          // Otherwise, extract nonzero values in each row and get the
+          // respective indices.
+          col_index_ptr = local_index_array.data();
+          col_value_ptr = local_value_array.data();
+
+          n_columns = 0;
+          for (size_type j = 0; j < n_cols; ++j)
+            {
+              const double value = values[j];
+              AssertIsFinite(value);
+              if (value != 0)
+                {
+                  local_index_array[n_columns] = col_indices[j];
+                  local_value_array[n_columns] = value;
+                  ++n_columns;
+                }
+            }
+
+          AssertIndexRange(n_columns, n_cols + 1);
+        }
+
+      // We distinguish between two cases: the first one is when the matrix is
+      // not filled (i.e., it is possible to add new elements to the sparsity
+      // pattern), and the second one is when the pattern is already fixed. In
+      // the former case, we add the possibility to insert new values, and in
+      // the second we just replace data.
+      if (compressed || matrix->isFillComplete())
+        {
+          matrix->resumeFill();
+          compressed = false;
+        }
+
+      if (!matrix->isStaticGraph())
+        matrix->insertGlobalValues(trilinos_row,
+                                   n_columns,
+                                   col_value_ptr,
+                                   col_index_ptr);
+      else
+        matrix->replaceGlobalValues(trilinos_row,
+                                    n_columns,
+                                    col_value_ptr,
+                                    col_index_ptr);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    SparseMatrix<Number, MemorySpace>::set(const size_type i,
+                                           const size_type j,
+                                           const Number    value)
+    {
+      AssertIsFinite(value);
+
+      set(i, 1, &j, &value, false);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    SparseMatrix<Number, MemorySpace>::set(
+      const std::vector<size_type> &indices,
+      const FullMatrix<Number>     &values,
+      const bool                    elide_zero_values)
+    {
+      Assert(indices.size() == values.m(),
+             ExcDimensionMismatch(indices.size(), values.m()));
+      Assert(values.m() == values.n(), ExcNotQuadratic());
+
+      for (size_type i = 0; i < indices.size(); ++i)
+        set(indices[i],
+            indices.size(),
+            indices.data(),
+            &values(i, 0),
+            elide_zero_values);
     }
 
 

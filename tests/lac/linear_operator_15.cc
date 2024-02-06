@@ -22,6 +22,10 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_tpetra_vector.h>
+#endif
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
@@ -90,6 +94,39 @@ main(int argc, char *argv[])
     // u = lo_A_plus_id_1 * f; // This is not allowed -- different payloads
     u = lo_A_plus_id_2 * f;
   }
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  {
+    DynamicSparsityPattern csp(dim, dim);
+    testproblem.five_point_structure(csp);
+
+    LinearAlgebra::TpetraWrappers::SparseMatrix<double> A;
+    A.reinit(csp);
+    testproblem.five_point(A);
+
+    LinearAlgebra::TpetraWrappers::Vector<double> f;
+    f.reinit(complete_index_set(dim));
+    LinearAlgebra::TpetraWrappers::Vector<double> u;
+    u.reinit(complete_index_set(dim));
+
+    A.compress(VectorOperation::insert);
+    f.compress(VectorOperation::insert);
+    u.compress(VectorOperation::insert);
+
+    const auto lo_A =
+      linear_operator<LinearAlgebra::TpetraWrappers::Vector<double>>(A);
+    const auto lo_id_1 =
+      identity_operator<LinearAlgebra::TpetraWrappers::Vector<double>>(
+        lo_A.reinit_range_vector);
+    const auto lo_id_2 =
+      identity_operator<LinearAlgebra::TpetraWrappers::Vector<double>>(lo_A);
+    const auto lo_A_plus_id_1 = lo_A + lo_id_1; // Not a good idea. See below.
+    const auto lo_A_plus_id_2 = lo_A + lo_id_2;
+
+    // u = lo_A_plus_id_1 * f; // This is not allowed -- different payloads
+    u = lo_A_plus_id_2 * f;
+  }
+#endif
 
   deallog << "OK" << std::endl;
 
