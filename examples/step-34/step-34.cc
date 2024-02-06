@@ -87,8 +87,7 @@ namespace Step34
             return (1. / (R.norm() * 4 * numbers::PI));
 
           default:
-            Assert(false, ExcInternalError());
-            return 0.;
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -105,8 +104,7 @@ namespace Step34
             return R / (-4 * numbers::PI * R.norm_square() * R.norm());
 
           default:
-            Assert(false, ExcInternalError());
-            return Tensor<1, dim>();
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   } // namespace LaplaceKernel

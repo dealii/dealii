@@ -1337,7 +1337,7 @@ namespace Step35
                   loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_ASSERT_UNREACHABLE();
             }
       }
     std::vector<std::string> joint_solution_names(dim, "v");

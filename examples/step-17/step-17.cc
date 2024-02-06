@@ -913,7 +913,7 @@ namespace Step17
               solution_names.emplace_back("z_displacement");
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_NOT_IMPLEMENTED();
           }
 
         data_out.add_data_vector(localized_solution, solution_names);

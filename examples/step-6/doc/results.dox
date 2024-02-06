@@ -593,25 +593,18 @@ double coefficient (const Point<dim> &p)
   else if ((p[0] >= 0) && (p[1] >= 0))    // upper right quadrant
     return 1000;
   else
-    {
-      Assert(false, ExcInternalError());
-      return 0;
-    }
+    DEAL_II_ASSERT_UNREACHABLE();
 }
 @endcode
-(Adding the <code>Assert</code> at the end ensures that either an exception
+(Adding the `DEAL_II_ASSERT_UNREACHABLE();` call at the end ensures that either an exception
 is thrown or that the program aborts if we ever get to that point
 -- which of course we shouldn't,
-but this is a good way to insure yourself: we all make mistakes by
+but this is a good way to insure yourself: We all make mistakes by
 sometimes not thinking of all cases, for example by checking
 for <code>p[0]</code> to be less than and greater than zero,
 rather than greater-or-equal to zero, and thereby forgetting
 some cases that would otherwise lead to bugs that are awkward
-to find. The <code>return 0;</code> at the end is only there to
-avoid compiler warnings that the function does not end in a
-<code>return</code> statement -- the compiler cannot see that the
-function would never actually get to that point because of the
-preceding <code>Assert</code> statement.)
+to find.
 
 By playing with such cases where four or more sectors come
 together and on which the coefficient has different values, one can
