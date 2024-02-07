@@ -1890,6 +1890,9 @@ namespace deal_II_exceptions
  *       DEAL_II_ASSERT_UNREACHABLE();
  *   }
  * @endcode
+ *
+ * This macro is first used in step-7, where we show another example of
+ * a context where it is frequently used.
  */
 #define DEAL_II_ASSERT_UNREACHABLE()                             \
   ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \

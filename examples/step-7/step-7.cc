@@ -732,23 +732,26 @@ namespace Step7
   // matrix), we omit this detail even though doing this in a strictly correct
   // way would not be hard to add.
   //
-  // At the end of the switch, we have a default case that looks slightly
-  // strange: an <code>Assert</code> statement with a <code>false</code>
-  // condition. Since the <code>Assert</code> macro raises an error whenever
-  // the condition is false, this means that whenever we hit this statement
-  // the program will be aborted. This in intentional: Right now we have only
+  // At the end of the switch, we have a default case that simply says
+  // `DEAL_II_ASSERT_UNREACHABLE()`. This macro raises an error whenever
+  // the program reaches this point; the program is then aborted.
+  // This is intentional: Right now we have only
   // implemented two refinement strategies (global and adaptive), but someone
   // might want to add a third strategy (for example adaptivity with a
   // different refinement criterion) and add a third member to the enumeration
   // that determines the refinement mode. If it weren't for the default case
   // of the switch statement, this function would simply run to its end
   // without doing anything. This is most likely not what was intended. One of
-  // the defensive programming techniques that you will find all over the
-  // deal.II library is therefore to always have default cases that abort, to
-  // make sure that values not considered when listing the cases in the switch
-  // statement are eventually caught, and forcing programmers to add code to
-  // handle them. We will use this same technique in other places further down
-  // as well.
+  // the [defensive programming
+  // techniques](https://en.wikipedia.org/wiki/Defensive_programming) that you
+  // will find all over the deal.II library is therefore to always have default
+  // cases that abort, to make sure that values not considered when listing the
+  // cases in the switch statement are eventually caught, and forcing
+  // programmers to add code to handle them. The documentation of
+  // DEAL_II_ASSERT_UNREACHABLE() shows other examples of how this macro can be
+  // used.
+  //
+  // We will use this same technique in other places further down as well.
   template <int dim>
   void HelmholtzProblem<dim>::refine_grid()
   {
@@ -782,7 +785,7 @@ namespace Step7
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_ASSERT_UNREACHABLE();
           }
       }
   }
@@ -1013,7 +1016,7 @@ namespace Step7
           vtk_filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     // We augment the filename by a postfix denoting the finite element which
@@ -1128,7 +1131,7 @@ namespace Step7
           error_filename += "-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     error_filename += "-q" + std::to_string(fe->degree);
@@ -1203,7 +1206,7 @@ namespace Step7
               conv_filename += "-adaptive";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
         conv_filename += "-q" + std::to_string(fe->degree);
         conv_filename += ".tex";
