@@ -335,7 +335,7 @@ namespace LinearAlgebra
        */
       void
       reinit(const IndexSet &parallel_partitioner,
-             const MPI_Comm  communicator,
+             const MPI_Comm  communicator         = MPI_COMM_WORLD,
              const bool      omit_zeroing_entries = false);
 
       /**

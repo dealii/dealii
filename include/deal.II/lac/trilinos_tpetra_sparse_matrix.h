@@ -446,6 +446,146 @@ namespace LinearAlgebra
           const TrilinosScalar *values,
           const bool            elide_zero_values      = true,
           const bool            col_indices_are_sorted = false);
+
+      /**
+       * Set the element (<i>i,j</i>) to @p value.
+       *
+       * This function is able to insert new elements into the matrix as long as
+       * compress() has not been called, so the sparsity pattern will be
+       * extended. When compress() is called for the first time (or in case the
+       * matrix is initialized from a sparsity pattern), no new elements can be
+       * added and an insertion of elements at positions which have not been
+       * initialized will throw an exception.
+       *
+       * For the case that the matrix is constructed without a sparsity pattern
+       * and new matrix entries are added on demand, please note the following
+       * behavior imposed by the underlying Tpetra::CrsMatrix data structure:
+       * If the same matrix entry is inserted more than once, the matrix entries
+       * will be added upon calling compress() (since Tpetra does not track
+       * values to the same entry before the final compress() is called), even
+       * if VectorOperation::insert is specified as argument to compress(). In
+       * the case you cannot make sure that matrix entries are only set once,
+       * initialize the matrix with a sparsity pattern to fix the matrix
+       * structure before inserting elements.
+       */
+      void
+      set(const size_type i, const size_type j, const Number value);
+
+      /**
+       * Set all elements given in a FullMatrix<double> into the sparse matrix
+       * locations given by <tt>indices</tt>. In other words, this function
+       * writes the elements in <tt>full_matrix</tt> into the calling matrix,
+       * using the local-to-global indexing specified by <tt>indices</tt> for
+       * both the rows and the columns of the matrix. This function assumes a
+       * quadratic sparse matrix and a quadratic full_matrix, the usual
+       * situation in FE calculations.
+       *
+       * This function is able to insert new elements into the matrix as long as
+       * compress() has not been called, so the sparsity pattern will be
+       * extended. After compress() has been called for the first time or the
+       * matrix has been initialized from a sparsity pattern, extending the
+       * sparsity pattern is no longer possible and an insertion of elements at
+       * positions which have not been initialized will throw an exception.
+       *
+       * The optional parameter <tt>elide_zero_values</tt> can be used to
+       * specify whether zero values should be inserted anyway or they should be
+       * filtered away. The default value is <tt>false</tt>, i.e., even zero
+       * values are inserted/replaced.
+       *
+       * For the case that the matrix is constructed without a sparsity pattern
+       * and new matrix entries are added on demand, please note the following
+       * behavior imposed by the underlying Tpetra::CrsMatrix data structure:
+       * If the same matrix entry is inserted more than once, the matrix entries
+       * will be added upon calling compress() (since Epetra does not track
+       * values to the same entry before the final compress() is called), even
+       * if VectorOperation::insert is specified as argument to compress(). In
+       * the case you cannot make sure that matrix entries are only set once,
+       * initialize the matrix with a sparsity pattern to fix the matrix
+       * structure before inserting elements.
+       */
+      void
+      set(const std::vector<size_type> &indices,
+          const FullMatrix<Number>     &full_matrix,
+          const bool                    elide_zero_values = false);
+
+      /**
+       * Same function as before, but now including the possibility to use
+       * rectangular full_matrices and different local-to-global indexing on
+       * rows and columns, respectively.
+       */
+      void
+      set(const std::vector<size_type> &row_indices,
+          const std::vector<size_type> &col_indices,
+          const FullMatrix<Number>     &full_matrix,
+          const bool                    elide_zero_values = false);
+
+      /**
+       * Set several elements in the specified row of the matrix with column
+       * indices as given by <tt>col_indices</tt> to the respective value.
+       *
+       * This function is able to insert new elements into the matrix as long as
+       * compress() has not been called, so the sparsity pattern will be
+       * extended. After compress() has been called for the first time or the
+       * matrix has been initialized from a sparsity pattern, extending the
+       * sparsity pattern is no longer possible and an insertion of elements at
+       * positions which have not been initialized will throw an exception.
+       *
+       * The optional parameter <tt>elide_zero_values</tt> can be used to
+       * specify whether zero values should be inserted anyway or they should be
+       * filtered away. The default value is <tt>false</tt>, i.e., even zero
+       * values are inserted/replaced.
+       *
+       * For the case that the matrix is constructed without a sparsity pattern
+       * and new matrix entries are added on demand, please note the following
+       * behavior imposed by the underlying Tpetra::CrsMatrix data structure:
+       * If the same matrix entry is inserted more than once, the matrix entries
+       * will be added upon calling compress() (since Epetra does not track
+       * values to the same entry before the final compress() is called), even
+       * if VectorOperation::insert is specified as argument to compress(). In
+       * the case you cannot make sure that matrix entries are only set once,
+       * initialize the matrix with a sparsity pattern to fix the matrix
+       * structure before inserting elements.
+       */
+      void
+      set(const size_type               row,
+          const std::vector<size_type> &col_indices,
+          const std::vector<Number>    &values,
+          const bool                    elide_zero_values = false);
+
+      /**
+       * Set several elements to values given by <tt>values</tt> in a given row
+       * in columns given by col_indices into the sparse matrix.
+       *
+       * This function is able to insert new elements into the matrix as long as
+       * compress() has not been called, so the sparsity pattern will be
+       * extended. After compress() has been called for the first time or the
+       * matrix has been initialized from a sparsity pattern, extending the
+       * sparsity pattern is no longer possible and an insertion of elements at
+       * positions which have not been initialized will throw an exception.
+       *
+       * The optional parameter <tt>elide_zero_values</tt> can be used to
+       * specify whether zero values should be inserted anyway or they should be
+       * filtered away. The default value is <tt>false</tt>, i.e., even zero
+       * values are inserted/replaced.
+       *
+       * For the case that the matrix is constructed without a sparsity pattern
+       * and new matrix entries are added on demand, please note the following
+       * behavior imposed by the underlying Tpetra::CrsMatrix data structure:
+       * If the same matrix entry is inserted more than once, the matrix entries
+       * will be added upon calling compress() (since Epetra does not track
+       * values to the same entry before the final compress() is called), even
+       * if VectorOperation::insert is specified as argument to compress(). In
+       * the case you cannot make sure that matrix entries are only set once,
+       * initialize the matrix with a sparsity pattern to fix the matrix
+       * structure before inserting elements.
+       */
+      void
+      set(const size_type  row,
+          const size_type  n_cols,
+          const size_type *col_indices,
+          const Number    *values,
+          const bool       elide_zero_values = false);
+
       /** @} */
 
       /**
