@@ -549,8 +549,8 @@ namespace LinearAlgebra
        * stored in @p values to the vector components specified by @p indices.
        */
       void
-      add(const std::vector<size_type>      &indices,
-          const std::vector<TrilinosScalar> &values);
+      add(const std::vector<size_type> &indices,
+          const std::vector<Number>    &values);
 
 
       /**
@@ -943,8 +943,8 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     inline void
-    Vector<Number, MemorySpace>::add(const std::vector<size_type>      &indices,
-                                     const std::vector<TrilinosScalar> &values)
+    Vector<Number, MemorySpace>::add(const std::vector<size_type> &indices,
+                                     const std::vector<Number>    &values)
     {
       // if we have ghost values, do not allow
       // writing to this vector at all.
