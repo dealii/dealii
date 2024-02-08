@@ -204,8 +204,12 @@ namespace PETScWrappers
     const PetscInt *ranges;
     AssertPETSc(PetscLayoutGetRanges(layout, &ranges));
 
-    PetscInt    cnt   = 0;
+    PetscInt cnt = 0;
+#  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)
     PetscMPIInt owner = 0;
+#  else
+    PetscInt owner = 0;
+#  endif
     for (const auto idx : inidx)
       {
         // short-circuit the search if the last owner owns this index too
