@@ -49,7 +49,7 @@ namespace LinearAlgebra
                                  const IndexSet &ghost_indices,
                                  const MPI_Comm  communicator)
     {
-      comm = Teuchos::rcpFromRef(communicator);
+      comm = Teuchos::rcpFromUndefRef(communicator);
 
       auto vector_space_vector_map =
         locally_owned_indices.make_tpetra_map_rcp(*comm, false);
