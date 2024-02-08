@@ -546,9 +546,8 @@ namespace step62
         elastic_constant = mu * (3 * lambda + 2 * mu) / (lambda + mu);
       }
     else
-      {
-        Assert(false, ExcInternalError());
-      }
+      DEAL_II_NOT_IMPLEMENTED();
+
     const double material_a_speed_of_sound =
       std::sqrt(elastic_constant / material_a_rho);
     const double material_a_wavelength =

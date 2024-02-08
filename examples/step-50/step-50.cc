@@ -1191,7 +1191,7 @@ void LaplaceProblem<dim, degree>::solve()
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   pcout << "   Number of CG iterations:      " << solver_control.last_step()
@@ -1569,7 +1569,7 @@ int main(int argc, char *argv[])
             }
 
           default:
-            Assert(false, ExcMessage("This program only works in 2d and 3d."));
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   catch (std::exception &exc)

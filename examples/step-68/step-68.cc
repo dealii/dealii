@@ -323,8 +323,7 @@ namespace Step68
           break;
 
         default:
-          Assert(false, ExcInternalError());
-          break;
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
     return base_weight + particle_weight * n_particles_in_cell;
