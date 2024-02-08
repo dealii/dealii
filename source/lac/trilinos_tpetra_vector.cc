@@ -36,13 +36,23 @@ namespace LinearAlgebra
     static_assert(concepts::is_vector_space_vector<Vector<float>>);
 #    endif
     template class Vector<float>;
+    namespace internal
+    {
+      template class VectorReference<float>;
+    }
 #  endif
+
 #  ifdef HAVE_TPETRA_INST_DOUBLE
 #    ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector<Vector<double>>);
 #    endif
     template class Vector<double>;
+    namespace internal
+    {
+      template class VectorReference<double>;
+    }
 #  endif
+
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
 #    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
 #      ifdef DEAL_II_HAVE_CXX20
@@ -50,13 +60,22 @@ namespace LinearAlgebra
                   Vector<std::complex<float>>);
 #      endif
     template class Vector<std::complex<float>>;
+    namespace internal
+    {
+      template class VectorReference<std::complex<float>>;
+    }
 #    endif
+
 #    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
 #      ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector <
                   Vector<std::complex<double>>);
 #      endif
     template class Vector<std::complex<double>>;
+    namespace internal
+    {
+      template class VectorReference<std::complex<double>>;
+    }
 #    endif
 #  endif
   } // namespace TpetraWrappers
