@@ -632,11 +632,11 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     SparseMatrix<Number, MemorySpace>::add(
-      const size_type       row,
-      const size_type       n_cols,
-      const size_type      *col_indices,
-      const TrilinosScalar *values,
-      const bool            elide_zero_values,
+      const size_type  row,
+      const size_type  n_cols,
+      const size_type *col_indices,
+      const Number    *values,
+      const bool       elide_zero_values,
       const bool /*col_indices_are_sorted*/)
     {
       AssertIndexRange(row, this->m());

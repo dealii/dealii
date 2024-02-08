@@ -424,7 +424,7 @@ namespace LinearAlgebra
        * back to an uncompressed state.
        */
       void
-      add(const size_type i, const size_type j, const TrilinosScalar value);
+      add(const size_type i, const size_type j, const Number value);
 
       /**
        * Add an array of values given by <tt>values</tt> in the given global
@@ -440,12 +440,12 @@ namespace LinearAlgebra
        * back to an uncompressed state.
        */
       void
-      add(const size_type       row,
-          const size_type       n_cols,
-          const size_type      *col_indices,
-          const TrilinosScalar *values,
-          const bool            elide_zero_values      = true,
-          const bool            col_indices_are_sorted = false);
+      add(const size_type  row,
+          const size_type  n_cols,
+          const size_type *col_indices,
+          const Number    *values,
+          const bool       elide_zero_values      = true,
+          const bool       col_indices_are_sorted = false);
 
       /**
        * Set the element (<i>i,j</i>) to @p value.
@@ -836,9 +836,9 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     inline void
-    SparseMatrix<Number, MemorySpace>::add(const size_type      i,
-                                           const size_type      j,
-                                           const TrilinosScalar value)
+    SparseMatrix<Number, MemorySpace>::add(const size_type i,
+                                           const size_type j,
+                                           const Number    value)
     {
       add(i, 1, &j, &value, false);
     }
