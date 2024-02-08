@@ -958,7 +958,7 @@ namespace LinearAlgebra
 
 
     template <typename MemorySpace>
-    Teuchos::RCP<const MapType<MemorySpace>>
+    Teuchos::RCP<const typename SparsityPattern<MemorySpace>::MapType>
     SparsityPattern<MemorySpace>::domain_partitioner() const
     {
       return graph->getDomainMap();
@@ -967,7 +967,7 @@ namespace LinearAlgebra
 
 
     template <typename MemorySpace>
-    Teuchos::RCP<const MapType<MemorySpace>>
+    Teuchos::RCP<const typename SparsityPattern<MemorySpace>::MapType>
     SparsityPattern<MemorySpace>::range_partitioner() const
     {
       return graph->getRangeMap();
