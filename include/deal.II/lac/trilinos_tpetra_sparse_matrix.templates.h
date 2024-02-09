@@ -31,6 +31,114 @@ namespace LinearAlgebra
 
   namespace TpetraWrappers
   {
+    namespace internal
+    {
+      template <typename Number, typename MemorySpace>
+      void
+      apply(const SparseMatrix<Number, MemorySpace> &M,
+            const Vector<Number, MemorySpace>       &src,
+            Vector<Number, MemorySpace>             &dst,
+            Teuchos::ETransp                         mode = Teuchos::NO_TRANS,
+            Number alpha = Teuchos::ScalarTraits<Number>::one(),
+            Number beta  = Teuchos::ScalarTraits<Number>::zero())
+      {
+        Assert(&src != &dst,
+               SparseMatrix<double>::ExcSourceEqualsDestination());
+        Assert(M.trilinos_matrix().isFillComplete(),
+               SparseMatrix<double>::ExcMatrixNotCompressed());
+
+        if (mode == Teuchos::NO_TRANS)
+          {
+            Assert(src.trilinos_vector().getMap()->isSameAs(
+                     *M.trilinos_matrix().getDomainMap()),
+                   SparseMatrix<double>::ExcColMapMissmatch());
+            Assert(dst.trilinos_vector().getMap()->isSameAs(
+                     *M.trilinos_matrix().getRangeMap()),
+                   SparseMatrix<double>::ExcDomainMapMissmatch());
+          }
+        else
+          {
+            Assert(dst.trilinos_vector().getMap()->isSameAs(
+                     *M.trilinos_matrix().getDomainMap()),
+                   SparseMatrix<double>::ExcColMapMissmatch());
+            Assert(src.trilinos_vector().getMap()->isSameAs(
+                     *M.trilinos_matrix().getRangeMap()),
+                   SparseMatrix<double>::ExcDomainMapMissmatch());
+          }
+
+        M.trilinos_matrix().apply(
+          src.trilinos_vector(), dst.trilinos_vector(), mode, alpha, beta);
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      void
+      apply(const SparseMatrix<Number, MemorySpace> &M,
+            const dealii::Vector<Number>            &src,
+            dealii::Vector<Number>                  &dst,
+            Teuchos::ETransp                         mode = Teuchos::NO_TRANS,
+            Number alpha = Teuchos::ScalarTraits<Number>::one(),
+            Number beta  = Teuchos::ScalarTraits<Number>::zero())
+      {
+        Assert(&src != &dst,
+               SparseMatrix<double>::ExcSourceEqualsDestination());
+        Assert(M.trilinos_matrix().isFillComplete(),
+               SparseMatrix<double>::ExcMatrixNotCompressed());
+
+        // get the size of the input vectors:
+        const size_type dst_local_size = dst.end() - dst.begin();
+        const size_type src_local_size = src.end() - src.begin();
+
+        // For the dst vector:
+        Kokkos::View<Number **, Kokkos::LayoutLeft, Kokkos::HostSpace>
+          kokkos_view_dst(dst.begin(), dst_local_size, 1);
+
+        // get a Kokkos::DualView
+        auto mirror_view_dst = Kokkos::create_mirror_view_and_copy(
+          typename MemorySpace::kokkos_space{}, kokkos_view_dst);
+        typename SparseMatrix<Number, MemorySpace>::VectorType::dual_view_type
+          kokkos_dual_view_dst(mirror_view_dst, kokkos_view_dst);
+
+        // create the Tpetra::Vector
+        typename SparseMatrix<Number, MemorySpace>::VectorType tpetra_dst(
+          M.trilinos_matrix().getRangeMap(), kokkos_dual_view_dst);
+
+        // For the src vector:
+        // create a Kokkos::View from the src vector
+        Kokkos::View<Number **, Kokkos::LayoutLeft, Kokkos::HostSpace>
+          kokkos_view_src(const_cast<Number *>(src.begin()), src_local_size, 1);
+
+        // get a Kokkos::DualView
+        auto mirror_view_src = Kokkos::create_mirror_view_and_copy(
+          typename MemorySpace::kokkos_space{}, kokkos_view_src);
+        typename SparseMatrix<Number, MemorySpace>::VectorType::dual_view_type
+          kokkos_dual_view_src(mirror_view_src, kokkos_view_src);
+
+        // create the Tpetra::Vector
+        typename SparseMatrix<Number, MemorySpace>::VectorType tpetra_src(
+          M.trilinos_matrix().getDomainMap(), kokkos_dual_view_src);
+
+        M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
+      }
+
+
+
+      template <typename Number, typename MemorySpace, typename VectorType>
+      void
+      apply(SparseMatrix<Number, MemorySpace> &,
+            const VectorType &,
+            VectorType &,
+            Teuchos::ETransp,
+            Number,
+            Number)
+      {
+        DEAL_II_NOT_IMPLEMENTED();
+      }
+    } // namespace internal
+
+
+
     // reinit_matrix():
     namespace
     {
@@ -1170,81 +1278,58 @@ namespace LinearAlgebra
 
 
     // Multiplications
-
     template <typename Number, typename MemorySpace>
+    template <typename InputVectorType>
     void
-    SparseMatrix<Number, MemorySpace>::vmult(
-      Vector<Number, MemorySpace>       &dst,
-      const Vector<Number, MemorySpace> &src) const
+    SparseMatrix<Number, MemorySpace>::vmult(InputVectorType       &dst,
+                                             const InputVectorType &src) const
     {
-      Assert(&src != &dst, ExcSourceEqualsDestination());
-      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
-             ExcColMapMissmatch());
-      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
-             ExcDomainMapMissmatch());
-      matrix->apply(src.trilinos_vector(), dst.trilinos_vector());
+      internal::apply(*this, src, dst);
     }
 
 
 
     template <typename Number, typename MemorySpace>
+    template <typename InputVectorType>
     void
-    SparseMatrix<Number, MemorySpace>::Tvmult(
-      Vector<Number, MemorySpace>       &dst,
-      const Vector<Number, MemorySpace> &src) const
+    SparseMatrix<Number, MemorySpace>::Tvmult(InputVectorType       &dst,
+                                              const InputVectorType &src) const
     {
-      Assert(&src != &dst, ExcSourceEqualsDestination());
-      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
-             ExcColMapMissmatch());
-      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
-             ExcDomainMapMissmatch());
-      matrix->apply(src.trilinos_vector(),
-                    dst.trilinos_vector(),
-                    Teuchos::TRANS);
+      internal::apply(*this, src, dst, Teuchos::TRANS);
     }
 
 
 
     template <typename Number, typename MemorySpace>
+    template <typename InputVectorType>
     void
     SparseMatrix<Number, MemorySpace>::vmult_add(
-      Vector<Number, MemorySpace>       &dst,
-      const Vector<Number, MemorySpace> &src) const
+      InputVectorType       &dst,
+      const InputVectorType &src) const
     {
-      Assert(&src != &dst, ExcSourceEqualsDestination());
-      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
-             ExcColMapMissmatch());
-      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
-             ExcDomainMapMissmatch());
-      matrix->apply(src.trilinos_vector(),
-                    dst.trilinos_vector(),
-                    Teuchos::NO_TRANS,
-                    Teuchos::ScalarTraits<Number>::one(),
-                    Teuchos::ScalarTraits<Number>::one());
+      internal::apply(*this,
+                      src,
+                      dst,
+                      Teuchos::NO_TRANS,
+                      Teuchos::ScalarTraits<Number>::one(),
+                      Teuchos::ScalarTraits<Number>::one());
     }
 
 
 
     template <typename Number, typename MemorySpace>
+    template <typename InputVectorType>
     void
     SparseMatrix<Number, MemorySpace>::Tvmult_add(
-      Vector<Number, MemorySpace>       &dst,
-      const Vector<Number, MemorySpace> &src) const
+      InputVectorType       &dst,
+      const InputVectorType &src) const
     {
-      Assert(&src != &dst, ExcSourceEqualsDestination());
-      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
-      Assert(dst.trilinos_vector().getMap()->isSameAs(*matrix->getDomainMap()),
-             ExcColMapMissmatch());
-      Assert(src.trilinos_vector().getMap()->isSameAs(*matrix->getRangeMap()),
-             ExcDomainMapMissmatch());
-      matrix->apply(src.trilinos_vector(),
-                    dst.trilinos_vector(),
-                    Teuchos::TRANS,
-                    Teuchos::ScalarTraits<Number>::one(),
-                    Teuchos::ScalarTraits<Number>::one());
+      internal::apply(*this,
+                      src,
+                      dst,
+                      Teuchos::TRANS,
+                      Teuchos::ScalarTraits<Number>::one(),
+                      Teuchos::ScalarTraits<Number>::one());
     }
 
 

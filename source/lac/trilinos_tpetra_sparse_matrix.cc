@@ -46,6 +46,37 @@ namespace LinearAlgebra
     template void
     SparseMatrix<double>::reinit(const dealii::DynamicSparsityPattern &);
 
+    template void
+    SparseMatrix<double>::vmult(Vector<double>       &dst,
+                                const Vector<double> &src) const;
+
+    template void
+    SparseMatrix<double>::Tvmult(Vector<double>       &dst,
+                                 const Vector<double> &src) const;
+
+    template void
+    SparseMatrix<double>::vmult_add(Vector<double>       &dst,
+                                    const Vector<double> &src) const;
+
+    template void
+    SparseMatrix<double>::Tvmult_add(Vector<double>       &dst,
+                                     const Vector<double> &src) const;
+
+    template void
+    SparseMatrix<double>::vmult(::dealii::Vector<double>       &dst,
+                                const ::dealii::Vector<double> &src) const;
+
+    template void
+    SparseMatrix<double>::Tvmult(::dealii::Vector<double>       &dst,
+                                 const ::dealii::Vector<double> &src) const;
+
+    template void
+    SparseMatrix<double>::vmult_add(::dealii::Vector<double>       &dst,
+                                    const ::dealii::Vector<double> &src) const;
+
+    template void
+    SparseMatrix<double>::Tvmult_add(::dealii::Vector<double>       &dst,
+                                     const ::dealii::Vector<double> &src) const;
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 #  endif // DOXYGEN
