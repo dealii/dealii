@@ -153,6 +153,28 @@ namespace LinearAlgebra
       SparseMatrix(const SparsityPattern<MemorySpace> &sparsity_pattern);
 
       /**
+       * Generate a matrix that is completely stored locally, having #m rows and
+       * #n columns.
+       *
+       * The number of columns entries per row is specified as the maximum
+       * number of entries argument.
+       */
+      SparseMatrix(const size_type    m,
+                   const size_type    n,
+                   const unsigned int n_max_entries_per_row);
+
+      /**
+       * Generate a matrix that is completely stored locally, having #m rows and
+       * #n columns.
+       *
+       * The vector <tt>n_entries_per_row</tt> specifies the number of entries
+       * in each row.
+       */
+      SparseMatrix(const size_type                  m,
+                   const size_type                  n,
+                   const std::vector<unsigned int> &n_entries_per_row);
+
+      /**
        * Move constructor. Create a new sparse matrix by stealing the internal
        * data of the `other` object.
        */
@@ -587,7 +609,50 @@ namespace LinearAlgebra
           const bool       elide_zero_values = false);
 
       /** @} */
+      /**
+       * @name Entry Access
+       */
+      /** @{ */
 
+      /**
+       * Return the value of the entry (<i>i,j</i>).  This may be an expensive
+       * operation and you should always take care where to call this function.
+       * As in the deal.II sparse matrix class, we throw an exception if the
+       * respective entry doesn't exist in the sparsity pattern of this class,
+       * which is requested from Trilinos. Moreover, an exception will be thrown
+       * when the requested element is not saved on the calling process.
+       */
+      Number
+      operator()(const size_type i, const size_type j) const;
+
+      /**
+       * Return the value of the matrix entry (<i>i,j</i>). If this entry does
+       * not exist in the sparsity pattern, then zero is returned. While this
+       * may be convenient in some cases, note that it is simple to write
+       * algorithms that are slow compared to an optimal solution, since the
+       * sparsity of the matrix is not used.  On the other hand, if you want to
+       * be sure the entry exists, you should use operator() instead.
+       *
+       * The lack of error checking in this function can also yield surprising
+       * results if you have a parallel matrix. In that case, just because you
+       * get a zero result from this function does not mean that either the
+       * entry does not exist in the sparsity pattern or that it does but has a
+       * value of zero. Rather, it could also be that it simply isn't stored on
+       * the current processor; in that case, it may be stored on a different
+       * processor, and possibly so with a nonzero value.
+       */
+      Number
+      el(const size_type i, const size_type j) const;
+
+      /**
+       * Return the main diagonal element in the <i>i</i>th row. This function
+       * throws an error if the matrix is not quadratic and it also throws an
+       * error if <i>(i,i)</i> is not element of the local matrix.
+       */
+      Number
+      diag_element(const size_type i) const;
+
+      /** @} */
       /**
        * @name Multiplications
        */
@@ -802,9 +867,39 @@ namespace LinearAlgebra
                        "Are you trying to put the product of the "
                        "matrix with a vector into a vector that has "
                        "ghost elements?");
+
+      /**
+       * Exception
+       */
+      DeclException2(ExcInvalidIndex,
+                     size_type,
+                     size_type,
+                     << "The entry with index <" << arg1 << ',' << arg2
+                     << "> does not exist.");
+
+      /**
+       * Exception
+       */
+      DeclException4(ExcAccessToNonLocalElement,
+                     size_type,
+                     size_type,
+                     size_type,
+                     size_type,
+                     << "You tried to access element (" << arg1 << '/' << arg2
+                     << ')'
+                     << " of a distributed matrix, but only rows in range ["
+                     << arg3 << ',' << arg4
+                     << "] are stored locally and can be accessed.");
+
       /** @} */
 
     private:
+      /**
+       * Helper function for operator() and el().
+       */
+      Number
+      element(const size_type i, const size_type j, const bool no_error) const;
+
       /**
        * Pointer to the user-supplied Tpetra Trilinos mapping of the matrix
        * columns that assigns parts of the matrix to the individual processes.

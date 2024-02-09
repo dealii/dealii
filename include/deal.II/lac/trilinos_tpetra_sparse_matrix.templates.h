@@ -232,6 +232,49 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     SparseMatrix<Number, MemorySpace>::SparseMatrix(
+      const size_type    m,
+      const size_type    n,
+      const unsigned int n_max_entries_per_row)
+      : column_space_map(Utilities::Trilinos::internal::make_rcp<MapType>(
+          n,
+          0,
+          Utilities::Trilinos::tpetra_comm_self()))
+      , matrix(Utilities::Trilinos::internal::make_rcp<MatrixType>(
+          Utilities::Trilinos::internal::make_rcp<MapType>(
+            m,
+            0,
+            Utilities::Trilinos::tpetra_comm_self()),
+          column_space_map,
+          n_max_entries_per_row))
+      , compressed(false)
+    {}
+
+
+
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
+      const size_type                  m,
+      const size_type                  n,
+      const std::vector<unsigned int> &n_entries_per_row)
+      : column_space_map(Utilities::Trilinos::internal::make_rcp<MapType>(
+          n,
+          0,
+          Utilities::Trilinos::tpetra_comm_self()))
+      , compressed(false)
+    {
+      std::vector<size_t> entries_per_row_size_type(n_entries_per_row.begin(),
+                                                    n_entries_per_row.end());
+      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
+        Utilities::Trilinos::internal::make_rcp<MapType>(
+          m, 0, Utilities::Trilinos::tpetra_comm_self()),
+        column_space_map,
+        Teuchos::ArrayView<size_t>{entries_per_row_size_type});
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
       SparseMatrix<Number, MemorySpace> &&other) noexcept
       : column_space_map(std::move(other.column_space_map))
       , matrix(std::move(other.matrix))
@@ -826,6 +869,8 @@ namespace LinearAlgebra
         }
     }
 
+
+
     template <typename Number, typename MemorySpace>
     void
     SparseMatrix<Number, MemorySpace>::resume_fill()
@@ -837,6 +882,101 @@ namespace LinearAlgebra
         }
     }
 
+
+    template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::element(const size_type i,
+                                               const size_type j,
+                                               const bool      no_error) const
+    {
+      // Extract local indices in the matrix.
+      const int      trilinos_i = matrix->getRowMap()->getLocalElement(i);
+      const int      trilinos_j = matrix->getColMap()->getLocalElement(j);
+      TrilinosScalar value      = 0.;
+
+      if (trilinos_i == Teuchos::OrdinalTraits<int>::invalid() ||
+          trilinos_j == Teuchos::OrdinalTraits<int>::invalid())
+        {
+          if (no_error)
+            return {};
+          Assert(false,
+                 ExcAccessToNonLocalElement(
+                   i, j, local_range().first, local_range().second - 1));
+        }
+      else
+        {
+          Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
+
+          // Prepare pointers for extraction of a view of the row.
+          size_t nnz_present = matrix->getNumEntriesInLocalRow(trilinos_i);
+          typename MatrixType::nonconst_local_inds_host_view_type col_indices(
+            "indices", nnz_present);
+          typename MatrixType::nonconst_values_host_view_type values(
+            "values", nnz_present);
+
+          matrix->getLocalRowCopy(trilinos_i, col_indices, values, nnz_present);
+
+          // Search the index where we look for the value, and then finally get
+          // it.
+          int local_col_index = 0;
+          for (; local_col_index < static_cast<int>(nnz_present);
+               ++local_col_index)
+            {
+              if (col_indices(local_col_index) == trilinos_j)
+                break;
+            }
+
+          if (local_col_index == static_cast<int>(nnz_present))
+            {
+              if (no_error)
+                return {};
+              Assert(false, ExcInvalidIndex(i, j));
+            }
+          else
+            value = values(local_col_index);
+        }
+
+      return value;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::operator()(const size_type i,
+                                                  const size_type j) const
+    {
+      return element(i, j, /* no_error */ false);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::el(const size_type i,
+                                          const size_type j) const
+    {
+      return element(i, j, /* no_error */ true);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::diag_element(const size_type i) const
+    {
+      Assert(m() == n(), ExcNotQuadratic());
+
+#  ifdef DEBUG
+      // use operator() in debug mode because it checks if this is a valid
+      // element (in parallel)
+      return operator()(i, i);
+#  else
+      // Trilinos doesn't seem to have a more efficient way to access the
+      // diagonal than by just using the standard el(i,j) function.
+      return el(i, i);
+#  endif
+    }
   } // namespace TpetraWrappers
 
 } // namespace LinearAlgebra
