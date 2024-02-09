@@ -216,11 +216,11 @@ macro(deal_ii_invoke_autopilot)
     COMMENT "distclean invoked"
     )
 
-  # Define a strip-comments target:
+  # Define a strip_comments target:
   find_package(Perl QUIET)
   if(PERL_FOUND)
     add_custom_target(strip_comments
-      COMMAND ${PERL_EXECUTABLE} -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${TARGET_SRC}
+      COMMAND ${PERL_EXECUTABLE} -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${CMAKE_SOURCE_DIR}/${TARGET_SRC}
       COMMENT "strip comments"
       )
   endif()
