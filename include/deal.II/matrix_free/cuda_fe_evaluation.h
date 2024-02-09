@@ -23,7 +23,12 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Namespace for the CUDA wrappers
  */
+// GCC 9 and before do not recognize the [[deprecated]] attribute
+#if defined(__GNUC__) && (__GNUC__ < 10)
 namespace CUDAWrappers
+#else
+namespace DEAL_II_DEPRECATED_EARLY CUDAWrappers
+#endif
 {
   using namespace Portable;
 } // namespace CUDAWrappers
