@@ -55,7 +55,7 @@ namespace Utilities
 
           // in case we have contiguous indices, only fill the vector upon
           // first request in `fill`
-          if (!index_range_contiguous)
+          if (use_vector && !index_range_contiguous)
             data.resize(size, invalid_index_value);
         }
 
