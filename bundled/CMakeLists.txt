@@ -19,6 +19,22 @@
 
 message(STATUS "Setting up bundled features")
 
+#
+# If we install any bundled software also install the README.md file into
+# the bundled header directory. First of all, this ensures that we always
+# have a disclaimer in place explaining where the header files come from.
+# Secondly, in rare circumstances we might end up not installing any header
+# (because they are only used internally). Because this is quite tricky to
+# figure out when setting up targets we work around this issue by simply
+# always installing something into the bundled header directory.
+#
+if(NOT "${DEAL_II_BUNDLED_INCLUDE_DIRS}" STREQUAL "")
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
+    COMPONENT library
+    )
+endif()
+
 if(DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
   add_subdirectory(${BOOST_FOLDER}/libs/serialization/src)
   add_subdirectory(${BOOST_FOLDER}/libs/system/src)
