@@ -268,7 +268,15 @@ namespace LinearAlgebra
         Utilities::Trilinos::internal::make_rcp<MapType>(
           m, 0, Utilities::Trilinos::tpetra_comm_self()),
         column_space_map,
-        Teuchos::ArrayView<size_t>{entries_per_row_size_type});
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+        Teuchos::ArrayView<size_t>{entries_per_row_size_type}
+#  else
+        Teuchos::ArrayRCP<size_t>(entries_per_row_size_type.data(),
+                                  0,
+                                  entries_per_row_size_type.size(),
+                                  false)
+#  endif
+      );
     }
 
 
@@ -541,7 +549,17 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace> &
     SparseMatrix<Number, MemorySpace>::operator*=(const Number a)
     {
+      if (compressed)
+        {
+          matrix->resumeFill();
+          compressed = false;
+        }
+
       matrix->scale(a);
+
+      matrix->fillComplete();
+      compressed = true;
+
       return *this;
     }
 
@@ -553,8 +571,18 @@ namespace LinearAlgebra
     {
       Assert(a != 0, ExcDivideByZero());
 
+      if (compressed)
+        {
+          matrix->resumeFill();
+          compressed = false;
+        }
+
       const Number factor = 1.0 / a;
       matrix->scale(factor);
+
+      matrix->fillComplete();
+      compressed = true;
+
       return *this;
     }
 
@@ -845,7 +873,8 @@ namespace LinearAlgebra
             {
               matrix->getLocalRowView(i, indices, values);
 
-              for (size_type j = 0; j < indices.size(); ++j)
+              for (size_type j = 0; j < static_cast<size_type>(indices.size());
+                   ++j)
                 out << "(" << matrix->getRowMap()->getGlobalElement(i) << ","
                     << matrix->getColMap()->getGlobalElement(indices[j]) << ") "
                     << values[j] << std::endl;
@@ -909,10 +938,17 @@ namespace LinearAlgebra
 
           // Prepare pointers for extraction of a view of the row.
           size_t nnz_present = matrix->getNumEntriesInLocalRow(trilinos_i);
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename MatrixType::nonconst_local_inds_host_view_type col_indices(
             "indices", nnz_present);
           typename MatrixType::nonconst_values_host_view_type values(
             "values", nnz_present);
+#  else
+          std::vector<int>           col_indices_vector(nnz_present);
+          Teuchos::ArrayView<int>    col_indices(col_indices_vector);
+          std::vector<Number>        values_vector(nnz_present);
+          Teuchos::ArrayView<Number> values(values_vector);
+#  endif
 
           matrix->getLocalRowCopy(trilinos_i, col_indices, values, nnz_present);
 
@@ -922,7 +958,7 @@ namespace LinearAlgebra
           for (; local_col_index < static_cast<int>(nnz_present);
                ++local_col_index)
             {
-              if (col_indices(local_col_index) == trilinos_j)
+              if (col_indices[local_col_index] == trilinos_j)
                 break;
             }
 
@@ -933,7 +969,7 @@ namespace LinearAlgebra
               Assert(false, ExcInvalidIndex(i, j));
             }
           else
-            value = values(local_col_index);
+            value = values[local_col_index];
         }
 
       return value;
