@@ -55,19 +55,21 @@ namespace LinearAlgebra
             static_cast<TrilinosWrappers::types::int_type>(index));
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-        Assert((local_index != Teuchos::OrdinalTraits<int>::invalid()),
-               ExcAccessToNonLocalElement(
-                 index,
-                 vector.vector->getMap()->getLocalNumElements(),
-                 vector.vector->getMap()->getMinLocalIndex(),
-                 vector.vector->getMap()->getMaxLocalIndex()));
+        Assert(
+          (local_index != Teuchos::OrdinalTraits<int>::invalid()),
+          (typename Vector<Number, MemorySpace>::ExcAccessToNonLocalElement(
+            index,
+            vector.vector->getMap()->getLocalNumElements(),
+            vector.vector->getMap()->getMinLocalIndex(),
+            vector.vector->getMap()->getMaxLocalIndex())));
 #  else
-        Assert((local_index != Teuchos::OrdinalTraits<int>::invalid()),
-               ExcAccessToNonLocalElement(
-                 index,
-                 vector.vector->getMap()->getNodeNumElements(),
-                 vector.vector->getMap()->getMinLocalIndex(),
-                 vector.vector->getMap()->getMaxLocalIndex()));
+        Assert(
+          (local_index != Teuchos::OrdinalTraits<int>::invalid()),
+          (typename Vector<Number, MemorySpace>::ExcAccessToNonLocalElement(
+            index,
+            vector.vector->getMap()->getNodeNumElements(),
+            vector.vector->getMap()->getMinLocalIndex(),
+            vector.vector->getMap()->getMaxLocalIndex())));
 #  endif
         return vector.vector->getData()[local_index];
       }
