@@ -875,6 +875,15 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
+    typename Vector<Number, MemorySpace>::real_type
+    Vector<Number, MemorySpace>::norm_sqr() const
+    {
+      Vector<Number, MemorySpace>::real_type d = l2_norm();
+      return d * d;
+    }
+
+
+    template <typename Number, typename MemorySpace>
     Number
     Vector<Number, MemorySpace>::add_and_dot(
       const Number                       a,

@@ -658,6 +658,16 @@ namespace LinearAlgebra
       linfty_norm() const;
 
       /**
+       * Return the square of the l<sub>2</sub>-norm.
+       */
+      real_type
+      norm_sqr() const;
+
+      /**
+       *
+       *
+       */
+      /**
        * Performs a combined operation of a vector addition and a subsequent
        * inner product, returning the value of the inner product. In other
        * words, the result of this function is the same as if the user called
