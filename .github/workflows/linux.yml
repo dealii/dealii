@@ -137,6 +137,73 @@ jobs:
           setup_tests_vtk
         ctest --output-on-failure -j2 -VV
 
+  ###############################
+  # linux-debug-parallel-tpetra #
+  ###############################
+
+  linux-debug-parallel-tpetra:
+    # simple parallel debug build using g++ and trilinos+tpetra
+
+    name: linux debug parallel tpetra
+    runs-on: [ubuntu-22.04]
+
+    #
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    container:
+      image: dealii/dependencies:jammy
+      options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: info
+      run: |
+        mpicc -v
+        cmake --version
+    - name: configure deal.II
+      run: |
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_CXX_FLAGS='-std=c++20' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
+              -D DEAL_II_WITH_64BIT_INDICES="ON" \
+              -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_WITH_P4EST="ON" \
+              -D DEAL_II_WITH_TRILINOS="ON" \
+              ..
+    - name: print detailed.log
+      run: cat build/detailed.log
+    - name: build
+      run: |
+        cd build
+        make VERBOSE=1 -j2
+    - name: test
+      run: |
+        # Remove warning: "A high-performance Open MPI point-to-point
+        # messaging module was unable to find any relevant network
+        # interfaces."
+        export OMPI_MCA_btl_base_warn_component_unused='0'
+
+        cd build
+        make VERBOSE=1 -j2
+    - name: test
+      run: |
+        # Remove warning: "A high-performance Open MPI point-to-point
+        # messaging module was unable to find any relevant network
+        # interfaces."
+        export OMPI_MCA_btl_base_warn_component_unused='0'
+
+        cd build
+        make -j2 setup_tests
+        ctest --output-on-failure -j2 -VV -R "tpetra"
+
   ############################
   # linux-debug-intel-oneapi #
   ############################

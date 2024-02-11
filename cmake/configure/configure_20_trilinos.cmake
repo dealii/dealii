@@ -319,6 +319,7 @@ macro(feature_trilinos_find_external var)
             )
           endif()
         endif()
+
         reset_cmake_required()
       endif()
     endif()
