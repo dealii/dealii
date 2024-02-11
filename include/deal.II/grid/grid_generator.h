@@ -1493,6 +1493,11 @@ namespace GridGenerator
    * default), then it is computed adaptively such that the resulting elements
    * have the least aspect ratio. The same holds for @p n_axial_cells.
    *
+   * If @p colorize is set to true, a boundary id of 0 is set for the inner
+   * cylinder, a boundary id of 1 is set for the outer cylinder, a boundary
+   * id of 2 is set for the bottom (z-) boundary and a boundary id of 3
+   * is set for the top (z+) boundary.
+   *
    * @note Although this function is declared as a template, it does not make
    * sense in 1d and 2d. Also keep in mind that this object is rotated
    * and positioned differently than the one created by cylinder().
