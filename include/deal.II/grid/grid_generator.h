@@ -1516,7 +1516,8 @@ namespace GridGenerator
                  const double        inner_radius,
                  const double        outer_radius,
                  const unsigned int  n_radial_cells = 0,
-                 const unsigned int  n_axial_cells  = 0);
+                 const unsigned int  n_axial_cells  = 0,
+                 const bool          colorize       = false);
 
   /**
    * Produce the volume or surface mesh of a torus. The axis of the torus is

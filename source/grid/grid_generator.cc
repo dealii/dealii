@@ -3997,7 +3997,8 @@ namespace GridGenerator
                  const double,
                  const double,
                  const unsigned int,
-                 const unsigned int)
+                 const unsigned int,
+                 const bool)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
@@ -4517,7 +4518,8 @@ namespace GridGenerator
                  const double,
                  const double,
                  const unsigned int,
-                 const unsigned int)
+                 const unsigned int,
+                 const bool)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
@@ -6392,7 +6394,8 @@ namespace GridGenerator
                  const double       inner_radius,
                  const double       outer_radius,
                  const unsigned int n_radial_cells,
-                 const unsigned int n_axial_cells)
+                 const unsigned int n_axial_cells,
+                 const bool         colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -6467,8 +6470,53 @@ namespace GridGenerator
     tria.create_triangulation(vertices_3d, cells, SubCellData());
     tria.set_all_manifold_ids(0);
     tria.set_manifold(0, CylindricalManifold<3>(2));
-  }
 
+    // If colorize, set boundary id on the triangualtion.
+    // Inner cylinder has boundary id 0
+    // Outer cylinder has boundary id 1
+    // Bottom (Z-) part of the cylinder has boundary id 2
+    // Top (Z+) part of the cylinder has boundary id 3
+
+    // Define tolerance to help detect boundary conditions
+    double eps_z =
+      std::min(1e-3 * (outer_radius - inner_radius), 1e-3 * length);
+    double mid_radial_distance = 0.5 * (outer_radius - inner_radius);
+
+    for (auto &cell : tria.active_cell_iterators())
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
+        {
+          if (!cell->face(f)->at_boundary())
+            continue;
+
+          const auto face_center = cell->face(f)->center();
+
+          const double radius = std::sqrt(face_center[0] * face_center[0] +
+                                          face_center[1] * face_center[1]);
+
+          const double z = face_center[2];
+
+          if (std::fabs(z) < eps_z) // z = 0 set boundary 2
+            {
+              cell->face(f)->set_boundary_id(2);
+            }
+          else if (std::fabs(z - length) < eps_z) // z = length set boundary 3
+            {
+              cell->face(f)->set_boundary_id(3);
+            }
+          else if (std::fabs(radius - inner_radius) >
+                   mid_radial_distance) // r =  outer_radius set boundary 1
+            {
+              cell->face(f)->set_boundary_id(1);
+            }
+          else if (std::fabs(radius - inner_radius) <
+                   mid_radial_distance) // r =  inner_radius set boundary 0
+            {
+              cell->face(f)->set_boundary_id(0);
+            }
+          else
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+  }
 
 
   template <int dim, int spacedim>
@@ -7475,7 +7523,7 @@ namespace GridGenerator
 
     // Start with a cylinder shell with the correct inner and outer radius
     // and as many layers as requested
-    cylinder_shell(triangulation, L, inner_radius, outer_radius, 8, Nz);
+    cylinder_shell(triangulation, L, inner_radius, outer_radius, 8, Nz, false);
     triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
 
     // Then loop over all vertices that are at the boundary (by looping
