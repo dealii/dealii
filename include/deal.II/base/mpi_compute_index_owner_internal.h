@@ -282,7 +282,8 @@ namespace Utilities
            */
           std::vector<std::vector<
             std::pair<unsigned int,
-                      std::vector<std::pair<unsigned int, unsigned int>>>>>
+                      std::vector<std::pair<types::global_dof_index,
+                                            types::global_dof_index>>>>>
             requesters;
 
           /**
@@ -366,10 +367,11 @@ namespace Utilities
            * therefore only need to append at the end.
            */
           void
-          append_index_origin(const unsigned int index_within_dictionary,
-                              const unsigned int rank_of_request,
-                              const unsigned int rank_of_owner,
-                              unsigned int      &owner_index_guess);
+          append_index_origin(
+            const types::global_dof_index index_within_dictionary,
+            const unsigned int            rank_of_request,
+            const unsigned int            rank_of_owner,
+            unsigned int                 &owner_index_guess);
         };
 
         /* ------------------------- inline functions ----------------------- */
