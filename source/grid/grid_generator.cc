@@ -6482,7 +6482,7 @@ namespace GridGenerator
       std::min(1e-3 * (outer_radius - inner_radius), 1e-3 * length);
     double mid_radial_distance = 0.5 * (outer_radius - inner_radius);
 
-    for (auto &cell : tria.active_cell_iterators())
+    for (const auto &cell : tria.active_cell_iterators())
       for (const unsigned int f : GeometryInfo<3>::face_indices())
         {
           if (!cell->face(f)->at_boundary())
