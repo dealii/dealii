@@ -367,6 +367,24 @@ namespace LinearAlgebra
              const bool                         omit_zeroing_entries = false);
 
       /**
+       * Swap the contents of this vector and the other vector @p v. One could do
+       * this operation with a temporary variable and copying over the data
+       * elements, but this function is significantly more efficient since it
+       * only swaps the pointers to the data of the two vectors and therefore
+       * does not need to allocate temporary storage and move data around.
+       *
+       * This function is analogous to the @p swap function of all C++
+       * standard containers. Also, there is a global function
+       * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
+       * analogy to standard functions.
+       *
+       * This function is virtual in order to allow for derived classes to
+       * handle memory separately.
+       */
+      virtual void
+      swap(Vector &v);
+
+      /**
        * Extract a range of elements all at once.
        */
       virtual void
@@ -639,6 +657,16 @@ namespace LinearAlgebra
       real_type
       linfty_norm() const;
 
+      /**
+       * Return the square of the l<sub>2</sub>-norm.
+       */
+      real_type
+      norm_sqr() const;
+
+      /**
+       *
+       *
+       */
       /**
        * Performs a combined operation of a vector addition and a subsequent
        * inner product, returning the value of the inner product. In other
@@ -924,6 +952,14 @@ namespace LinearAlgebra
     /* ------------------------- Inline functions ---------------------- */
 
     template <typename Number, typename MemorySpace>
+    inline void
+    swap(Vector<Number, MemorySpace> &u, Vector<Number, MemorySpace> &v)
+    {
+      u.swap(v);
+    }
+
+
+    template <typename Number, typename MemorySpace>
     inline bool
     Vector<Number, MemorySpace>::has_ghost_elements() const
     {
@@ -939,6 +975,12 @@ namespace LinearAlgebra
       return compressed;
     }
 
+    template <typename Number, typename MemorySpace>
+    inline void
+    Vector<Number, MemorySpace>::swap(Vector<Number, MemorySpace> &v)
+    {
+      vector.swap(v.vector);
+    }
 
 
     template <typename Number, typename MemorySpace>
