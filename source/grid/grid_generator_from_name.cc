@@ -214,7 +214,8 @@ namespace GridGenerator
                          double,
                          double,
                          unsigned int,
-                         unsigned int>(cylinder_shell, arguments, tria);
+                         unsigned int,
+                         bool>(cylinder_shell, arguments, tria);
 
       else if (name == "hyper_cube_with_cylindrical_hole")
         parse_and_create<dim, dim, double, double, double, unsigned int, bool>(
