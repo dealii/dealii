@@ -1903,7 +1903,29 @@ namespace deal_II_exceptions
     __PRETTY_FUNCTION__,                                         \
     nullptr,                                                     \
     nullptr,                                                     \
-    ::dealii::StandardExceptions::ExcInternalError())
+    ::dealii::StandardExceptions::ExcMessage(                    \
+      "The program has hit a line of code that the programmer "  \
+      "marked with the macro DEAL_II_ASSERT_UNREACHABLE() to "   \
+      "indicate that the program should never reach this "       \
+      "location. You will have to find out (best done in a "     \
+      "debugger) why that happened. Typical reasons include "    \
+      "passing invalid arguments to functions (for example, if " \
+      "a function takes an 'enum' with two possible values "     \
+      "as argument, but you call the function with a third "     \
+      "value), or if the programmer of the code that triggered " \
+      "the error believed that a variable can only have "        \
+      "specific values, but either that assumption is wrong "    \
+      "or the computation of that value is buggy."               \
+      "\n\n"                                                     \
+      "In those latter conditions, where some internal "         \
+      "assumption is not satisfied, there may not be very "      \
+      "much you can do if you encounter such an exception, "     \
+      "since it indicates an error in deal.II, not in your "     \
+      "own program. If that is the situation you encounter, "    \
+      "try to come up with "                                     \
+      "the smallest possible program that still demonstrates "   \
+      "the error and contact the deal.II mailing lists with it " \
+      "to obtain help."))
 
 
 namespace deal_II_exceptions
