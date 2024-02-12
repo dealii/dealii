@@ -258,9 +258,10 @@ namespace Utilities
           const unsigned int n_procs;
 
           /**
-           * Controls whether the origin of ghost owner should also be
-           * stored. If true, it will be added into `requesters` and can be
-           * queried by `get_requesters()`.
+           * Controls whether we should record a list of ranks who sent
+           * requests to the present MPI process when looking up their remote
+           * indices, and what those indices were. If true, it will be added
+           * into `requesters` and can be queried by `get_requesters()`.
            */
           const bool track_index_requests;
 
