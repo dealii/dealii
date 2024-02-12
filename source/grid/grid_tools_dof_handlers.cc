@@ -824,13 +824,24 @@ namespace GridTools
     std::vector<bool> locally_active_vertices_on_subdomain(
       mesh.get_triangulation().n_vertices(), false);
 
+    std::map<unsigned int, std::vector<unsigned int>> coinciding_vertex_groups;
+    std::map<unsigned int, unsigned int> vertex_to_coinciding_vertex_group;
+    GridTools::collect_coinciding_vertices(mesh.get_triangulation(),
+                                           coinciding_vertex_groups,
+                                           vertex_to_coinciding_vertex_group);
+
     // Find the cells for which the predicate is true
     // These are the cells around which we wish to construct
     // the halo layer
     for (const auto &cell : mesh.active_cell_iterators())
       if (predicate(cell)) // True predicate --> Part of subdomain
         for (const auto v : cell->vertex_indices())
-          locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
+          {
+            locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
+            for (const auto vv : coinciding_vertex_groups
+                   [vertex_to_coinciding_vertex_group[cell->vertex_index(v)]])
+              locally_active_vertices_on_subdomain[vv] = true;
+          }
 
     // Find the cells that do not conform to the predicate
     // but share a vertex with the selected subdomain

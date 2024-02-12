@@ -3240,6 +3240,22 @@ namespace DoFTools
             return;
           }
 
+      // In the case of shared Trinagulation with artificial cells all
+      // cells have valid DoF indices, i.e., the check above does not work.
+      if (const auto tria = dynamic_cast<
+            const parallel::shared::Triangulation<dim, spacedim> *>(
+            &face_1->get_triangulation()))
+        if (tria->with_artificial_cells() &&
+            (affine_constraints.get_local_lines().size() != 0))
+          for (unsigned int i = 0; i < dofs_per_face; ++i)
+            if ((affine_constraints.get_local_lines().is_element(dofs_1[i]) ==
+                 false) ||
+                (affine_constraints.get_local_lines().is_element(dofs_2[i]) ==
+                 false))
+              {
+                return;
+              }
+
       // Well, this is a hack:
       //
       // There is no
