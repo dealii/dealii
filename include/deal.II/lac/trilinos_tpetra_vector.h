@@ -1003,6 +1003,10 @@ namespace LinearAlgebra
                                      const size_type *indices,
                                      const Number    *values)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
       // First create an alias for the type of a view into our vectors.
       // The actual type is declared through several re-directions in
       // Tpetra, so instead of spelling it out, we get it via decltype:
