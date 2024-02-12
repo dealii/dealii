@@ -2858,13 +2858,16 @@ namespace internal
         (active_fe_index_given != numbers::invalid_unsigned_int ?
            active_fe_index_given :
            0);
+
     init_data.active_quad_index =
       fe_degree == numbers::invalid_unsigned_int ?
         (active_quad_index_given != numbers::invalid_unsigned_int ?
            active_quad_index_given :
-           std::min<unsigned int>(init_data.active_fe_index,
-                                  init_data.mapping_data->descriptor.size() -
-                                    1)) :
+           std::min<unsigned int>(
+             init_data.active_fe_index,
+             init_data.mapping_data->descriptor.size() /
+                 (is_face ? std::max<unsigned int>(1, dim - 1) : 1) -
+               1)) :
         init_data.mapping_data->quad_index_from_n_q_points(n_q_points);
 
     init_data.shape_info = &matrix_free.get_shape_info(
