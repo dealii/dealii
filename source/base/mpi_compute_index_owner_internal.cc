@@ -606,7 +606,8 @@ namespace Utilities
           // sent in total can be deduced both via the MPI status message at
           // the receiver site as well as be counting the buckets from
           // different requesters.
-          std::vector<std::vector<unsigned int>> send_data(requesters.size());
+          std::vector<std::vector<types::global_dof_index>> send_data(
+            requesters.size());
           for (unsigned int i = 0; i < requesters.size(); ++i)
             {
               // special code for our own indices
@@ -636,13 +637,15 @@ namespace Utilities
                         }
                     }
                   send_requests.push_back(MPI_Request());
-                  const int ierr = MPI_Isend(send_data[i].data(),
-                                             send_data[i].size(),
-                                             MPI_UNSIGNED,
-                                             dict.actually_owning_rank_list[i],
-                                             mpi_tag,
-                                             comm,
-                                             &send_requests.back());
+                  const int ierr =
+                    MPI_Isend(send_data[i].data(),
+                              send_data[i].size(),
+                              Utilities::MPI::mpi_type_id_for_type<
+                                types::global_dof_index>,
+                              dict.actually_owning_rank_list[i],
+                              mpi_tag,
+                              comm,
+                              &send_requests.back());
                   AssertThrowMPI(ierr);
                 }
             }
@@ -657,20 +660,25 @@ namespace Utilities
 
               // retrieve size of incoming message
               int number_amount;
-              ierr = MPI_Get_count(&status, MPI_UNSIGNED, &number_amount);
+              ierr = MPI_Get_count(
+                &status,
+                Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+                &number_amount);
               AssertThrowMPI(ierr);
 
               // receive message
               Assert(number_amount % 2 == 0, ExcInternalError());
-              std::vector<std::pair<unsigned int, unsigned int>> buffer(
-                number_amount / 2);
-              ierr = MPI_Recv(buffer.data(),
-                              number_amount,
-                              MPI_UNSIGNED,
-                              status.MPI_SOURCE,
-                              status.MPI_TAG,
-                              comm,
-                              &status);
+              std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>
+                buffer(number_amount / 2);
+              ierr = MPI_Recv(
+                buffer.data(),
+                number_amount,
+                Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+                status.MPI_SOURCE,
+                status.MPI_TAG,
+                comm,
+                &status);
               AssertThrowMPI(ierr);
 
               // unpack the message and translate the dictionary-local
@@ -733,10 +741,10 @@ namespace Utilities
 
         void
         ConsensusAlgorithmsPayload::append_index_origin(
-          const unsigned int index_within_dict,
-          const unsigned int rank_of_request,
-          const unsigned int rank_of_owner,
-          unsigned int      &owner_index_guess)
+          const types::global_dof_index index_within_dict,
+          const unsigned int            rank_of_request,
+          const unsigned int            rank_of_owner,
+          unsigned int                 &owner_index_guess)
         {
           // remember who requested which index. We want to use an
           // std::vector with simple addressing, via a good guess from the
@@ -749,7 +757,8 @@ namespace Utilities
           if (request.empty() || request.back().first != rank_of_request)
             request.emplace_back(
               rank_of_request,
-              std::vector<std::pair<unsigned int, unsigned int>>());
+              std::vector<
+                std::pair<types::global_dof_index, types::global_dof_index>>());
 
           auto &intervals = request.back().second;
           if (intervals.empty() || intervals.back().second != index_within_dict)
