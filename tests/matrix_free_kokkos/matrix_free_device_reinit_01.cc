@@ -15,7 +15,7 @@
 
 
 
-// Test that initializing with CUDAWrappers::MatrixFree with empty ranges work.
+// Test that initializing with Portable::MatrixFree with empty ranges work.
 
 #include <deal.II/distributed/tria.h>
 
@@ -28,7 +28,7 @@
 
 #include <deal.II/lac/affine_constraints.h>
 
-#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
@@ -67,11 +67,10 @@ test()
                                            constraints);
   constraints.close();
 
-  MappingQ<dim>                         mapping(fe_degree);
-  CUDAWrappers::MatrixFree<dim, Number> mf_data;
-  const QGauss<1>                       quad(fe_degree + 1);
-  typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
-    additional_data;
+  MappingQ<dim>                     mapping(fe_degree);
+  Portable::MatrixFree<dim, Number> mf_data;
+  const QGauss<1>                   quad(fe_degree + 1);
+  typename Portable::MatrixFree<dim, Number>::AdditionalData additional_data;
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;

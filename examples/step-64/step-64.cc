@@ -38,10 +38,8 @@
 
 // The following ones include the data structures for the
 // implementation of matrix-free methods on GPU:
-#include <deal.II/base/cuda.h>
-
-#include <deal.II/matrix_free/cuda_fe_evaluation.h>
-#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/portable_fe_evaluation.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/operators.h>
 
 #include <fstream>
@@ -57,7 +55,7 @@ namespace Step64
 
   // Next, we define a class that implements the varying coefficients
   // we want to use in the Helmholtz operator. Later, we want to pass
-  // an object of this type to a CUDAWrappers::MatrixFree
+  // an object of this type to a Portable::MatrixFree
   // object that expects the class to have an `operator()` that fills the
   // values provided in the constructor for a given cell. This operator
   // needs to run on the device, so it needs to be marked as
@@ -70,12 +68,12 @@ namespace Step64
       : coef(coefficient)
     {}
 
-    DEAL_II_HOST_DEVICE void operator()(
-      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-      const unsigned int                                          cell,
-      const unsigned int                                          q) const;
+    DEAL_II_HOST_DEVICE void
+    operator()(const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
+               const unsigned int                                      cell,
+               const unsigned int                                      q) const;
 
-    // Since CUDAWrappers::MatrixFree::Data doesn't know about the size of its
+    // Since Portable::MatrixFree::Data doesn't know about the size of its
     // arrays, we need to store the number of quadrature points and the
     // number of degrees of freedom in this class to do necessary index
     // conversions.
@@ -95,9 +93,9 @@ namespace Step64
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void
   VaryingCoefficientFunctor<dim, fe_degree>::operator()(
-    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-    const unsigned int                                          cell,
-    const unsigned int                                          q) const
+    const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
+    const unsigned int                                      cell,
+    const unsigned int                                      q) const
   {
     const unsigned int pos = gpu_data->local_q_point_id(cell, n_q_points, q);
     const Point<dim>   q_point = gpu_data->get_quadrature_point(cell, q);
@@ -127,26 +125,25 @@ namespace Step64
   {
   public:
     DEAL_II_HOST_DEVICE HelmholtzOperatorQuad(
-      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-      double                                                     *coef,
-      int                                                         cell)
+      const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
+      double                                                 *coef,
+      int                                                     cell)
       : gpu_data(gpu_data)
       , coef(coef)
       , cell(cell)
     {}
 
     DEAL_II_HOST_DEVICE void operator()(
-      CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-               *fe_eval,
+      Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
       const int q_point) const;
 
     static const unsigned int n_q_points =
       dealii::Utilities::pow(fe_degree + 1, dim);
 
   private:
-    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data;
-    double                                                     *coef;
-    int                                                         cell;
+    const typename Portable::MatrixFree<dim, double>::Data *gpu_data;
+    double                                                 *coef;
+    int                                                     cell;
   };
 
 
@@ -159,8 +156,7 @@ namespace Step64
   // here:
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void HelmholtzOperatorQuad<dim, fe_degree>::operator()(
-    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-             *fe_eval,
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
     const int q_point) const
   {
     const unsigned int pos =
@@ -180,7 +176,7 @@ namespace Step64
   class LocalHelmholtzOperator
   {
   public:
-    // Again, the CUDAWrappers::MatrixFree object doesn't know about the number
+    // Again, the Portable::MatrixFree object doesn't know about the number
     // of degrees of freedom and the number of quadrature points so we need
     // to store these for index calculations in the call operator.
     static constexpr unsigned int n_dofs_1d = fe_degree + 1;
@@ -193,12 +189,12 @@ namespace Step64
       : coef(coefficient)
     {}
 
-    DEAL_II_HOST_DEVICE void operator()(
-      const unsigned int                                          cell,
-      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-      CUDAWrappers::SharedData<dim, double>                      *shared_data,
-      const double                                               *src,
-      double                                                     *dst) const;
+    DEAL_II_HOST_DEVICE void
+    operator()(const unsigned int                                      cell,
+               const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
+               Portable::SharedData<dim, double> *shared_data,
+               const double                      *src,
+               double                            *dst) const;
 
   private:
     double *coef;
@@ -212,14 +208,14 @@ namespace Step64
   // vector.
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void LocalHelmholtzOperator<dim, fe_degree>::operator()(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, double>                      *shared_data,
-    const double                                               *src,
-    double                                                     *dst) const
+    const unsigned int                                      cell,
+    const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
+    Portable::SharedData<dim, double>                      *shared_data,
+    const double                                           *src,
+    double                                                 *dst) const
   {
-    CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-      fe_eval(gpu_data, shared_data);
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> fe_eval(
+      gpu_data, shared_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(
@@ -254,7 +250,7 @@ namespace Step64
       const;
 
   private:
-    CUDAWrappers::MatrixFree<dim, double>                            mf_data;
+    Portable::MatrixFree<dim, double>                                mf_data;
     LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef;
   };
 
@@ -279,8 +275,7 @@ namespace Step64
     const AffineConstraints<double> &constraints)
   {
     MappingQ<dim> mapping(fe_degree);
-    typename CUDAWrappers::MatrixFree<dim, double>::AdditionalData
-      additional_data;
+    typename Portable::MatrixFree<dim, double>::AdditionalData additional_data;
     additional_data.mapping_update_flags = update_values | update_gradients |
                                            update_JxW_values |
                                            update_quadrature_points;
@@ -504,7 +499,7 @@ namespace Step64
   // This solve() function finally contains the calls to the new classes
   // previously discussed. Here we don't use any preconditioner, i.e.,
   // precondition by the identity matrix, to focus just on the peculiarities of
-  // the CUDAWrappers::MatrixFree framework. Of course, in a real application
+  // the Portable::MatrixFree framework. Of course, in a real application
   // the choice of a suitable preconditioner is crucial but we have at least the
   // same restrictions as in step-37 since matrix entries are computed on the
   // fly and not stored.

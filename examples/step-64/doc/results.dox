@@ -1,7 +1,7 @@
 <h1>Results</h1>
 
 Since the main purpose of this tutorial is to demonstrate how to use the
-CUDAWrappers::MatrixFree interface, not to compute anything useful in
+Portable::MatrixFree interface, not to compute anything useful in
 itself, we just show the expected output here:
 @code
 Cycle 0

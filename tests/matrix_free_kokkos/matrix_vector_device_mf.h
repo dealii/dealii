@@ -21,8 +21,8 @@
 #include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
-#include <deal.II/matrix_free/cuda_fe_evaluation.h>
-#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/portable_fe_evaluation.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 
 #include "../tests.h"
 
@@ -32,9 +32,9 @@ class HelmholtzOperatorQuad
 public:
   DEAL_II_HOST_DEVICE
   HelmholtzOperatorQuad(
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    Number                                                     *coef,
-    int                                                         cell)
+    const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+    Number                                                 *coef,
+    int                                                     cell)
     : gpu_data(gpu_data)
     , coef(coef)
     , cell(cell)
@@ -42,17 +42,16 @@ public:
 
   DEAL_II_HOST_DEVICE void
   operator()(
-    CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
-       *fe_eval,
+    Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval,
     int q_point) const;
 
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
 
 private:
-  const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data;
-  Number                                                     *coef;
-  int                                                         cell;
+  const typename Portable::MatrixFree<dim, Number>::Data *gpu_data;
+  Number                                                 *coef;
+  int                                                     cell;
 };
 
 
@@ -60,7 +59,7 @@ private:
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 DEAL_II_HOST_DEVICE void
 HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::operator()(
-  CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval,
+  Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval,
   int q_point) const
 {
   unsigned int pos = gpu_data->local_q_point_id(cell, n_q_points, q_point);
@@ -85,12 +84,11 @@ public:
   {}
 
   DEAL_II_HOST_DEVICE void
-  operator()(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, Number>                      *shared_data,
-    const Number                                               *src,
-    Number                                                     *dst) const;
+  operator()(const unsigned int                                      cell,
+             const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+             Portable::SharedData<dim, Number> *shared_data,
+             const Number                      *src,
+             Number                            *dst) const;
 
   Number *coef;
 };
@@ -100,13 +98,13 @@ public:
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 DEAL_II_HOST_DEVICE void
 HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
-  const unsigned int                                          cell,
-  const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-  CUDAWrappers::SharedData<dim, Number>                      *shared_data,
-  const Number                                               *src,
-  Number                                                     *dst) const
+  const unsigned int                                      cell,
+  const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+  Portable::SharedData<dim, Number>                      *shared_data,
+  const Number                                           *src,
+  Number                                                 *dst) const
 {
-  CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
+  Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
     gpu_data, shared_data);
   fe_eval.read_dof_values(src);
   fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
@@ -129,10 +127,9 @@ public:
   {}
 
   DEAL_II_HOST_DEVICE void
-  operator()(
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    const unsigned int                                          cell,
-    const unsigned int                                          q) const;
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+             const unsigned int                                      cell,
+             const unsigned int                                      q) const;
 
   static const unsigned int n_dofs_1d = fe_degree + 1;
   static const unsigned int n_local_dofs =
@@ -149,9 +146,9 @@ private:
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 DEAL_II_HOST_DEVICE void
 VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::operator()(
-  const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-  const unsigned int                                          cell,
-  const unsigned int                                          q) const
+  const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+  const unsigned int                                      cell,
+  const unsigned int                                      q) const
 {
   const unsigned int pos     = gpu_data->local_q_point_id(cell, n_q_points, q);
   const auto         q_point = gpu_data->get_quadrature_point(cell, q);
@@ -178,8 +175,8 @@ template <int dim,
 class MatrixFreeTest : public Subscriptor
 {
 public:
-  MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in,
-                 const unsigned int                           size,
+  MatrixFreeTest(const Portable::MatrixFree<dim, Number> &data_in,
+                 const unsigned int                       size,
                  const bool constant_coeff = true);
 
   void
@@ -197,7 +194,7 @@ public:
   types::global_dof_index internal_m;
 
 private:
-  const CUDAWrappers::MatrixFree<dim, Number>                     &data;
+  const Portable::MatrixFree<dim, Number>                         &data;
   LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef;
 };
 
@@ -207,9 +204,9 @@ template <int dim,
           typename VectorType,
           int n_q_points_1d>
 MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::
-  MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in,
-                 const unsigned int                           size,
-                 const bool                                   constant_coeff)
+  MatrixFreeTest(const Portable::MatrixFree<dim, Number> &data_in,
+                 const unsigned int                       size,
+                 const bool                               constant_coeff)
   : data(data_in)
 {
   coef.reinit(size);
