@@ -6471,7 +6471,8 @@ namespace GridGenerator
     tria.set_all_manifold_ids(0);
     tria.set_manifold(0, CylindricalManifold<3>(2));
 
-    if (!colorize) return;
+    if (!colorize)
+      return;
 
     // If colorize, set boundary id on the triangualtion.
     // Inner cylinder has boundary id 0
