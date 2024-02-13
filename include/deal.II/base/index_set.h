@@ -255,6 +255,11 @@ public:
   /**
    * Return whether the index set stored by this object contains no elements.
    * This is similar, but faster than checking <code>n_elements() == 0</code>.
+   *
+   * Note that a set being empty does not imply that the size of the
+   * index space must be zero. Rather, this function returns `true` if
+   * the subset of indices in the index space is the empty set,
+   * regardless of the size of the index space.
    */
   bool
   is_empty() const;
