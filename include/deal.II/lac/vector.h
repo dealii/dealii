@@ -58,6 +58,18 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 #  endif
 
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace LinearAlgebra
+{
+  namespace TpetraWrappers
+  {
+    template <typename Number, typename MemorySpace>
+    class Vector;
+  }
+} // namespace LinearAlgebra
+#  endif
+
 template <typename number>
 class LAPACKFullMatrix;
 
@@ -438,6 +450,28 @@ public:
    */
   Vector<Number> &
   operator=(const TrilinosWrappers::MPI::Vector &v);
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  /**
+   * Another copy operator: copy the values from a (sequential or parallel,
+   * depending on the underlying compiler) Trilinos wrapper vector class. This
+   * operator is only available if Trilinos was detected during configuration
+   * time.
+   *
+   * @note Due to the communication model used in MPI, this operation can
+   * only succeed if all processes that have knowledge of @p v
+   * (i.e. those given by <code>v.get_mpi_communicator()</code>) do it at
+   * the same time. This means that unless you use a split MPI communicator
+   * then it is not normally possible for only one or a subset of processes
+   * to obtain a copy of a parallel vector while the other jobs do something
+   * else. In other words, calling this function is a @ref GlossCollectiveOperation "collective operation"
+   * that needs to be executed by all MPI processes that jointly share @p v.
+   */
+  template <typename Number2, typename MemorySpace>
+  Vector<Number> &
+  operator=(
+    const LinearAlgebra::TpetraWrappers::Vector<Number2, MemorySpace> &v);
 #endif
 
   /**

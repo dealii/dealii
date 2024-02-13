@@ -401,6 +401,15 @@ namespace LinearAlgebra
       operator=(const Vector &V);
 
       /**
+       * Copy function. This function takes a Vector and copies all the
+       * elements. The Vector will have the same parallel distribution as @p
+       * V.
+       */
+      template <typename Number2>
+      Vector &
+      operator=(const dealii::Vector<Number2> &V);
+
+      /**
        * Sets all elements of the vector to the scalar @p s. This operation is
        * only allowed if @p s is equal to zero.
        */
