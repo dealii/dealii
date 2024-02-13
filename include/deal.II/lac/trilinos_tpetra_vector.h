@@ -1007,23 +1007,13 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-      // First create an alias for the type of a view into our vectors.
-      // The actual type is declared through several re-directions in
-      // Tpetra, so instead of spelling it out, we get it via decltype:
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      using ViewType2d =
-        decltype(vector->template getLocalView<Kokkos::HostSpace>(
-          Tpetra::Access::ReadWrite));
-      ViewType2d vector_2d_local =
-        vector->template getLocalView<Kokkos::HostSpace>(
-          Tpetra::Access::ReadWrite);
+      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWrite);
 #  else
       vector->template sync<Kokkos::HostSpace>();
 
-      using ViewType2d =
-        decltype(vector->template getLocalView<Kokkos::HostSpace>());
-      ViewType2d vector_2d_local =
-        vector->template getLocalView<Kokkos::HostSpace>();
+      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>();
 #  endif
 
       // Having extracted a view into the multivectors above, now also
@@ -1032,11 +1022,8 @@ namespace LinearAlgebra
       // the view into the nonlocal part to when we know that we actually
       // need it; this also makes sure that we correctly deal with the
       // case where we do not actually store a nonlocal part.
-      using ViewType1d =
-        decltype(Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0));
-
-      ViewType1d vector_1d_local =
-        Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
+      auto vector_1d_local = Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
+      using ViewType1d     = decltype(vector_1d_local);
       std::optional<ViewType1d> vector_1d_nonlocal;
 
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
@@ -1091,11 +1078,11 @@ namespace LinearAlgebra
               if (!vector_1d_nonlocal)
                 {
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-                  ViewType2d vector_2d_nonlocal =
+                  auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
                       Tpetra::Access::ReadWrite);
 #  else
-                  ViewType2d vector_2d_nonlocal =
+                  auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>();
 #  endif
 
@@ -1138,23 +1125,13 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-      // First create an alias for the type of a view into our vectors.
-      // The actual type is declared through several re-directions in
-      // Tpetra, so instead of spelling it out, we get it via decltype:
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      using ViewType2d =
-        decltype(vector->template getLocalView<Kokkos::HostSpace>(
-          Tpetra::Access::ReadWrite));
-      ViewType2d vector_2d_local =
-        vector->template getLocalView<Kokkos::HostSpace>(
-          Tpetra::Access::ReadWrite);
+      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWrite);
 #  else
       vector->template sync<Kokkos::HostSpace>();
 
-      using ViewType2d =
-        decltype(vector->template getLocalView<Kokkos::HostSpace>());
-      ViewType2d vector_2d_local =
-        vector->template getLocalView<Kokkos::HostSpace>();
+      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>();
 #  endif
 
       // Having extracted a view into the multivectors above, now also
@@ -1163,11 +1140,8 @@ namespace LinearAlgebra
       // the view into the nonlocal part to when we know that we actually
       // need it; this also makes sure that we correctly deal with the
       // case where we do not actually store a nonlocal part.
-      using ViewType1d =
-        decltype(Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0));
-
-      ViewType1d vector_1d_local =
-        Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
+      auto vector_1d_local = Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
+      using ViewType1d     = decltype(vector_1d_local);
       std::optional<ViewType1d> vector_1d_nonlocal;
 
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
@@ -1222,11 +1196,11 @@ namespace LinearAlgebra
               if (!vector_1d_nonlocal)
                 {
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-                  ViewType2d vector_2d_nonlocal =
+                  auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
                       Tpetra::Access::ReadWrite);
 #  else
-                  ViewType2d vector_2d_nonlocal =
+                  auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>();
 #  endif
 
