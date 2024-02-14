@@ -479,6 +479,11 @@ category/test.with_umfpack=on.output, or
 category/test.with_zlib=off.output
 </pre>
       These tests will only be set up if the specified feature was configured.
+<p><b>Note:</b> For CMake variables indicating whether sub-packages of third party libraries
+      were detected, like <code>DEAL_II_TRILINOS_WITH_BELOS</code> or <code>DEAL_II_PETSC_WITH_HYPRE</code>
+      the correct syntax is adding an additional <code>with_</code>,
+      i.e. <code>with_trilinos_with_belos=on|off</code>.
+</p>
       It is possible to provide different output files for disabled/enabled
       features, e.g.,
 <pre>
