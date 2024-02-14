@@ -589,6 +589,16 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::frobenius_norm() const
+    {
+      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
+      return matrix->getFrobeniusNorm();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
     void
     SparseMatrix<Number, MemorySpace>::set(const size_type  row,
                                            const size_type  n_cols,
@@ -919,9 +929,9 @@ namespace LinearAlgebra
                                                const bool      no_error) const
     {
       // Extract local indices in the matrix.
-      const int      trilinos_i = matrix->getRowMap()->getLocalElement(i);
-      const int      trilinos_j = matrix->getColMap()->getLocalElement(j);
-      TrilinosScalar value      = 0.;
+      const int trilinos_i = matrix->getRowMap()->getLocalElement(i);
+      const int trilinos_j = matrix->getColMap()->getLocalElement(j);
+      Number    value      = 0.;
 
       if (trilinos_i == Teuchos::OrdinalTraits<int>::invalid() ||
           trilinos_j == Teuchos::OrdinalTraits<int>::invalid())

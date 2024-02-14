@@ -707,6 +707,20 @@ namespace LinearAlgebra
       /** @} */
 
       /**
+       * @name Matrix norms
+       */
+      /** @{ */
+
+      /**
+       * Return the frobenius norm of the matrix, i.e. the square root of the
+       * sum of squares of all entries in the matrix.
+       */
+      Number
+      frobenius_norm() const;
+
+      /** @} */
+
+      /**
        * @name Mixed Stuff
        */
       /** @{ */
