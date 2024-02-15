@@ -1728,7 +1728,7 @@ namespace Utilities
      * not satisfied.
      */
     template <typename T>
-    const MPI_Datatype
+    inline const MPI_Datatype
       mpi_type_id_for_type = internal::MPIDataTypes::mpi_type_id(
         static_cast<std::remove_cv_t<std::remove_reference_t<T>> *>(nullptr));
 #endif
