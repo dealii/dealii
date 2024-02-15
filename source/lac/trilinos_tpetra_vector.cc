@@ -36,6 +36,8 @@ namespace LinearAlgebra
     static_assert(concepts::is_vector_space_vector<Vector<float>>);
 #    endif
     template class Vector<float>;
+    template Vector<float> &
+    Vector<float>::operator=<float>(const dealii::Vector<float> &);
     namespace internal
     {
       template class VectorReference<float>;
@@ -47,6 +49,8 @@ namespace LinearAlgebra
     static_assert(concepts::is_vector_space_vector<Vector<double>>);
 #    endif
     template class Vector<double>;
+    template Vector<double> &
+    Vector<double>::operator=<double>(const dealii::Vector<double> &);
     namespace internal
     {
       template class VectorReference<double>;
@@ -60,6 +64,9 @@ namespace LinearAlgebra
                   Vector<std::complex<float>>);
 #      endif
     template class Vector<std::complex<float>>;
+    template Vector<std::complex<float>> &
+    Vector<std::complex<float>>::operator=
+      <std::complex<float>>(const dealii::Vector<std::complex<float>> &);
     namespace internal
     {
       template class VectorReference<std::complex<float>>;
@@ -72,6 +79,9 @@ namespace LinearAlgebra
                   Vector<std::complex<double>>);
 #      endif
     template class Vector<std::complex<double>>;
+    template Vector<std::complex<double>> &
+    Vector<std::complex<double>>::operator=
+      <std::complex<double>>(const dealii::Vector<std::complex<double>> &);
     namespace internal
     {
       template class VectorReference<std::complex<double>>;

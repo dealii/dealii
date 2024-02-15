@@ -27,6 +27,7 @@
 
 #  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
+#  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
@@ -400,6 +401,15 @@ namespace LinearAlgebra
        */
       Vector &
       operator=(const Vector &V);
+
+      /**
+       * Copy function. This function takes a Vector and copies all the
+       * elements. The Vector will have the same parallel distribution as @p
+       * V.
+       */
+      template <typename OtherNumber>
+      Vector &
+      operator=(const dealii::Vector<OtherNumber> &V);
 
       /**
        * Sets all elements of the vector to the scalar @p s. This operation is

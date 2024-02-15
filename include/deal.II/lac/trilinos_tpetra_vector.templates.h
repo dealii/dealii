@@ -412,6 +412,30 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
+    template <typename OtherNumber>
+    Vector<Number, MemorySpace> &
+    Vector<Number, MemorySpace>::operator=(const dealii::Vector<OtherNumber> &V)
+    {
+      static_assert(
+        std::is_same<Number, OtherNumber>::value,
+        "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
+
+      vector.reset();
+      nonlocal_vector.reset();
+
+      Teuchos::Array<OtherNumber> vector_data(V.begin(), V.end());
+      vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+        V.locally_owned_elements().make_tpetra_map_rcp(), vector_data);
+
+      has_ghost  = false;
+      compressed = true;
+
+      return *this;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const Number s)
     {

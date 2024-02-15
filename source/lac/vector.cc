@@ -83,4 +83,40 @@ Vector<int>::lp_norm(const real_type) const
   return -1;
 }
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifdef HAVE_TPETRA_INST_FLOAT
+template Vector<float>::Vector(
+  const LinearAlgebra::TpetraWrappers::Vector<float> &);
+template Vector<float> &
+Vector<float>::operator=
+  <float>(const LinearAlgebra::TpetraWrappers::Vector<float> &);
+#  endif
+
+#  ifdef HAVE_TPETRA_INST_DOUBLE
+template Vector<double>::Vector(
+  const LinearAlgebra::TpetraWrappers::Vector<double> &);
+template Vector<double> &
+Vector<double>::operator=
+  <double>(const LinearAlgebra::TpetraWrappers::Vector<double> &);
+#  endif
+
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
+#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+template Vector<std::complex<float>>::Vector(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &);
+template Vector<std::complex<float>> &
+Vector<std::complex<float>>::operator=<std::complex<float>>(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &);
+#    endif
+
+#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+template Vector<std::complex<double>>::Vector(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &);
+template Vector<std::complex<double>> &
+Vector<std::complex<double>>::operator=<std::complex<double>>(
+  const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &);
+#    endif
+#  endif
+#endif
+
 DEAL_II_NAMESPACE_CLOSE
