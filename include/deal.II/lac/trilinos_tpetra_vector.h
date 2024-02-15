@@ -37,6 +37,7 @@
 #  include <Tpetra_Version.hpp>
 
 #  include <memory>
+#  include <optional>
 
 DEAL_II_NAMESPACE_OPEN
 
