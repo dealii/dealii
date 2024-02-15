@@ -35,6 +35,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
+
+template <typename Number>
+class SparseMatrix;
+
 #  ifndef DOXYGEN
 namespace LinearAlgebra
 {

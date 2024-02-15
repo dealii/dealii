@@ -430,7 +430,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     template <typename SparsityPatternType>
-    inline std::enable_if_t<
+    std::enable_if_t<
       !std::is_same_v<SparsityPatternType, dealii::SparseMatrix<double>>>
     SparseMatrix<Number, MemorySpace>::reinit(
       const IndexSet            &parallel_partitioning,
