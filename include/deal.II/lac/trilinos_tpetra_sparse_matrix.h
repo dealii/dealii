@@ -319,7 +319,8 @@ namespace LinearAlgebra
        * processors in order to avoid a dead lock.
        */
       template <typename SparsityPatternType>
-      void
+      std::enable_if_t<
+        !std::is_same_v<SparsityPatternType, dealii::SparseMatrix<double>>>
       reinit(const IndexSet            &parallel_partitioning,
              const SparsityPatternType &sparsity_pattern,
              const MPI_Comm             communicator  = MPI_COMM_WORLD,
@@ -338,7 +339,8 @@ namespace LinearAlgebra
        * processors in order to avoid a dead lock.
        */
       template <typename SparsityPatternType>
-      void
+      std::enable_if_t<
+        !std::is_same_v<SparsityPatternType, dealii::SparseMatrix<double>>>
       reinit(const IndexSet            &row_parallel_partitioning,
              const IndexSet            &col_parallel_partitioning,
              const SparsityPatternType &sparsity_pattern,
