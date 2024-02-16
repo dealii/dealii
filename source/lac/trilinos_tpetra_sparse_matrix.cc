@@ -31,6 +31,13 @@ namespace LinearAlgebra
 
     template void
     SparseMatrix<double>::reinit(
+      const IndexSet                       &parallel_partitioning,
+      const dealii::DynamicSparsityPattern &sparsity_pattern,
+      const MPI_Comm                        communicator,
+      const bool                            exchange_data);
+
+    template void
+    SparseMatrix<double>::reinit(
       const IndexSet                       &row_parallel_partitioning,
       const IndexSet                       &col_parallel_partitioning,
       const dealii::DynamicSparsityPattern &sparsity_pattern,
