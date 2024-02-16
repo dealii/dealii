@@ -1,0 +1,70 @@
+
+DEAL:0::Tpetra first import add:
+size:4 locally_owned_size:2 :
+[0]: 2.000e+00
+[1]: 1.000e+02
+IndexSet: {[0,2]}
+
+[0]: 1.000e+00
+[1]: 1.000e+02
+[2]: 1.000e+01
+DEAL:0::Tpetra second import add:
+size:4 locally_owned_size:2 :
+[0]: 4.000e+00
+[1]: 2.000e+02
+IndexSet: {[0,2]}
+
+[0]: 2.000e+00
+[1]: 2.000e+02
+[2]: 2.000e+01
+DEAL:0::ReadWrite import add:
+IndexSet: {[0,2]}
+
+[0]: 6.000e+00
+[1]: 4.000e+02
+[2]: 5.000e+01
+DEAL:0::ReadWrite import min:
+IndexSet: {[0,2]}
+
+[0]: 4.000e+00
+[1]: 1.000e+00
+[2]: 3.000e+01
+DEAL:0::ReadWrite import max:
+IndexSet: {[0,2]}
+
+[0]: 4.000e+00
+[1]: 2.000e+02
+[2]: 1.000e+02
+
+DEAL:1::Tpetra first import add:
+size:4 locally_owned_size:2 :
+[2]: 1.000e+01
+[3]: 1.010e+02
+IndexSet: {0, 3}
+
+[0]: 1.000e+00
+[3]: 1.010e+02
+DEAL:1::Tpetra second import add:
+size:4 locally_owned_size:2 :
+[2]: 3.000e+01
+[3]: 2.010e+02
+IndexSet: {0, 3}
+
+[0]: 2.000e+00
+[3]: 2.010e+02
+DEAL:1::ReadWrite import add:
+IndexSet: {0, 3}
+
+[0]: 6.000e+00
+[3]: 4.020e+02
+DEAL:1::ReadWrite import min:
+IndexSet: {0, 3}
+
+[0]: 4.000e+00
+[3]: 1.000e+00
+DEAL:1::ReadWrite import max:
+IndexSet: {0, 3}
+
+[0]: 4.000e+00
+[3]: 2.010e+02
+
