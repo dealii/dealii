@@ -7067,6 +7067,9 @@ namespace GridGenerator
              "The number of slices for extrusion must be at least 2."));
     Assert(std::is_sorted(slice_coordinates.begin(), slice_coordinates.end()),
            ExcMessage("Slice z-coordinates should be in ascending order"));
+    Assert(input.all_reference_cells_are_hyper_cube(),
+           ExcMessage(
+             "This function is only implemented for quadrilateral meshes."));
 
     const auto priorities = [&]() -> std::vector<types::manifold_id> {
       // if a non-empty (i.e., not the default) vector is given for
