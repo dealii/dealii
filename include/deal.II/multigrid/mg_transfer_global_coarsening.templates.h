@@ -866,7 +866,11 @@ namespace internal
 
         for (const auto &i : targets_with_indexset)
           {
-            if (i.first == my_rank)
+            // Skip communication in case we would send to ourselves or when
+            // there are no indices to send (this can still happen in the run
+            // of the consensus algorithms above if the index spaces are
+            // sparse).
+            if (i.first == my_rank || i.second.begin() == i.second.end())
               continue;
 
             indices_to_be_sent[i.first] = {};
