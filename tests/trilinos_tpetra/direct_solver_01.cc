@@ -341,7 +341,7 @@ Step4<dim>::solve()
   {
     deallog.push("DirectKLU2");
     LinearAlgebra::TpetraWrappers::SolverDirect<double>::AdditionalData data(
-      "KLU2", true);
+      "KLU2");
     LinearAlgebra::TpetraWrappers::SolverDirect<double> direct_solver(
       solver_control, data);
 
@@ -394,7 +394,7 @@ Step4<dim>::solve()
     // independent of the Amesos2 configuration.
     deallog.push("DirectMEASLES");
     LinearAlgebra::TpetraWrappers::SolverDirect<double>::AdditionalData data(
-      "MEASLES", true);
+      "MEASLES");
     try
       {
         LinearAlgebra::TpetraWrappers::SolverDirect<double> direct_solver(
