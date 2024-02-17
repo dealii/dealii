@@ -241,6 +241,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_SYMENGINE_WITH_LLVM=1 \
                          DEAL_II_WITH_TBB=1 \
                          DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_TRILINOS_WITH_AMESOS2=1 \
                          DEAL_II_TRILINOS_WITH_EPETRAEXT=1 \
                          DEAL_II_TRILINOS_WITH_MUELU=1 \
                          DEAL_II_TRILINOS_WITH_NOX=1 \
