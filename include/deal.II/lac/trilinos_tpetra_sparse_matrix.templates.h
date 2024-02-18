@@ -583,6 +583,108 @@ namespace LinearAlgebra
 
 
 
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::reinit(
+      const IndexSet                     &row_parallel_partitioning,
+      const IndexSet                     &col_parallel_partitioning,
+      const dealii::SparseMatrix<Number> &dealii_sparse_matrix,
+      const MPI_Comm                      communicator,
+      const double                        drop_tolerance,
+      const bool                          copy_values,
+      const dealii::SparsityPattern      *use_this_sparsity)
+    {
+      dealii::types::signed_global_dof_index n_rows = dealii_sparse_matrix.m();
+      AssertDimension(row_parallel_partitioning.size(), n_rows);
+      AssertDimension(col_parallel_partitioning.size(),
+                      dealii_sparse_matrix.n());
+
+      const dealii::SparsityPattern &sparsity_pattern =
+        (use_this_sparsity != nullptr) ?
+          *use_this_sparsity :
+          dealii_sparse_matrix.get_sparsity_pattern();
+
+      if (matrix.is_null() || m() != n_rows ||
+          n_nonzero_elements() != sparsity_pattern.n_nonzero_elements() ||
+          copy_values)
+        if (use_this_sparsity == nullptr)
+          reinit(row_parallel_partitioning,
+                 col_parallel_partitioning,
+                 sparsity_pattern,
+                 communicator,
+                 false);
+
+      // in case we do not copy values, we are done
+      if (copy_values == false)
+        return;
+
+        // fill the values: go through all rows of the
+        // matrix, and then all columns. since the sparsity patterns of the
+        // input matrix and the specified sparsity pattern might be different,
+        // need to go through the row for both these sparsity structures
+        // simultaneously in order to really set the correct values.
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+      size_type maximum_row_length = matrix->getLocalMaxNumRowEntries();
+#  else
+      size_type maximum_row_length = matrix->getNodeMaxNumRowEntries();
+#  endif
+      std::vector<size_type> row_indices(maximum_row_length);
+      std::vector<Number>    values(maximum_row_length);
+
+      for (dealii::types::signed_global_dof_index row = 0; row < n_rows; ++row)
+        // see if the row is locally stored on this processor
+        if (row_parallel_partitioning.is_element(row) == true)
+          {
+            dealii::SparsityPattern::iterator select_index =
+              sparsity_pattern.begin(row);
+            typename dealii::SparseMatrix<Number>::const_iterator it =
+              dealii_sparse_matrix.begin(row);
+            size_type col = 0;
+            if (sparsity_pattern.n_rows() == sparsity_pattern.n_cols())
+              {
+                // optimized diagonal
+                AssertDimension(it->column(), row);
+                if (std::fabs(it->value()) > drop_tolerance)
+                  {
+                    values[col]        = it->value();
+                    row_indices[col++] = it->column();
+                  }
+                ++select_index;
+                ++it;
+              }
+
+            while (it != dealii_sparse_matrix.end(row) &&
+                   select_index != sparsity_pattern.end(row))
+              {
+                while (select_index->column() < it->column() &&
+                       select_index != sparsity_pattern.end(row))
+                  ++select_index;
+                while (it->column() < select_index->column() &&
+                       it != dealii_sparse_matrix.end(row))
+                  ++it;
+
+                if (it == dealii_sparse_matrix.end(row))
+                  break;
+                if (std::fabs(it->value()) > drop_tolerance)
+                  {
+                    values[col]        = it->value();
+                    row_indices[col++] = it->column();
+                  }
+                ++select_index;
+                ++it;
+              }
+            set(row,
+                col,
+                reinterpret_cast<size_type *>(row_indices.data()),
+                values.data(),
+                false);
+          }
+
+      compress(VectorOperation::insert);
+    }
+
+
+
     // Information on the matrix
 
     template <typename Number, typename MemorySpace>

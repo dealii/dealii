@@ -24,6 +24,8 @@
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/base/trilinos_utilities.h>
 
+#  include <deal.II/lac/sparse_matrix.h>
+#  include <deal.II/lac/sparsity_pattern.h>
 #  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
 
@@ -369,6 +371,32 @@ namespace LinearAlgebra
              const SparsityPatternType &sparsity_pattern,
              const MPI_Comm             communicator  = MPI_COMM_WORLD,
              const bool                 exchange_data = false);
+
+      /**
+       * This function initializes the Trilinos matrix using the deal.II sparse
+       * matrix and the entries stored therein. It uses a threshold to copy only
+       * elements with modulus larger than the threshold (so zeros in the
+       * deal.II matrix can be filtered away). In contrast to the other reinit
+       * function with deal.II sparse matrix argument, this function takes a
+       * %parallel partitioning specified by the user instead of internally
+       * generating it.
+       *
+       * The optional parameter <tt>copy_values</tt> decides whether only the
+       * sparsity structure of the input matrix should be used or the matrix
+       * entries should be copied, too.
+       *
+       * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
+       * processors in order to avoid a dead lock.
+       */
+      void
+      reinit(const IndexSet                     &row_parallel_partitioning,
+             const IndexSet                     &col_parallel_partitioning,
+             const dealii::SparseMatrix<Number> &dealii_sparse_matrix,
+             const MPI_Comm                      communicator = MPI_COMM_WORLD,
+             const double                        drop_tolerance    = 1e-13,
+             const bool                          copy_values       = true,
+             const dealii::SparsityPattern      *use_this_sparsity = nullptr);
+
       /** @} */
 
       /**
