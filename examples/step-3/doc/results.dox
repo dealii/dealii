@@ -308,6 +308,7 @@ data_file.write_dataset("mean_value",mean_value);
 
 
 <h3> Using R and ggplot2 to generate plots</h3>
+@note Alternatively, one could use the associated python script `plotting.py`.
 
 The data put into %HDF5 files above can then be used from scripting
 languages for further postprocessing. In the following, let us show
