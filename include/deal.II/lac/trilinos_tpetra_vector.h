@@ -710,6 +710,22 @@ namespace LinearAlgebra
       has_ghost_elements() const;
 
       /**
+       * Test for equality. This function assumes that the present vector and
+       * the one to compare with have the same size already, since comparing
+       * vectors of different sizes makes not much sense anyway.
+       */
+      bool
+      operator==(const Vector<Number, MemorySpace> &v) const;
+
+      /**
+       * Test for inequality. This function assumes that the present vector and
+       * the one to compare with have the same size already, since comparing
+       * vectors of different sizes makes not much sense anyway.
+       */
+      bool
+      operator!=(const Vector<Number, MemorySpace> &v) const;
+
+      /**
        * Return the global size of the vector, equal to the sum of the number of
        * locally owned indices among all processors.
        */
