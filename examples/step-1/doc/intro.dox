@@ -63,7 +63,7 @@ sections:
        interpretation. This section also frequently has a subsection
        that gives suggestions on how to extend the program in various
        direction; in the earlier programs, this is intended to give
-       you directions for little experiments designed to make your
+       you directions for little experiments designed to make you
        familiar with deal.II, while in later programs it is more about
        how to use more advanced numerical techniques.
   <li> <b>The plain program:</b> The source code stripped of
@@ -85,7 +85,7 @@ tutorial is that you're interested in) and type
 @endcode
 The first command sets up the files that describe which include files this
 tutorial program depends on, how to compile it and how to run it. This command
-should find the installed deal.II libraries as well that were generated when
+should find the installed deal.II libraries as well as those that were generated when
 you compiled and installed everything as described in the
 <a href="../../readme.html" target="body">README</a> file.
 If this command should fail to find the deal.II library, then you need to
