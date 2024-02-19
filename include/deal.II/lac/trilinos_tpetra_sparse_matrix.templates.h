@@ -594,7 +594,7 @@ namespace LinearAlgebra
       const bool                          copy_values,
       const dealii::SparsityPattern      *use_this_sparsity)
     {
-      dealii::types::signed_global_dof_index n_rows = dealii_sparse_matrix.m();
+      const size_type n_rows = dealii_sparse_matrix.m();
       AssertDimension(row_parallel_partitioning.size(), n_rows);
       AssertDimension(col_parallel_partitioning.size(),
                       dealii_sparse_matrix.n());
@@ -631,7 +631,7 @@ namespace LinearAlgebra
       std::vector<size_type> row_indices(maximum_row_length);
       std::vector<Number>    values(maximum_row_length);
 
-      for (dealii::types::signed_global_dof_index row = 0; row < n_rows; ++row)
+      for (size_type row = 0; row < n_rows; ++row)
         // see if the row is locally stored on this processor
         if (row_parallel_partitioning.is_element(row) == true)
           {

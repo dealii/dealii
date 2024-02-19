@@ -406,13 +406,13 @@ namespace LinearAlgebra
       /**
        * Return the number of rows in this matrix.
        */
-      dealii::types::signed_global_dof_index
+      size_type
       m() const;
 
       /**
        * Return the number of columns in this matrix.
        */
-      dealii::types::signed_global_dof_index
+      size_type
       n() const;
 
 
@@ -1110,7 +1110,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline dealii::types::signed_global_dof_index
+    inline typename SparseMatrix<Number, MemorySpace>::size_type
     SparseMatrix<Number, MemorySpace>::m() const
     {
       return matrix->getRowMap()->getGlobalNumElements();
@@ -1119,7 +1119,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline dealii::types::signed_global_dof_index
+    inline typename SparseMatrix<Number, MemorySpace>::size_type
     SparseMatrix<Number, MemorySpace>::n() const
     {
       // If the matrix structure has not been fixed (i.e., we did not have a
