@@ -902,6 +902,53 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
+    bool
+    Vector<Number, MemorySpace>::operator==(
+      const Vector<Number, MemorySpace> &v) const
+    {
+      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+
+      const size_t this_local_length  = vector->getLocalLength();
+      const size_t other_local_length = v.vector->getLocalLength();
+      if (this_local_length != other_local_length)
+        return false;
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto this_vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadOnly);
+      auto other_vector_2d = v.vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadOnly);
+
+#  else
+      vector->template sync<Kokkos::HostSpace>();
+      v.vector->template sync<Kokkos::HostSpace>();
+      auto this_vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
+      auto other_vector_2d =
+        v.vector->template getLocalView<Kokkos::HostSpace>();
+#  endif
+      auto this_vector_1d  = Kokkos::subview(this_vector_2d, Kokkos::ALL(), 0);
+      auto other_vector_1d = Kokkos::subview(other_vector_2d, Kokkos::ALL(), 0);
+
+      for (size_type i = 0; i < this_local_length; ++i)
+        if (this_vector_1d(i) != other_vector_1d(i))
+          return false;
+
+      return true;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    bool
+    Vector<Number, MemorySpace>::operator!=(
+      const Vector<Number, MemorySpace> &v) const
+    {
+      return (!(*this == v));
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
     typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::size() const
     {
