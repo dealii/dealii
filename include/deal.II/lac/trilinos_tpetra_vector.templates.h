@@ -808,18 +808,16 @@ namespace LinearAlgebra
     {
       // get a representation of the vector and
       // loop over all the elements
-      Number       *start_ptr = vector->getDataNonConst().get();
-      const Number *ptr       = start_ptr,
-                   *eptr      = start_ptr + vector->getLocalLength();
-      unsigned int flag       = 0;
-      while (ptr != eptr)
+      Teuchos::ArrayRCP<const Number> data       = vector->getData();
+      const size_type                 n_elements = vector->getLocalLength();
+      unsigned int                    flag       = 0;
+      for (size_type i = 0; i < n_elements; ++i)
         {
-          if (*ptr != Number(0))
+          if (data[i] != Number(0))
             {
               flag = 1;
               break;
             }
-          ++ptr;
         }
 
       // Check that the vector is zero on _all_ processors.
@@ -829,6 +827,34 @@ namespace LinearAlgebra
                               vector->getMap()->getComm()));
 
       return num_nonzero == 0;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    bool
+    Vector<Number, MemorySpace>::is_non_negative() const
+    {
+      // get a representation of the vector and
+      // loop over all the elements
+      Teuchos::ArrayRCP<const Number> data       = vector->getData();
+      const size_type                 n_elements = vector->getLocalLength();
+      unsigned int                    flag       = 0;
+      for (size_type i = 0; i < n_elements; ++i)
+        {
+          if (data[i] < Number(0))
+            {
+              flag = 1;
+              break;
+            }
+        }
+
+      // Check that the vector is non-negative on _all_ processors.
+      unsigned int num_negative =
+        Utilities::MPI::sum(flag,
+                            Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+                              vector->getMap()->getComm()));
+      return num_negative == 0;
     }
 
 
@@ -1065,10 +1091,6 @@ namespace LinearAlgebra
     {
       AssertThrow(out.fail() == false, ExcIO());
       boost::io::ios_flags_saver restore_flags(out);
-
-      // Get a representation of the vector and loop over all
-      // the elements
-      const auto val = vector->get1dView();
 
       out.precision(precision);
       if (scientific)
