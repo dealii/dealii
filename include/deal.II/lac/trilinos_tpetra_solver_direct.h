@@ -153,9 +153,7 @@ namespace LinearAlgebra
        * Constructor. Takes the solver control object and name
        * and creates the solver.
        */
-      SolverDirectBase(SolverControl     &cn,
-                       const std::string &solver_type,
-                       const bool         output_solver_details = false);
+      SolverDirectBase(SolverControl &cn, const std::string &solver_type);
       /**
        * Actually performs the operations for solving the linear system,
        * including the factorization and forward and backward substitution.
@@ -183,13 +181,6 @@ namespace LinearAlgebra
        * The set solver type to be handed to the solver factory of Amesos2.
        */
       std::string solver_type;
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
-
 
       /**
        * An optional Teuchos::ParameterList for fine tuning the solver.
@@ -225,8 +216,7 @@ namespace LinearAlgebra
        */
       struct AdditionalData
       {
-        AdditionalData(const std::string &solver_name,
-                       const bool         output_solver_details = false);
+        AdditionalData(const std::string &solver_name);
 
 
         /**
@@ -253,12 +243,6 @@ namespace LinearAlgebra
          * that can nevertheless be used if configured.
          */
         std::string solver_name;
-
-        /**
-         * Enables/disables the output of solver details (residual in each
-         * iterations etc.).
-         */
-        bool output_solver_details;
       };
 
       /**
@@ -299,12 +283,11 @@ namespace LinearAlgebra
        */
       struct AdditionalData
       {
-        AdditionalData(const std::string &transpose_mode        = "NOTRANS",
-                       const bool         symmetric_mode        = false,
-                       const bool         equilibrate_matrix    = true,
-                       const std::string &column_permutation    = "COLAMD",
-                       const std::string &iterative_refinement  = "NO",
-                       const bool         output_solver_details = false);
+        AdditionalData(const std::string &transpose_mode       = "NOTRANS",
+                       const bool         symmetric_mode       = false,
+                       const bool         equilibrate_matrix   = true,
+                       const std::string &column_permutation   = "COLAMD",
+                       const std::string &iterative_refinement = "NO");
         /**
          * Decide which system to solve
          * "NOTRANS": Ax=b (default)
@@ -340,13 +323,6 @@ namespace LinearAlgebra
          * "EXTRA": ??
          */
         std::string iterative_refinement;
-
-
-        /**
-         * Enables/disables the output of solver details (residual in each
-         * iterations etc.).
-         */
-        bool output_solver_details;
       };
 
       /**
