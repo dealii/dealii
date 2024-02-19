@@ -118,7 +118,7 @@ namespace boost
 {
     namespace hash_detail
     {
-#if defined(_HAS_AUTO_PTR_ETC) && !_HAS_AUTO_PTR_ETC
+#if defined(BOOST_NO_CXX98_FUNCTION_BASE)
         template <typename T>
         struct hash_base
         {
