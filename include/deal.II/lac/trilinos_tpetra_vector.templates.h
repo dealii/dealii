@@ -182,6 +182,7 @@ namespace LinearAlgebra
           0, 0, Utilities::Trilinos::tpetra_comm_self()));
       has_ghost  = false;
       compressed = true;
+      nonlocal_vector.reset();
     }
 
 
@@ -1111,6 +1112,7 @@ namespace LinearAlgebra
       // of the vector
       AssertThrow(out.fail() == false, ExcIO());
     }
+
 
 
     template <typename Number, typename MemorySpace>

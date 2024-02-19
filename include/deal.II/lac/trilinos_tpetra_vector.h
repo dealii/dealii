@@ -208,6 +208,34 @@ namespace LinearAlgebra
                        << "An error with error number " << arg1
                        << " occurred while calling a Trilinos function");
 
+        /*
+         * Access to a an element that is not (locally-)owned.
+         *
+         * @ingroup Exceptions
+         */
+        DeclException4(
+          ExcAccessToNonLocalElement,
+          size_type,
+          size_type,
+          size_type,
+          size_type,
+          << "You are trying to access element " << arg1
+          << " of a distributed vector, but this element is not stored "
+          << "on the current processor. Note: There are " << arg2
+          << " elements stored "
+          << "on the current processor from within the range [" << arg3 << ','
+          << arg4 << "] but Trilinos vectors need not store contiguous "
+          << "ranges on each processor, and not every element in "
+          << "this range may in fact be stored locally."
+          << "\n\n"
+          << "A common source for this kind of problem is that you "
+          << "are passing a 'fully distributed' vector into a function "
+          << "that needs read access to vector elements that correspond "
+          << "to degrees of freedom on ghost cells (or at least to "
+          << "'locally active' degrees of freedom that are not also "
+          << "'locally owned'). You need to pass a vector that has these "
+          << "elements as ghost entries.");
+
       private:
         /**
          * Point to the vector we are referencing.
@@ -261,6 +289,8 @@ namespace LinearAlgebra
       using real_type  = typename numbers::NumberTraits<Number>::real_type;
       using size_type  = types::global_dof_index;
       using reference  = internal::VectorReference<Number, MemorySpace>;
+      using const_reference =
+        const internal::VectorReference<Number, MemorySpace>;
       using MapType =
         Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
       using VectorType = Tpetra::
