@@ -1022,9 +1022,14 @@ namespace LinearAlgebra
       // not need to perform a deep copy.
 
       // Perform a deep copy
+#  if DEAL_II_TRILINOS_VERSION_GTE(12, 18, 1)
       matrix =
         Utilities::Trilinos::internal::make_rcp<MatrixType>(*source.matrix,
                                                             Teuchos::Copy);
+#  else
+      matrix = source.matrix->clone(
+        Utilities::Trilinos::internal::make_rcp<NodeType>());
+#  endif
       column_space_map = Teuchos::rcp_const_cast<MapType>(matrix->getColMap());
       compressed       = source.compressed;
     }
