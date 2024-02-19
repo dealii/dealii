@@ -806,6 +806,7 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::matrix_norm_square(
       const Vector<Number, MemorySpace> &v) const
     {
+      AssertDimension(m(), v.size());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
       Assert(matrix->getRowMap()->isSameAs(*matrix->getDomainMap()),
              ExcNotQuadratic());
@@ -825,6 +826,8 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpace> &u,
       const Vector<Number, MemorySpace> &v) const
     {
+      AssertDimension(m(), u.size());
+      AssertDimension(m(), v.size());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
       Assert(matrix->getRowMap()->isSameAs(*matrix->getDomainMap()),
              ExcNotQuadratic());
