@@ -4714,12 +4714,17 @@ AffineConstraints<number>::add_entries_local_to_global(
   const size_type n_local_rows = row_indices.size();
   const size_type n_local_cols = col_indices.size();
 
+  // Early return if the length of row and column indices is zero, relevant
+  // for the usage with FENothing.
+  if (n_local_cols == 0 && n_local_rows == 0)
+    return;
+
   typename internal::AffineConstraints::ScratchDataAccessor<number>
     scratch_data(this->scratch_data);
   std::vector<std::pair<size_type, size_type>> &cell_entries =
     scratch_data->new_entries;
   cell_entries.resize(0);
-  cell_entries.reserve(row_indices.size() * col_indices.size());
+  cell_entries.reserve(n_local_rows * n_local_cols);
 
   // if constrained entries should be kept, need to add rows and columns of
   // those to the sparsity pattern
