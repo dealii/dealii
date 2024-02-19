@@ -678,6 +678,59 @@ namespace LinearAlgebra
           const bool       elide_zero_values = false);
 
       /**
+       * Remove all elements from this <tt>row</tt> by setting them to zero. The
+       * function does not modify the number of allocated nonzero entries, it
+       * only sets the entries to zero.
+       *
+       * This operation is used in eliminating constraints (e.g. due to hanging
+       * nodes) and makes sure that we can write this modification to the matrix
+       * without having to read entries (such as the locations of non-zero
+       * elements) from it &mdash; without this operation, removing constraints
+       * on %parallel matrices is a rather complicated procedure.
+       *
+       * The second parameter can be used to set the diagonal entry of this row
+       * to a value different from zero. The default is to set it to zero.
+       *
+       * @note If the matrix is stored in parallel across multiple processors
+       * using MPI, this function only touches rows that are locally stored and
+       * simply ignores all other row indices. Further, in the context of
+       * parallel computations, you will get into trouble if you clear a row
+       * while other processors still have pending writes or additions into the
+       * same row. In other words, if another processor still wants to add
+       * something to an element of a row and you call this function to zero out
+       * the row, then the next time you call compress() may add the remote
+       * value to the zero you just created. Consequently, you will want to call
+       * compress() after you made the last modifications to a matrix and before
+       * starting to clear rows.
+       */
+      void
+      clear_row(const size_type row, const Number new_diag_value = 0);
+
+      /**
+       * Same as clear_row(), except that it works on a number of rows at once.
+       *
+       * The second parameter can be used to set the diagonal entries of all
+       * cleared rows to something different from zero. Note that all of these
+       * diagonal entries get the same value -- if you want different values for
+       * the diagonal entries, you have to set them by hand.
+       *
+       * @note If the matrix is stored in parallel across multiple processors
+       * using MPI, this function only touches rows that are locally stored and
+       * simply ignores all other row indices. Further, in the context of
+       * parallel computations, you will get into trouble if you clear a row
+       * while other processors still have pending writes or additions into the
+       * same row. In other words, if another processor still wants to add
+       * something to an element of a row and you call this function to zero out
+       * the row, then the next time you call compress() may add the remote
+       * value to the zero you just created. Consequently, you will want to call
+       * compress() after you made the last modifications to a matrix and before
+       * starting to clear rows.
+       */
+      void
+      clear_rows(const std::vector<size_type> &rows,
+                 const Number                  new_diag_value = 0);
+
+      /**
        * Release all memory and return to a state just like after having called
        * the default constructor.
        *
