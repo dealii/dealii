@@ -167,6 +167,31 @@ macro(process_feature _feature)
 
   if(${_feature}_FOUND)
     #
+    # Take care of "optimized", "debug", and "general" keywords in
+    # LIBRARIES and TARGETS variables by distributing affected entries into
+    # the respective LIBRARIES_(DEBUG|RELEASE) and TARGETS_(DEBUG|RELEASE)
+    # variables.
+    #
+    foreach(_suffix LIBRARIES TARGETS)
+      set(_temp ${_temp_${_suffix}})
+      set(_temp_${_suffix} "")
+      set(_switch "")
+      foreach(_entry ${_temp})
+        if("${_entry}" STREQUAL "optimized")
+          set(_split_configuration TRUE)
+          set(_switch "_RELEASE")
+        elseif("${_entry}" STREQUAL "debug")
+          set(_split_configuration TRUE)
+          set(_switch "_DEBUG")
+        elseif("${_entry}" STREQUAL "general")
+          set(_switch "")
+        else()
+          list(APPEND _temp_${_suffix}${_switch} ${_entry})
+        endif()
+      endforeach()
+    endforeach()
+
+    #
     # Deduplicate and stringify entries:
     #
     foreach(_suffix ${DEAL_II_LIST_SUFFIXES})
