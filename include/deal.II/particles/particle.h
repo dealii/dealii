@@ -251,6 +251,14 @@ namespace Particles
     get_location() const;
 
     /**
+     * Get the location of this particle.
+     *
+     * @return The location of this particle.
+     */
+    Point<spacedim> &
+    get_location();
+
+    /**
      * Set the reference location of this particle.
      *
      * @param [in] new_reference_location The new reference location for
@@ -278,6 +286,12 @@ namespace Particles
      */
     const Point<dim> &
     get_reference_location() const;
+
+    /**
+     * Return the reference location of this particle in its current cell.
+     */
+    Point<dim> &
+    get_reference_location();
 
     /**
      * Return the ID number of this particle. The ID of a particle is intended
@@ -538,6 +552,15 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  inline Point<spacedim> &
+  Particle<dim, spacedim>::get_location()
+  {
+    return property_pool->get_location(property_pool_handle);
+  }
+
+
+
+  template <int dim, int spacedim>
   inline void
   Particle<dim, spacedim>::set_reference_location(const Point<dim> &new_loc)
   {
@@ -549,6 +572,15 @@ namespace Particles
   template <int dim, int spacedim>
   inline const Point<dim> &
   Particle<dim, spacedim>::get_reference_location() const
+  {
+    return property_pool->get_reference_location(property_pool_handle);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline Point<dim> &
+  Particle<dim, spacedim>::get_reference_location()
   {
     return property_pool->get_reference_location(property_pool_handle);
   }
