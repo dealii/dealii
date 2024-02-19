@@ -785,6 +785,53 @@ namespace LinearAlgebra
                  const Vector<Number, MemorySpace> &src) const;
 
       /**
+       * Return the square of the norm of the vector $v$ with respect to the
+       * norm induced by this matrix, i.e., $\left(v,Mv\right)$. This is useful,
+       * e.g. in the finite element context, where the $L_2$ norm of a function
+       * equals the matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector
+       * representing the nodal values of the finite element function.
+       *
+       * Obviously, the matrix needs to be quadratic for this operation.
+       *
+       * The implementation of this function is not as efficient as the one in
+       * the @p SparseMatrix class used in deal.II (i.e. the original one, not
+       * the Trilinos wrapper class) since Trilinos doesn't support this
+       * operation and needs a temporary vector.
+       *
+       * The vector has to be initialized with the same IndexSet the matrix
+       * was initialized with.
+       *
+       * In case of a localized Vector, this function will only work when
+       * running on one processor, since the matrix object is inherently
+       * distributed. Otherwise, an exception will be thrown.
+       */
+      Number
+      matrix_norm_square(const Vector<Number, MemorySpace> &v) const;
+
+      /**
+       * Compute the matrix scalar product $\left(u,Mv\right)$.
+       *
+       * The implementation of this function is not as efficient as the one in
+       * the @p SparseMatrix class used in deal.II (i.e. the original one, not
+       * the Trilinos wrapper class) since Trilinos doesn't support this
+       * operation and needs a temporary vector.
+       *
+       * The vector @p u has to be initialized with the same IndexSet that
+       * was used for the row indices of the matrix and the vector @p v has
+       * to be initialized with the same IndexSet that was used for the
+       * column indices of the matrix.
+       *
+       * In case of a localized Vector, this function will only work when
+       * running on one processor, since the matrix object is inherently
+       * distributed. Otherwise, an exception will be thrown.
+       *
+       * This function is only implemented for square matrices.
+       */
+      Number
+      matrix_scalar_product(const Vector<Number, MemorySpace> &u,
+                            const Vector<Number, MemorySpace> &v) const;
+
+      /**
        * Compute the residual of an equation <i>Mx=b</i>, where the residual is
        * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
        * <i>l<sub>2</sub></i> norm of the residual vector is returned.

@@ -803,6 +803,43 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     Number
+    SparseMatrix<Number, MemorySpace>::matrix_norm_square(
+      const Vector<Number, MemorySpace> &v) const
+    {
+      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
+      Assert(matrix->getRowMap()->isSameAs(*matrix->getDomainMap()),
+             ExcNotQuadratic());
+
+      Vector<Number, MemorySpace> temp_vector;
+      temp_vector.reinit(v, true);
+
+      vmult(temp_vector, v);
+      return temp_vector * v;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::matrix_scalar_product(
+      const Vector<Number, MemorySpace> &u,
+      const Vector<Number, MemorySpace> &v) const
+    {
+      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
+      Assert(matrix->getRowMap()->isSameAs(*matrix->getDomainMap()),
+             ExcNotQuadratic());
+
+      Vector<Number, MemorySpace> temp_vector;
+      temp_vector.reinit(v, true);
+
+      vmult(temp_vector, v);
+      return u * temp_vector;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
     SparseMatrix<Number, MemorySpace>::frobenius_norm() const
     {
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
