@@ -727,8 +727,8 @@ namespace LinearAlgebra
        * starting to clear rows.
        */
       void
-      clear_rows(const std::vector<size_type> &rows,
-                 const Number                  new_diag_value = 0);
+      clear_rows(const ArrayView<const size_type> &rows,
+                 const Number                      new_diag_value = 0);
 
       /**
        * Release all memory and return to a state just like after having called

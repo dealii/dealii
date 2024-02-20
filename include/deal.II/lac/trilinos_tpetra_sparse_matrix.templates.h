@@ -1010,7 +1010,7 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::clear_row(const size_type row,
                                                  const Number    new_diag_value)
     {
-      clear_rows(std::vector<size_type>(1, row), new_diag_value);
+      clear_rows(ArrayView<const size_type>{&row, 1}, new_diag_value);
     }
 
 
@@ -1018,8 +1018,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     SparseMatrix<Number, MemorySpace>::clear_rows(
-      const std::vector<size_type> &rows,
-      const Number                  new_diag_value)
+      const ArrayView<const size_type> &rows,
+      const Number                      new_diag_value)
     {
       // If the matrix is marked as compressed, we need to
       // call resumeFill() first.

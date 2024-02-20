@@ -154,8 +154,8 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::clear_rows(const std::vector<size_type> &rows,
-                         const PetscScalar             new_diag_value)
+  MatrixBase::clear_rows(const ArrayView<const size_type> &rows,
+                         const PetscScalar                 new_diag_value)
   {
     assert_is_compressed();
 

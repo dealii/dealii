@@ -577,8 +577,8 @@ namespace PETScWrappers
      * the diagonal entries, you have to set them by hand.
      */
     void
-    clear_rows(const std::vector<size_type> &rows,
-               const PetscScalar             new_diag_value = 0);
+    clear_rows(const ArrayView<const size_type> &rows,
+               const PetscScalar                 new_diag_value = 0);
 
     /**
      * Same as clear_rows(), except that the function also zeros the columns.

@@ -1344,8 +1344,8 @@ namespace TrilinosWrappers
      * starting to clear rows.
      */
     void
-    clear_rows(const std::vector<size_type> &rows,
-               const TrilinosScalar          new_diag_value = 0);
+    clear_rows(const ArrayView<const size_type> &rows,
+               const TrilinosScalar              new_diag_value = 0);
 
     /**
      * Sets an internal flag so that all operations performed by the matrix,
