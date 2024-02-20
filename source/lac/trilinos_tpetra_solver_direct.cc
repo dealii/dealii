@@ -39,14 +39,14 @@ namespace LinearAlgebra
 #      endif
 #      ifdef DEAL_II_WITH_COMPLEX_VALUES
 #        ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
-    template class SolverDirectBase<complex<float>>;
-    template class SolverDirect<complex<float>>;
-    template class SolverDirectKLU2<complex<float>>;
+    template class SolverDirectBase<std::complex<float>>;
+    template class SolverDirect<std::complex<float>>;
+    template class SolverDirectKLU2<std::complex<float>>;
 #        endif
 #        ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
-    template class SolverDirectBase<complex<double>>;
-    template class SolverDirect<complex<double>>;
-    template class SolverDirectKLU2<complex<double>>;
+    template class SolverDirectBase<std::complex<double>>;
+    template class SolverDirect<std::complex<double>>;
+    template class SolverDirectKLU2<std::complex<double>>;
 #        endif
 #      endif
 
