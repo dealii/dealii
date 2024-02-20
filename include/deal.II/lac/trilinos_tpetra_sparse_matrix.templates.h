@@ -1047,6 +1047,75 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     void
+    SparseMatrix<Number, MemorySpace>::clear_row(const size_type row,
+                                                 const Number    new_diag_value)
+    {
+      clear_rows(ArrayView<const size_type>{&row, 1}, new_diag_value);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::clear_rows(
+      const ArrayView<const size_type> &rows,
+      const Number                      new_diag_value)
+    {
+      // If the matrix is marked as compressed, we need to
+      // call resumeFill() first.
+      if (compressed || matrix->isFillComplete())
+        {
+          matrix->resumeFill();
+          compressed = false;
+        }
+
+      std::vector<int>    col_indices_vector;
+      std::vector<Number> values_vector;
+
+      for (size_type row : rows)
+        {
+          // Only do this on the rows owned locally on this processor.
+          int local_row = matrix->getRowMap()->getLocalElement(row);
+          if (local_row != Teuchos::OrdinalTraits<int>::invalid())
+            {
+              size_t nnz = matrix->getNumEntriesInLocalRow(local_row);
+              col_indices_vector.resize(nnz);
+              values_vector.resize(nnz);
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+              typename MatrixType::nonconst_local_inds_host_view_type
+                col_indices(col_indices_vector.data(), nnz);
+              typename MatrixType::nonconst_values_host_view_type values(
+                values_vector.data(), nnz);
+#  else
+              Teuchos::ArrayView<int>    col_indices(col_indices_vector);
+              Teuchos::ArrayView<Number> values(values_vector);
+#  endif
+              matrix->getLocalRowCopy(local_row, col_indices, values, nnz);
+
+              const size_t diag_index = std::find(col_indices_vector.begin(),
+                                                  col_indices_vector.end(),
+                                                  local_row) -
+                                        col_indices_vector.begin();
+
+              for (size_t j = 0; j < nnz; ++j)
+                if (diag_index != j || new_diag_value == 0)
+                  values[j] = 0.;
+
+              if (diag_index != nnz)
+                values[diag_index] = new_diag_value;
+
+              [[maybe_unused]] int n_replacements =
+                matrix->replaceLocalValues(local_row, col_indices, values);
+              AssertDimension(n_replacements, nnz);
+            }
+        }
+      compress(VectorOperation::insert);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
     SparseMatrix<Number, MemorySpace>::copy_from(
       const SparseMatrix<Number, MemorySpace> &source)
     {
