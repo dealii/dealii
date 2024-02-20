@@ -2101,6 +2101,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   SparseMatrix::matrix_norm_square(const MPI::Vector &v) const
   {
+    AssertDimension(m(), v.size());
     Assert(matrix->RowMap().SameAs(matrix->DomainMap()), ExcNotQuadratic());
 
     MPI::Vector temp_vector;
@@ -2116,6 +2117,8 @@ namespace TrilinosWrappers
   SparseMatrix::matrix_scalar_product(const MPI::Vector &u,
                                       const MPI::Vector &v) const
   {
+    AssertDimension(m(), u.size());
+    AssertDimension(m(), v.size());
     Assert(matrix->RowMap().SameAs(matrix->DomainMap()), ExcNotQuadratic());
 
     MPI::Vector temp_vector;

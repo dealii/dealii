@@ -457,6 +457,8 @@ namespace PETScWrappers
   PetscScalar
   MatrixBase::matrix_norm_square(const VectorBase &v) const
   {
+    AssertDimension(m(), v.size());
+
     VectorBase tmp(v);
     vmult(tmp, v);
     return tmp * v;
@@ -467,6 +469,9 @@ namespace PETScWrappers
   MatrixBase::matrix_scalar_product(const VectorBase &u,
                                     const VectorBase &v) const
   {
+    AssertDimension(m(), u.size());
+    AssertDimension(m(), v.size());
+
     VectorBase tmp(u);
     vmult(tmp, v);
     return u * tmp;
