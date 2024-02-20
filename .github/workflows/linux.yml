@@ -382,8 +382,10 @@ jobs:
     - name: build CUDA tests
       run: |
         cd build
-        make -j2 setup_tests_cuda
+        make -j2 setup_tests_cuda setup_tests_matrix_free_kokkos
         cd tests/cuda
+        make -j2 compile_test_executables
+        cd ../matrix_free_kokkos
         make -j2 compile_test_executables
 
   #############################
@@ -477,6 +479,8 @@ jobs:
     - name: build CUDA tests
       run: |
         cd build
-        make -j 2 setup_tests_cuda
+        make -j2 setup_tests_cuda setup_tests_matrix_free_kokkos
         cd tests/cuda
+        make -j2 compile_test_executables
+        cd ../matrix_free_kokkos
         make -j2 compile_test_executables
