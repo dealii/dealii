@@ -197,9 +197,13 @@ namespace VectorTools
     const ComponentMask &component_mask = {});
 
   /**
-   * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
-   * @p u2, where @p dof1 and @p dof2 represent different triangulations with
-   * a common coarse grid.
+   * Compute the interpolation of a @p dof_handler_1 function @p u1 (i.e.,
+   * a function defined on the mesh that underlies @p dof_handler_1, using
+   * the finite element associated with that DoFHandler) to
+   * a @p dof_handler_2 function @p u2 (i.e., a function defined on the mesh
+   * and finite element associated with @p dof_handler_2). This function
+   * assumes that @p dof_handler_1 and @p dof_handler_2 are defined on
+   * (possibly different) triangulations that have a common coarse grid.
    *
    * dof1 and dof2 need to have the same finite element discretization.
    *
@@ -212,32 +216,34 @@ namespace VectorTools
    * For this case (continuous elements on grids with hanging nodes), please
    * use the interpolate_to_different_mesh function with an additional
    * AffineConstraints argument, see below, or make the field conforming
-   * yourself by calling the @p AffineConstraints::distribute function of your
+   * yourself by calling the AffineConstraints::distribute() function of your
    * hanging node constraints object.
    *
    * @note This function works with parallel::distributed::Triangulation, but
    * only if the parallel partitioning is the same for both meshes (see the
    * parallel::distributed::Triangulation<dim>::no_automatic_repartitioning
-   * flag).
+   * flag). In practice, this is rarely the case because two triangulations,
+   * partitioned in their own ways, will not typically have corresponding
+   * cells owned by the same process, and implementing the interpolation
+   * procedure would require transfering data between processes in ways
+   * that are difficult to implement efficiently.
    *
    * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
-  void interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
-                                     const VectorType                &u1,
-                                     const DoFHandler<dim, spacedim> &dof2,
-                                     VectorType                      &u2);
+  void interpolate_to_different_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_1,
+    const VectorType                &u1,
+    const DoFHandler<dim, spacedim> &dof_handler_2,
+    VectorType                      &u2);
 
   /**
-   * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
-   * @p u2, where @p dof1 and @p dof2 represent different triangulations with
-   * a common coarse grid.
+   * This is a variation of the previous function that takes an additional
+   * constraint object as argument.
    *
-   * dof1 and dof2 need to have the same finite element discretization.
-   *
-   * @p constraints is a hanging node constraints object corresponding to @p
-   * dof2. This object is particularly important when interpolating onto
+   * @p constraints is a hanging node constraints object corresponding to
+   * @p dof2. This object is particularly important when interpolating onto
    * continuous elements on grids with hanging nodes (locally refined grids):
    * Without it - due to cellwise interpolation - the resulting output vector
    * does not necessarily respect continuity requirements at hanging nodes.
@@ -247,15 +253,16 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void interpolate_to_different_mesh(
-    const DoFHandler<dim, spacedim>                          &dof1,
+    const DoFHandler<dim, spacedim>                          &dof_handler_1,
     const VectorType                                         &u1,
-    const DoFHandler<dim, spacedim>                          &dof2,
+    const DoFHandler<dim, spacedim>                          &dof_handler_2,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2);
 
   /**
    * The same function as above, but takes an InterGridMap object directly as
-   * a parameter. Useful for interpolating several vectors at the same time.
+   * a parameter. This function is useful for interpolating several vectors at
+   * the same time.
    *
    * @p intergridmap has to be initialized via InterGridMap::make_mapping
    * pointing from a source DoFHandler to a destination DoFHandler.
