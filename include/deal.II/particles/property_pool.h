@@ -178,13 +178,6 @@ namespace Particles
     get_reference_location(const Handle handle) const;
 
     /**
-     * Return a writeable reference to the reference location of a particle
-     * identified by the given `handle`.
-     */
-    Point<dim> &
-    get_reference_location(const Handle handle);
-
-    /**
      * Set the reference location of a particle identified by the given
      * `handle`.
      */
@@ -371,29 +364,6 @@ namespace Particles
   template <int dim, int spacedim>
   inline const Point<dim> &
   PropertyPool<dim, spacedim>::get_reference_location(const Handle handle) const
-  {
-    const std::vector<double>::size_type data_index =
-      (handle != invalid_handle) ? handle : 0;
-
-    // Ideally we would need to assert that 'handle' has not been deallocated
-    // by searching through 'currently_available_handles'. However, this
-    // is expensive and this function is performance critical, so instead
-    // just check against the array range, and rely on the fact
-    // that handles are invalidated when handed over to
-    // deallocate_properties_array().
-    Assert(data_index <= reference_locations.size() - 1,
-           ExcMessage("Invalid location handle. This can happen if the "
-                      "handle was duplicated and then one copy was deallocated "
-                      "before trying to access the properties."));
-
-    return reference_locations[data_index];
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline Point<dim> &
-  PropertyPool<dim, spacedim>::get_reference_location(const Handle handle)
   {
     const std::vector<double>::size_type data_index =
       (handle != invalid_handle) ? handle : 0;

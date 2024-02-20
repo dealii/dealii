@@ -466,15 +466,13 @@ namespace Step68
       {
         // We calculate the velocity of the particles using their current
         // location.
-        Point<dim> particle_location = particle.get_location();
+        Point<dim> &particle_location = particle.get_location();
         velocity.vector_value(particle_location, particle_velocity);
 
         // This updates the position of the particles and sets the old position
         // equal to the new position of the particle.
         for (int d = 0; d < dim; ++d)
           particle_location[d] += particle_velocity[d] * dt;
-
-        particle.set_location(particle_location);
 
         // We store the processor id (a scalar) and the particle velocity (a
         // vector) in the particle properties. In this example, this is done
@@ -534,11 +532,10 @@ namespace Step68
         for (unsigned int particle_index = 0; particle != pic.end();
              ++particle, ++particle_index)
           {
-            Point<dim>            particle_location = particle->get_location();
+            Point<dim>            &particle_location = particle->get_location();
             const Tensor<1, dim> &particle_velocity =
               evaluator.get_value(particle_index);
             particle_location += particle_velocity * dt;
-            particle->set_location(particle_location);
 
             // Again, we store the particle velocity and the processor id in the
             // particle properties for visualization purposes.

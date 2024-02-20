@@ -1341,12 +1341,15 @@ namespace Particles
                     get_next_free_particle_index() * spacedim);
     for (auto &p : *this)
       {
-        Point<spacedim> new_point(displace_particles ? p.get_location() :
-                                                       Point<spacedim>());
+        Point<spacedim> &position = p.get_location();
         const auto      id = p.get_id();
-        for (unsigned int i = 0; i < spacedim; ++i)
-          new_point[i] += input_vector[id * spacedim + i];
-        p.set_location(new_point);
+
+        if (displace_particles)
+          for (unsigned int i = 0; i < spacedim; ++i)
+            position[i] += input_vector[id * spacedim + i];
+        else
+          for (unsigned int i = 0; i < spacedim; ++i)
+            position[i] = input_vector[id * spacedim + i];
       }
     sort_particles_into_subdomains_and_cells();
   }

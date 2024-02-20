@@ -1127,10 +1127,11 @@ namespace Particles
     unsigned int i = 0;
     for (auto it = begin(); it != end(); ++it, ++i)
       {
+        Point<spacedim> &location = it->get_location();
         if (displace_particles)
-          it->set_location(it->get_location() + new_positions[i]);
+          location += new_positions[i];
         else
-          it->set_location(new_positions[i]);
+          location = new_positions[i];
       }
     sort_particles_into_subdomains_and_cells();
   }
@@ -1150,7 +1151,7 @@ namespace Particles
     Vector<double> new_position(spacedim);
     for (auto &particle : *this)
       {
-        Point<spacedim> particle_location = particle.get_location();
+        Point<spacedim> &particle_location = particle.get_location();
         function.vector_value(particle_location, new_position);
         if (displace_particles)
           for (unsigned int d = 0; d < spacedim; ++d)
@@ -1158,7 +1159,6 @@ namespace Particles
         else
           for (unsigned int d = 0; d < spacedim; ++d)
             particle_location[d] = new_position[d];
-        particle.set_location(particle_location);
       }
     sort_particles_into_subdomains_and_cells();
   }

@@ -288,12 +288,6 @@ namespace Particles
     get_reference_location() const;
 
     /**
-     * Return the reference location of this particle in its current cell.
-     */
-    Point<dim> &
-    get_reference_location();
-
-    /**
      * Return the ID number of this particle. The ID of a particle is intended
      * to be a property that is globally unique even in parallel computations
      * and is transferred along with other properties of a particle if it
@@ -572,15 +566,6 @@ namespace Particles
   template <int dim, int spacedim>
   inline const Point<dim> &
   Particle<dim, spacedim>::get_reference_location() const
-  {
-    return property_pool->get_reference_location(property_pool_handle);
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline Point<dim> &
-  Particle<dim, spacedim>::get_reference_location()
   {
     return property_pool->get_reference_location(property_pool_handle);
   }
