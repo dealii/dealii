@@ -1050,7 +1050,7 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::clear_row(const size_type row,
                                                  const Number    new_diag_value)
     {
-      clear_rows(ArrayView<const size_type>{&row, 1}, new_diag_value);
+      clear_rows(ArrayView<const size_type>(row), new_diag_value);
     }
 
 
