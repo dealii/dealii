@@ -835,26 +835,34 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpace>::is_non_negative() const
     {
-      // get a representation of the vector and
-      // loop over all the elements
-      Teuchos::ArrayRCP<const Number> data       = vector->getData();
-      const size_type                 n_elements = vector->getLocalLength();
-      unsigned int                    flag       = 0;
-      for (size_type i = 0; i < n_elements; ++i)
+      if constexpr (!std::is_same_v<Number, std::complex<double>> &&
+                    !std::is_same_v<Number, std::complex<float>>)
         {
-          if (data[i] < Number(0))
+          // get a representation of the vector and
+          // loop over all the elements
+          Teuchos::ArrayRCP<const Number> data       = vector->getData();
+          const size_type                 n_elements = vector->getLocalLength();
+          unsigned int                    flag       = 0;
+          for (size_type i = 0; i < n_elements; ++i)
             {
-              flag = 1;
-              break;
+              if (data[i] < Number(0))
+                {
+                  flag = 1;
+                  break;
+                }
             }
-        }
 
-      // Check that the vector is non-negative on _all_ processors.
-      unsigned int num_negative =
-        Utilities::MPI::sum(flag,
-                            Utilities::Trilinos::teuchos_comm_to_mpi_comm(
-                              vector->getMap()->getComm()));
-      return num_negative == 0;
+          // Check that the vector is non-negative on _all_ processors.
+          unsigned int num_negative =
+            Utilities::MPI::sum(flag,
+                                Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+                                  vector->getMap()->getComm()));
+          return num_negative == 0;
+        }
+      Assert(false,
+             ExcMessage("You can't ask a complex value "
+                        "whether it is non-negative."));
+      return true;
     }
 
 

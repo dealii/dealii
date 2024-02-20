@@ -593,12 +593,12 @@ namespace LinearAlgebra
       {
         case VectorOperation::insert:
           for (size_type i = 0; i < size; ++i)
-            values[i] = new_values(i);
+            values[i] = Number(new_values(i));
           break;
 
         case VectorOperation::add:
           for (size_type i = 0; i < size; ++i)
-            values[i] += new_values(i);
+            values[i] += Number(new_values(i));
           break;
 
         case VectorOperation::min:
@@ -609,14 +609,14 @@ namespace LinearAlgebra
           for (size_type i = 0; i < size; ++i)
             {
               Assert(
-                std::imag(new_values(i)) == 0.,
+                std::imag(Number(new_values(i))) == 0.,
                 ExcMessage(
                   "VectorOperation::min is not defined if there is an imaginary part!)"));
               Assert(
                 std::imag(values[i]) == 0.,
                 ExcMessage(
                   "VectorOperation::min is not defined if there is an imaginary part!)"));
-              if (std::real(new_values(i)) - std::real(values[i]) < 0.0)
+              if (std::real(Number(new_values(i))) - std::real(values[i]) < 0.0)
                 values[i] = new_values(i);
             }
           break;
@@ -625,15 +625,15 @@ namespace LinearAlgebra
           for (size_type i = 0; i < size; ++i)
             {
               Assert(
-                std::imag(new_values(i)) == 0.,
+                std::imag(Number(new_values(i))) == 0.,
                 ExcMessage(
                   "VectorOperation::max is not defined if there is an imaginary part!)"));
               Assert(
                 std::imag(values[i]) == 0.,
                 ExcMessage(
                   "VectorOperation::max is not defined if there is an imaginary part!)"));
-              if (std::real(new_values(i)) - std::real(values[i]) > 0.0)
-                values[i] = new_values(i);
+              if (std::real(Number(new_values(i))) - std::real(values[i]) > 0.0)
+                values[i] = Number(new_values(i));
             }
           break;
 
