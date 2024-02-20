@@ -1342,7 +1342,7 @@ namespace Particles
     for (auto &p : *this)
       {
         Point<spacedim> &position = p.get_location();
-        const auto      id = p.get_id();
+        const auto       id       = p.get_id();
 
         if (displace_particles)
           for (unsigned int i = 0; i < spacedim; ++i)

@@ -160,7 +160,7 @@ namespace Particles
      * Get read- and write-access to the location of this particle.
      * Note that changing the location does not check
      * whether this is a valid location in the simulation domain.
-     * 
+     *
      * @note In parallel programs, the ParticleHandler class stores particles
      *   on both the locally owned cells, as well as on ghost cells. The
      *   particles on the latter are *copies* of particles owned on other
