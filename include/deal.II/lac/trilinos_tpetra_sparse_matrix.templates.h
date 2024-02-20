@@ -1040,15 +1040,22 @@ namespace LinearAlgebra
             {
               size_t nnz = matrix->getNumEntriesInLocalRow(local_row);
               col_indices_vector.resize(nnz);
-              Teuchos::ArrayView<int> col_indices(col_indices_vector);
               values_vector.resize(nnz);
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+              typename MatrixType::nonconst_local_inds_host_view_type
+                col_indices(col_indices_vector.data(), nnz);
+              typename MatrixType::nonconst_values_host_view_type values(
+                values_vector.data(), nnz);
+#  else
+              Teuchos::ArrayView<int>    col_indices(col_indices_vector);
               Teuchos::ArrayView<Number> values(values_vector);
-
+#  endif
               matrix->getLocalRowCopy(local_row, col_indices, values, nnz);
 
-              const size_t diag_index =
-                std::find(col_indices.begin(), col_indices.end(), local_row) -
-                col_indices.begin();
+              const size_t diag_index = std::find(col_indices_vector.begin(),
+                                                  col_indices_vector.end(),
+                                                  local_row) -
+                                        col_indices_vector.begin();
 
               for (size_t j = 0; j < nnz; ++j)
                 if (diag_index != j || new_diag_value == 0)
