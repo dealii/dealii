@@ -47,6 +47,7 @@
 # search.
 #
 # Valid suffixes are
+#   TARGETS      TARGETS_RELEASE      TARGETS_DEBUG
 #   LIBRARIES    LIBRARIES_RELEASE    LIBRARIES_DEBUG
 #   INCLUDE_DIRS
 #   DEFINITIONS  DEFINITIONS_RELEASE  DEFINITIONS_DEBUG
@@ -166,6 +167,31 @@ macro(process_feature _feature)
   set(${_feature}_CLEAR_VARIABLES ${_clear} CACHE INTERNAL "")
 
   if(${_feature}_FOUND)
+    #
+    # Take care of "optimized", "debug", and "general" keywords in
+    # LIBRARIES and TARGETS variables by distributing affected entries into
+    # the respective LIBRARIES_(DEBUG|RELEASE) and TARGETS_(DEBUG|RELEASE)
+    # variables.
+    #
+    foreach(_suffix LIBRARIES TARGETS)
+      set(_temp ${_temp_${_suffix}})
+      set(_temp_${_suffix} "")
+      set(_switch "")
+      foreach(_entry ${_temp})
+        if("${_entry}" STREQUAL "optimized")
+          set(_split_configuration TRUE)
+          set(_switch "_RELEASE")
+        elseif("${_entry}" STREQUAL "debug")
+          set(_split_configuration TRUE)
+          set(_switch "_DEBUG")
+        elseif("${_entry}" STREQUAL "general")
+          set(_switch "")
+        else()
+          list(APPEND _temp_${_suffix}${_switch} ${_entry})
+        endif()
+      endforeach()
+    endforeach()
+
     #
     # Deduplicate and stringify entries:
     #
