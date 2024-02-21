@@ -215,13 +215,13 @@ class MGTwoLevelTransferBase : public Subscriptor
 {
 public:
   /**
-   * Perform prolongation.
+   * Perform prolongation on a solution vector.
    */
   virtual void
   prolongate_and_add(VectorType &dst, const VectorType &src) const = 0;
 
   /**
-   * Perform restriction.
+   * Perform restriction on a residual vector.
    */
   virtual void
   restrict_and_add(VectorType &dst, const VectorType &src) const = 0;
@@ -230,7 +230,8 @@ public:
    * Perform interpolation of a solution vector from the fine level to the
    * coarse level. This function is different from restriction, where a
    * weighted residual is transferred to a coarser level (transposition of
-   * prolongation matrix).
+   * prolongation matrix). In other words, restriction acts on right hand
+   * side vectors, whereas interpolation acts on solution vectors.
    */
   virtual void
   interpolate(VectorType &dst, const VectorType &src) const = 0;
@@ -274,20 +275,23 @@ public:
   MGTwoLevelTransferBase();
 
   /**
-   * Perform prolongation.
+   * Perform prolongation on a solution vector.
    */
   void
   prolongate_and_add(VectorType &dst, const VectorType &src) const;
 
   /**
-   * Perform restriction.
+   * Perform restriction on a residual vector.
    */
   void
   restrict_and_add(VectorType &dst, const VectorType &src) const;
 
   /**
    * Perform interpolation of a solution vector from the fine level to the
-   * coarse level.
+   * coarse level. This function is different from restriction, where a
+   * weighted residual is transferred to a coarser level (transposition of
+   * prolongation matrix). In other words, restriction acts on right hand
+   * side vectors, whereas interpolation acts on solution vectors.
    */
   virtual void
   interpolate(VectorType &dst, const VectorType &src) const = 0;
@@ -445,20 +449,19 @@ class MGTwoLevelTransfer : public MGTwoLevelTransferBase<VectorType>
 {
 public:
   /**
-   * Perform prolongation.
+   * @copydoc MGTwoLevelTransferBase::prolongate_and_add
    */
   void
   prolongate_and_add(VectorType &dst, const VectorType &src) const override;
 
   /**
-   * Perform restriction.
+   * @copydoc MGTwoLevelTransferBase::restrict_and_add
    */
   void
   restrict_and_add(VectorType &dst, const VectorType &src) const override;
 
   /**
-   * Perform interpolation of a solution vector from the fine level to the
-   * coarse level.
+   * @copydoc MGTwoLevelTransferBase::interpolate
    */
   void
   interpolate(VectorType &dst, const VectorType &src) const override;
@@ -568,8 +571,7 @@ public:
                                      const unsigned int fe_degree_coarse);
 
   /**
-   * Perform interpolation of a solution vector from the fine level to the
-   * coarse level.
+   * @copydoc MGTwoLevelTransferBase::interpolate
    */
   void
   interpolate(
