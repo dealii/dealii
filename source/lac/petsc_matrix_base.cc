@@ -147,8 +147,7 @@ namespace PETScWrappers
   void
   MatrixBase::clear_row(const size_type row, const PetscScalar new_diag_value)
   {
-    std::vector<size_type> rows(1, row);
-    clear_rows(rows, new_diag_value);
+    clear_rows(ArrayView<const size_type>(row), new_diag_value);
   }
 
 
