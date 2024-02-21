@@ -1,7 +1,7 @@
 #!/bin/sh
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2018 - 2022 by the deal.II authors
+## Copyright (C) 2018 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
