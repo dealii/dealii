@@ -38,7 +38,8 @@ check_operations()
   SparseMatrix<std::complex<number>> cmpl_matrix(pattern);
 
   real_matrix.set(0, 0, 1.0);
-  deallog << "real_matrix.set(0, 0, 1.0) " << (real_matrix(0, 0) == 1.0 ? "True" : "False")  << std::endl;
+  deallog << "real_matrix.set(0, 0, 1.0) "
+          << (real_matrix(0, 0) == 1.0 ? "True" : "False") << std::endl;
 
 
   cmpl_matrix.copy_from(real_matrix);
