@@ -100,7 +100,7 @@ vertices of the original edge.
 
 
 A different projection strategy has been implemented in the
-OpenCASCADE::NormalProjectionBoundary class. The <code>TopoDS_Shape</code>
+OpenCASCADE::NormalProjectionManifold class. The <code>TopoDS_Shape</code>
 assigned at construction time can be arbitrary (a collection of shapes, faces,
 edges or a single face or edge will all work). The new cell nodes are first
 computed by averaging the surrounding points in the same way as FlatManifold
@@ -119,7 +119,7 @@ direction as that normal to the CAD surface will not lead to surface mesh
 elements of suitable quality. This is because the direction normal to the CAD
 surface has in principle nothing to do with the direction along which the mesh
 needs the new nodes to be located. The
-OpenCASCADE::DirectionalProjectionBoundary class, in this case, can help. This
+OpenCASCADE::DirectionalProjectionManifold class, in this case, can help. This
 class is constructed assigning a <code>TopoDS_Shape</code> (containing at
 least a face) and a direction along which all the projections will be carried
 out. New points will be computed by first averaging the surrounding points (as
@@ -137,12 +137,12 @@ surface is rather uniform, so that a single projection direction can be
 identified. In cases in which the surface direction is approaching the
 projection direction, it is even possible that the directional projection is
 not found. To overcome these problems, the
-OpenCASCADE::NormalToMeshProjectionBoundary class implements a third
-projection algorithm. The OpenCASCADE::NormalToMeshProjectionBoundary class is
+OpenCASCADE::NormalToMeshProjectionManifold class implements a third
+projection algorithm. The OpenCASCADE::NormalToMeshProjectionManifold class is
 built assigning a <code>TopoDS_Shape</code> (containing at least one face) to
 the constructor, and works exactly like a
 OpenCASCADE::DirectionalProjection. But, as the name of the class suggests,
-OpenCASCADE::NormalToMeshProjectionBoundary tries to come up with a suitable
+OpenCASCADE::NormalToMeshProjectionManifold tries to come up with a suitable
 estimate of the direction normal to the mesh elements to be refined, and uses
 it for the projection of the new nodes onto the CAD surface. If we consider a
 mesh edge in a 2D space, the direction of its axis is a direction along which

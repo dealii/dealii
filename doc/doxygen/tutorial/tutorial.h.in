@@ -504,7 +504,7 @@
  *       <td>step-54</td>
  *       <td> Using CAD files to describe the boundary of your domain.
  *       <br/> Keywords: Manifold, OpenCASCADE::read_IGES(),
- *       OpenCASCADE::NormalProjectionBoundary
+ *       OpenCASCADE::NormalProjectionManifold
  *       </td></tr>
  *
  *   <tr valign="top">
