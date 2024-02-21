@@ -251,6 +251,30 @@ namespace Particles
     get_location() const;
 
     /**
+     * Get read- and write-access to the location of this particle.
+     * Note that changing the location does not check
+     * whether this is a valid location in the simulation domain.
+     *
+     * @note In parallel programs, the ParticleHandler class stores particles
+     *   on both the locally owned cells, as well as on ghost cells. The
+     *   particles on the latter are *copies* of particles owned on other
+     *   processors, and should therefore be treated in the same way as
+     *   ghost entries in
+     *   @ref GlossGhostedVector "vectors with ghost elements"
+     *   or
+     *   @ref GlossGhostCell "ghost cells":
+     *   In both cases, one should
+     *   treat the ghost elements or cells as `const` objects that shouldn't
+     *   be modified even if the objects allow for calls that modify
+     *   properties. Rather, properties should only be modified on processors
+     *   that actually *own* the particle.
+     *
+     * @return The location of this particle.
+     */
+    Point<spacedim> &
+    get_location();
+
+    /**
      * Set the reference location of this particle.
      *
      * @param [in] new_reference_location The new reference location for
@@ -531,6 +555,15 @@ namespace Particles
   template <int dim, int spacedim>
   inline const Point<spacedim> &
   Particle<dim, spacedim>::get_location() const
+  {
+    return property_pool->get_location(property_pool_handle);
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline Point<spacedim> &
+  Particle<dim, spacedim>::get_location()
   {
     return property_pool->get_location(property_pool_handle);
   }

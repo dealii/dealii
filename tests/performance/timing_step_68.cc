@@ -317,11 +317,10 @@ namespace Step68
         for (unsigned int particle_index = 0; particle != pic.end();
              ++particle, ++particle_index)
           {
-            Point<dim>            particle_location = particle->get_location();
+            Point<dim>           &particle_location = particle->get_location();
             const Tensor<1, dim> &particle_velocity =
               evaluator.get_value(particle_index);
             particle_location += particle_velocity * dt;
-            particle->set_location(particle_location);
 
             ArrayView<double> properties = particle->get_properties();
             for (int d = 0; d < dim; ++d)

@@ -377,10 +377,9 @@ namespace Step68
                   local_dof_values[j];
               }
 
-            Point<dim> particle_location = particle->get_location();
+            Point<dim> &particle_location = particle->get_location();
             for (int d = 0; d < dim; ++d)
               particle_location[d] += particle_velocity[d] * dt;
-            p.set_location(particle_location);
 
             // Again, we store the particle velocity and the processor id in the
             // particle properties for visualization purposes.
