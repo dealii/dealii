@@ -1262,7 +1262,8 @@ namespace Particles
         for (const auto &p_unit : reference_locations)
           {
             if (numbers::is_finite(p_unit[0]) &&
-                GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+                GeometryInfo<dim>::is_inside_unit_cell(p_unit,
+                                                       tolerance_inside_cell))
               particle->set_reference_location(p_unit);
             else
               particles_out_of_cell.push_back(particle);
@@ -1384,8 +1385,8 @@ namespace Particles
                                                           real_locations,
                                                           reference_locations);
 
-              if (GeometryInfo<dim>::is_inside_unit_cell(
-                    reference_locations[0]))
+              if (GeometryInfo<dim>::is_inside_unit_cell(reference_locations[0],
+                                                         tolerance_inside_cell))
                 {
                   current_cell = *cell;
                   found_cell   = true;
@@ -1433,7 +1434,7 @@ namespace Particles
                     cell, real_locations, reference_locations);
 
                   if (GeometryInfo<dim>::is_inside_unit_cell(
-                        reference_locations[0]))
+                        reference_locations[0], tolerance_inside_cell))
                     {
                       current_cell = cell;
                       found_cell   = true;
@@ -2431,8 +2432,8 @@ namespace Particles
                         const Point<dim> p_unit =
                           mapping->transform_real_to_unit_cell(
                             child, particle->get_location());
-                        if (GeometryInfo<dim>::is_inside_unit_cell(p_unit,
-                                                                   1e-12))
+                        if (GeometryInfo<dim>::is_inside_unit_cell(
+                              p_unit, tolerance_inside_cell))
                           {
                             found_new_cell = true;
                             particle->set_reference_location(p_unit);
