@@ -30,7 +30,7 @@ namespace ArborXWrappers
 {
   /**
    * This class implements a wrapper around ArborX::DistributedTree, the
-   * distributed version of ArborX:BVH.
+   * distributed version of ArborX::BVH.
    *
    * Because ArborX uses Kokkos, Kokkos needs to be initialized and finalized
    * before using this class.

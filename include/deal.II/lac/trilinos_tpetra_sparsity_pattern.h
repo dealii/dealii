@@ -341,7 +341,7 @@ namespace LinearAlgebra
         Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
 
       /**
-       * Typedef for Tpetra:Graph
+       * Typedef for Tpetra::Graph
        */
       using GraphType =
         Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
