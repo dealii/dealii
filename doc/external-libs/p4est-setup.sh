@@ -1,5 +1,7 @@
 #! /bin/bash
 #
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
 # This file is part of p4est [1].
 # p4est is a C library to manage a collection (a forest) of multiple
 # connected adaptive quadtrees or octrees in parallel.

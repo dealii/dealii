@@ -595,11 +595,13 @@ def main():
     # Generate output
     #
     with open(args["output_file"], 'w') as output:
-        print("// ---------------------------------------------------------------------",
+        print("// ------------------------------------------------------------------------",
               file=output)
         print("//",
               file=output)
         year = time.ctime().split(' ')[-1]
+        print("// SPDX-License-Identifier: LGPL-2.1-or-later",
+              file=output)
         print("// Copyright (C) 2005 - {} by the deal.II authors".format(year),
               file=output)
         print("//",
@@ -608,21 +610,17 @@ def main():
               file=output)
         print("//",
               file=output)
-        print("// The deal.II library is free software; you can use it, redistribute",
+        print("// Part of the source code is dual licensed under Apache-2.0 WITH",
               file=output)
-        print("// it, and/or modify it under the terms of the GNU Lesser General",
+        print("// LLVM-exception OR LGPL-2.1-or-later. Detailed license information",
               file=output)
-        print("// Public License as published by the Free Software Foundation; either",
+        print("// governing the source code and code contributions can be found in",
               file=output)
-        print("// version 2.1 of the License, or (at your option) any later version.",
-              file=output)
-        print("// The full text of the license can be found in the file LICENSE.md at",
-              file=output)
-        print("// the top level directory of deal.II.",
+        print("// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.",
               file=output)
         print("//",
               file=output)
-        print("// ---------------------------------------------------------------------",
+        print("// ------------------------------------------------------------------------------",
               file=output)
 
         print("", file=output)
