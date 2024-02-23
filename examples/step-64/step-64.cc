@@ -268,7 +268,7 @@ namespace Step64
   // DoFHandler::get_triangulation() returns a Triangulation object, not a
   // parallel::TriangulationBase object, we have to downcast the return value.
   // This is safe to do here because we know that the triangulation is a
-  // parallel:distributed::Triangulation object in fact.
+  // parallel::distributed::Triangulation object in fact.
   template <int dim, int fe_degree>
   HelmholtzOperator<dim, fe_degree>::HelmholtzOperator(
     const DoFHandler<dim>           &dof_handler,

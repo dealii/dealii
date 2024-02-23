@@ -2278,7 +2278,7 @@ namespace GridTools
    * GridTools::build_triangulation_from_patch.
    *
    * DoFHandler's built on top of Triangulation or
-   * parallel:distributed::Triangulation are supported and handled
+   * parallel::distributed::Triangulation are supported and handled
    * appropriately.
    *
    * The result is the patch of cells representing the support of the basis
