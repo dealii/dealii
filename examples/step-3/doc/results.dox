@@ -308,7 +308,7 @@ data_file.write_dataset("mean_value",mean_value);
 
 
 <h3> Using R and ggplot2 to generate plots</h3>
-@note Alternatively, one could use the associated python script `plotting.py`.
+@note Alternatively, one could use the python code in the next subsection.
 
 The data put into %HDF5 files above can then be used from scripting
 languages for further postprocessing. In the following, let us show
@@ -435,7 +435,7 @@ This is now going to look as follows:
  </tr>
 </table>
 
-For plotting the converge curves we need to re-run the C++ code multiple times with different values for <code>n_refinement_steps</code>
+For plotting the convergence curves we need to re-run the C++ code multiple times with different values for <code>n_refinement_steps</code>
 starting from 1.
 Since every file only contains a single data point we need to loop over them and concatenate the results into a single vector.
 @code{.r}
@@ -496,3 +496,235 @@ to zero:
     <td><img src="https://www.dealii.org/images/steps/developer/step-3.extensions.convergence_point.png" alt=""></td>
   </tr>
 </table>
+
+<h3> Using python to generate plots</h3>
+
+In this section we discuss the postprocessing of the data stored in %HDF5 files using the "python" programming language.
+The necessary packages to import are
+@code{.py}
+import numpy as np                        # to work with multidimensional arrays
+import h5py                               # to work with %HDF5 files
+
+import pandas as pd                       # for data frames
+import matplotlib.pyplot as plt           # plotting
+from matplotlib.patches import Polygon
+
+from scipy.interpolate import griddata    # interpolation function
+from matplotlib import cm                 # for colormaps
+
+@endcode
+The %HDF5 solution file corresponding to `refinement = 5` can be opened as
+@code{.py}
+refinement = 5
+filename = "solution_%d.h5" % refinement
+file = h5py.File(filename, "r")
+@endcode
+The following prints out the tables in the %HDF5 file
+@code{.py}
+for key, value in file.items():
+    print(key, " : ", value)
+@endcode
+which prints out
+@code{.unparsed}
+cells  :  <HDF5 dataset "cells": shape (1024, 4), type "<u4">
+mean_value  :  <HDF5 dataset "mean_value": shape (1,), type "<f8">
+nodes  :  <HDF5 dataset "nodes": shape (1089, 2), type "<f8">
+point_value  :  <HDF5 dataset "point_value": shape (1,), type "<f8">
+solution  :  <HDF5 dataset "solution": shape (1089, 1), type "<f8">
+@endcode
+There are $(32+1)\times(32+1) = 1089$ nodes.
+The coordinates of these nodes $(x,y)$ are stored in the table `nodes` in the %HDF5 file.
+There are a total of $32\times 32 = 1024$ cells. The nodes which make up each cell are
+marked in the table `cells` in the %HDF5 file.
+
+Next, we extract the data into multidimensional arrays
+@code{.py}
+nodes = np.array(file["/nodes"])
+cells = np.array(file["/cells"])
+solution = np.array(file["/solution"])
+
+x, y = nodes.T
+@endcode
+
+The following stores the $x$ and $y$ coordinates of each node of each cell in one flat array.
+@code{.py}
+cell_x = x[cells.flatten()]
+cell_y = y[cells.flatten()]
+@endcode
+The following tags the cell ids. Each four entries correspond to one cell.
+Then we collect the coordinates and ids into a data frame
+@code{.py}
+n_cells = cells.shape[0]
+cell_ids = np.repeat(np.arange(n_cells), 4)
+meshdata = pd.DataFrame({"x": cell_x, "y": cell_y, "ids": cell_ids})
+@endcode
+The data frame looks
+@code{.unparsed}
+print(meshdata)
+
+      x	      y	      ids
+0	0.00000	0.00000	0
+1	0.03125	0.00000	0
+2	0.03125	0.03125	0
+3	0.00000	0.03125	0
+4	0.03125	0.00000	1
+...	...	...	...
+4091	0.93750	1.00000	1022
+4092	0.96875	0.96875	1023
+4093	1.00000	0.96875	1023
+4094	1.00000	1.00000	1023
+4095	0.96875	1.00000	1023
+
+4096 rows × 3 columns
+@endcode
+
+To plot the mesh, we loop over all cells and connect the first and last node to complete the polygon
+@code{.py}
+fig, ax = plt.subplots()
+ax.set_aspect("equal", "box")
+ax.set_title("grid at refinement level #%d" % refinement)
+
+for cell_id, cell in meshdata.groupby(["ids"]):
+    cell = pd.concat([cell, cell.head(1)])
+    plt.plot(cell["x"], cell["y"], c="k")
+@endcode
+Alternatively one could use the matplotlib built-in Polygon class
+@code{.py}
+fig, ax = plt.subplots()
+ax.set_aspect("equal", "box")
+ax.set_title("grid at refinement level #%d" % refinement)
+for cell_id, cell in meshdata.groupby(["ids"]):
+    patch = Polygon(cell[["x", "y"]], facecolor="w", edgecolor="k")
+    ax.add_patch(patch)
+@endcode
+
+To plot the solution, we first create a finer grid and then interpolate the solution values
+into the grid and then plot it.
+@code{.py}
+nx = int(np.sqrt(n_cells)) + 1
+nx *= 10
+xg = np.linspace(x.min(), x.max(), nx)
+yg = np.linspace(y.min(), y.max(), nx)
+
+xgrid, ygrid = np.meshgrid(xg, yg)
+solution_grid = griddata((x, y), solution.flatten(), (xgrid, ygrid), method="linear")
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.set_title("solution at refinement level #%d" % refinement)
+c = ax.pcolor(xgrid, ygrid, solution_grid, cmap=cm.viridis)
+fig.colorbar(c, ax=ax)
+
+plt.show()
+@endcode
+
+To check the convergence of `mean_value` and `point_value`
+we loop over data of all refinements and store into vectors <code>mean_values</code> and <code>mean_values</code>
+@code{.py}
+mean_values = np.zeros((8,))
+point_values = np.zeros((8,))
+dofs = np.zeros((8,))
+
+for refinement in range(1, 9):
+    filename = "solution_%d.h5" % refinement
+    file = h5py.File(filename, "r")
+    mean_values[refinement - 1] = np.array(file["/mean_value"])[0]
+    point_values[refinement - 1] = np.array(file["/point_value"])[0]
+    dofs[refinement - 1] = np.array(file["/solution"]).shape[0]
+@endcode
+
+Following is the plot of <code>mean_values</code> on `log-log` scale
+@code{.py}
+mean_error = np.abs(mean_values[1:] - mean_values[:-1])
+plt.loglog(dofs[:-1], mean_error)
+plt.grid()
+plt.xlabel("#DoFs")
+plt.ylabel("mean value error")
+plt.show()
+@endcode
+
+Following is the plot of <code>point_values</code> on `log-log` scale
+@code{.py}
+point_error = np.abs(point_values[1:] - point_values[:-1])
+plt.loglog(dofs[:-1], point_error)
+plt.grid()
+plt.xlabel("#DoFs")
+plt.ylabel("point value error")
+plt.show()
+@endcode
+
+A python package which mimicks the `R` ggplot2 (which is based on specifying the grammar of the graphics) is
+<a href="https://plotnine.org/">plotnine</a>.
+@code{.py}
+We need to import the following from the <code>plotnine</code> package
+from plotnine import (
+    ggplot,
+    aes,
+    geom_raster,
+    geom_polygon,
+    geom_line,
+    labs,
+    scale_x_log10,
+    scale_y_log10,
+    ggtitle,
+)
+@endcode
+Then plot the mesh <code>meshdata</code> dataframe
+@code{.py}
+plot = (
+    ggplot(meshdata, aes(x="x", y="y", group="ids"))
+    + geom_polygon(fill="white", colour="black")
+    + ggtitle("grid at refinement level #%d" % refinement)
+)
+
+print(plot)
+@endcode
+Collect the solution into a dataframe
+@code{.py}
+colordata = pd.DataFrame({"x": x, "y": y, "solution": solution.flatten()})
+@endcode
+Plot of the solution
+@code{.py}
+plot = (
+    ggplot(colordata, aes(x="x", y="y", fill="solution"))
+    + geom_raster(interpolate=True)
+    + ggtitle("solution at refinement level #%d" % refinement)
+)
+
+print(plot)
+@endcode
+
+Collect the convergence data into a dataframe
+@code{.py}
+convdata = pd.DataFrame(
+    {"dofs": dofs[:-1], "mean_value": mean_error, "point_value": point_error}
+)
+
+@endcode
+Following is the plot of <code>mean_values</code> on `log-log` scale
+@code{.py}
+plot = (
+    ggplot(convdata, mapping=aes(x="dofs", y="mean_value"))
+    + geom_line()
+    + labs(x="#DoFs", y="mean value error")
+    + scale_x_log10()
+    + scale_y_log10()
+)
+
+plot.save("mean_error.pdf", dpi=60)
+print(plot)
+@endcode
+
+Following is the plot of <code>point_values</code> on `log-log` scale
+@code{.py}
+plot = (
+    ggplot(convdata, mapping=aes(x="dofs", y="point_value"))
+    + geom_line()
+    + labs(x="#DoFs", y="point value error")
+    + scale_x_log10()
+    + scale_y_log10()
+)
+
+plot.save("point_error.pdf", dpi=60)
+print(plot)
+@endcode
