@@ -6484,8 +6484,6 @@ namespace GridGenerator
     // bottom and top cells.
     double eps_z = 1e-6 * length;
 
-
-
     // Gather the inner radius from the faces instead of the argument, this is
     // more robust for some aspect ratios. First initialize the outer to 0 and
     // the inner to a large value
