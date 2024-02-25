@@ -30,7 +30,8 @@ template <int dim>
 void
 test(std::ostream &out)
 {
-  deallog << "cylinder_shell colorized" << std::endl;
+  deallog << "cylinder_shell colorized with default aspect ratio" << std::endl;
+  {
   Triangulation<dim> tr;
   GridGenerator::cylinder_shell(tr, 2., 5., 6., 0, 0, true);
 
@@ -46,6 +47,26 @@ test(std::ostream &out)
                     << " faceidx = " << face->index() << std::endl;
         }
     }
+  }
+
+  deallog << "cylinder_shell colorized with 3:2 ratio " << std::endl;
+  {
+  Triangulation<dim> tr;
+  GridGenerator::cylinder_shell(tr, 2., 5., 6., 3, 2, true);
+
+  for (const auto &cell : tr.active_cell_iterators())
+    {
+      deallog << "cell:" << std::endl;
+
+      for (const auto &face : cell->face_iterators())
+        {
+          if (face->at_boundary())
+            deallog << "boundary id = " << face->boundary_id()
+                    << " center = " << face->center()
+                    << " faceidx = " << face->index() << std::endl;
+        }
+    }
+  }
 }
 
 
