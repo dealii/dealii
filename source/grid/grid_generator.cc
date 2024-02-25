@@ -6480,42 +6480,41 @@ namespace GridGenerator
     // Top (Z+) part of the cylinder has boundary id 3
 
     // Define tolerance to help detect boundary conditions
-    // First we define the tolerance along the z axis to identify 
+    // First we define the tolerance along the z axis to identify
     // bottom and top cells.
     double eps_z = 1e-6 * length;
 
 
 
-      // Gather the inner radius from the faces instead of the argument, this is
-      // more robust for some aspect ratios. First initialize the outer to 0 and
-      // the inner to a large value
-      double inner_radius = DBL_MAX;
-      double outer_radius = 0.;
+    // Gather the inner radius from the faces instead of the argument, this is
+    // more robust for some aspect ratios. First initialize the outer to 0 and
+    // the inner to a large value
+    double face_inner_radius = DBL_MAX;
+    double face_outer_radius = 0.;
 
-      // Loop over the cells once to acquire the min and max radius at the face
-      // centers Otherwise, for some cell ratio, the center of the faces can be
-      // at a radius which is significantly different from the one prescribed.
-      for (const auto &cell : triangulation.active_cell_iterators())
-        for (const unsigned int f : GeometryInfo<3>::face_indices())
-          {
-            if (!cell->face(f)->at_boundary())
-              continue;
+    // Loop over the cells once to acquire the min and max radius at the face
+    // centers. Otherwise, for some cell ratio, the center of the faces can be
+    // at a radius which is significantly different from the one prescribed.
+    for (const auto &cell : tria.active_cell_iterators())
+      for (const unsigned int f : GeometryInfo<3>::face_indices())
+        {
+          if (!cell->face(f)->at_boundary())
+            continue;
 
-            const auto   face_center = cell->face(f)->center();
-            const double z           = face_center[2];
+          const auto   face_center = cell->face(f)->center();
+          const double z           = face_center[2];
 
-            if ((std::fabs(z) > eps_z) &&
-                (std::fabs(z - length) > eps_z)) // Not a zmin or zmax boundary
-              {
-                const double radius =
-                  std::sqrt(face_center[0] * face_center[0] +
-                            face_center[1] * face_center[1]);
-                inner_radius = std::min(inner_radius, radius);
-                outer_radius = std::max(outer_radius, radius);
-              }
-          }
-    
-    double mid_radial_distance = 0.5 * (outer_radius - inner_radius);
+          if ((std::fabs(z) > eps_z) &&
+              (std::fabs(z - length) > eps_z)) // Not a zmin or zmax boundary
+            {
+              const double radius = std::sqrt(face_center[0] * face_center[0] +
+                                              face_center[1] * face_center[1]);
+              face_inner_radius   = std::min(face_inner_radius, radius);
+              face_outer_radius   = std::max(face_outer_radius, radius);
+            }
+        }
+
+    double mid_radial_distance = 0.5 * (face_outer_radius - face_inner_radius);
 
     for (const auto &cell : tria.active_cell_iterators())
       for (const unsigned int f : GeometryInfo<3>::face_indices())
@@ -6538,12 +6537,12 @@ namespace GridGenerator
             {
               cell->face(f)->set_boundary_id(3);
             }
-          else if (std::fabs(radius - inner_radius) >
+          else if (std::fabs(radius - face_inner_radius) >
                    mid_radial_distance) // r =  outer_radius set boundary 1
             {
               cell->face(f)->set_boundary_id(1);
             }
-          else if (std::fabs(radius - inner_radius) <
+          else if (std::fabs(radius - face_inner_radius) <
                    mid_radial_distance) // r =  inner_radius set boundary 0
             {
               cell->face(f)->set_boundary_id(0);
