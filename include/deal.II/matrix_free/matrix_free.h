@@ -1635,7 +1635,7 @@ public:
   /**
    * Initialize function for a vector with each entry associated with a cell
    * batch (cell data). For reading and writing the vector use:
-   * FEEvaluationBase::read_cell_data() and FEEvaluationBase::write_cell_data().
+   * FEEvaluationBase::read_cell_data() and FEEvaluationBase::set_cell_data().
    */
   template <typename T>
   void
@@ -1644,7 +1644,7 @@ public:
   /**
    * Initialize function for a vector with each entry associated with a face
    * batch (face data). For reading and writing the vector use:
-   * FEEvaluationBase::read_face_data() and FEEvaluationBase::write_face_data().
+   * FEEvaluationBase::read_face_data() and FEEvaluationBase::set_face_data().
    */
   template <typename T>
   void
