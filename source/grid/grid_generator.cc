@@ -6487,7 +6487,7 @@ namespace GridGenerator
     // Gather the inner radius from the faces instead of the argument, this is
     // more robust for some aspect ratios. First initialize the outer to 0 and
     // the inner to a large value
-    double face_inner_radius = DBL_MAX;
+    double face_inner_radius = std::numeric_limits<double>::max();
     double face_outer_radius = 0.;
 
     // Loop over the cells once to acquire the min and max radius at the face
@@ -6517,36 +6517,37 @@ namespace GridGenerator
     for (const auto &cell : tria.active_cell_iterators())
       for (const unsigned int f : GeometryInfo<3>::face_indices())
         {
-          if (!cell->face(f)->at_boundary())
-            continue;
-
-          const auto face_center = cell->face(f)->center();
-
-          const double radius = std::sqrt(face_center[0] * face_center[0] +
-                                          face_center[1] * face_center[1]);
-
-          const double z = face_center[2];
-
-          if (std::fabs(z) < eps_z) // z = 0 set boundary 2
+          if (cell->face(f)->at_boundary())
             {
-              cell->face(f)->set_boundary_id(2);
+              const auto face_center = cell->face(f)->center();
+
+              const double radius = std::sqrt(face_center[0] * face_center[0] +
+                                              face_center[1] * face_center[1]);
+
+              const double z = face_center[2];
+
+              if (std::fabs(z) < eps_z) // z = 0 set boundary 2
+                {
+                  cell->face(f)->set_boundary_id(2);
+                }
+              else if (std::fabs(z - length) <
+                       eps_z) // z = length set boundary 3
+                {
+                  cell->face(f)->set_boundary_id(3);
+                }
+              else if (std::fabs(radius - face_inner_radius) >
+                       mid_radial_distance) // r =  outer_radius set boundary 1
+                {
+                  cell->face(f)->set_boundary_id(1);
+                }
+              else if (std::fabs(radius - face_inner_radius) <
+                       mid_radial_distance) // r =  inner_radius set boundary 0
+                {
+                  cell->face(f)->set_boundary_id(0);
+                }
+              else
+                DEAL_II_ASSERT_UNREACHABLE();
             }
-          else if (std::fabs(z - length) < eps_z) // z = length set boundary 3
-            {
-              cell->face(f)->set_boundary_id(3);
-            }
-          else if (std::fabs(radius - face_inner_radius) >
-                   mid_radial_distance) // r =  outer_radius set boundary 1
-            {
-              cell->face(f)->set_boundary_id(1);
-            }
-          else if (std::fabs(radius - face_inner_radius) <
-                   mid_radial_distance) // r =  inner_radius set boundary 0
-            {
-              cell->face(f)->set_boundary_id(0);
-            }
-          else
-            DEAL_II_ASSERT_UNREACHABLE();
         }
   }
 
