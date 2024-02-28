@@ -27,10 +27,13 @@
 #  include <deal.II/lac/sparsity_pattern.h>
 #  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
+#  include <deal.II/lac/vector.h>
 
 // Tpetra includes
 #  include <Tpetra_Core.hpp>
 #  include <Tpetra_CrsMatrix.hpp>
+
+#  include <type_traits>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -161,6 +164,12 @@ namespace LinearAlgebra
        */
       using GraphType =
         Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
+
+      /**
+       * Typedef for Tpetra::Vector
+       */
+      using VectorType = Tpetra::
+        Vector<Number, int, dealii::types::signed_global_dof_index, NodeType>;
 
       /**
        * @name Constructors and initialization.
@@ -799,9 +808,9 @@ namespace LinearAlgebra
        * initialized with the same IndexSet that was used for the column indices
        * of the matrix.
        */
+      template <typename InputVectorType>
       void
-      vmult(Vector<Number, MemorySpace>       &dst,
-            const Vector<Number, MemorySpace> &src) const;
+      vmult(InputVectorType &dst, const InputVectorType &src) const;
 
       /*
        * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
@@ -810,9 +819,9 @@ namespace LinearAlgebra
        *
        * Source and destination must not be the same vector.
        */
+      template <typename InputVectorType>
       void
-      Tvmult(Vector<Number, MemorySpace>       &dst,
-             const Vector<Number, MemorySpace> &src) const;
+      Tvmult(InputVectorType &dst, const InputVectorType &src) const;
 
       /**
        * Adding matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i>
@@ -820,10 +829,9 @@ namespace LinearAlgebra
        *
        * Source and destination must not be the same vector.
        */
+      template <typename InputVectorType>
       void
-      vmult_add(Vector<Number, MemorySpace>       &dst,
-                const Vector<Number, MemorySpace> &src) const;
-
+      vmult_add(InputVectorType &dst, const InputVectorType &src) const;
 
       /**
        * Adding matrix-vector multiplication. Add <i>M<sup>T</sup>*src</i> to
@@ -832,9 +840,9 @@ namespace LinearAlgebra
        *
        * Source and destination must not be the same vector.
        */
+      template <typename InputVectorType>
       void
-      Tvmult_add(Vector<Number, MemorySpace>       &dst,
-                 const Vector<Number, MemorySpace> &src) const;
+      Tvmult_add(InputVectorType &dst, const InputVectorType &src) const;
 
       /**
        * Return the square of the norm of the vector $v$ with respect to the
