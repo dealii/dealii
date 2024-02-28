@@ -1,5 +1,5 @@
 
-DEAL::cylinder_shell colorized
+DEAL::cylinder_shell colorized with default aspect ratio
 DEAL::cell:
 DEAL::boundary id = 2 center = 5.45581 0.491031 0.00000 faceidx = 0
 DEAL::boundary id = 1 center = 5.95179 0.535671 0.333333 faceidx = 35
@@ -385,3 +385,28 @@ DEAL::cell:
 DEAL::boundary id = 3 center = 5.45581 -0.491031 2.00000 faceidx = 418
 DEAL::boundary id = 1 center = 5.95179 -0.535671 1.66667 faceidx = 417
 DEAL::boundary id = 0 center = 4.95982 -0.446392 1.66667 faceidx = 454
+DEAL::cylinder_shell colorized with 3:2 ratio 
+DEAL::cell:
+DEAL::boundary id = 2 center = 1.37500 2.38157 0.00000 faceidx = 0
+DEAL::boundary id = 1 center = 1.50000 2.59808 0.500000 faceidx = 3
+DEAL::boundary id = 0 center = 1.25000 2.16506 0.500000 faceidx = 12
+DEAL::cell:
+DEAL::boundary id = 2 center = -2.75000 1.11022e-15 0.00000 faceidx = 1
+DEAL::boundary id = 1 center = -3.00000 8.88178e-16 0.500000 faceidx = 6
+DEAL::boundary id = 0 center = -2.50000 8.88178e-16 0.500000 faceidx = 13
+DEAL::cell:
+DEAL::boundary id = 2 center = 1.37500 -2.38157 0.00000 faceidx = 2
+DEAL::boundary id = 1 center = 1.50000 -2.59808 0.500000 faceidx = 9
+DEAL::boundary id = 0 center = 1.25000 -2.16506 0.500000 faceidx = 14
+DEAL::cell:
+DEAL::boundary id = 3 center = 1.37500 2.38157 2.00000 faceidx = 16
+DEAL::boundary id = 1 center = 1.50000 2.59808 1.50000 faceidx = 15
+DEAL::boundary id = 0 center = 1.25000 2.16506 1.50000 faceidx = 24
+DEAL::cell:
+DEAL::boundary id = 3 center = -2.75000 1.11022e-15 2.00000 faceidx = 19
+DEAL::boundary id = 1 center = -3.00000 8.88178e-16 1.50000 faceidx = 18
+DEAL::boundary id = 0 center = -2.50000 8.88178e-16 1.50000 faceidx = 25
+DEAL::cell:
+DEAL::boundary id = 3 center = 1.37500 -2.38157 2.00000 faceidx = 22
+DEAL::boundary id = 1 center = 1.50000 -2.59808 1.50000 faceidx = 21
+DEAL::boundary id = 0 center = 1.25000 -2.16506 1.50000 faceidx = 26
