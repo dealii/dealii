@@ -1378,8 +1378,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, MemorySpace>::compress(
-      [[maybe_unused]] VectorOperation::values operation)
+    SparseMatrix<Number, MemorySpace>::compress(VectorOperation::values)
     {
       if (!compressed)
         {
