@@ -1063,9 +1063,10 @@ namespace hp
               const unsigned int fe_index =
                 fe_index_for_hierarchy_level[cell_level];
 
-              // only update if necessary
               if (fe_index != cell->active_fe_index())
                 cell->set_future_fe_index(fe_index);
+              else
+                cell->clear_future_fe_index();
             }
         }
 
