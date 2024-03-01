@@ -21,11 +21,11 @@ Contributions
 As a contributor to this project, you agree that all of your contributions
 to deal.II (a) be governed by the
 [<b>Developer Certificate of Origin version 1.1</b>](https://developercertificate.org/),
-and (b) be dual-licensed under the terms of the
+and (b) be made available to the project under the terms of the
 [<b>Apache License 2.0</b>](https://spdx.org/licenses/Apache-2.0.html)
 with
-[<b>LLVM Exception</b>](https://spdx.org/licenses/LLVM-exception.html)
-and the
+[<b>LLVM Exception</b>](https://spdx.org/licenses/LLVM-exception.html),
+and separately under the terms of the
 [<b>GNU Lesser General Public License v2.1 or later</b>](https://spdx.org/licenses/LGPL-2.1-or-later.html).
 The deal.II project does not require copyright assignments for
 contributions. This means that the copyright for code contributions in the
