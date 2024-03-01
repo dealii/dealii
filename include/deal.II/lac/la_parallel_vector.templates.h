@@ -132,7 +132,13 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
+#if KOKKOS_VERSION >= 30600
+              Kokkos::resize(Kokkos::WithoutInitializing,
+                             data.values,
+                             new_alloc_size);
+#else
               Kokkos::resize(data.values, new_alloc_size);
+#endif
 
               allocated_size = new_alloc_size;
 
@@ -341,7 +347,13 @@ namespace LinearAlgebra
                       data.values.size() == 0),
                      ExcInternalError());
 
+#if KOKKOS_VERSION >= 30600
+              Kokkos::resize(Kokkos::WithoutInitializing,
+                             data.values,
+                             new_alloc_size);
+#else
               Kokkos::resize(data.values, new_alloc_size);
+#endif
 
               allocated_size = new_alloc_size;
             }
@@ -980,15 +992,27 @@ namespace LinearAlgebra
           if (std::is_same_v<MemorySpaceType, dealii::MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
+#    if KOKKOS_VERSION >= 30600
+                Kokkos::resize(Kokkos::WithoutInitializing,
+                               import_data.values_host_buffer,
+                               partitioner->n_import_indices());
+#    else
                 Kokkos::resize(import_data.values_host_buffer,
                                partitioner->n_import_indices());
+#    endif
             }
           else
 #  endif
             {
               if (import_data.values.size() == 0)
-                Kokkos::resize(import_data.values,
+#  if KOKKOS_VERSION >= 30600
+                Kokkos::resize(Kokkos::WithoutInitializing,
+                               import_data.values,
                                partitioner->n_import_indices());
+#  else
+              Kokkos::resize(import_data.values,
+                             partitioner->n_import_indices());
+#  endif
             }
         }
 
@@ -1128,15 +1152,27 @@ namespace LinearAlgebra
           if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
+#    if KOKKOS_VERSION >= 30600
+                Kokkos::resize(Kokkos::WithoutInitializing,
+                               import_data.values_host_buffer,
+                               partitioner->n_import_indices());
+#    else
                 Kokkos::resize(import_data.values_host_buffer,
                                partitioner->n_import_indices());
+#    endif
             }
           else
 #  endif
             {
               if (import_data.values.size() == 0)
-                Kokkos::resize(import_data.values,
+#  if KOKKOS_VERSION >= 30600
+                Kokkos::resize(Kokkos::WithoutInitializing,
+                               import_data.values,
                                partitioner->n_import_indices());
+#  else
+              Kokkos::resize(import_data.values,
+                             partitioner->n_import_indices());
+#  endif
             }
         }
 
