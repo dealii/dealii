@@ -140,7 +140,7 @@ namespace LinearAlgebra
 
 
     // reinit_matrix():
-    namespace
+    namespace SparseMatrixImpl
     {
       using size_type = dealii::types::signed_global_dof_index;
 
@@ -400,7 +400,7 @@ namespace LinearAlgebra
           Utilities::Trilinos::internal::make_rcp<MatrixType<Number, NodeType>>(
             graph);
       }
-    } // namespace
+    } // namespace SparseMatrixImpl
 
 
 
@@ -530,7 +530,7 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::reinit(
       const SparsityPatternType &sparsity_pattern)
     {
-      reinit_matrix<Number, NodeType, SparsityPatternType>(
+      SparseMatrixImpl::reinit_matrix<Number, NodeType, SparsityPatternType>(
         complete_index_set(sparsity_pattern.n_rows()),
         complete_index_set(sparsity_pattern.n_cols()),
         sparsity_pattern,
@@ -675,7 +675,7 @@ namespace LinearAlgebra
       const MPI_Comm             communicator,
       const bool                 exchange_data)
     {
-      reinit_matrix<Number, NodeType, SparsityPatternType>(
+      SparseMatrixImpl::reinit_matrix<Number, NodeType, SparsityPatternType>(
         row_parallel_partitioning,
         col_parallel_partitioning,
         sparsity_pattern,
