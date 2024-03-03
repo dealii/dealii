@@ -2756,7 +2756,7 @@ AffineConstraints<number>::copy_from(
   lines.clear();
   lines.reserve(other.lines.size());
 
-  for (const auto l : other.lines)
+  for (const auto &l : other.lines)
     lines.emplace_back(l.index,
                        typename ConstraintLine::Entries(l.entries.begin(),
                                                         l.entries.end()),
