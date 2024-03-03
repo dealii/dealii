@@ -51,9 +51,10 @@ it as a road block if you would like to contribute some code.
 
 As a contributor to this project, you agree that all of your contributions
 to deal.II (a) be governed by the <b>Developer Certificate of Origin
-version 1.1</b> and (b) be dual-licensed under the terms of the <b>Apache
-License 2.0</b> with <b>LLVM Exception</b> and the <b>GNU Lesser General
-Public License v2.1 or later</b>; see LICENSE.md for details. The deal.II
-project does not require copyright assignments for contributions. This
-means that the copyright for code contributions in the deal.II project is
-held by its respective contributors.
+version 1.1</b> and (b) be made available to the project under the terms of
+the <b>Apache License 2.0</b> with <b>LLVM Exception</b>, and separately
+under the terms of the <b>GNU Lesser General Public License v2.1 or
+later</b>; see [LICENSE.md](./LICENSE.md) for details. The deal.II project
+does not require copyright assignments for contributions. This means that
+the copyright for code contributions in the deal.II project is held by its
+respective contributors.
