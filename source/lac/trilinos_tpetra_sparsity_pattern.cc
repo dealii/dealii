@@ -258,7 +258,7 @@ namespace LinearAlgebra
 
 
 
-    namespace
+    namespace SparsityPatternImpl
     {
       template <typename MemorySpace>
       using size_type = typename SparsityPattern<MemorySpace>::size_type;
@@ -465,7 +465,7 @@ namespace LinearAlgebra
 
         graph->globalAssemble();
       }
-    } // namespace
+    } // namespace SparsityPatternImpl
 
 
     template <typename MemorySpace>
@@ -478,7 +478,7 @@ namespace LinearAlgebra
                                   parallel_partitioning.size());
       Teuchos::RCP<MapType> map =
         parallel_partitioning.make_tpetra_map_rcp(communicator, false);
-      reinit_sp<MemorySpace>(
+      SparsityPatternImpl::reinit_sp<MemorySpace>(
         map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
     }
 
@@ -495,7 +495,7 @@ namespace LinearAlgebra
                                   parallel_partitioning.size());
       Teuchos::RCP<MapType> map =
         parallel_partitioning.make_tpetra_map_rcp(communicator, false);
-      reinit_sp<MemorySpace>(
+      SparsityPatternImpl::reinit_sp<MemorySpace>(
         map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
     }
 
@@ -515,12 +515,12 @@ namespace LinearAlgebra
         row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
       Teuchos::RCP<MapType> col_map =
         col_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
-      reinit_sp<MemorySpace>(row_map,
-                             col_map,
-                             n_entries_per_row,
-                             column_space_map,
-                             graph,
-                             nonlocal_graph);
+      SparsityPatternImpl::reinit_sp<MemorySpace>(row_map,
+                                                  col_map,
+                                                  n_entries_per_row,
+                                                  column_space_map,
+                                                  graph,
+                                                  nonlocal_graph);
     }
 
 
@@ -539,12 +539,12 @@ namespace LinearAlgebra
         row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
       Teuchos::RCP<MapType> col_map =
         col_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
-      reinit_sp<MemorySpace>(row_map,
-                             col_map,
-                             n_entries_per_row,
-                             column_space_map,
-                             graph,
-                             nonlocal_graph);
+      SparsityPatternImpl::reinit_sp<MemorySpace>(row_map,
+                                                  col_map,
+                                                  n_entries_per_row,
+                                                  column_space_map,
+                                                  graph,
+                                                  nonlocal_graph);
     }
 
 
@@ -564,12 +564,12 @@ namespace LinearAlgebra
         row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
       Teuchos::RCP<MapType> col_map =
         col_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
-      reinit_sp<MemorySpace>(row_map,
-                             col_map,
-                             n_entries_per_row,
-                             column_space_map,
-                             graph,
-                             nonlocal_graph);
+      SparsityPatternImpl::reinit_sp<MemorySpace>(row_map,
+                                                  col_map,
+                                                  n_entries_per_row,
+                                                  column_space_map,
+                                                  graph,
+                                                  nonlocal_graph);
 
       IndexSet nonlocal_partitioner = writable_rows;
       AssertDimension(nonlocal_partitioner.size(),
@@ -615,13 +615,14 @@ namespace LinearAlgebra
         row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
       Teuchos::RCP<MapType> col_map =
         col_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
-      reinit_sp<SparsityPatternType, MemorySpace>(row_map,
-                                                  col_map,
-                                                  nontrilinos_sparsity_pattern,
-                                                  exchange_data,
-                                                  column_space_map,
-                                                  graph,
-                                                  nonlocal_graph);
+      SparsityPatternImpl::reinit_sp<SparsityPatternType, MemorySpace>(
+        row_map,
+        col_map,
+        nontrilinos_sparsity_pattern,
+        exchange_data,
+        column_space_map,
+        graph,
+        nonlocal_graph);
     }
 
 
@@ -643,13 +644,14 @@ namespace LinearAlgebra
                                   parallel_partitioning.size());
       Teuchos::RCP<MapType> map =
         parallel_partitioning.make_tpetra_map_rcp(communicator, false);
-      reinit_sp<SparsityPatternType, MemorySpace>(map,
-                                                  map,
-                                                  nontrilinos_sparsity_pattern,
-                                                  exchange_data,
-                                                  column_space_map,
-                                                  graph,
-                                                  nonlocal_graph);
+      SparsityPatternImpl::reinit_sp<SparsityPatternType, MemorySpace>(
+        map,
+        map,
+        nontrilinos_sparsity_pattern,
+        exchange_data,
+        column_space_map,
+        graph,
+        nonlocal_graph);
     }
 
 
@@ -701,7 +703,7 @@ namespace LinearAlgebra
           0,
           Utilities::Trilinos::tpetra_comm_self());
 
-      reinit_sp<SparsityPatternType, MemorySpace>(
+      SparsityPatternImpl::reinit_sp<SparsityPatternType, MemorySpace>(
         rows, columns, sp, false, column_space_map, graph, nonlocal_graph);
     }
 
