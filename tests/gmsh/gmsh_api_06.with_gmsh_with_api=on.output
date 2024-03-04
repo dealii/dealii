@@ -1,0 +1,6 @@
+
+DEAL::MaterialID = 4
+DEAL::BoundaryID = 0
+DEAL::BoundaryID = 1
+DEAL::BoundaryID = 2
+DEAL::BoundaryID = 3

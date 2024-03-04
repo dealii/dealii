@@ -2788,51 +2788,54 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
             std::string name;
             gmsh::model::getPhysicalName(entity_dim, physical_tag, name);
             if (!name.empty())
-              try
-                {
-                  std::map<std::string, int> id_names;
-                  Patterns::Tools::to_value(name, id_names);
-                  bool throw_anyway      = false;
-                  bool found_boundary_id = false;
-                  // If the above did not throw, we keep going, and retrieve
-                  // all the information that we know how to translate.
-                  for (const auto &it : id_names)
-                    {
-                      const auto &name = it.first;
-                      const auto &id   = it.second;
-                      if (entity_dim == dim && name == "MaterialID")
-                        {
-                          boundary_id = static_cast<types::boundary_id>(id);
-                          found_boundary_id = true;
-                        }
-                      else if (entity_dim < dim && name == "BoundaryID")
-                        {
-                          boundary_id = static_cast<types::boundary_id>(id);
-                          found_boundary_id = true;
-                        }
-                      else if (name == "ManifoldID")
-                        manifold_id = static_cast<types::manifold_id>(id);
-                      else
-                        // We did not recognize one of the keys. We'll fall
-                        // back to setting the boundary id to the physical tag
-                        // after reading all strings.
-                        throw_anyway = true;
-                    }
-                  // If we didn't find a BoundaryID:XX or MaterialID:XX, and
-                  // something was found but not recognized, then we set the
-                  // material id or boundary id in the catch block below,
-                  // using directly the physical tag
-                  if (throw_anyway && !found_boundary_id)
-                    throw;
-                }
-              catch (...)
-                {
-                  // When the above didn't work, we revert to the old
-                  // behaviour: the physical tag itself is interpreted either
-                  // as a material_id or a boundary_id, and no manifold id is
-                  // known
-                  boundary_id = physical_tag;
-                }
+              {
+                // Patterns::Tools::to_value throws an exception, if it can not
+                // convert name to a map from string to int.
+                try
+                  {
+                    std::map<std::string, int> id_names;
+                    Patterns::Tools::to_value(name, id_names);
+                    bool found_unrecognized_tag = false;
+                    bool found_boundary_id      = false;
+                    // If the above did not throw, we keep going, and retrieve
+                    // all the information that we know how to translate.
+                    for (const auto &it : id_names)
+                      {
+                        const auto &name = it.first;
+                        const auto &id   = it.second;
+                        if (entity_dim == dim && name == "MaterialID")
+                          {
+                            boundary_id = static_cast<types::boundary_id>(id);
+                            found_boundary_id = true;
+                          }
+                        else if (entity_dim < dim && name == "BoundaryID")
+                          {
+                            boundary_id = static_cast<types::boundary_id>(id);
+                            found_boundary_id = true;
+                          }
+                        else if (name == "ManifoldID")
+                          manifold_id = static_cast<types::manifold_id>(id);
+                        else
+                          // We did not recognize one of the keys. We'll fall
+                          // back to setting the boundary id to the physical tag
+                          // after reading all strings.
+                          found_unrecognized_tag = true;
+                      }
+                    // If we didn't find a BoundaryID:XX or MaterialID:XX, and
+                    // something was found but not recognized, then we set the
+                    // material id or boundary using the physical tag directly.
+                    if (found_unrecognized_tag && !found_boundary_id)
+                      boundary_id = physical_tag;
+                  }
+                catch (...)
+                  {
+                    // When the above didn't work, we revert to the old
+                    // behaviour: the physical tag itself is interpreted either
+                    // as a material_id or a boundary_id, and no manifold id is
+                    // known
+                    boundary_id = physical_tag;
+                  }
+              }
           }
 
       // Get the mesh elements for the entity (dim, tag):
