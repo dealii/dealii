@@ -123,11 +123,11 @@ namespace Functions
       {
         std::vector<std::string> this_c =
           Utilities::split_string_list(constant, '=');
-        AssertThrow(this_c.size() == 2, ExcMessage("Invalid format"));
-        double tmp;
-        AssertThrow(std::sscanf(this_c[1].c_str(), "%lf", &tmp),
-                    ExcMessage("Double number?"));
-        constants[this_c[0]] = tmp;
+        AssertThrow(this_c.size() == 2,
+                    ExcMessage("The list of constants, <" + constants_list +
+                               ">, is not a comma-separated list of "
+                               "entries of the form 'name=value'."));
+        constants[this_c[0]] = Utilities::string_to_double(this_c[1]);
       }
 
     // set pi and Pi as synonyms for the corresponding value. note that
