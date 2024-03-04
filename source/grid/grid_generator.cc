@@ -2634,7 +2634,7 @@ namespace GridGenerator
         // use a large epsilon to
         // compare numbers to avoid
         // roundoff problems.
-        double epsilon = 10;
+        double epsilon = std::numeric_limits<double>::max();
         for (unsigned int i = 0; i < dim; ++i)
           epsilon = std::min(epsilon, 0.01 * delta[i][i]);
         Assert(epsilon > 0,
@@ -8645,8 +8645,6 @@ namespace GridGenerator
   {
     AssertDimension(dim, spacedim);
 
-    AssertThrow(colorize == false, ExcNotImplemented());
-
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
 
@@ -8782,11 +8780,34 @@ namespace GridGenerator
       }
     else
       {
-        AssertThrow(colorize == false, ExcNotImplemented());
+        AssertThrow(false, ExcNotImplemented());
       }
 
     // actually create triangulation
     tria.create_triangulation(vertices, cells, SubCellData());
+
+    if (colorize)
+      {
+        // to colorize, run through all
+        // faces of all cells and set
+        // boundary indicator to the
+        // correct value if it was 0.
+
+        // use a large epsilon to
+        // compare numbers to avoid
+        // roundoff problems.
+        double epsilon = std::numeric_limits<double>::max();
+        for (unsigned int i = 0; i < dim; ++i)
+          epsilon = std::min(epsilon,
+                             0.01 * (std::abs(p2[i] - p1[i]) / repetitions[i]));
+        Assert(epsilon > 0,
+               ExcMessage(
+                 "The distance between corner points must be positive."));
+
+        // actual code is external since
+        // 1-D is different from 2/3d.
+        colorize_subdivided_hyper_rectangle(tria, p1, p2, epsilon);
+      }
   }
 
 
