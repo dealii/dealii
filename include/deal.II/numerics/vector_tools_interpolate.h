@@ -17,6 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/template_constraints.h>
+
 #include <deal.II/fe/component_mask.h>
 
 #include <map>
