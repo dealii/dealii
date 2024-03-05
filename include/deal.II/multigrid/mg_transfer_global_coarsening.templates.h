@@ -4944,33 +4944,30 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
                                                 evaluation_function);
   this->signals_non_nested.prolongation(false);
 
-  // Weight operator in case some points are owned by multiple cells.
-  if (rpe.is_map_unique() == false)
+  const auto &ptr = rpe.get_point_ptrs();
+
+  for (unsigned int j = 0;
+       j < (rpe.is_map_unique() ? evaluation_point_results.size() :
+                                  (ptr.size() - 1));
+       ++j)
     {
-      const auto evaluation_point_results_temp = evaluation_point_results;
-      evaluation_point_results.clear();
-      evaluation_point_results.reserve(rpe.get_point_ptrs().size() - 1);
+      value_type point_result = {};
 
-      const auto &ptr = rpe.get_point_ptrs();
-
-      for (unsigned int i = 0; i < ptr.size() - 1; ++i)
+      // Weight operator in case some points are owned by multiple cells.
+      if (rpe.is_map_unique() == false)
         {
-          const auto n_entries = ptr[i + 1] - ptr[i];
-
-          value_type result{};
+          const auto n_entries = ptr[j + 1] - ptr[j];
 
           if (n_entries > 0)
             {
-              for (unsigned int j = 0; j < n_entries; ++j)
-                result += evaluation_point_results_temp[ptr[i] + j];
-              result /= n_entries;
+              for (unsigned int i = 0; i < n_entries; ++i)
+                point_result += evaluation_point_results[ptr[j] + i];
+              point_result /= n_entries;
             }
-          evaluation_point_results.push_back(result);
         }
-    }
+      else
+        point_result = evaluation_point_results[j];
 
-  for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
-    {
       if (level_dof_indices_fine_ptrs.empty())
         {
           for (unsigned int c = 0; c < n_components; ++c)
@@ -4979,7 +4976,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
                                this->level_dof_indices_fine.size());
               dst.local_element(
                 this->level_dof_indices_fine[n_components * j + c]) +=
-                internal::access(evaluation_point_results[j], c);
+                internal::access(point_result, c);
             }
         }
       else
@@ -4993,7 +4990,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
                                  this->level_dof_indices_fine.size());
                 dst.local_element(
                   this->level_dof_indices_fine[n_components * i + c]) +=
-                  internal::access(evaluation_point_results[j], c);
+                  internal::access(point_result, c);
               }
         }
     }
@@ -5065,20 +5062,16 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
                     this->level_dof_indices_fine[n_components * i + c]);
               }
         }
-    }
 
-  // Weight operator in case some points are owned by multiple cells.
-  if (rpe.is_map_unique() == false)
-    {
-      const auto &ptr = rpe.get_point_ptrs();
-
-      for (unsigned int i = 0; i < ptr.size() - 1; ++i)
+      if (rpe.is_map_unique() == false)
         {
-          const auto n_entries = ptr[i + 1] - ptr[i];
+          const auto &ptr = rpe.get_point_ptrs();
+
+          const auto n_entries = ptr[j + 1] - ptr[j];
           if (n_entries == 0)
             continue;
 
-          evaluation_point_results[i] /= n_entries;
+          evaluation_point_results[j] /= n_entries;
         }
     }
 

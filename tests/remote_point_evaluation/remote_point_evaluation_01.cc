@@ -264,7 +264,7 @@ compute_force_vector_sharp_interface(
   const VectorType                &curvature_vector,
   VectorType                      &force_vector)
 {
-  using T = Tensor<1, spacedim, double>;
+  using T = double;
 
   const auto integration_points = [&]() {
     std::vector<Point<spacedim>> integration_points;
@@ -330,12 +330,10 @@ compute_force_vector_sharp_interface(
 
         for (const auto q : fe_eval_dim.quadrature_point_indices())
           {
-            T result;
             for (unsigned int i = 0; i < spacedim; ++i)
-              result[i] = -curvature_values[q] * normal_values[q][i] *
-                          fe_eval.JxW(q) * surface_tension;
-
-            integration_values.push_back(result);
+              integration_values.push_back(-curvature_values[q] *
+                                           normal_values[q][i] *
+                                           fe_eval.JxW(q) * surface_tension);
           }
       }
 
@@ -371,8 +369,9 @@ compute_force_vector_sharp_interface(
           cell_data.reference_point_ptrs[i + 1] -
             cell_data.reference_point_ptrs[i]);
 
-        const ArrayView<const T> force_JxW(
-          values.data() + cell_data.reference_point_ptrs[i],
+        const ArrayView<const Tensor<1, spacedim, T>> force_JxW(
+          reinterpret_cast<const Tensor<1, spacedim, T> *>(values.data()) +
+            cell_data.reference_point_ptrs[i],
           cell_data.reference_point_ptrs[i + 1] -
             cell_data.reference_point_ptrs[i]);
 
@@ -391,7 +390,10 @@ compute_force_vector_sharp_interface(
 
   std::vector<T> buffer;
 
-  eval.template process_and_evaluate<T>(integration_values, buffer, fu);
+  eval.template process_and_evaluate<T>(integration_values,
+                                        buffer,
+                                        fu,
+                                        spacedim);
 }
 
 
