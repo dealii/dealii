@@ -392,7 +392,7 @@ public:
 
 protected:
   /**
-   * Internal vector on that the actual prolongation/restriction is performed.
+   * Internal vector on which the actual prolongation/restriction is performed.
    */
   mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
 
