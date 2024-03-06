@@ -3058,7 +3058,7 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     this->update_ghost_values(*vec_fine_ptr);
 
   if (use_dst_inplace == false)
-    *vec_coarse_ptr = 0.0;
+    *vec_coarse_ptr = Number(0.0);
 
   this->zero_out_ghost_values(
     *vec_coarse_ptr); // since we might add into the
@@ -3239,7 +3239,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
                                      (src_ghosts_have_been_set == false)))
     this->update_ghost_values(*vec_fine_ptr);
 
-  *vec_coarse_ptr = 0.0;
+  *vec_coarse_ptr = Number(0.0);
 
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
@@ -4053,7 +4053,7 @@ MGTransferMF<dim, Number>::prolongate(const unsigned int to_level,
                                       VectorType        &dst,
                                       const VectorType  &src) const
 {
-  dst = 0;
+  dst = Number(0.0);
   prolongate_and_add(to_level, dst, src);
 }
 
@@ -4963,7 +4963,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
             {
               for (unsigned int j = 0; j < n_entries; ++j)
                 result += evaluation_point_results_temp[ptr[i] + j];
-              result /= n_entries;
+              result /= Number(n_entries);
             }
           evaluation_point_results.push_back(result);
         }
@@ -5051,7 +5051,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
         }
       else
         {
-          evaluation_point_results[j] = {};
+          evaluation_point_results[j] = value_type();
 
           for (unsigned int i = this->level_dof_indices_fine_ptrs[j];
                i < this->level_dof_indices_fine_ptrs[j + 1];
@@ -5078,7 +5078,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
           if (n_entries == 0)
             continue;
 
-          evaluation_point_results[i] /= n_entries;
+          evaluation_point_results[i] /= Number(n_entries);
         }
     }
 
