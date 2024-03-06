@@ -651,29 +651,28 @@ private:
     /**
      * Prolongation matrix for non-tensor-product elements.
      */
-    AlignedVector<VectorizedArrayType> prolongation_matrix;
+    AlignedVector<double> prolongation_matrix;
 
     /**
      * 1d prolongation matrix for tensor-product elements.
      */
-    AlignedVector<VectorizedArrayType> prolongation_matrix_1d;
+    AlignedVector<double> prolongation_matrix_1d;
 
     /**
      * Restriction matrix for non-tensor-product elements.
      */
-    AlignedVector<VectorizedArrayType> restriction_matrix;
+    AlignedVector<double> restriction_matrix;
 
     /**
      * 1d restriction matrix for tensor-product elements.
      */
-    AlignedVector<VectorizedArrayType> restriction_matrix_1d;
+    AlignedVector<double> restriction_matrix_1d;
 
     /**
      * ShapeInfo description of the coarse cell. Needed during the
      * fast application of hanging-node constraints.
      */
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-      shape_info_coarse;
+    internal::MatrixFreeFunctions::ShapeInfo<double> shape_info_coarse;
   };
 
   /**
