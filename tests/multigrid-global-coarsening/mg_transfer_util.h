@@ -17,6 +17,9 @@
 
 #include <deal.II/base/function_lib.h>
 
+#include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/multigrid/mg_transfer_global_coarsening.h>
+
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
