@@ -115,14 +115,14 @@ namespace
   /**
    * Helper class containing the cell-wise prolongation operation.
    */
-  template <int dim, typename Number>
+  template <int dim, typename Number, typename Number2>
   class CellProlongator
   {
   public:
     CellProlongator(const AlignedVector<Number> &prolongation_matrix,
                     const AlignedVector<Number> &prolongation_matrix_1d,
-                    const Number                *evaluation_data_coarse,
-                    Number                      *evaluation_data_fine)
+                    const Number2               *evaluation_data_coarse,
+                    Number2                     *evaluation_data_fine)
       : prolongation_matrix(prolongation_matrix)
       , prolongation_matrix_1d(prolongation_matrix_1d)
       , evaluation_data_coarse(evaluation_data_coarse)
@@ -170,21 +170,21 @@ namespace
   private:
     const AlignedVector<Number> &prolongation_matrix;
     const AlignedVector<Number> &prolongation_matrix_1d;
-    const Number                *evaluation_data_coarse;
-    Number                      *evaluation_data_fine;
+    const Number2               *evaluation_data_coarse;
+    Number2                     *evaluation_data_fine;
   };
 
   /**
    * Helper class containing the cell-wise restriction operation.
    */
-  template <int dim, typename Number>
+  template <int dim, typename Number, typename Number2>
   class CellRestrictor
   {
   public:
     CellRestrictor(const AlignedVector<Number> &prolongation_matrix,
                    const AlignedVector<Number> &prolongation_matrix_1d,
-                   Number                      *evaluation_data_fine,
-                   Number                      *evaluation_data_coarse)
+                   Number2                     *evaluation_data_fine,
+                   Number2                     *evaluation_data_coarse)
       : prolongation_matrix(prolongation_matrix)
       , prolongation_matrix_1d(prolongation_matrix_1d)
       , evaluation_data_fine(evaluation_data_fine)
@@ -235,8 +235,8 @@ namespace
   private:
     const AlignedVector<Number> &prolongation_matrix;
     const AlignedVector<Number> &prolongation_matrix_1d;
-    Number                      *evaluation_data_fine;
-    Number                      *evaluation_data_coarse;
+    Number2                     *evaluation_data_fine;
+    Number2                     *evaluation_data_coarse;
   };
 
   class CellProlongatorTest
@@ -2975,11 +2975,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           if (needs_interpolation)
             for (int c = n_components - 1; c >= 0; --c)
               {
-                CellProlongator<dim, VectorizedArrayType> cell_prolongator(
-                  scheme.prolongation_matrix,
-                  scheme.prolongation_matrix_1d,
-                  evaluation_data_coarse.begin() + c * n_scalar_dofs_coarse,
-                  evaluation_data_fine.begin() + c * n_scalar_dofs_fine);
+                CellProlongator<dim, double, VectorizedArrayType>
+                  cell_prolongator(scheme.prolongation_matrix,
+                                   scheme.prolongation_matrix_1d,
+                                   evaluation_data_coarse.begin() +
+                                     c * n_scalar_dofs_coarse,
+                                   evaluation_data_fine.begin() +
+                                     c * n_scalar_dofs_fine);
 
                 if (scheme.prolongation_matrix_1d.size() > 0)
                   cell_transfer.run(cell_prolongator);
@@ -3173,11 +3175,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           if (needs_interpolation)
             for (int c = n_components - 1; c >= 0; --c)
               {
-                CellRestrictor<dim, VectorizedArrayType> cell_restrictor(
-                  scheme.prolongation_matrix,
-                  scheme.prolongation_matrix_1d,
-                  evaluation_data_fine.begin() + c * n_scalar_dofs_fine,
-                  evaluation_data_coarse.begin() + c * n_scalar_dofs_coarse);
+                CellRestrictor<dim, double, VectorizedArrayType>
+                  cell_restrictor(scheme.prolongation_matrix,
+                                  scheme.prolongation_matrix_1d,
+                                  evaluation_data_fine.begin() +
+                                    c * n_scalar_dofs_fine,
+                                  evaluation_data_coarse.begin() +
+                                    c * n_scalar_dofs_coarse);
 
                 if (scheme.prolongation_matrix_1d.size() > 0)
                   cell_transfer.run(cell_restrictor);
@@ -3296,11 +3300,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
           if (needs_interpolation)
             for (int c = n_components - 1; c >= 0; --c)
               {
-                CellRestrictor<dim, VectorizedArrayType> cell_restrictor(
-                  scheme.restriction_matrix,
-                  scheme.restriction_matrix_1d,
-                  evaluation_data_fine.begin() + c * n_scalar_dofs_fine,
-                  evaluation_data_coarse.begin() + c * n_scalar_dofs_coarse);
+                CellRestrictor<dim, double, VectorizedArrayType>
+                  cell_restrictor(scheme.restriction_matrix,
+                                  scheme.restriction_matrix_1d,
+                                  evaluation_data_fine.begin() +
+                                    c * n_scalar_dofs_fine,
+                                  evaluation_data_coarse.begin() +
+                                    c * n_scalar_dofs_coarse);
 
                 if (scheme.restriction_matrix_1d.size() > 0)
                   cell_transfer.run(cell_restrictor);
