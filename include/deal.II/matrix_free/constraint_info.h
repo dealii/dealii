@@ -444,7 +444,8 @@ namespace internal
               const auto                   &entries   = *entries_ptr;
               const types::global_dof_index n_entries = entries.size();
               if (n_entries == 1 &&
-                  std::abs(entries[0].second - 1.) <
+                  std::abs(entries[0].second -
+                           typename Number::value_type(1.)) <
                     100 * std::numeric_limits<double>::epsilon())
                 {
                   current_dof = entries[0].first;
