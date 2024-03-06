@@ -207,66 +207,27 @@ namespace MGTransferGlobalCoarseningTools
 
 
 /**
- * Abstract base class for transfer operators between two multigrid levels.
- */
-template <typename VectorType>
-class MGTwoLevelTransferBase : public Subscriptor
-{
-public:
-  /**
-   * Perform prolongation on a solution vector.
-   */
-  virtual void
-  prolongate_and_add(VectorType &dst, const VectorType &src) const = 0;
-
-  /**
-   * Perform restriction on a residual vector.
-   */
-  virtual void
-  restrict_and_add(VectorType &dst, const VectorType &src) const = 0;
-
-  /**
-   * Perform interpolation of a solution vector from the fine level to the
-   * coarse level. This function is different from restriction, where a
-   * weighted residual is transferred to a coarser level (transposition of
-   * prolongation matrix). In other words, restriction acts on right hand
-   * side vectors, whereas interpolation acts on solution vectors.
-   */
-  virtual void
-  interpolate(VectorType &dst, const VectorType &src) const = 0;
-
-  /**
-   * Enable inplace vector operations if external and internal vectors
-   * are compatible.
-   */
-  virtual void
-  enable_inplace_operations_if_possible(
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &partitioner_fine) = 0;
-
-  /**
-   * Return the memory consumption of the allocated memory in this class.
-   */
-  virtual std::size_t
-  memory_consumption() const = 0;
-};
-
-
-/**
- * Base class for transfer operators between two multigrid levels.
+ * An abstract base class for transfer operators between two multigrid levels.
  * Specialization for LinearAlgebra::distributed::Vector. The implementation of
  * restriction and prolongation between levels is delegated to derived classes,
  * which implement prolongate_and_add_internal() and restrict_and_add_internal()
  * accordingly.
  */
-template <typename Number>
-class MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
-  : public Subscriptor
+template <typename VectorType>
+class MGTwoLevelTransferBase : public Subscriptor
 {
 public:
-  using VectorType = LinearAlgebra::distributed::Vector<Number>;
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>>,
+    "This class is currently only implemented for vectors of "
+    "type LinearAlgebra::distributed::Vector.");
+
+  /**
+   * The scalar type used by the vector-type template argument.
+   */
+  using Number = typename VectorType::value_type;
 
   /**
    * Default constructor.
@@ -335,8 +296,7 @@ protected:
    * partitioners.
    */
   void
-  update_ghost_values(
-    const LinearAlgebra::distributed::Vector<Number> &vec) const;
+  update_ghost_values(const VectorType &vec) const;
 
   /**
    * A wrapper around compress() optimized in case the
@@ -344,8 +304,7 @@ protected:
    * partitioners.
    */
   void
-  compress(LinearAlgebra::distributed::Vector<Number> &vec,
-           const VectorOperation::values               op) const;
+  compress(VectorType &vec, const VectorOperation::values op) const;
 
   /**
    * A wrapper around zero_out_ghost_values() optimized in case the
@@ -353,8 +312,7 @@ protected:
    * partitioners.
    */
   void
-  zero_out_ghost_values(
-    const LinearAlgebra::distributed::Vector<Number> &vec) const;
+  zero_out_ghost_values(const VectorType &vec) const;
 
   /**
    * Enable inplace vector operations if external and internal vectors
@@ -447,57 +405,24 @@ template <int dim, typename VectorType>
 class MGTwoLevelTransfer : public MGTwoLevelTransferBase<VectorType>
 {
 public:
-  /**
-   * @copydoc MGTwoLevelTransferBase::prolongate_and_add
-   */
-  void
-  prolongate_and_add(VectorType &dst, const VectorType &src) const override;
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>>,
+    "This class is currently only implemented for vectors of "
+    "type LinearAlgebra::distributed::Vector.");
 
   /**
-   * @copydoc MGTwoLevelTransferBase::restrict_and_add
+   * The scalar type used by the vector-type template argument.
    */
-  void
-  restrict_and_add(VectorType &dst, const VectorType &src) const override;
+  using Number = typename VectorType::value_type;
 
   /**
-   * @copydoc MGTwoLevelTransferBase::interpolate
+   * A data type representing a vectorized array of the same kind of objects
+   * stored in the `VectorType`.
    */
-  void
-  interpolate(VectorType &dst, const VectorType &src) const override;
-
-  /**
-   * Enable inplace vector operations if external and internal vectors
-   * are compatible.
-   */
-  void
-  enable_inplace_operations_if_possible(
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
-    override;
-
-  /**
-   * Return the memory consumption of the allocated memory in this class.
-   */
-  std::size_t
-  memory_consumption() const override;
-};
-
-
-
-/**
- * Class for transfer between two multigrid levels for p- or global coarsening.
- * Specialization for LinearAlgebra::distributed::Vector.
- *
- * The implementation of this class is explained in detail in @cite munch2022gc.
- */
-template <int dim, typename Number>
-class MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
-  : public MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
-{
   using VectorizedArrayType = VectorizedArray<Number>;
 
-public:
   /**
    * Set up global coarsening between the given DoFHandler objects (
    * @p dof_handler_fine and @p dof_handler_coarse). The transfer
@@ -573,9 +498,7 @@ public:
    * @copydoc MGTwoLevelTransferBase::interpolate
    */
   void
-  interpolate(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  interpolate(VectorType &dst, const VectorType &src) const override;
 
   /**
    * Enable inplace vector operations if external and internal vectors
@@ -596,14 +519,12 @@ public:
 
 protected:
   void
-  prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  prolongate_and_add_internal(VectorType       &dst,
+                              const VectorType &src) const override;
 
   void
-  restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  restrict_and_add_internal(VectorType       &dst,
+                            const VectorType &src) const override;
 
 private:
   /**

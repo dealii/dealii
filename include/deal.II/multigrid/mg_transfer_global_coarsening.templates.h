@@ -2852,20 +2852,18 @@ namespace MGTransferGlobalCoarseningTools
 
 
 
-template <typename Number>
-MGTwoLevelTransferBase<
-  LinearAlgebra::distributed::Vector<Number>>::MGTwoLevelTransferBase()
+template <typename VectorType>
+MGTwoLevelTransferBase<VectorType>::MGTwoLevelTransferBase()
   : vec_fine_needs_ghost_update(true)
 {}
 
 
 
-template <typename Number>
+template <typename VectorType>
 void
-MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
-  prolongate_and_add(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransferBase<VectorType>::prolongate_and_add(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   const bool  use_dst_inplace = this->vec_fine.size() == 0;
   auto *const vec_fine_ptr    = use_dst_inplace ? &dst : &this->vec_fine;
@@ -2903,12 +2901,11 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   const unsigned int n_lanes = VectorizedArrayType::size();
 
@@ -3033,11 +3030,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename VectorType>
 void
-MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
-  restrict_and_add(LinearAlgebra::distributed::Vector<Number>       &dst,
-                   const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransferBase<VectorType>::restrict_and_add(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   const bool        use_src_inplace = this->vec_fine.size() == 0;
   const auto *const vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
@@ -3084,12 +3081,11 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   const unsigned int n_lanes = VectorizedArrayType::size();
 
@@ -3215,11 +3211,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  interpolate(LinearAlgebra::distributed::Vector<Number>       &dst,
-              const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
+                                                 const VectorType &src) const
 {
   const unsigned int n_lanes = VectorizedArrayType::size();
 
@@ -3397,10 +3392,12 @@ namespace internal
   } // namespace
 } // namespace internal
 
-template <typename Number>
+
+
+template <typename VectorType>
 template <int dim, std::size_t width, typename IndexType>
 void
-MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
+MGTwoLevelTransferBase<VectorType>::
   internal_enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &external_partitioner_coarse,
@@ -3465,14 +3462,15 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     }
 }
 
-template <int dim, typename Number>
+
+
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  enable_inplace_operations_if_possible(
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &external_partitioner_coarse,
-    const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &external_partitioner_fine)
+MGTwoLevelTransfer<dim, VectorType>::enable_inplace_operations_if_possible(
+  const std::shared_ptr<const Utilities::MPI::Partitioner>
+    &external_partitioner_coarse,
+  const std::shared_ptr<const Utilities::MPI::Partitioner>
+    &external_partitioner_fine)
 {
   this->internal_enable_inplace_operations_if_possible(
     external_partitioner_coarse,
@@ -3484,15 +3482,15 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  reinit_geometric_transfer(const DoFHandler<dim>           &dof_handler_fine,
-                            const DoFHandler<dim>           &dof_handler_coarse,
-                            const AffineConstraints<Number> &constraints_fine,
-                            const AffineConstraints<Number> &constraints_coarse,
-                            const unsigned int               mg_level_fine,
-                            const unsigned int               mg_level_coarse)
+MGTwoLevelTransfer<dim, VectorType>::reinit_geometric_transfer(
+  const DoFHandler<dim>           &dof_handler_fine,
+  const DoFHandler<dim>           &dof_handler_coarse,
+  const AffineConstraints<Number> &constraints_fine,
+  const AffineConstraints<Number> &constraints_coarse,
+  const unsigned int               mg_level_fine,
+  const unsigned int               mg_level_coarse)
 {
   internal::MGTwoLevelTransferImplementation::reinit_geometric_transfer(
     dof_handler_fine,
@@ -3506,16 +3504,15 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  reinit_polynomial_transfer(
-    const DoFHandler<dim>           &dof_handler_fine,
-    const DoFHandler<dim>           &dof_handler_coarse,
-    const AffineConstraints<Number> &constraints_fine,
-    const AffineConstraints<Number> &constraints_coarse,
-    const unsigned int               mg_level_fine,
-    const unsigned int               mg_level_coarse)
+MGTwoLevelTransfer<dim, VectorType>::reinit_polynomial_transfer(
+  const DoFHandler<dim>           &dof_handler_fine,
+  const DoFHandler<dim>           &dof_handler_coarse,
+  const AffineConstraints<Number> &constraints_fine,
+  const AffineConstraints<Number> &constraints_coarse,
+  const unsigned int               mg_level_fine,
+  const unsigned int               mg_level_coarse)
 {
   internal::MGTwoLevelTransferImplementation::reinit_polynomial_transfer(
     dof_handler_fine,
@@ -3529,9 +3526,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
+MGTwoLevelTransfer<dim, VectorType>::reinit(
   const DoFHandler<dim>           &dof_handler_fine,
   const DoFHandler<dim>           &dof_handler_coarse,
   const AffineConstraints<Number> &constraints_fine,
@@ -3622,11 +3619,11 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 bool
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
-                                     const unsigned int fe_degree_coarse)
+MGTwoLevelTransfer<dim, VectorType>::fast_polynomial_transfer_supported(
+  const unsigned int fe_degree_fine,
+  const unsigned int fe_degree_coarse)
 {
   CellTransferFactory cell_transfer(fe_degree_fine, fe_degree_coarse);
   CellProlongatorTest cell_transfer_test;
@@ -3636,10 +3633,9 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 std::size_t
-MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  memory_consumption() const
+MGTwoLevelTransfer<dim, VectorType>::memory_consumption() const
 {
   std::size_t size = 0;
 
@@ -3664,11 +3660,10 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename VectorType>
 void
-MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
-  update_ghost_values(
-    const LinearAlgebra::distributed::Vector<Number> &vec) const
+MGTwoLevelTransferBase<VectorType>::update_ghost_values(
+  const VectorType &vec) const
 {
   if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
       (this->partitioner_coarse_embedded != nullptr))
@@ -3686,11 +3681,11 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename VectorType>
 void
-MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::compress(
-  LinearAlgebra::distributed::Vector<Number> &vec,
-  const VectorOperation::values               op) const
+MGTwoLevelTransferBase<VectorType>::compress(
+  VectorType                   &vec,
+  const VectorOperation::values op) const
 {
   Assert(op == VectorOperation::add, ExcNotImplemented());
 
@@ -3710,11 +3705,10 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::compress(
 
 
 
-template <typename Number>
+template <typename VectorType>
 void
-MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
-  zero_out_ghost_values(
-    const LinearAlgebra::distributed::Vector<Number> &vec) const
+MGTwoLevelTransferBase<VectorType>::zero_out_ghost_values(
+  const VectorType &vec) const
 {
   if ((vec.get_partitioner().get() == this->partitioner_coarse.get()) &&
       (this->partitioner_coarse_embedded != nullptr))
