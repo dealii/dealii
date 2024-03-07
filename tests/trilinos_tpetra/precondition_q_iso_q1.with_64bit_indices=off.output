@@ -1,0 +1,11 @@
+
+DEAL:02401:AMG_Q:cg::Starting value 34.1042
+DEAL:02401:AMG_Q:cg::Convergence step 38 value 0
+DEAL:02401:AMG_Q_iso_Q1:cg::Starting value 34.1042
+DEAL:02401:AMG_Q_iso_Q1:cg::Convergence step 28 value 0
+DEAL:02401::
+DEAL:09409:AMG_Q:cg::Starting value 47.4574
+DEAL:09409:AMG_Q:cg::Convergence step 43 value 0
+DEAL:09409:AMG_Q_iso_Q1:cg::Starting value 47.4574
+DEAL:09409:AMG_Q_iso_Q1:cg::Convergence step 28 value 0
+DEAL:09409::
