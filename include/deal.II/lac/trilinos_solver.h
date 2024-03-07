@@ -480,7 +480,7 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    */
-  class SolverDirect
+  class SolverDirect : public Subscriptor
   {
   public:
     /**
@@ -523,6 +523,11 @@ namespace TrilinosWrappers
     };
 
     /**
+     * Constructor. Creates the solver without solver control object.
+     */
+    explicit SolverDirect(const AdditionalData &data = AdditionalData());
+
+    /**
      * Constructor. Takes the solver control object and creates the solver.
      */
     SolverDirect(SolverControl        &cn,
@@ -543,9 +548,19 @@ namespace TrilinosWrappers
     initialize(const SparseMatrix &A);
 
     /**
+     * Initializes the direct solver for the matrix <tt>A</tt> and creates a
+     * factorization for it with the package chosen from the additional
+     * data structure. Note that there is no need for a preconditioner
+     * here and solve() is not called. Furthermore, @p data replaces the
+     * data stored in this instance.
+     */
+    void
+    initialize(const SparseMatrix &A, const AdditionalData &data);
+
+    /**
      * Solve the linear system <tt>Ax=b</tt> based on the
-     * package set in initialize(). Note the matrix is not refactorized during
-     * this call.
+     * package set in the constructor on initialize(). Note the matrix is not
+     * refactored during this call.
      */
     void
     solve(MPI::Vector &x, const MPI::Vector &b);
@@ -553,11 +568,28 @@ namespace TrilinosWrappers
     /**
      * Solve the linear system <tt>Ax=b</tt> based on the package set in
      * initialize() for deal.II's own parallel vectors. Note the matrix is not
-     * refactorized during this call.
+     * refactored during this call.
      */
     void
     solve(dealii::LinearAlgebra::distributed::Vector<double>       &x,
           const dealii::LinearAlgebra::distributed::Vector<double> &b);
+
+    /**
+     * Solve the linear system <tt>Ax=b</tt> based on the
+     * package set in the constructor or initialize(). Note the matrix is not
+     * refactored during this call.
+     */
+    void
+    vmult(MPI::Vector &x, const MPI::Vector &b) const;
+
+    /**
+     * Solve the linear system <tt>Ax=b</tt> based on the package set in
+     * initialize() for deal.II's own parallel vectors. Note the matrix is not
+     * refactored during this call.
+     */
+    void
+    vmult(dealii::LinearAlgebra::distributed::Vector<double>       &x,
+          const dealii::LinearAlgebra::distributed::Vector<double> &b) const;
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Creates a factorization of the
@@ -614,6 +646,11 @@ namespace TrilinosWrappers
     do_solve();
 
     /**
+     * Local dummy solver control object.
+     */
+    SolverControl solver_control_own;
+
+    /**
      * Reference to the object that controls convergence of the iterative
      * solver. In fact, for these Trilinos wrappers, Trilinos does so itself,
      * but we copy the data from this object before starting the solution
@@ -637,7 +674,7 @@ namespace TrilinosWrappers
     /**
      * Store a copy of the flags for this particular solver.
      */
-    const AdditionalData additional_data;
+    AdditionalData additional_data;
   };
 
 
