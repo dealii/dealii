@@ -664,17 +664,25 @@ namespace
           }
         else
           {
-            // it must be a subsection
-            prm.enter_subsection(demangle(p.first));
-            read_xml_recursively(p.second,
-                                 (current_path.empty() ?
-                                    p.first :
-                                    current_path + path_separator + p.first),
-                                 path_separator,
-                                 patterns,
-                                 skip_undefined,
-                                 prm);
-            prm.leave_subsection();
+            try
+              {
+                // it must be a subsection
+                prm.enter_subsection(demangle(p.first), !skip_undefined);
+                read_xml_recursively(p.second,
+                                     (current_path.empty() ?
+                                        p.first :
+                                        current_path + path_separator +
+                                          p.first),
+                                     path_separator,
+                                     patterns,
+                                     skip_undefined,
+                                     prm);
+                prm.leave_subsection();
+              }
+            catch (const ParameterHandler::ExcEntryUndeclared &)
+              {
+                // ignore undeclared entry assert
+              }
           }
       }
   }
@@ -969,10 +977,20 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
 
 
 void
-ParameterHandler::enter_subsection(const std::string &subsection)
+ParameterHandler::enter_subsection(const std::string &subsection,
+                                   const bool         create_path_if_needed)
 {
   // if necessary create subsection
-  if (!entries->get_child_optional(get_current_full_path(subsection)))
+  const auto path_exists =
+    entries->get_child_optional(get_current_full_path(subsection));
+
+  if (!create_path_if_needed)
+    {
+      AssertThrow(path_exists,
+                  ExcEntryUndeclared(get_current_full_path(subsection)));
+    }
+
+  if (!path_exists)
     entries->add_child(get_current_full_path(subsection),
                        boost::property_tree::ptree());
 

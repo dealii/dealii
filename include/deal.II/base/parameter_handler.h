@@ -1252,10 +1252,11 @@ public:
                 const bool         alias_is_deprecated = false);
 
   /**
-   * Enter a subsection. If it does not yet exist, create it.
+   * Enter a subsection. If it does not yet exist, create it if requested.
    */
   void
-  enter_subsection(const std::string &subsection);
+  enter_subsection(const std::string &subsection,
+                   const bool         create_path_if_needed = true);
 
   /**
    * Leave present subsection.
