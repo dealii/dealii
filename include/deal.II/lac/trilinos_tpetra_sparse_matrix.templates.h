@@ -1040,7 +1040,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline void
+    void
     SparseMatrix<Number, MemorySpace>::set(
       const std::vector<size_type> &indices,
       const FullMatrix<Number>     &values,
@@ -1056,6 +1056,49 @@ namespace LinearAlgebra
             indices.data(),
             &values(i, 0),
             elide_zero_values);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::set(
+      const std::vector<size_type> &row_indices,
+      const std::vector<size_type> &col_indices,
+      const FullMatrix<Number>     &full_matrix,
+      const bool                    elide_zero_values)
+    {
+      Assert(row_indices.size() == full_matrix.m(),
+             ExcDimensionMismatch(row_indices.size(), full_matrix.m()));
+      Assert(col_indices.size() == full_matrix.n(),
+             ExcDimensionMismatch(col_indices.size(), full_matrix.n()));
+
+      for (size_type i = 0; i < row_indices.size(); ++i)
+        set(row_indices[i],
+            col_indices.size(),
+            col_indices.data(),
+            &full_matrix(i, 0),
+            elide_zero_values);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::set(
+      const size_type               row,
+      const std::vector<size_type> &col_indices,
+      const std::vector<Number>    &values,
+      const bool                    elide_zero_values)
+    {
+      Assert(col_indices.size() == values.size(),
+             ExcDimensionMismatch(col_indices.size(), values.size()));
+
+      set(row,
+          col_indices.size(),
+          col_indices.data(),
+          &values[0],
+          elide_zero_values);
     }
 
 
