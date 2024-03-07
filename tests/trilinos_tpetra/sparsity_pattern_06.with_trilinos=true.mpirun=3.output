@@ -1,0 +1,48 @@
+
+DEAL:0::NumProc=3
+DEAL:0::before compress:
+DEAL:0::index: 0 = (0 , 0)
+DEAL:0::index: 1 = (0 , 1)
+DEAL:0::index: 2 = (0 , 2)
+DEAL:0::index: 0 = (3 , 3)
+DEAL:0::index: 1 = (3 , 4)
+DEAL:0::index: 2 = (3 , 5)
+DEAL:0::after compress:
+DEAL:0::index: 0 = (0 , 0)
+DEAL:0::index: 1 = (0 , 1)
+DEAL:0::index: 2 = (0 , 2)
+DEAL:0::index: 0 = (3 , 3)
+DEAL:0::index: 1 = (3 , 4)
+DEAL:0::index: 2 = (3 , 5)
+
+DEAL:1::before compress:
+DEAL:1::index: 0 = (1 , 1)
+DEAL:1::index: 1 = (1 , 0)
+DEAL:1::index: 2 = (1 , 2)
+DEAL:1::index: 0 = (4 , 4)
+DEAL:1::index: 1 = (4 , 3)
+DEAL:1::index: 2 = (4 , 5)
+DEAL:1::after compress:
+DEAL:1::index: 0 = (1 , 1)
+DEAL:1::index: 1 = (1 , 0)
+DEAL:1::index: 2 = (1 , 2)
+DEAL:1::index: 0 = (4 , 4)
+DEAL:1::index: 1 = (4 , 3)
+DEAL:1::index: 2 = (4 , 5)
+
+
+DEAL:2::before compress:
+DEAL:2::index: 0 = (2 , 2)
+DEAL:2::index: 1 = (2 , 0)
+DEAL:2::index: 2 = (2 , 1)
+DEAL:2::index: 0 = (5 , 5)
+DEAL:2::index: 1 = (5 , 3)
+DEAL:2::index: 2 = (5 , 4)
+DEAL:2::after compress:
+DEAL:2::index: 0 = (2 , 2)
+DEAL:2::index: 1 = (2 , 0)
+DEAL:2::index: 2 = (2 , 1)
+DEAL:2::index: 0 = (5 , 5)
+DEAL:2::index: 1 = (5 , 3)
+DEAL:2::index: 2 = (5 , 4)
+
