@@ -1914,8 +1914,8 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::in_local_range(
       const size_type index) const
     {
-      auto begin = matrix->getRowMap()->getMinGlobalIndex();
-      auto end   = matrix->getRowMap()->getMaxGlobalIndex() + 1;
+      size_type begin = matrix->getRowMap()->getMinGlobalIndex();
+      size_type end   = matrix->getRowMap()->getMaxGlobalIndex() + 1;
 
       return ((index >= begin) && (index < end));
     }
