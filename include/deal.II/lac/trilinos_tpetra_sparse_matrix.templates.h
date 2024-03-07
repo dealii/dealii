@@ -1137,17 +1137,28 @@ namespace LinearAlgebra
       AssertDimension(source.local_range().second, local_range().second);
       Assert(matrix->getRowMap()->isSameAs(*source.matrix->getRowMap()),
              ExcMessage(
-               "Can only add matrices with same distribution of rows"));
+               "Can only add matrices with same distribution of rows."));
       Assert(matrix->isFillComplete() && source.matrix->isFillComplete(),
-             ExcMessage("Addition of matrices only allowed if matrices are "
-                        "filled, i.e., compress() has been called"));
+             ExcMessage("Addition of matrices is only allowed if the matrices "
+                        "are filled, i.e., if compress() has been called."));
 
-      matrix->add(factor,
-                  *source.matrix,
-                  1.0,
-                  matrix->getDomainMap(),
-                  matrix->getRangeMap(),
-                  Teuchos::null);
+      // Tpetra does not have a function that adds a matrix in-place to the
+      // we're currently storing. But it (inefficiently) has one that returns a
+      // new matrix with the result. As a consequence, replace the current one
+      // by the one that is returned.
+      //
+      // Inconveniently, however, the Tpetra::CrsMatrix::add() function returns
+      // a RCP<Tpetra::RowMatrix>, though it guarantees that the stored object
+      // is actually a Tpetra::CrsMatrix for our combination of arguments. So,
+      // we have to do some casting around to assign things back to 'matrix':
+      auto result = matrix->add(factor,
+                                *source.matrix,
+                                1.0,
+                                matrix->getDomainMap(),
+                                matrix->getRangeMap(),
+                                Teuchos::null);
+      Assert(dynamic_cast<MatrixType *>(result.get()), ExcInternalError());
+      matrix.reset(dynamic_cast<MatrixType *>(result.release().get()));
     }
 
 
