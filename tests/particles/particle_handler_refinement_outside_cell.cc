@@ -33,47 +33,6 @@
 
 template <int dim, int spacedim>
 void
-create_regular_particle_distribution(
-  Particles::ParticleHandler<dim, spacedim>                 &particle_handler,
-  const parallel::distributed::Triangulation<dim, spacedim> &tr,
-  const unsigned int particles_per_direction = 3)
-{
-  for (unsigned int i = 0; i < particles_per_direction; ++i)
-    for (unsigned int j = 0; j < particles_per_direction; ++j)
-      {
-        Point<spacedim> position;
-        Point<dim>      reference_position;
-        unsigned int    id = i * particles_per_direction + j;
-
-        position[0] = static_cast<double>(i) /
-                      static_cast<double>(particles_per_direction - 1);
-        position[1] = static_cast<double>(j) /
-                      static_cast<double>(particles_per_direction - 1);
-
-        if (dim > 2)
-          for (unsigned int k = 0; k < particles_per_direction; ++k)
-            {
-              position[2] = static_cast<double>(j) /
-                            static_cast<double>(particles_per_direction - 1);
-            }
-        else
-          {
-            Particles::Particle<dim, spacedim> particle(position,
-                                                        reference_position,
-                                                        id);
-
-            typename parallel::distributed::Triangulation<dim, spacedim>::
-              active_cell_iterator cell =
-                GridTools::find_active_cell_around_point(
-                  tr, particle.get_location());
-
-            particle_handler.insert_particle(particle, cell);
-          }
-      }
-}
-
-template <int dim, int spacedim>
-void
 test()
 {
   {
