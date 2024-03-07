@@ -4716,9 +4716,9 @@ namespace internal
 
 
 
-template <int dim, typename Number>
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  MGTwoLevelTransferNonNested(const AdditionalData &data)
+template <int dim, typename VectorType>
+MGTwoLevelTransferNonNested<dim, VectorType>::MGTwoLevelTransferNonNested(
+  const AdditionalData &data)
   : additional_data(data)
   , rpe(typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData(
       data.tolerance,
@@ -4727,15 +4727,15 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
       {}))
 {}
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  reinit(const DoFHandler<dim>           &dof_handler_fine,
-         const DoFHandler<dim>           &dof_handler_coarse,
-         const Mapping<dim>              &mapping_fine,
-         const Mapping<dim>              &mapping_coarse,
-         const AffineConstraints<Number> &constraint_fine,
-         const AffineConstraints<Number> &constraint_coarse)
+MGTwoLevelTransferNonNested<dim, VectorType>::reinit(
+  const DoFHandler<dim>           &dof_handler_fine,
+  const DoFHandler<dim>           &dof_handler_coarse,
+  const Mapping<dim>              &mapping_fine,
+  const Mapping<dim>              &mapping_coarse,
+  const AffineConstraints<Number> &constraint_fine,
+  const AffineConstraints<Number> &constraint_coarse)
 {
   AssertThrow(dof_handler_coarse.get_fe().has_support_points(),
               ExcNotImplemented());
@@ -4889,13 +4889,12 @@ namespace internal
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 template <int n_components>
 void
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  prolongate_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   using Traits =
     internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components, Number>;
@@ -5001,12 +5000,11 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   if (this->fe_coarse->n_components() == 1)
     prolongate_and_add_internal_comp<1>(dst, src);
@@ -5018,13 +5016,12 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 template <int n_components>
 void
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  restrict_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   using Traits =
     internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components, Number>;
@@ -5126,12 +5123,11 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   if (this->fe_coarse->n_components() == 1)
     restrict_and_add_internal_comp<1>(dst, src);
@@ -5143,11 +5139,11 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  interpolate(LinearAlgebra::distributed::Vector<Number>       &dst,
-              const LinearAlgebra::distributed::Vector<Number> &src) const
+MGTwoLevelTransferNonNested<dim, VectorType>::interpolate(
+  VectorType       &dst,
+  const VectorType &src) const
 {
   AssertThrow(false, ExcNotImplemented());
   (void)dst;
@@ -5156,9 +5152,9 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 void
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+MGTwoLevelTransferNonNested<dim, VectorType>::
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &external_partitioner_coarse,
@@ -5175,10 +5171,9 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 std::size_t
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  memory_consumption() const
+MGTwoLevelTransferNonNested<dim, VectorType>::memory_consumption() const
 {
   std::size_t size = 0;
 
@@ -5192,40 +5187,40 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 boost::signals2::connection
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  connect_prolongation_cell_loop(const std::function<void(const bool)> &slot)
+MGTwoLevelTransferNonNested<dim, VectorType>::connect_prolongation_cell_loop(
+  const std::function<void(const bool)> &slot)
 {
   return signals_non_nested.prolongation_cell_loop.connect(slot);
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 boost::signals2::connection
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  connect_restriction_cell_loop(const std::function<void(const bool)> &slot)
+MGTwoLevelTransferNonNested<dim, VectorType>::connect_restriction_cell_loop(
+  const std::function<void(const bool)> &slot)
 {
   return signals_non_nested.restriction_cell_loop.connect(slot);
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 boost::signals2::connection
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  connect_prolongation(const std::function<void(const bool)> &slot)
+MGTwoLevelTransferNonNested<dim, VectorType>::connect_prolongation(
+  const std::function<void(const bool)> &slot)
 {
   return signals_non_nested.prolongation.connect(slot);
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 boost::signals2::connection
-MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  connect_restriction(const std::function<void(const bool)> &slot)
+MGTwoLevelTransferNonNested<dim, VectorType>::connect_restriction(
+  const std::function<void(const bool)> &slot)
 {
   return signals_non_nested.restriction.connect(slot);
 }

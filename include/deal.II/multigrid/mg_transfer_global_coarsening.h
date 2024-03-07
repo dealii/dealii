@@ -206,9 +206,10 @@ namespace MGTransferGlobalCoarseningTools
 } // namespace MGTransferGlobalCoarseningTools
 
 
+
 /**
  * An abstract base class for transfer operators between two multigrid levels.
- * Specialization for LinearAlgebra::distributed::Vector. The implementation of
+ * The implementation of
  * restriction and prolongation between levels is delegated to derived classes,
  * which implement prolongate_and_add_internal() and restrict_and_add_internal()
  * accordingly.
@@ -651,54 +652,19 @@ private:
 
 /**
  * Class for transfer between two non-nested multigrid levels.
- *
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransferNonNested : public MGTwoLevelTransferBase<VectorType>
 {
-public:
-  /**
-   * Perform prolongation.
-   */
-  void
-  prolongate_and_add(VectorType &dst, const VectorType &src) const override;
-
-  /**
-   * Perform restriction.
-   */
-  void
-  restrict_and_add(VectorType &dst, const VectorType &src) const override;
-
-  /**
-   * Perform interpolation of a solution vector from the fine level to the
-   * coarse level. This function is different from restriction, where a
-   * weighted residual is transferred to a coarser level (transposition of
-   * prolongation matrix).
-   */
-  void
-  interpolate(VectorType &dst, const VectorType &src) const override;
-
-  /**
-   * Return the memory consumption of the allocated memory in this class.
-   */
-  std::size_t
-  memory_consumption() const override;
-};
-
-
-
-/**
- * Class for transfer between two non-nested multigrid levels.
- *
- * Specialization for LinearAlgebra::distributed::Vector.
- *
- */
-template <int dim, typename Number>
-class MGTwoLevelTransferNonNested<dim,
-                                  LinearAlgebra::distributed::Vector<Number>>
-  : public MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
-{
 private:
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>>,
+    "This class is currently only implemented for vectors of "
+    "type LinearAlgebra::distributed::Vector.");
+
+  using Number              = typename VectorType::value_type;
   using VectorizedArrayType = VectorizedArray<Number, 1>;
 
   mg::SignalsNonNested signals_non_nested;
@@ -752,6 +718,9 @@ public:
     bool enforce_all_points_found;
   };
 
+  /**
+   * Constructor.
+   */
   MGTwoLevelTransferNonNested(const AdditionalData &data = AdditionalData());
 
   /**
@@ -775,9 +744,7 @@ public:
    * prolongation matrix).
    */
   void
-  interpolate(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  interpolate(VectorType &dst, const VectorType &src) const override;
 
   /**
    * Enable inplace vector operations if external and internal vectors
@@ -826,17 +793,15 @@ protected:
    * Perform prolongation.
    */
   void
-  prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  prolongate_and_add_internal(VectorType       &dst,
+                              const VectorType &src) const override;
 
   /**
    * Perform restriction.
    */
   void
-  restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  restrict_and_add_internal(VectorType       &dst,
+                            const VectorType &src) const override;
 
 private:
   /**
@@ -844,18 +809,15 @@ private:
    */
   template <int n_components>
   void
-  prolongate_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const;
+  prolongate_and_add_internal_comp(VectorType       &dst,
+                                   const VectorType &src) const;
 
   /**
    * Perform restriction for correct number of components.
    */
   template <int n_components>
   void
-  restrict_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const;
+  restrict_and_add_internal_comp(VectorType &dst, const VectorType &src) const;
 
   /**
    * Pointer to the DoFHandler object used during initialization.
