@@ -14,11 +14,10 @@
 
 
 
-// Check that particles are correctly transferred during grid
-// refinement/coarsening. Like particle_handler_05.cc, but with
-// a particle that is registered in a parent cell, but will not
-// be found in any child cell. Before this fix, this test
-// would lead to an endless loop.
+// Check that particles are correctly deleted during grid
+// refinement/coarsening.
+// Like particle_handler_refinement_outside_cell.cc, but
+// with particles that carry properties.
 
 #include <deal.II/distributed/tria.h>
 
@@ -41,7 +40,7 @@ test()
     GridGenerator::hyper_cube(tr);
     MappingQ<dim, spacedim> mapping(1);
 
-    Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
+    Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping, 2);
 
     // Create a particle outside of the domain
     Point<spacedim> position;

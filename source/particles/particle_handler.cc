@@ -2418,12 +2418,8 @@ namespace Particles
               {
                 bool found_new_cell = false;
 
-                for (unsigned int child_index = 0;
-                     child_index < GeometryInfo<dim>::max_children_per_cell;
-                     ++child_index)
+                for (const auto &child : cell->child_iterators())
                   {
-                    const typename Triangulation<dim, spacedim>::cell_iterator
-                      child = cell->child(child_index);
                     Assert(child->is_locally_owned(), ExcInternalError());
 
                     try
@@ -2437,19 +2433,21 @@ namespace Particles
                             found_new_cell = true;
                             particle->set_reference_location(p_unit);
 
-                            // if the particle is not in child 0, we stored the
-                            // handle in the wrong place; move the handle and
-                            // redo the loop; otherwise move on to next particle
-                            if (child_index != 0)
+                            // if the particle is not in the cell we stored it
+                            // in above, its handle is in the wrong place
+                            if (child != cell_to_store_particles)
                               {
+                                // move handle into correct cell
                                 insert_particle(cache->particles[i], child);
-
+                                // remove handle by replacing it with last one
                                 cache->particles[i] = cache->particles.back();
-                                cache->particles.resize(
-                                  cache->particles.size() - 1);
+                                cache->particles.pop_back();
+                                // no loop increment, we need to process
+                                // the new i-th particle.
                               }
                             else
                               {
+                                // move on to next particle
                                 ++i;
                                 ++particle;
                               }
@@ -2471,8 +2469,11 @@ namespace Particles
                     // and move on.
                     signals.particle_lost(particle,
                                           particle->get_surrounding_cell());
+                    if (cache->particles[i] !=
+                        PropertyPool<dim, spacedim>::invalid_handle)
+                      property_pool->deregister_particle(cache->particles[i]);
                     cache->particles[i] = cache->particles.back();
-                    cache->particles.resize(cache->particles.size() - 1);
+                    cache->particles.pop_back();
                   }
               }
             // clean up in case child 0 has no particle left
