@@ -780,21 +780,15 @@ namespace LinearAlgebra
                  ExcInternalError());
 #  endif
 
-          nonlocal_graph->fillComplete(column_space_map, graph->getRangeMap());
-          graph->fillComplete(column_space_map, graph->getRangeMap());
+          nonlocal_graph->fillComplete(column_space_map, graph->getRowMap());
         }
-      else
-        {
-          graph->globalAssemble();
-        }
+      graph->fillComplete(column_space_map, graph->getRowMap());
 
       // Check consistency between the sizes set at the beginning and what
       // Trilinos stores:
       using namespace deal_II_exceptions::internals;
-      Assert(compare_for_equality(n_rows(), graph->getGlobalNumEntries()),
-             ExcInternalError());
-      Assert(compare_for_equality(n_cols(), graph->getGlobalNumEntries()),
-             ExcInternalError());
+      AssertDimension(n_rows(), graph->getGlobalNumRows());
+      AssertDimension(n_cols(), graph->getGlobalNumCols());
     }
 
 

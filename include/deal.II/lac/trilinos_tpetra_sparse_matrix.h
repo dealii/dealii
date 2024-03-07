@@ -53,6 +53,12 @@ namespace LinearAlgebra
   {
     template <typename MemorySpace>
     class SparsityPattern;
+
+    namespace SparseMatrixIterators
+    {
+      template <typename Number, typename MemorySpace, bool Constness>
+      class Iterator;
+    }
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 #  endif
@@ -110,6 +116,16 @@ namespace LinearAlgebra
       using size_type = dealii::types::global_dof_index;
 
       /**
+       * Exception
+       */
+      DeclException1(ExcAccessToNonlocalRow,
+                     std::size_t,
+                     << "You tried to access row " << arg1
+                     << " of a non-contiguous locally owned row set."
+                     << " The row " << arg1
+                     << " is not stored locally and can't be accessed.");
+
+      /**
        * A structure that describes some of the traits of this class in terms of
        * its run-time behavior. Some other classes (such as the block matrix
        * classes) that take one or other of the matrix classes as its template
@@ -124,6 +140,18 @@ namespace LinearAlgebra
          */
         static const bool zero_addition_can_be_elided = true;
       };
+
+      /**
+       * Declare an alias for the iterator class.
+       */
+      using iterator =
+        SparseMatrixIterators::Iterator<Number, MemorySpace, false>;
+
+      /**
+       * Declare an alias for the const iterator class.
+       */
+      using const_iterator =
+        SparseMatrixIterators::Iterator<Number, MemorySpace, true>;
 
       /**
        * Declare an alias for the type used to store matrix elements, in analogy
@@ -447,11 +475,24 @@ namespace LinearAlgebra
       local_range() const;
 
       /**
+       * Return whether @p index is in the local range or not, see also
+       * local_range().
+       */
+      bool
+      in_local_range(const size_type index) const;
+
+      /**
        * Return the total number of nonzero elements of this matrix (summed
        * over all MPI processes).
        */
       size_t
       n_nonzero_elements() const;
+
+      /**
+       * Number of entries in a specific row.
+       */
+      unsigned int
+      row_length(const size_type row) const;
 
       /**
        * Return the state of the matrix, i.e., whether compress() needs to be
@@ -1052,6 +1093,107 @@ namespace LinearAlgebra
       /** @} */
 
       /**
+       * @name Iterators
+       */
+      /** @{ */
+
+      /**
+       * Return an iterator pointing to the first element of the matrix.
+       *
+       * The elements accessed by iterators within each row are ordered in the
+       * way in which Trilinos stores them, though the implementation guarantees
+       * that all elements of one row are accessed before the elements of the
+       * next row. If your algorithm relies on visiting elements within one row,
+       * you will need to consult with the Trilinos documentation on the order
+       * in which it stores data. It is, however, generally not a good and
+       * long-term stable idea to rely on the order in which receive elements if
+       * you iterate over them.
+       *
+       * When you iterate over the elements of a parallel matrix, you will only
+       * be able to access the locally owned rows. (You can access the other
+       * rows as well, but they will look empty.) In that case, you probably
+       * want to call the begin() function that takes the row as an argument to
+       * limit the range of elements to loop over.
+       */
+      const_iterator
+      begin() const;
+
+      /**
+       * Like the function above, but for non-const matrices.
+       */
+      iterator
+      begin();
+
+      /**
+       * Return an iterator pointing the element past the last one of this
+       * matrix.
+       */
+      const_iterator
+      end() const;
+
+      /**
+       * Like the function above, but for non-const matrices.
+       */
+      iterator
+      end();
+
+      /**
+       * Return an iterator pointing to the first element of row @p r.
+       *
+       * Note that if the given row is empty, i.e. does not contain any nonzero
+       * entries, then the iterator returned by this function equals
+       * <tt>end(r)</tt>. The returned iterator may not be dereferenceable in
+       * that case if neither row @p r nor any of the following rows contain any
+       * nonzero entries.
+       *
+       * The elements accessed by iterators within each row are ordered in the
+       * way in which Trilinos stores them, though the implementation guarantees
+       * that all elements of one row are accessed before the elements of the
+       * next row. If your algorithm relies on visiting elements within one row,
+       * you will need to consult with the Trilinos documentation on the order
+       * in which it stores data. It is, however, generally not a good and
+       * long-term stable idea to rely on the order in which receive elements if
+       * you iterate over them.
+       *
+       * @note When you access the elements of a parallel matrix, you can only
+       * access the elements of rows that are actually stored locally. (You can
+       * access the other rows as well, but they will look empty.) Even then, if
+       * another processor has since written into, or added to, an element of
+       * the matrix that is stored on the current processor, then you will still
+       * see the old value of this entry unless you have called compress()
+       * between modifying the matrix element on the remote processor and
+       * accessing it on the current processor. See the documentation of the
+       * compress() function for more information.
+       */
+      const_iterator
+      begin(const size_type r) const;
+
+      /**
+       * Like the function above, but for non-const matrices.
+       */
+      iterator
+      begin(const size_type r);
+
+      /**
+       * Return an iterator pointing the element past the last one of row @p r ,
+       * or past the end of the entire sparsity pattern if none of the rows
+       * after @p r contain any entries at all.
+       *
+       * Note that the end iterator is not necessarily dereferenceable. This is
+       * in particular the case if it is the end iterator for the last row of a
+       * matrix.
+       */
+      const_iterator
+      end(const size_type r) const;
+
+      /**
+       * Like the function above, but for non-const matrices.
+       */
+      iterator
+      end(const size_type r);
+
+      /** @} */
+      /**
        * @addtogroup Exceptions
        */
       /** @{ */
@@ -1175,9 +1317,428 @@ namespace LinearAlgebra
       friend class BlockMatrixBase<SparseMatrix<Number, MemorySpace>>;
     }; // class SparseMatrix
 
+    /**
+     * Iterators for Trilinos matrices
+     */
+    namespace SparseMatrixIterators
+    {
+      /**
+       * Exception
+       */
+      DeclException0(ExcBeyondEndOfMatrix);
 
-    /* ------------------------- Inline functions ---------------------- */
+      /**
+       * Handling of indices for both constant and non constant Accessor objects
+       *
+       * For a regular dealii::SparseMatrix, we would use an accessor for the
+       * sparsity pattern. For Trilinos matrices, this does not seem so simple,
+       * therefore, we write a little base class here.
+       */
+      template <typename Number, typename MemorySpace>
+      class AccessorBase
+      {
+      public:
+        /**
+         * Declare the type for container size.
+         */
+        using size_type = dealii::types::global_dof_index;
 
+        /**
+         * Constructor.
+         */
+        AccessorBase(SparseMatrix<Number, MemorySpace> *matrix,
+                     const size_type                    row,
+                     const size_type                    index);
+
+        /**
+         * Row number of the element represented by this object.
+         */
+        size_type
+        row() const;
+
+        /**
+         * Index in row of the element represented by this object.
+         */
+        size_type
+        index() const;
+
+        /**
+         * Column number of the element represented by this object.
+         */
+        size_type
+        column() const;
+
+      protected:
+        /**
+         * Pointer to the matrix object. This object should be handled as a
+         * const pointer or non-const by the appropriate derived classes. In
+         * order to be able to implement both, it is not const here, so handle
+         * with care!
+         */
+        mutable SparseMatrix<Number, MemorySpace> *matrix;
+        /**
+         * Current row number.
+         */
+        size_type a_row;
+
+        /**
+         * Current index in row.
+         */
+        size_type a_index;
+
+        /**
+         * Discard the old row caches (they may still be used by other
+         * accessors) and generate new ones for the row pointed to presently by
+         * this accessor.
+         */
+        void
+        visit_present_row();
+
+        /**
+         * Cache where we store the column indices of the present row. This is
+         * necessary, since Trilinos makes access to the elements of its
+         * matrices rather hard, and it is much more efficient to copy all
+         * column entries of a row once when we enter it than repeatedly asking
+         * Trilinos for individual ones. This also makes some sense since it is
+         * likely that we will access them sequentially anyway.
+         *
+         * In order to make copying of iterators/accessor of acceptable
+         * performance, we keep a shared pointer to these entries so that more
+         * than one accessor can access this data if necessary.
+         */
+        std::shared_ptr<std::vector<dealii::types::signed_global_dof_index>>
+          colnum_cache;
+
+        /**
+         * Cache for the values of this row.
+         */
+        std::shared_ptr<std::vector<Number>> value_cache;
+
+      private:
+        friend class Iterator<Number, MemorySpace, false>;
+        friend class Iterator<Number, MemorySpace, true>;
+      };
+
+      /**
+       * General template for sparse matrix accessors. The first template
+       * argument denotes the underlying numeric type, the second the constness
+       * of the matrix.
+       *
+       * The general template is not implemented, only the specializations for
+       * the two possible values of the second template argument. Therefore, the
+       * interface listed here only serves as a template provided since doxygen
+       * does not link the specializations.
+       */
+      template <typename Number, typename MemorySpace, bool Constness>
+      class Accessor : public AccessorBase<Number, MemorySpace>
+      {
+        /**
+         * Value of this matrix entry.
+         */
+        Number
+        value() const;
+
+        /**
+         * Value of this matrix entry.
+         */
+        Number &
+        value();
+      };
+
+      /**
+       * The specialization for a const Accessor.
+       */
+      template <typename Number, typename MemorySpace>
+      class Accessor<Number, MemorySpace, true>
+        : public AccessorBase<Number, MemorySpace>
+      {
+      public:
+        /**
+         * Typedef for the type (including constness) of the matrix to be used
+         * here.
+         */
+        using MatrixType = const SparseMatrix<Number, MemorySpace>;
+
+        /**
+         * Typedef for the size type of the matrix to be used here.
+         */
+        using size_type = typename AccessorBase<Number, MemorySpace>::size_type;
+
+        /**
+         * Constructor. Since we use accessors only for read access, a const
+         * matrix pointer is sufficient.
+         */
+        Accessor(MatrixType     *matrix,
+                 const size_type row,
+                 const size_type index);
+
+        /**
+         * Copy constructor to get from a const or non-const accessor to a const
+         * accessor.
+         */
+        template <bool Other>
+        Accessor(const Accessor<Number, MemorySpace, Other> &a);
+
+        /**
+         * Value of this matrix entry.
+         */
+        Number
+        value() const;
+      };
+
+      /**
+       * The specialization for a mutable Accessor.
+       */
+      template <typename Number, typename MemorySpace>
+      class Accessor<Number, MemorySpace, false>
+        : public AccessorBase<Number, MemorySpace>
+      {
+        class Reference
+        {
+        public:
+          /**
+           * Constructor.
+           */
+          Reference(const Accessor<Number, MemorySpace, false> &accessor);
+
+          /**
+           * Conversion operator to the data type of the matrix.
+           */
+          operator Number() const;
+
+          /**
+           * Set the element of the matrix we presently point to to @p n.
+           */
+          const Reference &
+          operator=(const Number n) const;
+
+          /**
+           * Add @p n to the element of the matrix we presently point to.
+           */
+          const Reference &
+          operator+=(const Number n) const;
+
+          /**
+           * Subtract @p n from the element of the matrix we presently point to.
+           */
+          const Reference &
+          operator-=(const Number n) const;
+
+          /**
+           * Multiply the element of the matrix we presently point to by @p n.
+           */
+          const Reference &
+          operator*=(const Number n) const;
+
+          /**
+           * Divide the element of the matrix we presently point to by @p n.
+           */
+          const Reference &
+          operator/=(const Number n) const;
+
+        private:
+          /**
+           * Pointer to the accessor that denotes which element we presently
+           * point to.
+           */
+          Accessor &accessor;
+        };
+
+      public:
+        /**
+         * Typedef for the type (including constness) of the matrix to be used
+         * here.
+         */
+        using MatrixType = SparseMatrix<Number, MemorySpace>;
+
+        /**
+         * Typedef for the size type of the matrix to be used here.
+         */
+        using size_type = typename AccessorBase<Number, MemorySpace>::size_type;
+
+        /**
+         * Constructor. Since we use accessors only for read access, a const
+         * matrix pointer is sufficient.
+         */
+        Accessor(MatrixType     *matrix,
+                 const size_type row,
+                 const size_type index);
+
+        /**
+         * Value of this matrix entry.
+         */
+        Reference
+        value() const;
+
+      private:
+        // Make Reference object a friend.
+        friend class Reference;
+      };
+
+      /**
+       * This class acts as an iterator walking over the elements of Trilinos
+       * matrices. The implementation of this class is similar to the one for
+       * PETSc matrices.
+       *
+       * Note that Trilinos stores the elements within each row in ascending
+       * order. This is opposed to the deal.II sparse matrix style where the
+       * diagonal element (if it exists) is stored before all other values, and
+       * the PETSc sparse matrices, where one can't guarantee a certain order of
+       * the elements.
+       *
+       * @ingroup TpetraWrappers
+       */
+      template <typename Number, typename MemorySpace, bool Constness>
+      class Iterator
+      {
+      public:
+        /**
+         * Declare type for container size.
+         */
+        using size_type = dealii::types::global_dof_index;
+
+        /**
+         * A type that denotes what data types is used to express the difference
+         * between two iterators.
+         */
+        using difference_type = dealii::types::global_dof_index;
+
+        /**
+         * An alias for the type you get when you dereference an iterator of the
+         * current kind.
+         */
+        using value_type = Number;
+
+        /**
+         * Typedef for the matrix type (including constness) we are to operate
+         * on.
+         */
+        using MatrixType =
+          typename Accessor<Number, MemorySpace, Constness>::MatrixType;
+
+        /**
+         * Constructor. Create an iterator into the matrix @p matrix for the
+         * given row and the index within it.
+         */
+        Iterator(MatrixType     *matrix,
+                 const size_type row,
+                 const size_type index);
+
+        /**
+         * Copy constructor with optional change of constness.
+         */
+        template <bool Other>
+        Iterator(const Iterator<Number, MemorySpace, Other> &other);
+
+        /**
+         * Prefix increment.
+         */
+        Iterator<Number, MemorySpace, Constness> &
+        operator++();
+
+        /**
+         * Postfix increment.
+         */
+        Iterator<Number, MemorySpace, Constness>
+        operator++(int);
+
+        /**
+         * Dereferencing operator.
+         */
+        const Accessor<Number, MemorySpace, Constness> &
+        operator*() const;
+
+        /**
+         * Dereferencing operator.
+         */
+        const Accessor<Number, MemorySpace, Constness> *
+        operator->() const;
+
+        /**
+         * Comparison. True, if both iterators point to the same matrix
+         * position.
+         */
+        template <bool OtherConstness>
+        bool
+        operator==(const Iterator<Number, MemorySpace, OtherConstness> &) const;
+
+        /**
+         * Inverse of <tt>==</tt>.
+         */
+        template <bool OtherConstness>
+        bool
+        operator!=(const Iterator<Number, MemorySpace, OtherConstness> &) const;
+
+        /**
+         * Comparison operator. Result is true if either the first row number is
+         * smaller or if the row numbers are equal and the first index is
+         * smaller.
+         */
+        template <bool OtherConstness>
+        bool
+        operator<(const Iterator<Number, MemorySpace, OtherConstness> &) const;
+
+        /**
+         * Comparison operator. The opposite of the previous operator
+         */
+        template <bool OtherConstness>
+        bool
+        operator>(const Iterator<Number, MemorySpace, OtherConstness> &) const;
+
+        /**
+         * Exception
+         */
+        DeclException2(ExcInvalidIndexWithinRow,
+                       size_type,
+                       size_type,
+                       << "Attempt to access element " << arg2 << " of row "
+                       << arg1 << " which doesn't have that many elements.");
+
+      private:
+        /**
+         * Store an object of the accessor class.
+         */
+        Accessor<Number, MemorySpace, Constness> accessor;
+
+        friend class Iterator<Number, MemorySpace, true>;
+        friend class Iterator<Number, MemorySpace, false>;
+      };
+    } // namespace SparseMatrixIterators
+
+  } // namespace TpetraWrappers
+
+} // namespace LinearAlgebra
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+namespace std
+{
+  template <typename Number, typename MemorySpace, bool Constness>
+  struct iterator_traits<
+    dealii::LinearAlgebra::TpetraWrappers::SparseMatrixIterators::
+      Iterator<Number, MemorySpace, Constness>>
+  {
+    using iterator_category = forward_iterator_tag;
+    using value_type =
+      typename dealii::LinearAlgebra::TpetraWrappers::SparseMatrixIterators::
+        Iterator<Number, MemorySpace, Constness>::value_type;
+    using difference_type =
+      typename dealii::LinearAlgebra::TpetraWrappers::SparseMatrixIterators::
+        Iterator<Number, MemorySpace, Constness>::difference_type;
+  };
+} // namespace std
+
+/* ------------------------- Inline functions ---------------------- */
+
+
+DEAL_II_NAMESPACE_OPEN
+
+namespace LinearAlgebra
+{
+
+  namespace TpetraWrappers
+  {
     template <typename Number, typename MemorySpace>
     inline void
     SparseMatrix<Number, MemorySpace>::set(const size_type i,
@@ -1243,6 +1804,134 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::is_compressed() const
     {
       return compressed;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::const_iterator
+    SparseMatrix<Number, MemorySpace>::begin() const
+    {
+      return begin(0);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::const_iterator
+    SparseMatrix<Number, MemorySpace>::end() const
+    {
+      return const_iterator(this, m(), 0);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::const_iterator
+    SparseMatrix<Number, MemorySpace>::begin(const size_type r) const
+    {
+      AssertIndexRange(r, m());
+      if (in_local_range(r) && (row_length(r) > 0))
+        return const_iterator(this, r, 0);
+      else
+        return end(r);
+    }
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::const_iterator
+    SparseMatrix<Number, MemorySpace>::end(const size_type r) const
+    {
+      AssertIndexRange(r, m());
+
+      // place the iterator on the first entry
+      // past this line, or at the end of the
+      // matrix
+      for (size_type i = r + 1; i < m(); ++i)
+        if (in_local_range(i) && (row_length(i) > 0))
+          return const_iterator(this, i, 0);
+
+      // if there is no such line, then take the
+      // end iterator of the matrix
+      return end();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::iterator
+    SparseMatrix<Number, MemorySpace>::begin()
+    {
+      return begin(0);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::iterator
+    SparseMatrix<Number, MemorySpace>::end()
+    {
+      return iterator(this, m(), 0);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::iterator
+    SparseMatrix<Number, MemorySpace>::begin(const size_type r)
+    {
+      AssertIndexRange(r, m());
+      if (in_local_range(r) && (row_length(r) > 0))
+        return iterator(this, r, 0);
+      else
+        return end(r);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::iterator
+    SparseMatrix<Number, MemorySpace>::end(const size_type r)
+    {
+      AssertIndexRange(r, m());
+
+      // place the iterator on the first entry
+      // past this line, or at the end of the
+      // matrix
+      for (size_type i = r + 1; i < m(); ++i)
+        if (in_local_range(i) && (row_length(i) > 0))
+          return iterator(this, i, 0);
+
+      // if there is no such line, then take the
+      // end iterator of the matrix
+      return end();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline bool
+    SparseMatrix<Number, MemorySpace>::in_local_range(
+      const size_type index) const
+    {
+      auto begin = matrix->getRowMap()->getMinGlobalIndex();
+      auto end   = matrix->getRowMap()->getMaxGlobalIndex() + 1;
+
+      return ((index >= begin) && (index < end));
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    unsigned int
+    SparseMatrix<Number, MemorySpace>::row_length(const size_type row) const
+    {
+      auto n_entries = matrix->getNumEntriesInGlobalRow(row);
+      Assert(n_entries !=
+               Teuchos::OrdinalTraits<decltype(n_entries)>::invalid(),
+             ExcAccessToNonlocalRow(row));
+
+      return n_entries;
     }
 
 
@@ -1333,7 +2022,375 @@ namespace LinearAlgebra
       return IndexSet(matrix->getRangeMap());
     }
 
-  } // namespace TpetraWrappers
+
+    namespace SparseMatrixIterators
+    {
+      template <typename Number, typename MemorySpace>
+      inline AccessorBase<Number, MemorySpace>::AccessorBase(
+        SparseMatrix<Number, MemorySpace> *matrix,
+        size_type                          row,
+        size_type                          index)
+        : matrix(matrix)
+        , a_row(row)
+        , a_index(index)
+      {
+        visit_present_row();
+      }
+
+
+      template <typename Number, typename MemorySpace>
+      inline typename AccessorBase<Number, MemorySpace>::size_type
+      AccessorBase<Number, MemorySpace>::row() const
+      {
+        Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+        return a_row;
+      }
+
+
+      template <typename Number, typename MemorySpace>
+      inline typename AccessorBase<Number, MemorySpace>::size_type
+      AccessorBase<Number, MemorySpace>::column() const
+      {
+        Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+        return (*colnum_cache)[a_index];
+      }
+
+
+      template <typename Number, typename MemorySpace>
+      inline typename AccessorBase<Number, MemorySpace>::size_type
+      AccessorBase<Number, MemorySpace>::index() const
+      {
+        Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+        return a_index;
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      void
+      AccessorBase<Number, MemorySpace>::visit_present_row()
+      {
+        // if we are asked to visit the past-the-end line, then simply
+        // release all our caches and go on with life.
+        //
+        // do the same if the row we're supposed to visit is not locally
+        // owned. this is simply going to make non-locally owned rows
+        // look like they're empty
+        if ((this->a_row == matrix->m()) ||
+            (matrix->in_local_range(this->a_row) == false))
+          {
+            colnum_cache.reset();
+            value_cache.reset();
+
+            return;
+          }
+
+        // get a representation of the present row
+        size_t                            ncols;
+        TrilinosWrappers::types::int_type colnums =
+          matrix->row_length(this->a_row);
+        if (value_cache.get() == nullptr)
+          {
+            value_cache  = std::make_shared<std::vector<Number>>(colnums);
+            colnum_cache = std::make_shared<
+              std::vector<dealii::types::signed_global_dof_index>>(colnums);
+          }
+        else
+          {
+            value_cache->resize(colnums);
+            colnum_cache->resize(colnums);
+          }
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+        typename SparseMatrix<Number, MemorySpace>::MatrixType::
+          nonconst_global_inds_host_view_type col_indices(colnum_cache->data(),
+                                                          colnums);
+        typename SparseMatrix<Number, MemorySpace>::MatrixType::
+          nonconst_values_host_view_type values(value_cache->data(), colnums);
+#  else
+        Teuchos::ArrayView<dealii::types::signed_global_dof_index> col_indices(
+          *colnum_cache);
+        Teuchos::ArrayView<Number> values(*value_cache);
+#  endif
+        matrix->trilinos_matrix().getGlobalRowCopy(this->a_row,
+                                                   col_indices,
+                                                   values,
+                                                   ncols);
+
+        AssertDimension(ncols, colnums);
+
+        // copy it into our caches if the
+        // line isn't empty. if it is, then
+        // we've done something wrong, since
+        // we shouldn't have initialized an
+        // iterator for an empty line (what
+        // would it point to?)
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      inline Accessor<Number, MemorySpace, true>::Accessor(
+        MatrixType     *matrix,
+        const size_type row,
+        const size_type index)
+        : AccessorBase<Number, MemorySpace>(
+            const_cast<SparseMatrix<Number, MemorySpace> *>(matrix),
+            row,
+            index)
+      {}
+
+
+
+      template <typename Number, typename MemorySpace>
+      template <bool Other>
+      inline Accessor<Number, MemorySpace, true>::Accessor(
+        const Accessor<Number, MemorySpace, Other> &other)
+        : AccessorBase<Number, MemorySpace>(other)
+      {}
+
+
+
+      template <typename Number, typename MemorySpace>
+      inline Number
+      Accessor<Number, MemorySpace, true>::value() const
+      {
+        Assert((AccessorBase<Number, MemorySpace>::a_row <
+                AccessorBase<Number, MemorySpace>::matrix->m()),
+               ExcBeyondEndOfMatrix());
+        return (*AccessorBase<Number, MemorySpace>::value_cache)
+          [AccessorBase<Number, MemorySpace>::a_index];
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      inline Accessor<Number, MemorySpace, false>::Reference::Reference(
+        const Accessor<Number, MemorySpace, false> &acc)
+        : accessor(const_cast<Accessor<Number, MemorySpace, false> &>(acc))
+      {}
+
+
+
+      template <typename Number, typename MemorySpace>
+      inline Accessor<Number, MemorySpace, false>::Reference::operator Number()
+        const
+      {
+        return (*accessor.value_cache)[accessor.a_index];
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      inline const typename Accessor<Number, MemorySpace, false>::Reference &
+      Accessor<Number, MemorySpace, false>::Reference::operator=(
+        const Number n) const
+      {
+        (*accessor.value_cache)[accessor.a_index] = n;
+        accessor.matrix->set(accessor.row(),
+                             accessor.column(),
+                             static_cast<Number>(*this));
+        return *this;
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      inline const typename Accessor<Number, MemorySpace, false>::Reference &
+      Accessor<Number, MemorySpace, false>::Reference::operator+=(
+        const Number n) const
+      {
+        (*accessor.value_cache)[accessor.a_index] += n;
+        accessor.matrix->set(accessor.row(),
+                             accessor.column(),
+                             static_cast<Number>(*this));
+        return *this;
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      inline const typename Accessor<Number, MemorySpace, false>::Reference &
+      Accessor<Number, MemorySpace, false>::Reference::operator-=(
+        const Number n) const
+      {
+        (*accessor.value_cache)[accessor.a_index] -= n;
+        accessor.matrix->set(accessor.row(),
+                             accessor.column(),
+                             static_cast<Number>(*this));
+        return *this;
+      }
+
+
+      template <typename Number, typename MemorySpace>
+      inline const typename Accessor<Number, MemorySpace, false>::Reference &
+      Accessor<Number, MemorySpace, false>::Reference::operator*=(
+        const Number n) const
+      {
+        (*accessor.value_cache)[accessor.a_index] *= n;
+        accessor.matrix->set(accessor.row(),
+                             accessor.column(),
+                             static_cast<Number>(*this));
+        return *this;
+      }
+
+
+      template <typename Number, typename MemorySpace>
+      inline const typename Accessor<Number, MemorySpace, false>::Reference &
+      Accessor<Number, MemorySpace, false>::Reference::operator/=(
+        const Number n) const
+      {
+        (*accessor.value_cache)[accessor.a_index] /= n;
+        accessor.matrix->set(accessor.row(),
+                             accessor.column(),
+                             static_cast<Number>(*this));
+        return *this;
+      }
+
+
+      template <typename Number, typename MemorySpace>
+      inline Accessor<Number, MemorySpace, false>::Accessor(
+        MatrixType     *matrix,
+        const size_type row,
+        const size_type index)
+        : AccessorBase<Number, MemorySpace>(matrix, row, index)
+      {}
+
+
+      template <typename Number, typename MemorySpace>
+      inline typename Accessor<Number, MemorySpace, false>::Reference
+      Accessor<Number, MemorySpace, false>::value() const
+      {
+        Assert((AccessorBase<Number, MemorySpace>::a_row <
+                AccessorBase<Number, MemorySpace>::matrix->m()),
+               ExcBeyondEndOfMatrix());
+        return {*this};
+      }
+
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      inline Iterator<Number, MemorySpace, Constness>::Iterator(
+        MatrixType     *matrix,
+        const size_type row,
+        const size_type index)
+        : accessor(matrix, row, index)
+      {}
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      template <bool Other>
+      inline Iterator<Number, MemorySpace, Constness>::Iterator(
+        const Iterator<Number, MemorySpace, Other> &other)
+        : accessor(other.accessor)
+      {}
+
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      inline Iterator<Number, MemorySpace, Constness> &
+      Iterator<Number, MemorySpace, Constness>::operator++()
+      {
+        Assert(accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+
+        ++accessor.a_index;
+
+        // If at end of line: do one
+        // step, then cycle until we
+        // find a row with a nonzero
+        // number of entries.
+        if (accessor.a_index >= accessor.colnum_cache->size())
+          {
+            accessor.a_index = 0;
+            ++accessor.a_row;
+
+            while (
+              (accessor.a_row < accessor.matrix->m()) &&
+              ((accessor.matrix->in_local_range(accessor.a_row) == false) ||
+               (accessor.matrix->row_length(accessor.a_row) == 0)))
+              ++accessor.a_row;
+
+            accessor.visit_present_row();
+          }
+        return *this;
+      }
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      inline Iterator<Number, MemorySpace, Constness>
+      Iterator<Number, MemorySpace, Constness>::operator++(int)
+      {
+        const Iterator<Number, MemorySpace, Constness> old_state = *this;
+        ++(*this);
+        return old_state;
+      }
+
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      inline const Accessor<Number, MemorySpace, Constness> &
+      Iterator<Number, MemorySpace, Constness>::operator*() const
+      {
+        return accessor;
+      }
+
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      inline const Accessor<Number, MemorySpace, Constness> *
+      Iterator<Number, MemorySpace, Constness>::operator->() const
+      {
+        return &accessor;
+      }
+
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      template <bool OtherConstness>
+      inline bool
+      Iterator<Number, MemorySpace, Constness>::operator==(
+        const Iterator<Number, MemorySpace, OtherConstness> &other) const
+      {
+        return (accessor.a_row == other.accessor.a_row &&
+                accessor.a_index == other.accessor.a_index);
+      }
+
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      template <bool OtherConstness>
+      inline bool
+      Iterator<Number, MemorySpace, Constness>::operator!=(
+        const Iterator<Number, MemorySpace, OtherConstness> &other) const
+      {
+        return !(*this == other);
+      }
+
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      template <bool OtherConstness>
+      inline bool
+      Iterator<Number, MemorySpace, Constness>::operator<(
+        const Iterator<Number, MemorySpace, OtherConstness> &other) const
+      {
+        return (accessor.row() < other.accessor.row() ||
+                (accessor.row() == other.accessor.row() &&
+                 accessor.index() < other.accessor.index()));
+      }
+
+
+      template <typename Number, typename MemorySpace, bool Constness>
+      template <bool OtherConstness>
+      inline bool
+      Iterator<Number, MemorySpace, Constness>::operator>(
+        const Iterator<Number, MemorySpace, OtherConstness> &other) const
+      {
+        return (other < *this);
+      }
+
+    } // namespace SparseMatrixIterators
+  }   // namespace TpetraWrappers
 
 } // namespace LinearAlgebra
 
