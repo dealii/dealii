@@ -862,17 +862,18 @@ namespace VectorTools
 
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
-  void interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
-                                     const VectorType                &u1,
-                                     const DoFHandler<dim, spacedim> &dof2,
-                                     VectorType                      &u2)
+  void interpolate_to_different_mesh(
+    const DoFHandler<dim, spacedim> &dof_handler_1,
+    const VectorType                &u1,
+    const DoFHandler<dim, spacedim> &dof_handler_2,
+    VectorType                      &u2)
   {
-    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_1, dof_handler_2),
            ExcMessage("The two DoF handlers must represent triangulations that "
                       "have the same coarse meshes"));
 
     InterGridMap<DoFHandler<dim, spacedim>> intergridmap;
-    intergridmap.make_mapping(dof1, dof2);
+    intergridmap.make_mapping(dof_handler_1, dof_handler_2);
 
     AffineConstraints<typename VectorType::value_type> dummy;
     dummy.close();
@@ -885,18 +886,18 @@ namespace VectorTools
   template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void interpolate_to_different_mesh(
-    const DoFHandler<dim, spacedim>                          &dof1,
+    const DoFHandler<dim, spacedim>                          &dof_handler_1,
     const VectorType                                         &u1,
-    const DoFHandler<dim, spacedim>                          &dof2,
+    const DoFHandler<dim, spacedim>                          &dof_handler_2,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2)
   {
-    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_1, dof_handler_2),
            ExcMessage("The two DoF handlers must represent triangulations that "
                       "have the same coarse meshes"));
 
     InterGridMap<DoFHandler<dim, spacedim>> intergridmap;
-    intergridmap.make_mapping(dof1, dof2);
+    intergridmap.make_mapping(dof_handler_1, dof_handler_2);
 
     interpolate_to_different_mesh(intergridmap, u1, constraints, u2);
   }
@@ -911,15 +912,17 @@ namespace VectorTools
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2)
   {
-    const DoFHandler<dim, spacedim> &dof1 = intergridmap.get_source_grid();
-    const DoFHandler<dim, spacedim> &dof2 = intergridmap.get_destination_grid();
-    (void)dof2;
+    const DoFHandler<dim, spacedim> &dof_handler_1 =
+      intergridmap.get_source_grid();
+    const DoFHandler<dim, spacedim> &dof_handler_2 =
+      intergridmap.get_destination_grid();
+    (void)dof_handler_2;
 
-    Assert(dof1.get_fe_collection() == dof2.get_fe_collection(),
-           ExcMessage(
-             "The FECollections of both DoFHandler objects must match"));
-    AssertDimension(u1.size(), dof1.n_dofs());
-    AssertDimension(u2.size(), dof2.n_dofs());
+    Assert(
+      dof_handler_1.get_fe_collection() == dof_handler_2.get_fe_collection(),
+      ExcMessage("The FECollections of both DoFHandler objects must match"));
+    AssertDimension(u1.size(), dof_handler_1.n_dofs());
+    AssertDimension(u2.size(), dof_handler_2.n_dofs());
 
     Vector<typename VectorType::value_type> cache;
 
@@ -932,10 +935,7 @@ namespace VectorTools
     // Therefore, loop over all cells
     // (active and inactive) of the source
     // grid ..
-    typename DoFHandler<dim, spacedim>::cell_iterator cell1 = dof1.begin();
-    const typename DoFHandler<dim, spacedim>::cell_iterator endc1 = dof1.end();
-
-    for (; cell1 != endc1; ++cell1)
+    for (const auto &cell1 : dof_handler_1.cell_iterators())
       {
         const typename DoFHandler<dim, spacedim>::cell_iterator cell2 =
           intergridmap[cell1];
