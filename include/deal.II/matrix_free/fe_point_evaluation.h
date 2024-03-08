@@ -31,7 +31,7 @@
 #include <deal.II/matrix_free/evaluation_kernels_face.h>
 #include <deal.II/matrix_free/mapping_info_storage.h>
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/tensor_product_kernels.h>
+#include <deal.II/matrix_free/tensor_product_point_kernels.h>
 
 #include <deal.II/non_matching/mapping_info.h>
 
