@@ -37,7 +37,7 @@
 #include <deal.II/matrix_free/fe_evaluation_data.h>
 #include <deal.II/matrix_free/mapping_info_storage.h>
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/tensor_product_kernels.h>
+#include <deal.II/matrix_free/tensor_product_point_kernels.h>
 
 #include <array>
 #include <limits>
