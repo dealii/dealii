@@ -103,7 +103,7 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
 
   AffineConstraints<Number> constraint_fine;
   DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
-  constraint_coarse.close();
+  constraint_fine.close();
 
   // setup transfer operator
   MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>> transfer;
