@@ -127,3 +127,28 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
     \}
 #endif
   }
+
+for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension == deal_II_space_dimension
+    namespace VectorTools
+    \{
+      template void
+      interpolate_to_coarser_mesh(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const VEC &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const AffineConstraints<VEC::value_type> &,
+        VEC &);
+
+      template void
+      interpolate_to_finer_mesh(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const VEC &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const AffineConstraints<VEC::value_type> &,
+        VEC &);
+    \}
+#endif
+  }
