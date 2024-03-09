@@ -28,7 +28,7 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/matrix_free/tensor_product_kernels.h>
+#include <deal.II/matrix_free/tensor_product_point_kernels.h>
 
 #include "../tests.h"
 
