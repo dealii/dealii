@@ -766,9 +766,10 @@ SphericalManifold<dim, spacedim>::do_get_new_points(
     {
       for (unsigned int row = 0; row < weight_rows; ++row)
         new_points[row] =
-          get_intermediate_point(surrounding_points[0],
-                                 surrounding_points[1],
-                                 weights[row * weight_columns + 1]);
+          SphericalManifold<dim, spacedim>::get_intermediate_point(
+            surrounding_points[0],
+            surrounding_points[1],
+            weights[row * weight_columns + 1]);
       return;
     }
 
