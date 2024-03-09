@@ -614,7 +614,7 @@ namespace FETools
 
   /** @} */
   /**
-   * @name Functions which should be in DoFTools
+   * @name Functions which should be in DoFTools or VectorTools
    */
   /** @{ */
   /**
@@ -645,6 +645,9 @@ namespace FETools
    * object as argument, see below, or make the field conforming yourself
    * by calling the @p distribute function of your hanging node constraints
    * object.
+   *
+   * @note There are also various interpolation-related functions in
+   *   namespace VectorTools.
    */
   template <int dim, int spacedim, class InVector, class OutVector>
   void
@@ -668,6 +671,9 @@ namespace FETools
    * a continuous finite element there is no point interpolation defined at
    * the discontinuities.  Therefore the mean value is taken at the DoF values
    * at the discontinuities.
+   *
+   * @note There are also various interpolation-related functions in
+   *   namespace VectorTools.
    */
   template <int dim, int spacedim, class InVector, class OutVector>
   void
@@ -680,7 +686,7 @@ namespace FETools
 
   /**
    * Compute the interpolation of the @p fe1-function @p u1 to a @p
-   * fe2-function, and interpolates this to a second @p fe1-function named @p
+   * fe2-function, and interpolate this to a second @p fe1-function named @p
    * u1_interpolated.
    *
    * Note, that this function does not work on continuous elements at hanging
@@ -700,7 +706,7 @@ namespace FETools
 
   /**
    * Compute the interpolation of the @p dof1-function @p u1 to a @p
-   * dof2-function, and interpolates this to a second @p dof1-function named
+   * dof2-function, and interpolate this to a second @p dof1-function named
    * @p u1_interpolated.  @p constraints1 and @p constraints2 are the hanging
    * node constraints corresponding to @p dof1 and @p dof2, respectively.
    * These objects are particular important when continuous elements on grids
