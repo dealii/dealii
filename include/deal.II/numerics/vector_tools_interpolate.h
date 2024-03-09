@@ -227,7 +227,11 @@ namespace VectorTools
    * partitioned in their own ways, will not typically have corresponding
    * cells owned by the same process, and implementing the interpolation
    * procedure would require transfering data between processes in ways
-   * that are difficult to implement efficiently.
+   * that are difficult to implement efficiently. However, some special
+   * cases can more easily be implemented, namely the case where one
+   * of the meshes is strictly coarser or finer than the other. For these
+   * cases, see the interpolate_to_coarser_mesh() and
+   * interpolate_to_finer_mesh().
    *
    * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
@@ -277,6 +281,71 @@ namespace VectorTools
     const VectorType                                         &u1,
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType                                               &u2);
+
+  /**
+   * This function addresses one of the limitations of the
+   * interpolate_to_different_mesh() function, namely that the latter only
+   * works on parallel triangulations in very specific cases where both
+   * triangulations involved happen to be partitioned in such a way that
+   * if a process owns a cell of one mesh, it also needs to own the
+   * corresponding parent of child cells of the other mesh. In practice, this is
+   * rarely the case.
+   *
+   * This function does not have this restriction, and consequently also works
+   * in parallel, as long as the mesh we interpolate onto can be obtained from
+   * the mesh we interpolate off by *coarsening*. In other words, the target
+   * mesh is coarser than the source mesh.
+   *
+   * The function takes an additional constraints argument that is used after
+   * interpolation to ensure that the output vector is conforming (that is,
+   * that all entries of the output vector conform to their constraints).
+   * @p constraints_coarse therefore needs to correspond to
+   * @p dof_handler_coarse .
+   *
+   * The opposite operation, interpolation from a coarser to a finer mesh,
+   * is implemented in the interpolate_to_finer_mesh() function.
+   */
+  template <int dim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_coarser_mesh(
+    const DoFHandler<dim> &dof_handler_fine,
+    const VectorType      &u_fine,
+    const DoFHandler<dim> &dof_handler_coarse,
+    const AffineConstraints<typename VectorType::value_type>
+               &constraints_coarse,
+    VectorType &u_coarse);
+
+  /**
+   * This function addresses one of the limitations of the
+   * interpolate_to_different_mesh() function, namely that the latter only
+   * works on parallel triangulations in very specific cases where both
+   * triangulations involved happen to be partitioned in such a way that
+   * if a process owns a cell of one mesh, it also needs to own the
+   * corresponding parent of child cells of the other mesh. In practice, this is
+   * rarely the case.
+   *
+   * This function does not have this restriction, and consequently also works
+   * in parallel, as long as the mesh we interpolate onto can be obtained from
+   * the mesh we interpolate off by *refinement*. In other words, the target
+   * mesh is finer than the source mesh.
+   *
+   * The function takes an additional constraints argument that is used after
+   * interpolation to ensure that the output vector is conforming (that is,
+   * that all entries of the output vector conform to their constraints).
+   * @p constraints_finee therefore needs to correspond to
+   * @p dof_handler_fine .
+   *
+   * The opposite operation, interpolation from a finer to a coarser mesh,
+   * is implemented in the interpolate_to_coarser_mesh() function.
+   */
+  template <int dim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_finer_mesh(
+    const DoFHandler<dim> &dof_handler_coarse,
+    const VectorType      &u_coarse,
+    const DoFHandler<dim> &dof_handler_fine,
+    const AffineConstraints<typename VectorType::value_type> &constraints_fine,
+    VectorType                                               &u_fine);
 
   /** @} */
 

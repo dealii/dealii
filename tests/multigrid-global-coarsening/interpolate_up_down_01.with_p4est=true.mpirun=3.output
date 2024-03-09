@@ -1,0 +1,122 @@
+
+DEAL:0:DG<2>(0)<->DG<2>(0)::coarse -> fine: OK
+DEAL:0:DG<2>(0)<->DG<2>(0)::fine -> coarse: OK
+DEAL:0:DG<2>(0)<->DG<2>(0)::coarse -> fine -> coarse: OK
+DEAL:0:CG<2>(1)<->CG<2>(1)::coarse -> fine: OK
+DEAL:0:CG<2>(1)<->CG<2>(1)::fine -> coarse: OK
+DEAL:0:CG<2>(1)<->CG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(1)<->CG<2>(1)::coarse -> fine: OK
+DEAL:0:DG<2>(1)<->CG<2>(1)::fine -> coarse: OK
+DEAL:0:DG<2>(1)<->CG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(1)<->DG<2>(1)::coarse -> fine: OK
+DEAL:0:DG<2>(1)<->DG<2>(1)::fine -> coarse: OK
+DEAL:0:DG<2>(1)<->DG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:0:CG<2>(2)<->CG<2>(2)::coarse -> fine: OK
+DEAL:0:CG<2>(2)<->CG<2>(2)::fine -> coarse: OK
+DEAL:0:CG<2>(2)<->CG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(2)<->CG<2>(2)::coarse -> fine: OK
+DEAL:0:DG<2>(2)<->CG<2>(2)::fine -> coarse: OK
+DEAL:0:DG<2>(2)<->CG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(2)<->DG<2>(2)::coarse -> fine: OK
+DEAL:0:DG<2>(2)<->DG<2>(2)::fine -> coarse: OK
+DEAL:0:DG<2>(2)<->DG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:0:CG<2>(3)<->CG<2>(3)::coarse -> fine: OK
+DEAL:0:CG<2>(3)<->CG<2>(3)::fine -> coarse: OK
+DEAL:0:CG<2>(3)<->CG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(3)<->CG<2>(3)::coarse -> fine: OK
+DEAL:0:DG<2>(3)<->CG<2>(3)::fine -> coarse: OK
+DEAL:0:DG<2>(3)<->CG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(3)<->DG<2>(3)::coarse -> fine: OK
+DEAL:0:DG<2>(3)<->DG<2>(3)::fine -> coarse: OK
+DEAL:0:DG<2>(3)<->DG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:0:CG<2>(4)<->CG<2>(4)::coarse -> fine: OK
+DEAL:0:CG<2>(4)<->CG<2>(4)::fine -> coarse: OK
+DEAL:0:CG<2>(4)<->CG<2>(4)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(4)<->CG<2>(4)::coarse -> fine: OK
+DEAL:0:DG<2>(4)<->CG<2>(4)::fine -> coarse: OK
+DEAL:0:DG<2>(4)<->CG<2>(4)::coarse -> fine -> coarse: OK
+DEAL:0:DG<2>(4)<->DG<2>(4)::coarse -> fine: OK
+DEAL:0:DG<2>(4)<->DG<2>(4)::fine -> coarse: OK
+DEAL:0:DG<2>(4)<->DG<2>(4)::coarse -> fine -> coarse: OK
+
+DEAL:1:DG<2>(0)<->DG<2>(0)::coarse -> fine: OK
+DEAL:1:DG<2>(0)<->DG<2>(0)::fine -> coarse: OK
+DEAL:1:DG<2>(0)<->DG<2>(0)::coarse -> fine -> coarse: OK
+DEAL:1:CG<2>(1)<->CG<2>(1)::coarse -> fine: OK
+DEAL:1:CG<2>(1)<->CG<2>(1)::fine -> coarse: OK
+DEAL:1:CG<2>(1)<->CG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(1)<->CG<2>(1)::coarse -> fine: OK
+DEAL:1:DG<2>(1)<->CG<2>(1)::fine -> coarse: OK
+DEAL:1:DG<2>(1)<->CG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(1)<->DG<2>(1)::coarse -> fine: OK
+DEAL:1:DG<2>(1)<->DG<2>(1)::fine -> coarse: OK
+DEAL:1:DG<2>(1)<->DG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:1:CG<2>(2)<->CG<2>(2)::coarse -> fine: OK
+DEAL:1:CG<2>(2)<->CG<2>(2)::fine -> coarse: OK
+DEAL:1:CG<2>(2)<->CG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(2)<->CG<2>(2)::coarse -> fine: OK
+DEAL:1:DG<2>(2)<->CG<2>(2)::fine -> coarse: OK
+DEAL:1:DG<2>(2)<->CG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(2)<->DG<2>(2)::coarse -> fine: OK
+DEAL:1:DG<2>(2)<->DG<2>(2)::fine -> coarse: OK
+DEAL:1:DG<2>(2)<->DG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:1:CG<2>(3)<->CG<2>(3)::coarse -> fine: OK
+DEAL:1:CG<2>(3)<->CG<2>(3)::fine -> coarse: OK
+DEAL:1:CG<2>(3)<->CG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(3)<->CG<2>(3)::coarse -> fine: OK
+DEAL:1:DG<2>(3)<->CG<2>(3)::fine -> coarse: OK
+DEAL:1:DG<2>(3)<->CG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(3)<->DG<2>(3)::coarse -> fine: OK
+DEAL:1:DG<2>(3)<->DG<2>(3)::fine -> coarse: OK
+DEAL:1:DG<2>(3)<->DG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:1:CG<2>(4)<->CG<2>(4)::coarse -> fine: OK
+DEAL:1:CG<2>(4)<->CG<2>(4)::fine -> coarse: OK
+DEAL:1:CG<2>(4)<->CG<2>(4)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(4)<->CG<2>(4)::coarse -> fine: OK
+DEAL:1:DG<2>(4)<->CG<2>(4)::fine -> coarse: OK
+DEAL:1:DG<2>(4)<->CG<2>(4)::coarse -> fine -> coarse: OK
+DEAL:1:DG<2>(4)<->DG<2>(4)::coarse -> fine: OK
+DEAL:1:DG<2>(4)<->DG<2>(4)::fine -> coarse: OK
+DEAL:1:DG<2>(4)<->DG<2>(4)::coarse -> fine -> coarse: OK
+
+
+DEAL:2:DG<2>(0)<->DG<2>(0)::coarse -> fine: OK
+DEAL:2:DG<2>(0)<->DG<2>(0)::fine -> coarse: OK
+DEAL:2:DG<2>(0)<->DG<2>(0)::coarse -> fine -> coarse: OK
+DEAL:2:CG<2>(1)<->CG<2>(1)::coarse -> fine: OK
+DEAL:2:CG<2>(1)<->CG<2>(1)::fine -> coarse: OK
+DEAL:2:CG<2>(1)<->CG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(1)<->CG<2>(1)::coarse -> fine: OK
+DEAL:2:DG<2>(1)<->CG<2>(1)::fine -> coarse: OK
+DEAL:2:DG<2>(1)<->CG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(1)<->DG<2>(1)::coarse -> fine: OK
+DEAL:2:DG<2>(1)<->DG<2>(1)::fine -> coarse: OK
+DEAL:2:DG<2>(1)<->DG<2>(1)::coarse -> fine -> coarse: OK
+DEAL:2:CG<2>(2)<->CG<2>(2)::coarse -> fine: OK
+DEAL:2:CG<2>(2)<->CG<2>(2)::fine -> coarse: OK
+DEAL:2:CG<2>(2)<->CG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(2)<->CG<2>(2)::coarse -> fine: OK
+DEAL:2:DG<2>(2)<->CG<2>(2)::fine -> coarse: OK
+DEAL:2:DG<2>(2)<->CG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(2)<->DG<2>(2)::coarse -> fine: OK
+DEAL:2:DG<2>(2)<->DG<2>(2)::fine -> coarse: OK
+DEAL:2:DG<2>(2)<->DG<2>(2)::coarse -> fine -> coarse: OK
+DEAL:2:CG<2>(3)<->CG<2>(3)::coarse -> fine: OK
+DEAL:2:CG<2>(3)<->CG<2>(3)::fine -> coarse: OK
+DEAL:2:CG<2>(3)<->CG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(3)<->CG<2>(3)::coarse -> fine: OK
+DEAL:2:DG<2>(3)<->CG<2>(3)::fine -> coarse: OK
+DEAL:2:DG<2>(3)<->CG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(3)<->DG<2>(3)::coarse -> fine: OK
+DEAL:2:DG<2>(3)<->DG<2>(3)::fine -> coarse: OK
+DEAL:2:DG<2>(3)<->DG<2>(3)::coarse -> fine -> coarse: OK
+DEAL:2:CG<2>(4)<->CG<2>(4)::coarse -> fine: OK
+DEAL:2:CG<2>(4)<->CG<2>(4)::fine -> coarse: OK
+DEAL:2:CG<2>(4)<->CG<2>(4)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(4)<->CG<2>(4)::coarse -> fine: OK
+DEAL:2:DG<2>(4)<->CG<2>(4)::fine -> coarse: OK
+DEAL:2:DG<2>(4)<->CG<2>(4)::coarse -> fine -> coarse: OK
+DEAL:2:DG<2>(4)<->DG<2>(4)::coarse -> fine: OK
+DEAL:2:DG<2>(4)<->DG<2>(4)::fine -> coarse: OK
+DEAL:2:DG<2>(4)<->DG<2>(4)::coarse -> fine -> coarse: OK
+

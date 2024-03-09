@@ -16,6 +16,8 @@
 #define dealii_vector_tools_interpolate_templates_h
 
 
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
@@ -33,9 +35,20 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <deal.II/multigrid/mg_transfer_global_coarsening.h>
+
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace LinearAlgebra
+{
+  namespace EpetraWrappers
+  {
+    class Vector;
+  }
+} // namespace LinearAlgebra
+
 
 namespace VectorTools
 {
@@ -989,6 +1002,248 @@ namespace VectorTools
     // Apply hanging node constraints.
     constraints.distribute(u2);
   }
+
+
+  // Some helper functions. Much of the functions here is taken from a similar
+  // implementation in data_out_dof_data.templates.h.
+  namespace InterpolateBetweenMeshes
+  {
+    template <int dim, int spacedim, typename Number>
+    void
+    create_vector(const DoFHandler<dim, spacedim>            &dof_handler,
+                  LinearAlgebra::distributed::Vector<Number> &u)
+    {
+      const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
+
+      Assert(locally_owned_dofs.is_contiguous(),
+             ExcMessage("You are trying to use vectors with non-contiguous "
+                        "locally-owned index sets. This is not possible."));
+
+      u.reinit(locally_owned_dofs,
+               locally_relevant_dofs,
+               dof_handler.get_communicator());
+    }
+
+
+    /**
+     * Copy the data from an arbitrary non-block vector to a
+     * LinearAlgebra::distributed::Vector.
+     */
+    template <typename VectorType, typename Number>
+    void
+    copy_locally_owned_data_from(
+      const VectorType                           &src,
+      LinearAlgebra::distributed::Vector<Number> &dst)
+    {
+      if constexpr (!IsBlockVector<VectorType>::value)
+        {
+          // If source and destination vector have the same underlying scalar,
+          // we can directly import elements by using only one temporary vector:
+          if constexpr (std::is_same_v<typename VectorType::value_type, Number>)
+            {
+              LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+                temp;
+              temp.reinit(src.locally_owned_elements());
+              temp.import_elements(src, VectorOperation::insert);
+
+              dst.import_elements(temp, VectorOperation::insert);
+            }
+          else
+            // The source and destination vector have different scalar types. We
+            // need to split the parallel import and local copy operations into
+            // two phases
+            {
+              LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+                temp;
+              temp.reinit(src.locally_owned_elements());
+              temp.import_elements(src, VectorOperation::insert);
+
+              LinearAlgebra::ReadWriteVector<Number> temp2;
+              temp2.reinit(temp, true);
+              temp2 = temp;
+
+              dst.import_elements(temp2, VectorOperation::insert);
+            }
+        }
+      else
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+#ifdef DEAL_II_WITH_TRILINOS
+    template <typename Number>
+    void
+    copy_locally_owned_data_from(
+      const TrilinosWrappers::MPI::Vector        &src,
+      LinearAlgebra::distributed::Vector<Number> &dst)
+    {
+      // ReadWriteVector does not work for ghosted
+      // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+      // entries manually.
+      for (const auto i : dst.locally_owned_elements())
+        dst[i] = src[i];
+    }
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    template <typename Number>
+    void
+    copy_locally_owned_data_from(
+      const LinearAlgebra::TpetraWrappers::Vector<Number> &src,
+      LinearAlgebra::distributed::Vector<Number>          &dst)
+    {
+      // ReadWriteVector does not work for ghosted
+      // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+      // entries manually.
+      for (const auto i : dst.locally_owned_elements())
+        dst[i] = src[i];
+    }
+#endif
+  } // namespace InterpolateBetweenMeshes
+
+
+  template <int dim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_coarser_mesh(
+    const DoFHandler<dim> &dof_handler_fine,
+    const VectorType      &u_fine,
+    const DoFHandler<dim> &dof_handler_coarse,
+    const AffineConstraints<typename VectorType::value_type>
+               &constraints_coarse,
+    VectorType &u_coarse)
+  {
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_coarse,
+                                            dof_handler_fine),
+           ExcMessage("The two DoF handlers must represent triangulations that "
+                      "have the same coarse meshes"));
+    AssertDimension(dof_handler_fine.n_dofs(), u_fine.size());
+    AssertDimension(dof_handler_coarse.n_dofs(), u_coarse.size());
+
+    using LAVector =
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>;
+
+    // Create and initialize a version of the coarse vector using the
+    // p::d::Vector type:
+    LAVector my_u_coarse;
+    InterpolateBetweenMeshes::create_vector(dof_handler_coarse, my_u_coarse);
+
+    // Then do the same for the fine vector, and initialize it with a copy
+    // of the source vector
+    LAVector my_u_fine;
+    InterpolateBetweenMeshes::create_vector(dof_handler_fine, my_u_fine);
+    InterpolateBetweenMeshes::copy_locally_owned_data_from(u_fine, my_u_fine);
+    my_u_fine.update_ghost_values();
+
+
+    // Set up transfer operator. The transfer object also wants a constraints
+    // object for the fine level, because it implements both the up- and
+    // down-transfers. But we here only ever need the down-transfer, which
+    // never touches the fine constraints. So we can use a dummy object for
+    // that.
+    AffineConstraints<typename VectorType::value_type> constraints_fine(
+      dof_handler_fine.locally_owned_dofs(),
+      DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
+    constraints_fine.close();
+
+    MGTwoLevelTransfer<dim, LAVector> transfer;
+    transfer.reinit(dof_handler_fine,
+                    dof_handler_coarse,
+                    constraints_fine,
+                    constraints_coarse);
+
+    // Then perform the interpolation from fine to coarse mesh:
+    transfer.interpolate(my_u_coarse, my_u_fine);
+
+    // Finally, apply the constraints to make sure that the resulting
+    // object is conforming. Then copy it back into the user vector.
+    // (At the time of writing, LinearAlgebra::EpetraWrappers::Vector
+    // does not allow individual element access via operator() or
+    // operator[]. So disallow this vector type for the moment here.)
+    constraints_coarse.distribute(my_u_coarse);
+    if constexpr (!std::is_same_v<VectorType,
+                                  LinearAlgebra::EpetraWrappers::Vector>)
+      {
+        for (const auto i : u_coarse.locally_owned_elements())
+          u_coarse(i) = my_u_coarse(i);
+      }
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+  }
+
+
+
+  template <int dim, typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_finer_mesh(
+    const DoFHandler<dim> &dof_handler_coarse,
+    const VectorType      &u_coarse,
+    const DoFHandler<dim> &dof_handler_fine,
+    const AffineConstraints<typename VectorType::value_type> &constraints_fine,
+    VectorType                                               &u_fine)
+  {
+    Assert(GridTools::have_same_coarse_mesh(dof_handler_fine,
+                                            dof_handler_coarse),
+           ExcMessage("The two DoF handlers must represent triangulations that "
+                      "have the same coarse meshes"));
+    AssertDimension(dof_handler_fine.n_dofs(), u_fine.size());
+    AssertDimension(dof_handler_coarse.n_dofs(), u_coarse.size());
+
+    using LAVector =
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>;
+
+    // Create and initialize a version of the coarse vector using the
+    // p::d::Vector type. Copy the source vector
+    LAVector my_u_coarse;
+    InterpolateBetweenMeshes::create_vector(dof_handler_coarse, my_u_coarse);
+    InterpolateBetweenMeshes::copy_locally_owned_data_from(u_coarse,
+                                                           my_u_coarse);
+    my_u_coarse.update_ghost_values();
+
+    // Then do the same for the fine vector, and initialize it with a copy
+    // of the source vector
+    LAVector my_u_fine;
+    InterpolateBetweenMeshes::create_vector(dof_handler_fine, my_u_fine);
+
+    // Set up transfer operator. The transfer object also wants a constraints
+    // object for the coarse level, because it implements both the up- and
+    // down-transfers. But we here only ever need the up-transfer, which
+    // never touches the coarse constraints. So we can use a dummy object for
+    // that.
+    AffineConstraints<typename VectorType::value_type> constraints_coarse(
+      dof_handler_coarse.locally_owned_dofs(),
+      DoFTools::extract_locally_relevant_dofs(dof_handler_coarse));
+    constraints_coarse.close();
+
+    MGTwoLevelTransfer<dim, LAVector> transfer;
+    transfer.reinit(dof_handler_fine,
+                    dof_handler_coarse,
+                    constraints_fine,
+                    constraints_coarse);
+
+    // Then perform the interpolation from coarse to fine mesh. (Note that
+    // we add to my_u_fine, but that vector is initially a zero vector,
+    // so we are really just writing into it.)
+    transfer.prolongate_and_add(my_u_fine, my_u_coarse);
+
+    // Finally, apply the constraints to make sure that the resulting
+    // object is conforming. Then copy it back into the user vector.
+    // (At the time of writing, LinearAlgebra::EpetraWrappers::Vector
+    // does not allow individual element access via operator() or
+    // operator[]. So disallow this vector type for the moment here.)
+    constraints_fine.distribute(my_u_fine);
+    if constexpr (!std::is_same_v<VectorType,
+                                  LinearAlgebra::EpetraWrappers::Vector>)
+      {
+        for (const auto i : u_fine.locally_owned_elements())
+          u_fine(i) = my_u_fine(i);
+      }
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+  }
+
+
 } // namespace VectorTools
 
 DEAL_II_NAMESPACE_CLOSE
