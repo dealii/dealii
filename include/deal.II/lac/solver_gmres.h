@@ -1367,8 +1367,6 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;
-  // reset this vector to the right size
-  h.reinit(n_tmp_vectors - 1);
 
   ///////////////////////////////////////////////////////////////////////////
   // outer iteration: loop until we either reach convergence or the maximum
