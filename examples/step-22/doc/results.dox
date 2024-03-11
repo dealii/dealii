@@ -544,7 +544,7 @@ $k=100$ temporary vectors:
                                     1e-6*system_rhs.l2_norm());
       GrowingVectorMemory<BlockVector<double> > vector_memory;
       SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
-      gmres_data.max_n_tmp_vectors = 100;
+      gmres_data.max_basis_size = 100;
 
       SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
                                               gmres_data);

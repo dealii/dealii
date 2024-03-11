@@ -154,7 +154,8 @@ main()
       solver_cg.solve(A, u, f, PreconditionIdentity());
 
       u = 0;
-      SolverGMRES<> solver_gmres(solver_control);
+      SolverGMRES<> solver_gmres(solver_control,
+                                 SolverGMRES<>::AdditionalData(28));
       // Attach all possible slots.
       solver_gmres.connect_condition_number_slot(
         std::bind(output_double_number,

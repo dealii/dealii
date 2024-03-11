@@ -67,7 +67,7 @@ test(unsigned int variant)
 
   SolverControl control(1000, 1e2 * std::numeric_limits<number>::epsilon());
   typename SolverGMRES<Vector<number>>::AdditionalData data;
-  data.max_n_tmp_vectors          = 80;
+  data.max_basis_size             = 80;
   data.force_re_orthogonalization = true;
 
   SolverGMRES<Vector<number>> solver(control, data);

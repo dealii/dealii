@@ -7,10 +7,10 @@ Refinement cycle 0
    Assembling Multigrid...
    Solving...
 	Number of FGMRES iterations: 14
-	Total number of iterations used for approximation of A inverse: 45
-	Total number of iterations used for approximation of S inverse: 15
+	Total number of iterations used for approximation of A inverse: 42
+	Total number of iterations used for approximation of S inverse: 14
 
-   Note: The mean value was adjusted by 8.38229e-15
+   Note: The mean value was adjusted by 8.58753e-15
 
    Velocity L2 Error: 0.00340778
    Pressure L2 Error: 0.017624
@@ -23,10 +23,10 @@ Refinement cycle 1
    Assembling Multigrid...
    Solving...
 	Number of FGMRES iterations: 16
-	Total number of iterations used for approximation of A inverse: 52
-	Total number of iterations used for approximation of S inverse: 17
+	Total number of iterations used for approximation of A inverse: 49
+	Total number of iterations used for approximation of S inverse: 16
 
-   Note: The mean value was adjusted by -1.75663e-14
+   Note: The mean value was adjusted by -1.77281e-14
 
    Velocity L2 Error: 0.000426317
    Pressure L2 Error: 0.00414007
@@ -39,10 +39,10 @@ Refinement cycle 2
    Assembling Multigrid...
    Solving...
 	Number of FGMRES iterations: 16
-	Total number of iterations used for approximation of A inverse: 52
-	Total number of iterations used for approximation of S inverse: 17
+	Total number of iterations used for approximation of A inverse: 49
+	Total number of iterations used for approximation of S inverse: 16
 
-   Note: The mean value was adjusted by -2.40243e-14
+   Note: The mean value was adjusted by -2.39441e-14
 
    Velocity L2 Error: 5.33246e-05
    Pressure L2 Error: 0.00102063
@@ -56,10 +56,10 @@ Refinement cycle 0
    Solving...   Computing preconditioner...
 
 	Number of FGMRES iterations: 14
-	Total number of iterations used for approximation of A inverse: 75
-	Total number of iterations used for approximation of S inverse: 15
+	Total number of iterations used for approximation of A inverse: 70
+	Total number of iterations used for approximation of S inverse: 14
 
-   Note: The mean value was adjusted by 3.10407e-15
+   Note: The mean value was adjusted by 3.04715e-15
 
    Velocity L2 Error: 0.00340778
    Pressure L2 Error: 0.017624
@@ -72,10 +72,10 @@ Refinement cycle 1
    Solving...   Computing preconditioner...
 
 	Number of FGMRES iterations: 16
-	Total number of iterations used for approximation of A inverse: 134
-	Total number of iterations used for approximation of S inverse: 17
+	Total number of iterations used for approximation of A inverse: 126
+	Total number of iterations used for approximation of S inverse: 16
 
-   Note: The mean value was adjusted by -3.36177e-15
+   Note: The mean value was adjusted by -3.40459e-15
 
    Velocity L2 Error: 0.000426317
    Pressure L2 Error: 0.00414007
@@ -88,10 +88,10 @@ Refinement cycle 2
    Solving...   Computing preconditioner...
 
 	Number of FGMRES iterations: 16
-	Total number of iterations used for approximation of A inverse: 229
-	Total number of iterations used for approximation of S inverse: 17
+	Total number of iterations used for approximation of A inverse: 216
+	Total number of iterations used for approximation of S inverse: 16
 
-   Note: The mean value was adjusted by -1.16485e-15
+   Note: The mean value was adjusted by -1.33296e-15
 
    Velocity L2 Error: 5.33247e-05
    Pressure L2 Error: 0.00102063

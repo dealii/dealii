@@ -105,7 +105,7 @@ main()
     deallog << "Solve with PreconditionIdentity: " << std::endl;
     SolverControl control(40, 1e-4);
     SolverGMRES<LinearAlgebra::distributed::Vector<double>>::AdditionalData
-      data3(8);
+      data3(6);
     data3.orthogonalization_strategy =
       LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
     SolverGMRES<LinearAlgebra::distributed::Vector<double>> solver(control,
@@ -127,7 +127,7 @@ main()
     deallog << "Solve with PreconditionIdentity: " << std::endl;
     SolverControl control(40, 1e-4);
     SolverGMRES<LinearAlgebra::distributed::BlockVector<double>>::AdditionalData
-      data3(8);
+      data3(6);
     data3.orthogonalization_strategy =
       LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
     SolverGMRES<LinearAlgebra::distributed::BlockVector<double>> solver(control,

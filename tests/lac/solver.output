@@ -110,13 +110,13 @@ DEAL:no-fail:Bicgstab::Failure step 10 value 0.001961
 DEAL:no-fail::Exception: SolverControl::NoConvergence(state.last_step, state.last_residual)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
-DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, last_res)
+DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, res)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
-DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, last_res)
+DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, res)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
-DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, last_res)
+DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, res)
 DEAL:no-fail:SQMR::Starting value 11.00
 DEAL:no-fail:SQMR::Failure step 10 value 0.4215
 DEAL:no-fail::Exception: SolverControl::NoConvergence(step, state.last_residual)
