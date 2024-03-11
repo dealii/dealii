@@ -78,6 +78,11 @@ macro(check_compiler_setup _compiler_flags _linker_flags _var)
     endif()
   endforeach()
 
+  if( ("${_var}" MATCHES "DEAL_II_HAVE_USABLE_FLAGS_RELEASE") AND
+      (CMAKE_CXX_COMPILER_ID MATCHES "MSVC") )
+    set(CMAKE_TRY_COMPILE_CONFIGURATION Release)
+  endif()
+
   try_compile(
     ${_var}
     ${CMAKE_CURRENT_BINARY_DIR}/check_compiler_setup/${_var}
