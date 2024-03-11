@@ -930,10 +930,11 @@ namespace internal
     {
       Assert(dim > 0, ExcInternalError());
 
-      for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int i = 0; i < dim - 1; ++i)
         vv.add(-h(i), orthogonal_vectors[i]);
 
-      return std::sqrt(vv.add_and_dot(-h(dim), orthogonal_vectors[dim], vv));
+      return std::sqrt(
+        vv.add_and_dot(-h(dim - 1), orthogonal_vectors[dim - 1], vv));
     }
 
 
@@ -1366,6 +1367,8 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;
+  // reset this vector to the right size
+  h.reinit(n_tmp_vectors - 1);
 
   ///////////////////////////////////////////////////////////////////////////
   // outer iteration: loop until we either reach convergence or the maximum
@@ -1373,9 +1376,6 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // restart
   do
     {
-      // reset this vector to the right size
-      h.reinit(n_tmp_vectors - 1);
-
       double rho = 0.0;
 
       if (left_precondition)
@@ -1577,7 +1577,7 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
             p, dim, h, tmp_vectors, true);
           preconditioner.vmult(v, p);
           x.add(1., v);
-        };
+        }
       // end of outer iteration. restart if no convergence and the number of
       // iterations is not exceeded
     }
