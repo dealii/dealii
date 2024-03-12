@@ -128,14 +128,14 @@ namespace internal
  * Implementation of the Restarted Preconditioned Direct Generalized Minimal
  * Residual Method. The stopping criterion is the norm of the residual.
  *
- * The AdditionalData structure contains the size of the Arnoldi basis used
- * for orthogonalization. It is related to the number of temporary vectors
- * used, which is the basis size plus two. Additionally, it allows you to
- * choose between right or left preconditioning. The default is left
- * preconditioning. Furthermore, it includes a flag indicating whether or not
- * the default residual is used as stopping criterion and an option for the
- * orthogonalization algorithm, see LinearAlgebra::OrthogonalizationStrategy
- * for available options.
+ * The AdditionalData structure allows to control the size of the Arnoldi
+ * basis used for orthogonalization (default: 30 vectors). It is related to
+ * the number of temporary vectors used, which is the basis size plus
+ * two. Additionally, it allows you to choose between right or left
+ * preconditioning (default: left preconditioning). Furthermore, it
+ * includes a flag indicating whether or not the default residual is used as
+ * stopping criterion and an option for the orthogonalization algorithm, see
+ * LinearAlgebra::OrthogonalizationStrategy for available options.
  *
  *
  * <h3>Left versus right preconditioning</h3>
@@ -144,7 +144,7 @@ namespace internal
  * preconditioning. As expected, this switches between solving for the systems
  * <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>, respectively.
  *
- * A second consequence is the type of residual, which is used to measure
+ * A second consequence is the type of residual used to measure
  * convergence. With left preconditioning, this is the <b>preconditioned</b>
  * residual, while with right preconditioning, it is the residual of the
  * unpreconditioned system.
@@ -161,7 +161,7 @@ namespace internal
  * The maximal basis size is controlled by AdditionalData::max_basis_size. If
  * the number of iteration steps exceeds this number, all basis vectors are
  * discarded and the iteration starts anew from the approximation obtained so
- * far.
+ * far. This algorithm strategy is typically called restarted GMRES method.
  *
  * Note that the minimizing property of GMRES only pertains to the Krylov
  * space spanned by the Arnoldi basis. Therefore, restarted GMRES is
@@ -201,12 +201,12 @@ public:
   struct AdditionalData
   {
     /**
-     * Constructor. By default, set the size of the Arnoldi basis.  Also set
-     * preconditioning from left, the residual of the stopping criterion to
-     * the default residual, and re-orthogonalization only if necessary. Also,
-     * the batched mode with reduced functionality to track information is
-     * disabled by default. Finally, the default orthogonalization algorithm
-     * is the modified Gram-Schmidt method.
+     * Constructor. By default, set the size of the Arnoldi basis to 30. Also
+     * set preconditioning from left, the residual of the stopping criterion
+     * to the default residual, and re-orthogonalization only if
+     * necessary. Also, the batched mode with reduced functionality to track
+     * information is disabled by default. Finally, the default
+     * orthogonalization algorithm is the modified Gram-Schmidt method.
      */
     explicit AdditionalData(
       const unsigned int max_basis_size             = 30,
@@ -224,8 +224,8 @@ public:
      * historical reasons is #max_n_tmp_vectors-2. SolverGMRES assumes that
      * there are at least three temporary vectors, so this value must be
      * greater than or equal to three. If both this variable and
-     * #max_basis_size are set to a non-zero value, the solver uses the latter
-     * variable.
+     * #max_basis_size are set to a non-zero value, the choice in
+     * #max_basis_size takes precedence.
      *
      * @deprecated Use #max_basis_size instead.
      */
@@ -235,8 +235,8 @@ public:
      * Maximum size of the Arnoldi basis. SolverGMRES assumes that there is at
      * least one vector in the Arnoldi basis, so this value must be greater
      * than or equal to one. Note that whenever this variable is set to a
-     * non-zero, including the value set by the default constructor, this
-     * variable takes precedence.
+     * non-zero value, including the value set by the default constructor,
+     * this variable takes precedence over #max_n_tmp_vectors.
      */
     unsigned int max_basis_size;
 
@@ -1337,8 +1337,8 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // present, left is default, but both ways are implemented
   const bool left_precondition = !additional_data.right_preconditioning;
 
-  // Per default the left preconditioned GMRes uses the preconditioned
-  // residual and the right preconditioned GMRes uses the unpreconditioned
+  // Per default the left preconditioned GMRES uses the preconditioned
+  // residual and the right preconditioned GMRES uses the unpreconditioned
   // residual as stopping criterion.
   const bool use_default_residual = additional_data.use_default_residual;
 
