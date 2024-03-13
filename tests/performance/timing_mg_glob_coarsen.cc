@@ -570,9 +570,8 @@ LaplaceProblem<dim>::setup_smoother()
       IterationNumberControl control(12, 1e-6, false, false);
 
       using VectorType = LinearAlgebra::distributed::Vector<float>;
-      SolverCG<VectorType> solver(control);
-      internal::PreconditionChebyshevImplementation::EigenvalueTracker
-        eigenvalue_tracker;
+      SolverCG<VectorType>        solver(control);
+      internal::EigenvalueTracker eigenvalue_tracker;
       solver.connect_eigenvalues_slot(
         [&eigenvalue_tracker](const std::vector<double> &eigenvalues) {
           eigenvalue_tracker.slot(eigenvalues);
