@@ -767,7 +767,8 @@ namespace internal
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
@@ -779,12 +780,19 @@ namespace internal
                Vector<double> &h)
     {
       for (unsigned int i = 0; i < dim; ++i)
-        h[i] += vv * orthogonal_vectors[i];
+        {
+          h(i) += vv * orthogonal_vectors[i];
+          if (delayed_reorthogonalization)
+            h(dim + i) += orthogonal_vectors[i] * orthogonal_vectors[dim - 1];
+        }
+      if (delayed_reorthogonalization)
+        h(dim + dim) += vv * vv;
     }
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
@@ -806,50 +814,137 @@ namespace internal
                 VectorizedArray<double>::size();
 
               VectorizedArray<double> hs[128];
-              for (unsigned int d = 0; d < dim; ++d)
-                hs[d] = 0.0;
+              for (unsigned int i = 0; i < dim; ++i)
+                hs[i] = 0.0;
+              VectorizedArray<double>
+                correct[delayed_reorthogonalization ? 129 : 1];
+              if (delayed_reorthogonalization)
+                for (unsigned int i = 0; i < dim + 1; ++i)
+                  correct[i] = 0.0;
 
               unsigned int c = 0;
 
-              for (; c < block(vv, b).locally_owned_size() / n_lanes / 4;
-                   ++c, j += n_lanes * 4)
-                for (unsigned int i = 0; i < dim; ++i)
-                  {
-                    VectorizedArray<double> vvec[4];
-                    for (unsigned int k = 0; k < 4; ++k)
-                      vvec[k].load(block(vv, b).begin() + j + k * n_lanes);
+              constexpr unsigned int inner_batch_size =
+                delayed_reorthogonalization ? 4 : 8;
 
-                    for (unsigned int k = 0; k < 4; ++k)
+              for (; c < block(vv, b).locally_owned_size() / n_lanes /
+                           inner_batch_size;
+                   ++c, j += n_lanes * inner_batch_size)
+                {
+                  VectorizedArray<double> vvec[inner_batch_size];
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
+                    vvec[k].load(block(vv, b).begin() + j + k * n_lanes);
+                  VectorizedArray<double> last_vector[inner_batch_size];
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
+                    last_vector[k].load(
+                      block(orthogonal_vectors[dim - 1], b).begin() + j +
+                      k * n_lanes);
+
+                  {
+                    VectorizedArray<double> local_sum_0 =
+                      last_vector[0] * vvec[0];
+                    VectorizedArray<double> local_sum_1 =
+                      last_vector[0] * last_vector[0];
+                    VectorizedArray<double> local_sum_2 = vvec[0] * vvec[0];
+                    for (unsigned int k = 1; k < inner_batch_size; ++k)
                       {
-                        VectorizedArray<double> temp;
-                        temp.load(block(orthogonal_vectors[i], b).begin() + j +
-                                  k * n_lanes);
-                        hs[i] += temp * vvec[k];
+                        local_sum_0 += last_vector[k] * vvec[k];
+                        if (delayed_reorthogonalization)
+                          {
+                            local_sum_1 += last_vector[k] * last_vector[k];
+                            local_sum_2 += vvec[k] * vvec[k];
+                          }
+                      }
+                    hs[dim - 1] += local_sum_0;
+                    if (delayed_reorthogonalization)
+                      {
+                        correct[dim - 1] += local_sum_1;
+                        correct[dim] += local_sum_2;
                       }
                   }
 
-              c *= 4;
+                  for (unsigned int i = 0; i < dim - 1; ++i)
+                    {
+                      // break the dependency chain into the field hs[i] for
+                      // small sizes i by first accumulating 4 or 8 results
+                      // into a local variable
+                      VectorizedArray<double> temp;
+                      temp.load(block(orthogonal_vectors[i], b).begin() + j);
+                      VectorizedArray<double> local_sum_0 = temp * vvec[0];
+                      VectorizedArray<double> local_sum_1 =
+                        delayed_reorthogonalization ? temp * last_vector[0] :
+                                                      0.;
+                      for (unsigned int k = 1; k < inner_batch_size; ++k)
+                        {
+                          temp.load(block(orthogonal_vectors[i], b).begin() +
+                                    j + k * n_lanes);
+                          local_sum_0 += temp * vvec[k];
+                          if (delayed_reorthogonalization)
+                            local_sum_1 += temp * last_vector[k];
+                        }
+                      hs[i] += local_sum_0;
+                      if (delayed_reorthogonalization)
+                        correct[i] += local_sum_1;
+                    }
+                }
+
+              c *= inner_batch_size;
               for (; c < block(vv, b).locally_owned_size() / n_lanes;
                    ++c, j += n_lanes)
-                for (unsigned int i = 0; i < dim; ++i)
-                  {
-                    VectorizedArray<double> vvec, temp;
-                    vvec.load(block(vv, b).begin() + j);
-                    temp.load(block(orthogonal_vectors[i], b).begin() + j);
-                    hs[i] += temp * vvec;
-                  }
+                {
+                  VectorizedArray<double> vvec, last_vector;
+                  vvec.load(block(vv, b).begin() + j);
+                  last_vector.load(
+                    block(orthogonal_vectors[dim - 1], b).begin() + j);
+                  hs[dim - 1] += last_vector * vvec;
+                  if (delayed_reorthogonalization)
+                    {
+                      correct[dim - 1] += last_vector * last_vector;
+                      correct[dim] += vvec * vvec;
+                    }
+
+                  for (unsigned int i = 0; i < dim - 1; ++i)
+                    {
+                      VectorizedArray<double> temp;
+                      temp.load(block(orthogonal_vectors[i], b).begin() + j);
+                      hs[i] += temp * vvec;
+                      if (delayed_reorthogonalization)
+                        correct[i] += temp * last_vector;
+                    }
+                }
 
               for (unsigned int i = 0; i < dim; ++i)
-                for (unsigned int v = 0; v < n_lanes; ++v)
-                  h(i) += hs[i][v];
+                {
+                  h(i) += hs[i].sum();
+                  if (delayed_reorthogonalization)
+                    h(i + dim) += correct[i].sum();
+                }
+              if (delayed_reorthogonalization)
+                h(dim + dim) += correct[dim].sum();
             }
 
           // remainder loop of optimized path or non-optimized path (if
           // dim>128)
           for (; j < block(vv, b).locally_owned_size(); ++j)
-            for (unsigned int i = 0; i < dim; ++i)
-              h(i) += block(orthogonal_vectors[i], b).local_element(j) *
-                      block(vv, b).local_element(j);
+            {
+              const double vvec = block(vv, b).local_element(j);
+              const double last_vector =
+                block(orthogonal_vectors[dim - 1], b).local_element(j);
+              h(dim - 1) += last_vector * vvec;
+              if (delayed_reorthogonalization)
+                {
+                  h(dim + dim - 1) += last_vector * last_vector;
+                  h(dim + dim) += vvec * vvec;
+                }
+              for (unsigned int i = 0; i < dim - 1; ++i)
+                {
+                  const double temp =
+                    block(orthogonal_vectors[i], b).local_element(j);
+                  h(i) += temp * vvec;
+                  if (delayed_reorthogonalization)
+                    h(dim + i) += temp * last_vector;
+                }
+            }
         }
 
       Utilities::MPI::sum(h, block(vv, 0).get_mpi_communicator(), h);
@@ -857,7 +952,8 @@ namespace internal
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
@@ -871,16 +967,40 @@ namespace internal
     {
       Assert(dim > 0, ExcInternalError());
 
+      VectorType &last_vector =
+        const_cast<VectorType &>(orthogonal_vectors[dim - 1]);
       for (unsigned int i = 0; i < dim - 1; ++i)
-        vv.add(-h(i), orthogonal_vectors[i]);
+        {
+          if (delayed_reorthogonalization && i + 2 < dim)
+            last_vector.add(-h(dim + i), orthogonal_vectors[i]);
+          vv.add(-h(i), orthogonal_vectors[i]);
+        }
 
-      return std::sqrt(
-        vv.add_and_dot(-h(dim - 1), orthogonal_vectors[dim - 1], vv));
+      if (delayed_reorthogonalization)
+        {
+          if (dim > 1)
+            last_vector.sadd(1. / h(dim + dim - 1),
+                             -h(dim + dim - 2) / h(dim + dim - 1),
+                             orthogonal_vectors[dim - 2]);
+
+          // h(dim + dim) is lucky breakdown
+          const double scaling_factor_vv =
+            h(dim + dim) > 0.0 ? 1. / (h(dim + dim - 1) * h(dim + dim)) :
+                                 1. / (h(dim + dim - 1) * h(dim + dim - 1));
+          vv.sadd(scaling_factor_vv,
+                  -h(dim - 1) * scaling_factor_vv,
+                  last_vector);
+          return vv.l2_norm();
+        }
+      else
+        return std::sqrt(
+          vv.add_and_dot(-h(dim - 1), orthogonal_vectors[dim - 1], vv));
     }
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
@@ -894,72 +1014,141 @@ namespace internal
     {
       static constexpr unsigned int n_lanes = VectorizedArray<double>::size();
 
-      double norm_vv_temp = 0.0;
+      double      norm_vv_temp = 0.0;
+      VectorType &last_vector =
+        const_cast<VectorType &>(orthogonal_vectors[dim - 1]);
+      const double inverse_norm_previous =
+        delayed_reorthogonalization ? 1. / h(dim + dim - 1) : 0.;
+      const double scaling_factor_vv =
+        delayed_reorthogonalization ?
+          (h(dim + dim) > 0.0 ? inverse_norm_previous / h(dim + dim) :
+                                inverse_norm_previous / h(dim + dim - 1)) :
+          0.;
 
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
           VectorizedArray<double> norm_vv_temp_vectorized = 0.0;
 
+          constexpr unsigned int inner_batch_size =
+            delayed_reorthogonalization ? 4 : 8;
+
           unsigned int j = 0;
           unsigned int c = 0;
-          for (; c < block(vv, b).locally_owned_size() / n_lanes / 4;
-               ++c, j += n_lanes * 4)
+          for (; c <
+                 block(vv, b).locally_owned_size() / n_lanes / inner_batch_size;
+               ++c, j += n_lanes * inner_batch_size)
             {
-              VectorizedArray<double> temp[4];
+              VectorizedArray<double> temp[inner_batch_size];
+              VectorizedArray<double> last_vec[inner_batch_size];
 
-              for (unsigned int k = 0; k < 4; ++k)
-                temp[k].load(block(vv, b).begin() + j + k * n_lanes);
+              const double last_factor = h(dim - 1);
+              for (unsigned int k = 0; k < inner_batch_size; ++k)
+                {
+                  temp[k].load(block(vv, b).begin() + j + k * n_lanes);
+                  last_vec[k].load(block(last_vector, b).begin() + j +
+                                   k * n_lanes);
+                  if (!delayed_reorthogonalization)
+                    temp[k] -= last_factor * last_vec[k];
+                }
 
-              for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int i = 0; i < dim - 1; ++i)
                 {
                   const double factor = h(i);
-                  for (unsigned int k = 0; k < 4; ++k)
+                  const double correction_factor =
+                    (delayed_reorthogonalization ? h(dim + i) : 0.0);
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
                     {
                       VectorizedArray<double> vec;
                       vec.load(block(orthogonal_vectors[i], b).begin() + j +
                                k * n_lanes);
                       temp[k] -= factor * vec;
+                      if (delayed_reorthogonalization)
+                        last_vec[k] -= correction_factor * vec;
                     }
                 }
 
-              for (unsigned int k = 0; k < 4; ++k)
-                temp[k].store(block(vv, b).begin() + j + k * n_lanes);
-
-              norm_vv_temp_vectorized +=
-                (temp[0] * temp[0] + temp[1] * temp[1]) +
-                (temp[2] * temp[2] + temp[3] * temp[3]);
+              if (delayed_reorthogonalization)
+                for (unsigned int k = 0; k < inner_batch_size; ++k)
+                  {
+                    last_vec[k] = last_vec[k] * inverse_norm_previous;
+                    last_vec[k].store(block(last_vector, b).begin() + j +
+                                      k * n_lanes);
+                    temp[k] -= last_factor * last_vec[k];
+                    temp[k] = temp[k] * scaling_factor_vv;
+                    temp[k].store(block(vv, b).begin() + j + k * n_lanes);
+                  }
+              else
+                for (unsigned int k = 0; k < inner_batch_size; ++k)
+                  {
+                    temp[k].store(block(vv, b).begin() + j + k * n_lanes);
+                    norm_vv_temp_vectorized += temp[k] * temp[k];
+                  }
             }
 
-          c *= 4;
+          c *= inner_batch_size;
           for (; c < block(vv, b).locally_owned_size() / n_lanes;
                ++c, j += n_lanes)
             {
-              VectorizedArray<double> temp;
+              VectorizedArray<double> temp, last_vec;
               temp.load(block(vv, b).begin() + j);
+              last_vec.load(block(last_vector, b).begin() + j);
+              if (!delayed_reorthogonalization)
+                temp -= h(dim - 1) * last_vec;
 
-              for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int i = 0; i < dim - 1; ++i)
                 {
                   VectorizedArray<double> vec;
                   vec.load(block(orthogonal_vectors[i], b).begin() + j);
                   temp -= h(i) * vec;
+                  if (delayed_reorthogonalization)
+                    last_vec -= h(dim + i) * vec;
                 }
 
-              temp.store(block(vv, b).begin() + j);
-
-              norm_vv_temp_vectorized += temp * temp;
+              if (delayed_reorthogonalization)
+                {
+                  last_vec = last_vec * inverse_norm_previous;
+                  last_vec.store(block(last_vector, b).begin() + j);
+                  temp -= h(dim - 1) * last_vec;
+                  temp = temp * scaling_factor_vv;
+                  temp.store(block(vv, b).begin() + j);
+                }
+              else
+                {
+                  temp.store(block(vv, b).begin() + j);
+                  norm_vv_temp_vectorized += temp * temp;
+                }
             }
 
-          for (unsigned int v = 0; v < n_lanes; ++v)
-            norm_vv_temp += norm_vv_temp_vectorized[v];
+          if (!delayed_reorthogonalization)
+            norm_vv_temp += norm_vv_temp_vectorized.sum();
 
           for (; j < block(vv, b).locally_owned_size(); ++j)
             {
-              double temp = block(vv, b).local_element(j);
-              for (unsigned int i = 0; i < dim; ++i)
-                temp -= h(i) * block(orthogonal_vectors[i], b).local_element(j);
+              double temp     = block(vv, b).local_element(j);
+              double last_vec = block(last_vector, b).local_element(j);
+              if (delayed_reorthogonalization)
+                {
+                  for (unsigned int i = 0; i < dim - 1; ++i)
+                    {
+                      const double vec =
+                        block(orthogonal_vectors[i], b).local_element(j);
+                      temp -= h(i) * vec;
+                      last_vec -= h(dim + i) * vec;
+                    }
+                  last_vec *= inverse_norm_previous;
+                  block(last_vector, b).local_element(j) = last_vec;
+                  temp -= h(dim - 1) * last_vec;
+                  temp *= scaling_factor_vv;
+                }
+              else
+                {
+                  temp -= h(dim - 1) * last_vec;
+                  for (unsigned int i = 0; i < dim - 1; ++i)
+                    temp -=
+                      h(i) * block(orthogonal_vectors[i], b).local_element(j);
+                  norm_vv_temp += temp * temp;
+                }
               block(vv, b).local_element(j) = temp;
-
-              norm_vv_temp += temp * temp;
             }
         }
 
@@ -1071,101 +1260,173 @@ namespace internal
      * Calls the signal re_orthogonalize_signal if it is connected.
      */
     template <typename VectorType>
-    inline double
+    inline void
     iterated_gram_schmidt(
       const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy,
-      const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                                               &orthogonal_vectors,
-      const unsigned int                        dim,
-      const unsigned int                        accumulated_iterations,
-      VectorType                               &vv,
-      Vector<double>                           &h,
-      bool                                     &reorthogonalize,
-      const boost::signals2::signal<void(int)> &reorthogonalize_signal =
+      const TmpVectors<VectorType>                  &orthogonal_vectors,
+      const unsigned int                             dim,
+      const unsigned int                             accumulated_iterations,
+      VectorType                                    &vv,
+      Vector<double>                                &h,
+      FullMatrix<double>                            &H,
+      FullMatrix<double>                            &H_orig,
+      bool                                          &reorthogonalize,
+      const boost::signals2::signal<void(int)>      &reorthogonalize_signal =
         boost::signals2::signal<void(int)>())
     {
       Assert(dim > 0, ExcInternalError());
-      const unsigned int inner_iteration = dim - 1;
-
-      // need initial norm for detection of re-orthogonalization, see below
-      double     norm_vv_start = 0;
-      const bool consider_reorthogonalize =
-        (reorthogonalize == false) && (inner_iteration % 5 == 4);
-      if (consider_reorthogonalize)
-        norm_vv_start = vv.l2_norm();
-
-      for (unsigned int i = 0; i < dim; ++i)
-        h[i] = 0;
-
-      for (unsigned int c = 0; c < 2;
-           ++c) // 0: orthogonalize, 1: reorthogonalize
+      if (orthogonalization_strategy ==
+          LinearAlgebra::OrthogonalizationStrategy::
+            delayed_classical_gram_schmidt)
         {
-          // Orthogonalization
-          double norm_vv = 0.0;
+          const double scaling_norm_previous = dim > 0 ? h(dim + dim - 2) : 1.;
 
-          if (orthogonalization_strategy ==
-              LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt)
+          for (unsigned int i = 0; i < dim + dim + 1; ++i)
+            h(i) = 0;
+
+          // This is algorithm 4 of Bielich et al. (2022)
+          Tvmult_add<true>(dim, vv, orthogonal_vectors, h);
+
+          // delayed correction terms
+          double tmp = 0;
+          for (unsigned int i = 0; i < dim - 1; ++i)
+            tmp += h(dim + i) * h(dim + i);
+          const double alpha_j = h(dim + dim - 1) > tmp ?
+                                   std::sqrt(h(dim + dim - 1) - tmp) :
+                                   std::sqrt(h(dim + dim - 1));
+          h(dim + dim - 1)     = alpha_j;
+
+          tmp = 0;
+          for (unsigned int i = 0; i < dim - 1; ++i)
+            tmp += h(i) * h(dim + i);
+          h(dim - 1) = (h(dim - 1) - tmp) / alpha_j;
+
+          // representation of H(j-1)
+          if (dim > 1)
             {
-              double htmp = vv * orthogonal_vectors[0];
-              h(0) += htmp;
-              for (unsigned int i = 1; i < dim; ++i)
-                {
-                  htmp = vv.add_and_dot(-htmp,
-                                        orthogonal_vectors[i - 1],
-                                        orthogonal_vectors[i]);
-                  h(i) += htmp;
-                }
+              for (unsigned int i = 0; i < dim - 1; ++i)
+                H(i, dim - 2) += h(dim + i) * scaling_norm_previous;
+              H(dim - 1, dim - 2) = alpha_j * scaling_norm_previous;
 
-              norm_vv = std::sqrt(
-                vv.add_and_dot(-htmp, orthogonal_vectors[dim - 1], vv));
+              // correct H_orig according to H
+              for (unsigned int i = 0; i < dim; ++i)
+                H_orig(i, dim - 2) = H(i, dim - 2);
             }
-          else if (orthogonalization_strategy ==
-                   LinearAlgebra::OrthogonalizationStrategy::
-                     classical_gram_schmidt)
+          for (unsigned int i = 0; i < dim; ++i)
             {
-              Tvmult_add(dim, vv, orthogonal_vectors, h);
-              norm_vv = subtract_and_norm(dim, orthogonal_vectors, h, vv);
-            }
-          else
-            {
-              AssertThrow(false, ExcNotImplemented());
+              double sum = 0;
+              for (unsigned int j = (i == 0 ? 0 : i - 1); j < dim - 1; ++j)
+                sum += H_orig(i, j) * h(dim + j);
+              H(i, dim - 1) = (h(i) - sum) / alpha_j;
             }
 
-          if (c == 1)
-            return norm_vv; // reorthogonalization already performed -> finished
+          // Compute estimate norm for approximate convergence criterion (to
+          // be corrected in next iteration)
+          double sum = 0;
+          for (unsigned int i = 0; i < dim - 1; ++i)
+            sum += h(i) * h(i);
+          sum += (2. - 1.) * h(dim - 1) * h(dim - 1);
+          H(dim, dim - 1) = std::sqrt(std::abs(h(dim + dim) - sum)) / alpha_j;
 
-          // Re-orthogonalization if loss of orthogonality detected. For the
-          // test, use a strategy discussed in C. T. Kelley, Iterative Methods
-          // for Linear and Nonlinear Equations, SIAM, Philadelphia, 1995:
-          // Compare the norm of vv after orthogonalization with its norm when
-          // starting the orthogonalization. If vv became very small (here: less
-          // than the square root of the machine precision times 10), it is
-          // almost in the span of the previous vectors, which indicates loss of
-          // precision.
+          // projection and delayed reorthogonalization. We scale the vector
+          // vv here by the preliminary norm to avoid working with too large
+          // values and correct to the actual norm in high precision in the
+          // next iteration.
+          h(dim + dim) = H(dim, dim - 1);
+          subtract_and_norm<true>(dim, orthogonal_vectors, h, vv);
+        }
+      else
+        {
+          const unsigned int inner_iteration = dim - 1;
+
+          // need initial norm for detection of re-orthogonalization, see below
+          double     norm_vv       = 0.0;
+          double     norm_vv_start = 0;
+          const bool consider_reorthogonalize =
+            (reorthogonalize == false) && (inner_iteration % 5 == 4);
           if (consider_reorthogonalize)
-            {
-              if (norm_vv >
-                  10. * norm_vv_start *
-                    std::sqrt(std::numeric_limits<
-                              typename VectorType::value_type>::epsilon()))
-                return norm_vv;
+            norm_vv_start = vv.l2_norm();
 
+          for (unsigned int i = 0; i < dim; ++i)
+            h(i) = 0;
+
+          // run two loops with index 0: orthogonalize, 1: reorthogonalize
+          for (unsigned int c = 0; c < 2; ++c)
+            {
+              // Orthogonalization
+              if (orthogonalization_strategy ==
+                  LinearAlgebra::OrthogonalizationStrategy::
+                    modified_gram_schmidt)
+                {
+                  double htmp = vv * orthogonal_vectors[0];
+                  h(0) += htmp;
+                  for (unsigned int i = 1; i < dim; ++i)
+                    {
+                      htmp = vv.add_and_dot(-htmp,
+                                            orthogonal_vectors[i - 1],
+                                            orthogonal_vectors[i]);
+                      h(i) += htmp;
+                    }
+
+                  norm_vv = std::sqrt(
+                    vv.add_and_dot(-htmp, orthogonal_vectors[dim - 1], vv));
+                }
+              else if (orthogonalization_strategy ==
+                       LinearAlgebra::OrthogonalizationStrategy::
+                         classical_gram_schmidt)
+                {
+                  Tvmult_add<false>(dim, vv, orthogonal_vectors, h);
+                  norm_vv =
+                    subtract_and_norm<false>(dim, orthogonal_vectors, h, vv);
+                }
               else
                 {
-                  reorthogonalize = true;
-                  if (!reorthogonalize_signal.empty())
-                    reorthogonalize_signal(accumulated_iterations);
+                  AssertThrow(false, ExcNotImplemented());
                 }
+
+              if (c == 1)
+                break; // reorthogonalization already performed -> finished
+
+              // Re-orthogonalization if loss of orthogonality detected. For the
+              // test, use a strategy discussed in C. T. Kelley, Iterative
+              // Methods for Linear and Nonlinear Equations, SIAM, Philadelphia,
+              // 1995: Compare the norm of vv after orthogonalization with its
+              // norm when starting the orthogonalization. If vv became very
+              // small (here: less than the square root of the machine precision
+              // times 10), it is almost in the span of the previous vectors,
+              // which indicates loss of precision.
+              if (consider_reorthogonalize)
+                {
+                  if (norm_vv >
+                      10. * norm_vv_start *
+                        std::sqrt(std::numeric_limits<
+                                  typename VectorType::value_type>::epsilon()))
+                    break;
+
+                  else
+                    {
+                      reorthogonalize = true;
+                      if (!reorthogonalize_signal.empty())
+                        reorthogonalize_signal(accumulated_iterations);
+                    }
+                }
+
+              if (reorthogonalize == false)
+                break; // no reorthogonalization needed -> finished
             }
 
-          if (reorthogonalize == false)
-            return norm_vv; // no reorthogonalization needed -> finished
+          for (unsigned int i = 0; i < dim; ++i)
+            H(i, dim - 1) = h(i);
+          H(dim, dim - 1) = norm_vv;
+
+          // norm_vv is a lucky breakdown, the solver will reach convergence,
+          // but we must not divide by zero here.
+          if (norm_vv != 0)
+            vv *= 1. / H(dim, inner_iteration);
         }
-
-      AssertThrow(false, ExcInternalError());
-
-      return 0.0;
     }
+
+
 
     // A comparator for better printing eigenvalues
     inline bool
@@ -1182,7 +1443,7 @@ namespace internal
     // the Hessenberg matrix involved in the Arnoldi process, transforming it
     // into an upper triangular matrix.
     inline void
-    givens_rotation(Vector<double>                         &h,
+    givens_rotation(FullMatrix<double>                     &H,
                     Vector<double>                         &b,
                     std::vector<std::pair<double, double>> &rotations,
                     const int                               col)
@@ -1191,19 +1452,49 @@ namespace internal
         {
           const double c   = rotations[i].first;
           const double s   = rotations[i].second;
-          const double tmp = h(i);
-          h(i)             = c * tmp + s * h(i + 1);
-          h(i + 1)         = -s * tmp + c * h(i + 1);
+          const double tmp = H(i, col);
+          H(i, col)        = c * tmp + s * H(i + 1, col);
+          H(i + 1, col)    = -s * tmp + c * H(i + 1, col);
         }
 
-      const double r =
-        1. / std::sqrt(h(col) * h(col) + h(col + 1) * h(col + 1));
-      rotations[col].second = h(col + 1) * r;
-      rotations[col].first  = h(col) * r;
-      h(col) =
-        rotations[col].first * h(col) + rotations[col].second * h(col + 1);
+      const double H_col1   = H(col + 1, col);
+      double      &H_col    = H(col, col);
+      const double r        = 1. / std::sqrt(H_col * H_col + H_col1 * H_col1);
+      rotations[col].second = H_col1 * r;
+      rotations[col].first  = H_col * r;
+      H_col = rotations[col].first * H_col + rotations[col].second * H_col1;
       b(col + 1) = -rotations[col].second * b(col);
       b(col) *= rotations[col].first;
+    }
+
+
+
+    // Function that determines factor for givens rotation in the right hand
+    // side, without actually performing the elimination in the matrix. This
+    // function is necessary to get a residual estimate for the classical
+    // Gram-Schmidt algorithm with delayed reorthogonalization, which
+    // maintains an accurate Hessenberg matrix that lags behind by one
+    // iteration compared to the residual we want to estimate. For how the
+    // code is derive, compare with the other function above and how itwould
+    // compute b(col + 1), removing all unnecessary computations.
+    inline double
+    compute_givens_rotation_rhs(
+      const FullMatrix<double>                     &H,
+      const Vector<double>                         &b,
+      const std::vector<std::pair<double, double>> &rotations,
+      const int                                     col)
+    {
+      double H_col = H(0, col);
+      for (int i = 0; i < col; ++i)
+        {
+          const double c = rotations[i].first;
+          const double s = rotations[i].second;
+          H_col          = -s * H_col + c * H(i + 1, col);
+        }
+
+      const double H_col1 = H(col + 1, col);
+      const double r      = 1. / std::sqrt(H_col * H_col + H_col1 * H_col1);
+      return -H_col1 * r * b(col);
     }
 
 
@@ -1304,6 +1595,9 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // Generate an object where basis vectors are stored.
   internal::SolverGMRESImplementation::TmpVectors<VectorType> basis_vectors(
     basis_size + 2, this->memory);
+  const bool delayed_reorthogonalization =
+    additional_data.orthogonalization_strategy ==
+    LinearAlgebra::OrthogonalizationStrategy::delayed_classical_gram_schmidt;
 
   // number of the present iteration; this
   // number is not reset to zero upon a
@@ -1319,7 +1613,7 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // for eigenvalue computation, need to collect the Hessenberg matrix (before
   // applying Givens rotations)
   FullMatrix<double> H_orig;
-  if (do_eigenvalues)
+  if (do_eigenvalues || delayed_reorthogonalization)
     H_orig.reinit(basis_size + 1, basis_size);
 
   // matrix used for the orthogonalization process later
@@ -1328,7 +1622,10 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // some additional vectors, also used in the orthogonalization
   projected_rhs.reinit(basis_size + 1);
   givens_rotations.resize(basis_size);
-  h.reinit(basis_size + 1);
+  if (delayed_reorthogonalization)
+    h.reinit(2 * basis_size + 3);
+  else
+    h.reinit(basis_size + 1);
 
   SolverControl::State iteration_state = SolverControl::iterate;
   double               res             = std::numeric_limits<double>::lowest();
@@ -1449,41 +1746,44 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
               A.vmult(vv, p);
             }
 
-          norm_v = internal::SolverGMRESImplementation::iterated_gram_schmidt(
+          internal::SolverGMRESImplementation::iterated_gram_schmidt(
             additional_data.orthogonalization_strategy,
             basis_vectors,
             inner_iteration + 1,
             accumulated_iterations,
             vv,
             h,
+            H,
+            H_orig,
             re_orthogonalize,
             re_orthogonalize_signal);
-
-          // norm_v = 0 is a lucky breakdown, the solver will reach
-          // convergence, but we must not divide by zero here.
-          if (norm_v != 0)
-            vv /= norm_v;
-
-          h(inner_iteration + 1) = norm_v;
 
           // for eigenvalues, get the resulting coefficients from the
           // orthogonalization process
           if (do_eigenvalues)
             for (unsigned int i = 0; i < inner_iteration + 2; ++i)
-              H_orig(i, inner_iteration) = h(i);
+              H_orig(i, inner_iteration) = H(i, inner_iteration);
 
-          //  Transformation into tridiagonal structure
-          internal::SolverGMRESImplementation::givens_rotation(h,
-                                                               projected_rhs,
-                                                               givens_rotations,
-                                                               inner_iteration);
+          //  Transformation into upper triangular structure
+          if (delayed_reorthogonalization)
+            {
+              if (inner_iteration > 0)
+                internal::SolverGMRESImplementation::givens_rotation(
+                  H, projected_rhs, givens_rotations, inner_iteration - 1);
+              res = std::fabs(internal::SolverGMRESImplementation::
+                                compute_givens_rotation_rhs(H,
+                                                            projected_rhs,
+                                                            givens_rotations,
+                                                            inner_iteration));
+            }
+          else
+            {
+              internal::SolverGMRESImplementation::givens_rotation(
+                H, projected_rhs, givens_rotations, inner_iteration);
 
-          //  append vector on matrix
-          for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-            H(i, inner_iteration) = h(i);
-
-          //  default residual
-          res = std::fabs(projected_rhs(inner_iteration + 1));
+              //  default residual
+              res = std::fabs(projected_rhs(inner_iteration + 1));
+            }
 
           if (use_default_residual)
             {
@@ -1540,7 +1840,14 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
         }
 
       // end of inner iteration. now calculate the solution from the temporary
-      // vectors
+      // vectors. do the last orthogonalization step (delayed by the algorithm
+      // design) without reorthogonalization when solving the triangular
+      // system
+      if (delayed_reorthogonalization)
+        {
+          internal::SolverGMRESImplementation::givens_rotation(
+            H, projected_rhs, givens_rotations, inner_iteration - 1);
+        }
       internal::SolverGMRESImplementation::solve_triangular(inner_iteration,
                                                             H,
                                                             projected_rhs,
@@ -1565,20 +1872,31 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
         }
 
       // in the last round, print the eigenvalues from the last Arnoldi step
-      if (iteration_state != SolverControl::iterate && do_eigenvalues)
-        compute_eigs_and_cond(H_orig,
-                              inner_iteration,
-                              eigenvalues_signal,
-                              hessenberg_signal,
-                              condition_number_signal);
+      if (iteration_state != SolverControl::iterate)
+        {
+          if (do_eigenvalues)
+            compute_eigs_and_cond(H_orig,
+                                  inner_iteration,
+                                  eigenvalues_signal,
+                                  hessenberg_signal,
+                                  condition_number_signal);
 
-      // end of outer iteration. restart if no convergence and the number of
-      // iterations is not exceeded
+          if (!additional_data.batched_mode && !krylov_space_signal.empty())
+            {
+              // Must normalize the last vector
+              if (delayed_reorthogonalization &&
+                  H(inner_iteration, inner_iteration - 1) != 0.0)
+                basis_vectors[inner_iteration] /=
+                  H(inner_iteration, inner_iteration - 1);
+
+              krylov_space_signal(basis_vectors);
+            }
+
+          // end of outer iteration. restart if no convergence and the number of
+          // iterations is not exceeded
+        }
     }
   while (iteration_state == SolverControl::iterate);
-
-  if (!additional_data.batched_mode && !krylov_space_signal.empty())
-    krylov_space_signal(basis_vectors);
 
   // in case of failure: throw exception
   AssertThrow(iteration_state == SolverControl::success,
@@ -1714,15 +2032,20 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
   typename internal::SolverGMRESImplementation::TmpVectors<VectorType> z(
     basis_size, this->memory);
 
+  const bool delayed_reorthogonalization =
+    additional_data.orthogonalization_strategy ==
+    LinearAlgebra::OrthogonalizationStrategy::delayed_classical_gram_schmidt;
+
   // number of the present iteration; this number is not reset to zero upon a
   // restart
   unsigned int accumulated_iterations = 0;
 
   // matrix used for the orthogonalization process later
   H.reinit(basis_size + 1, basis_size);
+  FullMatrix<double>                     H_orig(H);
   std::vector<std::pair<double, double>> givens_rotations(basis_size);
-
-  Vector<double> h(basis_size + 1);
+  Vector<double> h(delayed_reorthogonalization ? 2 * basis_size + 3 :
+                                                 basis_size + 1);
 
   // Vectors for projected system
   Vector<double> projected_rhs(basis_size + 1);
@@ -1742,46 +2065,51 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
       if (iteration_state == SolverControl::success)
         break;
 
-      H.reinit(basis_size + 1, basis_size);
+      projected_rhs(0) = norm_v;
+      if (norm_v != 0)
+        v[0] /= norm_v;
 
-      projected_rhs(0)             = norm_v;
       unsigned int inner_iteration = 0;
       for (; (inner_iteration < basis_size &&
               iteration_state == SolverControl::iterate);
            ++inner_iteration)
         {
-          // norm_v = 0 is a lucky breakdown, the solver will reach
-          // convergence, but we must not divide by zero here.
-          if (norm_v != 0)
-            v[inner_iteration] /= norm_v;
-
           preconditioner.vmult(z(inner_iteration, x), v[inner_iteration]);
           A.vmult(v(inner_iteration + 1, x), z[inner_iteration]);
 
           // Gram-Schmidt
           bool re_orthogonalize = false;
-          norm_v = internal::SolverGMRESImplementation::iterated_gram_schmidt<
+          internal::SolverGMRESImplementation::iterated_gram_schmidt<
             VectorType>(additional_data.orthogonalization_strategy,
                         v,
                         inner_iteration + 1,
-                        0,
+                        accumulated_iterations,
                         v[inner_iteration + 1],
                         h,
+                        H,
+                        H_orig,
                         re_orthogonalize);
 
           // Compute projected solution
-          h(inner_iteration + 1) = norm_v;
-          internal::SolverGMRESImplementation::givens_rotation(h,
-                                                               projected_rhs,
-                                                               givens_rotations,
-                                                               inner_iteration);
+          if (delayed_reorthogonalization)
+            {
+              if (inner_iteration > 0)
+                internal::SolverGMRESImplementation::givens_rotation(
+                  H, projected_rhs, givens_rotations, inner_iteration - 1);
+              res = std::fabs(internal::SolverGMRESImplementation::
+                                compute_givens_rotation_rhs(H,
+                                                            projected_rhs,
+                                                            givens_rotations,
+                                                            inner_iteration));
+            }
+          else
+            {
+              internal::SolverGMRESImplementation::givens_rotation(
+                H, projected_rhs, givens_rotations, inner_iteration);
 
-          //  append vector on Hessenberg matrix
-          for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-            H(i, inner_iteration) = h(i);
-
-          //  default residual
-          res = std::fabs(projected_rhs(inner_iteration + 1));
+              //  default residual
+              res = std::fabs(projected_rhs(inner_iteration + 1));
+            }
 
           // check convergence. note that the vector 'x' we pass to the
           // criterion is not the final solution we compute if we
@@ -1793,6 +2121,9 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
 
       // Solve triangular system with projected quantities and update solution
       // vector
+      if (delayed_reorthogonalization)
+        internal::SolverGMRESImplementation::givens_rotation(
+          H, projected_rhs, givens_rotations, inner_iteration - 1);
       internal::SolverGMRESImplementation::solve_triangular(inner_iteration,
                                                             H,
                                                             projected_rhs,

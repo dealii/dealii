@@ -39,7 +39,21 @@ namespace LinearAlgebra
      * is less stable in terms of roundoff error propagation, requiring
      * additional re-orthogonalization steps more frequently.
      */
-    classical_gram_schmidt
+    classical_gram_schmidt,
+    /**
+     * Use classical Gram-Schmidt algorithm with two orthogonalization
+     * iterations and delayed orthogonalization using the algorithm described
+     * in @cite Bielich2022. This approach works on multi-vectors with a
+     * single global reduction (of multiple elements) and more efficient than
+     * the modified Gram-Schmidt algorithm. At the same time, it
+     * unconditionally performs the second orthogonalization step, making it
+     * more stable than the classical Gram-Schmidt variant. For deal.II's own
+     * vectors, there is no additional cost compared to the classical
+     * Gram-Schmidt algorithm, because the second orthogonalization step is
+     * done on cached data. For these beneficial reasons, this is the default
+     * algorithm in the SolverGMRES class.
+     */
+    delayed_classical_gram_schmidt
   };
 } // namespace LinearAlgebra
 
