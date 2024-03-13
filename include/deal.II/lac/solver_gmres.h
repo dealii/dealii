@@ -219,15 +219,15 @@ public:
           LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt);
 
     /**
-     * Maximum number of temporary vectors. Together with #max_basis_size,
-     * this parameter controls the size of the Arnoldi basis, which for
-     * historical reasons is #max_n_tmp_vectors-2. SolverGMRES assumes that
-     * there are at least three temporary vectors, so this value must be
-     * greater than or equal to three. If both this variable and
-     * #max_basis_size are set to a non-zero value, the choice in
-     * #max_basis_size takes precedence.
+     * Maximum number of temporary vectors. Together with max_basis_size, this
+     * parameter controls the size of the Arnoldi basis, which corresponds to
+     * max_n_tmp_vectors-2 as used in previous versions of the deal.II
+     * library. SolverGMRES assumes that there are at least three temporary
+     * vectors, so this value must be greater than or equal to three. If both
+     * this variable and max_basis_size are set to a non-zero value, the
+     * choice in max_basis_size takes precedence.
      *
-     * @deprecated Use #max_basis_size instead.
+     * @deprecated Use max_basis_size instead.
      */
     unsigned int max_n_tmp_vectors;
 
@@ -236,7 +236,7 @@ public:
      * least one vector in the Arnoldi basis, so this value must be greater
      * than or equal to one. Note that whenever this variable is set to a
      * non-zero value, including the value set by the default constructor,
-     * this variable takes precedence over #max_n_tmp_vectors.
+     * this variable takes precedence over max_n_tmp_vectors.
      */
     unsigned int max_basis_size;
 
