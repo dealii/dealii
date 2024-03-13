@@ -106,6 +106,13 @@ public:
 
   template <typename VectorType>
   void
+  vmult(VectorType &dst, const VectorType &src) const
+  {
+    sparse_matrix.vmult(dst, src);
+  }
+
+  template <typename VectorType>
+  void
   vmult(VectorType       &dst,
         const VectorType &src,
         const std::function<void(const unsigned int, const unsigned int)>
@@ -210,7 +217,7 @@ main()
 
   src = 1.0;
 
-  std::vector<double>       relaxations{1.0, 0.9, 1.1};
+  std::vector<double>       relaxations{0.0, 1.0, 0.9, 1.1};
   std::vector<unsigned int> n_iterationss{1, 2, 3};
 
   for (const auto relaxation : relaxations)
