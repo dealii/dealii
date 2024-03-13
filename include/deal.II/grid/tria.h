@@ -3915,11 +3915,20 @@ protected:
   void
   update_cell_relations_serial();
 
+  /**
+   * Function to pack data for
+   * SolutionTransfer::prepare_for_coarsening_and_refinement().
+   */
   void
-  pack_data_serial_pre();
+  pack_data_serial();
 
+
+  /**
+   * Function to pack data for
+   * SolutionTransfer::interpolate().
+   */
   void
-  pack_data_serial_post();
+  unpack_data_serial();
 
   /**
    * Vector of pairs, each containing a deal.II cell iterator and its
@@ -4557,9 +4566,6 @@ private:
    */
   std::unique_ptr<std::map<unsigned int, types::manifold_id>>
     vertex_to_manifold_id_map_1d;
-
-  // TODO
-  std::vector<CellId> active_cell_old;
 
   // make a couple of classes friends
   template <int, int, int>

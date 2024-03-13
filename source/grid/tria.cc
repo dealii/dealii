@@ -15720,18 +15720,19 @@ void Triangulation<dim, spacedim>::update_cell_relations_serial()
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void Triangulation<dim, spacedim>::pack_data_serial_pre()
+void Triangulation<dim, spacedim>::pack_data_serial()
 {
   if (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
         this))
     return;
+
+  std::vector<CellId> active_cell_old;
 
   // pack data before triangulation gets updated
   if (this->cell_attached_data.n_attached_data_sets > 0)
     {
       // store old active cells to determine cell status after
       // coarsening/refinement
-      active_cell_old.clear();
       active_cell_old.reserve(this->n_active_cells());
 
       for (const auto &cell : this->active_cell_iterators())
@@ -15740,11 +15741,11 @@ void Triangulation<dim, spacedim>::pack_data_serial_pre()
             (cell->level() > 0) && (cell->coarsen_flag_set());
 
           if (children_will_be_coarsened == false)
-            this->active_cell_old.emplace_back(cell->id());
+            active_cell_old.emplace_back(cell->id());
           else
             {
               if (cell->parent()->child(0) == cell)
-                this->active_cell_old.emplace_back(cell->parent()->id());
+                active_cell_old.emplace_back(cell->parent()->id());
             }
         }
 
@@ -15825,7 +15826,7 @@ void Triangulation<dim, spacedim>::pack_data_serial_pre()
         this->cell_attached_data.pack_callbacks_variable,
         this->get_communicator());
 
-      // dummy copy of data (TODO: fill invalid cells)
+      // dummy copy of data
       this->data_serializer.dest_data_fixed =
         this->data_serializer.src_data_fixed;
       this->data_serializer.dest_data_variable =
@@ -15839,7 +15840,7 @@ void Triangulation<dim, spacedim>::pack_data_serial_pre()
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void Triangulation<dim, spacedim>::pack_data_serial_post()
+void Triangulation<dim, spacedim>::unpack_data_serial()
 {
   if (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
         this))
@@ -15867,9 +15868,6 @@ void Triangulation<dim, spacedim>::pack_data_serial_post()
         }
 
       this->local_cell_relations = temp;
-
-      // cell status has been set during update_cell_relations_serial()
-      active_cell_old.clear();
     }
 }
 
@@ -15895,13 +15893,13 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // Inform all listeners about beginning of refinement.
   signals.pre_refinement();
 
-  this->pack_data_serial_pre();
+  this->pack_data_serial();
 
   execute_coarsening();
 
   const DistortedCellList cells_with_distorted_children = execute_refinement();
 
-  this->pack_data_serial_post();
+  this->unpack_data_serial();
 
   reset_cell_vertex_indices_cache();
 

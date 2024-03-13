@@ -84,7 +84,6 @@ main()
   deallog << "Final number of dofs: " << dof_handler.n_dofs() << std::endl;
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  new_solution = 0.; // TODO: 1. is not supported
   solution_trans.interpolate(new_solution);
 
   deallog << "Vector after solution transfer:" << std::endl;

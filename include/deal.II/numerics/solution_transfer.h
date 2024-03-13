@@ -34,9 +34,14 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * Transfer a discrete FE function (like a solution vector) by
- * interpolation while refining and/or coarsening a distributed grid and
- * handles the necessary communication.
+ * This class implements the transfer of a discrete FE function (e.g. a
+ * solution vector) from one mesh to another that is obtained from the first
+ * by a single refinement and/or coarsening step. During interpolation the
+ * vector is filled with the interpolated values. This class is used in the
+ * step-15, step-26, step-31, and step-33 tutorial programs. This class
+ * works both for serial and distributed meshes.
+ *
+ * <h3>Usage</h3>
  *
  * @note It is important to note, that if you use more than one
  * SolutionTransfer object at the same time, that the calls to prepare_*()
@@ -56,8 +61,7 @@ DEAL_II_NAMESPACE_OPEN
  * vector type, e.g. PETScWrappers::MPI::Vector,
  * TrilinosWrappers::MPI::Vector, or corresponding block vectors.
  * @code
- * parallel::distributed::SolutionTransfer<dim, VectorType>
- *   soltrans(dof_handler);
+ * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
  * // flag some cells for refinement and coarsening, e.g.
  * parallel::distributed::GridRefinement::
  *   refine_and_coarsen_fixed_fraction(tria,
@@ -109,8 +113,7 @@ DEAL_II_NAMESPACE_OPEN
  * old_solution = solution;
  *
  * // Initialize SolutionTransfer object
- * parallel::distributed::SolutionTransfer<dim, VectorType>
- *   soltrans(dof_handler);
+ * SolutionTransfer<dim, VectorType> soltrans(dof_handler);
  * soltrans.prepare_for_coarsening_and_refinement(old_solution);
  * ...
  * // Refine grid
@@ -139,8 +142,7 @@ DEAL_II_NAMESPACE_OPEN
  * If vector has the locally relevant DoFs, serialization works as
  * follows:
  * @code
- * parallel::distributed::SolutionTransfer<dim, VectorType>
- *   sol_trans(dof_handler);
+ * SolutionTransfer<dim, VectorType> sol_trans(dof_handler);
  * sol_trans.prepare_for_serialization(vector);
  *
  * triangulation.save(filename);
@@ -151,8 +153,7 @@ DEAL_II_NAMESPACE_OPEN
  * //[create coarse mesh...]
  * triangulation.load(filename);
  *
- * parallel::distributed::SolutionTransfer<dim, VectorType>
- *   sol_trans(dof_handler);
+ * SolutionTransfer<dim, VectorType> sol_trans(dof_handler);
  * sol_trans.deserialize(distributed_vector);
  * @endcode
  *
@@ -180,8 +181,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * If vector has the locally relevant DoFs, serialization works as follows:
  * @code
- * parallel::distributed::
- *   SolutionTransfer<dim, VectorType, DoFHandler<dim,spacedim>>
+ * SolutionTransfer<dim, VectorType, DoFHandler<dim,spacedim>>
  *     sol_trans(hp_dof_handler);
  *
  * hp_dof_handler.prepare_for_serialization_of_active_fe_indices();
@@ -205,8 +205,7 @@ DEAL_II_NAMESPACE_OPEN
  * hp_dof_handler.deserialize_active_fe_indices();
  * hp_dof_handler.distribute_dofs(fe_collection);
  *
- * parallel::distributed::
- *   SolutionTransfer<dim,VectorType,DoFHandler<dim,spacedim>>
+ * SolutionTransfer<dim,VectorType,DoFHandler<dim,spacedim>>
  *     sol_trans(hp_dof_handler);
  * sol_trans.deserialize(distributed_vector);
  * @endcode
@@ -214,11 +213,84 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Interaction with hanging nodes</h3>
  *
- * In essence, this class implements the same steps as does
- * dealii::SolutionTransfer (though the implementation is entirely
- * separate). Consequently, the same issue with hanging nodes and
- * coarsening can happen with this class as happens with
- * dealii::SolutionTransfer. See there for an extended discussion.
+ * This class does its best to represent on the new mesh the finite element
+ * function that existed on the old mesh, but this may lead to situations
+ * where the function on the new mesh is no longer conforming at hanging
+ * nodes. To this end, consider a situation of a twice refined mesh that
+ * started with a single square cell (i.e., we now have 16 cells). Consider
+ * also that we coarsen 4 of the cells back to the first refinement level. In
+ * this case, we end up with a mesh that will look as follows if we were to
+ * use a $Q_1$ element:
+ *
+ * @image html hanging_nodes.png ""
+ *
+ * The process of interpolating from the old to the new mesh would imply that
+ * the values of the finite element function will not change on all of the
+ * cells that remained as they are (i.e., the fine cells) but that on the
+ * coarse cell at the top right, the four values at the vertices are obtained
+ * by interpolating down from its former children.  If the original function
+ * was not linear, this implies that the marked hanging nodes will retain
+ * their old values which, in general, will not lead to a continuous function
+ * along the corresponding edges. In other words, the solution vector obtained
+ * after SolutionTransfer::interpolate() does not satisfy hanging node
+ * constraints: it corresponds to the pointwise interpolation, but not to the
+ * interpolation <i>onto the new finite element space that contains
+ * constraints from hanging nodes</i>.
+ *
+ * Whether this is a problem you need to worry about or not depends on your
+ * application. The situation is easily corrected, of course, by applying
+ * AffineConstraints::distribute() to your solution vector after transfer,
+ * using a constraints object computed on the new DoFHandler object (you
+ * probably need to create this object anyway if you have hanging nodes). This
+ * is also what is done, for example, in step-15.
+ *
+ * @note This situation can only happen if you do coarsening. If all cells
+ * remain as they are or are refined, then SolutionTransfer::interpolate()
+ * computes a new vector of nodal values, but the function represented is of
+ * course exactly the same because the old finite element space is a subspace
+ * of the new one. Thus, if the old function was conforming (i.e., satisfied
+ * hanging node constraints), then so does the new one, and it is not
+ * necessary to call AffineConstraints::distribute().
+ *
+ *
+ * <h3>Implementation in the context of hp-finite elements</h3>
+ *
+ * In the case of DoFHandlers with hp-capabilities, nothing defines which of
+ * the finite elements that are part of the hp::FECollection associated with
+ * the DoFHandler, should be considered on cells that are not active (i.e.,
+ * that have children). This is because degrees of freedom are only allocated
+ * for active cells and, in fact, it is not allowed to set an active FE index
+ * on non-active cells using DoFAccessor::set_active_fe_index().
+ *
+ * It is, thus, not entirely natural what should happen if, for example, a few
+ * cells are coarsened away. This class then implements the following
+ * algorithm:
+ * - If a cell is refined, then the values of the solution vector(s) are
+ *   interpolated before refinement on the to-be-refined cell from the space
+ * of the active finite element to the one of the future finite element. These
+ *   values are then distributed on the finite element spaces of the children
+ *   post-refinement. This may lose information if, for example, the old cell
+ *   used a Q2 space and the children use Q1 spaces, or the information may be
+ *   prolonged if the mother cell used a Q1 space and the children are Q2s.
+ * - If cells are to be coarsened, then the values from the child cells are
+ *   interpolated to the mother cell using the largest of the child cell
+ * future finite element spaces, which will be identified as the least
+ * dominant element following the FiniteElementDomination logic (consult
+ *   hp::FECollection::find_dominated_fe_extended() for more information). For
+ *   example, if the children of a cell use Q1, Q2 and Q3 spaces, then the
+ *   values from the children are interpolated into a Q3 space on the mother
+ *   cell. After refinement, this Q3 function on the mother cell is then
+ *   interpolated into the space the user has selected for this cell (which
+ * may be different from Q3, in this example, if the user has set the active
+ * FE index for a different space post-refinement and before calling
+ *   DoFHandler::distribute_dofs()).
+ *
+ * @note In the context of hp-refinement, if cells are coarsened or the
+ * polynomial degree is lowered on some cells, then the old finite element
+ * space is not a subspace of the new space and you may run into the same
+ * situation as discussed above with hanging nodes. You may want to consider
+ * calling AffineConstraints::distribute() on the vector obtained by
+ * transferring the solution.
  *
  * @ingroup distributed
  */
@@ -333,7 +405,7 @@ public:
    * Reinit this class to the state that it has directly after calling the
    * constructor.
    */
-  void
+  DEAL_II_DEPRECATED_EARLY void
   clear();
 
 private:
@@ -699,6 +771,8 @@ namespace Legacy
    * transferring the solution.
    *
    * @ingroup numerics
+   *
+   * @deprecated Use dealii::SolutionTransfer instead.
    */
   template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
   class SolutionTransfer

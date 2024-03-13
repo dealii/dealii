@@ -15,9 +15,7 @@
 
 
 
-// Test distributed solution transfer with fullydistributed triangulations.
-
-#include <deal.II/distributed/solution_transfer.h>
+// Test SolutionTransfer::interpolate() for serial triangulations.
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -30,11 +28,11 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include "./tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class InterpolationFunction : public Function<dim>
@@ -68,10 +66,8 @@ test(const unsigned int type)
 
   VectorType vector(dof_handler.n_dofs());
   VectorTools::interpolate(dof_handler, InterpolationFunction<dim>(), vector);
-  // vector = 1.0;
 
-  parallel::distributed::SolutionTransfer<dim, VectorType> solution_transfer(
-    dof_handler);
+  SolutionTransfer<dim, VectorType> solution_transfer(dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
   solution_transfer.prepare_for_coarsening_and_refinement(vector);

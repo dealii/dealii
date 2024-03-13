@@ -17,7 +17,6 @@
 #include <deal.II/base/memory_consumption.h>
 
 #include <deal.II/distributed/shared_tria.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
