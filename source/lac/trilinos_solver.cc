@@ -636,6 +636,13 @@ namespace TrilinosWrappers
 
 
 
+  SolverDirect::SolverDirect(const AdditionalData &data)
+    : solver_control(solver_control_own)
+    , additional_data(data.output_solver_details, data.solver_type)
+  {}
+
+
+
   SolverDirect::SolverDirect(SolverControl &cn, const AdditionalData &data)
     : solver_control(cn)
     , additional_data(data.output_solver_details, data.solver_type)
@@ -696,8 +703,35 @@ namespace TrilinosWrappers
   }
 
 
+
+  void
+  SolverDirect::initialize(const SparseMatrix &A, const AdditionalData &data)
+  {
+    this->additional_data = data;
+
+    this->initialize(A);
+  }
+
+
   void
   SolverDirect::solve(MPI::Vector &x, const MPI::Vector &b)
+  {
+    this->vmult(x, b);
+  }
+
+
+
+  void
+  SolverDirect::solve(
+    dealii::LinearAlgebra::distributed::Vector<double>       &x,
+    const dealii::LinearAlgebra::distributed::Vector<double> &b)
+  {
+    this->vmult(x, b);
+  }
+
+
+  void
+  SolverDirect::vmult(MPI::Vector &x, const MPI::Vector &b) const
   {
     // Assign the empty LHS vector to the Epetra_LinearProblem object
     linear_problem->SetLHS(&x.trilinos_vector());
@@ -725,9 +759,9 @@ namespace TrilinosWrappers
 
 
   void
-  SolverDirect::solve(
+  SolverDirect::vmult(
     dealii::LinearAlgebra::distributed::Vector<double>       &x,
-    const dealii::LinearAlgebra::distributed::Vector<double> &b)
+    const dealii::LinearAlgebra::distributed::Vector<double> &b) const
   {
     Epetra_Vector ep_x(View,
                        linear_problem->GetOperator()->OperatorDomainMap(),
