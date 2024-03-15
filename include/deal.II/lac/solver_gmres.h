@@ -1283,8 +1283,12 @@ namespace internal
             }
         }
 
-      return std::sqrt(
-        Utilities::MPI::sum(norm_vv_temp, block(vv, 0).get_mpi_communicator()));
+      if (delayed_reorthogonalization)
+        return std::numeric_limits<double>::signaling_NaN();
+      else
+        return std::sqrt(
+          Utilities::MPI::sum(norm_vv_temp,
+                              block(vv, 0).get_mpi_communicator()));
     }
 
 
