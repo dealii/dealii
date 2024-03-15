@@ -89,9 +89,9 @@ main()
   SolverControl                 control(100, 1.e-3);
   SolverControl                 verbose_control(100, 1.e-3, true);
   SolverCG<>                    cg(control, mem);
-  SolverGMRES<>::AdditionalData data1(8);
+  SolverGMRES<>::AdditionalData data1(6);
   SolverGMRES<>                 gmres(control, mem, data1);
-  SolverGMRES<>::AdditionalData data2(8, true);
+  SolverGMRES<>::AdditionalData data2(6, true);
   SolverGMRES<>                 gmresright(control, mem, data2);
   SolverMinRes<>                minres(control, mem);
   SolverBicgstab<>              bicgstab(control, mem);
@@ -99,7 +99,7 @@ main()
   SolverQMRS<>                  qmrs(control, mem);
   SolverFIRE<>                  fire(control, mem);
 
-  SolverGMRES<>::AdditionalData data3(8);
+  SolverGMRES<>::AdditionalData data3(6);
   data3.orthogonalization_strategy =
     LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
   SolverGMRES<> gmresclassical(control, mem, data3);

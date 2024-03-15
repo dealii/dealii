@@ -75,8 +75,11 @@ main(int argc, char **argv)
     u.compress(VectorOperation::insert);
 
     GrowingVectorMemory<LinearAlgebra::TpetraWrappers::Vector<double>> mem;
+    SolverGMRES<LinearAlgebra::TpetraWrappers::Vector<double>>::AdditionalData
+                                                               sol_data(28);
     SolverGMRES<LinearAlgebra::TpetraWrappers::Vector<double>> solver(control,
-                                                                      mem);
+                                                                      mem,
+                                                                      sol_data);
     PreconditionIdentity                                       preconditioner;
 
     deallog << "Solver type: " << typeid(solver).name() << std::endl;

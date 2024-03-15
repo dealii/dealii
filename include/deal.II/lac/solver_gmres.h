@@ -25,7 +25,6 @@
 
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/householder.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/orthogonalization.h>
 #include <deal.II/lac/solver.h>
@@ -129,11 +128,14 @@ namespace internal
  * Implementation of the Restarted Preconditioned Direct Generalized Minimal
  * Residual Method. The stopping criterion is the norm of the residual.
  *
- * The AdditionalData structure contains the number of temporary vectors used.
- * The size of the Arnoldi basis is this number minus three. Additionally, it
- * allows you to choose between right or left preconditioning. The default is
- * left preconditioning. Finally it includes a flag indicating whether or not
- * the default residual is used as stopping criterion.
+ * The AdditionalData structure allows to control the size of the Arnoldi
+ * basis used for orthogonalization (default: 30 vectors). It is related to
+ * the number of temporary vectors used, which is the basis size plus
+ * two. Additionally, it allows you to choose between right or left
+ * preconditioning (default: left preconditioning). Furthermore, it
+ * includes a flag indicating whether or not the default residual is used as
+ * stopping criterion and an option for the orthogonalization algorithm, see
+ * LinearAlgebra::OrthogonalizationStrategy for available options.
  *
  *
  * <h3>Left versus right preconditioning</h3>
@@ -142,7 +144,7 @@ namespace internal
  * preconditioning. As expected, this switches between solving for the systems
  * <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i>, respectively.
  *
- * A second consequence is the type of residual which is used to measure
+ * A second consequence is the type of residual used to measure
  * convergence. With left preconditioning, this is the <b>preconditioned</b>
  * residual, while with right preconditioning, it is the residual of the
  * unpreconditioned system.
@@ -156,13 +158,13 @@ namespace internal
  *
  * <h3>The size of the Arnoldi basis</h3>
  *
- * The maximal basis size is controlled by AdditionalData::max_n_tmp_vectors,
- * and it is this number minus 2. If the number of iteration steps exceeds
- * this number, all basis vectors are discarded and the iteration starts anew
- * from the approximation obtained so far.
+ * The maximal basis size is controlled by AdditionalData::max_basis_size. If
+ * the number of iteration steps exceeds this number, all basis vectors are
+ * discarded and the iteration starts anew from the approximation obtained so
+ * far. This algorithm strategy is typically called restarted GMRES method.
  *
- * Note that the minimizing property of GMRes only pertains to the Krylov
- * space spanned by the Arnoldi basis. Therefore, restarted GMRes is
+ * Note that the minimizing property of GMRES only pertains to the Krylov
+ * space spanned by the Arnoldi basis. Therefore, restarted GMRES is
  * <b>not</b> minimizing anymore. The choice of the basis length is a
  * trade-off between memory consumption and convergence speed, since a longer
  * basis means minimization over a larger space.
@@ -199,14 +201,15 @@ public:
   struct AdditionalData
   {
     /**
-     * Constructor. By default, set the number of temporary vectors to 30,
-     * i.e. do a restart every 28 iterations. Also set preconditioning from
-     * left, the residual of the stopping criterion to the default residual,
-     * and re-orthogonalization only if necessary. Also, the batched mode with
-     * reduced functionality to track information is disabled by default.
+     * Constructor. By default, set the size of the Arnoldi basis to 30. Also
+     * set preconditioning from left, the residual of the stopping criterion
+     * to the default residual, and re-orthogonalization only if
+     * necessary. Also, the batched mode with reduced functionality to track
+     * information is disabled by default. Finally, the default
+     * orthogonalization algorithm is the modified Gram-Schmidt method.
      */
     explicit AdditionalData(
-      const unsigned int max_n_tmp_vectors          = 30,
+      const unsigned int max_basis_size             = 30,
       const bool         right_preconditioning      = false,
       const bool         use_default_residual       = true,
       const bool         force_re_orthogonalization = false,
@@ -216,12 +219,26 @@ public:
           LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt);
 
     /**
-     * Maximum number of temporary vectors. This parameter controls the size
-     * of the Arnoldi basis, which for historical reasons is
-     * #max_n_tmp_vectors-2. SolverGMRES assumes that there are at least three
-     * temporary vectors, so this value must be greater than or equal to three.
+     * Maximum number of temporary vectors. Together with max_basis_size, this
+     * parameter controls the size of the Arnoldi basis, which corresponds to
+     * max_n_tmp_vectors-2 as used in previous versions of the deal.II
+     * library. SolverGMRES assumes that there are at least three temporary
+     * vectors, so this value must be greater than or equal to three. If both
+     * this variable and max_basis_size are set to a non-zero value, the
+     * choice in max_basis_size takes precedence.
+     *
+     * @deprecated Use max_basis_size instead.
      */
     unsigned int max_n_tmp_vectors;
+
+    /**
+     * Maximum size of the Arnoldi basis. SolverGMRES assumes that there is at
+     * least one vector in the Arnoldi basis, so this value must be greater
+     * than or equal to one. Note that whenever this variable is set to a
+     * non-zero value, including the value set by the default constructor,
+     * this variable takes precedence over max_n_tmp_vectors.
+     */
+    unsigned int max_basis_size;
 
     /**
      * Flag for right preconditioning.
@@ -420,17 +437,6 @@ protected:
   criterion();
 
   /**
-   * Transformation of an upper Hessenberg matrix into tridiagonal structure
-   * by givens rotation of the last column
-   */
-  void
-  givens_rotation(Vector<double> &h,
-                  Vector<double> &b,
-                  Vector<double> &ci,
-                  Vector<double> &si,
-                  int             col) const;
-
-  /**
    * Estimates the eigenvalues from the Hessenberg matrix, H_orig, generated
    * during the inner iterations. Uses these estimate to compute the condition
    * number. Calls the signals eigenvalues_signal and cond_signal with these
@@ -454,17 +460,12 @@ protected:
   /**
    * Auxiliary vector for orthogonalization
    */
-  Vector<double> gamma;
+  Vector<double> projected_rhs;
 
   /**
    * Auxiliary vector for orthogonalization
    */
-  Vector<double> ci;
-
-  /**
-   * Auxiliary vector for orthogonalization
-   */
-  Vector<double> si;
+  std::vector<std::pair<double, double>> givens_rotations;
 
   /**
    * Auxiliary vector for orthogonalization
@@ -572,6 +573,51 @@ private:
 
 
 #ifndef DOXYGEN
+
+template <typename VectorType>
+inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
+  const unsigned int                             max_basis_size,
+  const bool                                     right_preconditioning,
+  const bool                                     use_default_residual,
+  const bool                                     force_re_orthogonalization,
+  const bool                                     batched_mode,
+  const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy)
+  : max_n_tmp_vectors(0)
+  , max_basis_size(max_basis_size)
+  , right_preconditioning(right_preconditioning)
+  , use_default_residual(use_default_residual)
+  , force_re_orthogonalization(force_re_orthogonalization)
+  , batched_mode(batched_mode)
+  , orthogonalization_strategy(orthogonalization_strategy)
+{
+  Assert(max_basis_size >= 1,
+         ExcMessage("SolverGMRES needs at least one vector in the "
+                    "Arnoldi basis."));
+}
+
+
+
+template <typename VectorType>
+SolverGMRES<VectorType>::SolverGMRES(SolverControl            &cn,
+                                     VectorMemory<VectorType> &mem,
+                                     const AdditionalData     &data)
+  : SolverBase<VectorType>(cn, mem)
+  , additional_data(data)
+  , solver_control(cn)
+{}
+
+
+
+template <typename VectorType>
+SolverGMRES<VectorType>::SolverGMRES(SolverControl        &cn,
+                                     const AdditionalData &data)
+  : SolverBase<VectorType>(cn)
+  , additional_data(data)
+  , solver_control(cn)
+{}
+
+
+
 namespace internal
 {
   namespace SolverGMRESImplementation
@@ -622,111 +668,6 @@ namespace internal
 
 
 
-    // A comparator for better printing eigenvalues
-    inline bool
-    complex_less_pred(const std::complex<double> &x,
-                      const std::complex<double> &y)
-    {
-      return x.real() < y.real() ||
-             (x.real() == y.real() && x.imag() < y.imag());
-    }
-
-    // A function to solve the (upper) triangular system after Givens
-    // rotations on a matrix that has possibly unused rows and columns
-    inline void
-    solve_triangular(const unsigned int        dim,
-                     const FullMatrix<double> &H,
-                     const Vector<double>     &rhs,
-                     Vector<double>           &solution)
-    {
-      for (int i = dim - 1; i >= 0; --i)
-        {
-          double s = rhs(i);
-          for (unsigned int j = i + 1; j < dim; ++j)
-            s -= solution(j) * H(i, j);
-          solution(i) = s / H(i, i);
-          AssertIsFinite(solution(i));
-        }
-    }
-  } // namespace SolverGMRESImplementation
-} // namespace internal
-
-
-
-template <typename VectorType>
-inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
-  const unsigned int                             max_n_tmp_vectors,
-  const bool                                     right_preconditioning,
-  const bool                                     use_default_residual,
-  const bool                                     force_re_orthogonalization,
-  const bool                                     batched_mode,
-  const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy)
-  : max_n_tmp_vectors(max_n_tmp_vectors)
-  , right_preconditioning(right_preconditioning)
-  , use_default_residual(use_default_residual)
-  , force_re_orthogonalization(force_re_orthogonalization)
-  , batched_mode(batched_mode)
-  , orthogonalization_strategy(orthogonalization_strategy)
-{
-  Assert(3 <= max_n_tmp_vectors,
-         ExcMessage("SolverGMRES needs at least three "
-                    "temporary vectors."));
-}
-
-
-
-template <typename VectorType>
-SolverGMRES<VectorType>::SolverGMRES(SolverControl            &cn,
-                                     VectorMemory<VectorType> &mem,
-                                     const AdditionalData     &data)
-  : SolverBase<VectorType>(cn, mem)
-  , additional_data(data)
-  , solver_control(cn)
-{}
-
-
-
-template <typename VectorType>
-SolverGMRES<VectorType>::SolverGMRES(SolverControl        &cn,
-                                     const AdditionalData &data)
-  : SolverBase<VectorType>(cn)
-  , additional_data(data)
-  , solver_control(cn)
-{}
-
-
-
-template <typename VectorType>
-inline void
-SolverGMRES<VectorType>::givens_rotation(Vector<double> &h,
-                                         Vector<double> &b,
-                                         Vector<double> &ci,
-                                         Vector<double> &si,
-                                         int             col) const
-{
-  for (int i = 0; i < col; ++i)
-    {
-      const double s     = si(i);
-      const double c     = ci(i);
-      const double dummy = h(i);
-      h(i)               = c * dummy + s * h(i + 1);
-      h(i + 1)           = -s * dummy + c * h(i + 1);
-    };
-
-  const double r = 1. / std::sqrt(h(col) * h(col) + h(col + 1) * h(col + 1));
-  si(col)        = h(col + 1) * r;
-  ci(col)        = h(col) * r;
-  h(col)         = ci(col) * h(col) + si(col) * h(col + 1);
-  b(col + 1)     = -si(col) * b(col);
-  b(col) *= ci(col);
-}
-
-
-
-namespace internal
-{
-  namespace SolverGMRESImplementation
-  {
     template <typename VectorType, typename Enable = void>
     struct is_dealii_compatible_distributed_vector;
 
@@ -1225,6 +1166,65 @@ namespace internal
 
       return 0.0;
     }
+
+    // A comparator for better printing eigenvalues
+    inline bool
+    complex_less_pred(const std::complex<double> &x,
+                      const std::complex<double> &y)
+    {
+      return x.real() < y.real() ||
+             (x.real() == y.real() && x.imag() < y.imag());
+    }
+
+
+
+    // A function to compute the Givens rotation for the QR factorization of
+    // the Hessenberg matrix involved in the Arnoldi process, transforming it
+    // into an upper triangular matrix.
+    inline void
+    givens_rotation(Vector<double>                         &h,
+                    Vector<double>                         &b,
+                    std::vector<std::pair<double, double>> &rotations,
+                    const int                               col)
+    {
+      for (int i = 0; i < col; ++i)
+        {
+          const double c   = rotations[i].first;
+          const double s   = rotations[i].second;
+          const double tmp = h(i);
+          h(i)             = c * tmp + s * h(i + 1);
+          h(i + 1)         = -s * tmp + c * h(i + 1);
+        }
+
+      const double r =
+        1. / std::sqrt(h(col) * h(col) + h(col + 1) * h(col + 1));
+      rotations[col].second = h(col + 1) * r;
+      rotations[col].first  = h(col) * r;
+      h(col) =
+        rotations[col].first * h(col) + rotations[col].second * h(col + 1);
+      b(col + 1) = -rotations[col].second * b(col);
+      b(col) *= rotations[col].first;
+    }
+
+
+
+    // A function to solve the (upper) triangular system after Givens
+    // rotations on a matrix that has possibly unused rows and columns
+    inline void
+    solve_triangular(const unsigned int        dim,
+                     const FullMatrix<double> &H,
+                     const Vector<double>     &rhs,
+                     Vector<double>           &solution)
+    {
+      for (int i = dim - 1; i >= 0; --i)
+        {
+          double s = rhs(i);
+          for (unsigned int j = i + 1; j < dim; ++j)
+            s -= solution(j) * H(i, j);
+          solution(i) = s / H(i, i);
+          AssertIsFinite(solution(i));
+        }
+    }
   } // namespace SolverGMRESImplementation
 } // namespace internal
 
@@ -1290,22 +1290,20 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
                                const VectorType         &b,
                                const PreconditionerType &preconditioner)
 {
-  // TODO:[?] Check, why there are two different start residuals.
-  // TODO:[GK] Make sure the parameter in the constructor means maximum basis
-  // size
-
   std::unique_ptr<LogStream::Prefix> prefix;
   if (!additional_data.batched_mode)
     prefix = std::make_unique<LogStream::Prefix>("GMRES");
 
   // extra call to std::max to placate static analyzers: coverity rightfully
   // complains that data.max_n_tmp_vectors - 2 may overflow
-  const unsigned int n_tmp_vectors =
-    std::max(additional_data.max_n_tmp_vectors, 3u);
+  const unsigned int basis_size =
+    (additional_data.max_basis_size > 0 ?
+       additional_data.max_basis_size :
+       std::max(additional_data.max_n_tmp_vectors, 3u) - 2);
 
   // Generate an object where basis vectors are stored.
-  internal::SolverGMRESImplementation::TmpVectors<VectorType> tmp_vectors(
-    n_tmp_vectors, this->memory);
+  internal::SolverGMRESImplementation::TmpVectors<VectorType> basis_vectors(
+    basis_size + 2, this->memory);
 
   // number of the present iteration; this
   // number is not reset to zero upon a
@@ -1322,40 +1320,36 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // applying Givens rotations)
   FullMatrix<double> H_orig;
   if (do_eigenvalues)
-    H_orig.reinit(n_tmp_vectors, n_tmp_vectors - 1);
+    H_orig.reinit(basis_size + 1, basis_size);
 
   // matrix used for the orthogonalization process later
-  H.reinit(n_tmp_vectors, n_tmp_vectors - 1, /* omit_initialization */ true);
+  H.reinit(basis_size + 1, basis_size, /* omit_initialization */ true);
 
   // some additional vectors, also used in the orthogonalization
-  gamma.reinit(n_tmp_vectors);
-  ci.reinit(n_tmp_vectors - 1);
-  si.reinit(n_tmp_vectors - 1);
-  h.reinit(n_tmp_vectors - 1);
-
-  unsigned int dim = 0;
+  projected_rhs.reinit(basis_size + 1);
+  givens_rotations.resize(basis_size);
+  h.reinit(basis_size + 1);
 
   SolverControl::State iteration_state = SolverControl::iterate;
-  double               last_res        = std::numeric_limits<double>::lowest();
+  double               res             = std::numeric_limits<double>::lowest();
 
   // switch to determine whether we want a left or a right preconditioner. at
   // present, left is default, but both ways are implemented
   const bool left_precondition = !additional_data.right_preconditioning;
 
-  // Per default the left preconditioned GMRes uses the preconditioned
-  // residual and the right preconditioned GMRes uses the unpreconditioned
+  // Per default the left preconditioned GMRES uses the preconditioned
+  // residual and the right preconditioned GMRES uses the unpreconditioned
   // residual as stopping criterion.
   const bool use_default_residual = additional_data.use_default_residual;
 
-  // define two aliases
-  VectorType &v = tmp_vectors(0, x);
-  VectorType &p = tmp_vectors(n_tmp_vectors - 1, x);
+  // define an alias
+  VectorType &p = basis_vectors(basis_size + 1, x);
 
   // Following vectors are needed when we are not using the default residuals
   // as stopping criterion
   typename VectorMemory<VectorType>::Pointer r;
   typename VectorMemory<VectorType>::Pointer x_;
-  std::unique_ptr<dealii::Vector<double>>    gamma_;
+  std::unique_ptr<dealii::Vector<double>>    gamma;
   if (!use_default_residual)
     {
       r  = std::move(typename VectorMemory<VectorType>::Pointer(this->memory));
@@ -1363,7 +1357,7 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
       r->reinit(x);
       x_->reinit(x);
 
-      gamma_ = std::make_unique<dealii::Vector<double>>(gamma.size());
+      gamma = std::make_unique<dealii::Vector<double>>(projected_rhs.size());
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;
@@ -1374,42 +1368,45 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // restart
   do
     {
-      double rho = 0.0;
+      VectorType &v      = basis_vectors(0, x);
+      double      norm_v = 0.;
 
       if (left_precondition)
         {
           A.vmult(p, x);
           p.sadd(-1., 1., b);
           preconditioner.vmult(v, p);
-          rho = v.l2_norm();
+          norm_v = v.l2_norm();
         }
       else
         {
           A.vmult(v, x);
-          rho = dealii::internal::SolverGMRESImplementation::sadd_and_norm(v,
-                                                                           -1,
-                                                                           b,
-                                                                           1.0);
+          norm_v = dealii::internal::SolverGMRESImplementation::sadd_and_norm(
+            v, -1, b, 1.0);
         }
+
+      projected_rhs(0) = norm_v;
+      if (norm_v != 0)
+        v /= norm_v;
 
       // check the residual here as well since it may be that we got the exact
       // (or an almost exact) solution vector at the outset. if we wouldn't
       // check here, the next scaling operation would produce garbage
       if (use_default_residual)
         {
-          last_res = rho;
+          res = norm_v;
           if (additional_data.batched_mode)
-            iteration_state = solver_control.check(accumulated_iterations, rho);
+            iteration_state = solver_control.check(accumulated_iterations, res);
           else
             iteration_state =
-              this->iteration_status(accumulated_iterations, rho, x);
+              this->iteration_status(accumulated_iterations, res, x);
 
           if (iteration_state != SolverControl::iterate)
             break;
         }
       else
         {
-          deallog << "default_res=" << rho << std::endl;
+          deallog << "default_res=" << norm_v << std::endl;
 
           if (left_precondition)
             {
@@ -1419,10 +1416,9 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
           else
             preconditioner.vmult(*r, v);
 
-          double res = r->l2_norm();
-          last_res   = res;
+          res = r->l2_norm();
           if (additional_data.batched_mode)
-            iteration_state = solver_control.check(accumulated_iterations, rho);
+            iteration_state = solver_control.check(accumulated_iterations, res);
           else
             iteration_state =
               this->iteration_status(accumulated_iterations, res, x);
@@ -1431,98 +1427,91 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
             break;
         }
 
-      gamma(0) = rho;
-
-      v *= 1. / rho;
-
-      // inner iteration doing at most as many steps as there are temporary
-      // vectors. the number of steps actually been done is propagated outside
-      // through the @p dim variable
-      for (unsigned int inner_iteration = 0;
-           ((inner_iteration < n_tmp_vectors - 2) &&
-            (iteration_state == SolverControl::iterate));
+      // inner iteration doing at most as many steps as the size of the
+      // Arnoldi basis
+      unsigned int inner_iteration = 0;
+      for (; (inner_iteration < basis_size &&
+              iteration_state == SolverControl::iterate);
            ++inner_iteration)
         {
           ++accumulated_iterations;
           // yet another alias
-          VectorType &vv = tmp_vectors(inner_iteration + 1, x);
+          VectorType &vv = basis_vectors(inner_iteration + 1, x);
 
           if (left_precondition)
             {
-              A.vmult(p, tmp_vectors[inner_iteration]);
+              A.vmult(p, basis_vectors[inner_iteration]);
               preconditioner.vmult(vv, p);
             }
           else
             {
-              preconditioner.vmult(p, tmp_vectors[inner_iteration]);
+              preconditioner.vmult(p, basis_vectors[inner_iteration]);
               A.vmult(vv, p);
             }
 
-          dim = inner_iteration + 1;
+          norm_v = internal::SolverGMRESImplementation::iterated_gram_schmidt(
+            additional_data.orthogonalization_strategy,
+            basis_vectors,
+            inner_iteration + 1,
+            accumulated_iterations,
+            vv,
+            h,
+            re_orthogonalize,
+            re_orthogonalize_signal);
 
-          const double s =
-            internal::SolverGMRESImplementation::iterated_gram_schmidt(
-              additional_data.orthogonalization_strategy,
-              tmp_vectors,
-              dim,
-              accumulated_iterations,
-              vv,
-              h,
-              re_orthogonalize,
-              re_orthogonalize_signal);
-          h(inner_iteration + 1) = s;
+          // norm_v = 0 is a lucky breakdown, the solver will reach
+          // convergence, but we must not divide by zero here.
+          if (norm_v != 0)
+            vv /= norm_v;
 
-          // s=0 is a lucky breakdown, the solver will reach convergence,
-          // but we must not divide by zero here.
-          if (s != 0)
-            vv *= 1. / s;
+          h(inner_iteration + 1) = norm_v;
 
           // for eigenvalues, get the resulting coefficients from the
           // orthogonalization process
           if (do_eigenvalues)
-            for (unsigned int i = 0; i < dim + 1; ++i)
+            for (unsigned int i = 0; i < inner_iteration + 2; ++i)
               H_orig(i, inner_iteration) = h(i);
 
           //  Transformation into tridiagonal structure
-          givens_rotation(h, gamma, ci, si, inner_iteration);
+          internal::SolverGMRESImplementation::givens_rotation(h,
+                                                               projected_rhs,
+                                                               givens_rotations,
+                                                               inner_iteration);
 
           //  append vector on matrix
-          for (unsigned int i = 0; i < dim; ++i)
+          for (unsigned int i = 0; i < inner_iteration + 1; ++i)
             H(i, inner_iteration) = h(i);
 
           //  default residual
-          rho = std::fabs(gamma(dim));
+          res = std::fabs(projected_rhs(inner_iteration + 1));
 
           if (use_default_residual)
             {
-              last_res = rho;
               if (additional_data.batched_mode)
                 iteration_state =
-                  solver_control.check(accumulated_iterations, rho);
+                  solver_control.check(accumulated_iterations, res);
               else
                 iteration_state =
-                  this->iteration_status(accumulated_iterations, rho, x);
+                  this->iteration_status(accumulated_iterations, res, x);
             }
           else
             {
               if (!additional_data.batched_mode)
-                deallog << "default_res=" << rho << std::endl;
+                deallog << "default_res=" << res << std::endl;
 
-              *x_     = x;
-              *gamma_ = gamma;
-              internal::SolverGMRESImplementation::solve_triangular(dim,
-                                                                    H,
-                                                                    *gamma_,
-                                                                    h);
+              *x_    = x;
+              *gamma = projected_rhs;
+              internal::SolverGMRESImplementation::solve_triangular(
+                inner_iteration + 1, H, *gamma, h);
 
               if (left_precondition)
-                for (unsigned int i = 0; i < dim; ++i)
-                  x_->add(h(i), tmp_vectors[i]);
+                for (unsigned int i = 0; i < inner_iteration + 1; ++i)
+                  x_->add(h(i), basis_vectors[i]);
               else
                 {
                   p = 0.;
-                  for (unsigned int i = 0; i < dim; ++i)
-                    p.add(h(i), tmp_vectors[i]);
+                  for (unsigned int i = 0; i < inner_iteration + 1; ++i)
+                    p.add(h(i), basis_vectors[i]);
                   preconditioner.vmult(*r, p);
                   x_->add(1., *r);
                 };
@@ -1531,69 +1520,69 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
               // Now *r contains the unpreconditioned residual!!
               if (left_precondition)
                 {
-                  const double res = r->l2_norm();
-                  last_res         = res;
-
+                  res = r->l2_norm();
                   iteration_state =
                     this->iteration_status(accumulated_iterations, res, x);
                 }
               else
                 {
                   preconditioner.vmult(*x_, *r);
-                  const double preconditioned_res = x_->l2_norm();
-                  last_res                        = preconditioned_res;
+                  res = x_->l2_norm();
 
                   if (additional_data.batched_mode)
                     iteration_state =
-                      solver_control.check(accumulated_iterations, rho);
+                      solver_control.check(accumulated_iterations, res);
                   else
                     iteration_state =
-                      this->iteration_status(accumulated_iterations,
-                                             preconditioned_res,
-                                             x);
+                      this->iteration_status(accumulated_iterations, res, x);
                 }
             }
         }
 
       // end of inner iteration. now calculate the solution from the temporary
       // vectors
-      internal::SolverGMRESImplementation::solve_triangular(dim, H, gamma, h);
+      internal::SolverGMRESImplementation::solve_triangular(inner_iteration,
+                                                            H,
+                                                            projected_rhs,
+                                                            h);
 
       if (do_eigenvalues)
         compute_eigs_and_cond(H_orig,
-                              dim,
+                              inner_iteration,
                               all_eigenvalues_signal,
                               all_hessenberg_signal,
                               condition_number_signal);
 
       if (left_precondition)
         dealii::internal::SolverGMRESImplementation::add(
-          x, dim, h, tmp_vectors, false);
+          x, inner_iteration, h, basis_vectors, false);
       else
         {
           dealii::internal::SolverGMRESImplementation::add(
-            p, dim, h, tmp_vectors, true);
+            p, inner_iteration, h, basis_vectors, true);
           preconditioner.vmult(v, p);
           x.add(1., v);
         }
+
+      // in the last round, print the eigenvalues from the last Arnoldi step
+      if (iteration_state != SolverControl::iterate && do_eigenvalues)
+        compute_eigs_and_cond(H_orig,
+                              inner_iteration,
+                              eigenvalues_signal,
+                              hessenberg_signal,
+                              condition_number_signal);
+
       // end of outer iteration. restart if no convergence and the number of
       // iterations is not exceeded
     }
   while (iteration_state == SolverControl::iterate);
 
-  if (do_eigenvalues)
-    compute_eigs_and_cond(H_orig,
-                          dim,
-                          eigenvalues_signal,
-                          hessenberg_signal,
-                          condition_number_signal);
-
   if (!additional_data.batched_mode && !krylov_space_signal.empty())
-    krylov_space_signal(tmp_vectors);
+    krylov_space_signal(basis_vectors);
 
   // in case of failure: throw exception
   AssertThrow(iteration_state == SolverControl::success,
-              SolverControl::NoConvergence(accumulated_iterations, last_res));
+              SolverControl::NoConvergence(accumulated_iterations, res));
 }
 
 
@@ -1721,7 +1710,7 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
 
   // Generate an object where basis vectors are stored.
   typename internal::SolverGMRESImplementation::TmpVectors<VectorType> v(
-    basis_size, this->memory);
+    basis_size + 1, this->memory);
   typename internal::SolverGMRESImplementation::TmpVectors<VectorType> z(
     basis_size, this->memory);
 
@@ -1731,84 +1720,85 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
 
   // matrix used for the orthogonalization process later
   H.reinit(basis_size + 1, basis_size);
+  std::vector<std::pair<double, double>> givens_rotations(basis_size);
 
   Vector<double> h(basis_size + 1);
 
   // Vectors for projected system
-  Vector<double> projected_rhs;
-  Vector<double> y;
+  Vector<double> projected_rhs(basis_size + 1);
+  Vector<double> y(basis_size);
 
   // Iteration starts here
   double res = std::numeric_limits<double>::lowest();
 
-  typename VectorMemory<VectorType>::Pointer aux(this->memory);
-  aux->reinit(x);
   do
     {
-      A.vmult(*aux, x);
-      aux->sadd(-1., 1., b);
+      A.vmult(v(0, x), x);
+      v[0].sadd(-1., 1., b);
 
-      double beta     = aux->l2_norm();
-      res             = beta;
+      double norm_v   = v[0].l2_norm();
+      res             = norm_v;
       iteration_state = this->iteration_status(accumulated_iterations, res, x);
       if (iteration_state == SolverControl::success)
         break;
 
       H.reinit(basis_size + 1, basis_size);
-      double a = beta;
 
-      for (unsigned int j = 0; j < basis_size; ++j)
+      projected_rhs(0)             = norm_v;
+      unsigned int inner_iteration = 0;
+      for (; (inner_iteration < basis_size &&
+              iteration_state == SolverControl::iterate);
+           ++inner_iteration)
         {
-          if (a != 0) // treat lucky breakdown
-            v(j, x).equ(1. / a, *aux);
-          else
-            v(j, x) = 0.;
+          // norm_v = 0 is a lucky breakdown, the solver will reach
+          // convergence, but we must not divide by zero here.
+          if (norm_v != 0)
+            v[inner_iteration] /= norm_v;
 
-
-          preconditioner.vmult(z(j, x), v[j]);
-          A.vmult(*aux, z[j]);
+          preconditioner.vmult(z(inner_iteration, x), v[inner_iteration]);
+          A.vmult(v(inner_iteration + 1, x), z[inner_iteration]);
 
           // Gram-Schmidt
-          bool         re_orthogonalize = false;
-          const double s =
-            internal::SolverGMRESImplementation::iterated_gram_schmidt<
-              VectorType>(additional_data.orthogonalization_strategy,
-                          v,
-                          j + 1,
-                          0,
-                          *aux,
-                          h,
-                          re_orthogonalize);
-          for (unsigned int i = 0; i <= j; ++i)
-            H(i, j) = h(i);
-          H(j + 1, j) = a = s;
+          bool re_orthogonalize = false;
+          norm_v = internal::SolverGMRESImplementation::iterated_gram_schmidt<
+            VectorType>(additional_data.orthogonalization_strategy,
+                        v,
+                        inner_iteration + 1,
+                        0,
+                        v[inner_iteration + 1],
+                        h,
+                        re_orthogonalize);
 
           // Compute projected solution
+          h(inner_iteration + 1) = norm_v;
+          internal::SolverGMRESImplementation::givens_rotation(h,
+                                                               projected_rhs,
+                                                               givens_rotations,
+                                                               inner_iteration);
 
-          if (j > 0)
-            {
-              H1.reinit(j + 1, j);
-              projected_rhs.reinit(j + 1);
-              y.reinit(j);
-              projected_rhs(0) = beta;
-              H1.fill(H);
+          //  append vector on Hessenberg matrix
+          for (unsigned int i = 0; i < inner_iteration + 1; ++i)
+            H(i, inner_iteration) = h(i);
 
-              // check convergence. note that the vector 'x' we pass to the
-              // criterion is not the final solution we compute if we
-              // decide to jump out of the iteration (we update 'x' again
-              // right after the current loop)
-              Householder<double> house(H1);
-              res = house.least_squares(y, projected_rhs);
-              iteration_state =
-                this->iteration_status(++accumulated_iterations, res, x);
-              if (iteration_state != SolverControl::iterate)
-                break;
-            }
+          //  default residual
+          res = std::fabs(projected_rhs(inner_iteration + 1));
+
+          // check convergence. note that the vector 'x' we pass to the
+          // criterion is not the final solution we compute if we
+          // decide to jump out of the iteration (we update 'x' again
+          // right after the current loop)
+          iteration_state =
+            this->iteration_status(++accumulated_iterations, res, x);
         }
 
-      // Update solution vector
-      for (unsigned int j = 0; j < y.size(); ++j)
-        x.add(y(j), z[j]);
+      // Solve triangular system with projected quantities and update solution
+      // vector
+      internal::SolverGMRESImplementation::solve_triangular(inner_iteration,
+                                                            H,
+                                                            projected_rhs,
+                                                            y);
+      dealii::internal::SolverGMRESImplementation::add(
+        x, inner_iteration, y, z, false);
     }
   while (iteration_state == SolverControl::iterate);
 

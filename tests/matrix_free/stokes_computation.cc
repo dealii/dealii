@@ -1386,13 +1386,19 @@ namespace StokesClass
     solution.block(block_vel) = distributed_stokes_solution.block(block_vel);
     solution.block(block_p)   = distributed_stokes_solution.block(block_p);
 
+    LinearAlgebra::distributed::BlockVector<double> vec(
+      distributed_stokes_solution);
+    stokes_matrix.vmult(vec, distributed_stokes_solution);
+    vec -= distributed_stokes_rhs;
+
     deallog << "Solved-in "
             << (solver_control_cheap.last_step() !=
                     numbers::invalid_unsigned_int ?
                   solver_control_cheap.last_step() :
                   0)
             << " iterations, final residual: "
-            << solver_control_cheap.last_value() << std::endl;
+            << solver_control_cheap.last_value() << " and true residual "
+            << vec.l2_norm() << std::endl;
   }
 
 

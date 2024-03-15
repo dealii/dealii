@@ -481,7 +481,7 @@ namespace Step12
     SolverControl solver_control(1000, 1e-6 * right_hand_side.l2_norm());
 
     SolverGMRES<Vector<double>>::AdditionalData additional_data;
-    additional_data.max_n_tmp_vectors = 100;
+    additional_data.max_basis_size = 100;
     SolverGMRES<Vector<double>> solver(solver_control, additional_data);
 
     // Here we create the preconditioner,
