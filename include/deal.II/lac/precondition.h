@@ -2698,7 +2698,8 @@ PreconditionRelaxation<MatrixType, PreconditionerType>::initialize(
   const MatrixType     &rA,
   const AdditionalData &parameters)
 {
-  A = &rA;
+  A                           = &rA;
+  eigenvalues_are_initialized = false;
 
   Assert(parameters.preconditioner, ExcNotInitialized());
 
