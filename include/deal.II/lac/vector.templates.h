@@ -1092,27 +1092,15 @@ Vector<Number>::do_reinit(const size_type new_size,
                           const bool      omit_zeroing_entries,
                           const bool      reset_partitioner)
 {
-  if (new_size <= size())
+  if (new_size == 0)
     {
-      if (new_size == 0)
-        {
-          values.clear();
-        }
-      else
-        {
-          values.resize_fast(new_size);
-          if (!omit_zeroing_entries)
-            values.fill();
-        }
+      values.clear();
     }
   else
     {
-      // otherwise size() < new_size and we must allocate
-      AlignedVector<Number> new_values;
-      new_values.resize_fast(new_size);
+      values.resize_fast(new_size);
       if (!omit_zeroing_entries)
-        new_values.fill();
-      new_values.swap(values);
+        values.fill();
     }
 
   if (reset_partitioner)
