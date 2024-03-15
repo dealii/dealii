@@ -1092,16 +1092,9 @@ Vector<Number>::do_reinit(const size_type new_size,
                           const bool      omit_zeroing_entries,
                           const bool      reset_partitioner)
 {
-  if (new_size == 0)
-    {
-      values.clear();
-    }
-  else
-    {
-      values.resize_fast(new_size);
-      if (!omit_zeroing_entries)
-        values.fill();
-    }
+  values.resize_fast(new_size);
+  if (!omit_zeroing_entries)
+    values.fill();
 
   if (reset_partitioner)
     maybe_reset_thread_partitioner();
