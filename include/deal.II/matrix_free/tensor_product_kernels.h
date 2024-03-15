@@ -19,8 +19,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/aligned_vector.h>
-#include <deal.II/base/ndarray.h>
-#include <deal.II/base/polynomial.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/matrix_free/shape_info.h>
