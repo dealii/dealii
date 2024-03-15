@@ -305,12 +305,12 @@ namespace VectorTools
    * The opposite operation, interpolation from a coarser to a finer mesh,
    * is implemented in the interpolate_to_finer_mesh() function.
    */
-  template <int dim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void interpolate_to_coarser_mesh(
-    const DoFHandler<dim> &dof_handler_fine,
-    const VectorType      &u_fine,
-    const DoFHandler<dim> &dof_handler_coarse,
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
+    const VectorType                &u_fine,
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
     const AffineConstraints<typename VectorType::value_type>
                &constraints_coarse,
     VectorType &u_coarse);
@@ -338,12 +338,12 @@ namespace VectorTools
    * The opposite operation, interpolation from a finer to a coarser mesh,
    * is implemented in the interpolate_to_coarser_mesh() function.
    */
-  template <int dim, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void interpolate_to_finer_mesh(
-    const DoFHandler<dim> &dof_handler_coarse,
-    const VectorType      &u_coarse,
-    const DoFHandler<dim> &dof_handler_fine,
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
+    const VectorType                &u_coarse,
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
     const AffineConstraints<typename VectorType::value_type> &constraints_fine,
     VectorType                                               &u_fine);
 
