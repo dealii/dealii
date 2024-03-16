@@ -4,5 +4,6 @@
     "dummy" : {"int3" : 3, "int4" : 4},
     "int5": {"value": 5},
     "int6": 6,
-    "dummy2" : {"int7" : 7, "int8" : 8}
+    "dummy2" : {"int7" : 7, "int8" : 8},
+    "test_underscore": {"int_5": 10}
 }

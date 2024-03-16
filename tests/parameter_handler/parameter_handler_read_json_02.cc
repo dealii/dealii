@@ -42,7 +42,7 @@ main()
   prm.leave_subsection();
 
   // read from json
-  std::ifstream in(SOURCE_DIR "/prm/parameter_handler_read_json_02.prm");
+  std::ifstream in(SOURCE_DIR "/prm/parameter_handler_read_json_02.json");
   prm.parse_input_from_json(in, true);
 
   AssertDimension(int1, 1);

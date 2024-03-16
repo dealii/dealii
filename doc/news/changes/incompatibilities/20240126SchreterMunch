@@ -1,0 +1,4 @@
+Changed:`ParameterHandler::parse_input_from_json()` reads now a json-file 
+without mangled parameter names.
+<br>
+(Magdalena Schreter, Peter Munch, 2024/01/26)

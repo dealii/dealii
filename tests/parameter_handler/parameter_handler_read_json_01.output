@@ -29,6 +29,15 @@
             "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
             "actions": "6"
         },
+        "double_double":
+        {
+            "value": "1.234",
+            "default_value": "0",
+            "documentation": "docs 4",
+            "pattern": "7",
+            "pattern_description": "[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]",
+            "actions": "7"
+        },
         "int*int":
         {
             "value": "2",

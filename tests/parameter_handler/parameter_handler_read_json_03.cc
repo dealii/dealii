@@ -31,6 +31,7 @@ main()
   int int2 = 0;
   int int3 = 0;
   int int4 = 0;
+  int int5 = 0;
 
   ParameterHandler prm;
   prm.add_parameter("int1", int1);
@@ -41,6 +42,10 @@ main()
   prm.add_parameter("int4", int4);
   prm.leave_subsection();
 
+  prm.enter_subsection("test_underscore");
+  prm.add_parameter("int_5", int5);
+  prm.leave_subsection();
+
   std::string source   = SOURCE_DIR;
   std::string filename = source + "/prm/parameter_handler_read_json_03.json";
   prm.parse_input(filename, "", true, true);
@@ -49,6 +54,7 @@ main()
   AssertDimension(int2, 2);
   AssertDimension(int3, 3);
   AssertDimension(int4, 4);
+  AssertDimension(int5, 10);
 
   return 0;
 }
