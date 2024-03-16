@@ -175,6 +175,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(10);
 
   using Number     = double;
   using VectorType = Vector<Number>;
