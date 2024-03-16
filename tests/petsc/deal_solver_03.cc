@@ -64,9 +64,10 @@ main(int argc, char **argv)
     f = 1.;
     A.compress(VectorOperation::insert);
 
-    GrowingVectorMemory<PETScWrappers::MPI::Vector> mem;
-    SolverGMRES<PETScWrappers::MPI::Vector>         solver(control, mem);
-    PreconditionIdentity                            preconditioner;
+    GrowingVectorMemory<PETScWrappers::MPI::Vector>         mem;
+    SolverGMRES<PETScWrappers::MPI::Vector>::AdditionalData data(28);
+    SolverGMRES<PETScWrappers::MPI::Vector> solver(control, mem, data);
+    PreconditionIdentity                    preconditioner;
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
     check_solver_within_range(solver.solve(A, u, f, preconditioner),
                               control.last_step(),
