@@ -175,6 +175,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(10);
 
   using Number     = double;
   using VectorType = Vector<Number>;
@@ -225,18 +226,19 @@ main()
       {
         std::vector<std::tuple<double, double, double, double>> results;
 
-        {
-          // 0) Test PreconditionJacobi
-          PreconditionJacobi<MatrixType> preconditioner;
+        if (relaxation != 0.0)
+          {
+            // 0) Test PreconditionJacobi
+            PreconditionJacobi<MatrixType> preconditioner;
 
-          PreconditionJacobi<MatrixType>::AdditionalData ad;
-          ad.relaxation   = relaxation;
-          ad.n_iterations = n_iterations;
+            PreconditionJacobi<MatrixType>::AdditionalData ad;
+            ad.relaxation   = relaxation;
+            ad.n_iterations = n_iterations;
 
-          preconditioner.initialize(system_matrix, ad);
+            preconditioner.initialize(system_matrix, ad);
 
-          results.emplace_back(test(preconditioner, src));
-        }
+            results.emplace_back(test(preconditioner, src));
+          }
 
         {
           // 1) Test PreconditionRelaxation + DiagonalMatrix and matrix with
@@ -358,7 +360,9 @@ main()
 
               return true;
             }))
-          deallog << "OK!" << std::endl;
+          deallog << "OK! " << std::get<0>(results[0]) << " "
+                  << std::get<1>(results[0]) << " " << std::get<2>(results[0])
+                  << " " << std::get<3>(results[0]) << " " << std::endl;
         else
           deallog << "ERROR!" << std::endl;
       }

@@ -2698,7 +2698,8 @@ PreconditionRelaxation<MatrixType, PreconditionerType>::initialize(
   const MatrixType     &rA,
   const AdditionalData &parameters)
 {
-  A = &rA;
+  A                           = &rA;
+  eigenvalues_are_initialized = false;
 
   Assert(parameters.preconditioner, ExcNotInitialized());
 
@@ -2880,6 +2881,10 @@ PreconditionJacobi<MatrixType>::initialize(const MatrixType     &A,
                                            const AdditionalData &parameters_in)
 {
   Assert(parameters_in.preconditioner == nullptr, ExcInternalError());
+  Assert(
+    parameters_in.relaxation != 0.0,
+    ExcMessage(
+      "Relaxation cannot automatically be determined by PreconditionJacobi."));
 
   AdditionalData parameters;
   parameters.relaxation   = 1.0;
@@ -2898,6 +2903,10 @@ PreconditionSOR<MatrixType>::initialize(const MatrixType     &A,
                                         const AdditionalData &parameters_in)
 {
   Assert(parameters_in.preconditioner == nullptr, ExcInternalError());
+  Assert(
+    parameters_in.relaxation != 0.0,
+    ExcMessage(
+      "Relaxation cannot automatically be determined by PreconditionSOR."));
 
   AdditionalData parameters;
   parameters.relaxation   = 1.0;
@@ -2916,6 +2925,10 @@ PreconditionSSOR<MatrixType>::initialize(const MatrixType     &A,
                                          const AdditionalData &parameters_in)
 {
   Assert(parameters_in.preconditioner == nullptr, ExcInternalError());
+  Assert(
+    parameters_in.relaxation != 0.0,
+    ExcMessage(
+      "Relaxation cannot automatically be determined by PreconditionSSOR."));
 
   AdditionalData parameters;
   parameters.relaxation   = 1.0;
@@ -2939,6 +2952,10 @@ PreconditionPSOR<MatrixType>::initialize(
   const typename BaseClass::AdditionalData &parameters_in)
 {
   Assert(parameters_in.preconditioner == nullptr, ExcInternalError());
+  Assert(
+    parameters_in.relaxation != 0.0,
+    ExcMessage(
+      "Relaxation cannot automatically be determined by PreconditionPSOR."));
 
   typename BaseClass::AdditionalData parameters;
   parameters.relaxation   = 1.0;
