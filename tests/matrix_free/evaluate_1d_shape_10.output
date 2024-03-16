@@ -1,0 +1,46 @@
+
+DEAL:values::Test 4 x 4
+DEAL:values::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Test 3 x 3
+DEAL:values::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Test 4 x 3
+DEAL:values::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Test 3 x 4
+DEAL:values::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Test 3 x 5
+DEAL:values::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:values::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Test 4 x 4
+DEAL:gradients::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Test 3 x 3
+DEAL:gradients::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Test 4 x 3
+DEAL:gradients::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Test 3 x 4
+DEAL:gradients::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Test 3 x 5
+DEAL:gradients::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:gradients::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Test 4 x 4
+DEAL:hessians::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Test 3 x 3
+DEAL:hessians::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Test 4 x 3
+DEAL:hessians::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Test 3 x 4
+DEAL:hessians::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Test 3 x 5
+DEAL:hessians::Errors no transpose: (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 
+DEAL:hessians::Errors transpose:    (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) (0.00000,0.00000) 

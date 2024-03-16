@@ -144,13 +144,37 @@ namespace internal
           {
             res0 = matrix[col] * x[0];
             for (int i = 1; i < mm; ++i)
-              res0 += matrix[i * n_columns + col] * x[i];
+              {
+                const Number2 mji = matrix[i * n_columns + col];
+                if constexpr (numbers::NumberTraits<Number>::is_complex &&
+                              numbers::NumberTraits<Number2>::is_complex)
+                  {
+                    res0.real(res0.real() + mji.real() * x[i].real() -
+                              mji.imag() * x[i].imag());
+                    res0.imag(res0.imag() + mji.imag() * x[i].real() +
+                              mji.real() * x[i].imag());
+                  }
+                else
+                  res0 += mji * x[i];
+              }
           }
         else
           {
             res0 = matrix[col * n_columns] * x[0];
             for (int i = 1; i < mm; ++i)
-              res0 += matrix[col * n_columns + i] * x[i];
+              {
+                const Number2 mij = matrix[col * n_columns + i];
+                if constexpr (numbers::NumberTraits<Number>::is_complex &&
+                              numbers::NumberTraits<Number2>::is_complex)
+                  {
+                    res0.real(res0.real() + mij.real() * x[i].real() -
+                              mij.imag() * x[i].imag());
+                    res0.imag(res0.imag() + mij.imag() * x[i].real() +
+                              mij.real() * x[i].imag());
+                  }
+                else
+                  res0 += mij * x[i];
+              }
           }
         if (add)
           out[stride_out * col] += res0;
