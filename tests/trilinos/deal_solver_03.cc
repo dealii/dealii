@@ -74,15 +74,16 @@ main(int argc, char **argv)
     f.compress(VectorOperation::insert);
     u.compress(VectorOperation::insert);
 
-    GrowingVectorMemory<TrilinosWrappers::MPI::Vector> mem;
-    SolverGMRES<TrilinosWrappers::MPI::Vector>         solver(control, mem);
-    PreconditionIdentity                               preconditioner;
+    GrowingVectorMemory<TrilinosWrappers::MPI::Vector>         mem;
+    SolverGMRES<TrilinosWrappers::MPI::Vector>::AdditionalData data(28);
+    SolverGMRES<TrilinosWrappers::MPI::Vector> solver(control, mem, data);
+    PreconditionIdentity                       preconditioner;
 
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
     check_solver_within_range(solver.solve(A, u, f, preconditioner),
                               control.last_step(),
-                              71,
+                              74,
                               76);
   }
 }
