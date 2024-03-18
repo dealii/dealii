@@ -704,13 +704,11 @@ namespace hp
       Assert(dof_handler.has_hp_capabilities(),
              (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-      // Ghost siblings might occur on parallel::shared::Triangulation objects.
+      // Ghost siblings might occur on parallel Triangulation objects.
       // We need information about future FE indices on all locally relevant
       // cells here, and thus communicate them.
-      if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-            &dof_handler.get_triangulation()) != nullptr)
-        internal::hp::DoFHandlerImplementation::communicate_future_fe_indices(
-          const_cast<DoFHandler<dim, spacedim> &>(dof_handler));
+      internal::hp::DoFHandlerImplementation::communicate_future_fe_indices(
+        const_cast<DoFHandler<dim, spacedim> &>(dof_handler));
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() && cell->future_fe_index_set())
@@ -749,15 +747,6 @@ namespace hp
                           }
                         else if (child->is_ghost())
                           {
-                            // The case of siblings being owned by different
-                            // processors can only occur for
-                            // parallel::shared::Triangulation objects.
-                            Assert(
-                              (dynamic_cast<const parallel::shared::
-                                              Triangulation<dim, spacedim> *>(
-                                 &dof_handler.get_triangulation()) != nullptr),
-                              ExcInternalError());
-
                             if (child->coarsen_flag_set())
                               ++h_flagged_children;
                             // The public interface does not allow to access
