@@ -748,34 +748,22 @@ namespace hp
                   {
                     if (child->is_active())
                       {
-                        if (child->is_locally_owned())
-                          {
-                            if (child->coarsen_flag_set())
-                              ++h_flagged_children;
-                            if (child->future_fe_index_set())
-                              ++p_flagged_children;
-                          }
-                        else if (child->is_ghost())
-                          {
-                            if (child->coarsen_flag_set())
-                              ++h_flagged_children;
-                            // The public interface does not allow to access
-                            // future FE indices on ghost cells. However, we
-                            // need this information here and thus call the
-                            // internal function that does not check for cell
-                            // ownership.
-                            if (internal::DoFCellAccessorImplementation::
-                                  Implementation::
-                                    future_fe_index_set<dim, spacedim, false>(
-                                      *child))
-                              ++p_flagged_children;
-                          }
-                        else
-                          {
-                            // Siblings of locally owned cells are all
-                            // either also locally owned or ghost cells.
-                            DEAL_II_ASSERT_UNREACHABLE();
-                          }
+                        Assert(child->is_artificial() == false,
+                               ExcInternalError());
+
+                        if (child->coarsen_flag_set())
+                          ++h_flagged_children;
+
+                        // The public interface does not allow to access
+                        // future FE indices on ghost cells. However, we
+                        // need this information here and thus call the
+                        // internal function that does not check for cell
+                        // ownership.
+                        if (internal::DoFCellAccessorImplementation::
+                              Implementation::
+                                future_fe_index_set<dim, spacedim, false>(
+                                  *child))
+                          ++p_flagged_children;
                       }
                   }
 
