@@ -705,8 +705,18 @@ namespace hp
              (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
       // Ghost siblings might occur on parallel Triangulation objects.
-      // We need information about future FE indices on all locally relevant
-      // cells here, and thus communicate them.
+      // We need information about refinement flags and future FE indices
+      // on all locally relevant cells here, and thus communicate them.
+      if (dealii::parallel::distributed::Triangulation<dim, spacedim> *tria =
+            dynamic_cast<
+              dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+              const_cast<dealii::Triangulation<dim, spacedim> *>(
+                &dof_handler.get_triangulation())))
+        {
+          dealii::internal::TriangulationImplementation::
+            exchange_refinement_flags(*tria);
+        }
+
       internal::hp::DoFHandlerImplementation::communicate_future_fe_indices(
         const_cast<DoFHandler<dim, spacedim> &>(dof_handler));
 

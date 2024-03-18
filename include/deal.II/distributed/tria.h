@@ -26,6 +26,7 @@
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
 #include <boost/range/iterator_range.hpp>
@@ -1094,6 +1095,55 @@ namespace parallel
 
 
 #endif
+
+
+
+namespace internal
+{
+  namespace TriangulationImplementation
+  {
+    /**
+     * Communicate refinement flags on ghost cells from the owner of the cell.
+     *
+     * This is necessary to get consistent refinement, as mesh/ smoothing would
+     * undo some of the requested coarsening/refinement.
+     */
+    template <int dim, int spacedim>
+    void
+    exchange_refinement_flags(
+      dealii::parallel::distributed::Triangulation<dim, spacedim> &tria)
+    {
+      auto pack =
+        [](const typename Triangulation<dim, spacedim>::active_cell_iterator
+             &cell) -> std::uint8_t {
+        if (cell->refine_flag_set())
+          return 1;
+        if (cell->coarsen_flag_set())
+          return 2;
+        return 0;
+      };
+
+      auto unpack =
+        [](const typename Triangulation<dim, spacedim>::active_cell_iterator
+                              &cell,
+           const std::uint8_t &flag) -> void {
+        cell->clear_coarsen_flag();
+        cell->clear_refine_flag();
+        if (flag == 1)
+          cell->set_refine_flag();
+        else if (flag == 2)
+          cell->set_coarsen_flag();
+      };
+
+      GridTools::exchange_cell_data_to_ghosts<
+        std::uint8_t,
+        dealii::parallel::distributed::Triangulation<dim, spacedim>>(tria,
+                                                                     pack,
+                                                                     unpack);
+    }
+  } // namespace TriangulationImplementation
+} // namespace internal
+
 
 
 namespace parallel
