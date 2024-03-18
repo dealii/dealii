@@ -2771,11 +2771,6 @@ void DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 
       // refinement signals
       this->tria_listeners_for_transfer.push_back(
-        this->tria->signals.pre_refinement.connect([this]() {
-          internal::hp::DoFHandlerImplementation::Implementation::
-            communicate_future_fe_indices(*this);
-        }));
-      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_refinement.connect(
           [this]() { this->pre_transfer_action(); }));
       this->tria_listeners_for_transfer.push_back(
@@ -2893,6 +2888,9 @@ void DoFHandler<dim, spacedim>::pre_transfer_action()
 
   this->active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
+  internal::hp::DoFHandlerImplementation::Implementation::
+    communicate_future_fe_indices(*this);
+
   dealii::internal::hp::DoFHandlerImplementation::Implementation::
     collect_fe_indices_on_cells_to_be_refined(*this);
 }
@@ -2925,6 +2923,9 @@ void DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
   // use our p::d::CellDataTransfer member to achieve this. Further,
   // we prepare the values in such a way that they will correspond to
   // the active FE indices on the new mesh.
+
+  internal::hp::DoFHandlerImplementation::Implementation::
+    communicate_future_fe_indices(*this);
 
   // Gather all current future FE indices.
   active_fe_index_transfer->active_fe_indices.resize(
