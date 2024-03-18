@@ -2938,8 +2938,8 @@ void DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
   for (const auto &cell : active_cell_iterators())
     if (cell->is_artificial() == false)
       active_fe_index_transfer->active_fe_indices[cell->active_cell_index()] =
-        dealii::internal::DoFCellAccessorImplementation::
-          Implementation::future_fe_index<dim, spacedim, false>(*cell);
+        dealii::internal::DoFCellAccessorImplementation::Implementation::
+          future_fe_index<dim, spacedim, false>(*cell);
 
   // Create transfer object and attach to it.
   const auto *distributed_tria =
