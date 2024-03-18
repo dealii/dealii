@@ -2924,17 +2924,22 @@ void DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
   // we prepare the values in such a way that they will correspond to
   // the active FE indices on the new mesh.
 
-  internal::hp::DoFHandlerImplementation::Implementation::
-    communicate_future_fe_indices(*this);
-
   // Gather all current future FE indices.
   active_fe_index_transfer->active_fe_indices.resize(
     get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
+  // Collect future FE indices on locally owned and ghost cells.
+  // The public interface does not allow to access future FE indices
+  // on ghost cells. However, we need this information here and thus
+  // call the internal function that does not check for cell ownership.
+  internal::hp::DoFHandlerImplementation::Implementation::
+    communicate_future_fe_indices(*this);
+
   for (const auto &cell : active_cell_iterators())
-    if (cell->is_locally_owned())
+    if (cell->is_artificial() == false)
       active_fe_index_transfer->active_fe_indices[cell->active_cell_index()] =
-        cell->future_fe_index();
+        dealii::internal::DoFCellAccessorImplementation::
+          Implementation::future_fe_index<dim, spacedim, false>(*cell);
 
   // Create transfer object and attach to it.
   const auto *distributed_tria =
