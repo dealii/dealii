@@ -1658,7 +1658,7 @@ namespace internal
                   "You ask for information on children of this cell which is only "
                   "available for active cells. One of its children is not active."));
 
-              // Ghost siblings might occur on parallel::shared::Triangulation
+              // Ghost siblings might occur on parallel Triangulation
               // objects. The public interface does not allow to access future
               // FE indices on ghost cells. However, we need this information
               // here and thus call the internal function that does not check

@@ -1782,7 +1782,7 @@ namespace internal
        * @note This function can only be called on direct parent cells, i.e.,
        * non-active cells whose children are all active.
        *
-       * @note On parallel::shared::Triangulation objects where sibling cells
+       * @note On parallel Triangulation objects where sibling cells
        * can be ghost cells, make sure that future FE indices have been properly
        * communicated with communicate_future_fe_indices() first. Otherwise,
        * results might differ on different processors. There is no check for
