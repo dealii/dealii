@@ -1840,14 +1840,25 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
 
       if (left_precondition)
         {
-          A.vmult(p, x);
-          p.sadd(-1., 1., b);
-          preconditioner.vmult(v, p);
+          // if the vector is zero, bypass the full computation
+          if (accumulated_iterations == 0 && x.all_zero())
+            preconditioner.vmult(v, b);
+          else
+            {
+              A.vmult(p, x);
+              p.sadd(-1., 1., b);
+              preconditioner.vmult(v, p);
+            }
         }
       else
         {
-          A.vmult(v, x);
-          v.sadd(-1., 1., b);
+          if (accumulated_iterations == 0 && x.all_zero())
+            v = b;
+          else
+            {
+              A.vmult(v, x);
+              v.sadd(-1., 1., b);
+            }
         }
 
       const double norm_v =
@@ -2165,8 +2176,13 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
 
   do
     {
-      A.vmult(v(0, x), x);
-      v[0].sadd(-1., 1., b);
+      if (accumulated_iterations == 0 && x.all_zero())
+        v(0, x) = b;
+      else
+        {
+          A.vmult(v(0, x), x);
+          v[0].sadd(-1., 1., b);
+        }
 
       res             = arnoldi_process.orthonormalize_nth_vector(0, v);
       iteration_state = this->iteration_status(accumulated_iterations, res, x);
