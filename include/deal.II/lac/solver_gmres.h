@@ -591,7 +591,7 @@ protected:
   /**
    * Estimates the eigenvalues from the Hessenberg matrix, H_orig, generated
    * during the inner iterations for @p n vectors in total. Uses these
-   * estimate to compute the condition number. Calls the signals
+   * estimates to compute the condition number. Calls the signals
    * eigenvalues_signal and cond_signal with these estimates as arguments.
    */
   static void
@@ -1645,7 +1645,7 @@ namespace internal
       // one where the orthogonalization has finished (i.e., end of inner
       // iteration in GMRES) and we can safely overwrite the content of the
       // tridiagonal matrix and right hand side, and the case during the inner
-      // iterations where need to create copies of the matrices in the QR
+      // iterations where we need to create copies of the matrices in the QR
       // decomposition as well as the right hand side.
       if (orthogonalization_strategy ==
           LinearAlgebra::OrthogonalizationStrategy::
