@@ -69,6 +69,8 @@ test(unsigned int variant)
   typename SolverGMRES<Vector<number>>::AdditionalData data;
   data.max_basis_size             = 80;
   data.force_re_orthogonalization = true;
+  data.orthogonalization_strategy =
+    LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt;
 
   SolverGMRES<Vector<number>> solver(control, data);
   auto print_re_orthogonalization = [](int accumulated_iterations) {

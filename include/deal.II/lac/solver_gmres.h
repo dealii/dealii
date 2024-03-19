@@ -358,17 +358,19 @@ public:
      * to the default residual, and re-orthogonalization only if
      * necessary. Also, the batched mode with reduced functionality to track
      * information is disabled by default. Finally, the default
-     * orthogonalization algorithm is the modified Gram-Schmidt method.
+     * orthogonalization algorithm is the classical Gram-Schmidt method with
+     * delayed reorthogonalization, which combines stability with fast
+     * execution, especially in parallel.
      */
-    explicit AdditionalData(
-      const unsigned int max_basis_size             = 30,
-      const bool         right_preconditioning      = false,
-      const bool         use_default_residual       = true,
-      const bool         force_re_orthogonalization = false,
-      const bool         batched_mode               = false,
-      const LinearAlgebra::OrthogonalizationStrategy
-        orthogonalization_strategy =
-          LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt);
+    explicit AdditionalData(const unsigned int max_basis_size        = 30,
+                            const bool         right_preconditioning = false,
+                            const bool         use_default_residual  = true,
+                            const bool force_re_orthogonalization    = false,
+                            const bool batched_mode                  = false,
+                            const LinearAlgebra::OrthogonalizationStrategy
+                              orthogonalization_strategy =
+                                LinearAlgebra::OrthogonalizationStrategy::
+                                  delayed_classical_gram_schmidt);
 
     /**
      * Maximum number of temporary vectors. Together with max_basis_size, this

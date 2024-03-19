@@ -44,6 +44,8 @@ test()
   SolverControl control(1000, 1e3 * std::numeric_limits<number>::epsilon());
   typename SolverGMRES<Vector<number>>::AdditionalData data;
   data.max_basis_size = 200;
+  data.orthogonalization_strategy =
+    LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt;
 
   SolverGMRES<Vector<number>> solver(control, data);
   auto print_re_orthogonalization = [](int accumulated_iterations) {
