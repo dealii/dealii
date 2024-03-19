@@ -15,7 +15,7 @@
 
 // tests that GMRES builds an orthonormal basis properly for a few difficult
 // test matrices. In particular, this test monitors when re-orthogonalization
-// kicks in.
+// kicks in for the modified Gram-Schmidt algorithm.
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -70,6 +70,8 @@ test(unsigned int variant, unsigned int min_convergence_steps)
   SolverControl control(1000, 1e2 * std::numeric_limits<number>::epsilon());
   typename SolverGMRES<Vector<number>>::AdditionalData data;
   data.max_basis_size = 80;
+  data.orthogonalization_strategy =
+    LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt;
 
   SolverGMRES<Vector<number>> solver(control, data);
   auto print_re_orthogonalization = [](int accumulated_iterations) {
