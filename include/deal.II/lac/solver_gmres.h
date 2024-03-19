@@ -59,7 +59,7 @@ namespace LinearAlgebra
 namespace internal
 {
   /**
-   * A namespace for a helper class to the GMRES solver.
+   * A namespace for helper classes and functions of the GMRES solver.
    */
   namespace SolverGMRESImplementation
   {
@@ -70,7 +70,6 @@ namespace internal
      * A future version should also be able to shift through vectors
      * automatically, avoiding restart.
      */
-
     template <typename VectorType>
     class TmpVectors
     {
@@ -120,6 +119,159 @@ namespace internal
        * Field for storing the vectors.
        */
       std::vector<typename VectorMemory<VectorType>::Pointer> data;
+    };
+
+
+
+    /**
+     * Class that performs the Arnoldi orthogonalization process within the
+     * SolverGMRES and SolverFGMRES classes. It uses one of the algorithms in
+     * LinearAlgebra::LinearizationStrategy for the work on the global vectors,
+     * can transform the resulting Hessenberg matrix into an upper triangular
+     * matrix by Givens rotations, and eventually solve the minimization problem
+     * in the projected Krylov space.
+     */
+    class ArnoldiProcess
+    {
+    public:
+      /**
+       * Initialize the data structures in this class.
+       */
+      void
+      initialize(const LinearAlgebra::OrthogonalizationStrategy
+                                    orthogonalization_strategy,
+                 const unsigned int max_basis_size,
+                 const bool         force_reorthogonalization);
+
+      /**
+       * Orthonormalize the vector at the position @p n within the array
+       * @p orthogonal_vectors against the @p n (orthonormal) vectors with
+       * indices <tt>0, ..., n - 1</tt> using the modified or classical
+       * Gram-Schmidt algorithm. The class internally stores the factors used
+       * for orthogonalization in an upper Hessenberg matrix. For the
+       * classical Gram-Schmidt and modified Gram-Schmidt algorithms, loss of
+       * orthogonality is checked every fifth step. In case this is detected,
+       * all subsequent iterations use re-orthogonalization as stored
+       * internally in this class, and a call to the optional signal is made.
+       *
+       * Note that the projected Hessenberg matrix and its factorization are
+       * only consistent if @p n is incremented by one for each successive
+       * call, or if @p n is zero when starting to build a new orthogonal
+       * basis in restarted GMRES.
+       *
+       * Within this function, the factors for the QR factorization are
+       * computed alongside the Hessenberg matrix, and an estimate of the
+       * residual in the Arnoldi space is returned from this function.
+       */
+      template <typename VectorType>
+      double
+      orthonormalize_nth_vector(
+        const unsigned int                        n,
+        TmpVectors<VectorType>                   &orthogonal_vectors,
+        const unsigned int                        accumulated_iterations = 0,
+        const boost::signals2::signal<void(int)> &reorthogonalize_signal =
+          boost::signals2::signal<void(int)>());
+
+      /**
+       * Using the matrix and right hand side computed during the
+       * factorization, solve the underlying minimization problem for the
+       * residual in the Krylov space, returning the resulting solution as a
+       * const reference. Note that the dimension of the vector is set to the
+       * size of the Krylov space.
+       */
+      const Vector<double> &
+      solve_projected_system(const bool orthogonalization_finished);
+
+      /**
+       * Return the upper Hessenberg matrix resulting from the
+       * Gram-Schmidt orthogonalization process.
+       */
+      const FullMatrix<double> &
+      get_hessenberg_matrix() const;
+
+    private:
+      /**
+       * Projected system matrix in upper Hessenberg form.
+       */
+      FullMatrix<double> hessenberg_matrix;
+
+      /**
+       * Upper triangular matrix that results from performing the QR
+       * factorization with Givens rotations on the upper Hessenberg matrix; the
+       * matrix Q is contained in the array givens_rotations.
+       */
+      FullMatrix<double> triangular_matrix;
+
+      /**
+       * Representation of the factor Q in the QR factorization of the
+       * Hessenberg matrix.
+       */
+      std::vector<std::pair<double, double>> givens_rotations;
+
+      /**
+       * Right-hand side vector for orthogonalization.
+       */
+      Vector<double> projected_rhs;
+
+      /**
+       * Solution vector when computing the minimization in the projected
+       * Krylov space.
+       */
+      Vector<double> projected_solution;
+
+      /**
+       * Auxiliary vector for orthogonalization.
+       */
+      Vector<double> h;
+
+      /**
+       * Flag to keep track reorthogonalization, which is checked every fifth
+       * iteration by default for
+       * LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt and
+       * LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt; for
+       * LinearAlgebra::OrthogonalizationStrategy::delayed_classical_gram_schmidt,
+       * no check is made.
+       */
+      bool do_reorthogonalization;
+
+      /**
+       * Selected orthogonalization algorithm.
+       */
+      LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
+
+      /**
+       * This is a helper function to perform the incremental computation of
+       * the QR factorization of the Hessenberg matrix involved in the Arnoldi
+       * process. The process will transform the member variable
+       * @p hessenberg_matrix into an upper triangular matrix R labeled
+       * @p matrix, an orthogonal matrix Q represented by a vector of Givens
+       * rotations, and the associated right hand side to minimize the norm of
+       * the solution in the Krylov space.
+       *
+       * More precisely, this function is called once a new column is added to
+       * the Hessenberg matrix and performs all necessary steps for that
+       * column. First, all evaluations with the Givens rotations resulting
+       * from the previous elimination steps are performed. Then, the single
+       * additional entry below the diagonal in the Hessenberg matrix is
+       * eliminated by a Givens rotation, a new pair of Givens factors is
+       * appended, and the right-hand side vector in the projected system is
+       * updated. The column number @p col for which the Gram-Schmidt should
+       * run needs to be given, because the delayed orthogonalization might
+       * lag by one step compared to the other sizes in the problem, and needs
+       * to perform additional computations.
+       *
+       * In most cases, the matrices and vectors passed to this function are
+       * the member variables of the present class, but there are also other
+       * cases. The function returns the modulus of the last entry in the
+       * transformed right-hand side, which is the obtained residual of the
+       * global vector x after minimization within the Krylov space.
+       */
+      double
+      do_givens_rotation(const bool          delayed_reorthogonalization,
+                         const int           col,
+                         FullMatrix<double> &matrix,
+                         std::vector<std::pair<double, double>> &rotations,
+                         Vector<double>                         &rhs);
     };
   } // namespace SolverGMRESImplementation
 } // namespace internal
@@ -438,14 +590,14 @@ protected:
 
   /**
    * Estimates the eigenvalues from the Hessenberg matrix, H_orig, generated
-   * during the inner iterations. Uses these estimate to compute the condition
-   * number. Calls the signals eigenvalues_signal and cond_signal with these
-   * estimates as arguments.
+   * during the inner iterations for @p n vectors in total. Uses these
+   * estimates to compute the condition number. Calls the signals
+   * eigenvalues_signal and cond_signal with these estimates as arguments.
    */
   static void
   compute_eigs_and_cond(
     const FullMatrix<double> &H_orig,
-    const unsigned int        dim,
+    const unsigned int        n,
     const boost::signals2::signal<
       void(const std::vector<std::complex<double>> &)> &eigenvalues_signal,
     const boost::signals2::signal<void(const FullMatrix<double> &)>
@@ -453,24 +605,10 @@ protected:
     const boost::signals2::signal<void(double)> &cond_signal);
 
   /**
-   * Projected system matrix
+   * Class that performs the actual orthogonalization process and solves the
+   * projected linear system.
    */
-  FullMatrix<double> H;
-
-  /**
-   * Auxiliary vector for orthogonalization
-   */
-  Vector<double> projected_rhs;
-
-  /**
-   * Auxiliary vector for orthogonalization
-   */
-  std::vector<std::pair<double, double>> givens_rotations;
-
-  /**
-   * Auxiliary vector for orthogonalization
-   */
-  Vector<double> h;
+  internal::SolverGMRESImplementation::ArnoldiProcess arnoldi_process;
 };
 
 
@@ -558,14 +696,10 @@ private:
   AdditionalData additional_data;
 
   /**
-   * Projected system matrix
+   * Class that performs the actual orthogonalization process and solves the
+   * projected linear system.
    */
-  FullMatrix<double> H;
-
-  /**
-   * Auxiliary matrix for inverting @p H
-   */
-  FullMatrix<double> H1;
+  internal::SolverGMRESImplementation::ArnoldiProcess arnoldi_process;
 };
 
 /** @} */
@@ -767,89 +901,182 @@ namespace internal
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     void
-    Tvmult_add(const unsigned int dim,
-               const VectorType  &vv,
-               const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                              &orthogonal_vectors,
-               Vector<double> &h)
+    Tvmult_add(const unsigned int            n,
+               const VectorType             &vv,
+               const TmpVectors<VectorType> &orthogonal_vectors,
+               Vector<double>               &h)
     {
-      for (unsigned int i = 0; i < dim; ++i)
-        h[i] += vv * orthogonal_vectors[i];
+      for (unsigned int i = 0; i < n; ++i)
+        {
+          h(i) += vv * orthogonal_vectors[i];
+          if (delayed_reorthogonalization)
+            h(n + i) += orthogonal_vectors[i] * orthogonal_vectors[n - 1];
+        }
+      if (delayed_reorthogonalization)
+        h(n + n) += vv * vv;
     }
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     void
-    Tvmult_add(const unsigned int dim,
-               const VectorType  &vv,
-               const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                              &orthogonal_vectors,
-               Vector<double> &h)
+    Tvmult_add(const unsigned int            n,
+               const VectorType             &vv,
+               const TmpVectors<VectorType> &orthogonal_vectors,
+               Vector<double>               &h)
     {
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
           unsigned int j = 0;
 
-          if (dim <= 128)
+          if (n <= 128)
             {
               // optimized path
               static constexpr unsigned int n_lanes =
                 VectorizedArray<double>::size();
 
               VectorizedArray<double> hs[128];
-              for (unsigned int d = 0; d < dim; ++d)
-                hs[d] = 0.0;
+              for (unsigned int i = 0; i < n; ++i)
+                hs[i] = 0.0;
+              VectorizedArray<double>
+                correct[delayed_reorthogonalization ? 129 : 1];
+              if (delayed_reorthogonalization)
+                for (unsigned int i = 0; i < n + 1; ++i)
+                  correct[i] = 0.0;
 
               unsigned int c = 0;
 
-              for (; c < block(vv, b).locally_owned_size() / n_lanes / 4;
-                   ++c, j += n_lanes * 4)
-                for (unsigned int i = 0; i < dim; ++i)
-                  {
-                    VectorizedArray<double> vvec[4];
-                    for (unsigned int k = 0; k < 4; ++k)
-                      vvec[k].load(block(vv, b).begin() + j + k * n_lanes);
+              constexpr unsigned int inner_batch_size =
+                delayed_reorthogonalization ? 6 : 12;
 
-                    for (unsigned int k = 0; k < 4; ++k)
+              for (; c < block(vv, b).locally_owned_size() / n_lanes /
+                           inner_batch_size;
+                   ++c, j += n_lanes * inner_batch_size)
+                {
+                  VectorizedArray<double> vvec[inner_batch_size];
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
+                    vvec[k].load(block(vv, b).begin() + j + k * n_lanes);
+                  VectorizedArray<double> last_vector[inner_batch_size];
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
+                    last_vector[k].load(
+                      block(orthogonal_vectors[n - 1], b).begin() + j +
+                      k * n_lanes);
+
+                  {
+                    VectorizedArray<double> local_sum_0 =
+                      last_vector[0] * vvec[0];
+                    VectorizedArray<double> local_sum_1 =
+                      last_vector[0] * last_vector[0];
+                    VectorizedArray<double> local_sum_2 = vvec[0] * vvec[0];
+                    for (unsigned int k = 1; k < inner_batch_size; ++k)
                       {
-                        VectorizedArray<double> temp;
-                        temp.load(block(orthogonal_vectors[i], b).begin() + j +
-                                  k * n_lanes);
-                        hs[i] += temp * vvec[k];
+                        local_sum_0 += last_vector[k] * vvec[k];
+                        if (delayed_reorthogonalization)
+                          {
+                            local_sum_1 += last_vector[k] * last_vector[k];
+                            local_sum_2 += vvec[k] * vvec[k];
+                          }
+                      }
+                    hs[n - 1] += local_sum_0;
+                    if (delayed_reorthogonalization)
+                      {
+                        correct[n - 1] += local_sum_1;
+                        correct[n] += local_sum_2;
                       }
                   }
 
-              c *= 4;
+                  for (unsigned int i = 0; i < n - 1; ++i)
+                    {
+                      // break the dependency chain into the field hs[i] for
+                      // small sizes i by first accumulating 4 or 8 results
+                      // into a local variable
+                      VectorizedArray<double> temp;
+                      temp.load(block(orthogonal_vectors[i], b).begin() + j);
+                      VectorizedArray<double> local_sum_0 = temp * vvec[0];
+                      VectorizedArray<double> local_sum_1 =
+                        delayed_reorthogonalization ? temp * last_vector[0] :
+                                                      0.;
+                      for (unsigned int k = 1; k < inner_batch_size; ++k)
+                        {
+                          temp.load(block(orthogonal_vectors[i], b).begin() +
+                                    j + k * n_lanes);
+                          local_sum_0 += temp * vvec[k];
+                          if (delayed_reorthogonalization)
+                            local_sum_1 += temp * last_vector[k];
+                        }
+                      hs[i] += local_sum_0;
+                      if (delayed_reorthogonalization)
+                        correct[i] += local_sum_1;
+                    }
+                }
+
+              c *= inner_batch_size;
               for (; c < block(vv, b).locally_owned_size() / n_lanes;
                    ++c, j += n_lanes)
-                for (unsigned int i = 0; i < dim; ++i)
-                  {
-                    VectorizedArray<double> vvec, temp;
-                    vvec.load(block(vv, b).begin() + j);
-                    temp.load(block(orthogonal_vectors[i], b).begin() + j);
-                    hs[i] += temp * vvec;
-                  }
+                {
+                  VectorizedArray<double> vvec, last_vector;
+                  vvec.load(block(vv, b).begin() + j);
+                  last_vector.load(block(orthogonal_vectors[n - 1], b).begin() +
+                                   j);
+                  hs[n - 1] += last_vector * vvec;
+                  if (delayed_reorthogonalization)
+                    {
+                      correct[n - 1] += last_vector * last_vector;
+                      correct[n] += vvec * vvec;
+                    }
 
-              for (unsigned int i = 0; i < dim; ++i)
-                for (unsigned int v = 0; v < n_lanes; ++v)
-                  h(i) += hs[i][v];
+                  for (unsigned int i = 0; i < n - 1; ++i)
+                    {
+                      VectorizedArray<double> temp;
+                      temp.load(block(orthogonal_vectors[i], b).begin() + j);
+                      hs[i] += temp * vvec;
+                      if (delayed_reorthogonalization)
+                        correct[i] += temp * last_vector;
+                    }
+                }
+
+              for (unsigned int i = 0; i < n; ++i)
+                {
+                  h(i) += hs[i].sum();
+                  if (delayed_reorthogonalization)
+                    h(i + n) += correct[i].sum();
+                }
+              if (delayed_reorthogonalization)
+                h(n + n) += correct[n].sum();
             }
 
           // remainder loop of optimized path or non-optimized path (if
-          // dim>128)
+          // n>128)
           for (; j < block(vv, b).locally_owned_size(); ++j)
-            for (unsigned int i = 0; i < dim; ++i)
-              h(i) += block(orthogonal_vectors[i], b).local_element(j) *
-                      block(vv, b).local_element(j);
+            {
+              const double vvec = block(vv, b).local_element(j);
+              const double last_vector =
+                block(orthogonal_vectors[n - 1], b).local_element(j);
+              h(n - 1) += last_vector * vvec;
+              if (delayed_reorthogonalization)
+                {
+                  h(n + n - 1) += last_vector * last_vector;
+                  h(n + n) += vvec * vvec;
+                }
+              for (unsigned int i = 0; i < n - 1; ++i)
+                {
+                  const double temp =
+                    block(orthogonal_vectors[i], b).local_element(j);
+                  h(i) += temp * vvec;
+                  if (delayed_reorthogonalization)
+                    h(n + i) += temp * last_vector;
+                }
+            }
         }
 
       Utilities::MPI::sum(h, block(vv, 0).get_mpi_communicator(), h);
@@ -857,109 +1084,202 @@ namespace internal
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     double
-    subtract_and_norm(
-      const unsigned int dim,
-      const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                           &orthogonal_vectors,
-      const Vector<double> &h,
-      VectorType           &vv)
+    subtract_and_norm(const unsigned int            n,
+                      const TmpVectors<VectorType> &orthogonal_vectors,
+                      const Vector<double>         &h,
+                      VectorType                   &vv)
     {
-      Assert(dim > 0, ExcInternalError());
+      Assert(n > 0, ExcInternalError());
 
-      for (unsigned int i = 0; i < dim - 1; ++i)
-        vv.add(-h(i), orthogonal_vectors[i]);
+      VectorType &last_vector =
+        const_cast<VectorType &>(orthogonal_vectors[n - 1]);
+      for (unsigned int i = 0; i < n - 1; ++i)
+        {
+          if (delayed_reorthogonalization && i + 2 < n)
+            last_vector.add(-h(n + i), orthogonal_vectors[i]);
+          vv.add(-h(i), orthogonal_vectors[i]);
+        }
 
-      return std::sqrt(
-        vv.add_and_dot(-h(dim - 1), orthogonal_vectors[dim - 1], vv));
+      if (delayed_reorthogonalization)
+        {
+          if (n > 1)
+            last_vector.sadd(1. / h(n + n - 1),
+                             -h(n + n - 2) / h(n + n - 1),
+                             orthogonal_vectors[n - 2]);
+
+          // h(n + n) is lucky breakdown
+          const double scaling_factor_vv = h(n + n) > 0.0 ?
+                                             1. / (h(n + n - 1) * h(n + n)) :
+                                             1. / (h(n + n - 1) * h(n + n - 1));
+          vv.sadd(scaling_factor_vv,
+                  -h(n - 1) * scaling_factor_vv,
+                  last_vector);
+
+          // the delayed reorthogonalization computes the norm from other
+          // quantities
+          return std::numeric_limits<double>::signaling_NaN();
+        }
+      else
+        return std::sqrt(
+          vv.add_and_dot(-h(n - 1), orthogonal_vectors[n - 1], vv));
     }
 
 
 
-    template <typename VectorType,
+    template <bool delayed_reorthogonalization,
+              typename VectorType,
               std::enable_if_t<
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     double
-    subtract_and_norm(
-      const unsigned int dim,
-      const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                           &orthogonal_vectors,
-      const Vector<double> &h,
-      VectorType           &vv)
+    subtract_and_norm(const unsigned int            n,
+                      const TmpVectors<VectorType> &orthogonal_vectors,
+                      const Vector<double>         &h,
+                      VectorType                   &vv)
     {
       static constexpr unsigned int n_lanes = VectorizedArray<double>::size();
 
-      double norm_vv_temp = 0.0;
+      double      norm_vv_temp = 0.0;
+      VectorType &last_vector =
+        const_cast<VectorType &>(orthogonal_vectors[n - 1]);
+      const double inverse_norm_previous =
+        delayed_reorthogonalization ? 1. / h(n + n - 1) : 0.;
+      const double scaling_factor_vv =
+        delayed_reorthogonalization ?
+          (h(n + n) > 0.0 ? inverse_norm_previous / h(n + n) :
+                            inverse_norm_previous / h(n + n - 1)) :
+          0.;
 
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
           VectorizedArray<double> norm_vv_temp_vectorized = 0.0;
 
+          constexpr unsigned int inner_batch_size =
+            delayed_reorthogonalization ? 6 : 12;
+
           unsigned int j = 0;
           unsigned int c = 0;
-          for (; c < block(vv, b).locally_owned_size() / n_lanes / 4;
-               ++c, j += n_lanes * 4)
+          for (; c <
+                 block(vv, b).locally_owned_size() / n_lanes / inner_batch_size;
+               ++c, j += n_lanes * inner_batch_size)
             {
-              VectorizedArray<double> temp[4];
+              VectorizedArray<double> temp[inner_batch_size];
+              VectorizedArray<double> last_vec[inner_batch_size];
 
-              for (unsigned int k = 0; k < 4; ++k)
-                temp[k].load(block(vv, b).begin() + j + k * n_lanes);
+              const double last_factor = h(n - 1);
+              for (unsigned int k = 0; k < inner_batch_size; ++k)
+                {
+                  temp[k].load(block(vv, b).begin() + j + k * n_lanes);
+                  last_vec[k].load(block(last_vector, b).begin() + j +
+                                   k * n_lanes);
+                  if (!delayed_reorthogonalization)
+                    temp[k] -= last_factor * last_vec[k];
+                }
 
-              for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int i = 0; i < n - 1; ++i)
                 {
                   const double factor = h(i);
-                  for (unsigned int k = 0; k < 4; ++k)
+                  const double correction_factor =
+                    (delayed_reorthogonalization ? h(n + i) : 0.0);
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
                     {
                       VectorizedArray<double> vec;
                       vec.load(block(orthogonal_vectors[i], b).begin() + j +
                                k * n_lanes);
                       temp[k] -= factor * vec;
+                      if (delayed_reorthogonalization)
+                        last_vec[k] -= correction_factor * vec;
                     }
                 }
 
-              for (unsigned int k = 0; k < 4; ++k)
-                temp[k].store(block(vv, b).begin() + j + k * n_lanes);
-
-              norm_vv_temp_vectorized +=
-                (temp[0] * temp[0] + temp[1] * temp[1]) +
-                (temp[2] * temp[2] + temp[3] * temp[3]);
+              if (delayed_reorthogonalization)
+                for (unsigned int k = 0; k < inner_batch_size; ++k)
+                  {
+                    last_vec[k] = last_vec[k] * inverse_norm_previous;
+                    last_vec[k].store(block(last_vector, b).begin() + j +
+                                      k * n_lanes);
+                    temp[k] -= last_factor * last_vec[k];
+                    temp[k] = temp[k] * scaling_factor_vv;
+                    temp[k].store(block(vv, b).begin() + j + k * n_lanes);
+                  }
+              else
+                for (unsigned int k = 0; k < inner_batch_size; ++k)
+                  {
+                    temp[k].store(block(vv, b).begin() + j + k * n_lanes);
+                    norm_vv_temp_vectorized += temp[k] * temp[k];
+                  }
             }
 
-          c *= 4;
+          c *= inner_batch_size;
           for (; c < block(vv, b).locally_owned_size() / n_lanes;
                ++c, j += n_lanes)
             {
-              VectorizedArray<double> temp;
+              VectorizedArray<double> temp, last_vec;
               temp.load(block(vv, b).begin() + j);
+              last_vec.load(block(last_vector, b).begin() + j);
+              if (!delayed_reorthogonalization)
+                temp -= h(n - 1) * last_vec;
 
-              for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int i = 0; i < n - 1; ++i)
                 {
                   VectorizedArray<double> vec;
                   vec.load(block(orthogonal_vectors[i], b).begin() + j);
                   temp -= h(i) * vec;
+                  if (delayed_reorthogonalization)
+                    last_vec -= h(n + i) * vec;
                 }
 
-              temp.store(block(vv, b).begin() + j);
-
-              norm_vv_temp_vectorized += temp * temp;
+              if (delayed_reorthogonalization)
+                {
+                  last_vec = last_vec * inverse_norm_previous;
+                  last_vec.store(block(last_vector, b).begin() + j);
+                  temp -= h(n - 1) * last_vec;
+                  temp = temp * scaling_factor_vv;
+                  temp.store(block(vv, b).begin() + j);
+                }
+              else
+                {
+                  temp.store(block(vv, b).begin() + j);
+                  norm_vv_temp_vectorized += temp * temp;
+                }
             }
 
-          for (unsigned int v = 0; v < n_lanes; ++v)
-            norm_vv_temp += norm_vv_temp_vectorized[v];
+          if (!delayed_reorthogonalization)
+            norm_vv_temp += norm_vv_temp_vectorized.sum();
 
           for (; j < block(vv, b).locally_owned_size(); ++j)
             {
-              double temp = block(vv, b).local_element(j);
-              for (unsigned int i = 0; i < dim; ++i)
-                temp -= h(i) * block(orthogonal_vectors[i], b).local_element(j);
+              double temp     = block(vv, b).local_element(j);
+              double last_vec = block(last_vector, b).local_element(j);
+              if (delayed_reorthogonalization)
+                {
+                  for (unsigned int i = 0; i < n - 1; ++i)
+                    {
+                      const double vec =
+                        block(orthogonal_vectors[i], b).local_element(j);
+                      temp -= h(i) * vec;
+                      last_vec -= h(n + i) * vec;
+                    }
+                  last_vec *= inverse_norm_previous;
+                  block(last_vector, b).local_element(j) = last_vec;
+                  temp -= h(n - 1) * last_vec;
+                  temp *= scaling_factor_vv;
+                }
+              else
+                {
+                  temp -= h(n - 1) * last_vec;
+                  for (unsigned int i = 0; i < n - 1; ++i)
+                    temp -=
+                      h(i) * block(orthogonal_vectors[i], b).local_element(j);
+                  norm_vv_temp += temp * temp;
+                }
               block(vv, b).local_element(j) = temp;
-
-              norm_vv_temp += temp * temp;
             }
         }
 
@@ -968,68 +1288,24 @@ namespace internal
     }
 
 
-    template <typename VectorType,
-              std::enable_if_t<
-                !is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
-    double
-    sadd_and_norm(VectorType       &v,
-                  const double      factor_a,
-                  const VectorType &b,
-                  const double      factor_b)
-    {
-      v.sadd(factor_a, factor_b, b);
-      return v.l2_norm();
-    }
-
-
-    template <typename VectorType,
-              std::enable_if_t<
-                is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
-    double
-    sadd_and_norm(VectorType       &v,
-                  const double      factor_a,
-                  const VectorType &w,
-                  const double      factor_b)
-    {
-      double norm = 0;
-
-      for (unsigned int b = 0; b < n_blocks(v); ++b)
-        for (unsigned int j = 0; j < block(v, b).locally_owned_size(); ++j)
-          {
-            const double temp = block(v, b).local_element(j) * factor_a +
-                                block(w, b).local_element(j) * factor_b;
-
-            block(v, b).local_element(j) = temp;
-
-            norm += temp * temp;
-          }
-
-      return std::sqrt(
-        Utilities::MPI::sum(norm, block(v, 0).get_mpi_communicator()));
-    }
-
-
 
     template <typename VectorType,
               std::enable_if_t<
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     void
-    add(VectorType           &p,
-        const unsigned int    dim,
-        const Vector<double> &h,
-        const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                  &tmp_vectors,
-        const bool zero_out)
+    add(VectorType                   &p,
+        const unsigned int            n,
+        const Vector<double>         &h,
+        const TmpVectors<VectorType> &tmp_vectors,
+        const bool                    zero_out)
     {
       if (zero_out)
         p.equ(h(0), tmp_vectors[0]);
       else
         p.add(h(0), tmp_vectors[0]);
 
-      for (unsigned int i = 1; i < dim; ++i)
+      for (unsigned int i = 1; i < n; ++i)
         p.add(h(i), tmp_vectors[i]);
     }
 
@@ -1040,18 +1316,17 @@ namespace internal
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     void
-    add(VectorType           &p,
-        const unsigned int    dim,
-        const Vector<double> &h,
-        const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                  &tmp_vectors,
-        const bool zero_out)
+    add(VectorType                   &p,
+        const unsigned int            n,
+        const Vector<double>         &h,
+        const TmpVectors<VectorType> &tmp_vectors,
+        const bool                    zero_out)
     {
       for (unsigned int b = 0; b < n_blocks(p); ++b)
         for (unsigned int j = 0; j < block(p, b).locally_owned_size(); ++j)
           {
             double temp = zero_out ? 0 : block(p, b).local_element(j);
-            for (unsigned int i = 0; i < dim; ++i)
+            for (unsigned int i = 0; i < n; ++i)
               temp += block(tmp_vectors[i], b).local_element(j) * h(i);
             block(p, b).local_element(j) = temp;
           }
@@ -1059,113 +1334,369 @@ namespace internal
 
 
 
-    /**
-     * Orthogonalize the vector @p vv against the @p dim (orthogonal) vectors
-     * given by @p orthogonal_vectors using the modified or classical
-     * Gram-Schmidt algorithm.
-     * The factors used for orthogonalization are stored in @p h. The boolean @p
-     * re_orthogonalize specifies whether the Gram-Schmidt algorithm
-     * should be applied twice. The algorithm checks loss of orthogonality in
-     * the procedure every fifth step and sets the flag to true in that case.
-     * All subsequent iterations use re-orthogonalization.
-     * Calls the signal re_orthogonalize_signal if it is connected.
-     */
+    inline void
+    ArnoldiProcess::initialize(
+      const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy,
+      const unsigned int                             basis_size,
+      const bool                                     force_reorthogonalization)
+    {
+      this->orthogonalization_strategy = orthogonalization_strategy;
+      this->do_reorthogonalization     = force_reorthogonalization;
+
+      hessenberg_matrix.reinit(basis_size + 1, basis_size);
+      triangular_matrix.reinit(basis_size + 1, basis_size, true);
+
+      // some additional vectors, also used in the orthogonalization
+      projected_rhs.reinit(basis_size + 1, true);
+      givens_rotations.reserve(basis_size);
+
+      if (orthogonalization_strategy ==
+          LinearAlgebra::OrthogonalizationStrategy::
+            delayed_classical_gram_schmidt)
+        h.reinit(2 * basis_size + 3);
+      else
+        h.reinit(basis_size + 1);
+    }
+
+
+
     template <typename VectorType>
     inline double
-    iterated_gram_schmidt(
-      const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy,
-      const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                                               &orthogonal_vectors,
-      const unsigned int                        dim,
+    ArnoldiProcess::orthonormalize_nth_vector(
+      const unsigned int                        n,
+      TmpVectors<VectorType>                   &orthogonal_vectors,
       const unsigned int                        accumulated_iterations,
-      VectorType                               &vv,
-      Vector<double>                           &h,
-      bool                                     &reorthogonalize,
-      const boost::signals2::signal<void(int)> &reorthogonalize_signal =
-        boost::signals2::signal<void(int)>())
+      const boost::signals2::signal<void(int)> &reorthogonalize_signal)
     {
-      Assert(dim > 0, ExcInternalError());
-      const unsigned int inner_iteration = dim - 1;
+      AssertIndexRange(n, hessenberg_matrix.m());
+      AssertIndexRange(n, orthogonal_vectors.size() + 1);
 
-      // need initial norm for detection of re-orthogonalization, see below
-      double     norm_vv_start = 0;
-      const bool consider_reorthogonalize =
-        (reorthogonalize == false) && (inner_iteration % 5 == 4);
-      if (consider_reorthogonalize)
-        norm_vv_start = vv.l2_norm();
+      VectorType &vv = orthogonal_vectors[n];
 
-      for (unsigned int i = 0; i < dim; ++i)
-        h[i] = 0;
-
-      for (unsigned int c = 0; c < 2;
-           ++c) // 0: orthogonalize, 1: reorthogonalize
+      double residual_estimate = std::numeric_limits<double>::signaling_NaN();
+      if (n == 0)
         {
-          // Orthogonalization
-          double norm_vv = 0.0;
+          givens_rotations.clear();
+          residual_estimate = vv.l2_norm();
+          if (residual_estimate != 0.)
+            vv /= residual_estimate;
+          projected_rhs(0) = residual_estimate;
+        }
+      else if (orthogonalization_strategy ==
+               LinearAlgebra::OrthogonalizationStrategy::
+                 delayed_classical_gram_schmidt)
+        {
+          // The algorithm implemented in the following few lines is algorithm
+          // 4 of Bielich et al. (2022).
 
-          if (orthogonalization_strategy ==
-              LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt)
+          // To avoid un-scaled numbers as appearing with the original
+          // algorithm of Bielich et al., we use a preliminary scaling of the
+          // last vector. This will be corrected in the delayed step.
+          const double previous_scaling = n > 0 ? h(n + n - 2) : 1.;
+
+          // Reset h to zero
+          h.reinit(n + n + 1);
+
+          // global reduction
+          Tvmult_add<true>(n, vv, orthogonal_vectors, h);
+
+          // delayed correction terms
+          double tmp = 0;
+          for (unsigned int i = 0; i < n - 1; ++i)
+            tmp += h(n + i) * h(n + i);
+          const double alpha_j = h(n + n - 1) > tmp ?
+                                   std::sqrt(h(n + n - 1) - tmp) :
+                                   std::sqrt(h(n + n - 1));
+          h(n + n - 1)         = alpha_j;
+
+          tmp = 0;
+          for (unsigned int i = 0; i < n - 1; ++i)
+            tmp += h(i) * h(n + i);
+          h(n - 1) = (h(n - 1) - tmp) / alpha_j;
+
+          // representation of H(j-1)
+          if (n > 1)
             {
-              double htmp = vv * orthogonal_vectors[0];
-              h(0) += htmp;
-              for (unsigned int i = 1; i < dim; ++i)
-                {
-                  htmp = vv.add_and_dot(-htmp,
-                                        orthogonal_vectors[i - 1],
-                                        orthogonal_vectors[i]);
-                  h(i) += htmp;
-                }
-
-              norm_vv = std::sqrt(
-                vv.add_and_dot(-htmp, orthogonal_vectors[dim - 1], vv));
+              for (unsigned int i = 0; i < n - 1; ++i)
+                hessenberg_matrix(i, n - 2) += h(n + i) * previous_scaling;
+              hessenberg_matrix(n - 1, n - 2) = alpha_j * previous_scaling;
             }
-          else if (orthogonalization_strategy ==
-                   LinearAlgebra::OrthogonalizationStrategy::
-                     classical_gram_schmidt)
+          for (unsigned int i = 0; i < n; ++i)
             {
-              Tvmult_add(dim, vv, orthogonal_vectors, h);
-              norm_vv = subtract_and_norm(dim, orthogonal_vectors, h, vv);
-            }
-          else
-            {
-              AssertThrow(false, ExcNotImplemented());
+              double sum = 0;
+              for (unsigned int j = (i == 0 ? 0 : i - 1); j < n - 1; ++j)
+                sum += hessenberg_matrix(i, j) * h(n + j);
+              hessenberg_matrix(i, n - 1) = (h(i) - sum) / alpha_j;
             }
 
-          if (c == 1)
-            return norm_vv; // reorthogonalization already performed -> finished
+          // Compute estimate norm for approximate convergence criterion (to
+          // be corrected in next iteration)
+          double sum = 0;
+          for (unsigned int i = 0; i < n - 1; ++i)
+            sum += h(i) * h(i);
+          sum += (2. - 1.) * h(n - 1) * h(n - 1);
+          hessenberg_matrix(n, n - 1) =
+            std::sqrt(std::abs(h(n + n) - sum)) / alpha_j;
 
-          // Re-orthogonalization if loss of orthogonality detected. For the
-          // test, use a strategy discussed in C. T. Kelley, Iterative Methods
-          // for Linear and Nonlinear Equations, SIAM, Philadelphia, 1995:
-          // Compare the norm of vv after orthogonalization with its norm when
-          // starting the orthogonalization. If vv became very small (here: less
-          // than the square root of the machine precision times 10), it is
-          // almost in the span of the previous vectors, which indicates loss of
-          // precision.
+          // projection and delayed reorthogonalization. We scale the vector
+          // vv here by the preliminary norm to avoid working with too large
+          // values and correct to the actual norm in high precision in the
+          // next iteration.
+          h(n + n) = hessenberg_matrix(n, n - 1);
+          subtract_and_norm<true>(n, orthogonal_vectors, h, vv);
+
+          // transform new column of upper Hessenberg matrix into upper
+          // triangular form by computing the respective factor
+          residual_estimate = do_givens_rotation(
+            true, n - 2, triangular_matrix, givens_rotations, projected_rhs);
+        }
+      else
+        {
+          // need initial norm for detection of re-orthogonalization, see below
+          double     norm_vv       = 0.0;
+          double     norm_vv_start = 0;
+          const bool consider_reorthogonalize =
+            (do_reorthogonalization == false) && (n % 5 == 0);
           if (consider_reorthogonalize)
-            {
-              if (norm_vv >
-                  10. * norm_vv_start *
-                    std::sqrt(std::numeric_limits<
-                              typename VectorType::value_type>::epsilon()))
-                return norm_vv;
+            norm_vv_start = vv.l2_norm();
 
+          // Reset h to zero
+          h.reinit(n);
+
+          // run two loops with index 0: orthogonalize, 1: reorthogonalize
+          for (unsigned int c = 0; c < 2; ++c)
+            {
+              // Orthogonalization
+              if (orthogonalization_strategy ==
+                  LinearAlgebra::OrthogonalizationStrategy::
+                    modified_gram_schmidt)
+                {
+                  double htmp = vv * orthogonal_vectors[0];
+                  h(0) += htmp;
+                  for (unsigned int i = 1; i < n; ++i)
+                    {
+                      htmp = vv.add_and_dot(-htmp,
+                                            orthogonal_vectors[i - 1],
+                                            orthogonal_vectors[i]);
+                      h(i) += htmp;
+                    }
+
+                  norm_vv = std::sqrt(
+                    vv.add_and_dot(-htmp, orthogonal_vectors[n - 1], vv));
+                }
+              else if (orthogonalization_strategy ==
+                       LinearAlgebra::OrthogonalizationStrategy::
+                         classical_gram_schmidt)
+                {
+                  Tvmult_add<false>(n, vv, orthogonal_vectors, h);
+                  norm_vv =
+                    subtract_and_norm<false>(n, orthogonal_vectors, h, vv);
+                }
               else
                 {
-                  reorthogonalize = true;
-                  if (!reorthogonalize_signal.empty())
-                    reorthogonalize_signal(accumulated_iterations);
+                  AssertThrow(false, ExcNotImplemented());
                 }
+
+              if (c == 1)
+                break; // reorthogonalization already performed -> finished
+
+              // Re-orthogonalization if loss of orthogonality detected. For the
+              // test, use a strategy discussed in C. T. Kelley, Iterative
+              // Methods for Linear and Nonlinear Equations, SIAM, Philadelphia,
+              // 1995: Compare the norm of vv after orthogonalization with its
+              // norm when starting the orthogonalization. If vv became very
+              // small (here: less than the square root of the machine precision
+              // times 10), it is almost in the span of the previous vectors,
+              // which indicates loss of precision.
+              if (consider_reorthogonalize)
+                {
+                  if (norm_vv >
+                      10. * norm_vv_start *
+                        std::sqrt(std::numeric_limits<
+                                  typename VectorType::value_type>::epsilon()))
+                    break;
+
+                  else
+                    {
+                      do_reorthogonalization = true;
+                      if (!reorthogonalize_signal.empty())
+                        reorthogonalize_signal(accumulated_iterations);
+                    }
+                }
+
+              if (do_reorthogonalization == false)
+                break; // no reorthogonalization needed -> finished
             }
 
-          if (reorthogonalize == false)
-            return norm_vv; // no reorthogonalization needed -> finished
+          for (unsigned int i = 0; i < n; ++i)
+            hessenberg_matrix(i, n - 1) = h(i);
+          hessenberg_matrix(n, n - 1) = norm_vv;
+
+          // norm_vv is a lucky breakdown, the solver will reach convergence,
+          // but we must not divide by zero here.
+          if (norm_vv != 0)
+            vv /= norm_vv;
+
+          residual_estimate = do_givens_rotation(
+            false, n - 1, triangular_matrix, givens_rotations, projected_rhs);
         }
 
-      AssertThrow(false, ExcInternalError());
-
-      return 0.0;
+      return residual_estimate;
     }
+
+
+
+    inline double
+    ArnoldiProcess::do_givens_rotation(
+      const bool                              delayed_reorthogonalization,
+      const int                               col,
+      FullMatrix<double>                     &matrix,
+      std::vector<std::pair<double, double>> &rotations,
+      Vector<double>                         &rhs)
+    {
+      // for the delayed orthogonalization, we can only compute the column of
+      // the previous column (as there will be correction terms added to the
+      // present column for stability reasons), but we still want to compute
+      // the residual estimate from the accumulated work; we therefore perform
+      // givens rotations on two columns simultaneously
+      if (delayed_reorthogonalization)
+        {
+          if (col >= 0)
+            {
+              AssertDimension(rotations.size(), static_cast<std::size_t>(col));
+              matrix(0, col) = hessenberg_matrix(0, col);
+            }
+          double H_next = hessenberg_matrix(0, col + 1);
+          for (int i = 0; i < col; ++i)
+            {
+              const double c   = rotations[i].first;
+              const double s   = rotations[i].second;
+              const double Hi  = matrix(i, col);
+              const double Hi1 = hessenberg_matrix(i + 1, col);
+              H_next = -s * H_next + c * hessenberg_matrix(i + 1, col + 1);
+              matrix(i, col)     = c * Hi + s * Hi1;
+              matrix(i + 1, col) = -s * Hi + c * Hi1;
+            }
+
+          if (col >= 0)
+            {
+              const double H_col1 = hessenberg_matrix(col + 1, col);
+              const double H_col  = matrix(col, col);
+              const double r = 1. / std::sqrt(H_col * H_col + H_col1 * H_col1);
+              rotations.emplace_back(H_col * r, H_col1 * r);
+              matrix(col, col) =
+                rotations[col].first * H_col + rotations[col].second * H_col1;
+
+              rhs(col + 1) = -rotations[col].second * rhs(col);
+              rhs(col) *= rotations[col].first;
+
+              H_next =
+                -rotations[col].second * H_next +
+                rotations[col].first * hessenberg_matrix(col + 1, col + 1);
+            }
+
+          const double H_last = hessenberg_matrix(col + 2, col + 1);
+          const double r = 1. / std::sqrt(H_next * H_next + H_last * H_last);
+          return std::abs(H_last * r * rhs(col + 1));
+        }
+      else
+        {
+          AssertDimension(rotations.size(), static_cast<std::size_t>(col));
+
+          matrix(0, col) = hessenberg_matrix(0, col);
+          for (int i = 0; i < col; ++i)
+            {
+              const double c     = rotations[i].first;
+              const double s     = rotations[i].second;
+              const double Hi    = matrix(i, col);
+              const double Hi1   = hessenberg_matrix(i + 1, col);
+              matrix(i, col)     = c * Hi + s * Hi1;
+              matrix(i + 1, col) = -s * Hi + c * Hi1;
+            }
+
+          const double Hi  = matrix(col, col);
+          const double Hi1 = hessenberg_matrix(col + 1, col);
+          const double r   = 1. / std::sqrt(Hi * Hi + Hi1 * Hi1);
+          rotations.emplace_back(Hi * r, Hi1 * r);
+          matrix(col, col) =
+            rotations[col].first * Hi + rotations[col].second * Hi1;
+
+          rhs(col + 1) = -rotations[col].second * rhs(col);
+          rhs(col) *= rotations[col].first;
+
+          return std::abs(rhs(col + 1));
+        }
+    }
+
+
+
+    inline const Vector<double> &
+    ArnoldiProcess::solve_projected_system(
+      const bool orthogonalization_finished)
+    {
+      FullMatrix<double>  tmp_triangular_matrix;
+      Vector<double>      tmp_rhs;
+      FullMatrix<double> *matrix = &triangular_matrix;
+      Vector<double>     *rhs    = &projected_rhs;
+      unsigned int        n      = givens_rotations.size();
+
+      // If we solve with the delayed orthogonalization, we still need to
+      // perform the elimination of the last column. We distinguish two cases,
+      // one where the orthogonalization has finished (i.e., end of inner
+      // iteration in GMRES) and we can safely overwrite the content of the
+      // tridiagonal matrix and right hand side, and the case during the inner
+      // iterations where we need to create copies of the matrices in the QR
+      // decomposition as well as the right hand side.
+      if (orthogonalization_strategy ==
+          LinearAlgebra::OrthogonalizationStrategy::
+            delayed_classical_gram_schmidt)
+        {
+          n += 1;
+          if (!orthogonalization_finished)
+            {
+              tmp_triangular_matrix = triangular_matrix;
+              tmp_rhs               = projected_rhs;
+              std::vector<std::pair<double, double>> tmp_givens_rotations(
+                givens_rotations);
+              do_givens_rotation(false,
+                                 givens_rotations.size(),
+                                 tmp_triangular_matrix,
+                                 tmp_givens_rotations,
+                                 tmp_rhs);
+              matrix = &tmp_triangular_matrix;
+              rhs    = &tmp_rhs;
+            }
+          else
+            do_givens_rotation(false,
+                               givens_rotations.size(),
+                               triangular_matrix,
+                               givens_rotations,
+                               projected_rhs);
+        }
+
+      // Now solve the triangular system by backward substitution
+      projected_solution.reinit(n);
+      for (int i = n - 1; i >= 0; --i)
+        {
+          double s = (*rhs)(i);
+          for (unsigned int j = i + 1; j < n; ++j)
+            s -= projected_solution(j) * (*matrix)(i, j);
+          projected_solution(i) = s / (*matrix)(i, i);
+          AssertIsFinite(projected_solution(i));
+        }
+
+      return projected_solution;
+    }
+
+
+
+    inline const FullMatrix<double> &
+    ArnoldiProcess::get_hessenberg_matrix() const
+    {
+      return hessenberg_matrix;
+    }
+
+
 
     // A comparator for better printing eigenvalues
     inline bool
@@ -1174,56 +1705,6 @@ namespace internal
     {
       return x.real() < y.real() ||
              (x.real() == y.real() && x.imag() < y.imag());
-    }
-
-
-
-    // A function to compute the Givens rotation for the QR factorization of
-    // the Hessenberg matrix involved in the Arnoldi process, transforming it
-    // into an upper triangular matrix.
-    inline void
-    givens_rotation(Vector<double>                         &h,
-                    Vector<double>                         &b,
-                    std::vector<std::pair<double, double>> &rotations,
-                    const int                               col)
-    {
-      for (int i = 0; i < col; ++i)
-        {
-          const double c   = rotations[i].first;
-          const double s   = rotations[i].second;
-          const double tmp = h(i);
-          h(i)             = c * tmp + s * h(i + 1);
-          h(i + 1)         = -s * tmp + c * h(i + 1);
-        }
-
-      const double r =
-        1. / std::sqrt(h(col) * h(col) + h(col + 1) * h(col + 1));
-      rotations[col].second = h(col + 1) * r;
-      rotations[col].first  = h(col) * r;
-      h(col) =
-        rotations[col].first * h(col) + rotations[col].second * h(col + 1);
-      b(col + 1) = -rotations[col].second * b(col);
-      b(col) *= rotations[col].first;
-    }
-
-
-
-    // A function to solve the (upper) triangular system after Givens
-    // rotations on a matrix that has possibly unused rows and columns
-    inline void
-    solve_triangular(const unsigned int        dim,
-                     const FullMatrix<double> &H,
-                     const Vector<double>     &rhs,
-                     Vector<double>           &solution)
-    {
-      for (int i = dim - 1; i >= 0; --i)
-        {
-          double s = rhs(i);
-          for (unsigned int j = i + 1; j < dim; ++j)
-            s -= solution(j) * H(i, j);
-          solution(i) = s / H(i, i);
-          AssertIsFinite(solution(i));
-        }
     }
   } // namespace SolverGMRESImplementation
 } // namespace internal
@@ -1234,7 +1715,7 @@ template <typename VectorType>
 inline void
 SolverGMRES<VectorType>::compute_eigs_and_cond(
   const FullMatrix<double> &H_orig,
-  const unsigned int        dim,
+  const unsigned int        n,
   const boost::signals2::signal<void(const std::vector<std::complex<double>> &)>
     &eigenvalues_signal,
   const boost::signals2::signal<void(const FullMatrix<double> &)>
@@ -1244,11 +1725,11 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
   // Avoid copying the Hessenberg matrix if it isn't needed.
   if ((!eigenvalues_signal.empty() || !hessenberg_signal.empty() ||
        !cond_signal.empty()) &&
-      dim > 0)
+      n > 0)
     {
-      LAPACKFullMatrix<double> mat(dim, dim);
-      for (unsigned int i = 0; i < dim; ++i)
-        for (unsigned int j = 0; j < dim; ++j)
+      LAPACKFullMatrix<double> mat(n, n);
+      for (unsigned int i = 0; i < n; ++i)
+        for (unsigned int j = 0; j < n; ++j)
           mat(i, j) = H_orig(i, j);
       hessenberg_signal(H_orig);
       // Avoid computing eigenvalues if they are not needed.
@@ -1259,7 +1740,7 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
           // LAPACKSupport::unusable.
           LAPACKFullMatrix<double> mat_eig(mat);
           mat_eig.compute_eigenvalues();
-          std::vector<std::complex<double>> eigenvalues(dim);
+          std::vector<std::complex<double>> eigenvalues(n);
           for (unsigned int i = 0; i < mat_eig.n(); ++i)
             eigenvalues[i] = mat_eig.eigenvalue(i);
           // Sort eigenvalues for nicer output.
@@ -1305,8 +1786,7 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   internal::SolverGMRESImplementation::TmpVectors<VectorType> basis_vectors(
     basis_size + 2, this->memory);
 
-  // number of the present iteration; this
-  // number is not reset to zero upon a
+  // number of the present iteration; this number is not reset to zero upon a
   // restart
   unsigned int accumulated_iterations = 0;
 
@@ -1316,19 +1796,6 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
      !all_condition_numbers_signal.empty() || !eigenvalues_signal.empty() ||
      !all_eigenvalues_signal.empty() || !hessenberg_signal.empty() ||
      !all_hessenberg_signal.empty());
-  // for eigenvalue computation, need to collect the Hessenberg matrix (before
-  // applying Givens rotations)
-  FullMatrix<double> H_orig;
-  if (do_eigenvalues)
-    H_orig.reinit(basis_size + 1, basis_size);
-
-  // matrix used for the orthogonalization process later
-  H.reinit(basis_size + 1, basis_size, /* omit_initialization */ true);
-
-  // some additional vectors, also used in the orthogonalization
-  projected_rhs.reinit(basis_size + 1);
-  givens_rotations.resize(basis_size);
-  h.reinit(basis_size + 1);
 
   SolverControl::State iteration_state = SolverControl::iterate;
   double               res             = std::numeric_limits<double>::lowest();
@@ -1349,18 +1816,17 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // as stopping criterion
   typename VectorMemory<VectorType>::Pointer r;
   typename VectorMemory<VectorType>::Pointer x_;
-  std::unique_ptr<dealii::Vector<double>>    gamma;
   if (!use_default_residual)
     {
       r  = std::move(typename VectorMemory<VectorType>::Pointer(this->memory));
       x_ = std::move(typename VectorMemory<VectorType>::Pointer(this->memory));
       r->reinit(x);
       x_->reinit(x);
-
-      gamma = std::make_unique<dealii::Vector<double>>(projected_rhs.size());
     }
 
-  bool re_orthogonalize = additional_data.force_re_orthogonalization;
+  arnoldi_process.initialize(additional_data.orthogonalization_strategy,
+                             basis_size,
+                             additional_data.force_re_orthogonalization);
 
   ///////////////////////////////////////////////////////////////////////////
   // outer iteration: loop until we either reach convergence or the maximum
@@ -1368,26 +1834,24 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // restart
   do
     {
-      VectorType &v      = basis_vectors(0, x);
-      double      norm_v = 0.;
+      VectorType &v = basis_vectors(0, x);
 
       if (left_precondition)
         {
           A.vmult(p, x);
           p.sadd(-1., 1., b);
           preconditioner.vmult(v, p);
-          norm_v = v.l2_norm();
         }
       else
         {
           A.vmult(v, x);
-          norm_v = dealii::internal::SolverGMRESImplementation::sadd_and_norm(
-            v, -1, b, 1.0);
+          v.sadd(-1., 1., b);
         }
 
-      projected_rhs(0) = norm_v;
-      if (norm_v != 0)
-        v /= norm_v;
+      const double norm_v =
+        arnoldi_process.orthonormalize_nth_vector(0,
+                                                  basis_vectors,
+                                                  accumulated_iterations);
 
       // check the residual here as well since it may be that we got the exact
       // (or an almost exact) solution vector at the outset. if we wouldn't
@@ -1449,41 +1913,11 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
               A.vmult(vv, p);
             }
 
-          norm_v = internal::SolverGMRESImplementation::iterated_gram_schmidt(
-            additional_data.orthogonalization_strategy,
-            basis_vectors,
-            inner_iteration + 1,
-            accumulated_iterations,
-            vv,
-            h,
-            re_orthogonalize,
-            re_orthogonalize_signal);
-
-          // norm_v = 0 is a lucky breakdown, the solver will reach
-          // convergence, but we must not divide by zero here.
-          if (norm_v != 0)
-            vv /= norm_v;
-
-          h(inner_iteration + 1) = norm_v;
-
-          // for eigenvalues, get the resulting coefficients from the
-          // orthogonalization process
-          if (do_eigenvalues)
-            for (unsigned int i = 0; i < inner_iteration + 2; ++i)
-              H_orig(i, inner_iteration) = h(i);
-
-          //  Transformation into tridiagonal structure
-          internal::SolverGMRESImplementation::givens_rotation(h,
-                                                               projected_rhs,
-                                                               givens_rotations,
-                                                               inner_iteration);
-
-          //  append vector on matrix
-          for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-            H(i, inner_iteration) = h(i);
-
-          //  default residual
-          res = std::fabs(projected_rhs(inner_iteration + 1));
+          res =
+            arnoldi_process.orthonormalize_nth_vector(inner_iteration + 1,
+                                                      basis_vectors,
+                                                      accumulated_iterations,
+                                                      re_orthogonalize_signal);
 
           if (use_default_residual)
             {
@@ -1499,24 +1933,24 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
               if (!additional_data.batched_mode)
                 deallog << "default_res=" << res << std::endl;
 
-              *x_    = x;
-              *gamma = projected_rhs;
-              internal::SolverGMRESImplementation::solve_triangular(
-                inner_iteration + 1, H, *gamma, h);
+              *x_ = x;
+              const Vector<double> &projected_solution =
+                arnoldi_process.solve_projected_system(false);
 
               if (left_precondition)
                 for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-                  x_->add(h(i), basis_vectors[i]);
+                  x_->add(projected_solution(i), basis_vectors[i]);
               else
                 {
                   p = 0.;
                   for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-                    p.add(h(i), basis_vectors[i]);
+                    p.add(projected_solution(i), basis_vectors[i]);
                   preconditioner.vmult(*r, p);
                   x_->add(1., *r);
                 };
               A.vmult(*r, *x_);
               r->sadd(-1., 1., b);
+
               // Now *r contains the unpreconditioned residual!!
               if (left_precondition)
                 {
@@ -1539,15 +1973,13 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
             }
         }
 
-      // end of inner iteration. now calculate the solution from the temporary
-      // vectors
-      internal::SolverGMRESImplementation::solve_triangular(inner_iteration,
-                                                            H,
-                                                            projected_rhs,
-                                                            h);
+      // end of inner iteration; now update the global solution vector x with
+      // the solution of the projected system (least-squares solution)
+      const Vector<double> &projected_solution =
+        arnoldi_process.solve_projected_system(true);
 
       if (do_eigenvalues)
-        compute_eigs_and_cond(H_orig,
+        compute_eigs_and_cond(arnoldi_process.get_hessenberg_matrix(),
                               inner_iteration,
                               all_eigenvalues_signal,
                               all_hessenberg_signal,
@@ -1555,30 +1987,33 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
 
       if (left_precondition)
         dealii::internal::SolverGMRESImplementation::add(
-          x, inner_iteration, h, basis_vectors, false);
+          x, inner_iteration, projected_solution, basis_vectors, false);
       else
         {
           dealii::internal::SolverGMRESImplementation::add(
-            p, inner_iteration, h, basis_vectors, true);
+            p, inner_iteration, projected_solution, basis_vectors, true);
           preconditioner.vmult(v, p);
           x.add(1., v);
         }
 
       // in the last round, print the eigenvalues from the last Arnoldi step
-      if (iteration_state != SolverControl::iterate && do_eigenvalues)
-        compute_eigs_and_cond(H_orig,
-                              inner_iteration,
-                              eigenvalues_signal,
-                              hessenberg_signal,
-                              condition_number_signal);
+      if (iteration_state != SolverControl::iterate)
+        {
+          if (do_eigenvalues)
+            compute_eigs_and_cond(arnoldi_process.get_hessenberg_matrix(),
+                                  inner_iteration,
+                                  eigenvalues_signal,
+                                  hessenberg_signal,
+                                  condition_number_signal);
 
-      // end of outer iteration. restart if no convergence and the number of
-      // iterations is not exceeded
+          if (!additional_data.batched_mode && !krylov_space_signal.empty())
+            krylov_space_signal(basis_vectors);
+
+          // end of outer iteration. restart if no convergence and the number of
+          // iterations is not exceeded
+        }
     }
   while (iteration_state == SolverControl::iterate);
-
-  if (!additional_data.batched_mode && !krylov_space_signal.empty())
-    krylov_space_signal(basis_vectors);
 
   // in case of failure: throw exception
   AssertThrow(iteration_state == SolverControl::success,
@@ -1719,14 +2154,9 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
   unsigned int accumulated_iterations = 0;
 
   // matrix used for the orthogonalization process later
-  H.reinit(basis_size + 1, basis_size);
-  std::vector<std::pair<double, double>> givens_rotations(basis_size);
-
-  Vector<double> h(basis_size + 1);
-
-  // Vectors for projected system
-  Vector<double> projected_rhs(basis_size + 1);
-  Vector<double> y(basis_size);
+  arnoldi_process.initialize(additional_data.orthogonalization_strategy,
+                             basis_size,
+                             false);
 
   // Iteration starts here
   double res = std::numeric_limits<double>::lowest();
@@ -1736,52 +2166,21 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
       A.vmult(v(0, x), x);
       v[0].sadd(-1., 1., b);
 
-      double norm_v   = v[0].l2_norm();
-      res             = norm_v;
+      res             = arnoldi_process.orthonormalize_nth_vector(0, v);
       iteration_state = this->iteration_status(accumulated_iterations, res, x);
       if (iteration_state == SolverControl::success)
         break;
 
-      H.reinit(basis_size + 1, basis_size);
-
-      projected_rhs(0)             = norm_v;
       unsigned int inner_iteration = 0;
       for (; (inner_iteration < basis_size &&
               iteration_state == SolverControl::iterate);
            ++inner_iteration)
         {
-          // norm_v = 0 is a lucky breakdown, the solver will reach
-          // convergence, but we must not divide by zero here.
-          if (norm_v != 0)
-            v[inner_iteration] /= norm_v;
-
           preconditioner.vmult(z(inner_iteration, x), v[inner_iteration]);
           A.vmult(v(inner_iteration + 1, x), z[inner_iteration]);
 
-          // Gram-Schmidt
-          bool re_orthogonalize = false;
-          norm_v = internal::SolverGMRESImplementation::iterated_gram_schmidt<
-            VectorType>(additional_data.orthogonalization_strategy,
-                        v,
-                        inner_iteration + 1,
-                        0,
-                        v[inner_iteration + 1],
-                        h,
-                        re_orthogonalize);
-
-          // Compute projected solution
-          h(inner_iteration + 1) = norm_v;
-          internal::SolverGMRESImplementation::givens_rotation(h,
-                                                               projected_rhs,
-                                                               givens_rotations,
-                                                               inner_iteration);
-
-          //  append vector on Hessenberg matrix
-          for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-            H(i, inner_iteration) = h(i);
-
-          //  default residual
-          res = std::fabs(projected_rhs(inner_iteration + 1));
+          res =
+            arnoldi_process.orthonormalize_nth_vector(inner_iteration + 1, v);
 
           // check convergence. note that the vector 'x' we pass to the
           // criterion is not the final solution we compute if we
@@ -1793,12 +2192,10 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
 
       // Solve triangular system with projected quantities and update solution
       // vector
-      internal::SolverGMRESImplementation::solve_triangular(inner_iteration,
-                                                            H,
-                                                            projected_rhs,
-                                                            y);
+      const Vector<double> &projected_solution =
+        arnoldi_process.solve_projected_system(true);
       dealii::internal::SolverGMRESImplementation::add(
-        x, inner_iteration, y, z, false);
+        x, inner_iteration, projected_solution, z, false);
     }
   while (iteration_state == SolverControl::iterate);
 
