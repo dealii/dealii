@@ -1025,6 +1025,41 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
+    std::pair<typename Vector<Number, MemorySpace>::size_type,
+              typename Vector<Number, MemorySpace>::size_type>
+    Vector<Number, MemorySpace>::local_range() const
+    {
+      const size_type begin = vector->getMap()->getMinGlobalIndex();
+      const size_type end   = vector->getMap()->getMaxGlobalIndex() + 1;
+
+      Assert(
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+        end - begin == vector->getMap()->getLocalNumElements(),
+#  else
+        end - begin == vector->getMap()->getNodeNumElements(),
+#  endif
+        ExcMessage(
+          "This function only makes sense if the elements that this "
+          "vector stores on the current processor form a contiguous range. "
+          "This does not appear to be the case for the current vector."));
+
+      return std::make_pair(begin, end);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    bool
+    Vector<Number, MemorySpace>::in_local_range(const size_type index) const
+    {
+      std::pair<size_type, size_type> range = local_range();
+
+      return ((index >= range.first) && (index < range.second));
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
     MPI_Comm
     Vector<Number, MemorySpace>::get_mpi_communicator() const
     {
