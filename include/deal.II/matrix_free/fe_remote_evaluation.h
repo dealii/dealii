@@ -42,10 +42,10 @@ namespace internal
   struct PrecomputedEvaluationData
   {
     using value_type = typename internal::FEPointEvaluation::
-      EvaluatorTypeTraits<dim, n_components, value_type_>::value_type;
+      EvaluatorTypeTraits<dim, dim, n_components, value_type_>::value_type;
 
     using gradient_type = typename internal::FEPointEvaluation::
-      EvaluatorTypeTraits<dim, n_components, value_type_>::gradient_type;
+      EvaluatorTypeTraits<dim, dim, n_components, value_type_>::gradient_type;
 
     /**
      * Values at quadrature points.

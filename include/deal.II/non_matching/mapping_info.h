@@ -186,7 +186,7 @@ namespace NonMatching
     dealii::internal::MatrixFreeFunctions::GeometryType
     compute_geometry_type(
       const double diameter,
-      const std::vector<DerivativeForm<1, dim, spacedim, double>>
+      const std::vector<DerivativeForm<1, spacedim, dim, double>>
         &inverse_jacobians)
     {
       const auto   jac_0 = inverse_jacobians[0];
@@ -195,7 +195,7 @@ namespace NonMatching
       bool jacobian_constant = true;
       for (unsigned int q = 1; q < inverse_jacobians.size(); ++q)
         {
-          const DerivativeForm<1, dim, spacedim> &jac = inverse_jacobians[q];
+          const DerivativeForm<1, spacedim, dim> &jac = inverse_jacobians[q];
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < spacedim; ++e)
               if (std::fabs(jac_0[d][e] - jac[d][e]) > zero_tolerance_double)
@@ -206,7 +206,7 @@ namespace NonMatching
 
       // check whether the Jacobian is diagonal to machine
       // accuracy
-      bool cell_cartesian = jacobian_constant;
+      bool cell_cartesian = jacobian_constant && dim == spacedim;
       for (unsigned int d = 0; d < dim; ++d)
         for (unsigned int e = 0; e < dim; ++e)
           if (d != e)
@@ -296,8 +296,8 @@ namespace NonMatching
      * @param additional_data Additional data for the class to specify the
      * behavior during reinitialization.
      */
-    MappingInfo(const Mapping<dim>  &mapping,
-                const UpdateFlags    update_flags,
+    MappingInfo(const Mapping<dim, spacedim> &mapping,
+                const UpdateFlags             update_flags,
                 const AdditionalData additional_data = AdditionalData());
 
     /**
@@ -448,7 +448,7 @@ namespace NonMatching
      * Getter function for real points. The offset can be obtained with
      * compute_data_index_offset().
      */
-    const Point<dim, Number> *
+    const Point<spacedim, Number> *
     get_real_point(const unsigned int offset) const;
 
     /**
@@ -797,9 +797,9 @@ namespace NonMatching
 
   template <int dim, int spacedim, typename Number>
   MappingInfo<dim, spacedim, Number>::MappingInfo(
-    const Mapping<dim>  &mapping,
-    const UpdateFlags    update_flags,
-    const AdditionalData additional_data)
+    const Mapping<dim, spacedim> &mapping,
+    const UpdateFlags             update_flags,
+    const AdditionalData          additional_data)
     : mapping(&mapping)
     , update_flags(update_flags)
     , update_flags_mapping(update_default)
@@ -1960,8 +1960,8 @@ namespace NonMatching
                         v) = mapping_data.jacobians[q * n_lanes + v][d][s];
                 if (update_flags_mapping &
                     UpdateFlags::update_inverse_jacobians)
-                  for (unsigned int d = 0; d < dim; ++d)
-                    for (unsigned int s = 0; s < spacedim; ++s)
+                  for (unsigned int d = 0; d < spacedim; ++d)
+                    for (unsigned int s = 0; s < dim; ++s)
                       dealii::internal::VectorizedArrayTrait<Number>::get(
                         inverse_jacobians[is_interior ? 0 : 1]
                                          [compressed_offset][s][d],
@@ -2076,7 +2076,7 @@ namespace NonMatching
 
 
   template <int dim, int spacedim, typename Number>
-  inline const Point<dim, Number> *
+  inline const Point<spacedim, Number> *
   MappingInfo<dim, spacedim, Number>::get_real_point(
     const unsigned int offset) const
   {

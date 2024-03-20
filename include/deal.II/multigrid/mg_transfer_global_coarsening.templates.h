@@ -4896,8 +4896,8 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
   VectorType       &dst,
   const VectorType &src) const
 {
-  using Traits =
-    internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components, Number>;
+  using Traits = internal::FEPointEvaluation::
+    EvaluatorTypeTraits<dim, dim, n_components, Number>;
   using value_type = typename Traits::value_type;
 
   std::vector<value_type> evaluation_point_results;
@@ -5023,8 +5023,8 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
   VectorType       &dst,
   const VectorType &src) const
 {
-  using Traits =
-    internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components, Number>;
+  using Traits = internal::FEPointEvaluation::
+    EvaluatorTypeTraits<dim, dim, n_components, Number>;
   using value_type = typename Traits::value_type;
 
   std::vector<value_type> evaluation_point_results;
