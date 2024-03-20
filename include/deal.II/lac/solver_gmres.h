@@ -126,16 +126,17 @@ namespace internal
     /**
      * Class that performs the Arnoldi orthogonalization process within the
      * SolverGMRES and SolverFGMRES classes. It uses one of the algorithms in
-     * LinearAlgebra::LinearizationStrategy for the work on the global vectors,
-     * can transform the resulting Hessenberg matrix into an upper triangular
-     * matrix by Givens rotations, and eventually solve the minimization problem
-     * in the projected Krylov space.
+     * LinearAlgebra::OrthogonalizationStrategy for the work on the global
+     * vectors, transforms the resulting Hessenberg matrix into an upper
+     * triangular matrix by Givens rotations, and eventually solves the
+     * minimization problem in the projected Krylov space.
      */
     class ArnoldiProcess
     {
     public:
       /**
-       * Initialize the data structures in this class.
+       * Initialize the data structures in this class with the given
+       * parameters for the solution process.
        */
       void
       initialize(const LinearAlgebra::OrthogonalizationStrategy
@@ -145,23 +146,25 @@ namespace internal
 
       /**
        * Orthonormalize the vector at the position @p n within the array
-       * @p orthogonal_vectors against the @p n (orthonormal) vectors with
+       * @p orthogonal_vectors against the @p n orthonormal vectors with
        * indices <tt>0, ..., n - 1</tt> using the modified or classical
        * Gram-Schmidt algorithm. The class internally stores the factors used
        * for orthogonalization in an upper Hessenberg matrix. For the
        * classical Gram-Schmidt and modified Gram-Schmidt algorithms, loss of
-       * orthogonality is checked every fifth step. In case this is detected,
+       * orthogonality is checked every fifth step (in case it is not yet
+       * already set via the initialize() function). In case this is detected,
        * all subsequent iterations use re-orthogonalization as stored
        * internally in this class, and a call to the optional signal is made.
        *
        * Note that the projected Hessenberg matrix and its factorization are
        * only consistent if @p n is incremented by one for each successive
        * call, or if @p n is zero when starting to build a new orthogonal
-       * basis in restarted GMRES.
+       * basis in restarted GMRES; an assertion will be raised if this
+       * assumption is not fulfilled.
        *
        * Within this function, the factors for the QR factorization are
        * computed alongside the Hessenberg matrix, and an estimate of the
-       * residual in the Arnoldi space is returned from this function.
+       * residual in the subspace is returned from this function.
        */
       template <typename VectorType>
       double
@@ -242,29 +245,29 @@ namespace internal
       /**
        * This is a helper function to perform the incremental computation of
        * the QR factorization of the Hessenberg matrix involved in the Arnoldi
-       * process. The process will transform the member variable
+       * process. More precisely, it transforms the member variable
        * @p hessenberg_matrix into an upper triangular matrix R labeled
        * @p matrix, an orthogonal matrix Q represented by a vector of Givens
        * rotations, and the associated right hand side to minimize the norm of
-       * the solution in the Krylov space.
+       * the solution in the Krylov subspace.
        *
        * More precisely, this function is called once a new column is added to
        * the Hessenberg matrix and performs all necessary steps for that
        * column. First, all evaluations with the Givens rotations resulting
        * from the previous elimination steps are performed. Then, the single
        * additional entry below the diagonal in the Hessenberg matrix is
-       * eliminated by a Givens rotation, a new pair of Givens factors is
-       * appended, and the right-hand side vector in the projected system is
+       * eliminated by a Givens rotation, appending a new pair of Givens
+       * factors, and the right-hand side vector in the projected system is
        * updated. The column number @p col for which the Gram-Schmidt should
-       * run needs to be given, because the delayed orthogonalization might
-       * lag by one step compared to the other sizes in the problem, and needs
-       * to perform additional computations.
+       * run needs to be given, because the algorithmic variant with delayed
+       * orthogonalization might lag by one step compared to the other sizes
+       * in the problem, and needs to perform additional computations.
        *
        * In most cases, the matrices and vectors passed to this function are
-       * the member variables of the present class, but there are also other
-       * cases. The function returns the modulus of the last entry in the
-       * transformed right-hand side, which is the obtained residual of the
-       * global vector x after minimization within the Krylov space.
+       * the member variables of the present class, but also other scenarios
+       * are supported. The function returns the modulus of the last entry in
+       * the transformed right-hand side, which is the obtained residual of
+       * the global vector x after minimization within the Krylov space.
        */
       double
       do_givens_rotation(const bool          delayed_reorthogonalization,
