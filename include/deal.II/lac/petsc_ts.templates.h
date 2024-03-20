@@ -340,6 +340,9 @@ namespace PETScWrappers
                                       TS_EXACTFINALTIME_MATCHSTEP :
                                       TS_EXACTFINALTIME_STEPOVER));
 
+    // Store the boolean to be passed to TSSetResize.
+    this->restart_if_remesh = data.restart_if_remesh;
+
     // Adaptive tolerances
     const PetscReal atol = data.absolute_tolerance > 0.0 ?
                              data.absolute_tolerance :
@@ -1034,10 +1037,21 @@ namespace PETScWrappers
       {
         AssertThrow(interpolate,
                     StandardExceptions::ExcFunctionNotProvided("interpolate"));
-#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+#  if DEAL_II_PETSC_VERSION_GTE(3, 21, 0)
+        (void)ts_poststep_amr;
+        AssertPETSc(TSSetResize(ts,
+                                static_cast<PetscBool>(restart_if_remesh),
+                                ts_resize_setup,
+                                ts_resize_transfer,
+                                this));
+#  else
+        AssertThrow(!restart_if_remesh,
+                    ExcMessage(
+                      "Restart with remesh supported from PETSc 3.21."));
+#    if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
         (void)ts_poststep_amr;
         AssertPETSc(TSSetResize(ts, ts_resize_setup, ts_resize_transfer, this));
-#  else
+#    else
         AssertPETSc(PetscObjectComposeFunction(
           (PetscObject)ts,
           "__dealii_ts_resize_setup__",
@@ -1050,6 +1064,7 @@ namespace PETScWrappers
           static_cast<PetscErrorCode (*)(TS, PetscInt, Vec[], Vec[], void *)>(
             ts_resize_transfer)));
         AssertPETSc(TSSetPostStep(ts, ts_poststep_amr));
+#    endif
 #  endif
       }
 
