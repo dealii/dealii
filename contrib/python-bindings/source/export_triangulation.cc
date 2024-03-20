@@ -81,6 +81,10 @@ namespace python
     generate_hyper_cube_with_cylindrical_hole,
     0,
     5)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_plate_with_a_hole_overloads,
+                                         generate_plate_with_a_hole,
+                                         0,
+                                         12)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_ball_overloads,
                                          generate_hyper_ball,
                                          1,
@@ -314,6 +318,14 @@ namespace python
     "This function produces a square in the xy-plane with a cylindrical     \n"
     "hole in the middle. In 3d, this geometry is extruded in z direction    \n"
     "to the interval [0,L].                                                 \n";
+
+
+
+  const char generate_plate_with_a_hole_docstring[] =
+    "Generate a rectangular plate with an (offset) cylindrical hole.       \n"
+    "The geometry consists of 2 regions: The first is a square region      \n"
+    "with length outer_radius and a hole of radius inner_radius.           \n"
+    "The second region describes the remainder of the bulk material.       \n";
 
 
 
@@ -591,6 +603,23 @@ namespace python
            &TriangulationWrapper::generate_cheese,
            generate_cheese_docstring,
            boost::python::args("self", "holes"))
+      .def("generate_plate_with_a_hole",
+           &TriangulationWrapper::generate_plate_with_a_hole,
+           generate_plate_with_a_hole_overloads(
+             boost::python::args("self",
+                                 "inner_radius",
+                                 "outer_radius",
+                                 "pad_bottom",
+                                 "pad_top",
+                                 "pad_left",
+                                 "pad_right",
+                                 "center",
+                                 "polar_manifold_id",
+                                 "tfi_manifold_id",
+                                 "L",
+                                 "n_slices",
+                                 "colorize"),
+             generate_plate_with_a_hole_docstring))
       .def("generate_general_cell",
            &TriangulationWrapper::generate_general_cell,
            generate_general_cell_overloads(

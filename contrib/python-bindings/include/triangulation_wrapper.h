@@ -192,6 +192,22 @@ namespace python
     void
     generate_cheese(boost::python::list &holes);
 
+    /*! @copydoc GridGenerator::plate_with_a_hole
+     */
+    void
+    generate_plate_with_a_hole(const double        inner_radius = 0.4,
+                               const double        outer_radius = 1.,
+                               const double        pad_bottom   = 2.,
+                               const double        pad_top      = 2.,
+                               const double        pad_left     = 1.,
+                               const double        pad_right    = 1.,
+                               const PointWrapper &center = PointWrapper(),
+                               const int           polar_manifold_id = 0,
+                               const int           tfi_manifold_id   = 1,
+                               const double        L                 = 1.,
+                               const unsigned int  n_slices          = 2,
+                               const bool          colorize          = false);
+
     /*! @copydoc GridGenerator::general_cell
      */
     void

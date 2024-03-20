@@ -262,6 +262,48 @@ namespace python
 
     template <int dim>
     void
+    generate_plate_with_a_hole(const double        inner_radius,
+                               const double        outer_radius,
+                               const double        pad_bottom,
+                               const double        pad_top,
+                               const double        pad_left,
+                               const double        pad_right,
+                               const PointWrapper &center,
+                               const int           polar_manifold_id,
+                               const int           tfi_manifold_id,
+                               const double        L,
+                               const unsigned int  n_slices,
+                               const bool          colorize,
+                               void               *triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      Point<dim> point =
+        center.get_point() ?
+          *(static_cast<const Point<dim> *>(center.get_point())) :
+          Point<dim>();
+
+      Triangulation<dim, dim> *tria =
+        static_cast<Triangulation<dim, dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::plate_with_a_hole(*tria,
+                                       inner_radius,
+                                       outer_radius,
+                                       pad_bottom,
+                                       pad_top,
+                                       pad_left,
+                                       pad_right,
+                                       point,
+                                       polar_manifold_id,
+                                       tfi_manifold_id,
+                                       L,
+                                       n_slices,
+                                       colorize);
+    }
+
+
+
+    template <int dim>
+    void
     generate_general_cell(std::vector<PointWrapper> &wrapped_points,
                           const bool                 colorize,
                           void                      *triangulation)
@@ -1184,6 +1226,52 @@ namespace python
       internal::generate_cheese<2, 3>(holes, triangulation);
     else
       internal::generate_cheese<3, 3>(holes, triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::generate_plate_with_a_hole(const double inner_radius,
+                                                   const double outer_radius,
+                                                   const double pad_bottom,
+                                                   const double pad_top,
+                                                   const double pad_left,
+                                                   const double pad_right,
+                                                   const PointWrapper &center,
+                                                   const int polar_manifold_id,
+                                                   const int tfi_manifold_id,
+                                                   const double       L,
+                                                   const unsigned int n_slices,
+                                                   const bool         colorize)
+  {
+    if (dim == 2)
+      internal::generate_plate_with_a_hole<2>(inner_radius,
+                                              outer_radius,
+                                              pad_bottom,
+                                              pad_top,
+                                              pad_left,
+                                              pad_right,
+                                              center,
+                                              polar_manifold_id,
+                                              tfi_manifold_id,
+                                              L,
+                                              n_slices,
+                                              colorize,
+                                              triangulation);
+    else
+      internal::generate_plate_with_a_hole<3>(inner_radius,
+                                              outer_radius,
+                                              pad_bottom,
+                                              pad_top,
+                                              pad_left,
+                                              pad_right,
+                                              center,
+                                              polar_manifold_id,
+                                              tfi_manifold_id,
+                                              L,
+                                              n_slices,
+                                              colorize,
+                                              triangulation);
   }
 
 

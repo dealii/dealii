@@ -181,6 +181,13 @@ class TestTriangulationWrapper(unittest.TestCase):
                 n_cells = triangulation.n_active_cells()
                 self.assertEqual(n_cells, 175)
 
+    def test_generate_plate_with_hole(self):
+        for dim in self.dim:
+            triangulation = Triangulation(dim[0])
+            triangulation.generate_plate_with_a_hole()
+            n_cells = triangulation.n_active_cells()
+            self.assertEqual(n_cells, 28)
+
     def test_generate_general_cell(self):
         for dim in self.restricted_dim:
             triangulation = Triangulation(dim[0], dim[1])
