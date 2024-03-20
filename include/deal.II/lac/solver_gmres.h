@@ -1838,9 +1838,15 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
     {
       VectorType &v = basis_vectors(0, x);
 
+      // Compute the preconditioned/unpreconditioned residual for left/right
+      // preconditioning. If 'x' is the zero vector, then we can bypass the
+      // full computation. But 'x' is only likely to be the zero vector if
+      // that's what the user provided as the starting guess, so it's only
+      // worth checking for this in the first iteration. (Calling all_zero()
+      // costs as much in memory transfer and communication as computing the
+      // norm of a vector.)
       if (left_precondition)
         {
-          // if the vector is zero, bypass the full computation
           if (accumulated_iterations == 0 && x.all_zero())
             preconditioner.vmult(v, b);
           else
@@ -2176,6 +2182,12 @@ SolverFGMRES<VectorType>::solve(const MatrixType         &A,
 
   do
     {
+      // Compute the residual. If 'x' is the zero vector, then we can bypass
+      // the full computation. But 'x' is only likely to be the zero vector if
+      // that's what the user provided as the starting guess, so it's only
+      // worth checking for this in the first iteration. (Calling all_zero()
+      // costs as much in memory transfer and communication as computing the
+      // norm of a vector.)
       if (accumulated_iterations == 0 && x.all_zero())
         v(0, x) = b;
       else
