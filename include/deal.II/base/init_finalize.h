@@ -79,8 +79,8 @@ operator|(const InitializeLibrary f1, const InitializeLibrary f2)
 
 
 /**
- * Global operator which sets the bits from the second argument also in the
- * first one.
+ * Global operator which returns an object in which all bits are set that are
+ * set both in the first and second argument.
  */
 inline InitializeLibrary
 operator&(const InitializeLibrary f1, const InitializeLibrary f2)
