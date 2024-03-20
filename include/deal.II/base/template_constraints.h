@@ -316,7 +316,7 @@ constexpr bool has_begin_and_end =
  * [std::identity_type](https://en.cppreference.com/w/cpp/types/type_identity)
  * class available under the name that deal.II has used for a long time.
  *
- * @deprecated Use `std_cxx20::identity_type` instead.
+ * @deprecated Use `std_cxx20::type_identity` instead.
  */
 template <typename T>
 using identity DEAL_II_DEPRECATED = std_cxx20::type_identity<T>;
