@@ -110,9 +110,10 @@ public:
    */
   template <typename T = DataType>
   void
-  initialize(const CellIteratorType &cell_start,
-             const CellIteratorType &cell_end,
-             const unsigned int      number_of_data_points_per_cell);
+  initialize(
+    const CellIteratorType                                          &cell_start,
+    const typename std_cxx20::type_identity<CellIteratorType>::type &cell_end,
+    const unsigned int number_of_data_points_per_cell);
 
   /**
    * Removes data stored at the @p cell. Returns true if the data was removed.
@@ -630,9 +631,9 @@ template <typename CellIteratorType, typename DataType>
 template <typename T>
 inline void
 CellDataStorage<CellIteratorType, DataType>::initialize(
-  const CellIteratorType &cell_start,
-  const CellIteratorType &cell_end,
-  const unsigned int      number)
+  const CellIteratorType                                          &cell_start,
+  const typename std_cxx20::type_identity<CellIteratorType>::type &cell_end,
+  const unsigned int                                               number)
 {
   for (CellIteratorType it = cell_start; it != cell_end; ++it)
     if (it->is_locally_owned())
