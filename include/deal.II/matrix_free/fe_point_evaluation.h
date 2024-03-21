@@ -85,6 +85,23 @@ namespace internal
         result[component] = vector_entry;
       }
 
+      static scalar_value_type
+      sum_value(const scalar_value_type &result)
+      {
+        return result;
+      }
+
+      static scalar_value_type
+      sum_value(const vectorized_value_type &result)
+      {
+        scalar_value_type result_scalar = {};
+
+        for (unsigned int c = 0; c < n_components; ++c)
+          result_scalar[c] = result[c].sum();
+
+        return result_scalar;
+      }
+
       static ScalarNumber
       sum_value(const unsigned int           component,
                 const vectorized_value_type &result)
@@ -234,6 +251,18 @@ namespace internal
                  scalar_value_type &result)
       {
         result = vector_entry;
+      }
+
+      static scalar_value_type
+      sum_value(const scalar_value_type &result)
+      {
+        return result;
+      }
+
+      static scalar_value_type
+      sum_value(const vectorized_value_type &result)
+      {
+        return result.sum();
       }
 
       static ScalarNumber
@@ -390,6 +419,23 @@ namespace internal
         result[component] = vector_entry;
       }
 
+      static scalar_value_type
+      sum_value(const scalar_value_type &result)
+      {
+        return result;
+      }
+
+      static scalar_value_type
+      sum_value(const vectorized_value_type &result)
+      {
+        scalar_value_type result_scalar = {};
+
+        for (unsigned int c = 0; c < dim; ++c)
+          result_scalar[c] = result[c].sum();
+
+        return result_scalar;
+      }
+
       static ScalarNumber
       sum_value(const unsigned int           component,
                 const vectorized_value_type &result)
@@ -539,6 +585,18 @@ namespace internal
                  scalar_value_type &result)
       {
         result = vector_entry;
+      }
+
+      static scalar_value_type
+      sum_value(const scalar_value_type &result)
+      {
+        return result;
+      }
+
+      static scalar_value_type
+      sum_value(const vectorized_value_type &result)
+      {
+        return result.sum();
       }
 
       static ScalarNumber
@@ -858,6 +916,16 @@ public:
    */
   Point<dim, Number>
   unit_point(const unsigned int point_index) const;
+
+  /**
+￼   * Take values collected at quadrature points via the submit_value()
+    * function, multiply by the Jacobian determinant
+    * and quadrature weights (JxW) and sum the values for all quadrature
+￼   * points on the cell. The result is a scalar, representing the integral
+￼   * of the function over the cell.
+￼   */
+  scalar_value_type
+  integrate_value() const;
 
   /**
    * Return an object that can be thought of as an array containing all indices
@@ -2462,6 +2530,22 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
                                               solution_values.size()),
             integration_flags,
             sum_into_values);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline typename FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
+  scalar_value_type
+  FEPointEvaluationBase<n_components_, dim, spacedim, Number>::integrate_value()
+    const
+{
+  value_type return_value = {};
+
+  for (const auto point_index : this->quadrature_point_indices())
+    return_value += values[point_index] * this->JxW(point_index);
+
+  return ETT::sum_value(return_value);
 }
 
 
