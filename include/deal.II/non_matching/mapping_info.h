@@ -1960,13 +1960,13 @@ namespace NonMatching
                         v) = mapping_data.jacobians[q * n_lanes + v][d][s];
                 if (update_flags_mapping &
                     UpdateFlags::update_inverse_jacobians)
-                  for (unsigned int d = 0; d < spacedim; ++d)
-                    for (unsigned int s = 0; s < dim; ++s)
+                  for (unsigned int d = 0; d < dim; ++d)
+                    for (unsigned int s = 0; s < spacedim; ++s)
                       dealii::internal::VectorizedArrayTrait<Number>::get(
                         inverse_jacobians[is_interior ? 0 : 1]
-                                         [compressed_offset][s][d],
+                                         [compressed_offset][d][s],
                         v) =
-                        mapping_data.inverse_jacobians[q * n_lanes + v][s][d];
+                        mapping_data.inverse_jacobians[q * n_lanes + v][d][s];
               }
 
             if (is_interior)
