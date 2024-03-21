@@ -1599,6 +1599,9 @@ namespace TrilinosWrappers
                     const bool /*col_indices_are_sorted*/)
   {
     AssertIndexRange(row, this->m());
+    for (size_type n = 0; n < n_cols; ++n)
+      AssertIndexRange(col_indices[n], this->n());
+
     int ierr;
     if (last_action == Insert)
       {

@@ -1114,6 +1114,8 @@ namespace LinearAlgebra
       const bool /*col_indices_are_sorted*/)
     {
       AssertIndexRange(row, this->m());
+      for (size_t n = 0; n < n_cols; ++n)
+        AssertIndexRange(col_indices[n], this->n());
 
       // If the matrix is marked as compressed, we need to
       // call resumeFill() first.
@@ -1145,7 +1147,6 @@ namespace LinearAlgebra
               if (values[i] != 0)
                 {
                   AssertIsFinite(values[i]);
-                  AssertIndexRange(col_indices[i], n());
                   AssertIndexRange(n_columns, n_zero_entries);
                   col_indices_array[n_columns] = col_indices[i];
                   values_array[n_columns]      = values[i];
@@ -1157,7 +1158,6 @@ namespace LinearAlgebra
         for (size_t i = 0; i < n_cols; ++i)
           {
             AssertIsFinite(values[i]);
-            AssertIndexRange(col_indices[i], n());
             col_indices_array[i] = col_indices[i];
             values_array[i]      = values[i];
           }
