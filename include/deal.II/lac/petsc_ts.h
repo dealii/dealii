@@ -63,6 +63,7 @@ namespace PETScWrappers
      * @param initial_step_size Initial step size.
      * @param max_steps Maximum number of steps allowed.
      * @param match_step Whether or not to exactly stop at final time or step over it.
+     * @param restart_if_remesh Whether or not to restart the step when remeshing is flagged.
      *
      * Error parameters:
      *
@@ -93,6 +94,7 @@ namespace PETScWrappers
       const real_type    initial_step_size = 0.0,
       const int          max_steps         = -1,
       const bool         match_step        = false,
+      const bool         restart_if_remesh = false,
       // Error parameters
       const std::string &ts_adapt_type        = "none",
       const real_type    minimum_step_size    = -1.0,
@@ -107,6 +109,7 @@ namespace PETScWrappers
       , initial_step_size(initial_step_size)
       , max_steps(max_steps)
       , match_step(match_step)
+      , restart_if_remesh(restart_if_remesh)
       , ts_adapt_type(ts_adapt_type)
       , minimum_step_size(minimum_step_size)
       , maximum_step_size(maximum_step_size)
@@ -159,6 +162,11 @@ namespace PETScWrappers
      * Flag to indicate to stop exactly at the requested final time.
      */
     bool match_step;
+
+    /**
+     * Flag to indicate to restart the step if remeshing is flagged.
+     */
+    bool restart_if_remesh;
 
     /**
      * PETSc time step adaptor type.
@@ -650,6 +658,12 @@ namespace PETScWrappers
      * Object to apply solve_with_jacobian.
      */
     PreconditionShell solve_with_jacobian_pc;
+
+    /**
+     * This flag is used to decide whether or not to restart the step if
+     * remeshing has been performed
+     */
+    bool restart_if_remesh;
 
     /**
      * This flag is set when changing the customization and used within solve.
