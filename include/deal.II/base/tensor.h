@@ -393,6 +393,55 @@ private:
 
 
 
+namespace internal
+{
+  namespace TensorImplementation
+  {
+    /**
+     * Whether or not the 'values' array of Tensor can be treated as (i.e.,
+     * bitcasted to) a vectorized array (of possibly more than 'dim' elements,
+     * where the padding elements would then have to
+     * be ignored by all functions).
+     *
+     * We can store the values as an array that can be casted to VectorizedArray
+     * if we are considering a rank-1 tensor, and if it stores `double` or
+     * `float` values, and if there are at most 4 values -- we do not try to
+     * vectorize the uncommon case of `dim>4`. We also don't consider the case
+     * `dim==1` because in that case vectorization does not provide any benefit.
+     *
+     * Note that this leads to a platform dependent alignment given that
+     * we want to treat the elements as VectorizedArray and that whether
+     * or not a VectorizedArray of sufficiently large size exists depends
+     * on the platform we're on.
+     */
+    template <int rank, int dim, typename Number>
+    constexpr bool can_treat_values_as_vectorized_array =
+      ((rank == 1) &&
+       /* Only if dim==2,3,4 */
+       (dim > 1) && (dim <= 4) &&
+       /* Only for float and double tensors */
+       (std::is_same_v<Number, double> || std::is_same_v<Number, float>)&&
+       /* Only if a VectorizedArray<Number,N> is avaiable where N>=dim
+          (but we only have to consider N=2 or 4 because dim==2,3,4). */
+       (internal::VectorizedArrayWidthSpecifier<Number>::max_width >=
+        (dim <= 2 ? 2 : 4)));
+
+    /**
+     * Compute the alignment to be used for Tensor objects. We align it
+     * by 2 or 4 times the size of the scalar object for rank-1 tensors if
+     * rank-1 tensors can be treated as vectorized arrays (which makes sure that
+     * the higher-rank tensors are then also so aligned). Otherwise, set the
+     * alignment to the alignment of `Number`.
+     */
+    template <int rank, int dim, typename Number>
+    constexpr size_t tensor_alignment =
+      (can_treat_values_as_vectorized_array<1, dim, Number> ?
+         (dim <= 2 ? 2 : 4) * sizeof(Number) :
+         alignof(Number));
+  } // namespace TensorImplementation
+} // namespace internal
+
+
 /**
  * A general tensor class with an arbitrary rank, i.e. with an arbitrary
  * number of indices. The Tensor class provides an indexing operator and a bit
@@ -467,7 +516,8 @@ private:
  * @ingroup geomprimitives
  */
 template <int rank_, int dim, typename Number>
-class Tensor
+class alignas(
+  internal::TensorImplementation::tensor_alignment<rank_, dim, Number>) Tensor
 {
 public:
   static_assert(rank_ >= 1,
