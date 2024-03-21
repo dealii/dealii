@@ -231,8 +231,9 @@ public:
   /**
    * Same as `normal_vector(const unsigned int q_point)`.
    *
-   * @warning  This function will be deprecated!
+   * @deprecated Use normal_vector() instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use normal_vector() instead.")
   Tensor<1, dim, Number>
   get_normal_vector(const unsigned int q_point) const;
 
