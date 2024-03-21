@@ -5053,19 +5053,21 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   this->values_quad_submitted = true;
 #  endif
 
-  const std::size_t nqp = this->n_quadrature_points;
+  const std::size_t    nqp    = this->n_quadrature_points;
+  VectorizedArrayType *values = this->values_quad + q_point;
+
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       const VectorizedArrayType JxW =
         this->J_value[0] * this->quadrature_weights[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
-        this->values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
+        values[comp * nqp] = val_in[comp] * JxW;
     }
   else
     {
       const VectorizedArrayType JxW = this->J_value[q_point];
       for (unsigned int comp = 0; comp < n_components; ++comp)
-        this->values_quad[comp * nqp + q_point] = val_in[comp] * JxW;
+        values[comp * nqp] = val_in[comp] * JxW;
     }
 }
 
