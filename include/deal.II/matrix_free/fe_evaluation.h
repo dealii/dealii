@@ -558,8 +558,9 @@ public:
 #endif
 
   /**
-   * Takes values at quadrature points, multiplies by the Jacobian determinant
-   * and quadrature weights (JxW) and sums the values for all quadrature
+   * Take values collected at quadrature points via the submit_value() function,
+   * multiply by the Jacobian determinant
+   * and quadrature weights (JxW) and sum the values for all quadrature
    * points on the cell. The result is a scalar, representing the integral
    * over the function over the cell. If a vector-element is used, the
    * resulting components are still separated. Moreover, if vectorization is
