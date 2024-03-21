@@ -49,13 +49,13 @@ test(const unsigned int version)
 
   if (version == 0 || version == 1)
     GridGenerator::reference_cell(tria, ReferenceCells::Tetrahedron);
-  else if (version == 2)
+  else if (version == 2 || version == 3)
     GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
 
   print(tria, "tria.0.vtk");
   if (version == 0 || version == 2)
     tria.refine_global(1);
-  else if (version == 1)
+  else if (version == 1 || version == 3)
     tria.refine_global(2);
 
   print(tria, "tria.1.vtk");
@@ -68,4 +68,5 @@ main()
   test(0); // coarse grid: 1 tet, n_refinements: 1
   test(1); // coarse grid: 1 tet, n_refinements: 2
   test(2); // coarse grid: 5 tets (cube), n_refinements: 1
+  test(3); // coarse grid: 5 tets (cube), n_refinements: 2
 }
