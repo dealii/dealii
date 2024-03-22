@@ -85,6 +85,11 @@ namespace python
                                          generate_plate_with_a_hole,
                                          0,
                                          12)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(
+    generate_channel_with_cylinder_overloads,
+    generate_channel_with_cylinder,
+    0,
+    4)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_ball_overloads,
                                          generate_hyper_ball,
                                          1,
@@ -326,6 +331,17 @@ namespace python
     "The geometry consists of 2 regions: The first is a square region      \n"
     "with length outer_radius and a hole of radius inner_radius.           \n"
     "The second region describes the remainder of the bulk material.       \n";
+
+
+
+  const char generate_channel_with_cylinder_docstring[] =
+    "Generate a grid consisting of a channel with a cylinder.              \n"
+    "The channel has three distinct regions:                               \n"
+    "  1. If n_shells is greater than zero, then there are that many       \n"
+    "     shells centered around the cylinder,                             \n"
+    "  2. a blending region between the shells and the rest of the         \n"
+    "     triangulation, and                                               \n"
+    "  3. a bulk region consisting of Cartesian cells.                     \n";
 
 
 
@@ -620,6 +636,12 @@ namespace python
                                  "n_slices",
                                  "colorize"),
              generate_plate_with_a_hole_docstring))
+      .def("generate_channel_with_cylinder",
+           &TriangulationWrapper::generate_channel_with_cylinder,
+           generate_channel_with_cylinder_overloads(
+             boost::python::args(
+               "shell_region_width", "n_shells", "skewness", "colorize"),
+             generate_channel_with_cylinder_docstring))
       .def("generate_general_cell",
            &TriangulationWrapper::generate_general_cell,
            generate_general_cell_overloads(

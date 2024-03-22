@@ -304,6 +304,23 @@ namespace python
 
     template <int dim>
     void
+    generate_channel_with_cylinder(const double       shell_region_width,
+                                   const unsigned int n_shells,
+                                   const double       skewness,
+                                   const bool         colorize,
+                                   void              *triangulation)
+    {
+      Triangulation<dim, dim> *tria =
+        static_cast<Triangulation<dim, dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::channel_with_cylinder(
+        *tria, shell_region_width, n_shells, skewness, colorize);
+    }
+
+
+
+    template <int dim>
+    void
     generate_general_cell(std::vector<PointWrapper> &wrapped_points,
                           const bool                 colorize,
                           void                      *triangulation)
@@ -1272,6 +1289,23 @@ namespace python
                                               n_slices,
                                               colorize,
                                               triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::generate_channel_with_cylinder(
+    const double       shell_region_width,
+    const unsigned int n_shells,
+    const double       skewness,
+    const bool         colorize)
+  {
+    if (dim == 2)
+      internal::generate_channel_with_cylinder<2>(
+        shell_region_width, n_shells, skewness, colorize, triangulation);
+    else
+      internal::generate_channel_with_cylinder<3>(
+        shell_region_width, n_shells, skewness, colorize, triangulation);
   }
 
 

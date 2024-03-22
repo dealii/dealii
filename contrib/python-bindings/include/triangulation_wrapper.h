@@ -208,6 +208,14 @@ namespace python
                                const unsigned int  n_slices          = 2,
                                const bool          colorize          = false);
 
+    /*! @copydoc GridGenerator::generate_channel_with_cylinder
+     */
+    void
+    generate_channel_with_cylinder(const double       shell_region_width = 0.03,
+                                   const unsigned int n_shells           = 2,
+                                   const double       skewness           = 2.,
+                                   const bool         colorize = false);
+
     /*! @copydoc GridGenerator::general_cell
      */
     void
