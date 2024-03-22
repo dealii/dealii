@@ -206,7 +206,6 @@ namespace internal
   {
     const int mm = transpose_matrix ? n_rows : n_columns,
               nn = transpose_matrix ? n_columns : n_rows;
-    Assert(n_rows <= 128, ExcNotImplemented());
     Assert(n_rows > 0 && n_columns > 0,
            ExcInternalError("Empty evaluation task!"));
     Assert(n_rows > 0 && n_columns > 0,
@@ -250,15 +249,15 @@ namespace internal
               out[stride_out * col] = result;
           }
       }
-    else
+    else if (mm <= 128)
       {
         std::array<Number, 129> x;
         for (int i = 0; i < mm; ++i)
           x[i] = in[stride_in * i];
 
-        Number res0;
         for (int col = 0; col < nn; ++col)
           {
+            Number res0;
             if (transpose_matrix == true)
               {
                 res0 = matrix[col] * x[0];
@@ -270,6 +269,31 @@ namespace internal
                 res0 = matrix[col * n_columns] * x[0];
                 for (int i = 1; i < mm; ++i)
                   res0 += matrix[col * n_columns + i] * x[i];
+              }
+            if (add)
+              out[stride_out * col] += res0;
+            else
+              out[stride_out * col] = res0;
+          }
+      }
+    else
+      {
+        Assert(in != out,
+               ExcNotImplemented("For large sizes, arrays may not overlap"));
+        for (int col = 0; col < nn; ++col)
+          {
+            Number res0;
+            if (transpose_matrix == true)
+              {
+                res0 = matrix[col] * in[0];
+                for (int i = 1; i < mm; ++i)
+                  res0 += matrix[i * n_columns + col] * in[stride_in * i];
+              }
+            else
+              {
+                res0 = matrix[col * n_columns] * in[0];
+                for (int i = 1; i < mm; ++i)
+                  res0 += matrix[col * n_columns + i] * in[stride_in * i];
               }
             if (add)
               out[stride_out * col] += res0;
