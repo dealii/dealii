@@ -94,6 +94,10 @@ namespace python
                                          generate_hyper_ball,
                                          1,
                                          2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_ball_balanced_overloads,
+                                         generate_hyper_ball_balanced,
+                                         0,
+                                         2)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_sphere_overloads,
                                          generate_hyper_sphere,
                                          1,
@@ -280,6 +284,13 @@ namespace python
     "boundary cells after one refinement is optimized. You should attach a  \n"
     "SphericalManifold to the cells and faces for correct placement of      \n"
     "vertices upon refinement and to be able to use higher order mappings.  \n";
+
+
+
+  const char generate_hyper_ball_balanced_docstring[] =
+    "This is an alternative to hyper_ball with 12 cells in 2d and 32 cells  \n"
+    "in 3d, which provides a better balance between the size of the cells   \n"
+    "around the outer curved boundaries and the cell in the interior.       \n";
 
 
 
@@ -680,6 +691,11 @@ namespace python
            generate_hyper_ball_overloads(
              boost::python::args("self", "center", "radius"),
              generate_hyper_ball_docstring))
+      .def("generate_hyper_ball_balanced",
+           &TriangulationWrapper::generate_hyper_ball_balanced,
+           generate_hyper_ball_balanced_overloads(
+             boost::python::args("self", "center", "radius"),
+             generate_hyper_ball_balanced_docstring))
       .def("generate_hyper_sphere",
            &TriangulationWrapper::generate_hyper_sphere,
            generate_hyper_sphere_overloads(

@@ -469,6 +469,26 @@ namespace python
 
 
 
+    template <int dim>
+    void
+    generate_hyper_ball_balanced(const PointWrapper &center,
+                                 const double        radius,
+                                 void               *triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      Point<dim> center_point =
+        center.get_point() ?
+          *(static_cast<const Point<dim> *>(center.get_point())) :
+          Point<dim>();
+
+      Triangulation<dim> *tria =
+        static_cast<Triangulation<dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::hyper_ball_balanced(*tria, center_point, radius);
+    }
+
+
+
     template <int dim, int spacedim>
     void
     generate_hyper_sphere(PointWrapper &center,
@@ -1496,6 +1516,22 @@ namespace python
       internal::generate_hyper_ball<2>(center, radius, triangulation);
     else
       internal::generate_hyper_ball<3>(center, radius, triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::generate_hyper_ball_balanced(const PointWrapper &center,
+                                                     const double        radius)
+  {
+    AssertThrow(
+      dim == spacedim,
+      ExcMessage(
+        "This function is only implemented for dim equal to spacedim."));
+    if (dim == 2)
+      internal::generate_hyper_ball_balanced<2>(center, radius, triangulation);
+    else
+      internal::generate_hyper_ball_balanced<3>(center, radius, triangulation);
   }
 
 

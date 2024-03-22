@@ -265,6 +265,12 @@ namespace python
     void
     generate_hyper_ball(PointWrapper &center, const double radius = 1.);
 
+    /*! @copydoc GridGenerator::hyper_ball_balanced
+     */
+    void
+    generate_hyper_ball_balanced(const PointWrapper &center = PointWrapper(),
+                                 const double        radius = 1.);
+
     /*! @copydoc GridGenerator::hyper_sphere
      */
     void

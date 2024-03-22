@@ -333,6 +333,16 @@ class TestTriangulationWrapper(unittest.TestCase):
             n_cells = triangulation.n_active_cells()
             self.assertEqual(n_cells, n_cells_ref)
 
+    def test_hyper_ball_balanced(self):
+        for dim in self.dim:
+            triangulation = Triangulation(dim[0])
+            triangulation.generate_hyper_ball_balanced()
+            n_cells = triangulation.n_active_cells()
+            if (dim[0] == '2D'):
+                self.assertEqual(n_cells, 12)
+            else:
+                self.assertEqual(n_cells, 32)
+
     def test_hyper_sphere(self):
          triangulation = Triangulation('2D', '3D')
          center = Point([0, 0])
