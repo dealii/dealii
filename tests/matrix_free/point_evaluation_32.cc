@@ -113,6 +113,11 @@ test(const unsigned int degree)
                            MyFunction<spacedim>(),
                            vector);
 
+  FEFaceValues<dim, spacedim> fe_val(mapping,
+                                     fe,
+                                     Quadrature<dim - 1>(unit_points),
+                                     update_values | update_gradients);
+
   std::vector<double> solution_values_in(fe.dofs_per_cell);
   std::vector<double> solution_values_out(fe.dofs_per_cell);
 
@@ -126,6 +131,7 @@ test(const unsigned int degree)
       for (const auto f : cell->face_indices())
         {
           evaluator.reinit(cell->active_cell_index(), f);
+          fe_val.reinit(cell, f);
 
           evaluator.evaluate(solution_values_in,
                              EvaluationFlags::values |
@@ -134,6 +140,19 @@ test(const unsigned int degree)
           for (unsigned int i = 0; i < unit_points.size(); ++i)
             deallog << "value " << evaluator.get_value(i) << " gradient "
                     << evaluator.get_gradient(i) << std::endl;
+          deallog << std::endl;
+          deallog << "reference" << std::endl;
+          for (unsigned int i = 0; i < unit_points.size(); ++i)
+            {
+              double              val = 0;
+              Tensor<1, spacedim> grad;
+              for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+                {
+                  val += solution_values_in[j] * fe_val.shape_value(j, i);
+                  grad += solution_values_in[j] * fe_val.shape_grad(j, i);
+                }
+              deallog << "value " << val << " gradient " << grad << std::endl;
+            }
           deallog << std::endl;
 
           for (unsigned int i = 0; i < unit_points.size(); ++i)
