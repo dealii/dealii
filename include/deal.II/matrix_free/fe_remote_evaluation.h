@@ -45,7 +45,8 @@ namespace internal
       EvaluatorTypeTraits<dim, dim, n_components, value_type_>::value_type;
 
     using gradient_type = typename internal::FEPointEvaluation::
-      EvaluatorTypeTraits<dim, dim, n_components, value_type_>::gradient_type;
+      EvaluatorTypeTraits<dim, dim, n_components, value_type_>::
+        real_gradient_type;
 
     /**
      * Values at quadrature points.

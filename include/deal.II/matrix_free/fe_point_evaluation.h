@@ -72,16 +72,17 @@ namespace internal
       using scalar_value_type = Tensor<1, n_components, ScalarNumber>;
       using vectorized_value_type =
         Tensor<1, n_components, VectorizedArrayType>;
-      using gradient_type = Tensor<1, n_components, Tensor<1, dim, Number>>;
+      using unit_gradient_type =
+        Tensor<1, n_components, Tensor<1, dim, Number>>;
       using real_gradient_type = std::conditional_t<
         n_components == spacedim,
         Tensor<2, spacedim, Number>,
         Tensor<1, n_components, Tensor<1, spacedim, Number>>>;
-      using scalar_gradient_type =
+      using scalar_unit_gradient_type =
         Tensor<1, n_components, Tensor<1, dim, ScalarNumber>>;
-      using vectorized_gradient_type =
+      using vectorized_unit_gradient_type =
         Tensor<1, n_components, Tensor<1, dim, VectorizedArrayType>>;
-      using interface_vectorized_gradient_type =
+      using interface_vectorized_unit_gradient_type =
         Tensor<1, dim, Tensor<1, n_components, VectorizedArrayType>>;
 
       static void
@@ -119,9 +120,9 @@ namespace internal
       }
 
       static void
-      set_gradient(const interface_vectorized_gradient_type &value,
-                   const unsigned int                        vector_lane,
-                   gradient_type                            &result)
+      set_gradient(const interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                             vector_lane,
+                   unit_gradient_type                            &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -131,9 +132,9 @@ namespace internal
       }
 
       static void
-      get_gradient(interface_vectorized_gradient_type &value,
-                   const unsigned int                  vector_lane,
-                   const gradient_type                &result)
+      get_gradient(interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                       vector_lane,
+                   const unit_gradient_type                &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -142,8 +143,8 @@ namespace internal
       }
 
       static void
-      get_gradient(interface_vectorized_gradient_type &value,
-                   const unsigned int                  vector_lane,
+      get_gradient(interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                       vector_lane,
                    const DerivativeForm<1, dim, n_components, Number> &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
@@ -257,14 +258,15 @@ namespace internal
       using VectorizedArrayType =
         typename dealii::internal::VectorizedArrayTrait<
           Number>::vectorized_value_type;
-      using value_type               = Number;
-      using scalar_value_type        = ScalarNumber;
-      using vectorized_value_type    = VectorizedArrayType;
-      using gradient_type            = Tensor<1, dim, Number>;
-      using real_gradient_type       = Tensor<1, spacedim, Number>;
-      using scalar_gradient_type     = Tensor<1, dim, ScalarNumber>;
-      using vectorized_gradient_type = Tensor<1, dim, VectorizedArrayType>;
-      using interface_vectorized_gradient_type = vectorized_gradient_type;
+      using value_type                    = Number;
+      using scalar_value_type             = ScalarNumber;
+      using vectorized_value_type         = VectorizedArrayType;
+      using unit_gradient_type            = Tensor<1, dim, Number>;
+      using real_gradient_type            = Tensor<1, spacedim, Number>;
+      using scalar_unit_gradient_type     = Tensor<1, dim, ScalarNumber>;
+      using vectorized_unit_gradient_type = Tensor<1, dim, VectorizedArrayType>;
+      using interface_vectorized_unit_gradient_type =
+        vectorized_unit_gradient_type;
 
       static void
       read_value(const ScalarNumber vector_entry,
@@ -293,35 +295,35 @@ namespace internal
       }
 
       static void
-      set_gradient(const vectorized_gradient_type &value,
-                   const unsigned int              vector_lane,
-                   scalar_gradient_type           &result)
+      set_gradient(const vectorized_unit_gradient_type &value,
+                   const unsigned int                   vector_lane,
+                   scalar_unit_gradient_type           &result)
       {
         for (unsigned int d = 0; d < dim; ++d)
           result[d] = value[d][vector_lane];
       }
 
       static void
-      set_gradient(const vectorized_gradient_type &value,
+      set_gradient(const vectorized_unit_gradient_type &value,
                    const unsigned int,
-                   vectorized_gradient_type &result)
+                   vectorized_unit_gradient_type &result)
       {
         result = value;
       }
 
       static void
-      get_gradient(vectorized_gradient_type   &value,
-                   const unsigned int          vector_lane,
-                   const scalar_gradient_type &result)
+      get_gradient(vectorized_unit_gradient_type   &value,
+                   const unsigned int               vector_lane,
+                   const scalar_unit_gradient_type &result)
       {
         for (unsigned int d = 0; d < dim; ++d)
           value[d][vector_lane] = result[d];
       }
 
       static void
-      get_gradient(vectorized_gradient_type &value,
+      get_gradient(vectorized_unit_gradient_type &value,
                    const unsigned int,
-                   const vectorized_gradient_type &result)
+                   const vectorized_unit_gradient_type &result)
       {
         value = result;
       }
@@ -427,14 +429,14 @@ namespace internal
       using VectorizedArrayType =
         typename dealii::internal::VectorizedArrayTrait<
           Number>::vectorized_value_type;
-      using value_type               = Tensor<1, dim, Number>;
-      using scalar_value_type        = Tensor<1, dim, ScalarNumber>;
-      using vectorized_value_type    = Tensor<1, dim, VectorizedArrayType>;
-      using gradient_type            = Tensor<2, dim, Number>;
-      using real_gradient_type       = gradient_type;
-      using scalar_gradient_type     = Tensor<2, dim, ScalarNumber>;
-      using vectorized_gradient_type = Tensor<2, dim, VectorizedArrayType>;
-      using interface_vectorized_gradient_type =
+      using value_type                    = Tensor<1, dim, Number>;
+      using scalar_value_type             = Tensor<1, dim, ScalarNumber>;
+      using vectorized_value_type         = Tensor<1, dim, VectorizedArrayType>;
+      using unit_gradient_type            = Tensor<2, dim, Number>;
+      using real_gradient_type            = unit_gradient_type;
+      using scalar_unit_gradient_type     = Tensor<2, dim, ScalarNumber>;
+      using vectorized_unit_gradient_type = Tensor<2, dim, VectorizedArrayType>;
+      using interface_vectorized_unit_gradient_type =
         Tensor<1, dim, Tensor<1, dim, VectorizedArrayType>>;
 
       static void
@@ -472,9 +474,9 @@ namespace internal
       }
 
       static void
-      set_gradient(const interface_vectorized_gradient_type &value,
-                   const unsigned int                        vector_lane,
-                   gradient_type                            &result)
+      set_gradient(const interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                             vector_lane,
+                   unit_gradient_type                            &result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -484,9 +486,9 @@ namespace internal
       }
 
       static void
-      get_gradient(interface_vectorized_gradient_type &value,
-                   const unsigned int                  vector_lane,
-                   const gradient_type                &result)
+      get_gradient(interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                       vector_lane,
+                   const unit_gradient_type                &result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -495,7 +497,8 @@ namespace internal
       }
 
       static void
-      set_zero_gradient(gradient_type &value, const unsigned int vector_lane)
+      set_zero_gradient(unit_gradient_type &value,
+                        const unsigned int  vector_lane)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -635,8 +638,8 @@ public:
   using scalar_value_type     = typename ETT::scalar_value_type;
   using vectorized_value_type = typename ETT::vectorized_value_type;
   using gradient_type         = typename ETT::real_gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
+  using interface_vectorized_unit_gradient_type =
+    typename ETT::interface_vectorized_unit_gradient_type;
 
 protected:
   /**
@@ -1110,10 +1113,10 @@ public:
   using value_type            = typename ETT::value_type;
   using scalar_value_type     = typename ETT::scalar_value_type;
   using vectorized_value_type = typename ETT::vectorized_value_type;
-  using unit_gradient_type    = typename ETT::gradient_type;
+  using unit_gradient_type    = typename ETT::unit_gradient_type;
   using gradient_type         = typename ETT::real_gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
+  using interface_vectorized_unit_gradient_type =
+    typename ETT::interface_vectorized_unit_gradient_type;
 
   /**
    * Constructor.
@@ -1377,7 +1380,7 @@ private:
     const unsigned int                                       n_shapes,
     const unsigned int                                       qb,
     vectorized_value_type                                   &value,
-    interface_vectorized_gradient_type                      &gradient);
+    interface_vectorized_unit_gradient_type                 &gradient);
 
   /**
    * Fast path of the evaluate function.
@@ -1405,12 +1408,12 @@ private:
   template <bool is_linear>
   void
   compute_integrate_fast(
-    const EvaluationFlags::EvaluationFlags  &integration_flags,
-    const unsigned int                       n_shapes,
-    const unsigned int                       qb,
-    const vectorized_value_type              value,
-    const interface_vectorized_gradient_type gradient,
-    vectorized_value_type                   *solution_values_vectorized_linear);
+    const EvaluationFlags::EvaluationFlags       &integration_flags,
+    const unsigned int                            n_shapes,
+    const unsigned int                            qb,
+    const vectorized_value_type                   value,
+    const interface_vectorized_unit_gradient_type gradient,
+    vectorized_value_type *solution_values_vectorized_linear);
 
   /**
    * Addition across the lanes of VectorizedArray as accumulated by the
@@ -1496,10 +1499,10 @@ public:
   using value_type            = typename ETT::value_type;
   using scalar_value_type     = typename ETT::scalar_value_type;
   using vectorized_value_type = typename ETT::vectorized_value_type;
-  using unit_gradient_type    = typename ETT::gradient_type;
+  using unit_gradient_type    = typename ETT::unit_gradient_type;
   using gradient_type         = typename ETT::real_gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
+  using interface_vectorized_unit_gradient_type =
+    typename ETT::interface_vectorized_unit_gradient_type;
 
   /**
    * Constructor. Allows to select if interior or exterior face is selected.
@@ -2512,7 +2515,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
   const unsigned int                                       n_shapes,
   const unsigned int                                       qb,
   vectorized_value_type                                   &value,
-  interface_vectorized_gradient_type                      &gradient)
+  interface_vectorized_unit_gradient_type                 &gradient)
 {
   if (evaluation_flags & EvaluationFlags::gradients)
     {
@@ -2591,8 +2594,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_fast(
 
   for (unsigned int qb = 0; qb < this->n_q_batches; ++qb)
     {
-      vectorized_value_type              value;
-      interface_vectorized_gradient_type gradient;
+      vectorized_value_type                   value;
+      interface_vectorized_unit_gradient_type gradient;
 
       compute_evaluate_fast<is_linear>(
         solution_values, evaluation_flags, n_shapes, qb, value, gradient);
@@ -2728,12 +2731,12 @@ template <int n_components_, int dim, int spacedim, typename Number>
 template <bool is_linear>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_integrate_fast(
-  const EvaluationFlags::EvaluationFlags  &integration_flags,
-  const unsigned int                       n_shapes,
-  const unsigned int                       qb,
-  const vectorized_value_type              value,
-  const interface_vectorized_gradient_type gradient,
-  vectorized_value_type                   *solution_values_vectorized_linear)
+  const EvaluationFlags::EvaluationFlags       &integration_flags,
+  const unsigned int                            n_shapes,
+  const unsigned int                            qb,
+  const vectorized_value_type                   value,
+  const interface_vectorized_unit_gradient_type gradient,
+  vectorized_value_type *solution_values_vectorized_linear)
 {
   if (integration_flags & EvaluationFlags::gradients)
     internal::integrate_tensor_product_value_and_gradient<
@@ -3435,8 +3438,8 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
 
   for (unsigned int qb = 0; qb < this->n_q_batches; ++qb)
     {
-      vectorized_value_type              value;
-      interface_vectorized_gradient_type gradient;
+      vectorized_value_type                   value;
+      interface_vectorized_unit_gradient_type gradient;
 
       if (evaluation_flags & EvaluationFlags::gradients)
         {
