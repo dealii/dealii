@@ -320,7 +320,7 @@ For this to be equal to $f(x,y,t)=0$, we need that
 and due to the initial conditions, $a(0)=1$. This differential equation can be
 integrated to yield
 @f{align*}{
-  a(t) = - e^{-(n_x^2+n_y^2)\pi^2 t}.
+  a(t) = e^{-(n_x^2+n_y^2)\pi^2 t}.
 @f}
 In other words, if the initial condition is a product of sines, then the
 solution has exactly the same shape of a product of sines that decays to zero
