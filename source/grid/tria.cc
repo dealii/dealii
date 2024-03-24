@@ -1643,21 +1643,20 @@ namespace
     const typename Triangulation<dim, spacedim>::cell_iterator &cell_2,
     unsigned int                                                n_face_1,
     unsigned int                                                n_face_2,
-    const std::bitset<3>                                       &orientation,
+    const unsigned char                                         orientation,
     typename std::map<
       std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                 unsigned int>,
       std::pair<std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                           unsigned int>,
-                std::bitset<3>>> &periodic_face_map)
+                unsigned char>> &periodic_face_map)
   {
     using FaceIterator = typename Triangulation<dim, spacedim>::face_iterator;
     const FaceIterator face_1 = cell_1->face(n_face_1);
     const FaceIterator face_2 = cell_2->face(n_face_2);
 
-    const bool face_orientation = orientation[0];
-    const bool face_flip        = orientation[1];
-    const bool face_rotation    = orientation[2];
+    const auto [face_orientation, face_rotation, face_flip] =
+      internal::split_face_orientation(orientation);
 
     Assert((dim != 1) || (face_orientation == true && face_flip == false &&
                           face_rotation == false),
@@ -1686,12 +1685,12 @@ namespace
     using CellFace =
       std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                 unsigned int>;
-    const CellFace                            cell_face_1(cell_1, n_face_1);
-    const CellFace                            cell_face_2(cell_2, n_face_2);
-    const std::pair<CellFace, std::bitset<3>> cell_face_orientation_2(
+    const CellFace                           cell_face_1(cell_1, n_face_1);
+    const CellFace                           cell_face_2(cell_2, n_face_2);
+    const std::pair<CellFace, unsigned char> cell_face_orientation_2(
       cell_face_2, orientation);
 
-    const std::pair<CellFace, std::pair<CellFace, std::bitset<3>>>
+    const std::pair<CellFace, std::pair<CellFace, unsigned char>>
       periodic_faces(cell_face_1, cell_face_orientation_2);
 
     // Only one periodic neighbor is allowed
@@ -15790,7 +15789,7 @@ const typename std::map<
   std::pair<typename Triangulation<dim, spacedim>::cell_iterator, unsigned int>,
   std::pair<std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                       unsigned int>,
-            std::bitset<3>>>
+            unsigned char>>
   &Triangulation<dim, spacedim>::get_periodic_face_map() const
 {
   return periodic_face_map;
@@ -16027,15 +16026,13 @@ void Triangulation<dim, spacedim>::update_periodic_face_map()
                                                           periodic_face_map);
 
       // for the other way, we need to invert the orientation
-      std::bitset<3> inverted_orientation;
+      unsigned char inverted_orientation;
       {
-        bool orientation, flip, rotation;
-        orientation = it->orientation[0];
-        rotation    = it->orientation[2];
-        flip = orientation ? rotation ^ it->orientation[1] : it->orientation[1];
-        inverted_orientation[0] = orientation;
-        inverted_orientation[1] = flip;
-        inverted_orientation[2] = rotation;
+        auto [orientation, rotation, flip] =
+          internal::split_face_orientation(it->orientation);
+        flip = orientation ? rotation ^ flip : flip;
+        inverted_orientation =
+          internal::combined_face_orientation(orientation, rotation, flip);
       }
       update_periodic_face_map_recursively<dim, spacedim>(it->cell[1],
                                                           it->cell[0],
@@ -16048,7 +16045,7 @@ void Triangulation<dim, spacedim>::update_periodic_face_map()
   // check consistency
   typename std::map<std::pair<cell_iterator, unsigned int>,
                     std::pair<std::pair<cell_iterator, unsigned int>,
-                              std::bitset<3>>>::const_iterator it_test;
+                              unsigned char>>::const_iterator it_test;
   for (it_test = periodic_face_map.begin(); it_test != periodic_face_map.end();
        ++it_test)
     {

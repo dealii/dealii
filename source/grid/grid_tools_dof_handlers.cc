@@ -2163,7 +2163,7 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (const std::optional<std::bitset<3>> orientation =
+            if (const std::optional<unsigned char> orientation =
                   GridTools::orthogonal_equality(cell1->face(face_idx1),
                                                  cell2->face(face_idx2),
                                                  direction,
@@ -2419,7 +2419,7 @@ namespace GridTools
 
 
   template <typename FaceIterator>
-  std::optional<std::bitset<3>>
+  std::optional<unsigned char>
   orthogonal_equality(
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
@@ -2472,7 +2472,7 @@ namespace GridTools
                             face1_vertices.cbegin() + face1->n_vertices()),
             make_array_view(face2_vertices.cbegin(),
                             face2_vertices.cbegin() + face2->n_vertices()));
-        std::bitset<3> orientation;
+        unsigned char orientation = std::numeric_limits<unsigned char>::max();
         if (dim == 1)
           {
             // In 1D things are always well-oriented
@@ -2489,20 +2489,11 @@ namespace GridTools
         else
           {
             Assert(dim == 3, ExcInternalError());
-            // There are two differences between the orientation implementation
-            // used in the periodicity code and that used in ReferenceCell:
-            //
-            // 1. The bitset is unpacked as (orientation, flip, rotation)
-            //    instead of the standard (orientation, rotation, flip).
-            //
-            // 2. The 90 degree rotations are always clockwise, so the third and
-            //    seventh (in the combined orientation) are switched.
-            //
-            // Both translations are encoded in this table. This matches
-            // OrientationLookupTable<3> which was present in previous revisions
-            // of this file.
+            // Unlike the standard orientation, here the 90 degree rotations are
+            // always clockwise, so the third and seventh (in the combined
+            // orientation) are switched.
             constexpr std::array<unsigned int, 8> translation{
-              {0, 1, 4, 7, 2, 3, 6, 5}};
+              {0, 1, 2, 7, 4, 5, 6, 3}};
             AssertIndexRange(combined_orientation, translation.size());
             orientation =
               translation[std::min<unsigned int>(combined_orientation, 7u)];

@@ -23,9 +23,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
                        deal_II_space_dimension>::face_iterator &,
       AffineConstraints<S> &,
       const ComponentMask &,
-      bool,
-      bool,
-      bool,
+      const unsigned char,
       const FullMatrix<double> &,
       const std::vector<unsigned int> &,
       const S);
@@ -38,9 +36,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       const FullMatrix<double>                                 &transformation,
       AffineConstraints<S> &affine_constraints,
       const ComponentMask  &component_mask,
-      const bool            face_orientation,
-      const bool            face_flip,
-      const bool            face_rotation,
+      const unsigned char   combined_orientation,
       const S               periodicity_factor,
       const unsigned int    level);
 
@@ -52,9 +48,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       const FullMatrix<double> &transformation,
       AffineConstraints<S>     &affine_constraints,
       const ComponentMask      &component_mask,
-      const bool                face_orientation,
-      const bool                face_flip,
-      const bool                face_rotation,
+      const unsigned char       combined_orientation,
       const S                   periodicity_factor,
       const unsigned int        level);
 #endif

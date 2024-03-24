@@ -4826,16 +4826,16 @@ namespace GridTools
           const auto face_a = pair.first.first->face(pair.first.second);
           const auto face_b =
             pair.second.first.first->face(pair.second.first.second);
-          const auto mask = pair.second.second;
+          const unsigned char combined_orientation = pair.second.second;
 
           AssertDimension(face_a->n_vertices(), face_b->n_vertices());
 
           // loop over all vertices on face
           for (unsigned int i = 0; i < face_a->n_vertices(); ++i)
             {
-              const bool face_orientation = mask[0];
-              const bool face_flip        = mask[1];
-              const bool face_rotation    = mask[2];
+              const auto [face_orientation, face_rotation, face_flip] =
+                ::dealii::internal::split_face_orientation(
+                  combined_orientation);
 
               // find the right local vertex index for the second face
               unsigned int j = 0;

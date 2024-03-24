@@ -20,6 +20,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
+#include <bitset>
 #include <string>
 
 #include "../tests.h"
@@ -50,8 +51,10 @@ check()
       deallog << periodic_faces[i].cell[0]->index() << ' '
               << periodic_faces[i].cell[1]->index() << ' '
               << periodic_faces[i].face_idx[0] << ' '
-              << periodic_faces[i].face_idx[1] << ' '
-              << periodic_faces[i].orientation << std::endl;
+              << periodic_faces[i].face_idx[1]
+              << ' '
+              // maintain old output by converting to a a bitset
+              << std::bitset<3>(periodic_faces[i].orientation) << std::endl;
     }
 }
 

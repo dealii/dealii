@@ -3106,19 +3106,12 @@ namespace DoFTools
       const FullMatrix<double>                       &transformation,
       AffineConstraints<number>                      &affine_constraints,
       const ComponentMask                            &component_mask,
-      const bool                                      face_orientation,
-      const bool                                      face_flip,
-      const bool                                      face_rotation,
+      const unsigned char                             combined_orientation,
       const number                                    periodicity_factor,
       const unsigned int                              level)
     {
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
-
-      const unsigned char combined_face_orientation =
-        ::dealii::internal::combined_face_orientation(face_orientation,
-                                                      face_rotation,
-                                                      face_flip);
 
       const bool use_mg = (level != numbers::invalid_unsigned_int);
 
@@ -3174,9 +3167,7 @@ namespace DoFTools
                                           child_transformation,
                                           affine_constraints,
                                           component_mask,
-                                          face_orientation,
-                                          face_flip,
-                                          face_rotation,
+                                          combined_orientation,
                                           periodicity_factor);
             }
           return;
@@ -3362,7 +3353,7 @@ namespace DoFTools
                   // given orientation:
                   const unsigned int j =
                     cell_to_rotated_face_index[fe.face_to_cell_index(
-                      jj, 0, combined_face_orientation)];
+                      jj, 0, combined_orientation)];
 
                   if (std::abs(transformation(i, jj)) > eps)
                     constraint_entries.emplace_back(dofs_1[j],
@@ -3385,7 +3376,7 @@ namespace DoFTools
           // orientation:
           const unsigned int j =
             cell_to_rotated_face_index[fe.face_to_cell_index(
-              target, 0, combined_face_orientation)];
+              target, 0, combined_orientation)];
 
           auto dof_left  = dofs_1[j];
           auto dof_right = dofs_2[i];
@@ -3601,9 +3592,7 @@ namespace DoFTools
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number>                      &affine_constraints,
     const ComponentMask                            &component_mask,
-    const bool                                      face_orientation,
-    const bool                                      face_flip,
-    const bool                                      face_rotation,
+    const unsigned char                             combined_orientation,
     const FullMatrix<double>                       &matrix,
     const std::vector<unsigned int>                &first_vector_components,
     const number                                    periodicity_factor)
@@ -3611,15 +3600,17 @@ namespace DoFTools
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
-    Assert((dim != 1) || (face_orientation == true && face_flip == false &&
-                          face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
+#ifdef DEBUG
+    const auto [orientation, rotation, flip] =
+      ::dealii::internal::split_face_orientation(combined_orientation);
+
+    Assert((dim != 1) ||
+             (orientation == true && flip == false && rotation == false),
+           ExcMessage("The supplied orientation (orientation, rotation, flip) "
                       "is invalid for 1d"));
 
-    Assert((dim != 2) || (face_flip == false && face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
+    Assert((dim != 2) || (flip == false && rotation == false),
+           ExcMessage("The supplied orientation (orientation, rotation, flip) "
                       "is invalid for 2d"));
 
     Assert(face_1 != face_2,
@@ -3638,12 +3629,6 @@ namespace DoFTools
            ExcMessage("first_vector_components is nonempty, so matrix must "
                       "be a rotation matrix exactly of size spacedim"));
 
-    const unsigned char combined_orientation =
-      ::dealii::internal::combined_face_orientation(face_orientation,
-                                                    face_rotation,
-                                                    face_flip);
-
-#ifdef DEBUG
     if (!face_1->has_children())
       {
         // TODO: the implementation makes the assumption that all faces have the
@@ -3724,9 +3709,7 @@ namespace DoFTools
                                          face_2->child(j),
                                          affine_constraints,
                                          component_mask,
-                                         face_orientation,
-                                         face_flip,
-                                         face_rotation,
+                                         combined_orientation,
                                          matrix,
                                          first_vector_components,
                                          periodicity_factor);
@@ -3769,9 +3752,7 @@ namespace DoFTools
                                                       transformation,
                                                       affine_constraints,
                                                       component_mask,
-                                                      face_orientation,
-                                                      face_flip,
-                                                      face_rotation,
+                                                      combined_orientation,
                                                       periodicity_factor);
               }
             else
@@ -3784,9 +3765,7 @@ namespace DoFTools
                                                       inverse,
                                                       affine_constraints,
                                                       component_mask,
-                                                      face_orientation,
-                                                      face_flip,
-                                                      face_rotation,
+                                                      combined_orientation,
                                                       periodicity_factor);
               }
           }
@@ -3800,17 +3779,16 @@ namespace DoFTools
             // the rotation when constraining face_2 to face_1. Therefore
             // face_flip has to be toggled if face_rotation is true: In case of
             // inverted orientation, nothing has to be done.
-            internal::set_periodicity_constraints(face_1,
-                                                  face_2,
-                                                  transformation,
-                                                  affine_constraints,
-                                                  component_mask,
-                                                  face_orientation,
-                                                  face_orientation ?
-                                                    face_rotation ^ face_flip :
-                                                    face_flip,
-                                                  face_rotation,
-                                                  periodicity_factor);
+
+            internal::set_periodicity_constraints(
+              face_1,
+              face_2,
+              transformation,
+              affine_constraints,
+              component_mask,
+              ::dealii::internal::combined_face_orientation(
+                orientation, rotation, orientation ? rotation ^ flip : flip),
+              periodicity_factor);
           }
       }
   }
@@ -3845,9 +3823,7 @@ namespace DoFTools
                                      face_2,
                                      constraints,
                                      component_mask,
-                                     pair.orientation[0],
-                                     pair.orientation[1],
-                                     pair.orientation[2],
+                                     pair.orientation,
                                      pair.matrix,
                                      first_vector_components,
                                      periodicity_factor);
