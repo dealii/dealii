@@ -2463,43 +2463,16 @@ namespace GridTools
           }
       }
 
-    // And finally, a lookup to determine the ordering bitmask:
     if (face2_vertices_set.empty())
       {
-        const auto combined_orientation =
-          face1->reference_cell().get_combined_orientation(
-            make_array_view(face1_vertices.cbegin(),
-                            face1_vertices.cbegin() + face1->n_vertices()),
-            make_array_view(face2_vertices.cbegin(),
-                            face2_vertices.cbegin() + face2->n_vertices()));
-        unsigned char orientation = std::numeric_limits<unsigned char>::max();
-        if (dim == 1)
-          {
-            // In 1D things are always well-oriented
-            orientation = ReferenceCell::default_combined_face_orientation();
-          }
-        // The original version of this doesn't use the standardized orientation
-        // value so we have to do an additional translation step
-        else if (dim == 2)
-          {
-            // In 2D only the first bit (orientation) is set
-            AssertIndexRange(combined_orientation, 2);
-            orientation = combined_orientation;
-          }
-        else
-          {
-            Assert(dim == 3, ExcInternalError());
-            // Unlike the standard orientation, here the 90 degree rotations are
-            // always clockwise, so the third and seventh (in the combined
-            // orientation) are switched.
-            constexpr std::array<unsigned int, 8> translation{
-              {0, 1, 2, 7, 4, 5, 6, 3}};
-            AssertIndexRange(combined_orientation, translation.size());
-            orientation =
-              translation[std::min<unsigned int>(combined_orientation, 7u)];
-          }
-
-        return std::make_optional(orientation);
+        const auto reference_cell = face1->reference_cell();
+        // We want the relative orientation of face1 with respect to face2 so
+        // the order is flipped here:
+        return std::make_optional(reference_cell.get_combined_orientation(
+          make_array_view(face2_vertices.cbegin(),
+                          face2_vertices.cbegin() + face2->n_vertices()),
+          make_array_view(face1_vertices.cbegin(),
+                          face1_vertices.cbegin() + face1->n_vertices())));
       }
     else
       return std::nullopt;
