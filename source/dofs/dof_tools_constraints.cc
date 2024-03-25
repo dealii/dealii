@@ -3780,14 +3780,15 @@ namespace DoFTools
             // face_flip has to be toggled if face_rotation is true: In case of
             // inverted orientation, nothing has to be done.
 
+            const auto face_reference_cell = face_1->reference_cell();
             internal::set_periodicity_constraints(
               face_1,
               face_2,
               transformation,
               affine_constraints,
               component_mask,
-              ::dealii::internal::combined_face_orientation(
-                orientation, rotation, orientation ? rotation ^ flip : flip),
+              face_reference_cell.get_inverse_combined_orientation(
+                combined_orientation),
               periodicity_factor);
           }
       }

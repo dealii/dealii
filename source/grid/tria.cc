@@ -16025,21 +16025,16 @@ void Triangulation<dim, spacedim>::update_periodic_face_map()
                                                           it->orientation,
                                                           periodic_face_map);
 
+      const auto face_reference_cell =
+        it->cell[0]->reference_cell().face_reference_cell(it->face_idx[0]);
       // for the other way, we need to invert the orientation
-      unsigned char inverted_orientation;
-      {
-        auto [orientation, rotation, flip] =
-          internal::split_face_orientation(it->orientation);
-        flip = orientation ? rotation ^ flip : flip;
-        inverted_orientation =
-          internal::combined_face_orientation(orientation, rotation, flip);
-      }
-      update_periodic_face_map_recursively<dim, spacedim>(it->cell[1],
-                                                          it->cell[0],
-                                                          it->face_idx[1],
-                                                          it->face_idx[0],
-                                                          inverted_orientation,
-                                                          periodic_face_map);
+      update_periodic_face_map_recursively<dim, spacedim>(
+        it->cell[1],
+        it->cell[0],
+        it->face_idx[1],
+        it->face_idx[0],
+        face_reference_cell.get_inverse_combined_orientation(it->orientation),
+        periodic_face_map);
     }
 
   // check consistency

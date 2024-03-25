@@ -712,6 +712,14 @@ public:
                                   const unsigned char       orientation) const;
 
   /**
+   * Return the inverse orientation. This is the value such that calling
+   * permute_by_combined_orientation() with <tt>o</tt> and then calling it again
+   * with get_inverse_combined_orientation(o) is the identity operation.
+   */
+  unsigned char
+  get_inverse_combined_orientation(const unsigned char orientation) const;
+
+  /**
    * Return a vector of faces a given @p vertex_index belongs to.
    */
   ArrayView<const unsigned int>
@@ -2971,6 +2979,43 @@ ReferenceCell::permute_by_combined_orientation(
     }
 
   return {};
+}
+
+
+
+inline unsigned char
+ReferenceCell::get_inverse_combined_orientation(
+  const unsigned char orientation) const
+{
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        // Things are always default-oriented in 1D
+        return orientation;
+
+      case ReferenceCells::Line:
+        // the 1d orientations are the identity and a flip: i.e., the identity
+        // and an involutory mapping
+        return orientation;
+
+      case ReferenceCells::Triangle:
+        {
+          AssertIndexRange(orientation, 6);
+          constexpr std::array<unsigned char, 6> inverses{{0, 1, 2, 5, 4, 3}};
+          return inverses[orientation];
+        }
+      case ReferenceCells::Quadrilateral:
+        {
+          AssertIndexRange(orientation, 8);
+          constexpr std::array<unsigned char, 8> inverses{
+            {0, 1, 2, 7, 4, 5, 6, 3}};
+          return inverses[orientation];
+        }
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return std::numeric_limits<unsigned char>::max();
 }
 
 
