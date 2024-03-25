@@ -3779,6 +3779,7 @@ namespace parallel
       // the level subdomain ids correct in the multigrid case
       dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 
+      const auto reference_cell      = ReferenceCells::get_hypercube<dim>();
       const auto face_reference_cell = ReferenceCells::get_hypercube<dim - 1>();
       for (const auto &face_pair : periodicity_vector)
         {
@@ -3864,13 +3865,10 @@ namespace parallel
                   face_idx_list[lower_idx],
                   orientation);
               const unsigned int second_dealii_idx_on_cell =
-                GeometryInfo<dim>::face_to_cell_vertices(
+                reference_cell.face_to_cell_vertices(
                   face_idx_list[higher_idx],
                   second_dealii_idx_on_face,
-                  cell_list[higher_idx]->face_orientation(
-                    face_idx_list[higher_idx]),
-                  cell_list[higher_idx]->face_flip(face_idx_list[higher_idx]),
-                  cell_list[higher_idx]->face_rotation(
+                  cell_list[higher_idx]->combined_face_orientation(
                     face_idx_list[higher_idx]));
               // map back to p4est
               const unsigned int second_p4est_idx_on_face =
