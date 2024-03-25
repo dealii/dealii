@@ -1295,15 +1295,29 @@ namespace Utilities
              ExcMessage("The given buffer has the wrong size."));
       (void)cend;
 
-      // Copy the elements:
-      object.clear();
+      // Resize the output array and copy the elements into it. We need
+      // to make sure that we don't access the buffer via a
+      // reinterpret_cast<T*> because the T objects in the buffer may
+      // not be aligned properly. Rather, use memcpy, which doesn't care
+      // about alignment and is correct in this situation because we
+      // are dealing with trivially copyable objects.
+      //
+      // (Strictly speaking, this writes into the output object twice, once
+      // for the resize() operation and once during memcpy. This could be
+      // avoided by (i) checking whether the point is aligned, using for
+      // example boost::alignment::is_aligned(), and (ii) if the data
+      // is aligned, re-create the output vector using
+      //   object.clear();
+      //   object.insert (object.end(),
+      //                  (T*)(&*cbegin + sizeof(vector_size)),
+      //                  (T*)(&*cbegin + sizeof(vector_size)) + vector_size);
+      // In practice, the difference is likely rather small, assuming the
+      // compiler does not already optimize away the first initialization.
+      object.resize(vector_size);
       if (vector_size > 0)
-        {
-          const T *const buffer_data_begin =
-            reinterpret_cast<const T *>(&*cbegin + sizeof(vector_size));
-          const T *const buffer_data_end = buffer_data_begin + vector_size;
-          object.insert(object.end(), buffer_data_begin, buffer_data_end);
-        }
+        std::memcpy(object.data(),
+                    &*cbegin + sizeof(vector_size),
+                    vector_size * sizeof(T));
     }
 
 
@@ -1326,9 +1340,9 @@ namespace Utilities
       object.resize(vector_size);
       std::vector<size_type> sizes(vector_size);
       if (vector_size > 0)
-        memcpy(sizes.data(),
-               &*iterator + sizeof(vector_size),
-               vector_size * sizeof(size_type));
+        std::memcpy(sizes.data(),
+                    &*iterator + sizeof(vector_size),
+                    vector_size * sizeof(size_type));
 
       iterator += sizeof(vector_size) * (1 + vector_size);
       size_type aggregated_size = 0;
@@ -1340,15 +1354,15 @@ namespace Utilities
              ExcMessage("The given buffer has the wrong size."));
       (void)cend;
 
-      // Then copy the elements:
+      // Then copy the elements. As for the previous function, use memcpy
+      // rather than accessing the data via reinterpret_cast<T*> to
+      // avoid alignment issues.
       for (unsigned int i = 0; i < vector_size; ++i)
         if (sizes[i] > 0)
           {
-            object[i].insert(object[i].end(),
-                             reinterpret_cast<const T *>(&*iterator),
-                             reinterpret_cast<const T *>(&*iterator +
-                                                         sizeof(T) * sizes[i]));
-            iterator += sizeof(T) * sizes[i];
+            object[i].resize(sizes[i]);
+            std::memcpy(object[i].data(), &*iterator, sizes[i] * sizeof(T));
+            iterator += sizes[i] * sizeof(T);
           }
 
       Assert(iterator == cend,
