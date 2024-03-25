@@ -1657,6 +1657,10 @@ namespace
     const FaceIterator face_1 = cell_1->face(n_face_1);
     const FaceIterator face_2 = cell_2->face(n_face_2);
 
+    const unsigned char inverse_orientation =
+      face_1->reference_cell().get_inverse_combined_orientation(orientation);
+
+#ifdef DEBUG
     const auto [face_orientation, face_rotation, face_flip] =
       internal::split_face_orientation(orientation);
 
@@ -1670,6 +1674,7 @@ namespace
            ExcMessage("The supplied orientation "
                       "(face_orientation, face_flip, face_rotation) "
                       "is invalid for 2d"));
+#endif
 
     Assert(face_1 != face_2, ExcMessage("face_1 and face_2 are equal!"));
 
@@ -1727,36 +1732,6 @@ namespace
       }
     else // dim == 2 || dim == 3
       {
-        // A lookup table on how to go through the child cells depending on the
-        // orientation:
-        // see Documentation of GeometryInfo for details
-
-        static const int lookup_table_2d[2][2] =
-          //               orientation:
-          {
-            {1, 0}, // false
-            {0, 1}  // true
-          };
-
-        static const int lookup_table_3d[2][2][2][4] =
-          //                           orientation flip  rotation
-          {{{
-              {0, 2, 1, 3}, // false       false false
-              {2, 3, 0, 1}  // false       false true
-            },
-            {
-              {3, 1, 2, 0}, // false       true  false
-              {1, 0, 3, 2}  // false       true  true
-            }},
-           {{
-              {0, 1, 2, 3}, // true        false false
-              {1, 3, 0, 2}  // true        false true
-            },
-            {
-              {3, 2, 1, 0}, // true        true  false
-              {2, 0, 3, 1}  // true        true  true
-            }}};
-
         if (cell_1->has_children())
           {
             if (cell_2->has_children())
@@ -1771,24 +1746,16 @@ namespace
                            GeometryInfo<dim>::max_children_per_face,
                        ExcNotImplemented());
 
+                const auto reference_cell = cell_1->reference_cell();
+
                 for (unsigned int i = 0;
                      i < GeometryInfo<dim>::max_children_per_face;
                      ++i)
                   {
                     // Lookup the index for the second face
-                    unsigned int j = 0;
-                    switch (dim)
-                      {
-                        case 2:
-                          j = lookup_table_2d[face_orientation][i];
-                          break;
-                        case 3:
-                          j = lookup_table_3d[face_orientation][face_flip]
-                                             [face_rotation][i];
-                          break;
-                        default:
-                          AssertThrow(false, ExcNotImplemented());
-                      }
+                    const unsigned int j =
+                      reference_cell.standard_to_real_face_vertex(
+                        i, n_face_1, inverse_orientation);
 
                     // find subcell ids that belong to the subface indices
                     unsigned int child_cell_1 =
