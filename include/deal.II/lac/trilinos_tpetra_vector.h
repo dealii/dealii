@@ -787,6 +787,41 @@ namespace LinearAlgebra
       locally_owned_size() const;
 
       /**
+       * Return a pair of indices indicating which elements of this vector are
+       * stored locally. The first number is the index of the first element
+       * stored, the second the index of the one past the last one that is
+       * stored locally. If this is a sequential vector, then the result will be
+       * the pair <code>(0,N)</code>, otherwise it will be a pair
+       * <code>(i,i+n)</code>, where <code>n</code> is the number of elements
+       * stored on this processor and and <code>i</code> is the first element of
+       * the vector stored on this processor, corresponding to the half open
+       * interval $[i,i+n)$
+       *
+       * @note The description above is true most of the time, but not always.
+       * In particular, Trilinos vectors need not store contiguous ranges of
+       * elements such as $[i,i+n)$. Rather, it can store vectors where the
+       * elements are distributed in an arbitrary way across all processors and
+       * each processor simply stores a particular subset, not necessarily
+       * contiguous. In this case, this function clearly makes no sense since it
+       * could, at best, return a range that includes all elements that are
+       * stored locally. Thus, the function only succeeds if the locally stored
+       * range is indeed contiguous. It will trigger an assertion if the local
+       * portion of the vector is not contiguous.
+       */
+      std::pair<size_type, size_type>
+      local_range() const;
+
+      /**
+       * Return whether @p index is in the local range or not, see also
+       * local_range().
+       *
+       * @note The same limitation for the applicability of this function
+       * applies as listed in the documentation of local_range().
+       */
+      bool
+      in_local_range(const size_type index) const;
+
+      /**
        * Return the state of the vector, i.e., whether compress() needs to be
        * called after an operation requiring data exchange. A call to compress()
        * is also needed when the method set() or add() has been called.
