@@ -4791,32 +4791,6 @@ namespace GridTools
     // 1) determine for each vertex a vertex it coincides with and
     //    put it into a map
     {
-      static const int lookup_table_2d[2][2] =
-        //           flip:
-        {
-          {0, 1}, // false
-          {1, 0}  // true
-        };
-
-      static const int lookup_table_3d[2][2][2][4] =
-        //                   orientation flip  rotation
-        {{{
-            {0, 2, 1, 3}, // false       false false
-            {2, 3, 0, 1}  // false       false true
-          },
-          {
-            {3, 1, 2, 0}, // false       true  false
-            {1, 0, 3, 2}  // false       true  true
-          }},
-         {{
-            {0, 1, 2, 3}, // true        false false
-            {1, 3, 0, 2}  // true        false true
-          },
-          {
-            {3, 2, 1, 0}, // true        true  false
-            {2, 0, 3, 1}  // true        true  true
-          }}};
-
       // loop over all periodic face pairs
       for (const auto &pair : tria.get_periodic_face_map())
         {
@@ -4826,34 +4800,22 @@ namespace GridTools
           const auto face_a = pair.first.first->face(pair.first.second);
           const auto face_b =
             pair.second.first.first->face(pair.second.first.second);
+          const auto reference_cell      = pair.first.first->reference_cell();
+          const auto face_reference_cell = face_a->reference_cell();
           const unsigned char combined_orientation = pair.second.second;
+          const unsigned char inverse_combined_orientation =
+            face_reference_cell.get_inverse_combined_orientation(
+              combined_orientation);
 
           AssertDimension(face_a->n_vertices(), face_b->n_vertices());
 
           // loop over all vertices on face
           for (unsigned int i = 0; i < face_a->n_vertices(); ++i)
             {
-              const auto [face_orientation, face_rotation, face_flip] =
-                ::dealii::internal::split_face_orientation(
-                  combined_orientation);
-
               // find the right local vertex index for the second face
-              unsigned int j = 0;
-              switch (dim)
-                {
-                  case 1:
-                    j = i;
-                    break;
-                  case 2:
-                    j = lookup_table_2d[face_flip][i];
-                    break;
-                  case 3:
-                    j = lookup_table_3d[face_orientation][face_flip]
-                                       [face_rotation][i];
-                    break;
-                  default:
-                    AssertThrow(false, ExcNotImplemented());
-                }
+              const unsigned int j =
+                reference_cell.standard_to_real_face_vertex(
+                  i, pair.first.second, inverse_combined_orientation);
 
               // get vertex indices and store in map
               const auto   vertex_a = face_a->vertex_index(i);
