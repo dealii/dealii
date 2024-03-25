@@ -341,6 +341,19 @@ public:
   submit_value(const value_type val_in, const unsigned int q_point);
 
   /**
+   * In 1D, the value_type and gradient_type can be unintentionally be mixed
+   * up because FEEvaluationBase does not distinguish between scalar accessors
+   * and vector-valued accessors and the respective types, but solely in terms
+   * of the number of components and dimension. Thus, enable the use of
+   * submit_value in that case as well.
+   */
+  template <int dim_ = dim,
+            typename = std::enable_if_t<dim_ == 1 && n_components == dim_>>
+  void
+  submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
+               const unsigned int                      q_point);
+
+  /**
    * Return the gradient of a finite element function at quadrature point
    * number @p q_point after a call to FEEvaluation::evaluate() with
    * EvaluationFlags::gradients, or the value that has been stored there with
@@ -372,6 +385,19 @@ public:
    */
   void
   submit_gradient(const gradient_type grad_in, const unsigned int q_point);
+
+  /**
+   * In 1D, the value_type and gradient_type can be unintentionally be mixed
+   * up because FEEvaluationBase does not distinguish between scalar accessors
+   * and vector-valued accessors and the respective types, but solely in terms
+   * of the number of components and dimension. Thus, enable the use of
+   * submit_value in that case as well.
+   */
+  template <int dim_ = dim,
+            typename = std::enable_if_t<dim_ == 1 && n_components == dim_>>
+  void
+  submit_gradient(const Tensor<2, 1, VectorizedArrayType> val_in,
+                  const unsigned int                      q_point);
 
   /**
    * Write a contribution that is tested by the gradient to the field
@@ -4837,6 +4863,22 @@ template <int dim,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
+template <int, typename>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
+               const unsigned int                      q_point)
+{
+  submit_value(val_in[0], q_point);
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_gradient(const gradient_type grad_in, const unsigned int q_point)
@@ -5092,6 +5134,22 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               gradients[comp * nqp_d + d] = new_val * JxW;
             }
     }
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+template <int, typename>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  submit_gradient(const Tensor<2, 1, VectorizedArrayType> grad_in,
+                  const unsigned int                      q_point)
+{
+  submit_value(grad_in[0], q_point);
 }
 
 
