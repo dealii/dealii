@@ -1032,12 +1032,14 @@ namespace LinearAlgebra
       const size_type begin = vector->getMap()->getMinGlobalIndex();
       const size_type end   = vector->getMap()->getMaxGlobalIndex() + 1;
 
-      Assert(
+      [[maybe_unused]] const size_type n_local_elements =
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-        end - begin == vector->getMap()->getLocalNumElements(),
+        vector->getMap()->getLocalNumElements();
 #  else
-        end - begin == vector->getMap()->getNodeNumElements(),
+        vector->getMap()->getNodeNumElements();
 #  endif
+      Assert(
+        end - begin == n_local_elements,
         ExcMessage(
           "This function only makes sense if the elements that this "
           "vector stores on the current processor form a contiguous range. "
