@@ -3779,6 +3779,7 @@ namespace parallel
       // the level subdomain ids correct in the multigrid case
       dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 
+      const auto face_reference_cell = ReferenceCells::get_hypercube<dim - 1>();
       for (const auto &face_pair : periodicity_vector)
         {
           const cell_iterator first_cell  = face_pair.cell[0];
@@ -3813,15 +3814,20 @@ namespace parallel
               const unsigned int  face_idx_list[] = {face_left, face_right};
               const cell_iterator cell_list[]     = {first_cell, second_cell};
               unsigned int        lower_idx, higher_idx;
+              unsigned char       orientation;
               if (face_left <= face_right)
                 {
                   higher_idx = 1;
                   lower_idx  = 0;
+                  orientation =
+                    face_reference_cell.get_inverse_combined_orientation(
+                      face_pair.orientation);
                 }
               else
                 {
-                  higher_idx = 0;
-                  lower_idx  = 1;
+                  higher_idx  = 0;
+                  lower_idx   = 1;
+                  orientation = face_pair.orientation;
                 }
 
               // get the cell index of the first index on the face with the
@@ -3850,29 +3856,13 @@ namespace parallel
                 }
               Assert(first_dealii_idx_on_face != numbers::invalid_unsigned_int,
                      ExcInternalError());
-              // Now map dealii_idx_on_face according to the orientation
 
-              constexpr unsigned int left_to_right[8][4] = {{0, 2, 1, 3},
-                                                            {0, 1, 2, 3},
-                                                            {2, 3, 0, 1},
-                                                            {1, 3, 0, 2},
-                                                            {3, 1, 2, 0},
-                                                            {3, 2, 1, 0},
-                                                            {1, 0, 3, 2},
-                                                            {2, 0, 3, 1}};
-              constexpr unsigned int right_to_left[8][4] = {{0, 2, 1, 3},
-                                                            {0, 1, 2, 3},
-                                                            {2, 3, 0, 1},
-                                                            {2, 0, 3, 1},
-                                                            {3, 1, 2, 0},
-                                                            {3, 2, 1, 0},
-                                                            {1, 0, 3, 2},
-                                                            {1, 3, 0, 2}};
-              const unsigned int     second_dealii_idx_on_face =
-                lower_idx == 0 ? left_to_right[face_pair.orientation]
-                                              [first_dealii_idx_on_face] :
-                                     right_to_left[face_pair.orientation]
-                                              [first_dealii_idx_on_face];
+              // Now map dealii_idx_on_face according to the orientation.
+              const unsigned int second_dealii_idx_on_face =
+                reference_cell.standard_to_real_face_vertex(
+                  first_dealii_idx_on_face,
+                  face_idx_list[lower_idx],
+                  orientation);
               const unsigned int second_dealii_idx_on_cell =
                 GeometryInfo<dim>::face_to_cell_vertices(
                   face_idx_list[higher_idx],
