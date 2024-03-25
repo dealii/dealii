@@ -15,11 +15,11 @@
 //
 // Test
 //   DoFTools::
-//   make_periodicity_constraints (const FaceIterator       &,
-//                                 const FaceIterator       &,
-//                                 dealii::AffineConstraints<double> &,
-//                                 const std::vector<bool>  &,
-//                                 bool, bool, bool)
+//   make_periodicity_constraints(const FaceIterator        &,
+//                                const FaceIterator        &,
+//                                AffineConstraints<double> &,
+//                                const ComponentMask       &,
+//                                unsigned char)
 // for correct behavior on non standard oriented meshes.
 //
 // like _21_b_x, but with a once refined mesh
@@ -157,7 +157,7 @@ generate_grid(Triangulation<2, 3> &triangulation)
 
 /*
  * Print out all face DoFs and support points as well as the actual
- * matching via make_periodicity_constraints
+ * matching via make_periodicity_constraints()
  */
 template <int dim, int spacedim>
 void

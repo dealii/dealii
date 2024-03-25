@@ -15,11 +15,11 @@
 //
 // Test
 //   DoFTools::
-//   make_periodicity_constraints (const FaceIterator       &,
-//                                 const FaceIterator       &,
-//                                 dealii::AffineConstraints<double> &,
-//                                 const std::vector<bool>  &,
-//                                 bool, bool, bool)
+//   make_periodicity_constraints(const FaceIterator        &,
+//                                const FaceIterator        &,
+//                                AffineConstraints<double> &,
+//                                const ComponentMask       &,
+//                                unsigned char)
 // for correct behavior on non standard oriented meshes.
 //
 // a redux of why the 21_b test failed starting in r29525. in essence,
@@ -157,7 +157,7 @@ generate_grid(Triangulation<2, 3> &triangulation)
 
 /*
  * Print out all face DoFs and support points as well as the actual
- * matching via make_periodicity_constraints
+ * matching via make_periodicity_constraints()
  */
 template <int dim, int spacedim>
 void
@@ -196,7 +196,11 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler)
             << std::endl;
 
   DoFTools::make_periodicity_constraints(
-    face_1, face_2, constraint_matrix, ComponentMask(), 0u);
+    face_1,
+    face_2,
+    constraint_matrix,
+    ComponentMask(),
+    ReferenceCell::reversed_combined_line_orientation());
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
   deallog << "Matching:" << std::endl;
