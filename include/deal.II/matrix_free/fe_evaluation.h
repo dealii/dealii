@@ -5149,7 +5149,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_gradient(const Tensor<2, 1, VectorizedArrayType> grad_in,
                   const unsigned int                      q_point)
 {
-  submit_value(grad_in[0], q_point);
+  submit_gradient(grad_in[0], q_point);
 }
 
 
@@ -5434,8 +5434,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   VectorizedArrayType divergence;
   const std::size_t   nqp = this->n_quadrature_points;
 
-  if (this->data->element_type ==
-      internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
+  if (dim > 1 &&
+      this->data->element_type ==
+        internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
       VectorizedArrayType inv_det =
         (!is_face &&
