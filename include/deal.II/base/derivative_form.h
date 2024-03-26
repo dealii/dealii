@@ -609,9 +609,7 @@ template <int dim, int spacedim, typename Number>
 inline DerivativeForm<1, spacedim, dim, Number>
 transpose(const DerivativeForm<1, dim, spacedim, Number> &DF)
 {
-  DerivativeForm<1, spacedim, dim, Number> tt;
-  tt = DF.transpose();
-  return tt;
+  return DF.transpose();
 }
 
 
@@ -685,6 +683,34 @@ apply_diagonal_transformation(
          Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>>
     dest;
   for (unsigned int i = 0; i < n_components; ++i)
+    dest[i] = apply_diagonal_transformation(grad_F, D_X[i]);
+
+  return dest;
+}
+
+
+
+/**
+ * Similar to the previous apply_transformation().
+ * Each row of the result corresponds to one of the rows of @p D_X transformed
+ * by @p grad_F, equivalent to $\mathrm{D\_X} \, \mathrm{grad\_F}^T$ in matrix
+ * notation.
+ *
+ * @relatesalso DerivativeForm
+ */
+// rank=2
+template <int spacedim, int dim, typename Number1, typename Number2>
+inline DerivativeForm<1,
+                      spacedim,
+                      dim,
+                      typename ProductType<Number1, Number2>::type>
+apply_diagonal_transformation(
+  const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
+  const Tensor<2, dim, Number2>                   &D_X)
+{
+  DerivativeForm<1, spacedim, dim, typename ProductType<Number1, Number2>::type>
+    dest;
+  for (unsigned int i = 0; i < dim; ++i)
     dest[i] = apply_diagonal_transformation(grad_F, D_X[i]);
 
   return dest;

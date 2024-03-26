@@ -43,9 +43,6 @@ namespace internal
     {
       // check if supported
       const bool flag = [&]() {
-        if (dim != spacedim)
-          return false;
-
         const FiniteElement<dim, spacedim> *fe_ptr =
           &(fe.base_element(base_element_number));
         if (fe_ptr->n_components() != 1)

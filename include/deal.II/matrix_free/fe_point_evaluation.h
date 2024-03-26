@@ -56,7 +56,11 @@ namespace internal
      * Struct to distinguish between the value and gradient types of different
      * numbers of components used by the FlexibleEvaluator class.
      */
-    template <int dim, int n_components, typename Number>
+    template <int dim,
+              int spacedim,
+              int n_components,
+              typename Number,
+              typename Enable = void>
     struct EvaluatorTypeTraits
     {
       using ScalarNumber =
@@ -68,12 +72,17 @@ namespace internal
       using scalar_value_type = Tensor<1, n_components, ScalarNumber>;
       using vectorized_value_type =
         Tensor<1, n_components, VectorizedArrayType>;
-      using gradient_type = Tensor<1, n_components, Tensor<1, dim, Number>>;
-      using scalar_gradient_type =
+      using unit_gradient_type =
+        Tensor<1, n_components, Tensor<1, dim, Number>>;
+      using real_gradient_type = std::conditional_t<
+        n_components == spacedim,
+        Tensor<2, spacedim, Number>,
+        Tensor<1, n_components, Tensor<1, spacedim, Number>>>;
+      using scalar_unit_gradient_type =
         Tensor<1, n_components, Tensor<1, dim, ScalarNumber>>;
-      using vectorized_gradient_type =
+      using vectorized_unit_gradient_type =
         Tensor<1, n_components, Tensor<1, dim, VectorizedArrayType>>;
-      using interface_vectorized_gradient_type =
+      using interface_vectorized_unit_gradient_type =
         Tensor<1, dim, Tensor<1, n_components, VectorizedArrayType>>;
 
       static void
@@ -111,9 +120,9 @@ namespace internal
       }
 
       static void
-      set_gradient(const interface_vectorized_gradient_type &value,
-                   const unsigned int                        vector_lane,
-                   gradient_type                            &result)
+      set_gradient(const interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                             vector_lane,
+                   unit_gradient_type                            &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -123,9 +132,9 @@ namespace internal
       }
 
       static void
-      get_gradient(interface_vectorized_gradient_type &value,
-                   const unsigned int                  vector_lane,
-                   const gradient_type                &result)
+      get_gradient(interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                       vector_lane,
+                   const unit_gradient_type                &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -134,10 +143,22 @@ namespace internal
       }
 
       static void
-      set_zero_gradient(gradient_type &value, const unsigned int vector_lane)
+      get_gradient(interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                       vector_lane,
+                   const DerivativeForm<1, dim, n_components, Number> &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           for (unsigned int d = 0; d < dim; ++d)
+            internal::VectorizedArrayTrait<Number>::get_from_vectorized(
+              value[d][i], vector_lane) = result[i][d];
+      }
+
+      static void
+      set_zero_gradient(real_gradient_type &value,
+                        const unsigned int  vector_lane)
+      {
+        for (unsigned int i = 0; i < n_components; ++i)
+          for (unsigned int d = 0; d < spacedim; ++d)
             internal::VectorizedArrayTrait<Number>::get(value[i][d],
                                                         vector_lane) = 0.;
       }
@@ -204,24 +225,24 @@ namespace internal
       }
 
       static void
-      access(gradient_type                      &value,
-             const unsigned int                  vector_lane,
-             const unsigned int                  component,
-             const Tensor<1, dim, ScalarNumber> &shape_gradient)
+      access(real_gradient_type                      &value,
+             const unsigned int                       vector_lane,
+             const unsigned int                       component,
+             const Tensor<1, spacedim, ScalarNumber> &shape_gradient)
       {
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           internal::VectorizedArrayTrait<Number>::get(value[component][d],
                                                       vector_lane) +=
             shape_gradient[d];
       }
 
-      static Tensor<1, dim, ScalarNumber>
-      access(const gradient_type &value,
-             const unsigned int   vector_lane,
-             const unsigned int   component)
+      static Tensor<1, spacedim, ScalarNumber>
+      access(const real_gradient_type &value,
+             const unsigned int        vector_lane,
+             const unsigned int        component)
       {
-        Tensor<1, dim, ScalarNumber> result;
-        for (unsigned int d = 0; d < dim; ++d)
+        Tensor<1, spacedim, ScalarNumber> result;
+        for (unsigned int d = 0; d < spacedim; ++d)
           result[d] =
             internal::VectorizedArrayTrait<Number>::get(value[component][d],
                                                         vector_lane);
@@ -229,21 +250,23 @@ namespace internal
       }
     };
 
-    template <int dim, typename Number>
-    struct EvaluatorTypeTraits<dim, 1, Number>
+    template <int dim, int spacedim, typename Number>
+    struct EvaluatorTypeTraits<dim, spacedim, 1, Number>
     {
       using ScalarNumber =
         typename internal::VectorizedArrayTrait<Number>::value_type;
       using VectorizedArrayType =
         typename dealii::internal::VectorizedArrayTrait<
           Number>::vectorized_value_type;
-      using value_type               = Number;
-      using scalar_value_type        = ScalarNumber;
-      using vectorized_value_type    = VectorizedArrayType;
-      using gradient_type            = Tensor<1, dim, Number>;
-      using scalar_gradient_type     = Tensor<1, dim, ScalarNumber>;
-      using vectorized_gradient_type = Tensor<1, dim, VectorizedArrayType>;
-      using interface_vectorized_gradient_type = vectorized_gradient_type;
+      using value_type                    = Number;
+      using scalar_value_type             = ScalarNumber;
+      using vectorized_value_type         = VectorizedArrayType;
+      using unit_gradient_type            = Tensor<1, dim, Number>;
+      using real_gradient_type            = Tensor<1, spacedim, Number>;
+      using scalar_unit_gradient_type     = Tensor<1, dim, ScalarNumber>;
+      using vectorized_unit_gradient_type = Tensor<1, dim, VectorizedArrayType>;
+      using interface_vectorized_unit_gradient_type =
+        vectorized_unit_gradient_type;
 
       static void
       read_value(const ScalarNumber vector_entry,
@@ -272,43 +295,44 @@ namespace internal
       }
 
       static void
-      set_gradient(const vectorized_gradient_type &value,
-                   const unsigned int              vector_lane,
-                   scalar_gradient_type           &result)
+      set_gradient(const vectorized_unit_gradient_type &value,
+                   const unsigned int                   vector_lane,
+                   scalar_unit_gradient_type           &result)
       {
         for (unsigned int d = 0; d < dim; ++d)
           result[d] = value[d][vector_lane];
       }
 
       static void
-      set_gradient(const vectorized_gradient_type &value,
+      set_gradient(const vectorized_unit_gradient_type &value,
                    const unsigned int,
-                   vectorized_gradient_type &result)
+                   vectorized_unit_gradient_type &result)
       {
         result = value;
       }
 
       static void
-      get_gradient(vectorized_gradient_type   &value,
-                   const unsigned int          vector_lane,
-                   const scalar_gradient_type &result)
+      get_gradient(vectorized_unit_gradient_type   &value,
+                   const unsigned int               vector_lane,
+                   const scalar_unit_gradient_type &result)
       {
         for (unsigned int d = 0; d < dim; ++d)
           value[d][vector_lane] = result[d];
       }
 
       static void
-      get_gradient(vectorized_gradient_type &value,
+      get_gradient(vectorized_unit_gradient_type &value,
                    const unsigned int,
-                   const vectorized_gradient_type &result)
+                   const vectorized_unit_gradient_type &result)
       {
         value = result;
       }
 
       static void
-      set_zero_gradient(gradient_type &value, const unsigned int vector_lane)
+      set_zero_gradient(real_gradient_type &value,
+                        const unsigned int  vector_lane)
       {
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           internal::VectorizedArrayTrait<Number>::get(value[d], vector_lane) =
             0.;
       }
@@ -370,23 +394,23 @@ namespace internal
       }
 
       static void
-      access(gradient_type     &value,
-             const unsigned int vector_lane,
+      access(real_gradient_type &value,
+             const unsigned int  vector_lane,
              const unsigned int,
-             const scalar_gradient_type &shape_gradient)
+             const Tensor<1, spacedim, ScalarNumber> &shape_gradient)
       {
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           internal::VectorizedArrayTrait<Number>::get(value[d], vector_lane) +=
             shape_gradient[d];
       }
 
-      static scalar_gradient_type
-      access(const gradient_type &value,
-             const unsigned int   vector_lane,
+      static Tensor<1, spacedim, ScalarNumber>
+      access(const real_gradient_type &value,
+             const unsigned int        vector_lane,
              const unsigned int)
       {
-        scalar_gradient_type result;
-        for (unsigned int d = 0; d < dim; ++d)
+        Tensor<1, spacedim, ScalarNumber> result;
+        for (unsigned int d = 0; d < spacedim; ++d)
           result[d] =
             internal::VectorizedArrayTrait<Number>::get(value[d], vector_lane);
         return result;
@@ -394,20 +418,25 @@ namespace internal
     };
 
     template <int dim, typename Number>
-    struct EvaluatorTypeTraits<dim, dim, Number>
+    struct EvaluatorTypeTraits<dim,
+                               dim,
+                               dim,
+                               Number,
+                               std::enable_if_t<dim != 1>>
     {
       using ScalarNumber =
         typename internal::VectorizedArrayTrait<Number>::value_type;
       using VectorizedArrayType =
         typename dealii::internal::VectorizedArrayTrait<
           Number>::vectorized_value_type;
-      using value_type               = Tensor<1, dim, Number>;
-      using scalar_value_type        = Tensor<1, dim, ScalarNumber>;
-      using vectorized_value_type    = Tensor<1, dim, VectorizedArrayType>;
-      using gradient_type            = Tensor<2, dim, Number>;
-      using scalar_gradient_type     = Tensor<2, dim, ScalarNumber>;
-      using vectorized_gradient_type = Tensor<2, dim, VectorizedArrayType>;
-      using interface_vectorized_gradient_type =
+      using value_type                    = Tensor<1, dim, Number>;
+      using scalar_value_type             = Tensor<1, dim, ScalarNumber>;
+      using vectorized_value_type         = Tensor<1, dim, VectorizedArrayType>;
+      using unit_gradient_type            = Tensor<2, dim, Number>;
+      using real_gradient_type            = unit_gradient_type;
+      using scalar_unit_gradient_type     = Tensor<2, dim, ScalarNumber>;
+      using vectorized_unit_gradient_type = Tensor<2, dim, VectorizedArrayType>;
+      using interface_vectorized_unit_gradient_type =
         Tensor<1, dim, Tensor<1, dim, VectorizedArrayType>>;
 
       static void
@@ -445,9 +474,9 @@ namespace internal
       }
 
       static void
-      set_gradient(const interface_vectorized_gradient_type &value,
-                   const unsigned int                        vector_lane,
-                   gradient_type                            &result)
+      set_gradient(const interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                             vector_lane,
+                   unit_gradient_type                            &result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -457,9 +486,9 @@ namespace internal
       }
 
       static void
-      get_gradient(interface_vectorized_gradient_type &value,
-                   const unsigned int                  vector_lane,
-                   const gradient_type                &result)
+      get_gradient(interface_vectorized_unit_gradient_type &value,
+                   const unsigned int                       vector_lane,
+                   const unit_gradient_type                &result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -468,7 +497,8 @@ namespace internal
       }
 
       static void
-      set_zero_gradient(gradient_type &value, const unsigned int vector_lane)
+      set_zero_gradient(unit_gradient_type &value,
+                        const unsigned int  vector_lane)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -538,7 +568,7 @@ namespace internal
       }
 
       static void
-      access(gradient_type                      &value,
+      access(real_gradient_type                 &value,
              const unsigned int                  vector_lane,
              const unsigned int                  component,
              const Tensor<1, dim, ScalarNumber> &shape_gradient)
@@ -550,173 +580,15 @@ namespace internal
       }
 
       static Tensor<1, dim, ScalarNumber>
-      access(const gradient_type &value,
-             const unsigned int   vector_lane,
-             const unsigned int   component)
+      access(const real_gradient_type &value,
+             const unsigned int        vector_lane,
+             const unsigned int        component)
       {
         Tensor<1, dim, ScalarNumber> result;
         for (unsigned int d = 0; d < dim; ++d)
           result[d] =
             internal::VectorizedArrayTrait<Number>::get(value[component][d],
                                                         vector_lane);
-        return result;
-      }
-    };
-
-    template <typename Number>
-    struct EvaluatorTypeTraits<1, 1, Number>
-    {
-      using ScalarNumber =
-        typename internal::VectorizedArrayTrait<Number>::value_type;
-      using VectorizedArrayType =
-        typename dealii::internal::VectorizedArrayTrait<
-          Number>::vectorized_value_type;
-      using value_type               = Number;
-      using scalar_value_type        = ScalarNumber;
-      using vectorized_value_type    = VectorizedArrayType;
-      using gradient_type            = Tensor<1, 1, Number>;
-      using scalar_gradient_type     = Tensor<1, 1, ScalarNumber>;
-      using vectorized_gradient_type = Tensor<1, 1, VectorizedArrayType>;
-      using interface_vectorized_gradient_type = vectorized_gradient_type;
-
-      static void
-      read_value(const ScalarNumber vector_entry,
-                 const unsigned int,
-                 scalar_value_type &result)
-      {
-        result = vector_entry;
-      }
-
-      static scalar_value_type
-      sum_value(const scalar_value_type &result)
-      {
-        return result;
-      }
-
-      static scalar_value_type
-      sum_value(const vectorized_value_type &result)
-      {
-        return result.sum();
-      }
-
-      static ScalarNumber
-      sum_value(const unsigned int, const vectorized_value_type &result)
-      {
-        return result.sum();
-      }
-
-      static void
-      set_gradient(const vectorized_gradient_type &value,
-                   const unsigned int              vector_lane,
-                   scalar_gradient_type           &result)
-      {
-        result[0] = value[0][vector_lane];
-      }
-
-      static void
-      set_gradient(const vectorized_gradient_type &value,
-                   const unsigned int,
-                   vectorized_gradient_type &result)
-      {
-        result = value;
-      }
-
-      static void
-      get_gradient(vectorized_gradient_type   &value,
-                   const unsigned int          vector_lane,
-                   const scalar_gradient_type &result)
-      {
-        value[0][vector_lane] = result[0];
-      }
-
-      static void
-      get_gradient(vectorized_gradient_type &value,
-                   const unsigned int,
-                   const vectorized_gradient_type &result)
-      {
-        value = result;
-      }
-
-      static void
-      set_zero_gradient(gradient_type &value, const unsigned int vector_lane)
-      {
-        internal::VectorizedArrayTrait<Number>::get(value[0], vector_lane) = 0.;
-      }
-
-      static void
-      set_value(const vectorized_value_type &value,
-                const unsigned int           vector_lane,
-                scalar_value_type           &result)
-      {
-        result = value[vector_lane];
-      }
-
-      static void
-      set_value(const vectorized_value_type &value,
-                const unsigned int,
-                vectorized_value_type &result)
-      {
-        result = value;
-      }
-
-      static void
-      get_value(vectorized_value_type   &value,
-                const unsigned int       vector_lane,
-                const scalar_value_type &result)
-      {
-        value[vector_lane] = result;
-      }
-
-      static void
-      get_value(vectorized_value_type &value,
-                const unsigned int,
-                const vectorized_value_type &result)
-      {
-        value = result;
-      }
-
-      static void
-      set_zero_value(value_type &value, const unsigned int vector_lane)
-      {
-        internal::VectorizedArrayTrait<Number>::get(value, vector_lane) = 0.;
-      }
-
-      static void
-      access(value_type        &value,
-             const unsigned int vector_lane,
-             const unsigned int,
-             const ScalarNumber &shape_value)
-      {
-        internal::VectorizedArrayTrait<Number>::get(value, vector_lane) +=
-          shape_value;
-      }
-
-      static ScalarNumber
-      access(const value_type  &value,
-             const unsigned int vector_lane,
-             const unsigned int)
-      {
-        return internal::VectorizedArrayTrait<Number>::get(value, vector_lane);
-      }
-
-      static void
-      access(gradient_type     &value,
-             const unsigned int vector_lane,
-             const unsigned int,
-             const scalar_gradient_type &shape_gradient)
-      {
-        internal::VectorizedArrayTrait<Number>::get(value[0], vector_lane) +=
-          shape_gradient[0];
-      }
-
-      static scalar_gradient_type
-      access(const gradient_type &value,
-             const unsigned int   vector_lane,
-             const unsigned int)
-      {
-        scalar_gradient_type result;
-        result[0] =
-          internal::VectorizedArrayTrait<Number>::get(value[0], vector_lane);
         return result;
       }
     };
@@ -761,13 +633,13 @@ public:
   using VectorizedArrayType = typename dealii::internal::VectorizedArrayTrait<
     Number>::vectorized_value_type;
   using ETT = typename internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, n_components, Number>;
+    EvaluatorTypeTraits<dim, spacedim, n_components, Number>;
   using value_type            = typename ETT::value_type;
   using scalar_value_type     = typename ETT::scalar_value_type;
   using vectorized_value_type = typename ETT::vectorized_value_type;
-  using gradient_type         = typename ETT::gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
+  using gradient_type         = typename ETT::real_gradient_type;
+  using interface_vectorized_unit_gradient_type =
+    typename ETT::interface_vectorized_unit_gradient_type;
 
 protected:
   /**
@@ -788,10 +660,10 @@ protected:
    * objects, this parameter allows to select a range of `n_components`
    * components starting from this parameter.
    */
-  FEPointEvaluationBase(const Mapping<dim>       &mapping,
-                        const FiniteElement<dim> &fe,
-                        const UpdateFlags         update_flags,
-                        const unsigned int        first_selected_component = 0);
+  FEPointEvaluationBase(const Mapping<dim, spacedim>       &mapping,
+                        const FiniteElement<dim, spacedim> &fe,
+                        const UpdateFlags                   update_flags,
+                        const unsigned int first_selected_component = 0);
 
   /**
    * Constructor to make the present class able to re-use the geometry
@@ -814,7 +686,7 @@ protected:
    */
   FEPointEvaluationBase(
     NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim>                        &fe,
+    const FiniteElement<dim, spacedim>              &fe,
     const unsigned int first_selected_component = 0,
     const bool         is_interior              = true);
 
@@ -995,7 +867,7 @@ protected:
   /**
    * Pointer to the FiniteElement object passed to the constructor.
    */
-  SmartPointer<const FiniteElement<dim>> fe;
+  SmartPointer<const FiniteElement<dim, spacedim>> fe;
 
   /**
    * Description of the 1d polynomial basis for tensor product elements used
@@ -1237,13 +1109,14 @@ public:
   using VectorizedArrayType = typename dealii::internal::VectorizedArrayTrait<
     Number>::vectorized_value_type;
   using ETT = typename internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, n_components, Number>;
+    EvaluatorTypeTraits<dim, spacedim, n_components, Number>;
   using value_type            = typename ETT::value_type;
   using scalar_value_type     = typename ETT::scalar_value_type;
   using vectorized_value_type = typename ETT::vectorized_value_type;
-  using gradient_type         = typename ETT::gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
+  using unit_gradient_type    = typename ETT::unit_gradient_type;
+  using gradient_type         = typename ETT::real_gradient_type;
+  using interface_vectorized_unit_gradient_type =
+    typename ETT::interface_vectorized_unit_gradient_type;
 
   /**
    * Constructor.
@@ -1263,10 +1136,10 @@ public:
    * objects, this parameter allows to select a range of `n_components`
    * components starting from this parameter.
    */
-  FEPointEvaluation(const Mapping<dim>       &mapping,
-                    const FiniteElement<dim> &fe,
-                    const UpdateFlags         update_flags,
-                    const unsigned int        first_selected_component = 0);
+  FEPointEvaluation(const Mapping<dim, spacedim>       &mapping,
+                    const FiniteElement<dim, spacedim> &fe,
+                    const UpdateFlags                   update_flags,
+                    const unsigned int first_selected_component = 0);
 
   /**
    * Constructor to make the present class able to re-use the geometry
@@ -1286,7 +1159,7 @@ public:
    */
   FEPointEvaluation(
     NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim>                        &fe,
+    const FiniteElement<dim, spacedim>              &fe,
     const unsigned int first_selected_component = 0);
 
   /**
@@ -1507,7 +1380,7 @@ private:
     const unsigned int                                       n_shapes,
     const unsigned int                                       qb,
     vectorized_value_type                                   &value,
-    interface_vectorized_gradient_type                      &gradient);
+    interface_vectorized_unit_gradient_type                 &gradient);
 
   /**
    * Fast path of the evaluate function.
@@ -1535,12 +1408,12 @@ private:
   template <bool is_linear>
   void
   compute_integrate_fast(
-    const EvaluationFlags::EvaluationFlags  &integration_flags,
-    const unsigned int                       n_shapes,
-    const unsigned int                       qb,
-    const vectorized_value_type              value,
-    const interface_vectorized_gradient_type gradient,
-    vectorized_value_type                   *solution_values_vectorized_linear);
+    const EvaluationFlags::EvaluationFlags       &integration_flags,
+    const unsigned int                            n_shapes,
+    const unsigned int                            qb,
+    const vectorized_value_type                   value,
+    const interface_vectorized_unit_gradient_type gradient,
+    vectorized_value_type *solution_values_vectorized_linear);
 
   /**
    * Addition across the lanes of VectorizedArray as accumulated by the
@@ -1622,20 +1495,21 @@ public:
   using VectorizedArrayType = typename dealii::internal::VectorizedArrayTrait<
     Number>::vectorized_value_type;
   using ETT = typename internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, n_components, Number>;
+    EvaluatorTypeTraits<dim, spacedim, n_components, Number>;
   using value_type            = typename ETT::value_type;
   using scalar_value_type     = typename ETT::scalar_value_type;
   using vectorized_value_type = typename ETT::vectorized_value_type;
-  using gradient_type         = typename ETT::gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
+  using unit_gradient_type    = typename ETT::unit_gradient_type;
+  using gradient_type         = typename ETT::real_gradient_type;
+  using interface_vectorized_unit_gradient_type =
+    typename ETT::interface_vectorized_unit_gradient_type;
 
   /**
    * Constructor. Allows to select if interior or exterior face is selected.
    */
   FEFacePointEvaluation(
     NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim>                        &fe,
+    const FiniteElement<dim, spacedim>              &fe,
     const bool                                       is_interior = true,
     const unsigned int first_selected_component                  = 0);
 
@@ -1869,15 +1743,17 @@ private:
     const bool                              sum_into_values);
 };
 
+
+
 // ----------------------- template and inline function ----------------------
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
-  FEPointEvaluationBase(const Mapping<dim>       &mapping,
-                        const FiniteElement<dim> &fe,
-                        const UpdateFlags         update_flags,
-                        const unsigned int        first_selected_component)
+  FEPointEvaluationBase(const Mapping<dim, spacedim>       &mapping,
+                        const FiniteElement<dim, spacedim> &fe,
+                        const UpdateFlags                   update_flags,
+                        const unsigned int first_selected_component)
   : n_q_batches(numbers::invalid_unsigned_int)
   , n_q_points(numbers::invalid_unsigned_int)
   , n_q_points_scalar(numbers::invalid_unsigned_int)
@@ -1904,7 +1780,7 @@ template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   FEPointEvaluationBase(
     NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim>                        &fe,
+    const FiniteElement<dim, spacedim>              &fe,
     const unsigned int                               first_selected_component,
     const bool                                       is_interior)
   : n_q_batches(numbers::invalid_unsigned_int)
@@ -1972,9 +1848,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
-  FEPointEvaluationBase(
-    FEPointEvaluationBase<n_components_, dim, spacedim, Number>
-      &&other) noexcept
+  FEPointEvaluationBase(FEPointEvaluationBase &&other) noexcept
   : n_q_batches(other.n_q_batches)
   , n_q_points(other.n_q_points)
   , n_q_points_scalar(other.n_q_points_scalar)
@@ -2373,7 +2247,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-  const FiniteElement<dim>                        &fe,
+  const FiniteElement<dim, spacedim>              &fe,
   const unsigned int                               first_selected_component)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping_info,
@@ -2385,10 +2259,10 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
-  const Mapping<dim>       &mapping,
-  const FiniteElement<dim> &fe,
-  const UpdateFlags         update_flags,
-  const unsigned int        first_selected_component)
+  const Mapping<dim, spacedim>       &mapping,
+  const FiniteElement<dim, spacedim> &fe,
+  const UpdateFlags                   update_flags,
+  const unsigned int                  first_selected_component)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping,
       fe,
@@ -2641,7 +2515,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
   const unsigned int                                       n_shapes,
   const unsigned int                                       qb,
   vectorized_value_type                                   &value,
-  interface_vectorized_gradient_type                      &gradient)
+  interface_vectorized_unit_gradient_type                 &gradient)
 {
   if (evaluation_flags & EvaluationFlags::gradients)
     {
@@ -2720,8 +2594,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_fast(
 
   for (unsigned int qb = 0; qb < this->n_q_batches; ++qb)
     {
-      vectorized_value_type              value;
-      interface_vectorized_gradient_type gradient;
+      vectorized_value_type                   value;
+      interface_vectorized_unit_gradient_type gradient;
 
       compute_evaluate_fast<is_linear>(
         solution_values, evaluation_flags, n_shapes, qb, value, gradient);
@@ -2743,13 +2617,13 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_fast(
                v < stride && (stride == 1 || offset < this->n_q_points_scalar);
                ++v, ++offset)
             {
-              gradient_type unit_gradient;
+              unit_gradient_type unit_gradient;
               ETT::set_gradient(gradient, v, unit_gradient);
               this->gradients[offset] =
                 this->cell_type <=
                     internal::MatrixFreeFunctions::GeometryType::cartesian ?
-                  apply_diagonal_transformation(this->inverse_jacobian_ptr[0],
-                                                unit_gradient) :
+                  apply_diagonal_transformation(
+                    this->inverse_jacobian_ptr[0].transpose(), unit_gradient) :
                   apply_transformation(
                     this
                       ->inverse_jacobian_ptr[this->cell_type <=
@@ -2857,12 +2731,12 @@ template <int n_components_, int dim, int spacedim, typename Number>
 template <bool is_linear>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_integrate_fast(
-  const EvaluationFlags::EvaluationFlags  &integration_flags,
-  const unsigned int                       n_shapes,
-  const unsigned int                       qb,
-  const vectorized_value_type              value,
-  const interface_vectorized_gradient_type gradient,
-  vectorized_value_type                   *solution_values_vectorized_linear)
+  const EvaluationFlags::EvaluationFlags       &integration_flags,
+  const unsigned int                            n_shapes,
+  const unsigned int                            qb,
+  const vectorized_value_type                   value,
+  const interface_vectorized_unit_gradient_type gradient,
+  vectorized_value_type *solution_values_vectorized_linear)
 {
   if (integration_flags & EvaluationFlags::gradients)
     internal::integrate_tensor_product_value_and_gradient<
@@ -2997,7 +2871,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
              v < stride && (stride == 1 || offset < this->n_q_points_scalar);
              ++v, ++offset)
           {
-            const auto grad_w =
+            const gradient_type grad_w =
               do_JxW ? this->gradients[offset] * this->JxW_ptr[offset] :
                        this->gradients[offset];
             ETT::get_gradient(
@@ -3178,7 +3052,7 @@ template <int n_components_, int dim, int spacedim, typename Number>
 FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
   FEFacePointEvaluation(
     NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim>                        &fe,
+    const FiniteElement<dim, spacedim>              &fe,
     const bool                                       is_interior,
     const unsigned int                               first_selected_component)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
@@ -3564,8 +3438,8 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
 
   for (unsigned int qb = 0; qb < this->n_q_batches; ++qb)
     {
-      vectorized_value_type              value;
-      interface_vectorized_gradient_type gradient;
+      vectorized_value_type                   value;
+      interface_vectorized_unit_gradient_type gradient;
 
       if (evaluation_flags & EvaluationFlags::gradients)
         {
@@ -3665,13 +3539,13 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
                v < stride && (stride == 1 || offset < this->n_q_points_scalar);
                ++v, ++offset)
             {
-              gradient_type unit_gradient;
+              unit_gradient_type unit_gradient;
               ETT::set_gradient(gradient, v, unit_gradient);
               this->gradients[offset] =
                 this->cell_type <=
                     internal::MatrixFreeFunctions::GeometryType::cartesian ?
-                  apply_diagonal_transformation(this->inverse_jacobian_ptr[0],
-                                                unit_gradient) :
+                  apply_diagonal_transformation(
+                    this->inverse_jacobian_ptr[0].transpose(), unit_gradient) :
                   apply_transformation(
                     this
                       ->inverse_jacobian_ptr[this->cell_type <=

@@ -84,23 +84,23 @@ namespace internal
 
 
 
-    template <int dim>
+    template <int dim, int spacedim>
     void
     get_element_type_specific_information(
-      const FiniteElement<dim, dim> &fe_in,
-      const FiniteElement<dim, dim> &fe,
-      const unsigned int             base_element_number,
-      ElementType                   &element_type,
-      std::vector<unsigned int>     &scalar_lexicographic,
-      std::vector<unsigned int>     &lexicographic_numbering)
+      const FiniteElement<dim, spacedim> &fe_in,
+      const FiniteElement<dim, spacedim> &fe,
+      const unsigned int                  base_element_number,
+      ElementType                        &element_type,
+      std::vector<unsigned int>          &scalar_lexicographic,
+      std::vector<unsigned int>          &lexicographic_numbering)
     {
       element_type = tensor_general;
 
-      const auto fe_poly = dynamic_cast<const FE_Poly<dim, dim> *>(&fe);
+      const auto fe_poly = dynamic_cast<const FE_Poly<dim, spacedim> *>(&fe);
 
-      if (dynamic_cast<const FE_SimplexPoly<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const FE_WedgePoly<dim, dim> *>(&fe) != nullptr ||
-          dynamic_cast<const FE_PyramidPoly<dim, dim> *>(&fe) != nullptr)
+      if (dynamic_cast<const FE_SimplexPoly<dim, spacedim> *>(&fe) != nullptr ||
+          dynamic_cast<const FE_WedgePoly<dim, spacedim> *>(&fe) != nullptr ||
+          dynamic_cast<const FE_PyramidPoly<dim, spacedim> *>(&fe) != nullptr)
         {
           scalar_lexicographic.resize(fe.n_dofs_per_cell());
           for (unsigned int i = 0; i < scalar_lexicographic.size(); ++i)
@@ -115,14 +115,16 @@ namespace internal
                     Polynomials::PiecewisePolynomial<double>> *>(
                   &fe_poly->get_poly_space()) != nullptr))
         scalar_lexicographic = fe_poly->get_poly_space_numbering_inverse();
-      else if (const auto fe_dgp = dynamic_cast<const FE_DGP<dim> *>(&fe))
+      else if (const auto fe_dgp =
+                 dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe))
         {
           scalar_lexicographic.resize(fe_dgp->n_dofs_per_cell());
           for (unsigned int i = 0; i < fe_dgp->n_dofs_per_cell(); ++i)
             scalar_lexicographic[i] = i;
           element_type = truncated_tensor;
         }
-      else if (const auto fe_q_dg0 = dynamic_cast<const FE_Q_DG0<dim> *>(&fe))
+      else if (const auto fe_q_dg0 =
+                 dynamic_cast<const FE_Q_DG0<dim, spacedim> *>(&fe))
         {
           scalar_lexicographic = fe_q_dg0->get_poly_space_numbering_inverse();
           element_type         = tensor_symmetric_plus_dg0;
@@ -190,7 +192,7 @@ namespace internal
         Assert(fe_name[template_starts + 1] ==
                  (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
                ExcInternalError());
-        fe_name[template_starts + 1] = std::to_string(dim_to).c_str()[0];
+        fe_name[template_starts + 1] = std::to_string(dim_to)[0];
       }
       return FETools::get_fe_by_name<dim_to, dim_to>(fe_name);
     }
@@ -237,9 +239,6 @@ namespace internal
                               const FiniteElement<dim, spacedim> &fe_in,
                               const unsigned int base_element_number)
     {
-      static_assert(dim == spacedim,
-                    "Currently, only the case dim=spacedim is implemented");
-
       // ShapeInfo for RT elements. Here, data is of size 2 instead of 1.
       // data[0] is univariate_shape_data in normal direction and
       // data[1] is univariate_shape_data in tangential direction
@@ -251,7 +250,7 @@ namespace internal
 
           const auto quad = quad_in.get_tensor_basis()[0];
 
-          const FiniteElement<dim> &fe =
+          const FiniteElement<dim, spacedim> &fe =
             fe_in.base_element(base_element_number);
           n_dimensions = dim;
           n_components = fe_in.n_components();
@@ -312,11 +311,11 @@ namespace internal
           return;
         }
       else if (quad_in.is_tensor_product() == false ||
-               dynamic_cast<const FE_SimplexPoly<dim, dim> *>(
+               dynamic_cast<const FE_SimplexPoly<dim, spacedim> *>(
                  &fe_in.base_element(base_element_number)) != nullptr ||
-               dynamic_cast<const FE_WedgePoly<dim, dim> *>(
+               dynamic_cast<const FE_WedgePoly<dim, spacedim> *>(
                  &fe_in.base_element(base_element_number)) != nullptr ||
-               dynamic_cast<const FE_PyramidPoly<dim, dim> *>(
+               dynamic_cast<const FE_PyramidPoly<dim, spacedim> *>(
                  &fe_in.base_element(base_element_number)) != nullptr)
         {
           // specialization for arbitrary finite elements and quadrature rules
@@ -504,9 +503,10 @@ namespace internal
 
       const auto quad = quad_in.get_tensor_basis()[0];
 
-      const FiniteElement<dim> &fe = fe_in.base_element(base_element_number);
-      n_dimensions                 = dim;
-      n_components                 = fe_in.n_components();
+      const FiniteElement<dim, spacedim> &fe =
+        fe_in.base_element(base_element_number);
+      n_dimensions = dim;
+      n_components = fe_in.n_components();
 
       Assert(fe.n_components() == 1,
              ExcMessage("FEEvaluation only works for scalar finite elements."));
@@ -553,8 +553,8 @@ namespace internal
                                                      scalar_lexicographic,
                                                      0);
 
-      if (dim > 1 && (dynamic_cast<const FE_Q<dim> *>(&fe) ||
-                      dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe)))
+      if (dim > 1 && (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe) ||
+                      dynamic_cast<const FE_Q_iso_Q1<dim, spacedim> *>(&fe)))
         {
           auto &subface_interpolation_matrix_0 =
             univariate_shape_data.subface_interpolation_matrices[0];
@@ -571,7 +571,8 @@ namespace internal
           subface_interpolation_matrix_scalar_0.resize(nn * nn);
           subface_interpolation_matrix_scalar_1.resize(nn * nn);
 
-          const bool is_feq = dynamic_cast<const FE_Q<dim> *>(&fe) != nullptr;
+          const bool is_feq =
+            dynamic_cast<const FE_Q<dim, spacedim> *>(&fe) != nullptr;
 
           std::vector<Point<1>> fe_q_points =
             is_feq ? QGaussLobatto<1>(nn).get_points() :
@@ -613,7 +614,7 @@ namespace internal
       if (element_type == tensor_general &&
           univariate_shape_data.check_and_set_shapes_symmetric())
         {
-          if (dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe) &&
+          if (dynamic_cast<const FE_Q_iso_Q1<dim, spacedim> *>(&fe) &&
               fe.tensor_degree() > 1)
             element_type = tensor_symmetric_no_collocation;
           else if (univariate_shape_data.check_shapes_collocation())
@@ -1151,9 +1152,6 @@ namespace internal
     bool
     ShapeInfo<Number>::is_supported(const FiniteElement<dim, spacedim> &fe)
     {
-      if (dim != spacedim)
-        return false;
-
       if (dynamic_cast<const FE_RaviartThomasNodal<dim> *>(&fe))
         return true;
 
@@ -1170,12 +1168,12 @@ namespace internal
                 dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
               // Simplices are a special case since the polynomial family is not
               // indicative of their support
-              if (dynamic_cast<const FE_SimplexPoly<dim, dim> *>(fe_poly_ptr) !=
-                    nullptr ||
-                  dynamic_cast<const FE_WedgePoly<dim, dim> *>(fe_poly_ptr) !=
-                    nullptr ||
-                  dynamic_cast<const FE_PyramidPoly<dim, dim> *>(fe_poly_ptr) !=
-                    nullptr)
+              if (dynamic_cast<const FE_SimplexPoly<dim, spacedim> *>(
+                    fe_poly_ptr) != nullptr ||
+                  dynamic_cast<const FE_WedgePoly<dim, spacedim> *>(
+                    fe_poly_ptr) != nullptr ||
+                  dynamic_cast<const FE_PyramidPoly<dim, spacedim> *>(
+                    fe_poly_ptr) != nullptr)
                 return true;
 
               if (dynamic_cast<const TensorProductPolynomials<

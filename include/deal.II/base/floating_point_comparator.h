@@ -232,7 +232,7 @@ FloatingPointComparator<Number>::compare(
   const DerivativeForm<rank, dim, spacedim, T> &t1,
   const DerivativeForm<rank, dim, spacedim, T> &t2) const
 {
-  for (unsigned int i = 0; i < dim; ++i)
+  for (unsigned int i = 0; i < spacedim; ++i)
     {
       const ComparisonResult result = compare(t1[i], t2[i]);
       if (result != ComparisonResult::equal)
