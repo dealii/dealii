@@ -73,7 +73,7 @@ set(_opencascade_libraries
     )
 if(OPENCASCADE_VERSION AND OPENCASCADE_VERSION VERSION_GREATER_EQUAL "7.8.0")
   list(APPEND _opencascade_libraries
-    TKiDEIGES TKDESTEP TKDESTL
+    TKDEIGES TKDESTEP TKDESTL
     )
 else()
   list(APPEND _opencascade_libraries
