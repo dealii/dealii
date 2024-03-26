@@ -491,7 +491,7 @@ namespace parallel
           std::ofstream f(fname);
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_global_active_cells"
             << std::endl
-            << 4 << " "
+            << 5 << " "
             << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
             << this->cell_attached_data.pack_callbacks_fixed.size() << " "
             << this->cell_attached_data.pack_callbacks_variable.size() << " "
@@ -626,7 +626,7 @@ namespace parallel
           attached_count_variable >> n_global_active_cells;
       }
 
-      AssertThrow(version == 4,
+      AssertThrow(version == 5,
                   ExcMessage("Incompatible version found in .info file."));
       Assert(this->n_global_active_cells() == n_global_active_cells,
              ExcMessage("Number of global active cells differ!"));

@@ -93,12 +93,12 @@ transfer(std::ostream &out)
     cell->set_refine_flag(RefinementCase<dim>::cut_x);
 
   tria.prepare_coarsening_and_refinement();
-  soltrans.prepare_for_pure_refinement();
+  soltrans.prepare_for_coarsening_and_refinement(solution);
   tria.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe);
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  soltrans.refine_interpolate(solution, new_solution);
+  soltrans.interpolate(new_solution);
   solution.reinit(dof_handler.n_dofs());
   solution = new_solution;
 
@@ -122,7 +122,7 @@ transfer(std::ostream &out)
   tria.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe);
   solution.reinit(dof_handler.n_dofs());
-  soltrans2.interpolate(old_solution, solution);
+  soltrans2.interpolate(solution);
 
   data_out.clear_data_vectors();
   data_out.add_data_vector(solution, "solution");

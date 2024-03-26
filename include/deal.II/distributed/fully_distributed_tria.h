@@ -296,8 +296,8 @@ namespace parallel
        * The stored vector will have a size equal to the number of locally owned
        * active cells and will be ordered by the occurrence of those cells.
        */
-      virtual void
-      update_cell_relations() override;
+      void
+      update_cell_relations();
 
       virtual void
       update_number_cache() override;

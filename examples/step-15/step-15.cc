@@ -406,7 +406,7 @@ namespace Step15
     // values. Thus, we have the new values written into a temporary vector,
     // and only afterwards write them into the solution vector object:
     Vector<double> tmp(dof_handler.n_dofs());
-    solution_transfer.interpolate(current_solution, tmp);
+    solution_transfer.interpolate(tmp);
     current_solution = tmp;
 
     // On the new mesh, there are different hanging nodes, for which we have to

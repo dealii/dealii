@@ -1,0 +1,10 @@
+Deprecated: The classes SolutionTransfer and parallel::distributed::SolutionTransfer
+have been unified to SolutionTransfer. The class now supports both serial and parallel
+meshes. The class has lost some functions: the function SolutionTransfer::interpolate()
+that takes the input vector as well as the less frequently used functions
+SolutionTransfer::prepare_for_pure_refinement() and 
+SolutionTransfer::refine_interpolate(). Please use the other functions to accomplish the
+same functionality. For the time being, the old implementation has been to the namespace
+Legacy. The old parallel::distributed::SolutionTransfer has been now early deprecated.
+<br>
+(Pasquale Claudio Africa, Bruno Blais, Peter Munch, 2024/01/03)
