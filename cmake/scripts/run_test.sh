@@ -95,9 +95,15 @@ case $STAGE in
     #    policies. This is important to ensure that performance tests are
     #    scheduled properly.
     #
+    # for OpenMPI 4 and older:
     export OMPI_MCA_rmaps_base_oversubscribe=1
+    # for OpenMPI 5:
+    export PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
     if [ -z "${TEST_IS_EXCLUSIVE+x}" ]; then
+      # for OpenMPI 4 and older:
       export OMPI_MCA_hwloc_base_binding_policy=none
+      # for OpenMPI 5:
+      export PRTE_MCA_hwloc_default_binding_policy=none
     fi
 
     #
