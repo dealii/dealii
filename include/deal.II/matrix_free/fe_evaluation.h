@@ -6636,12 +6636,12 @@ FEEvaluation<dim,
     }
 
 #  ifdef DEBUG
-  if (evaluation_flag_actual & EvaluationFlags::values)
-    this->values_quad_initialized = true;
-  if (evaluation_flag_actual & EvaluationFlags::gradients)
-    this->gradients_quad_initialized = true;
-  if (evaluation_flag_actual & EvaluationFlags::hessians)
-    this->hessians_quad_initialized = true;
+  this->values_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::values;
+  this->gradients_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::gradients;
+  this->hessians_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::hessians;
 #  endif
 }
 
@@ -7340,12 +7340,12 @@ FEFaceEvaluation<dim,
       n_components, evaluation_flag_actual, values_array, *this);
 
 #  ifdef DEBUG
-  if (evaluation_flag_actual & EvaluationFlags::values)
-    this->values_quad_initialized = true;
-  if (evaluation_flag_actual & EvaluationFlags::gradients)
-    this->gradients_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
-    this->hessians_quad_initialized = true;
+  this->values_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::values;
+  this->gradients_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::gradients;
+  this->hessians_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::hessians;
 #  endif
 }
 
@@ -7474,12 +7474,12 @@ FEFaceEvaluation<dim,
       evaluate_in_face(n_components, evaluation_flag_actual, *this);
 
 #  ifdef DEBUG
-  if (evaluation_flag_actual & EvaluationFlags::values)
-    this->values_quad_initialized = true;
-  if (evaluation_flag_actual & EvaluationFlags::gradients)
-    this->gradients_quad_initialized = true;
-  if ((evaluation_flag_actual & EvaluationFlags::hessians) != 0u)
-    this->hessians_quad_initialized = true;
+  this->values_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::values;
+  this->gradients_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::gradients;
+  this->hessians_quad_initialized =
+    evaluation_flag_actual & EvaluationFlags::hessians;
 #  endif
 }
 
@@ -7821,12 +7821,10 @@ FEFaceEvaluation<dim,
     }
 
 #  ifdef DEBUG
-  if (evaluation_flag & EvaluationFlags::values)
-    this->values_quad_initialized = true;
-  if (evaluation_flag & EvaluationFlags::gradients)
-    this->gradients_quad_initialized = true;
-  if (evaluation_flag & EvaluationFlags::hessians)
-    this->hessians_quad_initialized = true;
+  this->values_quad_initialized = evaluation_flag & EvaluationFlags::values;
+  this->gradients_quad_initialized =
+    evaluation_flag & EvaluationFlags::gradients;
+  this->hessians_quad_initialized = evaluation_flag & EvaluationFlags::hessians;
 #  endif
 }
 
