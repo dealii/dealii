@@ -1,0 +1,10 @@
+
+DEAL::
+DEAL::Test with doubles
+DEAL::
+DEAL:1d::  Verification fe degree 1: 2.89e-16
+DEAL:1d::
+DEAL:2d::  Verification fe degree 1: 1.05e-15
+DEAL:2d::
+DEAL:3d::  Verification fe degree 1: 1.31e-15
+DEAL:3d::

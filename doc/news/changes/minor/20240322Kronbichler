@@ -5,4 +5,4 @@ into the class FEEvaluationBase, using conditional types deduced from
 std::conditional. This should not change any application code, but reduced the
 amount of code by 1,500 lines, thus making the library simpler to maintain.
 <br>
-(Martin Kronbichler, 2024/03/22)
+(Martin Kronbichler, Magdalena Schreter-Fleischhacker, 2024/03/22)
