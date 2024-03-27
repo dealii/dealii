@@ -124,9 +124,11 @@ endif()
 
 if(DEAL_II_WITH_GINKGO)
   set(_unity_include_src
-    ${_unity_include_src}
-    ginkgo_solver.cc
-  )
+      ${_unity_include_src}
+      ginkgo_solver.cc
+      ginkgo_vector.cc
+      ginkgo_sparse_matrix.cc
+      )
 endif()
 
 # Also add Trilinos wrapper files
