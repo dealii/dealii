@@ -334,9 +334,11 @@ jobs:
             numdiff \
             openmpi-bin \
             libboost-all-dev
+    - uses: lukka/get-cmake@v3.28.4
     - name: info
       run: |
         mpicc -v
+        which cmake
         cmake --version
     - uses: actions/checkout@v4
       with:
@@ -428,9 +430,11 @@ jobs:
             numdiff \
             openmpi-bin \
             libboost-all-dev
+    - uses: lukka/get-cmake@v3.28.4
     - name: info
       run: |
         mpicc -v
+        which cmake
         cmake --version
     - uses: actions/checkout@v4
       with:
