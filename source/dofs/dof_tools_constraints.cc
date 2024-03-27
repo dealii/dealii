@@ -22,6 +22,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_nedelec_sz.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -1189,6 +1190,22 @@ namespace DoFTools
       // make_oldstyle_hanging_node_constraints are commented on.
 
       const unsigned int dim = 3;
+
+      {
+        // In order to find all hanging edges in a reasonable
+        // computing time, even when five or more cells share
+        // one edge, we pre-compute the edge-to-cell map.
+        // That map is used internally from FE_NedelecSZ.
+        auto &fe = dof_handler.get_fe();
+
+        for (unsigned int i = 0; i < fe.n_blocks(); ++i)
+          {
+            FE_NedelecSZ<dim> &fe_sz = const_cast<FE_NedelecSZ<dim> &>(
+              dynamic_cast<const FE_NedelecSZ<dim> &>(
+                fe.get_sub_fe(i * dim, dim)));
+            fe_sz.precompute_line_to_cell_map(dof_handler);
+          }
+      }
 
       std::vector<types::global_dof_index> dofs_on_mother;
       std::vector<types::global_dof_index> dofs_on_children;
