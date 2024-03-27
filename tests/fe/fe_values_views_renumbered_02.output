@@ -1,0 +1,9 @@
+
+DEAL::dof_renumbering = -1 0 1 2 3 
+DEAL::quad_renumbering = 0 1 2 3 0 1 2 3 
+DEAL::function_values = 2.32457 2.90192 8.09808 8.67543 
+DEAL::function_values_renumbered = 2.32457 2.90192 8.09808 8.67543 2.32457 2.90192 8.09808 8.67543 
+DEAL::dof_values = 0.00000 1.00000 10.0000 11.0000 
+DEAL::dof_values_renumbered = 42.0000 0.00000 1.00000 10.0000 11.0000 
+DEAL::function_values from dof_values = 2.32457 2.90192 8.09808 8.67543 
+DEAL::function_values_renumbered from dof_values_renumbered = 2.32457 2.90192 8.09808 8.67543 2.32457 2.90192 8.09808 8.67543 
