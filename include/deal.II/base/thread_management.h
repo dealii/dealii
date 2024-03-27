@@ -23,6 +23,8 @@
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <taskflow/taskflow.hpp>
+
 #include <atomic>
 #include <functional>
 #include <future>
@@ -498,7 +500,10 @@ namespace Threads
     {
       if (MultithreadInfo::n_threads() > 1)
         {
-#ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TASKFLOW
+          task_data = std::make_shared<TaskData>(
+            MultithreadInfo::get_taskflow_executor().async(function_object));
+#elif defined(DEAL_II_WITH_TBB)
           // Create a promise object and from it extract a future that
           // we can use to refer to the outcome of the task. For reasons
           // explained below, we can't just create a std::promise object,
