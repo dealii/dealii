@@ -1018,6 +1018,7 @@ void
 TimerOutput::disable_output()
 {
   output_is_enabled = false;
+  out_stream.set_condition(false);
 }
 
 
@@ -1026,6 +1027,7 @@ void
 TimerOutput::enable_output()
 {
   output_is_enabled = true;
+  out_stream.set_condition(true);
 }
 
 void
