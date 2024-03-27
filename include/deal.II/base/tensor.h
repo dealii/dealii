@@ -192,55 +192,6 @@ public:
 #endif
 
   /**
-   * Return a pointer to the first element of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  begin_raw();
-
-  /**
-   * Return a const pointer to the first element of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  begin_raw() const;
-
-  /**
-   * Return a pointer to the element past the end of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  end_raw();
-
-  /**
-   * Return a const pointer to the element past the end of the underlying
-   * storage.
-   *
-   * @deprecated This function suggests that the elements of a Tensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  end_raw() const;
-
-  /**
    * Return a reference to the encapsulated Number object. Since rank-0
    * tensors are scalars, this is a natural operation.
    *
@@ -668,24 +619,28 @@ public:
   /**
    * Return a pointer to the first element of the underlying storage.
    */
+  DEAL_II_DEPRECATED_EARLY
   Number *
   begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
+  DEAL_II_DEPRECATED_EARLY
   const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
+  DEAL_II_DEPRECATED_EARLY
   Number *
   end_raw();
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
+  DEAL_II_DEPRECATED_EARLY
   const Number *
   end_raw() const;
 
@@ -1028,41 +983,6 @@ Tensor<0, dim, Number>::Tensor(Tensor<0, dim, Number> &&other) noexcept
   : value{std::move(other.value)}
 {}
 #  endif
-
-
-template <int dim, typename Number>
-inline Number *
-Tensor<0, dim, Number>::begin_raw()
-{
-  return std::addressof(value);
-}
-
-
-
-template <int dim, typename Number>
-inline const Number *
-Tensor<0, dim, Number>::begin_raw() const
-{
-  return std::addressof(value);
-}
-
-
-
-template <int dim, typename Number>
-inline Number *
-Tensor<0, dim, Number>::end_raw()
-{
-  return begin_raw() + n_independent_components;
-}
-
-
-
-template <int dim, typename Number>
-const Number *
-Tensor<0, dim, Number>::end_raw() const
-{
-  return begin_raw() + n_independent_components;
-}
 
 
 
@@ -1584,6 +1504,11 @@ template <int rank_, int dim, typename Number>
 inline Number *
 Tensor<rank_, dim, Number>::begin_raw()
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return std::addressof(
     this->operator[](this->unrolled_to_component_indices(0)));
 }
@@ -1594,6 +1519,11 @@ template <int rank_, int dim, typename Number>
 inline const Number *
 Tensor<rank_, dim, Number>::begin_raw() const
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return std::addressof(
     this->operator[](this->unrolled_to_component_indices(0)));
 }
@@ -1604,6 +1534,11 @@ template <int rank_, int dim, typename Number>
 inline Number *
 Tensor<rank_, dim, Number>::end_raw()
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return begin_raw() + n_independent_components;
 }
 
@@ -1613,6 +1548,11 @@ template <int rank_, int dim, typename Number>
 inline const Number *
 Tensor<rank_, dim, Number>::end_raw() const
 {
+  static_assert(rank_ == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return begin_raw() + n_independent_components;
 }
 

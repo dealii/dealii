@@ -593,6 +593,8 @@ namespace GridTools
     }
   } // namespace internal
 
+
+
   template <typename Iterator>
   Point<Iterator::AccessorType::space_dimension>
   project_to_object(

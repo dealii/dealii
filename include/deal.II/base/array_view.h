@@ -1055,6 +1055,11 @@ template <int rank, int dim, typename Number>
 DEAL_II_DEPRECATED inline ArrayView<const Number>
 make_array_view(const Tensor<rank, dim, Number> &tensor)
 {
+  static_assert(rank == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
 }
 
@@ -1085,6 +1090,11 @@ template <int rank, int dim, typename Number>
 DEAL_II_DEPRECATED inline ArrayView<Number>
 make_array_view(Tensor<rank, dim, Number> &tensor)
 {
+  static_assert(rank == 1,
+                "This function is only available for rank-1 tensors "
+                "because higher-rank tensors may not store their elements "
+                "in a contiguous array.");
+
   return make_array_view(tensor.begin_raw(), tensor.end_raw());
 }
 
