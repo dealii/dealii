@@ -1,22 +1,24 @@
-/* ------------------------------------------------------------------------
+/* ---------------------------------------------------------------------
  *
- * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2021 - 2024 by the deal.II authors
+ * Copyright (C) 2020 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
- * Part of the source code is dual licensed under Apache-2.0 WITH
- * LLVM-exception OR LGPL-2.1-or-later. Detailed license information
- * governing the source code and code contributions can be found in
- * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+ * The deal.II library is free software; you can use it, redistribute
+ * it, and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * The full text of the license can be found in the file LICENSE at
+ * the top level of the deal.II distribution.
  *
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
 
  * Author:
  *         Timo Heister, Clemson University
  */
 
-// test FEInterfaceValues for a DG Stokes problem.
+// test FEInterfaceValues for a DG Stokes problem n a
+// simplex mesh.
 
 #include <deal.II/base/flow_function.h>
 #include <deal.II/base/function.h>
@@ -30,13 +32,16 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_dg_vector.h>
+#include <deal.II/fe/fe_bdm.h>
+#include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_fe.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
@@ -69,8 +74,11 @@
 
 #include "../tests.h"
 
+#define USE_SIMPLEX
+
 namespace StokesTests
 {
+  using namespace dealii;
 
   struct CopyDataFace
   {
@@ -108,10 +116,10 @@ namespace StokesTests
 
   template <class MatrixType, class VectorType>
   inline void
-  copy(const CopyData                  &c,
+  copy(const CopyData &                 c,
        const AffineConstraints<double> &constraints,
-       MatrixType                      &system_matrix,
-       VectorType                      &system_rhs)
+       MatrixType &                     system_matrix,
+       VectorType &                     system_rhs)
   {
     constraints.distribute_local_to_global(c.cell_matrix,
                                            c.cell_rhs,
@@ -157,8 +165,8 @@ namespace StokesTests
   Solution<2>::value(const Point<2> &p, const unsigned int component) const
   {
     using numbers::PI;
-    const double x = p[0];
-    const double y = p[1];
+    const double x = p(0);
+    const double y = p(1);
     // zero on BD's
     if (component == 0)
       return PI * sin(PI * x) * sin(PI * x) * sin(2.0 * PI * y);
@@ -177,9 +185,9 @@ namespace StokesTests
     Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p[0];
-    const double y = p[1];
-    const double z = p[2];
+    const double x = p(0);
+    const double y = p(1);
+    const double z = p(2);
 
     if (component == 0)
       return 2. * PI * sin(PI * x) * sin(PI * x) * sin(2.0 * PI * y) *
@@ -204,8 +212,8 @@ namespace StokesTests
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    const double x = p[0];
-    const double y = p[1];
+    const double x = p(0);
+    const double y = p(1);
 
     Tensor<1, 2> return_value;
     if (component == 0)
@@ -236,9 +244,9 @@ namespace StokesTests
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p[0];
-    const double y = p[1];
-    const double z = p[2];
+    const double x = p(0);
+    const double y = p(1);
+    const double z = p(2);
 
     Tensor<1, 3> return_value;
     if (component == 0)
@@ -300,8 +308,8 @@ namespace StokesTests
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    double x  = p[0];
-    double y  = p[1];
+    double x  = p(0);
+    double y  = p(1);
     double nu = 1.0;
 
     // RHS for 0 BD's
@@ -327,9 +335,9 @@ namespace StokesTests
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    double x = p[0];
-    double y = p[1];
-    double z = p[2];
+    double x = p(0);
+    double y = p(1);
+    double z = p(2);
 
     if (component == 0)
       return 4. * PI * PI * PI *
@@ -361,7 +369,7 @@ namespace StokesTests
   class StokesProblem
   {
   public:
-    StokesProblem(FiniteElement<dim> &fe, const unsigned int velocity_degree);
+    StokesProblem(FiniteElement<dim> &fe, const unsigned int pressure_degree);
     void
     run();
 
@@ -375,7 +383,21 @@ namespace StokesTests
     void
     compute_errors(unsigned int k);
 
-    const unsigned int velocity_degree;
+    const unsigned int pressure_degree;
+
+#ifdef USE_SIMPLEX
+    const QGaussSimplex<dim>     quadrature;
+    const QGaussSimplex<dim - 1> face_quadrature;
+    const QGaussSimplex<dim>     quadrature_2;
+    const QGaussSimplex<dim - 1> face_quadrature_2;
+    const MappingFE<dim>         mapping;
+#else
+    const QGauss<dim>     quadrature;
+    const QGauss<dim - 1> face_quadrature;
+    const QGauss<dim>     quadrature_2;
+    const QGauss<dim - 1> face_quadrature_2;
+    const MappingQ1<dim>  mapping;
+#endif
 
     Triangulation<dim>  triangulation;
     FiniteElement<dim> &fe;
@@ -400,9 +422,17 @@ namespace StokesTests
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(FiniteElement<dim> &fe,
-                                    const unsigned int  velocity_degree)
-    : velocity_degree(velocity_degree)
-    , triangulation(Triangulation<dim>::maximum_smoothing)
+                                    const unsigned int  pressure_degree)
+    : pressure_degree(pressure_degree)
+    , quadrature(pressure_degree + 1)
+    , face_quadrature(pressure_degree + 1)
+    , quadrature_2(pressure_degree + 2)
+    , face_quadrature_2(pressure_degree + 2)
+#ifdef USE_SIMPLEX
+    , mapping(FE_SimplexP<dim>(1))
+#else
+    , mapping()
+#endif
     , fe(fe)
     , dof_handler(triangulation)
   {}
@@ -456,14 +486,11 @@ namespace StokesTests
     {
       constraints.reinit();
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-      ComponentMask velocity_mask(dim + 1, false);
-      if (fe.is_primitive())
-        for (unsigned int d = 0; d < dim; ++d)
-          {
-            velocity_mask.set(d, true);
-          }
-      VectorTools::interpolate_boundary_values(
-        dof_handler, 0, Solution<dim>(), constraints, velocity_mask);
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               0,
+                                               Solution<dim>(),
+                                               constraints,
+                                               fe.component_mask(velocities));
       constraints.close();
     }
 
@@ -502,9 +529,9 @@ namespace StokesTests
              (1.0 / extent1 + 1.0 / extent2);
     };
 
-    auto cell_worker = [&](const Iterator               &cell,
+    auto cell_worker = [&](const Iterator &              cell,
                            MeshWorker::ScratchData<dim> &scratch_data,
-                           CopyData                     &copy_data) {
+                           CopyData &                    copy_data) {
       const FEValues<dim> &fe_v = scratch_data.reinit(cell);
 
       const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
@@ -550,15 +577,15 @@ namespace StokesTests
         }
     };
 
-    auto boundary_worker = [&](const Iterator               &cell,
-                               const unsigned int           &face_no,
+    auto boundary_worker = [&](const Iterator &              cell,
+                               const unsigned int &          face_no,
                                MeshWorker::ScratchData<dim> &scratch_data,
-                               CopyData                     &copy_data) {
+                               CopyData &                    copy_data) {
       const FEFaceValuesBase<dim> &fe_fv = scratch_data.reinit(cell, face_no);
 
       const auto &q_points = fe_fv.get_quadrature_points();
 
-      const std::vector<double>         &JxW     = fe_fv.get_JxW_values();
+      const std::vector<double> &        JxW     = fe_fv.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_fv.get_normal_vectors();
 
       std::vector<Vector<double>> g_values(q_points.size(),
@@ -568,8 +595,7 @@ namespace StokesTests
 
       const double degree =
         std::max(1.0, static_cast<double>(fe_fv.get_fe().degree));
-      const double extent1 = cell->extent_in_direction(
-        GeometryInfo<dim>::unit_normal_direction[face_no]);
+      const double extent1 = cell->measure() / cell->face(face_no)->measure();
       const double penalty = penalty_parameter(degree, extent1, extent1);
 
       for (unsigned int point = 0; point < q_points.size(); ++point)
@@ -628,14 +654,14 @@ namespace StokesTests
         }
     };
 
-    auto face_worker = [&](const Iterator               &cell,
-                           const unsigned int           &f,
-                           const unsigned int           &sf,
-                           const Iterator               &ncell,
-                           const unsigned int           &nf,
-                           const unsigned int           &nsf,
+    auto face_worker = [&](const Iterator &              cell,
+                           const unsigned int &          f,
+                           const unsigned int &          sf,
+                           const Iterator &              ncell,
+                           const unsigned int &          nf,
+                           const unsigned int &          nsf,
                            MeshWorker::ScratchData<dim> &scratch_data,
-                           CopyData                     &copy_data) {
+                           CopyData &                    copy_data) {
       const FEInterfaceValues<dim> &fe_fv =
         scratch_data.reinit(cell, f, sf, ncell, nf, nsf);
       FEInterfaceViews::Scalar<dim> interface_scalar(fe_fv, pressure.component);
@@ -643,13 +669,13 @@ namespace StokesTests
         fe_fv, velocities.first_vector_component);
 
       copy_data.face_data.emplace_back();
-      CopyDataFace      &copy_data_face = copy_data.face_data.back();
+      CopyDataFace &     copy_data_face = copy_data.face_data.back();
       const unsigned int dofs_per_cell  = fe_fv.n_current_interface_dofs();
 
       copy_data_face.joint_dof_indices = fe_fv.get_interface_dof_indices();
       copy_data_face.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 
-      const std::vector<double>         &JxW     = fe_fv.get_JxW_values();
+      const std::vector<double> &        JxW     = fe_fv.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_fv.get_normal_vectors();
       const auto &q_points = fe_fv.get_quadrature_points();
 
@@ -668,28 +694,28 @@ namespace StokesTests
                 (
                   // - nu {\nabla u}n . [v] (consistency)
                   -nu *
-                    (fe_fv[velocities].average_of_gradients(j, point) *
+                    (fe_fv[velocities].average_gradient(j, point) *
                      normals[point]) *
-                    fe_fv[velocities].jump_in_values(i, point)
+                    fe_fv[velocities].jump(i, point)
 
                   // - nu [u] . {\nabla v}n  (symmetry) // NIPG: use +
-                  - nu * fe_fv[velocities].jump_in_values(j, point) *
-                      (fe_fv[velocities].average_of_gradients(i, point) *
+                  - nu * fe_fv[velocities].jump(j, point) *
+                      (fe_fv[velocities].average_gradient(i, point) *
                        normals[point])
 
                   // nu sigma [u].[v] (penalty)
                   + nu * penalty *
-                      scalar_product(fe_fv[velocities].jump_in_values(j, point),
-                                     fe_fv[velocities].jump_in_values(i, point))
+                      scalar_product(fe_fv[velocities].jump(j, point),
+                                     fe_fv[velocities].jump(i, point))
 
                   // {p} ([v].n)
-                  + fe_fv[pressure].average_of_values(j, point) *
-                      scalar_product(fe_fv[velocities].jump_in_values(i, point),
+                  + fe_fv[pressure].average(j, point) *
+                      scalar_product(fe_fv[velocities].jump(i, point),
                                      normals[point])
 
                   // {q} ([u].n)
-                  + fe_fv[pressure].average_of_values(i, point) *
-                      scalar_product(fe_fv[velocities].jump_in_values(j, point),
+                  + fe_fv[pressure].average(i, point) *
+                      scalar_product(fe_fv[velocities].jump(j, point),
                                      normals[point])) *
                 JxW[point];
         }
@@ -699,17 +725,13 @@ namespace StokesTests
       copy(c, constraints, system_matrix, system_rhs);
     };
 
-    const unsigned int n_gauss_points = velocity_degree + 1;
-    const UpdateFlags  cell_flags     = update_values | update_gradients |
+    const UpdateFlags cell_flags = update_values | update_gradients |
                                    update_quadrature_points | update_JxW_values;
     const UpdateFlags face_flags = update_values | update_gradients |
                                    update_quadrature_points |
                                    update_normal_vectors | update_JxW_values;
 
-    const QGauss<dim>     quadrature(n_gauss_points);
-    const QGauss<dim - 1> face_quadrature(n_gauss_points);
 
-    static MappingQ1<dim>        mapping;
     MeshWorker::ScratchData<dim> scratch_data(
       mapping, fe, quadrature, cell_flags, face_quadrature, face_flags);
     CopyData cd;
@@ -759,31 +781,34 @@ namespace StokesTests
     const ComponentSelectFunction<dim> pressure_mask(dim, 1.0, dim + 1);
 
     Vector<float> difference_per_cell(triangulation.n_active_cells());
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 1),
+                                      quadrature_2,
                                       VectorTools::L2_norm,
                                       &velocity_mask);
 
     const double Velocity_L2_error = difference_per_cell.l2_norm();
 
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 1),
+                                      quadrature_2,
                                       VectorTools::H1_norm,
                                       &velocity_mask);
 
     const double Velocity_H1_error = difference_per_cell.l2_norm();
 
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Functions::ZeroFunction<dim>(dim + 1),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 1),
+                                      quadrature_2,
                                       VectorTools::Hdiv_seminorm,
                                       &velocity_mask);
 
@@ -791,15 +816,16 @@ namespace StokesTests
 
     static double last_Pressure_L2_error = 0;
 
-    const double mean_pressure = VectorTools::compute_mean_value(
-      dof_handler, QGauss<dim>(velocity_degree + 1), solution, dim);
+    const double mean_pressure =
+      VectorTools::compute_mean_value(dof_handler, quadrature_2, solution, dim);
     solution.block(1).add(-mean_pressure);
 
-    VectorTools::integrate_difference(dof_handler,
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(velocity_degree + 1),
+                                      quadrature_2,
                                       VectorTools::L2_norm,
                                       &pressure_mask);
     const double Pressure_L2_error =
@@ -840,7 +866,13 @@ namespace StokesTests
   void
   StokesProblem<dim>::run()
   {
+#ifdef USE_SIMPLEX
+    Triangulation<dim> temp;
+    GridGenerator::hyper_cube(temp);
+    GridGenerator::convert_hypercube_to_simplex_mesh(temp, triangulation);
+#else
     GridGenerator::hyper_cube(triangulation);
+#endif
 
     triangulation.refine_global(1);
 
@@ -854,8 +886,6 @@ namespace StokesTests
 
         setup_dofs();
 
-        int assemble_type = 2;
-
         assemble_system_mesh_loop();
 
         solve();
@@ -866,24 +896,22 @@ namespace StokesTests
 } // namespace StokesTests
 
 
-
 template <int dim>
 void
-test_stokes(FiniteElement<dim> &fe, const unsigned int velocity_degree)
+test_stokes(FiniteElement<dim> &fe, const unsigned int pressure_degree)
 {
   deallog << fe.get_name() << ": degree=" << fe.degree
           << " tensor_degree=" << fe.tensor_degree() << std::endl;
-  StokesTests::StokesProblem<dim> flow_problem(fe, velocity_degree);
+  StokesTests::StokesProblem<dim> flow_problem(fe, pressure_degree);
   flow_problem.run();
 }
-
-
 
 int
 main()
 {
   try
     {
+      using namespace dealii;
       using namespace StokesTests;
       const int dim = 2;
 
@@ -894,30 +922,23 @@ main()
 
       Assert(degree >= 1, ExcMessage("invalid degree!"));
       {
+#ifdef USE_SIMPLEX
+        fe = std::make_unique<FESystem<dim>>(
+          FESystem<dim>(FE_SimplexDGP<dim>(degree), dim),
+          1,
+          FE_SimplexDGP<dim>(degree - 1),
+          1);
+#else
         fe = std::make_unique<FESystem<dim>>(FESystem<dim>(FE_DGQ<dim>(degree),
                                                            dim),
                                              1,
                                              FE_DGQ<dim>(degree - 1),
                                              1);
-
-        test_stokes(*fe, degree);
-      }
-      {
-        fe = std::make_unique<FESystem<dim>>(FE_RaviartThomas<dim>(degree),
-                                             1,
-                                             FE_DGQ<dim>(degree),
-                                             1);
-        test_stokes(*fe, degree);
-      }
-      {
-        fe = std::make_unique<FESystem<dim>>(FE_DGNedelec<dim>(degree),
-                                             1,
-                                             FE_DGQ<dim>(degree - 1),
-                                             1);
+#endif
         test_stokes(*fe, degree);
       }
     }
-  catch (const std::exception &exc)
+  catch (std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl
