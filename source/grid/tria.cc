@@ -21,6 +21,8 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/distributed/tria.h>
+
 #include <deal.II/grid/connectivity.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/magic_numbers.h>
@@ -16718,8 +16720,32 @@ namespace
     const bool allow_anisotropic_smoothing)
   {
     Assert(cell->is_active(), ExcInternalError());
-    Assert(cell->refine_flag_set() == false, ExcInternalError());
 
+#ifdef DEBUG
+    // If this is not a parallel::distributed::Triangulation, then we really
+    // should only get here if the cell is marked for refinement:
+    if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                       *>(&cell->get_triangulation()) == nullptr)
+      Assert(cell->refine_flag_set() == false, ExcInternalError());
+    else
+      // But if this is a p::d::Triangulation, then we don't have that
+      // much control and we can get here because mesh smoothing is
+      // requested but can not be honored because p4est controls
+      // what gets refined. In that case, we can at least provide
+      // a better error message.
+      Assert(cell->refine_flag_set() == false,
+             ExcMessage(
+               "The triangulation is trying to avoid unrefined islands "
+               "during mesh refinement/coarsening, as you had requested "
+               " by passing the appropriate 'smoothing flags' to the "
+               "constructor of the triangulation. However, for objects "
+               "of type parallel::distributed::Triangulation, control "
+               "over which cells get refined rests with p4est, not the "
+               "deal.II triangulation, and consequently it is not "
+               "always possible to avoid unrefined islands in the mesh. "
+               "Please remove the constructor argument to the triangulation "
+               "object that requests mesh smoothing."));
+#endif
 
     // now we provide two algorithms. the first one is the standard
     // one, coming from the time, where only isotropic refinement was
