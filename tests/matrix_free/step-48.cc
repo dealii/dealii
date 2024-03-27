@@ -329,6 +329,7 @@ namespace Step48
                                       norm_per_cell,
                                       QGauss<dim>(fe_degree + 1),
                                       VectorTools::L2_norm);
+    solution.zero_out_ghost_values();
     const double solution_norm =
       std::sqrt(Utilities::MPI::sum(norm_per_cell.norm_sqr(), MPI_COMM_WORLD));
 

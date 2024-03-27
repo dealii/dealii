@@ -3409,7 +3409,10 @@ namespace internal
              ExcNotImplemented());
 
       if (ghosts_set)
-        ghosts_were_set = true;
+        {
+          ghosts_were_set = true;
+          return;
+        }
 
       vec.update_ghost_values();
     }
@@ -3437,7 +3440,10 @@ namespace internal
              ExcNotImplemented());
 
       if (ghosts_set)
-        ghosts_were_set = true;
+        {
+          ghosts_were_set = true;
+          return;
+        }
 
       vec.update_ghost_values_start(component_in_block_vector + channel_shift);
     }
@@ -3468,7 +3474,10 @@ namespace internal
              ExcNotImplemented());
 
       if (ghosts_set)
-        ghosts_were_set = true;
+        {
+          ghosts_were_set = true;
+          return;
+        }
 
       if (vec.size() != 0)
         {
@@ -3532,6 +3541,10 @@ namespace internal
                                const VectorType  &vec)
     {
       (void)component_in_block_vector;
+
+      if (ghosts_were_set)
+        return;
+
       vec.update_ghost_values_finish();
     }
 
@@ -3554,6 +3567,9 @@ namespace internal
       static_assert(std::is_same_v<Number, typename VectorType::value_type>,
                     "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
+
+      if (ghosts_were_set)
+        return;
 
       if (vec.size() != 0)
         {
@@ -4078,7 +4094,10 @@ namespace internal
                ExcNotImplemented());
 
         if (ghosts_set)
-          exchanger.ghosts_were_set = true;
+          {
+            exchanger.ghosts_were_set = true;
+            return;
+          }
 
         vec.update_ghost_values();
       }
@@ -4449,6 +4468,10 @@ namespace internal
     const VectorStruct                                   &vec,
     VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
   {
+    // return immediately if there is nothing to do.
+    if (exchanger.ghosts_were_set == true)
+      return;
+
     exchanger.reset_ghost_values(vec);
   }
 
