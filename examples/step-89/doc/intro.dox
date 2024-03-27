@@ -1,0 +1,221 @@
+<br>
+
+<i>
+This program was contributed by Johannes Heinz, Maximilian Bergbauer, Marco Feder, and Peter Munch.
+Many ideas presented here are the result of common code development with
+Niklas Fehn, Luca Heltai, Martin Kronbichler,
+and Magdalena Schreter-Fleischhacker.
+
+This tutorial is loosely based on the publication
+"High-order non-conforming discontinuous Galerkin methods for the acoustic conservation equations"
+by Johannes Heinz, Peter Munch and Manfred Kaltenbacher @cite heinz2022high.
+
+Johannes Heinz was supported by the European Union’s Framework Programme for Research
+and Innovation Horizon 2020 (2014-2020) under the Marie Skłodowská--Curie Grant
+Agreement No. [812719].
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.10033975,https://zenodo.org/badge/DOI/10.5281/zenodo.10033975.svg}
+
+<h1>Introduction</h1>
+
+This tutorial presents one way how to apply non-matching and/or Chimera methods
+within matrix-free loops in deal.II.
+We are following @cite heinz2022high to show that in some cases a simple point-to-point
+interpolation is not sufficient. As a remedy, Nitsche-type mortaring is used to suppress
+artificial modes observed for the acoustic conservation equations @cite heinz2022high.
+
+<h3>%Acoustic conservation equations</h3>
+
+Acoustic conservation equations are used to describe linear wave propagation.
+The set of equations consists of the conservation of mass and momentum
+@f[
+  \frac{\partial \, p}{\partial \, t} + \rho c^2 \nabla\cdot \mathbf{u} = 0,\\
+  \frac{\partial \, \mathbf{u}}{\partial \, t} + \frac{1}{\rho}\nabla p = \mathbf{0}.
+@f]
+Here, $p$ is the acoustic pressure, $\mathbf{u}$ the acoustic particle velocity, $c$ the
+speed of sound, and $\rho$ the mean density of the fluid in which waves are propagating.
+For the discretization we make use of discontinuous Galerkin (DG) methods. DG methods are
+especially attractive for the acoustic conservation equations due to their low numerical
+dispersion errors. More importantly for this tutorial, DG methods natively extend to non-matching
+Nitsche-type methods @cite arnold2002unified. I.e., numerical fluxes are not only used on inner
+element faces but also as non-matching coupling conditions.
+
+The discretized equations read
+@f[
+  \int_{\Omega} q_h\frac{\partial \, p_h}{\partial \, t} +\int_{\Omega} q_h \rho c^2 \nabla\cdot\mathbf{u}_h +\int_{\partial\Omega} q_h\mathbf{n}\cdot\rho c^2(\mathbf{u}^*_h-\mathbf{u}_h)=0,\\
+  \int_{\Omega} \mathbf{w}_h\cdot\frac{\partial \,\mathbf{u}_h}{\partial \, t} +\int_{\Omega} \mathbf{w}_h\cdot \frac{1}{\rho} \nabla p_h +\int_{\partial\Omega} \mathbf{w}_h \cdot\mathbf{n} \frac{1}{\rho}(p^*_h-p_h)=\mathbf{0},
+@f]
+where $\mathbf{w}_h$ and $q_h$ are test functions. The numerical fluxes are
+defined as follows @cite hochbruck2014efficient
+@f[
+  p_h^*=p_h-\frac{\tau^-}{\tau^-+\tau^+}[p_h]+\frac{\tau^-\tau^+}{\tau^-+\tau^+}\jump{\mathbf{u}_h},\\
+  \mathbf{u}_h^*=\mathbf{u}_h-\frac{\gamma^-}{\gamma^-+\gamma^+}[\mathbf{u}_h]+\frac{\gamma^-\gamma^+}{\gamma^-+\gamma^+}\jump{p_h},
+@f]
+with the penalty parameters $\tau=\frac{\rho c}{2}$ and $\gamma=\frac{1}{2\rho c}$.
+$[a] = a^- - a^+ $ denotes the jump of an arbitrary quantity $a$
+over element faces (face between elements $K^-$ and $K^+$) and
+$\jump{a} = a^- \mathbf{n}^- + a^+ \mathbf{n}^+$.
+For homogeneous materials, the fluxes reduce to standard Lax--Friedrichs fluxes
+($\gamma^-=\gamma^+$ and $\tau^-=\tau^+$)
+@f[
+  p_h^*=\average{p_h}+\tau\jump{\mathbf{u}_h},\\
+  \mathbf{u}_h^*=\average{\mathbf{u}_h}+\gamma\jump{p_h}.
+@f]
+$\average{a}=\frac{a^- + a^+}{2}$ denots the averaging operator.
+
+<h3>%Non-matching discretizations</h3>
+
+Non-matching discretizations can be used to connect mesh regions with different element sizes
+without the need for a transition region. Therefore, they are highly desirable in multiphysics
+applications. One example is a plate that radiates sound. The plate needs a much finer
+discretization than the surrounding air. In purely acoustic simulations, different materials
+require different element sizes to resolve the same wave because the speed of sound is directly
+proportional to the wavelength (we will simulate this example later on).
+
+Considering sliding rotating interfaces @cite duerrwaechter2021an also requires the ability to
+handle non-matching discretizations: A cylindrical mesh is embedded in a surrounding mesh with a
+cylindrical hole. Every time step, the cylinder rotates while the outer mesh remains at the
+same position. In this situation it is hardly possible to construct a conforming mesh in every
+time step.
+
+Besides this, non-matching methods can be extended to Chimera methods (elements overlap).
+Chimera methods can help to reduce the pressure on mesh generation tools since different regions
+of a mesh (that may overlap) can be considered independently.
+
+Different methods exist to treat non-matching interfaces. Within this tutorial, we concentrate on
+two methods: Point-to-point interpolation and Nitsche-type mortaring.
+
+<h4>%Point-to-point interpolation</h4>
+
+@image html https://www.dealii.org/images/steps/developer/step_89_intro_point_to_point.svg "" width=25%
+
+Point-to-point interpolation is a naive approach. The points in which values/gradients are
+queried in the coupling terms are defined by the quadrature points on the element face of
+element $K^-$. As it can be seen from the picture this approach might be subject to aliasing
+in some cases. In the picture, information from element $K_1^+$ is completely neglected.
+
+<h4>%Nitsche-type mortaring</h4>
+
+@image html https://www.dealii.org/images/steps/developer/step_89_intro_mortaring.svg "" width=25%
+
+Mortaring is the process of computing intersections and is not related to the Mortar method which
+enforces the coupling via Lagrange multipliers. Obtained intersections are also referred to as
+mortars. On each mortar a new integration rule is defined. The integral of the face of element
+$K^-$ is computed on the intersections. This way, the numerical integration is exact as long
+as a sufficient number of integration points is used.
+In this tutorial, the intersections are computed using `CGAL`. Therefore, `deal.II` has
+to be configured with `DEAL_II_WITH_CGAL` for the Nitsche-type mortaring implementation.
+
+<h3>%FERemoteEvaluation</h3>
+
+FERemoteEvaluation is a wrapper class which provides a similar interface to, e.g., FEEvaluation to
+access values over non-matching interfaces in matrix-free loops. A detailed description on how to setup
+the class and how to use it in actual code is given below on hands-on examples. Within this tutorial we only
+show the usage for non-matching discretizations. Note however, that FERemoteEvaluation can also be used in
+other settings such as volume coupling. Under the hood, Utilities::MPI::RemotePointEvaluation is used to query
+the solution or gradients at quadrature points. A detailed description how this is done can be found in step-87.
+The main difference in the usage of FERemoteEvaluation compared to FEEvaluation is that the interpolated
+values/gradients of the finite element solution at all the quadrature points are precomputed globally <i>before</i>
+the loop that passes through the cells/faces of the mesh (i.e., near the place where the communication takes place)
+instead of performing the interpolation out of the vector on a cell-by-cell basis.
+
+The standard code to evaluate fluxes via FEEvaluation reads:
+@code
+const auto face_function =
+  [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+
+    FEFaceEvaluation phi_m(data, true);
+    FEFaceEvaluation phi_p(data, false);
+
+    for (unsigned int f = face_range.first; f < face_range.second; ++f)
+    {
+      phi_m.reinit(f);
+      phi_p.reinit(f);
+
+      phi_p.gather_evaluate(src, EvaluationFlags::values); //compute values on face f
+
+      for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+        phi_m.submit_value(phi_p.get_value(q), q); //access values with phi_p
+
+      phi_m.integrate_scatter(EvaluationFlags::values, dst);
+     }
+   };
+
+matrix_free.template loop<VectorType, VectorType>({}, face_function, {}, dst, src);
+@endcode
+
+The code to evaluate fluxes via FERemoteEvaluation is shown below.
+For brevity, we assume all boundary faces are somehow connected via non-conforming interfaces for FERemoteEvaluation.
+
+@code
+// Initialize FERemoteEvaluation: Note, that FERemoteEvaluation internally manages
+// the memory to store precomputed values. Therefore, FERemoteEvaluation
+// should be initialized only once to avoid continuous memory
+// allocation/deallocation. At this point, remote_communicator is assumed
+// to be initialized.
+FERemoteEvaluation<dim,Number> phi_p_evaluator(remote_communicator);
+
+// Precompute the interpolated values of the finite element solution at all
+// the quadrature points outside the loop, invoking the vector entries and
+// respective basis function at possibly remote MPI processes before communication.
+phi_p_evaluator.gather_evaluate(src, EvaluationFlags::values);
+
+const auto boundary_function =
+  [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+
+    FEFaceEvaluation phi_m(data, true);
+    // To access the values in a thread safe way each thread has
+    // to create a own accessor object. A small helper function
+    // provides the accessor.
+    auto phi_p = phi_p_evaluator.get_data_accessor();
+
+    for (unsigned int f = face_range.first; f < face_range.second; ++f)
+    {
+      phi_m.reinit(f);
+      phi_p.reinit(f);
+
+      for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+        phi_m.submit_value(phi_p.get_value(q), q); //access values with phi_p
+
+      phi_m.integrate_scatter(EvaluationFlags::values, dst);
+    }
+  };
+
+matrix_free.template loop<VectorType, VectorType>({}, {}, boundary_function, dst, src);
+@endcode
+The object @c remote_communicator is of type FERemoteCommunicator and assumed to be correctly initialized in above code snippet.
+FERemoteCommunicator internally manages the update of ghost values over non-matching interfaces and keeps track of the
+mapping between quadrature point index and corresponding values/gradients. The update of the values/gradients happens
+<i>before</i> the actual matrix-free loop. FERemoteCommunicator, as well as FERemoteEvaluation behaves differently for
+the given template parameter @c value_type. If we want to access values at arbitrary points (e.g. in combination with
+@c FEPointEvaluation) @c value_type=Number. If the values are defined at quadrature points of a @c FEEvaluation object
+it is possible to get the values at the quadrature points of <i>batches</i> and @c value_type=VectorizedArray<Number>.
+
+<h3>Overview</h3>
+
+In the following, point-to-point interpolation and Nitsche-type mortaring is implemented.
+
+At first we are considering the test case of a vibrating membrane, see e.g. @cite nguyen2011high.
+Standing waves of length $\lambda=2/M$ are oscillating with a period duration of
+$T=2 / (M \sqrt{dim} c)$. $M$ is the number of modes per meter, i.e. the number of half-waves
+per meter. The corresponding analytical solution reads as
+
+@f[
+  p =\cos(M \sqrt{d} \pi c t)\prod_{i=1}^{d} \sin(M \pi x_i),\\
+  u_i=-\frac{\sin(M \sqrt{d} \pi c t)}{\sqrt{d}\rho c} \cos(M \pi x_i)\prod_{j=1,j\neq i}^{d} \sin(M \pi x_j),
+@f]
+
+For simplicity, we are using homogeneous pressure Dirichlet boundary conditions within this tutorial.
+To be able to do so we have to tailor the domain size as well as the number of modes to conform with
+the homogeneous pressure Dirichlet boundary conditions. Within this tutorial we are using $M=10$ and
+a domain that spans from $(0,0)$ to $(1,1)$.
+
+For the point-to-point interpolation we observe aliasing which can be resolved using Nitsche-type mortaring.
+
+In a more realistic example, we effectively apply the implementations to a test case in which a wave
+is propagating from one fluid into another fluid. The speed of sound in the left part of the domain
+the speed of sound is $c=1$ and in the right part it is $c=3$. Since the wavelength is directly proportional
+to the speed of sound, three times larger elements can be used in the right part of the domain to resolve waves
+up to the same frequency. The test case has been simulated with a different domain and different initial
+conditions, e.g. in @cite bangerth2010adaptive.
