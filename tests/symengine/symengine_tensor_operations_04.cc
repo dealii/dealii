@@ -102,11 +102,20 @@ test_tensor()
   using Tensor_SD_number_t = Tensor<rank, dim, SD_number_t>;
   using Tensor_t           = Tensor<rank, dim, double>;
 
+  // Fill two tensors with ones and twos, respectively.
   Tensor_t t_a, t_b;
-  for (auto it = t_a.begin_raw(); it != t_a.end_raw(); ++it)
-    *it = 1.0;
-  for (auto it = t_b.begin_raw(); it != t_b.end_raw(); ++it)
-    *it = 2.0;
+  if constexpr (rank > 0)
+    {
+      for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+        t_a[Tensor_t::unrolled_to_component_indices(i)] = 1.0;
+      for (unsigned int i = 0; i < Tensor_t::n_independent_components; ++i)
+        t_b[Tensor_t::unrolled_to_component_indices(i)] = 2.0;
+    }
+  else
+    {
+      t_a = 1.0;
+      t_b = 2.0;
+    }
 
   const Tensor_SD_number_t symb_t_a =
     SD::make_tensor_of_symbols<rank, dim>("a");
