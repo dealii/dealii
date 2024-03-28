@@ -541,7 +541,17 @@ public:
 
   /**
    * Number of independent components of a tensor of current rank. This is dim
-   * times the number of independent components of each sub-tensor.
+   * times the number of independent components of each sub-tensor, which
+   * equates to `dim^rank`.
+   *
+   * This number can be used to loop over all of the entries of a tensor,
+   * using the unrolled_to_component_indices() function:
+   * @code
+   *   // Fill a tensor of arbitrary rank with ones:
+   *   Tensor<rank,dim> t;
+   *   for (unsigned int i=0; i<Tensor<rank,dim>::n_independent_components; ++i)
+   *     t[Tensor<rank,dim>::unrolled_to_component_indices(i)] = 1.0;
+   * @endcode
    */
   static constexpr unsigned int n_independent_components =
     Tensor<rank_ - 1, dim>::n_independent_components * dim;
