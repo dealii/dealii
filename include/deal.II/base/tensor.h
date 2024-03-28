@@ -2887,34 +2887,29 @@ constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 2, Number>
   return return_tensor;
 }
 
-
 template <typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
                                        invert(const Tensor<2, 3, Number> &t)
 {
   Tensor<2, 3, Number> return_tensor;
 
-  return_tensor[0][0] = internal::NumberType<Number>::value(t[1][1] * t[2][2]) -
-                        internal::NumberType<Number>::value(t[1][2] * t[2][1]);
-  return_tensor[0][1] = internal::NumberType<Number>::value(t[0][2] * t[2][1]) -
-                        internal::NumberType<Number>::value(t[0][1] * t[2][2]);
-  return_tensor[0][2] = internal::NumberType<Number>::value(t[0][1] * t[1][2]) -
-                        internal::NumberType<Number>::value(t[0][2] * t[1][1]);
-  return_tensor[1][0] = internal::NumberType<Number>::value(t[1][2] * t[2][0]) -
-                        internal::NumberType<Number>::value(t[1][0] * t[2][2]);
-  return_tensor[1][1] = internal::NumberType<Number>::value(t[0][0] * t[2][2]) -
-                        internal::NumberType<Number>::value(t[0][2] * t[2][0]);
-  return_tensor[1][2] = internal::NumberType<Number>::value(t[0][2] * t[1][0]) -
-                        internal::NumberType<Number>::value(t[0][0] * t[1][2]);
-  return_tensor[2][0] = internal::NumberType<Number>::value(t[1][0] * t[2][1]) -
-                        internal::NumberType<Number>::value(t[1][1] * t[2][0]);
-  return_tensor[2][1] = internal::NumberType<Number>::value(t[0][1] * t[2][0]) -
-                        internal::NumberType<Number>::value(t[0][0] * t[2][1]);
-  return_tensor[2][2] = internal::NumberType<Number>::value(t[0][0] * t[1][1]) -
-                        internal::NumberType<Number>::value(t[0][1] * t[1][0]);
-  const Number inv_det_t = internal::NumberType<Number>::value(
-    1.0 / (t[0][0] * return_tensor[0][0] + t[0][1] * return_tensor[1][0] +
-           t[0][2] * return_tensor[2][0]));
+  const auto value = [](const auto &t) {
+    return internal::NumberType<Number>::value(t);
+  };
+
+  return_tensor[0][0] = value(t[1][1] * t[2][2]) - value(t[1][2] * t[2][1]);
+  return_tensor[0][1] = value(t[0][2] * t[2][1]) - value(t[0][1] * t[2][2]);
+  return_tensor[0][2] = value(t[0][1] * t[1][2]) - value(t[0][2] * t[1][1]);
+  return_tensor[1][0] = value(t[1][2] * t[2][0]) - value(t[1][0] * t[2][2]);
+  return_tensor[1][1] = value(t[0][0] * t[2][2]) - value(t[0][2] * t[2][0]);
+  return_tensor[1][2] = value(t[0][2] * t[1][0]) - value(t[0][0] * t[1][2]);
+  return_tensor[2][0] = value(t[1][0] * t[2][1]) - value(t[1][1] * t[2][0]);
+  return_tensor[2][1] = value(t[0][1] * t[2][0]) - value(t[0][0] * t[2][1]);
+  return_tensor[2][2] = value(t[0][0] * t[1][1]) - value(t[0][1] * t[1][0]);
+
+  const Number inv_det_t =
+    value(1.0 / (t[0][0] * return_tensor[0][0] + t[0][1] * return_tensor[1][0] +
+                 t[0][2] * return_tensor[2][0]));
   return_tensor *= inv_det_t;
 
   return return_tensor;
