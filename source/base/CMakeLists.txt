@@ -41,6 +41,7 @@ set(_unity_include_src
   geometric_utilities.cc
   graph_coloring.cc
   incremental_function.cc
+  init_finalize.cc
   index_set.cc
   job_identifier.cc
   logstream.cc

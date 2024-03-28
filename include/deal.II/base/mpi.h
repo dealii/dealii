@@ -18,19 +18,17 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/init_finalize.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
 
-#include <boost/signals2.hpp>
-
 #include <complex>
 #include <limits>
 #include <map>
 #include <numeric>
-#include <set>
 #include <vector>
 
 
@@ -1079,7 +1077,7 @@ namespace Utilities
      * MPI processes at the beginning of the program because it uses
      * `MPI_COMM_WORLD` during initialization.
      */
-    class MPI_InitFinalize
+    class MPI_InitFinalize : public InitFinalize
     {
     public:
       /**
@@ -1136,78 +1134,7 @@ namespace Utilities
        * Destructor. Calls <tt>MPI_Finalize()</tt> in case this class owns the
        * MPI process.
        */
-      ~MPI_InitFinalize();
-
-      /**
-       * Register a reference to an MPI_Request
-       * on which we need to call `MPI_Wait` before calling `MPI_Finalize`.
-       *
-       * The object @p request needs to exist when MPI_Finalize is called, which means the
-       * request is typically statically allocated. Otherwise, you need to call
-       * unregister_request() before the request goes out of scope. Note that it
-       * is acceptable for a request to be already waited on (and consequently
-       * reset to MPI_REQUEST_NULL).
-       *
-       * It is acceptable to call this function more than once with the same
-       * instance (as it is done in the example below).
-       *
-       * Typically, this function is used by CollectiveMutex and not directly,
-       * but it can also be used directly like this:
-       * @code
-       * void my_fancy_communication()
-       * {
-       *   static MPI_Request request = MPI_REQUEST_NULL;
-       *   MPI_InitFinalize::register_request(request);
-       *   MPI_Wait(&request, MPI_STATUS_IGNORE);
-       *   // [some algorithm that is not safe to be executed twice in a row.]
-       *   MPI_IBarrier(comm, &request);
-       * }
-       * @endcode
-       */
-      static void
-      register_request(MPI_Request &request);
-
-      /**
-       * Unregister a request previously added using register_request().
-       */
-      static void
-      unregister_request(MPI_Request &request);
-
-      /**
-       * A structure that has boost::signal objects to register a call back
-       * to run after MPI init or finalize.
-       *
-       * For documentation on signals, see
-       * http://www.boost.org/doc/libs/release/libs/signals2 .
-       */
-      struct Signals
-      {
-        /**
-         * A signal that is triggered immediately after we have
-         * initialized the MPI context with <code>MPI_Init()</code>.
-         */
-        boost::signals2::signal<void()> at_mpi_init;
-
-        /**
-         * A signal that is triggered just before we close the MPI context
-         * with <code>MPI_Finalize()</code>. It can be used to deallocate
-         * statically allocated MPI resources that need to be deallocated
-         * before <code>MPI_Finalize()</code> is called.
-         */
-        boost::signals2::signal<void()> at_mpi_finalize;
-      };
-
-      static Signals signals;
-
-    private:
-      /**
-       * Requests to MPI_Wait before finalizing
-       */
-      static std::set<MPI_Request *> requests;
-
-#ifdef DEAL_II_WITH_PETSC
-      bool finalize_petscslepc;
-#endif
+      ~MPI_InitFinalize() = default;
     };
 
     /**
