@@ -4869,6 +4869,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
                const unsigned int                      q_point)
 {
+  static_assert(n_components == 1 && dim == 1,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
   submit_value(val_in[0], q_point);
 }
 
@@ -5149,6 +5152,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_gradient(const Tensor<2, 1, VectorizedArrayType> grad_in,
                   const unsigned int                      q_point)
 {
+  static_assert(n_components == 1 && dim == 1,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
   submit_gradient(grad_in[0], q_point);
 }
 
@@ -5422,6 +5428,10 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_divergence(const unsigned int q_point) const
 {
+  static_assert(n_components == dim,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
+
 #  ifdef DEBUG
   Assert(this->gradients_quad_initialized == true,
          internal::ExcAccessToUninitializedField());
@@ -5503,6 +5513,10 @@ inline DEAL_II_ALWAYS_INLINE SymmetricTensor<2, dim, VectorizedArrayType>
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_symmetric_gradient(const unsigned int q_point) const
 {
+  static_assert(n_components == dim,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
+
   // copy from generic function into dim-specialization function
   const auto          grad = get_gradient(q_point);
   VectorizedArrayType symmetrized[(dim * dim + dim) / 2];
@@ -5544,6 +5558,10 @@ inline DEAL_II_ALWAYS_INLINE
   FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     get_curl(const unsigned int q_point) const
 {
+  static_assert(dim > 1 && n_components == dim,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
+
   // copy from generic function into dim-specialization function
   const Tensor<2, dim, VectorizedArrayType> grad = get_gradient(q_point);
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType> curl;
@@ -5576,6 +5594,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_divergence(const VectorizedArrayType div_in,
                     const unsigned int        q_point)
 {
+  static_assert(n_components == dim,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
+
 #  ifdef DEBUG
   Assert(this->is_reinitialized, ExcNotInitialized());
 #  endif
@@ -5669,6 +5691,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     const SymmetricTensor<2, dim, VectorizedArrayType> sym_grad,
     const unsigned int                                 q_point)
 {
+  static_assert(n_components == dim,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
+
   AssertThrow(
     this->data->element_type !=
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas,
@@ -5756,6 +5782,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_curl(const Tensor<1, dim == 2 ? 1 : dim, VectorizedArrayType> curl,
               const unsigned int                                       q_point)
 {
+  static_assert(n_components == dim,
+                "Do not try to modify the default template parameters used for"
+                " selectively enabling this function via std::enable_if!");
+
   Tensor<2, dim, VectorizedArrayType> grad;
   switch (dim)
     {
