@@ -31,6 +31,7 @@ MappingC1<dim, spacedim>::MappingC1()
   : MappingQ<dim, spacedim>(3)
 {
   Assert(dim > 1, ExcImpossibleInDim(dim));
+  Assert(dim == spacedim, ExcNotImplemented());
 }
 
 
@@ -156,8 +157,8 @@ MappingC1<2>::add_line_support_points(
 template <int dim, int spacedim>
 void
 MappingC1<dim, spacedim>::add_line_support_points(
-  const typename Triangulation<dim>::cell_iterator &,
-  std::vector<Point<dim>> &) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &,
+  std::vector<Point<spacedim>> &) const
 {
   DEAL_II_NOT_IMPLEMENTED();
 }
@@ -191,8 +192,8 @@ MappingC1<2>::add_quad_support_points(const Triangulation<2>::cell_iterator &,
 template <int dim, int spacedim>
 void
 MappingC1<dim, spacedim>::add_quad_support_points(
-  const typename Triangulation<dim>::cell_iterator &,
-  std::vector<Point<dim>> &) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &,
+  std::vector<Point<spacedim>> &) const
 {
   DEAL_II_NOT_IMPLEMENTED();
 }
