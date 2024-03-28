@@ -63,8 +63,8 @@ public:
    */
   virtual void
   add_line_support_points(
-    const typename Triangulation<dim>::cell_iterator &cell,
-    std::vector<Point<dim>>                          &a) const override;
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim>> &a) const override;
 
   /**
    * For <tt>dim=3</tt>. Append the support points of all shape functions
@@ -77,8 +77,8 @@ public:
    */
   virtual void
   add_quad_support_points(
-    const typename Triangulation<dim>::cell_iterator &cell,
-    std::vector<Point<dim>>                          &a) const override;
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim>> &a) const override;
 };
 
 /** @} */
