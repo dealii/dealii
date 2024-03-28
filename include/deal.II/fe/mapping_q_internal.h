@@ -1234,40 +1234,6 @@ namespace internal
 
 
     template <int dim, int spacedim>
-    inline DEAL_II_ALWAYS_INLINE void
-    store_vectorized_tensor(
-      const unsigned int n_points,
-      const unsigned int cur_index,
-      const DerivativeForm<1, dim, spacedim, VectorizedArray<double>>
-                                                    &derivative,
-      std::vector<DerivativeForm<1, dim, spacedim>> &result_array)
-    {
-      AssertDimension(result_array.size(), n_points);
-      constexpr unsigned int n_lanes = VectorizedArray<double>::size();
-      if (cur_index + n_lanes <= n_points)
-        {
-          std::array<unsigned int, n_lanes> indices;
-          for (unsigned int j = 0; j < n_lanes; ++j)
-            indices[j] = j * dim * spacedim;
-          const unsigned int even       = (dim * spacedim) / 4 * 4;
-          double            *result_ptr = &result_array[cur_index][0][0];
-          const VectorizedArray<double> *derivative_ptr = &derivative[0][0];
-          vectorized_transpose_and_store(
-            false, even, derivative_ptr, indices.data(), result_ptr);
-          for (unsigned int d = even; d < dim * spacedim; ++d)
-            for (unsigned int j = 0; j < n_lanes; ++j)
-              result_ptr[j * dim * spacedim + d] = derivative_ptr[d][j];
-        }
-      else
-        for (unsigned int j = 0; j < n_lanes && cur_index + j < n_points; ++j)
-          for (unsigned int d = 0; d < spacedim; ++d)
-            for (unsigned int e = 0; e < dim; ++e)
-              result_array[cur_index + j][d][e] = derivative[d][e][j];
-    }
-
-
-
-    template <int dim, int spacedim>
     inline void
     maybe_update_q_points_Jacobians_generic(
       const CellSimilarity::Similarity cell_similarity,
@@ -1354,7 +1320,10 @@ namespace internal
               continue;
 
             if (update_flags & update_contravariant_transformation)
-              store_vectorized_tensor(n_points, i, derivative, jacobians);
+              for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                for (unsigned int d = 0; d < spacedim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    jacobians[i + j][d][e] = derivative[d][e][j];
 
             if (update_flags & update_volume_elements)
               {
@@ -1366,10 +1335,10 @@ namespace internal
             if (update_flags & update_covariant_transformation)
               {
                 const auto covariant = derivative.covariant_form();
-                store_vectorized_tensor(n_points,
-                                        i,
-                                        covariant.transpose(),
-                                        inverse_jacobians);
+                for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
+                  for (unsigned int d = 0; d < dim; ++d)
+                    for (unsigned int e = 0; e < spacedim; ++e)
+                      inverse_jacobians[i + j][d][e] = covariant[e][d][j];
               }
           }
         else
