@@ -1,0 +1,1021 @@
+
+DEAL::Testing 2D with point -0.1498310826 0.7854420410
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1498310826 0.7854420410 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6577169290 0.9304965238
+DEAL::   delta=-0.01964396697 -1.075632255
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1091690351
+DEAL::       ||f*||   =0.002220303333
+DEAL::       ||f*||_A =0.002879969997
+DEAL::Newton iteration 1 for unit point guess 0.6773608960 2.006128778
+DEAL::   delta=-0.002639902825 0.002146435532
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.002220303333
+DEAL::       ||f*||   =3.112201344e-06
+DEAL::       ||f*||_A =3.056467665e-05
+DEAL::Newton iteration 2 for unit point guess 0.6800007988 2.003982343
+DEAL::   delta=7.154242912e-07 3.054008749e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =3.112201344e-06
+DEAL::       ||f*||   =2.280203855e-12
+DEAL::       ||f*||_A =2.795413189e-12
+DEAL::Iteration converged for p_unit = [ 0.6800000834 2.003951803 ] and iteration error 2.795413189e-12
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1498310826 0.7854420410 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6762718619 -0.06950347624
+DEAL::   delta=-0.003286945564 -1.073516223
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1073970152
+DEAL::       ||f*||   =0.0003695480664
+DEAL::       ||f*||_A =0.0003919397833
+DEAL::Newton iteration 1 for unit point guess 0.6795588074 1.004012747
+DEAL::   delta=-0.0004412793292 6.009041335e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0003695480664
+DEAL::       ||f*||   =8.542519741e-08
+DEAL::       ||f*||_A =8.538106952e-07
+DEAL::Newton iteration 2 for unit point guess 0.6800000867 1.003952657
+DEAL::   delta=3.349108959e-09 8.537914413e-07
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =8.542519741e-08
+DEAL::       ||f*||   =4.041272810e-16
+DEAL::       ||f*||_A =1.869006826e-15
+DEAL::Iteration converged for p_unit = [ 0.6800000834 1.003951803 ] and iteration error 1.869006826e-15
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1498310826 0.7854420410 ] 
+DEAL::Newton iteration 0 for unit point guess -0.2121143758 2.966937436
+DEAL::   delta=0.1428269458 1.910786094
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2113630349
+DEAL::       ||f*||   =0.02939566834
+DEAL::       ||f*||_A =0.09840128762
+DEAL::Newton iteration 1 for unit point guess -0.3549413216 1.056151342
+DEAL::   delta=-0.03499552779 0.04542821360
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.02939566834
+DEAL::       ||f*||   =0.0005546602656
+DEAL::       ||f*||_A =0.005289702180
+DEAL::Newton iteration 2 for unit point guess -0.3199457938 1.010723128
+DEAL::   delta=0.0002224320487 0.005222131286
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0005546602656
+DEAL::       ||f*||   =1.230502584e-07
+DEAL::       ||f*||_A =2.585712416e-07
+DEAL::Newton iteration 3 for unit point guess -0.3201682258 1.005500997
+DEAL::   delta=-1.450147960e-07 2.137399458e-07
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.230502584e-07
+DEAL::       ||f*||   =1.136352722e-14
+DEAL::       ||f*||_A =1.094589460e-13
+DEAL::Iteration converged for p_unit = [ -0.3201680808 1.005500783 ] and iteration error 1.094589460e-13
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::
+DEAL::Testing on cell 2_1:0 with center -1.018281668e-15 -0.9500000000
+DEAL::
+DEAL::Testing on cell 2_1:1 with center 0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 2_1:2 with center -9.110941236e-16 -0.8500000000
+DEAL::
+DEAL::Testing on cell 2_1:3 with center 0.7361215932 -0.4250000000
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1591955252 0.8345321686
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1591955252 0.8345321686 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6675742371 0.3636525565
+DEAL::   delta=-0.01095483010 -1.141265517
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1146605902
+DEAL::       ||f*||   =0.001310649040
+DEAL::       ||f*||_A =0.001412918580
+DEAL::Newton iteration 1 for unit point guess 0.6785290672 1.504918074
+DEAL::   delta=-0.001471140194 0.0007092022461
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.001310649040
+DEAL::       ||f*||   =1.014095031e-06
+DEAL::       ||f*||_A =1.008321605e-05
+DEAL::Newton iteration 2 for unit point guess 0.6800002074 1.504208871
+DEAL::   delta=1.239861461e-07 1.008078741e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.014095031e-06
+DEAL::       ||f*||   =1.366165973e-13
+DEAL::       ||f*||_A =2.888021411e-13
+DEAL::Iteration converged for p_unit = [ 0.6800000834 1.504198790 ] and iteration error 2.888021411e-13
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1591955252 0.8345321686 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6872888532 -0.6363474435
+DEAL::   delta=0.006426017190 -1.140793731
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1142636757
+DEAL::       ||f*||   =0.0007679580846
+DEAL::       ||f*||_A =0.0007847275400
+DEAL::Newton iteration 1 for unit point guess 0.6808628360 0.5044462878
+DEAL::   delta=0.0008627776427 0.0002440296680
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0007679580846
+DEAL::       ||f*||   =3.474771906e-07
+DEAL::       ||f*||_A =3.467922421e-06
+DEAL::Newton iteration 2 for unit point guess 0.6800000584 0.5042022581
+DEAL::   delta=-2.501107313e-08 3.467635102e-06
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =3.474771906e-07
+DEAL::       ||f*||   =9.074842391e-15
+DEAL::       ||f*||_A =1.101452001e-14
+DEAL::Iteration converged for p_unit = [ 0.6800000834 0.5041987905 ] and iteration error 1.101452001e-14
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1591955252 0.8345321686 ] 
+DEAL::Newton iteration 0 for unit point guess -0.2566215243 2.589871026
+DEAL::   delta=0.08412187179 2.065428663
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2141878653
+DEAL::       ||f*||   =0.01834158612
+DEAL::       ||f*||_A =0.04219690946
+DEAL::Newton iteration 1 for unit point guess -0.3407433961 0.5244423628
+DEAL::   delta=-0.02062157494 0.01665380783
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.01834158612
+DEAL::       ||f*||   =0.0001987919777
+DEAL::       ||f*||_A =0.001952722899
+DEAL::Newton iteration 2 for unit point guess -0.3201218211 0.5077885549
+DEAL::   delta=4.627025514e-05 0.001943962900
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0001987919777
+DEAL::       ||f*||   =9.443382164e-09
+DEAL::       ||f*||_A =1.444807487e-08
+DEAL::Newton iteration 3 for unit point guess -0.3201680914 0.5058445920
+DEAL::   delta=-1.057704079e-08 9.835374622e-09
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =9.443382164e-09
+DEAL::       ||f*||   =6.173042190e-15
+DEAL::       ||f*||_A =4.560199500e-14
+DEAL::Iteration converged for p_unit = [ -0.3201680808 0.5058445822 ] and iteration error 4.560199500e-14
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::
+DEAL::Testing on cell 2_1:0 with center -1.018281668e-15 -0.9500000000
+DEAL::
+DEAL::Testing on cell 2_1:1 with center 0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 2_1:2 with center -9.110941236e-16 -0.8500000000
+DEAL::
+DEAL::Testing on cell 2_1:3 with center 0.7361215932 -0.4250000000
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1685599679 0.8836222961
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1685599679 0.8836222961 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6774315452 -0.2031914108
+DEAL::   delta=-0.002264526527 -1.207669732
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1207912384
+DEAL::       ||f*||   =0.0002864001918
+DEAL::       ||f*||_A =0.0002692265626
+DEAL::Newton iteration 1 for unit point guess 0.6796960717 1.004478321
+DEAL::   delta=-0.0003040128115 3.208687252e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0002864001918
+DEAL::       ||f*||   =4.560114808e-08
+DEAL::       ||f*||_A =4.558991505e-07
+DEAL::Newton iteration 2 for unit point guess 0.6800000845 1.004446234
+DEAL::   delta=1.095378255e-09 4.558946092e-07
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =4.560114808e-08
+DEAL::       ||f*||   =1.110223025e-16
+DEAL::       ||f*||_A =2.380656802e-16
+DEAL::Iteration converged for p_unit = [ 0.6800000834 1.004445778 ] and iteration error 2.380656802e-16
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1685599679 0.8836222961 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6983058446 -1.203191411
+DEAL::   delta=0.01613812237 -1.209290123
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1221524499
+DEAL::       ||f*||   =0.002048427935
+DEAL::       ||f*||_A =0.002304514146
+DEAL::Newton iteration 1 for unit point guess 0.6821677222 0.006098711986
+DEAL::   delta=0.002168035294 0.001629756762
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.002048427935
+DEAL::       ||f*||   =2.347613751e-06
+DEAL::       ||f*||_A =2.318879655e-05
+DEAL::Newton iteration 2 for unit point guess 0.6799996869 0.004468955224
+DEAL::   delta=-3.964790127e-07 2.317708016e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =2.347613751e-06
+DEAL::       ||f*||   =9.654338624e-13
+DEAL::       ||f*||_A =1.280374176e-12
+DEAL::Iteration converged for p_unit = [ 0.6800000834 0.004445778144 ] and iteration error 1.280374176e-12
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1685599679 0.8836222961 ] 
+DEAL::Newton iteration 0 for unit point guess -0.3011286728 2.212804616
+DEAL::   delta=0.02522519793 2.204850895
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2212724322
+DEAL::       ||f*||   =0.005818395750
+DEAL::       ||f*||_A =0.008752605945
+DEAL::Newton iteration 1 for unit point guess -0.3263538707 0.007953720612
+DEAL::   delta=-0.006187188923 0.001579179786
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.005818395750
+DEAL::       ||f*||   =1.866811930e-05
+DEAL::       ||f*||_A =0.0001862443711
+DEAL::Newton iteration 2 for unit point guess -0.3201666818 0.006374540826
+DEAL::   delta=1.399061463e-06 0.0001861596547
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.866811930e-05
+DEAL::       ||f*||   =2.723229511e-11
+DEAL::       ||f*||_A =3.047825010e-11
+DEAL::Newton iteration 3 for unit point guess -0.3201680808 0.006188381171
+DEAL::   delta=-2.894346690e-11 9.547636357e-12
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =2.723229511e-11
+DEAL::       ||f*||   =5.389157964e-15
+DEAL::       ||f*||_A =3.805091534e-14
+DEAL::Iteration converged for p_unit = [ -0.3201680808 0.006188381162 ] and iteration error 3.805091534e-14
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::
+DEAL::Testing on cell 2_1:0 with center -1.018281668e-15 -0.9500000000
+DEAL::
+DEAL::Testing on cell 2_1:1 with center 0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 2_1:2 with center -9.110941236e-16 -0.8500000000
+DEAL::
+DEAL::Testing on cell 2_1:3 with center 0.7361215932 -0.4250000000
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1779244106 0.9327124237
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1779244106 0.9327124237 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6872888532 -0.7700353780
+DEAL::   delta=0.006426017190 -1.275004758
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1277064611
+DEAL::       ||f*||   =0.0008583060945
+DEAL::       ||f*||_A =0.0007905799815
+DEAL::Newton iteration 1 for unit point guess 0.6808628360 0.5049693805
+DEAL::   delta=0.0008627776426 0.0002727390487
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0008583060945
+DEAL::       ||f*||   =3.883568604e-07
+DEAL::       ||f*||_A =3.875893753e-06
+DEAL::Newton iteration 2 for unit point guess 0.6800000584 0.5046966414
+DEAL::   delta=-2.501107388e-08 3.875592176e-06
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =3.883568604e-07
+DEAL::       ||f*||   =1.012740064e-14
+DEAL::       ||f*||_A =1.070032252e-14
+DEAL::Iteration converged for p_unit = [ 0.6800000834 0.5046927658 ] and iteration error 1.070032252e-14
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1779244106 0.9327124237 ] 
+DEAL::Newton iteration 0 for unit point guess 0.7093228359 -1.770035378
+DEAL::   delta=0.02584807626 -1.279204813
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1312006456
+DEAL::       ||f*||   =0.003483090498
+DEAL::       ||f*||_A =0.004640276357
+DEAL::Newton iteration 1 for unit point guess 0.6834747597 -0.4908305655
+DEAL::   delta=0.003476307473 0.004413805684
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.003483090498
+DEAL::       ||f*||   =6.492193758e-06
+DEAL::       ||f*||_A =6.294218101e-05
+DEAL::Newton iteration 2 for unit point guess 0.6799984522 -0.4952443712
+DEAL::   delta=-1.631189853e-06 6.286298156e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =6.492193758e-06
+DEAL::       ||f*||   =1.082564072e-11
+DEAL::       ||f*||_A =1.750950637e-11
+DEAL::Newton iteration 3 for unit point guess 0.6800000834 -0.4953072342
+DEAL::   delta=1.079863532e-11 1.378280593e-11
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.082564072e-11
+DEAL::       ||f*||   =1.099345059e-14
+DEAL::       ||f*||_A =1.075737870e-13
+DEAL::Iteration converged for p_unit = [ 0.6800000834 -0.4953072342 ] and iteration error 1.075737870e-13
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1779244106 0.9327124237 ] 
+DEAL::Newton iteration 0 for unit point guess -0.2566215243 2.835738205
+DEAL::   delta=0.08412187145 2.308420270
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2393864377
+DEAL::       ||f*||   =0.02049941944
+DEAL::       ||f*||_A =0.04520655633
+DEAL::Newton iteration 1 for unit point guess -0.3407433957 0.5273179349
+DEAL::   delta=-0.02062157460 0.01861307949
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.02049941944
+DEAL::       ||f*||   =0.0002221792619
+DEAL::       ||f*||_A =0.002182356000
+DEAL::Newton iteration 2 for unit point guess -0.3201218211 0.5087048555
+DEAL::   delta=4.627025456e-05 0.002172664344
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0002221792619
+DEAL::       ||f*||   =1.055434984e-08
+DEAL::       ||f*||_A =1.525994083e-08
+DEAL::Newton iteration 3 for unit point guess -0.3201680914 0.5065321911
+DEAL::   delta=-1.057702338e-08 1.099235368e-08
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.055434984e-08
+DEAL::       ||f*||   =5.622337002e-15
+DEAL::       ||f*||_A =5.252092328e-14
+DEAL::Iteration converged for p_unit = [ -0.3201680808 0.5065321801 ] and iteration error 5.252092328e-14
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1779244106 0.9327124237 ] 
+DEAL::Newton iteration 0 for unit point guess -0.3456358213 1.835738205
+DEAL::   delta=-0.03374928680 2.325878019
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2339649831
+DEAL::       ||f*||   =0.008226459952
+DEAL::       ||f*||_A =0.01241782258
+DEAL::Newton iteration 1 for unit point guess -0.3118865345 -0.4901398135
+DEAL::   delta=0.008283965944 0.002975593131
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.008226459952
+DEAL::       ||f*||   =3.532603013e-05
+DEAL::       ||f*||_A =0.0003526124455
+DEAL::Newton iteration 2 for unit point guess -0.3201705004 -0.4931154066
+DEAL::   delta=-2.419685566e-06 0.0003524132430
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =3.532603013e-05
+DEAL::       ||f*||   =8.903437860e-11
+DEAL::       ||f*||_A =9.410069242e-11
+DEAL::Newton iteration 3 for unit point guess -0.3201680807 -0.4934678199
+DEAL::   delta=8.964764054e-11 2.859226418e-11
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =8.903437860e-11
+DEAL::       ||f*||   =4.775586633e-13
+DEAL::       ||f*||_A =4.444343157e-12
+DEAL::Iteration converged for p_unit = [ -0.3201680808 -0.4934678199 ] and iteration error 4.444343157e-12
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::
+DEAL::Testing on cell 2_1:0 with center -1.018281668e-15 -0.9500000000
+DEAL::
+DEAL::Testing on cell 2_1:1 with center 0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 2_1:2 with center -9.110941236e-16 -0.8500000000
+DEAL::
+DEAL::Testing on cell 2_1:3 with center 0.7361215932 -0.4250000000
+DEAL::
+DEAL::
+DEAL::Testing 2D with point -0.1872888532 0.9818025513
+DEAL::Testing on cell 0_1:0 with center 0.8227241336 0.4750000000
+DEAL::
+DEAL::Testing on cell 0_1:1 with center 5.817072296e-17 0.9500000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1872888532 0.9818025513 ] 
+DEAL::Newton iteration 0 for unit point guess 0.6971461613 -1.336879345
+DEAL::   delta=0.01511587437 -1.343430368
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.1355366079
+DEAL::       ||f*||   =0.002130896460
+DEAL::       ||f*||_A =0.002185933729
+DEAL::Newton iteration 1 for unit point guess 0.6820302869 0.006551022429
+DEAL::   delta=0.002030529284 0.001588678663
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.002130896460
+DEAL::       ||f*||   =2.284621676e-06
+DEAL::       ||f*||_A =2.259975607e-05
+DEAL::Newton iteration 2 for unit point guess 0.6799997576 0.004962343766
+DEAL::   delta=-3.257733708e-07 2.259027304e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =2.284621676e-06
+DEAL::       ||f*||   =7.728835393e-13
+DEAL::       ||f*||_A =9.381363124e-13
+DEAL::Iteration converged for p_unit = [ 0.6800000834 0.004939753493 ] and iteration error 9.381363124e-13
+DEAL::
+DEAL::Testing on cell 0_1:2 with center 0.7361215932 0.4250000000
+DEAL::
+DEAL::Testing on cell 0_1:3 with center 5.204748896e-17 0.8500000000
+DEAL::
+DEAL::Testing on cell 1_1:0 with center -0.8227241336 0.4750000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1872888532 0.9818025513 ] 
+DEAL::Newton iteration 0 for unit point guess -0.2964437098 2.458671795
+DEAL::   delta=0.03143044143 2.448749748
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2461989783
+DEAL::       ||f*||   =0.008055182487
+DEAL::       ||f*||_A =0.01150728502
+DEAL::Newton iteration 1 for unit point guess -0.3278741512 0.009922047487
+DEAL::   delta=-0.007708692704 0.002725078965
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.008055182487
+DEAL::       ||f*||   =3.222628405e-05
+DEAL::       ||f*||_A =0.0003212064393
+DEAL::Newton iteration 2 for unit point guess -0.3201654585 0.007196968523
+DEAL::   delta=2.622396469e-06 0.0003209894167
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =3.222628405e-05
+DEAL::       ||f*||   =8.803837999e-11
+DEAL::       ||f*||_A =9.199099550e-11
+DEAL::Newton iteration 3 for unit point guess -0.3201680809 0.006875979106
+DEAL::   delta=-8.419139130e-11 3.706106569e-11
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =8.803837999e-11
+DEAL::       ||f*||   =9.181727323e-15
+DEAL::       ||f*||_A =8.716953082e-14
+DEAL::Iteration converged for p_unit = [ -0.3201680808 0.006875979069 ] and iteration error 8.716953082e-14
+DEAL::
+DEAL::Testing on cell 1_1:1 with center -0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 1_1:2 with center -0.7361215932 0.4250000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1872888532 0.9818025513 ] 
+DEAL::Newton iteration 0 for unit point guess -0.3901429698 1.458671795
+DEAL::   delta=-0.09269387135 2.425411282
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2531997727
+DEAL::       ||f*||   =0.02385946852
+DEAL::       ||f*||_A =0.05491848397
+DEAL::Newton iteration 1 for unit point guess -0.2974490984 -0.9667394866
+DEAL::   delta=0.02277430251 0.02359126417
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.02385946852
+DEAL::       ||f*||   =0.0002852047463
+DEAL::       ||f*||_A =0.002806529440
+DEAL::Newton iteration 2 for unit point guess -0.3202234009 -0.9903307507
+DEAL::   delta=-5.533558988e-05 0.002793253633
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0002852047463
+DEAL::       ||f*||   =1.626678054e-08
+DEAL::       ||f*||_A =2.268729928e-08
+DEAL::Newton iteration 3 for unit point guess -0.3201680653 -0.9931240044
+DEAL::   delta=1.548517336e-08 1.656756631e-08
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.626678054e-08
+DEAL::       ||f*||   =1.605658879e-12
+DEAL::       ||f*||_A =1.637106024e-12
+DEAL::Iteration converged for p_unit = [ -0.3201680808 -0.9931240209 ] and iteration error 1.637106024e-12
+DEAL::
+DEAL::Testing on cell 1_1:3 with center -0.7361215932 -0.4250000000
+DEAL::
+DEAL::Testing on cell 2_1:0 with center -1.018281668e-15 -0.9500000000
+DEAL::
+DEAL::Testing on cell 2_1:1 with center 0.8227241336 -0.4750000000
+DEAL::
+DEAL::Testing on cell 2_1:2 with center -9.110941236e-16 -0.8500000000
+DEAL::
+DEAL::Testing on cell 2_1:3 with center 0.7361215932 -0.4250000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1498310826 0.7854420410 0.02512860726
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1498310826 0.7854420410 0.02512860726 ] 
+DEAL::Newton iteration 0 for unit point guess 3.702424762 1.255791956 0.5241800136
+DEAL::   delta=2.856388591 -0.7329178826 -0.07384132321
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5585835069
+DEAL::       ||f*||   =0.9496238325
+DEAL::       ||f*||_A =4.671562097
+DEAL::     step_length=0.5000000000
+DEAL::       ||f*||   =0.3989025573
+DEAL::       ||f*||_A =2.107213631
+DEAL::Newton iteration 1 for unit point guess 2.274230467 1.622250898 0.5611006752
+DEAL::Newton iteration 1 for unit point guess 1.000000000 1.000000000 0.5611006752
+DEAL::   delta=-0.6775152184 -0.3855878006 -0.001349240328
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.4709858772
+DEAL::       ||f*||   =0.2020861084
+DEAL::       ||f*||_A =0.5469157809
+DEAL::Newton iteration 2 for unit point guess 1.677515218 1.385587801 0.5624499155
+DEAL::   delta=1.266079264 -0.2156126809 -0.008282391349
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2020861084
+DEAL::       ||f*||   =0.1049223850
+DEAL::       ||f*||_A =0.6628409621
+DEAL::Newton iteration 3 for unit point guess 0.4114359540 1.601200481 0.5707323069
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1498310826 0.7854420410 0.02512860726 ] 
+DEAL::Newton iteration 0 for unit point guess -1.802127607 0.3558249736 0.5241800136
+DEAL::   delta=-2.805512532 -0.01580652674 0.002582563451
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5620799794
+DEAL::       ||f*||   =0.01436684397
+DEAL::       ||f*||_A =0.006730022601
+DEAL::Newton iteration 1 for unit point guess 1.003384925 0.3716315003 0.5215974502
+DEAL::   delta=0.003147124850 -0.01106989252 0.001788042630
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.01436684397
+DEAL::       ||f*||   =0.0001299736755
+DEAL::       ||f*||_A =0.0006449800586
+DEAL::Newton iteration 2 for unit point guess 1.000237800 0.3827013928 0.5198094075
+DEAL::   delta=0.0006433441903 1.326333803e-05 -5.908202145e-06
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0001299736755
+DEAL::       ||f*||   =2.979104114e-09
+DEAL::       ||f*||_A =2.561312774e-09
+DEAL::Newton iteration 3 for unit point guess 0.9995944559 0.3826881295 0.5198153157
+DEAL::   delta=1.078282804e-09 -2.127435446e-09 9.323111179e-10
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =2.979104114e-09
+DEAL::       ||f*||   =1.253330208e-16
+DEAL::       ||f*||_A =5.952587152e-16
+DEAL::Iteration converged for p_unit = [ 0.9995944549 0.3826881316 0.5198153148 ] and iteration error 5.952587152e-16
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1591955252 0.8345321686 0.02669914522
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1591955252 0.8345321686 0.02669914522 ] 
+DEAL::Newton iteration 0 for unit point guess 3.621326310 1.303028954 0.5256912645
+DEAL::   delta=3.194052890 -0.6600674790 -0.07966380171
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5920447676
+DEAL::       ||f*||   =0.9165285293
+DEAL::       ||f*||_A =4.978904027
+DEAL::     step_length=0.5000000000
+DEAL::       ||f*||   =0.4201155126
+DEAL::       ||f*||_A =2.306653962
+DEAL::Newton iteration 1 for unit point guess 2.024299865 1.633062693 0.5655231653
+DEAL::Newton iteration 1 for unit point guess 1.000000000 1.000000000 0.5655231653
+DEAL::   delta=-0.4706798901 -0.4099576263 0.0004091119748
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.4882994847
+DEAL::       ||f*||   =0.2160200439
+DEAL::       ||f*||_A =0.6434558405
+DEAL::Newton iteration 2 for unit point guess 1.470679890 1.409957626 0.5651140533
+DEAL::   delta=1.453515393 -0.2064922549 -0.007935435238
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2160200439
+DEAL::       ||f*||   =0.1139084658
+DEAL::       ||f*||_A =0.7744783373
+DEAL::Newton iteration 3 for unit point guess 0.01716449706 1.616449881 0.5730494886
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1591955252 0.8345321686 0.02669914522 ] 
+DEAL::Newton iteration 0 for unit point guess -2.227260583 0.3468140344 0.5256912645
+DEAL::   delta=-2.984004804 -0.02111069061 0.003484766185
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5987206642
+DEAL::       ||f*||   =0.02039700604
+DEAL::       ||f*||_A =0.009167287649
+DEAL::Newton iteration 1 for unit point guess 0.7567442217 0.3679247250 0.5222064983
+DEAL::   delta=0.005956738222 -0.01479312618 0.002402897797
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.02039700604
+DEAL::       ||f*||   =0.0002474545613
+DEAL::       ||f*||_A =0.001223428251
+DEAL::Newton iteration 2 for unit point guess 0.7507874835 0.3827178512 0.5198036005
+DEAL::   delta=0.001218369679 2.972808967e-05 -1.171759931e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0002474545613
+DEAL::       ||f*||   =1.243143900e-08
+DEAL::       ||f*||_A =1.066824314e-08
+DEAL::Newton iteration 3 for unit point guess 0.7495691138 0.3826881231 0.5198153181
+DEAL::   delta=5.551614894e-09 -8.494136968e-09 3.280125926e-09
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.243143900e-08
+DEAL::       ||f*||   =1.257165964e-16
+DEAL::       ||f*||_A =5.378759939e-16
+DEAL::Iteration converged for p_unit = [ 0.7495691083 0.3826881316 0.5198153148 ] and iteration error 5.378759939e-16
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1685599679 0.8836222961 0.02826968317
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1685599679 0.8836222961 0.02826968317 ] 
+DEAL::Newton iteration 0 for unit point guess 3.540227857 1.350265951 0.5272025153
+DEAL::   delta=3.563108903 -0.5947761735 -0.08726992221
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6279729539
+DEAL::       ||f*||   =0.8983345291
+DEAL::       ||f*||_A =5.504053175
+DEAL::     step_length=0.5000000000
+DEAL::       ||f*||   =0.4439967188
+DEAL::       ||f*||_A =2.555152222
+DEAL::Newton iteration 1 for unit point guess 1.758673406 1.647654038 0.5708374764
+DEAL::Newton iteration 1 for unit point guess 1.000000000 1.000000000 0.5708374764
+DEAL::   delta=-0.2642670141 -0.4344439561 0.002772053468
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5100712180
+DEAL::       ||f*||   =0.2331871882
+DEAL::       ||f*||_A =0.7513804837
+DEAL::Newton iteration 2 for unit point guess 1.264267014 1.434443956 0.5680654230
+DEAL::   delta=1.670051431 -0.2002124112 -0.007724121197
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2331871882
+DEAL::       ||f*||   =0.1274152335
+DEAL::       ||f*||_A =0.9518211610
+DEAL::Newton iteration 3 for unit point guess -0.4057844171 1.634656367 0.5757895441
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1685599679 0.8836222961 0.02826968317 ] 
+DEAL::Newton iteration 0 for unit point guess -2.652393558 0.3378030953 0.5272025153
+DEAL::   delta=-3.163815489 -0.02641498558 0.004391680085
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6359961941
+DEAL::       ||f*||   =0.02704151679
+DEAL::       ||f*||_A =0.01179290427
+DEAL::Newton iteration 1 for unit point guess 0.5114219311 0.3642180808 0.5228108352
+DEAL::   delta=0.009859953020 -0.01852606978 0.003015648199
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.02704151679
+DEAL::       ||f*||   =0.0004125306161
+DEAL::       ||f*||_A =0.002030597423
+DEAL::Newton iteration 2 for unit point guess 0.5015619781 0.3827441506 0.5197951870
+DEAL::   delta=0.002018195959 5.604404827e-05 -2.013654737e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0004125306161
+DEAL::       ||f*||   =3.843012285e-08
+DEAL::       ||f*||_A =3.350019630e-08
+DEAL::Newton iteration 3 for unit point guess 0.4995437821 0.3826881066 0.5198153236
+DEAL::   delta=2.042052887e-08 -2.503750209e-08 8.776975336e-09
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =3.843012285e-08
+DEAL::       ||f*||   =7.742465578e-16
+DEAL::       ||f*||_A =3.621723849e-15
+DEAL::Iteration converged for p_unit = [ 0.4995437617 0.3826881316 0.5198153148 ] and iteration error 3.621723849e-15
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1779244106 0.9327124237 0.02984022112
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1779244106 0.9327124237 0.02984022112 ] 
+DEAL::Newton iteration 0 for unit point guess 3.459129405 1.397502948 0.5287137662
+DEAL::   delta=3.979828397 -0.5423958607 -0.09739294421
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6668294077
+DEAL::       ||f*||   =0.9171795326
+DEAL::       ||f*||_A =6.576519589
+DEAL::     step_length=0.5000000000
+DEAL::       ||f*||   =0.4737130780
+DEAL::       ||f*||_A =2.906475607
+DEAL::Newton iteration 1 for unit point guess 1.469215207 1.668700879 0.5774102383
+DEAL::Newton iteration 1 for unit point guess 1.000000000 1.000000000 0.5774102383
+DEAL::   delta=-0.05852563525 -0.4591073408 0.005969607494
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5358286371
+DEAL::       ||f*||   =0.2540023766
+DEAL::       ||f*||_A =0.8710470496
+DEAL::Newton iteration 2 for unit point guess 1.058525635 1.459107341 0.5714406308
+DEAL::   delta=1.928810109 -0.1985615361 -0.007803797502
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2540023766
+DEAL::       ||f*||   =0.1498020872
+DEAL::       ||f*||_A =1.270586809
+DEAL::Newton iteration 3 for unit point guess -0.8702844736 1.657668877 0.5792444283
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1779244106 0.9327124237 0.02984022112 ] 
+DEAL::Newton iteration 0 for unit point guess -3.077526534 0.3287921561 0.5287137662
+DEAL::   delta=-3.345097096 -0.03171894519 0.005303684595
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6739766956
+DEAL::       ||f*||   =0.03430597763
+DEAL::       ||f*||_A =0.01468153343
+DEAL::Newton iteration 1 for unit point guess 0.2675705623 0.3605111013 0.5234100816
+DEAL::   delta=0.01498260395 -0.02227148874 0.003626316435
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.03430597763
+DEAL::       ||f*||   =0.0006321096333
+DEAL::       ||f*||_A =0.003095644195
+DEAL::Newton iteration 2 for unit point guess 0.2525879584 0.3827825900 0.5197837651
+DEAL::   delta=0.003069482877 9.451923762e-05 -3.156939903e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0006321096333
+DEAL::       ||f*||   =9.796087453e-08
+DEAL::       ||f*||_A =8.800136951e-08
+DEAL::Newton iteration 3 for unit point guess 0.2495184755 0.3826880708 0.5198153345
+DEAL::   delta=6.035640058e-08 -6.080731171e-08 1.973325099e-08
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =9.796087453e-08
+DEAL::       ||f*||   =5.782243200e-15
+DEAL::       ||f*||_A =2.793245044e-14
+DEAL::Iteration converged for p_unit = [ 0.2495184151 0.3826881316 0.5198153148 ] and iteration error 2.793245044e-14
+DEAL::
+DEAL::
+DEAL::Testing 3D with point -0.1872888532 0.9818025513 0.03141075908
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ -0.1872888532 0.9818025513 0.03141075908 ] 
+DEAL::Newton iteration 0 for unit point guess 3.378030953 1.444739945 0.5302250170
+DEAL::   delta=4.481775075 -0.5164923722 -0.1114133431
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.7090545024
+DEAL::       ||f*||   =1.040376964
+DEAL::       ||f*||_A =9.431636229
+DEAL::     step_length=0.5000000000
+DEAL::       ||f*||   =0.5189006405
+DEAL::       ||f*||_A =3.548765004
+DEAL::Newton iteration 1 for unit point guess 1.137143415 1.702986132 0.5859316886
+DEAL::Newton iteration 1 for unit point guess 1.000000000 1.000000000 0.5859316886
+DEAL::   delta=0.1460488594 -0.4840658966 0.01041830049
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5651606508
+DEAL::       ||f*||   =0.2788717609
+DEAL::       ||f*||_A =1.003004700
+DEAL::Newton iteration 2 for unit point guess 0.8539511406 1.484065897 0.5755133881
+DEAL::   delta=2.256510264 -0.2053129307 -0.008548455192
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.2788717609
+DEAL::       ||f*||   =0.1920633747
+DEAL::       ||f*||_A =1.953837842
+DEAL::Newton iteration 3 for unit point guess -1.402559123 1.689378827 0.5840618433
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.04694448799 0.06461354454 0.7960033322
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ 0.04694448799 0.06461354454 0.7960033322 ] 
+DEAL::Newton iteration 0 for unit point guess 0.5451723546 -1.893591072 0.5621744122
+DEAL::   delta=0.004969656478 -2.894555770 0.006855209102
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.5791702826
+DEAL::       ||f*||   =0.007834938276
+DEAL::       ||f*||_A =0.003571810879
+DEAL::Newton iteration 1 for unit point guess 0.5402026982 1.000964698 0.5553192031
+DEAL::   delta=0.003587465407 0.0009021920921 0.004953715025
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.007834938276
+DEAL::       ||f*||   =3.884066112e-05
+DEAL::       ||f*||_A =0.0001929674524
+DEAL::Newton iteration 2 for unit point guess 0.5366152327 1.000062506 0.5503654881
+DEAL::   delta=-2.660056690e-06 0.0001927096002 -2.683324670e-06
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =3.884066112e-05
+DEAL::       ||f*||   =2.326926611e-10
+DEAL::       ||f*||_A =1.956067947e-10
+DEAL::Newton iteration 3 for unit point guess 0.5366178928 0.9998697960 0.5503681714
+DEAL::   delta=1.274584728e-10 7.366018736e-11 1.287881287e-10
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =2.326926611e-10
+DEAL::       ||f*||   =1.430489625e-16
+DEAL::       ||f*||_A =5.340170717e-16
+DEAL::Iteration converged for p_unit = [ 0.5366178927 0.9998697959 0.5503681713 ] and iteration error 5.340170717e-16
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.04890050833 0.06730577556 0.8291701377
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ 0.04890050833 0.06730577556 0.8291701377 ] 
+DEAL::Newton iteration 0 for unit point guess 0.5470545361 -2.180824033 0.5647650127
+DEAL::   delta=0.006064776973 -3.015717358 0.008360635756
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6035598825
+DEAL::       ||f*||   =0.009951748567
+DEAL::       ||f*||_A =0.004371343603
+DEAL::Newton iteration 1 for unit point guess 0.5409897591 0.8348933245 0.5564043770
+DEAL::   delta=0.004376158946 0.001397238002 0.006040640167
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.009951748567
+DEAL::       ||f*||   =6.023554464e-05
+DEAL::       ||f*||_A =0.0002989039364
+DEAL::Newton iteration 2 for unit point guess 0.5366136002 0.8334960865 0.5503637368
+DEAL::   delta=-4.292825736e-06 0.0002983822338 -4.434798042e-06
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =6.023554464e-05
+DEAL::       ||f*||   =5.885477391e-10
+DEAL::       ||f*||_A =4.851422786e-10
+DEAL::Newton iteration 3 for unit point guess 0.5366178930 0.8331977043 0.5503681716
+DEAL::   delta=3.055682257e-10 2.047493549e-10 3.162746961e-10
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =5.885477391e-10
+DEAL::       ||f*||   =1.177569344e-16
+DEAL::       ||f*||_A =5.561724839e-16
+DEAL::Iteration converged for p_unit = [ 0.5366178927 0.8331977041 0.5503681713 ] and iteration error 5.561724839e-16
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05085652866 0.06999800658 0.8623369432
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ 0.05085652866 0.06999800658 0.8623369432 ] 
+DEAL::Newton iteration 0 for unit point guess 0.5489367175 -2.468056995 0.5673556132
+DEAL::   delta=0.007160560813 -3.137037000 0.009866511490
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6280236718
+DEAL::       ||f*||   =0.01221120457
+DEAL::       ||f*||_A =0.005181873656
+DEAL::Newton iteration 1 for unit point guess 0.5417761567 0.6689800054 0.5574891018
+DEAL::   delta=0.005164708567 0.002022568285 0.007127722446
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.01221120457
+DEAL::       ||f*||   =8.732694439e-05
+DEAL::       ||f*||_A =0.0004327777066
+DEAL::Newton iteration 2 for unit point guess 0.5366114481 0.6669574371 0.5503613793
+DEAL::   delta=-6.445176344e-06 0.0004318243265 -6.792659999e-06
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =8.732694439e-05
+DEAL::       ||f*||   =1.292239481e-09
+DEAL::       ||f*||_A =1.049590808e-09
+DEAL::Newton iteration 3 for unit point guess 0.5366178933 0.6665256127 0.5503681720
+DEAL::   delta=6.380390490e-10 4.900790799e-10 6.738742223e-10
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =1.292239481e-09
+DEAL::       ||f*||   =2.292986862e-16
+DEAL::       ||f*||_A =1.131616662e-15
+DEAL::Iteration converged for p_unit = [ 0.5366178927 0.6665256123 0.5503681713 ] and iteration error 1.131616662e-15
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05281254899 0.07269023761 0.8955037488
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ 0.05281254899 0.07269023761 0.8955037488 ] 
+DEAL::Newton iteration 0 for unit point guess 0.5508188990 -2.755289956 0.5699462137
+DEAL::   delta=0.008257034834 -3.258527571 0.01137284273
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6525676654
+DEAL::       ||f*||   =0.01461334118
+DEAL::       ||f*||_A =0.006006826689
+DEAL::Newton iteration 1 for unit point guess 0.5425618641 0.5032376147 0.5585733710
+DEAL::   delta=0.005953152018 0.002788806016 0.008215041053
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.01461334118
+DEAL::       ||f*||   =0.0001206127230
+DEAL::       ||f*||_A =0.0005969040838
+DEAL::Newton iteration 2 for unit point guess 0.5366087121 0.5004488087 0.5503583300
+DEAL::   delta=-9.181772798e-06 0.0005952871908 -9.842616982e-06
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0001206127230
+DEAL::       ||f*||   =2.560943784e-09
+DEAL::       ||f*||_A =2.059237276e-09
+DEAL::Newton iteration 3 for unit point guess 0.5366178939 0.4998535215 0.5503681726
+DEAL::   delta=1.205909590e-09 1.051590514e-09 1.295765213e-09
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =2.560943784e-09
+DEAL::       ||f*||   =8.355534722e-17
+DEAL::       ||f*||_A =6.584838629e-17
+DEAL::Iteration converged for p_unit = [ 0.5366178927 0.4998535204 0.5503681713 ] and iteration error 6.584838629e-17
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05476856932 0.07538246863 0.9286705543
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::Start MappingQ::do_transform_real_to_unit_cell for real point [ 0.05476856932 0.07538246863 0.9286705543 ] 
+DEAL::Newton iteration 0 for unit point guess 0.5527010804 -3.042522917 0.5725368143
+DEAL::   delta=0.009354226180 -3.380201895 0.01287963629
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.6771978331
+DEAL::       ||f*||   =0.01715820711
+DEAL::       ||f*||_A =0.006850101627
+DEAL::Newton iteration 1 for unit point guess 0.5433468542 0.3376789780 0.5596571780
+DEAL::   delta=0.006741526547 0.003706534633 0.009302674609
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.01715820711
+DEAL::       ||f*||   =0.0001605975923
+DEAL::       ||f*||_A =0.0007936021325
+DEAL::Newton iteration 2 for unit point guess 0.5366053277 0.3339724433 0.5503545034
+DEAL::   delta=-1.256711301e-05 0.0007910126894 -1.367023795e-05
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =0.0001605975923
+DEAL::       ||f*||   =4.695015947e-09
+DEAL::       ||f*||_A =3.754229163e-09
+DEAL::Newton iteration 3 for unit point guess 0.5366178948 0.3331814307 0.5503681736
+DEAL::   delta=2.113650474e-09 2.075282043e-09 2.305167393e-09
+DEAL::     step_length=1.000000000
+DEAL::       ||f ||   =4.695015947e-09
+DEAL::       ||f*||   =2.220446049e-16
+DEAL::       ||f*||_A =1.104742540e-15
+DEAL::Iteration converged for p_unit = [ 0.5366178927 0.3331814286 0.5503681713 ] and iteration error 1.104742540e-15
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05672458966 0.07807469965 0.9618373598
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
+DEAL::Testing 3D with point 0.05868060999 0.08076693067 0.9950041653
+DEAL::Testing on cell 0_0: with center -3.024635639e-17 -9.723960037e-18 -0.9000000000
+DEAL::
+DEAL::Testing on cell 1_0: with center 0.9000000000 2.849697548e-17 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 2_0: with center 2.849697548e-17 -4.996003611e-17 0.9000000000
+DEAL::
+DEAL::Testing on cell 3_0: with center -0.9000000000 3.684882982e-17 0.000000000
+DEAL::
+DEAL::Testing on cell 4_0: with center 2.712486979e-17 -0.9000000000 -4.996003611e-17
+DEAL::
+DEAL::Testing on cell 5_0: with center 3.684882982e-17 0.9000000000 0.000000000
+DEAL::
+DEAL::
