@@ -261,10 +261,10 @@ check(const unsigned int orientation, bool reverse)
 
   using CellFace =
     std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>;
-  const typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>
+  const typename std::map<CellFace, std::pair<CellFace, unsigned char>>
     &face_map = triangulation.get_periodic_face_map();
   typename std::map<CellFace,
-                    std::pair<CellFace, std::bitset<3>>>::const_iterator it;
+                    std::pair<CellFace, unsigned char>>::const_iterator it;
   int sum_of_pairs_local = face_map.size();
   int sum_of_pairs_global;
   MPI_Allreduce(&sum_of_pairs_local,
@@ -295,7 +295,7 @@ check(const unsigned int orientation, bool reverse)
             {
               std::cout << "face_center_1: " << face_center_1 << std::endl;
               std::cout << "face_center_2: " << face_center_2 << std::endl;
-              typename std::map<CellFace, std::pair<CellFace, std::bitset<3>>>::
+              typename std::map<CellFace, std::pair<CellFace, unsigned char>>::
                 const_iterator it;
               for (it = triangulation.get_periodic_face_map().begin();
                    it != triangulation.get_periodic_face_map().end();

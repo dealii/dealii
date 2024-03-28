@@ -88,9 +88,7 @@ MGConstrainedDoFs::initialize(
         transformation,
         level_constraints[first_cell.first->level()],
         component_mask,
-        second_cell.second[0],
-        second_cell.second[1],
-        second_cell.second[2],
+        second_cell.second,
         periodicity_factor,
         first_cell.first->level());
     }

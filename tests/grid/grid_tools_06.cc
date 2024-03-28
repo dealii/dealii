@@ -167,9 +167,9 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
  */
 template <typename FaceIterator>
 void
-print_match(const FaceIterator   &face_1,
-            const FaceIterator   &face_2,
-            const std::bitset<3> &orientation)
+print_match(const FaceIterator &face_1,
+            const FaceIterator &face_2,
+            const unsigned char combined_orientation)
 {
   static const int dim = FaceIterator::AccessorType::dimension;
 
@@ -183,8 +183,10 @@ print_match(const FaceIterator   &face_1,
     deallog << " :: " << face_2->vertex(j);
   deallog << std::endl;
 
-  deallog << "orientation: " << orientation[0] << "  flip: " << orientation[1]
-          << "  rotation: " << orientation[2] << std::endl
+  const auto [orientation, rotation, flip] =
+    internal::split_face_orientation(combined_orientation);
+  deallog << "orientation: " << orientation << "  flip: " << flip
+          << "  rotation: " << rotation << std::endl
           << std::endl;
 }
 

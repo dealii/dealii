@@ -917,97 +917,9 @@ namespace DoFTools
    * of components of the finite element. This can be used to enforce
    * periodicity in only one variable in a system of equations.
    *
-   * @p face_orientation, @p face_flip and @p face_rotation describe an
-   * orientation that should be applied to @p face_1 prior to matching and
-   * constraining DoFs. This has nothing to do with the actual orientation of
-   * the given faces in their respective cells (which for boundary faces is
-   * always the default) but instead how you want to see periodicity to be
-   * enforced. For example, by using these flags, you can enforce a condition
-   * of the kind $u(0,y)=u(1,1-y)$ (i.e., a Moebius band) or in 3d a twisted
-   * torus. More precisely, these flags match local face DoF indices in the
-   * following manner:
-   *
-   * In 2d: <tt>face_orientation</tt> must always be <tt>true</tt>,
-   * <tt>face_rotation</tt> is always <tt>false</tt>, and face_flip has the
-   * meaning of <tt>line_flip</tt>; this implies e.g. for <tt>Q1</tt>:
-   *
-   * @code
-   *
-   * face_orientation = true, face_flip = false, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     1                1
-   *     |        <-->    |
-   *     0                0
-   *
-   *     Resulting constraints: 0 <-> 0, 1 <-> 1
-   *
-   *     (Numbers denote local face DoF indices.)
-   *
-   *
-   * face_orientation = true, face_flip = true, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     0                1
-   *     |        <-->    |
-   *     1                0
-   *
-   *     Resulting constraints: 1 <-> 0, 0 <-> 1
-   * @endcode
-   *
-   * And similarly for the case of Q1 in 3d:
-   *
-   * @code
-   *
-   * face_orientation = true, face_flip = false, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     2 - 3            2 - 3
-   *     |   |    <-->    |   |
-   *     0 - 1            0 - 1
-   *
-   *     Resulting constraints: 0 <-> 0, 1 <-> 1, 2 <-> 2, 3 <-> 3
-   *
-   *     (Numbers denote local face DoF indices.)
-   *
-   *
-   * face_orientation = false, face_flip = false, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     1 - 3            2 - 3
-   *     |   |    <-->    |   |
-   *     0 - 2            0 - 1
-   *
-   *     Resulting constraints: 0 <-> 0, 2 <-> 1, 1 <-> 2, 3 <-> 3
-   *
-   *
-   * face_orientation = true, face_flip = true, face_rotation = false:
-   *
-   *     face1:           face2:
-   *
-   *     1 - 0            2 - 3
-   *     |   |    <-->    |   |
-   *     3 - 2            0 - 1
-   *
-   *     Resulting constraints: 3 <-> 0, 2 <-> 1, 1 <-> 2, 0 <-> 3
-   *
-   *
-   * face_orientation = true, face_flip = false, face_rotation = true
-   *
-   *     face1:           face2:
-   *
-   *     0 - 2            2 - 3
-   *     |   |    <-->    |   |
-   *     1 - 3            0 - 1
-   *
-   *     Resulting constraints: 1 <-> 0, 3 <-> 1, 0 <-> 2, 2 <-> 3
-   *
-   * and any combination of that...
-   * @endcode
+   * Here, @p combined_orientation is the relative orientation of @p face_1 with
+   * respect to @p face_2. This is typically computed by
+   * GridTools::orthogonal_equality().
    *
    * Optionally a matrix @p matrix along with a std::vector @p
    * first_vector_components can be specified that describes how DoFs on @p
@@ -1045,10 +957,9 @@ namespace DoFTools
     const FaceIterator                             &face_1,
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number>                      &constraints,
-    const ComponentMask                            &component_mask   = {},
-    const bool                                      face_orientation = true,
-    const bool                                      face_flip        = false,
-    const bool                                      face_rotation    = false,
+    const ComponentMask                            &component_mask = {},
+    const unsigned char                             combined_orientation =
+      ReferenceCell::default_combined_face_orientation(),
     const FullMatrix<double>        &matrix = FullMatrix<double>(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),
@@ -1198,9 +1109,7 @@ namespace DoFTools
       const FullMatrix<double>                       &transformation,
       AffineConstraints<number>                      &affine_constraints,
       const ComponentMask                            &component_mask,
-      const bool                                      face_orientation,
-      const bool                                      face_flip,
-      const bool                                      face_rotation,
+      const unsigned char                             combined_orientation,
       const number                                    periodicity_factor,
       const unsigned int level = numbers::invalid_unsigned_int);
   } // namespace internal

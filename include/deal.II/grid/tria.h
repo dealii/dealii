@@ -3649,7 +3649,7 @@ public:
    */
   const std::map<
     std::pair<cell_iterator, unsigned int>,
-    std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>> &
+    std::pair<std::pair<cell_iterator, unsigned int>, unsigned char>> &
   get_periodic_face_map() const;
 
   /**
@@ -4089,7 +4089,7 @@ private:
    * face pairs.
    */
   std::map<std::pair<cell_iterator, unsigned int>,
-           std::pair<std::pair<cell_iterator, unsigned int>, std::bitset<3>>>
+           std::pair<std::pair<cell_iterator, unsigned int>, unsigned char>>
     periodic_face_map;
 
   /**

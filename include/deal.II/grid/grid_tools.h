@@ -58,7 +58,6 @@
 #  include <boost/iostreams/stream.hpp>
 #endif
 
-#include <bitset>
 #include <optional>
 #include <set>
 
@@ -2336,9 +2335,9 @@ namespace GridTools
     /**
      * The relative orientation of the first face with respect to the second
      * face as described in orthogonal_equality() and
-     * DoFTools::make_periodicity_constraints() (and stored as a bitset).
+     * DoFTools::make_periodicity_constraints().
      */
-    std::bitset<3> orientation;
+    unsigned char orientation;
 
     /**
      * A @p dim $\times$ @p dim rotation matrix that describes how vector
@@ -2377,59 +2376,14 @@ namespace GridTools
    * identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1 with
-   * respect to @p face2 is returned a std::optional<std::bitset<3>> object
-   * orientation in which
-   * @code
-   * orientation.value()[0] = face_orientation
-   * orientation.value()[1] = face_flip
-   * orientation.value()[2] = face_rotation
-   * @endcode
-   *
-   * In 2d <tt>face_orientation</tt> is always <tt>true</tt>,
-   * <tt>face_rotation</tt> is always <tt>false</tt>, and face_flip has the
-   * meaning of <tt>line_flip</tt>. More precisely in 3d:
-   *
-   * <tt>face_orientation</tt>: <tt>true</tt> if @p face1 and @p face2 have
-   * the same orientation. Otherwise, the vertex indices of @p face1 match the
-   * vertex indices of @p face2 in the following manner:
-   *
-   * @code
-   * face1:           face2:
-   *
-   * 1 - 3            2 - 3
-   * |   |    <-->    |   |
-   * 0 - 2            0 - 1
-   * @endcode
-   *
-   * <tt>face_flip</tt>: <tt>true</tt> if the matched vertices are rotated by
-   * 180 degrees:
-   *
-   * @code
-   * face1:           face2:
-   *
-   * 1 - 0            2 - 3
-   * |   |    <-->    |   |
-   * 3 - 2            0 - 1
-   * @endcode
-   *
-   * <tt>face_rotation</tt>: <tt>true</tt> if the matched vertices are rotated
-   * by 90 degrees counterclockwise:
-   *
-   * @code
-   * face1:           face2:
-   *
-   * 0 - 2            2 - 3
-   * |   |    <-->    |   |
-   * 1 - 3            0 - 1
-   * @endcode
-   *
-   * and any combination of that... More information on the topic can be found
-   * in the
+   * respect to @p face2 is returned a std::optional<unsigned char>, in which
+   * the stored value is the same orientation bit format used elsewhere in the
+   * library. More information on that topic can be found in the
    * @ref GlossFaceOrientation "glossary"
    * article.
    */
   template <typename FaceIterator>
-  std::optional<std::bitset<3>>
+  std::optional<unsigned char>
   orthogonal_equality(
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
@@ -2451,7 +2405,7 @@ namespace GridTools
    * with faces belonging to the second boundary with the help of
    * orthogonal_equality().
    *
-   * The bitset that is returned inside of PeriodicFacePair encodes the
+   * The unsigned char that is returned inside of PeriodicFacePair encodes the
    * _relative_ orientation of the first face with respect to the second face,
    * see the documentation of orthogonal_equality() for further details.
    *

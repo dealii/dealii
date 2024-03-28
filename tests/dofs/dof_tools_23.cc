@@ -32,10 +32,9 @@
 
 // A simple test for
 //   DoFTools::
-//   make_periodicity_constraints (const FaceIterator       &,
-//                                 const FaceIterator       &,
-//                                 dealii::AffineConstraints<double> &,
-//                                 const std::vector<bool>  &)
+//   make_periodicity_constraints(const FaceIterator       &,
+//                                const FaceIterator       &,
+//                                AffineConstraints<std::complex<double>> &)
 //
 // We project an already periodic function onto the FE space of
 // periodic functions and store the resulting L2 difference

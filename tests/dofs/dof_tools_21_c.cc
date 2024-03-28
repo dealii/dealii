@@ -26,6 +26,7 @@
 
 #include <deal.II/lac/affine_constraints.h>
 
+#include <bitset>
 #include <iostream>
 #include <utility>
 
@@ -34,11 +35,11 @@
 //
 // Test
 //   DoFTools::
-//   make_periodicity_constraints (const FaceIterator       &,
-//                                 const FaceIterator       &,
-//                                 dealii::AffineConstraints<double> &,
-//                                 const std::vector<bool>  &,
-//                                 bool, bool, bool)
+//   make_periodicity_constraints(const FaceIterator        &,
+//                                const FaceIterator        &,
+//                                AffineConstraints<double> &,
+//                                const ComponentMask       &,
+//                                unsigned char)
 //
 // for correct behavior with hanging nodes. This is done by additionally
 // refining the second cube once. Test that constraining face_1 -> face_2
@@ -242,7 +243,7 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
 
 /*
  * Print out all face DoFs and support points as well as the actual
- * matching via make_periodicity_constraints
+ * matching via make_periodicity_constraints()
  */
 template <int dim, int spacedim>
 void
@@ -326,10 +327,13 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
     face_1, face_2, dim == 2 ? 1 : 2, Tensor<1, spacedim>());
   AssertThrow(orientation, ExcInternalError());
   const auto o = *orientation;
-  deallog << "Orientation: " << o[0] << o[1] << o[2] << std::endl;
+  // Preserve old output by printing a bitset and also using the old
+  // (orientation, flip, rotation) format
+  std::bitset<3> bo(o);
+  deallog << "Orientation: " << bo[0] << bo[2] << bo[1] << std::endl;
 
   DoFTools::make_periodicity_constraints(
-    face_1, face_2, constraint_matrix, velocity_mask, o[0], o[1], o[2]);
+    face_1, face_2, constraint_matrix, velocity_mask, o);
   deallog << "Matching:" << std::endl;
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
@@ -338,13 +342,8 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
     face_2, face_1, dim == 2 ? 1 : 2, Tensor<1, spacedim>());
   AssertThrow(reverse_orientation, ExcInternalError());
   const auto ro = *reverse_orientation;
-  DoFTools::make_periodicity_constraints(face_2,
-                                         face_1,
-                                         constraint_matrix_reverse,
-                                         velocity_mask,
-                                         ro[0],
-                                         ro[1],
-                                         ro[2]);
+  DoFTools::make_periodicity_constraints(
+    face_2, face_1, constraint_matrix_reverse, velocity_mask, ro);
   deallog << "Reverse Matching:" << std::endl;
   constraint_matrix_reverse.print(deallog.get_file_stream());
   constraint_matrix_reverse.close();

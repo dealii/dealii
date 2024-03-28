@@ -2163,7 +2163,7 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (const std::optional<std::bitset<3>> orientation =
+            if (const std::optional<unsigned char> orientation =
                   GridTools::orthogonal_equality(cell1->face(face_idx1),
                                                  cell2->face(face_idx2),
                                                  direction,
@@ -2419,7 +2419,7 @@ namespace GridTools
 
 
   template <typename FaceIterator>
-  std::optional<std::bitset<3>>
+  std::optional<unsigned char>
   orthogonal_equality(
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
@@ -2463,52 +2463,16 @@ namespace GridTools
           }
       }
 
-    // And finally, a lookup to determine the ordering bitmask:
     if (face2_vertices_set.empty())
       {
-        const auto combined_orientation =
-          face1->reference_cell().get_combined_orientation(
-            make_array_view(face1_vertices.cbegin(),
-                            face1_vertices.cbegin() + face1->n_vertices()),
-            make_array_view(face2_vertices.cbegin(),
-                            face2_vertices.cbegin() + face2->n_vertices()));
-        std::bitset<3> orientation;
-        if (dim == 1)
-          {
-            // In 1D things are always well-oriented
-            orientation = ReferenceCell::default_combined_face_orientation();
-          }
-        // The original version of this doesn't use the standardized orientation
-        // value so we have to do an additional translation step
-        else if (dim == 2)
-          {
-            // In 2D only the first bit (orientation) is set
-            AssertIndexRange(combined_orientation, 2);
-            orientation = combined_orientation;
-          }
-        else
-          {
-            Assert(dim == 3, ExcInternalError());
-            // There are two differences between the orientation implementation
-            // used in the periodicity code and that used in ReferenceCell:
-            //
-            // 1. The bitset is unpacked as (orientation, flip, rotation)
-            //    instead of the standard (orientation, rotation, flip).
-            //
-            // 2. The 90 degree rotations are always clockwise, so the third and
-            //    seventh (in the combined orientation) are switched.
-            //
-            // Both translations are encoded in this table. This matches
-            // OrientationLookupTable<3> which was present in previous revisions
-            // of this file.
-            constexpr std::array<unsigned int, 8> translation{
-              {0, 1, 4, 7, 2, 3, 6, 5}};
-            AssertIndexRange(combined_orientation, translation.size());
-            orientation =
-              translation[std::min<unsigned int>(combined_orientation, 7u)];
-          }
-
-        return std::make_optional(orientation);
+        const auto reference_cell = face1->reference_cell();
+        // We want the relative orientation of face1 with respect to face2 so
+        // the order is flipped here:
+        return std::make_optional(reference_cell.get_combined_orientation(
+          make_array_view(face2_vertices.cbegin(),
+                          face2_vertices.cbegin() + face2->n_vertices()),
+          make_array_view(face1_vertices.cbegin(),
+                          face1_vertices.cbegin() + face1->n_vertices())));
       }
     else
       return std::nullopt;

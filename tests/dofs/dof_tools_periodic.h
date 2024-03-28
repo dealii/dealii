@@ -15,7 +15,7 @@
 
 // Code duplication:
 // This is a copy of dof_tools_common.h with a slightly different mesh
-// generation to fit the assumptions made by make_periodicity_constraints
+// generation to fit the assumptions made by make_periodicity_constraints()
 
 #include <deal.II/base/logstream.h>
 

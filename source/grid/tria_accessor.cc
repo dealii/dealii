@@ -2801,13 +2801,17 @@ CellAccessor<dim, spacedim>::periodic_neighbor_child_on_subface(
    * number of children as i_subface.
    */
   AssertIndexRange(i_subface, nb_parent_face_it->n_children());
+
+  const auto [orientation, rotation, flip] =
+    internal::split_face_orientation(my_face_pair->second.second);
+
   unsigned int sub_neighbor_num =
     GeometryInfo<dim>::child_cell_on_face(parent_nb_it->refinement_case(),
                                           nb_face_num,
                                           i_subface,
-                                          my_face_pair->second.second[0],
-                                          my_face_pair->second.second[1],
-                                          my_face_pair->second.second[2],
+                                          orientation,
+                                          flip,
+                                          rotation,
                                           nb_parent_face_it->refinement_case());
   return parent_nb_it->child(sub_neighbor_num);
 }

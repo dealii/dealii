@@ -2590,16 +2590,18 @@ namespace parallel
           typename Triangulation<dim, spacedim>::cell_iterator;
         typename std::map<std::pair<cell_iterator, unsigned int>,
                           std::pair<std::pair<cell_iterator, unsigned int>,
-                                    std::bitset<3>>>::const_iterator it;
+                                    unsigned char>>::const_iterator it;
         for (it = tria.get_periodic_face_map().begin();
              it != tria.get_periodic_face_map().end();
              ++it)
           {
-            const cell_iterator &cell_1           = it->first.first;
-            const unsigned int   face_no_1        = it->first.second;
-            const cell_iterator &cell_2           = it->second.first.first;
-            const unsigned int   face_no_2        = it->second.first.second;
-            const std::bitset<3> face_orientation = it->second.second;
+            const cell_iterator &cell_1               = it->first.first;
+            const unsigned int   face_no_1            = it->first.second;
+            const cell_iterator &cell_2               = it->second.first.first;
+            const unsigned int   face_no_2            = it->second.first.second;
+            const unsigned char  combined_orientation = it->second.second;
+            const auto [orientation, rotation, flip] =
+              ::dealii::internal::split_face_orientation(combined_orientation);
 
             if (cell_1->level() == cell_2->level())
               {
@@ -2611,10 +2613,7 @@ namespace parallel
                     // cell[0] into account
                     const unsigned int vface0 =
                       GeometryInfo<dim>::standard_to_real_face_vertex(
-                        v,
-                        face_orientation[0],
-                        face_orientation[1],
-                        face_orientation[2]);
+                        v, orientation, flip, rotation);
                     const unsigned int vi0 =
                       topological_vertex_numbering[cell_1->face(face_no_1)
                                                      ->vertex_index(vface0)];
@@ -3706,11 +3705,13 @@ namespace parallel
       for (unsigned int repetition = 0; repetition < dim; ++repetition)
         for (const auto &it : this->get_periodic_face_map())
           {
-            const cell_iterator  &cell_1           = it.first.first;
-            const unsigned int    face_no_1        = it.first.second;
-            const cell_iterator  &cell_2           = it.second.first.first;
-            const unsigned int    face_no_2        = it.second.first.second;
-            const std::bitset<3> &face_orientation = it.second.second;
+            const cell_iterator &cell_1               = it.first.first;
+            const unsigned int   face_no_1            = it.first.second;
+            const cell_iterator &cell_2               = it.second.first.first;
+            const unsigned int   face_no_2            = it.second.first.second;
+            const unsigned char  combined_orientation = it.second.second;
+            const auto [orientation, rotation, flip] =
+              ::dealii::internal::split_face_orientation(combined_orientation);
 
             if (cell_1->level() == level && cell_2->level() == level)
               {
@@ -3722,10 +3723,7 @@ namespace parallel
                     // account
                     const unsigned int vface0 =
                       GeometryInfo<dim>::standard_to_real_face_vertex(
-                        v,
-                        face_orientation[0],
-                        face_orientation[1],
-                        face_orientation[2]);
+                        v, orientation, flip, rotation);
                     if (marked_vertices[cell_1->face(face_no_1)->vertex_index(
                           vface0)] ||
                         marked_vertices[cell_2->face(face_no_2)->vertex_index(
@@ -3781,6 +3779,8 @@ namespace parallel
       // the level subdomain ids correct in the multigrid case
       dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
 
+      const auto reference_cell      = ReferenceCells::get_hypercube<dim>();
+      const auto face_reference_cell = ReferenceCells::get_hypercube<dim - 1>();
       for (const auto &face_pair : periodicity_vector)
         {
           const cell_iterator first_cell  = face_pair.cell[0];
@@ -3794,30 +3794,41 @@ namespace parallel
           const unsigned int tree_right =
             coarse_cell_to_p4est_tree_permutation[second_cell->index()];
 
-          // p4est wants to know which corner the first corner on
-          // the face with the lower id is mapped to on the face with
-          // with the higher id. For d==2 there are only two possibilities
-          // that are determined by it->orientation[0] (the face_orientation
-          // flag). For d==3 we have to use GridTools::OrientationLookupTable.
-          // The result is given below.
+          // p4est wants to know which corner the first corner on the face with
+          // the lower id is mapped to on the face with with the higher id. For
+          // d==2 there are only two possibilities: i.e., face_pair.orientation
+          // must be 0 or 1. For d==3 we have to use a lookup table. The result
+          // is given below.
 
           unsigned int p4est_orientation = 0;
           if (dim == 2)
-            p4est_orientation = face_pair.orientation[0] == true ? 0u : 1u;
+            {
+              AssertIndexRange(face_pair.orientation, 2);
+              p4est_orientation =
+                face_pair.orientation ==
+                    ReferenceCell::default_combined_face_orientation() ?
+                  0u :
+                  1u;
+            }
           else
             {
               const unsigned int  face_idx_list[] = {face_left, face_right};
               const cell_iterator cell_list[]     = {first_cell, second_cell};
               unsigned int        lower_idx, higher_idx;
+              unsigned char       orientation;
               if (face_left <= face_right)
                 {
                   higher_idx = 1;
                   lower_idx  = 0;
+                  orientation =
+                    face_reference_cell.get_inverse_combined_orientation(
+                      face_pair.orientation);
                 }
               else
                 {
-                  higher_idx = 0;
-                  lower_idx  = 1;
+                  higher_idx  = 0;
+                  lower_idx   = 1;
+                  orientation = face_pair.orientation;
                 }
 
               // get the cell index of the first index on the face with the
@@ -3846,36 +3857,18 @@ namespace parallel
                 }
               Assert(first_dealii_idx_on_face != numbers::invalid_unsigned_int,
                      ExcInternalError());
-              // Now map dealii_idx_on_face according to the orientation
-              constexpr unsigned int left_to_right[8][4] = {{0, 2, 1, 3},
-                                                            {0, 1, 2, 3},
-                                                            {3, 1, 2, 0},
-                                                            {3, 2, 1, 0},
-                                                            {2, 3, 0, 1},
-                                                            {1, 3, 0, 2},
-                                                            {1, 0, 3, 2},
-                                                            {2, 0, 3, 1}};
-              constexpr unsigned int right_to_left[8][4] = {{0, 2, 1, 3},
-                                                            {0, 1, 2, 3},
-                                                            {3, 1, 2, 0},
-                                                            {3, 2, 1, 0},
-                                                            {2, 3, 0, 1},
-                                                            {2, 0, 3, 1},
-                                                            {1, 0, 3, 2},
-                                                            {1, 3, 0, 2}};
-              const unsigned int     second_dealii_idx_on_face =
-                lower_idx == 0 ? left_to_right[face_pair.orientation.to_ulong()]
-                                              [first_dealii_idx_on_face] :
-                                     right_to_left[face_pair.orientation.to_ulong()]
-                                              [first_dealii_idx_on_face];
+
+              // Now map dealii_idx_on_face according to the orientation.
+              const unsigned int second_dealii_idx_on_face =
+                reference_cell.standard_to_real_face_vertex(
+                  first_dealii_idx_on_face,
+                  face_idx_list[lower_idx],
+                  orientation);
               const unsigned int second_dealii_idx_on_cell =
-                GeometryInfo<dim>::face_to_cell_vertices(
+                reference_cell.face_to_cell_vertices(
                   face_idx_list[higher_idx],
                   second_dealii_idx_on_face,
-                  cell_list[higher_idx]->face_orientation(
-                    face_idx_list[higher_idx]),
-                  cell_list[higher_idx]->face_flip(face_idx_list[higher_idx]),
-                  cell_list[higher_idx]->face_rotation(
+                  cell_list[higher_idx]->combined_face_orientation(
                     face_idx_list[higher_idx]));
               // map back to p4est
               const unsigned int second_p4est_idx_on_face =
