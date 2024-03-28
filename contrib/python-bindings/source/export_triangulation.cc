@@ -81,9 +81,22 @@ namespace python
     generate_hyper_cube_with_cylindrical_hole,
     0,
     5)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_plate_with_a_hole_overloads,
+                                         generate_plate_with_a_hole,
+                                         0,
+                                         12)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(
+    generate_channel_with_cylinder_overloads,
+    generate_channel_with_cylinder,
+    0,
+    4)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_ball_overloads,
                                          generate_hyper_ball,
                                          1,
+                                         2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_ball_balanced_overloads,
+                                         generate_hyper_ball_balanced,
+                                         0,
                                          2)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_sphere_overloads,
                                          generate_hyper_sphere,
@@ -274,6 +287,13 @@ namespace python
 
 
 
+  const char generate_hyper_ball_balanced_docstring[] =
+    "This is an alternative to hyper_ball with 12 cells in 2d and 32 cells  \n"
+    "in 3d, which provides a better balance between the size of the cells   \n"
+    "around the outer curved boundaries and the cell in the interior.       \n";
+
+
+
   const char generate_hyper_sphere_docstring[] =
     "Generate a hyper sphere, i.e., a surface of a ball in spacedim         \n"
     "dimensions. This function only exists for dim+1=spacedim in 2 and 3    \n"
@@ -314,6 +334,25 @@ namespace python
     "This function produces a square in the xy-plane with a cylindrical     \n"
     "hole in the middle. In 3d, this geometry is extruded in z direction    \n"
     "to the interval [0,L].                                                 \n";
+
+
+
+  const char generate_plate_with_a_hole_docstring[] =
+    "Generate a rectangular plate with an (offset) cylindrical hole.       \n"
+    "The geometry consists of 2 regions: The first is a square region      \n"
+    "with length outer_radius and a hole of radius inner_radius.           \n"
+    "The second region describes the remainder of the bulk material.       \n";
+
+
+
+  const char generate_channel_with_cylinder_docstring[] =
+    "Generate a grid consisting of a channel with a cylinder.              \n"
+    "The channel has three distinct regions:                               \n"
+    "  1. If n_shells is greater than zero, then there are that many       \n"
+    "     shells centered around the cylinder,                             \n"
+    "  2. a blending region between the shells and the rest of the         \n"
+    "     triangulation, and                                               \n"
+    "  3. a bulk region consisting of Cartesian cells.                     \n";
 
 
 
@@ -591,6 +630,29 @@ namespace python
            &TriangulationWrapper::generate_cheese,
            generate_cheese_docstring,
            boost::python::args("self", "holes"))
+      .def("generate_plate_with_a_hole",
+           &TriangulationWrapper::generate_plate_with_a_hole,
+           generate_plate_with_a_hole_overloads(
+             boost::python::args("self",
+                                 "inner_radius",
+                                 "outer_radius",
+                                 "pad_bottom",
+                                 "pad_top",
+                                 "pad_left",
+                                 "pad_right",
+                                 "center",
+                                 "polar_manifold_id",
+                                 "tfi_manifold_id",
+                                 "L",
+                                 "n_slices",
+                                 "colorize"),
+             generate_plate_with_a_hole_docstring))
+      .def("generate_channel_with_cylinder",
+           &TriangulationWrapper::generate_channel_with_cylinder,
+           generate_channel_with_cylinder_overloads(
+             boost::python::args(
+               "shell_region_width", "n_shells", "skewness", "colorize"),
+             generate_channel_with_cylinder_docstring))
       .def("generate_general_cell",
            &TriangulationWrapper::generate_general_cell,
            generate_general_cell_overloads(
@@ -629,6 +691,11 @@ namespace python
            generate_hyper_ball_overloads(
              boost::python::args("self", "center", "radius"),
              generate_hyper_ball_docstring))
+      .def("generate_hyper_ball_balanced",
+           &TriangulationWrapper::generate_hyper_ball_balanced,
+           generate_hyper_ball_balanced_overloads(
+             boost::python::args("self", "center", "radius"),
+             generate_hyper_ball_balanced_docstring))
       .def("generate_hyper_sphere",
            &TriangulationWrapper::generate_hyper_sphere,
            generate_hyper_sphere_overloads(

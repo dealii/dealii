@@ -557,9 +557,6 @@ namespace python
   {
     dim = other.dim;
 
-    AssertThrow(other.point != nullptr,
-                ExcMessage("Underlying point does not exist."));
-
     if (dim == 2)
       {
         Point<2> *other_point = static_cast<Point<2> *>(other.point);
@@ -572,8 +569,9 @@ namespace python
           new Point<3>((*other_point)[0], (*other_point)[1], (*other_point)[2]);
       }
     else
-      AssertThrow(false,
-                  ExcMessage("The dimension of the point should be 2 or 3."));
+      {
+        point = nullptr;
+      }
   }
 } // namespace python
 
