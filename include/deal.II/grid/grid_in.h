@@ -304,7 +304,6 @@ struct CellData;
  *
  * @ingroup grid
  * @ingroup input
- * Pelteret 2015, Timo Heister 2015,  Krzysztof Bzowski, 2015
  */
 
 template <int dim, int spacedim = dim>
