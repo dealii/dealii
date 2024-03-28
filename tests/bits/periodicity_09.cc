@@ -72,9 +72,7 @@ test()
     (std::next(dof_handler.begin(0)))->face(1),
     cm,
     ComponentMask(),
-    true,
-    false,
-    false,
+    ReferenceCell::default_combined_face_orientation(),
     FullMatrix<double>(),
     std::vector<unsigned int>(),
     periodicity_factor);
