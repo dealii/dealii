@@ -693,6 +693,14 @@ namespace hp
   inline const FEValuesType &
   FEValuesBase<dim, q_dim, FEValuesType>::get_present_fe_values() const
   {
+    Assert(
+      present_fe_values_index != TableIndices<3>(numbers::invalid_unsigned_int,
+                                                 numbers::invalid_unsigned_int,
+                                                 numbers::invalid_unsigned_int),
+      ExcMessage(
+        "The indices of the present FEValues object are all invalid. The reason"
+        " is likely that you have forgotten to call the reinit() function."));
+
     return *fe_values_table(present_fe_values_index);
   }
 
