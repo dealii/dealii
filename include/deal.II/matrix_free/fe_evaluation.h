@@ -291,51 +291,65 @@ public:
   /** @} */
 
   /**
-   * @name Access to data at quadrature points or the gather vector data
+   * @name Access to data at quadrature points or the data at cell DoFs
    */
   /** @{ */
   /**
-   * Return the value stored for the local degree of freedom with index @p
-   * dof. If the object is vector-valued, a vector-valued return argument is
-   * given. Thus, the argument @p dof can at most run until @p
+   * Return the value stored in the array of coefficients for the elemental
+   * finite element solution expansion for the local degree of freedom with
+   * index @p dof. If the object is vector-valued, a vector-valued return
+   * argument is given. Thus, the argument @p dof can at most run until @p
    * dofs_per_component rather than @p dofs_per_cell since the different
-   * components of a vector-valued FE are return together. Note that when
-   * vectorization is enabled, values from several cells are grouped
-   * together. If @p set_dof_values was called last, the value corresponds to
-   * the one set there. If @p integrate was called last, it instead
-   * corresponds to the value of the integrated function with the test
-   * function of the given index.
+   * components of a vector-valued FE are returned together. Note that when
+   * vectorization is enabled, values from several cells are grouped together
+   * in the inner VectorizedArray argument of @p value_type. If @p
+   * submit_dof_value was called last, the value corresponds to the data set
+   * there for the respective index. If @p integrate was called last, it
+   * instead corresponds to the value of the integrated function with the test
+   * function of the given index that gets written into the global vector by
+   * distribute_local_to_global().
    */
   value_type
   get_dof_value(const unsigned int dof) const;
 
   /**
-   * Write a value to the field containing the degrees of freedom with
-   * component @p dof. Writes to the same field as is accessed through @p
-   * get_dof_value. Therefore, the original data that was read from a vector
-   * is overwritten as soon as a value is submitted.
+   * Write a value to the field containing coefficients associated with the
+   * cell-local degrees of freedom with index @p dof. This function writes to
+   * the same field as is accessed through @p get_dof_value. Therefore, the
+   * original data that is stored in this location, e.g. from reading a global
+   * vector via read_dof_values(), is overwritten as soon as a value is
+   * submitted for a particular DoF index.
    */
   void
   submit_dof_value(const value_type val_in, const unsigned int dof);
 
   /**
-   * Return the value of a finite element function at quadrature point number
-   * @p q_point after a call to FEEvaluation::evaluate() with
-   * EvaluationFlags::values set, or the value that has been stored there with
-   * a call to FEEvaluationBase::submit_value(). If the object is
-   * vector-valued, a vector-valued return argument is given. Note that when
-   * vectorization is enabled, values from several cells are grouped together.
+   * Return the value of a finite element function interpolated to the
+   * quadrature point with index @p q_point after a call to
+   * @p evaluate() with @p EvaluationFlags::values set, or the
+   * value that has been stored there with a call to
+   * FEEvaluationBase::submit_value(). If the object is vector-valued, a
+   * vector-valued return argument is given. In case vectorization is enabled,
+   * values from several cells are grouped together as a VectorizedArray for
+   * each component in @p value_type.
    */
   value_type
   get_value(const unsigned int q_point) const;
 
   /**
-   * Write a value to the field containing the values on quadrature points
-   * with component @p q_point. Access to the same field as through
-   * get_value(). If applied before the function FEEvaluation::integrate()
-   * with EvaluationFlags::values set is called, this specifies the value
-   * which is tested by all basis function on the current cell and integrated
-   * over.
+   * Write a contribution that gets multiplied by the value of the test
+   * function to the field containing the values at quadrature points with
+   * index @p q_point. As part of this function, the data gets multiplied by
+   * the quadrature weight and possible Jacobian determinants. When this
+   * function has been called for all quadrature points and a subsequent call
+   * to the function @p integrate(EvaluationFlags::values) has been made, the
+   * result is an array of entries, each representing the result of the
+   * integral of product of the test function multiplied by the data passed to
+   * this function.
+   *
+   * @note This function accessses the same field as through get_value(), so
+   * make sure to not call it after calling submit_value() for a specific
+   * quadrature point index.
    */
   void
   submit_value(const value_type val_in, const unsigned int q_point);
@@ -345,7 +359,7 @@ public:
    * up because FEEvaluationBase does not distinguish between scalar accessors
    * and vector-valued accessors and the respective types, but solely in terms
    * of the number of components and dimension. Thus, enable the use of
-   * submit_value in that case as well.
+   * submit_value() also for tensors with a single component.
    */
   template <int dim_ = dim,
             typename = std::enable_if_t<dim_ == 1 && n_components == dim_>>
@@ -354,20 +368,23 @@ public:
                const unsigned int                      q_point);
 
   /**
-   * Return the gradient of a finite element function at quadrature point
-   * number @p q_point after a call to FEEvaluation::evaluate() with
-   * EvaluationFlags::gradients, or the value that has been stored there with
-   * a call to FEEvaluationBase::submit_gradient().
+   * Return the gradient of the finite element function evaluated at
+   * quadrature point with index @p q_point after a call to
+   * @p evaluate() with @p EvaluationFlags::gradients set, collecting
+   * all components in a vector-valued problem as the outer tensor index and
+   * all partial derivatives as the inner (second) tensor index. For scalar
+   * problems, @p gradient_type is overloaded as a Tensor@<1, dim@>. For
+   * further information, see the get_value() function.
    */
   gradient_type
   get_gradient(const unsigned int q_point) const;
 
   /**
-   * Return the derivative of a finite element function at quadrature point
-   * number @p q_point after a call to
-   * FEEvaluation::evaluate(EvaluationFlags::gradients) the direction normal
+   * Return the derivative of a finite element function interpolated to the
+   * quadrature point with index @p q_point after a call to
+   * @p evaluate(EvaluationFlags::gradients) the direction normal
    * to the face: $\boldsymbol \nabla u(\mathbf x_q) \cdot \mathbf n(\mathbf
-   * x_q)$
+   * x_q)$.
    *
    * This call is equivalent to calling get_gradient() * normal_vector()
    * but will use a more efficient internal representation of data.
@@ -376,12 +393,18 @@ public:
   get_normal_derivative(const unsigned int q_point) const;
 
   /**
-   * Write a contribution that is tested by the gradient to the field
-   * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through get_gradient(). If applied before the
-   * function FEEvaluation::integrate(EvaluationFlags::gradients) is called,
-   * this specifies what is tested by all basis function gradients on the
-   * current cell and integrated over.
+   * Write a contribution that gets multiplied by the gradient of the test
+   * function to the field containing the gradients at quadrature points with
+   * index @p q_point. When this function has queued information for all
+   * quadrature points and followed by a call to the function
+   * @p integrate(EvaluationFlags::gradients), the result is an
+   * array of entries, each representing the result of the integral of product
+   * of the test function gradient multiplied by the values passed to this
+   * function.
+   *
+   * @note This function accessses the same field as through get_gradient(),
+   * so make sure to not call it after calling submit_gradient() for a
+   * specific quadrature point index.
    */
   void
   submit_gradient(const gradient_type grad_in, const unsigned int q_point);
@@ -391,7 +414,7 @@ public:
    * up because FEEvaluationBase does not distinguish between scalar accessors
    * and vector-valued accessors and the respective types, but solely in terms
    * of the number of components and dimension. Thus, enable the use of
-   * submit_value in that case as well.
+   * submit_gradient() also for rank-2 tensors with a single component.
    */
   template <int dim_ = dim,
             typename = std::enable_if_t<dim_ == 1 && n_components == dim_>>
@@ -400,27 +423,27 @@ public:
                   const unsigned int                      q_point);
 
   /**
-   * Write a contribution that is tested by the gradient to the field
-   * containing the values on quadrature points with component @p
-   * q_point. Access to the same field as through get_gradient() or
-   * get_normal_derivative(). If applied before the function
-   * FEEvaluation::integrate(EvaluationFlags::gradients) is called, this
-   * specifies what is tested by all basis function gradients on the current
-   * cell and integrated over.
+   * Write a contribution that gets multiplied by the gradient of the test
+   * function times the normal vector to the field containing the gradients at
+   * quadrature points with index @p q_point, see submit_gradient() for
+   * further information.
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
    * used. Usually, the contribution of a potential call to this function must
-   * be added into the contribution for submit_gradient().
+   * be added into the contribution for submit_gradient() when both are
+   * desired. Furthermore, the data array is the same as for get_gradient()
+   * and get_normal_derivative(), so invalid data will be returned after
+   * calling this function.
    */
   void
   submit_normal_derivative(const value_type   grad_in,
                            const unsigned int q_point);
 
   /**
-   * Return the Hessian of a finite element function at quadrature point
-   * number @p q_point after a call to
-   * FEEvaluation::evaluate(EvaluationFlags::hessians). If only the diagonal
+   * Return the Hessian of the finite element function interpolated to
+   * quadrature point with index @p q_point after a call to
+   * @p evaluate(EvaluationFlags::hessians). If only the diagonal
    * or even the trace of the Hessian, the Laplacian, is needed, use the other
    * functions below.
    */
@@ -428,30 +451,36 @@ public:
   get_hessian(const unsigned int q_point) const;
 
   /**
-   * Return the diagonal of the Hessian of a finite element function at
-   * quadrature point number @p q_point after a call to
-   * FEEvaluation::evaluate(EvaluationFlags::hessians).
+   * Return the diagonal of the Hessian of the finite element function
+   * interpolated to the quadrature point with index @p q_point after a call
+   * to @p evaluate(EvaluationFlags::hessians).
    */
   gradient_type
   get_hessian_diagonal(const unsigned int q_point) const;
 
   /**
-   * Return the Laplacian (i.e., the trace of the Hessian) of a finite element
-   * function at quadrature point number @p q_point after a call to
-   * FEEvaluation::evaluate(EvaluationFlags::hessians). Compared to the case
-   * when computing the full Hessian, some operations can be saved when only
-   * the Laplacian is requested.
+   * Return the Laplacian (i.e., the trace of the Hessian) of the finite
+   * element function interpolated to the quadrature point with index
+   * @p q_point after a call to @p evaluate(EvaluationFlags::hessians).
+   * Compared to the case when computing the full Hessian, some operations can
+   * be saved when only the Laplacian is requested.
    */
   value_type
   get_laplacian(const unsigned int q_point) const;
 
   /**
-   * Write a contribution that is tested by the Hessian to the field
-   * containing the values at quadrature points with component @p q_point.
-   * Access to the same field as through get_hessian(). If applied before the
-   * function FEEvaluation::integrate(EvaluationFlags::hessians) is called,
-   * this specifies what is tested by the Hessians of all basis functions on the
-   * current cell and integrated over.
+   * Write a contribution that gets multiplied by the Hessian of the test
+   * function to the field containing the Hessians at quadrature points with
+   * index @p q_point. When this function has queued information for all
+   * quadrature points and followed by a call to the function
+   * @p integrate(EvaluationFlags::hessians), the result is an
+   * array of entries, each representing the result of the integral of product
+   * of the test function Hessian multiplied by the values passed to this
+   * function.
+   *
+   * @note This function accessses the same field as through get_hessian(),
+   * so make sure to not call it after calling submit_hessian() for a
+   * specific quadrature point index.
    */
   void
   submit_hessian(const hessian_type hessian_in, const unsigned int q_point);
@@ -461,17 +490,36 @@ public:
    * point number @p q_point after a call to
    * @p evaluate(EvaluationFlags::gradients).
    *
-   * @note Only available for the vector-valued case (n_components == dim).
+   * @note Only available for the vector-valued case (`n_components == dim`).
    */
   template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
   VectorizedArrayType
   get_divergence(const unsigned int q_point) const;
 
   /**
-   * Return the symmetric gradient of a vector-valued finite element at
-   * quadrature point number @p q_point after a call to @p
-   * evaluate(EvaluationFlags::gradients). It corresponds to <tt>0.5
-   * (grad+grad<sup>T</sup>)</tt>.
+   * Write a contribution that is multiplied by the divergence of the test
+   * function to the field containing the gradients at quadrature points with
+   * index @p q_point. See submit_gradient() for further information.
+   *
+   * @note Only available for the vector-valued case (n_components == dim).
+   *
+   * @note This operation writes the data to the same field as
+   * submit_gradient() or submit_divergence(). As a consequence, only one of
+   * these three can be used. In case several terms of this kind appear in a
+   * weak form, the contribution of a potential call to this function must be
+   * added into the diagonal of the rank-2 tensor contribution passed to
+   * submit_gradient().
+   */
+  template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
+  void
+  submit_divergence(const VectorizedArrayType div_in,
+                    const unsigned int        q_point);
+
+  /**
+   * Return the symmetric gradient of the vector-valued finite element
+   * function interpolated at the quadrature point with index @p q_point after
+   * a call to @p evaluate(EvaluationFlags::gradients). It corresponds to
+   * <tt>0.5 (grad+grad<sup>T</sup>)</tt>.
    *
    * @note Only available for the vector-valued case (n_components == dim).
    */
@@ -480,52 +528,19 @@ public:
   get_symmetric_gradient(const unsigned int q_point) const;
 
   /**
-   * Return the curl of the vector field, $\nabla \times v$ after a call to @p
-   * evaluate(EvaluationFlags::gradients).
-   *
-   * @note Only available for the vector-valued case (n_components == dim).
-   */
-  template <int dim_ = dim,
-            typename = std::enable_if_t<n_components_ == dim_ && dim_ != 1>>
-  Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
-  get_curl(const unsigned int q_point) const;
-
-  /**
-   * Write a contribution that is tested by the divergence to the field
-   * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through get_gradient() and
-   * submit_gradient(). If applied before the function @p
-   * integrate(EvaluationFlags::gradients) is called, this quantity specifies
-   * what is tested by all basis function gradients on the current cell and
-   * integrated over.
+   * Write a contribution that is multiplied by the symmetric gradient of the
+   * test function to the field containing the gradients at quadrature points
+   * with index @p q_point. See submit_gradient() for further information.
    *
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient(). As a consequence, only one of these two can be
-   * used. Usually, the contribution of a potential call to this function must
-   * be added into the diagonal of the contribution for submit_gradient().
-   */
-  template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
-  void
-  submit_divergence(const VectorizedArrayType div_in,
-                    const unsigned int        q_point);
-
-  /**
-   * Write a contribution that is tested by the symmetric gradient to the field
-   * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through @p get_symmetric_gradient. If applied
-   * before the function @p integrate(EvaluationFlags::gradients) is called,
-   * this specifies the symmetric gradient which is tested by all basis
-   * function symmetric gradients on the current cell and integrated over.
-   *
-   * @note Only available for the vector-valued case (n_components == dim).
-   *
-   * @note This operation writes the data to the same field as
-   * submit_gradient(). As a consequence, only one of these two can be
-   * used. Usually, the contribution of a potential call to this function must
-   * be added to the respective entries of the rank-2 tensor for
-   * submit_gradient(), in order not to overwrite information.
+   * submit_gradient() or submit_divergence(). As a consequence, only one of
+   * these three functions can be used. In case several terms of this kind
+   * appear in a weak form, the contribution of a potential call to this
+   * function must be added into the diagonal of the rank-2 tensor
+   * contribution passed to submit_gradient(), in order not to overwrite
+   * information.
    */
   template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
   void
@@ -534,15 +549,28 @@ public:
     const unsigned int                                 q_point);
 
   /**
+   * Return the curl of the vector field, $\nabla \times v$ interpolated to
+   * the quadrature point index after calling
+   * @p evaluate(EvaluationFlags::gradients).
+   *
+   * @note Only available for the vector-valued case (n_components == dim) in
+   * 2 and 3 dimensions.
+   */
+  template <int dim_ = dim,
+            typename = std::enable_if_t<n_components_ == dim_ && dim_ != 1>>
+  Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
+  get_curl(const unsigned int q_point) const;
+
+  /**
    * Write the components of a curl containing the values on quadrature point
-   * @p q_point. Access to the same data field as through @p get_gradient.
+   * @p q_point. Access to the same data field as through get_gradient().
    *
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient(). As a consequence, only one of these two can be
-   * used. Usually, the contribution of a potential call to this function must
-   * be added to the respective entries of the rank-2 tensor for
+   * submit_gradient() and submit_divergence(). As a consequence, only one of
+   * these can be used. Usually, the contribution of a potential call to this
+   * function must be added to the respective entries of the rank-2 tensor for
    * submit_gradient().
    */
   template <int dim_ = dim,
