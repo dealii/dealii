@@ -1877,7 +1877,7 @@ ReferenceCell::face_to_cell_vertices(
   if (get_dimension() == 1)
     Assert(combined_face_orientation ==
              ReferenceCell::default_combined_face_orientation(),
-           ExcMessage("In 1D, all cells must have the default orientation."));
+           ExcMessage("In 1D, all faces must have the default orientation."));
   else
     AssertIndexRange(combined_face_orientation, n_face_orientations(face));
 
@@ -1988,9 +1988,13 @@ ReferenceCell::standard_to_real_face_vertex(
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-      case ReferenceCells::Line:
         DEAL_II_NOT_IMPLEMENTED();
         break;
+      case ReferenceCells::Line:
+        Assert(face_orientation == default_combined_face_orientation(),
+               ExcMessage(
+                 "In 1D, all faces must have the default orientation."));
+        return vertex;
       case ReferenceCells::Triangle:
       case ReferenceCells::Quadrilateral:
         return line_vertex_permutations[face_orientation][vertex];
