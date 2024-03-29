@@ -147,8 +147,12 @@ main()
     Tensor<2, 3>::component_to_unrolled_index(TableIndices<2>{});
   Assert(index == 0, ExcInternalError());
 
+  // Also make sure one can call memory_consumption() in a constexpr
+  // context. The actual amount of memory used depends on the platform
+  // and vectorization level, so compute it but don't output it to a
+  // file.
   DEAL_II_CONSTEXPR const auto used_memory = Tensor<2, 3>::memory_consumption();
-  deallog << "Used memory: " << used_memory << std::endl;
+  (void)used_memory;
 
   {
     constexpr double a_init[3][3] = {{1., 0., 0.}, {2., 1., 0.}, {3., 2., 1.}};
