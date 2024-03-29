@@ -331,7 +331,7 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("IC");
-    static constexpr std::array<unsigned int, 2> lower{{48, 67}};
+    static constexpr std::array<unsigned int, 2> lower{{48, 62}};
     TrilinosWrappers::PreconditionIC             preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
@@ -341,7 +341,7 @@ Step4<dim>::solve(int cycle)
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
       solver_control.last_step(),
       lower[cycle],
-      lower[cycle] + 5);
+      lower[cycle] + 10);
     deallog.pop();
   }
 

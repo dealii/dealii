@@ -5,7 +5,7 @@ DEAL:01089:SOR::Solver stopped within 31 - 33 iterations
 DEAL:01089:BlockJacobi::Solver stopped within 73 - 75 iterations
 DEAL:01089:BlockSSOR::Solver stopped within 30 - 32 iterations
 DEAL:01089:BlockSOR::Solver stopped within 18 - 20 iterations
-DEAL:01089:IC::Solver stopped within 48 - 53 iterations
+DEAL:01089:IC::Solver stopped within 48 - 58 iterations
 DEAL:01089:ILU::Solver stopped within 30 - 32 iterations
 DEAL:01089:ILUT::Solver stopped within 11 - 13 iterations
 DEAL:01089:Chebyshev::Solver stopped within 23 - 25 iterations
@@ -16,7 +16,7 @@ DEAL:04225:SOR::Solver stopped within 62 - 64 iterations
 DEAL:04225:BlockJacobi::Solver stopped within 145 - 147 iterations
 DEAL:04225:BlockSSOR::Solver stopped within 59 - 61 iterations
 DEAL:04225:BlockSOR::Solver stopped within 37 - 39 iterations
-DEAL:04225:IC::Solver stopped within 67 - 72 iterations
+DEAL:04225:IC::Solver stopped within 62 - 72 iterations
 DEAL:04225:ILU::Solver stopped within 56 - 58 iterations
 DEAL:04225:ILUT::Solver stopped within 19 - 21 iterations
 DEAL:04225:Chebyshev::Solver stopped within 46 - 48 iterations
