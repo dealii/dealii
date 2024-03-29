@@ -262,6 +262,65 @@ namespace python
 
     template <int dim>
     void
+    generate_plate_with_a_hole(const double        inner_radius,
+                               const double        outer_radius,
+                               const double        pad_bottom,
+                               const double        pad_top,
+                               const double        pad_left,
+                               const double        pad_right,
+                               const PointWrapper &center,
+                               const int           polar_manifold_id,
+                               const int           tfi_manifold_id,
+                               const double        L,
+                               const unsigned int  n_slices,
+                               const bool          colorize,
+                               void               *triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      Point<dim> point =
+        center.get_point() ?
+          *(static_cast<const Point<dim> *>(center.get_point())) :
+          Point<dim>();
+
+      Triangulation<dim, dim> *tria =
+        static_cast<Triangulation<dim, dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::plate_with_a_hole(*tria,
+                                       inner_radius,
+                                       outer_radius,
+                                       pad_bottom,
+                                       pad_top,
+                                       pad_left,
+                                       pad_right,
+                                       point,
+                                       polar_manifold_id,
+                                       tfi_manifold_id,
+                                       L,
+                                       n_slices,
+                                       colorize);
+    }
+
+
+
+    template <int dim>
+    void
+    generate_channel_with_cylinder(const double       shell_region_width,
+                                   const unsigned int n_shells,
+                                   const double       skewness,
+                                   const bool         colorize,
+                                   void              *triangulation)
+    {
+      Triangulation<dim, dim> *tria =
+        static_cast<Triangulation<dim, dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::channel_with_cylinder(
+        *tria, shell_region_width, n_shells, skewness, colorize);
+    }
+
+
+
+    template <int dim>
+    void
     generate_general_cell(std::vector<PointWrapper> &wrapped_points,
                           const bool                 colorize,
                           void                      *triangulation)
@@ -406,6 +465,26 @@ namespace python
         static_cast<Triangulation<dim> *>(triangulation);
       tria->clear();
       GridGenerator::hyper_ball(*tria, center_point, radius);
+    }
+
+
+
+    template <int dim>
+    void
+    generate_hyper_ball_balanced(const PointWrapper &center,
+                                 const double        radius,
+                                 void               *triangulation)
+    {
+      // Cast the PointWrapper object to Point<dim>
+      Point<dim> center_point =
+        center.get_point() ?
+          *(static_cast<const Point<dim> *>(center.get_point())) :
+          Point<dim>();
+
+      Triangulation<dim> *tria =
+        static_cast<Triangulation<dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::hyper_ball_balanced(*tria, center_point, radius);
     }
 
 
@@ -1189,6 +1268,69 @@ namespace python
 
 
   void
+  TriangulationWrapper::generate_plate_with_a_hole(const double inner_radius,
+                                                   const double outer_radius,
+                                                   const double pad_bottom,
+                                                   const double pad_top,
+                                                   const double pad_left,
+                                                   const double pad_right,
+                                                   const PointWrapper &center,
+                                                   const int polar_manifold_id,
+                                                   const int tfi_manifold_id,
+                                                   const double       L,
+                                                   const unsigned int n_slices,
+                                                   const bool         colorize)
+  {
+    if (dim == 2)
+      internal::generate_plate_with_a_hole<2>(inner_radius,
+                                              outer_radius,
+                                              pad_bottom,
+                                              pad_top,
+                                              pad_left,
+                                              pad_right,
+                                              center,
+                                              polar_manifold_id,
+                                              tfi_manifold_id,
+                                              L,
+                                              n_slices,
+                                              colorize,
+                                              triangulation);
+    else
+      internal::generate_plate_with_a_hole<3>(inner_radius,
+                                              outer_radius,
+                                              pad_bottom,
+                                              pad_top,
+                                              pad_left,
+                                              pad_right,
+                                              center,
+                                              polar_manifold_id,
+                                              tfi_manifold_id,
+                                              L,
+                                              n_slices,
+                                              colorize,
+                                              triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::generate_channel_with_cylinder(
+    const double       shell_region_width,
+    const unsigned int n_shells,
+    const double       skewness,
+    const bool         colorize)
+  {
+    if (dim == 2)
+      internal::generate_channel_with_cylinder<2>(
+        shell_region_width, n_shells, skewness, colorize, triangulation);
+    else
+      internal::generate_channel_with_cylinder<3>(
+        shell_region_width, n_shells, skewness, colorize, triangulation);
+  }
+
+
+
+  void
   TriangulationWrapper::generate_general_cell(boost::python::list &vertices,
                                               const bool           colorize)
   {
@@ -1374,6 +1516,22 @@ namespace python
       internal::generate_hyper_ball<2>(center, radius, triangulation);
     else
       internal::generate_hyper_ball<3>(center, radius, triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::generate_hyper_ball_balanced(const PointWrapper &center,
+                                                     const double        radius)
+  {
+    AssertThrow(
+      dim == spacedim,
+      ExcMessage(
+        "This function is only implemented for dim equal to spacedim."));
+    if (dim == 2)
+      internal::generate_hyper_ball_balanced<2>(center, radius, triangulation);
+    else
+      internal::generate_hyper_ball_balanced<3>(center, radius, triangulation);
   }
 
 
