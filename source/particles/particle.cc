@@ -285,8 +285,9 @@ namespace Particles
   std::size_t
   Particle<dim, spacedim>::serialized_size_in_bytes() const
   {
-    std::size_t size = sizeof(get_id()) + sizeof(get_location()) +
-                       sizeof(get_reference_location());
+    std::size_t size = sizeof(get_id()) +
+                       sizeof(double) * spacedim + // get_location()
+                       sizeof(double) * dim;       // get_reference_location()
 
     if (has_properties())
       {
