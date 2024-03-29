@@ -510,8 +510,8 @@ std::string
 FE_Hermite<dim, spacedim>::get_name() const
 {
   std::ostringstream name_buffer;
-  name_buffer << "FE_Hermite<" << dim << "," << spacedim << ">(" << this->degree
-              << ")";
+  name_buffer << "FE_Hermite<" << Utilities::dim_string(dim, spacedim) << ">("
+              << this->degree << ")";
   return name_buffer.str();
 }
 

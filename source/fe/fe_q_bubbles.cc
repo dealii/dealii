@@ -330,10 +330,11 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
             break;
           }
       if (type == true)
-        namebuf << "FE_Q_Bubbles<" << dim << ">(" << this->degree - 1 << ")";
+        namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
+                << ">(" << this->degree - 1 << ")";
       else
-        namebuf << "FE_Q_Bubbles<" << dim << ">(QUnknownNodes(" << this->degree
-                << "))";
+        namebuf << "FE_Q_Bubbles<" << Utilities::dim_string(dim, spacedim)
+                << ">(QUnknownNodes(" << this->degree << "))";
     }
   return namebuf.str();
 }

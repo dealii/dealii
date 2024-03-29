@@ -647,7 +647,8 @@ std::string
 FE_SimplexP<dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_SimplexP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_SimplexP<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
 
   return namebuf.str();
 }
@@ -893,7 +894,8 @@ std::string
 FE_SimplexDGP<dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_SimplexDGP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_SimplexDGP<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
 
   return namebuf.str();
 }
