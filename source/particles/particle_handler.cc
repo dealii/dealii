@@ -2366,7 +2366,19 @@ namespace Particles
           &(*data_range.begin()) + (data_range.end() - data_range.begin()));
 
         while (data < end)
-          insert_particle(data, cell_to_store_particles);
+          {
+            const void *old_data = data;
+            const auto  x = insert_particle(data, cell_to_store_particles);
+
+            // Ensure that the particle read exactly as much data as
+            // it promised it needs to store its data
+            const void *new_data = data;
+            (void)old_data;
+            (void)new_data;
+            (void)x;
+            AssertDimension((const char *)new_data - (const char *)old_data,
+                            x->serialized_size_in_bytes());
+          }
 
         Assert(data == end,
                ExcMessage(
