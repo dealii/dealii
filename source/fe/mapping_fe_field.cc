@@ -1718,9 +1718,8 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_face_values(
       numbers::invalid_unsigned_int,
       QProjector<dim>::DataSetDescriptor::face(reference_cell,
                                                face_no,
-                                               cell->face_orientation(face_no),
-                                               cell->face_flip(face_no),
-                                               cell->face_rotation(face_no),
+                                               cell->combined_face_orientation(
+                                                 face_no),
                                                quadrature[0].size()),
       data,
       euler_dof_handler->get_fe(),
@@ -1759,9 +1758,8 @@ MappingFEField<dim, spacedim, VectorType>::fill_fe_subface_values(
     QProjector<dim>::DataSetDescriptor::subface(reference_cell,
                                                 face_no,
                                                 subface_no,
-                                                cell->face_orientation(face_no),
-                                                cell->face_flip(face_no),
-                                                cell->face_rotation(face_no),
+                                                cell->combined_face_orientation(
+                                                  face_no),
                                                 quadrature.size(),
                                                 cell->subface_case(face_no)),
     data,

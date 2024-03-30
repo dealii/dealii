@@ -388,14 +388,12 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   for (unsigned int k = 0;
        k < face_points.size() * GeometryInfo<dim>::faces_per_cell;
        ++k)
-    this->generalized_support_points[k] = faces.point(
-      k +
-      QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                               0,
-                                               true,
-                                               false,
-                                               false,
-                                               this->n_dofs_per_face(face_no)));
+    this->generalized_support_points[k] =
+      faces.point(k + QProjector<dim>::DataSetDescriptor::face(
+                        this->reference_cell(),
+                        0,
+                        ReferenceCell::default_combined_face_orientation(),
+                        this->n_dofs_per_face(face_no)));
 
   // Currently, for backward compatibility, we do not use moments, but
   // point values on faces in 2d. In 3d, this is impossible, since the

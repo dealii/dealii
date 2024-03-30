@@ -3142,9 +3142,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   const auto         offset =
     QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
                                              face_no,
-                                             cell->face_orientation(face_no),
-                                             cell->face_flip(face_no),
-                                             cell->face_rotation(face_no),
+                                             cell->combined_face_orientation(
+                                               face_no),
                                              n_q_points);
 
   if (flags & update_values)

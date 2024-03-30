@@ -623,7 +623,10 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
           // TODO: Check what the face_orientation, face_flip and face_rotation
           // have to be in 3d
           unsigned int k = QProjector<dim>::DataSetDescriptor::face(
-            this->reference_cell(), face, false, false, false, n_face_points);
+            this->reference_cell(),
+            face,
+            ReferenceCell::default_combined_face_orientation(),
+            n_face_points);
           for (unsigned int i = 0; i < boundary_weights_abf.size(1); ++i)
             nodal_values[start_abf_dofs + i] +=
               n_orient * boundary_weights_abf(k + fp, i) *

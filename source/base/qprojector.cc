@@ -1618,9 +1618,7 @@ QProjector<1>::DataSetDescriptor::subface(
   const ReferenceCell &reference_cell,
   const unsigned int   face_no,
   const unsigned int   subface_no,
-  const bool,
-  const bool,
-  const bool,
+  const unsigned char /*combined_orientation*/,
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<1>)
 {
@@ -1643,9 +1641,7 @@ QProjector<2>::DataSetDescriptor::subface(
   const ReferenceCell &reference_cell,
   const unsigned int   face_no,
   const unsigned int   subface_no,
-  const bool,
-  const bool,
-  const bool,
+  const unsigned char /*combined_orientation*/,
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
@@ -1668,13 +1664,14 @@ QProjector<3>::DataSetDescriptor::subface(
   const ReferenceCell           &reference_cell,
   const unsigned int             face_no,
   const unsigned int             subface_no,
-  const bool                     face_orientation,
-  const bool                     face_flip,
-  const bool                     face_rotation,
+  const unsigned char            combined_orientation,
   const unsigned int             n_quadrature_points,
   const internal::SubfaceCase<3> ref_case)
 {
   const unsigned int dim = 3;
+
+  const auto [face_orientation, face_rotation, face_flip] =
+    internal::split_face_orientation(combined_orientation);
 
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
   (void)reference_cell;

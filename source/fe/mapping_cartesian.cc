@@ -293,9 +293,7 @@ MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
       const auto offset = QProjector<dim>::DataSetDescriptor::face(
         ReferenceCells::get_hypercube<dim>(),
         face_no,
-        cell->face_orientation(face_no),
-        cell->face_flip(face_no),
-        cell->face_rotation(face_no),
+        cell->combined_face_orientation(face_no),
         quadrature_points.size());
 
 
@@ -327,9 +325,7 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
         ReferenceCells::get_hypercube<dim>(),
         face_no,
         sub_no,
-        cell->face_orientation(face_no),
-        cell->face_flip(face_no),
-        cell->face_rotation(face_no),
+        cell->combined_face_orientation(face_no),
         quadrature_points.size(),
         cell->subface_case(face_no));
 
