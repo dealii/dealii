@@ -183,7 +183,8 @@ std::string
 FE_WedgeP<dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_WedgeP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_WedgeP<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
 
   return namebuf.str();
 }
@@ -352,7 +353,8 @@ std::string
 FE_WedgeDGP<dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_WedgeDGP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_WedgeDGP<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
 
   return namebuf.str();
 }

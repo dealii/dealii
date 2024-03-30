@@ -199,16 +199,16 @@ DEAL::Generated :
 DEAL::FE_Bernstein<1>(1)
 DEAL::Read FE_Bernstein(1)
 DEAL::Generated :
-DEAL::FE_Bernstein<1>(1)
+DEAL::FE_Bernstein<1,2>(1)
 DEAL::Read FE_Bernstein(1)
 DEAL::Generated :
 DEAL::FE_Bernstein<2>(1)
 DEAL::Read FE_Bernstein(1)
 DEAL::Generated :
-DEAL::FE_Bernstein<1>(1)
+DEAL::FE_Bernstein<1,3>(1)
 DEAL::Read FE_Bernstein(1)
 DEAL::Generated :
-DEAL::FE_Bernstein<2>(1)
+DEAL::FE_Bernstein<2,3>(1)
 DEAL::Read FE_Bernstein(1)
 DEAL::Generated :
 DEAL::FE_Bernstein<3>(1)
@@ -307,13 +307,13 @@ DEAL::Generated :
 DEAL::FE_Q_Bubbles<1>(QUnknownNodes(2))
 DEAL::Read FE_Q_Bubbles(1)
 DEAL::Generated :
-DEAL::FE_Q_Bubbles<1>(QUnknownNodes(2))
+DEAL::FE_Q_Bubbles<1,2>(QUnknownNodes(2))
 DEAL::Read FE_Q_Bubbles(1)
 DEAL::Generated :
 DEAL::FE_Q_Bubbles<2>(1)
 DEAL::Read FE_Q_Bubbles(1)
 DEAL::Generated :
-DEAL::FE_Q_Bubbles<1>(QUnknownNodes(2))
+DEAL::FE_Q_Bubbles<1,3>(QUnknownNodes(2))
 DEAL::Read FE_Q_Bubbles(1)
 DEAL::Generated :
 DEAL::FE_Q_Bubbles<2,3>(1)
@@ -379,16 +379,16 @@ DEAL::Generated :
 DEAL::FE_Bernstein<1>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
-DEAL::FE_Bernstein<1>(2)
+DEAL::FE_Bernstein<1,2>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
 DEAL::FE_Bernstein<2>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
-DEAL::FE_Bernstein<1>(2)
+DEAL::FE_Bernstein<1,3>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
-DEAL::FE_Bernstein<2>(2)
+DEAL::FE_Bernstein<2,3>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
 DEAL::FE_Bernstein<3>(2)
@@ -451,13 +451,13 @@ DEAL::Generated :
 DEAL::FE_Q_Bubbles<1>(QUnknownNodes(3))
 DEAL::Read FE_Q_Bubbles(2)
 DEAL::Generated :
-DEAL::FE_Q_Bubbles<1>(QUnknownNodes(3))
+DEAL::FE_Q_Bubbles<1,2>(QUnknownNodes(3))
 DEAL::Read FE_Q_Bubbles(2)
 DEAL::Generated :
 DEAL::FE_Q_Bubbles<2>(2)
 DEAL::Read FE_Q_Bubbles(2)
 DEAL::Generated :
-DEAL::FE_Q_Bubbles<1>(QUnknownNodes(3))
+DEAL::FE_Q_Bubbles<1,3>(QUnknownNodes(3))
 DEAL::Read FE_Q_Bubbles(2)
 DEAL::Generated :
 DEAL::FE_Q_Bubbles<2,3>(2)
@@ -523,16 +523,16 @@ DEAL::Generated :
 DEAL::FE_Bernstein<1>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
-DEAL::FE_Bernstein<1>(2)
+DEAL::FE_Bernstein<1,2>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
 DEAL::FE_Bernstein<2>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
-DEAL::FE_Bernstein<1>(2)
+DEAL::FE_Bernstein<1,3>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
-DEAL::FE_Bernstein<2>(2)
+DEAL::FE_Bernstein<2,3>(2)
 DEAL::Read FE_Bernstein(2)
 DEAL::Generated :
 DEAL::FE_Bernstein<3>(2)
@@ -559,16 +559,16 @@ DEAL::Generated :
 DEAL::FE_SimplexP<1>(1)
 DEAL::Read FE_SimplexP(1)
 DEAL::Generated :
-DEAL::FE_SimplexP<1>(1)
+DEAL::FE_SimplexP<1,2>(1)
 DEAL::Read FE_SimplexP(1)
 DEAL::Generated :
 DEAL::FE_SimplexP<2>(1)
 DEAL::Read FE_SimplexP(1)
 DEAL::Generated :
-DEAL::FE_SimplexP<1>(1)
+DEAL::FE_SimplexP<1,3>(1)
 DEAL::Read FE_SimplexP(1)
 DEAL::Generated :
-DEAL::FE_SimplexP<2>(1)
+DEAL::FE_SimplexP<2,3>(1)
 DEAL::Read FE_SimplexP(1)
 DEAL::Generated :
 DEAL::FE_SimplexP<3>(1)
@@ -577,16 +577,16 @@ DEAL::Generated :
 DEAL::FE_SimplexP<1>(2)
 DEAL::Read FE_SimplexP(2)
 DEAL::Generated :
-DEAL::FE_SimplexP<1>(2)
+DEAL::FE_SimplexP<1,2>(2)
 DEAL::Read FE_SimplexP(2)
 DEAL::Generated :
 DEAL::FE_SimplexP<2>(2)
 DEAL::Read FE_SimplexP(2)
 DEAL::Generated :
-DEAL::FE_SimplexP<1>(2)
+DEAL::FE_SimplexP<1,3>(2)
 DEAL::Read FE_SimplexP(2)
 DEAL::Generated :
-DEAL::FE_SimplexP<2>(2)
+DEAL::FE_SimplexP<2,3>(2)
 DEAL::Read FE_SimplexP(2)
 DEAL::Generated :
 DEAL::FE_SimplexP<3>(2)
@@ -595,16 +595,16 @@ DEAL::Generated :
 DEAL::FE_SimplexDGP<1>(1)
 DEAL::Read FE_SimplexDGP(1)
 DEAL::Generated :
-DEAL::FE_SimplexDGP<1>(1)
+DEAL::FE_SimplexDGP<1,2>(1)
 DEAL::Read FE_SimplexDGP(1)
 DEAL::Generated :
 DEAL::FE_SimplexDGP<2>(1)
 DEAL::Read FE_SimplexDGP(1)
 DEAL::Generated :
-DEAL::FE_SimplexDGP<1>(1)
+DEAL::FE_SimplexDGP<1,3>(1)
 DEAL::Read FE_SimplexDGP(1)
 DEAL::Generated :
-DEAL::FE_SimplexDGP<2>(1)
+DEAL::FE_SimplexDGP<2,3>(1)
 DEAL::Read FE_SimplexDGP(1)
 DEAL::Generated :
 DEAL::FE_SimplexDGP<3>(1)
@@ -613,16 +613,16 @@ DEAL::Generated :
 DEAL::FE_SimplexDGP<1>(2)
 DEAL::Read FE_SimplexDGP(2)
 DEAL::Generated :
-DEAL::FE_SimplexDGP<1>(2)
+DEAL::FE_SimplexDGP<1,2>(2)
 DEAL::Read FE_SimplexDGP(2)
 DEAL::Generated :
 DEAL::FE_SimplexDGP<2>(2)
 DEAL::Read FE_SimplexDGP(2)
 DEAL::Generated :
-DEAL::FE_SimplexDGP<1>(2)
+DEAL::FE_SimplexDGP<1,3>(2)
 DEAL::Read FE_SimplexDGP(2)
 DEAL::Generated :
-DEAL::FE_SimplexDGP<2>(2)
+DEAL::FE_SimplexDGP<2,3>(2)
 DEAL::Read FE_SimplexDGP(2)
 DEAL::Generated :
 DEAL::FE_SimplexDGP<3>(2)

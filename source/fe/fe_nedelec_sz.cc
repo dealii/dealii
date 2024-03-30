@@ -3342,7 +3342,8 @@ FE_NedelecSZ<dim, spacedim>::get_name() const
   // note that the FETools::get_fe_by_name function depends on the particular
   // format of the string this function returns, so they have to be kept in sync
   std::ostringstream namebuf;
-  namebuf << "FE_NedelecSZ<" << dim << ">(" << this->degree - 1 << ")";
+  namebuf << "FE_NedelecSZ<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree - 1 << ")";
 
   return namebuf.str();
 }

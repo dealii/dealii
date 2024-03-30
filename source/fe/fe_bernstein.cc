@@ -340,7 +340,8 @@ FE_Bernstein<dim, spacedim>::get_name() const
   // kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_Bernstein<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_Bernstein<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
   return namebuf.str();
 }
 

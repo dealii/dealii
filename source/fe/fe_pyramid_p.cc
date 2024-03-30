@@ -163,7 +163,8 @@ std::string
 FE_PyramidP<dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_PyramidP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_PyramidP<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
 
   return namebuf.str();
 }
@@ -332,7 +333,8 @@ std::string
 FE_PyramidDGP<dim, spacedim>::get_name() const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_PyramidDGP<" << dim << ">(" << this->degree << ")";
+  namebuf << "FE_PyramidDGP<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
 
   return namebuf.str();
 }
