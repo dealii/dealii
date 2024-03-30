@@ -3262,7 +3262,13 @@ namespace parallel
           // get a non-const view of the array
           double *this_sc_point =
             static_cast<double *>(sc_array_index_ssize_t(point_sc_array, i));
-          owner_rank[i] = static_cast<types::subdomain_id>(this_sc_point[dim]);
+          Assert(this_sc_point[dim] >= 0. || this_sc_point[dim] == -1.,
+                 ExcInternalError());
+          if (this_sc_point[dim] < 0.)
+            owner_rank[i] = numbers::invalid_subdomain_id;
+          else
+            owner_rank[i] =
+              static_cast<types::subdomain_id>(this_sc_point[dim]);
         }
 
       // reset the internal pointer to this triangulation
