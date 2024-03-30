@@ -165,4 +165,5 @@ DEAL:double::0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.0
 DEAL::Using Tensor within constexpr functions
 DEAL::15.2000
 DEAL::116.000
+DEAL::Used memory: 72
 DEAL::OK
