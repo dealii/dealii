@@ -1,5 +1,0 @@
-Changed: The Tensor class now has an alignment greater than what the
-compiler would automatically choose to enable more efficient memory
-operations on these objects.
-<br>
-(Wolfgang Bangerth, 2024/03/23)
