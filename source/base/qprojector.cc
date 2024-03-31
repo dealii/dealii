@@ -30,10 +30,10 @@ namespace internal
   {
     namespace
     {
+      // Reflect points across the y = x line.
       std::vector<Point<2>>
       reflect(const std::vector<Point<2>> &points)
       {
-        // Take the points and reflect them by the diagonal
         std::vector<Point<2>> q_points;
         q_points.reserve(points.size());
         for (const Point<2> &p : points)
@@ -43,6 +43,8 @@ namespace internal
       }
 
 
+      // Rotate points in the plane around the positive z axis (i.e.,
+      // counter-clockwise).
       std::vector<Point<2>>
       rotate(const std::vector<Point<2>> &points, const unsigned int n_times)
       {
@@ -146,22 +148,36 @@ namespace internal
 
       std::vector<Point<2>>
       mutate_points_with_offset(const std::vector<Point<2>> &points,
-                                const unsigned int           offset)
+                                const unsigned char combined_orientation)
       {
-        switch (offset)
+        // These rotations are backwards (relative to the standard notion of,
+        // e.g., what rotation index 7 means) since they are rotations about the
+        // positive z axis in 2d: i.e., they are done from the perspective of
+        // 'inside' a cell instead of the perspective of an abutting cell.
+        //
+        // For example: consider points on face 4 of a hexahedron with
+        // orientation 3. In 2d, rotating such points clockwise is the same as
+        // rotating them counter-clockwise from the perspective of the abutting
+        // face. Hence, such points must be rotated 90 degrees
+        // counter-clockwise.
+        switch (combined_orientation)
           {
             case 0:
-              return points;
-            case 1:
-            case 2:
-            case 3:
-              return rotate(points, offset);
-            case 4:
               return reflect(points);
-            case 5:
+            case 2:
+              return rotate(reflect(points), 3);
+            case 4:
+              return rotate(reflect(points), 2);
             case 6:
+              return rotate(reflect(points), 1);
+            case 1:
+              return points;
+            case 3:
+              return rotate(points, 1);
+            case 5:
+              return rotate(points, 2);
             case 7:
-              return rotate(reflect(points), 8 - offset);
+              return rotate(points, 3);
             default:
               DEAL_II_ASSERT_UNREACHABLE();
           }
@@ -170,25 +186,11 @@ namespace internal
 
       Quadrature<2>
       mutate_quadrature(const Quadrature<2> &quadrature,
-                        const bool           face_orientation,
-                        const bool           face_flip,
-                        const bool           face_rotation)
+                        const unsigned char  combined_orientation)
       {
-        static const unsigned int offset[2][2][2] = {
-          {{4, 5},   // face_orientation=false; face_flip=false;
-                     // face_rotation=false and true
-           {6, 7}},  // face_orientation=false; face_flip=true;
-                     // face_rotation=false and true
-          {{0, 1},   // face_orientation=true;  face_flip=false;
-                     // face_rotation=false and true
-           {2, 3}}}; // face_orientation=true; face_flip=true;
-                     // face_rotation=false and true
-
-        return Quadrature<2>(
-          mutate_points_with_offset(
-            quadrature.get_points(),
-            offset[face_orientation][face_flip][face_rotation]),
-          quadrature.get_weights());
+        return Quadrature<2>(mutate_points_with_offset(quadrature.get_points(),
+                                                       combined_orientation),
+                             quadrature.get_weights());
       }
 
       std::pair<unsigned int, RefinementCase<2>>
@@ -463,7 +465,10 @@ QProjector<3>::project_to_oriented_face(const ReferenceCell &reference_cell,
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
   const Quadrature<2> mutation = internal::QProjector::mutate_quadrature(
-    quadrature, face_orientation, face_flip, face_rotation);
+    quadrature,
+    internal::combined_face_orientation(face_orientation,
+                                        face_rotation,
+                                        face_flip));
 
   return QProjector<3>::project_to_face(reference_cell, mutation, face_no);
 }
@@ -696,7 +701,10 @@ QProjector<3>::project_to_oriented_subface(
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
   const Quadrature<2> mutation = internal::QProjector::mutate_quadrature(
-    quadrature, face_orientation, face_flip, face_rotation);
+    quadrature,
+    internal::combined_face_orientation(face_orientation,
+                                        face_rotation,
+                                        face_flip));
 
   const std::pair<unsigned int, RefinementCase<2>>
     final_subface_no_and_ref_case =
@@ -1025,7 +1033,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
       std::vector<double> weights;
       weights.reserve(n_points_total);
 
-      for (unsigned int offset = 0; offset < 8; ++offset)
+      for (unsigned char offset = 0; offset < 8; ++offset)
         {
           const auto mutation = internal::QProjector::mutate_points_with_offset(
             quadrature[0].get_points(), offset);
@@ -1181,7 +1189,7 @@ QProjector<3>::project_to_all_subfaces(const ReferenceCell &reference_cell,
 
   // do the following for all possible mutations of a face (mutation==0
   // corresponds to a face with standard orientation, no flip and no rotation)
-  for (unsigned int offset = 0; offset < 8; ++offset)
+  for (unsigned char offset = 0; offset < 8; ++offset)
     {
       const auto mutation =
         internal::QProjector::mutate_points_with_offset(quadrature.get_points(),
@@ -1340,8 +1348,6 @@ QProjector<dim>::DataSetDescriptor::face(
   const unsigned char  combined_orientation,
   const unsigned int   n_quadrature_points)
 {
-  const auto [face_orientation, face_rotation, face_flip] =
-    internal::split_face_orientation(combined_orientation);
   // TODO: once we move to representing the default orientation as 0 (instead of
   // 1) we can get rid of the dim = 1 check
   Assert(dim == 1 ||
@@ -1375,53 +1381,10 @@ QProjector<dim>::DataSetDescriptor::face(
       case 1:
       case 2:
         return face_no * n_quadrature_points;
-
-
       case 3:
-        {
-          // in 3d, we have to account for faces that
-          // have non-standard face orientation, flip
-          // and rotation. thus, we have to store
-          // _eight_ data sets per face or subface
-
-          // set up a table with the according offsets
-          // for non-standard orientation, first index:
-          // face_orientation (standard true=1), second
-          // index: face_flip (standard false=0), third
-          // index: face_rotation (standard false=0)
-          //
-          // note, that normally we should use the
-          // obvious offsets 0,1,2,3,4,5,6,7. However,
-          // prior to the changes enabling flipped and
-          // rotated faces, in many places of the
-          // library the convention was used, that the
-          // first dataset with offset 0 corresponds to
-          // a face in standard orientation. therefore
-          // we use the offsets 4,5,6,7,0,1,2,3 here to
-          // stick to that (implicit) convention
-          static const unsigned int offset[2][2][2] = {
-            {{4 * GeometryInfo<dim>::faces_per_cell,
-              5 * GeometryInfo<dim>::
-                    faces_per_cell}, // face_orientation=false; face_flip=false;
-                                     // face_rotation=false and true
-             {6 * GeometryInfo<dim>::faces_per_cell,
-              7 * GeometryInfo<dim>::
-                    faces_per_cell}}, // face_orientation=false; face_flip=true;
-                                      // face_rotation=false and true
-            {{0 * GeometryInfo<dim>::faces_per_cell,
-              1 * GeometryInfo<dim>::
-                    faces_per_cell}, // face_orientation=true;  face_flip=false;
-                                     // face_rotation=false and true
-             {2 * GeometryInfo<dim>::faces_per_cell,
-              3 * GeometryInfo<dim>::
-                    faces_per_cell}}}; // face_orientation=true; face_flip=true;
-                                       // face_rotation=false and true
-
-          return (
-            (face_no + offset[face_orientation][face_flip][face_rotation]) *
-            n_quadrature_points);
-        }
-
+        return (face_no +
+                GeometryInfo<dim>::faces_per_cell * combined_orientation) *
+               n_quadrature_points;
       default:
         DEAL_II_ASSERT_UNREACHABLE();
     }
@@ -1458,9 +1421,6 @@ QProjector<dim>::DataSetDescriptor::face(
   const unsigned char             combined_orientation,
   const hp::QCollection<dim - 1> &quadrature)
 {
-  const auto [face_orientation, face_rotation, face_flip] =
-    internal::split_face_orientation(combined_orientation);
-
   if (reference_cell == ReferenceCells::Triangle ||
       reference_cell == ReferenceCells::Tetrahedron ||
       reference_cell == ReferenceCells::Wedge ||
@@ -1526,41 +1486,9 @@ QProjector<dim>::DataSetDescriptor::face(
         }
       case 3:
         {
-          // in 3d, we have to account for faces that
-          // have non-standard face orientation, flip
-          // and rotation. thus, we have to store
-          // _eight_ data sets per face or subface
-
-          // set up a table with the according offsets
-          // for non-standard orientation, first index:
-          // face_orientation (standard true=1), second
-          // index: face_flip (standard false=0), third
-          // index: face_rotation (standard false=0)
-          //
-          // note, that normally we should use the
-          // obvious offsets 0,1,2,3,4,5,6,7. However,
-          // prior to the changes enabling flipped and
-          // rotated faces, in many places of the
-          // library the convention was used, that the
-          // first dataset with offset 0 corresponds to
-          // a face in standard orientation. therefore
-          // we use the offsets 4,5,6,7,0,1,2,3 here to
-          // stick to that (implicit) convention
-          static const unsigned int offset[2][2][2] = {
-            {{4, 5},   // face_orientation=false; face_flip=false;
-                       // face_rotation=false and true
-             {6, 7}},  // face_orientation=false; face_flip=true;
-                       // face_rotation=false and true
-            {{0, 1},   // face_orientation=true;  face_flip=false;
-                       // face_rotation=false and true
-             {2, 3}}}; // face_orientation=true; face_flip=true;
-                       // face_rotation=false and true
-
-
           if (quadrature.size() == 1)
             return (face_no +
-                    offset[face_orientation][face_flip][face_rotation] *
-                      GeometryInfo<dim>::faces_per_cell) *
+                    combined_orientation * GeometryInfo<dim>::faces_per_cell) *
                    quadrature[0].size();
           else
             {
@@ -1573,9 +1501,7 @@ QProjector<dim>::DataSetDescriptor::face(
                    ++i)
                 n_points += quadrature[i].size();
 
-              return (n_points_i +
-                      offset[face_orientation][face_flip][face_rotation] *
-                        n_points);
+              return n_points_i + combined_orientation * n_points;
             }
         }
 
@@ -1680,60 +1606,15 @@ QProjector<3>::DataSetDescriptor::subface(
   Assert(subface_no < GeometryInfo<dim>::max_children_per_face,
          ExcInternalError());
 
-  // As the quadrature points created by
-  // QProjector are on subfaces in their
-  // "standard location" we have to use a
-  // permutation of the equivalent subface
-  // number in order to respect face
-  // orientation, flip and rotation. The
-  // information we need here is exactly the
-  // same as the
-  // GeometryInfo<3>::child_cell_on_face info
-  // for the bottom face (face 4) of a hex, as
-  // on this the RefineCase of the cell matches
-  // that of the face and the subfaces are
-  // numbered in the same way as the child
-  // cells.
-
   // in 3d, we have to account for faces that
-  // have non-standard face orientation, flip
-  // and rotation. thus, we have to store
-  // _eight_ data sets per face or subface
-  // already for the isotropic
+  // have non-standard orientation. thus, we
+  // have to store _eight_ data sets per face
+  // or subface already for the isotropic
   // case. Additionally, we have three
   // different refinement cases, resulting in
   // <tt>4 + 2 + 2 = 8</tt> different subfaces
   // for each face.
   const unsigned int total_subfaces_per_face = 8;
-
-  // set up a table with the according offsets
-  // for non-standard orientation, first index:
-  // face_orientation (standard true=1), second
-  // index: face_flip (standard false=0), third
-  // index: face_rotation (standard false=0)
-  //
-  // note, that normally we should use the
-  // obvious offsets 0,1,2,3,4,5,6,7. However,
-  // prior to the changes enabling flipped and
-  // rotated faces, in many places of the
-  // library the convention was used, that the
-  // first dataset with offset 0 corresponds to
-  // a face in standard orientation. therefore
-  // we use the offsets 4,5,6,7,0,1,2,3 here to
-  // stick to that (implicit) convention
-  static const unsigned int orientation_offset[2][2][2] = {
-    {// face_orientation=false; face_flip=false; face_rotation=false and true
-     {4 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face,
-      5 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face},
-     // face_orientation=false; face_flip=true;  face_rotation=false and true
-     {6 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face,
-      7 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face}},
-    {// face_orientation=true;  face_flip=false; face_rotation=false and true
-     {0 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face,
-      1 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face},
-     // face_orientation=true;  face_flip=true;  face_rotation=false and true
-     {2 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face,
-      3 * GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face}}};
 
   // set up a table with the offsets for a
   // given refinement case respecting the
@@ -1761,11 +1642,12 @@ QProjector<3>::DataSetDescriptor::subface(
       internal::QProjector::select_subface_no_and_refinement_case(
         subface_no, face_orientation, face_flip, face_rotation, ref_case);
 
-  return (((face_no * total_subfaces_per_face +
-            ref_case_offset[final_subface_no_and_ref_case.second - 1] +
-            final_subface_no_and_ref_case.first) +
-           orientation_offset[face_orientation][face_flip][face_rotation]) *
-          n_quadrature_points);
+  return ((face_no * total_subfaces_per_face +
+           ref_case_offset[final_subface_no_and_ref_case.second - 1] +
+           final_subface_no_and_ref_case.first) +
+          GeometryInfo<dim>::faces_per_cell * total_subfaces_per_face *
+            combined_orientation) *
+         n_quadrature_points;
 }
 
 
