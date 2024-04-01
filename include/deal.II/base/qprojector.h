@@ -333,8 +333,9 @@ public:
          const unsigned int   n_quadrature_points);
 
     /**
-     * Like the above function but taking a quadrature collection, enabling
-     * that each face might have different number of quadrature points.
+     * Compute an offset object for the given face number and orientation,
+     * taking into account the possibility of different quadrature rules being
+     * used on each face.
      *
      * @deprecated Use the version of this function which takes a
      * combined_orientation argument instead.
@@ -351,8 +352,10 @@ public:
          const hp::QCollection<dim - 1> &quadrature);
 
     /**
-     * Like the above function but taking a quadrature collection, enabling
-     * that each face might have different number of quadrature points.
+     * Compute an offset object for the given face number and orientation,
+     * taking into account the possibility of different quadrature rules being
+     * used on each face.
+     *
      */
     static DataSetDescriptor
     face(const ReferenceCell            &reference_cell,
