@@ -187,14 +187,12 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
       for (unsigned int k = 0; k < this->n_dofs_per_face(face_no) *
                                      GeometryInfo<dim>::faces_per_cell;
            ++k)
-        this->generalized_support_points[k] = faces.point(
-          k + QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                                       0,
-                                                       true,
-                                                       false,
-                                                       false,
-                                                       this->n_dofs_per_face(
-                                                         face_no)));
+        this->generalized_support_points[k] =
+          faces.point(k + QProjector<dim>::DataSetDescriptor::face(
+                            this->reference_cell(),
+                            0,
+                            ReferenceCell::default_combined_face_orientation(),
+                            this->n_dofs_per_face(face_no)));
 
       current =
         this->n_dofs_per_face(face_no) * GeometryInfo<dim>::faces_per_cell;

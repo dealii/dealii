@@ -1616,9 +1616,8 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
     numbers::invalid_unsigned_int,
     QProjector<dim>::DataSetDescriptor::face(this->fe->reference_cell(),
                                              face_no,
-                                             cell->face_orientation(face_no),
-                                             cell->face_flip(face_no),
-                                             cell->face_rotation(face_no),
+                                             cell->combined_face_orientation(
+                                               face_no),
                                              quadrature),
     quadrature[quadrature.size() == 1 ? 0 : face_no],
     data,
@@ -1664,9 +1663,8 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
     QProjector<dim>::DataSetDescriptor::subface(this->fe->reference_cell(),
                                                 face_no,
                                                 subface_no,
-                                                cell->face_orientation(face_no),
-                                                cell->face_flip(face_no),
-                                                cell->face_rotation(face_no),
+                                                cell->combined_face_orientation(
+                                                  face_no),
                                                 quadrature.size(),
                                                 cell->subface_case(face_no)),
     quadrature,

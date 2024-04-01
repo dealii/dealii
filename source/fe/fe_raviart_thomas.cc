@@ -211,9 +211,11 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
           // Enter the support point
           // into the vector
           this->generalized_support_points[current] = faces.point(
-            current +
-            QProjector<dim>::DataSetDescriptor::face(
-              this->reference_cell(), 0, true, false, false, n_face_points));
+            current + QProjector<dim>::DataSetDescriptor::face(
+                        this->reference_cell(),
+                        0,
+                        ReferenceCell::default_combined_face_orientation(),
+                        n_face_points));
         }
     }
 
