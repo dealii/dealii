@@ -214,8 +214,8 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
-                                operator+(const Tensor<1, dim, Number> &) const;
+  DEAL_II_HOST_DEVICE Point<dim, Number>
+                      operator+(const Tensor<1, dim, Number> &) const;
 
   /**
    * Subtract two points, i.e., obtain the vector that connects the two. As
@@ -226,8 +226,8 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  constexpr DEAL_II_HOST_DEVICE Tensor<1, dim, Number>
-                                operator-(const Point<dim, Number> &) const;
+  DEAL_II_HOST_DEVICE Tensor<1, dim, Number>
+                      operator-(const Point<dim, Number> &) const;
 
   /**
    * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
@@ -237,8 +237,8 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
-                                operator-(const Tensor<1, dim, Number> &) const;
+  DEAL_II_HOST_DEVICE Point<dim, Number>
+                      operator-(const Tensor<1, dim, Number> &) const;
 
   /**
    * The opposite vector.
@@ -505,7 +505,7 @@ constexpr DEAL_II_ALWAYS_INLINE Point<dim, Number>
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator+(
+DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator+(
   const Tensor<1, dim, Number> &p) const
 {
   Point<dim, Number> tmp = *this;
@@ -517,9 +517,8 @@ constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator+(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE
-  Tensor<1, dim, Number> Point<dim, Number>::operator-(
-    const Point<dim, Number> &p) const
+DEAL_II_HOST_DEVICE Tensor<1, dim, Number> Point<dim, Number>::operator-(
+  const Point<dim, Number> &p) const
 {
   return (Tensor<1, dim, Number>(*this) -= p);
 }
@@ -528,7 +527,7 @@ constexpr DEAL_II_HOST_DEVICE
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-(
+DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-(
   const Tensor<1, dim, Number> &p) const
 {
   Point<dim, Number> tmp = *this;
