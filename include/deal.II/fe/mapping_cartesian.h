@@ -109,6 +109,13 @@ public:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<spacedim> &p) const override;
 
+  // for documentation, see the Mapping base class
+  virtual void
+  transform_points_real_to_unit_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const ArrayView<const Point<spacedim>>                     &real_points,
+    const ArrayView<Point<dim>> &unit_points) const override;
+
   /**
    * @}
    */
@@ -222,6 +229,13 @@ public:
      * i.e., <i>h<sub>x</sub></i>, <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
      */
     mutable Tensor<1, dim> cell_extents;
+
+    /**
+     * Reciprocal of the extents of the last cell we have seen in the
+     * coordinate directions, i.e., <i>h<sub>x</sub></i>,
+     * <i>h<sub>y</sub></i>, <i>h<sub>z</sub></i>.
+     */
+    mutable Tensor<1, dim> inverse_cell_extents;
 
     /**
      * The volume element
@@ -352,7 +366,7 @@ private:
 
   /**
    * Transform quadrature points in InternalData to real space by scaling unit
-   * coordinates with cell_extends in each direction.
+   * coordinates with cell_extents in each direction.
    *
    * Called from the various maybe_update_*_quadrature_points functions.
    */
