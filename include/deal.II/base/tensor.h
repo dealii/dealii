@@ -421,6 +421,9 @@ namespace internal
        (dim > 1) && (dim <= 4) &&
        /* Only for float and double tensors */
        (std::is_same_v<Number, double> || std::is_same_v<Number, float>)&&
+       /* We currently don't have VectorizedArray<float,2> even in cases
+          where we have VectorizedArray<float,4>. So exclude this case. */
+       (!(std::is_same_v<Number, float> && (dim == 2))) &&
        /* Only if a VectorizedArray<Number,N> is avaiable where N>=dim
           (but we only have to consider N=2 or 4 because dim==2,3,4). */
        (internal::VectorizedArrayWidthSpecifier<Number>::max_width >=
