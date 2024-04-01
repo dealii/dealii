@@ -786,7 +786,7 @@ public:
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
-  constexpr DEAL_II_HOST_DEVICE Tensor &
+  DEAL_II_HOST_DEVICE Tensor &
   operator+=(const Tensor<rank_, dim, OtherNumber> &);
 
   /**
@@ -795,7 +795,7 @@ public:
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
-  constexpr DEAL_II_HOST_DEVICE Tensor &
+  DEAL_II_HOST_DEVICE Tensor &
   operator-=(const Tensor<rank_, dim, OtherNumber> &);
 
   /**
@@ -805,7 +805,7 @@ public:
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
-  constexpr DEAL_II_HOST_DEVICE Tensor &
+  DEAL_II_HOST_DEVICE Tensor &
   operator*=(const OtherNumber &factor);
 
   /**
@@ -814,7 +814,7 @@ public:
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
-  constexpr DEAL_II_HOST_DEVICE Tensor &
+  DEAL_II_HOST_DEVICE Tensor &
   operator/=(const OtherNumber &factor);
 
   /**
@@ -857,7 +857,7 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  constexpr DEAL_II_HOST_DEVICE
+   DEAL_II_HOST_DEVICE
     typename numbers::NumberTraits<Number>::real_type
     norm_square() const;
 
@@ -1688,8 +1688,10 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
   (void)d;
 
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = internal::NumberType<Number>::value(0.0);
+  // Since zero is the only possible argument, the result is always equal
+  // to a default constructed object:
+  *this = Tensor<rank_, dim, Number>();
+
   return *this;
 }
 
@@ -1765,10 +1767,8 @@ Tensor<rank_, dim, Number>::operator!=(
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_ALWAYS_INLINE
-  DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number>                     &
-  Tensor<rank_, dim, Number>::operator+=(
-    const Tensor<rank_, dim, OtherNumber> &p)
+inline DEAL_II_ALWAYS_INLINE DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
+Tensor<rank_, dim, Number>::operator+=(const Tensor<rank_, dim, OtherNumber> &p)
 {
   for (unsigned int i = 0; i < dim; ++i)
     values[i] += p.values[i];
@@ -1778,10 +1778,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_ALWAYS_INLINE
-  DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number>                     &
-  Tensor<rank_, dim, Number>::operator-=(
-    const Tensor<rank_, dim, OtherNumber> &p)
+inline DEAL_II_ALWAYS_INLINE DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
+Tensor<rank_, dim, Number>::operator-=(const Tensor<rank_, dim, OtherNumber> &p)
 {
   for (unsigned int i = 0; i < dim; ++i)
     values[i] -= p.values[i];
@@ -1791,9 +1789,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_ALWAYS_INLINE
-  DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
-  Tensor<rank_, dim, Number>::operator*=(const OtherNumber &s)
+inline DEAL_II_ALWAYS_INLINE DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
+Tensor<rank_, dim, Number>::operator*=(const OtherNumber &s)
 {
   for (unsigned int i = 0; i < dim; ++i)
     values[i] *= s;
@@ -1804,9 +1801,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-constexpr inline DEAL_II_ALWAYS_INLINE
-  DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
-  Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
+inline DEAL_II_ALWAYS_INLINE DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
+Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 {
   if constexpr (std::is_integral<
                   typename ProductType<Number, OtherNumber>::type>::value ||
@@ -1872,7 +1868,7 @@ Tensor<rank_, dim, Number>::norm() const
 
 
 template <int rank_, int dim, typename Number>
-constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
+DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   typename numbers::NumberTraits<Number>::real_type
   Tensor<rank_, dim, Number>::norm_square() const
 {
@@ -2000,8 +1996,7 @@ template <int rank_, int dim, typename Number>
 constexpr inline void
 Tensor<rank_, dim, Number>::clear()
 {
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = internal::NumberType<Number>::value(0.0);
+  *this = Tensor<rank_, dim, Number>();
 }
 
 
@@ -2297,7 +2292,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
+DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
   operator+(const Tensor<rank, dim, Number>      &p,
             const Tensor<rank, dim, OtherNumber> &q)
@@ -2321,7 +2316,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
+DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
   operator-(const Tensor<rank, dim, Number>      &p,
             const Tensor<rank, dim, OtherNumber> &q)
@@ -2370,7 +2365,7 @@ inline constexpr DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-inline constexpr DEAL_II_ALWAYS_INLINE
+inline DEAL_II_ALWAYS_INLINE
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
   schur_product(const Tensor<rank, dim, Number>      &src1,
                 const Tensor<rank, dim, OtherNumber> &src2)
@@ -2684,10 +2679,9 @@ constexpr inline
  * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
-constexpr inline DEAL_II_ALWAYS_INLINE
-  typename ProductType<Number, OtherNumber>::type
-  scalar_product(const Tensor<rank, dim, Number>      &left,
-                 const Tensor<rank, dim, OtherNumber> &right)
+inline DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
+scalar_product(const Tensor<rank, dim, Number>      &left,
+               const Tensor<rank, dim, OtherNumber> &right)
 {
   typename ProductType<Number, OtherNumber>::type result{};
   TensorAccessors::contract<rank, rank, rank, dim>(result, left, right);
@@ -2984,8 +2978,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 2, Number>
 }
 
 template <typename Number>
-constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
-                                       invert(const Tensor<2, 3, Number> &t)
+inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
+                             invert(const Tensor<2, 3, Number> &t)
 {
   Tensor<2, 3, Number> return_tensor;
 
@@ -3051,7 +3045,7 @@ transpose(const Tensor<2, dim, Number> &t)
  * @relatesalso Tensor
  */
 template <int dim, typename Number>
-constexpr Tensor<2, dim, Number>
+Tensor<2, dim, Number>
 adjugate(const Tensor<2, dim, Number> &t)
 {
   return determinant(t) * invert(t);
@@ -3072,7 +3066,7 @@ adjugate(const Tensor<2, dim, Number> &t)
  * @relatesalso Tensor
  */
 template <int dim, typename Number>
-constexpr Tensor<2, dim, Number>
+Tensor<2, dim, Number>
 cofactor(const Tensor<2, dim, Number> &t)
 {
   return transpose(adjugate(t));
