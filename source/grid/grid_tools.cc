@@ -1081,11 +1081,12 @@ namespace GridTools
     const Point<spacedim>                                             &position,
     const Mapping<dim, spacedim>                                      &mapping)
   {
-    const auto   vertices         = mapping.get_vertices(cell);
-    double       minimum_distance = position.distance_square(vertices[0]);
-    unsigned int closest_vertex   = 0;
+    const auto         vertices         = mapping.get_vertices(cell);
+    double             minimum_distance = position.distance_square(vertices[0]);
+    unsigned int       closest_vertex   = 0;
+    const unsigned int n_vertices       = cell->n_vertices();
 
-    for (unsigned int v = 1; v < cell->n_vertices(); ++v)
+    for (unsigned int v = 1; v < n_vertices; ++v)
       {
         const double vertex_distance = position.distance_square(vertices[v]);
         if (vertex_distance < minimum_distance)
