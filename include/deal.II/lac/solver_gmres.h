@@ -650,11 +650,11 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
-    explicit AdditionalData(
-      const unsigned int max_basis_size = 30,
-      const LinearAlgebra::OrthogonalizationStrategy
-        orthogonalization_strategy =
-          LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt)
+    explicit AdditionalData(const unsigned int max_basis_size = 30,
+                            const LinearAlgebra::OrthogonalizationStrategy
+                              orthogonalization_strategy =
+                                LinearAlgebra::OrthogonalizationStrategy::
+                                  delayed_classical_gram_schmidt)
       : max_basis_size(max_basis_size)
       , orthogonalization_strategy(orthogonalization_strategy)
     {}
