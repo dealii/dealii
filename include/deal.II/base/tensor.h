@@ -430,6 +430,23 @@ namespace internal
         (dim <= 2 ? 2 : 4)));
 
     /**
+     * If the base array (i.e., the array that holds the elements of the
+     * rank-1 tensor) can be vectorized, this variable returns how many
+     * elements it should store. If the base array cannot be vectorized,
+     * then there are exactly `dim` elements. On the other hand, if the
+     * base array can be vectorized, the number of elements stores may be
+     * larger than `dim` so that it can hold as many elements as the next
+     * larger VectorizedArray. In practice, since we don't vectorize
+     * things larger than `dim==4`, the only deviation appears when
+     * `dim==3`, where we store 4 elements.
+     */
+    template <int rank, int dim, typename Number>
+    constexpr size_t n_elements_for_base_array =
+      (can_treat_values_as_vectorized_array<rank, dim, Number> ?
+         (dim <= 2 ? 2 : 4) :
+         dim);
+
+    /**
      * Compute the alignment to be used for Tensor objects. We align it
      * by 2 or 4 times the size of the scalar object for rank-1 tensors if
      * rank-1 tensors can be treated as vectorized arrays (which makes sure that
@@ -438,8 +455,8 @@ namespace internal
      */
     template <int rank, int dim, typename Number>
     constexpr size_t tensor_alignment =
-      (can_treat_values_as_vectorized_array<1, dim, Number> ?
-         (dim <= 2 ? 2 : 4) * sizeof(Number) :
+      ((dim == 1) && can_treat_values_as_vectorized_array<1, dim, Number> ?
+         n_elements_for_base_array<rank, dim, Number> * sizeof(Number) :
          alignof(Number));
   } // namespace TensorImplementation
 } // namespace internal
@@ -914,9 +931,19 @@ private:
    * Array of tensors holding the elements of the tensor. If this is
    * a rank-1 tensor, then we simply need an array of scalars.
    * Otherwise, it is an array of tensors one rank lower.
+   *
+   * Typically, we would store `dim` elements for the base case (i.e., for
+   * rank-1 tensors), but sometimes we would like to vectorize operations
+   * and in that case we may have to store more elements so that the whole
+   * array can be treated as a vectorized data type. In this case, constructors
+   * initialize these "padding elements" with zeros, and all operations
+   * must ensure that the padding elements remain at value zero -- this is
+   * an invariant.
    */
   std::conditional_t<rank_ == 1,
-                     std::array<Number, dim>,
+                     std::array<Number,
+                                internal::TensorImplementation::
+                                  n_elements_for_base_array<rank, dim, Number>>,
                      std::array<Tensor<rank_ - 1, dim, Number>, dim>>
     values;
 
@@ -1320,6 +1347,11 @@ Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
 {
   static_assert(sizeof...(indices) == dim,
                 "dim should match the number of indices");
+
+  // If we have padding elements to support vectorization, initialize
+  // those to zero:
+  for (unsigned int i = dim; i < values.size(); ++i)
+    values[i] = internal::NumberType<Number>::value(0.0);
 }
 
 
@@ -1360,6 +1392,11 @@ Tensor<rank_, dim, Number>::Tensor()
       // to simply have another (nested) lambda function that takes the
       // integer sequence element as an argument and ignores it, just
       // returning a zero instead.
+      //
+      // (To support vectorization, we may end up using an array that's
+      // larger than 'dim' elements. As a consequence, we don't just
+      // build a list of elements of size 'dim', but of the number of
+      // elements of the 'values' array we're trying to initialize.)
       []<std::size_t... I>(
         const std::index_sequence<I...> &) constexpr -> decltype(values) {
         if constexpr (rank_ == 1)
@@ -1376,7 +1413,7 @@ Tensor<rank_, dim, Number>::Tensor()
             };
             return {{(get_zero_and_ignore_argument(I))...}};
           }
-      }(std::make_index_sequence<dim>()))
+      }(std::make_index_sequence<std::tuple_size_v<decltype(values)>>()))
 {}
 
 #  else
@@ -1398,7 +1435,10 @@ namespace internal
     constexpr std::array<typename Tensor<rank, dim, Number>::value_type, dim>
     make_zero_array(const std::index_sequence<I...> &)
     {
-      static_assert(sizeof...(I) == dim, "This is bad.");
+      static_assert(sizeof...(I) ==
+                      internal::TensorImplementation::
+                        n_elements_for_base_array<rank, dim, Number>,
+                    "This is bad.");
 
       // First peel off the case dim==0. If we don't, some compilers
       // will warn below that we define these lambda functions but
@@ -1431,7 +1471,7 @@ template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor()
   : values(internal::TensorInitialization::make_zero_array<rank_, dim, Number>(
-      std::make_index_sequence<dim>()))
+      std::make_index_sequence<std::tuple_size_v<decltype(values)>>()))
 {}
 
 
@@ -1458,6 +1498,11 @@ Tensor<rank_, dim, Number>::Tensor(
 
   for (unsigned int i = 0; i < my_n_independent_components; ++i)
     (*this)[unrolled_to_component_indices(i)] = initializer[i];
+
+  // If we have padding elements to support vectorization, initialize
+  // those to zero:
+  for (unsigned int i = dim; i < values.size(); ++i)
+    values[i] = internal::NumberType<Number>::value(0.0);
 }
 
 
@@ -1488,7 +1533,7 @@ constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const
 {
   Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> x;
-  std::copy(values.begin(), values.end(), x.values.begin());
+  std::copy(values.begin(), values.begin() + dim, x.values.begin());
   return x;
 }
 
