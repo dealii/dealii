@@ -23,6 +23,7 @@
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor_accessors.h>
+#include <deal.II/base/vectorization.h>
 
 #ifdef DEAL_II_WITH_ADOLC
 #  include <adolc/adouble.h> // Taped double
@@ -430,20 +431,92 @@ namespace internal
         (dim <= 2 ? 2 : 4)));
 
     /**
-     * Compute the alignment to be used for Tensor objects. We align it
-     * by 2 or 4 times the size of the scalar object for rank-1 tensors if
-     * rank-1 tensors can be treated as vectorized arrays (which makes sure that
-     * the higher-rank tensors are then also so aligned). Otherwise, set the
-     * alignment to the alignment of `Number`.
+     * If an array can be converted to a vectorized array by adding some
+     * padding elements, this variable returns how many elements
+     * the latter should store. In practice, since we don't vectorize
+     * things larger than `dim==4`, the only deviation appears when
+     * `dim==3`, where we store 4 elements.
      */
     template <int rank, int dim, typename Number>
-    constexpr size_t tensor_alignment =
-      (can_treat_values_as_vectorized_array<1, dim, Number> ?
-         (dim <= 2 ? 2 : 4) * sizeof(Number) :
-         alignof(Number));
+    constexpr size_t vectorized_size_for_dim =
+      (can_treat_values_as_vectorized_array<rank, dim, Number> ?
+         (dim <= 2 ? 2 : 4) :
+         1);
+
+
+    /**
+     * Given a std::array object, return an appropriately sized VectorizedArray
+     * object that is big enough to hold the given array elements and is
+     * otherwise padded by zeros.
+     */
+    template <size_t dim, typename Number>
+    VectorizedArray<Number, vectorized_size_for_dim<1, dim, Number>>
+    to_vectorized_array(const std::array<Number, dim> &array)
+    {
+      if constexpr (dim == 1)
+        return {{array[0]}};
+      else if constexpr (dim == 2)
+        return {{array[0], array[1]}};
+      else if constexpr (dim == 3)
+        return {{array[0], array[1], array[2]}};
+      else if constexpr (dim == 4)
+        return {{array[0], array[1], array[2], array[3]}};
+      else
+        {
+          DEAL_II_NOT_IMPLEMENTED();
+          return {};
+        }
+    }
+
+
+    /**
+     * Given a VectorizedArray object that can hold at least `dim` elements,
+     * return a std::array object that will contain the first `dim` elements,
+     * potentially discarding padding elements in the VectorizedArray.
+     */
+    template <int dim, typename Number>
+    std::array<Number, dim>
+    to_std_array(
+      const VectorizedArray<Number, vectorized_size_for_dim<1, dim, Number>>
+        &array)
+    {
+      if constexpr (dim == 1)
+        return {{array[0]}};
+      else if constexpr (dim == 2)
+        return {{array[0], array[1]}};
+      else if constexpr (dim == 3)
+        return {{array[0], array[1], array[2]}};
+      else if constexpr (dim == 4)
+        return {{array[0], array[1], array[2], array[3]}};
+      else
+        {
+          DEAL_II_NOT_IMPLEMENTED();
+          return {};
+        }
+    }
+
   } // namespace TensorImplementation
 } // namespace internal
 
+
+// A forward declaration of a function so that we can properly make it
+// a friend later. We need this here because the function has a defaulted
+// template argument; the default value may not be provided in the friend
+// declaration, but if we only specify it at the place where the function
+// is actually defined, the compiler complains that the default value
+// cannot be attached there either because it has to be provided on the
+// first declaration.
+template <int rank_1,
+          int rank_2,
+          int dim,
+          typename Number,
+          typename OtherNumber,
+          typename = std::enable_if_t<rank_1 >= 1 && rank_2 >= 1>>
+typename Tensor<rank_1 + rank_2 - 2,
+                dim,
+                typename ProductType<Number, OtherNumber>::type>::tensor_type
+operator*(const Tensor<rank_1, dim, Number>      &src1,
+          const Tensor<rank_2, dim, OtherNumber> &src2);
 
 /**
  * A general tensor class with an arbitrary rank, i.e. with an arbitrary
@@ -519,8 +592,7 @@ namespace internal
  * @ingroup geomprimitives
  */
 template <int rank_, int dim, typename Number>
-class alignas(
-  internal::TensorImplementation::tensor_alignment<rank_, dim, Number>) Tensor
+class Tensor
 {
 public:
   static_assert(rank_ >= 1,
@@ -937,6 +1009,30 @@ private:
   // Point is allowed access to the coordinates. This is supposed to improve
   // speed.
   friend class Point<dim, Number>;
+
+  // Make some functions 'friend' so they can access the 'values' array.
+  template <int rankX, int dimX, typename NumberX, typename OtherNumber>
+  friend Tensor<rankX, dimX, typename ProductType<NumberX, OtherNumber>::type>
+  schur_product(const Tensor<rankX, dimX, NumberX>     &src1,
+                const Tensor<rankX, dimX, OtherNumber> &src2);
+
+  template <int rank_1,
+            int rank_2,
+            int dimX,
+            typename NumberX,
+            typename OtherNumber,
+            typename>
+  friend typename Tensor<
+    rank_1 + rank_2 - 2,
+    dimX,
+    typename ProductType<NumberX, OtherNumber>::type>::tensor_type
+  operator*(const Tensor<rank_1, dimX, NumberX>     &src1,
+            const Tensor<rank_2, dimX, OtherNumber> &src2);
+
+  template <int rankX, int dimX, typename NumberX, typename OtherNumber>
+  friend typename ProductType<NumberX, OtherNumber>::type
+  scalar_product(const Tensor<rankX, dimX, NumberX>     &left,
+                 const Tensor<rankX, dimX, OtherNumber> &right);
 };
 
 
@@ -1720,13 +1816,31 @@ Tensor<rank_, dim, Number>::operator!=(
 }
 
 
+
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator+=(const Tensor<rank_, dim, OtherNumber> &p)
 {
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] += p.values[i];
+  if constexpr ((rank == 1) &&
+                internal::TensorImplementation::
+                  can_treat_values_as_vectorized_array<rank_, dim, Number> &&
+                std::is_same_v<Number, OtherNumber>)
+    {
+      // If we can treat this tensor as vectorizable, convert
+      // the 'values' array and operate on it with the appropriate
+      // intrinsics
+      values = internal::TensorImplementation::to_std_array<dim>(
+        internal::TensorImplementation::to_vectorized_array(values) +
+        internal::TensorImplementation::to_vectorized_array(p.values));
+    }
+  else
+    {
+      // Otherwise just iterate over the individual elements:
+      for (unsigned int i = 0; i < dim; ++i)
+        values[i] += p.values[i];
+    }
+
   return *this;
 }
 
@@ -1736,8 +1850,22 @@ template <typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator-=(const Tensor<rank_, dim, OtherNumber> &p)
 {
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] -= p.values[i];
+  if constexpr ((rank == 1) &&
+                internal::TensorImplementation::
+                  can_treat_values_as_vectorized_array<rank_, dim, Number> &&
+                std::is_same_v<Number, OtherNumber>)
+    {
+      values = internal::TensorImplementation::to_std_array<dim>(
+        internal::TensorImplementation::to_vectorized_array(values) -
+        internal::TensorImplementation::to_vectorized_array(p.values));
+    }
+  else
+    {
+      // Otherwise just iterate over the individual elements:
+      for (unsigned int i = 0; i < dim; ++i)
+        values[i] -= p.values[i];
+    }
+
   return *this;
 }
 
@@ -1747,8 +1875,28 @@ template <typename OtherNumber>
 inline DEAL_II_ALWAYS_INLINE DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator*=(const OtherNumber &s)
 {
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] *= s;
+  if constexpr ((rank == 1) &&
+                internal::TensorImplementation::
+                  can_treat_values_as_vectorized_array<rank_, dim, Number> &&
+                std::is_same_v<Number, OtherNumber>)
+    {
+      using VectorizedArrayTypeForValues =
+        VectorizedArray<Number,
+                        internal::TensorImplementation::
+                          vectorized_size_for_dim<rank, dim, Number>>;
+      // Create a vectorized object that contains the provided number,
+      // then do an element-wise product with the current object:
+      VectorizedArrayTypeForValues f(s);
+
+      values = internal::TensorImplementation::to_std_array<dim>(
+        internal::TensorImplementation::to_vectorized_array(values) * f);
+    }
+  else
+    {
+      for (unsigned int i = 0; i < dim; ++i)
+        values[i] *= s;
+    }
+
   return *this;
 }
 
@@ -1772,8 +1920,30 @@ Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
       // If we can, avoid division by multiplying by the inverse of the given
       // factor:
       const Number inverse_factor = Number(1.) / s;
-      for (unsigned int d = 0; d < dim; ++d)
-        values[d] *= inverse_factor;
+      if constexpr ((rank == 1) &&
+                    internal::TensorImplementation::
+                      can_treat_values_as_vectorized_array<rank_,
+                                                           dim,
+                                                           Number> &&
+                    std::is_same_v<Number, OtherNumber>)
+        {
+          using VectorizedArrayTypeForValues =
+            VectorizedArray<Number,
+                            internal::TensorImplementation::
+                              vectorized_size_for_dim<rank, dim, Number>>;
+          // Create a vectorized object that contains the provided number,
+          // then do an element-wise product with the current object:
+          VectorizedArrayTypeForValues inverse_f(inverse_factor);
+
+          values = internal::TensorImplementation::to_std_array<dim>(
+            internal::TensorImplementation::to_vectorized_array(values) *
+            inverse_f);
+        }
+      else
+        {
+          for (unsigned int d = 0; d < dim; ++d)
+            values[d] *= inverse_factor;
+        }
     }
 
   return *this;
@@ -1833,13 +2003,26 @@ DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   else if constexpr (rank_ == 1)
     {
       // For rank-1 tensors, the square of the norm is simply the sum of
-      // squares of the elements:
-      typename numbers::NumberTraits<Number>::real_type s =
-        numbers::NumberTraits<Number>::abs_square(values[0]);
-      for (unsigned int i = 1; i < dim; ++i)
-        s += numbers::NumberTraits<Number>::abs_square(values[i]);
+      // squares of the elements. For tensors over float or
+      // double (or whatever else may vectorize), we can efficiently
+      // vectorize this as a dot product. For everything else,
+      // we use a loop:
+      if constexpr (internal::TensorImplementation::
+                      can_treat_values_as_vectorized_array<rank_, dim, Number>)
+        {
+          return internal::TensorImplementation::to_vectorized_array(values)
+            .dot_product(
+              internal::TensorImplementation::to_vectorized_array(values));
+        }
+      else
+        {
+          typename numbers::NumberTraits<Number>::real_type s =
+            numbers::NumberTraits<Number>::abs_square(values[0]);
+          for (unsigned int i = 1; i < dim; ++i)
+            s += numbers::NumberTraits<Number>::abs_square(values[i]);
 
-      return s;
+          return s;
+        }
     }
   else
     {
@@ -2306,9 +2489,28 @@ inline DEAL_II_ALWAYS_INLINE
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp;
 
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] = schur_product(Tensor<rank - 1, dim, Number>(src1[i]),
-                           Tensor<rank - 1, dim, OtherNumber>(src2[i]));
+  if constexpr ((rank == 1) &&
+                internal::TensorImplementation::
+                  can_treat_values_as_vectorized_array<rank, dim, Number> &&
+                std::is_same_v<Number, OtherNumber>)
+    {
+      // If we can treat this tensor as vectorizable, reinterpret_cast
+      // the 'values' array and operate on it with the appropriate
+      // intrinsics. Here, we can just use the element-wise product of
+      // two rank-1 tensors, since that is what the Schur product actually
+      // is:
+      tmp.values = internal::TensorImplementation::to_std_array<dim>(
+        internal::TensorImplementation::to_vectorized_array(src1.values) *
+        internal::TensorImplementation::to_vectorized_array(src2.values));
+    }
+  else
+    {
+      // If we can't vectorize, or in the case rank>1, just recurse to
+      // the sub-tensors:
+      for (unsigned int i = 0; i < dim; ++i)
+        tmp[i] = schur_product(Tensor<rank - 1, dim, Number>(src1[i]),
+                               Tensor<rank - 1, dim, OtherNumber>(src2[i]));
+    }
 
   return tmp;
 }
@@ -2362,8 +2564,11 @@ template <int rank_1,
           int dim,
           typename Number,
           typename OtherNumber,
-          typename = std::enable_if_t<rank_1 >= 1 && rank_2 >= 1>>
-constexpr inline DEAL_II_ALWAYS_INLINE
+          // For the last argument, a default value
+          //   std::enable_if_t<rank_1 >= 1 && rank_2 >= 1
+          // is provided in a forward declaration higher up in this file.
+          typename>
+inline DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
@@ -2378,14 +2583,30 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   // to rank-1 times rank-1 dot products.
   if constexpr ((rank_1 == 1) && (rank_2 == 1))
     {
-      // This is a dot product between two rank-1 tensors. Write it out as
-      // a linear loop:
-      static_assert(dim > 0, "Tensors cannot have dimension zero.");
-      typename ProductType<Number, OtherNumber>::type sum = src1[0] * src2[0];
-      for (unsigned int i = 1; i < dim; ++i)
-        sum += src1[i] * src2[i];
+      // This is a dot product between two rank-1 tensors. See if we can
+      // vectorize it:
+      if constexpr (internal::TensorImplementation::
+                      can_treat_values_as_vectorized_array<rank_1,
+                                                           dim,
+                                                           Number> &&
+                    std::is_same_v<Number, OtherNumber>)
+        {
+          return internal::TensorImplementation::to_vectorized_array(
+                   src1.values)
+            .dot_product(
+              internal::TensorImplementation::to_vectorized_array(src2.values));
+        }
+      else
+        {
+          // Otherwise write it out as a linear loop:
+          static_assert(dim > 0, "Tensors cannot have dimension zero.");
+          typename ProductType<Number, OtherNumber>::type sum =
+            src1[0] * src2[0];
+          for (unsigned int i = 1; i < dim; ++i)
+            sum += src1[i] * src2[i];
 
-      return sum;
+          return sum;
+        }
     }
   else if constexpr ((rank_1 == 2) && (rank_2 == 1))
     {
@@ -2617,9 +2838,47 @@ inline DEAL_II_ALWAYS_INLINE typename ProductType<Number, OtherNumber>::type
 scalar_product(const Tensor<rank, dim, Number>      &left,
                const Tensor<rank, dim, OtherNumber> &right)
 {
-  typename ProductType<Number, OtherNumber>::type result{};
-  TensorAccessors::contract<rank, rank, rank, dim>(result, left, right);
-  return result;
+  // The scalar product can be thought of as the sum of scalar
+  // products of lower-dimensional tensors. Treat it as such:
+  // treat the rank-1 case separately (because we may be able to
+  // vectorize it) and write the higher-rank cases as memory-access-efficient
+  // loops.
+  if constexpr (rank == 1)
+    {
+      if constexpr (internal::TensorImplementation::
+                      can_treat_values_as_vectorized_array<rank, dim, Number> &&
+                    std::is_same_v<Number, OtherNumber>)
+        {
+          return internal::TensorImplementation::to_vectorized_array(
+                   left.values)
+            .dot_product(internal::TensorImplementation::to_vectorized_array(
+              right.values));
+        }
+      else
+        {
+          // Otherwise write it out as a linear loop:
+          static_assert(dim > 0, "Tensors cannot have dimension zero.");
+          typename ProductType<Number, OtherNumber>::type sum =
+            left[0] * right[0];
+          for (unsigned int i = 1; i < dim; ++i)
+            sum += left[i] * right[i];
+
+          return sum;
+        }
+    }
+  else
+    {
+      // We're in the case rank>1, which we can reduce recursively
+      // to a sum of scalar products of lower-rank tensors that eventually
+      // lands us in the case above.
+      static_assert(dim > 0, "Tensors cannot have dimension zero.");
+      typename ProductType<Number, OtherNumber>::type sum =
+        scalar_product(left[0], right[0]);
+      for (unsigned int i = 1; i < dim; ++i)
+        sum += scalar_product(left[i], right[i]);
+
+      return sum;
+    }
 }
 
 
