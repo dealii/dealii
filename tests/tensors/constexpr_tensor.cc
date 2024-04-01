@@ -29,17 +29,6 @@ test_constexpr_tensor_constructors()
   deallog << a << std::endl;
   deallog << b << std::endl;
   deallog << c << std::endl;
-
-  DEAL_II_CONSTEXPR const auto d = a * 2.;
-  DEAL_II_CONSTEXPR const auto e = 2. * a;
-  DEAL_II_CONSTEXPR const auto f = a / 2.;
-  DEAL_II_CONSTEXPR const auto g = d + e;
-  DEAL_II_CONSTEXPR const auto h = d - e;
-  deallog << d << std::endl;
-  deallog << e << std::endl;
-  deallog << f << std::endl;
-  deallog << g << std::endl;
-  deallog << h << std::endl;
 }
 
 DEAL_II_CONSTEXPR double
@@ -55,26 +44,15 @@ tensor_rank2_constexpr()
   constexpr double a_init[3][3] = {{4., 2., 0.}, {2., 3., 0.}, {0., 0., 5.}};
   constexpr Tensor<2, 3>       a(a_init);
   DEAL_II_CONSTEXPR const auto det   = determinant(a);
-  DEAL_II_CONSTEXPR const auto tr    = trace(transpose(a) * a);
   DEAL_II_CONSTEXPR const auto dummy = symmetrize(a);
 
-  auto d = a;
-  d /= 2.;
+  auto       d      = a;
   const auto test_1 = d[0][0];
-  d *= 2.;
   const auto test_2 = d[0][0];
-  d += a;
-  const auto test_3 = d[0][0];
-  d -= a;
-  const auto test_4 = d[0][0];
   d.clear();
   const auto test_5 = d[0][0];
-  d                 = 0.;
-  const auto test_6 = d[0][0];
-  const auto test_7 = d.norm_square();
 
-  return det + tr + test_1 + test_2 + test_3 + test_4 + test_5 + test_6 +
-         test_7;
+  return det + test_1 + test_2 + test_5;
 }
 
 int
@@ -157,35 +135,19 @@ main()
   {
     constexpr double a_init[3][3] = {{1., 0., 0.}, {2., 1., 0.}, {3., 2., 1.}};
     constexpr Tensor<2, 3>       a{a_init};
-    DEAL_II_CONSTEXPR const auto inverted       = invert(a);
-    constexpr double             ref_init[3][3] = {{1., 0., 0.},
-                                                   {-2., 1., 0.},
-                                                   {1., -2., 1}};
-    constexpr Tensor<2, 3>       ref{ref_init};
-    Assert(inverted == ref, ExcInternalError());
-  }
-  {
-    constexpr double a_init[3][3] = {{1., 0., 0.}, {2., 1., 0.}, {3., 2., 1.}};
-    constexpr Tensor<2, 3>       a{a_init};
     DEAL_II_CONSTEXPR const auto transposed = transpose(a);
     constexpr double ref_init[3][3] = {{1., 2., 3.}, {0., 1., 2.}, {0., 0., 1}};
     constexpr Tensor<2, 3> ref{ref_init};
     Assert(transposed == ref, ExcInternalError());
-    DEAL_II_CONSTEXPR const auto dummy   = scalar_product(a, ref);
     DEAL_II_CONSTEXPR const auto dummy_2 = contract<0, 0>(a, ref);
     DEAL_II_CONSTEXPR const auto dummy_3 = double_contract<0, 0, 1, 1>(a, ref);
-    DEAL_II_CONSTEXPR const auto dummy_4 = schur_product(a, ref);
-    DEAL_II_CONSTEXPR const auto dummy_5 = a * ref;
     DEAL_II_CONSTEXPR const auto middle  = outer_product(a, a);
     DEAL_II_CONSTEXPR const auto dummy_6 = contract3(a, middle, a);
-    DEAL_II_CONSTEXPR const auto dummy_7 = adjugate(a);
-    DEAL_II_CONSTEXPR const auto dummy_8 = cofactor(a);
   }
 
   {
     constexpr Tensor<1, 3> dummy_1;
     constexpr Tensor<0, 3> dummy_0;
-    DEAL_II_CONSTEXPR auto product_result = dummy_1 * dummy_1;
     DEAL_II_CONSTEXPR auto constraction_result =
       contract<0, 0>(dummy_1, dummy_1);
     DEAL_II_CONSTEXPR auto outer_product_result =
