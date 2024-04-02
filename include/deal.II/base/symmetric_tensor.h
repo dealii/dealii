@@ -2654,10 +2654,12 @@ DEAL_II_HOST inline DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-DEAL_II_HOST DEAL_II_ALWAYS_INLINE
-  Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const SymmetricTensor<rank_, dim, Number> &left,
-            const Tensor<rank_, dim, OtherNumber>     &right)
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator+(const SymmetricTensor<rank_, dim, Number> &left,
+          const Tensor<rank_, dim, OtherNumber>     &right)
 {
   return Tensor<rank_, dim, Number>(left) + right;
 }
@@ -2671,10 +2673,12 @@ DEAL_II_HOST DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-DEAL_II_HOST DEAL_II_ALWAYS_INLINE
-  Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const Tensor<rank_, dim, Number>               &left,
-            const SymmetricTensor<rank_, dim, OtherNumber> &right)
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator+(const Tensor<rank_, dim, Number>               &left,
+          const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
   return left + Tensor<rank_, dim, OtherNumber>(right);
 }
@@ -2688,10 +2692,12 @@ DEAL_II_HOST DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-DEAL_II_HOST DEAL_II_ALWAYS_INLINE
-  Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const SymmetricTensor<rank_, dim, Number> &left,
-            const Tensor<rank_, dim, OtherNumber>     &right)
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator-(const SymmetricTensor<rank_, dim, Number> &left,
+          const Tensor<rank_, dim, OtherNumber>     &right)
 {
   return Tensor<rank_, dim, Number>(left) - right;
 }
@@ -2705,10 +2711,12 @@ DEAL_II_HOST DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
-DEAL_II_HOST DEAL_II_ALWAYS_INLINE
-  Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const Tensor<rank_, dim, Number>               &left,
-            const SymmetricTensor<rank_, dim, OtherNumber> &right)
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator-(const Tensor<rank_, dim, Number>               &left,
+          const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
   return left - Tensor<rank_, dim, OtherNumber>(right);
 }
@@ -3394,8 +3402,8 @@ invert(const SymmetricTensor<2, dim, Number> &t)
  * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number>
-DEAL_II_HOST SymmetricTensor<4, dim, Number>
-             invert(const SymmetricTensor<4, dim, Number> &t)
+DEAL_II_HOST inline SymmetricTensor<4, dim, Number>
+invert(const SymmetricTensor<4, dim, Number> &t)
 {
   return internal::SymmetricTensorImplementation::Inverse<4, dim, Number>::
     value(t);
@@ -3699,7 +3707,7 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t, const Number &factor)
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number>
-DEAL_II_HOST DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>
+DEAL_II_HOST inline DEAL_II_ALWAYS_INLINE SymmetricTensor<rank_, dim, Number>
 operator*(const Number &factor, const SymmetricTensor<rank_, dim, Number> &t)
 {
   // simply forward to the other operator
