@@ -1547,9 +1547,10 @@ TriaAccessor<structdim, dim, spacedim>::bounding_box() const
   std::pair<Point<spacedim>, Point<spacedim>> boundary_points =
     std::make_pair(this->vertex(0), this->vertex(0));
 
-  for (unsigned int v = 1; v < this->n_vertices(); ++v)
+  const unsigned int n_vertices = this->n_vertices();
+  for (unsigned int v = 1; v < n_vertices; ++v)
     {
-      const Point<spacedim> &x = this->vertex(v);
+      const Point<spacedim> x = this->vertex(v);
       for (unsigned int k = 0; k < spacedim; ++k)
         {
           boundary_points.first[k]  = std::min(boundary_points.first[k], x[k]);
