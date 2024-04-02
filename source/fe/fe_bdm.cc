@@ -379,21 +379,24 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
 
   // Compute the size of the whole support point set
   const unsigned int npoints =
-    cell_points.size() + GeometryInfo<dim>::faces_per_cell * face_points.size();
+    GeometryInfo<dim>::faces_per_cell * face_points.size() + cell_points.size();
 
   this->generalized_support_points.resize(npoints);
 
   Quadrature<dim> faces =
     QProjector<dim>::project_to_all_faces(this->reference_cell(), face_points);
-  for (unsigned int k = 0;
-       k < face_points.size() * GeometryInfo<dim>::faces_per_cell;
-       ++k)
-    this->generalized_support_points[k] =
-      faces.point(k + QProjector<dim>::DataSetDescriptor::face(
-                        this->reference_cell(),
-                        0,
-                        ReferenceCell::default_combined_face_orientation(),
-                        this->n_dofs_per_face(face_no)));
+
+  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    {
+      const auto offset = QProjector<dim>::DataSetDescriptor::face(
+        this->reference_cell(),
+        f,
+        ReferenceCell::default_combined_face_orientation(),
+        face_points.size());
+      for (unsigned int k = 0; k < face_points.size(); ++k)
+        this->generalized_support_points[face_points.size() * f + k] =
+          faces.point(offset + k);
+    }
 
   // Currently, for backward compatibility, we do not use moments, but
   // point values on faces in 2d. In 3d, this is impossible, since the
