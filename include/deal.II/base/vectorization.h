@@ -455,9 +455,6 @@ public:
    */
   using value_type = Number;
 
-  static_assert(width == 1,
-                "You specified an illegal width that is not supported.");
-
   /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
@@ -469,6 +466,9 @@ public:
    */
   VectorizedArray(const Number scalar)
   {
+    static_assert(width == 1,
+                  "You specified an illegal width that is not supported.");
+
     this->operator=(scalar);
   }
 
@@ -478,7 +478,10 @@ public:
   template <typename U>
   VectorizedArray(const std::initializer_list<U> &list)
     : VectorizedArrayBase<VectorizedArray<Number, width>, 1>(list)
-  {}
+  {
+    static_assert(width == 1,
+                  "You specified an illegal width that is not supported.");
+  }
 
   /**
    * This function assigns a scalar to the current object.
