@@ -1168,8 +1168,7 @@ MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
   const Point<dim>                                           &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
-  if (dim != spacedim)
-    DEAL_II_NOT_IMPLEMENTED();
+  Assert(dim == spacedim, ExcNotImplemented());
 
   Point<dim> unit = cell->vertex(0);
 
@@ -1189,9 +1188,8 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
   const Point<spacedim>                                      &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
+  Assert(dim == spacedim, ExcNotImplemented());
 
-  if (dim != spacedim)
-    DEAL_II_NOT_IMPLEMENTED();
   const Point<dim> start = cell->vertex(0);
   Point<dim>       real  = p;
 
