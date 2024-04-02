@@ -2658,10 +2658,19 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
+<<<<<<< Updated upstream
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
   operator+(const SymmetricTensor<rank_, dim, Number> &left,
             const Tensor<rank_, dim, OtherNumber>     &right)
+=======
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator+(const SymmetricTensor<rank_, dim, Number> &left,
+          const Tensor<rank_, dim, OtherNumber>     &right)
+>>>>>>> Stashed changes
 {
   return Tensor<rank_, dim, Number>(left) + right;
 }
@@ -2675,10 +2684,19 @@ DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
+<<<<<<< Updated upstream
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
   operator+(const Tensor<rank_, dim, Number>               &left,
             const SymmetricTensor<rank_, dim, OtherNumber> &right)
+=======
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator+(const Tensor<rank_, dim, Number>               &left,
+          const SymmetricTensor<rank_, dim, OtherNumber> &right)
+>>>>>>> Stashed changes
 {
   return left + Tensor<rank_, dim, OtherNumber>(right);
 }
@@ -2692,10 +2710,19 @@ DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
+<<<<<<< Updated upstream
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
   operator-(const SymmetricTensor<rank_, dim, Number> &left,
             const Tensor<rank_, dim, OtherNumber>     &right)
+=======
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator-(const SymmetricTensor<rank_, dim, Number> &left,
+          const Tensor<rank_, dim, OtherNumber>     &right)
+>>>>>>> Stashed changes
 {
   return Tensor<rank_, dim, Number>(left) - right;
 }
@@ -2709,10 +2736,19 @@ DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
  * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
+<<<<<<< Updated upstream
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
   operator-(const Tensor<rank_, dim, Number>               &left,
             const SymmetricTensor<rank_, dim, OtherNumber> &right)
+=======
+DEAL_II_HOST DEAL_II_ALWAYS_INLINE inline Tensor<
+  rank_,
+  dim,
+  typename ProductType<Number, OtherNumber>::type>
+operator-(const Tensor<rank_, dim, Number>               &left,
+          const SymmetricTensor<rank_, dim, OtherNumber> &right)
+>>>>>>> Stashed changes
 {
   return left - Tensor<rank_, dim, OtherNumber>(right);
 }
