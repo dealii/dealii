@@ -334,6 +334,25 @@ public:
     return VectorizedArrayIterator<const VectorizedArrayType>(
       static_cast<const VectorizedArrayType &>(*this), width);
   }
+
+  /**
+   * A default implementation for computing the dot product between two
+   * vectorized arrays. It first forms the lane-by-lane product between
+   * the current object and the argument, and then the across-lanes
+   * sum of the product. The function returns the kind of object that
+   * the VectorizedArray::sum() function returns.
+   *
+   * This function is inherited by all derived classes and provides
+   * the dot product to them unless they override it with their own
+   * implementation (presumably using a more efficient approach).
+   */
+  auto
+  dot_product(const VectorizedArrayType &v) const
+  {
+    VectorizedArrayType p = static_cast<const VectorizedArrayType &>(*this);
+    p *= v;
+    return p.sum();
+  }
 };
 
 
