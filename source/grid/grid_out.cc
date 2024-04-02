@@ -4287,7 +4287,12 @@ namespace internal
                       std::vector<Point<spacedim>> line_points;
                       // compute offset of quadrature points within set of
                       // projected points
-                      const unsigned int offset = face_no * n_points;
+                      const auto offset =
+                        QProjector<dim>::DataSetDescriptor::face(
+                          cell->reference_cell(),
+                          face_no,
+                          cell->combined_face_orientation(face_no),
+                          n_points);
                       for (unsigned int i = 0; i < n_points; ++i)
                         line_points.push_back(
                           mapping->transform_unit_to_real_cell(
@@ -4497,7 +4502,12 @@ namespace internal
                   if (face->at_boundary() &&
                       gnuplot_flags.write_additional_boundary_lines)
                     {
-                      const unsigned int offset = face_no * n_points * n_points;
+                      const auto offset =
+                        QProjector<dim>::DataSetDescriptor::face(
+                          cell->reference_cell(),
+                          face_no,
+                          cell->combined_face_orientation(face_no),
+                          n_points * n_points);
                       for (unsigned int i = 0; i < n_points - 1; ++i)
                         for (unsigned int j = 0; j < n_points - 1; ++j)
                           {
@@ -4804,7 +4814,12 @@ namespace internal
                             // of the line
                             // and generate
                             // line-lets
-                            const unsigned int offset = face_no * n_points;
+                            const auto offset =
+                              QProjector<dim>::DataSetDescriptor::face(
+                                cell->reference_cell(),
+                                face_no,
+                                cell->combined_face_orientation(face_no),
+                                n_points);
                             for (unsigned int i = 0; i < n_points; ++i)
                               {
                                 const Point<dim> p1_dim(
