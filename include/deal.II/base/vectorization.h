@@ -244,12 +244,15 @@ private:
  * A base class for the various VectorizedArray template specializations,
  * containing common functionalities.
  *
- * @tparam T Type of the actual vectorized array. We are using the
- *   Couriously Recurring Template Pattern (see
+ * @tparam VectorizedArrayType Type of the actual vectorized array this
+ *   class is operating on. We are using the
+ *   Curiously Recurring Template Pattern (see
  *   https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) in this
- *   class to avoid having to resort to `virtual` member functions.
+ *   class to avoid having to resort to `virtual` member functions. In
+ *   other words, `VectorizedArrayType` is a class derived from the
+ *   current class.
  */
-template <typename T, std::size_t width>
+template <typename VectorizedArrayType, std::size_t width>
 class VectorizedArrayBase
 {
 public:
@@ -293,40 +296,43 @@ public:
   /**
    * @return An iterator pointing to the beginning of the underlying data.
    */
-  constexpr VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<VectorizedArrayType>
   begin()
   {
-    return VectorizedArrayIterator<T>(static_cast<T &>(*this), 0);
+    return VectorizedArrayIterator<VectorizedArrayType>(
+      static_cast<VectorizedArrayType &>(*this), 0);
   }
 
   /**
    * @return An iterator pointing to the beginning of the underlying data (`const`
    * version).
    */
-  constexpr VectorizedArrayIterator<const T>
+  constexpr VectorizedArrayIterator<const VectorizedArrayType>
   begin() const
   {
-    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this), 0);
+    return VectorizedArrayIterator<const VectorizedArrayType>(
+      static_cast<const VectorizedArrayType &>(*this), 0);
   }
 
   /**
    * @return An iterator pointing to the end of the underlying data.
    */
-  constexpr VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<VectorizedArrayType>
   end()
   {
-    return VectorizedArrayIterator<T>(static_cast<T &>(*this), width);
+    return VectorizedArrayIterator<VectorizedArrayType>(
+      static_cast<VectorizedArrayType &>(*this), width);
   }
 
   /**
    * @return An iterator pointing to the end of the underlying data (`const`
    * version).
    */
-  constexpr VectorizedArrayIterator<const T>
+  constexpr VectorizedArrayIterator<const VectorizedArrayType>
   end() const
   {
-    return VectorizedArrayIterator<const T>(static_cast<const T &>(*this),
-                                            width);
+    return VectorizedArrayIterator<const VectorizedArrayType>(
+      static_cast<const VectorizedArrayType &>(*this), width);
   }
 };
 
@@ -343,20 +349,21 @@ public:
  * operations. For floats and doubles, an array of numbers are packed together
  * with the goal to be processed in a single-instruction/multiple-data (SIMD)
  * fashion. In the SIMD context, the elements of such a short vector are often
- * called lanes. The number of elements packed together, i.e., the number of
+ * called "lanes". The number of elements packed together, i.e., the number of
  * lanes, depends on the computer system and compiler flags that are used for
  * compilation of deal.II. The fundamental idea of these packed data types is
  * to use one single CPU instruction to perform arithmetic operations on the
  * whole array using the processor's vector (SIMD) units. Most computer
  * systems by 2010 standards will use an array of two doubles or four floats,
  * respectively (this corresponds to the SSE/SSE2 data sets) when compiling
- * deal.II on 64-bit operating systems. On Intel Sandy Bridge processors and
- * newer or AMD Bulldozer processors and newer, four doubles or eight floats
- * are used when deal.II is configured using gcc with \--with-cpu=native
- * or \--with-cpu=corei7-avx. On compilations with AVX-512 support (e.g.,
- * Intel Skylake Server from 2017), eight doubles or sixteen floats are used.
+ * deal.II on 64-bit operating systems. On later processors (such as Intel Sandy
+ * Bridge and newer, or AMD Bulldozer processors and newer), four
+ * doubles or eight floats are used when deal.II is configured using gcc with
+ * `--with-cpu=native` or `--with-cpu=corei7-avx`. On compilations with
+ * AVX-512 support (e.g., Intel Skylake Server from 2017), eight doubles
+ * or sixteen floats are used.
  *
- * This behavior of this class is made similar to the basic data types double
+ * The behavior of this class is made similar to the basic data types double
  * and float. The definition of a vectorized array does not initialize the
  * data field but rather leaves it undefined, as is the case for double and
  * float. However, when calling something like `VectorizedArray<double> a =
@@ -401,7 +408,7 @@ public:
  *  - VectorizedArray<double, 1>
  *  - VectorizedArray<double, 2>
  *
- * for older x86 processors or in case no processor-specific compilation flags
+ * For older x86 processors or in case no processor-specific compilation flags
  * were added (i.e., without `-D CMAKE_CXX_FLAGS=-march=native` or similar
  * flags):
  *  - VectorizedArray<double, 1> // no vectorization (auto-optimization)
@@ -410,11 +417,14 @@ public:
  * Similar considerations also apply to the data type `float`.
  *
  * Wrongly selecting the width, e.g., width=3 or width=8 on a processor which
- * does not support AVX-512 leads to a static assert.
+ * does not support AVX-512 leads to a failing `static_assert`, i.e., you cannot
+ * compile code using a VectorizedArray class with a number of lanes that
+ * is not supported by the platform you are on. In particular, all platforms
+ * we are aware of only ever support widths that are powers of two.
  *
- * @tparam Number underlying data type
- * @tparam width  vector length (optional; if not set, the maximal width of the
- *                architecture is used)
+ * @tparam Number The underlying scalar data type.
+ * @tparam width  Vector length. (Optional; if not set, the maximal width of the
+ *                architecture is used.)
  */
 template <typename Number, std::size_t width>
 class VectorizedArray
@@ -422,7 +432,7 @@ class VectorizedArray
 {
 public:
   /**
-   * This gives the type of the array elements.
+   * The scalar type of the array elements.
    */
   using value_type = Number;
 
@@ -497,7 +507,7 @@ public:
   }
 
   /**
-   * Addition
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -508,7 +518,7 @@ public:
   }
 
   /**
-   * Subtraction
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -519,7 +529,7 @@ public:
   }
 
   /**
-   * Multiplication
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -530,7 +540,7 @@ public:
   }
 
   /**
-   * Division
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1041,7 +1051,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
@@ -1051,7 +1061,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   VectorizedArray &
   operator-=(const VectorizedArray &vec)
@@ -1061,7 +1071,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   VectorizedArray &
   operator*=(const VectorizedArray &vec)
@@ -1071,7 +1081,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   VectorizedArray &
   operator/=(const VectorizedArray &vec)
@@ -1327,7 +1337,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
@@ -1337,7 +1347,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   VectorizedArray &
   operator-=(const VectorizedArray &vec)
@@ -1347,7 +1357,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   VectorizedArray &
   operator*=(const VectorizedArray &vec)
@@ -1357,7 +1367,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   VectorizedArray &
   operator/=(const VectorizedArray &vec)
@@ -1605,7 +1615,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1620,7 +1630,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1635,7 +1645,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1650,7 +1660,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2090,7 +2100,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2105,7 +2115,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2120,7 +2130,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2135,7 +2145,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2598,7 +2608,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2618,7 +2628,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2632,7 +2642,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2647,7 +2657,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3176,7 +3186,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3196,7 +3206,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3210,7 +3220,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3225,7 +3235,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3778,7 +3788,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3798,7 +3808,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3812,7 +3822,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3827,7 +3837,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4407,7 +4417,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4427,7 +4437,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4441,7 +4451,7 @@ public:
     return *this;
   }
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4456,7 +4466,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5121,7 +5131,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5132,7 +5142,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5143,7 +5153,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5154,7 +5164,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5376,7 +5386,7 @@ public:
   }
 
   /**
-   * Addition.
+   * Element-wise addition of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5387,7 +5397,7 @@ public:
   }
 
   /**
-   * Subtraction.
+   * Element-wise subtraction of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5398,7 +5408,7 @@ public:
   }
 
   /**
-   * Multiplication.
+   * Element-wise multiplication of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5409,7 +5419,7 @@ public:
   }
 
   /**
-   * Division.
+   * Element-wise division of two arrays of numbers.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
