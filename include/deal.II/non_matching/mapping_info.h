@@ -52,16 +52,16 @@ namespace NonMatching
     public:
       static UpdateFlags
       required_update_flags(
-        const SmartPointer<const Mapping<dim, spacedim>> mapping,
-        const UpdateFlags                               &update_flags)
+        const SmartPointer<const Mapping<dim, spacedim>> &mapping,
+        const UpdateFlags                                &update_flags)
       {
         return mapping->requires_update_flags(update_flags);
       }
 
       static void
       compute_mapping_data_for_quadrature(
-        const SmartPointer<const Mapping<dim, spacedim>> mapping,
-        const UpdateFlags                               &update_flags_mapping,
+        const SmartPointer<const Mapping<dim, spacedim>> &mapping,
+        const UpdateFlags                                &update_flags_mapping,
         const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         CellSimilarity::Similarity &cell_similarity,
         const Quadrature<dim>      &quadrature,
@@ -100,8 +100,8 @@ namespace NonMatching
 
       static void
       compute_mapping_data_for_immersed_surface_quadrature(
-        const SmartPointer<const Mapping<dim, spacedim>> mapping,
-        const UpdateFlags                               &update_flags_mapping,
+        const SmartPointer<const Mapping<dim, spacedim>> &mapping,
+        const UpdateFlags                                &update_flags_mapping,
         const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         const ImmersedSurfaceQuadrature<dim>                       &quadrature,
         std::shared_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
@@ -136,8 +136,8 @@ namespace NonMatching
 
       static void
       compute_mapping_data_for_face_quadrature(
-        const SmartPointer<const Mapping<dim, spacedim>> mapping,
-        const UpdateFlags                               &update_flags_mapping,
+        const SmartPointer<const Mapping<dim, spacedim>> &mapping,
+        const UpdateFlags                                &update_flags_mapping,
         const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         const unsigned int                                          face_no,
         const Quadrature<dim - 1>                                  &quadrature,
