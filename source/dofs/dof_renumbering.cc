@@ -723,12 +723,26 @@ namespace DoFRenumbering
         renumbering, start, end, component_order_arg, true);
     (void)result;
 
-    Assert(result == 0 || result == dof_handler.n_dofs(level),
+    // If we don't have a renumbering (i.e., when there is 1 component) then
+    // return
+    if (Utilities::MPI::max(renumbering.size(),
+                            dof_handler.get_communicator()) == 0)
+      return;
+
+    // verify that the last numbered
+    // degree of freedom is either
+    // equal to the number of degrees
+    // of freedom in total (the
+    // sequential case) or in the
+    // distributed case at least
+    // makes sense
+    Assert((result == dof_handler.locally_owned_mg_dofs(level).n_elements()) ||
+             ((dof_handler.locally_owned_mg_dofs(level).n_elements() <
+               dof_handler.n_dofs(level)) &&
+              (result <= dof_handler.n_dofs(level))),
            ExcInternalError());
 
-    if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_communicator()) > 0)
-      dof_handler.renumber_dofs(level, renumbering);
+    dof_handler.renumber_dofs(level, renumbering);
   }
 
 
