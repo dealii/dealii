@@ -419,6 +419,9 @@ namespace Utilities
    * In general, C++ uses mangled names to identify types. This function
    * uses boost::core::demangle to return a human readable string describing
    * the type of the variable passed as argument.
+   *
+   * While the function takes the argument `t`, it does not actually use
+   * its value but only the type of `t` for its output.
    */
   template <class T>
   std::string
