@@ -461,7 +461,7 @@ namespace internal
     Tensor<1, dim, typename ProductTypeNoPoint<Number, Number2>::type>>
   evaluate_tensor_product_value_and_gradient(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number>                          &values,
+    const ArrayView<const Number>                      &values,
     const Point<dim, Number2>                          &p,
     const bool                                          d_linear = false,
     const std::vector<unsigned int>                    &renumber = {})
@@ -682,7 +682,7 @@ namespace internal
   inline typename ProductTypeNoPoint<Number, Number2>::type
   evaluate_tensor_product_value(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number>                          &values,
+    const ArrayView<const Number>                      &values,
     const Point<dim, Number2>                          &p,
     const bool                                          d_linear = false,
     const std::vector<unsigned int>                    &renumber = {})
@@ -718,7 +718,7 @@ namespace internal
   inline Tensor<1, 1, typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_higher_derivatives(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number>                          &values,
+    const ArrayView<const Number>                      &values,
     const Point<1, Number2>                            &p,
     const std::vector<unsigned int>                    &renumber = {})
   {
@@ -758,7 +758,7 @@ namespace internal
                 typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_higher_derivatives(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number>                          &values,
+    const ArrayView<const Number>                      &values,
     const Point<2, Number2>                            &p,
     const std::vector<unsigned int>                    &renumber = {})
   {
@@ -810,7 +810,7 @@ namespace internal
                 typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_higher_derivatives(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number>                          &values,
+    const ArrayView<const Number>                      &values,
     const Point<3, Number2>                            &p,
     const std::vector<unsigned int>                    &renumber = {})
   {
@@ -874,7 +874,7 @@ namespace internal
   SymmetricTensor<2, dim, typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_hessian(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number>                          &values,
+    const ArrayView<const Number>                      &values,
     const Point<dim, Number2>                          &p,
     const std::vector<unsigned int>                    &renumber = {})
   {

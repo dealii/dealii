@@ -74,7 +74,7 @@ print_result(const unsigned int                  mapping_degree,
           do_transform_real_to_unit_cell_internal(
             p,
             cell->real_to_unit_cell_affine_approximation(p),
-            fe_values.get_quadrature_points(),
+            make_array_view(fe_values.get_quadrature_points()),
             polynomials,
             renumber,
             /* print_iterations = */ true);

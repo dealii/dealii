@@ -71,7 +71,11 @@ test(const unsigned int degree)
   for (const auto &p : evaluation_points)
     {
       const auto val = internal::evaluate_tensor_product_value_and_gradient(
-        polynomials, coefficients, p, false, renumbering);
+        polynomials,
+        make_const_array_view(coefficients),
+        p,
+        false,
+        renumbering);
       deallog << "Value " << val.first << " vs "
               << transform * (matrix * p + offset) << " ; gradient "
               << val.second << " vs " << transform * matrix << std::endl;
@@ -83,7 +87,11 @@ test(const unsigned int degree)
       for (const auto &p : evaluation_points)
         {
           const auto val = internal::evaluate_tensor_product_value_and_gradient(
-            polynomials, coefficients, p, true, renumbering);
+            polynomials,
+            make_const_array_view(coefficients),
+            p,
+            true,
+            renumbering);
           deallog << "Value " << val.first << " vs "
                   << transform * (matrix * p + offset) << " ; gradient "
                   << val.second << " vs " << transform * matrix << std::endl;

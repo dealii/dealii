@@ -69,10 +69,8 @@ test(const unsigned int degree)
         for (unsigned int d = 0; d < dim; ++d)
           p_vec[d][v] = p[d] + 0.01 * v;
 
-      const auto hess = internal::evaluate_tensor_product_hessian(polynomials,
-                                                                  coefficients,
-                                                                  p_vec,
-                                                                  renumbering);
+      const auto hess = internal::evaluate_tensor_product_hessian(
+        polynomials, make_const_array_view(coefficients), p_vec, renumbering);
 
       double error = 0;
       for (unsigned int v = 0; v < VectorizedArray<double>::size(); ++v)
