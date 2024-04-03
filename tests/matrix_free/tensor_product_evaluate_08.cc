@@ -72,7 +72,7 @@ test(const unsigned int degree)
       deallog << "]: ";
       const auto derivative =
         internal::evaluate_tensor_product_higher_derivatives<derivative_order>(
-          polynomials, function_values, p);
+          polynomials, make_const_array_view(function_values), p);
 
       for (unsigned int d = 0; d < derivative.dimension; ++d)
         deallog << (std::abs(derivative[d]) < 1e-11 ? 0. : derivative[d])

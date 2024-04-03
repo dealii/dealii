@@ -477,7 +477,7 @@ namespace internal
     do_transform_real_to_unit_cell_internal(
       const Point<spacedim, Number>                      &p,
       const Point<dim, Number>                           &initial_p_unit,
-      const std::vector<Point<spacedim>>                 &points,
+      const ArrayView<const Point<spacedim>>             &points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
       const std::vector<unsigned int>                    &renumber,
       const bool print_iterations_to_deallog = false)
@@ -734,7 +734,7 @@ namespace internal
     do_transform_real_to_unit_cell_internal_codim1(
       const Point<dim + 1>                               &p,
       const Point<dim>                                   &initial_p_unit,
-      const std::vector<Point<dim + 1>>                  &points,
+      const ArrayView<const Point<dim + 1>>              &points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
       const std::vector<unsigned int>                    &renumber)
     {
@@ -1245,9 +1245,9 @@ namespace internal
       std::vector<DerivativeForm<1, dim, spacedim>> &jacobians,
       std::vector<DerivativeForm<1, spacedim, dim>> &inverse_jacobians)
     {
-      const UpdateFlags                   update_flags = data.update_each;
-      const std::vector<Point<spacedim>> &support_points =
-        data.mapping_support_points;
+      const UpdateFlags                      update_flags = data.update_each;
+      const ArrayView<const Point<spacedim>> support_points(
+        data.mapping_support_points);
 
       const unsigned int n_points = unit_points.size();
       const unsigned int n_lanes  = VectorizedArray<double>::size();
@@ -1406,8 +1406,8 @@ namespace internal
     {
       if (data.update_each & update_jacobian_grads)
         {
-          const std::vector<Point<spacedim>> &support_points =
-            data.mapping_support_points;
+          const ArrayView<const Point<spacedim>> support_points(
+            data.mapping_support_points);
           const unsigned int n_q_points = jacobian_grads.size();
 
           if (cell_similarity != CellSimilarity::translation)
@@ -1448,8 +1448,8 @@ namespace internal
     {
       if (data.update_each & update_jacobian_pushed_forward_grads)
         {
-          const std::vector<Point<spacedim>> &support_points =
-            data.mapping_support_points;
+          const ArrayView<const Point<spacedim>> support_points(
+            data.mapping_support_points);
           const unsigned int n_q_points = jacobian_pushed_forward_grads.size();
 
           if (cell_similarity != CellSimilarity::translation)
@@ -1563,8 +1563,8 @@ namespace internal
     {
       if (data.update_each & update_jacobian_2nd_derivatives)
         {
-          const std::vector<Point<spacedim>> &support_points =
-            data.mapping_support_points;
+          const ArrayView<const Point<spacedim>> support_points(
+            data.mapping_support_points);
           const unsigned int n_q_points = jacobian_2nd_derivatives.size();
 
           if (cell_similarity != CellSimilarity::translation)
@@ -1603,8 +1603,8 @@ namespace internal
     {
       if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
         {
-          const std::vector<Point<spacedim>> &support_points =
-            data.mapping_support_points;
+          const ArrayView<const Point<spacedim>> support_points(
+            data.mapping_support_points);
           const unsigned int n_q_points =
             jacobian_pushed_forward_2nd_derivatives.size();
 
@@ -1750,8 +1750,8 @@ namespace internal
     {
       if (data.update_each & update_jacobian_3rd_derivatives)
         {
-          const std::vector<Point<spacedim>> &support_points =
-            data.mapping_support_points;
+          const ArrayView<const Point<spacedim>> support_points(
+            data.mapping_support_points);
           const unsigned int n_q_points = jacobian_3rd_derivatives.size();
 
           if (cell_similarity != CellSimilarity::translation)
@@ -1790,8 +1790,8 @@ namespace internal
     {
       if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
         {
-          const std::vector<Point<spacedim>> &support_points =
-            data.mapping_support_points;
+          const ArrayView<const Point<spacedim>> support_points(
+            data.mapping_support_points);
           const unsigned int n_q_points =
             jacobian_pushed_forward_3rd_derivatives.size();
 

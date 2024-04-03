@@ -292,7 +292,7 @@ MappingQ<dim, spacedim>::transform_unit_to_real_cell(
 {
   return Point<spacedim>(internal::evaluate_tensor_product_value(
     polynomials_1d,
-    this->compute_mapping_support_points(cell),
+    make_const_array_view(this->compute_mapping_support_points(cell)),
     p,
     polynomials_1d.size() == 2,
     renumber_lexicographic_to_hierarchic));
@@ -345,7 +345,7 @@ MappingQ<1, 1>::transform_real_to_unit_cell_internal(
     do_transform_real_to_unit_cell_internal<1>(
       p,
       initial_p_unit,
-      this->compute_mapping_support_points(cell),
+      make_const_array_view(this->compute_mapping_support_points(cell)),
       polynomials_1d,
       renumber_lexicographic_to_hierarchic);
 }
@@ -363,7 +363,7 @@ MappingQ<2, 2>::transform_real_to_unit_cell_internal(
     do_transform_real_to_unit_cell_internal<2>(
       p,
       initial_p_unit,
-      this->compute_mapping_support_points(cell),
+      make_const_array_view(this->compute_mapping_support_points(cell)),
       polynomials_1d,
       renumber_lexicographic_to_hierarchic);
 }
@@ -381,7 +381,7 @@ MappingQ<3, 3>::transform_real_to_unit_cell_internal(
     do_transform_real_to_unit_cell_internal<3>(
       p,
       initial_p_unit,
-      this->compute_mapping_support_points(cell),
+      make_const_array_view(this->compute_mapping_support_points(cell)),
       polynomials_1d,
       renumber_lexicographic_to_hierarchic);
 }
@@ -414,7 +414,7 @@ MappingQ<1, 2>::transform_real_to_unit_cell_internal(
     do_transform_real_to_unit_cell_internal_codim1<1>(
       p,
       initial_p_unit,
-      mdata->mapping_support_points,
+      make_const_array_view(mdata->mapping_support_points),
       polynomials_1d,
       renumber_lexicographic_to_hierarchic);
 }
@@ -447,7 +447,7 @@ MappingQ<2, 3>::transform_real_to_unit_cell_internal(
     do_transform_real_to_unit_cell_internal_codim1<2>(
       p,
       initial_p_unit,
-      mdata->mapping_support_points,
+      make_const_array_view(mdata->mapping_support_points),
       polynomials_1d,
       renumber_lexicographic_to_hierarchic);
 }

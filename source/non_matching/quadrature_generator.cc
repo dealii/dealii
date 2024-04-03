@@ -1631,12 +1631,12 @@ namespace NonMatching
             return this->is_fe_q_iso_q1() ?
                      dealii::internal::evaluate_tensor_product_value(
                        poly,
-                       local_dof_values_subcell,
+                       make_array_view(local_dof_values_subcell),
                        subcell_box.real_to_unit(point),
                        polynomials_are_hat_functions) :
                      dealii::internal::evaluate_tensor_product_value(
                        poly,
-                       local_dof_values,
+                       make_array_view(local_dof_values),
                        point,
                        polynomials_are_hat_functions,
                        renumber);
@@ -1670,13 +1670,13 @@ namespace NonMatching
                       dealii::internal::
                         evaluate_tensor_product_value_and_gradient(
                           poly,
-                          local_dof_values_subcell,
+                          make_array_view(local_dof_values_subcell),
                           subcell_box.real_to_unit(point),
                           polynomials_are_hat_functions) :
                       dealii::internal::
                         evaluate_tensor_product_value_and_gradient(
                           poly,
-                          local_dof_values,
+                          make_array_view(local_dof_values),
                           point,
                           polynomials_are_hat_functions,
                           renumber))
@@ -1710,10 +1710,13 @@ namespace NonMatching
             return this->is_fe_q_iso_q1() ?
                      dealii::internal::evaluate_tensor_product_hessian(
                        poly,
-                       local_dof_values_subcell,
+                       make_array_view(local_dof_values_subcell),
                        subcell_box.real_to_unit(point)) :
                      dealii::internal::evaluate_tensor_product_hessian(
-                       poly, local_dof_values, point, renumber);
+                       poly,
+                       make_array_view(local_dof_values),
+                       point,
+                       renumber);
           }
         else
           {

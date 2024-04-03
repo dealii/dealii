@@ -72,7 +72,11 @@ test(const unsigned int degree)
           p_vec[d][v] = p[d] + 0.01 * v;
 
       const auto val = internal::evaluate_tensor_product_value_and_gradient(
-        polynomials, coefficients, p_vec, false, renumbering);
+        polynomials,
+        make_const_array_view(coefficients),
+        p_vec,
+        false,
+        renumbering);
 
       const auto error_vec = val.first - matrix * p_vec;
       double     error     = 0;
@@ -100,7 +104,11 @@ test(const unsigned int degree)
               p_vec[d][v] = p[d] + 0.01 * v;
 
           const auto val = internal::evaluate_tensor_product_value_and_gradient(
-            polynomials, coefficients, p_vec, true, renumbering);
+            polynomials,
+            make_const_array_view(coefficients),
+            p_vec,
+            true,
+            renumbering);
 
           const auto error_vec = val.first - matrix * p_vec;
           double     error     = 0;
