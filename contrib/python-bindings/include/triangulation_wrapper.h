@@ -286,6 +286,11 @@ namespace python
     void
     generate_half_hyper_ball(PointWrapper &center, const double radius = 1.);
 
+    /*! @copydoc GridGenerator::cylinder
+     */
+    void
+    generate_cylinder(const double radius = 1., const double half_length = 1.);
+
     /*! @copydoc GridGenerator::hyper_shell
      */
     void

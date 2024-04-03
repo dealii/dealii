@@ -110,6 +110,10 @@ namespace python
                                          generate_half_hyper_ball,
                                          1,
                                          2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_cylinder_overloads,
+                                         generate_cylinder,
+                                         0,
+                                         2)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_shell_overloads,
                                          generate_hyper_shell,
                                          3,
@@ -327,6 +331,19 @@ namespace python
     "x-axis. The boundary indicators for the final triangulation are 0 for  \n"
     "the curved boundary and 1 for the cut plane. The appropriate manifold  \n"
     "class is SphericalManifold.                                            \n";
+
+
+
+  const char generate_cylinder_docstring[] =
+    "Create a dim dimensional cylinder where the x-axis serves as the axis \n"
+    "of the cylinder. For the purposes of this function, a cylinder is     \n"
+    "defined as a (dim - 1) dimensional disk of given radius, extruded     \n"
+    "along the axis of the cylinder (which is the first coordinate         \n"
+    "direction). Consequently, in three dimensions, the cylinder extends   \n"
+    "from x=-half_length to x=+half_length and its projection into the     \n"
+    "yz-plane is a circle of radius radius. In two dimensions, the         \n"
+    "cylinder is a rectangle from x=-half_length to x=+half_length and     \n"
+    "from y=-radius to y=radius.                                           \n";
 
 
 
@@ -711,6 +728,11 @@ namespace python
            generate_half_hyper_ball_overloads(
              boost::python::args("self", "center", "radius"),
              generate_half_hyper_ball_docstring))
+      .def("generate_cylinder",
+           &TriangulationWrapper::generate_cylinder,
+           generate_cylinder_overloads(
+             boost::python::args("self", "radius", "half_length"),
+             generate_cylinder_docstring))
       .def("generate_hyper_shell",
            &TriangulationWrapper::generate_hyper_shell,
            generate_hyper_shell_overloads(boost::python::args("self",
