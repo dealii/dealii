@@ -187,16 +187,15 @@ namespace VectorTools
                     const FEValuesType                 &fe_values_jacobians,
                     T3                                 &function_values)
     {
-      if (const auto *system =
-            dynamic_cast<const FESystem<dim, spacedim> *>(&fe))
+      if (fe.n_base_elements() > 1 || fe.element_multiplicity(0) > 1)
         {
           // In case of an FESystem transform every (vector) component
           // separately:
           unsigned current_offset = offset;
-          for (unsigned int i = 0; i < system->n_base_elements(); ++i)
+          for (unsigned int i = 0; i < fe.n_base_elements(); ++i)
             {
-              const auto &base_fe      = system->base_element(i);
-              const auto  multiplicity = system->element_multiplicity(i);
+              const auto &base_fe      = fe.base_element(i);
+              const auto  multiplicity = fe.element_multiplicity(i);
               for (unsigned int m = 0; m < multiplicity; ++m)
                 {
                   // recursively call apply_transform to make sure to
@@ -313,11 +312,32 @@ namespace VectorTools
       // initialize a quadrature with all generalized support points and
       // create an FEValues object with it.
 
+      std::vector<bool>    needs_expensive_algorithm(fe.size(), true);
       hp::QCollection<dim> support_quadrature;
       for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
         {
-          const auto &points = fe[fe_index].get_generalized_support_points();
+          const auto &fe_i   = fe[fe_index];
+          const auto &points = fe_i.get_generalized_support_points();
           support_quadrature.push_back(Quadrature<dim>(points));
+          if (fe_i.n_base_elements() == 1 &&
+              fe_i.element_multiplicity(0) == fe.n_components() &&
+              fe_i.has_support_points())
+            {
+              const auto &fe_base          = fe_i.base_element(0);
+              bool        all_points_equal = true;
+              // Check points for exact equality - they are either copied
+              // inside an FESystem or genuinely different, so no need for a
+              // tolerance
+              for (unsigned int i = 0; i < fe_base.n_dofs_per_cell(); ++i)
+                if (fe_base.get_unit_support_points()[i].distance(points[i]) >
+                    0.)
+                  {
+                    all_points_equal = false;
+                    break;
+                  }
+              if (all_points_equal)
+                needs_expensive_algorithm[fe_index] = false;
+            }
         }
 
       // An FEValues object to evaluate (generalized) support point
@@ -368,33 +388,37 @@ namespace VectorTools
           auto &dof_values      = fe_dof_values[fe_index];
 
           const auto n_components = fe[fe_index].n_components();
-          function_values.resize(generalized_support_points.size(),
-                                 Vector<number>(n_components));
-          dof_values.resize(n_dofs);
+          // Only resize (and create sample entry) if sizes do not match
+          if (function_values.size() != generalized_support_points.size())
+            function_values.resize(generalized_support_points.size(),
+                                   Vector<number>(n_components));
 
           // Get all function values:
           AssertDimension(n_components, function(cell)->n_components);
           function(cell)->vector_value_list(generalized_support_points,
                                             function_values);
 
-          {
-            // Before we can average, we have to transform all function values
-            // from the real cell back to the unit cell. We query the finite
-            // element for the correct transformation. Matters get a bit more
-            // complicated because we have to apply said transformation for
-            // every base element.
+          // For the simple case with elements with support points, we will
+          // simply use the interpolated DoF values in the access loop further
+          // down. Otherwise, we have to transform all function values from
+          // the real cell back to the unit cell. We query the finite element
+          // for the correct transformation. Matters get a bit more
+          // complicated because we have to apply said transformation for
+          // every base element.
+          if (needs_expensive_algorithm[fe_index])
+            {
+              dof_values.resize(n_dofs);
+              const unsigned int offset =
+                apply_transform(fe[fe_index],
+                                /* starting_offset = */ 0,
+                                fe_values,
+                                function_values);
+              (void)offset;
+              Assert(offset == n_components, ExcInternalError());
 
-            const unsigned int offset =
-              apply_transform(fe[fe_index],
-                              /* starting_offset = */ 0,
-                              fe_values,
-                              function_values);
-            (void)offset;
-            Assert(offset == n_components, ExcInternalError());
-          }
-
-          FETools::convert_generalized_support_point_values_to_dof_values(
-            fe[fe_index], function_values, dof_values);
+              FETools::convert_generalized_support_point_values_to_dof_values(
+                fe[fe_index], function_values, dof_values);
+            }
 
           for (unsigned int i = 0; i < n_dofs; ++i)
             {
@@ -429,8 +453,19 @@ namespace VectorTools
 #endif
 
                   // Add local values to the global vectors
-                  ::dealii::internal::ElementAccess<VectorType>::add(
-                    dof_values[i], dofs_on_cell[i], interpolation);
+                  if (needs_expensive_algorithm[fe_index])
+                    ::dealii::internal::ElementAccess<VectorType>::add(
+                      dof_values[i], dofs_on_cell[i], interpolation);
+                  else
+                    {
+                      const auto base_index =
+                        fe[fe_index].system_to_base_index(i);
+                      ::dealii::internal::ElementAccess<VectorType>::add(
+                        function_values[base_index.second]
+                                       [base_index.first.second],
+                        dofs_on_cell[i],
+                        interpolation);
+                    }
                   ::dealii::internal::ElementAccess<VectorType>::add(
                     typename VectorType::value_type(1.0),
                     dofs_on_cell[i],
