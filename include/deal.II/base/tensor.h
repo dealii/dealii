@@ -458,7 +458,7 @@ namespace internal
     constexpr size_t tensor_alignment =
       ((rank == 1) && can_treat_values_as_vectorized_array<1, dim, Number> ?
          n_elements_for_base_array<rank, dim, Number> * sizeof(Number) :
-         alignof(Number));
+         alignof(std::array<Number, dim>));
   } // namespace TensorImplementation
 } // namespace internal
 
