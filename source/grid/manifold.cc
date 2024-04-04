@@ -1055,12 +1055,15 @@ ChartManifold<dim, spacedim, chartdim>::get_new_points(
 
   const std::size_t n_points = surrounding_points.size();
 
-  boost::container::small_vector<Point<chartdim>, 200> chart_points(n_points);
+  boost::container::small_vector<Point<chartdim>, 208> chart_points(n_points);
   for (std::size_t i = 0; i < n_points; ++i)
     chart_points[i] = pull_back(surrounding_points[i]);
 
-  boost::container::small_vector<Point<chartdim>, 200> new_points_on_chart(
+  boost::container::small_vector<Point<chartdim>, 208> new_points_on_chart(
     weights.size(0));
+  Assert((std::size_t)new_points_on_chart.data() % alignof(Point<chartdim>) ==
+           0,
+         ExcInternalError());
   sub_manifold.get_new_points(chart_points, weights, new_points_on_chart);
 
   for (std::size_t row = 0; row < weights.size(0); ++row)
