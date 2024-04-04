@@ -1,0 +1,7 @@
+Changed: Many functions in class Tensor and class SymmetricTensor were
+made `constexpr` over the past couple of years, but this conflicts
+with the desire to use vector intrinsics in these functions to
+accelerate tensor operations. As a consequence, we have removed the
+`constexpr` annotations again selectively where necessary.
+<br>
+(Wolfgang Bangerth, 2024/04/04)
