@@ -114,6 +114,10 @@ namespace python
                                          generate_cylinder,
                                          0,
                                          2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_subdivided_cylinder_overloads,
+                                         generate_subdivided_cylinder,
+                                         1,
+                                         3)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_shell_overloads,
                                          generate_hyper_shell,
                                          3,
@@ -344,6 +348,20 @@ namespace python
     "yz-plane is a circle of radius radius. In two dimensions, the         \n"
     "cylinder is a rectangle from x=-half_length to x=+half_length and     \n"
     "from y=-radius to y=radius.                                           \n";
+
+
+
+  const char generate_subdivided_cylinder_docstring[] =
+    "Create a dim dimensional cylinder where the x-axis serves as the axis \n"
+    "of the cylinder. For the purposes of this function, a cylinder is     \n"
+    "defined as a (dim - 1) dimensional disk of given radius, extruded     \n"
+    "along the axis of the cylinder (which is the first coordinate         \n"
+    "direction). Consequently, in three dimensions, the cylinder extends   \n"
+    "from x=-half_length to x=+half_length and its projection into the     \n"
+    "yz-plane is a circle of radius radius. In two dimensions, the         \n"
+    "cylinder is a rectangle from x=-half_length to x=+half_length and     \n"
+    "from y=-radius to y=radius. This function is only implemented for     \n"
+    "dim == 3.                                                             \n";
 
 
 
@@ -733,6 +751,12 @@ namespace python
            generate_cylinder_overloads(
              boost::python::args("self", "radius", "half_length"),
              generate_cylinder_docstring))
+      .def("generate_subdivided_cylinder",
+           &TriangulationWrapper::generate_subdivided_cylinder,
+           generate_subdivided_cylinder_overloads(
+             boost::python::args(
+               "self", "x_subdivisions", "radius", "half_length"),
+             generate_subdivided_cylinder_docstring))
       .def("generate_hyper_shell",
            &TriangulationWrapper::generate_hyper_shell,
            generate_hyper_shell_overloads(boost::python::args("self",

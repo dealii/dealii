@@ -291,6 +291,12 @@ namespace python
     void
     generate_cylinder(const double radius = 1., const double half_length = 1.);
 
+    /*! @copydoc GridGenerator::subdivided_cylinder
+     */
+    void
+    generate_subdivided_cylinder(const unsigned int x_subdivisions,
+                                 const double       radius      = 1.,
+                                 const double       half_length = 1.);
     /*! @copydoc GridGenerator::hyper_shell
      */
     void
