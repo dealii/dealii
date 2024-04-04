@@ -290,12 +290,19 @@ MappingQ<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim>                                           &p) const
 {
-  return Point<spacedim>(internal::evaluate_tensor_product_value(
-    polynomials_1d,
-    make_const_array_view(this->compute_mapping_support_points(cell)),
-    p,
-    polynomials_1d.size() == 2,
-    renumber_lexicographic_to_hierarchic));
+  if (polynomial_degree == 1)
+    {
+      const auto vertices = this->get_vertices(cell);
+      return Point<spacedim>(
+        internal::evaluate_tensor_product_value_linear(vertices.data(), p));
+    }
+  else
+    return Point<spacedim>(internal::evaluate_tensor_product_value(
+      polynomials_1d,
+      make_const_array_view(this->compute_mapping_support_points(cell)),
+      p,
+      polynomials_1d.size() == 2,
+      renumber_lexicographic_to_hierarchic));
 }
 
 
@@ -341,13 +348,25 @@ MappingQ<1, 1>::transform_real_to_unit_cell_internal(
 {
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return internal::MappingQImplementation::
-    do_transform_real_to_unit_cell_internal<1>(
-      p,
-      initial_p_unit,
-      make_const_array_view(this->compute_mapping_support_points(cell)),
-      polynomials_1d,
-      renumber_lexicographic_to_hierarchic);
+  if (polynomial_degree == 1)
+    {
+      const auto vertices = this->get_vertices(cell);
+      return internal::MappingQImplementation::
+        do_transform_real_to_unit_cell_internal<1>(
+          p,
+          initial_p_unit,
+          ArrayView<const Point<1>>(vertices.data(), vertices.size()),
+          polynomials_1d,
+          renumber_lexicographic_to_hierarchic);
+    }
+  else
+    return internal::MappingQImplementation::
+      do_transform_real_to_unit_cell_internal<1>(
+        p,
+        initial_p_unit,
+        make_const_array_view(this->compute_mapping_support_points(cell)),
+        polynomials_1d,
+        renumber_lexicographic_to_hierarchic);
 }
 
 
@@ -359,13 +378,25 @@ MappingQ<2, 2>::transform_real_to_unit_cell_internal(
   const Point<2>                           &p,
   const Point<2>                           &initial_p_unit) const
 {
-  return internal::MappingQImplementation::
-    do_transform_real_to_unit_cell_internal<2>(
-      p,
-      initial_p_unit,
-      make_const_array_view(this->compute_mapping_support_points(cell)),
-      polynomials_1d,
-      renumber_lexicographic_to_hierarchic);
+  if (polynomial_degree == 1)
+    {
+      const auto vertices = this->get_vertices(cell);
+      return internal::MappingQImplementation::
+        do_transform_real_to_unit_cell_internal<2>(
+          p,
+          initial_p_unit,
+          ArrayView<const Point<2>>(vertices.data(), vertices.size()),
+          polynomials_1d,
+          renumber_lexicographic_to_hierarchic);
+    }
+  else
+    return internal::MappingQImplementation::
+      do_transform_real_to_unit_cell_internal<2>(
+        p,
+        initial_p_unit,
+        make_const_array_view(this->compute_mapping_support_points(cell)),
+        polynomials_1d,
+        renumber_lexicographic_to_hierarchic);
 }
 
 
@@ -377,13 +408,25 @@ MappingQ<3, 3>::transform_real_to_unit_cell_internal(
   const Point<3>                           &p,
   const Point<3>                           &initial_p_unit) const
 {
-  return internal::MappingQImplementation::
-    do_transform_real_to_unit_cell_internal<3>(
-      p,
-      initial_p_unit,
-      make_const_array_view(this->compute_mapping_support_points(cell)),
-      polynomials_1d,
-      renumber_lexicographic_to_hierarchic);
+  if (polynomial_degree == 1)
+    {
+      const auto vertices = this->get_vertices(cell);
+      return internal::MappingQImplementation::
+        do_transform_real_to_unit_cell_internal<3>(
+          p,
+          initial_p_unit,
+          ArrayView<const Point<3>>(vertices.data(), vertices.size()),
+          polynomials_1d,
+          renumber_lexicographic_to_hierarchic);
+    }
+  else
+    return internal::MappingQImplementation::
+      do_transform_real_to_unit_cell_internal<3>(
+        p,
+        initial_p_unit,
+        make_const_array_view(this->compute_mapping_support_points(cell)),
+        polynomials_1d,
+        renumber_lexicographic_to_hierarchic);
 }
 
 
@@ -475,7 +518,7 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
 {
   // Use an exact formula if one is available. this is only the case
   // for Q1 mappings in 1d, and in 2d if dim==spacedim
-  if (this->preserves_vertex_locations() && (polynomial_degree == 1) &&
+  if ((polynomial_degree == 1) &&
       ((dim == 1) || ((dim == 2) && (dim == spacedim))))
     {
       // The dimension-dependent algorithms are much faster (about 25-45x in
@@ -605,8 +648,18 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
     }
 
   AssertDimension(real_points.size(), unit_points.size());
-  const std::vector<Point<spacedim>> support_points =
-    this->compute_mapping_support_points(cell);
+  std::vector<Point<spacedim>> support_points_higher_order;
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<dim>::vertices_per_cell>
+    vertices;
+  if (polynomial_degree == 1)
+    vertices = this->get_vertices(cell);
+  else
+    support_points_higher_order = this->compute_mapping_support_points(cell);
+  const ArrayView<const Point<spacedim>> support_points(
+    polynomial_degree == 1 ? vertices.data() :
+                             support_points_higher_order.data(),
+    Utilities::pow(polynomial_degree + 1, dim));
 
   // From the given (high-order) support points, now only pick the first
   // 2^dim points and construct an affine approximation from those.
@@ -808,7 +861,16 @@ MappingQ<dim, spacedim>::fill_fe_values(
   // object attached to the cell and all of its bounding faces/edges,
   // etc. to reliably test that the "cell" we are on is, therefore,
   // not easily done
-  data.mapping_support_points = this->compute_mapping_support_points(cell);
+  if (polynomial_degree == 1)
+    {
+      data.mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
+      const auto vertices = this->get_vertices(cell);
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        data.mapping_support_points[i] = vertices[i];
+    }
+  else
+    data.mapping_support_points = this->compute_mapping_support_points(cell);
+
   data.cell_of_current_support_points = cell;
 
   // if the order of the mapping is greater than 1, then do not reuse any cell
@@ -1026,7 +1088,18 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
        &data.cell_of_current_support_points->get_triangulation()) ||
       (cell != data.cell_of_current_support_points))
     {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
+      if (polynomial_degree == 1)
+        {
+          data.mapping_support_points.resize(
+            GeometryInfo<dim>::vertices_per_cell);
+          const auto vertices = this->get_vertices(cell);
+          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
+               ++i)
+            data.mapping_support_points[i] = vertices[i];
+        }
+      else
+        data.mapping_support_points =
+          this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
     }
 
@@ -1077,7 +1150,18 @@ MappingQ<dim, spacedim>::fill_fe_subface_values(
        &data.cell_of_current_support_points->get_triangulation()) ||
       (cell != data.cell_of_current_support_points))
     {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
+      if (polynomial_degree == 1)
+        {
+          data.mapping_support_points.resize(
+            GeometryInfo<dim>::vertices_per_cell);
+          const auto vertices = this->get_vertices(cell);
+          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
+               ++i)
+            data.mapping_support_points[i] = vertices[i];
+        }
+      else
+        data.mapping_support_points =
+          this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
     }
 
@@ -1121,7 +1205,15 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
 
   const unsigned int n_q_points = quadrature.size();
 
-  data.mapping_support_points = this->compute_mapping_support_points(cell);
+  if (polynomial_degree == 1)
+    {
+      data.mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
+      const auto vertices = this->get_vertices(cell);
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        data.mapping_support_points[i] = vertices[i];
+    }
+  else
+    data.mapping_support_points = this->compute_mapping_support_points(cell);
   data.cell_of_current_support_points = cell;
 
   internal::MappingQImplementation::maybe_update_q_points_Jacobians_generic(
@@ -1258,7 +1350,15 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
                                                            unit_points.end())));
   const InternalData &data = static_cast<const InternalData &>(*internal_data);
   data.output_data         = &output_data;
-  data.mapping_support_points = this->compute_mapping_support_points(cell);
+  if (polynomial_degree == 1)
+    {
+      data.mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
+      const auto vertices = this->get_vertices(cell);
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        data.mapping_support_points[i] = vertices[i];
+    }
+  else
+    data.mapping_support_points = this->compute_mapping_support_points(cell);
 
   internal::MappingQImplementation::maybe_update_q_points_Jacobians_generic(
     CellSimilarity::none,
@@ -1291,8 +1391,16 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_face_quadrature(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  data.mapping_support_points = this->compute_mapping_support_points(cell);
-  data.output_data            = &output_data;
+  if (polynomial_degree == 1)
+    {
+      data.mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
+      const auto vertices = this->get_vertices(cell);
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        data.mapping_support_points[i] = vertices[i];
+    }
+  else
+    data.mapping_support_points = this->compute_mapping_support_points(cell);
+  data.output_data = &output_data;
 
   internal::MappingQImplementation::do_fill_fe_face_values(
     *this,

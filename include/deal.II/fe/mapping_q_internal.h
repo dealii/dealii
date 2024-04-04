@@ -833,8 +833,8 @@ namespace internal
        * points in real space by a polynomial map.
        */
       InverseQuadraticApproximation(
-        const std::vector<Point<spacedim>> &real_support_points,
-        const std::vector<Point<dim>>      &unit_support_points)
+        const ArrayView<const Point<spacedim>> &real_support_points,
+        const std::vector<Point<dim>>          &unit_support_points)
         : normalization_shift(real_support_points[0])
         , normalization_length(
             1. / real_support_points[0].distance(real_support_points[1]))
