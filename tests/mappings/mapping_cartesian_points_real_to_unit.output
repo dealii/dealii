@@ -1,0 +1,7 @@
+
+DEAL::dim=1
+DEAL::MappingCartesian: OK
+DEAL::dim=2
+DEAL::MappingCartesian: OK
+DEAL::dim=3
+DEAL::MappingCartesian: OK

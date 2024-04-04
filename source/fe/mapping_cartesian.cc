@@ -91,6 +91,7 @@ template <int dim, int spacedim>
 MappingCartesian<dim, spacedim>::InternalData::InternalData(
   const Quadrature<dim> &q)
   : cell_extents(numbers::signaling_nan<Tensor<1, dim>>())
+  , inverse_cell_extents(numbers::signaling_nan<Tensor<1, dim>>())
   , volume_element(numbers::signaling_nan<double>())
   , quadrature_points(q.get_points())
 {}
@@ -103,6 +104,7 @@ MappingCartesian<dim, spacedim>::InternalData::memory_consumption() const
 {
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
           MemoryConsumption::memory_consumption(cell_extents) +
+          MemoryConsumption::memory_consumption(inverse_cell_extents) +
           MemoryConsumption::memory_consumption(volume_element) +
           MemoryConsumption::memory_consumption(quadrature_points));
 }
@@ -232,29 +234,18 @@ MappingCartesian<dim, spacedim>::update_cell_extents(
   const CellSimilarity::Similarity                            cell_similarity,
   const InternalData                                         &data) const
 {
-  // Compute start point and sizes
-  // along axes.  Strange vertex
-  // numbering makes this complicated
-  // again.
+  // Compute start point and sizes along axes. The vertices to be looked at
+  // are 1, 2, 4 compared to the base vertex 0.
   if (cell_similarity != CellSimilarity::translation)
     {
-      const Point<dim> &start = cell->vertex(0);
-      switch (dim)
+      const Point<dim> start = cell->vertex(0);
+      for (unsigned int d = 0; d < dim; ++d)
         {
-          case 1:
-            data.cell_extents[0] = cell->vertex(1)[0] - start[0];
-            break;
-          case 2:
-            data.cell_extents[0] = cell->vertex(1)[0] - start[0];
-            data.cell_extents[1] = cell->vertex(2)[1] - start[1];
-            break;
-          case 3:
-            data.cell_extents[0] = cell->vertex(1)[0] - start[0];
-            data.cell_extents[1] = cell->vertex(2)[1] - start[1];
-            data.cell_extents[2] = cell->vertex(4)[2] - start[2];
-            break;
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
+          const double cell_extent_d = cell->vertex(1 << d)[d] - start[d];
+          data.cell_extents[d]       = cell_extent_d;
+          Assert(cell_extent_d != 0.,
+                 ExcMessage("Cell does not appear to be Cartesian!"));
+          data.inverse_cell_extents[d] = 1. / cell_extent_d;
         }
     }
 }
@@ -345,7 +336,7 @@ MappingCartesian<dim, spacedim>::transform_quadrature_points(
 {
   // let @p{start} be the origin of a local coordinate system. it is chosen
   // as the (lower) left vertex
-  const Point<dim> &start = cell->vertex(0);
+  const Point<dim> start = cell->vertex(0);
 
   for (unsigned int i = 0; i < quadrature_points.size(); ++i)
     {
@@ -483,7 +474,8 @@ MappingCartesian<dim, spacedim>::maybe_update_inverse_jacobians(
         {
           output_data.inverse_jacobians[i] = Tensor<2, dim>();
           for (unsigned int j = 0; j < dim; ++j)
-            output_data.inverse_jacobians[i][j][j] = 1. / data.cell_extents[j];
+            output_data.inverse_jacobians[i][j][j] =
+              data.inverse_cell_extents[j];
         }
 }
 
@@ -721,7 +713,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
         const Tensor<1, dim> &ref_space_normal = quadrature.normal_vector(i);
         for (unsigned int d = 0; d < dim; ++d)
           {
-            normal[d] = ref_space_normal[d] / data.cell_extents[d];
+            normal[d] = ref_space_normal[d] * data.inverse_cell_extents[d];
           }
         normal /= normal.norm();
         output_data.normal_vectors[i] = normal;
@@ -738,7 +730,8 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
         for (unsigned int d = 0; d < dim; ++d)
           {
             det_jacobian *= data.cell_extents[d];
-            invJTxNormal[d] = ref_space_normal[d] / data.cell_extents[d];
+            invJTxNormal[d] =
+              ref_space_normal[d] * data.inverse_cell_extents[d];
           }
         output_data.JxW_values[i] =
           det_jacobian * invJTxNormal.norm() * quadrature.weight(i);
@@ -775,7 +768,7 @@ MappingCartesian<dim, spacedim>::transform(
 
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d = 0; d < dim; ++d)
-              output[i][d] = input[i][d] / data.cell_extents[d];
+              output[i][d] = input[i][d] * data.inverse_cell_extents[d];
           return;
         }
 
@@ -836,7 +829,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2];
+                output[i][d1][d2] =
+                  input[i][d1][d2] * data.inverse_cell_extents[d2];
           return;
         }
 
@@ -862,8 +856,9 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] *
+                                    data.inverse_cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -876,8 +871,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -910,8 +905,9 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1] / data.volume_element;
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1] /
+                                    data.volume_element;
           return;
         }
 
@@ -946,7 +942,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2];
+                output[i][d1][d2] =
+                  input[i][d1][d2] * data.inverse_cell_extents[d2];
           return;
         }
 
@@ -972,8 +969,9 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] / data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] *
+                                    data.inverse_cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -986,8 +984,8 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1];
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1];
           return;
         }
 
@@ -1020,8 +1018,9 @@ MappingCartesian<dim, spacedim>::transform(
           for (unsigned int i = 0; i < output.size(); ++i)
             for (unsigned int d1 = 0; d1 < dim; ++d1)
               for (unsigned int d2 = 0; d2 < dim; ++d2)
-                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] /
-                                    data.cell_extents[d1] / data.volume_element;
+                output[i][d1][d2] = input[i][d1][d2] * data.cell_extents[d2] *
+                                    data.inverse_cell_extents[d1] /
+                                    data.volume_element;
           return;
         }
 
@@ -1058,9 +1057,9 @@ MappingCartesian<dim, spacedim>::transform(
               for (unsigned int j = 0; j < spacedim; ++j)
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
-                    output[q][i][j][k] = input[q][i][j][k] /
-                                         data.cell_extents[j] /
-                                         data.cell_extents[k];
+                    output[q][i][j][k] = input[q][i][j][k] *
+                                         data.inverse_cell_extents[j] *
+                                         data.inverse_cell_extents[k];
                   }
           return;
         }
@@ -1100,9 +1099,10 @@ MappingCartesian<dim, spacedim>::transform(
               for (unsigned int j = 0; j < spacedim; ++j)
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
-                    output[q][i][j][k] =
-                      input[q][i][j][k] * data.cell_extents[i] /
-                      data.cell_extents[j] / data.cell_extents[k];
+                    output[q][i][j][k] = input[q][i][j][k] *
+                                         data.cell_extents[i] *
+                                         data.inverse_cell_extents[j] *
+                                         data.inverse_cell_extents[k];
                   }
           return;
         }
@@ -1118,9 +1118,10 @@ MappingCartesian<dim, spacedim>::transform(
               for (unsigned int j = 0; j < spacedim; ++j)
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
-                    output[q][i][j][k] =
-                      input[q][i][j][k] / data.cell_extents[i] /
-                      data.cell_extents[j] / data.cell_extents[k];
+                    output[q][i][j][k] = input[q][i][j][k] *
+                                         (data.inverse_cell_extents[i] *
+                                          data.inverse_cell_extents[j]) *
+                                         data.inverse_cell_extents[k];
                   }
 
           return;
@@ -1144,9 +1145,10 @@ MappingCartesian<dim, spacedim>::transform(
                 for (unsigned int k = 0; k < spacedim; ++k)
                   {
                     output[q][i][j][k] =
-                      input[q][i][j][k] * data.cell_extents[i] /
-                      data.volume_element / data.cell_extents[j] /
-                      data.cell_extents[k];
+                      input[q][i][j][k] *
+                      (data.cell_extents[i] / data.volume_element *
+                       data.inverse_cell_extents[j]) *
+                      data.inverse_cell_extents[k];
                   }
 
           return;
@@ -1166,32 +1168,15 @@ MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
   const Point<dim>                                           &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
+  Assert(dim == spacedim, ExcNotImplemented());
 
-  Tensor<1, dim>   length;
-  const Point<dim> start = cell->vertex(0);
-  switch (dim)
-    {
-      case 1:
-        length[0] = cell->vertex(1)[0] - start[0];
-        break;
-      case 2:
-        length[0] = cell->vertex(1)[0] - start[0];
-        length[1] = cell->vertex(2)[1] - start[1];
-        break;
-      case 3:
-        length[0] = cell->vertex(1)[0] - start[0];
-        length[1] = cell->vertex(2)[1] - start[1];
-        length[2] = cell->vertex(4)[2] - start[2];
-        break;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
-    }
+  Point<dim> unit = cell->vertex(0);
 
-  Point<dim> p_real = cell->vertex(0);
+  // Go through vertices with numbers 1, 2, 4
   for (unsigned int d = 0; d < dim; ++d)
-    p_real[d] += length[d] * p[d];
+    unit[d] += (cell->vertex(1 << d)[d] - unit[d]) * p[d];
 
-  return p_real;
+  return unit;
 }
 
 
@@ -1203,31 +1188,43 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
   const Point<spacedim>                                      &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
+  Assert(dim == spacedim, ExcNotImplemented());
+
+  const Point<dim> start = cell->vertex(0);
+  Point<dim>       real  = p;
+
+  // Go through vertices with numbers 1, 2, 4
+  for (unsigned int d = 0; d < dim; ++d)
+    real[d] = (real[d] - start[d]) / (cell->vertex(1 << d)[d] - start[d]);
+
+  return real;
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::transform_points_real_to_unit_cell(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const ArrayView<const Point<spacedim>>                     &real_points,
+  const ArrayView<Point<dim>>                                &unit_points) const
+{
+  Assert(is_cartesian(cell), ExcCellNotCartesian());
+  AssertDimension(real_points.size(), unit_points.size());
 
   if (dim != spacedim)
     DEAL_II_NOT_IMPLEMENTED();
-  const Point<dim> &start = cell->vertex(0);
-  Point<dim>        real  = p;
-  real -= start;
 
-  switch (dim)
-    {
-      case 1:
-        real[0] /= cell->vertex(1)[0] - start[0];
-        break;
-      case 2:
-        real[0] /= cell->vertex(1)[0] - start[0];
-        real[1] /= cell->vertex(2)[1] - start[1];
-        break;
-      case 3:
-        real[0] /= cell->vertex(1)[0] - start[0];
-        real[1] /= cell->vertex(2)[1] - start[1];
-        real[2] /= cell->vertex(4)[2] - start[2];
-        break;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
-    }
-  return real;
+  const Point<dim> start = cell->vertex(0);
+
+  // Go through vertices with numbers 1, 2, 4
+  std::array<double, dim> inverse_lengths;
+  for (unsigned int d = 0; d < dim; ++d)
+    inverse_lengths[d] = 1. / (cell->vertex(1 << d)[d] - start[d]);
+
+  for (unsigned int i = 0; i < real_points.size(); ++i)
+    for (unsigned int d = 0; d < dim; ++d)
+      unit_points[i][d] = (real_points[i][d] - start[d]) * inverse_lengths[d];
 }
 
 
