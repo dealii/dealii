@@ -595,6 +595,21 @@ namespace python
 
 
 
+    template <int dim>
+    void
+    generate_truncated_cone(const double radius_0,
+                            const double radius_1,
+                            const double half_length,
+                            void        *triangulation)
+    {
+      Triangulation<dim> *tria =
+        static_cast<Triangulation<dim> *>(triangulation);
+      tria->clear();
+      GridGenerator::truncated_cone(*tria, radius_0, radius_1, half_length);
+    }
+
+
+
     template <int dim, int spacedim>
     void
     scale(const double scaling_factor, void *triangulation)
@@ -1669,6 +1684,29 @@ namespace python
                                                 x_subdivisions,
                                                 half_length,
                                                 triangulation);
+  }
+
+
+
+  void
+  TriangulationWrapper::generate_truncated_cone(const double radius_0,
+                                                const double radius_1,
+                                                const double half_length)
+  {
+    AssertThrow(
+      dim == spacedim,
+      ExcMessage(
+        "This function is only implemented for dim equal to spacedim."));
+    if (dim == 2)
+      internal::generate_truncated_cone<2>(radius_0,
+                                           radius_1,
+                                           half_length,
+                                           triangulation);
+    else
+      internal::generate_truncated_cone<3>(radius_0,
+                                           radius_1,
+                                           half_length,
+                                           triangulation);
   }
 
 

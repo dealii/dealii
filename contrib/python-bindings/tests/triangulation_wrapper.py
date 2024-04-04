@@ -395,6 +395,17 @@ class TestTriangulationWrapper(unittest.TestCase):
         n_cells = triangulation.n_active_cells()
         self.assertEqual(n_cells, n_cells_ref)
 
+    def test_truncated_cone(self):
+        for dim in self.dim:
+            triangulation = Triangulation(dim[0])
+            if (dim[0] == '2D'):
+                n_cells_ref = 1
+            else:
+                n_cells_ref = 5
+            triangulation.generate_truncated_cone()
+            n_cells = triangulation.n_active_cells()
+            self.assertEqual(n_cells, n_cells_ref)
+
     def test_shift_and_merge(self):
         for dim in self.dim:
             triangulation_1 = self.build_hyper_cube_triangulation(dim)

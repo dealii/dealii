@@ -297,6 +297,14 @@ namespace python
     generate_subdivided_cylinder(const unsigned int x_subdivisions,
                                  const double       radius      = 1.,
                                  const double       half_length = 1.);
+
+    /*! @copydoc GridGenerator::truncated_cone
+     */
+    void
+    generate_truncated_cone(const double radius_0    = 1.,
+                            const double radius_1    = 0.5,
+                            const double half_length = 1.0);
+
     /*! @copydoc GridGenerator::hyper_shell
      */
     void

@@ -118,6 +118,10 @@ namespace python
                                          generate_subdivided_cylinder,
                                          1,
                                          3)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_truncated_cone_overloads,
+                                         generate_truncated_cone,
+                                         0,
+                                         3)
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(generate_hyper_shell_overloads,
                                          generate_hyper_shell,
                                          3,
@@ -365,10 +369,22 @@ namespace python
 
 
 
+  const char generate_truncated_cone_docstring[] =
+    "Create a cut cone around the x-axis. The cone extends from            \n"
+    "x=-half_length to x=half_length and its projection into the yz-plane  \n"
+    "is a circle of radius radius_0 at x=-half_length and a circle of      \n"
+    "radius radius_1 at x=+half_length. In between the radius is linearly  \n"
+    "decreasing. In two dimensions, the cone is a trapezoid from           \n"
+    "x=-half_length to x=+half_length and from y=-radius_0 to y=radius_0   \n"
+    "at x=-half_length and from y=-radius_1 to y=radius_1 at               \n"
+    "x=+half_length. In between the range of y is linearly decreasing.     \n";
+
+
+
   const char generate_hyper_cube_with_cylindrical_hole_docstring[] =
-    "This function produces a square in the xy-plane with a cylindrical     \n"
-    "hole in the middle. In 3d, this geometry is extruded in z direction    \n"
-    "to the interval [0,L].                                                 \n";
+    "This function produces a square in the xy-plane with a cylindrical    \n"
+    "hole in the middle. In 3d, this geometry is extruded in z direction   \n"
+    "to the interval [0,L].                                                \n";
 
 
 
@@ -757,6 +773,11 @@ namespace python
              boost::python::args(
                "self", "x_subdivisions", "radius", "half_length"),
              generate_subdivided_cylinder_docstring))
+      .def("generate_truncated_cone",
+           &TriangulationWrapper::generate_truncated_cone,
+           generate_truncated_cone_overloads(
+             boost::python::args("self", "radius_0", "radius", "half_length"),
+             generate_truncated_cone_docstring))
       .def("generate_hyper_shell",
            &TriangulationWrapper::generate_hyper_shell,
            generate_hyper_shell_overloads(boost::python::args("self",
