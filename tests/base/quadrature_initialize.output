@@ -1,0 +1,9 @@
+
+DEAL:1d::Testing initialize(vector&, vector&): OK
+DEAL:1d::Testing initialize(vector&, vector&): OK
+DEAL:1d::Testing initialize(ArrayView, ArrayView): OK
+DEAL:1d::Testing initialize(ArrayView): OK
+DEAL:2d::Testing initialize(vector&, vector&): OK
+DEAL:2d::Testing initialize(vector&, vector&): OK
+DEAL:2d::Testing initialize(ArrayView, ArrayView): OK
+DEAL:2d::Testing initialize(ArrayView): OK
