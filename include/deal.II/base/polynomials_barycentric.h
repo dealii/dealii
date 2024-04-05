@@ -687,7 +687,7 @@ BarycentricPolynomial<dim, Number>::value(const Point<dim> &point) const
 
       auto temp = Number(1);
       for (unsigned int d = 0; d < dim + 1; ++d)
-        temp *= std::pow(b_point[d], indices[d]);
+        temp *= Utilities::pow(b_point[d], indices[d]);
       result += coef * temp;
     }
 
