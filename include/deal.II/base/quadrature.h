@@ -238,14 +238,6 @@ public:
 
   /**
    * Set the quadrature points and weights to the values provided in the
-   * arguments.
-   */
-  void
-  initialize(const std::vector<Point<dim>> &points,
-             const std::vector<double>     &weights);
-
-  /**
-   * Set the quadrature points and weights to the values provided in the
    * arguments. The weights array is allowed to be empty, in which case the
    * weights are set to infinity. The resulting object is therefore not meant
    * to actually perform integrations, but rather to be used with FEValues
