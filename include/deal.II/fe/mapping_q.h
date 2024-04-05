@@ -312,10 +312,6 @@ public:
     /**
      * Initialize the object's member variables related to cell data based on
      * the given arguments.
-     *
-     * The function also calls compute_shape_function_values() to actually set
-     * the member variables related to the values and derivatives of the
-     * mapping shape functions.
      */
     void
     initialize(const UpdateFlags      update_flags,
