@@ -48,12 +48,24 @@ Quadrature<dim>::Quadrature(const unsigned int n_q)
 
 template <int dim>
 void
-Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
-                            const std::vector<double>     &w)
+Quadrature<dim>::initialize(const ArrayView<const Point<dim>> &points,
+                            const ArrayView<const double>     &weights)
 {
-  AssertDimension(w.size(), p.size());
-  quadrature_points      = p;
-  weights                = w;
+  this->weights.clear();
+  if (weights.size() > 0)
+    {
+      AssertDimension(weights.size(), points.size());
+      this->weights.insert(this->weights.end(), weights.begin(), weights.end());
+    }
+  else
+    this->weights.resize(points.size(),
+                         std::numeric_limits<double>::infinity());
+
+  quadrature_points.clear();
+  quadrature_points.insert(quadrature_points.end(),
+                           points.begin(),
+                           points.end());
+
   is_tensor_product_flag = dim == 1;
 }
 

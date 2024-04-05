@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/subscriptor.h>
 
@@ -237,11 +238,15 @@ public:
 
   /**
    * Set the quadrature points and weights to the values provided in the
-   * arguments.
+   * arguments. The weights array is allowed to be empty, in which case the
+   * weights are set to infinity. The resulting object is therefore not meant
+   * to actually perform integrations, but rather to be used with FEValues
+   * objects in order to find the position of some points (the quadrature
+   * points in this object) on the transformed cell in real space.
    */
   void
-  initialize(const std::vector<Point<dim>> &points,
-             const std::vector<double>     &weights);
+  initialize(const ArrayView<const Point<dim>> &points,
+             const ArrayView<const double>     &weights = {});
 
   /**
    * Number of quadrature points.
