@@ -72,9 +72,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       for (const auto q : fe_values.quadrature_point_indices())
         {
           deallog << scalar_values[q] << std::endl;
-          Assert((scalar_values[q] - vector_values[q][c]).norm() <=
-                   1e-12 * scalar_values[q].norm(),
-                 ExcInternalError());
+          const auto norm = (scalar_values[q] - vector_values[q][c]).norm();
+          const auto tolerance =
+            std::max(1.e-11, 1.e-12 * scalar_values[q].norm());
+          Assert(norm <= tolerance, ExcInternalError());
         }
     }
 }

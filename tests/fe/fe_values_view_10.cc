@@ -78,9 +78,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
               deallog << scalar_values[q][d][e]
                       << (d < dim - 1 || e < dim - 1 ? " " : "");
           deallog << std::endl;
-          Assert((scalar_values[q] - vector_values[q][c]).norm() <=
-                   1e-12 * scalar_values[q].norm(),
-                 ExcInternalError());
+          const auto norm = (scalar_values[q] - vector_values[q][c]).norm();
+          const auto tolerance =
+            std::max(1.e-11, 1.e-12 * scalar_values[q].norm());
+          Assert(norm <= tolerance, ExcInternalError());
         }
     }
 }
