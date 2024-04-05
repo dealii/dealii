@@ -1514,8 +1514,10 @@ namespace internal
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor()
-  : values(internal::TensorInitialization::make_zero_array<rank_, dim, Number>(
-      std::make_index_sequence<std::tuple_size_v<decltype(values)>>()))
+  : values(
+      internal::TensorInitialization::
+        make_zero_array<rank_, std::tuple_size_v<decltype(values)>, Number>(
+          std::make_index_sequence<std::tuple_size_v<decltype(values)>>()))
 {}
 
 
