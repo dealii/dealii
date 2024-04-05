@@ -81,6 +81,12 @@ enable_if_supported(DEAL_II_WARNING_FLAGS "-Wwrite-strings")
 enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-placement-new")
 
 #
+# Disable Wstrict-aliasing: We do type punning in class Tensor to
+# use vector intrinsics.
+#
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-strict-aliasing")
+
+#
 # Disable deprecation warnings
 #
 enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-deprecated-declarations")
