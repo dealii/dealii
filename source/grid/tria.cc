@@ -5149,7 +5149,10 @@ namespace internal
 
           std::array<typename Triangulation<dim, spacedim>::raw_line_iterator,
                      12>
-                       new_lines;
+                                        new_lines;
+          std::array<unsigned char, 12> inherited_orientations;
+          inherited_orientations.fill(
+            ReferenceCell::default_combined_face_orientation());
           unsigned int lmin = 0;
           unsigned int lmax = 0;
 
@@ -5157,6 +5160,12 @@ namespace internal
             {
               lmin = 6;
               lmax = 9;
+              // For triangles, the innermost faces are always reversed for the
+              // first three children and are in the standard orientation for
+              // the last one.
+              std::fill(inherited_orientations.begin() + lmin,
+                        inherited_orientations.begin() + lmax,
+                        ReferenceCell::reversed_combined_line_orientation());
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -5196,6 +5205,8 @@ namespace internal
               for (unsigned int c = 0; c < 2; ++c)
                 {
                   new_lines[2 * face_no + c] = cell->line(face_no)->child(c);
+                  inherited_orientations[2 * face_no + c] =
+                    cell->combined_face_orientation(face_no);
                 }
               if (combined_orientation ==
                   ReferenceCell::reversed_combined_line_orientation())
@@ -5263,24 +5274,6 @@ namespace internal
                   ++next_unused_cell;
             }
 
-          // Set subcell line orientations by checking the line's second
-          // vertex (from the subcell's perspective) to the line's actual
-          // second vertex.
-          const auto fix_line_orientation =
-            [&](const unsigned int line_no,
-                const unsigned int vertex_no,
-                const unsigned int subcell_no,
-                const unsigned int subcell_line_no) {
-              if (new_lines[line_no]->vertex_index(1) !=
-                  new_vertices[vertex_no])
-                triangulation.levels[subcells[subcell_no]->level()]
-                  ->face_orientations.set_combined_orientation(
-                    subcells[subcell_no]->index() *
-                        GeometryInfo<2>::faces_per_cell +
-                      subcell_line_no,
-                    ReferenceCell::reversed_combined_line_orientation());
-            };
-
           if (cell->reference_cell() == ReferenceCells::Triangle)
             {
               subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
@@ -5295,24 +5288,6 @@ namespace internal
               subcells[3]->set_bounding_object_indices({new_lines[6]->index(),
                                                         new_lines[7]->index(),
                                                         new_lines[8]->index()});
-
-              fix_line_orientation(0, 3, 0, 0);
-              fix_line_orientation(8, 5, 0, 1);
-              fix_line_orientation(5, 0, 0, 2);
-
-              fix_line_orientation(1, 1, 1, 0);
-              fix_line_orientation(2, 4, 1, 1);
-              fix_line_orientation(6, 3, 1, 2);
-
-              fix_line_orientation(7, 4, 2, 0);
-              fix_line_orientation(3, 2, 2, 1);
-              fix_line_orientation(4, 5, 2, 2);
-
-              // all lines of the new interior cell are oriented backwards so
-              // that it has positive area.
-              fix_line_orientation(6, 4, 3, 0);
-              fix_line_orientation(7, 5, 3, 1);
-              fix_line_orientation(8, 3, 3, 2);
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -5340,6 +5315,21 @@ namespace internal
               AssertThrow(false, ExcNotImplemented());
             }
 
+          // Assign lines to child cells:
+          constexpr unsigned int X = numbers::invalid_unsigned_int;
+          static constexpr dealii::ndarray<unsigned int, 4, 4> tri_child_lines =
+            {{{{0, 8, 5, X}}, {{1, 2, 6, X}}, {{7, 3, 4, X}}, {{6, 7, 8, X}}}};
+          static constexpr dealii::ndarray<unsigned int, 4, 4>
+            quad_child_lines = {{{{0, 8, 4, 10}},
+                                 {{8, 2, 5, 11}},
+                                 {{1, 9, 10, 6}},
+                                 {{9, 3, 11, 7}}}};
+          // Here and below we assume that child cells have the same reference
+          // cell type as the parent.
+          const auto &child_lines =
+            cell->reference_cell() == ReferenceCells::Triangle ?
+              tri_child_lines :
+              quad_child_lines;
           for (unsigned int i = 0; i < n_children; ++i)
             {
               subcells[i]->set_used_flag();
@@ -5355,9 +5345,22 @@ namespace internal
               triangulation.levels[subcells[i]->level()]
                 ->reference_cell[subcells[i]->index()] = cell->reference_cell();
 
+              // Finally, now that children are marked as used, we can set
+              // orientation flags:
+              for (unsigned int face_no : cell->face_indices())
+                subcells[i]->set_combined_face_orientation(
+                  face_no, inherited_orientations[child_lines[i][face_no]]);
+
               if (i % 2 == 0)
                 subcells[i]->set_parent(cell->index());
             }
+
+          // Unlike the same lines on other children, the innermost triangle's
+          // faces are all in the default orientation:
+          if (cell->reference_cell() == ReferenceCells::Triangle)
+            for (unsigned int face_no : cell->face_indices())
+              subcells[3]->set_combined_face_orientation(
+                face_no, ReferenceCell::default_combined_face_orientation());
 
           for (unsigned int i = 0; i < n_children / 2; ++i)
             cell->set_children(2 * i, subcells[2 * i]->index());
