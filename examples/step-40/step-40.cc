@@ -243,6 +243,12 @@ namespace Step40
 
     dof_handler.distribute_dofs(fe);
 
+    pcout << "   Number of active cells:       "
+          << triangulation.n_global_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+          << std::endl;
+
+
     // The next two lines extract some information we will need later on,
     // namely two index sets that provide information about which degrees of
     // freedom are owned by the current processor (this information will be
@@ -644,12 +650,6 @@ namespace Step40
           refine_grid();
 
         setup_system();
-
-        pcout << "   Number of active cells:       "
-              << triangulation.n_global_active_cells() << std::endl
-              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl;
-
         assemble_system();
         solve();
 
