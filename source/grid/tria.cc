@@ -5263,8 +5263,25 @@ namespace internal
                   ++next_unused_cell;
             }
 
-          if ((dim == 2) &&
-              (cell->reference_cell() == ReferenceCells::Triangle))
+          // Set subcell line orientations by checking the line's second
+          // vertex (from the subcell's perspective) to the line's actual
+          // second vertex.
+          const auto fix_line_orientation =
+            [&](const unsigned int line_no,
+                const unsigned int vertex_no,
+                const unsigned int subcell_no,
+                const unsigned int subcell_line_no) {
+              if (new_lines[line_no]->vertex_index(1) !=
+                  new_vertices[vertex_no])
+                triangulation.levels[subcells[subcell_no]->level()]
+                  ->face_orientations.set_combined_orientation(
+                    subcells[subcell_no]->index() *
+                        GeometryInfo<2>::faces_per_cell +
+                      subcell_line_no,
+                    ReferenceCell::reversed_combined_line_orientation());
+            };
+
+          if (cell->reference_cell() == ReferenceCells::Triangle)
             {
               subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
                                                         new_lines[8]->index(),
@@ -5278,24 +5295,6 @@ namespace internal
               subcells[3]->set_bounding_object_indices({new_lines[6]->index(),
                                                         new_lines[7]->index(),
                                                         new_lines[8]->index()});
-
-              // Set subcell line orientations by checking the line's second
-              // vertex (from the subcell's perspective) to the line's actual
-              // second vertex.
-              const auto fix_line_orientation =
-                [&](const unsigned int line_no,
-                    const unsigned int vertex_no,
-                    const unsigned int subcell_no,
-                    const unsigned int subcell_line_no) {
-                  if (new_lines[line_no]->vertex_index(1) !=
-                      new_vertices[vertex_no])
-                    triangulation.levels[subcells[subcell_no]->level()]
-                      ->face_orientations.set_combined_orientation(
-                        subcells[subcell_no]->index() *
-                            GeometryInfo<2>::faces_per_cell +
-                          subcell_line_no,
-                        0u);
-                };
 
               fix_line_orientation(0, 3, 0, 0);
               fix_line_orientation(8, 5, 0, 1);
@@ -5315,8 +5314,7 @@ namespace internal
               fix_line_orientation(7, 5, 3, 1);
               fix_line_orientation(8, 3, 3, 2);
             }
-          else if ((dim == 2) &&
-                   (cell->reference_cell() == ReferenceCells::Quadrilateral))
+          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
               subcells[0]->set_bounding_object_indices(
                 {new_lines[0]->index(),
