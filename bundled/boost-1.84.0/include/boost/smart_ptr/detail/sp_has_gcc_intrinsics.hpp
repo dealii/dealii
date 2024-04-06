@@ -18,7 +18,7 @@
 // intrinsics are available.
 
 
-#if defined( __ATOMIC_RELAXED ) && defined( __ATOMIC_ACQUIRE ) && defined( __ATOMIC_RELEASE ) && defined( __ATOMIC_ACQ_REL )
+#if defined( __ATOMIC_RELAXED ) && defined( __ATOMIC_ACQUIRE ) && defined( __ATOMIC_RELEASE ) && defined( __ATOMIC_ACQ_REL ) && !defined(_MSC_VER)
 
 # define BOOST_SP_HAS_GCC_INTRINSICS
 
