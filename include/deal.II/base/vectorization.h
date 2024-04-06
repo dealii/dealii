@@ -455,8 +455,15 @@ public:
    */
   using value_type = Number;
 
-  static_assert(width == 1,
-                "You specified an illegal width that is not supported.");
+  /**
+   * A constexpr boolean indicating whether the VectorizedArray with the
+   * given choice of template parameters @p Number and @p width is indeed
+   * implemented. The generic implementation is only implemented for
+   * @p width equal to one. For specializations of this class (which are
+   * defined depending on the instruction sets available) the boolean is
+   * set to true as well.
+   */
+  static constexpr bool is_implemented = (width == 1);
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -469,6 +476,9 @@ public:
    */
   VectorizedArray(const Number scalar)
   {
+    static_assert(width == 1,
+                  "You specified an illegal width that is not supported.");
+
     this->operator=(scalar);
   }
 
@@ -478,7 +488,10 @@ public:
   template <typename U>
   VectorizedArray(const std::initializer_list<U> &list)
     : VectorizedArrayBase<VectorizedArray<Number, width>, 1>(list)
-  {}
+  {
+    static_assert(width == 1,
+                  "You specified an illegal width that is not supported.");
+  }
 
   /**
    * This function assigns a scalar to the current object.
@@ -1012,6 +1025,12 @@ public:
   using value_type = double;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -1298,6 +1317,12 @@ public:
   using value_type = float;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -1569,6 +1594,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = double;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -2054,6 +2085,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -2562,6 +2599,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = double;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -3140,6 +3183,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -3741,6 +3790,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = double;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -4371,6 +4426,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
@@ -5082,6 +5143,12 @@ public:
   using value_type = double;
 
   /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
+
+  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -5335,6 +5402,12 @@ public:
    * This gives the type of the array elements.
    */
   using value_type = float;
+
+  /**
+   * Record the fact that the given specialization of VectorizedArray is
+   * indeed implemented.
+   */
+  static constexpr bool is_implemented = true;
 
   /**
    * Default empty constructor, leaving the data in an uninitialized state
