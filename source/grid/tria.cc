@@ -5274,47 +5274,6 @@ namespace internal
                   ++next_unused_cell;
             }
 
-          if (cell->reference_cell() == ReferenceCells::Triangle)
-            {
-              subcells[0]->set_bounding_object_indices({new_lines[0]->index(),
-                                                        new_lines[8]->index(),
-                                                        new_lines[5]->index()});
-              subcells[1]->set_bounding_object_indices({new_lines[1]->index(),
-                                                        new_lines[2]->index(),
-                                                        new_lines[6]->index()});
-              subcells[2]->set_bounding_object_indices({new_lines[7]->index(),
-                                                        new_lines[3]->index(),
-                                                        new_lines[4]->index()});
-              subcells[3]->set_bounding_object_indices({new_lines[6]->index(),
-                                                        new_lines[7]->index(),
-                                                        new_lines[8]->index()});
-            }
-          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
-            {
-              subcells[0]->set_bounding_object_indices(
-                {new_lines[0]->index(),
-                 new_lines[8]->index(),
-                 new_lines[4]->index(),
-                 new_lines[10]->index()});
-              subcells[1]->set_bounding_object_indices(
-                {new_lines[8]->index(),
-                 new_lines[2]->index(),
-                 new_lines[5]->index(),
-                 new_lines[11]->index()});
-              subcells[2]->set_bounding_object_indices({new_lines[1]->index(),
-                                                        new_lines[9]->index(),
-                                                        new_lines[10]->index(),
-                                                        new_lines[6]->index()});
-              subcells[3]->set_bounding_object_indices({new_lines[9]->index(),
-                                                        new_lines[3]->index(),
-                                                        new_lines[11]->index(),
-                                                        new_lines[7]->index()});
-            }
-          else
-            {
-              AssertThrow(false, ExcNotImplemented());
-            }
-
           // Assign lines to child cells:
           constexpr unsigned int X = numbers::invalid_unsigned_int;
           static constexpr dealii::ndarray<unsigned int, 4, 4> tri_child_lines =
@@ -5332,6 +5291,18 @@ namespace internal
               quad_child_lines;
           for (unsigned int i = 0; i < n_children; ++i)
             {
+              if (cell->reference_cell() == ReferenceCells::Triangle)
+                subcells[i]->set_bounding_object_indices(
+                  {new_lines[child_lines[i][0]]->index(),
+                   new_lines[child_lines[i][1]]->index(),
+                   new_lines[child_lines[i][2]]->index()});
+              else
+                subcells[i]->set_bounding_object_indices(
+                  {new_lines[child_lines[i][0]]->index(),
+                   new_lines[child_lines[i][1]]->index(),
+                   new_lines[child_lines[i][2]]->index(),
+                   new_lines[child_lines[i][3]]->index()});
+
               subcells[i]->set_used_flag();
               subcells[i]->clear_refine_flag();
               subcells[i]->clear_user_flag();
