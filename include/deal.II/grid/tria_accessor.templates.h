@@ -862,25 +862,36 @@ namespace internal
       template <int structdim, int dim, int spacedim>
       inline static void
       set_combined_face_orientation(
-        const TriaAccessor<structdim, dim, spacedim> &,
-        const unsigned int,
-        const unsigned char)
+        const TriaAccessor<structdim, dim, spacedim> &accessor,
+        const unsigned int                            face,
+        const unsigned char                           combined_orientation)
       {
-        DEAL_II_ASSERT_UNREACHABLE();
-      }
-
-
-
-      inline static void
-      set_combined_face_orientation(const TriaAccessor<3, 3, 3> &accessor,
-                                    const unsigned int           face,
-                                    const unsigned char combined_orientation)
-      {
+        Assert(structdim == dim,
+               ExcMessage("This function can only be used on objects that are "
+                          "cells and not on objects which bound cells."));
         AssertIndexRange(face, accessor.n_faces());
-        accessor.tria->levels[accessor.present_level]
-          ->face_orientations.set_combined_orientation(
-            accessor.present_index * GeometryInfo<3>::faces_per_cell + face,
-            combined_orientation);
+
+        if (dim == 1)
+          Assert(combined_orientation ==
+                   ReferenceCell::default_combined_face_orientation(),
+                 ExcMessage("In 1d, faces do not have an orientation, so the "
+                            "only valid value is the default."));
+        else if (dim == 2)
+          Assert(combined_orientation ==
+                     ReferenceCell::default_combined_face_orientation() ||
+                   combined_orientation ==
+                     ReferenceCell::reversed_combined_line_orientation(),
+                 ExcMessage(
+                   "In 2d, the only valid values of the combined orientation "
+                   "are the standard orientation or the reversed line "
+                   "orientation."));
+
+        // face_orientations is not set up in 1d
+        if (dim != 1)
+          accessor.tria->levels[accessor.present_level]
+            ->face_orientations.set_combined_orientation(
+              accessor.present_index * GeometryInfo<dim>::faces_per_cell + face,
+              combined_orientation);
       }
 
       /**

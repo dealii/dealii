@@ -1818,10 +1818,8 @@ private:
 
   /**
    * Set the combined face orientation (i.e., the integer that uniquely encodes
-   * the orientation, flip, and rotation).
-   *
-   * It is only possible to set the face_orientation of cells in 3d (i.e.
-   * <code>structdim==3 && dim==3</code>).
+   * the orientation, flip, and rotation). This function is only implemented for
+   * objects which have faces, i.e., for structdim == dim.
    *
    * @ingroup reordering
    */
