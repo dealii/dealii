@@ -5078,21 +5078,17 @@ namespace internal
                 children[1]->set_bounding_object_indices(
                   {next_unused_vertex, line->vertex_index(1)});
 
-                children[0]->set_used_flag();
-                children[1]->set_used_flag();
-                children[0]->clear_children();
-                children[1]->clear_children();
-                children[0]->clear_user_data();
-                children[1]->clear_user_data();
-                children[0]->clear_user_flag();
-                children[1]->clear_user_flag();
-
-
-                children[0]->set_boundary_id_internal(line->boundary_id());
-                children[1]->set_boundary_id_internal(line->boundary_id());
-
-                children[0]->set_manifold_id(line->manifold_id());
-                children[1]->set_manifold_id(line->manifold_id());
+                for (auto &child : children)
+                  {
+                    child->set_used_flag();
+                    child->clear_children();
+                    child->clear_user_data();
+                    child->clear_user_flag();
+                    child->set_boundary_id_internal(line->boundary_id());
+                    child->set_manifold_id(line->manifold_id());
+                    // Line orientation is relative to the cell it is on so
+                    // those cannot be set at this point.
+                  }
 
                 line->clear_user_flag();
               }
