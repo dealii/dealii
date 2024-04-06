@@ -65,6 +65,13 @@ test()
 int
 main()
 {
+  // CGAL uses hand-optimized AVX instructions for certain performance
+  // critical operations that can create (temporary) signalling NaNs and
+  // trigger a spurious floating point exception. Thus disable FE_INVALID:
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  fedisableexcept(FE_INVALID);
+#endif
+
   initlog();
   test();
 }
