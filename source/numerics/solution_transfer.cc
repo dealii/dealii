@@ -585,16 +585,7 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(
   // We have written into the output vectors. If this was a PETSc vector, for
   // example, then we need to compress these to make future operations safe:
   for (auto &vec : all_out)
-    {
-      if constexpr (std::is_same<VectorType,
-                                 LinearAlgebra::distributed::Vector<
-                                   typename VectorType::value_type>>::value)
-        for (unsigned int i = 0; i < vec.size(); ++i)
-          std::cout << vec[i] << " ";
-      std::cout << std::endl;
-
-      vec.compress(VectorOperation::insert);
-    }
+    vec.compress(VectorOperation::insert);
 }
 
 
