@@ -5184,34 +5184,33 @@ namespace internal
               AssertIsNotUsed(new_lines[l]);
             }
 
+          // set up lines which have parents:
+          for (const unsigned int face_no : cell->face_indices())
+            {
+              // Check the face (line) orientation to ensure that the (six or
+              // eight) outer lines in new_lines are indexed in the default
+              // orientation. This way we can index into this array in the
+              // without special casing orientations (e.g., quadrilateral child
+              // 3 will always have lines 9, 3, 11, 7) when setting child lines.
+              const unsigned char combined_orientation =
+                cell->combined_face_orientation(face_no);
+              Assert(combined_orientation ==
+                         ReferenceCell::default_combined_face_orientation() ||
+                       combined_orientation ==
+                         ReferenceCell::reversed_combined_line_orientation(),
+                     ExcInternalError());
+              for (unsigned int c = 0; c < 2; ++c)
+                {
+                  new_lines[2 * face_no + c] = cell->line(face_no)->child(c);
+                }
+              if (combined_orientation ==
+                  ReferenceCell::reversed_combined_line_orientation())
+                std::swap(new_lines[2 * face_no], new_lines[2 * face_no + 1]);
+            }
+
+          // set up lines which do not have parents:
           if (cell->reference_cell() == ReferenceCells::Triangle)
             {
-              // add lines in the order implied by their orientation. Here,
-              // face_no is the cell (not subcell) face number and vertex_no is
-              // the first vertex on that face in the standard orientation.
-              const auto ref = [&](const unsigned int face_no,
-                                   const unsigned int vertex_no) {
-                auto l = cell->line(face_no);
-                // if the vertex is on the first child then add the first child
-                // first
-                if (l->child(0)->vertex_index(0) == new_vertices[vertex_no] ||
-                    l->child(0)->vertex_index(1) == new_vertices[vertex_no])
-                  {
-                    new_lines[2 * face_no + 0] = l->child(0);
-                    new_lines[2 * face_no + 1] = l->child(1);
-                  }
-                else
-                  {
-                    new_lines[2 * face_no + 0] = l->child(1);
-                    new_lines[2 * face_no + 1] = l->child(0);
-                  }
-              };
-
-              ref(0, 0);
-              ref(1, 1);
-              ref(2, 2);
-
-              // set up lines which do not have parents:
               new_lines[6]->set_bounding_object_indices(
                 {new_vertices[3], new_vertices[4]});
               new_lines[7]->set_bounding_object_indices(
@@ -5221,11 +5220,6 @@ namespace internal
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
-              unsigned int l = 0;
-              for (const unsigned int face_no : cell->face_indices())
-                for (unsigned int c = 0; c < 2; ++c, ++l)
-                  new_lines[l] = cell->line(face_no)->child(c);
-
               new_lines[8]->set_bounding_object_indices(
                 {new_vertices[6], new_vertices[8]});
               new_lines[9]->set_bounding_object_indices(
