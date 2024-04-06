@@ -59,6 +59,8 @@ namespace NonMatching
     template <int dim, int spacedim>
     class ComputeMappingDataHelper;
   }
+  template <int dim, int spacedim, typename Number>
+  class MappingInfo;
 } // namespace NonMatching
 
 
@@ -656,6 +658,18 @@ public:
     InternalDataBase(const InternalDataBase &) = delete;
 
     /**
+     * This function initializes the data fields related to evaluation of the
+     * mapping on cells, implemented by (derived) classes. This function is
+     * used both when setting up a field of this class for the first time or
+     * when a new Quadrature formula should be considered without creating an
+     * entirely new object. This is used when the number of evaluation points
+     * is different on each cell, e.g. when using FEPointEvaluation for
+     * handling particles or with certain non-matching problem settings.
+     */
+    virtual void
+    reinit(const UpdateFlags update_flags, const Quadrature<dim> &quadrature);
+
+    /**
      * Virtual destructor for derived classes
      */
     virtual ~InternalDataBase() = default;
@@ -682,7 +696,6 @@ public:
     virtual std::size_t
     memory_consumption() const;
   };
-
 
 protected:
   /**
@@ -1323,6 +1336,8 @@ public:
   friend class FESubfaceValues<dim, spacedim>;
   friend class NonMatching::FEImmersedSurfaceValues<dim>;
   friend class NonMatching::internal::ComputeMappingDataHelper<dim, spacedim>;
+  template <int, int, typename>
+  friend class NonMatching::MappingInfo;
 };
 
 

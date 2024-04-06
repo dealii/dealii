@@ -289,6 +289,11 @@ public:
     InternalData(const FiniteElement<dim, spacedim> &fe,
                  const ComponentMask                &mask);
 
+    // Documentation see Mapping::InternalDataBase.
+    virtual void
+    reinit(const UpdateFlags      update_flags,
+           const Quadrature<dim> &quadrature) override;
+
     /**
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
@@ -358,6 +363,11 @@ public:
      */
     virtual std::size_t
     memory_consumption() const override;
+
+    /**
+     * A pointer to the underlying finite element.
+     */
+    SmartPointer<const FiniteElement<dim, spacedim>> fe;
 
     /**
      * Values of shape functions. Access by function @p shape.
@@ -590,7 +600,6 @@ private:
   Point<spacedim>
   do_transform_unit_to_real_cell(const InternalData &mdata) const;
 
-
   /**
    * Transform the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
@@ -598,10 +607,8 @@ private:
    * Takes a reference to an @p InternalData that is assumed to be previously
    * created by the @p get_data function with @p UpdateFlags including @p
    * update_transformation_values and @p update_transformation_gradients and a
-   * one point Quadrature that includes the given initial guess for the
-   * transformation @p initial_p_unit.  Hence this function assumes that @p
-   * mdata already includes the transformation shape values and gradients
-   * computed at @p initial_p_unit.
+   * one point Quadrature that includes the given initial guess specified
+   * through the given @p point_quadrature object.
    *
    * @p mdata will be changed by this function.
    */
@@ -609,8 +616,8 @@ private:
   do_transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<spacedim>                                      &p,
-    const Point<dim>                                           &initial_p_unit,
-    InternalData                                               &mdata) const;
+    Quadrature<dim> &point_quadrature,
+    InternalData    &mdata) const;
 
   /**
    * Update internal degrees of freedom.
@@ -620,15 +627,6 @@ private:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const typename MappingFEField<dim, spacedim, VectorType>::InternalData
       &data) const;
-
-  /**
-   * See the documentation of the base class for detailed information.
-   */
-  virtual void
-  compute_shapes_virtual(
-    const std::vector<Point<dim>> &unit_points,
-    typename MappingFEField<dim, spacedim, VectorType>::InternalData &data)
-    const;
 
   /*
    * Which components to use for the mapping.
@@ -658,17 +656,8 @@ private:
   mutable Threads::Mutex fe_values_mutex;
 
   void
-  compute_data(const UpdateFlags      update_flags,
-               const Quadrature<dim> &q,
-               const unsigned int     n_original_q_points,
-               InternalData          &data) const;
-
-  void
-  compute_face_data(const UpdateFlags      update_flags,
-                    const Quadrature<dim> &q,
-                    const unsigned int     n_original_q_points,
-                    InternalData          &data) const;
-
+  compute_face_data(const unsigned int n_original_q_points,
+                    InternalData      &data) const;
 
   // Declare other MappingFEField classes friends.
   template <int, int, class>

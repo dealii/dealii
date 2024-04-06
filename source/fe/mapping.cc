@@ -270,6 +270,16 @@ Mapping<dim, spacedim>::InternalDataBase::InternalDataBase()
 
 
 template <int dim, int spacedim>
+void
+Mapping<dim, spacedim>::InternalDataBase::reinit(const UpdateFlags,
+                                                 const Quadrature<dim> &)
+{
+  DEAL_II_ASSERT_UNREACHABLE();
+}
+
+
+
+template <int dim, int spacedim>
 std::size_t
 Mapping<dim, spacedim>::InternalDataBase::memory_consumption() const
 {

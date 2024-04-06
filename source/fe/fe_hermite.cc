@@ -247,8 +247,7 @@ namespace internal
       const typename Mapping<1, spacedim>::InternalDataBase &mapping_data,
       Table<2, Number>                                      &value_list)
     {
-      unsigned int n_q_points;
-      double       cell_extent = 1.0;
+      double cell_extent = 1.0;
 
       // Check mapping_data is associated with a compatible mapping class
       if (dynamic_cast<const typename MappingCartesian<1>::InternalData *>(
@@ -257,7 +256,6 @@ namespace internal
           const typename MappingCartesian<1>::InternalData *data =
             dynamic_cast<const typename MappingCartesian<1>::InternalData *>(
               &mapping_data);
-          n_q_points  = data->quadrature_points.size();
           cell_extent = data->cell_extents[0];
         }
       else
@@ -270,8 +268,6 @@ namespace internal
 
       AssertDimension(value_list.size(0), n_dofs_per_cell);
       AssertDimension(n_dofs_per_cell, 2 * regularity + 2);
-      AssertIndexRange(n_q_points_out, n_q_points + 1);
-      (void)n_q_points;
 
       std::vector<unsigned int> l2h =
         hermite_lexicographic_to_hierarchic_numbering<1>(regularity);
@@ -306,7 +302,6 @@ namespace internal
       const typename Mapping<2, spacedim>::InternalDataBase &mapping_data,
       Table<2, Number>                                      &value_list)
     {
-      unsigned int n_q_points;
       Tensor<1, 2> cell_extents;
 
       // Check mapping_data is associated with a compatible mapping class
@@ -316,7 +311,6 @@ namespace internal
           const typename MappingCartesian<2>::InternalData *data =
             dynamic_cast<const typename MappingCartesian<2>::InternalData *>(
               &mapping_data);
-          n_q_points   = data->quadrature_points.size();
           cell_extents = data->cell_extents;
         }
       else
@@ -330,8 +324,6 @@ namespace internal
 
       AssertDimension(value_list.size(0), n_dofs_per_cell);
       AssertDimension(n_dofs_per_dim * n_dofs_per_dim, n_dofs_per_cell);
-      AssertIndexRange(n_q_points_out, n_q_points + 1);
-      (void)n_q_points;
 
       std::vector<unsigned int> l2h =
         hermite_lexicographic_to_hierarchic_numbering<2>(regularity);
@@ -380,7 +372,6 @@ namespace internal
       const typename Mapping<3, spacedim>::InternalDataBase &mapping_data,
       Table<2, Number>                                      &value_list)
     {
-      unsigned int n_q_points;
       Tensor<1, 3> cell_extents;
 
       // Check mapping_data is associated with a compatible mapping class
@@ -390,7 +381,6 @@ namespace internal
           const typename MappingCartesian<3>::InternalData *data =
             dynamic_cast<const typename MappingCartesian<3>::InternalData *>(
               &mapping_data);
-          n_q_points   = data->quadrature_points.size();
           cell_extents = data->cell_extents;
         }
       else
@@ -405,8 +395,6 @@ namespace internal
 
       AssertDimension(value_list.size(0), n_dofs_per_cell);
       AssertDimension(Utilities::pow(n_dofs_per_dim, 3), n_dofs_per_cell);
-      AssertIndexRange(n_q_points_out, n_q_points + 1);
-      (void)n_q_points;
 
       std::vector<unsigned int> l2h =
         hermite_lexicographic_to_hierarchic_numbering<3>(regularity);

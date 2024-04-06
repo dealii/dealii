@@ -78,10 +78,8 @@ MappingQ<dim, spacedim>::InternalData::memory_consumption() const
 
 template <int dim, int spacedim>
 void
-MappingQ<dim, spacedim>::InternalData::initialize(
-  const UpdateFlags      update_flags,
-  const Quadrature<dim> &quadrature,
-  const unsigned int     n_original_q_points)
+MappingQ<dim, spacedim>::InternalData::reinit(const UpdateFlags update_flags,
+                                              const Quadrature<dim> &quadrature)
 {
   // store the flags in the internal data object so we can access them
   // in fill_fe_*_values()
@@ -90,7 +88,7 @@ MappingQ<dim, spacedim>::InternalData::initialize(
   const unsigned int n_q_points = quadrature.size();
 
   if (this->update_each & update_volume_elements)
-    volume_elements.resize(n_original_q_points);
+    volume_elements.resize(n_q_points);
 
   tensor_product_quadrature = quadrature.is_tensor_product();
 
@@ -163,7 +161,7 @@ MappingQ<dim, spacedim>::InternalData::initialize_face(
   const Quadrature<dim> &quadrature,
   const unsigned int     n_original_q_points)
 {
-  initialize(update_flags, quadrature, n_original_q_points);
+  reinit(update_flags, quadrature);
 
   quadrature_points = quadrature.get_points();
 
@@ -785,9 +783,7 @@ MappingQ<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>(polynomial_degree);
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
-  data.initialize(this->requires_update_flags(update_flags), q, q.size());
-
+  data_ptr->reinit(update_flags, q);
   return data_ptr;
 }
 

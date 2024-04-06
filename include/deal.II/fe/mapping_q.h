@@ -309,14 +309,10 @@ public:
      */
     InternalData(const unsigned int polynomial_degree);
 
-    /**
-     * Initialize the object's member variables related to cell data based on
-     * the given arguments.
-     */
-    void
-    initialize(const UpdateFlags      update_flags,
-               const Quadrature<dim> &quadrature,
-               const unsigned int     n_original_q_points);
+    // Documentation see Mapping::InternalDataBase.
+    virtual void
+    reinit(const UpdateFlags      update_flags,
+           const Quadrature<dim> &quadrature) override;
 
     /**
      * Initialize the object's member variables related to cell and face data

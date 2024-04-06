@@ -70,24 +70,7 @@ namespace NonMatching
         MappingData &mapping_data)
       {
         mapping_data.initialize(quadrature.size(), update_flags_mapping);
-
-        // reuse internal_mapping_data for MappingQ to avoid memory allocations
-        if (const MappingQ<dim, spacedim> *mapping_q =
-              dynamic_cast<const MappingQ<dim, spacedim> *>(mapping.get()))
-          {
-            (void)mapping_q;
-            auto &data =
-              static_cast<typename MappingQ<dim, spacedim>::InternalData &>(
-                *internal_mapping_data);
-            data.initialize(update_flags_mapping,
-                            quadrature,
-                            quadrature.size());
-          }
-        else
-          {
-            internal_mapping_data =
-              mapping->get_data(update_flags_mapping, quadrature);
-          }
+        internal_mapping_data->reinit(update_flags_mapping, quadrature);
 
         cell_similarity = mapping->fill_fe_values(cell,
                                                   cell_similarity,
@@ -110,21 +93,7 @@ namespace NonMatching
       {
         mapping_data.initialize(quadrature.size(), update_flags_mapping);
 
-        // reuse internal_mapping_data for MappingQ to avoid memory allocations
-        if (dynamic_cast<const MappingQ<dim, spacedim> *>(&(*mapping)))
-          {
-            auto &data =
-              dynamic_cast<typename MappingQ<dim, spacedim>::InternalData &>(
-                *internal_mapping_data);
-            data.initialize(update_flags_mapping,
-                            quadrature,
-                            quadrature.size());
-          }
-        else
-          {
-            internal_mapping_data =
-              mapping->get_data(update_flags_mapping, quadrature);
-          }
+        internal_mapping_data->reinit(update_flags_mapping, quadrature);
 
         mapping->fill_fe_immersed_surface_values(cell,
                                                  quadrature,
@@ -241,6 +210,12 @@ namespace NonMatching
    * template argument, e.g. VectorizedArray<double>) provides both mapping data
    * and unit points in vectorized format. The Number template parameter of
    * MappingInfo and FEPointEvaluation has to be identical.
+   *
+   * @note This class cannot be copied or copy-constructed. The intention of
+   * this class is to be available as a single use, e.g. inside
+   * FEPointEvaluation or as a storage container for the whole mesh. Use a
+   * shared or unique pointer of this class in case several objects should be
+   * held.
    */
   template <int dim, int spacedim = dim, typename Number = double>
   class MappingInfo : public Subscriptor
@@ -299,6 +274,17 @@ namespace NonMatching
     MappingInfo(const Mapping<dim, spacedim> &mapping,
                 const UpdateFlags             update_flags,
                 const AdditionalData additional_data = AdditionalData());
+
+    /**
+     * Do not allow making copies.
+     */
+    MappingInfo(const MappingInfo &) = delete;
+
+    /**
+     * Do not allow copy assignment of this class.
+     */
+    MappingInfo &
+    operator=(const MappingInfo &) = delete;
 
     /**
      * Compute the mapping information for the incoming cell and unit
@@ -665,7 +651,9 @@ namespace NonMatching
     Quadrature<dim> quadrature;
 
     /**
-     * An array containing the data fields of this class.
+     * Helper class that temporarily holds the data requested for one cell by
+     * Mapping::fill_fe_values() before it is filled into appropriate data
+     * structures for consumption by FEPointEvaluation.
      */
     MappingData mapping_data;
 
@@ -837,15 +825,9 @@ namespace NonMatching
       internal::ComputeMappingDataHelper<dim, spacedim>::required_update_flags(
         this->mapping, update_flags_mapping);
 
-    // construct internal_mapping_data for MappingQ to be able to reuse it in
-    // reinit() calls to avoid memory allocations
-    if (const MappingQ<dim, spacedim> *mapping_q =
-          dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
-      {
-        internal_mapping_data =
-          std::make_unique<typename MappingQ<dim, spacedim>::InternalData>(
-            mapping_q->get_degree());
-      }
+    // construct internal_mapping_data for mappings for reuse in reinit()
+    // calls to avoid frequent memory allocations
+    internal_mapping_data = mapping.get_data(update_flags, Quadrature<dim>());
   }
 
 

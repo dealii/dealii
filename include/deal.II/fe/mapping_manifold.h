@@ -167,18 +167,10 @@ public:
      */
     InternalData() = default;
 
-    /**
-     * Initialize the object's member variables related to cell data based on
-     * the given arguments.
-     *
-     * The function also calls compute_shape_function_values() to actually set
-     * the member variables related to the values and derivatives of the
-     * mapping shape functions.
-     */
-    void
-    initialize(const UpdateFlags      update_flags,
-               const Quadrature<dim> &quadrature,
-               const unsigned int     n_original_q_points);
+    // Documentation see Mapping::InternalDataBase.
+    virtual void
+    reinit(const UpdateFlags      update_flags,
+           const Quadrature<dim> &quadrature) override;
 
     /**
      * Initialize the object's member variables related to cell and face data
@@ -390,37 +382,6 @@ private:
 /*----------------------------------------------------------------------*/
 
 #ifndef DOXYGEN
-
-template <int dim, int spacedim>
-inline void
-MappingManifold<dim, spacedim>::InternalData::store_vertices(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
-{
-  vertices.resize(GeometryInfo<dim>::vertices_per_cell);
-  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-    vertices[i] = cell->vertex(i);
-  this->cell = cell;
-}
-
-
-template <int dim, int spacedim>
-inline void
-MappingManifold<dim, spacedim>::InternalData::
-  compute_manifold_quadrature_weights(const Quadrature<dim> &quad)
-{
-  cell_manifold_quadrature_weights.resize(
-    quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
-  for (unsigned int q = 0; q < quad.size(); ++q)
-    {
-      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-        {
-          cell_manifold_quadrature_weights[q][i] =
-            GeometryInfo<dim>::d_linear_shape_function(quad.point(q), i);
-        }
-    }
-}
-
-
 
 template <int dim, int spacedim>
 inline bool

@@ -218,6 +218,11 @@ public:
      */
     InternalData(const Quadrature<dim> &quadrature);
 
+    // Documentation see Mapping::InternalDataBase.
+    virtual void
+    reinit(const UpdateFlags      update_flags,
+           const Quadrature<dim> &quadrature) override;
+
     /**
      * Return an estimate (in bytes) for the memory consumption of this object.
      */
@@ -243,7 +248,9 @@ public:
     mutable double volume_element;
 
     /**
-     * Vector of all quadrature points. Especially, all points on all faces.
+     * Location of quadrature points of faces or subfaces in 3d with all
+     * possible orientations. Can be accessed with the correct offset provided
+     * via QProjector::DataSetDescriptor. Not needed/used for cells.
      */
     std::vector<Point<dim>> quadrature_points;
   };
@@ -335,7 +342,8 @@ private:
   maybe_update_cell_quadrature_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const InternalData                                         &data,
-    std::vector<Point<dim>> &quadrature_points) const;
+    const ArrayView<const Point<dim>> &unit_quadrature_points,
+    std::vector<Point<dim>>           &quadrature_points) const;
 
   /**
    * Compute the quadrature points if the UpdateFlags of the incoming
@@ -362,19 +370,6 @@ private:
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
     const InternalData                                         &data,
-    std::vector<Point<dim>> &quadrature_points) const;
-
-  /**
-   * Transform quadrature points in InternalData to real space by scaling unit
-   * coordinates with cell_extents in each direction.
-   *
-   * Called from the various maybe_update_*_quadrature_points functions.
-   */
-  void
-  transform_quadrature_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const InternalData                                         &data,
-    const typename QProjector<dim>::DataSetDescriptor          &offset,
     std::vector<Point<dim>> &quadrature_points) const;
 
   /**

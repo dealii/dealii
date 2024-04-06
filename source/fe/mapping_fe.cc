@@ -74,12 +74,11 @@ MappingFE<dim, spacedim>::InternalData::memory_consumption() const
 }
 
 
+
 template <int dim, int spacedim>
 void
-MappingFE<dim, spacedim>::InternalData::initialize(
-  const UpdateFlags      update_flags,
-  const Quadrature<dim> &q,
-  const unsigned int     n_original_q_points)
+MappingFE<dim, spacedim>::InternalData::reinit(const UpdateFlags update_flags,
+                                               const Quadrature<dim> &q)
 {
   // store the flags in the internal data object so we can access them
   // in fill_fe_*_values()
@@ -88,13 +87,13 @@ MappingFE<dim, spacedim>::InternalData::initialize(
   const unsigned int n_q_points = q.size();
 
   if (this->update_each & update_covariant_transformation)
-    covariant.resize(n_original_q_points);
+    covariant.resize(n_q_points);
 
   if (this->update_each & update_contravariant_transformation)
-    contravariant.resize(n_original_q_points);
+    contravariant.resize(n_q_points);
 
   if (this->update_each & update_volume_elements)
-    volume_elements.resize(n_original_q_points);
+    volume_elements.resize(n_q_points);
 
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
@@ -139,7 +138,7 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
   const Quadrature<dim> &q,
   const unsigned int     n_original_q_points)
 {
-  initialize(update_flags, q, n_original_q_points);
+  reinit(update_flags, q);
 
   if (this->update_each &
       (update_boundary_forms | update_normal_vectors | update_jacobians |
@@ -1059,9 +1058,7 @@ MappingFE<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>(*this->fe);
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
-  data.initialize(this->requires_update_flags(update_flags), q, q.size());
-
+  data_ptr->reinit(this->requires_update_flags(update_flags), q);
   return data_ptr;
 }
 
