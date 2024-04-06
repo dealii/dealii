@@ -5142,7 +5142,9 @@ namespace internal
               Assert(
                 next_unused_vertex < triangulation.vertices.size(),
                 ExcMessage(
-                  "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+                  "Internal error: During refinement, the triangulation wants "
+                  "to access an element of the 'vertices' array but it turns "
+                  "out that the array is not large enough."));
               triangulation.vertices_used[next_unused_vertex] = true;
 
               new_vertices[8] = next_unused_vertex;
