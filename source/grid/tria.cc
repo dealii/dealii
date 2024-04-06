@@ -5041,10 +5041,8 @@ namespace internal
           for (; line != endl; ++line)
             if (line->user_flag_set())
               {
-                // this line needs to be refined
-
-                // find the next unused vertex and set it
-                // appropriately
+                // This line needs to be refined. Find the next unused vertex
+                // and set it appropriately
                 while (triangulation.vertices_used[next_unused_vertex] == true)
                   ++next_unused_vertex;
                 Assert(
@@ -5240,7 +5238,7 @@ namespace internal
               new_lines[l]->clear_user_flag();
               new_lines[l]->clear_user_data();
               new_lines[l]->clear_children();
-              // interior line
+              // new lines are always internal.
               new_lines[l]->set_boundary_id_internal(
                 numbers::internal_face_boundary_id);
               new_lines[l]->set_manifold_id(cell->manifold_id());
@@ -5252,7 +5250,6 @@ namespace internal
             ++next_unused_cell;
 
           unsigned int n_children = 0;
-
           if (cell->reference_cell() == ReferenceCells::Triangle)
             n_children = 4;
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
@@ -5349,8 +5346,6 @@ namespace internal
               AssertThrow(false, ExcNotImplemented());
             }
 
-          types::subdomain_id subdomainid = cell->subdomain_id();
-
           for (unsigned int i = 0; i < n_children; ++i)
             {
               subcells[i]->set_used_flag();
@@ -5358,14 +5353,11 @@ namespace internal
               subcells[i]->clear_user_flag();
               subcells[i]->clear_user_data();
               subcells[i]->clear_children();
-              // inherit material
-              // properties
+              // inherit material properties
               subcells[i]->set_material_id(cell->material_id());
               subcells[i]->set_manifold_id(cell->manifold_id());
-              subcells[i]->set_subdomain_id(subdomainid);
+              subcells[i]->set_subdomain_id(cell->subdomain_id());
 
-              // TODO: here we assume that all children have the same reference
-              // cell type as the parent! This is justified for 2d.
               triangulation.levels[subcells[i]->level()]
                 ->reference_cell[subcells[i]->index()] = cell->reference_cell();
 
