@@ -166,7 +166,7 @@ namespace Step40
     void assemble_system();
     void solve();
     void refine_grid();
-    void output_results(const unsigned int cycle) const;
+    void output_results(const unsigned int cycle);
 
     MPI_Comm mpi_communicator;
 
@@ -483,7 +483,8 @@ namespace Step40
   void LaplaceProblem<dim>::solve()
   {
     TimerOutput::Scope t(computing_timer, "solve");
-    LA::MPI::Vector    completely_distributed_solution(locally_owned_dofs,
+
+    LA::MPI::Vector completely_distributed_solution(locally_owned_dofs,
                                                     mpi_communicator);
 
     SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
@@ -584,8 +585,10 @@ namespace Step40
   // to locally owned cells, while providing the wrong value for all other
   // elements -- but these are then ignored anyway.
   template <int dim>
-  void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
+  void LaplaceProblem<dim>::output_results(const unsigned int cycle)
   {
+    TimerOutput::Scope t(computing_timer, "output");
+
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(locally_relevant_solution, "u");
@@ -652,11 +655,7 @@ namespace Step40
 
         assemble_system();
         solve();
-
-        {
-          TimerOutput::Scope t(computing_timer, "output");
-          output_results(cycle);
-        }
+        output_results(cycle);
 
         computing_timer.print_summary();
         computing_timer.reset();
