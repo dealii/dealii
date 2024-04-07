@@ -690,6 +690,13 @@
  *       <br/> Keywords: Utilities::MPI::RemotePointEvaluation, VectorTools::point_values()
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-89</td>
+ *       <td> Matrix-free operator evaluation for non-matching and Chimera methods with application
+ *       to acoustic conservation equations.
+ *       <br/> Keywords: FERemoteEvaluation
+ *       </td></tr>
+ *
  * </table>
  *
  *
@@ -1012,7 +1019,8 @@
  *       step-66,
  *       step-67,
  *       step-75,
- *       step-76
+ *       step-76,
+ *       step-89
  *     </td>
  *   </tr>
  *
@@ -1034,7 +1042,8 @@
  *       step-60,
  *       step-70,
  *       step-85,
- *       step-87
+ *       step-87,
+ *       step-89
  *     </td>
  *   </tr>
  *

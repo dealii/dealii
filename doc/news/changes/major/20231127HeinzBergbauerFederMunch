@@ -3,4 +3,4 @@ evaluation for non-matching and Chimera methods. The acoustic conservation equat
 using Nitsche-type mortaring and point-to-point interpolation to demonstrate that
 a simple point-to-point interpolation approach is sometimes not sufficient.
 <br>
-(Johannes Heinz, Marco Feder, Peter Munch, 2023/11/27)
+(Johannes Heinz, Maximilian Bergbauer, Marco Feder, Peter Munch, 2023/11/27)
