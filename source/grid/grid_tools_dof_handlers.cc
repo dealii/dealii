@@ -2437,6 +2437,9 @@ namespace GridTools
     std::array<unsigned int, GeometryInfo<dim>::vertices_per_face>
       face1_vertices, face2_vertices;
 
+    face1_vertices.fill(numbers::invalid_unsigned_int);
+    face2_vertices.fill(numbers::invalid_unsigned_int);
+
     AssertDimension(face1->n_vertices(), face2->n_vertices());
 
     std::set<unsigned int> face2_vertices_set;
@@ -2465,6 +2468,18 @@ namespace GridTools
 
     if (face2_vertices_set.empty())
       {
+        // Just to be sure, did we fill both arrays with sensible data?
+        Assert(face1_vertices.end() ==
+                 std::find(face1_vertices.begin(),
+                           face1_vertices.begin() + face1->n_vertices(),
+                           numbers::invalid_unsigned_int),
+               ExcInternalError());
+        Assert(face2_vertices.end() ==
+                 std::find(face2_vertices.begin(),
+                           face2_vertices.begin() + face1->n_vertices(),
+                           numbers::invalid_unsigned_int),
+               ExcInternalError());
+
         const auto reference_cell = face1->reference_cell();
         // We want the relative orientation of face1 with respect to face2 so
         // the order is flipped here:
