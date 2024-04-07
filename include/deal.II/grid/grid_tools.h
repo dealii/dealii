@@ -371,7 +371,16 @@ namespace GridTools
    * vertices of the grid.  The direction of movement of each vertex is
    * random, while the length of the shift vector has a value of @p factor
    * times the minimal length of the active edges adjacent to this vertex.
-   * Note that @p factor should obviously be well below <tt>0.5</tt>.
+   * Note that @p factor should obviously be well below <tt>0.5</tt> in order
+   * to avoid getting cells that are @ref GlossDistorted "distorted".
+   *
+   * The function will make sure that vertices on restricted faces
+   * (i.e., faces with hanging nodes) will end up in the correct
+   * place, i.e. in the middle of the two other vertices of the parent
+   * edge, and the analogue in higher space dimensions (vertices on
+   * the boundary are not corrected, so don't distort boundary
+   * vertices in more than two space dimensions, i.e. in dimensions
+   * where boundary vertices can be hanging nodes).
    *
    * If @p keep_boundary is set to @p true (which is the default), then
    * boundary vertices are not moved.
@@ -381,9 +390,10 @@ namespace GridTools
    * previous versions of deal.II.
    *
    * @note If the Triangulation is of distributed kind (derived from
-   * DistributedTriangulationBase) and computations are done in
+   * parallel::DistributedTriangulationBase) and computations are done in
    * parallel, the new vertex locations will be consistently updated
    * on all ranks.
+   *
    */
   template <int dim, int spacedim>
   void
