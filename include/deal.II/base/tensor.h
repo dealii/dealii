@@ -2119,10 +2119,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
                               typename EnableIfScalar<OtherNumber>::type>::type>
   operator*(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
-  // recurse over the base objects
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-  for (unsigned int d = 0; d < dim; ++d)
-    tt[d] = t[d] * factor;
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt(t);
+  tt *= factor;
   return tt;
 }
 
@@ -2170,21 +2168,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
                               typename EnableIfScalar<OtherNumber>::type>::type>
   operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
-  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-  if constexpr (std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value)
-    {
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        tt[d] = t[d] / factor;
-    }
-  else
-    {
-      const Number inverse_factor = Number(1.) / factor;
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        tt[d] = t[d] * inverse_factor;
-    }
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt(t);
+  tt /= factor;
   return tt;
 }
 
@@ -2205,10 +2190,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
             const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
-
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] += q[i];
-
+  tmp += q;
   return tmp;
 }
 
@@ -2229,10 +2211,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
             const Tensor<rank, dim, OtherNumber> &q)
 {
   Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp(p);
-
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] -= q[i];
-
+  tmp -= q;
   return tmp;
 }
 
