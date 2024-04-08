@@ -2434,8 +2434,13 @@ namespace GridTools
 
     // Do a full matching of the face vertices:
 
-    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face>
-      face1_vertices, face2_vertices;
+    boost::container::small_vector<unsigned int,
+                                   GeometryInfo<dim>::vertices_per_face>
+      face1_vertices(face1->n_vertices());
+
+    boost::container::small_vector<unsigned int,
+                                   GeometryInfo<dim>::vertices_per_face>
+      face2_vertices(face1->n_vertices());
 
     AssertDimension(face1->n_vertices(), face2->n_vertices());
 
