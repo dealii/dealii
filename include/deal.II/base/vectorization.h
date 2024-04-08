@@ -135,12 +135,6 @@ public:
   }
 
   /**
-   * Copy assignment.
-   */
-  constexpr VectorizedArrayIterator<T> &
-  operator=(const VectorizedArrayIterator<T> &other) = default;
-
-  /**
    * Dereferencing operator (const version): returns the value of the current
    * lane.
    */
