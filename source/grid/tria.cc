@@ -1884,28 +1884,6 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException2(ExcLineInexistant,
-                   int,
-                   int,
-                   << "While trying to assign a boundary indicator to a line: "
-                   << "the line with end vertices " << arg1 << " and " << arg2
-                   << " does not exist.");
-    /**
-     * Exception
-     * @ingroup Exceptions
-     */
-    DeclException4(ExcQuadInexistant,
-                   int,
-                   int,
-                   int,
-                   int,
-                   << "While trying to assign a boundary indicator to a quad: "
-                   << "the quad with bounding lines " << arg1 << ", " << arg2
-                   << ", " << arg3 << ", " << arg4 << " does not exist.");
-    /**
-     * Exception
-     * @ingroup Exceptions
-     */
     DeclException3(
       ExcInteriorLineCantBeBoundary,
       int,
