@@ -6674,7 +6674,7 @@ namespace internal
 
                     // For the tetrahedron the parent consists of the vertices
                     // 0,1,2,3, the new vertices 4-9 are defined as the
-                    // midpoints fo the edges: 4 -> (0,1), 5 -> (1,2), 6 ->
+                    // midpoints of the edges: 4 -> (0,1), 5 -> (1,2), 6 ->
                     // (2,0), 7 -> (0,3), 8 -> (1,3), 9 -> (2,3).
                     // Order is defined by the reference cell, see
                     // https://dealii.org/developer/doxygen/deal.II/group__simplex.html#simplex_reference_cells.
@@ -6798,7 +6798,7 @@ namespace internal
                         // The order of the lines is defined by the ordering
                         // of the faces of the reference cell and the ordering
                         // of the lines within a face.
-                        // Each face is split into 4 child triangels, the
+                        // Each face is split into 4 child triangles, the
                         // relevant lines are defined by the vertices of the
                         // center triangles: 0 -> (4,5), 1 -> (5,6), 2 -> (4,6),
                         // 3 -> (4,7), 4 -> (7,8), 5 -> (4,8), 6 -> (6,9), 7 ->
@@ -6865,7 +6865,7 @@ namespace internal
                     // 8 child tets. To build the child tets, 8 new faces are
                     // needed. The the vertices, which define the lines of these
                     // new faces are listed in table_tet. Now only the
-                    // coresponding index of the lines and quads have to be
+                    // corresponding index of the lines and quads have to be
                     // listed in new_quad_lines_tet and cell_quads_tet.
 
                     // The first 4 define the faces which cut off the
@@ -7077,9 +7077,9 @@ namespace internal
                       {
                         // list of the indices of the surfaces which define the
                         // 8 new tets. the indices 0-7 are the new quads defined
-                        // above (so 0-3 cut off the corners and 4-7 sperate the
-                        // remaining octahedral), the indices between 8-11 are
-                        // the children of the first face, from 12-15 of the
+                        // above (so 0-3 cut off the corners and 4-7 separate
+                        // the remaining octahedral), the indices between 8-11
+                        // are the children of the first face, from 12-15 of the
                         // second, etc.
                         for (unsigned int i = 0; i < n_new_quads; ++i)
                           quad_indices[i] = new_quads[i]->index();
@@ -15824,7 +15824,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // cell has been refined, all of its children have neighbors
   // in all directions in which the parent cell has neighbors as
   // well. The children's neighbors are either the parent
-  // neighbor or the parent neigbor's children, or simply one of
+  // neighbor or the parent neighbor's children, or simply one of
   // the other children of the current cell. This check is
   // useful because if one creates a triangulation with an
   // inconsistently ordered set of cells (e.g., because one has

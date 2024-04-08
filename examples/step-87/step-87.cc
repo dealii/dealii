@@ -1013,9 +1013,9 @@ namespace Step87
                 dim, DataComponentInterpretation::component_is_part_of_vector);
             pcout << "  - write data (background mesh)" << std::endl;
             DataOut<dim>          data_out_background;
-            DataOutBase::VtkFlags flags_backround;
-            flags_backround.write_higher_order_cells = true;
-            data_out_background.set_flags(flags_backround);
+            DataOutBase::VtkFlags flags_background;
+            flags_background.write_higher_order_cells = true;
+            data_out_background.set_flags(flags_background);
             data_out_background.add_data_vector(
               dof_handler_background,
               force_vector,

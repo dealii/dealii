@@ -541,7 +541,7 @@ namespace ArborX
 
     /**
      * Return an ArborX::nearest(ArborX::Sphere,
-     * SphereNearestPredicate::get_n_nearest_neightbors) object constructed from
+     * SphereNearestPredicate::get_n_nearest_neighbors) object constructed from
      * the `i`th sphere stored in @p sph_nearest.
      */
     static auto

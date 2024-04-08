@@ -135,7 +135,7 @@ named the same or very similarly, but live in different namespaces:
   in functionality to what PETSc provides, but it does so in a very different
   way (namely, as a bunch of independent and loosely coupled sub-projects,
   rather than as a single library). This nothwithstanding, the classes
-  deal.II provides in namepace TrilinosWrappers are very similar to the
+  deal.II provides in namespace TrilinosWrappers are very similar to the
   ones in namespace PETScWrappers. Trilinos, like PETSc, is run on some of
   the biggest machines in the world.
 - The classes in namespace TrilinosWrappers are generally written for the

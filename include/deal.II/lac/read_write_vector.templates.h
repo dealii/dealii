@@ -570,7 +570,8 @@ namespace LinearAlgebra
 
     // Communicate the vector to the correct map.
     // Remark: We use here doImport on an Export object since we have to use
-    //         the communication plan stored in the tpetra_comm_patern backward.
+    //         the communication plan stored in the tpetra_comm_pattern
+    //         backward.
     target_vector.doImport(vector, tpetra_export, Tpetra::INSERT);
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)

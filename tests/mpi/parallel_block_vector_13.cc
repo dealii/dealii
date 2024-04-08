@@ -14,7 +14,7 @@
 
 
 // check ghost handling on parallel block vectors for large
-// number of blocks with split compres_start()/update_ghosts_start().
+// number of blocks with split compress_start()/update_ghosts_start().
 // almost copy-paste of parallel_block_vector_02.cc
 
 #include <deal.II/base/index_set.h>

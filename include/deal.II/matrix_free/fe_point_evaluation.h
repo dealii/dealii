@@ -3105,7 +3105,7 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
 {
-  Assert(this->is_reinitialized, ExcMessage("Is not reinitalized!"));
+  Assert(this->is_reinitialized, ExcMessage("Is not reinitialized!"));
 
   if (this->n_q_points == 0)
     return;
@@ -3201,7 +3201,7 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::integrate(
   const EvaluationFlags::EvaluationFlags            &integration_flags,
   const bool                                         sum_into_values)
 {
-  Assert(this->is_reinitialized, ExcMessage("Is not reinitalized!"));
+  Assert(this->is_reinitialized, ExcMessage("Is not reinitialized!"));
 
   Assert(!(integration_flags & EvaluationFlags::hessians), ExcNotImplemented());
 
@@ -3253,7 +3253,7 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
   const EvaluationFlags::EvaluationFlags            &integration_flags,
   const bool                                         sum_into_values)
 {
-  Assert(this->is_reinitialized, ExcMessage("Is not reinitalized!"));
+  Assert(this->is_reinitialized, ExcMessage("Is not reinitialized!"));
 
   Assert(!(integration_flags & EvaluationFlags::hessians), ExcNotImplemented());
 

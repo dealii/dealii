@@ -673,7 +673,7 @@ AffineConstraints<number>::add_entries(
 {
   Assert(sorted == false, ExcMatrixIsClosed());
   Assert(is_constrained(constrained_dof_index),
-         ExcLineInexistant(constrained_dof_index));
+         ExcLineInexistent(constrained_dof_index));
 
   ConstraintLine &line =
     lines[lines_cache[calculate_line_index(constrained_dof_index)]];

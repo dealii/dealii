@@ -3480,9 +3480,10 @@ positive_negative_split(const SymmetricTensor<2, dim, Number> &original_tensor)
     eigen_system = eigenvectors(original_tensor);
 
   std::pair<SymmetricTensor<2, dim, Number>, SymmetricTensor<2, dim, Number>>
-    postive_negative_tensors;
+    positive_negative_tensors;
 
-  auto &[positive_part_tensor, negative_part_tensor] = postive_negative_tensors;
+  auto &[positive_part_tensor, negative_part_tensor] =
+    positive_negative_tensors;
 
   positive_part_tensor = 0;
   for (unsigned int i = 0; i < dim; ++i)
@@ -3498,7 +3499,7 @@ positive_negative_split(const SymmetricTensor<2, dim, Number> &original_tensor)
                               symmetrize(outer_product(eigen_system[i].second,
                                                        eigen_system[i].second));
 
-  return postive_negative_tensors;
+  return positive_negative_tensors;
 }
 
 /**

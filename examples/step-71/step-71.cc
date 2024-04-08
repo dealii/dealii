@@ -3951,7 +3951,7 @@ namespace Step71
       // differentiable number type is hard-coded here, but with some clever
       // templating it is possible to select which framework to use at run time
       // (e.g., as selected through the parameter file). We'll simultaneously
-      // perform the experiments with the counterpary material law that was
+      // perform the experiments with the counterpart material law that was
       // fully implemented by hand, and check what it computes against our
       // assisted implementation.
       {

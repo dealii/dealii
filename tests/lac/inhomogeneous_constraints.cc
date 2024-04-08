@@ -632,7 +632,7 @@ LaplaceProblem<dim>::run()
               << hanging_nodes_only.n_constraints() << std::endl
               << "   Total number of constraints:        "
               << test_all_constraints.n_constraints() << std::endl
-              << "   Number of inhomogenous constraints: "
+              << "   Number of inhomogeneous constraints: "
               << test_all_constraints.n_inhomogeneities() << std::endl
               << "   Number of identity constraints:     "
               << test_all_constraints.n_identities() << std::endl;

@@ -1215,7 +1215,7 @@ namespace LinearAlgebra
       /*
        * Exception
        */
-      DeclExceptionMsg(ExcColMapMissmatch,
+      DeclExceptionMsg(ExcColMapMismatch,
                        "The column partitioning of a matrix does not match "
                        "the partitioning of a vector you are trying to "
                        "multiply it with. Are you multiplying the "
@@ -1224,7 +1224,7 @@ namespace LinearAlgebra
       /*
        * Exception
        */
-      DeclExceptionMsg(ExcDomainMapMissmatch,
+      DeclExceptionMsg(ExcDomainMapMismatch,
                        "The row partitioning of a matrix does not match "
                        "the partitioning of a vector you are trying to "
                        "put the result of a matrix-vector product in. "

@@ -467,7 +467,7 @@ namespace Step63
   }
 
 
-  // @sect3{<code>AdvectionProlem</code> class}
+  // @sect3{<code>AdvectionProblem</code> class}
 
   // This is the main class of the program, and should look very similar to
   // step-16. The major difference is that, since we are defining our multigrid

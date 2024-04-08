@@ -653,7 +653,7 @@ plt.ylabel("point value error")
 plt.show()
 @endcode
 
-A python package which mimicks the `R` ggplot2 (which is based on specifying the grammar of the graphics) is
+A python package which mimics the `R` ggplot2 (which is based on specifying the grammar of the graphics) is
 <a href="https://plotnine.org/">plotnine</a>.
 @code{.py}
 We need to import the following from the <code>plotnine</code> package

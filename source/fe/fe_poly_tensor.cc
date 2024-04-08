@@ -81,11 +81,11 @@ namespace internal
                 const typename dealii::Triangulation<dim,
                                                      spacedim>::cell_iterator
                              neighbor_cell_at_face = cell->neighbor(f);
-                const CellId neigbor_cell_id = neighbor_cell_at_face->id();
+                const CellId neighbor_cell_id = neighbor_cell_at_face->id();
 
                 // Only fix sign if the orientation is opposite and only do so
                 // on the face dofs on the cell with smaller cell_id.
-                if (((nn + f) % 2 == 0) && this_cell_id < neigbor_cell_id)
+                if (((nn + f) % 2 == 0) && this_cell_id < neighbor_cell_id)
                   for (unsigned int j = 0; j < fe.n_dofs_per_face(f); ++j)
                     {
                       const unsigned int cell_j = fe.face_to_cell_index(j, f);
