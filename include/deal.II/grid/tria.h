@@ -774,26 +774,6 @@ namespace internal
  * data will have to be transferred between the grids.
  * </ul>
  *
- * Finally, there is a special function for folks who like bad grids:
- * distort_random(). It moves all the vertices in the grid a bit around by a
- * random value, leaving behind a distorted mesh. Note that you should apply
- * this function to the final mesh, since refinement smoothes the mesh a bit.
- *
- * The function will make sure that vertices on restricted faces (hanging
- * nodes) will end up in the correct place, i.e. in the middle of the two
- * other vertices of the mother line, and the analogue in higher space
- * dimensions (vertices on the boundary are not corrected, so don't distort
- * boundary vertices in more than two space dimension, i.e. in dimensions
- * where boundary vertices can be hanging nodes). Applying the algorithm has
- * another drawback related to the placement of cells, however: the children
- * of a cell will not occupy the same region of the domain as the mother cell
- * does. While this is the usual behavior with cells at the boundary, here you
- * may get into trouble when using multigrid algorithms or when transferring
- * solutions from coarse to fine grids and back. In general, the use of this
- * function is only safe if you only use the most refined level of the
- * triangulation for computations.
- *
- *
  *
  * <h3>Refinement and coarsening of a triangulation</h3>
  *
