@@ -1641,15 +1641,12 @@ FE_Q_Base<dim, spacedim>::has_support_on_face(
              ExcInternalError());
 
       // in 2d, the line is the face, so get the line index
-      if (dim == 2)
+      if constexpr (dim == 2)
         return (line_index == face_index);
-      else if (dim == 3)
+      else if constexpr (dim == 3)
         {
-          // silence compiler warning
-          const unsigned int lines_per_face =
-            dim == 3 ? GeometryInfo<dim>::lines_per_face : 1;
           // see whether the given line is on the given face.
-          for (unsigned int l = 0; l < lines_per_face; ++l)
+          for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_face; ++l)
             if (GeometryInfo<3>::face_to_cell_lines(face_index, l) ==
                 line_index)
               return true;
