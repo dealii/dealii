@@ -162,7 +162,7 @@ public:
   restore();
 
   /**
-   * Differential restore. Performs the @p step_noth local refinement and
+   * Differential restore. Performs the `step_no`th local refinement and
    * coarsening step. Step 0 stands for the copying of the coarse grid.
    *
    * This function will only succeed if the triangulation is in just the state

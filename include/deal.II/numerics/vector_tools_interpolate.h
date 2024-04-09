@@ -226,7 +226,7 @@ namespace VectorTools
    * flag). In practice, this is rarely the case because two triangulations,
    * partitioned in their own ways, will not typically have corresponding
    * cells owned by the same process, and implementing the interpolation
-   * procedure would require transfering data between processes in ways
+   * procedure would require transferring data between processes in ways
    * that are difficult to implement efficiently. However, some special
    * cases can more easily be implemented, namely the case where one
    * of the meshes is strictly coarser or finer than the other. For these

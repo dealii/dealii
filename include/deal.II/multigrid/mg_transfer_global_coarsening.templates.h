@@ -4448,7 +4448,7 @@ namespace internal
       {
         // Support points have a hierarchic numbering, L2 DoFs have
         // lexicographic numbering. Therefore, we need to convert the DoF
-        // indices if DoFHander is L2 conforming and has degree > 0.
+        // indices if DoFHandler is L2 conforming and has degree > 0.
         const bool needs_conversion =
           dof_handler.get_fe().conforming_space ==
             FiniteElementData<dim>::Conformity::L2 &&
@@ -4806,7 +4806,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::reinit(
     !additional_data.enforce_all_points_found || rpe.all_points_found(),
     ExcMessage(
       "You requested that all points should be found, but this didn'thappen."
-      " You can change this option through the AdditionaData struct in the constructor."));
+      " You can change this option through the AdditionalData struct in the constructor."));
 
   // set up MappingInfo for easier data access
   mapping_info = internal::fill_mapping_info<dim, Number>(rpe);

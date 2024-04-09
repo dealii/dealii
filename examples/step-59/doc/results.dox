@@ -375,4 +375,4 @@ these three coarsening variants, the discontinuous-continuous auxiliary
 function concept, p-multigrid, and traditional h-multigrid. The main
 ingredient is to define an appropriate MGTwoLevelTransfer object and call
 MGTwoLevelTransfer::reinit_geometric_transfer() or
-MGTwoLevelTranfer::reinit_polynomial_transfer(), respectively.
+MGTwoLevelTransfer::reinit_polynomial_transfer(), respectively.

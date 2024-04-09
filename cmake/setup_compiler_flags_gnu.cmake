@@ -134,7 +134,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel
   endif()
 
   #
-  # Clang-14.0.5 complaines loudly about not being able to vectorize some
+  # Clang-14.0.5 complains loudly about not being able to vectorize some
   # of our loops that we have annotated with DEAL_II_OPENMP_SIMD:
   #
   #     warning: loop not vectorized: the optimizer was unable to perform

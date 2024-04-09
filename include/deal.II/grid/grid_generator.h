@@ -1726,7 +1726,7 @@ namespace GridGenerator
    * @p grid_generator_function_arguments.
    *
    * The string that supplies the arguments is passed to the function
-   * Patterns::Tools::Convert<TupleTyple>::to_value(), where `TupleType` here is
+   * Patterns::Tools::Convert<TupleType>::to_value(), where `TupleType` here is
    * a tuple containing **all** the arguments of the GridGenerator function,
    * including all optional arguments.
    *

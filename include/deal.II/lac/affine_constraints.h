@@ -2028,7 +2028,7 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcLineInexistant,
+  DeclException1(ExcLineInexistent,
                  size_type,
                  << "The specified line " << arg1 << " does not exist.");
   /**

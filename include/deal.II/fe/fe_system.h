@@ -1273,8 +1273,8 @@ private:
     ~InternalData() override;
 
     /**
-     * Give write-access to the pointer to a @p InternalData of the @p
-     * base_noth base element.
+     * Give write-access to the pointer to a @p InternalData of the
+     * `base_no`th base element.
      */
     void
     set_fe_data(
@@ -1282,8 +1282,8 @@ private:
       std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>);
 
     /**
-     * Give read-access to the pointer to a @p InternalData of the @p
-     * base_noth base element.
+     * Give read-access to the pointer to a @p InternalData of the
+     * `base_no`th base element.
      */
     typename FiniteElement<dim, spacedim>::InternalDataBase &
     get_fe_data(const unsigned int base_no) const;

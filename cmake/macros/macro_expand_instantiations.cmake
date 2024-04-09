@@ -16,7 +16,7 @@
 # A macro for the inst.in file expansion
 #
 # Usage:
-#     EXPAND_INSTANTATIONS(target inst_in_files)
+#     expand_instantiations(target inst_in_files)
 #
 # Options:
 #

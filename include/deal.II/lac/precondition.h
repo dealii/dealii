@@ -546,7 +546,7 @@ private:
  * Internally, the minimum and maximum eigenvalues of the preconditioned
  * system are estimated by an eigenvalue algorithm, and the resulting estimate
  * is multiplied by the 1.2 for safety reasons. For more details on the
- * unterlying algorithms, see PreconditionChebyshev.
+ * underlying algorithms, see PreconditionChebyshev.
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename PreconditionerType = IdentityMatrix>

@@ -51,19 +51,19 @@ namespace LinearAlgebra
           {
             Assert(src.trilinos_vector().getMap()->isSameAs(
                      *M.trilinos_matrix().getDomainMap()),
-                   SparseMatrix<double>::ExcColMapMissmatch());
+                   SparseMatrix<double>::ExcColMapMismatch());
             Assert(dst.trilinos_vector().getMap()->isSameAs(
                      *M.trilinos_matrix().getRangeMap()),
-                   SparseMatrix<double>::ExcDomainMapMissmatch());
+                   SparseMatrix<double>::ExcDomainMapMismatch());
           }
         else
           {
             Assert(dst.trilinos_vector().getMap()->isSameAs(
                      *M.trilinos_matrix().getDomainMap()),
-                   SparseMatrix<double>::ExcColMapMissmatch());
+                   SparseMatrix<double>::ExcColMapMismatch());
             Assert(src.trilinos_vector().getMap()->isSameAs(
                      *M.trilinos_matrix().getRangeMap()),
-                   SparseMatrix<double>::ExcDomainMapMissmatch());
+                   SparseMatrix<double>::ExcDomainMapMismatch());
           }
 
         M.trilinos_matrix().apply(

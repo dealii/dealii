@@ -1100,8 +1100,8 @@ namespace TrilinosWrappers
         // an exception and therefore call_and_possibly_capture_exception
         // returns code different from 0, then NOX does not interrupt the
         // solution process but rather performs a recovery step. To ensure this
-        // feature is available to the user, we need to supress the exception in
-        // this case, since it is exactly that, what NOX expects from our
+        // feature is available to the user, we need to suppress the exception
+        // in this case, since it is exactly that, what NOX expects from our
         // callbacks.
         const bool do_rescue =
           parameters->sublist("Newton").get("Rescue Bad Newton Solve", true);

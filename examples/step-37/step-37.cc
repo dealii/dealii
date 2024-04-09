@@ -565,8 +565,8 @@ namespace Step37
   // columns in the local matrix and putting the entry 1 in the <i>i</i>th
   // slot and a zero entry in all other slots, i.e., we apply the cell-wise
   // differential operator on one unit vector at a time. The inner part
-  // invoking FEEvaluation::evaluate, the loop over quadrature points, and
-  // FEEvalution::integrate, is exactly the same as in the local_apply
+  // invoking FEEvaluation::evaluate(), the loop over quadrature points, and
+  // FEEvaluation::integrate(), is exactly the same as in the local_apply
   // function. Afterwards, we pick out the <i>i</i>th entry of the local
   // result and put it to a temporary storage (as we overwrite all entries in
   // the array behind FEEvaluation::get_dof_value() with the next loop
