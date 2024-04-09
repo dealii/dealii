@@ -1662,9 +1662,7 @@ FE_Q_Base<dim, spacedim>::has_support_on_face(
       const unsigned int quad_index =
         (shape_index - this->get_first_quad_index(0)) /
         this->n_dofs_per_quad(face_index); // this won't work
-      Assert(static_cast<signed int>(quad_index) <
-               static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
-             ExcInternalError());
+      AssertIndexRange(quad_index, GeometryInfo<dim>::quads_per_cell);
 
       // in 2d, cell bubble are zero on all faces. but we have treated this
       // case above already
