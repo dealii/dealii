@@ -1371,6 +1371,16 @@ namespace DoFTools
   extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                          const ComponentMask             &component_mask,
                          std::vector<std::vector<bool>>  &constant_modes);
+
+  /**
+   * Same as above but for multigrid levels.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_level_constant_modes(const unsigned int               level,
+                               const DoFHandler<dim, spacedim> &dof_handler,
+                               const ComponentMask             &component_mask,
+                               std::vector<std::vector<bool>>  &constant_modes);
   /** @} */
 
   /**
