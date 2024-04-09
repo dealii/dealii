@@ -43,6 +43,10 @@
 #  include <cfenv>
 #endif
 
+#if defined(DEAL_II_WITH_HDF5)
+#  include <hdf5.h>
+#endif
+
 
 // silence extra diagnostics in the testsuite
 #ifdef DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -846,6 +850,15 @@ struct EnableFPE
   EnableFPE()
   {
 #if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+#  if defined(DEAL_II_WITH_HDF5)
+    // Modern versions of HDF5 detect the floating-point environment by
+    // performing several operations which trigger floating-point exceptions.
+    // Hence we need to set up HDF5's global state before calling
+    // feenableexcept().
+    const int ierr = H5open();
+    AssertThrow(ierr == 0, ExcInternalError());
+    feclearexcept(FE_ALL_EXCEPT);
+#  endif
     // enable floating point exceptions
     feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #endif
