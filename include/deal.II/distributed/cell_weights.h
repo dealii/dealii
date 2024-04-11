@@ -271,8 +271,8 @@ namespace parallel
      * A callback function that will be connected to the `weight` signal of
      * the @p triangulation, to which the @p dof_handler is attached. Ultimately
      * returns the weight for each cell, determined by the @p weight_cache
-     * provided as a parameter. Returns zero if @p dof_handler has not been
-     * initialized yet.
+     * provided as a parameter. Uses @p fe_collection to validate @p weight_cache.
+     * Returns zero if @p dof_handler has not been initialized yet.
      */
     static unsigned int
     weighting_callback_with_cache(
@@ -280,6 +280,7 @@ namespace parallel
       const CellStatus                                  status,
       const DoFHandler<dim, spacedim>                  &dof_handler,
       const parallel::TriangulationBase<dim, spacedim> &triangulation,
+      const hp::FECollection<dim, spacedim>            &fe_collection,
       const std::vector<unsigned int>                  &weight_cache);
   };
 } // namespace parallel

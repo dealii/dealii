@@ -244,12 +244,17 @@ namespace parallel
         "parallel::CellWeights requires a parallel::TriangulationBase object."));
 
     // capture the cache by copy
-    return [&dof_handler, tria, weight_cache](
+    // for validation purposes, also capture the fe_collection by copy
+    // with which the cache has been built
+    return [&dof_handler,
+            tria,
+            fe_collection = dof_handler.get_fe_collection(),
+            weight_cache](
              const typename dealii::Triangulation<dim, spacedim>::cell_iterator
                              &cell,
              const CellStatus status) -> unsigned int {
       return CellWeights<dim, spacedim>::weighting_callback_with_cache(
-        cell, status, dof_handler, *tria, weight_cache);
+        cell, status, dof_handler, *tria, fe_collection, weight_cache);
     };
   }
 
@@ -262,6 +267,7 @@ namespace parallel
     const CellStatus                                                    status,
     const DoFHandler<dim, spacedim>                  &dof_handler,
     const parallel::TriangulationBase<dim, spacedim> &triangulation,
+    const hp::FECollection<dim, spacedim>            &fe_collection,
     const std::vector<unsigned int>                  &weight_cache)
   {
     // Check if we are still working with the correct combination of
@@ -271,9 +277,11 @@ namespace parallel
              "Triangulation associated with the DoFHandler has changed!"));
     (void)triangulation;
 
-    // Check if cache still matches FECollection.
-    AssertDimension(dof_handler.get_fe_collection().size(),
-                    weight_cache.size());
+    // Check if the cache is still valid by comparing FECollection.
+    Assert(fe_collection == dof_handler.get_fe_collection(),
+           ExcMessage(
+             "FECollection has changed, with which the cache was built."));
+    (void)fe_collection;
 
     // Skip if the DoFHandler has not been initialized yet.
     if (dof_handler.get_fe_collection().size() == 0)
