@@ -57,13 +57,35 @@ struct MemoryScopeCore {};
 struct MemoryScopeCaller {};
 }  // namespace desul
 
-#ifndef __ATOMIC_RELAXED
-#define __ATOMIC_RELAXED 0
-#define __ATOMIC_CONSUME 1
-#define __ATOMIC_ACQUIRE 2
-#define __ATOMIC_RELEASE 3
-#define __ATOMIC_ACQ_REL 4
-#define __ATOMIC_SEQ_CST 5
+#ifdef __ATOMIC_RELAXED
+#define KOKKOS_ATOMIC_RELAXED __ATOMIC_RELAXED
+#else
+#define KOKKOS_ATOMIC_RELAXED 0
+#endif
+#ifdef __ATOMIC_CONSUME
+#define KOKKOS_ATOMIC_CONSUME __ATOMIC_CONSUME
+#else
+#define KOKKOS_ATOMIC_CONSUME 1
+#endif
+#ifdef __ATOMIC_ACQUIRE
+#define KOKKOS_ATOMIC_ACQUIRE __ATOMIC_ACQUIRE
+#else
+#define KOKKOS_ATOMIC_ACQUIRE 2
+#endif
+#ifdef __ATOMIC_RELEASE
+#define KOKKOS_ATOMIC_RELEASE __ATOMIC_RELEASE
+#else
+#define KOKKOS_ATOMIC_RELEASE 3
+#endif
+#ifdef __ATOMIC_ACQ_REL
+#define KOKKOS_ATOMIC_ACQ_REL __ATOMIC_ACQ_REL
+#else
+#define KOKKOS_ATOMIC_ACQ_REL 4
+#endif
+#ifdef __ATOMIC_SEQ_CST
+#define KOKKOS_ATOMIC_SEQ_CST __ATOMIC_SEQ_CST
+#else
+#define KOKKOS_ATOMIC_SEQ_CST 5
 #endif
 
 namespace desul {
@@ -72,27 +94,27 @@ struct GCCMemoryOrder;
 
 template <>
 struct GCCMemoryOrder<MemoryOrderRelaxed> {
-  static constexpr int value = __ATOMIC_RELAXED;
+  static constexpr int value = KOKKOS_ATOMIC_RELAXED;
 };
 
 template <>
 struct GCCMemoryOrder<MemoryOrderAcquire> {
-  static constexpr int value = __ATOMIC_ACQUIRE;
+  static constexpr int value = KOKKOS_ATOMIC_ACQUIRE;
 };
 
 template <>
 struct GCCMemoryOrder<MemoryOrderRelease> {
-  static constexpr int value = __ATOMIC_RELEASE;
+  static constexpr int value = KOKKOS_ATOMIC_RELEASE;
 };
 
 template <>
 struct GCCMemoryOrder<MemoryOrderAcqRel> {
-  static constexpr int value = __ATOMIC_ACQ_REL;
+  static constexpr int value = KOKKOS_ATOMIC_ACQ_REL;
 };
 
 template <>
 struct GCCMemoryOrder<MemoryOrderSeqCst> {
-  static constexpr int value = __ATOMIC_SEQ_CST;
+  static constexpr int value = KOKKOS_ATOMIC_SEQ_CST;
 };
 
 template <class MemoryOrderDesul>
