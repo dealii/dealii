@@ -520,18 +520,14 @@ namespace SUNDIALS
                 lr);
             };
 
-            auto jacobian_solver_setup_callback = [](SUNDIALS::realtype t,
-                                                     N_Vector           y,
-                                                     N_Vector           fy,
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                                                     sunbooleantype  jok,
-                                                     sunbooleantype *jcurPtr,
-#  else
-                                                     booleantype  jok,
-                                                     booleantype *jcurPtr,
-#  endif
-                                                     SUNDIALS::realtype gamma,
-                                                     void *user_data) -> int {
+            auto jacobian_solver_setup_callback =
+              [](SUNDIALS::realtype  t,
+                 N_Vector            y,
+                 N_Vector            fy,
+                 SUNDIALS::booltype  jok,
+                 SUNDIALS::booltype *jcurPtr,
+                 SUNDIALS::realtype  gamma,
+                 void               *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
               ARKode<VectorType> &solver =
                 *static_cast<ARKode<VectorType> *>(user_data);
@@ -641,13 +637,8 @@ namespace SUNDIALS
 #  endif
           }
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-        sunbooleantype mass_time_dependent =
+        SUNDIALS::booltype mass_time_dependent =
           data.mass_is_time_independent ? SUNFALSE : SUNTRUE;
-#  else
-        booleantype mass_time_dependent =
-          data.mass_is_time_independent ? SUNFALSE : SUNTRUE;
-#  endif
 
         status = ARKStepSetMassLinearSolver(arkode_mem,
                                             sun_mass_linear_solver,
