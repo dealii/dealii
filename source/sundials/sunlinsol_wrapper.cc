@@ -144,12 +144,16 @@ namespace SUNDIALS
         , pending_exception(pending_exception)
       {}
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+      SUNATimesFn a_times_fn;
+      SUNPSetupFn preconditioner_setup;
+      SUNPSolveFn preconditioner_solve;
+
+      SUNContext linsol_ctx;
+#  else
       ATimesFn a_times_fn;
       PSetupFn preconditioner_setup;
       PSolveFn preconditioner_solve;
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-      SUNContext linsol_ctx;
 #  endif
 
       LinearSolveFunction<VectorType> lsolve;
@@ -254,10 +258,15 @@ namespace SUNDIALS
     }
 
 
-
     template <typename VectorType>
     int
-    arkode_linsol_set_a_times(SUNLinearSolver LS, void *A_data, ATimesFn ATimes)
+    arkode_linsol_set_a_times(SUNLinearSolver LS,
+                              void           *A_data,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                              SUNATimesFn ATimes)
+#  else
+                              ATimesFn        ATimes)
+#  endif
     {
       LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
 
@@ -272,8 +281,13 @@ namespace SUNDIALS
     int
     arkode_linsol_set_preconditioner(SUNLinearSolver LS,
                                      void           *P_data,
-                                     PSetupFn        p_setup,
-                                     PSolveFn        p_solve)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                     SUNPSetupFn p_setup,
+                                     SUNPSolveFn p_solve)
+#  else
+                                     PSetupFn p_setup,
+                                     PSolveFn p_solve)
+#  endif
     {
       LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
 
@@ -342,9 +356,9 @@ namespace SUNDIALS
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   template <typename VectorType>
-  SundialsOperator<VectorType>::SundialsOperator(void      *A_data,
-                                                 ATimesFn   a_times_fn,
-                                                 SUNContext linsol_ctx)
+  SundialsOperator<VectorType>::SundialsOperator(void       *A_data,
+                                                 SUNATimesFn a_times_fn,
+                                                 SUNContext  linsol_ctx)
     : A_data(A_data)
     , a_times_fn(a_times_fn)
     , linsol_ctx(linsol_ctx)
@@ -394,10 +408,10 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   template <typename VectorType>
   SundialsPreconditioner<VectorType>::SundialsPreconditioner(
-    void      *P_data,
-    PSolveFn   p_solve_fn,
-    SUNContext linsol_ctx,
-    double     tol)
+    void       *P_data,
+    SUNPSolveFn p_solve_fn,
+    SUNContext  linsol_ctx,
+    double      tol)
     : P_data(P_data)
     , p_solve_fn(p_solve_fn)
     , linsol_ctx(linsol_ctx)

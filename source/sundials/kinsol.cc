@@ -41,7 +41,11 @@
 // Make sure we #include the SUNDIALS config file...
 #  include <sundials/sundials_config.h>
 // ...before the rest of the SUNDIALS files:
-#  include <kinsol/kinsol_direct.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#    include <kinsol/kinsol_ls.h>
+#  else
+#    include <kinsol/kinsol_direct.h>
+#  endif
 #  include <sunlinsol/sunlinsol_dense.h>
 #  include <sunmatrix/sunmatrix_dense.h>
 
@@ -175,12 +179,19 @@ namespace SUNDIALS
   {
     set_functions_to_trigger_an_assert();
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     // SUNDIALS will always duplicate communicators if we provide them. This
     // can cause problems if SUNDIALS is configured with MPI and we pass along
     // MPI_COMM_SELF in a serial application as MPI won't be
     // initialized. Hence, work around that by just not providing a
     // communicator in that case.
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &kinsol_ctx);
+    (void)status;
+    AssertKINSOL(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     const int status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
                                                             &mpi_communicator,
@@ -234,9 +245,17 @@ namespace SUNDIALS
     AssertKINSOL(status);
 #  endif
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-    kinsol_mem = KINCreate();
-#  else
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &kinsol_ctx);
+    AssertKINSOL(status);
+
+    kinsol_mem = KINCreate(kinsol_ctx);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     // Same comment applies as in class constructor:
     status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
@@ -245,6 +264,8 @@ namespace SUNDIALS
     AssertKINSOL(status);
 
     kinsol_mem = KINCreate(kinsol_ctx);
+#  else
+    kinsol_mem = KINCreate();
 #  endif
 
     status = KINSetUserData(kinsol_mem, static_cast<void *>(this));

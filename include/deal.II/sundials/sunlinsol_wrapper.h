@@ -59,7 +59,9 @@ namespace SUNDIALS
      * @param a_times_fn A function pointer to the function that computes A*v
      * @param linsol_ctx The context object used to set up the linear solver and all vectors
      */
-    SundialsOperator(void *A_data, ATimesFn a_times_fn, SUNContext linsol_ctx);
+    SundialsOperator(void       *A_data,
+                     SUNATimesFn a_times_fn,
+                     SUNContext  linsol_ctx);
 #  else
     /**
      * Constructor.
@@ -76,17 +78,23 @@ namespace SUNDIALS
      */
     void *A_data;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * %Function pointer declared by SUNDIALS to evaluate the matrix vector
+     * product.
+     */
+    SUNATimesFn a_times_fn;
+
+    /**
+     * Context object used for SUNDIALS logging.
+     */
+    SUNContext linsol_ctx;
+#  else
     /**
      * %Function pointer declared by SUNDIALS to evaluate the matrix vector
      * product.
      */
     ATimesFn a_times_fn;
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    /**
-     * Context object used for SUNDIALS logging.
-     */
-    SUNContext linsol_ctx;
 #  endif
   };
 
@@ -124,10 +132,10 @@ namespace SUNDIALS
      * 6.0.0. If you are using an earlier version of SUNDIALS then you need to
      * use the other constructor.
      */
-    SundialsPreconditioner(void      *P_data,
-                           PSolveFn   p_solve_fn,
-                           SUNContext linsol_ctx,
-                           double     tol);
+    SundialsPreconditioner(void       *P_data,
+                           SUNPSolveFn p_solve_fn,
+                           SUNContext  linsol_ctx,
+                           double      tol);
 #  else
     /**
      * Constructor.
@@ -150,17 +158,23 @@ namespace SUNDIALS
      */
     void *P_data;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * %Function pointer to a function that computes the preconditioner
+     * application.
+     */
+    SUNPSolveFn p_solve_fn;
+
+    /**
+     * Context object used for SUNDIALS logging.
+     */
+    SUNContext linsol_ctx;
+#  else
     /**
      * %Function pointer to a function that computes the preconditioner
      * application.
      */
     PSolveFn p_solve_fn;
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    /**
-     * Context object used for SUNDIALS logging.
-     */
-    SUNContext linsol_ctx;
 #  endif
 
     /**

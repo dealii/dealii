@@ -69,12 +69,19 @@ namespace SUNDIALS
   {
     set_functions_to_trigger_an_assert();
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     // SUNDIALS will always duplicate communicators if we provide them. This
     // can cause problems if SUNDIALS is configured with MPI and we pass along
     // MPI_COMM_SELF in a serial application as MPI won't be
     // initialized. Hence, work around that by just not providing a
     // communicator in that case.
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &arkode_ctx);
+    (void)status;
+    AssertARKode(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     const int status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
                                                             &mpi_communicator,
@@ -239,9 +246,20 @@ namespace SUNDIALS
     int status;
     (void)status;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
     status = SUNContext_Free(&arkode_ctx);
     AssertARKode(status);
+
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &arkode_ctx);
+    AssertARKode(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    status = SUNContext_Free(&arkode_ctx);
+    AssertARKode(status);
+
     // Same comment applies as in class constructor:
     status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
@@ -409,7 +427,7 @@ namespace SUNDIALS
 #  else
             sun_linear_solver =
               SUNLinSol_SPGMR(y_template,
-                              PREC_NONE,
+                              SUN_PREC_NONE,
                               0 /*krylov subvectors, 0 uses default*/,
                               arkode_ctx);
 #  endif
@@ -505,8 +523,13 @@ namespace SUNDIALS
             auto jacobian_solver_setup_callback = [](SUNDIALS::realtype t,
                                                      N_Vector           y,
                                                      N_Vector           fy,
-                                                     booleantype        jok,
-                                                     booleantype       *jcurPtr,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                     sunbooleantype  jok,
+                                                     sunbooleantype *jcurPtr,
+#  else
+                                                     booleantype  jok,
+                                                     booleantype *jcurPtr,
+#  endif
                                                      SUNDIALS::realtype gamma,
                                                      void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
@@ -612,13 +635,20 @@ namespace SUNDIALS
 #  else
             sun_mass_linear_solver =
               SUNLinSol_SPGMR(y_template,
-                              PREC_NONE,
+                              SUN_PREC_NONE,
                               0 /*krylov subvectors, 0 uses default*/,
                               arkode_ctx);
 #  endif
           }
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+        sunbooleantype mass_time_dependent =
+          data.mass_is_time_independent ? SUNFALSE : SUNTRUE;
+#  else
         booleantype mass_time_dependent =
           data.mass_is_time_independent ? SUNFALSE : SUNTRUE;
+#  endif
+
         status = ARKStepSetMassLinearSolver(arkode_mem,
                                             sun_mass_linear_solver,
                                             nullptr,
