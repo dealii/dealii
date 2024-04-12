@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS;
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      deal_II_scalar : REAL_SCALARS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
@@ -56,7 +56,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS;
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
      deal_II_scalar_vectorized : REAL_SCALARS_VECTORIZED)
   {
 #if deal_II_dimension <= deal_II_space_dimension
