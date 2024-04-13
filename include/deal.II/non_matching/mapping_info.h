@@ -65,29 +65,12 @@ namespace NonMatching
         const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         CellSimilarity::Similarity &cell_similarity,
         const Quadrature<dim>      &quadrature,
-        std::shared_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-                     internal_mapping_data,
+        std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+                    &internal_mapping_data,
         MappingData &mapping_data)
       {
         mapping_data.initialize(quadrature.size(), update_flags_mapping);
-
-        // reuse internal_mapping_data for MappingQ to avoid memory allocations
-        if (const MappingQ<dim, spacedim> *mapping_q =
-              dynamic_cast<const MappingQ<dim, spacedim> *>(&(*mapping)))
-          {
-            (void)mapping_q;
-            auto &data =
-              dynamic_cast<typename MappingQ<dim, spacedim>::InternalData &>(
-                *internal_mapping_data);
-            data.initialize(update_flags_mapping,
-                            quadrature,
-                            quadrature.size());
-          }
-        else
-          {
-            internal_mapping_data =
-              mapping->get_data(update_flags_mapping, quadrature);
-          }
+        internal_mapping_data->reinit(update_flags_mapping, quadrature);
 
         cell_similarity = mapping->fill_fe_values(cell,
                                                   cell_similarity,
@@ -104,27 +87,13 @@ namespace NonMatching
         const UpdateFlags                                &update_flags_mapping,
         const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         const ImmersedSurfaceQuadrature<dim>                       &quadrature,
-        std::shared_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-                     internal_mapping_data,
+        std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+                    &internal_mapping_data,
         MappingData &mapping_data)
       {
         mapping_data.initialize(quadrature.size(), update_flags_mapping);
 
-        // reuse internal_mapping_data for MappingQ to avoid memory allocations
-        if (dynamic_cast<const MappingQ<dim, spacedim> *>(&(*mapping)))
-          {
-            auto &data =
-              dynamic_cast<typename MappingQ<dim, spacedim>::InternalData &>(
-                *internal_mapping_data);
-            data.initialize(update_flags_mapping,
-                            quadrature,
-                            quadrature.size());
-          }
-        else
-          {
-            internal_mapping_data =
-              mapping->get_data(update_flags_mapping, quadrature);
-          }
+        internal_mapping_data->reinit(update_flags_mapping, quadrature);
 
         mapping->fill_fe_immersed_surface_values(cell,
                                                  quadrature,
@@ -141,8 +110,8 @@ namespace NonMatching
         const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         const unsigned int                                          face_no,
         const Quadrature<dim - 1>                                  &quadrature,
-        std::shared_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
-                     internal_mapping_data,
+        std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+                    &internal_mapping_data,
         MappingData &mapping_data)
       {
         mapping_data.initialize(quadrature.size(), update_flags_mapping);
@@ -241,6 +210,12 @@ namespace NonMatching
    * template argument, e.g. VectorizedArray<double>) provides both mapping data
    * and unit points in vectorized format. The Number template parameter of
    * MappingInfo and FEPointEvaluation has to be identical.
+   *
+   * @note This class cannot be copied or copy-constructed. The intention of
+   * this class is to be available as a single use, e.g. inside
+   * FEPointEvaluation or as a storage container for the whole mesh. Use a
+   * shared or unique pointer of this class in case several objects should be
+   * held.
    */
   template <int dim, int spacedim = dim, typename Number = double>
   class MappingInfo : public Subscriptor
@@ -299,6 +274,17 @@ namespace NonMatching
     MappingInfo(const Mapping<dim, spacedim> &mapping,
                 const UpdateFlags             update_flags,
                 const AdditionalData additional_data = AdditionalData());
+
+    /**
+     * Do not allow making copies.
+     */
+    MappingInfo(const MappingInfo &) = delete;
+
+    /**
+     * Do not allow copy assignment of this class.
+     */
+    MappingInfo &
+    operator=(const MappingInfo &) = delete;
 
     /**
      * Compute the mapping information for the incoming cell and unit
@@ -656,8 +642,20 @@ namespace NonMatching
     /**
      * A pointer to the internal data of the underlying mapping.
      */
-    std::shared_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
+    std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
       internal_mapping_data;
+
+    /**
+     * Quadrature object that is used for the reinit(ArrayView) function.
+     */
+    Quadrature<dim> quadrature;
+
+    /**
+     * Helper class that temporarily holds the data requested for one cell by
+     * Mapping::fill_fe_values() before it is filled into appropriate data
+     * structures for consumption by FEPointEvaluation.
+     */
+    MappingData mapping_data;
 
     /**
      * A pointer to the underlying mapping.
@@ -779,6 +777,10 @@ namespace NonMatching
      */
     std::vector<std::pair<int, int>> cell_level_and_indices;
 
+    /**
+     * Store the face number of interior or exterior faces as set up in the
+     * initialization.
+     */
     std::vector<std::pair<unsigned char, unsigned char>> face_number;
   };
 
@@ -823,15 +825,9 @@ namespace NonMatching
       internal::ComputeMappingDataHelper<dim, spacedim>::required_update_flags(
         this->mapping, update_flags_mapping);
 
-    // construct internal_mapping_data for MappingQ to be able to reuse it in
-    // reinit() calls to avoid memory allocations
-    if (const MappingQ<dim, spacedim> *mapping_q =
-          dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping))
-      {
-        internal_mapping_data =
-          std::make_unique<typename MappingQ<dim, spacedim>::InternalData>(
-            mapping_q->get_degree());
-      }
+    // construct internal_mapping_data for mappings for reuse in reinit()
+    // calls to avoid frequent memory allocations
+    internal_mapping_data = mapping.get_data(update_flags, Quadrature<dim>());
   }
 
 
@@ -855,7 +851,7 @@ namespace NonMatching
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const std::vector<Point<dim>>                              &unit_points_in)
   {
-    reinit(cell, Quadrature<dim>(unit_points_in));
+    reinit(cell, make_array_view(unit_points_in));
   }
 
 
@@ -866,9 +862,8 @@ namespace NonMatching
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const ArrayView<const Point<dim>>                          &unit_points_in)
   {
-    reinit(cell,
-           std::vector<Point<dim>>(unit_points_in.begin(),
-                                   unit_points_in.end()));
+    quadrature.initialize(unit_points_in);
+    reinit(cell, quadrature);
   }
 
 
@@ -899,7 +894,6 @@ namespace NonMatching
                       quadrature.get_points());
 
     // compute mapping data
-    MappingData                mapping_data;
     CellSimilarity::Similarity cell_similarity = CellSimilarity::none;
     internal::ComputeMappingDataHelper<dim, spacedim>::
       compute_mapping_data_for_quadrature(mapping,
@@ -1026,7 +1020,6 @@ namespace NonMatching
       cell_index_to_compressed_cell_index.resize(n_unfiltered_cells,
                                                  numbers::invalid_unsigned_int);
 
-    MappingData  mapping_data;
     MappingData  mapping_data_previous_cell;
     unsigned int size_compressed_data = 0;
     unsigned int cell_index           = 0;
@@ -1318,7 +1311,6 @@ namespace NonMatching
     resize_unit_points_faces(n_unit_points);
     resize_data_fields(n_data_points);
 
-    MappingData  mapping_data;
     MappingData  mapping_data_previous_cell;
     MappingData  mapping_data_first;
     bool         first_set            = false;

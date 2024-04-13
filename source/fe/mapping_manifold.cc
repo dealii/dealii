@@ -63,19 +63,21 @@ MappingManifold<dim, spacedim>::InternalData::memory_consumption() const
 }
 
 
+
 template <int dim, int spacedim>
 void
-MappingManifold<dim, spacedim>::InternalData::initialize(
+MappingManifold<dim, spacedim>::InternalData::reinit(
   const UpdateFlags      update_flags,
-  const Quadrature<dim> &q,
-  const unsigned int     n_original_q_points)
+  const Quadrature<dim> &q)
 {
   // store the flags in the internal data object so we can access them
   // in fill_fe_*_values()
   this->update_each = update_flags;
 
+  const unsigned int n_q_points = q.size();
+
   // Store the quadrature
-  this->quad = q;
+  this->quad.initialize(q.get_points(), q.get_weights());
 
   // Resize the weights
   this->vertex_weights.resize(GeometryInfo<dim>::vertices_per_cell);
@@ -87,14 +89,15 @@ MappingManifold<dim, spacedim>::InternalData::initialize(
     compute_manifold_quadrature_weights(q);
 
   if (this->update_each & update_covariant_transformation)
-    covariant.resize(n_original_q_points);
+    covariant.resize(n_q_points);
 
   if (this->update_each & update_contravariant_transformation)
-    contravariant.resize(n_original_q_points);
+    contravariant.resize(n_q_points);
 
   if (this->update_each & update_volume_elements)
-    volume_elements.resize(n_original_q_points);
+    volume_elements.resize(n_q_points);
 }
+
 
 
 template <int dim, int spacedim>
@@ -104,7 +107,18 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
   const Quadrature<dim> &q,
   const unsigned int     n_original_q_points)
 {
-  initialize(update_flags, q, n_original_q_points);
+  reinit(update_flags, q);
+
+  // Set to the size of a single quadrature object for faces, as the size set
+  // in in reinit() is for all points
+  if (this->update_each & update_covariant_transformation)
+    covariant.resize(n_original_q_points);
+
+  if (this->update_each & update_contravariant_transformation)
+    contravariant.resize(n_original_q_points);
+
+  if (this->update_each & update_volume_elements)
+    volume_elements.resize(n_original_q_points);
 
   if (dim > 1)
     {
@@ -132,6 +146,38 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
                     GeometryInfo<dim>::unit_tangential_vectors[i][1]);
                 }
             }
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingManifold<dim, spacedim>::InternalData::store_vertices(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  vertices.resize(GeometryInfo<dim>::vertices_per_cell);
+  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    vertices[i] = cell->vertex(i);
+  this->cell = cell;
+}
+
+
+
+template <int dim, int spacedim>
+void
+MappingManifold<dim, spacedim>::InternalData::
+  compute_manifold_quadrature_weights(const Quadrature<dim> &quad)
+{
+  cell_manifold_quadrature_weights.resize(
+    quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
+  for (unsigned int q = 0; q < quad.size(); ++q)
+    {
+      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+        {
+          cell_manifold_quadrature_weights[q][i] =
+            GeometryInfo<dim>::d_linear_shape_function(quad.point(q), i);
         }
     }
 }
@@ -269,8 +315,7 @@ MappingManifold<dim, spacedim>::get_data(const UpdateFlags      update_flags,
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std::make_unique<InternalData>();
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
-  data.initialize(this->requires_update_flags(update_flags), q, q.size());
+  data_ptr->reinit(this->requires_update_flags(update_flags), q);
 
   return data_ptr;
 }

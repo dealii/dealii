@@ -99,14 +99,27 @@ MappingCartesian<dim, spacedim>::InternalData::InternalData(
 
 
 template <int dim, int spacedim>
+void
+MappingCartesian<dim, spacedim>::InternalData::reinit(
+  const UpdateFlags update_flags,
+  const Quadrature<dim> &)
+{
+  // store the flags in the internal data object so we can access them
+  // in fill_fe_*_values(). use the transitive hull of the required
+  // flags
+  this->update_each = update_flags;
+}
+
+
+
+template <int dim, int spacedim>
 std::size_t
 MappingCartesian<dim, spacedim>::InternalData::memory_consumption() const
 {
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
           MemoryConsumption::memory_consumption(cell_extents) +
           MemoryConsumption::memory_consumption(inverse_cell_extents) +
-          MemoryConsumption::memory_consumption(volume_element) +
-          MemoryConsumption::memory_consumption(quadrature_points));
+          MemoryConsumption::memory_consumption(volume_element));
 }
 
 
@@ -162,13 +175,8 @@ MappingCartesian<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                           const Quadrature<dim> &q) const
 {
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(q);
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
-
-  // store the flags in the internal data object so we can access them
-  // in fill_fe_*_values(). use the transitive hull of the required
-  // flags
-  data.update_each = requires_update_flags(update_flags);
+    std::make_unique<InternalData>();
+  data_ptr->reinit(requires_update_flags(update_flags), q);
 
   return data_ptr;
 }
@@ -252,18 +260,46 @@ MappingCartesian<dim, spacedim>::update_cell_extents(
 
 
 
+namespace
+{
+  template <int dim>
+  void
+  transform_quadrature_points(
+    const Tensor<1, dim>                               first_vertex,
+    const Tensor<1, dim>                               cell_extents,
+    const ArrayView<const Point<dim>>                 &unit_quadrature_points,
+    const typename QProjector<dim>::DataSetDescriptor &offset,
+    std::vector<Point<dim>>                           &quadrature_points)
+  {
+    for (unsigned int i = 0; i < quadrature_points.size(); ++i)
+      {
+        quadrature_points[i] = first_vertex;
+        for (unsigned int d = 0; d < dim; ++d)
+          quadrature_points[i][d] +=
+            cell_extents[d] * unit_quadrature_points[i + offset][d];
+      }
+  }
+} // namespace
+
+
+
 template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::maybe_update_cell_quadrature_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const InternalData                                         &data,
-  std::vector<Point<dim>> &quadrature_points) const
+  const ArrayView<const Point<dim>> &unit_quadrature_points,
+  std::vector<Point<dim>>           &quadrature_points) const
 {
   if (data.update_each & update_quadrature_points)
     {
       const auto offset = QProjector<dim>::DataSetDescriptor::cell();
 
-      transform_quadrature_points(cell, data, offset, quadrature_points);
+      transform_quadrature_points(cell->vertex(0),
+                                  data.cell_extents,
+                                  unit_quadrature_points,
+                                  offset,
+                                  quadrature_points);
     }
 }
 
@@ -288,7 +324,11 @@ MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
         quadrature_points.size());
 
 
-      transform_quadrature_points(cell, data, offset, quadrature_points);
+      transform_quadrature_points(cell->vertex(0),
+                                  data.cell_extents,
+                                  make_array_view(data.quadrature_points),
+                                  offset,
+                                  quadrature_points);
     }
 }
 
@@ -320,30 +360,11 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
         quadrature_points.size(),
         cell->subface_case(face_no));
 
-      transform_quadrature_points(cell, data, offset, quadrature_points);
-    }
-}
-
-
-
-template <int dim, int spacedim>
-void
-MappingCartesian<dim, spacedim>::transform_quadrature_points(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const InternalData                                         &data,
-  const typename QProjector<dim>::DataSetDescriptor          &offset,
-  std::vector<Point<dim>> &quadrature_points) const
-{
-  // let @p{start} be the origin of a local coordinate system. it is chosen
-  // as the (lower) left vertex
-  const Point<dim> start = cell->vertex(0);
-
-  for (unsigned int i = 0; i < quadrature_points.size(); ++i)
-    {
-      quadrature_points[i] = start;
-      for (unsigned int d = 0; d < dim; ++d)
-        quadrature_points[i][d] +=
-          data.cell_extents[d] * data.quadrature_points[i + offset][d];
+      transform_quadrature_points(cell->vertex(0),
+                                  data.cell_extents,
+                                  make_array_view(data.quadrature_points),
+                                  offset,
+                                  quadrature_points);
     }
 }
 
@@ -504,6 +525,7 @@ MappingCartesian<dim, spacedim>::fill_fe_values(
 
   maybe_update_cell_quadrature_points(cell,
                                       data,
+                                      quadrature.get_points(),
                                       output_data.quadrature_points);
 
   // compute Jacobian determinant. all values are equal and are the
@@ -553,13 +575,12 @@ MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
 
   InternalData data;
   data.update_each = update_flags;
-  data.quadrature_points =
-    std::vector<Point<dim>>(unit_points.begin(), unit_points.end());
 
   update_cell_extents(cell, CellSimilarity::none, data);
 
   maybe_update_cell_quadrature_points(cell,
                                       data,
+                                      unit_points,
                                       output_data.quadrature_points);
 
   maybe_update_jacobians(data, CellSimilarity::none, output_data);
@@ -703,6 +724,7 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
 
   maybe_update_cell_quadrature_points(cell,
                                       data,
+                                      quadrature.get_points(),
                                       output_data.quadrature_points);
 
   if (data.update_each & update_normal_vectors)

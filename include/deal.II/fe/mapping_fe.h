@@ -185,23 +185,15 @@ public:
      */
     InternalData(const FiniteElement<dim, spacedim> &fe);
 
-    /**
-     * Initialize the object's member variables related to cell data based on
-     * the given arguments.
-     *
-     * The function also calls compute_shape_function_values() to actually set
-     * the member variables related to the values and derivatives of the
-     * mapping shape functions.
-     */
-    void
-    initialize(const UpdateFlags      update_flags,
-               const Quadrature<dim> &quadrature,
-               const unsigned int     n_original_q_points);
+    // Documentation see Mapping::InternalDataBase.
+    virtual void
+    reinit(const UpdateFlags      update_flags,
+           const Quadrature<dim> &quadrature) override;
 
     /**
      * Initialize the object's member variables related to cell and face data
      * based on the given arguments. In order to initialize cell data, this
-     * function calls initialize().
+     * function calls reinit().
      */
     void
     initialize_face(const UpdateFlags      update_flags,
