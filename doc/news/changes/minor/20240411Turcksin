@@ -1,0 +1,5 @@
+New: Add GridGenerator::cylinder, GridGenerator::subdivided_cylinder,
+and GridGenerator::truncated_cone to the python wrappers
+<br>
+(Bruno Turcksin, 2024/04/11)
+
