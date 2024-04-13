@@ -3583,7 +3583,7 @@ namespace internal
 
         const unsigned int max_faces_per_cell = 2 * dim;
 
-        level.active_cell_indices.assign(size, -1);
+        level.active_cell_indices.assign(size, numbers::invalid_unsigned_int);
         level.subdomain_ids.assign(size, 0);
         level.level_subdomain_ids.assign(size, 0);
 
