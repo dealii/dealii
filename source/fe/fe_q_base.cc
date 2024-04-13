@@ -497,7 +497,7 @@ FE_Q_Base<dim, spacedim>::initialize(const std::vector<Point<1>> &points)
     Threads::new_task([&]() { initialize_unit_face_support_points(points); });
   tasks += Threads::new_task([&]() { initialize_constraints(points); });
   tasks +=
-    Threads::new_task([&]() { this->initialize_quad_dof_index_permutation(); });
+    Threads::new_task([&]() { this->initialize_dof_index_permutations(); });
   tasks.join_all();
 
   // do not initialize embedding and restriction here. these matrices are
@@ -1025,9 +1025,14 @@ FE_Q_Base<dim, spacedim>::initialize_unit_face_support_points(
 
 template <int dim, int spacedim>
 void
-FE_Q_Base<dim, spacedim>::initialize_quad_dof_index_permutation()
+FE_Q_Base<dim, spacedim>::initialize_dof_index_permutations()
 {
-  // for 1d and 2d, do nothing
+  // initialize reordering of line dofs
+  for (unsigned int i = 0; i < this->n_dofs_per_line(); ++i)
+    this->adjust_line_dof_index_for_line_orientation_table[i] =
+      this->n_dofs_per_line() - 1 - i - i;
+
+  // for 1d and 2d we can skip adjust_quad_dof_index_for_face_orientation_table
   if (dim < 3)
     return;
 
@@ -1101,11 +1106,6 @@ FE_Q_Base<dim, spacedim>::initialize_quad_dof_index_permutation()
         local, internal::combined_face_orientation(true, true, true)) =
         (n - 1 - j) + i * n - local;
     }
-
-  // additionally initialize reordering of line dofs
-  for (unsigned int i = 0; i < this->n_dofs_per_line(); ++i)
-    this->adjust_line_dof_index_for_line_orientation_table[i] =
-      this->n_dofs_per_line() - 1 - i - i;
 }
 
 
@@ -1119,15 +1119,6 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
 {
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
-
-  // TODO: we could presumably solve the 3d case below using the
-  // adjust_quad_dof_index_for_face_orientation_table field. for the
-  // 2d case, we can't use adjust_line_dof_index_for_line_orientation_table
-  // since that array is empty (presumably because we thought that
-  // there are no flipped edges in 2d, but these can happen in
-  // DoFTools::make_periodicity_constraints, for example). so we
-  // would need to either fill this field, or rely on derived classes
-  // implementing this function, as we currently do
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements

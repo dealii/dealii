@@ -307,11 +307,12 @@ protected:
   initialize_unit_face_support_points(const std::vector<Point<1>> &points);
 
   /**
-   * Initialize the @p adjust_quad_dof_index_for_face_orientation_table field
-   * of the FiniteElement class. Called from initialize().
+   * Initialize the @p adjust_quad_dof_index_for_face_orientation_table and
+   * adjust_line_dof_index_for_line_orientation_table tables of the
+   * FiniteElement class. Called from initialize().
    */
   void
-  initialize_quad_dof_index_permutation();
+  initialize_dof_index_permutations();
 
   /**
    * Forward declaration of a class into which we put significant parts of the
