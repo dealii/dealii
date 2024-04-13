@@ -14,7 +14,7 @@
 
 
 for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : DIMENSIONS)
+     deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension < deal_II_space_dimension
     template void DataOut_DoFData<deal_II_dimension,
@@ -70,7 +70,7 @@ for (deal_II_dimension : DIMENSIONS)
   }
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace internal
     \{
