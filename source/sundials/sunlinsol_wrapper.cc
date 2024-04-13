@@ -263,10 +263,11 @@ namespace SUNDIALS
     arkode_linsol_set_a_times(SUNLinearSolver LS,
                               void           *A_data,
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                              SUNATimesFn ATimes)
+                              SUNATimesFn ATimes
 #  else
-                              ATimesFn        ATimes)
+                              ATimesFn        ATimes
 #  endif
+    )
     {
       LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
 
@@ -283,11 +284,12 @@ namespace SUNDIALS
                                      void           *P_data,
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                      SUNPSetupFn p_setup,
-                                     SUNPSolveFn p_solve)
+                                     SUNPSolveFn p_solve
 #  else
                                      PSetupFn p_setup,
-                                     PSolveFn p_solve)
+                                     PSolveFn p_solve
 #  endif
+    )
     {
       LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
 
