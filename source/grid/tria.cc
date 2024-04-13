@@ -6756,16 +6756,12 @@ namespace internal
                                             {{2, 1, 0}}, // 4
                                             {{2, 0, 1}}}};
 
+                              const unsigned char combined_orientation =
+                                hex->combined_face_orientation(f);
                               relevant_lines[k] =
                                 hex->face(f)
                                   ->child(3 /*center triangle*/)
-                                  ->line(
-                                    table[triangulation.levels[hex->level()]
-                                            ->face_orientations
-                                            .get_combined_orientation(
-                                              hex->index() * GeometryInfo<dim>::
-                                                               faces_per_cell +
-                                              f)][l]);
+                                  ->line(table[combined_orientation][l]);
                             }
 
                         relevant_lines[k++] = new_lines[0];
@@ -7021,19 +7017,13 @@ namespace internal
                         for (unsigned int f = 0, k = n_new_quads; f < 4; ++f)
                           for (unsigned int c = 0; c < 4; ++c, ++k)
                             {
+                              const unsigned char combined_orientation =
+                                hex->combined_face_orientation(f);
                               quad_indices[k] = hex->face(f)->child_index(
-                                (c == 3) ?
-                                  3 :
-                                  reference_cell_type
-                                    .standard_to_real_face_vertex(
-                                      c,
-                                      f,
-                                      triangulation.levels[hex->level()]
-                                        ->face_orientations
-                                        .get_combined_orientation(
-                                          hex->index() *
-                                            GeometryInfo<dim>::faces_per_cell +
-                                          f)));
+                                (c == 3) ? 3 :
+                                           reference_cell_type
+                                             .standard_to_real_face_vertex(
+                                               c, f, combined_orientation));
                             }
                       }
                     else
