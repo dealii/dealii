@@ -569,15 +569,6 @@ FiniteElement<dim, spacedim>::face_to_cell_index(
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, this->reference_cell().n_faces());
 
-  // TODO: we could presumably solve the 3d case below using the
-  // adjust_quad_dof_index_for_face_orientation_table field. For the 2d case, we
-  // can't use adjust_line_dof_index_for_line_orientation_table since that array
-  // is not populated for elements with quadrilateral reference cells
-  // (presumably because we thought that there are no flipped edges in 2d, but
-  // these can happen in DoFTools::make_periodicity_constraints(), for example).
-  // so we would need to either fill this field, or rely on derived classes
-  // implementing this function, as we currently do
-
   // see the function's documentation for an explanation of this
   // assertion -- in essence, derived classes have to implement
   // an overloaded version of this function if we are to use any
@@ -591,7 +582,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(
              "an overloaded version but apparently hasn't done so. See "
              "the documentation of this function for more information."));
 
-  // we need to distinguish between DoFs on vertices, lines and in 3d quads.
+  // we need to distinguish between DoFs on vertices, lines and (in 3d) quads.
   // do so in a sequence of if-else statements
   if (face_index < this->get_first_face_line_index(face))
     // DoF is on a vertex
@@ -685,19 +676,11 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   const unsigned int  index,
   const unsigned char combined_orientation) const
 {
-  // We orient quads (and 1D meshes are always oriented) so always skip those
-  // cases
-  //
-  // TODO - we may want to change this in the future: see also the notes in
-  // face_to_cell_index()
   Assert(combined_orientation ==
              ReferenceCell::default_combined_face_orientation() ||
            combined_orientation ==
              ReferenceCell::reversed_combined_line_orientation(),
          ExcInternalError());
-  if (this->reference_cell() == ReferenceCells::Line ||
-      this->reference_cell() == ReferenceCells::Quadrilateral)
-    return index;
 
   AssertIndexRange(index, this->n_dofs_per_line());
   Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
