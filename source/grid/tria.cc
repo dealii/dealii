@@ -6425,7 +6425,11 @@ namespace internal
                             s.insert(i);
 #endif
 
-                          new_quad->set_line_orientation(f, orientation);
+                          new_quad->set_line_orientation(
+                            f,
+                            orientation ==
+                              ReferenceCell::
+                                default_combined_face_orientation());
                         }
 #ifdef DEBUG
                       AssertDimension(s.size(), 3);
@@ -6972,7 +6976,11 @@ namespace internal
                                 make_array_view(vertices_0),
                                 make_array_view(vertices_1));
 
-                            new_quad->set_line_orientation(l, orientation);
+                            new_quad->set_line_orientation(
+                              l,
+                              orientation ==
+                                ReferenceCell::
+                                  default_combined_face_orientation());
 
                             // on a hex, inject the status of the current line
                             // also to the line on the other quad along the
@@ -6981,7 +6989,11 @@ namespace internal
                                 ReferenceCells::Hexahedron)
                               new_quads[representative_lines[q % 4][1] + q -
                                         (q % 4)]
-                                ->set_line_orientation(l, orientation);
+                                ->set_line_orientation(
+                                  l,
+                                  orientation ==
+                                    ReferenceCell::
+                                      default_combined_face_orientation());
                           }
                       }
                   }

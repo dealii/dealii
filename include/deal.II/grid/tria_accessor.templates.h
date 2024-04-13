@@ -973,7 +973,9 @@ namespace internal
             corner);
         const auto vertex_within_line_index =
           accessor.reference_cell().standard_to_real_face_vertex(
-            vertex_index, line_index, accessor.line_orientation(line_index));
+            vertex_index,
+            line_index,
+            accessor.combined_face_orientation(line_index));
 
         return accessor.line(line_index)
           ->vertex_index(vertex_within_line_index);
