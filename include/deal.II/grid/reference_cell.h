@@ -1901,8 +1901,8 @@ ReferenceCell::face_to_cell_vertices(
           static constexpr ndarray<unsigned int, 3, 2> table = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
-          return table[face][combined_face_orientation !=
-                                 reversed_combined_line_orientation() ?
+          return table[face][combined_face_orientation ==
+                                 default_combined_face_orientation() ?
                                vertex :
                                (1 - vertex)];
         }
