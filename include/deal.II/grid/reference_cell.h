@@ -870,11 +870,18 @@ private:
   constexpr ReferenceCell(const std::uint8_t kind);
 
   /**
+   * Table containing all 'vertex' permutations for a vertex. Defined
+   * analogously to line_vertex_permutations et al to make things work the same
+   * way in 1d.
+   */
+  static constexpr ndarray<unsigned int, 1, 1> vertex_vertex_permutations = {
+    {{{0}}}};
+
+  /**
    * Table containing all vertex permutations for a line.
    */
   static constexpr ndarray<unsigned int, 2, 2> line_vertex_permutations = {
     {{{1, 0}}, {{0, 1}}}};
-
 
   /**
    * Table containing all vertex permutations for a triangle.
@@ -2787,94 +2794,36 @@ ReferenceCell::get_combined_orientation(
                     "the number of vertices of the cell "
                     "referenced by this object."));
 
-  const auto v0_equals = [&](const std::initializer_list<const T> &list) {
-    Assert(list.size() == n_vertices(), ExcInternalError());
-    return std::equal(vertices_0.begin(), vertices_0.end(), std::begin(list));
+  auto compute_orientation = [&](const auto &table) {
+    for (unsigned char o = 0; o < table.size(); ++o)
+      {
+        bool match = true;
+        for (unsigned int j = 0; j < table[o].size(); ++j)
+          match = (match && vertices_0[j] == vertices_1[table[o][j]]);
+
+        if (match)
+          return o;
+      }
+
+    Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
+    return std::numeric_limits<unsigned char>::max();
   };
 
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        // Things are always default-oriented in 1D
-        if (v0_equals({vertices_1[0]}))
+        // TODO: we can get rid of this special-case and use
+        // vertex_vertex_permutations once we make 0 the default orientation.
+        (void)vertex_vertex_permutations;
+        if (vertices_0[0] == vertices_1[0])
           return default_combined_face_orientation();
         break;
-
       case ReferenceCells::Line:
-        // line_orientation=true
-        if (v0_equals({vertices_1[0], vertices_1[1]}))
-          return default_combined_face_orientation();
-
-        // line_orientation=false
-        if (v0_equals({vertices_1[1], vertices_1[0]}))
-          return reversed_combined_line_orientation();
-        break;
+        return compute_orientation(line_vertex_permutations);
       case ReferenceCells::Triangle:
-        // face_orientation=true, face_rotation=false, face_flip=false
-        if (v0_equals({vertices_1[0], vertices_1[1], vertices_1[2]}))
-          return 1;
-
-        // face_orientation=true, face_rotation=true, face_flip=false
-        if (v0_equals({vertices_1[1], vertices_1[2], vertices_1[0]}))
-          return 5;
-
-        // face_orientation=true, face_rotation=false, face_flip=true
-        if (v0_equals({vertices_1[2], vertices_1[0], vertices_1[1]}))
-          return 3;
-
-        // face_orientation=false, face_rotation=false, face_flip=false
-        if (v0_equals({vertices_1[0], vertices_1[2], vertices_1[1]}))
-          return 0;
-
-        // face_orientation=false, face_rotation=true, face_flip=false
-        if (v0_equals({vertices_1[2], vertices_1[1], vertices_1[0]}))
-          return 2;
-
-        // face_orientation=false, face_rotation=false, face_flip=true
-        if (v0_equals({vertices_1[1], vertices_1[0], vertices_1[2]}))
-          return 4;
-        break;
+        return compute_orientation(triangle_vertex_permutations);
       case ReferenceCells::Quadrilateral:
-        // face_orientation=true, face_rotation=false, face_flip=false
-        if (v0_equals(
-              {vertices_1[0], vertices_1[1], vertices_1[2], vertices_1[3]}))
-          return 1;
-
-        // face_orientation=true, face_rotation=true, face_flip=false
-        if (v0_equals(
-              {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]}))
-          return 3;
-
-        // face_orientation=true, face_rotation=false, face_flip=true
-        if (v0_equals(
-              {vertices_1[3], vertices_1[2], vertices_1[1], vertices_1[0]}))
-          return 5;
-
-        // face_orientation=true, face_rotation=true, face_flip=true
-        if (v0_equals(
-              {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]}))
-          return 7;
-
-        // face_orientation=false, face_rotation=false, face_flip=false
-        if (v0_equals(
-              {vertices_1[0], vertices_1[2], vertices_1[1], vertices_1[3]}))
-          return 0;
-
-        // face_orientation=false, face_rotation=true, face_flip=false
-        if (v0_equals(
-              {vertices_1[2], vertices_1[3], vertices_1[0], vertices_1[1]}))
-          return 2;
-
-        // face_orientation=false, face_rotation=false, face_flip=true
-        if (v0_equals(
-              {vertices_1[3], vertices_1[1], vertices_1[2], vertices_1[0]}))
-          return 4;
-
-        // face_orientation=false, face_rotation=true, face_flip=true
-        if (v0_equals(
-              {vertices_1[1], vertices_1[0], vertices_1[3], vertices_1[2]}))
-          return 6;
-        break;
+        return compute_orientation(quadrilateral_vertex_permutations);
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
