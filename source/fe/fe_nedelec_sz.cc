@@ -162,13 +162,25 @@ FE_NedelecSZ<dim, spacedim>::shape_value(const unsigned int /*i*/,
 template <int dim, int spacedim>
 double
 FE_NedelecSZ<dim, spacedim>::shape_value_component(
-  const unsigned int /*i*/,
-  const Point<dim> & /*p*/,
-  const unsigned int /*component*/) const
+  const unsigned int i,
+  const Point<dim>  &p,
+  const unsigned int component) const
 {
-  // Not implemented yet:
-  DEAL_II_NOT_IMPLEMENTED();
-  return 0.;
+  AssertIndexRange(i, this->n_dofs_per_cell());
+  AssertIndexRange(component, dim);
+
+  std::unique_ptr<
+    typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+    data_ptr = std::make_unique<InternalData>();
+
+  std::vector<Point<dim>> p_list = {p};
+
+  // compute the data
+  this->evaluate(p_list, update_values, data_ptr);
+
+  // access the data
+  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  return data.shape_values[i][0][component];
 }
 
 
@@ -187,12 +199,25 @@ FE_NedelecSZ<dim, spacedim>::shape_grad(const unsigned int /*i*/,
 template <int dim, int spacedim>
 Tensor<1, dim>
 FE_NedelecSZ<dim, spacedim>::shape_grad_component(
-  const unsigned int /*i*/,
-  const Point<dim> & /*p*/,
-  const unsigned int /*component*/) const
+  const unsigned int i,
+  const Point<dim>  &p,
+  const unsigned int component) const
 {
-  DEAL_II_NOT_IMPLEMENTED();
-  return Tensor<1, dim>();
+  AssertIndexRange(i, this->n_dofs_per_cell());
+  AssertIndexRange(component, dim);
+
+  std::unique_ptr<
+    typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+    data_ptr = std::make_unique<InternalData>();
+
+  std::vector<Point<dim>> p_list = {p};
+
+  // compute the data
+  this->evaluate(p_list, update_gradients, data_ptr);
+
+  // access the data
+  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  return data.shape_grads[i][0][component];
 }
 
 
@@ -211,12 +236,25 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_grad(const unsigned int /*i*/,
 template <int dim, int spacedim>
 Tensor<2, dim>
 FE_NedelecSZ<dim, spacedim>::shape_grad_grad_component(
-  const unsigned int /*i*/,
-  const Point<dim> & /*p*/,
-  const unsigned int /*component*/) const
+  const unsigned int i,
+  const Point<dim>  &p,
+  const unsigned int component) const
 {
-  DEAL_II_NOT_IMPLEMENTED();
-  return Tensor<2, dim>();
+  AssertIndexRange(i, this->n_dofs_per_cell());
+  AssertIndexRange(component, dim);
+
+  std::unique_ptr<
+    typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+    data_ptr = std::make_unique<InternalData>();
+
+  std::vector<Point<dim>> p_list = {p};
+
+  // compute the data
+  this->evaluate(p_list, update_hessians, data_ptr);
+
+  // access the data
+  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  return data.shape_hessians[i][0][component];
 }
 
 
