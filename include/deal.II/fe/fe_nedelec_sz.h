@@ -163,6 +163,17 @@ protected:
    */
   MappingKind mapping_kind;
 
+  /**
+   * Compute the value and the derivatives of the Nedelec functions at
+   * the points given in <tt>p_list</tt>.
+   */
+  void
+  evaluate(const std::vector<Point<dim>> &p_list,
+           const UpdateFlags              update_flags,
+           std::unique_ptr<
+             typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+             &data_ptr) const;
+
   virtual std::unique_ptr<
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
   get_data(

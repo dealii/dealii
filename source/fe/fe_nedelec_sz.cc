@@ -222,35 +222,43 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_grad_component(
 
 
 template <int dim, int spacedim>
-std::unique_ptr<typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
-FE_NedelecSZ<dim, spacedim>::get_data(
-  const UpdateFlags update_flags,
-  const Mapping<dim, spacedim> & /*mapping*/,
-  const Quadrature<dim> &quadrature,
-  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                     spacedim>
-    & /*output_data*/) const
-{
+void
+FE_NedelecSZ<dim, spacedim>::evaluate(
+  const std::vector<Point<dim>> /*p_list*/,
+  const UpdateFlags /*update_flags*/,
   std::unique_ptr<
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
-        data_ptr   = std::make_unique<InternalData>();
+    & /*data_ptr*/) const
+{
+  DEAL_II_NOT_IMPLEMENTED();
+}
+
+
+
+template <>
+void
+FE_NedelecSZ<2, 2>::evaluate(
+  const std::vector<Point<2>> &p_list,
+  const UpdateFlags            update_flags,
+  std::unique_ptr<typename dealii::FiniteElement<2, 2>::InternalDataBase>
+    &data_ptr) const
+{
   auto &data       = dynamic_cast<InternalData &>(*data_ptr);
   data.update_each = requires_update_flags(update_flags);
 
   // Useful quantities:
+  const unsigned int dim = 2;
   const unsigned int degree(this->degree - 1); // Note: FE holds input degree+1
 
-  const unsigned int vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
-  const unsigned int lines_per_cell    = GeometryInfo<dim>::lines_per_cell;
-  const unsigned int faces_per_cell    = GeometryInfo<dim>::faces_per_cell;
+  const unsigned int vertices_per_cell =
+    GeometryInfo<2 /*dim*/>::vertices_per_cell;
+  const unsigned int lines_per_cell = GeometryInfo<2 /*dim*/>::lines_per_cell;
 
   const unsigned int n_line_dofs = this->n_dofs_per_line() * lines_per_cell;
 
-  // we assume that all quads have the same number of dofs
-  const unsigned int n_face_dofs = this->n_dofs_per_quad(0) * faces_per_cell;
+  const unsigned int n_q_points = p_list.size();
 
-  const UpdateFlags  flags(data.update_each);
-  const unsigned int n_q_points = quadrature.size();
+  const UpdateFlags flags(data.update_each);
 
   // Resize the internal data storage:
   data.sigma_imj_values.resize(
@@ -264,1302 +272,1151 @@ FE_NedelecSZ<dim, spacedim>::get_data(
 
   // Resize shape function arrays according to update flags:
   if (flags & update_values)
-    {
-      data.shape_values.resize(this->n_dofs_per_cell(),
-                               std::vector<Tensor<1, dim>>(n_q_points));
-    }
+    data.shape_values.resize(this->n_dofs_per_cell(),
+                             std::vector<Tensor<1, dim>>(n_q_points));
 
   if (flags & update_gradients)
-    {
-      data.shape_grads.resize(this->n_dofs_per_cell(),
-                              std::vector<DerivativeForm<1, dim, dim>>(
-                                n_q_points));
-    }
+    data.shape_grads.resize(this->n_dofs_per_cell(),
+                            std::vector<DerivativeForm<1, dim, dim>>(
+                              n_q_points));
 
   if (flags & update_hessians)
+    data.shape_hessians.resize(this->n_dofs_per_cell(),
+                               std::vector<DerivativeForm<2, dim, dim>>(
+                                 n_q_points));
+
+  // Compute values of sigma & lambda and the sigma differences and
+  // lambda additions.
+  std::vector<std::vector<double>> sigma(n_q_points,
+                                         std::vector<double>(lines_per_cell));
+  std::vector<std::vector<double>> lambda(n_q_points,
+                                          std::vector<double>(lines_per_cell));
+
+  for (unsigned int q = 0; q < n_q_points; ++q)
     {
-      data.shape_hessians.resize(this->n_dofs_per_cell(),
-                                 std::vector<DerivativeForm<2, dim, dim>>(
-                                   n_q_points));
+      sigma[q][0] = (1.0 - p_list[q][0]) + (1.0 - p_list[q][1]);
+      sigma[q][1] = p_list[q][0] + (1.0 - p_list[q][1]);
+      sigma[q][2] = (1.0 - p_list[q][0]) + p_list[q][1];
+      sigma[q][3] = p_list[q][0] + p_list[q][1];
+
+      lambda[q][0] = (1.0 - p_list[q][0]) * (1.0 - p_list[q][1]);
+      lambda[q][1] = p_list[q][0] * (1.0 - p_list[q][1]);
+      lambda[q][2] = (1.0 - p_list[q][0]) * p_list[q][1];
+      lambda[q][3] = p_list[q][0] * p_list[q][1];
+      for (unsigned int i = 0; i < vertices_per_cell; ++i)
+        for (unsigned int j = 0; j < vertices_per_cell; ++j)
+          data.sigma_imj_values[q][i][j] = sigma[q][i] - sigma[q][j];
     }
+
+  // Calculate the gradient of sigma_imj_values[q][i][j] =
+  // sigma[q][i]-sigma[q][j]
+  //   - this depends on the component and the direction of the
+  //   corresponding edge.
+  //   - the direction of the edge is determined by
+  //   sigma_imj_sign[i][j].
+  // Helper arrays:
+  const int    sigma_comp_signs[vertices_per_cell][dim] = {{-1, -1},
+                                                           {1, -1},
+                                                           {-1, 1},
+                                                           {1, 1}};
+  int          sigma_imj_sign[vertices_per_cell][vertices_per_cell];
+  unsigned int sigma_imj_component[vertices_per_cell][vertices_per_cell];
+
+  for (unsigned int i = 0; i < vertices_per_cell; ++i)
+    for (unsigned int j = 0; j < vertices_per_cell; ++j)
+      {
+        // sigma_imj_sign is the sign (+/-) of the coefficient of
+        // x/y/z in sigma_imj_values Due to the numbering of vertices
+        // on the reference element it is easy to find edges in the
+        // positive direction are from smaller to higher local vertex
+        // numbering.
+        sigma_imj_sign[i][j] = (i < j) ? -1 : 1;
+        sigma_imj_sign[i][j] = (i == j) ? 0 : sigma_imj_sign[i][j];
+
+        // Now store the component which the sigma_i - sigma_j
+        // corresponds to:
+        sigma_imj_component[i][j] = 0;
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            int temp_imj = sigma_comp_signs[i][d] - sigma_comp_signs[j][d];
+            // Only interested in the first non-zero
+            // as if there is a second, it can not be a valid edge.
+            if (temp_imj != 0)
+              {
+                sigma_imj_component[i][j] = d;
+                break;
+              }
+          }
+        // Can now calculate the gradient, only non-zero in the
+        // component given: Note some i,j combinations will be
+        // incorrect, but only on invalid edges.
+        data.sigma_imj_grads[i][j][sigma_imj_component[i][j]] =
+          2.0 * sigma_imj_sign[i][j];
+      }
+
+  // Now compute the edge parameterisations for a single element
+  // with global numbering matching that of the reference element:
+
+  // Resize the edge parameterisations
+  data.edge_sigma_values.resize(lines_per_cell,
+                                std::vector<double>(n_q_points));
+  data.edge_sigma_grads.resize(lines_per_cell, std::vector<double>(dim));
+
+  // Fill the values for edge lambda and edge sigma:
+  const unsigned int edge_sigma_direction[lines_per_cell] = {1, 1, 0, 0};
+
+  data.edge_lambda_values.resize(lines_per_cell,
+                                 std::vector<double>(n_q_points));
+
+  data.edge_lambda_grads_2d.resize(lines_per_cell, std::vector<double>(dim));
+
+  for (unsigned int m = 0; m < lines_per_cell; ++m)
+    {
+      // e1=max(reference vertex numbering on this edge)
+      // e2=min(reference vertex numbering on this edge)
+      // Which is guaranteed to be:
+      const unsigned int e1(GeometryInfo<dim>::line_to_cell_vertices(m, 1));
+      const unsigned int e2(GeometryInfo<dim>::line_to_cell_vertices(m, 0));
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        {
+          data.edge_sigma_values[m][q]  = data.sigma_imj_values[q][e2][e1];
+          data.edge_lambda_values[m][q] = lambda[q][e1] + lambda[q][e2];
+        }
+
+      data.edge_sigma_grads[m][edge_sigma_direction[m]] = -2.0;
+    }
+
+  data.edge_lambda_grads_2d[0] = {-1.0, 0.0};
+  data.edge_lambda_grads_2d[1] = {1.0, 0.0};
+  data.edge_lambda_grads_2d[2] = {0.0, -1.0};
+  data.edge_lambda_grads_2d[3] = {0.0, 1.0};
+
+  // If the polynomial order is 0, then no more work to do:
+  if (degree < 1)
+    return;
+
+  // Otherwise, we can compute the non-cell dependent shape functions.
+  //
+  // Note: the local dof numberings follow the usual order of lines ->
+  // faces -> cells
+  //       (we have no vertex-based DoFs in this element).
+  // For a given cell we have:
+  //      n_line_dofs = dofs_per_line*lines_per_cell.
+  //      n_face_dofs = dofs_per_face*faces_per_cell.
+  //      n_cell_dofs = dofs_per_quad (2d)
+  //                  = dofs_per_hex (3d)
+  //
+  // i.e. For the local dof numbering:
+  //      the first line dof is 0,
+  //      the first face dof is n_line_dofs,
+  //      the first cell dof is n_line_dofs + n_face_dofs.
+  //
+  // On a line, DoFs are ordered first by line_dof and then line_index:
+  // i.e. line_dof_index = line_dof + line_index*(dofs_per_line)
+  //
+  // and similarly for faces:
+  // i.e. face_dof_index = face_dof + face_index*(dofs_per_face).
+  //
+  // HOWEVER, we have different types of DoFs on a line/face/cell.
+  // On a line we have two types, lowest order and higher order
+  // gradients.
+  //    - The numbering is such the lowest order is first, then higher
+  //    order.
+  //      This is simple enough as there is only 1 lowest order and
+  //      degree higher orders DoFs per line.
+  //
+  // On a 2d cell, we have 3 types: Type 1/2/3:
+  //    - The ordering done by type:
+  //      - Type 1: 0 <= i1,j1 < degree. degree^2 in total.
+  //        Numbered: ij1 = i1 + j1*(degree).        i.e. cell_dof_index
+  //        = ij1.
+  //      - Type 2: 0 <= i2,j2 < degree. degree^2 in total.
+  //        Numbered: ij2 = i2 + j2*(degree).        i.e. cell_dof_index
+  //        = degree^2 + ij2
+  //      - Type 3: 0 <= i3 < 2*degree. 2*degree in total.
+  //        Numbered: ij3 = i3.                      i.e. cell_dof_index
+  //        =  2*(degree^2) + ij3.
+  //
+  // These then fit into the local dof numbering described above:
+  // - local dof numberings are:
+  //   line_dofs: local_dof = line_dof_index.    0 <= local_dof <
+  //   dofs_per_line*lines_per_cell face_dofs: local_dof =
+  //   n_line_dofs*lines_per_cell + face_dof_index. cell dofs: local_dof
+  //   = n_lines_dof + n_face_dofs + cell_dof_index.
+  //
+  // The cell-based shape functions are:
+  //
+  // Type 1 (gradients):
+  // \phi^{C_{1}}_{ij} = grad( L_{i+2}(2x-1)L_{j+2}(2y-1) ),
+  //
+  // 0 <= i,j < degree.
+  //
+  // NOTE: The derivative produced by IntegratedLegendrePolynomials does
+  // not account for the
+  //       (2*x-1) or (2*y-1) so we must take this into account when
+  //       taking derivatives.
+  const unsigned int cell_type1_offset = n_line_dofs;
+
+  // Type 2:
+  // \phi^{C_{2}}_{ij} = L'_{i+2}(2x-1) L_{j+2}(2y-1) \mathbf{e}_{x}
+  //                     - L_{i+2}(2x-1) L'_{j+2}(2y-1) \mathbf{e}_{y},
+  //
+  // 0 <= i,j < degree.
+  const unsigned int cell_type2_offset = cell_type1_offset + degree * degree;
+
+  // Type 3 (two subtypes):
+  // \phi^{C_{3}}_{j}        = L_{j+2}(2y-1) \mathbf{e}_{x}
+  //
+  // \phi^{C_{3}}_{j+degree} = L_{j+2}(2x-1) \mathbf{e}_{y}
+  //
+  // 0 <= j < degree
+  const unsigned int cell_type3_offset1 = cell_type2_offset + degree * degree;
+  const unsigned int cell_type3_offset2 = cell_type3_offset1 + degree;
+
+  if (flags & (update_values | update_gradients | update_hessians))
+    {
+      // compute all points we must evaluate the 1d polynomials at:
+      std::vector<Point<dim>> cell_points(n_q_points);
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        for (unsigned int d = 0; d < dim; ++d)
+          cell_points[q][d] = 2.0 * p_list[q][d] - 1.0;
+
+      // Loop through quad points:
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        {
+          // pre-compute values & required derivatives at this quad
+          // point (x,y): polyx = L_{i+2}(2x-1), polyy = L_{j+2}(2y-1),
+          //
+          // for each polyc[d], c=x,y, contains the d-th derivative with
+          // respect to the coordinate c.
+
+          // We only need poly values and 1st derivative for
+          // update_values, but need the 2nd derivative too for
+          // update_gradients. For update_hessians we also need the 3rd
+          // derivatives.
+          const unsigned int poly_length =
+            (flags & update_hessians) ? 4 :
+                                        ((flags & update_gradients) ? 3 : 2);
+
+          std::vector<std::vector<double>> polyx(
+            degree, std::vector<double>(poly_length));
+          std::vector<std::vector<double>> polyy(
+            degree, std::vector<double>(poly_length));
+          for (unsigned int i = 0; i < degree; ++i)
+            {
+              // Compute all required 1d polynomials and their
+              // derivatives, starting at degree 2. e.g. to access
+              // L'_{3}(2x-1) use polyx[1][1].
+              IntegratedLegendrePolynomials[i + 2].value(cell_points[q][0],
+                                                         polyx[i]);
+              IntegratedLegendrePolynomials[i + 2].value(cell_points[q][1],
+                                                         polyy[i]);
+            }
+          // Now use these to compute the shape functions:
+          if (flags & update_values)
+            {
+              for (unsigned int j = 0; j < degree; ++j)
+                {
+                  const unsigned int shift_j(j * degree);
+                  for (unsigned int i = 0; i < degree; ++i)
+                    {
+                      const unsigned int shift_ij(i + shift_j);
+
+                      // Type 1:
+                      const unsigned int dof_index1(cell_type1_offset +
+                                                    shift_ij);
+                      data.shape_values[dof_index1][q][0] =
+                        2.0 * polyx[i][1] * polyy[j][0];
+                      data.shape_values[dof_index1][q][1] =
+                        2.0 * polyx[i][0] * polyy[j][1];
+
+                      // Type 2:
+                      const unsigned int dof_index2(cell_type2_offset +
+                                                    shift_ij);
+                      data.shape_values[dof_index2][q][0] =
+                        data.shape_values[dof_index1][q][0];
+                      data.shape_values[dof_index2][q][1] =
+                        -1.0 * data.shape_values[dof_index1][q][1];
+                    }
+                  // Type 3:
+                  const unsigned int dof_index3_1(cell_type3_offset1 + j);
+                  data.shape_values[dof_index3_1][q][0] = polyy[j][0];
+                  data.shape_values[dof_index3_1][q][1] = 0.0;
+
+                  const unsigned int dof_index3_2(cell_type3_offset2 + j);
+                  data.shape_values[dof_index3_2][q][0] = 0.0;
+                  data.shape_values[dof_index3_2][q][1] = polyx[j][0];
+                }
+            }
+          if (flags & update_gradients)
+            {
+              for (unsigned int j = 0; j < degree; ++j)
+                {
+                  const unsigned int shift_j(j * degree);
+                  for (unsigned int i = 0; i < degree; ++i)
+                    {
+                      const unsigned int shift_ij(i + shift_j);
+
+                      // Type 1:
+                      const unsigned int dof_index1(cell_type1_offset +
+                                                    shift_ij);
+                      data.shape_grads[dof_index1][q][0][0] =
+                        4.0 * polyx[i][2] * polyy[j][0];
+                      data.shape_grads[dof_index1][q][0][1] =
+                        4.0 * polyx[i][1] * polyy[j][1];
+                      data.shape_grads[dof_index1][q][1][0] =
+                        data.shape_grads[dof_index1][q][0][1];
+                      data.shape_grads[dof_index1][q][1][1] =
+                        4.0 * polyx[i][0] * polyy[j][2];
+
+                      // Type 2:
+                      const unsigned int dof_index2(cell_type2_offset +
+                                                    shift_ij);
+                      data.shape_grads[dof_index2][q][0][0] =
+                        data.shape_grads[dof_index1][q][0][0];
+                      data.shape_grads[dof_index2][q][0][1] =
+                        data.shape_grads[dof_index1][q][0][1];
+                      data.shape_grads[dof_index2][q][1][0] =
+                        -1.0 * data.shape_grads[dof_index1][q][1][0];
+                      data.shape_grads[dof_index2][q][1][1] =
+                        -1.0 * data.shape_grads[dof_index1][q][1][1];
+                    }
+                  // Type 3:
+                  const unsigned int dof_index3_1(cell_type3_offset1 + j);
+                  data.shape_grads[dof_index3_1][q][0][0] = 0.0;
+                  data.shape_grads[dof_index3_1][q][0][1] = 2.0 * polyy[j][1];
+                  data.shape_grads[dof_index3_1][q][1][0] = 0.0;
+                  data.shape_grads[dof_index3_1][q][1][1] = 0.0;
+
+                  const unsigned int dof_index3_2(cell_type3_offset2 + j);
+                  data.shape_grads[dof_index3_2][q][0][0] = 0.0;
+                  data.shape_grads[dof_index3_2][q][0][1] = 0.0;
+                  data.shape_grads[dof_index3_2][q][1][0] = 2.0 * polyx[j][1];
+                  data.shape_grads[dof_index3_2][q][1][1] = 0.0;
+                }
+            }
+          if (flags & update_hessians)
+            {
+              for (unsigned int j = 0; j < degree; ++j)
+                {
+                  const unsigned int shift_j(j * degree);
+                  for (unsigned int i = 0; i < degree; ++i)
+                    {
+                      const unsigned int shift_ij(i + shift_j);
+
+                      // Type 1:
+                      const unsigned int dof_index1(cell_type1_offset +
+                                                    shift_ij);
+                      data.shape_hessians[dof_index1][q][0][0][0] =
+                        8.0 * polyx[i][3] * polyy[j][0];
+                      data.shape_hessians[dof_index1][q][1][0][0] =
+                        8.0 * polyx[i][2] * polyy[j][1];
+
+                      data.shape_hessians[dof_index1][q][0][1][0] =
+                        data.shape_hessians[dof_index1][q][1][0][0];
+                      data.shape_hessians[dof_index1][q][1][1][0] =
+                        8.0 * polyx[i][1] * polyy[j][2];
+
+                      data.shape_hessians[dof_index1][q][0][0][1] =
+                        data.shape_hessians[dof_index1][q][1][0][0];
+                      data.shape_hessians[dof_index1][q][1][0][1] =
+                        data.shape_hessians[dof_index1][q][1][1][0];
+
+                      data.shape_hessians[dof_index1][q][0][1][1] =
+                        data.shape_hessians[dof_index1][q][1][1][0];
+                      data.shape_hessians[dof_index1][q][1][1][1] =
+                        8.0 * polyx[i][0] * polyy[j][3];
+
+
+
+                      // Type 2:
+                      const unsigned int dof_index2(cell_type2_offset +
+                                                    shift_ij);
+                      for (unsigned int d = 0; d < dim; ++d)
+                        {
+                          data.shape_hessians[dof_index2][q][0][0][d] =
+                            data.shape_hessians[dof_index1][q][0][0][d];
+                          data.shape_hessians[dof_index2][q][0][1][d] =
+                            data.shape_hessians[dof_index1][q][0][1][d];
+                          data.shape_hessians[dof_index2][q][1][0][d] =
+                            -1.0 * data.shape_hessians[dof_index1][q][1][0][d];
+                          data.shape_hessians[dof_index2][q][1][1][d] =
+                            -1.0 * data.shape_hessians[dof_index1][q][1][1][d];
+                        }
+                    }
+                  // Type 3:
+                  const unsigned int dof_index3_1(cell_type3_offset1 + j);
+                  data.shape_hessians[dof_index3_1][q][0][0][0] = 0.0;
+                  data.shape_hessians[dof_index3_1][q][0][0][1] = 0.0;
+                  data.shape_hessians[dof_index3_1][q][0][1][0] = 0.0;
+                  data.shape_hessians[dof_index3_1][q][0][1][1] =
+                    4.0 * polyy[j][2];
+                  data.shape_hessians[dof_index3_1][q][1][0][0] = 0.0;
+                  data.shape_hessians[dof_index3_1][q][1][0][1] = 0.0;
+                  data.shape_hessians[dof_index3_1][q][1][1][0] = 0.0;
+                  data.shape_hessians[dof_index3_1][q][1][1][1] = 0.0;
+
+                  const unsigned int dof_index3_2(cell_type3_offset2 + j);
+                  data.shape_hessians[dof_index3_2][q][0][0][0] = 0.0;
+                  data.shape_hessians[dof_index3_2][q][0][0][1] = 0.0;
+                  data.shape_hessians[dof_index3_2][q][0][1][0] = 0.0;
+                  data.shape_hessians[dof_index3_2][q][0][1][1] = 0.0;
+                  data.shape_hessians[dof_index3_2][q][1][0][0] =
+                    4.0 * polyx[j][2];
+                  data.shape_hessians[dof_index3_2][q][1][0][1] = 0.0;
+                  data.shape_hessians[dof_index3_2][q][1][1][0] = 0.0;
+                  data.shape_hessians[dof_index3_2][q][1][1][1] = 0.0;
+                }
+            }
+        }
+    }
+}
+
+
+
+template <>
+void
+FE_NedelecSZ<3, 3>::evaluate(
+  const std::vector<Point<3>> p_list,
+  const UpdateFlags           update_flags,
+  std::unique_ptr<typename dealii::FiniteElement<3, 3>::InternalDataBase>
+    &data_ptr) const
+{
+  auto &data       = dynamic_cast<InternalData &>(*data_ptr);
+  data.update_each = requires_update_flags(update_flags);
+
+  // Useful quantities:
+  const unsigned int dim = 3;
+  const unsigned int degree(this->degree - 1); // Note: FE holds input degree+1
+
+  const unsigned int vertices_per_cell =
+    GeometryInfo<3 /*dim*/>::vertices_per_cell;
+  const unsigned int lines_per_cell = GeometryInfo<3 /*dim*/>::lines_per_cell;
+  const unsigned int faces_per_cell = GeometryInfo<3 /*dim*/>::faces_per_cell;
+
+  const unsigned int n_line_dofs = this->n_dofs_per_line() * lines_per_cell;
+
+  // we assume that all quads have the same number of dofs
+  const unsigned int n_face_dofs = this->n_dofs_per_quad(0) * faces_per_cell;
+  const unsigned int n_q_points  = p_list.size();
+
+  const UpdateFlags flags(data.update_each);
+
+  // Resize the internal data storage:
+  data.sigma_imj_values.resize(
+    n_q_points,
+    std::vector<std::vector<double>>(vertices_per_cell,
+                                     std::vector<double>(vertices_per_cell)));
+
+  data.sigma_imj_grads.resize(vertices_per_cell,
+                              std::vector<std::vector<double>>(
+                                vertices_per_cell, std::vector<double>(dim)));
+
+  // Resize shape function arrays according to update flags:
+  if (flags & update_values)
+    data.shape_values.resize(this->n_dofs_per_cell(),
+                             std::vector<Tensor<1, dim>>(n_q_points));
+
+  if (flags & update_gradients)
+    data.shape_grads.resize(this->n_dofs_per_cell(),
+                            std::vector<DerivativeForm<1, dim, dim>>(
+                              n_q_points));
+
+  if (flags & update_hessians)
+    data.shape_hessians.resize(this->n_dofs_per_cell(),
+                               std::vector<DerivativeForm<2, dim, dim>>(
+                                 n_q_points));
+
+  // Compute values of sigma & lambda and the sigma differences and
+  // lambda additions.
+  std::vector<std::vector<double>> sigma(n_q_points,
+                                         std::vector<double>(lines_per_cell));
+  std::vector<std::vector<double>> lambda(n_q_points,
+                                          std::vector<double>(lines_per_cell));
+
+  for (unsigned int q = 0; q < n_q_points; ++q)
+    {
+      sigma[q][0] =
+        (1.0 - p_list[q][0]) + (1.0 - p_list[q][1]) + (1 - p_list[q][2]);
+      sigma[q][1] = p_list[q][0] + (1.0 - p_list[q][1]) + (1 - p_list[q][2]);
+      sigma[q][2] = (1.0 - p_list[q][0]) + p_list[q][1] + (1 - p_list[q][2]);
+      sigma[q][3] = p_list[q][0] + p_list[q][1] + (1 - p_list[q][2]);
+      sigma[q][4] = (1.0 - p_list[q][0]) + (1.0 - p_list[q][1]) + p_list[q][2];
+      sigma[q][5] = p_list[q][0] + (1.0 - p_list[q][1]) + p_list[q][2];
+      sigma[q][6] = (1.0 - p_list[q][0]) + p_list[q][1] + p_list[q][2];
+      sigma[q][7] = p_list[q][0] + p_list[q][1] + p_list[q][2];
+
+      lambda[q][0] =
+        (1.0 - p_list[q][0]) * (1.0 - p_list[q][1]) * (1.0 - p_list[q][2]);
+      lambda[q][1] = p_list[q][0] * (1.0 - p_list[q][1]) * (1.0 - p_list[q][2]);
+      lambda[q][2] = (1.0 - p_list[q][0]) * p_list[q][1] * (1.0 - p_list[q][2]);
+      lambda[q][3] = p_list[q][0] * p_list[q][1] * (1.0 - p_list[q][2]);
+      lambda[q][4] = (1.0 - p_list[q][0]) * (1.0 - p_list[q][1]) * p_list[q][2];
+      lambda[q][5] = p_list[q][0] * (1.0 - p_list[q][1]) * p_list[q][2];
+      lambda[q][6] = (1.0 - p_list[q][0]) * p_list[q][1] * p_list[q][2];
+      lambda[q][7] = p_list[q][0] * p_list[q][1] * p_list[q][2];
+
+      // Compute values of sigma_imj = \sigma_{i} - \sigma_{j}
+      // and lambda_ipj = \lambda_{i} + \lambda_{j}.
+      for (unsigned int i = 0; i < vertices_per_cell; ++i)
+        for (unsigned int j = 0; j < vertices_per_cell; ++j)
+          data.sigma_imj_values[q][i][j] = sigma[q][i] - sigma[q][j];
+    }
+
+  // We now want some additional information about
+  // sigma_imj_values[q][i][j] = sigma[q][i]-sigma[q][j] In order to
+  // calculate values & derivatives of the shape functions we need to
+  // know:
+  // - The component the sigma_imj value corresponds to - this varies
+  // with i & j.
+  // - The gradient of the sigma_imj value
+  //   - this depends on the component and the direction of the
+  //   corresponding edge.
+  //   - the direction of the edge is determined by
+  //   sigma_imj_sign[i][j].
+  //
+  // Note that not every i,j combination is a valid edge (there are only
+  // 12 valid edges in 3d), but we compute them all as it simplifies
+  // things.
+
+  // store the sign of each component x, y, z in the sigma list.
+  // can use this to fill in the sigma_imj_component data.
+  const int sigma_comp_signs[vertices_per_cell][dim] = {{-1, -1, -1},
+                                                        {1, -1, -1},
+                                                        {-1, 1, -1},
+                                                        {1, 1, -1},
+                                                        {-1, -1, 1},
+                                                        {1, -1, 1},
+                                                        {-1, 1, 1},
+                                                        {1, 1, 1}};
+
+  int          sigma_imj_sign[vertices_per_cell][vertices_per_cell];
+  unsigned int sigma_imj_component[vertices_per_cell][vertices_per_cell];
+
+  for (unsigned int i = 0; i < vertices_per_cell; ++i)
+    for (unsigned int j = 0; j < vertices_per_cell; ++j)
+      {
+        // sigma_imj_sign is the sign (+/-) of the coefficient of
+        // x/y/z in sigma_imj. Due to the numbering of vertices on the
+        // reference element this is easy to work out because edges in
+        // the positive direction go from smaller to higher local
+        // vertex numbering.
+        sigma_imj_sign[i][j] = (i < j) ? -1 : 1;
+        sigma_imj_sign[i][j] = (i == j) ? 0 : sigma_imj_sign[i][j];
+
+        // Now store the component which the sigma_i - sigma_j
+        // corresponds to:
+        sigma_imj_component[i][j] = 0;
+        for (unsigned int d = 0; d < dim; ++d)
+          {
+            int temp_imj = sigma_comp_signs[i][d] - sigma_comp_signs[j][d];
+            // Only interested in the first non-zero
+            // as if there is a second, it will not be a valid edge.
+            if (temp_imj != 0)
+              {
+                sigma_imj_component[i][j] = d;
+                break;
+              }
+          }
+        // Can now calculate the gradient, only non-zero in the
+        // component given: Note some i,j combinations will be
+        // incorrect, but only on invalid edges.
+        data.sigma_imj_grads[i][j][sigma_imj_component[i][j]] =
+          2.0 * sigma_imj_sign[i][j];
+      }
+
+  // Now compute the edge parameterisations for a single element
+  // with global numbering matching that of the reference element:
+
+  // resize the edge parameterisations
+  data.edge_sigma_values.resize(lines_per_cell,
+                                std::vector<double>(n_q_points));
+  data.edge_lambda_values.resize(lines_per_cell,
+                                 std::vector<double>(n_q_points));
+  data.edge_sigma_grads.resize(lines_per_cell, std::vector<double>(dim));
+  data.edge_lambda_grads_3d.resize(
+    lines_per_cell,
+    std::vector<std::vector<double>>(n_q_points, std::vector<double>(dim)));
+  data.edge_lambda_gradgrads_3d.resize(
+    lines_per_cell,
+    std::vector<std::vector<double>>(dim, std::vector<double>(dim)));
+
+  // Fill the values:
+  const unsigned int edge_sigma_direction[lines_per_cell] = {
+    1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 2, 2};
+
+  for (unsigned int m = 0; m < lines_per_cell; ++m)
+    {
+      // e1=max(reference vertex numbering on this edge)
+      // e2=min(reference vertex numbering on this edge)
+      // Which is guaranteed to be:
+      const unsigned int e1(GeometryInfo<dim>::line_to_cell_vertices(m, 1));
+      const unsigned int e2(GeometryInfo<dim>::line_to_cell_vertices(m, 0));
+
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        {
+          data.edge_sigma_values[m][q]  = data.sigma_imj_values[q][e2][e1];
+          data.edge_lambda_values[m][q] = lambda[q][e1] + lambda[q][e2];
+        }
+
+      data.edge_sigma_grads[m][edge_sigma_direction[m]] = -2.0;
+    }
+
+  // edge_lambda_grads
+  for (unsigned int q = 0; q < n_q_points; ++q)
+    {
+      double x(p_list[q][0]);
+      double y(p_list[q][1]);
+      double z(p_list[q][2]);
+      data.edge_lambda_grads_3d[0][q]  = {z - 1.0, 0.0, x - 1.0};
+      data.edge_lambda_grads_3d[1][q]  = {1.0 - z, 0.0, -x};
+      data.edge_lambda_grads_3d[2][q]  = {0.0, z - 1.0, y - 1.0};
+      data.edge_lambda_grads_3d[3][q]  = {0.0, 1.0 - z, -y};
+      data.edge_lambda_grads_3d[4][q]  = {-z, 0.0, 1.0 - x};
+      data.edge_lambda_grads_3d[5][q]  = {z, 0.0, x};
+      data.edge_lambda_grads_3d[6][q]  = {0.0, -z, 1.0 - y};
+      data.edge_lambda_grads_3d[7][q]  = {0.0, z, y};
+      data.edge_lambda_grads_3d[8][q]  = {y - 1.0, x - 1.0, 0.0};
+      data.edge_lambda_grads_3d[9][q]  = {1.0 - y, -x, 0.0};
+      data.edge_lambda_grads_3d[10][q] = {-y, 1.0 - x, 0.0};
+      data.edge_lambda_grads_3d[11][q] = {y, x, 0.0};
+    }
+
+  // edge_lambda gradgrads:
+  const int edge_lambda_sign[lines_per_cell] = {
+    1, -1, 1, -1, -1, 1, -1, 1, 1, -1, -1, 1}; // sign of the 2nd derivative for
+                                               // each edge.
+
+  const unsigned int edge_lambda_directions[lines_per_cell][2] = {
+    {0, 2},
+    {0, 2},
+    {1, 2},
+    {1, 2},
+    {0, 2},
+    {0, 2},
+    {1, 2},
+    {1, 2},
+    {0, 1},
+    {0, 1},
+    {0, 1},
+    {0, 1}}; // component which edge_lambda[m] depends on.
+
+  for (unsigned int m = 0; m < lines_per_cell; ++m)
+    {
+      data.edge_lambda_gradgrads_3d[m][edge_lambda_directions[m][0]]
+                                   [edge_lambda_directions[m][1]] =
+        edge_lambda_sign[m];
+      data.edge_lambda_gradgrads_3d[m][edge_lambda_directions[m][1]]
+                                   [edge_lambda_directions[m][0]] =
+        edge_lambda_sign[m];
+    }
+
+  // If the polynomial order is 0, then no more work to do:
+  if (degree < 1)
+    return;
+
+  // resize required data:
+  data.face_lambda_values.resize(faces_per_cell,
+                                 std::vector<double>(n_q_points));
+  data.face_lambda_grads.resize(faces_per_cell, std::vector<double>(dim));
+
+  // Fill in the values (these don't change between cells).
+  for (unsigned int q = 0; q < n_q_points; ++q)
+    {
+      double x(p_list[q][0]);
+      double y(p_list[q][1]);
+      double z(p_list[q][2]);
+      data.face_lambda_values[0][q] = 1.0 - x;
+      data.face_lambda_values[1][q] = x;
+      data.face_lambda_values[2][q] = 1.0 - y;
+      data.face_lambda_values[3][q] = y;
+      data.face_lambda_values[4][q] = 1.0 - z;
+      data.face_lambda_values[5][q] = z;
+    }
+
+  // gradients are constant:
+  data.face_lambda_grads[0] = {-1.0, 0.0, 0.0};
+  data.face_lambda_grads[1] = {1.0, 0.0, 0.0};
+  data.face_lambda_grads[2] = {0.0, -1.0, 0.0};
+  data.face_lambda_grads[3] = {0.0, 1.0, 0.0};
+  data.face_lambda_grads[4] = {0.0, 0.0, -1.0};
+  data.face_lambda_grads[5] = {0.0, 0.0, 1.0};
+
+  // for cell-based shape functions:
+  // these don't depend on the cell, so can precompute all here:
+  if (flags & (update_values | update_gradients | update_hessians))
+    {
+      // Cell-based shape functions:
+      //
+      // Type-1 (gradients):
+      // \phi^{C_{1}}_{ijk} = grad(
+      // L_{i+2}(2x-1)L_{j+2}(2y-1)L_{k+2}(2z-1) ),
+      //
+      // 0 <= i,j,k < degree. (in a group of degree*degree*degree)
+      const unsigned int cell_type1_offset(n_line_dofs + n_face_dofs);
+      // Type-2:
+      //
+      // \phi^{C_{2}}_{ijk} = diag(1, -1, 1)\phi^{C_{1}}_{ijk}
+      // \phi^{C_{2}}_{ijk + p^3} = diag(1, -1,
+      // -1)\phi^{C_{1}}_{ijk}
+      //
+      // 0 <= i,j,k < degree. (subtypes in groups of
+      // degree*degree*degree)
+      //
+      // here we order so that all of subtype 1 comes first, then
+      // subtype 2.
+      const unsigned int cell_type2_offset1(cell_type1_offset +
+                                            degree * degree * degree);
+      const unsigned int cell_type2_offset2(cell_type2_offset1 +
+                                            degree * degree * degree);
+      // Type-3
+      // \phi^{C_{3}}_{jk} = L_{j+2}(2y-1)L_{k+2}(2z-1)e_{x}
+      // \phi^{C_{3}}_{ik} = L_{i+2}(2x-1)L_{k+2}(2z-1)e_{y}
+      // \phi^{C_{3}}_{ij} = L_{i+2}(2x-1)L_{j+2}(2y-1)e_{z}
+      //
+      // 0 <= i,j,k < degree. (subtypes in groups of degree*degree)
+      //
+      // again we order so we compute all of subtype 1 first, then
+      // subtype 2, etc.
+      const unsigned int cell_type3_offset1(cell_type2_offset2 +
+                                            degree * degree * degree);
+      const unsigned int cell_type3_offset2(cell_type3_offset1 +
+                                            degree * degree);
+      const unsigned int cell_type3_offset3(cell_type3_offset2 +
+                                            degree * degree);
+
+      // compute all points we must evaluate the 1d polynomials at:
+      std::vector<Point<dim>> cell_points(n_q_points);
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        {
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              cell_points[q][d] = 2.0 * p_list[q][d] - 1.0;
+            }
+        }
+
+      // We only need poly values and 1st derivative for
+      // update_values, but need the 2nd derivative too for
+      // update_gradients. For update_hessians we also need 3rd
+      // derivative.
+      const unsigned int poly_length =
+        (flags & update_hessians) ? 4 : ((flags & update_gradients) ? 3 : 2);
+
+      // Loop through quad points:
+      for (unsigned int q = 0; q < n_q_points; ++q)
+        {
+          // pre-compute values & required derivatives at this quad
+          // point, (x,y,z): polyx = L_{i+2}(2x-1), polyy =
+          // L_{j+2}(2y-1), polyz = L_{k+2}(2z-1).
+          //
+          // for each polyc[d], c=x,y,z, contains the d-th
+          // derivative with respect to the coordinate c.
+          std::vector<std::vector<double>> polyx(
+            degree, std::vector<double>(poly_length));
+          std::vector<std::vector<double>> polyy(
+            degree, std::vector<double>(poly_length));
+          std::vector<std::vector<double>> polyz(
+            degree, std::vector<double>(poly_length));
+          for (unsigned int i = 0; i < degree; ++i)
+            {
+              // compute all required 1d polynomials for i
+              IntegratedLegendrePolynomials[i + 2].value(cell_points[q][0],
+                                                         polyx[i]);
+              IntegratedLegendrePolynomials[i + 2].value(cell_points[q][1],
+                                                         polyy[i]);
+              IntegratedLegendrePolynomials[i + 2].value(cell_points[q][2],
+                                                         polyz[i]);
+            }
+          // Now use these to compute the shape functions:
+          if (flags & update_values)
+            {
+              for (unsigned int k = 0; k < degree; ++k)
+                {
+                  const unsigned int shift_k(k * degree * degree);
+                  const unsigned int shift_j(k *
+                                             degree); // Used below when subbing
+                                                      // k for j (type 3)
+                  for (unsigned int j = 0; j < degree; ++j)
+                    {
+                      const unsigned int shift_jk(j * degree + shift_k);
+                      for (unsigned int i = 0; i < degree; ++i)
+                        {
+                          const unsigned int shift_ijk(shift_jk + i);
+
+                          // Type 1:
+                          const unsigned int dof_index1(cell_type1_offset +
+                                                        shift_ijk);
+
+                          data.shape_values[dof_index1][q][0] =
+                            2.0 * polyx[i][1] * polyy[j][0] * polyz[k][0];
+                          data.shape_values[dof_index1][q][1] =
+                            2.0 * polyx[i][0] * polyy[j][1] * polyz[k][0];
+                          data.shape_values[dof_index1][q][2] =
+                            2.0 * polyx[i][0] * polyy[j][0] * polyz[k][1];
+
+                          // Type 2:
+                          const unsigned int dof_index2_1(cell_type2_offset1 +
+                                                          shift_ijk);
+                          const unsigned int dof_index2_2(cell_type2_offset2 +
+                                                          shift_ijk);
+
+                          data.shape_values[dof_index2_1][q][0] =
+                            data.shape_values[dof_index1][q][0];
+                          data.shape_values[dof_index2_1][q][1] =
+                            -1.0 * data.shape_values[dof_index1][q][1];
+                          data.shape_values[dof_index2_1][q][2] =
+                            data.shape_values[dof_index1][q][2];
+
+                          data.shape_values[dof_index2_2][q][0] =
+                            data.shape_values[dof_index1][q][0];
+                          data.shape_values[dof_index2_2][q][1] =
+                            -1.0 * data.shape_values[dof_index1][q][1];
+                          data.shape_values[dof_index2_2][q][2] =
+                            -1.0 * data.shape_values[dof_index1][q][2];
+                        }
+                      // Type 3: (note we re-use k and j for
+                      // convenience):
+                      const unsigned int shift_ij(j +
+                                                  shift_j); // here we've subbed
+                                                            // j for i, k for j.
+                      const unsigned int dof_index3_1(cell_type3_offset1 +
+                                                      shift_ij);
+                      const unsigned int dof_index3_2(cell_type3_offset2 +
+                                                      shift_ij);
+                      const unsigned int dof_index3_3(cell_type3_offset3 +
+                                                      shift_ij);
+
+                      data.shape_values[dof_index3_1][q][0] =
+                        polyy[j][0] * polyz[k][0];
+                      data.shape_values[dof_index3_1][q][1] = 0.0;
+                      data.shape_values[dof_index3_1][q][2] = 0.0;
+
+                      data.shape_values[dof_index3_2][q][0] = 0.0;
+                      data.shape_values[dof_index3_2][q][1] =
+                        polyx[j][0] * polyz[k][0];
+                      data.shape_values[dof_index3_2][q][2] = 0.0;
+
+                      data.shape_values[dof_index3_3][q][0] = 0.0;
+                      data.shape_values[dof_index3_3][q][1] = 0.0;
+                      data.shape_values[dof_index3_3][q][2] =
+                        polyx[j][0] * polyy[k][0];
+                    }
+                }
+            }
+          if (flags & update_gradients)
+            {
+              for (unsigned int k = 0; k < degree; ++k)
+                {
+                  const unsigned int shift_k(k * degree * degree);
+                  const unsigned int shift_j(k *
+                                             degree); // Used below when subbing
+                                                      // k for j (type 3)
+                  for (unsigned int j = 0; j < degree; ++j)
+                    {
+                      const unsigned int shift_jk(j * degree + shift_k);
+                      for (unsigned int i = 0; i < degree; ++i)
+                        {
+                          const unsigned int shift_ijk(shift_jk + i);
+
+                          // Type 1:
+                          const unsigned int dof_index1(cell_type1_offset +
+                                                        shift_ijk);
+
+                          data.shape_grads[dof_index1][q][0][0] =
+                            4.0 * polyx[i][2] * polyy[j][0] * polyz[k][0];
+                          data.shape_grads[dof_index1][q][0][1] =
+                            4.0 * polyx[i][1] * polyy[j][1] * polyz[k][0];
+                          data.shape_grads[dof_index1][q][0][2] =
+                            4.0 * polyx[i][1] * polyy[j][0] * polyz[k][1];
+
+                          data.shape_grads[dof_index1][q][1][0] =
+                            data.shape_grads[dof_index1][q][0][1];
+                          data.shape_grads[dof_index1][q][1][1] =
+                            4.0 * polyx[i][0] * polyy[j][2] * polyz[k][0];
+                          data.shape_grads[dof_index1][q][1][2] =
+                            4.0 * polyx[i][0] * polyy[j][1] * polyz[k][1];
+
+                          data.shape_grads[dof_index1][q][2][0] =
+                            data.shape_grads[dof_index1][q][0][2];
+                          data.shape_grads[dof_index1][q][2][1] =
+                            data.shape_grads[dof_index1][q][1][2];
+                          data.shape_grads[dof_index1][q][2][2] =
+                            4.0 * polyx[i][0] * polyy[j][0] * polyz[k][2];
+
+                          // Type 2:
+                          const unsigned int dof_index2_1(cell_type2_offset1 +
+                                                          shift_ijk);
+                          const unsigned int dof_index2_2(cell_type2_offset2 +
+                                                          shift_ijk);
+
+                          for (unsigned int d = 0; d < dim; ++d)
+                            {
+                              data.shape_grads[dof_index2_1][q][0][d] =
+                                data.shape_grads[dof_index1][q][0][d];
+                              data.shape_grads[dof_index2_1][q][1][d] =
+                                -1.0 * data.shape_grads[dof_index1][q][1][d];
+                              data.shape_grads[dof_index2_1][q][2][d] =
+                                data.shape_grads[dof_index1][q][2][d];
+
+                              data.shape_grads[dof_index2_2][q][0][d] =
+                                data.shape_grads[dof_index1][q][0][d];
+                              data.shape_grads[dof_index2_2][q][1][d] =
+                                -1.0 * data.shape_grads[dof_index1][q][1][d];
+                              data.shape_grads[dof_index2_2][q][2][d] =
+                                -1.0 * data.shape_grads[dof_index1][q][2][d];
+                            }
+                        }
+                      // Type 3: (note we re-use k and j for
+                      // convenience):
+                      const unsigned int shift_ij(j +
+                                                  shift_j); // here we've subbed
+                                                            // j for i, k for j.
+                      const unsigned int dof_index3_1(cell_type3_offset1 +
+                                                      shift_ij);
+                      const unsigned int dof_index3_2(cell_type3_offset2 +
+                                                      shift_ij);
+                      const unsigned int dof_index3_3(cell_type3_offset3 +
+                                                      shift_ij);
+                      for (unsigned int d1 = 0; d1 < dim; ++d1)
+                        {
+                          for (unsigned int d2 = 0; d2 < dim; ++d2)
+                            {
+                              data.shape_grads[dof_index3_1][q][d1][d2] = 0.0;
+                              data.shape_grads[dof_index3_2][q][d1][d2] = 0.0;
+                              data.shape_grads[dof_index3_3][q][d1][d2] = 0.0;
+                            }
+                        }
+                      data.shape_grads[dof_index3_1][q][0][1] =
+                        2.0 * polyy[j][1] * polyz[k][0];
+                      data.shape_grads[dof_index3_1][q][0][2] =
+                        2.0 * polyy[j][0] * polyz[k][1];
+
+                      data.shape_grads[dof_index3_2][q][1][0] =
+                        2.0 * polyx[j][1] * polyz[k][0];
+                      data.shape_grads[dof_index3_2][q][1][2] =
+                        2.0 * polyx[j][0] * polyz[k][1];
+
+                      data.shape_grads[dof_index3_3][q][2][0] =
+                        2.0 * polyx[j][1] * polyy[k][0];
+                      data.shape_grads[dof_index3_3][q][2][1] =
+                        2.0 * polyx[j][0] * polyy[k][1];
+                    }
+                }
+            }
+          if (flags & update_hessians)
+            {
+              for (unsigned int k = 0; k < degree; ++k)
+                {
+                  const unsigned int shift_k(k * degree * degree);
+                  const unsigned int shift_j(k *
+                                             degree); // Used below when subbing
+                                                      // k for j type 3
+
+                  for (unsigned int j = 0; j < degree; ++j)
+                    {
+                      const unsigned int shift_jk(j * degree + shift_k);
+                      for (unsigned int i = 0; i < degree; ++i)
+                        {
+                          const unsigned int shift_ijk(shift_jk + i);
+
+                          // Type 1:
+                          const unsigned int dof_index1(cell_type1_offset +
+                                                        shift_ijk);
+
+                          data.shape_hessians[dof_index1][q][0][0][0] =
+                            8.0 * polyx[i][3] * polyy[j][0] * polyz[k][0];
+                          data.shape_hessians[dof_index1][q][1][0][0] =
+                            8.0 * polyx[i][2] * polyy[j][1] * polyz[k][0];
+                          data.shape_hessians[dof_index1][q][2][0][0] =
+                            8.0 * polyx[i][2] * polyy[j][0] * polyz[k][1];
+
+                          data.shape_hessians[dof_index1][q][0][1][0] =
+                            data.shape_hessians[dof_index1][q][1][0][0];
+                          data.shape_hessians[dof_index1][q][1][1][0] =
+                            8.0 * polyx[i][1] * polyy[j][2] * polyz[k][0];
+                          data.shape_hessians[dof_index1][q][2][1][0] =
+                            8.0 * polyx[i][1] * polyy[j][1] * polyz[k][1];
+
+                          data.shape_hessians[dof_index1][q][0][2][0] =
+                            data.shape_hessians[dof_index1][q][2][0][0];
+                          data.shape_hessians[dof_index1][q][1][2][0] =
+                            data.shape_hessians[dof_index1][q][2][1][0];
+                          data.shape_hessians[dof_index1][q][2][2][0] =
+                            8.0 * polyx[i][1] * polyy[j][0] * polyz[k][2];
+
+
+                          data.shape_hessians[dof_index1][q][0][0][1] =
+                            data.shape_hessians[dof_index1][q][1][0][0];
+                          data.shape_hessians[dof_index1][q][1][0][1] =
+                            data.shape_hessians[dof_index1][q][1][1][0];
+                          data.shape_hessians[dof_index1][q][2][0][1] =
+                            data.shape_hessians[dof_index1][q][2][1][0];
+
+                          data.shape_hessians[dof_index1][q][0][1][1] =
+                            data.shape_hessians[dof_index1][q][1][1][0];
+                          data.shape_hessians[dof_index1][q][1][1][1] =
+                            8.0 * polyx[i][0] * polyy[j][3] * polyz[k][0];
+                          data.shape_hessians[dof_index1][q][2][1][1] =
+                            8.0 * polyx[i][0] * polyy[j][2] * polyz[k][1];
+
+                          data.shape_hessians[dof_index1][q][0][2][1] =
+                            data.shape_hessians[dof_index1][q][2][1][0];
+                          data.shape_hessians[dof_index1][q][1][2][1] =
+                            data.shape_hessians[dof_index1][q][2][1][1];
+                          data.shape_hessians[dof_index1][q][2][2][1] =
+                            8.0 * polyx[i][0] * polyy[j][1] * polyz[k][2];
+
+
+                          data.shape_hessians[dof_index1][q][0][0][2] =
+                            data.shape_hessians[dof_index1][q][2][0][0];
+                          data.shape_hessians[dof_index1][q][1][0][2] =
+                            data.shape_hessians[dof_index1][q][2][1][0];
+                          data.shape_hessians[dof_index1][q][2][0][2] =
+                            data.shape_hessians[dof_index1][q][2][2][0];
+
+                          data.shape_hessians[dof_index1][q][0][1][2] =
+                            data.shape_hessians[dof_index1][q][2][1][0];
+                          data.shape_hessians[dof_index1][q][1][1][2] =
+                            data.shape_hessians[dof_index1][q][2][1][1];
+                          data.shape_hessians[dof_index1][q][2][1][2] =
+                            data.shape_hessians[dof_index1][q][2][2][1];
+
+                          data.shape_hessians[dof_index1][q][0][2][2] =
+                            data.shape_hessians[dof_index1][q][2][2][0];
+                          data.shape_hessians[dof_index1][q][1][2][2] =
+                            data.shape_hessians[dof_index1][q][2][2][1];
+                          data.shape_hessians[dof_index1][q][2][2][2] =
+                            8.0 * polyx[i][0] * polyy[j][0] * polyz[k][3];
+
+
+                          // Type 2:
+                          const unsigned int dof_index2_1(cell_type2_offset1 +
+                                                          shift_ijk);
+                          const unsigned int dof_index2_2(cell_type2_offset2 +
+                                                          shift_ijk);
+
+                          for (unsigned int d1 = 0; d1 < dim; ++d1)
+                            {
+                              for (unsigned int d2 = 0; d2 < dim; ++d2)
+                                {
+                                  data.shape_hessians[dof_index2_1][q][0][d1]
+                                                     [d2] =
+                                    data
+                                      .shape_hessians[dof_index1][q][0][d1][d2];
+                                  data.shape_hessians[dof_index2_1][q][1][d1]
+                                                     [d2] =
+                                    -1.0 *
+                                    data
+                                      .shape_hessians[dof_index1][q][1][d1][d2];
+                                  data.shape_hessians[dof_index2_1][q][2][d1]
+                                                     [d2] =
+                                    data
+                                      .shape_hessians[dof_index1][q][2][d1][d2];
+
+                                  data.shape_hessians[dof_index2_2][q][0][d1]
+                                                     [d2] =
+                                    data
+                                      .shape_hessians[dof_index1][q][0][d1][d2];
+                                  data.shape_hessians[dof_index2_2][q][1][d1]
+                                                     [d2] =
+                                    -1.0 *
+                                    data
+                                      .shape_hessians[dof_index1][q][1][d1][d2];
+                                  data.shape_hessians[dof_index2_2][q][2][d1]
+                                                     [d2] =
+                                    -1.0 *
+                                    data
+                                      .shape_hessians[dof_index1][q][2][d1][d2];
+                                }
+                            }
+                        }
+                      // Type 3: (note we re-use k and j for
+                      // convenience):
+                      const unsigned int shift_ij(j +
+                                                  shift_j); // here we've subbed
+                                                            // j for i, k for j.
+                      const unsigned int dof_index3_1(cell_type3_offset1 +
+                                                      shift_ij);
+                      const unsigned int dof_index3_2(cell_type3_offset2 +
+                                                      shift_ij);
+                      const unsigned int dof_index3_3(cell_type3_offset3 +
+                                                      shift_ij);
+                      for (unsigned int d1 = 0; d1 < dim; ++d1)
+                        {
+                          for (unsigned int d2 = 0; d2 < dim; ++d2)
+                            {
+                              for (unsigned int d3 = 0; d3 < dim; ++d3)
+                                {
+                                  data.shape_hessians[dof_index3_1][q][d1][d2]
+                                                     [d3] = 0.0;
+                                  data.shape_hessians[dof_index3_2][q][d1][d2]
+                                                     [d3] = 0.0;
+                                  data.shape_hessians[dof_index3_3][q][d1][d2]
+                                                     [d3] = 0.0;
+                                }
+                            }
+                        }
+                      data.shape_hessians[dof_index3_1][q][0][1][1] =
+                        4.0 * polyy[j][2] * polyz[k][0];
+                      data.shape_hessians[dof_index3_1][q][0][1][2] =
+                        4.0 * polyy[j][1] * polyz[k][1];
+
+                      data.shape_hessians[dof_index3_1][q][0][2][1] =
+                        data.shape_hessians[dof_index3_1][q][0][1][2];
+                      data.shape_hessians[dof_index3_1][q][0][2][2] =
+                        4.0 * polyy[j][0] * polyz[k][2];
+
+
+                      data.shape_hessians[dof_index3_2][q][1][0][0] =
+                        4.0 * polyx[j][2] * polyz[k][0];
+                      data.shape_hessians[dof_index3_2][q][1][0][2] =
+                        4.0 * polyx[j][1] * polyz[k][1];
+
+                      data.shape_hessians[dof_index3_2][q][1][2][0] =
+                        data.shape_hessians[dof_index3_2][q][1][0][2];
+                      data.shape_hessians[dof_index3_2][q][1][2][2] =
+                        4.0 * polyx[j][0] * polyz[k][2];
+
+
+                      data.shape_hessians[dof_index3_3][q][2][0][0] =
+                        4.0 * polyx[j][2] * polyy[k][0];
+                      data.shape_hessians[dof_index3_3][q][2][0][1] =
+                        4.0 * polyx[j][1] * polyy[k][1];
+
+                      data.shape_hessians[dof_index3_3][q][2][1][0] =
+                        data.shape_hessians[dof_index3_3][q][2][0][1];
+                      data.shape_hessians[dof_index3_3][q][2][1][1] =
+                        4.0 * polyx[j][0] * polyy[k][2];
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
+std::unique_ptr<typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+FE_NedelecSZ<dim, spacedim>::get_data(
+  const UpdateFlags update_flags,
+  const Mapping<dim, spacedim> & /*mapping*/,
+  const Quadrature<dim> &quadrature,
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                     spacedim>
+    & /*output_data*/) const
+{
+  std::unique_ptr<
+    typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+    data_ptr = std::make_unique<InternalData>();
+
+  const unsigned int n_q_points = quadrature.size();
 
   std::vector<Point<dim>> p_list(n_q_points);
   p_list = quadrature.get_points();
 
+  this->evaluate(p_list, update_flags, data_ptr);
 
-  switch (dim)
-    {
-      case 2:
-        {
-          // Compute values of sigma & lambda and the sigma differences and
-          // lambda additions.
-          std::vector<std::vector<double>> sigma(
-            n_q_points, std::vector<double>(lines_per_cell));
-          std::vector<std::vector<double>> lambda(
-            n_q_points, std::vector<double>(lines_per_cell));
-
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              sigma[q][0] = (1.0 - p_list[q][0]) + (1.0 - p_list[q][1]);
-              sigma[q][1] = p_list[q][0] + (1.0 - p_list[q][1]);
-              sigma[q][2] = (1.0 - p_list[q][0]) + p_list[q][1];
-              sigma[q][3] = p_list[q][0] + p_list[q][1];
-
-              lambda[q][0] = (1.0 - p_list[q][0]) * (1.0 - p_list[q][1]);
-              lambda[q][1] = p_list[q][0] * (1.0 - p_list[q][1]);
-              lambda[q][2] = (1.0 - p_list[q][0]) * p_list[q][1];
-              lambda[q][3] = p_list[q][0] * p_list[q][1];
-              for (unsigned int i = 0; i < vertices_per_cell; ++i)
-                {
-                  for (unsigned int j = 0; j < vertices_per_cell; ++j)
-                    {
-                      data.sigma_imj_values[q][i][j] =
-                        sigma[q][i] - sigma[q][j];
-                    }
-                }
-            }
-
-          // Calculate the gradient of sigma_imj_values[q][i][j] =
-          // sigma[q][i]-sigma[q][j]
-          //   - this depends on the component and the direction of the
-          //   corresponding edge.
-          //   - the direction of the edge is determined by
-          //   sigma_imj_sign[i][j].
-          // Helper arrays:
-          const int sigma_comp_signs[GeometryInfo<2>::vertices_per_cell][2] = {
-            {-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
-          int          sigma_imj_sign[vertices_per_cell][vertices_per_cell];
-          unsigned int sigma_imj_component[vertices_per_cell]
-                                          [vertices_per_cell];
-
-          for (unsigned int i = 0; i < vertices_per_cell; ++i)
-            {
-              for (unsigned int j = 0; j < vertices_per_cell; ++j)
-                {
-                  // sigma_imj_sign is the sign (+/-) of the coefficient of
-                  // x/y/z in sigma_imj_values Due to the numbering of vertices
-                  // on the reference element it is easy to find edges in the
-                  // positive direction are from smaller to higher local vertex
-                  // numbering.
-                  sigma_imj_sign[i][j] = (i < j) ? -1 : 1;
-                  sigma_imj_sign[i][j] = (i == j) ? 0 : sigma_imj_sign[i][j];
-
-                  // Now store the component which the sigma_i - sigma_j
-                  // corresponds to:
-                  sigma_imj_component[i][j] = 0;
-                  for (unsigned int d = 0; d < dim; ++d)
-                    {
-                      int temp_imj =
-                        sigma_comp_signs[i][d] - sigma_comp_signs[j][d];
-                      // Only interested in the first non-zero
-                      // as if there is a second, it can not be a valid edge.
-                      if (temp_imj != 0)
-                        {
-                          sigma_imj_component[i][j] = d;
-                          break;
-                        }
-                    }
-                  // Can now calculate the gradient, only non-zero in the
-                  // component given: Note some i,j combinations will be
-                  // incorrect, but only on invalid edges.
-                  data.sigma_imj_grads[i][j][sigma_imj_component[i][j]] =
-                    2.0 * sigma_imj_sign[i][j];
-                }
-            }
-
-          // Now compute the edge parameterisations for a single element
-          // with global numbering matching that of the reference element:
-
-          // Resize the edge parameterisations
-          data.edge_sigma_values.resize(lines_per_cell);
-          data.edge_sigma_grads.resize(lines_per_cell);
-          for (unsigned int m = 0; m < lines_per_cell; ++m)
-            {
-              data.edge_sigma_values[m].resize(n_q_points);
-
-              // sigma grads are constant in a cell (no need for quad points)
-              data.edge_sigma_grads[m].resize(dim);
-            }
-
-          // Fill the values for edge lambda and edge sigma:
-          const unsigned int
-            edge_sigma_direction[GeometryInfo<2>::lines_per_cell] = {1,
-                                                                     1,
-                                                                     0,
-                                                                     0};
-
-          data.edge_lambda_values.resize(lines_per_cell,
-                                         std::vector<double>(n_q_points));
-          data.edge_lambda_grads_2d.resize(lines_per_cell,
-                                           std::vector<double>(dim));
-          for (unsigned int m = 0; m < lines_per_cell; ++m)
-            {
-              // e1=max(reference vertex numbering on this edge)
-              // e2=min(reference vertex numbering on this edge)
-              // Which is guaranteed to be:
-              const unsigned int e1(
-                GeometryInfo<dim>::line_to_cell_vertices(m, 1));
-              const unsigned int e2(
-                GeometryInfo<dim>::line_to_cell_vertices(m, 0));
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                {
-                  data.edge_sigma_values[m][q] =
-                    data.sigma_imj_values[q][e2][e1];
-                  data.edge_lambda_values[m][q] = lambda[q][e1] + lambda[q][e2];
-                }
-
-              data.edge_sigma_grads[m][edge_sigma_direction[m]] = -2.0;
-            }
-          data.edge_lambda_grads_2d[0] = {-1.0, 0.0};
-          data.edge_lambda_grads_2d[1] = {1.0, 0.0};
-          data.edge_lambda_grads_2d[2] = {0.0, -1.0};
-          data.edge_lambda_grads_2d[3] = {0.0, 1.0};
-
-          // If the polynomial order is 0, then no more work to do:
-          if (degree < 1)
-            {
-              break;
-            }
-
-          // Otherwise, we can compute the non-cell dependent shape functions.
-          //
-          // Note: the local dof numberings follow the usual order of lines ->
-          // faces -> cells
-          //       (we have no vertex-based DoFs in this element).
-          // For a given cell we have:
-          //      n_line_dofs = dofs_per_line*lines_per_cell.
-          //      n_face_dofs = dofs_per_face*faces_per_cell.
-          //      n_cell_dofs = dofs_per_quad (2d)
-          //                  = dofs_per_hex (3d)
-          //
-          // i.e. For the local dof numbering:
-          //      the first line dof is 0,
-          //      the first face dof is n_line_dofs,
-          //      the first cell dof is n_line_dofs + n_face_dofs.
-          //
-          // On a line, DoFs are ordered first by line_dof and then line_index:
-          // i.e. line_dof_index = line_dof + line_index*(dofs_per_line)
-          //
-          // and similarly for faces:
-          // i.e. face_dof_index = face_dof + face_index*(dofs_per_face).
-          //
-          // HOWEVER, we have different types of DoFs on a line/face/cell.
-          // On a line we have two types, lowest order and higher order
-          // gradients.
-          //    - The numbering is such the lowest order is first, then higher
-          //    order.
-          //      This is simple enough as there is only 1 lowest order and
-          //      degree higher orders DoFs per line.
-          //
-          // On a 2d cell, we have 3 types: Type 1/2/3:
-          //    - The ordering done by type:
-          //      - Type 1: 0 <= i1,j1 < degree. degree^2 in total.
-          //        Numbered: ij1 = i1 + j1*(degree).        i.e. cell_dof_index
-          //        = ij1.
-          //      - Type 2: 0 <= i2,j2 < degree. degree^2 in total.
-          //        Numbered: ij2 = i2 + j2*(degree).        i.e. cell_dof_index
-          //        = degree^2 + ij2
-          //      - Type 3: 0 <= i3 < 2*degree. 2*degree in total.
-          //        Numbered: ij3 = i3.                      i.e. cell_dof_index
-          //        =  2*(degree^2) + ij3.
-          //
-          // These then fit into the local dof numbering described above:
-          // - local dof numberings are:
-          //   line_dofs: local_dof = line_dof_index.    0 <= local_dof <
-          //   dofs_per_line*lines_per_cell face_dofs: local_dof =
-          //   n_line_dofs*lines_per_cell + face_dof_index. cell dofs: local_dof
-          //   = n_lines_dof + n_face_dofs + cell_dof_index.
-          //
-          // The cell-based shape functions are:
-          //
-          // Type 1 (gradients):
-          // \phi^{C_{1}}_{ij) = grad( L_{i+2}(2x-1)L_{j+2}(2y-1) ),
-          //
-          // 0 <= i,j < degree.
-          //
-          // NOTE: The derivative produced by IntegratedLegendrePolynomials does
-          // not account for the
-          //       (2*x-1) or (2*y-1) so we must take this into account when
-          //       taking derivatives.
-          const unsigned int cell_type1_offset = n_line_dofs;
-
-          // Type 2:
-          // \phi^{C_{2}}_{ij) = L'_{i+2}(2x-1) L_{j+2}(2y-1) \mathbf{e}_{x}
-          //                     - L_{i+2}(2x-1) L'_{j+2}(2y-1) \mathbf{e}_{y},
-          //
-          // 0 <= i,j < degree.
-          const unsigned int cell_type2_offset =
-            cell_type1_offset + degree * degree;
-
-          // Type 3 (two subtypes):
-          // \phi^{C_{3}}_{j)        = L_{j+2}(2y-1) \mathbf{e}_{x}
-          //
-          // \phi^{C_{3}}_{j+degree) = L_{j+2}(2x-1) \mathbf{e}_{y}
-          //
-          // 0 <= j < degree
-          const unsigned int cell_type3_offset1 =
-            cell_type2_offset + degree * degree;
-          const unsigned int cell_type3_offset2 = cell_type3_offset1 + degree;
-
-          if (flags & (update_values | update_gradients | update_hessians))
-            {
-              // compute all points we must evaluate the 1d polynomials at:
-              std::vector<Point<dim>> cell_points(n_q_points);
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                {
-                  for (unsigned int d = 0; d < dim; ++d)
-                    {
-                      cell_points[q][d] = 2.0 * p_list[q][d] - 1.0;
-                    }
-                }
-
-              // Loop through quad points:
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                {
-                  // pre-compute values & required derivatives at this quad
-                  // point (x,y): polyx = L_{i+2}(2x-1), polyy = L_{j+2}(2y-1),
-                  //
-                  // for each polyc[d], c=x,y, contains the d-th derivative with
-                  // respect to the coordinate c.
-
-                  // We only need poly values and 1st derivative for
-                  // update_values, but need the 2nd derivative too for
-                  // update_gradients. For update_hessians we also need the 3rd
-                  // derivatives.
-                  const unsigned int poly_length =
-                    (flags & update_hessians) ?
-                      4 :
-                      ((flags & update_gradients) ? 3 : 2);
-
-                  std::vector<std::vector<double>> polyx(
-                    degree, std::vector<double>(poly_length));
-                  std::vector<std::vector<double>> polyy(
-                    degree, std::vector<double>(poly_length));
-                  for (unsigned int i = 0; i < degree; ++i)
-                    {
-                      // Compute all required 1d polynomials and their
-                      // derivatives, starting at degree 2. e.g. to access
-                      // L'_{3}(2x-1) use polyx[1][1].
-                      IntegratedLegendrePolynomials[i + 2].value(
-                        cell_points[q][0], polyx[i]);
-                      IntegratedLegendrePolynomials[i + 2].value(
-                        cell_points[q][1], polyy[i]);
-                    }
-                  // Now use these to compute the shape functions:
-                  if (flags & update_values)
-                    {
-                      for (unsigned int j = 0; j < degree; ++j)
-                        {
-                          const unsigned int shift_j(j * degree);
-                          for (unsigned int i = 0; i < degree; ++i)
-                            {
-                              const unsigned int shift_ij(i + shift_j);
-
-                              // Type 1:
-                              const unsigned int dof_index1(cell_type1_offset +
-                                                            shift_ij);
-                              data.shape_values[dof_index1][q][0] =
-                                2.0 * polyx[i][1] * polyy[j][0];
-                              data.shape_values[dof_index1][q][1] =
-                                2.0 * polyx[i][0] * polyy[j][1];
-
-                              // Type 2:
-                              const unsigned int dof_index2(cell_type2_offset +
-                                                            shift_ij);
-                              data.shape_values[dof_index2][q][0] =
-                                data.shape_values[dof_index1][q][0];
-                              data.shape_values[dof_index2][q][1] =
-                                -1.0 * data.shape_values[dof_index1][q][1];
-                            }
-                          // Type 3:
-                          const unsigned int dof_index3_1(cell_type3_offset1 +
-                                                          j);
-                          data.shape_values[dof_index3_1][q][0] = polyy[j][0];
-                          data.shape_values[dof_index3_1][q][1] = 0.0;
-
-                          const unsigned int dof_index3_2(cell_type3_offset2 +
-                                                          j);
-                          data.shape_values[dof_index3_2][q][0] = 0.0;
-                          data.shape_values[dof_index3_2][q][1] = polyx[j][0];
-                        }
-                    }
-                  if (flags & update_gradients)
-                    {
-                      for (unsigned int j = 0; j < degree; ++j)
-                        {
-                          const unsigned int shift_j(j * degree);
-                          for (unsigned int i = 0; i < degree; ++i)
-                            {
-                              const unsigned int shift_ij(i + shift_j);
-
-                              // Type 1:
-                              const unsigned int dof_index1(cell_type1_offset +
-                                                            shift_ij);
-                              data.shape_grads[dof_index1][q][0][0] =
-                                4.0 * polyx[i][2] * polyy[j][0];
-                              data.shape_grads[dof_index1][q][0][1] =
-                                4.0 * polyx[i][1] * polyy[j][1];
-                              data.shape_grads[dof_index1][q][1][0] =
-                                data.shape_grads[dof_index1][q][0][1];
-                              data.shape_grads[dof_index1][q][1][1] =
-                                4.0 * polyx[i][0] * polyy[j][2];
-
-                              // Type 2:
-                              const unsigned int dof_index2(cell_type2_offset +
-                                                            shift_ij);
-                              data.shape_grads[dof_index2][q][0][0] =
-                                data.shape_grads[dof_index1][q][0][0];
-                              data.shape_grads[dof_index2][q][0][1] =
-                                data.shape_grads[dof_index1][q][0][1];
-                              data.shape_grads[dof_index2][q][1][0] =
-                                -1.0 * data.shape_grads[dof_index1][q][1][0];
-                              data.shape_grads[dof_index2][q][1][1] =
-                                -1.0 * data.shape_grads[dof_index1][q][1][1];
-                            }
-                          // Type 3:
-                          const unsigned int dof_index3_1(cell_type3_offset1 +
-                                                          j);
-                          data.shape_grads[dof_index3_1][q][0][0] = 0.0;
-                          data.shape_grads[dof_index3_1][q][0][1] =
-                            2.0 * polyy[j][1];
-                          data.shape_grads[dof_index3_1][q][1][0] = 0.0;
-                          data.shape_grads[dof_index3_1][q][1][1] = 0.0;
-
-                          const unsigned int dof_index3_2(cell_type3_offset2 +
-                                                          j);
-                          data.shape_grads[dof_index3_2][q][0][0] = 0.0;
-                          data.shape_grads[dof_index3_2][q][0][1] = 0.0;
-                          data.shape_grads[dof_index3_2][q][1][0] =
-                            2.0 * polyx[j][1];
-                          data.shape_grads[dof_index3_2][q][1][1] = 0.0;
-                        }
-                    }
-                  if (flags & update_hessians)
-                    {
-                      for (unsigned int j = 0; j < degree; ++j)
-                        {
-                          const unsigned int shift_j(j * degree);
-                          for (unsigned int i = 0; i < degree; ++i)
-                            {
-                              const unsigned int shift_ij(i + shift_j);
-
-                              // Type 1:
-                              const unsigned int dof_index1(cell_type1_offset +
-                                                            shift_ij);
-                              data.shape_hessians[dof_index1][q][0][0][0] =
-                                8.0 * polyx[i][3] * polyy[j][0];
-                              data.shape_hessians[dof_index1][q][1][0][0] =
-                                8.0 * polyx[i][2] * polyy[j][1];
-
-                              data.shape_hessians[dof_index1][q][0][1][0] =
-                                data.shape_hessians[dof_index1][q][1][0][0];
-                              data.shape_hessians[dof_index1][q][1][1][0] =
-                                8.0 * polyx[i][1] * polyy[j][2];
-
-                              data.shape_hessians[dof_index1][q][0][0][1] =
-                                data.shape_hessians[dof_index1][q][1][0][0];
-                              data.shape_hessians[dof_index1][q][1][0][1] =
-                                data.shape_hessians[dof_index1][q][1][1][0];
-
-                              data.shape_hessians[dof_index1][q][0][1][1] =
-                                data.shape_hessians[dof_index1][q][1][1][0];
-                              data.shape_hessians[dof_index1][q][1][1][1] =
-                                8.0 * polyx[i][0] * polyy[j][3];
-
-
-
-                              // Type 2:
-                              const unsigned int dof_index2(cell_type2_offset +
-                                                            shift_ij);
-                              for (unsigned int d = 0; d < dim; ++d)
-                                {
-                                  data.shape_hessians[dof_index2][q][0][0][d] =
-                                    data.shape_hessians[dof_index1][q][0][0][d];
-                                  data.shape_hessians[dof_index2][q][0][1][d] =
-                                    data.shape_hessians[dof_index1][q][0][1][d];
-                                  data.shape_hessians[dof_index2][q][1][0][d] =
-                                    -1.0 *
-                                    data.shape_hessians[dof_index1][q][1][0][d];
-                                  data.shape_hessians[dof_index2][q][1][1][d] =
-                                    -1.0 *
-                                    data.shape_hessians[dof_index1][q][1][1][d];
-                                }
-                            }
-                          // Type 3:
-                          const unsigned int dof_index3_1(cell_type3_offset1 +
-                                                          j);
-                          data.shape_hessians[dof_index3_1][q][0][0][0] = 0.0;
-                          data.shape_hessians[dof_index3_1][q][0][0][1] = 0.0;
-                          data.shape_hessians[dof_index3_1][q][0][1][0] = 0.0;
-                          data.shape_hessians[dof_index3_1][q][0][1][1] =
-                            4.0 * polyy[j][2];
-                          data.shape_hessians[dof_index3_1][q][1][0][0] = 0.0;
-                          data.shape_hessians[dof_index3_1][q][1][0][1] = 0.0;
-                          data.shape_hessians[dof_index3_1][q][1][1][0] = 0.0;
-                          data.shape_hessians[dof_index3_1][q][1][1][1] = 0.0;
-
-                          const unsigned int dof_index3_2(cell_type3_offset2 +
-                                                          j);
-                          data.shape_hessians[dof_index3_2][q][0][0][0] = 0.0;
-                          data.shape_hessians[dof_index3_2][q][0][0][1] = 0.0;
-                          data.shape_hessians[dof_index3_2][q][0][1][0] = 0.0;
-                          data.shape_hessians[dof_index3_2][q][0][1][1] = 0.0;
-                          data.shape_hessians[dof_index3_2][q][1][0][0] =
-                            4.0 * polyx[j][2];
-                          data.shape_hessians[dof_index3_2][q][1][0][1] = 0.0;
-                          data.shape_hessians[dof_index3_2][q][1][1][0] = 0.0;
-                          data.shape_hessians[dof_index3_2][q][1][1][1] = 0.0;
-                        }
-                    }
-                }
-            }
-          break;
-        }
-      case 3:
-        {
-          // Compute values of sigma & lambda and the sigma differences and
-          // lambda additions.
-          std::vector<std::vector<double>> sigma(
-            n_q_points, std::vector<double>(lines_per_cell));
-          std::vector<std::vector<double>> lambda(
-            n_q_points, std::vector<double>(lines_per_cell));
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              sigma[q][0] = (1.0 - p_list[q][0]) + (1.0 - p_list[q][1]) +
-                            (1 - p_list[q][2]);
-              sigma[q][1] =
-                p_list[q][0] + (1.0 - p_list[q][1]) + (1 - p_list[q][2]);
-              sigma[q][2] =
-                (1.0 - p_list[q][0]) + p_list[q][1] + (1 - p_list[q][2]);
-              sigma[q][3] = p_list[q][0] + p_list[q][1] + (1 - p_list[q][2]);
-              sigma[q][4] =
-                (1.0 - p_list[q][0]) + (1.0 - p_list[q][1]) + p_list[q][2];
-              sigma[q][5] = p_list[q][0] + (1.0 - p_list[q][1]) + p_list[q][2];
-              sigma[q][6] = (1.0 - p_list[q][0]) + p_list[q][1] + p_list[q][2];
-              sigma[q][7] = p_list[q][0] + p_list[q][1] + p_list[q][2];
-
-              lambda[q][0] = (1.0 - p_list[q][0]) * (1.0 - p_list[q][1]) *
-                             (1.0 - p_list[q][2]);
-              lambda[q][1] =
-                p_list[q][0] * (1.0 - p_list[q][1]) * (1.0 - p_list[q][2]);
-              lambda[q][2] =
-                (1.0 - p_list[q][0]) * p_list[q][1] * (1.0 - p_list[q][2]);
-              lambda[q][3] = p_list[q][0] * p_list[q][1] * (1.0 - p_list[q][2]);
-              lambda[q][4] =
-                (1.0 - p_list[q][0]) * (1.0 - p_list[q][1]) * p_list[q][2];
-              lambda[q][5] = p_list[q][0] * (1.0 - p_list[q][1]) * p_list[q][2];
-              lambda[q][6] = (1.0 - p_list[q][0]) * p_list[q][1] * p_list[q][2];
-              lambda[q][7] = p_list[q][0] * p_list[q][1] * p_list[q][2];
-
-              // Compute values of sigma_imj = \sigma_{i} - \sigma_{j}
-              // and lambda_ipj = \lambda_{i} + \lambda_{j}.
-              for (unsigned int i = 0; i < vertices_per_cell; ++i)
-                {
-                  for (unsigned int j = 0; j < vertices_per_cell; ++j)
-                    {
-                      data.sigma_imj_values[q][i][j] =
-                        sigma[q][i] - sigma[q][j];
-                    }
-                }
-            }
-
-          // We now want some additional information about
-          // sigma_imj_values[q][i][j] = sigma[q][i]-sigma[q][j] In order to
-          // calculate values & derivatives of the shape functions we need to
-          // know:
-          // - The component the sigma_imj value corresponds to - this varies
-          // with i & j.
-          // - The gradient of the sigma_imj value
-          //   - this depends on the component and the direction of the
-          //   corresponding edge.
-          //   - the direction of the edge is determined by
-          //   sigma_imj_sign[i][j].
-          //
-          // Note that not every i,j combination is a valid edge (there are only
-          // 12 valid edges in 3d), but we compute them all as it simplifies
-          // things.
-
-          // store the sign of each component x, y, z in the sigma list.
-          // can use this to fill in the sigma_imj_component data.
-          const int sigma_comp_signs[GeometryInfo<3>::vertices_per_cell][3] = {
-            {-1, -1, -1},
-            {1, -1, -1},
-            {-1, 1, -1},
-            {1, 1, -1},
-            {-1, -1, 1},
-            {1, -1, 1},
-            {-1, 1, 1},
-            {1, 1, 1}};
-
-          int          sigma_imj_sign[vertices_per_cell][vertices_per_cell];
-          unsigned int sigma_imj_component[vertices_per_cell]
-                                          [vertices_per_cell];
-
-          for (unsigned int i = 0; i < vertices_per_cell; ++i)
-            {
-              for (unsigned int j = 0; j < vertices_per_cell; ++j)
-                {
-                  // sigma_imj_sign is the sign (+/-) of the coefficient of
-                  // x/y/z in sigma_imj. Due to the numbering of vertices on the
-                  // reference element this is easy to work out because edges in
-                  // the positive direction go from smaller to higher local
-                  // vertex numbering.
-                  sigma_imj_sign[i][j] = (i < j) ? -1 : 1;
-                  sigma_imj_sign[i][j] = (i == j) ? 0 : sigma_imj_sign[i][j];
-
-                  // Now store the component which the sigma_i - sigma_j
-                  // corresponds to:
-                  sigma_imj_component[i][j] = 0;
-                  for (unsigned int d = 0; d < dim; ++d)
-                    {
-                      int temp_imj =
-                        sigma_comp_signs[i][d] - sigma_comp_signs[j][d];
-                      // Only interested in the first non-zero
-                      // as if there is a second, it will not be a valid edge.
-                      if (temp_imj != 0)
-                        {
-                          sigma_imj_component[i][j] = d;
-                          break;
-                        }
-                    }
-                  // Can now calculate the gradient, only non-zero in the
-                  // component given: Note some i,j combinations will be
-                  // incorrect, but only on invalid edges.
-                  data.sigma_imj_grads[i][j][sigma_imj_component[i][j]] =
-                    2.0 * sigma_imj_sign[i][j];
-                }
-            }
-          // Now compute the edge parameterisations for a single element
-          // with global numbering matching that of the reference element:
-
-          // resize the edge parameterisations
-          data.edge_sigma_values.resize(lines_per_cell);
-          data.edge_lambda_values.resize(lines_per_cell);
-          data.edge_sigma_grads.resize(lines_per_cell);
-          data.edge_lambda_grads_3d.resize(lines_per_cell);
-          data.edge_lambda_gradgrads_3d.resize(lines_per_cell);
-          for (unsigned int m = 0; m < lines_per_cell; ++m)
-            {
-              data.edge_sigma_values[m].resize(n_q_points);
-              data.edge_lambda_values[m].resize(n_q_points);
-
-              // sigma grads are constant in a cell (no need for quad points)
-              data.edge_sigma_grads[m].resize(dim);
-
-              data.edge_lambda_grads_3d[m].resize(n_q_points);
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                {
-                  data.edge_lambda_grads_3d[m][q].resize(dim);
-                }
-              // lambda_gradgrads are constant in a cell (no need for quad
-              // points)
-              data.edge_lambda_gradgrads_3d[m].resize(dim);
-              for (unsigned int d = 0; d < dim; ++d)
-                {
-                  data.edge_lambda_gradgrads_3d[m][d].resize(dim);
-                }
-            }
-
-          // Fill the values:
-          const unsigned int
-            edge_sigma_direction[GeometryInfo<3>::lines_per_cell] = {
-              1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 2, 2};
-
-          for (unsigned int m = 0; m < lines_per_cell; ++m)
-            {
-              // e1=max(reference vertex numbering on this edge)
-              // e2=min(reference vertex numbering on this edge)
-              // Which is guaranteed to be:
-              const unsigned int e1(
-                GeometryInfo<dim>::line_to_cell_vertices(m, 1));
-              const unsigned int e2(
-                GeometryInfo<dim>::line_to_cell_vertices(m, 0));
-
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                {
-                  data.edge_sigma_values[m][q] =
-                    data.sigma_imj_values[q][e2][e1];
-                  data.edge_lambda_values[m][q] = lambda[q][e1] + lambda[q][e2];
-                }
-
-              data.edge_sigma_grads[m][edge_sigma_direction[m]] = -2.0;
-            }
-          // edge_lambda_grads
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              double x(p_list[q][0]);
-              double y(p_list[q][1]);
-              double z(p_list[q][2]);
-              data.edge_lambda_grads_3d[0][q]  = {z - 1.0, 0.0, x - 1.0};
-              data.edge_lambda_grads_3d[1][q]  = {1.0 - z, 0.0, -x};
-              data.edge_lambda_grads_3d[2][q]  = {0.0, z - 1.0, y - 1.0};
-              data.edge_lambda_grads_3d[3][q]  = {0.0, 1.0 - z, -y};
-              data.edge_lambda_grads_3d[4][q]  = {-z, 0.0, 1.0 - x};
-              data.edge_lambda_grads_3d[5][q]  = {z, 0.0, x};
-              data.edge_lambda_grads_3d[6][q]  = {0.0, -z, 1.0 - y};
-              data.edge_lambda_grads_3d[7][q]  = {0.0, z, y};
-              data.edge_lambda_grads_3d[8][q]  = {y - 1.0, x - 1.0, 0.0};
-              data.edge_lambda_grads_3d[9][q]  = {1.0 - y, -x, 0.0};
-              data.edge_lambda_grads_3d[10][q] = {-y, 1.0 - x, 0.0};
-              data.edge_lambda_grads_3d[11][q] = {y, x, 0.0};
-            }
-          // edge_lambda gradgrads:
-          const int edge_lambda_sign[GeometryInfo<3>::lines_per_cell] = {
-            1,
-            -1,
-            1,
-            -1,
-            -1,
-            1,
-            -1,
-            1,
-            1,
-            -1,
-            -1,
-            1}; // sign of the 2nd derivative for each edge.
-          const unsigned int
-            edge_lambda_directions[GeometryInfo<3>::lines_per_cell][2] = {
-              {0, 2},
-              {0, 2},
-              {1, 2},
-              {1, 2},
-              {0, 2},
-              {0, 2},
-              {1, 2},
-              {1, 2},
-              {0, 1},
-              {0, 1},
-              {0, 1},
-              {0, 1}}; // component which edge_lambda[m] depends on.
-          for (unsigned int m = 0; m < lines_per_cell; ++m)
-            {
-              data.edge_lambda_gradgrads_3d[m][edge_lambda_directions[m][0]]
-                                           [edge_lambda_directions[m][1]] =
-                edge_lambda_sign[m];
-              data.edge_lambda_gradgrads_3d[m][edge_lambda_directions[m][1]]
-                                           [edge_lambda_directions[m][0]] =
-                edge_lambda_sign[m];
-            }
-          // Precomputation for higher order shape functions,
-          // and the face parameterisation.
-          if (degree > 0)
-            {
-              // resize required data:
-              data.face_lambda_values.resize(faces_per_cell);
-              data.face_lambda_grads.resize(faces_per_cell);
-              // for face-based shape functions:
-              for (unsigned int m = 0; m < faces_per_cell; ++m)
-                {
-                  data.face_lambda_values[m].resize(n_q_points);
-                  data.face_lambda_grads[m].resize(3);
-                }
-              // Fill in the values (these don't change between cells).
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                {
-                  double x(p_list[q][0]);
-                  double y(p_list[q][1]);
-                  double z(p_list[q][2]);
-                  data.face_lambda_values[0][q] = 1.0 - x;
-                  data.face_lambda_values[1][q] = x;
-                  data.face_lambda_values[2][q] = 1.0 - y;
-                  data.face_lambda_values[3][q] = y;
-                  data.face_lambda_values[4][q] = 1.0 - z;
-                  data.face_lambda_values[5][q] = z;
-                }
-              // gradients are constant:
-              data.face_lambda_grads[0] = {-1.0, 0.0, 0.0};
-              data.face_lambda_grads[1] = {1.0, 0.0, 0.0};
-              data.face_lambda_grads[2] = {0.0, -1.0, 0.0};
-              data.face_lambda_grads[3] = {0.0, 1.0, 0.0};
-              data.face_lambda_grads[4] = {0.0, 0.0, -1.0};
-              data.face_lambda_grads[5] = {0.0, 0.0, 1.0};
-
-              // for cell-based shape functions:
-              // these don't depend on the cell, so can precompute all here:
-              if (flags & (update_values | update_gradients | update_hessians))
-                {
-                  // Cell-based shape functions:
-                  //
-                  // Type-1 (gradients):
-                  // \phi^{C_{1}}_{ijk} = grad(
-                  // L_{i+2}(2x-1)L_{j+2}(2y-1)L_{k+2}(2z-1) ),
-                  //
-                  // 0 <= i,j,k < degree. (in a group of degree*degree*degree)
-                  const unsigned int cell_type1_offset(n_line_dofs +
-                                                       n_face_dofs);
-                  // Type-2:
-                  //
-                  // \phi^{C_{2}}_{ijk} = diag(1, -1, 1)\phi^{C_{1}}_{ijk}
-                  // \phi^{C_{2}}_{ijk + p^3} = diag(1, -1,
-                  // -1)\phi^{C_{1}}_{ijk}
-                  //
-                  // 0 <= i,j,k < degree. (subtypes in groups of
-                  // degree*degree*degree)
-                  //
-                  // here we order so that all of subtype 1 comes first, then
-                  // subtype 2.
-                  const unsigned int cell_type2_offset1(
-                    cell_type1_offset + degree * degree * degree);
-                  const unsigned int cell_type2_offset2(
-                    cell_type2_offset1 + degree * degree * degree);
-                  // Type-3
-                  // \phi^{C_{3}}_{jk} = L_{j+2}(2y-1)L_{k+2}(2z-1)e_{x}
-                  // \phi^{C_{3}}_{ik} = L_{i+2}(2x-1)L_{k+2}(2z-1)e_{y}
-                  // \phi^{C_{3}}_{ij} = L_{i+2}(2x-1)L_{j+2}(2y-1)e_{z}
-                  //
-                  // 0 <= i,j,k < degree. (subtypes in groups of degree*degree)
-                  //
-                  // again we order so we compute all of subtype 1 first, then
-                  // subtype 2, etc.
-                  const unsigned int cell_type3_offset1(
-                    cell_type2_offset2 + degree * degree * degree);
-                  const unsigned int cell_type3_offset2(cell_type3_offset1 +
-                                                        degree * degree);
-                  const unsigned int cell_type3_offset3(cell_type3_offset2 +
-                                                        degree * degree);
-
-                  // compute all points we must evaluate the 1d polynomials at:
-                  std::vector<Point<dim>> cell_points(n_q_points);
-                  for (unsigned int q = 0; q < n_q_points; ++q)
-                    {
-                      for (unsigned int d = 0; d < dim; ++d)
-                        {
-                          cell_points[q][d] = 2.0 * p_list[q][d] - 1.0;
-                        }
-                    }
-
-                  // We only need poly values and 1st derivative for
-                  // update_values, but need the 2nd derivative too for
-                  // update_gradients. For update_hessians we also need 3rd
-                  // derivative.
-                  const unsigned int poly_length =
-                    (flags & update_hessians) ?
-                      4 :
-                      ((flags & update_gradients) ? 3 : 2);
-
-                  // Loop through quad points:
-                  for (unsigned int q = 0; q < n_q_points; ++q)
-                    {
-                      // pre-compute values & required derivatives at this quad
-                      // point, (x,y,z): polyx = L_{i+2}(2x-1), polyy =
-                      // L_{j+2}(2y-1), polyz = L_{k+2}(2z-1).
-                      //
-                      // for each polyc[d], c=x,y,z, contains the d-th
-                      // derivative with respect to the coordinate c.
-                      std::vector<std::vector<double>> polyx(
-                        degree, std::vector<double>(poly_length));
-                      std::vector<std::vector<double>> polyy(
-                        degree, std::vector<double>(poly_length));
-                      std::vector<std::vector<double>> polyz(
-                        degree, std::vector<double>(poly_length));
-                      for (unsigned int i = 0; i < degree; ++i)
-                        {
-                          // compute all required 1d polynomials for i
-                          IntegratedLegendrePolynomials[i + 2].value(
-                            cell_points[q][0], polyx[i]);
-                          IntegratedLegendrePolynomials[i + 2].value(
-                            cell_points[q][1], polyy[i]);
-                          IntegratedLegendrePolynomials[i + 2].value(
-                            cell_points[q][2], polyz[i]);
-                        }
-                      // Now use these to compute the shape functions:
-                      if (flags & update_values)
-                        {
-                          for (unsigned int k = 0; k < degree; ++k)
-                            {
-                              const unsigned int shift_k(k * degree * degree);
-                              const unsigned int shift_j(
-                                k * degree); // Used below when subbing k for j
-                                             // (type 3)
-                              for (unsigned int j = 0; j < degree; ++j)
-                                {
-                                  const unsigned int shift_jk(j * degree +
-                                                              shift_k);
-                                  for (unsigned int i = 0; i < degree; ++i)
-                                    {
-                                      const unsigned int shift_ijk(shift_jk +
-                                                                   i);
-
-                                      // Type 1:
-                                      const unsigned int dof_index1(
-                                        cell_type1_offset + shift_ijk);
-
-                                      data.shape_values[dof_index1][q][0] =
-                                        2.0 * polyx[i][1] * polyy[j][0] *
-                                        polyz[k][0];
-                                      data.shape_values[dof_index1][q][1] =
-                                        2.0 * polyx[i][0] * polyy[j][1] *
-                                        polyz[k][0];
-                                      data.shape_values[dof_index1][q][2] =
-                                        2.0 * polyx[i][0] * polyy[j][0] *
-                                        polyz[k][1];
-
-                                      // Type 2:
-                                      const unsigned int dof_index2_1(
-                                        cell_type2_offset1 + shift_ijk);
-                                      const unsigned int dof_index2_2(
-                                        cell_type2_offset2 + shift_ijk);
-
-                                      data.shape_values[dof_index2_1][q][0] =
-                                        data.shape_values[dof_index1][q][0];
-                                      data.shape_values[dof_index2_1][q][1] =
-                                        -1.0 *
-                                        data.shape_values[dof_index1][q][1];
-                                      data.shape_values[dof_index2_1][q][2] =
-                                        data.shape_values[dof_index1][q][2];
-
-                                      data.shape_values[dof_index2_2][q][0] =
-                                        data.shape_values[dof_index1][q][0];
-                                      data.shape_values[dof_index2_2][q][1] =
-                                        -1.0 *
-                                        data.shape_values[dof_index1][q][1];
-                                      data.shape_values[dof_index2_2][q][2] =
-                                        -1.0 *
-                                        data.shape_values[dof_index1][q][2];
-                                    }
-                                  // Type 3: (note we re-use k and j for
-                                  // convenience):
-                                  const unsigned int shift_ij(
-                                    j + shift_j); // here we've subbed j for i,
-                                                  // k for j.
-                                  const unsigned int dof_index3_1(
-                                    cell_type3_offset1 + shift_ij);
-                                  const unsigned int dof_index3_2(
-                                    cell_type3_offset2 + shift_ij);
-                                  const unsigned int dof_index3_3(
-                                    cell_type3_offset3 + shift_ij);
-
-                                  data.shape_values[dof_index3_1][q][0] =
-                                    polyy[j][0] * polyz[k][0];
-                                  data.shape_values[dof_index3_1][q][1] = 0.0;
-                                  data.shape_values[dof_index3_1][q][2] = 0.0;
-
-                                  data.shape_values[dof_index3_2][q][0] = 0.0;
-                                  data.shape_values[dof_index3_2][q][1] =
-                                    polyx[j][0] * polyz[k][0];
-                                  data.shape_values[dof_index3_2][q][2] = 0.0;
-
-                                  data.shape_values[dof_index3_3][q][0] = 0.0;
-                                  data.shape_values[dof_index3_3][q][1] = 0.0;
-                                  data.shape_values[dof_index3_3][q][2] =
-                                    polyx[j][0] * polyy[k][0];
-                                }
-                            }
-                        }
-                      if (flags & update_gradients)
-                        {
-                          for (unsigned int k = 0; k < degree; ++k)
-                            {
-                              const unsigned int shift_k(k * degree * degree);
-                              const unsigned int shift_j(
-                                k * degree); // Used below when subbing k for j
-                                             // (type 3)
-                              for (unsigned int j = 0; j < degree; ++j)
-                                {
-                                  const unsigned int shift_jk(j * degree +
-                                                              shift_k);
-                                  for (unsigned int i = 0; i < degree; ++i)
-                                    {
-                                      const unsigned int shift_ijk(shift_jk +
-                                                                   i);
-
-                                      // Type 1:
-                                      const unsigned int dof_index1(
-                                        cell_type1_offset + shift_ijk);
-
-                                      data.shape_grads[dof_index1][q][0][0] =
-                                        4.0 * polyx[i][2] * polyy[j][0] *
-                                        polyz[k][0];
-                                      data.shape_grads[dof_index1][q][0][1] =
-                                        4.0 * polyx[i][1] * polyy[j][1] *
-                                        polyz[k][0];
-                                      data.shape_grads[dof_index1][q][0][2] =
-                                        4.0 * polyx[i][1] * polyy[j][0] *
-                                        polyz[k][1];
-
-                                      data.shape_grads[dof_index1][q][1][0] =
-                                        data.shape_grads[dof_index1][q][0][1];
-                                      data.shape_grads[dof_index1][q][1][1] =
-                                        4.0 * polyx[i][0] * polyy[j][2] *
-                                        polyz[k][0];
-                                      data.shape_grads[dof_index1][q][1][2] =
-                                        4.0 * polyx[i][0] * polyy[j][1] *
-                                        polyz[k][1];
-
-                                      data.shape_grads[dof_index1][q][2][0] =
-                                        data.shape_grads[dof_index1][q][0][2];
-                                      data.shape_grads[dof_index1][q][2][1] =
-                                        data.shape_grads[dof_index1][q][1][2];
-                                      data.shape_grads[dof_index1][q][2][2] =
-                                        4.0 * polyx[i][0] * polyy[j][0] *
-                                        polyz[k][2];
-
-                                      // Type 2:
-                                      const unsigned int dof_index2_1(
-                                        cell_type2_offset1 + shift_ijk);
-                                      const unsigned int dof_index2_2(
-                                        cell_type2_offset2 + shift_ijk);
-
-                                      for (unsigned int d = 0; d < dim; ++d)
-                                        {
-                                          data.shape_grads[dof_index2_1][q][0]
-                                                          [d] =
-                                            data
-                                              .shape_grads[dof_index1][q][0][d];
-                                          data.shape_grads[dof_index2_1][q][1]
-                                                          [d] =
-                                            -1.0 *
-                                            data
-                                              .shape_grads[dof_index1][q][1][d];
-                                          data.shape_grads[dof_index2_1][q][2]
-                                                          [d] =
-                                            data
-                                              .shape_grads[dof_index1][q][2][d];
-
-                                          data.shape_grads[dof_index2_2][q][0]
-                                                          [d] =
-                                            data
-                                              .shape_grads[dof_index1][q][0][d];
-                                          data.shape_grads[dof_index2_2][q][1]
-                                                          [d] =
-                                            -1.0 *
-                                            data
-                                              .shape_grads[dof_index1][q][1][d];
-                                          data.shape_grads[dof_index2_2][q][2]
-                                                          [d] =
-                                            -1.0 *
-                                            data
-                                              .shape_grads[dof_index1][q][2][d];
-                                        }
-                                    }
-                                  // Type 3: (note we re-use k and j for
-                                  // convenience):
-                                  const unsigned int shift_ij(
-                                    j + shift_j); // here we've subbed j for i,
-                                                  // k for j.
-                                  const unsigned int dof_index3_1(
-                                    cell_type3_offset1 + shift_ij);
-                                  const unsigned int dof_index3_2(
-                                    cell_type3_offset2 + shift_ij);
-                                  const unsigned int dof_index3_3(
-                                    cell_type3_offset3 + shift_ij);
-                                  for (unsigned int d1 = 0; d1 < dim; ++d1)
-                                    {
-                                      for (unsigned int d2 = 0; d2 < dim; ++d2)
-                                        {
-                                          data.shape_grads[dof_index3_1][q][d1]
-                                                          [d2] = 0.0;
-                                          data.shape_grads[dof_index3_2][q][d1]
-                                                          [d2] = 0.0;
-                                          data.shape_grads[dof_index3_3][q][d1]
-                                                          [d2] = 0.0;
-                                        }
-                                    }
-                                  data.shape_grads[dof_index3_1][q][0][1] =
-                                    2.0 * polyy[j][1] * polyz[k][0];
-                                  data.shape_grads[dof_index3_1][q][0][2] =
-                                    2.0 * polyy[j][0] * polyz[k][1];
-
-                                  data.shape_grads[dof_index3_2][q][1][0] =
-                                    2.0 * polyx[j][1] * polyz[k][0];
-                                  data.shape_grads[dof_index3_2][q][1][2] =
-                                    2.0 * polyx[j][0] * polyz[k][1];
-
-                                  data.shape_grads[dof_index3_3][q][2][0] =
-                                    2.0 * polyx[j][1] * polyy[k][0];
-                                  data.shape_grads[dof_index3_3][q][2][1] =
-                                    2.0 * polyx[j][0] * polyy[k][1];
-                                }
-                            }
-                        }
-                      if (flags & update_hessians)
-                        {
-                          for (unsigned int k = 0; k < degree; ++k)
-                            {
-                              const unsigned int shift_k(k * degree * degree);
-                              const unsigned int shift_j(
-                                k * degree); // Used below when subbing k for j
-                                             // type 3
-
-                              for (unsigned int j = 0; j < degree; ++j)
-                                {
-                                  const unsigned int shift_jk(j * degree +
-                                                              shift_k);
-                                  for (unsigned int i = 0; i < degree; ++i)
-                                    {
-                                      const unsigned int shift_ijk(shift_jk +
-                                                                   i);
-
-                                      // Type 1:
-                                      const unsigned int dof_index1(
-                                        cell_type1_offset + shift_ijk);
-
-                                      data.shape_hessians[dof_index1][q][0][0]
-                                                         [0] =
-                                        8.0 * polyx[i][3] * polyy[j][0] *
-                                        polyz[k][0];
-                                      data.shape_hessians[dof_index1][q][1][0]
-                                                         [0] =
-                                        8.0 * polyx[i][2] * polyy[j][1] *
-                                        polyz[k][0];
-                                      data.shape_hessians[dof_index1][q][2][0]
-                                                         [0] =
-                                        8.0 * polyx[i][2] * polyy[j][0] *
-                                        polyz[k][1];
-
-                                      data.shape_hessians[dof_index1][q][0][1]
-                                                         [0] =
-                                        data.shape_hessians[dof_index1][q][1][0]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][1]
-                                                         [0] =
-                                        8.0 * polyx[i][1] * polyy[j][2] *
-                                        polyz[k][0];
-                                      data.shape_hessians[dof_index1][q][2][1]
-                                                         [0] =
-                                        8.0 * polyx[i][1] * polyy[j][1] *
-                                        polyz[k][1];
-
-                                      data.shape_hessians[dof_index1][q][0][2]
-                                                         [0] =
-                                        data.shape_hessians[dof_index1][q][2][0]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][2]
-                                                         [0] =
-                                        data.shape_hessians[dof_index1][q][2][1]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][2][2]
-                                                         [0] =
-                                        8.0 * polyx[i][1] * polyy[j][0] *
-                                        polyz[k][2];
-
-
-                                      data.shape_hessians[dof_index1][q][0][0]
-                                                         [1] =
-                                        data.shape_hessians[dof_index1][q][1][0]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][0]
-                                                         [1] =
-                                        data.shape_hessians[dof_index1][q][1][1]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][2][0]
-                                                         [1] =
-                                        data.shape_hessians[dof_index1][q][2][1]
-                                                           [0];
-
-                                      data.shape_hessians[dof_index1][q][0][1]
-                                                         [1] =
-                                        data.shape_hessians[dof_index1][q][1][1]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][1]
-                                                         [1] =
-                                        8.0 * polyx[i][0] * polyy[j][3] *
-                                        polyz[k][0];
-                                      data.shape_hessians[dof_index1][q][2][1]
-                                                         [1] =
-                                        8.0 * polyx[i][0] * polyy[j][2] *
-                                        polyz[k][1];
-
-                                      data.shape_hessians[dof_index1][q][0][2]
-                                                         [1] =
-                                        data.shape_hessians[dof_index1][q][2][1]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][2]
-                                                         [1] =
-                                        data.shape_hessians[dof_index1][q][2][1]
-                                                           [1];
-                                      data.shape_hessians[dof_index1][q][2][2]
-                                                         [1] =
-                                        8.0 * polyx[i][0] * polyy[j][1] *
-                                        polyz[k][2];
-
-
-                                      data.shape_hessians[dof_index1][q][0][0]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][0]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][0]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][1]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][2][0]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][2]
-                                                           [0];
-
-                                      data.shape_hessians[dof_index1][q][0][1]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][1]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][1]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][1]
-                                                           [1];
-                                      data.shape_hessians[dof_index1][q][2][1]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][2]
-                                                           [1];
-
-                                      data.shape_hessians[dof_index1][q][0][2]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][2]
-                                                           [0];
-                                      data.shape_hessians[dof_index1][q][1][2]
-                                                         [2] =
-                                        data.shape_hessians[dof_index1][q][2][2]
-                                                           [1];
-                                      data.shape_hessians[dof_index1][q][2][2]
-                                                         [2] =
-                                        8.0 * polyx[i][0] * polyy[j][0] *
-                                        polyz[k][3];
-
-
-                                      // Type 2:
-                                      const unsigned int dof_index2_1(
-                                        cell_type2_offset1 + shift_ijk);
-                                      const unsigned int dof_index2_2(
-                                        cell_type2_offset2 + shift_ijk);
-
-                                      for (unsigned int d1 = 0; d1 < dim; ++d1)
-                                        {
-                                          for (unsigned int d2 = 0; d2 < dim;
-                                               ++d2)
-                                            {
-                                              data
-                                                .shape_hessians[dof_index2_1][q]
-                                                               [0][d1][d2] =
-                                                data
-                                                  .shape_hessians[dof_index1][q]
-                                                                 [0][d1][d2];
-                                              data
-                                                .shape_hessians[dof_index2_1][q]
-                                                               [1][d1][d2] =
-                                                -1.0 *
-                                                data
-                                                  .shape_hessians[dof_index1][q]
-                                                                 [1][d1][d2];
-                                              data
-                                                .shape_hessians[dof_index2_1][q]
-                                                               [2][d1][d2] =
-                                                data
-                                                  .shape_hessians[dof_index1][q]
-                                                                 [2][d1][d2];
-
-                                              data
-                                                .shape_hessians[dof_index2_2][q]
-                                                               [0][d1][d2] =
-                                                data
-                                                  .shape_hessians[dof_index1][q]
-                                                                 [0][d1][d2];
-                                              data
-                                                .shape_hessians[dof_index2_2][q]
-                                                               [1][d1][d2] =
-                                                -1.0 *
-                                                data
-                                                  .shape_hessians[dof_index1][q]
-                                                                 [1][d1][d2];
-                                              data
-                                                .shape_hessians[dof_index2_2][q]
-                                                               [2][d1][d2] =
-                                                -1.0 *
-                                                data
-                                                  .shape_hessians[dof_index1][q]
-                                                                 [2][d1][d2];
-                                            }
-                                        }
-                                    }
-                                  // Type 3: (note we re-use k and j for
-                                  // convenience):
-                                  const unsigned int shift_ij(
-                                    j + shift_j); // here we've subbed j for i,
-                                                  // k for j.
-                                  const unsigned int dof_index3_1(
-                                    cell_type3_offset1 + shift_ij);
-                                  const unsigned int dof_index3_2(
-                                    cell_type3_offset2 + shift_ij);
-                                  const unsigned int dof_index3_3(
-                                    cell_type3_offset3 + shift_ij);
-                                  for (unsigned int d1 = 0; d1 < dim; ++d1)
-                                    {
-                                      for (unsigned int d2 = 0; d2 < dim; ++d2)
-                                        {
-                                          for (unsigned int d3 = 0; d3 < dim;
-                                               ++d3)
-                                            {
-                                              data
-                                                .shape_hessians[dof_index3_1][q]
-                                                               [d1][d2][d3] =
-                                                0.0;
-                                              data
-                                                .shape_hessians[dof_index3_2][q]
-                                                               [d1][d2][d3] =
-                                                0.0;
-                                              data
-                                                .shape_hessians[dof_index3_3][q]
-                                                               [d1][d2][d3] =
-                                                0.0;
-                                            }
-                                        }
-                                    }
-                                  data
-                                    .shape_hessians[dof_index3_1][q][0][1][1] =
-                                    4.0 * polyy[j][2] * polyz[k][0];
-                                  data
-                                    .shape_hessians[dof_index3_1][q][0][1][2] =
-                                    4.0 * polyy[j][1] * polyz[k][1];
-
-                                  data
-                                    .shape_hessians[dof_index3_1][q][0][2][1] =
-                                    data
-                                      .shape_hessians[dof_index3_1][q][0][1][2];
-                                  data
-                                    .shape_hessians[dof_index3_1][q][0][2][2] =
-                                    4.0 * polyy[j][0] * polyz[k][2];
-
-
-                                  data
-                                    .shape_hessians[dof_index3_2][q][1][0][0] =
-                                    4.0 * polyx[j][2] * polyz[k][0];
-                                  data
-                                    .shape_hessians[dof_index3_2][q][1][0][2] =
-                                    4.0 * polyx[j][1] * polyz[k][1];
-
-                                  data
-                                    .shape_hessians[dof_index3_2][q][1][2][0] =
-                                    data
-                                      .shape_hessians[dof_index3_2][q][1][0][2];
-                                  data
-                                    .shape_hessians[dof_index3_2][q][1][2][2] =
-                                    4.0 * polyx[j][0] * polyz[k][2];
-
-
-                                  data
-                                    .shape_hessians[dof_index3_3][q][2][0][0] =
-                                    4.0 * polyx[j][2] * polyy[k][0];
-                                  data
-                                    .shape_hessians[dof_index3_3][q][2][0][1] =
-                                    4.0 * polyx[j][1] * polyy[k][1];
-
-                                  data
-                                    .shape_hessians[dof_index3_3][q][2][1][0] =
-                                    data
-                                      .shape_hessians[dof_index3_3][q][2][0][1];
-                                  data
-                                    .shape_hessians[dof_index3_3][q][2][1][1] =
-                                    4.0 * polyx[j][0] * polyy[k][2];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-          break;
-        }
-      default:
-        {
-          DEAL_II_NOT_IMPLEMENTED();
-        }
-    }
   return data_ptr;
 }
 
@@ -3414,8 +3271,6 @@ FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
   IntegratedLegendrePolynomials =
     IntegratedLegendreSZ::generate_complete_basis(degree + 1);
 }
-
-
 
 // explicit instantiations
 #include "fe_nedelec_sz.inst"
