@@ -1529,8 +1529,9 @@ public:
    * combined_orientation of that line, return the local dof which accounts for
    * @p combined_orientation.
    *
-   * @note In both 1d and all-quadrilateral meshes in 2d all lines have the
-   * standard orientation.
+   * @note In both 1d and 2d all-quadrilateral meshes all lines have the
+   * standard orientation. However, since 2d meshes may contain both
+   * quadrilaterals and triangles, this assumption cannot be made in this class.
    */
   unsigned int
   adjust_line_dof_index_for_line_orientation(
@@ -2471,13 +2472,11 @@ protected:
   std::vector<Table<2, int>> adjust_quad_dof_index_for_face_orientation_table;
 
   /**
-   * For lines with non-standard line_orientation in 3d, the dofs on lines
+   * For lines with non-standard orientation in 2d or 3d, the dofs on lines
    * have to be permuted in order to be combined with the correct shape
    * functions. Given a local dof @p index on a line, return the shift in the
    * local index, if the line has non-standard line_orientation, i.e.
-   * <code>old_index + shift = new_index</code>. In 2d and 1d there is no need
-   * for permutation so the vector is empty. In 3d it has the size of
-   * #dofs_per_line.
+   * <code>old_index + shift = new_index</code>.
    *
    * The constructor of this class fills this table with zeros, i.e.,
    * no permutation at all. Derived finite element classes have to
