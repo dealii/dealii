@@ -25,11 +25,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace SUNDIALS
 {
 /**
- * Alias for the real type used by SUNDIALS.
+ * Alias for the bool and real types used by SUNDIALS.
  */
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+  using booltype = sunbooleantype;
   using realtype = ::sunrealtype;
 #  else
+  using booltype = booleantype;
   using realtype = ::realtype;
 #  endif
 } // namespace SUNDIALS

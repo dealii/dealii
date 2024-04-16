@@ -403,6 +403,14 @@ namespace SUNDIALS
       const MPI_Comm &
       get_communicator(N_Vector v);
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+      /**
+       * Sundials likes their own communicator type by value.
+       */
+      template <typename VectorType>
+      inline SUNComm
+      get_communicator_by_value(N_Vector v);
+#  else
       /**
        * Sundials likes a void* but we want to use the above functions
        * internally with a safe type.
@@ -410,6 +418,7 @@ namespace SUNDIALS
       template <typename VectorType>
       inline void *
       get_communicator_as_void_ptr(N_Vector v);
+#  endif
     } // namespace NVectorOperations
   }   // namespace internal
 } // namespace SUNDIALS
@@ -728,22 +737,45 @@ namespace SUNDIALS
 
 
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+      template <typename VectorType>
+      SUNComm
+      get_communicator_by_value(N_Vector v)
+      {
+#    ifndef DEAL_II_WITH_MPI
+        (void)v;
+        return SUN_COMM_NULL;
+#    else
+        if (is_serial_vector<VectorType>::value == false)
+          // SUNDIALS asks for a `SUNComm` object, which is a MPI-aware typedef
+          // for `MPI_Comm` or `int`. To be clear, we adopt the SUNDIALS
+          // interface here.
+          //
+          // Further, we need to cast away const here, as SUNDIALS demands the
+          // communicator by value.
+          return const_cast<SUNComm>(get_communicator<VectorType>(v));
+        else
+          return SUN_COMM_NULL;
+#    endif
+      }
+#  else
       template <typename VectorType>
       void *
       get_communicator_as_void_ptr(N_Vector v)
       {
-#  ifndef DEAL_II_WITH_MPI
+#    ifndef DEAL_II_WITH_MPI
         (void)v;
         return nullptr;
-#  else
+#    else
         if (is_serial_vector<VectorType>::value == false)
           // We need to cast away const here, as SUNDIALS demands a pure
           // `void*`.
           return &(const_cast<MPI_Comm &>(get_communicator<VectorType>(v)));
         else
           return nullptr;
-#  endif
+#    endif
       }
+#  endif
 
 
 
@@ -1238,8 +1270,13 @@ namespace SUNDIALS
       v->ops->nvcloneempty  = &NVectorOperations::clone_empty;
       v->ops->nvdestroy     = &NVectorOperations::destroy<VectorType>;
       //  v->ops->nvspace           = undef;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+      v->ops->nvgetcommunicator =
+        &NVectorOperations::get_communicator_by_value<VectorType>;
+#  else
       v->ops->nvgetcommunicator =
         &NVectorOperations::get_communicator_as_void_ptr<VectorType>;
+#  endif
       v->ops->nvgetlength = &NVectorOperations::get_global_length<VectorType>;
 
       /* standard vector operations */

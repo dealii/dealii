@@ -61,12 +61,21 @@ namespace SUNDIALS
     , mpi_communicator(mpi_comm)
     , pending_exception(nullptr)
   {
+    set_functions_to_trigger_an_assert();
+
     // SUNDIALS will always duplicate communicators if we provide them. This
     // can cause problems if SUNDIALS is configured with MPI and we pass along
     // MPI_COMM_SELF in a serial application as MPI won't be
     // initialized. Hence, work around that by just not providing a
     // communicator in that case.
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    const int status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &ida_ctx);
+    (void)status;
+    AssertIDA(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     const int status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
                                                             &mpi_communicator,
@@ -74,7 +83,6 @@ namespace SUNDIALS
     (void)status;
     AssertIDA(status);
 #  endif
-    set_functions_to_trigger_an_assert();
   }
 
 
@@ -187,7 +195,17 @@ namespace SUNDIALS
     int status;
     (void)status;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    status = SUNContext_Free(&ida_ctx);
+    AssertIDA(status);
+
+    // Same comment applies as in class constructor:
+    status =
+      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
+                                                            mpi_communicator,
+                        &ida_ctx);
+    AssertIDA(status);
+#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     status = SUNContext_Free(&ida_ctx);
     AssertIDA(status);
 
