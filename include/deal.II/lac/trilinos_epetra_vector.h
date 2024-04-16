@@ -51,6 +51,17 @@ namespace LinearAlgebra
   namespace EpetraWrappers
   {
     /**
+     * This class defines type aliases that are used in other classes
+     * within the EpetraWrappers namespace.
+     */
+    class VectorTraits
+    {
+    public:
+      using value_type = double;
+      using size_type  = types::global_dof_index;
+    };
+
+    /**
      * @cond internal
      */
 
@@ -63,16 +74,6 @@ namespace LinearAlgebra
     namespace internal
     {
       /**
-       * Declare type for container size.
-       */
-      using size_type = dealii::types::global_dof_index;
-
-      /**
-       * Declare type for container value type.
-       */
-      using value_type = double;
-
-      /**
        * This class implements a wrapper for accessing the Trilinos Epetra
        * vector in the same way as we access deal.II objects: it is initialized
        * with a vector and an element within it, and has a conversion operator
@@ -84,6 +85,9 @@ namespace LinearAlgebra
       class VectorReference
       {
       private:
+        using value_type = VectorTraits::value_type;
+        using size_type  = VectorTraits::size_type;
+
         /**
          * Constructor. It is made private so as to only allow the actual vector
          * class to create it.
@@ -218,11 +222,13 @@ namespace LinearAlgebra
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public ReadVector<internal::value_type>, public Subscriptor
+    class Vector : public ReadVector<VectorTraits::value_type>,
+                   public Subscriptor
     {
     public:
-      using value_type      = internal::value_type;
-      using size_type       = types::global_dof_index;
+      using value_type      = VectorTraits::value_type;
+      using size_type       = VectorTraits::size_type;
+      using real_type       = value_type;
       using reference       = internal::VectorReference;
       using const_reference = const internal::VectorReference;
 
