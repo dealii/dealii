@@ -198,7 +198,9 @@ public:
 
   /**
    * Copy operator for arguments of the same type. Resize the present vector
-   * if necessary.
+   * if necessary to the correct number of blocks, then copy the individual
+   * blocks from `v` using the copy-assignment operator of the class that
+   * represents the individual blocks.
    */
   BlockVector<Number> &
   operator=(const BlockVector<Number> &v);
