@@ -467,12 +467,29 @@ namespace LinearAlgebra
        * Assigns the vector to the parallel partitioning of the input vector
        * @p in_vector, and copies all the data.
        *
-       * If one of the input vector or the calling vector (to the left of the
-       * assignment operator) had ghost elements set before this operation,
-       * the calling vector will have ghost values set. Otherwise, it will be
-       * in write mode. If the input vector does not have any ghost elements
-       * at all, the vector will also update its ghost values in analogy to
-       * the respective setting the Trilinos and PETSc vectors.
+       * The semantics of this operator are complex. If the two vectors have
+       * the same size, and
+       * if either the left or right hand side vector of the assignment (i.e.,
+       * either the input vector on the right hand side, or the calling vector
+       * to the left of the assignment operator) currently has ghost elements,
+       * then the left hand side vector will also have ghost values and will
+       * consequently be a read-only vector (see also the
+       * @ref GlossGhostedVector "glossary entry" on the issue). Otherwise, the
+       * left hand vector will be a writable vector after this operation.
+       * These semantics facilitate having a vector with ghost elements on the
+       * left hand side of the assignment, and a vector without ghost elements
+       * on the right hand side, with the resulting left hand side vector
+       * having the correct values in both its locally owned and its ghost
+       * elements.
+       *
+       * On the other hand, if the left hand side vector does not have the
+       * correct size yet, or is perhaps an entirely uninitialized vector,
+       * then the assignment is simply a copy operation in the usual sense:
+       * In that case, if the right hand side has no ghost elements (i.e.,
+       * is a completely distributed vector), then the left hand side will
+       * have no ghost elements either. And if the right hand side has
+       * ghost elements (and is consequently read-only), then the left
+       * hand side will have these same properties after the operation.
        */
       Vector<Number, MemorySpace> &
       operator=(const Vector<Number, MemorySpace> &in_vector);

@@ -208,15 +208,27 @@ namespace LinearAlgebra
       operator=(const value_type s);
 
       /**
-       * Copy operator for arguments of the same type. Resize the present
-       * vector if necessary.
+       * Copy operator for arguments of the same type. Resize the present vector
+       * if necessary to the correct number of blocks, then copy the individual
+       * blocks from `v` using the copy-assignment operator of the class that
+       * represents the individual blocks.
+       *
+       * Copying the vectors that make up individual blocks can have complex
+       * semantics in parallel vector classes. See the information provided
+       * by the class used to represent the individual blocks.
        */
       BlockVector &
       operator=(const BlockVector &V);
 
       /**
-       * Copy operator for template arguments of different types. Resize the
-       * present vector if necessary.
+       * Copy operator for arguments of different type. Resize the present
+       * vector if necessary to the correct number of blocks, then copy the
+       * individual blocks from `v` using the copy-assignment operator of the
+       * class that represents the individual blocks.
+       *
+       * Copying the vectors that make up individual blocks can have complex
+       * semantics in parallel vector classes. See the information provided
+       * by the class used to represent the individual blocks.
        */
       template <class Number2>
       BlockVector &
