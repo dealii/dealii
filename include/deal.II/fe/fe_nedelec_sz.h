@@ -25,6 +25,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/grid/grid_tools.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -155,6 +157,16 @@ public:
   shape_grad_grad_component(const unsigned int i,
                             const Point<dim>  &p,
                             const unsigned int component) const override;
+
+  /**
+   * This function pre-computes the line-to-cell map for the underlying
+   * triangulation. This map is required to avoid a sign conflict in the
+   * presence of hanging edges whenever five or more cells share one edge.
+   * Normally, this function does not need to be called manually, because
+   * it is called by compute_hanging_node_constrains().
+   */
+  void
+  precompute_line_to_cell_map(const DoFHandler<dim, spacedim> &dof_handler);
 
 protected:
   /**
@@ -433,6 +445,13 @@ private:
    * Internal storage for all required integrated Legendre polynomials.
    */
   std::vector<Polynomials::Polynomial<double>> IntegratedLegendrePolynomials;
+
+  /**
+   * Internal storage for the edge and face orientation.
+   */
+  std::vector<std::vector<
+    std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>>>
+    line_to_cell_map;
 
   /**
    * Internal function to populate the internal array of integrated Legendre
