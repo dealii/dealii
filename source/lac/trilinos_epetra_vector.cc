@@ -37,6 +37,33 @@ namespace LinearAlgebra
 {
   namespace EpetraWrappers
   {
+#  ifndef DOXYGEN
+    namespace internal
+    {
+      VectorReference::operator value_type() const
+      {
+        AssertIndexRange(index, vector.size());
+
+        // Trilinos allows for vectors to be referenced by the [] or ()
+        // operators but only () checks index bounds. We check these bounds by
+        // ourselves, so we can use []. Note that we can only get local values.
+
+        const TrilinosWrappers::types::int_type local_index =
+          vector.vector->Map().LID(
+            static_cast<TrilinosWrappers::types::int_type>(index));
+
+        Assert(local_index >= 0,
+               ExcAccessToNonLocalElement(index,
+                                          vector.vector->Map().NumMyElements(),
+                                          vector.vector->Map().MinMyGID(),
+                                          vector.vector->Map().MaxMyGID()));
+
+        return (*(vector.vector))[0][local_index];
+      }
+    } // namespace internal
+#  endif
+
+
     // Check that the class we declare here satisfies the
     // vector-space-vector concept. If we catch it here,
     // any mistake in the vector class declaration would

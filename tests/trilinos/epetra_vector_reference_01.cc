@@ -14,14 +14,14 @@
 
 
 
-// TrilinosWrappers::internal::VectorReference had its non-const copy
-// operator return a const reference. That was non-intuitive but,
-// because of the particular semantics of copying vector reference
-// objects, made no difference. Either way, we now check these semantics.
+// LinearAlgebra::EpetraWrappers::internal::VectorReference had its non-const
+// copy operator return a const reference. That was non-intuitive but, because
+// of the particular semantics of copying vector reference objects, made no
+// difference. Either way, we now check these semantics.
 
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_epetra_vector.h>
 
 #include <iostream>
 
@@ -31,15 +31,15 @@
 void
 test()
 {
-  TrilinosWrappers::MPI::Vector v;
+  LinearAlgebra::EpetraWrappers::Vector v;
   v.reinit(complete_index_set(3), MPI_COMM_WORLD);
   v(0) = 0;
   v(1) = 1;
   v(2) = 2;
 
-  TrilinosWrappers::internal::VectorReference a(v(0));
-  TrilinosWrappers::internal::VectorReference b(v(1));
-  TrilinosWrappers::internal::VectorReference c(v(2));
+  LinearAlgebra::EpetraWrappers::internal::VectorReference a(v(0));
+  LinearAlgebra::EpetraWrappers::internal::VectorReference b(v(1));
+  LinearAlgebra::EpetraWrappers::internal::VectorReference c(v(2));
 
   // Copy the VectorReference objects. Note that operator= for these
   // objects does not copy the *content* of the reference object, but
