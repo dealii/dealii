@@ -113,14 +113,21 @@ public:
   clone() const override;
 
   /**
-   * This element is vector-valued so this function will
+   * Return the value of the <tt>i</tt>th shape function at the point
+   * <tt>p</tt>. See the FiniteElement base class for more information about
+   * the semantics of this function.
+   *
+   * Since this element is vector-valued, this function will
    * throw an exception.
    */
   virtual double
   shape_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
+   * Return the value of the <tt>component</tt>th vector component of the
+   * <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    */
   virtual double
   shape_value_component(const unsigned int i,
@@ -128,14 +135,21 @@ public:
                         const unsigned int component) const override;
 
   /**
-   * This element is vector-valued so this function will
+   * Return the gradient of the <tt>i</tt>th shape function at the point
+   * <tt>p</tt>. See the FiniteElement base class for more information about
+   * the semantics of this function.
+   *
+   * Since this element is vector-valued, this function will
    * throw an exception.
    */
   virtual Tensor<1, dim>
   shape_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
+   * Return the gradient of the <tt>component</tt>th vector component of the
+   * <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    */
   virtual Tensor<1, dim>
   shape_grad_component(const unsigned int i,
@@ -143,14 +157,21 @@ public:
                        const unsigned int component) const override;
 
   /**
-   * This element is vector-valued so this function will
+   * Return the tensor of second derivatives of the <tt>i</tt>th shape
+   * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
+   * class for more information about the semantics of this function.
+   *
+   * Since this element is vector-valued, this function will
    * throw an exception.
    */
   virtual Tensor<2, dim>
   shape_grad_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * Not implemented.
+   * Return the second derivative of the <tt>component</tt>th vector component
+   * of the <tt>i</tt>th shape function at the point <tt>p</tt>. See the
+   * FiniteElement base class for more information about the semantics of this
+   * function.
    */
   virtual Tensor<2, dim>
   shape_grad_grad_component(const unsigned int i,
@@ -189,6 +210,17 @@ protected:
    * cell to the mesh cell.
    */
   MappingKind mapping_kind;
+
+  /**
+   * Compute the value and the derivatives of the Nedelec functions at
+   * the points given in <tt>p_list</tt>.
+   */
+  void
+  evaluate(const std::vector<Point<dim>> &p_list,
+           const UpdateFlags              update_flags,
+           std::unique_ptr<
+             typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
+             &data_ptr) const;
 
   virtual std::unique_ptr<
     typename dealii::FiniteElement<dim, spacedim>::InternalDataBase>
