@@ -4900,9 +4900,6 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
     EvaluatorTypeTraits<dim, dim, n_components, Number>;
   using value_type = typename Traits::value_type;
 
-  std::vector<value_type> evaluation_point_results;
-  std::vector<value_type> buffer;
-
   const auto evaluation_function = [&](auto &values, const auto &cell_data) {
     this->signals_non_nested.prolongation_cell_loop(true);
     std::vector<Number> solution_values;
@@ -4938,38 +4935,48 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
   };
 
   this->signals_non_nested.prolongation(true);
+
+  std::vector<value_type> evaluation_point_results;
+  std::vector<value_type> buffer;
   rpe.template evaluate_and_process<value_type>(evaluation_point_results,
                                                 buffer,
                                                 evaluation_function);
   this->signals_non_nested.prolongation(false);
 
-  // Weight operator in case some points are owned by multiple cells.
-  if (rpe.is_map_unique() == false)
+  // Keep a vector of typical inverse touch counts that avoid divisions, all
+  // other cases are handled by a division in the code below.
+  std::array<Number, 8> typical_weights;
+  for (unsigned int i = 0; i < typical_weights.size(); ++i)
+    typical_weights[i] = Number(1) / Number(i + 1);
+
+  const bool  must_interpolate = (rpe.is_map_unique() == false);
+  const auto &ptr              = rpe.get_point_ptrs();
+  for (unsigned int j = 0; j < ptr.size() - 1; ++j)
     {
-      const auto evaluation_point_results_temp = evaluation_point_results;
-      evaluation_point_results.clear();
-      evaluation_point_results.reserve(rpe.get_point_ptrs().size() - 1);
-
-      const auto &ptr = rpe.get_point_ptrs();
-
-      for (unsigned int i = 0; i < ptr.size() - 1; ++i)
+      value_type result;
+      // Weight operator in case some points are owned by multiple cells.
+      if (must_interpolate)
         {
-          const auto n_entries = ptr[i + 1] - ptr[i];
+          const unsigned int n_entries = ptr[j + 1] - ptr[j];
 
-          value_type result{};
-
-          if (n_entries > 0)
+          if (n_entries > 1)
             {
-              for (unsigned int j = 0; j < n_entries; ++j)
-                result += evaluation_point_results_temp[ptr[i] + j];
-              result /= Number(n_entries);
+              result = {};
+              for (unsigned int k = 0; k < n_entries; ++k)
+                result += evaluation_point_results[ptr[j] + k];
+              if (n_entries <= typical_weights.size())
+                result *= typical_weights[n_entries - 1];
+              else
+                result /= Number(n_entries);
             }
-          evaluation_point_results.push_back(result);
+          else if (n_entries == 1)
+            result = evaluation_point_results[ptr[j]];
+          else
+            result = {};
         }
-    }
+      else
+        result = evaluation_point_results[j];
 
-  for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
-    {
       if (level_dof_indices_fine_ptrs.empty())
         {
           for (unsigned int c = 0; c < n_components; ++c)
@@ -4978,7 +4985,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
                                this->level_dof_indices_fine.size());
               dst.local_element(
                 this->level_dof_indices_fine[n_components * j + c]) +=
-                internal::access(evaluation_point_results[j], c);
+                internal::access(result, c);
             }
         }
       else
@@ -4992,7 +4999,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
                                  this->level_dof_indices_fine.size());
                 dst.local_element(
                   this->level_dof_indices_fine[n_components * i + c]) +=
-                  internal::access(evaluation_point_results[j], c);
+                  internal::access(result, c);
               }
         }
     }
@@ -5030,10 +5037,17 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
   std::vector<value_type> evaluation_point_results;
   std::vector<value_type> buffer;
 
-  evaluation_point_results.resize(rpe.get_point_ptrs().size() - 1);
+  std::array<Number, 8> typical_weights;
+  for (unsigned int i = 0; i < typical_weights.size(); ++i)
+    typical_weights[i] = Number(1) / Number(i + 1);
+
+  const bool  must_interpolate = (rpe.is_map_unique() == false);
+  const auto &ptr              = rpe.get_point_ptrs();
+  evaluation_point_results.resize(ptr.size() - 1);
 
   for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
     {
+      value_type result;
       if (level_dof_indices_fine_ptrs.empty())
         {
           for (unsigned int c = 0; c < n_components; ++c)
@@ -5041,14 +5055,13 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
               AssertIndexRange(n_components * j + c,
                                this->level_dof_indices_fine.size());
 
-              internal::access(evaluation_point_results[j], c) =
-                src.local_element(
-                  this->level_dof_indices_fine[n_components * j + c]);
+              internal::access(result, c) = src.local_element(
+                this->level_dof_indices_fine[n_components * j + c]);
             }
         }
       else
         {
-          evaluation_point_results[j] = value_type();
+          result = value_type();
 
           for (unsigned int i = this->level_dof_indices_fine_ptrs[j];
                i < this->level_dof_indices_fine_ptrs[j + 1];
@@ -5057,26 +5070,22 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
               {
                 AssertIndexRange(n_components * i + c,
                                  this->level_dof_indices_fine.size());
-                internal::access(evaluation_point_results[j], c) +=
-                  src.local_element(
-                    this->level_dof_indices_fine[n_components * i + c]);
+                internal::access(result, c) += src.local_element(
+                  this->level_dof_indices_fine[n_components * i + c]);
               }
         }
-    }
-
-  // Weight operator in case some points are owned by multiple cells.
-  if (rpe.is_map_unique() == false)
-    {
-      const auto &ptr = rpe.get_point_ptrs();
-
-      for (unsigned int i = 0; i < ptr.size() - 1; ++i)
+      if (must_interpolate)
         {
-          const auto n_entries = ptr[i + 1] - ptr[i];
-          if (n_entries == 0)
-            continue;
-
-          evaluation_point_results[i] /= Number(n_entries);
+          const unsigned int n_entries = ptr[j + 1] - ptr[j];
+          if (n_entries > 1)
+            {
+              if (n_entries <= typical_weights.size())
+                result *= typical_weights[n_entries - 1];
+              else
+                result /= Number(n_entries);
+            }
         }
+      evaluation_point_results[j] = result;
     }
 
   const auto evaluation_function = [&](const auto &values,
