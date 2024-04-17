@@ -52,11 +52,19 @@ namespace LinearAlgebra
           vector.vector->Map().LID(
             static_cast<TrilinosWrappers::types::int_type>(index));
 
+#    ifndef DEAL_II_WITH_64BIT_INDICES
         Assert(local_index >= 0,
                ExcAccessToNonLocalElement(index,
                                           vector.vector->Map().NumMyElements(),
                                           vector.vector->Map().MinMyGID(),
                                           vector.vector->Map().MaxMyGID()));
+#    else
+        Assert(local_index >= 0,
+               ExcAccessToNonLocalElement(index,
+                                          vector.vector->Map().NumMyElements(),
+                                          vector.vector->Map().MinMyGID64(),
+                                          vector.vector->Map().MaxMyGID64()));
+#    endif
 
         return (*(vector.vector))[0][local_index];
       }

@@ -52,12 +52,21 @@ namespace TrilinosWrappers
       const TrilinosWrappers::types::int_type local_index =
         vector.vector->Map().LID(
           static_cast<TrilinosWrappers::types::int_type>(index));
+#    ifndef DEAL_II_WITH_64BIT_INDICES
       Assert(local_index >= 0,
              MPI::Vector::ExcAccessToNonLocalElement(
                index,
                vector.vector->Map().NumMyElements(),
                vector.vector->Map().MinMyGID(),
                vector.vector->Map().MaxMyGID()));
+#    else
+      Assert(local_index >= 0,
+             MPI::Vector::ExcAccessToNonLocalElement(
+               index,
+               vector.vector->Map().NumMyElements(),
+               vector.vector->Map().MinMyGID64(),
+               vector.vector->Map().MaxMyGID64()));
+#    endif
 
 
       return (*(vector.vector))[0][local_index];
@@ -690,11 +699,19 @@ namespace TrilinosWrappers
       // continue. This is the main difference to the el() function.
       if (trilinos_i == -1)
         {
+#  ifndef DEAL_II_WITH_64BIT_INDICES
           Assert(false,
                  ExcAccessToNonLocalElement(index,
                                             vector->Map().NumMyElements(),
                                             vector->Map().MinMyGID(),
                                             vector->Map().MaxMyGID()));
+#  else
+          Assert(false,
+                 ExcAccessToNonLocalElement(index,
+                                            vector->Map().NumMyElements(),
+                                            vector->Map().MinMyGID64(),
+                                            vector->Map().MaxMyGID64()));
+#  endif
         }
       else
         value = (*vector)[0][trilinos_i];
