@@ -503,35 +503,35 @@ namespace Utilities
       evaluation_function(buffer_eval, *cell_data);
 
       // sort for communication
-      unsigned int my_rank_local_recv = numbers::invalid_unsigned_int;
-      unsigned int my_rank_local_send = numbers::invalid_unsigned_int;
-
       const auto my_rank_local_recv_ptr =
         std::find(recv_ranks.begin(), recv_ranks.end(), my_rank);
 
       if (my_rank_local_recv_ptr != recv_ranks.end())
         {
-          my_rank_local_recv =
+          const unsigned int my_rank_local_recv =
             std::distance(recv_ranks.begin(), my_rank_local_recv_ptr);
-          my_rank_local_send = std::distance(send_ranks.begin(),
-                                             std::find(send_ranks.begin(),
-                                                       send_ranks.end(),
-                                                       my_rank));
+          const unsigned int my_rank_local_send = std::distance(
+            send_ranks.begin(),
+            std::find(send_ranks.begin(), send_ranks.end(), my_rank));
+          const unsigned int  start = send_ptrs[my_rank_local_send];
+          const unsigned int  end   = send_ptrs[my_rank_local_send + 1];
+          const unsigned int *recv_ptr =
+            recv_permutation.data() + recv_ptrs[my_rank_local_recv];
+          for (unsigned int i = 0; i < send_permutation.size(); ++i)
+            {
+              const unsigned int send_index = send_permutation[i];
+
+              // local data -> can be copied to output directly
+              if (start <= send_index && send_index < end)
+                output[recv_ptr[send_index - start]] = buffer_eval[i];
+              else // data to be sent
+                buffer_comm[send_index] = buffer_eval[i];
+            }
         }
-
-      for (unsigned int i = 0; i < send_permutation.size(); ++i)
+      else
         {
-          const unsigned int send_index = send_permutation[i];
-
-          // local data -> can be copied to output directly
-          if (my_rank_local_send != numbers::invalid_unsigned_int &&
-              (send_ptrs[my_rank_local_send] <= send_index &&
-               send_index < send_ptrs[my_rank_local_send + 1]))
-            output[recv_permutation[send_index - send_ptrs[my_rank_local_send] +
-                                    recv_ptrs[my_rank_local_recv]]] =
-              buffer_eval[i];
-          else // data to be sent
-            buffer_comm[send_index] = buffer_eval[i];
+          for (unsigned int i = 0; i < send_permutation.size(); ++i)
+            buffer_comm[send_permutation[i]] = buffer_eval[i];
         }
 
       // send data
@@ -686,40 +686,44 @@ namespace Utilities
                                point_ptrs.back());
 
       // sort for communication (and duplicate data if necessary)
-      unsigned int my_rank_local_recv = numbers::invalid_unsigned_int;
-      unsigned int my_rank_local_send = numbers::invalid_unsigned_int;
 
       const auto my_rank_local_recv_ptr =
         std::find(recv_ranks.begin(), recv_ranks.end(), my_rank);
 
       if (my_rank_local_recv_ptr != recv_ranks.end())
         {
-          my_rank_local_recv =
+          // optimize the case if we have our own rank among the possible list
+          const unsigned int my_rank_local_recv =
             std::distance(recv_ranks.begin(), my_rank_local_recv_ptr);
-          my_rank_local_send = std::distance(send_ranks.begin(),
-                                             std::find(send_ranks.begin(),
-                                                       send_ranks.end(),
-                                                       my_rank));
-        }
+          const unsigned int my_rank_local_send = std::distance(
+            send_ranks.begin(),
+            std::find(send_ranks.begin(), send_ranks.end(), my_rank));
 
-      for (unsigned int i = 0, c = 0; i < point_ptrs.size() - 1; ++i)
-        {
-          const auto n_entries = point_ptrs[i + 1] - point_ptrs[i];
-
-          for (unsigned int j = 0; j < n_entries; ++j, ++c)
+          const unsigned int  start = recv_ptrs[my_rank_local_recv];
+          const unsigned int  end   = recv_ptrs[my_rank_local_recv + 1];
+          const unsigned int *send_ptr =
+            send_permutation_inv.data() + send_ptrs[my_rank_local_send];
+          for (unsigned int i = 0, c = 0; i < point_ptrs.size() - 1; ++i)
             {
-              const unsigned int recv_index = recv_permutation_inv[c];
+              const unsigned int next = point_ptrs[i + 1];
+              for (unsigned int j = point_ptrs[i]; j < next; ++j, ++c)
+                {
+                  const unsigned int recv_index = recv_permutation_inv[c];
 
-              // local data -> can be copied to final buffer directly
-              if (my_rank_local_recv != numbers::invalid_unsigned_int &&
-                  (recv_ptrs[my_rank_local_recv] <= recv_index &&
-                   recv_index < recv_ptrs[my_rank_local_recv + 1]))
-                buffer_eval[send_permutation_inv
-                              [recv_index - recv_ptrs[my_rank_local_recv] +
-                               send_ptrs[my_rank_local_send]]] = input[i];
-              else // data to be sent
-                buffer_comm[recv_index] = input[i];
+                  // local data -> can be copied to final buffer directly
+                  if (start <= recv_index && recv_index < end)
+                    buffer_eval[send_ptr[recv_index - start]] = input[i];
+                  else // data to be sent
+                    buffer_comm[recv_index] = input[i];
+                }
             }
+        }
+      else
+        {
+          for (unsigned int i = 0, c = 0; i < point_ptrs.size() - 1; ++i)
+            for (unsigned int j = point_ptrs[i]; j < point_ptrs[i + 1];
+                 ++j, ++c)
+              buffer_comm[recv_permutation_inv[c]] = input[i];
         }
 
       // send data
