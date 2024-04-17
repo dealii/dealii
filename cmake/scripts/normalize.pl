@@ -100,3 +100,20 @@ s/.*<PDataArray type.*(mpirank|level).*\n//g;
 #     {
 #
 s/^(\s*)(".*":) \{$/\1\2\n\1\{/;
+
+
+#
+# Some of the dependency libraries use the X protocol and want to communicate
+# with the X server of the system from which the terminal was opened. This
+# requires privileges that the owner of the system may not have provided, and
+# one then gets warning messages that clutter the test output.
+#
+# Because these dependency libraries do not (and should not) actually do on the
+# user's screen, these warnings are entirely harmless, but they break the
+# tests on which these messages appear.
+#
+if (m/Authorization required, but no authorization protocol specified/)
+{
+    <>;
+    $_ = "";
+}
