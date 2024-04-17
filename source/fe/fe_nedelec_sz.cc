@@ -3417,6 +3417,53 @@ FE_NedelecSZ<dim, spacedim>::create_polynomials(const unsigned int degree)
 
 
 
+template <int dim, int spacedim>
+const FullMatrix<double> &
+FE_NedelecSZ<dim, spacedim>::get_prolongation_matrix(
+  const unsigned int         child,
+  const RefinementCase<dim> &refinement_case) const
+{
+  AssertIndexRange(refinement_case,
+                   RefinementCase<dim>::isotropic_refinement + 1);
+  Assert(refinement_case != RefinementCase<dim>::no_refinement,
+         ExcMessage(
+           "Prolongation matrices are only available for refined cells!"));
+  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+
+  // initialization upon first request
+  if (this->prolongation[refinement_case - 1][child].n() == 0)
+    {
+      std::lock_guard<std::mutex> lock(prolongation_matrix_mutex);
+
+      // if matrix got updated while waiting for the lock
+      if (this->prolongation[refinement_case - 1][child].n() ==
+          this->n_dofs_per_cell())
+        return this->prolongation[refinement_case - 1][child];
+
+      // now do the work. need to get a non-const version of data in order to
+      // be able to modify them inside a const function
+      FE_NedelecSZ<dim> &this_nonconst = const_cast<FE_NedelecSZ<dim> &>(*this);
+
+      // Reinit the vectors of
+      // restriction and prolongation
+      // matrices to the right sizes.
+      // Restriction only for isotropic
+      // refinement
+      this_nonconst.reinit_restriction_and_prolongation_matrices();
+      // Fill prolongation matrices with embedding operators
+      FETools::compute_embedding_matrices(
+        this_nonconst,
+        this_nonconst.prolongation,
+        true,
+        1.e-15 * std::exp(std::pow(this->degree, 1.075)));
+    }
+
+  // we use refinement_case-1 here. the -1 takes care of the origin of the
+  // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
+  // available and so the vector indices are shifted
+  return this->prolongation[refinement_case - 1][child];
+}
+
 // explicit instantiations
 #include "fe_nedelec_sz.inst"
 

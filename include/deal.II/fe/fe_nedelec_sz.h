@@ -20,6 +20,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
@@ -155,6 +156,32 @@ public:
   shape_grad_grad_component(const unsigned int i,
                             const Point<dim>  &p,
                             const unsigned int component) const override;
+
+  /**
+   * Embedding matrix between grids.
+   *
+   * The identity operator from a coarse grid space into a fine grid space is
+   * associated with a matrix @p P. The restriction of this matrix @p P_i to a
+   * single child cell is returned here.
+   *
+   * The matrix @p P is the concatenation, not the sum of the cell matrices @p
+   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in two
+   * different child matrices @p P_i, the value should be the same in both
+   * matrices and it is copied into the matrix @p P only once.
+   *
+   * Row and column indices are related to fine grid and coarse grid spaces,
+   * respectively, consistent with the definition of the associated operator.
+   *
+   * These matrices are used by routines assembling the prolongation matrix
+   * for multi-level methods.  Upon assembling the transfer matrix between
+   * cells using this matrix array, zero elements in the prolongation matrix
+   * are discarded and will not fill up the transfer matrix.
+   */
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 
 protected:
   /**
@@ -464,6 +491,12 @@ private:
   fill_face_values(const typename Triangulation<dim, dim>::cell_iterator &cell,
                    const Quadrature<dim> &quadrature,
                    const InternalData    &fedata) const;
+
+  /**
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
+   */
+  mutable Threads::Mutex prolongation_matrix_mutex;
 };
 
 
