@@ -101,6 +101,16 @@ namespace LinearAlgebra
   namespace TpetraWrappers
   {
     /**
+     * This class defines type aliases that are used in vector classes
+     * within the TpetraWrappers namespace.
+     */
+    class VectorTraits
+    {
+    public:
+      using size_type = dealii::types::global_dof_index;
+    };
+
+    /**
      * @cond internal
      */
 
@@ -115,7 +125,7 @@ namespace LinearAlgebra
       /**
        * Declare type for container size.
        */
-      using size_type = dealii::types::global_dof_index;
+      using size_type = VectorTraits::size_type;
 
       /**
        * This class implements a wrapper for accessing the Trilinos Tpetra
@@ -287,7 +297,7 @@ namespace LinearAlgebra
 #  endif
       using value_type = Number;
       using real_type  = typename numbers::NumberTraits<Number>::real_type;
-      using size_type  = types::global_dof_index;
+      using size_type  = VectorTraits::size_type;
       using reference  = internal::VectorReference<Number, MemorySpace>;
       using const_reference =
         const internal::VectorReference<Number, MemorySpace>;

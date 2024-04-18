@@ -2134,8 +2134,6 @@ namespace TrilinosWrappers
 
   namespace internals
   {
-    using size_type = dealii::types::global_dof_index;
-
     void
     perform_mmult(const SparseMatrix &inputleft,
                   const SparseMatrix &inputright,
@@ -2322,6 +2320,8 @@ namespace TrilinosWrappers
   {
     namespace LinearOperatorImplementation
     {
+      using size_type = VectorTraits::size_type;
+
       TrilinosPayload::TrilinosPayload()
         : use_transpose(false)
         , communicator(MPI_COMM_SELF)

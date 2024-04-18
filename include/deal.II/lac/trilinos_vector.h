@@ -67,6 +67,16 @@ namespace TrilinosWrappers
   class SparseMatrix;
 
   /**
+   * This class defines type aliases that are used in vector classes
+   * within the TrilinosWrappers namespace.
+   */
+  class VectorTraits
+  {
+  public:
+    using size_type = dealii::types::global_dof_index;
+  };
+
+  /**
    * @cond internal
    */
 
@@ -79,11 +89,6 @@ namespace TrilinosWrappers
   namespace internal
   {
     /**
-     * Declare type for container size.
-     */
-    using size_type = dealii::types::global_dof_index;
-
-    /**
      * This class implements a wrapper for accessing the Trilinos vector in
      * the same way as we access deal.II objects: it is initialized with a
      * vector and an element within it, and has a conversion operator to
@@ -95,6 +100,8 @@ namespace TrilinosWrappers
     class VectorReference
     {
     private:
+      using size_type = VectorTraits::size_type;
+
       /**
        * Constructor. It is made private so as to only allow the actual vector
        * class to create it.
@@ -404,7 +411,7 @@ namespace TrilinosWrappers
        */
       using value_type      = TrilinosScalar;
       using real_type       = TrilinosScalar;
-      using size_type       = dealii::types::global_dof_index;
+      using size_type       = VectorTraits::size_type;
       using iterator        = value_type *;
       using const_iterator  = const value_type *;
       using reference       = internal::VectorReference;
