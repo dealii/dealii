@@ -2044,6 +2044,7 @@ namespace TrilinosWrappers
       (void)dst;
     }
 
+
     namespace LinearOperatorImplementation
     {
       /**
@@ -2082,6 +2083,11 @@ namespace TrilinosWrappers
          * Definition for the vector type for the range space of the operator.
          */
         using Domain = VectorType;
+
+        /**
+         * Index of the referenced element of the vector.
+         */
+        using size_type = dealii::types::global_dof_index;
 
         /**
          * @name Constructors / destructor

@@ -51,14 +51,14 @@ namespace LinearAlgebra
   namespace EpetraWrappers
   {
     /**
-     * This class defines type aliases that are used in other classes
+     * This class defines type aliases that are used in vector classes
      * within the EpetraWrappers namespace.
      */
     class VectorTraits
     {
     public:
       using value_type = double;
-      using size_type  = types::global_dof_index;
+      using size_type  = dealii::types::global_dof_index;
     };
 
     /**
