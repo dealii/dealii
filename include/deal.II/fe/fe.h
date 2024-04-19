@@ -1040,6 +1040,21 @@ public:
    * FiniteElement::ExcProjectionVoid. You can check whether this would happen
    * by first calling the restriction_is_implemented() or the
    * isotropic_restriction_is_implemented() function.
+   *
+   * @note The term "restriction" is also used in the definition of multigrid
+   *   methods, but in a different context. For the current function, we are
+   *   interested in the interpolation of a finite element function from
+   *   child cells to the parent cell, and this results in a situation where
+   *   you have a function that is constant on a fine mesh, the function
+   *   "restricted" to the coarse mesh will also be constant and have the same
+   *   value. In contrast, in the multigrid context, the restriction operation
+   *   is applied to residual (rather than solution) vectors, and is usually
+   *   chosen as the transpose of the prolongation operation. For the multigrid
+   *   restriction operation, one would consequently not typically expect
+   *   that it maps a constant function to a constant function. In other words,
+   *   the *meaning* of the term "restriction" in the current context and in
+   *   the multigrid context is quite different, and the two should not
+   *   be confused.
    */
   virtual const FullMatrix<double> &
   get_restriction_matrix(const unsigned int         child,
