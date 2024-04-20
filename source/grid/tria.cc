@@ -3583,7 +3583,7 @@ namespace internal
 
         const unsigned int max_faces_per_cell = 2 * dim;
 
-        level.active_cell_indices.assign(size, -1);
+        level.active_cell_indices.assign(size, numbers::invalid_unsigned_int);
         level.subdomain_ids.assign(size, 0);
         level.level_subdomain_ids.assign(size, 0);
 
@@ -5023,10 +5023,12 @@ namespace internal
                 // and set it appropriately
                 while (triangulation.vertices_used[next_unused_vertex] == true)
                   ++next_unused_vertex;
-                Assert(
-                  next_unused_vertex < triangulation.vertices.size(),
-                  ExcMessage(
-                    "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+                Assert(next_unused_vertex < triangulation.vertices.size(),
+                       ExcMessage(
+                         "Internal error: During refinement, the triangulation "
+                         "wants to access an element of the 'vertices' array "
+                         "but it turns out that the array is not large "
+                         "enough."));
                 triangulation.vertices_used[next_unused_vertex] = true;
 
                 triangulation.vertices[next_unused_vertex] = line->center(true);
@@ -6756,16 +6758,12 @@ namespace internal
                                             {{2, 1, 0}}, // 4
                                             {{2, 0, 1}}}};
 
+                              const unsigned char combined_orientation =
+                                hex->combined_face_orientation(f);
                               relevant_lines[k] =
                                 hex->face(f)
                                   ->child(3 /*center triangle*/)
-                                  ->line(
-                                    table[triangulation.levels[hex->level()]
-                                            ->face_orientations
-                                            .get_combined_orientation(
-                                              hex->index() * GeometryInfo<dim>::
-                                                               faces_per_cell +
-                                              f)][l]);
+                                  ->line(table[combined_orientation][l]);
                             }
 
                         relevant_lines[k++] = new_lines[0];
@@ -7021,19 +7019,13 @@ namespace internal
                         for (unsigned int f = 0, k = n_new_quads; f < 4; ++f)
                           for (unsigned int c = 0; c < 4; ++c, ++k)
                             {
+                              const unsigned char combined_orientation =
+                                hex->combined_face_orientation(f);
                               quad_indices[k] = hex->face(f)->child_index(
-                                (c == 3) ?
-                                  3 :
-                                  reference_cell_type
-                                    .standard_to_real_face_vertex(
-                                      c,
-                                      f,
-                                      triangulation.levels[hex->level()]
-                                        ->face_orientations
-                                        .get_combined_orientation(
-                                          hex->index() *
-                                            GeometryInfo<dim>::faces_per_cell +
-                                          f)));
+                                (c == 3) ? 3 :
+                                           reference_cell_type
+                                             .standard_to_real_face_vertex(
+                                               c, f, combined_orientation));
                             }
                       }
                     else
