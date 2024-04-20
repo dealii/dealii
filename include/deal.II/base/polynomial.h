@@ -157,10 +157,13 @@ namespace Polynomials
      * `number` by `operator=`.
      */
     template <std::size_t n_entries, typename Number2>
-    void
-    values_of_array(const std::array<Number2, n_entries> &points,
-                    const unsigned int                    n_derivatives,
-                    std::array<Number2, n_entries>       *values) const;
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      void
+      values_of_array(const std::array<Number2, n_entries> &points,
+                      const unsigned int                    n_derivatives,
+                      std::array<Number2, n_entries>       *values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
@@ -863,11 +866,15 @@ namespace Polynomials
 
   template <typename number>
   template <std::size_t n_entries, typename Number2>
-  inline void
-  Polynomial<number>::values_of_array(
-    const std::array<Number2, n_entries> &x,
-    const unsigned int                    n_derivatives,
-    std::array<Number2, n_entries>       *values) const
+  inline
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+    void
+    Polynomial<number>::values_of_array(
+      const std::array<Number2, n_entries> &x,
+      const unsigned int                    n_derivatives,
+      std::array<Number2, n_entries>       *values) const
   {
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)
