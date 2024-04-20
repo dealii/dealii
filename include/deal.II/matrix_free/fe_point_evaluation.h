@@ -816,6 +816,12 @@ public:
   inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   quadrature_point_indices() const;
 
+  /**
+   * Returns how many lanes of a quadrature batch are active.
+   */
+  unsigned int
+  n_active_entries_per_quadrature_batch(unsigned int q);
+
 protected:
   static constexpr std::size_t n_lanes_user_interface =
     internal::VectorizedArrayTrait<Number>::width();
@@ -2440,6 +2446,29 @@ inline typename FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
     return_value += values[point_index] * this->JxW(point_index);
 
   return ETT::sum_value(return_value);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+unsigned int
+FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
+  n_active_entries_per_quadrature_batch(unsigned int q)
+{
+  Assert(stride == 1,
+         ExcMessage(
+           "Calling this function only makes sense in fully vectorized mode."));
+  if (q == n_q_batches - 1)
+    {
+      const unsigned int n_filled_lanes =
+        n_q_points_scalar & (n_lanes_user_interface - 1);
+      if (n_filled_lanes == 0)
+        return n_lanes_user_interface;
+      else
+        return n_filled_lanes;
+    }
+  else
+    return n_lanes_user_interface;
 }
 
 
