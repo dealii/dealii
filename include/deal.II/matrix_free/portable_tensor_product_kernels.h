@@ -196,23 +196,26 @@ namespace Portable
         thread_policy, [&](const int i, const int j, const int q) {
           const int q_point =
             i + j * n_q_points_1d + q * n_q_points_1d * n_q_points_1d;
-          t[q_point] = 0;
 
           // This loop simply multiplies the shape function at the quadrature
           // point by the value finite element coefficient.
           // FIXME check why using parallel_reduce ThreadVector is slower
-          for (int k = 0; k < n_q_points_1d; ++k)
+          const int     base         = dof_to_quad ? q : q * n_q_points_1d;
+          const int     stride_shape = dof_to_quad ? n_q_points_1d : 1;
+          const Number *in_ptr =
+            in.data() +
+            (direction == 0 ?
+               (n_q_points_1d * (i + n_q_points_1d * j)) :
+               (direction == 1 ? (i + n_q_points_1d * n_q_points_1d * j) :
+                                 (i + n_q_points_1d * j)));
+          const int stride_in = Utilities::pow(n_q_points_1d, direction);
+          Number    sum       = shape_data[base] * (*in_ptr);
+          for (int k = 1; k < n_q_points_1d; ++k)
             {
-              const unsigned int shape_idx =
-                dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
-              const unsigned int source_idx =
-                (direction == 0) ?
-                  (k + n_q_points_1d * (i + n_q_points_1d * j)) :
-                (direction == 1) ?
-                  (i + n_q_points_1d * (k + n_q_points_1d * j)) :
-                  (i + n_q_points_1d * (j + n_q_points_1d * k));
-              t[q_point] += shape_data[shape_idx] * in(source_idx);
+              sum +=
+                shape_data[base + k * stride_shape] * in_ptr[k * stride_in];
             }
+          t[q_point] = sum;
         });
 
       if (in_place)
