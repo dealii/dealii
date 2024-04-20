@@ -23,7 +23,7 @@
 #include "../tests.h"
 
 void
-test(const unsigned int orientation)
+test(const unsigned char orientation)
 {
   const unsigned int face_no = 0;
 
@@ -43,11 +43,11 @@ test(const unsigned int orientation)
   }
 
   {
-    const auto &face = dummy.begin()->face(face_no);
+    const auto &face                = dummy.begin()->face(face_no);
+    const auto  face_reference_cell = face->reference_cell();
     const auto  permuted =
-      ReferenceCell(ReferenceCells::Triangle)
-        .permute_according_orientation(std::array<unsigned int, 3>{{0, 1, 2}},
-                                       orientation);
+      ReferenceCells::Triangle.permute_according_orientation(
+        std::array<unsigned int, 3>{{0, 1, 2}}, orientation);
 
     auto direction =
       cross_product_3d(vertices[permuted[1]] - vertices[permuted[0]],
@@ -57,13 +57,10 @@ test(const unsigned int orientation)
     vertices.push_back(face->center() + direction);
 
     CellData<3> cell;
-    cell.vertices.resize(4);
-
-    cell.vertices[permuted[0]] = face->vertex_index(0);
-    cell.vertices[permuted[1]] = face->vertex_index(1);
-    cell.vertices[permuted[2]] = face->vertex_index(2);
-    cell.vertices[3]           = 4;
-
+    cell.vertices    = {face->vertex_index(permuted[0]),
+                        face->vertex_index(permuted[1]),
+                        face->vertex_index(permuted[2]),
+                        4};
     cell.material_id = 1;
     cells.push_back(cell);
   }
@@ -74,7 +71,7 @@ test(const unsigned int orientation)
   cell++;
 
   // check orientation
-  deallog << "face orientation: " << orientation << ' '
+  deallog << "face orientation: " << int(orientation) << ' '
           << int(cell->combined_face_orientation(0)) << ' ' << std::endl;
 
   // check vertices
