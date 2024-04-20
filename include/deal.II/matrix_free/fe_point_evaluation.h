@@ -1842,8 +1842,6 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   , current_face_number(other.current_face_number)
   , fast_path(other.fast_path)
   , is_reinitialized(false)
-  , shapes(other.shapes)
-  , shapes_faces(other.shapes_faces)
   , is_interior(other.is_interior)
 {
   connection_is_reinitialized = mapping_info->connect_is_reinitialized(
@@ -1879,8 +1877,6 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   , current_face_number(other.current_face_number)
   , fast_path(other.fast_path)
   , is_reinitialized(false)
-  , shapes(other.shapes)
-  , shapes_faces(other.shapes_faces)
   , is_interior(other.is_interior)
 {
   connection_is_reinitialized = mapping_info->connect_is_reinitialized(
@@ -2064,13 +2060,16 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::do_reinit()
   if (!is_linear && fast_path)
     {
       const std::size_t n_shapes = poly.size();
+      if (is_face)
+        shapes_faces.resize_fast(n_q_batches * n_shapes);
+      else
+        shapes.resize_fast(n_q_batches * n_shapes);
 
       for (unsigned int qb = 0; qb < n_q_batches; ++qb)
         if (is_face)
           {
             if (dim > 1)
               {
-                shapes_faces.resize_fast(n_q_batches * n_shapes);
                 internal::compute_values_of_array(
                   shapes_faces.data() + qb * n_shapes,
                   poly,
@@ -2080,12 +2079,31 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::do_reinit()
           }
         else
           {
-            shapes.resize_fast(n_q_batches * n_shapes);
-            internal::compute_values_of_array(
-              shapes.data() + qb * n_shapes,
-              poly,
-              unit_point_ptr[qb],
-              update_flags & UpdateFlags::update_gradients ? 1 : 0);
+            if (update_flags & UpdateFlags::update_gradients)
+              {
+                internal::compute_values_of_array(shapes.data() + qb * n_shapes,
+                                                  poly,
+                                                  unit_point_ptr[qb],
+                                                  1);
+              }
+            else if (qb + 1 < n_q_batches)
+              {
+                // Use function with reduced overhead to compute for two
+                // points at once
+                internal::compute_values_of_array_in_pairs(
+                  shapes.data() + qb * n_shapes,
+                  poly,
+                  unit_point_ptr[qb],
+                  unit_point_ptr[qb + 1]);
+                ++qb;
+              }
+            else
+              {
+                internal::compute_values_of_array(shapes.data() + qb * n_shapes,
+                                                  poly,
+                                                  unit_point_ptr[qb],
+                                                  0);
+              }
           }
     }
 

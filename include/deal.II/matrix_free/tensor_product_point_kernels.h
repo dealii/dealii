@@ -52,8 +52,8 @@ namespace internal
 
 
   /**
-   * Computes the values and derivatives of the 1d polynomials @p poly at the
-   * specified point @p p and stores it in @p shapes.
+   * Compute the values and derivatives of the 1d polynomials @p poly at the
+   * specified point @p p and store them in @p shapes.
    */
   template <int dim, typename Number>
   inline void
@@ -86,6 +86,43 @@ namespace internal
                           const unsigned int)
   {
     DEAL_II_ASSERT_UNREACHABLE();
+  }
+
+
+
+  /**
+   * Evaluate the 1d polynomials @p poly at the two specified points @p p0 and
+   * @p p1 and store them in @p shapes. This function can be used as a more
+   * efficient alternative to the compute_values_of_array() function, because
+   * of reduced overhead when querying the polynomials (which usually have
+   * loop bounds that are not known at compile time).
+   */
+  template <int dim, typename Number>
+  inline void
+  compute_values_of_array_in_pairs(
+    dealii::ndarray<Number, 2, dim>                    *shapes,
+    const std::vector<Polynomials::Polynomial<double>> &poly,
+    const Point<dim, Number>                           &p0,
+    const Point<dim, Number>                           &p1)
+  {
+    // Use 'int' variable here to let the compiler apply additional
+    // optimizations, in particular regarding multiplications and additions in
+    // loop increments that are known not to overflow/wrap around (as is the
+    // case for unsigned int).
+    const int n_shapes = poly.size();
+
+    std::array<Number, 2 * dim> point, result;
+    for (unsigned int d = 0; d < dim; ++d)
+      point[d] = p0[d];
+    for (unsigned int d = 0; d < dim; ++d)
+      point[dim + d] = p1[d];
+    for (int i = 0; i < n_shapes; ++i)
+      {
+        poly[i].values_of_array(point, 0, &result);
+        for (unsigned int j = 0; j < 2; ++j)
+          for (unsigned int d = 0; d < dim; ++d)
+            shapes[j * n_shapes + i][0][d] = result[j * dim + d];
+      }
   }
 
 
