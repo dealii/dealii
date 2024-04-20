@@ -2867,71 +2867,36 @@ ReferenceCell::permute_by_combined_orientation(
   const ArrayView<const T> &vertices,
   const unsigned char       orientation) const
 {
-  Assert(vertices.size() == n_vertices(),
-         ExcMessage("The number of array elements must be equal to "
-                    "the number of vertices of the cell "
-                    "referenced by this object."));
+  AssertDimension(vertices.size(), n_vertices());
+  boost::container::small_vector<T, 8> result(n_vertices());
+
+  auto permute = [&](const auto &table) {
+    AssertIndexRange(orientation, table.size());
+    for (unsigned int j = 0; j < table[orientation].size(); ++j)
+      result[j] = vertices[table[orientation][j]];
+  };
 
   switch (this->kind)
     {
+      case ReferenceCells::Vertex:
+        // TODO: we can get rid of this special-case and use
+        // vertex_vertex_permutations once we make 0 the default orientation.
+        std::copy(vertices.begin(), vertices.end(), result.begin());
+        break;
       case ReferenceCells::Line:
-        switch (orientation)
-          {
-            case 1:
-              return {vertices[0], vertices[1]};
-            case 0:
-              return {vertices[1], vertices[0]};
-            default:
-              DEAL_II_NOT_IMPLEMENTED();
-          }
+        permute(line_vertex_permutations);
         break;
       case ReferenceCells::Triangle:
-        switch (orientation)
-          {
-            case 1:
-              return {vertices[0], vertices[1], vertices[2]};
-            case 3:
-              return {vertices[2], vertices[0], vertices[1]};
-            case 5:
-              return {vertices[1], vertices[2], vertices[0]};
-            case 0:
-              return {vertices[0], vertices[2], vertices[1]};
-            case 2:
-              return {vertices[2], vertices[1], vertices[0]};
-            case 4:
-              return {vertices[1], vertices[0], vertices[2]};
-            default:
-              DEAL_II_NOT_IMPLEMENTED();
-          }
+        permute(triangle_vertex_permutations);
         break;
       case ReferenceCells::Quadrilateral:
-        switch (orientation)
-          {
-            case 1:
-              return {vertices[0], vertices[1], vertices[2], vertices[3]};
-            case 3:
-              return {vertices[2], vertices[0], vertices[3], vertices[1]};
-            case 5:
-              return {vertices[3], vertices[2], vertices[1], vertices[0]};
-            case 7:
-              return {vertices[1], vertices[3], vertices[0], vertices[2]};
-            case 0:
-              return {vertices[0], vertices[2], vertices[1], vertices[3]};
-            case 2:
-              return {vertices[2], vertices[3], vertices[0], vertices[1]};
-            case 4:
-              return {vertices[3], vertices[1], vertices[2], vertices[0]};
-            case 6:
-              return {vertices[1], vertices[0], vertices[3], vertices[2]};
-            default:
-              DEAL_II_NOT_IMPLEMENTED();
-          }
+        permute(quadrilateral_vertex_permutations);
         break;
       default:
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
-  return {};
+  return result;
 }
 
 
