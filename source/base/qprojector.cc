@@ -911,6 +911,8 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
     // loop over all faces (triangles) ...
     for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
       {
+        const ReferenceCell face_reference_cell =
+          reference_cell.face_reference_cell(face_no);
         // We will use linear polynomials to map the reference quadrature
         // points correctly to on faces. There are as many linear shape
         // functions as there are vertices in the face.
@@ -929,9 +931,30 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
           {
             const auto &face = faces[face_no];
 
+            // The goal of this function is to compute identical sets of
+            // quadrature points on the common face of two abutting cells. Our
+            // orientation convention is that, given such a pair of abutting
+            // cells:
+            //
+            // 1. The shared face, from the perspective of the first cell, is
+            //    in the default orientation.
+            // 2. The shared face, from the perspective of the second cell, has
+            //    its orientation computed relative to the first cell: i.e.,
+            //    'orientation' is the vertex permutation applied to the first
+            //    cell's face to get the second cell's face.
+            //
+            // The first case is trivial since points do not need to be
+            // oriented. However, in the second case, we need to use the
+            // *reverse* of the stored orientation (i.e., the permutation
+            // applied to the second cell's face which yields the first cell's
+            // face) so that we get identical quadrature points.
+            //
+            // For more information see connectivity.h.
             const boost::container::small_vector<Point<3>, 8> support_points =
-              reference_cell.face_reference_cell(face_no)
-                .permute_by_combined_orientation<Point<3>>(face, orientation);
+              face_reference_cell.permute_by_combined_orientation<Point<3>>(
+                face,
+                face_reference_cell.get_inverse_combined_orientation(
+                  orientation));
 
             // the quadrature rule to be projected ...
             const auto &sub_quadrature_points =
