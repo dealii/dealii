@@ -132,20 +132,21 @@ namespace Portable
                                                              n_q_points_1d);
       Kokkos::parallel_for(thread_policy, [&](const int i, const int j) {
         int q_point = i + j * n_q_points_1d;
-        t[q_point]  = 0;
 
         // This loop simply multiplies the shape function at the quadrature
         // point by the value finite element coefficient.
         // FIXME check why using parallel_reduce ThreadVector is slower
-        for (int k = 0; k < n_q_points_1d; ++k)
+        const int base_shape   = dof_to_quad ? j : j * n_q_points_1d;
+        const int stride_shape = dof_to_quad ? n_q_points_1d : 1;
+        const int base_in      = (direction == 0) ? (n_q_points_1d * i) : i;
+        const int stride_in    = Utilities::pow(n_q_points_1d, direction);
+        Number    sum          = shape_data[base_shape] * in(base_in);
+        for (int k = 1; k < n_q_points_1d; ++k)
           {
-            const unsigned int shape_idx =
-              dof_to_quad ? (j + k * n_q_points_1d) : (k + j * n_q_points_1d);
-            const unsigned int source_idx = (direction == 0) ?
-                                              (k + n_q_points_1d * i) :
-                                              (i + n_q_points_1d * k);
-            t[q_point] += shape_data[shape_idx] * in(source_idx);
+            sum += shape_data[base_shape + k * stride_shape] *
+                   in(base_in + k * stride_in);
           }
+        t[q_point] = sum;
       });
 
       if (in_place)
@@ -200,20 +201,19 @@ namespace Portable
           // This loop simply multiplies the shape function at the quadrature
           // point by the value finite element coefficient.
           // FIXME check why using parallel_reduce ThreadVector is slower
-          const int     base         = dof_to_quad ? q : q * n_q_points_1d;
-          const int     stride_shape = dof_to_quad ? n_q_points_1d : 1;
-          const Number *in_ptr =
-            in.data() +
+          const int base_shape   = dof_to_quad ? q : q * n_q_points_1d;
+          const int stride_shape = dof_to_quad ? n_q_points_1d : 1;
+          const int base_in =
             (direction == 0 ?
                (n_q_points_1d * (i + n_q_points_1d * j)) :
                (direction == 1 ? (i + n_q_points_1d * n_q_points_1d * j) :
                                  (i + n_q_points_1d * j)));
           const int stride_in = Utilities::pow(n_q_points_1d, direction);
-          Number    sum       = shape_data[base] * (*in_ptr);
+          Number    sum       = shape_data[base_shape] * in(base_in);
           for (int k = 1; k < n_q_points_1d; ++k)
             {
-              sum +=
-                shape_data[base + k * stride_shape] * in_ptr[k * stride_in];
+              sum += shape_data[base_shape + k * stride_shape] *
+                     in(base_in + k * stride_in);
             }
           t[q_point] = sum;
         });
