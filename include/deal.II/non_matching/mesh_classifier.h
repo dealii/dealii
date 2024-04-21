@@ -47,6 +47,7 @@ namespace NonMatching
    * inside      if $\psi(x) < 0$,
    * outside     if $\psi(x) > 0$,
    * intersected if $\psi(x)$ varies in sign,
+   * aligned     if $\psi((x) = 0$,
    *
    * over the cell/face. The value "unassigned" is used to describe that the
    * location of a cell/face has not yet been determined.
@@ -56,7 +57,8 @@ namespace NonMatching
     inside,
     outside,
     intersected,
-    unassigned
+    unassigned,
+    aligned
   };
 
 
