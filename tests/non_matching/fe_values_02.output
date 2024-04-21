@@ -1,0 +1,16 @@
+
+DEAL::dim = 1
+DEAL::inside volume = 1.00000
+DEAL::surface area = 1.00000
+DEAL::outside volume = 1.00000
+DEAL::
+DEAL::dim = 2
+DEAL::inside volume = 1.00000
+DEAL::surface area = 1.00000
+DEAL::outside volume = 1.00000
+DEAL::
+DEAL::dim = 3
+DEAL::inside volume = 1.00000
+DEAL::surface area = 1.00000
+DEAL::outside volume = 1.00000
+DEAL::
