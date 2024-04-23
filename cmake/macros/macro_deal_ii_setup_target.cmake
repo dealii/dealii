@@ -93,6 +93,10 @@ macro(deal_ii_setup_target _target)
     "${DEAL_II_WARNING_FLAGS} ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
     )
 
+  target_compile_definitions(${_target} PRIVATE
+    ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+    )
+
   get_property(_type TARGET ${_target} PROPERTY TYPE)
   if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
     target_link_flags(${_target} PRIVATE
