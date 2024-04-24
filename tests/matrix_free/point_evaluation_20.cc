@@ -14,7 +14,7 @@
 
 
 // Check FEPointEvaluation::evaluate()/integrate() with precomputed mapping
-// with different location of unit points provided my NonMatching::MappingInfo.
+// with different location of unit points provided by NonMatching::MappingInfo.
 
 #include <deal.II/base/function_lib.h>
 
