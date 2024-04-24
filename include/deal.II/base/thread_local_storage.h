@@ -24,6 +24,7 @@
 #  include <map>
 #  include <memory>
 #  include <mutex>
+#  include <optional>
 #  include <shared_mutex>
 #  include <thread>
 #  include <vector>
@@ -174,6 +175,23 @@ namespace Threads
      */
     T &
     get(bool &exists);
+
+    /**
+     * If the thread with given `id` has an object currently stored, then return
+     * it by value via the `std::optional` object. If the indicated thread does
+     * not have an object stored, return an empty `std::optional`.
+     *
+     * Note that in the successful case, this function returns a *copy* of
+     * the object, unlike get() which returns a reference to it. This is
+     * because when you call get(), you are calling it from the current
+     * thread (i.e., the thread that "owns" the object), and so all accesses
+     * are by definition not concurrent. On the other hand, if you are asking
+     * about the object owned by a different thread, that other thread might
+     * concurrently be accessing it and that might cause race conditions.
+     * To avoid these, the function here returns a copy.
+     */
+    std::optional<T>
+    get_for_thread(const std::thread::id &id) const;
 
     /**
      * Conversion operator that simply converts the thread-local object to the
@@ -437,6 +455,23 @@ namespace Threads
 
       return internal::construct_element(data, my_id, exemplar);
     }
+  }
+
+
+  template <typename T>
+  std::optional<T>
+  ThreadLocalStorage<T>::get_for_thread(const std::thread::id &id) const
+  {
+    // Take a shared ("reader") lock for lookup:
+    std::shared_lock<decltype(insertion_mutex)> lock(insertion_mutex);
+
+    // Then see whether we can find the indicated object; if so, copy it,
+    // otherwise return an empty std::optional.
+    const auto it = data.find(id);
+    if (it != data.end())
+      return it->second;
+    else
+      return {};
   }
 
 
