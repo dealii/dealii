@@ -274,8 +274,6 @@ namespace Threads
      * An exemplar for creating a new (thread specific) copy.
      */
     std::shared_ptr<const T> exemplar;
-
-    friend class dealii::LogStream;
   };
 } // namespace Threads
 /**
