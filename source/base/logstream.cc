@@ -386,11 +386,11 @@ LogStream::get_prefixes() const
 
   // If this is a new locally stored stack, copy the "blessed" prefixes
   // from the initial thread that created logstream.
-  if (!exists)
+  if (exists == false)
     {
-      auto it = prefixes.data.find(parent_thread);
-      if (it != prefixes.data.end())
-        local_prefixes = it->second;
+      const auto parent_prefixes = prefixes.get_for_thread(parent_thread);
+      if (parent_prefixes)
+        local_prefixes = parent_prefixes.value();
     }
 
   return local_prefixes;
