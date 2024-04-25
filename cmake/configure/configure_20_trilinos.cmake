@@ -284,18 +284,18 @@ macro(feature_trilinos_find_external var)
             STATUS
             "  Tpetra wasn't configured with support for 64-bit global indices\n"
             "  but deal.II is configured to use 64-bit global indices.\n"
-            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF.\n"
+            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF\n"
             "  or rebuild Trilinos with -DTPETRA_INST_INT_LONG_LONG=ON"
           )
           if(DEAL_II_HAVE_TPETRA_INT_LONG)
             message(
               STATUS
-              "  and -DTPETRA_INST_INT_LONG=OFF"
+              "  and -DTPETRA_INST_INT_LONG=OFF."
             )
           elseif(DEAL_II_HAVE_TPETRA_INT_INT)
             message(
               STATUS
-              "  and -DTPETRA_INST_INT_INT=OFF"
+              "  and -DTPETRA_INST_INT_INT=OFF."
             )
           endif()
         elseif(NOT DEAL_II_HAVE_TPETRA_INT_INT AND NOT DEAL_II_WITH_64BIT_INDICES)
@@ -303,18 +303,18 @@ macro(feature_trilinos_find_external var)
             STATUS
             "  Tpetra wasn't configured with support for 32-bit global indices\n"
             "  but deal.II is configured to use 32-bit global indices.\n"
-            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON.\n"
+            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON\n"
             "  or rebuild Trilinos with -DTPETRA_INST_INT_INT=ON"
           )
           if(DEAL_II_HAVE_TPETRA_INT_LONG)
             message(
               STATUS
-              "  and -DTPETRA_INST_INT_LONG=OFF"
+              "  and -DTPETRA_INST_INT_LONG=OFF."
             )
           elseif(DEAL_II_HAVE_TPETRA_INT_LONG_LONG)
             message(
               STATUS
-              "  and -DTPETRA_INST_INT_LONG_LONG=OFF"
+              "  and -DTPETRA_INST_INT_LONG_LONG=OFF."
             )
           endif()
         endif()
