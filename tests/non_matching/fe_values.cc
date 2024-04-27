@@ -88,9 +88,10 @@ private:
   void
   setup_discrete_level_set();
 
+  template <typename IteratorType>
   void
-  test_fe_values_reinitializes_correctly(
-    NonMatching::FEValues<dim> &fe_values) const;
+  test_fe_values_reinitializes_correctly(NonMatching::FEValues<dim> &fe_values,
+                                         IteratorType cell) const;
 
   Triangulation<dim>    triangulation;
   hp::FECollection<dim> fe_collection;
@@ -139,7 +140,10 @@ Test<dim>::run()
                                          mesh_classifier,
                                          dof_handler,
                                          level_set);
-    test_fe_values_reinitializes_correctly(fe_values);
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           triangulation.begin_active());
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           dof_handler.begin_active());
   }
   {
     // Test with the "more advanced" constructor.
@@ -151,7 +155,10 @@ Test<dim>::run()
                                          mesh_classifier,
                                          dof_handler,
                                          level_set);
-    test_fe_values_reinitializes_correctly(fe_values);
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           triangulation.begin_active());
+    test_fe_values_reinitializes_correctly(fe_values,
+                                           dof_handler.begin_active());
   }
 }
 
@@ -197,13 +204,14 @@ Test<dim>::setup_discrete_level_set()
 
 
 template <int dim>
+template <typename IteratorType>
 void
 Test<dim>::test_fe_values_reinitializes_correctly(
-  NonMatching::FEValues<dim> &fe_values) const
+  NonMatching::FEValues<dim> &fe_values,
+  IteratorType                cell) const
 {
   //  The first is inside so only the inside FEValues object should be
   //  initialized.
-  auto cell = dof_handler.begin_active();
   fe_values.reinit(cell);
 
   assert_cells_are_the_same<dim>(cell,

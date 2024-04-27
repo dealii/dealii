@@ -148,10 +148,72 @@ namespace NonMatching
   template <bool level_dof_access>
   void
   FEValues<dim>::reinit(
-    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell)
+    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
+    const unsigned int                                               q_index,
+    const unsigned int mapping_index)
+  {
+    this->reinit_internal(cell,
+                          q_index,
+                          mapping_index,
+                          cell->active_fe_index());
+  }
+
+
+
+  template <int dim>
+  void
+  FEValues<dim>::reinit(const TriaIterator<CellAccessor<dim, dim>> &cell,
+                        const unsigned int                          q_index,
+                        const unsigned int mapping_index,
+                        const unsigned int fe_index)
+  {
+    this->reinit_internal(cell, q_index, mapping_index, fe_index);
+  }
+
+
+
+  template <int dim>
+  template <typename CellIteratorType>
+  void
+  FEValues<dim>::reinit_internal(const CellIteratorType &cell,
+                                 const unsigned int      q_index_in,
+                                 const unsigned int      mapping_index_in,
+                                 const unsigned int      fe_index_in)
   {
     current_cell_location = mesh_classifier->location_to_level_set(cell);
-    active_fe_index       = cell->active_fe_index();
+
+    if (fe_index_in == numbers::invalid_unsigned_int)
+      this->active_fe_index = 0;
+    else
+      this->active_fe_index = fe_index_in;
+
+    unsigned int mapping_index = mapping_index_in;
+    unsigned int q_index       = q_index_in;
+    unsigned int q_index_1D    = q_index_in;
+
+    if (mapping_index == numbers::invalid_unsigned_int)
+      {
+        if (mapping_collection->size() > 1)
+          mapping_index = active_fe_index;
+        else
+          mapping_index = 0;
+      }
+
+    if (q_index == numbers::invalid_unsigned_int)
+      {
+        if (fe_values_inside_full_quadrature.size() > 1)
+          q_index = active_fe_index;
+        else
+          q_index = 0;
+      }
+
+    if (q_index_1D == numbers::invalid_unsigned_int)
+      {
+        if (q_collection_1D.size() > 1)
+          q_index_1D = active_fe_index;
+        else
+          q_index_1D = 0;
+      }
 
     // These objects were created with a quadrature based on the previous cell
     // and are thus no longer valid.
@@ -163,22 +225,29 @@ namespace NonMatching
       {
         case LocationToLevelSet::inside:
           {
-            fe_values_inside_full_quadrature.at(active_fe_index)->reinit(cell);
+            Assert((active_fe_index == mapping_index) ||
+                     ((mapping_collection->size() == 1) &&
+                      (mapping_index == 0)),
+                   ExcNotImplemented());
+            Assert(active_fe_index == q_index, ExcNotImplemented());
+
+            fe_values_inside_full_quadrature.at(q_index)->reinit(cell);
             break;
           }
         case LocationToLevelSet::outside:
           {
-            fe_values_outside_full_quadrature.at(active_fe_index)->reinit(cell);
+            Assert((active_fe_index == mapping_index) ||
+                     ((mapping_collection->size() == 1) &&
+                      (mapping_index == 0)),
+                   ExcNotImplemented());
+            Assert(active_fe_index == q_index, ExcNotImplemented());
+
+            fe_values_outside_full_quadrature.at(q_index)->reinit(cell);
             break;
           }
         case LocationToLevelSet::intersected:
           {
-            const unsigned int mapping_index =
-              mapping_collection->size() > 1 ? active_fe_index : 0;
-
-            const unsigned int q1D_index =
-              q_collection_1D.size() > 1 ? active_fe_index : 0;
-            quadrature_generator.set_1D_quadrature(q1D_index);
+            quadrature_generator.set_1D_quadrature(q_index_1D);
             quadrature_generator.generate(cell);
 
             const Quadrature<dim> &inside_quadrature =

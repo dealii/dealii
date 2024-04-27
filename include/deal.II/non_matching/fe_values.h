@@ -216,14 +216,57 @@ namespace NonMatching
      * Reinitialize the various FEValues-like objects for the 3 different
      * regions of the cell. After calling this function an FEValues-like object
      * can be retrieved for each region using the functions
-     * get_inside_fe_values(),
-     * get_outside_fe_values(), or
+     * get_inside_fe_values(), get_outside_fe_values(), or
      * get_surface_fe_values().
+     *
+     * If the @p q_index argument is left at its default value, then we use
+     * that quadrature formula within the hp::QCollection passed to the
+     * constructor of this class with index given by
+     * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
+     * the finite element. In this case, there should be a corresponding
+     * quadrature formula for each finite element in the hp::FECollection. As
+     * a special case, if the quadrature collection contains only a single
+     * element (a frequent case if one wants to use the same quadrature object
+     * for all finite elements in an hp-discretization, even if that may not
+     * be the most efficient), then this single quadrature is used unless a
+     * different value for this argument is specified. On the other hand, if a
+     * value is given for this argument, it overrides the choice of
+     * <code>cell-@>active_fe_index()</code> or the choice for the single
+     * quadrature.
+     *
+     * If the @p mapping_index argument is left at its default value, then we
+     * use that mapping object within the hp::MappingCollection passed to the
+     * constructor of this class with index given by
+     * <code>cell-@>active_fe_index()</code>, i.e. the same index as that of
+     * the finite element. As above, if the mapping collection contains only a
+     * single element (a frequent case if one wants to use a $Q_1$ mapping for
+     * all finite elements in an hp-discretization), then this single mapping
+     * is used unless a different value for this argument is specified.
      */
     template <bool level_dof_access>
     void
     reinit(
-      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell);
+      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
+      const unsigned int q_index       = numbers::invalid_unsigned_int,
+      const unsigned int mapping_index = numbers::invalid_unsigned_int);
+
+    /**
+     * Like the previous function, but for non-DoFHandler iterators. The reason
+     * this function exists is so that one can use NonMatching::FEValues for
+     * Triangulation objects too.
+     *
+     * Since <code>cell-@>active_fe_index()</code> doesn't make sense for
+     * triangulation iterators, this function chooses the zero-th finite
+     * element, mapping, and quadrature object from the relevant constructions
+     * passed to the constructor of this object. The only exception is if you
+     * specify a value different from the default value for any of these last
+     * three arguments.
+     */
+    void
+    reinit(const TriaIterator<CellAccessor<dim, dim>> &cell,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
      * Return an dealii::FEValues object reinitialized with a quadrature for the
@@ -258,6 +301,16 @@ namespace NonMatching
     get_surface_fe_values() const;
 
   private:
+    /**
+     * Internal function called by the reinit() functions.
+     */
+    template <typename CellIteratorType>
+    void
+    reinit_internal(const CellIteratorType &cell,
+                    const unsigned int      q_index,
+                    const unsigned int      mapping_index,
+                    const unsigned int      fe_index);
+
     /**
      * Do work common to the constructors. The incoming QCollection should be
      * quadratures integrating over $[0, 1]^{dim}$. These will be used on the
