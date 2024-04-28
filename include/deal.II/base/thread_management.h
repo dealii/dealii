@@ -948,6 +948,25 @@ namespace Threads
             // tbb::task_group, and then here wait for the single task
             // associated with that task group.
             //
+            // This also makes sense from another perspective. Imagine that
+            // we allow at most N threads, and that we create N+1 tasks in such
+            // a way that the first N all wait for the (N+1)st task to finish.
+            // (See the multithreading/task_17 test for an example.) If they
+            // all just sit in their std::future::wait() function, nothing
+            // is ever going to happen because the scheduler sees that N tasks
+            // are currently running and is never informed that all they're
+            // doing is wait for another task to finish. What *needs* to
+            // happen is that the wait() or join() function goes back into
+            // the scheduler to make sure the scheduler knows that these
+            // tasks are not actually using CPU time on the thread they're
+            // working on, and that it is time to run other tasks on the
+            // same thread -- this is the way we can eventually get that
+            // (N+1)st task executed, which then unblocks the other N threads.
+            // (Note that this also implies that multiple tasks can be
+            // executing on the same thread at the same time -- not
+            // concurrently, of course, but with one executing and the others
+            // currently waiting for other tasks to finish.)
+            //
             // If we get here, we know for a fact that atomically
             // (because under a lock), no other thread has so far
             // determined that we are finished and removed the
