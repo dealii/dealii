@@ -47,7 +47,7 @@ the tutorial programs preceding this one.
 This program is therefore devoted to showing how one deals with complex
 geometries using a concrete application. In particular, what it shows is how
 we make a mesh fit the domain we want to solve on. On the other hand, what the
-program does not show is how to create a coarse for a domain. The process to
+program does not show is how to create a coarse mesh for a domain. The process to
 arrive at a coarse mesh is called "mesh generation" and there are a number of
 high-quality programs that do this much better than we could ever
 implement. However, deal.II does have the ability to read in meshes in many
