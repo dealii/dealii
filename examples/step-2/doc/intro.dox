@@ -114,7 +114,7 @@ may be several hundred. But the important point is that this number is
 independent of the overall size of the problem: If you refine the mesh, the
 maximal number of unknowns per row remains the same.
 
-Sparsity is one of the distinguishing feature of
+Sparsity is one of the distinguishing features of
 the finite element method compared to, say, approximating the solution of a
 partial differential equation using a Taylor expansion and matching
 coefficients, or using a Fourier basis.
