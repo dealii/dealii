@@ -1715,9 +1715,10 @@ namespace FETools
         const unsigned int                  ref_case,
         const double                        threshold)
       {
-        const unsigned int n = fe.n_dofs_per_cell();
-        const unsigned int nc =
-          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+        const unsigned int  n              = fe.n_dofs_per_cell();
+        const ReferenceCell reference_cell = fe.reference_cell();
+        const unsigned int  nc =
+          reference_cell.n_children(RefinementCase<dim>(ref_case));
 
         AssertDimension(matrices.size(), nc);
 
@@ -1729,13 +1730,19 @@ namespace FETools
                    ExcDimensionMismatch(matrices[i].m(), n));
           }
 
-        const ReferenceCell reference_cell = fe.reference_cell();
 
         // Set up meshes, one with a single
         // reference cell and refine it once
         Triangulation<dim, spacedim> tria;
         GridGenerator::reference_cell(tria, reference_cell);
-        tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
+        if (reference_cell == ReferenceCells::Tetrahedron)
+          {
+            tria.begin_active()->set_refine_flag(
+              RefinementCase<dim>::isotropic_refinement);
+            tria.begin_active()->set_refine_choice(ref_case);
+          }
+        else
+          tria.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tria.execute_coarsening_and_refinement();
 
         const unsigned int degree = fe.degree;
@@ -1862,10 +1869,23 @@ namespace FETools
     Threads::TaskGroup<void> task_group;
 
     // loop over all possible refinement cases
-    for (unsigned int ref_case =
-           (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
-                             RefinementCase<dim>::cut_x);
-         ref_case <= RefinementCase<dim>::isotropic_refinement;
+    unsigned int ref_case_start, ref_case_end;
+
+    if (fe.reference_cell() == ReferenceCells::Tetrahedron)
+      {
+        ref_case_start =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_68);
+        ref_case_end =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_49);
+      }
+    else
+      {
+        ref_case_start = isotropic_only ?
+                           RefinementCase<dim>::isotropic_refinement :
+                           RefinementCase<dim>::cut_x;
+        ref_case_end   = RefinementCase<dim>::isotropic_refinement;
+      }
+    for (unsigned int ref_case = ref_case_start; ref_case <= ref_case_end;
          ++ref_case)
       task_group += Threads::new_task(
         &internal::FEToolsComputeEmbeddingMatricesHelper::
@@ -2169,7 +2189,7 @@ namespace FETools
         const FullMatrix<double>        &inverse_mass_matrix,
         std::vector<FullMatrix<double>> &matrices) {
         const unsigned int nc =
-          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+          reference_cell.n_children(RefinementCase<dim>(ref_case));
 
         for (unsigned int i = 0; i < nc; ++i)
           {
@@ -2182,7 +2202,15 @@ namespace FETools
         // create a respective refinement on the triangulation
         Triangulation<dim, spacedim> tr;
         GridGenerator::reference_cell(tr, reference_cell);
-        tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
+
+        if (reference_cell == ReferenceCells::Tetrahedron)
+          {
+            tr.begin_active()->set_refine_flag(
+              RefinementCase<dim>::isotropic_refinement);
+            tr.begin_active()->set_refine_choice(ref_case);
+          }
+        else
+          tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
         tr.execute_coarsening_and_refinement();
 
         FEValues<dim, spacedim> fine(mapping,
@@ -2267,10 +2295,22 @@ namespace FETools
 
     // finally loop over all possible refinement cases
     Threads::TaskGroup<> tasks;
-    for (unsigned int ref_case =
-           (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
-                             RefinementCase<dim>::cut_x);
-         ref_case <= RefinementCase<dim>::isotropic_refinement;
+    unsigned int         ref_case_start, ref_case_end;
+    if (reference_cell == ReferenceCells::Tetrahedron)
+      {
+        ref_case_start =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_68);
+        ref_case_end =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_49);
+      }
+    else
+      {
+        ref_case_start =
+          (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
+                            RefinementCase<dim>::cut_x);
+        ref_case_end = RefinementCase<dim>::isotropic_refinement;
+      }
+    for (unsigned int ref_case = ref_case_start; ref_case <= ref_case_end;
          ++ref_case)
       tasks += Threads::new_task([&, ref_case]() {
         compute_one_case(ref_case, mass, matrices[ref_case - 1]);

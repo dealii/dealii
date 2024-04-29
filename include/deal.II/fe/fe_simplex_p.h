@@ -42,6 +42,7 @@ public:
   FE_SimplexPoly(
     const BarycentricPolynomials<dim>              polynomials,
     const FiniteElementData<dim>                  &fe_data,
+    const bool                                     prolongation_is_additive,
     const std::vector<Point<dim>>                 &unit_support_points,
     const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
     const FullMatrix<double>                      &interface_constraints);
@@ -107,7 +108,7 @@ public:
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double>               &nodal_values) const override;
 
-private:
+protected:
   /**
    * Mutex variables used for protecting the initialization of restriction
    * and embedding matrices.
@@ -225,6 +226,17 @@ public:
   std::vector<std::pair<unsigned int, unsigned int>>
   hp_line_dof_identities(
     const FiniteElement<dim, spacedim> &fe_other) const override;
+
+  /**
+   * @copydoc dealii::FiniteElement::get_restriction_matrix()
+   *
+   * @note Only implemented for RefinementCase::isotropic_refinement.
+   */
+  virtual const FullMatrix<double> &
+  get_restriction_matrix(
+    const unsigned int         child,
+    const RefinementCase<dim> &refinement_case =
+      RefinementCase<dim>::isotropic_refinement) const override;
 };
 
 DEAL_II_NAMESPACE_CLOSE

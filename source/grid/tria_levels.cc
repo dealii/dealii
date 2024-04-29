@@ -28,6 +28,7 @@ namespace internal
     {
       return (
         MemoryConsumption::memory_consumption(refine_flags) +
+        MemoryConsumption::memory_consumption(refine_choice) +
         MemoryConsumption::memory_consumption(coarsen_flags) +
         MemoryConsumption::memory_consumption(active_cell_indices) +
         MemoryConsumption::memory_consumption(global_active_cell_indices) +

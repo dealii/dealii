@@ -2076,7 +2076,8 @@ namespace internal
     reserve_space(TriaLevel         &tria_level,
                   const unsigned int total_cells,
                   const unsigned int dimension,
-                  const unsigned int space_dimension)
+                  const unsigned int space_dimension,
+                  const bool         tetraheder_in_mesh = false)
     {
       // we need space for total_cells cells. Maybe we have more already
       // with those cells which are unused, so only allocate new space if
@@ -2091,6 +2092,16 @@ namespace internal
                                          total_cells -
                                            tria_level.refine_flags.size(),
                                          /*RefinementCase::no_refinement=*/0);
+
+          if (tetraheder_in_mesh)
+            {
+              tria_level.refine_choice.reserve(total_cells);
+              tria_level.refine_choice.insert(
+                tria_level.refine_choice.end(),
+                total_cells - tria_level.refine_choice.size(),
+                static_cast<char>(
+                  IsotropicRefinementChoice::isotropic_refinement));
+            }
 
           tria_level.coarsen_flags.reserve(total_cells);
           tria_level.coarsen_flags.insert(tria_level.coarsen_flags.end(),
@@ -3588,6 +3599,7 @@ namespace internal
         level.level_subdomain_ids.assign(size, 0);
 
         level.refine_flags.assign(size, 0u);
+        level.refine_choice.assign(size, 0u);
         level.coarsen_flags.assign(size, false);
 
         level.parents.assign((size + 1) / 2, -1);
@@ -6016,10 +6028,18 @@ namespace internal
                          triangulation.levels[level + 1]->cells.used.end(),
                          true);
 
-            reserve_space(*triangulation.levels[level + 1],
-                          used_cells + new_cells,
-                          3,
-                          spacedim);
+            if (triangulation.all_reference_cells_are_hyper_cube())
+              reserve_space(*triangulation.levels[level + 1],
+                            used_cells + new_cells,
+                            3,
+                            spacedim,
+                            false);
+            else
+              reserve_space(*triangulation.levels[level + 1],
+                            used_cells + new_cells,
+                            3,
+                            spacedim,
+                            true);
 
             reserve_space(triangulation.levels[level + 1]->cells, new_cells);
           }
@@ -6666,22 +6686,64 @@ namespace internal
                       static constexpr dealii::ndarray<unsigned int, 3, 2>
                         new_line_vertices = {{{{6, 8}}, {{5, 7}}, {{4, 9}}}};
 
-                      const auto &vertices = triangulation.get_vertices();
-                      double      min_distance =
-                        std::numeric_limits<double>::infinity();
-                      for (unsigned int i = 0; i < new_line_vertices.size();
-                           ++i)
+                      // choose line to cut either by refinement case or by
+                      // shortest distance between edge midpoints
+                      std::uint8_t refinement_choice = hex->refine_choice();
+                      if (refinement_choice ==
+                          static_cast<char>(
+                            IsotropicRefinementChoice::isotropic_refinement))
                         {
-                          const double current_distance =
-                            vertices[vertex_indices[new_line_vertices[i][0]]]
-                              .distance(
-                                vertices
-                                  [vertex_indices[new_line_vertices[i][1]]]);
-                          if (current_distance < min_distance)
+                          const auto &vertices = triangulation.get_vertices();
+                          double      min_distance =
+                            std::numeric_limits<double>::infinity();
+                          for (unsigned int i = 0; i < new_line_vertices.size();
+                               ++i)
                             {
-                              chosen_line_tetrahedron = i;
-                              min_distance            = current_distance;
+                              const double current_distance =
+                                vertices
+                                  [vertex_indices[new_line_vertices[i][0]]]
+                                    .distance(
+                                      vertices[vertex_indices
+                                                 [new_line_vertices[i][1]]]);
+                              if (current_distance < min_distance)
+                                {
+                                  chosen_line_tetrahedron = i;
+                                  min_distance            = current_distance;
+                                }
                             }
+                        }
+                      else if (refinement_choice ==
+                               static_cast<char>(
+                                 IsotropicRefinementChoice::cut_tet_68))
+                        chosen_line_tetrahedron = 0;
+                      else if (refinement_choice ==
+                               static_cast<char>(
+                                 IsotropicRefinementChoice::cut_tet_57))
+                        chosen_line_tetrahedron = 1;
+                      else if (refinement_choice ==
+                               static_cast<char>(
+                                 IsotropicRefinementChoice::cut_tet_49))
+                        chosen_line_tetrahedron = 2;
+                      else
+                        DEAL_II_NOT_IMPLEMENTED();
+
+                      switch (chosen_line_tetrahedron)
+                        {
+                          case 0:
+                            hex->set_refinement_case(
+                              RefinementCase<dim>(static_cast<char>(
+                                IsotropicRefinementChoice::cut_tet_68)));
+                            break;
+                          case 1:
+                            hex->set_refinement_case(
+                              RefinementCase<dim>(static_cast<char>(
+                                IsotropicRefinementChoice::cut_tet_57)));
+                            break;
+                          case 2:
+                            hex->set_refinement_case(
+                              RefinementCase<dim>(static_cast<char>(
+                                IsotropicRefinementChoice::cut_tet_49)));
+                            break;
                         }
 
                       new_lines[0]->set_bounding_object_indices(
@@ -6780,27 +6842,16 @@ namespace internal
                          ++i)
                       relevant_line_indices[i] = relevant_lines[i]->index();
 
-                    static constexpr dealii::ndarray<unsigned int, 12, 4>
-                      new_quad_lines_hex = {{{{10, 28, 16, 24}},
-                                             {{28, 14, 17, 25}},
-                                             {{11, 29, 24, 20}},
-                                             {{29, 15, 25, 21}},
-                                             {{18, 26, 0, 28}},
-                                             {{26, 22, 1, 29}},
-                                             {{19, 27, 28, 4}},
-                                             {{27, 23, 29, 5}},
-                                             {{2, 24, 8, 26}},
-                                             {{24, 6, 9, 27}},
-                                             {{3, 25, 26, 12}},
-                                             {{25, 7, 27, 13}}}};
-
-                    // It is easierst to start at table cell_vertices_tet,
+                    // It is easierst to start at table cell_vertices,
                     // there the vertices are listed which build up the
                     // 8 child tets. To build the child tets, 8 new faces are
                     // needed. The the vertices, which define the lines of these
                     // new faces are listed in table_tet. Now only the
                     // corresponding index of the lines and quads have to be
                     // listed in new_quad_lines_tet and cell_quads_tet.
+                    const auto &new_quad_lines =
+                      hex->reference_cell().new_isotropic_child_face_lines(
+                        chosen_line_tetrahedron);
 
                     // The first 4 define the faces which cut off the
                     // parent tetrahedron at the edges. the numbers are the
@@ -6809,116 +6860,13 @@ namespace internal
                     // of these contain line number 12. the ordering of the
                     // faces is arbitrary, the ordering within the faces has to
                     // follow the righthand convention for triangles
-                    static constexpr dealii::ndarray<unsigned int, 3, 12, 4>
-                      new_quad_lines_tet = {{// new line is (6,8)
-                                             {{{{2, 3, 8, X}},
-                                               {{0, 9, 5, X}},
-                                               {{1, 6, 11, X}},
-                                               {{4, 10, 7, X}},
-                                               {{2, 12, 5, X}},
-                                               {{1, 9, 12, X}},
-                                               {{4, 8, 12, X}},
-                                               {{6, 12, 10, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}}}},
-                                             // new line is (5,7)
-                                             {{{{2, 3, 8, X}},
-                                               {{0, 9, 5, X}},
-                                               {{1, 6, 11, X}},
-                                               {{4, 10, 7, X}},
-                                               {{0, 3, 12, X}},
-                                               {{1, 12, 8, X}},
-                                               {{4, 12, 9, X}},
-                                               {{7, 11, 12, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}}}},
-                                             // new line is (4,9)
-                                             {{{{2, 3, 8, X}},
-                                               {{0, 9, 5, X}},
-                                               {{1, 6, 11, X}},
-                                               {{4, 10, 7, X}},
-                                               {{0, 12, 11, X}},
-                                               {{2, 6, 12, X}},
-                                               {{3, 12, 7, X}},
-                                               {{5, 10, 12, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}},
-                                               {{X, X, X, X}}}}}};
-
-                    static constexpr dealii::ndarray<unsigned int, 12, 4, 2>
-                      table_hex = {
-                        {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
-                         {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
-                         {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
-                         {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
-                         {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
-                         {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
-                         {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
-                         {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
-                         {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
-                         {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
-                         {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
-                         {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}}}};
-
                     // The table defines the vertices of the lines above
                     // see relevant_lines for mapping between line indices and
                     // vertex numbering
-                    static constexpr dealii::ndarray<unsigned int, 3, 12, 4, 2>
-                      table_tet = {
-                        {// new line is (6, 8)
-                         {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                           {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                           {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                           {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                           {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
-                           {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
-                           {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
-                           {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-                         // new line is (5, 7)
-                         {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                           {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                           {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                           {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                           {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
-                           {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
-                           {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
-                           {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-                         // new line is (4, 9)
-                         {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                           {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                           {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                           {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                           {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
-                           {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
-                           {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
-                           {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                           {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}}}};
-
-                    const auto &new_quad_lines =
-                      (reference_cell_type == ReferenceCells::Hexahedron) ?
-                        new_quad_lines_hex :
-                        new_quad_lines_tet[chosen_line_tetrahedron];
-
                     const auto &table =
-                      (reference_cell_type == ReferenceCells::Hexahedron) ?
-                        table_hex :
-                        table_tet[chosen_line_tetrahedron];
+                      hex->reference_cell()
+                        .new_isotropic_child_face_line_vertices(
+                          chosen_line_tetrahedron);
 
                     static constexpr dealii::ndarray<unsigned int, 4, 2>
                       representative_lines{
@@ -7041,18 +6989,6 @@ namespace internal
                         DEAL_II_NOT_IMPLEMENTED();
                       }
 
-                    static constexpr dealii::ndarray<unsigned int, 8, 6>
-                      cell_quads_hex = {{
-                        {{12, 0, 20, 4, 28, 8}},  // bottom children
-                        {{0, 16, 22, 6, 29, 9}},  //
-                        {{13, 1, 4, 24, 30, 10}}, //
-                        {{1, 17, 6, 26, 31, 11}}, //
-                        {{14, 2, 21, 5, 8, 32}},  // top children
-                        {{2, 18, 23, 7, 9, 33}},  //
-                        {{15, 3, 5, 25, 10, 34}}, //
-                        {{3, 19, 7, 27, 11, 35}}  //
-                      }};
-
                     // indices of the faces which define the new tets
                     // the ordering of the tets is arbitrary
                     // the first 4 determine the tets cutting of the corners
@@ -7061,85 +6997,9 @@ namespace internal
                     // the ordering within the faces is determined by
                     // convention for the tetrahedron unit cell, see
                     // cell_vertices_tet below
-                    static constexpr dealii::ndarray<unsigned int, 3, 8, 6>
-                      cell_quads_tet = {{// new line is (6, 8)
-                                         {{{{8, 13, 16, 0, X, X}},
-                                           {{9, 12, 1, 21, X, X}},
-                                           {{10, 2, 17, 20, X, X}},
-                                           {{3, 14, 18, 22, X, X}},
-                                           {{11, 1, 4, 5, X, X}},
-                                           {{15, 0, 4, 6, X, X}},
-                                           {{19, 7, 6, 3, X, X}},
-                                           {{23, 5, 2, 7, X, X}}}},
-                                         // new line is (5, 7)
-                                         {{
-                                           {{8, 13, 16, 0, X, X}},
-                                           {{9, 12, 1, 21, X, X}},
-                                           {{10, 2, 17, 20, X, X}},
-                                           {{3, 14, 18, 22, X, X}},
-                                           {{11, 4, 0, 5, X, X}},
-                                           {{15, 4, 1, 6, X, X}},
-                                           {{19, 2, 5, 7, X, X}},
-                                           {{23, 6, 7, 3, X, X}},
-                                         }},
-                                         // new line is (4, 9)
-                                         {{
-                                           {{8, 13, 16, 0, X, X}},
-                                           {{9, 12, 1, 21, X, X}},
-                                           {{10, 2, 17, 20, X, X}},
-                                           {{3, 14, 18, 22, X, X}},
-                                           {{11, 4, 5, 2, X, X}},
-                                           {{15, 6, 7, 3, X, X}},
-                                           {{19, 5, 0, 6, X, X}},
-                                           {{23, 1, 4, 7, X, X}},
-                                         }}}};
-
-                    // the 4 faces of the reference tet are defined by 3
-                    // vertices each and follow the order of the unit cell
-                    static constexpr dealii::ndarray<unsigned int, 4, 3>
-                      reference_cell_face_vertices = {
-                        {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
-
-                    // the 8 child tets are each defined by 4 vertices
-                    // the ordering of the tets has to be consistent with above
-                    // the ordering within the tets is given by the reference
-                    // tet i.e. looking at the fifth line the first 3 vertices
-                    // are given by face 11, the last vertex is the remaining of
-                    // the tet
-                    static constexpr dealii::ndarray<unsigned int, 3, 8, 4>
-                      cell_vertices_tet = {{// new line is (6,8)
-                                            {{{{0, 4, 6, 7}},
-                                              {{4, 1, 5, 8}},
-                                              {{6, 5, 2, 9}},
-                                              {{7, 8, 9, 3}},
-                                              {{4, 5, 6, 8}},
-                                              {{4, 7, 8, 6}},
-                                              {{6, 9, 7, 8}},
-                                              {{5, 8, 9, 6}}}},
-                                            // new line is (5,7)
-                                            {{{{0, 4, 6, 7}},
-                                              {{4, 1, 5, 8}},
-                                              {{6, 5, 2, 9}},
-                                              {{7, 8, 9, 3}},
-                                              {{4, 5, 6, 7}},
-                                              {{4, 7, 8, 5}},
-                                              {{6, 9, 7, 5}},
-                                              {{5, 8, 9, 7}}}},
-                                            // new line is (4,9)
-                                            {{{{0, 4, 6, 7}},
-                                              {{4, 1, 5, 8}},
-                                              {{6, 5, 2, 9}},
-                                              {{7, 8, 9, 3}},
-                                              {{4, 5, 6, 9}},
-                                              {{4, 7, 8, 9}},
-                                              {{6, 9, 7, 4}},
-                                              {{5, 8, 9, 4}}}}}};
-
-
                     const auto &cell_quads =
-                      (reference_cell_type == ReferenceCells::Hexahedron) ?
-                        cell_quads_hex :
-                        cell_quads_tet[chosen_line_tetrahedron];
+                      hex->reference_cell().new_isotropic_child_cell_faces(
+                        chosen_line_tetrahedron);
 
                     for (unsigned int c = 0;
                          c < GeometryInfo<dim>::max_children_per_cell;
@@ -7170,19 +7030,34 @@ namespace internal
                                    face->vertex_index(1),
                                    face->vertex_index(2)}};
 
-                                const auto &new_hex_vertices =
-                                  cell_vertices_tet[chosen_line_tetrahedron][c];
-                                const auto face_f_vertices =
-                                  reference_cell_face_vertices[f];
+                                // the 8 child tets are each defined by 4
+                                // vertices the ordering of the tets has to be
+                                // consistent with above the ordering within the
+                                // tets is given by the reference tet i.e.
+                                // looking at the fifth line the first 3
+                                // vertices are given by face 11, the last
+                                // vertex is the remaining of the tet
+                                const auto new_hex_vertices =
+                                  hex->reference_cell()
+                                    .new_isotropic_child_cell_vertices(
+                                      chosen_line_tetrahedron)[c];
 
+                                // arrange after vertices of the faces of the
+                                // unit cell
                                 const std::array<unsigned int, 3> vertices_1 = {
                                   {
                                     vertex_indices
-                                      [new_hex_vertices[face_f_vertices[0]]],
+                                      [new_hex_vertices
+                                         [hex->reference_cell()
+                                            .face_to_cell_vertices(f, 0, 1)]],
                                     vertex_indices
-                                      [new_hex_vertices[face_f_vertices[1]]],
+                                      [new_hex_vertices
+                                         [hex->reference_cell()
+                                            .face_to_cell_vertices(f, 1, 1)]],
                                     vertex_indices
-                                      [new_hex_vertices[face_f_vertices[2]]],
+                                      [new_hex_vertices
+                                         [hex->reference_cell()
+                                            .face_to_cell_vertices(f, 2, 1)]],
                                   }};
 
                                 new_hex->set_combined_face_orientation(
@@ -12998,6 +12873,7 @@ void Triangulation<dim, spacedim>::set_all_refine_flags()
     {
       cell->clear_coarsen_flag();
       cell->set_refine_flag();
+      cell->set_refine_choice();
     }
 }
 

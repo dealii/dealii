@@ -3631,6 +3631,27 @@ public:
   clear_refine_flag() const;
 
   /**
+   * Return the @p IsotropicRefinementChoices this cell was flagged to be refined
+   * with.
+   */
+  std::uint8_t
+  refine_choice() const;
+
+  /**
+   * Set the @p IsotropicRefinementChoices this cell is flagged to be refined
+   * with.
+   */
+  void
+  set_refine_choice(const std::uint8_t refinement_choice = static_cast<char>(
+                      IsotropicRefinementChoice::isotropic_refinement)) const;
+
+  /**
+   * Clear the @p IsotropicRefinementChoices flag.
+   */
+  void
+  clear_refine_choice() const;
+
+  /**
    * Modify the refinement flag of the cell to ensure (at least) the given
    * refinement case @p face_refinement_case at face <tt>face_no</tt>, taking
    * into account orientation, flip and rotation of the face. Return, whether

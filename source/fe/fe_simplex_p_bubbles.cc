@@ -267,6 +267,7 @@ FE_SimplexP_Bubbles<dim, spacedim>::FE_SimplexP_Bubbles(
   : FE_SimplexPoly<dim, spacedim>(
       FE_P_BubblesImplementation::get_basis<dim>(degree),
       FE_P_BubblesImplementation::get_fe_data<dim>(degree),
+      false,
       FE_P_BubblesImplementation::unit_support_points<dim>(degree),
       {FE_P_BubblesImplementation::unit_support_points<dim - 1>(degree)},
       // Interface constraints are not yet implemented

@@ -66,6 +66,34 @@ namespace internal
 
 
 /**
+ * Enum of different choices for istropic refinement.
+ * There are 3 different ways to refine a tetrahedral, here we save the
+ * different possibilites. It is different to RefinementPossibilites are these
+ * are options in the case that an isotropic refinement is conducted.
+ */
+enum class IsotropicRefinementChoice : std::uint8_t
+{
+  /**
+   * Decide where to perform a cut based on the shortest edge length.
+   */
+  isotropic_refinement = 0,
+  /**
+   * Perform a cut in the along the edge (6,8).
+   */
+  cut_tet_68 = 1,
+  /**
+   * Perform a cut in the along the edge (5,7).
+   */
+  cut_tet_57 = 2,
+  /**
+   * Perform a cut in the along the edge (4,9).
+   */
+  cut_tet_49 = 3,
+};
+
+
+
+/**
  * A type that describes the kinds of reference cells that can be
  * used.  This includes quadrilaterals and hexahedra (i.e.,
  * "hypercubes"), triangles and tetrahedra (simplices), and the
@@ -306,6 +334,18 @@ public:
   face_indices() const;
 
   /**
+   * Return the number of refinement directions of the cell.
+   */
+  unsigned int
+  n_isotropic_refinement_choices() const;
+
+  /**
+   * Return the refinement possibility @p ref_choice.
+   */
+  IsotropicRefinementChoice
+  get_isotropic_refinement_choice(const unsigned int ref_choice) const;
+
+  /**
    * Return the number of cells one would get by isotropically
    * refining the current cell. Here, "isotropic refinement"
    * means that we subdivide in each "direction" of a cell.
@@ -318,6 +358,15 @@ public:
    */
   unsigned int
   n_isotropic_children() const;
+
+  /**
+   * Return the number of cells one would get by refining the
+   * current cell with the given refinement case.
+   */
+  template <int dim>
+  unsigned int
+  n_children(const RefinementCase<dim> ref_case =
+               RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * Return an object that can be thought of as an array containing all
@@ -726,6 +775,35 @@ public:
   faces_for_given_vertex(const unsigned int vertex_index) const;
 
   /**
+   * Return a vector of line indices for all new faces required for isotropic
+   * refinement.
+   */
+  constexpr dealii::ndarray<unsigned int, 12, 4>
+  new_isotropic_child_face_lines(const unsigned int refinement_choice) const;
+
+  /**
+   * Return a vector of vertex indices for all new face lines required for
+   * isotropic refinement.
+   */
+  constexpr dealii::ndarray<unsigned int, 12, 4, 2>
+  new_isotropic_child_face_line_vertices(
+    const unsigned int refinement_choice) const;
+
+  /**
+   * Return a vector of face indices for all new cells required for isotropic
+   * refinement.
+   */
+  constexpr dealii::ndarray<unsigned int, 8, 6>
+  new_isotropic_child_cell_faces(const unsigned int refinement_choice) const;
+
+  /**
+   * Return a vector of vertex indices for all new cells required for isotropic
+   * refinement.
+   */
+  constexpr dealii::ndarray<unsigned int, 8, 4>
+  new_isotropic_child_cell_vertices(const unsigned int refinement_choice) const;
+
+  /**
    * @}
    */
 
@@ -1115,6 +1193,280 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
 }
 
 
+constexpr dealii::ndarray<unsigned int, 12, 4>
+ReferenceCell::new_isotropic_child_face_lines(
+  const unsigned int refienement_choice) const
+{
+  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+  const unsigned int X = numbers::invalid_unsigned_int;
+  switch (this->kind)
+    {
+      case ReferenceCells::Tetrahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 3, 12, 4> new_quad_lines_tet =
+            {{// new line is (6,8)
+              {{{{2, 3, 8, X}},
+                {{0, 9, 5, X}},
+                {{1, 6, 11, X}},
+                {{4, 10, 7, X}},
+                {{2, 12, 5, X}},
+                {{1, 9, 12, X}},
+                {{4, 8, 12, X}},
+                {{6, 12, 10, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}}}},
+              // new line is (5,7)
+              {{{{2, 3, 8, X}},
+                {{0, 9, 5, X}},
+                {{1, 6, 11, X}},
+                {{4, 10, 7, X}},
+                {{0, 3, 12, X}},
+                {{1, 12, 8, X}},
+                {{4, 12, 9, X}},
+                {{7, 11, 12, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}}}},
+              // new line is (4,9)
+              {{{{2, 3, 8, X}},
+                {{0, 9, 5, X}},
+                {{1, 6, 11, X}},
+                {{4, 10, 7, X}},
+                {{0, 12, 11, X}},
+                {{2, 6, 12, X}},
+                {{3, 12, 7, X}},
+                {{5, 10, 12, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}},
+                {{X, X, X, X}}}}}};
+          return new_quad_lines_tet[refienement_choice];
+        }
+
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 12, 4> new_quad_lines_hex = {
+            {{{10, 28, 16, 24}},
+             {{28, 14, 17, 25}},
+             {{11, 29, 24, 20}},
+             {{29, 15, 25, 21}},
+             {{18, 26, 0, 28}},
+             {{26, 22, 1, 29}},
+             {{19, 27, 28, 4}},
+             {{27, 23, 29, 5}},
+             {{2, 24, 8, 26}},
+             {{24, 6, 9, 27}},
+             {{3, 25, 26, 12}},
+             {{25, 7, 27, 13}}}};
+          return new_quad_lines_hex;
+        }
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return {};
+}
+
+
+
+constexpr dealii::ndarray<unsigned int, 12, 4, 2>
+ReferenceCell::new_isotropic_child_face_line_vertices(
+  const unsigned int refienement_choice) const
+{
+  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+  const unsigned int X = numbers::invalid_unsigned_int;
+  switch (this->kind)
+    {
+      case ReferenceCells::Tetrahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 3, 12, 4, 2> table_tet = {
+            {// new line is (6, 8)
+             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+               {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
+               {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
+               {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
+               {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
+             // new line is (5, 7)
+             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+               {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
+               {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
+               {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
+               {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
+             // new line is (4, 9)
+             {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+               {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+               {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+               {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+               {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
+               {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
+               {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
+               {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}}}};
+          return table_tet[refienement_choice];
+        }
+
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 12, 4, 2> table_hex = {
+            {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
+             {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
+             {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
+             {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
+             {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
+             {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
+             {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
+             {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
+             {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
+             {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
+             {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
+             {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}}}};
+          return table_hex;
+        }
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return {};
+}
+
+
+
+constexpr dealii::ndarray<unsigned int, 8, 6>
+ReferenceCell::new_isotropic_child_cell_faces(
+  const unsigned int refienement_choice) const
+{
+  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+  const unsigned int X = numbers::invalid_unsigned_int;
+  switch (this->kind)
+    {
+      case ReferenceCells::Tetrahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 3, 8, 6> cell_quads_tet = {
+            {// new line is (6, 8)
+             {{{{8, 13, 16, 0, X, X}},
+               {{9, 12, 1, 21, X, X}},
+               {{10, 2, 17, 20, X, X}},
+               {{3, 14, 18, 22, X, X}},
+               {{11, 1, 4, 5, X, X}},
+               {{15, 0, 4, 6, X, X}},
+               {{19, 7, 6, 3, X, X}},
+               {{23, 5, 2, 7, X, X}}}},
+             // new line is (5, 7)
+             {{
+               {{8, 13, 16, 0, X, X}},
+               {{9, 12, 1, 21, X, X}},
+               {{10, 2, 17, 20, X, X}},
+               {{3, 14, 18, 22, X, X}},
+               {{11, 4, 0, 5, X, X}},
+               {{15, 4, 1, 6, X, X}},
+               {{19, 2, 5, 7, X, X}},
+               {{23, 6, 7, 3, X, X}},
+             }},
+             // new line is (4, 9)
+             {{
+               {{8, 13, 16, 0, X, X}},
+               {{9, 12, 1, 21, X, X}},
+               {{10, 2, 17, 20, X, X}},
+               {{3, 14, 18, 22, X, X}},
+               {{11, 4, 5, 2, X, X}},
+               {{15, 6, 7, 3, X, X}},
+               {{19, 5, 0, 6, X, X}},
+               {{23, 1, 4, 7, X, X}},
+             }}}};
+          return cell_quads_tet[refienement_choice];
+        }
+
+      case ReferenceCells::Hexahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 8, 6> cell_quads_hex = {{
+            {{12, 0, 20, 4, 28, 8}},  // bottom children
+            {{0, 16, 22, 6, 29, 9}},  //
+            {{13, 1, 4, 24, 30, 10}}, //
+            {{1, 17, 6, 26, 31, 11}}, //
+            {{14, 2, 21, 5, 8, 32}},  // top children
+            {{2, 18, 23, 7, 9, 33}},  //
+            {{15, 3, 5, 25, 10, 34}}, //
+            {{3, 19, 7, 27, 11, 35}}  //
+          }};
+          return cell_quads_hex;
+        }
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return {};
+}
+
+
+
+constexpr dealii::ndarray<unsigned int, 8, 4>
+ReferenceCell::new_isotropic_child_cell_vertices(
+  const unsigned int refienement_choice) const
+{
+  // AssertIndexRange(refienement_choice, n_isotropic_refinement_choices());
+
+  switch (this->kind)
+    {
+      case ReferenceCells::Tetrahedron:
+        {
+          constexpr dealii::ndarray<unsigned int, 3, 8, 4> cell_vertices_tet = {
+            {// new line is (6,8)
+             {{{{0, 4, 6, 7}},
+               {{4, 1, 5, 8}},
+               {{6, 5, 2, 9}},
+               {{7, 8, 9, 3}},
+               {{4, 5, 6, 8}},
+               {{4, 7, 8, 6}},
+               {{6, 9, 7, 8}},
+               {{5, 8, 9, 6}}}},
+             // new line is (5,7)
+             {{{{0, 4, 6, 7}},
+               {{4, 1, 5, 8}},
+               {{6, 5, 2, 9}},
+               {{7, 8, 9, 3}},
+               {{4, 5, 6, 7}},
+               {{4, 7, 8, 5}},
+               {{6, 9, 7, 5}},
+               {{5, 8, 9, 7}}}},
+             // new line is (4,9)
+             {{{{0, 4, 6, 7}},
+               {{4, 1, 5, 8}},
+               {{6, 5, 2, 9}},
+               {{7, 8, 9, 3}},
+               {{4, 5, 6, 9}},
+               {{4, 7, 8, 9}},
+               {{6, 9, 7, 4}},
+               {{5, 8, 9, 4}}}}}};
+          return cell_vertices_tet[refienement_choice];
+        }
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+
+  return {};
+}
+
+
 
 inline bool
 ReferenceCell::is_hyper_cube() const
@@ -1391,6 +1743,62 @@ ReferenceCell::face_indices() const
 
 
 inline unsigned int
+ReferenceCell::n_isotropic_refinement_choices() const
+{
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return 1;
+      case ReferenceCells::Line:
+        return 1;
+      case ReferenceCells::Triangle:
+        return 1;
+      case ReferenceCells::Quadrilateral:
+        return 1;
+      case ReferenceCells::Tetrahedron:
+        return 3;
+      case ReferenceCells::Pyramid:
+        return 1;
+      case ReferenceCells::Wedge:
+        return 1;
+      case ReferenceCells::Hexahedron:
+        return 1;
+      default:
+        DEAL_II_ASSERT_UNREACHABLE();
+    }
+
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline IsotropicRefinementChoice
+ReferenceCell::get_isotropic_refinement_choice(
+  const unsigned int ref_choice) const
+{
+  AssertIndexRange(ref_choice, n_isotropic_refinement_choices());
+  switch (this->kind)
+    {
+      case ReferenceCells::Tetrahedron:
+        {
+          static constexpr ndarray<IsotropicRefinementChoice, 3>
+            isotropic_ref_choices = {{IsotropicRefinementChoice::cut_tet_68,
+                                      IsotropicRefinementChoice::cut_tet_57,
+                                      IsotropicRefinementChoice::cut_tet_49}};
+          return isotropic_ref_choices[ref_choice];
+        }
+      default:
+        {
+          DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+
+  return IsotropicRefinementChoice::isotropic_refinement;
+}
+
+
+
+inline unsigned int
 ReferenceCell::n_isotropic_children() const
 {
   switch (this->kind)
@@ -1408,17 +1816,29 @@ ReferenceCell::n_isotropic_children() const
       case ReferenceCells::Pyramid:
         // We haven't yet decided how to refine pyramids. Update this when we
         // have
-        DEAL_II_NOT_IMPLEMENTED();
-        return numbers::invalid_unsigned_int;
+        return 0;
       case ReferenceCells::Wedge:
         return 8;
       case ReferenceCells::Hexahedron:
         return 8;
       default:
-        DEAL_II_NOT_IMPLEMENTED();
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
   return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim>
+unsigned int
+ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
+{
+  // Use GeometryInfo here to keep it the single source of truth
+  if (this->is_hyper_cube())
+    return GeometryInfo<dim>::n_children(ref_case);
+  else
+    return this->n_isotropic_children();
 }
 
 

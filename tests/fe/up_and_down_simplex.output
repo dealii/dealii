@@ -1,0 +1,23 @@
+
+DEAL::2d, uniform grid, fe #0, dofs_per_cell=3; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #1, dofs_per_cell=6; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #2, dofs_per_cell=10; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #3, dofs_per_cell=3; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #4, dofs_per_cell=6; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #5, dofs_per_cell=10; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #6, dofs_per_cell=12; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #7, dofs_per_cell=18; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #8, dofs_per_cell=19; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #9, dofs_per_cell=55; relative residual: 0.000 ok
+DEAL::2d, uniform grid, fe #10, dofs_per_cell=49; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #0, dofs_per_cell=4; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #1, dofs_per_cell=10; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #2, dofs_per_cell=20; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #3, dofs_per_cell=4; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #4, dofs_per_cell=10; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #5, dofs_per_cell=20; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #6, dofs_per_cell=20; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #7, dofs_per_cell=28; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #8, dofs_per_cell=29; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #9, dofs_per_cell=85; relative residual: 0.000 ok
+DEAL::3d, uniform grid, fe #10, dofs_per_cell=71; relative residual: 0.000 ok
