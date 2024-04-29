@@ -598,21 +598,6 @@ namespace parallel
       Assert(this->n_cells() == 0,
              ExcMessage("load() only works if the Triangulation is empty!"));
 
-      // Compute global offset for each rank.
-      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
-
-      unsigned int global_first_cell = 0;
-
-      int ierr = MPI_Exscan(&n_locally_owned_cells,
-                            &global_first_cell,
-                            1,
-                            MPI_UNSIGNED,
-                            MPI_SUM,
-                            this->mpi_communicator);
-      AssertThrowMPI(ierr);
-
-      global_first_cell *= sizeof(unsigned int);
-
 
       unsigned int version, numcpus, attached_count_fixed,
         attached_count_variable, n_global_active_cells;
@@ -628,8 +613,6 @@ namespace parallel
 
       AssertThrow(version == 4,
                   ExcMessage("Incompatible version found in .info file."));
-      Assert(this->n_global_active_cells() == n_global_active_cells,
-             ExcMessage("Number of global active cells differ!"));
 
       // Load description and construct the triangulation.
       {
@@ -708,6 +691,24 @@ namespace parallel
 
         this->create_triangulation(construction_data);
       }
+
+      // Compute global offset for each rank.
+      unsigned int n_locally_owned_cells = this->n_locally_owned_active_cells();
+
+      unsigned int global_first_cell = 0;
+
+      int ierr = MPI_Exscan(&n_locally_owned_cells,
+                            &global_first_cell,
+                            1,
+                            MPI_UNSIGNED,
+                            MPI_SUM,
+                            this->mpi_communicator);
+      AssertThrowMPI(ierr);
+
+      global_first_cell *= sizeof(unsigned int);
+
+      Assert(this->n_global_active_cells() == n_global_active_cells,
+             ExcMessage("Number of global active cells differ!"));
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()

@@ -304,6 +304,15 @@ namespace parallel
     virtual types::coarse_cell_id
     n_global_coarse_cells() const override;
 
+    /**
+     * Reset this triangulation to an empty state by deleting all data.
+     *
+     * Note that this operation is only allowed if no subscriptions to this
+     * object exist any more, such as DoFHandler objects using it.
+     */
+    virtual void
+    clear() override;
+
   protected:
     /**
      * MPI communicator to be used for the triangulation. We create a unique
@@ -459,15 +468,6 @@ namespace parallel
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
-
-    /**
-     * Reset this triangulation into a virgin state by deleting all data.
-     *
-     * Note that this operation is only allowed if no subscriptions to this
-     * object exist any more, such as DoFHandler objects using it.
-     */
-    virtual void
-    clear() override;
 
     using cell_iterator =
       typename dealii::Triangulation<dim, spacedim>::cell_iterator;
