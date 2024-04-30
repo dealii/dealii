@@ -1795,7 +1795,7 @@ public:
   virtual ~Triangulation() override;
 
   /**
-   * Reset this triangulation into a virgin state by deleting all data.
+   * Reset this triangulation into an empty state by deleting all data.
    *
    * Note that this operation is only allowed if no subscriptions to this
    * object exist any more, such as DoFHandler objects using it.

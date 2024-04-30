@@ -520,7 +520,7 @@ TimeStepBase_Tria<dim>::restore_grid()
   Assert(tria == nullptr, ExcGridNotDeleted());
   Assert(refine_flags.size() == coarsen_flags.size(), ExcInternalError());
 
-  // create a virgin triangulation and
+  // create an empty triangulation and
   // set it to a copy of the coarse grid
   tria = new Triangulation<dim>();
   tria->copy_triangulation(*coarse_grid);
