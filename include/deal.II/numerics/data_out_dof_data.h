@@ -931,7 +931,7 @@ public:
    * Release the pointers to the data vectors and the DoF handler. You have to
    * set all data entries again using the add_data_vector() function. The
    * pointer to the dof handler is cleared as well, along with all other data.
-   * In effect, this function resets everything to a virgin state.
+   * In effect, this function resets everything to an empty state.
    */
   virtual void
   clear();

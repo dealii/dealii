@@ -96,7 +96,7 @@ DEAL_II_NAMESPACE_OPEN
  * a triangulation; it only becomes one after @p restore is first called. Note
  * also that the @p execute_coarsening_and_refinement stores all necessary
  * flags for later reconstruction using the @p restore function.
- * Triangulation::clear() resets the underlying triangulation to a virgin
+ * Triangulation::clear() resets the underlying triangulation to an empty
  * state, but does not affect the stored refinement flags needed for later
  * reconstruction and does also not touch the coarse grid which is used within
  * restore().

@@ -338,8 +338,7 @@ MatrixOut::build_patches(const Matrix      &matrix,
       --gridpoints_y;
     }
 
-  // first clear old data and set it
-  // to virgin state
+  // first clear old data and re-set the object to a correctly sized state:
   patches.clear();
   patches.resize((gridpoints_x) * (gridpoints_y));
 
