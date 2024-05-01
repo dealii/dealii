@@ -688,7 +688,7 @@ namespace Step7
 
     std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
+                                             types::boundary_id(0),
                                              Solution<dim>(),
                                              boundary_values);
     MatrixTools::apply_boundary_values(boundary_values,

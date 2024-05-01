@@ -194,7 +194,7 @@ void Step6<dim>::setup_system()
   // order: if two constraints conflict then the constraint matrix either abort
   // or throw an exception via the Assert macro.
   VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
+                                           types::boundary_id(0),
                                            Functions::ZeroFunction<dim>(),
                                            constraints);
 

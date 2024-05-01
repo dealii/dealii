@@ -490,8 +490,9 @@ void Step3::assemble_system()
   // boundary by indicators, and tell the interpolate_boundary_values
   // function to only compute the boundary values on a certain part of the
   // boundary (e.g. the clamped part, or the inflow boundary). By default,
-  // all boundaries have a 0 boundary indicator, unless otherwise specified. If
-  // sections of the boundary have different boundary conditions, you have to
+  // all boundaries have a 0 boundary indicator, unless otherwise specified.
+  // (For example, many functions in namespace GridGenerator specify otherwise.)
+  // If sections of the boundary have different boundary conditions, you have to
   // number those parts with different boundary indicators. The function call
   // below will then only determine boundary values for those parts of the
   // boundary for which the boundary indicator is in fact the zero specified as
@@ -510,7 +511,7 @@ void Step3::assemble_system()
   // class.
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
+                                           types::boundary_id(0),
                                            Functions::ZeroFunction<2>(),
                                            boundary_values);
   // Now that we got the list of boundary DoFs and their respective boundary

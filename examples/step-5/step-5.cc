@@ -218,7 +218,7 @@ void Step5<dim>::assemble_system()
   // With the matrix so built, we use zero boundary values again:
   std::map<types::global_dof_index, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
-                                           0,
+                                           types::boundary_id(0),
                                            Functions::ZeroFunction<dim>(),
                                            boundary_values);
   MatrixTools::apply_boundary_values(boundary_values,
