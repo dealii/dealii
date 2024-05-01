@@ -89,6 +89,13 @@ namespace internal
       std::vector<std::uint8_t> refine_flags;
 
       /**
+       * @p IsotropicRefinementChoices direction for the tetrahedral cells to be
+       * refined with
+       * or choose the optimal way @p ReferenceCell::isotropic_refinement.
+       */
+      std::vector<std::uint8_t> refine_choice;
+
+      /**
        * Same meaning as the one above, but specifies whether a cell must be
        * coarsened.
        */

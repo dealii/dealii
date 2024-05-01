@@ -155,10 +155,14 @@ main(int argc, char **argv)
 
   // Functions::ConstantFunction<2, double> fu(1.);
   RightHandSideFunction<2> fu;
+  RightHandSideFunction<3> fu3;
 
   for (unsigned int i = 0; i <= 4; ++i)
     test<2, double>(i, fu, false);
 
   for (unsigned int i = 0; i <= 2; ++i)
     test<2, double>(i, fu, true);
+
+  for (unsigned int i = 1; i <= 2; ++i)
+    test<3, double>(i, fu3, true);
 }

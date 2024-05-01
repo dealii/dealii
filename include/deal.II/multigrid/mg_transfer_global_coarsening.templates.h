@@ -376,14 +376,16 @@ namespace internal
 
     template <int dim, int spacedim>
     FullMatrix<double>
-    get_restriction_matrix(const FiniteElement<dim, spacedim> &fe,
-                           const unsigned int                  child)
+    get_restriction_matrix(
+      const FiniteElement<dim, spacedim> &fe,
+      const unsigned int                  child,
+      RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement)
     {
-      auto matrix = fe.get_restriction_matrix(child);
+      auto matrix = fe.get_restriction_matrix(child, ref_case);
 
       for (unsigned int c_other = 0; c_other < child; ++c_other)
         {
-          auto matrix_other = fe.get_restriction_matrix(c_other);
+          auto matrix_other = fe.get_restriction_matrix(c_other, ref_case);
           for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
             {
               if (fe.restriction_is_additive(i) == true)
@@ -1973,13 +1975,20 @@ namespace internal
               for (unsigned int c = 0;
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
-                for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
-                  for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
-                    transfer.schemes[1].prolongation_matrix
-                      [i * n_dofs_per_cell *
-                         GeometryInfo<dim>::max_children_per_cell +
-                       j + c * n_dofs_per_cell] =
-                      fe.get_prolongation_matrix(c)(j, i);
+                {
+                  const auto matrix =
+                    reference_cell == ReferenceCells::Tetrahedron ?
+                      fe.get_prolongation_matrix(c, RefinementCase<dim>(1)) :
+                      fe.get_prolongation_matrix(c);
+
+
+                  for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+                    for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+                      transfer.schemes[1].prolongation_matrix
+                        [i * n_dofs_per_cell *
+                           GeometryInfo<dim>::max_children_per_cell +
+                         j + c * n_dofs_per_cell] = matrix(j, i);
+                }
             }
             {
               transfer.schemes[1].restriction_matrix.resize(
@@ -1990,7 +1999,10 @@ namespace internal
                    c < GeometryInfo<dim>::max_children_per_cell;
                    ++c)
                 {
-                  const auto matrix = get_restriction_matrix(fe, c);
+                  const auto matrix =
+                    reference_cell == ReferenceCells::Tetrahedron ?
+                      get_restriction_matrix(fe, c, RefinementCase<dim>(1)) :
+                      get_restriction_matrix(fe, c);
                   for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
                     for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
                       transfer.schemes[1].restriction_matrix

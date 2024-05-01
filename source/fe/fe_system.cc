@@ -892,7 +892,9 @@ FESystem<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
+
+
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -974,7 +976,7 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
 
   // initialization upon first request, construction completely analogous to
   // restriction matrix

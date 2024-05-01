@@ -139,10 +139,10 @@ FiniteElement<dim, spacedim>::FiniteElement(
        RefinementCase<dim>::all_refinement_cases())
     if (ref_case != RefinementCase<dim>::no_refinement)
       {
-        prolongation[ref_case - 1].resize(GeometryInfo<dim>::n_children(
+        prolongation[ref_case - 1].resize(this->reference_cell().n_children(
                                             RefinementCase<dim>(ref_case)),
                                           FullMatrix<double>());
-        restriction[ref_case - 1].resize(GeometryInfo<dim>::n_children(
+        restriction[ref_case - 1].resize(this->reference_cell().n_children(
                                            RefinementCase<dim>(ref_case)),
                                          FullMatrix<double>());
       }
@@ -305,7 +305,7 @@ FiniteElement<dim, spacedim>::reinit_restriction_and_prolongation_matrices(
     if (ref_case != RefinementCase<dim>::no_refinement)
       {
         const unsigned int nc =
-          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+          this->reference_cell().n_children(RefinementCase<dim>(ref_case));
 
         for (unsigned int i = 0; i < nc; ++i)
           {
@@ -337,8 +337,9 @@ FiniteElement<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
+  AssertIndexRange(child,
+                   this->reference_cell().n_children(
+                     RefinementCase<dim>(refinement_case)));
   // we use refinement_case-1 here. the -1 takes care of the origin of the
   // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
   // available and so the vector indices are shifted
@@ -360,8 +361,9 @@ FiniteElement<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
+  AssertIndexRange(child,
+                   this->reference_cell().n_children(
+                     RefinementCase<dim>(refinement_case)));
   // we use refinement_case-1 here. the -1 takes care
   // of the origin of the vector, as for
   // RefinementCase::no_refinement (=0) there is no
@@ -703,7 +705,7 @@ FiniteElement<dim, spacedim>::prolongation_is_implemented() const
        RefinementCase<dim>::all_refinement_cases())
     if (ref_case != RefinementCase<dim>::no_refinement)
       for (unsigned int c = 0;
-           c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+           c < this->reference_cell().n_children(RefinementCase<dim>(ref_case));
            ++c)
         {
           // make sure also the lazily initialized matrices are created
@@ -733,7 +735,7 @@ FiniteElement<dim, spacedim>::restriction_is_implemented() const
        RefinementCase<dim>::all_refinement_cases())
     if (ref_case != RefinementCase<dim>::no_refinement)
       for (unsigned int c = 0;
-           c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+           c < this->reference_cell().n_children(RefinementCase<dim>(ref_case));
            ++c)
         {
           // make sure also the lazily initialized matrices are created
@@ -763,7 +765,7 @@ FiniteElement<dim, spacedim>::isotropic_prolongation_is_implemented() const
     RefinementCase<dim>::isotropic_refinement;
 
   for (unsigned int c = 0;
-       c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+       c < this->reference_cell().n_children(RefinementCase<dim>(ref_case));
        ++c)
     {
       // make sure also the lazily initialized matrices are created
@@ -791,7 +793,7 @@ FiniteElement<dim, spacedim>::isotropic_restriction_is_implemented() const
     RefinementCase<dim>::isotropic_refinement;
 
   for (unsigned int c = 0;
-       c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+       c < this->reference_cell().n_children(RefinementCase<dim>(ref_case));
        ++c)
     {
       // make sure also the lazily initialized matrices are created
