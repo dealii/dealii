@@ -262,7 +262,7 @@ void Step3::assemble_system()
   // 2d. This quadrature formula integrates polynomials of degrees up to three
   // exactly (in 1d). It is easy to check that this is sufficient for the
   // present problem:
-  QGauss<2> quadrature_formula(fe.degree + 1);
+  const QGauss<2> quadrature_formula(fe.degree + 1);
   // And we initialize the object which we have briefly talked about above. It
   // needs to be told which finite element we want to use, and the quadrature
   // points and their weights (jointly described by a Quadrature object). As
