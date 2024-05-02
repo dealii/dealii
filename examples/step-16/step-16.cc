@@ -580,7 +580,7 @@ namespace Step16
 
     // With all this together, we can finally get about solving the linear
     // system in the usual way:
-    SolverControl            solver_control(1000, 1e-12);
+    SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
     SolverCG<Vector<double>> solver(solver_control);
 
     solution = 0;
