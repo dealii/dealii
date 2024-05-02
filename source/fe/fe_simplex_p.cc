@@ -495,10 +495,6 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
 
       const auto &child_cell = tria.begin(0)->child(child);
 
-      const auto &mapping =
-        this->reference_cell()
-          .template get_default_linear_mapping<dim, spacedim>();
-
       // iterate over all support points and transfom them to the unit cell of
       // the child
       for (unsigned int i = 0; i < unit_support_points.size(); i++)
@@ -510,10 +506,12 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
                        Point<spacedim>(unit_support_points[i][0],
                                        unit_support_points[i][1],
                                        unit_support_points[i][2])};
-          mapping.transform_points_real_to_unit_cell(
-            child_cell,
-            make_array_view(unit_support_point),
-            make_array_view(transformed_point));
+          this->reference_cell()
+            .template get_default_linear_mapping<dim, spacedim>()
+            .transform_points_real_to_unit_cell(
+              child_cell,
+              make_array_view(unit_support_point),
+              make_array_view(transformed_point));
 
           // if point is inside the unit cell iterate over all shape functions
           if (this->reference_cell().contains_point(transformed_point[0], eps))
