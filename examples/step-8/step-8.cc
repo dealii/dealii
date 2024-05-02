@@ -318,10 +318,10 @@ namespace Step8
     // Now we can begin with the loop over all cells:
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
+        fe_values.reinit(cell);
+
         cell_matrix = 0;
         cell_rhs    = 0;
-
-        fe_values.reinit(cell);
 
         // Next we get the values of the coefficients at the quadrature
         // points. Likewise for the right hand side:

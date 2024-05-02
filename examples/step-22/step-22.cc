@@ -659,6 +659,7 @@ namespace Step22
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
+
         local_matrix                = 0;
         local_preconditioner_matrix = 0;
         local_rhs                   = 0;
