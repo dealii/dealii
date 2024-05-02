@@ -145,7 +145,7 @@ double coefficient(const Point<dim> &p)
 // the desired polynomial degree (here <code>2</code>):
 template <int dim>
 Step6<dim>::Step6()
-  : fe(2)
+  : fe(/* polynomial degree = */ 2)
   , dof_handler(triangulation)
 {}
 

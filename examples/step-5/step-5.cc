@@ -114,7 +114,7 @@ double coefficient(const Point<dim> &p)
 // This function is as before.
 template <int dim>
 Step5<dim>::Step5()
-  : fe(1)
+  : fe(/* polynomial degree = */ 1)
   , dof_handler(triangulation)
 {}
 

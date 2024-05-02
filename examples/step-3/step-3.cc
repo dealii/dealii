@@ -132,7 +132,7 @@ private:
 // distribute_dofs() function.) All the other member variables of the Step3
 // class have a default constructor which does all we want.
 Step3::Step3()
-  : fe(1)
+  : fe(/* polynomial degree = */ 1)
   , dof_handler(triangulation)
 {}
 
