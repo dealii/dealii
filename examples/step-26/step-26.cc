@@ -86,7 +86,7 @@ namespace Step26
                      const unsigned int max_grid_level);
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     AffineConstraints<double> constraints;

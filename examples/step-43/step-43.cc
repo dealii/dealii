@@ -504,7 +504,7 @@ namespace Step43
     const unsigned int degree;
 
     const unsigned int        darcy_degree;
-    FESystem<dim>             darcy_fe;
+    const FESystem<dim>       darcy_fe;
     DoFHandler<dim>           darcy_dof_handler;
     AffineConstraints<double> darcy_constraints;
 
@@ -521,7 +521,7 @@ namespace Step43
 
 
     const unsigned int        saturation_degree;
-    FE_Q<dim>                 saturation_fe;
+    const FE_Q<dim>           saturation_fe;
     DoFHandler<dim>           saturation_dof_handler;
     AffineConstraints<double> saturation_constraints;
 

@@ -351,7 +351,7 @@ namespace Step64
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
     IndexSet locally_owned_dofs;

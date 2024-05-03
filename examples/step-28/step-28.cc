@@ -1194,7 +1194,7 @@ namespace Step28
     // all energy groups:
     const Parameters  &parameters;
     const MaterialData material_data;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
 
     // Furthermore, we have (iv) the value of the computed eigenvalue at the
     // present iteration. This is, in fact, the only part of the solution that

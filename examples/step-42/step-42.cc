@@ -660,9 +660,9 @@ namespace Step42
     const unsigned int                        n_initial_global_refinements;
     parallel::distributed::Triangulation<dim> triangulation;
 
-    const unsigned int fe_degree;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    const unsigned int  fe_degree;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;

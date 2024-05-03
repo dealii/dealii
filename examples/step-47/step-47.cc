@@ -163,7 +163,7 @@ namespace Step47
 
     MappingQ<dim> mapping;
 
-    FE_Q<dim>                 fe;
+    const FE_Q<dim>           fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
 

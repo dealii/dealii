@@ -372,9 +372,9 @@ namespace Step29
 
     ParameterHandler &prm;
 
-    Triangulation<dim> triangulation;
-    DoFHandler<dim>    dof_handler;
-    FESystem<dim>      fe;
+    Triangulation<dim>  triangulation;
+    DoFHandler<dim>     dof_handler;
+    const FESystem<dim> fe;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;

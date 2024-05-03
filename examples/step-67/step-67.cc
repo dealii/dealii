@@ -1774,9 +1774,9 @@ namespace Euler_DG
     Triangulation<dim> triangulation;
 #endif
 
-    FESystem<dim>   fe;
-    MappingQ<dim>   mapping;
-    DoFHandler<dim> dof_handler;
+    const FESystem<dim> fe;
+    MappingQ<dim>       mapping;
+    DoFHandler<dim>     dof_handler;
 
     TimerOutput timer;
 

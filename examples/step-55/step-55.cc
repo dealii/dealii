@@ -306,7 +306,7 @@ namespace Step55
     double       viscosity;
     MPI_Comm     mpi_communicator;
 
-    FESystem<dim>                             fe;
+    const FESystem<dim>                       fe;
     parallel::distributed::Triangulation<dim> triangulation;
     DoFHandler<dim>                           dof_handler;
 

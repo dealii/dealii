@@ -73,7 +73,7 @@ namespace Step58
 
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     AffineConstraints<std::complex<double>> constraints;

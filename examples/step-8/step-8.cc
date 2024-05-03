@@ -94,7 +94,7 @@ namespace Step8
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    FESystem<dim> fe;
+    const FESystem<dim> fe;
 
     AffineConstraints<double> constraints;
 

@@ -111,9 +111,9 @@ namespace Step21
 
     const unsigned int degree;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;

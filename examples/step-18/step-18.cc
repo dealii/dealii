@@ -401,7 +401,7 @@ namespace Step18
     // This is the new shared Triangulation:
     parallel::shared::Triangulation<dim> triangulation;
 
-    FESystem<dim> fe;
+    const FESystem<dim> fe;
 
     DoFHandler<dim> dof_handler;
 

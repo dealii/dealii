@@ -123,8 +123,8 @@ namespace Step46
     const unsigned int elasticity_degree;
 
     Triangulation<dim>    triangulation;
-    FESystem<dim>         stokes_fe;
-    FESystem<dim>         elasticity_fe;
+    const FESystem<dim>   stokes_fe;
+    const FESystem<dim>   elasticity_fe;
     hp::FECollection<dim> fe_collection;
     DoFHandler<dim>       dof_handler;
 

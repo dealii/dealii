@@ -119,14 +119,14 @@ namespace Step82
 
     const unsigned int n_refinements;
 
-    FE_DGQ<dim>     fe;
-    DoFHandler<dim> dof_handler;
+    const FE_DGQ<dim> fe;
+    DoFHandler<dim>   dof_handler;
 
     // We also need a variable that describes the finite element space
     // $[\mathbb{V}_h]^{d\times d}$ used for the two lifting
     // operators. The other member variables below are as in most of the other
     // tutorial programs.
-    FESystem<dim> fe_lift;
+    const FESystem<dim> fe_lift;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> matrix;

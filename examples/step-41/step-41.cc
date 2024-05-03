@@ -86,7 +86,7 @@ namespace Step41
     void output_results(const unsigned int iteration) const;
 
     Triangulation<dim>        triangulation;
-    FE_Q<dim>                 fe;
+    const FE_Q<dim>           fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
     IndexSet                  active_set;

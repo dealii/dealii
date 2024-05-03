@@ -83,7 +83,7 @@ namespace Step11
     void write_high_order_mesh(const unsigned cycle);
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
     MappingQ<dim>      mapping;
 

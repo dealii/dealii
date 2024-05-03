@@ -164,8 +164,8 @@ namespace Step12
     // specified in the constructor). If you want to use a DG method of a
     // different degree the whole program stays the same, only replace 1 in
     // the constructor by the desired polynomial degree.
-    FE_DGQ<dim>     fe;
-    DoFHandler<dim> dof_handler;
+    const FE_DGQ<dim> fe;
+    DoFHandler<dim>   dof_handler;
 
     // The next four members represent the linear system to be solved.
     // <code>system_matrix</code> and <code>right_hand_side</code> are generated

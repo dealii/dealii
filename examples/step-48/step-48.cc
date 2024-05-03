@@ -307,7 +307,7 @@ namespace Step48
 #else
     Triangulation<dim> triangulation;
 #endif
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
     MappingQ1<dim> mapping;

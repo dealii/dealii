@@ -986,7 +986,7 @@ int main()
       deallog.depth_console(2);
       std::ofstream logfile("deallog");
       deallog.attach(logfile);
-      FE_DGQ<2>                 fe1(3);
+      const FE_DGQ<2>           fe1(3);
       InteriorPenaltyProblem<2> test1(fe1);
       test1.run(12);
     }

@@ -165,7 +165,7 @@ namespace Step87
     Triangulation<dim> tria;
     GridGenerator::subdivided_hyper_cube(tria, 7);
 
-    FE_Q<dim>       fe(fe_degree);
+    const FE_Q<dim> fe(fe_degree);
     DoFHandler<dim> dof_handler(tria);
     dof_handler.distribute_dofs(fe);
 
@@ -303,7 +303,7 @@ namespace Step87
     DistributedTriangulation<dim> tria(MPI_COMM_WORLD);
     GridGenerator::subdivided_hyper_cube(tria, 7);
 
-    FE_Q<dim>       fe(fe_degree);
+    const FE_Q<dim> fe(fe_degree);
     DoFHandler<dim> dof_handler(tria);
     dof_handler.distribute_dofs(fe);
 
@@ -465,7 +465,7 @@ namespace Step87
     pcout << "Running: example 2" << std::endl;
     pcout << "  - create system" << std::endl;
 
-    FE_Q<dim>                     fe(fe_degree);
+    const FE_Q<dim>               fe(fe_degree);
     MappingQ1<dim>                mapping;
     DistributedTriangulation<dim> tria(MPI_COMM_WORLD);
     GridGenerator::subdivided_hyper_cube(tria, 50);
@@ -736,9 +736,9 @@ namespace Step87
     GridGenerator::hyper_cube(tria_background);
     tria_background.refine_global(5);
 
-    MappingQ1<dim>  mapping_background;
-    FESystem<dim>   fe_background(FE_Q<dim>(degree), dim);
-    DoFHandler<dim> dof_handler_background(tria_background);
+    MappingQ1<dim>      mapping_background;
+    const FESystem<dim> fe_background(FE_Q<dim>(degree), dim);
+    DoFHandler<dim>     dof_handler_background(tria_background);
     dof_handler_background.distribute_dofs(fe_background);
 
     // and, similarly, for the immersed surface mesh.
@@ -763,9 +763,9 @@ namespace Step87
     mapping_immersed.initialize(mapping_immersed_base, tria_immersed);
     const QGauss<dim - 1> quadrature_immersed(degree + 1);
 
-    FE_Q<dim - 1, dim>       fe_scalar_immersed(degree);
-    FESystem<dim - 1, dim>   fe_immersed(fe_scalar_immersed, dim);
-    DoFHandler<dim - 1, dim> dof_handler_immersed(tria_immersed);
+    const FE_Q<dim - 1, dim>     fe_scalar_immersed(degree);
+    const FESystem<dim - 1, dim> fe_immersed(fe_scalar_immersed, dim);
+    DoFHandler<dim - 1, dim>     dof_handler_immersed(tria_immersed);
     dof_handler_immersed.distribute_dofs(fe_immersed);
 
     // We renumber the DoFs related to the vector-valued problem to

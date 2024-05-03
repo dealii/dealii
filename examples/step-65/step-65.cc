@@ -134,7 +134,7 @@ namespace Step65
     void postprocess(const Mapping<dim> &mapping);
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     AffineConstraints<double> constraints;

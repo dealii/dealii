@@ -234,7 +234,7 @@ namespace SAND
     // factors below) as well as the filter matrix to ensure that
     // the design remains smooth.
     Triangulation<dim>        triangulation;
-    FESystem<dim>             fe;
+    const FESystem<dim>       fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
 
