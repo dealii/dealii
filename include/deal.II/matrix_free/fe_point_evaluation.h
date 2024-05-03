@@ -1454,6 +1454,14 @@ private:
     const StridedArrayView<ScalarNumber, stride_view> &solution_values,
     const EvaluationFlags::EvaluationFlags            &integration_flags,
     const bool                                         sum_into_values);
+
+  /**
+   * Internal function to initialize the pointers of this class when an
+   * external MappingInfo has already queried the mapping for the relevant
+   * information.
+   */
+  void
+  internal_reinit_single_cell_state_mapping_info();
 };
 
 
@@ -2268,7 +2276,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
 
 template <int n_components_, int dim, int spacedim, typename Number>
 inline void
-FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit()
+FEPointEvaluation<n_components_, dim, spacedim, Number>::
+  internal_reinit_single_cell_state_mapping_info()
 {
   this->current_cell_index  = numbers::invalid_unsigned_int;
   this->current_face_number = numbers::invalid_unsigned_int;
@@ -2277,6 +2286,16 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit()
     this->template do_reinit<false, true>();
   else
     this->template do_reinit<false, false>();
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit()
+{
+  internal_reinit_single_cell_state_mapping_info();
+  this->must_reinitialize_pointers = false;
 }
 
 
@@ -2358,7 +2377,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
 {
   if (this->must_reinitialize_pointers)
-    reinit();
+    internal_reinit_single_cell_state_mapping_info();
 
   if (this->n_q_points == 0)
     return;
@@ -3011,7 +3030,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
   const bool                                         sum_into_values)
 {
   if (this->must_reinitialize_pointers)
-    reinit();
+    internal_reinit_single_cell_state_mapping_info();
 
   Assert(!(integration_flags & EvaluationFlags::hessians), ExcNotImplemented());
 
