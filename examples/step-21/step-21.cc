@@ -579,8 +579,8 @@ namespace Step21
     system_matrix = 0;
     system_rhs    = 0;
 
-    QGauss<dim>     quadrature_formula(degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(degree + 2);
+    const QGauss<dim>     quadrature_formula(degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(degree + 2);
 
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
@@ -729,18 +729,18 @@ namespace Step21
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_rhs_S()
   {
-    QGauss<dim>       quadrature_formula(degree + 2);
-    QGauss<dim - 1>   face_quadrature_formula(degree + 2);
-    FEValues<dim>     fe_values(fe,
+    const QGauss<dim>     quadrature_formula(degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(degree + 2);
+    FEValues<dim>         fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim> fe_face_values(fe,
+    FEFaceValues<dim>     fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_normal_vectors |
                                        update_quadrature_points |
                                        update_JxW_values);
-    FEFaceValues<dim> fe_face_values_neighbor(fe,
+    FEFaceValues<dim>     fe_face_values_neighbor(fe,
                                               face_quadrature_formula,
                                               update_values);
 
@@ -1048,7 +1048,7 @@ namespace Step21
   template <int dim>
   double TwoPhaseFlowProblem<dim>::get_maximal_velocity() const
   {
-    QGauss<dim>        quadrature_formula(degree + 2);
+    const QGauss<dim>  quadrature_formula(degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
 
     FEValues<dim> fe_values(fe, quadrature_formula, update_values);

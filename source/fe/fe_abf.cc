@@ -169,7 +169,7 @@ template <int dim>
 void
 FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 {
-  QGauss<dim>        cell_quadrature(deg + 2);
+  const QGauss<dim>  cell_quadrature(deg + 2);
   const unsigned int n_interior_points = cell_quadrature.size();
 
   // TODO: the implementation makes the assumption that all faces have the
@@ -207,7 +207,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
   if (dim > 1)
     {
-      QGauss<dim - 1>                   face_points(deg + 1);
+      const QGauss<dim - 1>             face_points(deg + 1);
       TensorProductPolynomials<dim - 1> legendre =
         Polynomials::Legendre::generate_complete_basis(deg);
 
@@ -348,9 +348,9 @@ FE_ABF<dim>::initialize_restriction()
         this->restriction[iso][i].reinit(0, 0);
       return;
     }
-  unsigned int       iso = RefinementCase<dim>::isotropic_refinement - 1;
-  QGauss<dim - 1>    q_base(rt_order + 1);
-  const unsigned int n_face_points = q_base.size();
+  unsigned int          iso = RefinementCase<dim>::isotropic_refinement - 1;
+  const QGauss<dim - 1> q_base(rt_order + 1);
+  const unsigned int    n_face_points = q_base.size();
   // First, compute interpolation on
   // subfaces
   for (const unsigned int face : GeometryInfo<dim>::face_indices())
@@ -441,7 +441,7 @@ FE_ABF<dim>::initialize_restriction()
   AssertDimension(this->n_unique_faces(), 1);
   const unsigned int face_no = 0;
 
-  QGauss<dim>        q_cell(rt_order + 1);
+  const QGauss<dim>  q_cell(rt_order + 1);
   const unsigned int start_cell_dofs =
     GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face(face_no);
 

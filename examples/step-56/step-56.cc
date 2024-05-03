@@ -609,7 +609,7 @@ namespace Step56
     const bool assemble_pressure_mass_matrix =
       (solver_type == SolverType::UMFPACK) ? false : true;
 
-    QGauss<dim> quadrature_formula(pressure_degree + 2);
+    const QGauss<dim> quadrature_formula(pressure_degree + 2);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -707,7 +707,7 @@ namespace Step56
 
     mg_matrices = 0.;
 
-    QGauss<dim> quadrature_formula(pressure_degree + 2);
+    const QGauss<dim> quadrature_formula(pressure_degree + 2);
 
     FEValues<dim> fe_values(velocity_fe,
                             quadrature_formula,

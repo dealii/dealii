@@ -359,7 +359,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // up to deg, which means we need dg+1 points in each direction. The
   // fact that we do not have tensor product polynomials will be
   // considered later. In 2d, we can use point values.
-  QGauss<dim - 1> face_points(deg + 1);
+  const QGauss<dim - 1> face_points(deg + 1);
 
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
@@ -375,7 +375,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
   // deg-2, thus we use deg points. Note that deg>=1 and the lowest
   // order element has no points in the cell, such that we have to
   // distinguish this case.
-  QGauss<dim> cell_points(deg == 1 ? 0 : deg);
+  const QGauss<dim> cell_points(deg == 1 ? 0 : deg);
 
   // Compute the size of the whole support point set
   const unsigned int npoints =
@@ -383,7 +383,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
 
   this->generalized_support_points.resize(npoints);
 
-  Quadrature<dim> faces =
+  const Quadrature<dim> faces =
     QProjector<dim>::project_to_all_faces(this->reference_cell(), face_points);
 
   for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)

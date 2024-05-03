@@ -3521,7 +3521,8 @@ namespace DoFTools
 
       Assert(matrix.m() == spacedim, ExcInternalError());
 
-      Quadrature<dim - 1> quadrature(fe.get_unit_face_support_points(face_no));
+      const Quadrature<dim - 1> quadrature(
+        fe.get_unit_face_support_points(face_no));
 
       // have an array that stores the location of each vector-dof tuple we want
       // to rotate.

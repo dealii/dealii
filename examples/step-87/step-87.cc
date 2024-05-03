@@ -761,7 +761,7 @@ namespace Step87
     MappingQ<dim - 1, dim>      mapping_immersed_base(3);
     MappingQCache<dim - 1, dim> mapping_immersed(3);
     mapping_immersed.initialize(mapping_immersed_base, tria_immersed);
-    QGauss<dim - 1> quadrature_immersed(degree + 1);
+    const QGauss<dim - 1> quadrature_immersed(degree + 1);
 
     FE_Q<dim - 1, dim>       fe_scalar_immersed(degree);
     FESystem<dim - 1, dim>   fe_immersed(fe_scalar_immersed, dim);

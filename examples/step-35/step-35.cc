@@ -451,8 +451,8 @@ namespace Step35
     DoFHandler<dim> dof_handler_velocity;
     DoFHandler<dim> dof_handler_pressure;
 
-    QGauss<dim> quadrature_pressure;
-    QGauss<dim> quadrature_velocity;
+    const QGauss<dim> quadrature_pressure;
+    const QGauss<dim> quadrature_velocity;
 
     SparsityPattern sparsity_pattern_velocity;
     SparsityPattern sparsity_pattern_pressure;

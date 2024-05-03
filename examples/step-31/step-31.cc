@@ -1398,8 +1398,8 @@ namespace Step31
     temperature_mass_matrix      = 0;
     temperature_stiffness_matrix = 0;
 
-    QGauss<dim>   quadrature_formula(temperature_degree + 2);
-    FEValues<dim> temperature_fe_values(temperature_fe,
+    const QGauss<dim> quadrature_formula(temperature_degree + 2);
+    FEValues<dim>     temperature_fe_values(temperature_fe,
                                         quadrature_formula,
                                         update_values | update_gradients |
                                           update_JxW_values);

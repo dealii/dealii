@@ -54,7 +54,7 @@ DataOutResample<dim, patch_dim, spacedim>::update_mapping(
 
   std::vector<std::pair<types::global_dof_index, Point<spacedim>>> points_all;
 
-  Quadrature<patch_dim> quadrature(fe.get_unit_support_points());
+  const Quadrature<patch_dim> quadrature(fe.get_unit_support_points());
 
   FEValues<patch_dim, spacedim> fe_values(*patch_mapping,
                                           fe,

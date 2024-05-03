@@ -424,8 +424,8 @@ namespace Step17
   template <int dim>
   void ElasticProblem<dim>::assemble_system()
   {
-    QGauss<dim>   quadrature_formula(fe.degree + 1);
-    FEValues<dim> fe_values(fe,
+    const QGauss<dim> quadrature_formula(fe.degree + 1);
+    FEValues<dim>     fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);

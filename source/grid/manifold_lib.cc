@@ -1656,7 +1656,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
   // back to a simple GridTools::affine_cell_approximation<dim>() which
   // requires 2^dim points, instead. Thus, initialize the QIterated
   // quadrature with no subdivisions.
-  std::vector<Point<dim>> unit_points =
+  const std::vector<Point<dim>> unit_points =
     QIterated<dim>(QTrapezoid<1>(), (dim == spacedim ? 2 : 1)).get_points();
   std::vector<Point<spacedim>> real_points(unit_points.size());
 

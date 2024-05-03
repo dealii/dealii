@@ -314,7 +314,7 @@ namespace step62
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    QGauss<dim> quadrature_formula;
+    const QGauss<dim> quadrature_formula;
 
     // We store the mass and stiffness matrices for each cell this vector.
     std::vector<QuadratureCache<dim>> quadrature_cache;

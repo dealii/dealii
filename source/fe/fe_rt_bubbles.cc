@@ -175,7 +175,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
   // This is the deg of the RT_Bubble element plus one.
   if (dim > 1)
     {
-      QGaussLobatto<dim - 1> face_points(deg + 1);
+      const QGaussLobatto<dim - 1> face_points(deg + 1);
       Assert(face_points.size() == this->n_dofs_per_face(face_no),
              ExcInternalError());
       for (unsigned int k = 0; k < this->n_dofs_per_face(face_no); ++k)
@@ -203,8 +203,8 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
 
   // In the interior, we need anisotropic Gauss-Lobatto quadratures,
   // one for each direction
-  QGaussLobatto<1>      high(deg + 1);
-  std::vector<Point<1>> pts = high.get_points();
+  const QGaussLobatto<1> high(deg + 1);
+  std::vector<Point<1>>  pts = high.get_points();
   if (pts.size() > 2)
     {
       pts.erase(pts.begin());
@@ -212,7 +212,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
     }
 
   std::vector<double> wts(pts.size(), 1);
-  Quadrature<1>       low(pts, wts);
+  const Quadrature<1> low(pts, wts);
 
   for (unsigned int d = 0; d < dim; ++d)
     {

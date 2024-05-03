@@ -257,7 +257,7 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
         std::vector<Point<dim - 2>> line_support_points(n);
         for (unsigned int i = 0; i < n; ++i)
           line_support_points[i][0] = (i + 1) * step;
-        Quadrature<dim - 2> qline(line_support_points);
+        const Quadrature<dim - 2> qline(line_support_points);
 
         // auxiliary points in 2d
         std::vector<Point<dim - 1>> p_line(n);

@@ -157,7 +157,7 @@ void Step5<dim>::setup_system()
 template <int dim>
 void Step5<dim>::assemble_system()
 {
-  QGauss<dim> quadrature_formula(fe.degree + 1);
+  const QGauss<dim> quadrature_formula(fe.degree + 1);
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,

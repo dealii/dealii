@@ -202,7 +202,7 @@ namespace Step14
 
       // ...then have some objects of which the meaning will become clear
       // below...
-      QTrapezoid<dim>             vertex_quadrature;
+      const QTrapezoid<dim>       vertex_quadrature;
       FEValues<dim>               fe_values(dof_handler.get_fe(),
                               vertex_quadrature,
                               update_gradients | update_quadrature_points);
@@ -1528,7 +1528,7 @@ namespace Step14
       // Initialize a <code>FEValues</code> object with a quadrature formula,
       // have abbreviations for the number of quadrature points and shape
       // functions...
-      QGauss<dim>        quadrature(dof_handler.get_fe().degree + 1);
+      const QGauss<dim>  quadrature(dof_handler.get_fe().degree + 1);
       FEValues<dim>      fe_values(dof_handler.get_fe(),
                               quadrature,
                               update_gradients | update_quadrature_points |

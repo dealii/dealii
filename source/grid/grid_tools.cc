@@ -322,7 +322,7 @@ namespace GridTools
 
     SparseMatrix<double> S(sparsity_pattern);
 
-    QGauss<dim> quadrature(4);
+    const QGauss<dim> quadrature(4);
 
     Assert(triangulation.all_reference_cells_are_hyper_cube(),
            ExcNotImplemented());

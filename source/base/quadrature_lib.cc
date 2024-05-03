@@ -785,9 +785,9 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
   // only need n quadrature points. In the most difficult one, we
   // need 2*n points for the first segment, and 2*n points for the
   // second segment.
-  QGaussLog<1> quad1(n, origin[0] != 0);
-  QGaussLog<1> quad2(n);
-  QGauss<1>    quad(n);
+  const QGaussLog<1> quad1(n, origin[0] != 0);
+  const QGaussLog<1> quad2(n);
+  const QGauss<1>    quad(n);
 
   // Check that the origin is inside 0,1
   Assert((fraction >= 0) && (fraction <= 1),
@@ -928,7 +928,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 
   // Start with the gauss quadrature formula on the (u,v) reference
   // element.
-  QGauss<2> gauss(n);
+  const QGauss<2> gauss(n);
 
   Assert(gauss.size() == n * n, ExcInternalError());
 
@@ -2353,8 +2353,8 @@ QGaussWedge<dim>::QGaussWedge(const unsigned int n_points)
 {
   AssertDimension(dim, 3);
 
-  QGaussSimplex<2> quad_tri(n_points);
-  QGauss<1>        quad_line(n_points);
+  const QGaussSimplex<2> quad_tri(n_points);
+  const QGauss<1>        quad_line(n_points);
 
   for (unsigned int i = 0; i < quad_line.size(); ++i)
     for (unsigned int j = 0; j < quad_tri.size(); ++j)

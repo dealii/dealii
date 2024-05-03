@@ -970,8 +970,8 @@ namespace Step43
     darcy_matrix = 0;
     darcy_rhs    = 0;
 
-    QGauss<dim>     quadrature_formula(darcy_degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(darcy_degree + 2);
+    const QGauss<dim>     quadrature_formula(darcy_degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(darcy_degree + 2);
 
     FEValues<dim> darcy_fe_values(darcy_fe,
                                   quadrature_formula,
@@ -1174,7 +1174,7 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_matrix()
   {
-    QGauss<dim> quadrature_formula(saturation_degree + 2);
+    const QGauss<dim> quadrature_formula(saturation_degree + 2);
 
     FEValues<dim> saturation_fe_values(saturation_fe,
                                        quadrature_formula,
@@ -1242,8 +1242,8 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_rhs()
   {
-    QGauss<dim>     quadrature_formula(saturation_degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(saturation_degree + 2);
+    const QGauss<dim>     quadrature_formula(saturation_degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(saturation_degree + 2);
 
     FEValues<dim> saturation_fe_values(saturation_fe,
                                        quadrature_formula,

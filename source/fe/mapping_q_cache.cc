@@ -111,14 +111,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping, fe, quadrature, update_quadrature_points);
@@ -208,14 +209,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping, fe, quadrature, update_quadrature_points);
@@ -364,14 +366,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping,
@@ -567,14 +570,15 @@ MappingQCache<dim, spacedim>::initialize(
           auto &fe_values = fe_values_all.get();
           if (fe_values.get() == nullptr)
             {
-              QGaussLobatto<dim> quadrature_gl(this->polynomial_degree + 1);
+              const QGaussLobatto<dim> quadrature_gl(this->polynomial_degree +
+                                                     1);
 
               std::vector<Point<dim>> quadrature_points;
               for (const auto i :
                    FETools::hierarchic_to_lexicographic_numbering<dim>(
                      this->polynomial_degree))
                 quadrature_points.push_back(quadrature_gl.point(i));
-              Quadrature<dim> quadrature(quadrature_points);
+              const Quadrature<dim> quadrature(quadrature_points);
 
               fe_values = std::make_unique<FEValues<dim, spacedim>>(
                 mapping,

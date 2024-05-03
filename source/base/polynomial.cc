@@ -710,7 +710,7 @@ namespace Polynomials
     // Gauss-Legendre quadrature formula
     if (k > 0)
       {
-        QGauss<1> gauss(k);
+        const QGauss<1> gauss(k);
         for (unsigned int i = 0; i < k; ++i)
           this->lagrange_support_points[i] = gauss.get_points()[i][0];
       }
@@ -1139,8 +1139,8 @@ namespace Polynomials
       // Note that the polynomials are not yet normalized here, which is not
       // necessary because we are only looking for the x_star where the matrix
       // entry is zero, for which the constants do not matter.
-      QGauss<1> gauss(degree + 1);
-      double    integral_left = 0, integral_right = 0;
+      const QGauss<1> gauss(degree + 1);
+      double          integral_left = 0, integral_right = 0;
       for (unsigned int q = 0; q < gauss.size(); ++q)
         {
           const double x               = gauss.point(q)[0];

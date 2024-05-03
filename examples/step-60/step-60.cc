@@ -904,7 +904,7 @@ namespace Step60
   {
     TimerOutput::Scope timer_section(monitor, "Setup coupling");
 
-    QGauss<dim> quad(parameters.coupling_quadrature_order);
+    const QGauss<dim> quad(parameters.coupling_quadrature_order);
 
     DynamicSparsityPattern dsp(space_dh->n_dofs(), embedded_dh->n_dofs());
 
@@ -954,7 +954,7 @@ namespace Step60
       // To compute the coupling matrix we use the
       // NonMatching::create_coupling_mass_matrix tool, which works similarly to
       // NonMatching::create_coupling_sparsity_pattern.
-      QGauss<dim> quad(parameters.coupling_quadrature_order);
+      const QGauss<dim> quad(parameters.coupling_quadrature_order);
       NonMatching::create_coupling_mass_matrix(*space_grid_tools_cache,
                                                *space_dh,
                                                *embedded_dh,

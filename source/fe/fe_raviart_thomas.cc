@@ -158,7 +158,7 @@ template <int dim>
 void
 FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 {
-  QGauss<dim>        cell_quadrature(deg + 1);
+  const QGauss<dim>  cell_quadrature(deg + 1);
   const unsigned int n_interior_points = (deg > 0) ? cell_quadrature.size() : 0;
 
   // TODO: the implementation makes the assumption that all faces have the
@@ -181,7 +181,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 
   if (dim > 1)
     {
-      QGauss<dim - 1>                   face_points(deg + 1);
+      const QGauss<dim - 1>             face_points(deg + 1);
       TensorProductPolynomials<dim - 1> legendre =
         Polynomials::Legendre::generate_complete_basis(deg);
 
@@ -453,8 +453,8 @@ FE_RaviartThomas<dim>::initialize_restriction()
 {
   const unsigned int iso = RefinementCase<dim>::isotropic_refinement - 1;
 
-  QGauss<dim - 1>    q_base(this->degree);
-  const unsigned int n_face_points = q_base.size();
+  const QGauss<dim - 1> q_base(this->degree);
+  const unsigned int    n_face_points = q_base.size();
   // First, compute interpolation on
   // subfaces
   for (const unsigned int face : GeometryInfo<dim>::face_indices())
@@ -463,7 +463,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
       // child cell are evaluated
       // in the quadrature points
       // of a full face.
-      Quadrature<dim> q_face =
+      const Quadrature<dim> q_face =
         QProjector<dim>::project_to_face(this->reference_cell(), q_base, face);
       // Store shape values, since the
       // evaluation suffers if not
@@ -482,7 +482,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
           // the coarse face are
           // evaluated on the subface
           // only.
-          Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
+          const Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
             this->reference_cell(), q_base, face, sub);
           const unsigned int child = GeometryInfo<dim>::child_cell_on_face(
             RefinementCase<dim>::isotropic_refinement, face, sub);
@@ -546,7 +546,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
   AssertDimension(this->n_unique_faces(), 1);
   const unsigned int face_no = 0;
 
-  QGauss<dim>        q_cell(this->degree);
+  const QGauss<dim>  q_cell(this->degree);
   const unsigned int start_cell_dofs =
     GeometryInfo<dim>::faces_per_cell * this->n_dofs_per_face(face_no);
 

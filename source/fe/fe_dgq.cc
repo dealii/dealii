@@ -994,7 +994,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
     polynomial_space->get_numbering_inverse();
   for (unsigned int i = 0; i <= this->degree; ++i)
     qpoints[i] = Point<1>(this->unit_support_points[lexicographic[i]][0]);
-  Quadrature<1> pquadrature(qpoints);
+  const Quadrature<1> pquadrature(qpoints);
 
   return std::make_unique<FE_DGQArbitraryNodes<dim, spacedim>>(pquadrature);
 }

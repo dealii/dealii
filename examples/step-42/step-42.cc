@@ -1123,7 +1123,7 @@ namespace Step42
   void PlasticityContactProblem<dim>::assemble_mass_matrix_diagonal(
     TrilinosWrappers::SparseMatrix &mass_matrix)
   {
-    QGaussLobatto<dim - 1> face_quadrature_formula(fe.degree + 1);
+    const QGaussLobatto<dim - 1> face_quadrature_formula(fe.degree + 1);
 
     FEFaceValues<dim> fe_values_face(fe,
                                      face_quadrature_formula,
@@ -1216,8 +1216,9 @@ namespace Step42
     // many quadrature points as there are shape functions per face and
     // looping over quadrature points is equivalent to looping over shape
     // functions defined on a face. With this, the code looks as follows:
-    Quadrature<dim - 1> face_quadrature(fe.get_unit_face_support_points());
-    FEFaceValues<dim>   fe_values_face(fe,
+    const Quadrature<dim - 1> face_quadrature(
+      fe.get_unit_face_support_points());
+    FEFaceValues<dim> fe_values_face(fe,
                                      face_quadrature,
                                      update_quadrature_points);
 
@@ -1326,8 +1327,8 @@ namespace Step42
   {
     TimerOutput::Scope t(computing_timer, "Assembling");
 
-    QGauss<dim>     quadrature_formula(fe.degree + 1);
-    QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
+    const QGauss<dim>     quadrature_formula(fe.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -1479,8 +1480,8 @@ namespace Step42
   void PlasticityContactProblem<dim>::compute_nonlinear_residual(
     const TrilinosWrappers::MPI::Vector &linearization_point)
   {
-    QGauss<dim>     quadrature_formula(fe.degree + 1);
-    QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
+    const QGauss<dim>     quadrature_formula(fe.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -2078,8 +2079,8 @@ namespace Step42
 
     double contact_force = 0.0;
 
-    QGauss<dim - 1>   face_quadrature_formula(fe.degree + 1);
-    FEFaceValues<dim> fe_values_face(fe,
+    const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
+    FEFaceValues<dim>     fe_values_face(fe,
                                      face_quadrature_formula,
                                      update_values | update_JxW_values);
 

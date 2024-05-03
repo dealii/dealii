@@ -803,7 +803,7 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 {
   TimerOutput::Scope timing(computing_timer, "Assemble multigrid");
 
-  QGauss<dim> quadrature_formula(degree + 1);
+  const QGauss<dim> quadrature_formula(degree + 1);
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
