@@ -583,10 +583,10 @@ namespace Step7
     // previous examples, so we only comment on the things that have changed.
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
+        fe_values.reinit(cell);
+
         cell_matrix = 0.;
         cell_rhs    = 0.;
-
-        fe_values.reinit(cell);
 
         right_hand_side.value_list(fe_values.get_quadrature_points(),
                                    rhs_values);

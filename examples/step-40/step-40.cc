@@ -399,10 +399,10 @@ namespace Step40
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
+          fe_values.reinit(cell);
+
           cell_matrix = 0.;
           cell_rhs    = 0.;
-
-          fe_values.reinit(cell);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {

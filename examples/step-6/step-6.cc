@@ -271,10 +271,10 @@ void Step6<dim>::assemble_system()
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
+      fe_values.reinit(cell);
+
       cell_matrix = 0;
       cell_rhs    = 0;
-
-      fe_values.reinit(cell);
 
       for (const unsigned int q_index : fe_values.quadrature_point_indices())
         {
