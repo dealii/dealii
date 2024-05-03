@@ -70,9 +70,17 @@ The equation to solve here is as follows:
 If $a(\mathbf x)$ was a constant coefficient, this would simply be the Poisson
 equation that we have already solved in step-3 and step-4. However, if it is
 indeed spatially variable, it is a more complex equation (sometimes referred
-to as the "Poisson equation with a coefficient"). Depending on
-what the variable $u$ refers to, it models a variety of situations with wide
-applicability:
+to as the "Poisson equation with a coefficient"). Specifically, we will here
+choose it as follows:
+@f{align*}{
+  a(\mathbf x) =
+  \begin{cases}
+    20 & \text{if}\ |\mathbf x|<0.5, \\
+    1  & \text{otherwise.}
+  \end{cases}
+@f}
+Depending on what the variable $u$ refers to, it models a variety of
+situations with wide applicability:
 
 - If $u$ is the electric potential, then $-a\nabla u$ is the electric current
   in a medium and the coefficient $a$ is the conductivity of the medium at any
