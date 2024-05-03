@@ -199,7 +199,7 @@ namespace ResFlow
     {
       constraints.reinit(locally_relevant_dofs);
 
-      FEValuesExtractors::Vector velocities(0);
+      const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
       VectorTools::project_boundary_values_div_conforming(

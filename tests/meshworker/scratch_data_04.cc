@@ -79,8 +79,8 @@ test()
   {};
 
 
-  double                     H1_norm = 0;
-  FEValuesExtractors::Scalar scalar(0);
+  double                           H1_norm = 0;
+  const FEValuesExtractors::Scalar scalar(0);
 
   ScratchData scratch(fe, quad, cell_flags);
   CopyData    copy;

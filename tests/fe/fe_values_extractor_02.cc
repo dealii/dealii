@@ -26,10 +26,10 @@ main()
 {
   initlog();
 
-  FEValuesExtractors::Scalar             scalar(0);
-  FEValuesExtractors::Vector             vector(1);
-  FEValuesExtractors::Tensor<2>          tensor(3);
-  FEValuesExtractors::SymmetricTensor<2> symmetric_tensor(4);
+  const FEValuesExtractors::Scalar             scalar(0);
+  const FEValuesExtractors::Vector             vector(1);
+  const FEValuesExtractors::Tensor<2>          tensor(3);
+  const FEValuesExtractors::SymmetricTensor<2> symmetric_tensor(4);
 
 
   deallog << scalar.get_name() << std::endl

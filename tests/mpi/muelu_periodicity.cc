@@ -339,8 +339,8 @@ namespace Step22
     {
       constraints.clear();
 
-      FEValuesExtractors::Vector velocities(0);
-      FEValuesExtractors::Scalar pressure(dim);
+      const FEValuesExtractors::Vector velocities(0);
+      const FEValuesExtractors::Scalar pressure(dim);
 
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 #ifdef PERIODIC
@@ -711,7 +711,7 @@ namespace Step22
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    FEValuesExtractors::Scalar pressure(dim);
+    const FEValuesExtractors::Scalar pressure(dim);
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
       QGauss<dim - 1>(degree + 1),

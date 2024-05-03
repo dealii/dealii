@@ -42,9 +42,9 @@ main()
 {
   initlog();
 
-  FEValuesExtractors::Scalar    scalar(0);
-  FEValuesExtractors::Vector    vector(1);
-  FEValuesExtractors::Tensor<2> tensor(2);
+  const FEValuesExtractors::Scalar    scalar(0);
+  const FEValuesExtractors::Vector    vector(1);
+  const FEValuesExtractors::Tensor<2> tensor(2);
 
   test<1, 1>(scalar);
   test<1, 1>(vector);

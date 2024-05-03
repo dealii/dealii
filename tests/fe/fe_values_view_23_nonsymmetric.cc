@@ -55,8 +55,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   // let the FEValues object compute the
   // divergences at quadrature points
-  std::vector<Tensor<1, dim>>   divergences(quadrature.size());
-  FEValuesExtractors::Tensor<2> extractor(0);
+  std::vector<Tensor<1, dim>>         divergences(quadrature.size());
+  const FEValuesExtractors::Tensor<2> extractor(0);
   fe_values[extractor].get_function_divergences(fe_function, divergences);
 
   // now do the same "by hand"

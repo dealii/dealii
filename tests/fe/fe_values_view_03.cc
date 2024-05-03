@@ -60,7 +60,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
       for (unsigned int c = 0; c < fe.n_components(); ++c)
         {
-          FEValuesExtractors::Scalar single_component(c);
+          const FEValuesExtractors::Scalar single_component(c);
 
           for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
             for (const auto q : fe_values.quadrature_point_indices())

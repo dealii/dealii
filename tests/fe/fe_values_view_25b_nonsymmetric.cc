@@ -98,7 +98,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   // let the FEValues object compute the
   // divergences at quadrature points
-  FEValuesExtractors::Tensor<2> extractor(0);
+  const FEValuesExtractors::Tensor<2> extractor(0);
 
   // also compare get_function_values/gradients/divergences
   // the manual evaluation

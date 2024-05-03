@@ -60,9 +60,9 @@ test()
   // DoFRenumbering::component_wise(dof_handler);
   deallog << "Number of dofs: " << dof_handler.n_dofs() << std::endl;
 
-  AffineConstraints<double>  constraints;
-  FEValuesExtractors::Vector velocities(1);
-  ComponentMask              mask = fe.component_mask(velocities);
+  AffineConstraints<double>        constraints;
+  const FEValuesExtractors::Vector velocities(1);
+  ComponentMask                    mask = fe.component_mask(velocities);
 
   deallog << "ComponentMask " << mask[0] << mask[1] << mask[2] << std::endl;
   DoFTools::make_zero_boundary_constraints(dof_handler, constraints, mask);

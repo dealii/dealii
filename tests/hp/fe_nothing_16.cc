@@ -60,9 +60,9 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  QGauss<dim - 1>            q(2);
-  FEFaceValues<dim>          fe_values(fe, q, update_values);
-  FEValuesExtractors::Scalar nothing(1);
+  QGauss<dim - 1>                  q(2);
+  FEFaceValues<dim>                fe_values(fe, q, update_values);
+  const FEValuesExtractors::Scalar nothing(1);
   fe_values.reinit(dof_handler.begin_active(), 0);
 
   // the following (second) call to reinit

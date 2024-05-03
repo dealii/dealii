@@ -73,11 +73,11 @@ test_kinematic_tensors()
   dot_soln_t -= soln_t1;
   dot_soln_t *= (1.0 / delta_t);
 
-  FEValuesExtractors::Vector  u_fe(0);
-  std::vector<Tensor<2, dim>> qp_Grad_u_t;
-  std::vector<Tensor<2, dim>> qp_Grad_u_t1;
-  std::vector<Tensor<2, dim>> qp_dot_Grad_u_t;
-  std::vector<Tensor<2, dim>> qp_dot_grad_u_t;
+  const FEValuesExtractors::Vector u_fe(0);
+  std::vector<Tensor<2, dim>>      qp_Grad_u_t;
+  std::vector<Tensor<2, dim>>      qp_Grad_u_t1;
+  std::vector<Tensor<2, dim>>      qp_dot_Grad_u_t;
+  std::vector<Tensor<2, dim>>      qp_dot_grad_u_t;
 
   FEValues<dim>         fe_values(fe, qf, update_gradients);
   MappingQEulerian<dim> q1_mapping(1, dof_handler, soln_t);

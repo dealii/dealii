@@ -78,7 +78,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
             // 'c'
             if (c + dim <= fe.n_components())
               {
-                FEValuesExtractors::Vector vec_components(c);
+                const FEValuesExtractors::Vector vec_components(c);
                 for (unsigned int i = 0; i < n_dofs_face; ++i)
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {

@@ -69,7 +69,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     // 'c'
     if (c + dim <= fe.n_components())
       {
-        FEValuesExtractors::Vector vector_components(c);
+        const FEValuesExtractors::Vector vector_components(c);
         fe_values[vector_components].get_function_hessians(
           fe_function, selected_vector_values);
         deallog << "component=" << c << std::endl;

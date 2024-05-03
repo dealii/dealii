@@ -638,7 +638,7 @@ namespace Step18
 #endif
 
 
-    FEValuesExtractors::Scalar                z_component(dim - 1);
+    const FEValuesExtractors::Scalar          z_component(dim - 1);
     std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(mapping,
                                              dof_handler,

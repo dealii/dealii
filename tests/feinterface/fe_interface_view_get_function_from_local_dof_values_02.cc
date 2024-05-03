@@ -269,16 +269,16 @@ test()
 
   deallog.push("FEInterfaceViews Scalar");
   {
-    FE_Q<dim>                  fe(degree);
-    FEValuesExtractors::Scalar extractor(0);
+    FE_Q<dim>                        fe(degree);
+    const FEValuesExtractors::Scalar extractor(0);
     test_feiv_extractor<NumberType, dim>(fe, extractor);
   }
   deallog.pop();
 
   deallog.push("FEInterfaceViews Vector");
   {
-    FESystem<dim>              fe(FE_Q<dim>(degree), dim);
-    FEValuesExtractors::Vector extractor(0);
+    FESystem<dim>                    fe(FE_Q<dim>(degree), dim);
+    const FEValuesExtractors::Vector extractor(0);
     test_feiv_extractor<NumberType, dim>(fe, extractor);
   }
   deallog.pop();

@@ -116,7 +116,7 @@ main()
           << "n_coupling_dofs = " << fcv.n_coupling_dofs() << std::endl;
 
   FullMatrix<double> matrix(fcv.n_coupling_dofs(), fcv.n_coupling_dofs());
-  FEValuesExtractors::Scalar scalar(0);
+  const FEValuesExtractors::Scalar scalar(0);
 
   const auto first  = fcv.get_first_extractor(scalar);
   const auto second = fcv.get_second_extractor(scalar);

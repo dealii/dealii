@@ -103,8 +103,8 @@ template <int dim = 2>
 void
 test()
 {
-  FESystem<dim>              fe(FE_DGP<dim>(4), 1);
-  FEValuesExtractors::Scalar extractor(0);
+  FESystem<dim>                    fe(FE_DGP<dim>(4), 1);
+  const FEValuesExtractors::Scalar extractor(0);
 
   Triangulation<dim> tria;
   DoFHandler<dim>    dof_handler(tria);
