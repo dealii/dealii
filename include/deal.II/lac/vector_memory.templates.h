@@ -204,9 +204,9 @@ GrowingVectorMemory<VectorType>::memory_consumption() const
   std::lock_guard<std::mutex> lock(mutex);
 
   std::size_t result = sizeof(*this);
-  for (const entry_type &i : *get_pool().data)
-    result +=
-      sizeof(entry_type) + MemoryConsumption::memory_consumption(i.second);
+  for (const auto &[_, ptr] : *get_pool().data)
+    result += sizeof(ptr) + (ptr ? MemoryConsumption::memory_consumption(*ptr) :
+                                   MemoryConsumption::memory_consumption(ptr));
 
   return result;
 }
