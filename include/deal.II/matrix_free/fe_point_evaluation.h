@@ -700,11 +700,6 @@ protected:
    */
   FEPointEvaluationBase(FEPointEvaluationBase &&other) noexcept;
 
-  /**
-   * Destructor.
-   */
-  ~FEPointEvaluationBase();
-
 public:
   /**
    * Return the value at quadrature point number @p point_index after a call to
@@ -1040,15 +1035,12 @@ protected:
   bool fast_path;
 
   /**
-   * Connection to NonMatching::MappingInfo to check whether mapping data
-   * has been invalidated.
+   * Bool indicating if class needs to call reinit() inside
+   * evaluate()/integrate() functions, which is the case when the present
+   * class does not own the MappingInfo object but shares evaluation points
+   * with another object.
    */
-  boost::signals2::connection connection_is_reinitialized;
-
-  /**
-   * Bool indicating if class is reinitialized and data vectors a resized.
-   */
-  bool is_reinitialized;
+  bool must_reinitialize_pointers;
 
   /**
    * Vector containing tensor product shape functions evaluated (during
@@ -1774,7 +1766,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   , mapping_info(mapping_info_on_the_fly.get())
   , current_cell_index(numbers::invalid_unsigned_int)
   , current_face_number(numbers::invalid_unsigned_int)
-  , is_reinitialized(false)
+  , must_reinitialize_pointers(false)
   , is_interior(true)
 {
   setup(first_selected_component);
@@ -1799,12 +1791,10 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   , mapping_info(&mapping_info)
   , current_cell_index(numbers::invalid_unsigned_int)
   , current_face_number(numbers::invalid_unsigned_int)
-  , is_reinitialized(false)
+  , must_reinitialize_pointers(true)
   , is_interior(is_interior)
 {
   setup(first_selected_component);
-  connection_is_reinitialized = mapping_info.connect_is_reinitialized(
-    [this]() { this->is_reinitialized = false; });
 }
 
 
@@ -1841,12 +1831,9 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   , current_cell_index(other.current_cell_index)
   , current_face_number(other.current_face_number)
   , fast_path(other.fast_path)
-  , is_reinitialized(false)
+  , must_reinitialize_pointers(true)
   , is_interior(other.is_interior)
-{
-  connection_is_reinitialized = mapping_info->connect_is_reinitialized(
-    [this]() { this->is_reinitialized = false; });
-}
+{}
 
 
 
@@ -1876,21 +1863,9 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   , current_cell_index(other.current_cell_index)
   , current_face_number(other.current_face_number)
   , fast_path(other.fast_path)
-  , is_reinitialized(false)
+  , must_reinitialize_pointers(other.must_reinitialize_pointers)
   , is_interior(other.is_interior)
-{
-  connection_is_reinitialized = mapping_info->connect_is_reinitialized(
-    [this]() { this->is_reinitialized = false; });
-}
-
-
-
-template <int n_components_, int dim, int spacedim, typename Number>
-FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
-  ~FEPointEvaluationBase()
-{
-  connection_is_reinitialized.disconnect();
-}
+{}
 
 
 
@@ -2012,10 +1987,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::do_reinit()
     }
 
   if (n_q_points == 0)
-    {
-      is_reinitialized = true;
-      return;
-    }
+    return;
 
   // set unit point pointer
   const unsigned int unit_point_offset =
@@ -2106,8 +2078,6 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::do_reinit()
               }
           }
     }
-
-  is_reinitialized = true;
 }
 
 
@@ -2322,6 +2292,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
               ExcNotImplemented());
 
   this->mapping_info->reinit(cell, unit_points);
+  this->must_reinitialize_pointers = false;
 
   if (!this->fast_path)
     {
@@ -2347,8 +2318,9 @@ inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   const unsigned int cell_index)
 {
-  this->current_cell_index  = cell_index;
-  this->current_face_number = numbers::invalid_unsigned_int;
+  this->current_cell_index         = cell_index;
+  this->current_face_number        = numbers::invalid_unsigned_int;
+  this->must_reinitialize_pointers = false;
 
   if (this->use_linear_path)
     this->template do_reinit<false, true>();
@@ -2385,7 +2357,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
 {
-  if (!this->is_reinitialized)
+  if (this->must_reinitialize_pointers)
     reinit();
 
   if (this->n_q_points == 0)
@@ -3038,7 +3010,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
   const EvaluationFlags::EvaluationFlags            &integration_flags,
   const bool                                         sum_into_values)
 {
-  if (!this->is_reinitialized)
+  if (this->must_reinitialize_pointers)
     reinit();
 
   Assert(!(integration_flags & EvaluationFlags::hessians), ExcNotImplemented());
@@ -3117,8 +3089,9 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   const unsigned int cell_index,
   const unsigned int face_number)
 {
-  this->current_cell_index  = cell_index;
-  this->current_face_number = face_number;
+  this->current_cell_index         = cell_index;
+  this->current_face_number        = face_number;
+  this->must_reinitialize_pointers = false;
 
   if (this->use_linear_path)
     this->template do_reinit<true, true>();
@@ -3136,6 +3109,7 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   this->current_cell_index = face_index;
   this->current_face_number =
     this->mapping_info->get_face_number(face_index, this->is_interior);
+  this->must_reinitialize_pointers = false;
 
   if (this->use_linear_path)
     this->template do_reinit<true, true>();
@@ -3152,7 +3126,8 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
 {
-  Assert(this->is_reinitialized, ExcMessage("Is not reinitialized!"));
+  Assert(!this->must_reinitialize_pointers,
+         ExcMessage("Object has not been reinitialized!"));
 
   if (this->n_q_points == 0)
     return;
@@ -3248,7 +3223,8 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::integrate(
   const EvaluationFlags::EvaluationFlags            &integration_flags,
   const bool                                         sum_into_values)
 {
-  Assert(this->is_reinitialized, ExcMessage("Is not reinitialized!"));
+  Assert(!this->must_reinitialize_pointers,
+         ExcMessage("Object has not been reinitialized!"));
 
   Assert(!(integration_flags & EvaluationFlags::hessians), ExcNotImplemented());
 
@@ -3300,7 +3276,8 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
   const EvaluationFlags::EvaluationFlags            &integration_flags,
   const bool                                         sum_into_values)
 {
-  Assert(this->is_reinitialized, ExcMessage("Is not reinitialized!"));
+  Assert(!this->must_reinitialize_pointers,
+         ExcMessage("Object has not been reinitialized!"));
 
   Assert(!(integration_flags & EvaluationFlags::hessians), ExcNotImplemented());
 

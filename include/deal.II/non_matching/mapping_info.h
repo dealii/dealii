@@ -456,12 +456,6 @@ namespace NonMatching
     get_update_flags_mapping() const;
 
     /**
-     * Connects to is_reinitialized().
-     */
-    boost::signals2::connection
-    connect_is_reinitialized(const std::function<void()> &set_is_reinitialized);
-
-    /**
      * Compute the geometry index offset of the current cell/face.
      */
     template <bool is_face>
@@ -759,12 +753,6 @@ namespace NonMatching
     bool do_cell_index_compression;
 
     /**
-     * This signal is triggered right after this object is reinitialized, to let
-     * dependent objects know that they need to reinitialize as well.
-     */
-    boost::signals2::signal<void()> is_reinitialized;
-
-    /**
      * Reference to the triangulation passed via the cells to the
      * reinit functions. This field is only set if
      * AdditionalData::store_cells is enabled.
@@ -932,7 +920,6 @@ namespace NonMatching
     compressed_data_index_offsets.push_back(0);
 
     state = State::single_cell;
-    is_reinitialized();
   }
 
 
@@ -1153,7 +1140,6 @@ namespace NonMatching
       }
 
     state = State::cell_vector;
-    is_reinitialized();
   }
 
 
@@ -1473,7 +1459,6 @@ namespace NonMatching
       }
 
     state = State::faces_on_cells_in_vector;
-    is_reinitialized();
   }
 
 
@@ -1746,7 +1731,6 @@ namespace NonMatching
       }
 
     state = State::face_vector;
-    is_reinitialized();
   }
 
 
@@ -2169,16 +2153,6 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_update_flags_mapping() const
   {
     return update_flags_mapping;
-  }
-
-
-
-  template <int dim, int spacedim, typename Number>
-  boost::signals2::connection
-  MappingInfo<dim, spacedim, Number>::connect_is_reinitialized(
-    const std::function<void()> &set_is_reinitialized)
-  {
-    return is_reinitialized.connect(set_is_reinitialized);
   }
 
 
