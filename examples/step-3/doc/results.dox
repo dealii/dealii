@@ -141,7 +141,7 @@ suggestions:
   call to <code>interpolate_boundary_values</code> for boundary indicator one:
   @code
   VectorTools::interpolate_boundary_values(dof_handler,
-					   1,
+					   types::boundary_id(1),
 					   Functions::ConstantFunction<2>(1.),
 					   boundary_values);
   @endcode
