@@ -724,38 +724,6 @@ namespace internal
       }
 
 
-      /**
-       * Implementation of the function of some name in the mother class.
-       */
-      template <int structdim, int dim, int spacedim>
-      inline static bool
-      face_flip(const TriaAccessor<structdim, dim, spacedim> &,
-                const unsigned int)
-      {
-        /*
-         * Default implementation used in 1d and 2d
-         *
-         * In 1d, face_flip is always false as there is no such concept as
-         * "flipped" faces in 1d.
-         *
-         * In 2d the orientation is a single bit (i.e., the orientation of a
-         * line) encoded in face_orientation so face_flip is also always false.
-         */
-        return false;
-      }
-
-
-
-      inline static bool
-      face_flip(const TriaAccessor<3, 3, 3> &accessor, const unsigned int face)
-      {
-        AssertIndexRange(face, accessor.n_faces());
-        return accessor.tria->levels[accessor.present_level]
-          ->face_orientations.get_flip(
-            accessor.present_index * GeometryInfo<3>::faces_per_cell + face);
-      }
-
-
 
       /**
        * Implementation of the function of some name in the mother class.
@@ -1413,9 +1381,21 @@ inline bool
 TriaAccessor<structdim, dim, spacedim>::face_flip(const unsigned int face) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(structdim == dim,
+         ExcMessage("This function can only be used on objects "
+                    "that are cells, but not on faces or edges "
+                    "that bound cells."));
+  AssertIndexRange(face, n_faces());
+  // work around a bogus GCC-9 warning which considers face unused except in 3d
+  (void)face;
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    face_flip(*this, face);
+  if constexpr (structdim == 3)
+    return this->tria->levels[this->present_level]->face_orientations.get_flip(
+      this->present_index * GeometryInfo<3>::faces_per_cell + face);
+  else
+    // In 1d and 2d, face_flip is always false as faces can only be
+    // 'flipped' in 3d.
+    return false;
 }
 
 
