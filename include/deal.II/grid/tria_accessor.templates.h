@@ -618,7 +618,7 @@ namespace internal
           accessor.reference_cell().standard_to_real_face_line(
             line_index,
             face_index,
-            combined_face_orientation(accessor, face_index));
+            accessor.combined_face_orientation(face_index));
 
         return accessor.quad(face_index)->line_index(line_within_face_index);
       }
@@ -647,42 +647,6 @@ namespace internal
         constexpr unsigned int max_faces_per_cell = 6;
         return accessor.tria->levels[accessor.present_level]
           ->cells.cells[accessor.present_index * max_faces_per_cell + i];
-      }
-
-
-
-      template <int dim, int spacedim>
-      inline static unsigned char
-      combined_face_orientation(
-        const TriaAccessor<1, dim, spacedim> & /*accessor*/,
-        const unsigned int /*face*/)
-      {
-        // There is only one way to orient a vertex
-        return ReferenceCell::default_combined_face_orientation();
-      }
-
-
-
-      template <int dim, int spacedim>
-      inline static unsigned char
-      combined_face_orientation(const TriaAccessor<2, dim, spacedim> &accessor,
-                                const unsigned int                    face)
-      {
-        return line_orientation(accessor, face) == true ?
-                 ReferenceCell::default_combined_face_orientation() :
-                 ReferenceCell::reversed_combined_line_orientation();
-      }
-
-
-
-      inline static unsigned char
-      combined_face_orientation(const TriaAccessor<3, 3, 3> &accessor,
-                                const unsigned int           face)
-      {
-        AssertIndexRange(face, accessor.n_faces());
-        return accessor.tria->levels[accessor.present_level]
-          ->face_orientations.get_combined_orientation(
-            accessor.present_index * GeometryInfo<3>::faces_per_cell + face);
       }
 
 
@@ -895,7 +859,7 @@ namespace internal
           accessor.reference_cell().standard_to_real_face_vertex(
             vertex_index,
             face_index,
-            combined_face_orientation(accessor, face_index));
+            accessor.combined_face_orientation(face_index));
 
         return accessor.quad(face_index)
           ->vertex_index(vertex_within_face_index);
@@ -984,9 +948,9 @@ namespace internal
         else if (ref_cell == ReferenceCells::Tetrahedron)
           {
             std::array<unsigned int, 3> orientations{
-              {combined_face_orientation(cell, 0),
-               combined_face_orientation(cell, 1),
-               combined_face_orientation(cell, 2)}};
+              {cell.combined_face_orientation(0),
+               cell.combined_face_orientation(1),
+               cell.combined_face_orientation(2)}};
             const std::array<unsigned int, 6> my_indices{
               {ref_cell.standard_to_real_face_line(0, 0, orientations[0]),
                ref_cell.standard_to_real_face_line(1, 0, orientations[0]),
@@ -1124,9 +1088,9 @@ namespace internal
         else if (ref_cell == ReferenceCells::Tetrahedron)
           {
             std::array<unsigned int, 3> orientations{
-              {combined_face_orientation(cell, 0),
-               combined_face_orientation(cell, 1),
-               combined_face_orientation(cell, 2)}};
+              {cell.combined_face_orientation(0),
+               cell.combined_face_orientation(1),
+               cell.combined_face_orientation(2)}};
             const std::array<unsigned int, 6> my_indices{
               {ref_cell.standard_to_real_face_line(0, 0, orientations[0]),
                ref_cell.standard_to_real_face_line(1, 0, orientations[0]),
@@ -1319,8 +1283,25 @@ inline unsigned char
 TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
   const unsigned int face) const
 {
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    combined_face_orientation(*this, face);
+  Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
+  AssertIndexRange(face, n_faces());
+  Assert(structdim == dim,
+         ExcMessage("This function can only be used on objects "
+                    "that are cells, but not on faces or edges "
+                    "that bound cells."));
+  // work around a bogus GCC-9 warning which considers face unused except in 3d
+  (void)face;
+
+  if constexpr (structdim == 1)
+    return ReferenceCell::default_combined_face_orientation();
+  else if constexpr (structdim == 2)
+    return this->line_orientation(face) == true ?
+             ReferenceCell::default_combined_face_orientation() :
+             ReferenceCell::reversed_combined_line_orientation();
+  else
+    return this->tria->levels[this->present_level]
+      ->face_orientations.get_combined_orientation(
+        this->present_index * GeometryInfo<structdim>::faces_per_cell + face);
 }
 
 
