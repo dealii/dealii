@@ -760,35 +760,6 @@ namespace internal
       /**
        * Implementation of the function of some name in the mother class.
        */
-      template <int structdim, int dim, int spacedim>
-      inline static bool
-      face_rotation(const TriaAccessor<structdim, dim, spacedim> &,
-                    const unsigned int)
-      {
-        /*
-         * Default implementation used in 1d and 2d
-         *
-         * In 1d and 2d, face_rotation is always false as there is no such
-         * concept as "rotated" faces in 1d and 2d.
-         */
-        return false;
-      }
-
-
-      inline static bool
-      face_rotation(const TriaAccessor<3, 3, 3> &accessor,
-                    const unsigned int           face)
-      {
-        AssertIndexRange(face, accessor.n_faces());
-
-        return accessor.tria->levels[accessor.present_level]
-          ->face_orientations.get_rotation(
-            accessor.present_index * GeometryInfo<3>::faces_per_cell + face);
-      }
-
-      /**
-       * Implementation of the function of some name in the mother class.
-       */
       template <int dim, int spacedim>
       inline static bool
       line_orientation(const TriaAccessor<1, dim, spacedim> &,
@@ -1454,9 +1425,22 @@ TriaAccessor<structdim, dim, spacedim>::face_rotation(
   const unsigned int face) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert(structdim == dim,
+         ExcMessage("This function can only be used on objects "
+                    "that are cells, but not on faces or edges "
+                    "that bound cells."));
+  AssertIndexRange(face, n_faces());
+  // work around a bogus GCC-9 warning which considers face unused except in 3d
+  (void)face;
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    face_rotation(*this, face);
+  if constexpr (structdim == 3)
+    return this->tria->levels[this->present_level]
+      ->face_orientations.get_rotation(
+        this->present_index * GeometryInfo<3>::faces_per_cell + face);
+  else
+    // In 1d and 2d, face_rotation is always false as faces can only be
+    // 'rotated' in 3d.
+    return false;
 }
 
 
