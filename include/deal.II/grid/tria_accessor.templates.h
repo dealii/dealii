@@ -654,76 +654,6 @@ namespace internal
       /**
        * Implementation of the function of some name in the mother class.
        */
-      template <int dim, int spacedim>
-      inline static bool
-      line_orientation(const TriaAccessor<1, dim, spacedim> &,
-                       const unsigned int)
-      {
-        return true;
-      }
-
-
-      template <int spacedim>
-      inline static bool
-      line_orientation(const TriaAccessor<2, 2, spacedim> &accessor,
-                       const unsigned int                  line)
-      {
-        AssertIndexRange(line, accessor.n_lines());
-        if (accessor.tria->levels[accessor.present_level]
-              ->face_orientations.n_objects() == 0)
-          return true; // quads in 2d have no non-standard orientation and
-                       // face_orientations is left empty
-        else
-          return accessor.tria->levels[accessor.present_level]
-            ->face_orientations.get_orientation(
-              accessor.present_index * GeometryInfo<2>::faces_per_cell + line);
-      }
-
-
-      template <int spacedim>
-      inline static bool
-      line_orientation(const TriaAccessor<2, 3, spacedim> &accessor,
-                       const unsigned int                  line)
-      {
-        Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        Assert(accessor.present_index * GeometryInfo<3>::lines_per_face + line <
-                 accessor.tria->faces->quads_line_orientations.size(),
-               ExcInternalError());
-
-        // quads as part of 3d hexes can have non-standard orientation
-        return accessor.tria->faces->quads_line_orientations
-          [accessor.present_index * GeometryInfo<3>::lines_per_face + line];
-      }
-
-
-      inline static bool
-      line_orientation(const TriaAccessor<3, 3, 3> &accessor,
-                       const unsigned int           line)
-      {
-        Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        AssertIndexRange(line, accessor.n_lines());
-
-        // First pick a face on which this line is a part of, and the
-        // index of the line within.
-        const auto [face_index, line_index] =
-          accessor.reference_cell().standard_line_to_face_and_line_index(line);
-        const auto line_within_face_index =
-          accessor.reference_cell().standard_to_real_face_line(
-            line_index,
-            face_index,
-            combined_face_orientation(accessor, face_index));
-
-        // Then query how that line is oriented within that face:
-        return accessor.reference_cell().standard_vs_true_line_orientation(
-          line_index,
-          face_index,
-          combined_face_orientation(accessor, face_index),
-          accessor.quad(face_index)->line_orientation(line_within_face_index));
-      }
-
-      /**
-       * Implementation of the function of some name in the mother class.
-       */
       template <int structdim, int dim, int spacedim>
       inline static void
       set_combined_face_orientation(
@@ -840,7 +770,9 @@ namespace internal
           accessor.reference_cell().standard_to_real_face_vertex(
             vertex_index,
             line_index,
-            accessor.combined_face_orientation(line_index));
+            accessor.line_orientation(line_index) == true ?
+              ReferenceCell::default_combined_face_orientation() :
+              ReferenceCell::reversed_combined_line_orientation());
 
         return accessor.line(line_index)
           ->vertex_index(vertex_within_line_index);
@@ -1389,9 +1321,61 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
   AssertIndexRange(line, this->n_lines());
+  // work around a bogus GCC-9 warning which considers line unused in 1d
+  (void)line;
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    line_orientation(*this, line);
+  if constexpr (structdim == 1)
+    return true;
+  else if constexpr (structdim == 2 && dim == 2)
+    // lines in 2d are faces
+    {
+      // if all elements are quads (or if we have a very special consistently
+      // oriented triangular mesh) then we do not store this array
+      if (this->tria->levels[this->present_level]
+            ->face_orientations.n_objects() == 0)
+        {
+          return true;
+        }
+      else
+        {
+          return this->tria->levels[this->present_level]
+            ->face_orientations.get_orientation(
+              this->present_index * GeometryInfo<structdim>::faces_per_cell +
+              line);
+        }
+    }
+  else if constexpr (structdim == 2 && dim == 3)
+    {
+      // line orientations in 3d are stored in their own array
+      Assert(this->present_index * GeometryInfo<3>::lines_per_face + line <
+               this->tria->faces->quads_line_orientations.size(),
+             ExcInternalError());
+      return this->tria->faces->quads_line_orientations
+        [this->present_index * GeometryInfo<3>::lines_per_face + line];
+    }
+  else if constexpr (structdim == 3 && dim == 3)
+    {
+      const auto reference_cell = this->reference_cell();
+      // First pick a face on which this line is a part of, and the
+      // index of the line within.
+      const auto [face_index, line_index] =
+        reference_cell.standard_line_to_face_and_line_index(line);
+      const auto line_within_face_index =
+        reference_cell.standard_to_real_face_line(
+          line_index, face_index, this->combined_face_orientation(face_index));
+
+      // Then query how that line is oriented within that face:
+      return reference_cell.standard_vs_true_line_orientation(
+        line_index,
+        face_index,
+        this->combined_face_orientation(face_index),
+        this->quad(face_index)->line_orientation(line_within_face_index));
+    }
+  else
+    {
+      DEAL_II_ASSERT_UNREACHABLE();
+      return false;
+    }
 }
 
 
