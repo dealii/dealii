@@ -110,24 +110,6 @@ namespace internal
                                const unsigned char value);
 
       /**
-       * Set the orientation bit of the object.
-       */
-      void
-      set_orientation(const unsigned int object, const bool value);
-
-      /**
-       * Set the rotate bit of the object.
-       */
-      void
-      set_rotation(const unsigned int object, const bool value);
-
-      /**
-       * Set the flip bit of the object.
-       */
-      void
-      set_flip(const unsigned int object, const bool value);
-
-      /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization using the [BOOST serialization
        * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
@@ -246,36 +228,6 @@ namespace internal
     {
       AssertIndexRange(object, n_stored_objects);
       flags[object] = value;
-    }
-
-
-
-    inline void
-    TriaObjectsOrientations::set_orientation(const unsigned int object,
-                                             const bool         value)
-    {
-      AssertIndexRange(object, n_stored_objects);
-      Utilities::set_bit(flags[object], 0, value);
-    }
-
-
-
-    inline void
-    TriaObjectsOrientations::set_rotation(const unsigned int object,
-                                          const bool         value)
-    {
-      AssertIndexRange(object, n_stored_objects);
-      Utilities::set_bit(flags[object], 1, value);
-    }
-
-
-
-    inline void
-    TriaObjectsOrientations::set_flip(const unsigned int object,
-                                      const bool         value)
-    {
-      AssertIndexRange(object, n_stored_objects);
-      Utilities::set_bit(flags[object], 2, value);
     }
 
 
