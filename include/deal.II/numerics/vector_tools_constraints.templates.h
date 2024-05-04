@@ -118,12 +118,12 @@ namespace VectorTools
      * The function does not add constraints if a degree of freedom is already
      * constrained in the constraints object.
      */
-    template <int dim>
+    template <int dim, typename number>
     void
     add_constraint(const VectorDoFTuple<dim> &dof_indices,
                    const Tensor<1, dim>      &constraining_vector,
-                   AffineConstraints<double> &constraints,
-                   const double               inhomogeneity = 0)
+                   AffineConstraints<number> &constraints,
+                   const number               inhomogeneity = 0)
     {
       // choose the DoF that has the largest component in the
       // constraining_vector as the one to be constrained as this makes the
@@ -169,15 +169,15 @@ namespace VectorTools
                   if (!constraints.is_constrained(dof_indices.dof_indices[0]) &&
                       constraints.can_store_line(dof_indices.dof_indices[0]))
                     {
-                      const double normalized_inhomogeneity =
+                      const number normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[0]) >
-                             std::numeric_limits<double>::epsilon() ?
+                             std::numeric_limits<number>::epsilon() ?
                            inhomogeneity / constraining_vector[0] :
                            0);
 
                       if (std::fabs(constraining_vector[1] /
                                     constraining_vector[0]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraints.add_constraint(dof_indices.dof_indices[0],
                                                    {{dof_indices.dof_indices[1],
                                                      -constraining_vector[1] /
@@ -194,15 +194,15 @@ namespace VectorTools
                   if (!constraints.is_constrained(dof_indices.dof_indices[1]) &&
                       constraints.can_store_line(dof_indices.dof_indices[1]))
                     {
-                      const double normalized_inhomogeneity =
+                      const number normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[1]) >
-                             std::numeric_limits<double>::epsilon() ?
+                             std::numeric_limits<number>::epsilon() ?
                            inhomogeneity / constraining_vector[1] :
                            0);
 
                       if (std::fabs(constraining_vector[0] /
                                     constraining_vector[1]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraints.add_constraint(dof_indices.dof_indices[1],
                                                    {{dof_indices.dof_indices[0],
                                                      -constraining_vector[0] /
@@ -226,7 +226,7 @@ namespace VectorTools
               // TODO: This could use std::inplace_vector once available (in
               // C++26?)
               boost::container::
-                small_vector<std::pair<types::global_dof_index, double>, 2>
+                small_vector<std::pair<types::global_dof_index, number>, 2>
                   constraint_entries;
 
               if ((std::fabs(constraining_vector[0]) >=
@@ -239,7 +239,7 @@ namespace VectorTools
                     {
                       if (std::fabs(constraining_vector[1] /
                                     constraining_vector[0]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraint_entries.emplace_back(
                           std::make_pair(dof_indices.dof_indices[1],
                                          -constraining_vector[1] /
@@ -247,15 +247,15 @@ namespace VectorTools
 
                       if (std::fabs(constraining_vector[2] /
                                     constraining_vector[0]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraint_entries.emplace_back(
                           std::make_pair(dof_indices.dof_indices[2],
                                          -constraining_vector[2] /
                                            constraining_vector[0]));
 
-                      const double normalized_inhomogeneity =
+                      const number normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[0]) >
-                             std::numeric_limits<double>::epsilon() ?
+                             std::numeric_limits<number>::epsilon() ?
                            inhomogeneity / constraining_vector[0] :
                            0);
 
@@ -274,7 +274,7 @@ namespace VectorTools
                     {
                       if (std::fabs(constraining_vector[0] /
                                     constraining_vector[1]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraint_entries.emplace_back(
                           std::make_pair(dof_indices.dof_indices[0],
                                          -constraining_vector[0] /
@@ -282,15 +282,15 @@ namespace VectorTools
 
                       if (std::fabs(constraining_vector[2] /
                                     constraining_vector[1]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraint_entries.emplace_back(
                           std::make_pair(dof_indices.dof_indices[2],
                                          -constraining_vector[2] /
                                            constraining_vector[1]));
 
-                      const double normalized_inhomogeneity =
+                      const number normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[1]) >
-                             std::numeric_limits<double>::epsilon() ?
+                             std::numeric_limits<number>::epsilon() ?
                            inhomogeneity / constraining_vector[1] :
                            0);
 
@@ -306,7 +306,7 @@ namespace VectorTools
                     {
                       if (std::fabs(constraining_vector[0] /
                                     constraining_vector[2]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraint_entries.emplace_back(
                           std::make_pair(dof_indices.dof_indices[0],
                                          -constraining_vector[0] /
@@ -314,15 +314,15 @@ namespace VectorTools
 
                       if (std::fabs(constraining_vector[1] /
                                     constraining_vector[2]) >
-                          std::numeric_limits<double>::epsilon())
+                          std::numeric_limits<number>::epsilon())
                         constraint_entries.emplace_back(
                           std::make_pair(dof_indices.dof_indices[1],
                                          -constraining_vector[1] /
                                            constraining_vector[2]));
 
-                      const double normalized_inhomogeneity =
+                      const number normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[2]) >
-                             std::numeric_limits<double>::epsilon() ?
+                             std::numeric_limits<number>::epsilon() ?
                            inhomogeneity / constraining_vector[2] :
                            0);
 
@@ -352,13 +352,13 @@ namespace VectorTools
      * The function does not add constraints if a degree of freedom is already
      * constrained in the constraints object.
      */
-    template <int dim>
+    template <int dim, typename number>
     void
     add_tangentiality_constraints(
       const VectorDoFTuple<dim> &dof_indices,
       const Tensor<1, dim>      &tangent_vector,
-      AffineConstraints<double> &constraints,
-      const Vector<double>      &b_values = Vector<double>(dim))
+      AffineConstraints<number> &constraints,
+      const Vector<number>      &b_values = Vector<number>(dim))
     {
       // choose the DoF that has the
       // largest component in the
@@ -384,20 +384,20 @@ namespace VectorTools
           if (!constraints.is_constrained(dof_indices.dof_indices[d]) &&
               constraints.can_store_line(dof_indices.dof_indices[d]))
             {
-              const double inhomogeneity =
+              const number inhomogeneity =
                 (b_values(d) * tangent_vector[largest_component] -
                  b_values(largest_component) * tangent_vector[d]) /
                 tangent_vector[largest_component];
 
-              const double normalized_inhomogeneity =
+              const number normalized_inhomogeneity =
                 (std::fabs(inhomogeneity) >
-                     std::numeric_limits<double>::epsilon() ?
+                     std::numeric_limits<number>::epsilon() ?
                    inhomogeneity :
                    0);
 
               if (std::fabs(tangent_vector[d] /
                             tangent_vector[largest_component]) >
-                  std::numeric_limits<double>::epsilon())
+                  std::numeric_limits<number>::epsilon())
                 constraints.add_constraint(
                   dof_indices.dof_indices[d],
                   {{dof_indices.dof_indices[largest_component],
@@ -596,13 +596,13 @@ namespace VectorTools
      * Compute the mappings from vector degrees of freedom to normal vectors @p dof_to_normals_map
      * and vector degrees of freedom to prescribed normal fluxes @p dof_vector_to_b_values.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
     map_dofs_to_normal_vectors_and_normal_fluxes(
       const typename DoFHandler<dim, spacedim>::cell_iterator &cell,
       const unsigned int                  first_vector_component,
       const std::set<types::boundary_id> &boundary_ids,
-      const std::map<types::boundary_id, const Function<spacedim> *>
+      const std::map<types::boundary_id, const Function<spacedim, number> *>
                                       &function_map,
       hp::FEFaceValues<dim, spacedim> &x_fe_face_values,
       const unsigned int               n_dofs,
@@ -613,7 +613,7 @@ namespace VectorTools
         std::pair<Tensor<1, dim>,
                   typename DoFHandler<dim, spacedim>::cell_iterator>>
                                                     &dof_to_normals_map,
-      std::map<VectorDoFTuple<dim>, Vector<double>> &dof_vector_to_b_values)
+      std::map<VectorDoFTuple<dim>, Vector<number>> &dof_vector_to_b_values)
     {
       // mapping from (active_fe_index, face_no and local
       // dof index) to dim vector indices of the same
@@ -749,7 +749,7 @@ namespace VectorTools
                     normal_vector /= normal_vector.norm();
 
                     const Point<dim> &point = fe_values.quadrature_point(i);
-                    Vector<double>    b_values(dim);
+                    Vector<number>    b_values(dim);
                     function_map.at(*b_id)->vector_value(point, b_values);
 
                     // now enter the (dofs,(normal_vector,cell)) entry into
@@ -781,15 +781,15 @@ namespace VectorTools
      * compute_nonzero_normal_flux_constraints_on_level() so as to have
      * separate interfaces for the active and level cells.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename number>
     void
     compute_nonzero_normal_flux_constraints_active_or_level(
       const DoFHandler<dim, spacedim>    &dof_handler,
       const unsigned int                  first_vector_component,
       const std::set<types::boundary_id> &boundary_ids,
-      const std::map<types::boundary_id, const Function<spacedim> *>
+      const std::map<types::boundary_id, const Function<spacedim, number> *>
                                    &function_map,
-      AffineConstraints<double>    &constraints,
+      AffineConstraints<number>    &constraints,
       const Mapping<dim, spacedim> &mapping,
       const IndexSet               &refinement_edge_indices = IndexSet(),
       const unsigned int            level = numbers::invalid_unsigned_int)
@@ -851,7 +851,7 @@ namespace VectorTools
         VectorDoFTuple<dim>,
         std::pair<Tensor<1, dim>,
                   typename DoFHandler<dim, spacedim>::cell_iterator>>;
-      std::map<VectorDoFTuple<dim>, Vector<double>> dof_vector_to_b_values;
+      std::map<VectorDoFTuple<dim>, Vector<number>> dof_vector_to_b_values;
 
       DoFToNormalsMap dof_to_normals_map;
 
@@ -1025,8 +1025,8 @@ namespace VectorTools
                   // then construct constraints from this:
                   const VectorDoFTuple<dim> &dof_indices =
                     same_dof_range[0]->first;
-                  double               normal_value = 0.;
-                  const Vector<double> b_values =
+                  number               normal_value = 0.;
+                  const Vector<number> b_values =
                     dof_vector_to_b_values[dof_indices];
                   for (unsigned int i = 0; i < dim; ++i)
                     normal_value += b_values[i] * normal[i];
@@ -1080,7 +1080,7 @@ namespace VectorTools
                   // ignore dofs already constrained
                   const VectorDoFTuple<dim> &dof_indices =
                     same_dof_range[0]->first;
-                  const Vector<double> b_values =
+                  const Vector<number> b_values =
                     dof_vector_to_b_values[dof_indices];
                   for (unsigned int i = 0; i < dim; ++i)
                     if (!constraints.is_constrained(
@@ -1092,7 +1092,7 @@ namespace VectorTools
                           dof_indices.dof_indices[i],
                           {},
                           (std::fabs(b_values[i]) >
-                               std::numeric_limits<double>::epsilon() ?
+                               std::numeric_limits<number>::epsilon() ?
                              b_values[i] :
                              0));
                       }
@@ -1249,7 +1249,7 @@ namespace VectorTools
                   // the vector is parallel to the tangent
                   const VectorDoFTuple<dim> &dof_indices =
                     same_dof_range[0]->first;
-                  const Vector<double> b_values =
+                  const Vector<number> b_values =
                     dof_vector_to_b_values[dof_indices];
                   add_tangentiality_constraints(dof_indices,
                                                 average_tangent,
@@ -1543,17 +1543,18 @@ namespace VectorTools
   }
 
 
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void
   compute_no_normal_flux_constraints(
     const DoFHandler<dim, spacedim>    &dof_handler,
     const unsigned int                  first_vector_component,
     const std::set<types::boundary_id> &boundary_ids,
-    AffineConstraints<double>          &constraints,
+    AffineConstraints<number>          &constraints,
     const Mapping<dim, spacedim>       &mapping)
   {
-    Functions::ZeroFunction<dim>                             zero_function(dim);
-    std::map<types::boundary_id, const Function<spacedim> *> function_map;
+    Functions::ZeroFunction<dim, number> zero_function(dim);
+    std::map<types::boundary_id, const Function<spacedim, number> *>
+      function_map;
     for (const types::boundary_id boundary_id : boundary_ids)
       function_map[boundary_id] = &zero_function;
     internal::compute_nonzero_normal_flux_constraints_active_or_level(

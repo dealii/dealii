@@ -343,13 +343,13 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, typename number>
   void
   compute_no_normal_flux_constraints(
     const DoFHandler<dim, spacedim>    &dof_handler,
     const unsigned int                  first_vector_component,
     const std::set<types::boundary_id> &boundary_ids,
-    AffineConstraints<double>          &constraints,
+    AffineConstraints<number>          &constraints,
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
