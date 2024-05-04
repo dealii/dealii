@@ -651,44 +651,6 @@ namespace internal
 
 
 
-      /**
-       * Implementation of the function of some name in the mother class
-       */
-      template <int structdim, int dim, int spacedim>
-      inline static bool
-      face_orientation(const TriaAccessor<structdim, dim, spacedim> &,
-                       const unsigned int)
-      {
-        /*
-         * Default implementation used in 1d
-         *
-         * In 1d, face_orientation is always true
-         */
-
-        return true;
-      }
-
-
-      template <int spacedim>
-      inline static bool
-      face_orientation(const TriaAccessor<2, 2, spacedim> &accessor,
-                       const unsigned int                  face)
-      {
-        return line_orientation(accessor, face);
-      }
-
-
-      inline static bool
-      face_orientation(const TriaAccessor<3, 3, 3> &accessor,
-                       const unsigned int           face)
-      {
-        return accessor.tria->levels[accessor.present_level]
-          ->face_orientations.get_orientation(
-            accessor.present_index * GeometryInfo<3>::faces_per_cell + face);
-      }
-
-
-
       template <int dim, int spacedim>
       inline static unsigned char
       combined_face_orientation(
@@ -1369,9 +1331,23 @@ TriaAccessor<structdim, dim, spacedim>::face_orientation(
   const unsigned int face) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
+  AssertIndexRange(face, n_faces());
+  Assert(structdim == dim,
+         ExcMessage("This function can only be used on objects "
+                    "that are cells, but not on faces or edges "
+                    "that bound cells."));
+  // work around a bogus GCC-9 warning which considers face unused in 1d
+  (void)face;
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    face_orientation(*this, face);
+  if constexpr (structdim == 1)
+    // in 1d 'faces' are vertices and those are always consistently oriented
+    return true;
+  else if constexpr (structdim == 2)
+    return this->line_orientation(face);
+  else
+    return this->tria->levels[this->present_level]
+      ->face_orientations.get_orientation(
+        this->present_index * GeometryInfo<structdim>::faces_per_cell + face);
 }
 
 
