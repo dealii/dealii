@@ -144,7 +144,7 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
 
-  FEValuesExtractors::Vector extractor(0);
+  const FEValuesExtractors::Vector extractor(0);
 
   run<2>(extractor);
   run<3>(extractor);

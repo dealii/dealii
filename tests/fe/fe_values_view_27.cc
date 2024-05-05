@@ -77,8 +77,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   // divergences at quadrature points
   std::vector<typename dealii::internal::CurlType<dim>::type> curls(
     quadrature.size());
-  std::vector<Tensor<2, dim>> grads(quadrature.size());
-  FEValuesExtractors::Vector  extractor(0);
+  std::vector<Tensor<2, dim>>      grads(quadrature.size());
+  const FEValuesExtractors::Vector extractor(0);
   fe_values[extractor].get_function_curls(fe_function, curls);
   fe_values[extractor].get_function_gradients(fe_function, grads);
 

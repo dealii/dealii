@@ -456,7 +456,7 @@ namespace Step18
         }
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
-    FEValuesExtractors::Scalar                z_component(dim - 1);
+    const FEValuesExtractors::Scalar          z_component(dim - 1);
     std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,

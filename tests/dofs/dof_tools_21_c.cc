@@ -260,11 +260,11 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
                                                       dof_handler,
                                                       support_points);
 
-  FEValuesExtractors::Vector v(0);
-  FEValuesExtractors::Scalar v_1(0);
-  FEValuesExtractors::Scalar v_2(1);
-  FEValuesExtractors::Scalar v_3(2);
-  FEValuesExtractors::Scalar pressure(3);
+  const FEValuesExtractors::Vector v(0);
+  const FEValuesExtractors::Scalar v_1(0);
+  const FEValuesExtractors::Scalar v_2(1);
+  const FEValuesExtractors::Scalar v_3(2);
+  const FEValuesExtractors::Scalar pressure(3);
 
   ComponentMask velocity_mask;
   if (constrain_only_velocity)

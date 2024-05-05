@@ -114,7 +114,7 @@ test()
 
   using Iterator = decltype(cell);
 
-  FEValuesExtractors::Scalar scalar(0);
+  const FEValuesExtractors::Scalar scalar(0);
 
   auto cell_worker = [&rhs_function, &solution, &scalar](const Iterator &cell,
                                                          ScratchData    &s,

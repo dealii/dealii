@@ -99,7 +99,7 @@ test()
   std::vector<double> solution_values(fe.dofs_per_cell);
   std::vector<double> solution_values2(fe.dofs_per_cell);
 
-  FEValuesExtractors::Vector extractor(0);
+  const FEValuesExtractors::Vector extractor(0);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {

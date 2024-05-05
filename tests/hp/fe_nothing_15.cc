@@ -53,8 +53,8 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  FEValues<dim>              fe_values(fe, QGauss<dim>(2), update_values);
-  FEValuesExtractors::Scalar nothing(1);
+  FEValues<dim>                    fe_values(fe, QGauss<dim>(2), update_values);
+  const FEValuesExtractors::Scalar nothing(1);
   fe_values.reinit(dof_handler.begin_active());
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)

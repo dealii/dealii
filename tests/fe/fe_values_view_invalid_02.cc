@@ -42,7 +42,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   FEValues<dim>     fe_values(fe, quadrature, update_values);
   fe_values.reinit(dof.begin_active());
 
-  FEValuesExtractors::Vector extr; // invalid object
+  const FEValuesExtractors::Vector extr; // invalid object
   try
     {
       fe_values[extr]; // invalid access

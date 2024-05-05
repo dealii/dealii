@@ -455,34 +455,34 @@ test()
 
   deallog.push("Scalar");
   {
-    FE_Q<dim>                  fe(degree);
-    FEValuesExtractors::Scalar extractor(0);
+    FE_Q<dim>                        fe(degree);
+    const FEValuesExtractors::Scalar extractor(0);
     test_extractor<NumberType, dim>(fe, extractor);
   }
   deallog.pop();
 
   deallog.push("Vector");
   {
-    FESystem<dim>              fe(FE_Q<dim>(degree), dim);
-    FEValuesExtractors::Vector extractor(0);
+    FESystem<dim>                    fe(FE_Q<dim>(degree), dim);
+    const FEValuesExtractors::Vector extractor(0);
     test_extractor<NumberType, dim>(fe, extractor);
   }
   deallog.pop();
 
   deallog.push("SymmetricTensor");
   {
-    FESystem<dim>                          fe(FE_Q<dim>(degree),
+    FESystem<dim>                                fe(FE_Q<dim>(degree),
                      SymmetricTensor<2, dim>::n_independent_components);
-    FEValuesExtractors::SymmetricTensor<2> extractor(0);
+    const FEValuesExtractors::SymmetricTensor<2> extractor(0);
     test_extractor<NumberType, dim>(fe, extractor);
   }
   deallog.pop();
 
   deallog.push("Tensor");
   {
-    FESystem<dim>                 fe(FE_Q<dim>(degree),
+    FESystem<dim>                       fe(FE_Q<dim>(degree),
                      Tensor<2, dim>::n_independent_components);
-    FEValuesExtractors::Tensor<2> extractor(0);
+    const FEValuesExtractors::Tensor<2> extractor(0);
     test_extractor<NumberType, dim>(fe, extractor);
   }
   deallog.pop();

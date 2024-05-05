@@ -110,8 +110,8 @@ test(const unsigned int degree)
   std::vector<double>         function_values_scalar(unit_points.size());
   std::vector<Tensor<1, dim>> function_gradients_scalar(unit_points.size());
 
-  FEValuesExtractors::Vector extractor(0);
-  FEValuesExtractors::Scalar extractor_s(dim);
+  const FEValuesExtractors::Vector extractor(0);
+  const FEValuesExtractors::Scalar extractor_s(dim);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {

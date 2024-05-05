@@ -96,7 +96,7 @@ main()
                                         QuadratureCouplingType::matching);
 
   FullMatrix<double> matrix(fcv.n_coupling_dofs(), fcv.n_coupling_dofs());
-  FEValuesExtractors::Scalar scalar(0);
+  const FEValuesExtractors::Scalar scalar(0);
 
   const auto bulk    = fcv.get_first_extractor(scalar);
   const auto surface = fcv.get_second_extractor(scalar);
