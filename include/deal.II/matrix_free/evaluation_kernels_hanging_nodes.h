@@ -88,15 +88,18 @@ namespace internal
     Number>
   {
   private:
-    template <int structdim, unsigned int direction, bool transpose>
+    template <int          structdim,
+              unsigned int direction,
+              bool         transpose,
+              typename Number2>
     static void
-    interpolate(const unsigned int             offset,
-                const unsigned int             outer_stride,
-                const unsigned int             given_degree,
-                const Number                   mask_weight,
-                const Number                   mask_write,
-                const Number *DEAL_II_RESTRICT weights,
-                Number *DEAL_II_RESTRICT       values)
+    interpolate(const unsigned int              offset,
+                const unsigned int              outer_stride,
+                const unsigned int              given_degree,
+                const Number                    mask_weight,
+                const Number                    mask_write,
+                const Number2 *DEAL_II_RESTRICT weights,
+                Number *DEAL_II_RESTRICT        values)
     {
       static constexpr unsigned int max_n_points_1D = 40;
 
@@ -178,19 +181,19 @@ namespace internal
     }
 
   public:
-    template <bool transpose>
+    template <bool transpose, typename Number2>
     static void
     run_internal(
-      const unsigned int                            n_components,
-      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const unsigned int                             n_components,
+      const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
       const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                       Number::size()>             &constraint_mask,
-      Number                                       *values)
+                       Number::size()>              &constraint_mask,
+      Number                                        *values)
     {
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
 
-      const Number *DEAL_II_RESTRICT weights =
+      const Number2 *DEAL_II_RESTRICT weights =
         shape_info.data.front().subface_interpolation_matrices[0].data();
 
       const unsigned int points = given_degree + 1;
@@ -1524,14 +1527,14 @@ namespace internal
     }
 
   public:
-    template <bool transpose>
+    template <bool transpose, typename Number2>
     static void
     run_internal(
-      const unsigned int                            n_desired_components,
-      const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+      const unsigned int                             n_desired_components,
+      const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
       const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                       Number::size()>             &constraint_mask,
-      Number                                       *values)
+                       Number::size()>              &constraint_mask,
+      Number                                        *values)
     {
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
@@ -1703,14 +1706,14 @@ namespace internal
   struct FEEvaluationImplHangingNodes
   {
   public:
-    template <int fe_degree>
+    template <int fe_degree, typename Number2>
     static bool
-    run(const unsigned int                            n_desired_components,
-        const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-        const bool                                    transpose,
+    run(const unsigned int                             n_desired_components,
+        const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
+        const bool                                     transpose,
         const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                         Number::size()>             &c_mask,
-        Number                                       *values)
+                         Number::size()>              &c_mask,
+        Number                                        *values)
     {
       using RunnerType =
         FEEvaluationImplHangingNodesRunner<used_runner_type<fe_degree>(),

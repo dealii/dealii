@@ -405,7 +405,7 @@ public:
      * we need to store the evaluations of the 1d polynomials at
      * the 1d quadrature points. That is what this variable is for.
      */
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> shape_info;
+    internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
 
     /**
      * In case the quadrature rule given represents a tensor product

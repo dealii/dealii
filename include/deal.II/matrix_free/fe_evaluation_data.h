@@ -112,7 +112,8 @@ namespace internal
 template <int dim, typename Number, bool is_face>
 class FEEvaluationData
 {
-  using ShapeInfoType = internal::MatrixFreeFunctions::ShapeInfo<Number>;
+  using ShapeInfoType = internal::MatrixFreeFunctions::ShapeInfo<
+    typename internal::VectorizedArrayTrait<Number>::value_type>;
   using MappingInfoStorageType = internal::MatrixFreeFunctions::
     MappingInfoStorage<(is_face ? dim - 1 : dim), dim, Number>;
   using DoFInfo = internal::MatrixFreeFunctions::DoFInfo;
@@ -120,10 +121,10 @@ class FEEvaluationData
 public:
   static constexpr unsigned int dimension = dim;
 
-  using NumberType             = Number;
-  using shape_info_number_type = Number;
+  using NumberType = Number;
   using ScalarNumber =
     typename internal::VectorizedArrayTrait<Number>::value_type;
+  using shape_info_number_type = ScalarNumber;
 
   static constexpr unsigned int n_lanes =
     internal::VectorizedArrayTrait<Number>::width();

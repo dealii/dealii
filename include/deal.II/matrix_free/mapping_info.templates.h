@@ -1151,13 +1151,13 @@ namespace internal
                 typename VectorizedDouble>
       void
       mapping_q_compute_range(
-        const unsigned int                 begin_cell,
-        const unsigned int                 end_cell,
-        const std::vector<GeometryType>   &cell_type,
-        const std::vector<bool>           &process_cell,
-        const UpdateFlags                  update_flags_cells,
-        const AlignedVector<double>       &plain_quadrature_points,
-        const ShapeInfo<VectorizedDouble> &shape_info,
+        const unsigned int               begin_cell,
+        const unsigned int               end_cell,
+        const std::vector<GeometryType> &cell_type,
+        const std::vector<bool>         &process_cell,
+        const UpdateFlags                update_flags_cells,
+        const AlignedVector<double>     &plain_quadrature_points,
+        const ShapeInfo<double>         &shape_info,
         MappingInfoStorage<dim, dim, VectorizedArrayType> &my_data)
       {
         constexpr unsigned int n_lanes   = VectorizedArrayType::size();
@@ -2083,12 +2083,12 @@ namespace internal
         const unsigned int begin_face,
         const unsigned int end_face,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
-                                          &faces,
-        const std::vector<GeometryType>   &face_type,
-        const std::vector<bool>           &process_face,
-        const UpdateFlags                  update_flags_faces,
-        const AlignedVector<double>       &plain_quadrature_points,
-        const ShapeInfo<VectorizedDouble> &shape_info,
+                                        &faces,
+        const std::vector<GeometryType> &face_type,
+        const std::vector<bool>         &process_face,
+        const UpdateFlags                update_flags_faces,
+        const AlignedVector<double>     &plain_quadrature_points,
+        const ShapeInfo<double>         &shape_info,
         MappingInfoStorage<dim - 1, dim, VectorizedArrayType> &my_data)
       {
         constexpr unsigned int n_lanes   = VectorizedArrayType::size();
@@ -2696,7 +2696,7 @@ namespace internal
       // functions or the quadrature points; shape info is merely a vehicle to
       // return us the right interpolation matrices from the cell support
       // points to the cell and face quadrature points.
-      std::vector<ShapeInfo<VectorizedDouble>> shape_infos(cell_data.size());
+      std::vector<ShapeInfo<double>> shape_infos(cell_data.size());
       {
         FE_DGQ<dim> fe_geometry(mapping_degree);
         for (unsigned int my_q = 0; my_q < cell_data.size(); ++my_q)

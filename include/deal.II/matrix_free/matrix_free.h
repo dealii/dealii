@@ -2147,7 +2147,7 @@ public:
   /**
    * Return the unit cell information for given hp-index.
    */
-  const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &
+  const internal::MatrixFreeFunctions::ShapeInfo<Number> &
   get_shape_info(const unsigned int dof_handler_index_component = 0,
                  const unsigned int quad_index                  = 0,
                  const unsigned int fe_base_element             = 0,
@@ -2292,8 +2292,7 @@ private:
   /**
    * Contains shape value information on the unit cell.
    */
-  Table<4, internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>>
-    shape_info;
+  Table<4, internal::MatrixFreeFunctions::ShapeInfo<Number>> shape_info;
 
   /**
    * Describes how the cells are gone through. With the cell level (first
@@ -2856,7 +2855,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_ghost_set(
 
 
 template <int dim, typename Number, typename VectorizedArrayType>
-inline const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &
+inline const internal::MatrixFreeFunctions::ShapeInfo<Number> &
 MatrixFree<dim, Number, VectorizedArrayType>::get_shape_info(
   const unsigned int dof_handler_index,
   const unsigned int index_quad,
@@ -3920,7 +3919,17 @@ namespace internal
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
       if (range_index == numbers::invalid_unsigned_int || range_index == 0)
-        vec = typename VectorType::value_type();
+        {
+          if constexpr (std::is_same_v<
+                          ArrayView<typename VectorType::value_type>,
+                          VectorType>)
+            {
+              for (unsigned int i = 0; i < vec.size(); ++i)
+                vec[i] = typename VectorType::value_type();
+            }
+          else
+            vec = typename VectorType::value_type();
+        }
     }
 
 

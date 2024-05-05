@@ -153,13 +153,13 @@ namespace internal
   struct FEEvaluationHangingNodesFactory
   {
     static void
-    apply(const unsigned int n_components,
-          const unsigned int fe_degree,
-          const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
-          const bool                                                 transpose,
+    apply(const unsigned int                             n_components,
+          const unsigned int                             fe_degree,
+          const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
+          const bool                                     transpose,
           const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                           VectorizedArrayType::size()>             &c_mask,
-          VectorizedArrayType                                       *values);
+                           VectorizedArrayType::size()> &c_mask,
+          VectorizedArrayType                           *values);
   };
 
 } // end of namespace internal

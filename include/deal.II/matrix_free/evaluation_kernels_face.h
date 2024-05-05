@@ -2429,10 +2429,10 @@ namespace internal
                 const auto face_no = fe_eval.get_face_no(v);
 
                 grad_weight[v] =
-                  shape_data.shape_data_on_face[0][fe_degree +
-                                                   (integrate ?
-                                                      (2 - (face_no % 2)) :
-                                                      (1 + (face_no % 2)))][0];
+                  shape_data
+                    .shape_data_on_face[0][fe_degree + (integrate ?
+                                                          (2 - (face_no % 2)) :
+                                                          (1 + (face_no % 2)))];
 
                 index_array_hermite[v] =
                   &fe_eval.get_shape_info().face_to_cell_index_hermite(face_no,

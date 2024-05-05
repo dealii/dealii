@@ -2439,11 +2439,10 @@ inline FEEvaluationBase<dim,
   (void)base_element_number;
 
   Assert(this->data == nullptr, ExcInternalError());
-  this->data =
-    new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>(
-      Quadrature<(is_face ? dim - 1 : dim)>(quadrature),
-      fe,
-      fe.component_to_base_index(first_selected_component).first);
+  this->data = new internal::MatrixFreeFunctions::ShapeInfo<Number>(
+    Quadrature<(is_face ? dim - 1 : dim)>(quadrature),
+    fe,
+    fe.component_to_base_index(first_selected_component).first);
 
   this->set_data_pointers(scratch_data_array, n_components_);
 }
@@ -2475,8 +2474,7 @@ inline FEEvaluationBase<dim,
     {
       Assert(other.mapped_geometry.get() != nullptr, ExcInternalError());
       this->data =
-        new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>(
-          *other.data);
+        new internal::MatrixFreeFunctions::ShapeInfo<Number>(*other.data);
 
       // Create deep copy of mapped geometry for use in parallel
       this->mapped_geometry =
@@ -2543,8 +2541,7 @@ operator=(const FEEvaluationBase<dim,
     {
       Assert(other.mapped_geometry.get() != nullptr, ExcInternalError());
       this->data =
-        new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>(
-          *other.data);
+        new internal::MatrixFreeFunctions::ShapeInfo<Number>(*other.data);
       scratch_data_array = new AlignedVector<VectorizedArrayType>();
 
       // Create deep copy of mapped geometry for use in parallel
