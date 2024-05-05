@@ -1901,7 +1901,7 @@ namespace DoFRenumbering
         std::vector<std::pair<Point<spacedim>, unsigned int>>
           support_point_list(n_dofs);
 
-        Quadrature<dim>         q_dummy(dof.get_fe().get_unit_support_points());
+        const Quadrature<dim>   q_dummy(dof.get_fe().get_unit_support_points());
         FEValues<dim, spacedim> fe_values(dof.get_fe(),
                                           q_dummy,
                                           update_quadrature_points);

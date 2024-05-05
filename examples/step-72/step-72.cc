@@ -159,9 +159,9 @@ namespace Step72
 
     Triangulation<dim> triangulation;
 
-    DoFHandler<dim> dof_handler;
-    FE_Q<dim>       fe;
-    QGauss<dim>     quadrature_formula;
+    DoFHandler<dim>   dof_handler;
+    const FE_Q<dim>   fe;
+    const QGauss<dim> quadrature_formula;
 
     AffineConstraints<double> hanging_node_constraints;
 

@@ -367,7 +367,7 @@ namespace Step57
 
     system_rhs = 0;
 
-    QGauss<dim> quadrature_formula(degree + 2);
+    const QGauss<dim> quadrature_formula(degree + 2);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,

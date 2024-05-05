@@ -482,8 +482,8 @@ namespace Step82
   {
     matrix = 0;
 
-    QGauss<dim>     quad(fe.degree + 1);
-    QGauss<dim - 1> quad_face(fe.degree + 1);
+    const QGauss<dim>     quad(fe.degree + 1);
+    const QGauss<dim - 1> quad_face(fe.degree + 1);
 
     const unsigned int n_q_points      = quad.size();
     const unsigned int n_q_points_face = quad_face.size();
@@ -931,8 +931,8 @@ namespace Step82
     double error_H1 = 0;
     double error_L2 = 0;
 
-    QGauss<dim>     quad(fe.degree + 1);
-    QGauss<dim - 1> quad_face(fe.degree + 1);
+    const QGauss<dim>     quad(fe.degree + 1);
+    const QGauss<dim - 1> quad_face(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quad,
@@ -1191,8 +1191,8 @@ namespace Step82
     const typename Triangulation<dim>::cell_iterator cell_lift =
       static_cast<typename Triangulation<dim>::cell_iterator>(cell);
 
-    QGauss<dim>     quad(fe.degree + 1);
-    QGauss<dim - 1> quad_face(fe.degree + 1);
+    const QGauss<dim>     quad(fe.degree + 1);
+    const QGauss<dim - 1> quad_face(fe.degree + 1);
 
     const unsigned int n_q_points      = quad.size();
     const unsigned int n_q_points_face = quad_face.size();

@@ -513,8 +513,8 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::assemble_system()
   {
-    QGauss<dim>     quadrature_formula(fe->degree + 1);
-    QGauss<dim - 1> face_quadrature_formula(fe->degree + 1);
+    const QGauss<dim>     quadrature_formula(fe->degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe->degree + 1);
 
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();

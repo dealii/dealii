@@ -277,8 +277,8 @@ DataOutStack<dim, spacedim>::build_patches(const unsigned int nnnn_subdivisions)
   // patch, and an object that
   // extracts the data on each
   // cell to these points
-  QTrapezoid<1>  q_trapez;
-  QIterated<dim> patch_points(q_trapez, n_subdivisions);
+  const QTrapezoid<1>  q_trapez;
+  const QIterated<dim> patch_points(q_trapez, n_subdivisions);
 
   // create collection objects from
   // single quadratures,

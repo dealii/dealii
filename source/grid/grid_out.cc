@@ -3698,7 +3698,7 @@ GridOut::write_mesh_per_processor_as_vtu(
 
           // We need a dummy vector with the names of the data values in the
           // .vtu files in order that the .pvtu contains reference these values
-          Vector<float> dummy_vector(tr->n_active_cells());
+          const Vector<float> dummy_vector(tr->n_active_cells());
           data_out.add_data_vector(dummy_vector, "level");
           data_out.add_data_vector(dummy_vector, "subdomain");
           data_out.add_data_vector(dummy_vector, "level_subdomain");
@@ -4233,8 +4233,8 @@ namespace internal
           for (unsigned int i = 1; i < n_points - 1; ++i)
             boundary_points[i][0] = 1. * i / (n_points - 1);
 
-          std::vector<double> dummy_weights(n_points, 1. / n_points);
-          Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
+          const std::vector<double> dummy_weights(n_points, 1. / n_points);
+          const Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
 
           q_projector = QProjector<dim>::project_to_all_faces(
             ReferenceCells::get_hypercube<dim>(), quadrature);
@@ -4355,11 +4355,11 @@ namespace internal
           for (unsigned int i = 1; i < n_points - 1; ++i)
             boundary_points[i][0] = 1. * i / (n_points - 1);
 
-          std::vector<double> dummy_weights(n_points, 1. / n_points);
-          Quadrature<1>       quadrature1d(boundary_points, dummy_weights);
+          const std::vector<double> dummy_weights(n_points, 1. / n_points);
+          const Quadrature<1> quadrature1d(boundary_points, dummy_weights);
 
           // tensor product of points, only one copy
-          QIterated<dim - 1> quadrature(quadrature1d, 1);
+          const QIterated<dim - 1> quadrature(quadrature1d, 1);
           q_projector = std::make_unique<Quadrature<dim>>(
             QProjector<dim>::project_to_all_faces(
               ReferenceCells::get_hypercube<dim>(), quadrature));
@@ -4788,8 +4788,8 @@ namespace internal
                   for (unsigned int i = 0; i < n_points; ++i)
                     boundary_points[i][0] = 1. * (i + 1) / (n_points + 1);
 
-                  Quadrature<dim - 1> quadrature(boundary_points);
-                  Quadrature<dim>     q_projector(
+                  const Quadrature<dim - 1> quadrature(boundary_points);
+                  const Quadrature<dim>     q_projector(
                     QProjector<dim>::project_to_all_faces(
                       ReferenceCells::get_hypercube<dim>(), quadrature));
 

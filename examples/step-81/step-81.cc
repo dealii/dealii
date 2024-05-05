@@ -597,8 +597,8 @@ namespace Step81
   template <int dim>
   void Maxwell<dim>::assemble_system()
   {
-    QGauss<dim>     quadrature_formula(quadrature_order);
-    QGauss<dim - 1> face_quadrature_formula(quadrature_order);
+    const QGauss<dim>     quadrature_formula(quadrature_order);
+    const QGauss<dim - 1> face_quadrature_formula(quadrature_order);
 
     FEValues<dim, dim>     fe_values(*fe,
                                  quadrature_formula,

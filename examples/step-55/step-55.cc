@@ -684,8 +684,8 @@ namespace Step55
       const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
                                                        dim + 1);
 
-      Vector<double> cellwise_errors(triangulation.n_active_cells());
-      QGauss<dim>    quadrature(velocity_degree + 2);
+      Vector<double>    cellwise_errors(triangulation.n_active_cells());
+      const QGauss<dim> quadrature(velocity_degree + 2);
 
       VectorTools::integrate_difference(dof_handler,
                                         locally_relevant_solution,

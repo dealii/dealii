@@ -433,8 +433,8 @@ namespace Step20
   template <int dim>
   void MixedLaplaceProblem<dim>::assemble_system()
   {
-    QGauss<dim>     quadrature_formula(degree + 2);
-    QGauss<dim - 1> face_quadrature_formula(degree + 2);
+    const QGauss<dim>     quadrature_formula(degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(degree + 2);
 
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
@@ -699,8 +699,8 @@ namespace Step20
     // points for integration. To avoid this problem, we simply use a
     // trapezoidal rule and iterate it <code>degree+2</code> times in each
     // coordinate direction (again as explained in step-7):
-    QTrapezoid<1>  q_trapez;
-    QIterated<dim> quadrature(q_trapez, degree + 2);
+    const QTrapezoid<1>  q_trapez;
+    const QIterated<dim> quadrature(q_trapez, degree + 2);
 
     // With this, we can then let the library compute the errors and output
     // them to the screen:

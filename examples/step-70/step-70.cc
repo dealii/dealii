@@ -1115,7 +1115,7 @@ namespace Step70
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_solid_particles()
   {
-    QGauss<dim> quadrature(fluid_fe->degree + 1);
+    const QGauss<dim> quadrature(fluid_fe->degree + 1);
 
     const unsigned int n_properties = 1;
     solid_particle_handler.initialize(fluid_tria,
@@ -1338,8 +1338,8 @@ namespace Step70
 
     TimerOutput::Scope t(computing_timer, "Assemble Stokes terms");
 
-    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
-    FEValues<spacedim> fe_values(*fluid_fe,
+    const QGauss<spacedim> quadrature_formula(fluid_fe->degree + 1);
+    FEValues<spacedim>     fe_values(*fluid_fe,
                                  quadrature_formula,
                                  update_values | update_gradients |
                                    update_quadrature_points |

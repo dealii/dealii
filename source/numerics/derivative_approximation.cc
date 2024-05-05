@@ -749,7 +749,7 @@ namespace DerivativeApproximation
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       typename DerivativeDescription::Derivative &derivative)
     {
-      QMidpoint<dim> midpoint_rule;
+      const QMidpoint<dim> midpoint_rule;
 
       // create collection objects from
       // single quadratures, mappings,
