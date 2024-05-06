@@ -23,7 +23,9 @@
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/template_constraints.h>
 
-#include <taskflow/taskflow.hpp>
+#ifdef DEAL_II_WITH_TASKFLOW
+#  include <taskflow/taskflow.hpp>
+#endif
 
 #include <atomic>
 #include <functional>
