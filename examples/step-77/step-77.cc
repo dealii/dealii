@@ -95,13 +95,12 @@ namespace Step77
     void run();
 
   private:
-    void setup_system(const bool initial_step);
+    void setup_system();
     void solve(const Vector<double> &rhs,
                Vector<double>       &solution,
                const double          tolerance);
     void refine_mesh();
     void output_results(const unsigned int refinement_cycle);
-    void set_boundary_values();
     void compute_and_factorize_jacobian(const Vector<double> &evaluation_point);
     void compute_residual(const Vector<double> &evaluation_point,
                           Vector<double>       &residual);
@@ -111,7 +110,8 @@ namespace Step77
     DoFHandler<dim> dof_handler;
     FE_Q<dim>       fe;
 
-    AffineConstraints<double> hanging_node_constraints;
+    AffineConstraints<double> zero_constraints;
+    AffineConstraints<double> nonzero_constraints;
 
     SparsityPattern                      sparsity_pattern;
     SparseMatrix<double>                 jacobian_matrix;
@@ -160,25 +160,30 @@ namespace Step77
 
 
   template <int dim>
-  void MinimalSurfaceProblem<dim>::setup_system(const bool initial_step)
+  void MinimalSurfaceProblem<dim>::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "set up");
 
-    if (initial_step)
-      {
-        dof_handler.distribute_dofs(fe);
-        current_solution.reinit(dof_handler.n_dofs());
+    zero_constraints.clear();
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             zero_constraints);
 
-        hanging_node_constraints.clear();
-        DoFTools::make_hanging_node_constraints(dof_handler,
-                                                hanging_node_constraints);
-        hanging_node_constraints.close();
-      }
+    DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
+    zero_constraints.close();
+
+    nonzero_constraints.clear();
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             BoundaryValues<dim>(),
+                                             nonzero_constraints);
+
+    DoFTools::make_hanging_node_constraints(dof_handler, nonzero_constraints);
+    nonzero_constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler, dsp);
-
-    hanging_node_constraints.condense(dsp);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, zero_constraints);
 
     sparsity_pattern.copy_from(dsp);
     jacobian_matrix.reinit(sparsity_pattern);
@@ -260,22 +265,10 @@ namespace Step77
             }
 
           cell->get_dof_indices(local_dof_indices);
-          hanging_node_constraints.distribute_local_to_global(cell_matrix,
-                                                              local_dof_indices,
-                                                              jacobian_matrix);
+          zero_constraints.distribute_local_to_global(cell_matrix,
+                                                      local_dof_indices,
+                                                      jacobian_matrix);
         }
-
-      std::map<types::global_dof_index, double> boundary_values;
-      VectorTools::interpolate_boundary_values(dof_handler,
-                                               0,
-                                               Functions::ZeroFunction<dim>(),
-                                               boundary_values);
-      Vector<double> dummy_solution(dof_handler.n_dofs());
-      Vector<double> dummy_rhs(dof_handler.n_dofs());
-      MatrixTools::apply_boundary_values(boundary_values,
-                                         jacobian_matrix,
-                                         dummy_solution,
-                                         dummy_rhs);
     }
 
     // The second half of the function then deals with factorizing the
@@ -372,19 +365,12 @@ namespace Step77
           }
 
         cell->get_dof_indices(local_dof_indices);
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          residual(local_dof_indices[i]) += cell_residual(i);
+        zero_constraints.distribute_local_to_global(cell_residual,
+                                                    local_dof_indices,
+                                                    residual);
       }
 
-    hanging_node_constraints.condense(residual);
-
-    for (const types::global_dof_index i :
-         DoFTools::extract_boundary_dofs(dof_handler))
-      residual(i) = 0;
-
-    for (const types::global_dof_index i :
-         DoFTools::extract_hanging_node_dofs(dof_handler))
-      residual(i) = 0;
+    zero_constraints.set_zero(residual);
 
     std::cout << " norm=" << residual.l2_norm() << std::endl;
   }
@@ -418,8 +404,7 @@ namespace Step77
     std::cout << "  Solving linear system" << std::endl;
 
     jacobian_matrix_factorization->vmult(solution, rhs);
-
-    hanging_node_constraints.distribute(solution);
+    zero_constraints.distribute(solution);
   }
 
 
@@ -458,33 +443,9 @@ namespace Step77
     solution_transfer.interpolate(current_solution, tmp);
     current_solution = std::move(tmp);
 
-    hanging_node_constraints.clear();
+    setup_system();
 
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
-    hanging_node_constraints.close();
-
-    hanging_node_constraints.distribute(current_solution);
-
-    set_boundary_values();
-
-    setup_system(/*initial_step=*/false);
-  }
-
-
-
-  template <int dim>
-  void MinimalSurfaceProblem<dim>::set_boundary_values()
-  {
-    std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             BoundaryValues<dim>(),
-                                             boundary_values);
-    for (const auto &boundary_value : boundary_values)
-      current_solution(boundary_value.first) = boundary_value.second;
-
-    hanging_node_constraints.distribute(current_solution);
+    nonzero_constraints.distribute(current_solution);
   }
 
 
@@ -533,8 +494,11 @@ namespace Step77
     GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
 
-    setup_system(/*initial_step=*/true);
-    set_boundary_values();
+    dof_handler.distribute_dofs(fe);
+    current_solution.reinit(dof_handler.n_dofs());
+
+    setup_system();
+    nonzero_constraints.distribute(current_solution);
 
     for (unsigned int refinement_cycle = 0; refinement_cycle < 6;
          ++refinement_cycle)
@@ -638,8 +602,8 @@ int main()
     {
       using namespace Step77;
 
-      MinimalSurfaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run();
+      MinimalSurfaceProblem<2> problem;
+      problem.run();
     }
   catch (std::exception &exc)
     {
