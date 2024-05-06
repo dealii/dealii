@@ -210,7 +210,7 @@ macro(deal_ii_invoke_autopilot)
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target runclean
     COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
     COMMAND ${CMAKE_COMMAND} -E remove
-      CMakeCache.txt cmake_install.cmake Makefile
+      CMakeCache.txt cmake_install.cmake compile_commands.json Makefile
       build.ninja rules.ninja .ninja_deps .ninja_log
     COMMENT "distclean invoked"
     )
