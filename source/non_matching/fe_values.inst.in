@@ -69,7 +69,9 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
     template void FEValues<deal_II_dimension>::reinit(
       const TriaIterator<
-        DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &);
+        DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &,
+      const unsigned int,
+      const unsigned int);
 
     template void FEInterfaceValues<deal_II_dimension>::do_reinit(
       const TriaIterator<
