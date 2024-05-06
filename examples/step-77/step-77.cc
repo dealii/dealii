@@ -77,7 +77,7 @@ namespace Step77
   // (If you are wondering why the program uses a direct object for the Jacobian
   // matrix but a pointer for the factorization: Every time KINSOL requests that
   // the Jacobian be updated, we can simply write `jacobian_matrix=0;` to reset
-  // it to an empty matrix that we can then fill again. On the other hand, the
+  // it to a zero matrix that we can then fill again. On the other hand, the
   // SparseDirectUMFPACK class does not have any way to throw away its content
   // or to replace it with a new factorization, and so we use a pointer: We just
   // throw away the whole object and create a new one whenever we have a new
