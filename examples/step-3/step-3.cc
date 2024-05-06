@@ -105,7 +105,7 @@ private:
   // will specify the exact polynomial degree of the finite element in the
   // constructor of this class)...
   Triangulation<2> triangulation;
-  FE_Q<2>          fe;
+  const FE_Q<2>    fe;
   DoFHandler<2>    dof_handler;
 
   // ...variables for the sparsity pattern and values of the system matrix

@@ -159,9 +159,9 @@ namespace Step17
     // and vector types to use parallel PETSc objects instead. Note that
     // we do not use a separate sparsity pattern, since PETSc manages this
     // internally as part of its matrix data structures.
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     AffineConstraints<double> hanging_node_constraints;
 

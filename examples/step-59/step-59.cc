@@ -924,8 +924,8 @@ namespace Step59
     Triangulation<dim> triangulation;
 #endif
 
-    FE_DGQHermite<dim> fe;
-    DoFHandler<dim>    dof_handler;
+    const FE_DGQHermite<dim> fe;
+    DoFHandler<dim>          dof_handler;
 
     MappingQ1<dim> mapping;
 

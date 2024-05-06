@@ -97,8 +97,8 @@ namespace Step61
 
     Triangulation<dim> triangulation;
 
-    FESystem<dim>   fe;
-    DoFHandler<dim> dof_handler;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     AffineConstraints<double> constraints;
 
@@ -108,9 +108,9 @@ namespace Step61
     Vector<double> solution;
     Vector<double> system_rhs;
 
-    FE_DGRaviartThomas<dim> fe_dgrt;
-    DoFHandler<dim>         dof_handler_dgrt;
-    Vector<double>          darcy_velocity;
+    const FE_DGRaviartThomas<dim> fe_dgrt;
+    DoFHandler<dim>               dof_handler_dgrt;
+    Vector<double>                darcy_velocity;
   };
 
 

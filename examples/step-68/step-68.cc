@@ -230,7 +230,7 @@ namespace Step68
     Particles::ParticleHandler<dim>           particle_handler;
 
     DoFHandler<dim>                            fluid_dh;
-    FESystem<dim>                              fluid_fe;
+    const FESystem<dim>                        fluid_fe;
     MappingQ1<dim>                             mapping;
     LinearAlgebra::distributed::Vector<double> velocity_field;
 

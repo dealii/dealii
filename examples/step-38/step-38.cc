@@ -112,7 +112,7 @@ namespace Step38
 
 
     Triangulation<dim, spacedim> triangulation;
-    FE_Q<dim, spacedim>          fe;
+    const FE_Q<dim, spacedim>    fe;
     DoFHandler<dim, spacedim>    dof_handler;
     MappingQ<dim, spacedim>      mapping;
 

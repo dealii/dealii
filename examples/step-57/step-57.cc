@@ -116,9 +116,9 @@ namespace Step57
     const unsigned int                   degree;
     std::vector<types::global_dof_index> dofs_per_block;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     AffineConstraints<double> zero_constraints;
     AffineConstraints<double> nonzero_constraints;

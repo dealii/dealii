@@ -231,7 +231,7 @@ namespace Step34
     // mapping can be selected in the constructor of the class.
 
     Triangulation<dim - 1, dim> tria;
-    FE_Q<dim - 1, dim>          fe;
+    const FE_Q<dim - 1, dim>    fe;
     DoFHandler<dim - 1, dim>    dof_handler;
     MappingQ<dim - 1, dim>      mapping;
 
@@ -912,7 +912,7 @@ namespace Step34
     Triangulation<dim> external_tria;
     GridGenerator::hyper_cube(external_tria, -2, 2);
 
-    FE_Q<dim>       external_fe(1);
+    const FE_Q<dim> external_fe(1);
     DoFHandler<dim> external_dh(external_tria);
     Vector<double>  external_phi;
 

@@ -410,7 +410,7 @@ namespace Step66
 
     // As usual we then define the Lagrangian finite elements FE_Q and a
     // DoFHandler.
-    FE_Q<dim>       fe;
+    const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
 

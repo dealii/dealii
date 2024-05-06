@@ -76,7 +76,7 @@ private:
   void output_results(const unsigned int cycle) const;
 
   Triangulation<dim> triangulation;
-  FE_Q<dim>          fe;
+  const FE_Q<dim>    fe;
   DoFHandler<dim>    dof_handler;
 
   SparsityPattern      sparsity_pattern;

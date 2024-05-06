@@ -92,9 +92,9 @@ namespace Step20
 
     const unsigned int degree;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     // The second difference is that the sparsity pattern, the system matrix,
     // and solution and right hand side vectors are now blocked. What this

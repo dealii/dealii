@@ -320,8 +320,8 @@ namespace step62
     std::vector<QuadratureCache<dim>> quadrature_cache;
 
 
-    FESystem<dim>   fe;
-    DoFHandler<dim> dof_handler;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
 
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;

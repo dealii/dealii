@@ -80,7 +80,7 @@ namespace Step36
     void         output_results() const;
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     // With these exceptions: For our eigenvalue problem, we need both a

@@ -87,7 +87,7 @@ namespace Step45
     MPI_Comm mpi_communicator;
 
     parallel::distributed::Triangulation<dim> triangulation;
-    FESystem<dim>                             fe;
+    const FESystem<dim>                       fe;
     DoFHandler<dim>                           dof_handler;
 
     AffineConstraints<double> constraints;

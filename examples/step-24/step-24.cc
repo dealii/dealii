@@ -75,7 +75,7 @@ namespace Step24
     void output_results() const;
 
     Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
+    const FE_Q<dim>    fe;
     DoFHandler<dim>    dof_handler;
 
     AffineConstraints<double> constraints;

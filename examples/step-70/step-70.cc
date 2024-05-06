@@ -995,7 +995,7 @@ namespace Step70
       par.arguments_for_particle_grid);
     particle_insert_tria.refine_global(par.particle_insertion_refinement);
 
-    FE_Q<spacedim>       particles_fe(1);
+    const FE_Q<spacedim> particles_fe(1);
     DoFHandler<spacedim> particles_dof_handler(particle_insert_tria);
     particles_dof_handler.distribute_dofs(particles_fe);
 

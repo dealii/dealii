@@ -278,7 +278,7 @@ namespace Step9
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    FE_Q<dim> fe;
+    const FE_Q<dim> fe;
 
     AffineConstraints<double> hanging_node_constraints;
 

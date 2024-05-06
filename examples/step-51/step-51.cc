@@ -321,17 +321,17 @@ namespace Step51
     // The 'local' solutions are interior to each element.  These
     // represent the primal solution field $u$ as well as the auxiliary
     // field $\mathbf{q}$.
-    FESystem<dim>   fe_local;
-    DoFHandler<dim> dof_handler_local;
-    Vector<double>  solution_local;
+    const FESystem<dim> fe_local;
+    DoFHandler<dim>     dof_handler_local;
+    Vector<double>      solution_local;
 
     // The new finite element type and corresponding <code>DoFHandler</code> are
     // used for the global skeleton solution that couples the element-level
     // local solutions.
-    FE_FaceQ<dim>   fe;
-    DoFHandler<dim> dof_handler;
-    Vector<double>  solution;
-    Vector<double>  system_rhs;
+    const FE_FaceQ<dim> fe;
+    DoFHandler<dim>     dof_handler;
+    Vector<double>      solution;
+    Vector<double>      system_rhs;
 
     // As stated in the introduction, HDG solutions can be post-processed to
     // attain superconvergence rates of $\mathcal{O}(h^{p+2})$.  The
@@ -339,9 +339,9 @@ namespace Step51
     // representing the primal variable on the interior of each cell.  We define
     // a FE type of degree $p+1$ to represent this post-processed solution,
     // which we only use for output after constructing it.
-    FE_DGQ<dim>     fe_u_post;
-    DoFHandler<dim> dof_handler_u_post;
-    Vector<double>  solution_u_post;
+    const FE_DGQ<dim> fe_u_post;
+    DoFHandler<dim>   dof_handler_u_post;
+    Vector<double>    solution_u_post;
 
     // The degrees of freedom corresponding to the skeleton strongly enforce
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite

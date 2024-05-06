@@ -483,7 +483,7 @@ namespace Step31
     double             global_Omega_diameter;
 
     const unsigned int        stokes_degree;
-    FESystem<dim>             stokes_fe;
+    const FESystem<dim>       stokes_fe;
     DoFHandler<dim>           stokes_dof_handler;
     AffineConstraints<double> stokes_constraints;
 
@@ -497,7 +497,7 @@ namespace Step31
 
 
     const unsigned int        temperature_degree;
-    FE_Q<dim>                 temperature_fe;
+    const FE_Q<dim>           temperature_fe;
     DoFHandler<dim>           temperature_dof_handler;
     AffineConstraints<double> temperature_constraints;
 

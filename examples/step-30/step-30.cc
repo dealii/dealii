@@ -311,7 +311,7 @@ namespace Step30
     // specified in the constructor). If you want to use a DG method of a
     // different degree replace 1 in the constructor by the new degree.
     const unsigned int degree;
-    FE_DGQ<dim>        fe;
+    const FE_DGQ<dim>  fe;
     DoFHandler<dim>    dof_handler;
 
     SparsityPattern      sparsity_pattern;

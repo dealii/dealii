@@ -1254,7 +1254,7 @@ int main()
                   << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(1);
+        const FE_Q<dim>       fe(1);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::adaptive_refinement);
 
@@ -1268,7 +1268,7 @@ int main()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(1);
+        const FE_Q<dim>       fe(1);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::global_refinement);
 
@@ -1282,7 +1282,7 @@ int main()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(2);
+        const FE_Q<dim>       fe(2);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::global_refinement);
 
@@ -1296,7 +1296,7 @@ int main()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim>             fe(2);
+        const FE_Q<dim>       fe(2);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::adaptive_refinement);
 

@@ -851,7 +851,7 @@ namespace Step32
     TrilinosWrappers::MPI::BlockVector stokes_rhs;
 
 
-    FE_Q<dim>                 temperature_fe;
+    const FE_Q<dim>           temperature_fe;
     DoFHandler<dim>           temperature_dof_handler;
     AffineConstraints<double> temperature_constraints;
 

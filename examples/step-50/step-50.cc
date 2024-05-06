@@ -421,7 +421,7 @@ private:
 
   parallel::distributed::Triangulation<dim> triangulation;
   const MappingQ1<dim>                      mapping;
-  FE_Q<dim>                                 fe;
+  const FE_Q<dim>                           fe;
 
   DoFHandler<dim> dof_handler;
 

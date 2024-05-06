@@ -445,8 +445,8 @@ namespace Step35
 
     Triangulation<dim> triangulation;
 
-    FE_Q<dim> fe_velocity;
-    FE_Q<dim> fe_pressure;
+    const FE_Q<dim> fe_velocity;
+    const FE_Q<dim> fe_pressure;
 
     DoFHandler<dim> dof_handler_velocity;
     DoFHandler<dim> dof_handler_pressure;

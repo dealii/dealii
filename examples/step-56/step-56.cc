@@ -420,11 +420,11 @@ namespace Step56
     const unsigned int pressure_degree;
     const SolverType   solver_type;
 
-    Triangulation<dim> triangulation;
-    FESystem<dim>      velocity_fe;
-    FESystem<dim>      fe;
-    DoFHandler<dim>    dof_handler;
-    DoFHandler<dim>    velocity_dof_handler;
+    Triangulation<dim>  triangulation;
+    const FESystem<dim> velocity_fe;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
+    DoFHandler<dim>     velocity_dof_handler;
 
     AffineConstraints<double> constraints;
 
