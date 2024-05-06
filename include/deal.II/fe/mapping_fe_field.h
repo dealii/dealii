@@ -602,13 +602,15 @@ private:
 
   /**
    * Transform the point @p p on the real cell to the corresponding point on
-   * the unit cell @p cell by a Newton iteration.
+   * the unit cell @p cell by a Newton iteration. @p starting_guess is
+   * a guess for the position on the unit cell at which this function will
+   * start its Newton iteration.
    *
    * Takes a reference to an @p InternalData that is assumed to be previously
    * created by the @p get_data function with @p UpdateFlags including @p
    * update_transformation_values and @p update_transformation_gradients and a
    * one point Quadrature that includes the given initial guess specified
-   * through the given @p point_quadrature object.
+   * through the given @p starting_guess.
    *
    * @p mdata will be changed by this function.
    */
@@ -616,8 +618,8 @@ private:
   do_transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<spacedim>                                      &p,
-    Quadrature<dim> &point_quadrature,
-    InternalData    &mdata) const;
+    const Point<dim>                                           &starting_guess,
+    InternalData                                               &mdata) const;
 
   /**
    * Update internal degrees of freedom.

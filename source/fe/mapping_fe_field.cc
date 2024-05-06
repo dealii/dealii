@@ -2249,13 +2249,11 @@ MappingFEField<dim, spacedim, VectorType>::transform_real_to_unit_cell(
 
   initial_p_unit = cell->reference_cell().closest_point(initial_p_unit);
 
-  Quadrature<dim> point_quadrature(initial_p_unit);
-
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim > dim)
     update_flags |= update_jacobian_grads;
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> mdata(
-    get_data(update_flags, point_quadrature));
+    get_data(update_flags, Quadrature<dim>(initial_p_unit)));
   Assert(dynamic_cast<InternalData *>(mdata.get()) != nullptr,
          ExcInternalError());
 
@@ -2263,7 +2261,7 @@ MappingFEField<dim, spacedim, VectorType>::transform_real_to_unit_cell(
 
   return do_transform_real_to_unit_cell(cell,
                                         p,
-                                        point_quadrature,
+                                        initial_p_unit,
                                         static_cast<InternalData &>(*mdata));
 }
 
@@ -2273,7 +2271,7 @@ Point<dim>
 MappingFEField<dim, spacedim, VectorType>::do_transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<spacedim>                                      &p,
-  Quadrature<dim>                                            &point_quadrature,
+  const Point<dim>                                           &starting_guess,
   InternalData                                               &mdata) const
 {
   const unsigned int n_shapes = mdata.shape_values.size();
@@ -2291,10 +2289,9 @@ MappingFEField<dim, spacedim, VectorType>::do_transform_real_to_unit_cell(
   // of the mapping at this point are
   // previously computed.
 
-  AssertDimension(point_quadrature.size(), 1);
-  Point<dim> p_unit = point_quadrature.point(0);
+  Point<dim> p_unit = starting_guess;
   Point<dim> f;
-  mdata.reinit(mdata.update_each, point_quadrature);
+  mdata.reinit(mdata.update_each, Quadrature<dim>(starting_guess));
 
   Point<spacedim>     p_real(do_transform_unit_to_real_cell(mdata));
   Tensor<1, spacedim> p_minus_F              = p - p_real;
@@ -2343,11 +2340,10 @@ MappingFEField<dim, spacedim, VectorType>::do_transform_real_to_unit_cell(
             p_unit_trial[i] -= step_length * delta[i];
           // shape values and derivatives
           // at new p_unit point
-          point_quadrature.initialize(
-            ArrayView<const Point<dim>>(&p_unit_trial, 1));
-          mdata.reinit(mdata.update_each, point_quadrature);
+          mdata.reinit(mdata.update_each, Quadrature<dim>(p_unit_trial));
           // f(x)
-          Point<spacedim> p_real_trial = do_transform_unit_to_real_cell(mdata);
+          const Point<spacedim> p_real_trial =
+            do_transform_unit_to_real_cell(mdata);
           const Tensor<1, spacedim> f_trial = p - p_real_trial;
           // see if we are making progress with the current step length
           // and if not, reduce it by a factor of two and try again
