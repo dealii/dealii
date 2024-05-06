@@ -164,6 +164,9 @@ namespace Step77
   {
     TimerOutput::Scope t(computing_timer, "set up");
 
+    dof_handler.distribute_dofs(fe);
+    current_solution.reinit(dof_handler.n_dofs());
+
     zero_constraints.clear();
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -370,8 +373,6 @@ namespace Step77
                                                     residual);
       }
 
-    zero_constraints.set_zero(residual);
-
     std::cout << " norm=" << residual.l2_norm() << std::endl;
   }
 
@@ -433,17 +434,14 @@ namespace Step77
     triangulation.prepare_coarsening_and_refinement();
 
     SolutionTransfer<dim> solution_transfer(dof_handler);
-    solution_transfer.prepare_for_coarsening_and_refinement(current_solution);
+    const Vector<double>  coarse_solution = current_solution;
+    solution_transfer.prepare_for_coarsening_and_refinement(coarse_solution);
 
     triangulation.execute_coarsening_and_refinement();
 
-    dof_handler.distribute_dofs(fe);
-
-    Vector<double> tmp(dof_handler.n_dofs());
-    solution_transfer.interpolate(current_solution, tmp);
-    current_solution = std::move(tmp);
-
     setup_system();
+
+    solution_transfer.interpolate(coarse_solution, current_solution);
 
     nonzero_constraints.distribute(current_solution);
   }
@@ -493,9 +491,6 @@ namespace Step77
   {
     GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
-
-    dof_handler.distribute_dofs(fe);
-    current_solution.reinit(dof_handler.n_dofs());
 
     setup_system();
     nonzero_constraints.distribute(current_solution);
