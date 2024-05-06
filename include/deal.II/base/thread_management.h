@@ -944,7 +944,48 @@ namespace Threads
           return;
         else
           {
-#ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TASKFLOW
+            auto wait_for_task = [](std::future<RT> &future) {
+              // We want to call executor.corun_until() to keep scheduling tasks
+              // until the task we are waiting for has actually finished. The
+              // problem is that TaskFlow documents that you can only call
+              // corun_until() on a worker of the executor. In other words, we
+              // can call it from *inside* other tasks, but not from the main
+              // thread (or other threads that might have been created outside
+              // of TaskFlow).
+              //
+              // Fortunately, we can check whether we are on a worker thread:
+              if (MultithreadInfo::get_taskflow_executor().this_worker_id() >=
+                  0)
+                MultithreadInfo::get_taskflow_executor().corun_until(
+                  [&future]() {
+                    return (future.wait_for(std::chrono::seconds(0)) ==
+                            std::future_status::ready);
+                  });
+              else
+                // We are on a thread not managed by TaskFlow. In that case, we
+                // can simply stop the current thread to wait for the task to
+                // finish (i.e., for the std::future object to become ready). We
+                // can do this because we need not fear that this leads to a
+                // deadlock: The current threads is waiting for completion of a
+                // task that is running on a completely different set of
+                // threads, and so not making any progress here can not deprive
+                // these other threads of the ability to schedule their tasks.
+                //
+                // Indeed, this is even true if the current thread is a worker
+                // of one executor and we are waiting for a task running on a
+                // different executor: The current task being stopped may block
+                // the current executor from scheduling more tasks, but it is
+                // unrelated to the tasks of the scheduler for which we are
+                // waiting for something, and so that other executor will
+                // eventually get arond to scheduling the task we are waiting
+                // for, at which point the current task will also complete.
+                future.wait();
+            };
+
+            wait_for_task(future);
+
+#elif defined(DEAL_II_WITH_TBB)
             // If we build on the TBB, then we can't just wait for the
             // std::future object to get ready. Apparently the TBB happily
             // enqueues a task into an arena and then just sits on it without
