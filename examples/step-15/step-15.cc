@@ -695,8 +695,8 @@ int main()
     {
       using namespace Step15;
 
-      MinimalSurfaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run();
+      MinimalSurfaceProblem<2> problem;
+      problem.run();
     }
   catch (std::exception &exc)
     {
