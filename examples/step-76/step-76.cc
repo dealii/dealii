@@ -741,17 +741,19 @@ namespace Euler_DG
               for (unsigned int c = 0; c < dim + 2; ++c)
                 {
                   if (dim >= 1 && body_force.get() == nullptr)
-                    eval.template gradients<0, false, false>(
-                      gradient_ptr + phi.static_n_q_points * 0, values_ptr);
+                    eval.template gradients<0, false, false, dim>(gradient_ptr,
+                                                                  values_ptr);
                   else if (dim >= 1)
-                    eval.template gradients<0, false, true>(
-                      gradient_ptr + phi.static_n_q_points * 0, values_ptr);
+                    eval.template gradients<0, false, true, dim>(gradient_ptr,
+                                                                 values_ptr);
                   if (dim >= 2)
-                    eval.template gradients<1, false, true>(
-                      gradient_ptr + phi.static_n_q_points * 1, values_ptr);
+                    eval.template gradients<1, false, true, dim>(gradient_ptr +
+                                                                   1,
+                                                                 values_ptr);
                   if (dim >= 3)
-                    eval.template gradients<2, false, true>(
-                      gradient_ptr + phi.static_n_q_points * 2, values_ptr);
+                    eval.template gradients<2, false, true, dim>(gradient_ptr +
+                                                                   2,
+                                                                 values_ptr);
 
                   values_ptr += phi.static_n_q_points;
                   gradient_ptr += phi.static_n_q_points * dim;
