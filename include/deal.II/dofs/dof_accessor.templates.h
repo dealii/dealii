@@ -1090,8 +1090,8 @@ namespace internal
         if (structdim == 3 && fe.max_dofs_per_quad() > 0)
           for (const auto face_no : accessor.face_indices())
             {
-              const auto combined_orientation = TriaAccessorImplementation::
-                Implementation::combined_face_orientation(accessor, face_no);
+              const auto combined_orientation =
+                accessor.combined_face_orientation(face_no);
               const unsigned int quad_index = accessor.quad_index(face_no);
               if (combined_orientation ==
                   ReferenceCell::default_combined_face_orientation())
