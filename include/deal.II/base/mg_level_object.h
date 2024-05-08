@@ -75,11 +75,9 @@ public:
                 Args &&...args);
 
   /**
-   * Constructor. Same as above but without arguments to be forwarded to the
-   * constructor of the underlying object.
+   * Default constructor.
    */
-  MGLevelObject(const unsigned int minlevel = 0,
-                const unsigned int maxlevel = 0);
+  MGLevelObject() = default;
 
   /**
    * Access object on level @p level.
@@ -210,15 +208,6 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
   : minlevel(0)
 {
   resize(min, max, std::forward<Args>(args)...);
-}
-
-
-template <class Object>
-MGLevelObject<Object>::MGLevelObject(const unsigned int min,
-                                     const unsigned int max)
-  : minlevel(0)
-{
-  resize(min, max);
 }
 
 
