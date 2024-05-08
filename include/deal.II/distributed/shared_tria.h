@@ -319,6 +319,21 @@ namespace parallel
       copy_triangulation(
         const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
+#  ifdef DOXYGEN
+      /**
+       * Write and read the data of this object from a stream for the purpose
+       * of serialization. using the [BOOST serialization
+       * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+       */
+      template <class Archive>
+      void
+      serialize(Archive &archive, const unsigned int version);
+#  else
+      // This macro defines the serialize() method that is compatible with
+      // the templated save() and load() method that have been implemented.
+      BOOST_SERIALIZATION_SPLIT_MEMBER()
+#  endif
+
       /**
        * Save the triangulation into the given file. This file needs to be
        * reachable from all nodes in the computation on a shared network file
