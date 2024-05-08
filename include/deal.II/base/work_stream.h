@@ -481,13 +481,13 @@ namespace WorkStream
                                                             ScratchData,
                                                             CopyData>::ItemType;
 
-        // Create the three stages of the pipeline:
+        // Define the three stages of the pipeline:
 
         //
         // ----- Stage 1 -----
         //
         // The first stage is the one that provides us with chunks of data
-        // to work on (the stream of "items"). This stage runs sequentially.
+        // to work on (the stream of "items"). This stage will run sequentially.
         IteratorRangeToItemStream<Iterator, ScratchData, CopyData>
              iterator_range_to_item_stream(begin,
                                         end,
@@ -495,33 +495,22 @@ namespace WorkStream
                                         chunk_size,
                                         sample_scratch_data,
                                         sample_copy_data);
-        auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
-          tbb::filter_mode::serial_in_order,
-#    else
-          tbb::filter::serial,
-#    endif
-          [&](tbb::flow_control &fc) -> ItemType * {
-            if (const auto item = iterator_range_to_item_stream.get_item())
-              return item;
-            else
-              {
-                fc.stop();
-                return nullptr;
-              }
-          });
+        auto item_generator = [&](tbb::flow_control &fc) -> ItemType * {
+          if (const auto item = iterator_range_to_item_stream.get_item())
+            return item;
+          else
+            {
+              fc.stop();
+              return nullptr;
+            }
+        };
 
         //
         // ----- Stage 2 -----
         //
         // The second stage is the one that does the actual work. This is the
         // stage that runs in parallel
-        auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
-          tbb::filter_mode::parallel,
-#    else
-          tbb::filter::parallel,
-#    endif
+        auto item_worker =
           [worker =
              std::function<void(const Iterator &, ScratchData &, CopyData &)>(
                worker),
@@ -560,7 +549,7 @@ namespace WorkStream
                   current_item->scratch_data->get().emplace_back(scratch_data,
                                                                  true);
                 }
-            }
+            };
 
             // then call the worker function on each element of the chunk we
             // were given. since these worker functions are called on separate
@@ -605,52 +594,66 @@ namespace WorkStream
             // Then return the original pointer
             // to the now modified object. The copier will work on it next.
             return current_item;
-          });
-
+          };
 
         //
         // ----- Stage 3 -----
         //
         // The last stage is the one that copies data from the CopyData objects
         // to the final destination. This stage runs sequentially again.
+        auto item_copier = [copier = std::function<void(const CopyData &)>(
+                              copier)](ItemType *current_item) {
+          if (copier)
+            {
+              // Initiate copying data. For the same reasons as in the worker
+              // class above, catch exceptions rather than letting them
+              // propagate into unknown territories:
+              for (unsigned int i = 0; i < current_item->n_iterators; ++i)
+                {
+                  try
+                    {
+                      copier(current_item->copy_datas[i]);
+                    }
+                  catch (const std::exception &exc)
+                    {
+                      Threads::internal::handle_std_exception(exc);
+                    }
+                  catch (...)
+                    {
+                      Threads::internal::handle_unknown_exception();
+                    }
+                }
+            }
+          // mark current item as usable again
+          current_item->currently_in_use = false;
+        };
+
+
+        // Now we just have to set up the pipeline and run it:
+        auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::serial_in_order,
+#    else
+          tbb::filter::serial,
+#    endif
+          item_generator);
+
+        auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
+#    ifdef DEAL_II_TBB_WITH_ONEAPI
+          tbb::filter_mode::parallel,
+#    else
+          tbb::filter::parallel,
+#    endif
+          item_worker);
+
         auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
 #    ifdef DEAL_II_TBB_WITH_ONEAPI
           tbb::filter_mode::serial_in_order,
 #    else
           tbb::filter::serial,
 #    endif
-          [copier = std::function<void(const CopyData &)>(copier)](
-            ItemType *current_item) {
-            if (copier)
-              {
-                // Initiate copying data. For the same reasons as in the worker
-                // class above, catch exceptions rather than letting them
-                // propagate into unknown territories:
-                for (unsigned int i = 0; i < current_item->n_iterators; ++i)
-                  {
-                    try
-                      {
-                        copier(current_item->copy_datas[i]);
-                      }
-                    catch (const std::exception &exc)
-                      {
-                        Threads::internal::handle_std_exception(exc);
-                      }
-                    catch (...)
-                      {
-                        Threads::internal::handle_unknown_exception();
-                      }
-                  }
-              }
-            // mark current item as usable again
-            current_item->currently_in_use = false;
-          });
+          item_copier);
 
-
-        //
-        // ----- The pipeline -----
-        //
-        // Now create a pipeline from these stages and execute it:
         tbb::parallel_pipeline(queue_length,
                                tbb_item_stream_filter & tbb_worker_filter &
                                  tbb_copier_filter);
