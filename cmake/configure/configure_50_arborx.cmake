@@ -55,7 +55,7 @@ macro(feature_arborx_find_external var)
       #include <ArborX.hpp>
       int main() {
         Kokkos::View<ArborX::Point*, Kokkos::HostSpace> points(\"points\", 0);
-        [[maybe_unused]] ArborX::BVH<Kokkos::HostSpace> bvh(Kokkos::DefaultExecutionSpace{}, points);
+        [[maybe_unused]] ArborX::BVH<Kokkos::HostSpace> bvh(Kokkos::DefaultHostExecutionSpace{}, points);
       }
       "
       DEAL_II_ARBORX_CXX20_BUG)
