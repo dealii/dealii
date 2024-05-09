@@ -19,7 +19,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/memory_consumption.h>
 
 #include <deal.II/lac/full_matrix.h>
@@ -260,14 +259,9 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
       const size_type    permuted_block_start =
         permuted ? permutation[block_start] : block_start;
 
-      //       deallog << std::endl << cell << '-' << block_start
-      //            << '-' << permuted_block_start << (permuted ? 't' : 'f') <<
-      //            '\t';
-
       for (row = permuted_block_start, row_cell = 0; row_cell < this->blocksize;
            ++row_cell, ++row)
         {
-          //        deallog << ' ' << row;
           const typename MatrixType::const_iterator row_end = M.end(row);
           typename MatrixType::const_iterator       entry   = M.begin(row);
 

@@ -21,7 +21,6 @@
 #ifdef DEAL_II_WITH_SUNDIALS
 #  include <deal.II/base/conditional_ostream.h>
 #  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/logstream.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/parameter_handler.h>
 

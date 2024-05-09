@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/kokkos.h>
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/memory_consumption.h>
 
 #include <deal.II/lac/vector_memory.h>

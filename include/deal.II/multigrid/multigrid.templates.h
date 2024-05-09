@@ -18,8 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/logstream.h>
-
 #include <deal.II/multigrid/multigrid.h>
 
 #include <iostream>
