@@ -302,6 +302,13 @@ FullMatrix<number>::backward(Vector<number2>       &dst,
 
 
 template <typename number>
+void
+FullMatrix<number>::compress(VectorOperation::values)
+{}
+
+
+
+template <typename number>
 template <typename number2>
 void
 FullMatrix<number>::fill(const FullMatrix<number2> &src,

@@ -24,6 +24,7 @@
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/identity_matrix.h>
+#include <deal.II/lac/vector_operation.h>
 
 #include <cstring>
 #include <iomanip>
@@ -1078,6 +1079,11 @@ public:
   template <typename number2>
   void
   backward(Vector<number2> &dst, const Vector<number2> &src) const;
+
+  /**
+   * Dummy function for compatibility with distributed, parallel matrices.
+   */
+  void compress(VectorOperation::values);
 
   /** @} */
 
