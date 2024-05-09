@@ -1,0 +1,20 @@
+67c67
+<   constexpr unsigned int fe_degree            = 5;
+---
+>   constexpr unsigned int fe_degree            = 3;
+89c89
+<   constexpr double final_time  = testcase == 0 ? 10 : 2.0;
+---
+>   constexpr double final_time  = testcase == 0 ? 10 : 0.5;
+1519,1521d1518
+<       const unsigned int n_vect_number = VectorizedArrayType::size();
+<       const unsigned int n_vect_bits   = 8 * sizeof(Number) * n_vect_number;
+< 
+1525,1529d1521
+<       pcout << "Vectorization over " << n_vect_number << ' '
+<             << (std::is_same_v<Number, double> ? "doubles" : "floats") << " = "
+<             << n_vect_bits << " bits ("
+<             << Utilities::System::get_current_vectorization_level() << ')'
+<             << std::endl;
+1593d1584
+<     timer.print_wall_time_statistics(MPI_COMM_WORLD);

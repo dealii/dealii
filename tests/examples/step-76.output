@@ -1,0 +1,16 @@
+Running with 1 MPI processes
+Number of degrees of freedom: 102400 ( = 4 [vars] x 1600 [cells] x 16 [dofs/cell/var] )
+Time step size: 0.000636798, minimal h: 0.0075, initial transport scaling: 0.00441186
+
+Time:       0, dt:  0.00064, norm rho:  3.914e-16, rho * u:  1.431e-16, energy: 8.334e-16
+Time:  0.0503, dt:  0.00054, norm rho:     0.0207, rho * u:    0.03801, energy:   0.08745
+Time:     0.1, dt:  0.00051, norm rho:    0.02202, rho * u:    0.04509, energy:   0.08908
+Time:    0.15, dt:  0.00049, norm rho:    0.02256, rho * u:    0.04585, energy:   0.08944
+Time:     0.2, dt:   0.0005, norm rho:    0.02052, rho * u:    0.04354, energy:   0.08191
+Time:    0.25, dt:  0.00051, norm rho:    0.01688, rho * u:    0.04195, energy:   0.06839
+Time:     0.3, dt:  0.00051, norm rho:    0.01649, rho * u:    0.04002, energy:    0.0658
+Time:    0.35, dt:  0.00049, norm rho:    0.01768, rho * u:    0.04255, energy:   0.07025
+Time:     0.4, dt:   0.0005, norm rho:    0.01599, rho * u:    0.04491, energy:   0.06383
+Time:    0.45, dt:   0.0005, norm rho:    0.01523, rho * u:    0.04347, energy:   0.06164
+Time:     0.5, dt:   0.0005, norm rho:    0.01567, rho * u:    0.04187, energy:   0.06332
+
