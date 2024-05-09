@@ -1,0 +1,4 @@
+684c684
+<     while (last_residual_norm > 1e-2);
+---
+>     while (last_residual_norm > 1e-1);
