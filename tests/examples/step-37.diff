@@ -1,0 +1,33 @@
+1003,1005c1003,1006
+<             smoother_data[0].smoothing_range = 1e-3;
+<             smoother_data[0].degree          = numbers::invalid_unsigned_int;
+<             smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
+---
+>             smoother_data[0].smoothing_range = 20;
+>             smoother_data[0].degree          = 5;
+>             smoother_data[0].max_eigenvalue = 2;
+>             smoother_data[0].eig_cg_n_iterations = 0;
+1006a1008,1009
+>         smoother_data[level].eigenvalue_algorithm =
+>           internal::EigenvalueAlgorithm::power_iteration;
+1082d1084
+<     pcout << "Total setup time               (wall) " << setup_time << "s\n";
+1092,1093c1094
+<           << (solver_control.last_step() < 10 ? "  " : " ") << "(CPU/wall) "
+<           << time.cpu_time() << "s/" << time.wall_time() << "s\n";
+---
+>           << std::endl;
+1151,1161c1152
+<     {
+<       const unsigned int n_vect_doubles = VectorizedArray<double>::size();
+<       const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
+< 
+<       pcout << "Vectorization over " << n_vect_doubles
+<             << " doubles = " << n_vect_bits << " bits ("
+<             << Utilities::System::get_current_vectorization_level() << ')'
+<             << std::endl;
+<     }
+< 
+<     for (unsigned int cycle = 0; cycle < 9 - dim; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 5; ++cycle)
