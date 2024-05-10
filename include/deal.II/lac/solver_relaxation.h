@@ -77,11 +77,15 @@ public:
    * residual.
    */
   template <typename MatrixType, typename RelaxationType>
-  void
-  solve(const MatrixType     &A,
-        VectorType           &x,
-        const VectorType     &b,
-        const RelaxationType &R);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     requires(const RelaxationType &R, VectorType &a, VectorType &b) {
+       R.step(a, b);
+     }))
+  void solve(const MatrixType     &A,
+             VectorType           &x,
+             const VectorType     &b,
+             const RelaxationType &R);
 };
 
 //----------------------------------------------------------------------//
@@ -98,6 +102,11 @@ SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename RelaxationType>
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   requires(const RelaxationType &R, VectorType &a, VectorType &b) {
+     R.step(a, b);
+   }))
 void SolverRelaxation<VectorType>::solve(const MatrixType     &A,
                                          VectorType           &x,
                                          const VectorType     &b,

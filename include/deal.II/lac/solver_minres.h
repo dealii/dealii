@@ -101,11 +101,13 @@ public:
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  solve(const MatrixType         &A,
-        VectorType               &x,
-        const VectorType         &b,
-        const PreconditionerType &preconditioner);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &preconditioner);
 
   /**
    * @addtogroup Exceptions
@@ -192,6 +194,9 @@ void SolverMinRes<VectorType>::print_vectors(const unsigned int,
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
 void SolverMinRes<VectorType>::solve(const MatrixType         &A,
                                      VectorType               &x,
                                      const VectorType         &b,
