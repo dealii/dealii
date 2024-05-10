@@ -258,7 +258,7 @@ void Step5<dim>::assemble_system()
 template <int dim>
 void Step5<dim>::solve()
 {
-  SolverControl            solver_control(1000, 1e-12);
+  SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
   SolverCG<Vector<double>> solver(solver_control);
 
   PreconditionSSOR<SparseMatrix<double>> preconditioner;

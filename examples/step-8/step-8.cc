@@ -434,14 +434,14 @@ namespace Step8
 
   // @sect4{ElasticProblem::solve}
 
-  // The solver does not care about where the system of equations comes, as
-  // long as it stays positive definite and symmetric (which are the
+  // The solver does not care about where the system of equations comes from, as
+  // long as it is positive definite and symmetric (which are the
   // requirements for the use of the CG solver), which the system indeed
   // is. Therefore, we need not change anything.
   template <int dim>
   void ElasticProblem<dim>::solve()
   {
-    SolverControl            solver_control(1000, 1e-12);
+    SolverControl            solver_control(1000, 1e-6 * system_rhs.l2_norm());
     SolverCG<Vector<double>> cg(solver_control);
 
     PreconditionSSOR<SparseMatrix<double>> preconditioner;
