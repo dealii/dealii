@@ -21,6 +21,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/full_matrix.h>
@@ -115,6 +116,7 @@ namespace internal
  * iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverIDR : public SolverBase<VectorType>
 {
 public:
@@ -278,6 +280,7 @@ namespace internal
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverIDR<VectorType>::SolverIDR(SolverControl            &cn,
                                  VectorMemory<VectorType> &mem,
                                  const AdditionalData     &data)
@@ -288,6 +291,7 @@ SolverIDR<VectorType>::SolverIDR(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverIDR<VectorType>::SolverIDR(SolverControl &cn, const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
@@ -296,22 +300,22 @@ SolverIDR<VectorType>::SolverIDR(SolverControl &cn, const AdditionalData &data)
 
 
 template <typename VectorType>
-void
-SolverIDR<VectorType>::print_vectors(const unsigned int,
-                                     const VectorType &,
-                                     const VectorType &,
-                                     const VectorType &) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverIDR<VectorType>::print_vectors(const unsigned int,
+                                          const VectorType &,
+                                          const VectorType &,
+                                          const VectorType &) const
 {}
 
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverIDR<VectorType>::solve(const MatrixType         &A,
-                             VectorType               &x,
-                             const VectorType         &b,
-                             const PreconditionerType &preconditioner)
+void SolverIDR<VectorType>::solve(const MatrixType         &A,
+                                  VectorType               &x,
+                                  const VectorType         &b,
+                                  const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("IDR(s)");
 

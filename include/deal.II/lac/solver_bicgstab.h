@@ -21,6 +21,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -75,6 +76,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverBicgstab : public SolverBase<VectorType>
 {
 public:
@@ -209,6 +211,7 @@ private:
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverBicgstab<VectorType>::IterationResult::IterationResult(
   const bool                 breakdown,
   const SolverControl::State state,
@@ -223,6 +226,7 @@ SolverBicgstab<VectorType>::IterationResult::IterationResult(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverBicgstab<VectorType>::SolverBicgstab(SolverControl            &cn,
                                            VectorMemory<VectorType> &mem,
                                            const AdditionalData     &data)
@@ -233,6 +237,7 @@ SolverBicgstab<VectorType>::SolverBicgstab(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverBicgstab<VectorType>::SolverBicgstab(SolverControl        &cn,
                                            const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -242,12 +247,12 @@ SolverBicgstab<VectorType>::SolverBicgstab(SolverControl        &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType>
-double
-SolverBicgstab<VectorType>::criterion(const MatrixType &A,
-                                      const VectorType &x,
-                                      const VectorType &b,
-                                      VectorType       &t)
+double SolverBicgstab<VectorType>::criterion(const MatrixType &A,
+                                             const VectorType &x,
+                                             const VectorType &b,
+                                             VectorType       &t)
 {
   A.vmult(t, x);
   return std::sqrt(t.add_and_dot(-1.0, b, t));
@@ -256,23 +261,24 @@ SolverBicgstab<VectorType>::criterion(const MatrixType &A,
 
 
 template <typename VectorType>
-void
-SolverBicgstab<VectorType>::print_vectors(const unsigned int,
-                                          const VectorType &,
-                                          const VectorType &,
-                                          const VectorType &) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverBicgstab<VectorType>::print_vectors(const unsigned int,
+                                               const VectorType &,
+                                               const VectorType &,
+                                               const VectorType &) const
 {}
 
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
 typename SolverBicgstab<VectorType>::IterationResult
-SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
-                                    VectorType               &x,
-                                    const VectorType         &b,
-                                    const PreconditionerType &preconditioner,
-                                    const unsigned int        last_step)
+  SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
+                                      VectorType               &x,
+                                      const VectorType         &b,
+                                      const PreconditionerType &preconditioner,
+                                      const unsigned int        last_step)
 {
   // Allocate temporary memory.
   typename VectorMemory<VectorType>::Pointer Vr(this->memory);
@@ -397,12 +403,12 @@ SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverBicgstab<VectorType>::solve(const MatrixType         &A,
-                                  VectorType               &x,
-                                  const VectorType         &b,
-                                  const PreconditionerType &preconditioner)
+void SolverBicgstab<VectorType>::solve(const MatrixType         &A,
+                                       VectorType               &x,
+                                       const VectorType         &b,
+                                       const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("Bicgstab");
 

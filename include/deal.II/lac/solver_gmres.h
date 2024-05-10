@@ -21,6 +21,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/lac/block_vector_base.h>
@@ -347,6 +348,7 @@ namespace internal
  * will then be called from the solver with the estimates as argument.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverGMRES : public SolverBase<VectorType>
 {
 public:
@@ -639,6 +641,7 @@ protected:
  * For more details see @cite Saad1991.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverFGMRES : public SolverBase<VectorType>
 {
 public:
@@ -714,6 +717,7 @@ private:
 #ifndef DOXYGEN
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
   const unsigned int                             max_basis_size,
   const bool                                     right_preconditioning,
@@ -737,6 +741,7 @@ inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverGMRES<VectorType>::SolverGMRES(SolverControl            &cn,
                                      VectorMemory<VectorType> &mem,
                                      const AdditionalData     &data)
@@ -748,6 +753,7 @@ SolverGMRES<VectorType>::SolverGMRES(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverGMRES<VectorType>::SolverGMRES(SolverControl        &cn,
                                      const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -1717,8 +1723,8 @@ namespace internal
 
 
 template <typename VectorType>
-inline void
-SolverGMRES<VectorType>::compute_eigs_and_cond(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+inline void SolverGMRES<VectorType>::compute_eigs_and_cond(
   const FullMatrix<double> &H_orig,
   const unsigned int        n,
   const boost::signals2::signal<void(const std::vector<std::complex<double>> &)>
@@ -1769,12 +1775,12 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverGMRES<VectorType>::solve(const MatrixType         &A,
-                               VectorType               &x,
-                               const VectorType         &b,
-                               const PreconditionerType &preconditioner)
+void SolverGMRES<VectorType>::solve(const MatrixType         &A,
+                                    VectorType               &x,
+                                    const VectorType         &b,
+                                    const PreconditionerType &preconditioner)
 {
   std::unique_ptr<LogStream::Prefix> prefix;
   if (!additional_data.batched_mode)
@@ -2045,10 +2051,11 @@ SolverGMRES<VectorType>::solve(const MatrixType         &A,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 boost::signals2::connection
-SolverGMRES<VectorType>::connect_condition_number_slot(
-  const std::function<void(double)> &slot,
-  const bool                         every_iteration)
+  SolverGMRES<VectorType>::connect_condition_number_slot(
+    const std::function<void(double)> &slot,
+    const bool                         every_iteration)
 {
   if (every_iteration)
     {
@@ -2063,8 +2070,8 @@ SolverGMRES<VectorType>::connect_condition_number_slot(
 
 
 template <typename VectorType>
-boost::signals2::connection
-SolverGMRES<VectorType>::connect_eigenvalues_slot(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+boost::signals2::connection SolverGMRES<VectorType>::connect_eigenvalues_slot(
   const std::function<void(const std::vector<std::complex<double>> &)> &slot,
   const bool every_iteration)
 {
@@ -2081,8 +2088,8 @@ SolverGMRES<VectorType>::connect_eigenvalues_slot(
 
 
 template <typename VectorType>
-boost::signals2::connection
-SolverGMRES<VectorType>::connect_hessenberg_slot(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+boost::signals2::connection SolverGMRES<VectorType>::connect_hessenberg_slot(
   const std::function<void(const FullMatrix<double> &)> &slot,
   const bool                                             every_iteration)
 {
@@ -2099,8 +2106,8 @@ SolverGMRES<VectorType>::connect_hessenberg_slot(
 
 
 template <typename VectorType>
-boost::signals2::connection
-SolverGMRES<VectorType>::connect_krylov_space_slot(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+boost::signals2::connection SolverGMRES<VectorType>::connect_krylov_space_slot(
   const std::function<void(
     const internal::SolverGMRESImplementation::TmpVectors<VectorType> &)> &slot)
 {
@@ -2110,9 +2117,10 @@ SolverGMRES<VectorType>::connect_krylov_space_slot(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 boost::signals2::connection
-SolverGMRES<VectorType>::connect_re_orthogonalization_slot(
-  const std::function<void(int)> &slot)
+  SolverGMRES<VectorType>::connect_re_orthogonalization_slot(
+    const std::function<void(int)> &slot)
 {
   return re_orthogonalize_signal.connect(slot);
 }
@@ -2120,8 +2128,8 @@ SolverGMRES<VectorType>::connect_re_orthogonalization_slot(
 
 
 template <typename VectorType>
-double
-SolverGMRES<VectorType>::criterion()
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+double SolverGMRES<VectorType>::criterion()
 {
   // dummy implementation. this function is not needed for the present
   // implementation of gmres
@@ -2133,6 +2141,7 @@ SolverGMRES<VectorType>::criterion()
 //----------------------------------------------------------------------//
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData     &data)
@@ -2143,6 +2152,7 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
                                        const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -2152,12 +2162,12 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverFGMRES<VectorType>::solve(const MatrixType         &A,
-                                VectorType               &x,
-                                const VectorType         &b,
-                                const PreconditionerType &preconditioner)
+void SolverFGMRES<VectorType>::solve(const MatrixType         &A,
+                                     VectorType               &x,
+                                     const VectorType         &b,
+                                     const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("FGMRES");
 

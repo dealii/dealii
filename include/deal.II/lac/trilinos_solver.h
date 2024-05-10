@@ -20,6 +20,8 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#  include <deal.II/base/template_constraints.h>
+
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/solver_control.h>
@@ -687,6 +689,7 @@ namespace TrilinosWrappers
    * targeting deal.II data structures.
    */
   template <typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
   class SolverBelos
   {
   public:
@@ -775,6 +778,7 @@ namespace TrilinosWrappers
      * https://docs.trilinos.org/latest-release/packages/belos/doc/html/classBelos_1_1MultiVec.html.
      */
     template <typename VectorType>
+    DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
     class MultiVecWrapper
       : public Belos::MultiVec<typename VectorType::value_type>
     {
@@ -1214,6 +1218,7 @@ namespace TrilinosWrappers
      * https://docs.trilinos.org/latest-release/packages/belos/doc/html/classBelos_1_1Operator.html.
      */
     template <typename OperatorType, typename VectorType>
+    DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
     class OperatorWrapper
       : public Belos::Operator<typename VectorType::value_type>
     {
@@ -1283,6 +1288,7 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
   SolverBelos<VectorType>::SolverBelos(
     SolverControl                              &solver_control,
     const AdditionalData                       &additional_data,
@@ -1295,12 +1301,12 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
   template <typename OperatorType, typename PreconditionerType>
-  void
-  SolverBelos<VectorType>::solve(const OperatorType       &A_dealii,
-                                 VectorType               &x_dealii,
-                                 const VectorType         &b_dealii,
-                                 const PreconditionerType &P_dealii)
+  void SolverBelos<VectorType>::solve(const OperatorType       &A_dealii,
+                                      VectorType               &x_dealii,
+                                      const VectorType         &b_dealii,
+                                      const PreconditionerType &P_dealii)
   {
     using value_type = typename VectorType::value_type;
 

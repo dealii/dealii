@@ -20,6 +20,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -60,6 +61,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverRichardson : public SolverBase<VectorType>
 {
 public:
@@ -163,6 +165,7 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
   const double omega,
   const bool   use_preconditioned_residual)
@@ -172,6 +175,7 @@ inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverRichardson<VectorType>::SolverRichardson(SolverControl            &cn,
                                                VectorMemory<VectorType> &mem,
                                                const AdditionalData     &data)
@@ -182,6 +186,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
                                                const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -191,12 +196,13 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverRichardson<VectorType>::solve(const MatrixType         &A,
-                                    VectorType               &x,
-                                    const VectorType         &b,
-                                    const PreconditionerType &preconditioner)
+void SolverRichardson<VectorType>::solve(
+  const MatrixType         &A,
+  VectorType               &x,
+  const VectorType         &b,
+  const PreconditionerType &preconditioner)
 {
   SolverControl::State conv = SolverControl::iterate;
 
@@ -248,12 +254,13 @@ SolverRichardson<VectorType>::solve(const MatrixType         &A,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverRichardson<VectorType>::Tsolve(const MatrixType         &A,
-                                     VectorType               &x,
-                                     const VectorType         &b,
-                                     const PreconditionerType &preconditioner)
+void SolverRichardson<VectorType>::Tsolve(
+  const MatrixType         &A,
+  VectorType               &x,
+  const VectorType         &b,
+  const PreconditionerType &preconditioner)
 {
   SolverControl::State conv           = SolverControl::iterate;
   double               last_criterion = std::numeric_limits<double>::lowest();
@@ -301,20 +308,22 @@ SolverRichardson<VectorType>::Tsolve(const MatrixType         &A,
 }
 
 
+
 template <typename VectorType>
-void
-SolverRichardson<VectorType>::print_vectors(const unsigned int,
-                                            const VectorType &,
-                                            const VectorType &,
-                                            const VectorType &) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverRichardson<VectorType>::print_vectors(const unsigned int,
+                                                 const VectorType &,
+                                                 const VectorType &,
+                                                 const VectorType &) const
 {}
 
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline typename VectorType::value_type
-SolverRichardson<VectorType>::criterion(const VectorType &r,
-                                        const VectorType &d) const
+  SolverRichardson<VectorType>::criterion(const VectorType &r,
+                                          const VectorType &d) const
 {
   if (!additional_data.use_preconditioned_residual)
     return r.l2_norm();
@@ -324,8 +333,8 @@ SolverRichardson<VectorType>::criterion(const VectorType &r,
 
 
 template <typename VectorType>
-inline void
-SolverRichardson<VectorType>::set_omega(const double om)
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+inline void SolverRichardson<VectorType>::set_omega(const double om)
 {
   additional_data.omega = om;
 }
