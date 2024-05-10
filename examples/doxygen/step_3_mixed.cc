@@ -355,6 +355,9 @@ void Step3::solve()
   SolverControl            solver_control(1000, 1e-12);
   SolverCG<Vector<double>> solver(solver_control);
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+
+  std::cout << solver_control.last_step()
+            << " CG iterations needed to obtain convergence." << std::endl;
 }
 
 
@@ -395,8 +398,6 @@ void Step3::run()
 // Nothing has changed here.
 int main()
 {
-  deallog.depth_console(2);
-
   Step3 laplace_problem;
   laplace_problem.run();
 

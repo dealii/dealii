@@ -412,7 +412,45 @@ operator<<(LogStream &log, const T &t)
 
 
 /**
- * The standard log object of deal.II:
+ * The standard log object of deal.II. Take a look at the documentation of
+ * the LogStream class for more information, as well as below.
+ *
+ * The @p deallog
+ * variable (which stands for deal-log, not de-allog) represents a
+ * stream to which some parts of the library write output. For
+ * example, iterative solvers will generate diagnostics (starting
+ * residual, number of solver steps, final residual).
+ *
+ * The output of @p deallog can be written to the console, to a file,
+ * or both. Both are disabled by default since over the years we have
+ * learned that a program should only generate output when a user
+ * explicitly asks for it. But this can be changed, and to explain how
+ * this can be done, we need to explain how @p deallog works: When
+ * individual parts of the library want to log output, they open a
+ * "context" or "section" into which this output will be placed. At
+ * the end of the part that wants to write output, one exits this
+ * section again. Since a function may call another one from within
+ * the scope where this output section is open, output may in fact be
+ * nested hierarchically into these sections. The LogStream class of
+ * which @p deallog is a variable calls each of these sections a
+ * "prefix" because all output is printed with this prefix at the left
+ * end of the line, with prefixes separated by colons. There is always
+ * a default prefix called "DEAL" (a hint at deal.II's history as the
+ * successor of a previous library called "DEAL" and from which the
+ * LogStream class is one of the few pieces of code that were taken
+ * into deal.II).
+ *
+ * By default, @p logstream only outputs lines with zero prefixes --
+ * i.e., all output is disabled because the default "DEAL" prefix is
+ * always there. But one can set a different maximal number of
+ * prefixes for lines that should be output to something larger,
+ * by calling LogStream::depth_console() with an integer argument. Let's
+ * assume you call it with `2` as argument. This means that for all screen
+ * output a context that has pushed one additional prefix beyond the default
+ * "DEAL" is allowed to print its output to the screen ("console"),
+ * whereas all further nested sections that would have three or more
+ * prefixes active would write to @p deallog, but @p deallog does not
+ * forward this output to the screen.
  */
 extern LogStream deallog;
 

@@ -453,8 +453,6 @@ void Step4<dim>::solve()
   SolverCG<Vector<double>> solver(solver_control);
   solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
-  // We have made one addition, though: since we suppress output from the
-  // linear solvers, we have to print the number of iterations by hand.
   std::cout << "   " << solver_control.last_step()
             << " CG iterations needed to obtain convergence." << std::endl;
 }
