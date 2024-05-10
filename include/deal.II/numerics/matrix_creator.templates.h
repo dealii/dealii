@@ -631,42 +631,7 @@ namespace MatrixCreator
 
 
     } // namespace AssemblerBoundary
-
-
-
-    template <typename T>
-    using compress_t = decltype(std::declval<T>().compress(
-      std::declval<VectorOperation::values>()));
-
-
-
-    template <typename T>
-    constexpr bool has_compress =
-      dealii::internal::is_supported_operation<compress_t, T>;
-
-
-
-    template <
-      typename MatrixType,
-      std::enable_if_t<has_compress<MatrixType>, MatrixType> * = nullptr>
-    void
-    compress(MatrixType &A, const VectorOperation::values operation)
-    {
-      A.compress(operation);
-    }
-
-
-
-    template <
-      typename MatrixType,
-      std::enable_if_t<!has_compress<MatrixType>, MatrixType> * = nullptr>
-    void
-    compress(MatrixType &, const VectorOperation::values)
-    {
-      // nothing to do
-    }
-
-  } // namespace internal
+  }   // namespace internal
 } // namespace MatrixCreator
 
 
@@ -733,7 +698,7 @@ namespace MatrixCreator
       assembler_data,
       copy_data);
 
-    internal::compress(matrix, VectorOperation::add);
+    matrix.compress(VectorOperation::add);
   }
 
 
@@ -818,7 +783,7 @@ namespace MatrixCreator
       assembler_data,
       copy_data);
 
-    internal::compress(matrix, VectorOperation::add);
+    matrix.compress(VectorOperation::add);
   }
 
 
@@ -904,7 +869,7 @@ namespace MatrixCreator
       assembler_data,
       copy_data);
 
-    internal::compress(matrix, VectorOperation::add);
+    matrix.compress(VectorOperation::add);
   }
 
 
@@ -986,7 +951,7 @@ namespace MatrixCreator
       assembler_data,
       copy_data);
 
-    internal::compress(matrix, VectorOperation::add);
+    matrix.compress(VectorOperation::add);
   }
 
 
@@ -2017,7 +1982,7 @@ namespace MatrixCreator
       assembler_data,
       copy_data);
 
-    internal::compress(matrix, VectorOperation::add);
+    matrix.compress(VectorOperation::add);
   }
 
 
@@ -2102,7 +2067,7 @@ namespace MatrixCreator
       assembler_data,
       copy_data);
 
-    internal::compress(matrix, VectorOperation::add);
+    matrix.compress(VectorOperation::add);
   }
 
 
