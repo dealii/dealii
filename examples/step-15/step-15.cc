@@ -209,7 +209,7 @@ namespace Step15
   // of course, the matrix and right hand side functions depend on the
   // previous iteration's solution. As discussed in the introduction, we need
   // to use zero boundary values for the Newton updates; this is done by using
-  // the `zero_constraint` object when assembling into the global matrix and
+  // the `zero_constraints` object when assembling into the global matrix and
   // vector.
   //
   // The top of the function contains the usual boilerplate code, setting up
