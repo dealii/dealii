@@ -1,0 +1,51 @@
+59c59
+<   // it is passed as a template argument to the implementation of the
+---
+>  // it is passed as a template argument to the implementation of the
+352c352
+<     , n_global_refinements(10 - 2 * dim)
+---
+>     , n_global_refinements(9 - 2 * dim)
+355c355
+<     , final_time(10.)
+---
+>     , final_time(-5.)
+522,534d521
+<     {
+<       pcout << "Number of MPI ranks:            "
+<             << Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) << std::endl;
+<       pcout << "Number of threads on each rank: "
+<             << MultithreadInfo::n_threads() << std::endl;
+<       const unsigned int n_vect_doubles = VectorizedArray<double>::size();
+<       const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
+<       pcout << "Vectorization over " << n_vect_doubles
+<             << " doubles = " << n_vect_bits << " bits ("
+<             << Utilities::System::get_current_vectorization_level() << ')'
+<             << std::endl
+<             << std::endl;
+<     }
+596,597d582
+<     double wtime       = 0;
+<     double output_time = 0;
+605d589
+<         wtime += timer.wall_time();
+607d590
+<         timer.restart();
+610,611d592
+< 
+<         output_time += timer.wall_time();
+613d593
+<     timer.restart();
+615d594
+<     output_time += timer.wall_time();
+619,624d597
+< 
+<     pcout << "   Average wallclock time per time step: "
+<           << wtime / timestep_number << 's' << std::endl;
+< 
+<     pcout << "   Spent " << output_time << "s on output and " << wtime
+<           << "s on computations." << std::endl;
+645c618
+<     argc, argv, numbers::invalid_unsigned_int);
+---
+>     argc, argv, 2);

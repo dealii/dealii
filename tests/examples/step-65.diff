@@ -1,0 +1,16 @@
+23a24
+> #include <deal.II/base/multithread_info.h>
+268c269
+<     triangulation.refine_global(9 - 2 * dim);
+---
+>     triangulation.refine_global(2);
+619d619
+<       timer.print_summary();
+644,645d643
+<       std::cout << "   Memory consumption cache:     "
+<                 << 1e-6 * mapping.memory_consumption() << " MB" << std::endl;
+651,652d648
+< 
+<       timer.print_summary();
+660a657
+>   dealii::MultithreadInfo::set_thread_limit(2);
