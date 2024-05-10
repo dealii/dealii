@@ -826,9 +826,10 @@ namespace SLEPcWrappers
                     imag_eigenvectors[index]);
   }
 
-  template <typename Vector>
+  template <typename VectorType>
   void
-  SolverBase::set_initial_space(const std::vector<Vector> &this_initial_space)
+  SolverBase::set_initial_space(
+    const std::vector<VectorType> &this_initial_space)
   {
     std::vector<Vec> vecs(this_initial_space.size());
 
