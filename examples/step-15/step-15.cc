@@ -373,7 +373,7 @@ namespace Step15
     // it to the SolutionTransfer. Now we can actually execute the refinement
     // and create the new matrices and vectors including the vector
     // `current_solution`, that will hold the current solution on the new mesh
-    // after calling `interpolate`:
+    // after calling SolutionTransfer::interpolate():
     SolutionTransfer<dim> solution_transfer(dof_handler);
     const Vector<double>  coarse_solution = current_solution;
     solution_transfer.prepare_for_coarsening_and_refinement(coarse_solution);
