@@ -1053,6 +1053,36 @@ namespace concepts
     } -> std::same_as<bool>;
   };
 
+
+  /**
+   * A concept that tests whether objects of type `MatrixType` can act
+   * as linear operators on `VectorType`. In practice, that means that
+   * `MatrixType` must have a `vmult()` member function that can take
+   * a `VectorType` object as input and produce another `VectorType`
+   * as output (both objects being taken as arguments to the `vmult()`
+   * function).
+   */
+  template <typename MatrixType, typename VectorType>
+  concept is_linear_operator_on =
+    requires(const MatrixType &A, VectorType &dst, const VectorType &src) {
+      A.vmult(dst, src);
+    };
+
+
+  /**
+   * A concept that tests whether objects of type `MatrixType` can act
+   * as the transposes of linear operators on `VectorType`. In practice, that
+   * means that `MatrixType` must have a `Tvmult()` member function that can
+   * take a `VectorType` object as input and produce another `VectorType`
+   * as output (both objects being taken as arguments to the `vmult()`
+   * function).
+   */
+  template <typename MatrixType, typename VectorType>
+  concept is_transpose_linear_operator_on =
+    requires(const MatrixType &A, VectorType &dst, const VectorType &src) {
+      A.Tvmult(dst, src);
+    };
+
 #endif
 
 } // namespace concepts
