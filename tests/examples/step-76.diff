@@ -1,6 +1,8 @@
-67c67
+66,67c66,67
+<   constexpr unsigned int n_global_refinements = 2;
 <   constexpr unsigned int fe_degree            = 5;
 ---
+>   constexpr unsigned int n_global_refinements = 1;
 >   constexpr unsigned int fe_degree            = 3;
 89c89
 <   constexpr double final_time  = testcase == 0 ? 10 : 2.0;
