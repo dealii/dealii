@@ -1,4 +1,14 @@
 #!/bin/bash
+#
+# A script that can be used to create/update the .diff files in the
+# current directory based on the original tutorial code and a modified
+# version stored in a separate directory (typically in
+# $BUILD/tests/examples/source). Call this script as in
+#   ./update_diffs.sh /path/to/deal.II /path/to/deal.II/tests/examples
+# This script is automatically executed when you say
+#   make update_diffs
+# in the build directory after setting up the tests.
+#
 set -u
 
 DEAL_II_SOURCE_DIR="${1}"

@@ -4,7 +4,10 @@ This folder, that is part of the deal.II testsuite, contains the logic
 to run the deal.II examples (located under ./examples/ in the
 repository) as automated tests using CTest. Instead of storing copies
 of the source code of these example, we only store a fairly small
-textual diff for each example. This is motivated by the lesson, that
+textual diff for each example that, for example, limit the number of
+time steps or number of mesh refinement steps. Wanting to test the
+current form of the tutorial programs, perhaps up to these small
+modifications, is motivated by the lesson that
 copies of examples very quickly become out of date and we repeatedly
 fail to detect if an example program breaks due to a change in the
 library.
@@ -22,4 +25,5 @@ For development of new examples, we suggest first creating an empty
 
 To modify the source code, go into ``build/tests/examples/source/``
 and edit the .cc file there. Afterwards, you can update the .diff
-files by running the ``update_diffs`` target in that folder.
+files by running the ``update_diffs`` target in that folder that calls
+the ``update_diffs.sh`` script in the current directory.
