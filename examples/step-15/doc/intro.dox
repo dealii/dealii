@@ -264,8 +264,8 @@ follows:
 <li>
   Start with the function $u^{0}\equiv 0$ and modify it in such a way
   that the values of $u^0$ along the boundary equal the correct
-  boundary values $g$ (this happens in
-  <code>MinimalSurfaceProblem::set_boundary_values</code>). Set
+  boundary values $g$ (this happens in the call to
+  <code>AffineConstraints::distribute()</code>). Set
   $n=0$.
 </li>
 
@@ -296,8 +296,7 @@ follows:
   If $n$ is a multiple of 5 then refine the mesh, transfer the
   solution $u^{n+1}$ to the new mesh and set the values of $u^{n+1}$
   in such a way that along the boundary we have
-  $u^{n+1}|_{\partial\Gamma}=g$ (again in
-  <code>MinimalSurfaceProblem::set_boundary_values</code>). Note that
+  $u^{n+1}|_{\partial\Gamma}=g$. Note that
   this isn't automatically
   guaranteed even though by construction we had that before mesh
   refinement $u^{n+1}|_{\partial\Gamma}=g$ because mesh refinement
