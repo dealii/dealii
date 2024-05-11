@@ -7052,15 +7052,15 @@ namespace internal
                                   {
                                     vertex_indices
                                       [new_hex_vertices
-                                         [hex->reference_cell()
+                                         [ReferenceCells::Tetrahedron
                                             .face_to_cell_vertices(f, 0, 1)]],
                                     vertex_indices
                                       [new_hex_vertices
-                                         [hex->reference_cell()
+                                         [ReferenceCells::Tetrahedron
                                             .face_to_cell_vertices(f, 1, 1)]],
                                     vertex_indices
                                       [new_hex_vertices
-                                         [hex->reference_cell()
+                                         [ReferenceCells::Tetrahedron
                                             .face_to_cell_vertices(f, 2, 1)]],
                                   }};
 
