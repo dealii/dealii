@@ -34,6 +34,80 @@ good for some things at least.)
 
 <h3> Possibilities for extensions </h3>
 
+<h4> Use triangles </h4>
+
+For the first 20 or so years of its existence, deal.II only supported
+hypercube elements (i.e., quadrilaterals in 2d, and hexahedra in
+3d). It now also supports triangles in 2d; and tetrahedra, pyramids,
+and wedges in 3d. A consequence of this history is that nearly all of
+the tutorial programs you will see exclusively use quadrilaterals and
+hexahedra, and you may be forgiven that that is all that's
+supported. But you can try out other types of cells yourself here
+already. For example, here are two ideas:
+
+- You could create a triangular triangulation meshing a triangular
+  domain. To do this, you would replace the call to
+  `GridGenerator::hyper_cube(triangulation);` in the `first_grid()`
+  function by `GridGenerator::reference_cell(triangulation,
+  ReferenceCells::Triangle);`. This will give you the following output
+  in `grid-1.svg`:
+  <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1-triangle.png" alt="">
+
+- You can start with a quadrilateral mesh and convert it to a
+  triangular mesh. For example, in the `first_grid()` function,
+  replace the code
+  @code
+  Triangulation<2> triangulation;
+  GridGenerator::hyper_cube(triangulation);
+  @endcode
+  by the following, which first creates a temporary mesh
+  `triangulation_quad` consisting of quadrilaterals, and then converts
+  it into the `triangulation` object that then only consists of
+  triangles:
+  @code
+  Triangulation<2> triangulation_quad;
+  GridGenerator::hyper_cube(triangulation_quad);
+  Triangulation<2> triangulation;
+  GridGenerator::convert_hypercube_to_simplex_mesh (triangulation_quad,
+                                                    triangulation);
+  @endcode
+  This produces the following mesh:
+  <img src="https://www.dealii.org/images/steps/developer/step-1.grid-1-triangle-2.png" alt="">
+
+  You can do the same in the `second_grid()` function by replacing
+  @code
+  Triangulation<2> triangulation;
+
+  const Point<2> center(1, 0);
+  const double   inner_radius = 0.5, outer_radius = 1.0;
+  GridGenerator::hyper_shell(
+    triangulation, center, inner_radius, outer_radius, 10);
+  @endcode
+  by the following (that includes some magic at the bottom we're
+  perhaps not quite ready to explain in detail yet, but that is
+  mentioned in the documentation of
+  GridGenerator::convert_hypercube_to_simplex_mesh()):
+  @code
+  Triangulation<2> triangulation_quad;
+
+  const Point<2> center(1, 0);
+  const double   inner_radius = 0.5, outer_radius = 1.0;
+  GridGenerator::hyper_shell(
+    triangulation_quad, center, inner_radius, outer_radius, 10);
+
+  Triangulation<2> triangulation;
+  GridGenerator::convert_hypercube_to_simplex_mesh (triangulation_quad,
+                                                    triangulation);
+  for (const auto i : triangulation_quad.get_manifold_ids())
+    if (i != numbers::flat_manifold_id)
+      triangulation.set_manifold(i, triangulation_quad.get_manifold(i));
+  @endcode
+  This results in this picture:
+  This produces the following mesh:
+  <img src="https://www.dealii.org/images/steps/developer/step-1.grid-2-triangle.png" alt="">
+
+
+
 <h4> Different adaptive refinement strategies </h4>
 
 This program obviously does not have a whole lot of functionality, but
