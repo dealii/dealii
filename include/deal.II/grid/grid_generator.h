@@ -105,8 +105,9 @@ namespace GridGenerator
   /**
    * Create a $d$-<a href="https://en.wikipedia.org/wiki/Simplex">simplex</a>
    * (i.e., a triangle in 2d, or a tetrahedron in 3d) with
-   * $d+1$ corners. Since deal.II does not support triangular and
-   * tetrahedral cells, the simplex described by the input arguments
+   * $d+1$ corners. Since this function dates back to a time when deal.II
+   * did not support triangular and tetrahedral cells (which it does now),
+   * the simplex created by this function and described by the input arguments
    * is subdivided into quadrilaterals and hexahedra by adding edge,
    * face, and simplex midpoints, resulting in a mesh that consists of
    * $d+1$ quadrilateral or hexahedral cells.
@@ -2275,8 +2276,10 @@ namespace GridGenerator
    *
    * Material ID and boundary IDs are inherited upon conversion.
    *
-   * @param in_tria The triangulation containing hex elements.
-   * @param out_tria The converted triangulation containing tet elements.
+   * @param[in] in_tria The triangulation containing quadrilateral or
+   *   hexahedral elements.
+   * @param[out] out_tria The converted triangulation containing triangular or
+   *   tetrahedral elements.
    *
    * @note No manifold objects are copied by this function: you must
    *   copy existing manifold objects from @p in_tria to @p out_tria, e.g.,
