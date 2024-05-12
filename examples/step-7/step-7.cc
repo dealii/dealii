@@ -11,8 +11,6 @@
  * LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
  *
  * ------------------------------------------------------------------------
- *
- * Authors: Wolfgang Bangerth and Ralf Hartmann, University of Heidelberg, 2000
  */
 
 
