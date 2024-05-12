@@ -110,7 +110,10 @@ namespace GridGenerator
    * the simplex created by this function and described by the input arguments
    * is subdivided into quadrilaterals and hexahedra by adding edge,
    * face, and simplex midpoints, resulting in a mesh that consists of
-   * $d+1$ quadrilateral or hexahedral cells.
+   * $d+1$ quadrilateral or hexahedral cells. (However, you can create a
+   * simplex geometry with a single simplex cell -- i.e., a triangle or
+   * a tetrahedron -- with both the GridGenerator::reference_cell() and
+   * the directly with the Triangulation::create_triangulation() functions.)
    *
    * The @p vertices argument contains a vector with all d+1 vertices defining
    * the corners of the simplex. They must be given in an order such that the
