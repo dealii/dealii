@@ -18,6 +18,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector_memory.h>
@@ -336,6 +337,7 @@ class Vector;
  * @ingroup Solvers
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverBase : public Subscriptor
 {
 public:
@@ -475,8 +477,8 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
-inline SolverControl::State
-SolverBase<VectorType>::StateCombiner::operator()(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+inline SolverControl::State SolverBase<VectorType>::StateCombiner::operator()(
   const SolverControl::State state1,
   const SolverControl::State state2) const
 {
@@ -491,10 +493,11 @@ SolverBase<VectorType>::StateCombiner::operator()(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename Iterator>
 inline SolverControl::State
-SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
-                                                  const Iterator end) const
+  SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
+                                                    const Iterator end) const
 {
   Assert(begin != end,
          ExcMessage("You can't combine iterator states if no state is given."));
@@ -511,6 +514,7 @@ SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline SolverBase<VectorType>::SolverBase(
   SolverControl            &solver_control,
   VectorMemory<VectorType> &vector_memory)
@@ -530,6 +534,7 @@ inline SolverBase<VectorType>::SolverBase(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
   : // use the static memory object this class owns
   memory(static_vector_memory)
@@ -548,8 +553,8 @@ inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
 
 
 template <typename VectorType>
-inline boost::signals2::connection
-SolverBase<VectorType>::connect(
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+inline boost::signals2::connection SolverBase<VectorType>::connect(
   const std::function<SolverControl::State(const unsigned int iteration,
                                            const double       check_value,
                                            const VectorType  &current_iterate)>

@@ -21,6 +21,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -66,6 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverMinRes : public SolverBase<VectorType>
 {
 public:
@@ -149,6 +151,7 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverMinRes<VectorType>::SolverMinRes(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData &)
@@ -159,6 +162,7 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl            &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
                                        const AdditionalData &)
   : SolverBase<VectorType>(cn)
@@ -168,30 +172,30 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
 
 
 template <typename VectorType>
-double
-SolverMinRes<VectorType>::criterion()
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+double SolverMinRes<VectorType>::criterion()
 {
   return res2;
 }
 
 
 template <typename VectorType>
-void
-SolverMinRes<VectorType>::print_vectors(const unsigned int,
-                                        const VectorType &,
-                                        const VectorType &,
-                                        const VectorType &) const
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverMinRes<VectorType>::print_vectors(const unsigned int,
+                                             const VectorType &,
+                                             const VectorType &,
+                                             const VectorType &) const
 {}
 
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverMinRes<VectorType>::solve(const MatrixType         &A,
-                                VectorType               &x,
-                                const VectorType         &b,
-                                const PreconditionerType &preconditioner)
+void SolverMinRes<VectorType>::solve(const MatrixType         &A,
+                                     VectorType               &x,
+                                     const VectorType         &b,
+                                     const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("minres");
 

@@ -20,6 +20,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -53,6 +54,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Solvers
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverRelaxation : public SolverBase<VectorType>
 {
 public:
@@ -85,6 +87,7 @@ public:
 //----------------------------------------------------------------------//
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
                                                const AdditionalData &)
   : SolverBase<VectorType>(cn)
@@ -93,12 +96,12 @@ SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename RelaxationType>
-void
-SolverRelaxation<VectorType>::solve(const MatrixType     &A,
-                                    VectorType           &x,
-                                    const VectorType     &b,
-                                    const RelaxationType &R)
+void SolverRelaxation<VectorType>::solve(const MatrixType     &A,
+                                         VectorType           &x,
+                                         const VectorType     &b,
+                                         const RelaxationType &R)
 {
   GrowingVectorMemory<VectorType> mem;
   SolverControl::State            conv = SolverControl::iterate;

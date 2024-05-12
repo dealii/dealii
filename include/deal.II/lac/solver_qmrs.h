@@ -19,6 +19,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -90,6 +91,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  */
 template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverQMRS : public SolverBase<VectorType>
 {
 public:
@@ -240,6 +242,7 @@ private:
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverQMRS<VectorType>::IterationResult::IterationResult(
   const SolverControl::State state,
   const double               last_residual)
@@ -250,6 +253,7 @@ SolverQMRS<VectorType>::IterationResult::IterationResult(
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverQMRS<VectorType>::SolverQMRS(SolverControl            &cn,
                                    VectorMemory<VectorType> &mem,
                                    const AdditionalData     &data)
@@ -258,7 +262,10 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl            &cn,
   , step(0)
 {}
 
+
+
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
                                    const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -266,21 +273,25 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
   , step(0)
 {}
 
-template <typename VectorType>
-void
-SolverQMRS<VectorType>::print_vectors(const unsigned int,
-                                      const VectorType &,
-                                      const VectorType &,
-                                      const VectorType &) const
-{}
+
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+void SolverQMRS<VectorType>::print_vectors(const unsigned int,
+                                           const VectorType &,
+                                           const VectorType &,
+                                           const VectorType &) const
+{}
+
+
+
+template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
-void
-SolverQMRS<VectorType>::solve(const MatrixType         &A,
-                              VectorType               &x,
-                              const VectorType         &b,
-                              const PreconditionerType &preconditioner)
+void SolverQMRS<VectorType>::solve(const MatrixType         &A,
+                                   VectorType               &x,
+                                   const VectorType         &b,
+                                   const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("SQMR");
 
@@ -322,18 +333,21 @@ SolverQMRS<VectorType>::solve(const MatrixType         &A,
   // otherwise exit as normal
 }
 
+
+
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
-SolverQMRS<VectorType>::iterate(const MatrixType         &A,
-                                VectorType               &x,
-                                const VectorType         &b,
-                                const PreconditionerType &preconditioner,
-                                VectorType               &r,
-                                VectorType               &u,
-                                VectorType               &q,
-                                VectorType               &t,
-                                VectorType               &d)
+  SolverQMRS<VectorType>::iterate(const MatrixType         &A,
+                                  VectorType               &x,
+                                  const VectorType         &b,
+                                  const PreconditionerType &preconditioner,
+                                  VectorType               &r,
+                                  VectorType               &u,
+                                  VectorType               &q,
+                                  VectorType               &t,
+                                  VectorType               &d)
 {
   SolverControl::State state = SolverControl::iterate;
 
