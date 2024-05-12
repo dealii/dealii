@@ -54,7 +54,9 @@ public:
 /**
  * Implementation of a scalar Lagrange finite element on a pyramid that yields
  * the finite element space of continuous, piecewise polynomials of
- * degree $k$.
+ * degree $k$. The corresponding element on simplex (triangular or tetrahedral)
+ * cells is FE_SimplexP, on hypercube cells it is FE_Q, and
+ * on wedges it is FE_WedgeP.
  *
  * @note Currently, only linear polynomials (degree=1) are implemented. See
  * also the documentation of ScalarLagrangePolynomialPyramid.
