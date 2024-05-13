@@ -152,28 +152,22 @@ namespace Step39
   {
     FullMatrix<double> &M = dinfo.matrix(0, false).matrix;
 
-    const unsigned int n_dofs       = info.fe_values().dofs_per_cell;
-    const unsigned int n_components = info.fe_values().get_fe().n_components();
-
     for (unsigned int k = 0; k < info.fe_values().n_quadrature_points; ++k)
       {
         const double dx = info.fe_values().JxW(k);
 
-        for (unsigned int i = 0; i < n_dofs; ++i)
+        for (unsigned int i = 0; i < info.fe_values().dofs_per_cell; ++i)
           {
-            double Mii = 0.0;
-            for (unsigned int d = 0; d < n_components; ++d)
-              Mii += (info.fe_values().shape_grad_component(i, k, d) *
-                      info.fe_values().shape_grad_component(i, k, d) * dx);
+            const double Mii = (info.fe_values().shape_grad(i, k) *
+                                info.fe_values().shape_grad(i, k) * dx);
 
             M(i, i) += Mii;
 
-            for (unsigned int j = i + 1; j < n_dofs; ++j)
+            for (unsigned int j = i + 1; j < info.fe_values().dofs_per_cell;
+                 ++j)
               {
-                double Mij = 0.0;
-                for (unsigned int d = 0; d < n_components; ++d)
-                  Mij += (info.fe_values().shape_grad_component(j, k, d) *
-                          info.fe_values().shape_grad_component(i, k, d) * dx);
+                const double Mij = info.fe_values().shape_grad(j, k) *
+                                   info.fe_values().shape_grad(i, k) * dx;
 
                 M(i, j) += Mij;
                 M(j, i) += Mij;
@@ -195,26 +189,26 @@ namespace Step39
     AssertDimension(M.n(), fe_face_values.dofs_per_cell);
     AssertDimension(M.m(), fe_face_values.dofs_per_cell);
 
-    const unsigned int degree = info.fe_values(0).get_fe().tensor_degree();
+    const unsigned int polynomial_degree =
+      info.fe_values(0).get_fe().tensor_degree();
 
-    const double ip_penalty = ip_penalty_factor(dinfo, dinfo, degree, degree);
+    const double ip_penalty =
+      ip_penalty_factor(dinfo, dinfo, polynomial_degree, polynomial_degree);
 
     for (unsigned int k = 0; k < fe_face_values.n_quadrature_points; ++k)
       {
         const double          dx = fe_face_values.JxW(k);
         const Tensor<1, dim> &n  = fe_face_values.normal_vector(k);
-        for (unsigned int d = 0; d < fe_face_values.get_fe().n_components();
-             ++d)
-          for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
-            for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
-              M(i, j) +=
-                (2. * fe_face_values.shape_value_component(i, k, d) *
-                   ip_penalty * fe_face_values.shape_value_component(j, k, d) -
-                 (n * fe_face_values.shape_grad_component(i, k, d)) *
-                   fe_face_values.shape_value_component(j, k, d) -
-                 (n * fe_face_values.shape_grad_component(j, k, d)) *
-                   fe_face_values.shape_value_component(i, k, d)) *
-                dx;
+
+        for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
+            M(i, j) += (2. * fe_face_values.shape_value(i, k) * ip_penalty *
+                          fe_face_values.shape_value(j, k) -
+                        (n * fe_face_values.shape_grad(i, k)) *
+                          fe_face_values.shape_value(j, k) -
+                        (n * fe_face_values.shape_grad(j, k)) *
+                          fe_face_values.shape_value(i, k)) *
+                       dx;
       }
   }
 
@@ -256,43 +250,32 @@ namespace Step39
       {
         const double          dx = fe_face_values_1.JxW(k);
         const Tensor<1, dim> &n  = fe_face_values_1.normal_vector(k);
-        for (unsigned int d = 0; d < fe_face_values_1.get_fe().n_components();
-             ++d)
+
+        for (unsigned int i = 0; i < fe_face_values_1.dofs_per_cell; ++i)
           {
-            for (unsigned int i = 0; i < fe_face_values_1.dofs_per_cell; ++i)
+            for (unsigned int j = 0; j < fe_face_values_1.dofs_per_cell; ++j)
               {
-                for (unsigned int j = 0; j < fe_face_values_1.dofs_per_cell;
-                     ++j)
-                  {
-                    const double vi =
-                      fe_face_values_1.shape_value_component(i, k, d);
-                    const double dnvi =
-                      n * fe_face_values_1.shape_grad_component(i, k, d);
-                    const double ve =
-                      fe_face_values_2.shape_value_component(i, k, d);
-                    const double dnve =
-                      n * fe_face_values_2.shape_grad_component(i, k, d);
-                    const double ui =
-                      fe_face_values_1.shape_value_component(j, k, d);
-                    const double dnui =
-                      n * fe_face_values_1.shape_grad_component(j, k, d);
-                    const double ue =
-                      fe_face_values_2.shape_value_component(j, k, d);
-                    const double dnue =
-                      n * fe_face_values_2.shape_grad_component(j, k, d);
-                    M11(i, j) += (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
-                                  nu * ip_penalty * ui * vi) *
-                                 dx;
-                    M12(i, j) += (.5 * nui * dnvi * ue - .5 * nue * dnue * vi -
-                                  nu * ip_penalty * vi * ue) *
-                                 dx;
-                    M21(i, j) += (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
-                                  nu * ip_penalty * ui * ve) *
-                                 dx;
-                    M22(i, j) += (.5 * nue * dnve * ue + .5 * nue * dnue * ve +
-                                  nu * ip_penalty * ue * ve) *
-                                 dx;
-                  }
+                const double vi   = fe_face_values_1.shape_value(i, k);
+                const double dnvi = n * fe_face_values_1.shape_grad(i, k);
+                const double ve   = fe_face_values_2.shape_value(i, k);
+                const double dnve = n * fe_face_values_2.shape_grad(i, k);
+                const double ui   = fe_face_values_1.shape_value(j, k);
+                const double dnui = n * fe_face_values_1.shape_grad(j, k);
+                const double ue   = fe_face_values_2.shape_value(j, k);
+                const double dnue = n * fe_face_values_2.shape_grad(j, k);
+
+                M11(i, j) += (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
+                              nu * ip_penalty * ui * vi) *
+                             dx;
+                M12(i, j) += (.5 * nui * dnvi * ue - .5 * nue * dnue * vi -
+                              nu * ip_penalty * vi * ue) *
+                             dx;
+                M21(i, j) += (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
+                              nu * ip_penalty * ui * ve) *
+                             dx;
+                M22(i, j) += (.5 * nue * dnve * ue + .5 * nue * dnue * ve +
+                              nu * ip_penalty * ue * ve) *
+                             dx;
               }
           }
       }
