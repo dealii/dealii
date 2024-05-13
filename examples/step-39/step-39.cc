@@ -106,38 +106,120 @@ namespace Step39
   };
 
 
-  // On each cell, we integrate the Dirichlet form. We use the library of
-  // ready made integrals in LocalIntegrators to avoid writing these loops
-  // ourselves. Similarly, we implement Nitsche boundary conditions and the
-  // interior penalty fluxes between cells.
+  // On each cell, we integrate the Dirichlet form as well as the
+  // Nitsche boundary conditions and the interior penalty fluxes between
+  // cells.
   //
   // The boundary and flux terms need a penalty parameter, which should be
-  // adjusted to the cell size and the polynomial degree. A safe choice of
-  // this parameter for constant coefficients can be found in
-  // LocalIntegrators::Laplace::compute_penalty() and we use this below.
+  // adjusted to the cell size and the polynomial degree. We compute it
+  // in two steps: First, we compute on each cell
+  // $K_i$ the value $P_i = p_i(p_i+1)/h_i$, where
+  // $p_i$ is the polynomial degree on cell $K_i$ and $h_i$ is the length of
+  // $K_i$ orthogonal to the current face. Second, if one of the two
+  // cells adjacent to the face has children, its penalty is multiplied
+  // by two (to account for the fact that the mesh size $h_i$ there is
+  // only half that previously computed). Finally, we return the average
+  // of the two penalty values.
+  template <int dim>
+  double ip_penalty_factor(const MeshWorker::DoFInfo<dim> &dinfo1,
+                           const MeshWorker::DoFInfo<dim> &dinfo2,
+                           unsigned int                    deg1,
+                           unsigned int                    deg2)
+  {
+    const unsigned int normal1 =
+      GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
+    const unsigned int normal2 =
+      GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
+    const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1 + 1);
+    const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2 + 1);
+
+    double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
+    double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
+    if (dinfo1.cell->has_children() ^ dinfo2.cell->has_children())
+      {
+        Assert(dinfo1.face == dinfo2.face, ExcInternalError());
+        Assert(dinfo1.face->has_children(), ExcInternalError());
+        penalty1 *= 2;
+      }
+    const double penalty = 0.5 * (penalty1 + penalty2);
+    return penalty;
+  }
+
+
   template <int dim>
   void MatrixIntegrator<dim>::cell(
     MeshWorker::DoFInfo<dim>                  &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
-    LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
-                                           info.fe_values());
+    FullMatrix<double> &M = dinfo.matrix(0, false).matrix;
+
+    const unsigned int n_dofs       = info.fe_values().dofs_per_cell;
+    const unsigned int n_components = info.fe_values().get_fe().n_components();
+
+    for (unsigned int k = 0; k < info.fe_values().n_quadrature_points; ++k)
+      {
+        const double dx = info.fe_values().JxW(k);
+
+        for (unsigned int i = 0; i < n_dofs; ++i)
+          {
+            double Mii = 0.0;
+            for (unsigned int d = 0; d < n_components; ++d)
+              Mii += (info.fe_values().shape_grad_component(i, k, d) *
+                      info.fe_values().shape_grad_component(i, k, d) * dx);
+
+            M(i, i) += Mii;
+
+            for (unsigned int j = i + 1; j < n_dofs; ++j)
+              {
+                double Mij = 0.0;
+                for (unsigned int d = 0; d < n_components; ++d)
+                  Mij += (info.fe_values().shape_grad_component(j, k, d) *
+                          info.fe_values().shape_grad_component(i, k, d) * dx);
+
+                M(i, j) += Mij;
+                M(j, i) += Mij;
+              }
+          }
+      }
   }
 
 
+  // Boundary faces use the Nitsche method to impose boundary values:
   template <int dim>
-  void MatrixIntegrator<dim>::boundary(
-    MeshWorker::DoFInfo<dim>                  &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+  void
+  MatrixIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                                  MeshWorker::IntegrationInfo<dim> &info) const
   {
+    const FEValuesBase<dim> &fe_face_values = info.fe_values(0);
+
+    FullMatrix<double> &M = dinfo.matrix(0, false).matrix;
+    AssertDimension(M.n(), fe_face_values.dofs_per_cell);
+    AssertDimension(M.m(), fe_face_values.dofs_per_cell);
+
     const unsigned int degree = info.fe_values(0).get_fe().tensor_degree();
-    LocalIntegrators::Laplace::nitsche_matrix(
-      dinfo.matrix(0, false).matrix,
-      info.fe_values(0),
-      LocalIntegrators::Laplace::compute_penalty(dinfo, dinfo, degree, degree));
+
+    const double ip_penalty = ip_penalty_factor(dinfo, dinfo, degree, degree);
+
+    for (unsigned int k = 0; k < fe_face_values.n_quadrature_points; ++k)
+      {
+        const double          dx = fe_face_values.JxW(k);
+        const Tensor<1, dim> &n  = fe_face_values.normal_vector(k);
+        for (unsigned int d = 0; d < fe_face_values.get_fe().n_components();
+             ++d)
+          for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
+            for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
+              M(i, j) +=
+                (2. * fe_face_values.shape_value_component(i, k, d) *
+                   ip_penalty * fe_face_values.shape_value_component(j, k, d) -
+                 (n * fe_face_values.shape_grad_component(i, k, d)) *
+                   fe_face_values.shape_value_component(j, k, d) -
+                 (n * fe_face_values.shape_grad_component(j, k, d)) *
+                   fe_face_values.shape_value_component(i, k, d)) *
+                dx;
+      }
   }
 
-  // Interior faces use the interior penalty method
+  // Interior faces use the interior penalty method:
   template <int dim>
   void MatrixIntegrator<dim>::face(
     MeshWorker::DoFInfo<dim>                  &dinfo1,
@@ -145,16 +227,76 @@ namespace Step39
     typename MeshWorker::IntegrationInfo<dim> &info1,
     typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
-    const unsigned int degree = info1.fe_values(0).get_fe().tensor_degree();
-    LocalIntegrators::Laplace::ip_matrix(
-      dinfo1.matrix(0, false).matrix,
-      dinfo1.matrix(0, true).matrix,
-      dinfo2.matrix(0, true).matrix,
-      dinfo2.matrix(0, false).matrix,
-      info1.fe_values(0),
-      info2.fe_values(0),
-      LocalIntegrators::Laplace::compute_penalty(
-        dinfo1, dinfo2, degree, degree));
+    const FEValuesBase<dim> &fe_face_values_1 = info1.fe_values(0);
+    const FEValuesBase<dim> &fe_face_values_2 = info2.fe_values(0);
+
+    FullMatrix<double> &M11 = dinfo1.matrix(0, false).matrix;
+    FullMatrix<double> &M12 = dinfo1.matrix(0, true).matrix;
+    FullMatrix<double> &M21 = dinfo2.matrix(0, true).matrix;
+    FullMatrix<double> &M22 = dinfo2.matrix(0, false).matrix;
+
+    AssertDimension(M11.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M11.m(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M12.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M12.m(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M21.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M21.m(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M22.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M22.m(), fe_face_values_1.dofs_per_cell);
+
+    const unsigned int polynomial_degree =
+      info1.fe_values(0).get_fe().tensor_degree();
+    const double ip_penalty =
+      ip_penalty_factor(dinfo1, dinfo2, polynomial_degree, polynomial_degree);
+
+    const double nui = 1.;
+    const double nue = 1.;
+    const double nu  = .5 * (nui + nue);
+
+    for (unsigned int k = 0; k < fe_face_values_1.n_quadrature_points; ++k)
+      {
+        const double          dx = fe_face_values_1.JxW(k);
+        const Tensor<1, dim> &n  = fe_face_values_1.normal_vector(k);
+        for (unsigned int d = 0; d < fe_face_values_1.get_fe().n_components();
+             ++d)
+          {
+            for (unsigned int i = 0; i < fe_face_values_1.dofs_per_cell; ++i)
+              {
+                for (unsigned int j = 0; j < fe_face_values_1.dofs_per_cell;
+                     ++j)
+                  {
+                    const double vi =
+                      fe_face_values_1.shape_value_component(i, k, d);
+                    const double dnvi =
+                      n * fe_face_values_1.shape_grad_component(i, k, d);
+                    const double ve =
+                      fe_face_values_2.shape_value_component(i, k, d);
+                    const double dnve =
+                      n * fe_face_values_2.shape_grad_component(i, k, d);
+                    const double ui =
+                      fe_face_values_1.shape_value_component(j, k, d);
+                    const double dnui =
+                      n * fe_face_values_1.shape_grad_component(j, k, d);
+                    const double ue =
+                      fe_face_values_2.shape_value_component(j, k, d);
+                    const double dnue =
+                      n * fe_face_values_2.shape_grad_component(j, k, d);
+                    M11(i, j) += (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
+                                  nu * ip_penalty * ui * vi) *
+                                 dx;
+                    M12(i, j) += (.5 * nui * dnvi * ue - .5 * nue * dnue * vi -
+                                  nu * ip_penalty * vi * ue) *
+                                 dx;
+                    M21(i, j) += (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
+                                  nu * ip_penalty * ui * ve) *
+                                 dx;
+                    M22(i, j) += (.5 * nue * dnve * ue + .5 * nue * dnue * ve +
+                                  nu * ip_penalty * ue * ve) *
+                                 dx;
+                  }
+              }
+          }
+      }
   }
 
   // The second local integrator builds the right hand side. In our example,
