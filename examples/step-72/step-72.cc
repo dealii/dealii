@@ -383,7 +383,7 @@ namespace Step72
     // in the `copy_data` instance that is passed into this function. This
     // `copy_data` has been filled with data during @a some call to the
     // `cell_worker`.
-    const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
+    const auto copier = [this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
       const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
@@ -592,7 +592,7 @@ namespace Step72
     };
 
     // The remainder of the function equals what we had previously:
-    const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
+    const auto copier = [this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
       const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
@@ -740,7 +740,7 @@ namespace Step72
 
     // As in the previous two functions, the remainder of the function is as
     // before:
-    const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
+    const auto copier = [this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
       const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
