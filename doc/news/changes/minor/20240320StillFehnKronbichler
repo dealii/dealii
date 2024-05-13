@@ -1,8 +1,0 @@
-Improved: The isotropic refinement function 
-TriangulationImplementation::Implementation::execute_refinement_isotropic() 
-now supports 2 additional ways to split a tetrahedron into its children. 
-Cutting the parent between the 2 edge midpoints, which are the shortest 
-distance apart, leads to more regular refined cells and optimal convergence 
-under mesh refinement.
-<br>
-(Dominik Still, Niklas Fehn, Martin Kronbichler, 2024/03/20)

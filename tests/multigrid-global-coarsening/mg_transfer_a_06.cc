@@ -14,9 +14,10 @@
 
 
 /**
- * Test prolongation with uniformly refined meshes.
+ * Test interpolation operator with uniformly refined meshes.
  *
- * To compare with non_nested_transfer_04.
+ * To compare with mg_transfer_a_01 but tests the interpolation
+ * operator instead of the transfer operators.
  */
 
 #include <deal.II/base/conditional_ostream.h>
@@ -65,6 +66,50 @@ public:
   }
 };
 
+template <int dim, typename Number, typename MeshType>
+void
+test_interpolation(
+  const MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
+                              &transfer,
+  const MeshType              &dof_handler_fine,
+  const MeshType              &dof_handler_coarse,
+  const Function<dim, Number> &function,
+  const unsigned int           mg_level_fine   = numbers::invalid_unsigned_int,
+  const unsigned int           mg_level_coarse = numbers::invalid_unsigned_int)
+{
+  AffineConstraints<Number> constraint_fine(
+    dof_handler_fine.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
+  DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
+  constraint_fine.close();
+
+  // perform interpolation
+  LinearAlgebra::distributed::Vector<Number> src, dst;
+
+  initialize_dof_vector(dst, dof_handler_fine, mg_level_fine);
+  initialize_dof_vector(src, dof_handler_coarse, mg_level_coarse);
+
+  // test interpolate
+  {
+    VectorTools::interpolate(dof_handler_fine, function, dst); // dst = 1.0
+    src = 0.0;
+    transfer.interpolate(src, dst);
+
+    // print norms
+    if (true)
+      {
+        deallog << src.l2_norm() << std::endl;
+      }
+
+    // print vectors
+    if (true)
+      {
+        print(dst);
+        print(src);
+      }
+  }
+}
+
 template <int dim, typename Number>
 void
 do_test(const FiniteElement<dim>    &fe_fine,
@@ -111,10 +156,7 @@ do_test(const FiniteElement<dim>    &fe_fine,
                   constraint_fine,
                   constraint_coarse);
 
-  test_non_nested_transfer(transfer,
-                           dof_handler_fine,
-                           dof_handler_coarse,
-                           function);
+  test_interpolation(transfer, dof_handler_fine, dof_handler_coarse, function);
 }
 
 template <int dim, typename Number>

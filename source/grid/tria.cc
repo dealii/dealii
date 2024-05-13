@@ -6733,24 +6733,8 @@ namespace internal
                       else
                         DEAL_II_NOT_IMPLEMENTED();
 
-                      switch (chosen_line_tetrahedron)
-                        {
-                          case 0:
-                            hex->set_refinement_case(
-                              RefinementCase<dim>(static_cast<char>(
-                                IsotropicRefinementChoice::cut_tet_68)));
-                            break;
-                          case 1:
-                            hex->set_refinement_case(
-                              RefinementCase<dim>(static_cast<char>(
-                                IsotropicRefinementChoice::cut_tet_57)));
-                            break;
-                          case 2:
-                            hex->set_refinement_case(
-                              RefinementCase<dim>(static_cast<char>(
-                                IsotropicRefinementChoice::cut_tet_49)));
-                            break;
-                        }
+                      hex->set_refinement_case(
+                        RefinementCase<dim>(chosen_line_tetrahedron + 1));
 
                       new_lines[0]->set_bounding_object_indices(
                         {vertex_indices
