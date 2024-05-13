@@ -130,14 +130,9 @@ public:
   using SubQuadrature = Quadrature<dim == 0 ? 0 : dim - 1>;
 
   /**
-   * Constructor.
-   *
-   * This constructor is marked as explicit to avoid involuntary accidents
-   * like in <code>hp::QCollection@<dim@> q_collection(3)</code> where
-   * <code>hp::QCollection@<dim@> q_collection(QGauss@<dim@>(3))</code> was
-   * meant.
+   * Default constructor.
    */
-  explicit Quadrature(const unsigned int n_quadrature_points = 0);
+  Quadrature();
 
   /**
    * Build this quadrature formula as the tensor product of a formula in a
@@ -336,6 +331,21 @@ public:
   get_tensor_basis() const;
 
 protected:
+  /**
+   * Constructor.
+   *
+   * This constructor is marked as explicit to avoid involuntary accidents
+   * like in <code>hp::QCollection@<dim@> q_collection(3)</code> where
+   * <code>hp::QCollection@<dim@> q_collection(QGauss@<dim@>(3))</code> was
+   * meant. Nonetheless, it is easy to accidentally write
+   * @code
+   *   Quadrature<dim> quadrature(3);
+   * @endcode
+   * where QGauss was meant. As a consequence, this constructor is `protected`
+   * and so only available to derived classes initializing their base class.
+   */
+  explicit Quadrature(const unsigned int n_quadrature_points);
+
   /**
    * List of quadrature points. To be filled by the constructors of derived
    * classes.
