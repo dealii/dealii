@@ -114,10 +114,12 @@ namespace Step39
   // in two steps: First, we compute on each cell
   // $K_i$ the value $P_i = p_i(p_i+1)/h_i$, where
   // $p_i$ is the polynomial degree on cell $K_i$ and $h_i$ is the length of
-  // $K_i$ orthogonal to the current face. Second, if one of the two
+  // $K_i$ orthogonal to the current face. Second, if exactly one of the two
   // cells adjacent to the face has children, its penalty is multiplied
   // by two (to account for the fact that the mesh size $h_i$ there is
-  // only half that previously computed). Finally, we return the average
+  // only half that previously computed); it is possible that both adjacent
+  // cells are refined, in which case we are integrating over a non-active
+  // face and no adjustment is necessary. Finally, we return the average
   // of the two penalty values.
   template <int dim>
   double ip_penalty_factor(const MeshWorker::DoFInfo<dim> &dinfo1,
@@ -134,12 +136,11 @@ namespace Step39
 
     double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
     double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
-    if (dinfo1.cell->has_children() ^ dinfo2.cell->has_children())
-      {
-        Assert(dinfo1.face == dinfo2.face, ExcInternalError());
-        Assert(dinfo1.face->has_children(), ExcInternalError());
-        penalty1 *= 2;
-      }
+    if (dinfo1.cell->has_children() && !dinfo2.cell->has_children())
+      penalty1 *= 2;
+    else if (!dinfo1.cell->has_children() && dinfo2.cell->has_children())
+      penalty2 *= 2;
+
     const double penalty = 0.5 * (penalty1 + penalty2);
     return penalty;
   }
