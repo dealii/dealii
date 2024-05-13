@@ -584,7 +584,7 @@ namespace Step39
   public:
     using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
-    InteriorPenaltyProblem(const FiniteElement<dim> &fe);
+    InteriorPenaltyProblem();
 
     void run(unsigned int n_steps);
 
@@ -599,10 +599,10 @@ namespace Step39
     void   output_results(const unsigned int cycle) const;
 
     // The member objects related to the discretization are here.
-    Triangulation<dim>        triangulation;
-    const MappingQ1<dim>      mapping;
-    const FiniteElement<dim> &fe;
-    DoFHandler<dim>           dof_handler;
+    Triangulation<dim>   triangulation;
+    const MappingQ1<dim> mapping;
+    const FE_DGQ<2>      fe;
+    DoFHandler<dim>      dof_handler;
 
     // Then, we have the matrices and vectors related to the global discrete
     // system.
@@ -634,14 +634,12 @@ namespace Step39
   };
 
 
-  // The constructor simply sets up the coarse grid and the DoFHandler. The
-  // FiniteElement is provided as a parameter to allow flexibility.
+  // The constructor simply sets up the coarse grid and the DoFHandler.
   template <int dim>
-  InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(
-    const FiniteElement<dim> &fe)
+  InteriorPenaltyProblem<dim>::InteriorPenaltyProblem()
     : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
     , mapping()
-    , fe(fe)
+    , fe(3)
     , dof_handler(triangulation)
     , estimates(1)
   {
@@ -1117,8 +1115,8 @@ int main()
       deallog.depth_console(2);
       std::ofstream logfile("deallog");
       deallog.attach(logfile);
-      const FE_DGQ<2>           fe1(3);
-      InteriorPenaltyProblem<2> test1(fe1);
+
+      InteriorPenaltyProblem<2> test1;
       test1.run(12);
     }
   catch (std::exception &exc)
