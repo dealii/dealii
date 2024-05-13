@@ -550,12 +550,12 @@ namespace internal
  * associated with curves in 2d or surfaces in 3d) are the ones one wants to
  * use in the boundary element method.
  *
- * The name of the class is mostly hierarchical and is not meant to imply that
+ * The name of the class is mostly historical and is not meant to imply that
  * a Triangulation can only consist of triangles. Instead, triangulations
- * consist of line segments in 1d (i.e., if `dim==1`), and of three-dimensional
- * cells (if `dim==3`). Moreover, historically, deal.II only supported
- * quadrilaterals (cells with four vertices: deformed rectangles) in 2d
- * and hexahedra (cells with six sides and eight vertices that are deformed
+ * will consist of line segments in 1d (i.e., if `dim==1`), and of
+ * three-dimensional cells (if `dim==3`). Moreover, historically, deal.II only
+ * supported quadrilaterals (cells with four vertices: deformed rectangles) in
+ * 2d and hexahedra (cells with six sides and eight vertices that are deformed
  * boxes), neither of which are triangles. In other words, the term
  * "triangulation" in the deal.II language is synonymous with "mesh" and is
  * to be understood separate from its linguistic origin.
