@@ -516,7 +516,21 @@ namespace deal_II_exceptions
             }
         }
 #endif
+
+#if KOKKOS_VERSION >= 30600
+      KOKKOS_IF_ON_HOST(({ std::abort(); }))
+      KOKKOS_IF_ON_DEVICE(({
+        Kokkos::abort(
+          "Abort() was called during dealing with an assertion or exception.");
+      }))
+#else /*if KOKKOS_VERSION >= 30600*/
+#  ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
       std::abort();
+#  else
+      Kokkos::abort(
+        "Abort() was called during dealing with an assertion or exception.");
+#  endif
+#endif
     }
 
 
