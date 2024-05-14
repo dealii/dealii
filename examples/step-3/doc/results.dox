@@ -52,7 +52,7 @@ suggestions:
 <ul>
   <li>
   Change the geometry and mesh: In the program, we have generated a square
-  domain and mesh by using the <code>GridGenerator::hyper_cube</code>
+  domain and mesh by using the GridGenerator::hyper_cube()
   function. However, the <code>GridGenerator</code> has a good number of other
   functions as well. Try an L-shaped domain, a ring, or other domains you find
   there.
@@ -137,6 +137,70 @@ suggestions:
   computed for boundary indicator 0. The result will be that we will get
   discontinuous boundary values, zero on three sides of the square, and one on
   the fourth.
+
+  <li>
+  Use triangles: As mentioned in the results section of step-1, for
+  historical reasons, almost all tutorial programs for deal.II are
+  written using quadrilateral or hexahedral meshes. But deal.II also
+  supports triangular and tetrahedral meshes. So a good experiment would
+  be to replace the mesh used here by a triangular mesh.
+
+  This is *almost* trivial. First, as discussed in step-1, we may want
+  to start with the quadrilateral mesh we are already creating, and
+  then convert it into a triangular one. You can do that by replacing
+  the first line of `Step3::make_grid()` by the following code:
+  @code
+  Triangulation<2> triangulation_quad;
+  GridGenerator::hyper_cube(triangulation_quad, -1, 1);
+  GridGenerator::convert_hypercube_to_simplex_mesh (triangulation_quad,
+                                                    triangulation);
+  @endcode
+  The GridGenerator::convert_hypercube_to_simplex_mesh() replaces each
+  quadrilateral by eight triangles with half the diameter of the original
+  quadrilateral; as a consequence, the resulting mesh is substantially
+  finer and one might expect that the solution is consequently more
+  accurate (but also has many more degrees of freedom). That is a question
+  you can explore with the techniques discussed in the "Results" section
+  of step-4, but that goes beyond what we want to demonstrate here.
+
+  If you run this program, you will run into an error message that
+  will look something like this:
+  @code
+--------------------------------------------------------
+An error occurred in line <2633> of file </home/bangerth/p/deal.II/1/dealii/include/deal.II/dofs/dof_accessor.templates.h> in function
+    const dealii::FiniteElement<dimension_, space_dimension_>& dealii::DoFCellAccessor<dim, spacedim, lda>::get_fe() const [with int dimension_ = 2; int space_dimension_ = 2; bool level_dof_access = false]
+The violated condition was:
+    this->reference_cell() == fe.reference_cell()
+Additional information:
+    The reference-cell type used on this cell (Tri) does not match the
+    reference-cell type of the finite element associated with this cell
+    (Quad). Did you accidentally use simplex elements on hypercube meshes
+    (or the other way around), or are you using a mixed mesh and assigned
+    a simplex element to a hypercube cell (or the other way around) via
+    the active_fe_index?
+  @endcode
+  It is worth carefully reading the error message. It doesn't just
+  state that there is an error, but also how it may have
+  arisen. Specifically, it asks whether we are using a finite element
+  for simplex meshes (in 2d simplices are triangles) with a hypercube
+  mesh (in 2d hypercubes are quadrilaterals) or the other way around?
+
+  Of course, this is exactly what we are doing, though this may
+  perhaps not be clear to you. But if you look up the documentation,
+  you will find that the FE_Q element we use in the main class can
+  only be used on hypercube meshes; what we *want* to use instead now
+  that we are using a simplex mesh is the FE_SimplexP class that is the
+  equivalent to FE_Q for simplex cells. (To do this, you will also
+  have to add `#include <deal.II/fe/fe_simplex_p.h>` at the top of the file.)
+
+  The last thing you need to change (which at the time of writing is
+  unfortunately not prompted by getting an error message) is that when
+  we integrate, we need to use a quadrature formula that is
+  appropriate for triangles. This is done by changing QGauss by
+  QGaussSimplex in the code.
+
+  With all of these steps, you then get the following solution:
+  <img src="https://www.dealii.org/images/steps/developer/step-3.solution-triangles.png" alt="Visualization of the solution of step-3 using triangles">
 
   <li>
   Observe convergence: We will only discuss computing errors in norms in
