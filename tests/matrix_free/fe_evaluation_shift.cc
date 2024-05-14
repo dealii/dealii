@@ -74,19 +74,18 @@ namespace dealii
 
         };
 
-    const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-      *shape_info_base;
+    const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info_base;
 
     void
     reinit(unsigned int cell_batch_index,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info = nullptr);
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info =
+             nullptr);
 
     void
     reinit(unsigned int cell_batch_index,
            unsigned int face_number,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info = nullptr);
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info =
+             nullptr);
   };
 
   template <int dim,
@@ -103,8 +102,7 @@ namespace dealii
                     Number,
                     VectorizedArrayType>::
     reinit(const unsigned int cell_batch_index,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info)
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info)
   {
     Assert(this->mapped_geometry == nullptr,
            ExcMessage(
@@ -163,8 +161,7 @@ namespace dealii
                     VectorizedArrayType>::
     reinit(const unsigned int cell_batch_index,
            const unsigned int face_number,
-           const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-             *shape_info)
+           const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info)
   {
     Assert(
       this->quad_no <
@@ -344,8 +341,7 @@ test(const dealii::FE_Poly<dim> &fe)
 
   matrix_free.initialize_dof_vector(dst);
 
-  std::array<internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>,
-             2 * dim>
+  std::array<internal::MatrixFreeFunctions::ShapeInfo<Number>, 2 * dim>
     shape_info_shift;
 
   const QGauss<1> quadrature_1D(n_points);
@@ -355,11 +351,11 @@ test(const dealii::FE_Poly<dim> &fe)
   const Quadrature<1> quadrature_1D_shift_plus =
     shift_1d_quadrature(quadrature_1D, +1.);
 
-  dealii::internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-    shape_info_base(quadrature_1D, fe);
-  dealii::internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
+  dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info_base(
+    quadrature_1D, fe);
+  dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
     shape_info_shift_plus(quadrature_1D_shift_plus, fe);
-  dealii::internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
+  dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
     shape_info_shift_minus(quadrature_1D_shift_minus, fe);
 
   for (unsigned int f = 0; f < 2 * dim; ++f)

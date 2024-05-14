@@ -663,10 +663,11 @@ namespace Euler_DG
           dim,
           n_points_1d,
           n_points_1d,
-          VectorizedArrayType>
-          eval(AlignedVector<VectorizedArrayType>(),
+          VectorizedArrayType,
+          Number>
+          eval({},
                data.get_shape_info().data[0].shape_gradients_collocation_eo,
-               AlignedVector<VectorizedArrayType>());
+               {});
 
         AlignedVector<VectorizedArrayType> buffer(phi.static_n_q_points *
                                                   phi.n_components);

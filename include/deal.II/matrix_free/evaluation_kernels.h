@@ -1285,7 +1285,7 @@ namespace internal
     // might have non-symmetric quadrature formula, so use the more
     // conservative 'evaluate_general' scheme rather than 'even_odd' as the
     // Hessians are not used very often
-    const MatrixFreeFunctions::UnivariateShapeData<Number> &data =
+    const MatrixFreeFunctions::UnivariateShapeData<Number2> &data =
       fe_eval.get_shape_info().data[0];
     AssertDimension(data.shape_gradients_collocation.size(),
                     data.n_q_points_1d * data.n_q_points_1d);
@@ -1356,7 +1356,7 @@ namespace internal
     using Number2 =
       typename FEEvaluationData<dim, Number, false>::shape_info_number_type;
 
-    const MatrixFreeFunctions::UnivariateShapeData<Number> &data =
+    const MatrixFreeFunctions::UnivariateShapeData<Number2> &data =
       fe_eval.get_shape_info().data[0];
     AssertDimension(data.shape_gradients_collocation.size(),
                     data.n_q_points_1d * data.n_q_points_1d);

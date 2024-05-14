@@ -674,17 +674,19 @@ namespace NavierStokes_DG
       dim,
       n_points_1d,
       n_points_1d,
-      VectorizedArrayType>
-      eval(AlignedVector<VectorizedArrayType>(),
+      VectorizedArrayType,
+      Number>
+      eval({},
            data.get_shape_info().data[0].shape_gradients_collocation_eo,
-           AlignedVector<VectorizedArrayType>());
+           {});
 
     internal::EvaluatorTensorProduct<
       internal::EvaluatorVariant::evaluate_evenodd,
       dim - 1,
       n_q_points_1d,
       n_q_points_1d,
-      VectorizedArrayType>
+      VectorizedArrayType,
+      Number>
       eval_face({},
                 data.get_shape_info().data[0].shape_gradients_collocation_eo,
                 {});
@@ -789,7 +791,7 @@ namespace NavierStokes_DG
 
             phi_m.reinit(cell, face);
 
-            const AlignedVector<VectorizedArrayType> &shape_data =
+            const AlignedVector<Number> &shape_data =
               data.get_shape_info().data.front().quadrature_data_on_face[face %
                                                                          2];
             const std::array<int, 2> n_blocks{

@@ -202,10 +202,10 @@ namespace dealii
                               const auto w =
                                 transpose ?
                                   constraint_weights[i * (fe_degree + 1) +
-                                                     interp_idx][v] :
+                                                     interp_idx] :
                                   constraint_weights[interp_idx *
                                                        (fe_degree + 1) +
-                                                     i][v];
+                                                     i];
                               t += w * values_temp[real_idx][v];
                             }
                         }
@@ -222,11 +222,10 @@ namespace dealii
                                 transpose ?
                                   constraint_weights[(fe_degree - i) *
                                                        (fe_degree + 1) +
-                                                     fe_degree - interp_idx]
-                                                    [v] :
+                                                     fe_degree - interp_idx] :
                                   constraint_weights[(fe_degree - interp_idx) *
                                                        (fe_degree + 1) +
-                                                     fe_degree - i][v];
+                                                     fe_degree - i];
                               t += w * values_temp[real_idx][v];
                             }
                         }
@@ -375,10 +374,10 @@ namespace dealii
                                 const auto w =
                                   transpose ?
                                     constraint_weights[i * (fe_degree + 1) +
-                                                       interp_idx][v] :
+                                                       interp_idx] :
                                     constraint_weights[interp_idx *
                                                          (fe_degree + 1) +
-                                                       i][v];
+                                                       i];
                                 t += w * values_temp[real_idx][v];
                               }
                           }
@@ -397,12 +396,11 @@ namespace dealii
                                   transpose ?
                                     constraint_weights[(fe_degree - i) *
                                                          (fe_degree + 1) +
-                                                       fe_degree - interp_idx]
-                                                      [v] :
+                                                       fe_degree - interp_idx] :
                                     constraint_weights[(fe_degree -
                                                         interp_idx) *
                                                          (fe_degree + 1) +
-                                                       fe_degree - i][v];
+                                                       fe_degree - i];
                                 t += w * values_temp[real_idx][v];
                               }
                           }
