@@ -124,7 +124,7 @@ namespace MeshWorker
      * @deprecated Because the library itself does not use this field, it is
      *   better placed in derived classes.
      */
-    DEAL_II_DEPRECATE_EARLY
+    DEAL_II_DEPRECATED_EARLY
     std::vector<std::string> input_vector_names;
 
     /**
@@ -138,7 +138,7 @@ namespace MeshWorker
      * @deprecated Because the library itself does not use this field, it is
      *   better placed in derived classes.
      */
-    DEAL_II_DEPRECATE_EARLY
+    DEAL_II_DEPRECATED_EARLY
     std::vector<std::string> output_names;
 
     /**
