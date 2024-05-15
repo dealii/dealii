@@ -517,20 +517,11 @@ namespace deal_II_exceptions
         }
 #endif
 
-#if KOKKOS_VERSION >= 30600
-      KOKKOS_IF_ON_HOST(({ std::abort(); }))
-      KOKKOS_IF_ON_DEVICE(({
-        Kokkos::abort(
-          "Abort() was called during dealing with an assertion or exception.");
-      }))
-#else /*if KOKKOS_VERSION >= 30600*/
-#  ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
-      std::abort();
-#  else
+      // Let's abort the program here. On the host, we need to call std::abort,
+      // on devices we need to do something different. Kokkos::abort() does
+      // the right thing in all circumstances.
       Kokkos::abort(
         "Abort() was called during dealing with an assertion or exception.");
-#  endif
-#endif
     }
 
 
