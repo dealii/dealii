@@ -563,10 +563,10 @@ test_functions()
       symb_d2psi_ds1_ds0,
       symb_d2psi_ds0_ds1,
       symb_d2psi_ds1_ds1); // Dependent symbolic functions
-    std::cout << FunctionStruct<number_t>::name() << ": About to optimise... "
-              << std::flush;
+    deallog << FunctionStruct<number_t>::name() << ": About to optimise... "
+            << std::flush;
     optimizer.optimize();
-    std::cout << "done." << std::endl;
+    deallog << "done." << std::endl;
     deallog.pop();
 
     deallog.push("Symbolic computation: Substitution");
@@ -575,11 +575,11 @@ test_functions()
     SD::add_to_substitution_map(sub_vals, symb_s1, s2);
 
     // Perform substitution of symbols
-    std::cout << FunctionStruct<number_t>::name() << ": About to substitute... "
-              << std::flush;
+    deallog << FunctionStruct<number_t>::name() << ": About to substitute... "
+            << std::flush;
     optimizer.substitute(sub_vals);
-    std::cout << "done." << std::endl;
-    // optimizer.print(std::cout);
+    deallog << "done." << std::endl;
+    // optimizer.print(deallog);
 
     // Evaluate
     deallog << "subs_psi: " << optimizer.evaluate(symb_psi) << std::endl;
@@ -612,10 +612,10 @@ test_all_functions()
      (opt_method == SD::OptimizerType::dictionary ||
       opt_method == SD::OptimizerType::lambda));
 
-  std::cout << "Optimisation method: " << opt_method << "\n"
-            << "Optimisation flags: " << opt_flags << "\n"
-            << "Skip non-implemented functions: "
-            << skip_non_implemented_functions << std::endl;
+  deallog << "Optimisation method: " << opt_method << "\n"
+          << "Optimisation flags: " << opt_flags << "\n"
+          << "Skip non-implemented functions: "
+          << skip_non_implemented_functions << std::endl;
 
   test_functions<number_t, opt_method, opt_flags, FunctionAdd>();
   test_functions<number_t, opt_method, opt_flags, FunctionSub>();
