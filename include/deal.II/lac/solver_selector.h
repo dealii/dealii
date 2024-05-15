@@ -118,11 +118,13 @@ public:
    * SolverName was specified in the constructor.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  solve(const MatrixType         &A,
-        VectorType               &x,
-        const VectorType         &b,
-        const PreconditionerType &precond) const;
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &precond) const;
 
   /**
    * Select a new solver. Note that all solver names used in this class are
@@ -269,6 +271,9 @@ void SolverSelector<VectorType>::select(const std::string &name)
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
 void SolverSelector<VectorType>::solve(const MatrixType         &A,
                                        VectorType               &x,
                                        const VectorType         &b,

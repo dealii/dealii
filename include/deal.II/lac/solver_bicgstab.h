@@ -139,11 +139,13 @@ public:
    * Solve primal problem only.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void
-  solve(const MatrixType         &A,
-        VectorType               &x,
-        const VectorType         &b,
-        const PreconditionerType &preconditioner);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
+  void solve(const MatrixType         &A,
+             VectorType               &x,
+             const VectorType         &b,
+             const PreconditionerType &preconditioner);
 
 protected:
   /**
@@ -405,6 +407,9 @@ typename SolverBicgstab<VectorType>::IterationResult
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename PreconditionerType>
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
 void SolverBicgstab<VectorType>::solve(const MatrixType         &A,
                                        VectorType               &x,
                                        const VectorType         &b,
