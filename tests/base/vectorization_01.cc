@@ -105,16 +105,70 @@ test()
     AssertThrow(std::fabs(e[i] - std::sin(d[i])) <
                   10. * std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
+  deallog << "OK" << std::endl << "Arc sine: ";
+  d = std::asin(e);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(d[i] - std::asin(e[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
   deallog << "OK" << std::endl << "Cosine: ";
   e = std::cos(c);
   for (unsigned int i = 0; i < n_vectors; ++i)
     AssertThrow(std::fabs(e[i] - std::cos(c[i])) <
                   10. * std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
+  deallog << "OK" << std::endl << "Arc cosine: ";
+  c = std::acos(e);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(c[i] - std::acos(e[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
   deallog << "OK" << std::endl << "Tangent: ";
   d = std::tan(e);
   for (unsigned int i = 0; i < n_vectors; ++i)
     AssertThrow(std::fabs(d[i] - std::tan(e[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
+  deallog << "OK" << std::endl << "Arc tangent: ";
+  d = std::atan(e);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(d[i] - std::atan(e[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
+  deallog << "OK" << std::endl << "Hyperbolic cosine: ";
+  e = std::cosh(c);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(e[i] - std::cosh(c[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
+  deallog << "OK" << std::endl << "Area hyperbolic cosine: ";
+  c = std::acosh(e);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(c[i] - std::acosh(e[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
+  deallog << "OK" << std::endl << "Hyperbolic sine: ";
+  e = std::sinh(d);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(e[i] - std::sinh(d[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
+  deallog << "OK" << std::endl << "Area hyperbolic sine: ";
+  d = std::asinh(e);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(d[i] - std::asinh(e[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
+  deallog << "OK" << std::endl << "Hyperbolic tangent: ";
+  d = std::tanh(e);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(d[i] - std::tanh(e[i])) <
+                  10. * std::numeric_limits<Number>::epsilon(),
+                ExcInternalError());
+  deallog << "OK" << std::endl << "Area hyperbolic tangent: ";
+  e = std::atanh(d);
+  for (unsigned int i = 0; i < n_vectors; ++i)
+    AssertThrow(std::fabs(e[i] - std::atanh(d[i])) <
                   10. * std::numeric_limits<Number>::epsilon(),
                 ExcInternalError());
   deallog << "OK" << std::endl << "Exponential: ";
