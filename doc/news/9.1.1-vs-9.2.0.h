@@ -734,7 +734,8 @@ inconvenience this causes.
 
  <li>
   New: The step-12 tutorial program has been changed to use
-  FEInterfaceValues. The old version of step-12 is still available as step-12b.
+  FEInterfaceValues. The old version of step-12 was still available
+  until deal.II 9.5 as step 12b.
   <br>
   (Timo Heister, 2019/08/27)
  </li>
