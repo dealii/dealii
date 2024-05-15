@@ -122,7 +122,8 @@ protected:
 /**
  * Implementation of a scalar Lagrange finite element $P_k$ that yields
  * the finite element space of continuous, piecewise polynomials of
- * degree $k$.
+ * degree $k$. The corresponding element on hypercube cells is FE_Q, on
+ * wegdes it is FE_WedgeP, and on pyramids it is FE_PyramidP.
  *
  * Also see
  * @ref simplex "Simplex support".

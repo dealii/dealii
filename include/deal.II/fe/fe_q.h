@@ -30,11 +30,15 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * Implementation of a scalar Lagrange finite element @p Qp that yields the
+ * This class provides an implementation of the scalar Lagrange $Q_p$ finite
+ * element on hypercube (line segments, quadrilaterals, or hexahedra) cells that
+ * yields the
  * finite element space of continuous, piecewise polynomials of degree @p p in
  * each coordinate direction. This class is realized using tensor product
  * polynomials based on 1d Lagrange polynomials with equidistant (degree up to
- * 2), Gauss-Lobatto (starting from degree 3), or given support points.
+ * 2), Gauss-Lobatto (starting from degree 3), or given support points. The
+ * corresponding element on simplex (triangular or tetrahedral) cells is
+ * FE_SimplexP, whereas on other cell kinds it is FE_WedgeP and FE_PyramidP.
  *
  * The standard constructor of this class takes the degree @p p of this finite
  * element. Alternatively, it can take a quadrature formula @p points defining
