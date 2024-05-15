@@ -430,9 +430,9 @@ namespace internal
        * Return whether an element is supported by MatrixFree.
        *
        * The following scalar elements are supported:
-       * - FENothing, FE_DGP, and FE_Q_DG0
+       * - FE_Nothing, FE_DGP, and FE_Q_DG0
        * - polynomial tensor-product elements based on
-       *   Polynomials::Polynomial (FE_Q, FE_DG_Q, FE_DGQArbitraryNodes,
+       *   Polynomials::Polynomial (FE_Q, FE_DGQ, FE_DGQArbitraryNodes,
        *   FE_DGQHermite, FE_DGQLegendre) or Polynomials::PiecewisePolynomial
        *   (FE_Q_iso_Q1).
        * - elements for simplex, pyramids, and wedges (FE_SimplexP,

@@ -15,7 +15,7 @@
 
 
 // check the case where the two children on a face with a hanging node
-// have different FENothing structure:
+// have different FE_Nothing structure:
 
 // active_fe_index
 // *-----*--*--*

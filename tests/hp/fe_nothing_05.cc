@@ -43,7 +43,7 @@
 
 
 // Create a mesh with hanging
-// nodes and FEQ/FENothing interfaces
+// nodes and FEQ/FE_Nothing interfaces
 // in several admissible configurations
 // we'd like to check.  In 2D the mesh
 // looks like the following (with 0
