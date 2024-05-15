@@ -54,7 +54,7 @@ test_hessians(const unsigned int                             degree,
   using VectorizedArrayType = VectorizedArray<double>;
 
   Triangulation<dim> tria;
-  GridGenerator::hyper_ball(tria, Point<dim>(), 1., true);
+  GridGenerator::hyper_ball(tria, Point<dim>(), 1.);
   tria.refine_global(1);
 
   DoFHandler<dim> dof_handler(tria);
