@@ -76,6 +76,50 @@ DEAL_II_NAMESPACE_OPEN
  * };
  * ```
  *
+ * @note Conceptually, this class is not so different from
+ *   [std::future](https://en.cppreference.com/w/cpp/thread/future), which
+ *   can also be used to represent a possibly-not-yet-available value on which
+ *   one can wait when used with the "deferred" policy of
+ *   [std::async](https://en.cppreference.com/w/cpp/thread/async).
+ *   In particular, the following code could be used in place
+ *   of the one above:
+ * ```
+ * template<...>
+ * class FE
+ * {
+ * public:
+ *   FE () {
+ *     prolongation_matrix = std::async(std::launch::deferred,
+ *       [&](){
+ *       // Some expensive operation initializing the prolongation matrix
+ *       // that we only want to perform once and when necessary.
+ *       });
+ *   }
+ *
+ *   const FullMatrix<double> & get_prolongation_matrix() const
+ *   {
+ *     return prolongation_matrix.get();
+ *   }
+ *
+ * private:
+ *   std::future<FullMatrix<double>> prolongation_matrix;
+ * };
+ * ```
+ *   The difference to what Lazy does is that for Lazy, the action must be
+ *   specified in the place where we want to access the deferred computation's
+ *   result. In contrast, in the scheme with `std::future` and `std::async`,
+ *   the action has to be provided at the point where the `std::future`
+ *   object is initialized. Both are valid approaches and, depending on
+ *   context, can usefully be employed. The difference is simply in what
+ *   kind of information the provided lambda function can capture: Is it
+ *   the environment available at the time the constructor is run, or the
+ *   environment available at the time the access function is run. The latter
+ *   has the advantage that the information captured is always up to date,
+ *   whereas in the scheme with `std::async`, one has to be careful not to
+ *   capture information in the lambda function that could be changed by later
+ *   calls to member functions but before the lambda function is finally
+ *   evaluated in the getter function.
+ *
  * @dealiiConceptRequires{std::is_move_constructible_v<T> &&
                           std::is_move_assignable_v<T >}
  */
