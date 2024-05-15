@@ -359,7 +359,7 @@ namespace Step85
                                                       level_set);
 
     // As we iterate over the cells, we don't need to do anything on the cells
-    // that have FENothing elements. To disregard them we use an iterator
+    // that have FE_Nothing elements. To disregard them we use an iterator
     // filter.
     for (const auto &cell :
          dof_handler.active_cell_iterators() |

@@ -160,10 +160,10 @@ namespace MatrixFreeTools
   /**
    * A wrapper around MatrixFree to help users to deal with DoFHandler
    * objects involving cells without degrees of freedom, i.e.,
-   * cells using FENothing as element type.  In the following we call such cells
-   * deactivated. All other cells are activated. In contrast to MatrixFree,
-   * this class skips deactivated cells and faces between activated and
-   * deactivated cells are treated as boundary faces.
+   * cells using FE_Nothing as element type.  In the following we call such
+   * cells deactivated. All other cells are activated. In contrast to
+   * MatrixFree, this class skips deactivated cells and faces between activated
+   * and deactivated cells are treated as boundary faces.
    */
   template <int dim,
             typename Number,
@@ -196,7 +196,7 @@ namespace MatrixFreeTools
      *
      * @note At the moment, only DoFHandler objects are accepted
      * that are initialized with FECollection objects with at most
-     * two finite elements (i.e., `FENothing` and another finite
+     * two finite elements (i.e., `FE_Nothing` and another finite
      * element).
      */
     void

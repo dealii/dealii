@@ -15,7 +15,7 @@
 
 
 // SolutionTransfer got into trouble when interpolating between an old and a
-// new mesh where some cells are set to use FENothing, see bug #83
+// new mesh where some cells are set to use FE_Nothing, see bug #83
 // (https://code.google.com/p/dealii/issues/detail?id=83)
 //
 // the testcase is really invalid -- it forgot to call

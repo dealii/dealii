@@ -4714,7 +4714,7 @@ AffineConstraints<number>::add_entries_local_to_global(
   const size_type n_local_cols = col_indices.size();
 
   // Early return if the length of row and column indices is zero, relevant
-  // for the usage with FENothing.
+  // for the usage with FE_Nothing.
   if (n_local_cols == 0 && n_local_rows == 0)
     return;
 

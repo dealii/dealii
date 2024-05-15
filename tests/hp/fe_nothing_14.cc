@@ -15,7 +15,7 @@
 
 
 // check the case where the two children on a face with a hanging node have
-// different FENothing structure. compared to _12 and _13, the situation is
+// different FE_Nothing structure. compared to _12 and _13, the situation is
 // even more wicked since in the picture below 0=FE_Q(1), 1=FE_Nothing,
 // 2=FE_Q(2), i.e. 2 dominates 1
 

@@ -16,8 +16,9 @@
 // A lightly adapted version of the step-4 tutorial program. Compared
 // to step-4, this test uses hp::DoFHandler and
 // parallel::distributed::Triangulation. In the upper half of the domain
-// FENothing is used to save effort, as these elements would only be used later.
-// The test checks whether the hanging-node constraints are setup correctly.
+// FE_Nothing is used to save effort, as these elements would only be used
+// later. The test checks whether the hanging-node constraints are setup
+// correctly.
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>

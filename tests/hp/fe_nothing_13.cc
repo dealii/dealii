@@ -15,7 +15,7 @@
 
 
 // check the case where the two children on a face with a hanging node have
-// different FENothing structure. while all cells in the _12 test had degrees
+// different FE_Nothing structure. while all cells in the _12 test had degrees
 // of freedom, here, cells with active_fe_index==1 are simply FE_Nothing:
 
 // active_fe_index
