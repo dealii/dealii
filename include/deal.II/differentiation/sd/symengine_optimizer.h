@@ -45,6 +45,7 @@
 #  include <boost/type_traits.hpp>
 
 #  include <algorithm>
+#  include <iosfwd>
 #  include <map>
 #  include <memory>
 #  include <type_traits>
@@ -114,9 +115,8 @@ namespace Differentiation
     /**
      * Output operator that outputs the selected optimizer type.
      */
-    template <typename StreamType>
-    inline StreamType &
-    operator<<(StreamType &s, OptimizerType o)
+    inline std::ostream &
+    operator<<(std::ostream &s, OptimizerType o)
     {
       if (o == OptimizerType::dictionary)
         s << "dictionary";
@@ -266,9 +266,8 @@ namespace Differentiation
      * Output operator that outputs optimization flags as a set of or'd
      * text values.
      */
-    template <typename StreamType>
-    inline StreamType &
-    operator<<(StreamType &s, OptimizationFlags o)
+    inline std::ostream &
+    operator<<(std::ostream &s, OptimizationFlags o)
     {
       s << " OptimizationFlags|";
       if (static_cast<unsigned int>(o & OptimizationFlags::optimize_cse))
