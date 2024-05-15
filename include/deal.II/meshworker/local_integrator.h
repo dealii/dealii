@@ -120,7 +120,11 @@ namespace MeshWorker
      *
      * @note This variable is currently not used by the library, but it is
      * provided to help develop application programs.
+     *
+     * @deprecated Because the library itself does not use this field, it is
+     *   better placed in derived classes.
      */
+    DEAL_II_DEPRECATED_EARLY
     std::vector<std::string> input_vector_names;
 
     /**
@@ -130,7 +134,11 @@ namespace MeshWorker
      *
      * @note This variable is currently not used by the library, but it is
      * provided to help develop application programs.
+     *
+     * @deprecated Because the library itself does not use this field, it is
+     *   better placed in derived classes.
      */
+    DEAL_II_DEPRECATED_EARLY
     std::vector<std::string> output_names;
 
     /**
