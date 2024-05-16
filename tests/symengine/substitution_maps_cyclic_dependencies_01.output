@@ -1,3 +1,6 @@
 
-DEAL::Detected cyclic dependency in substitution map.
+DEAL::Original map:
+DEAL::a = b
+b = a
+Detected cyclic dependency in substitution map.
 DEAL::OK

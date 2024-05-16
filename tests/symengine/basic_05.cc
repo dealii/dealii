@@ -86,7 +86,7 @@ main(int argc, char *argv[])
                          h->diff(t_02),
                          h->diff(s)};
 
-  std::cout << *h << std::endl;
+  deallog << *h << std::endl;
 
   SE::map_basic_basic dict;
   std::vector<double> vals(v.size());
