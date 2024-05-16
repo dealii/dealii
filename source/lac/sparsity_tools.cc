@@ -1022,6 +1022,13 @@ namespace SparsityTools
                               const MPI_Comm          mpi_comm,
                               const IndexSet         &locally_relevant_rows)
   {
+    IndexSet rows_dsp = dsp.row_index_set();
+    rows_dsp.subtract_set(locally_relevant_rows);
+    AssertThrow(
+      rows_dsp.n_elements() == 0,
+      ExcMessage(
+        "Dynamic Sparsity Pattern must be initialized with locally_relevant_rows."));
+
     IndexSet requested_rows(locally_relevant_rows);
     requested_rows.subtract_set(locally_owned_rows);
 
