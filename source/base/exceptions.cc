@@ -516,7 +516,12 @@ namespace deal_II_exceptions
             }
         }
 #endif
-      std::abort();
+
+      // Let's abort the program here. On the host, we need to call std::abort,
+      // on devices we need to do something different. Kokkos::abort() does
+      // the right thing in all circumstances.
+      Kokkos::abort(
+        "Abort() was called during dealing with an assertion or exception.");
     }
 
 
