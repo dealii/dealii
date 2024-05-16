@@ -294,7 +294,7 @@ public:
   reinit_faces(const std::vector<FERemoteCommunicationObjectEntityBatches<dim>>
                                                            &comm_objects,
                const std::pair<unsigned int, unsigned int> &face_batch_range,
-               const std::vector<Quadrature<dim>>          &quadrature_vector);
+               const std::vector<unsigned int>             &quadrature_sizes);
 
   /**
    * This function stores given communication objects
@@ -305,7 +305,7 @@ public:
   reinit_faces(
     const std::vector<FERemoteCommunicationObject<dim>> &comm_objects,
     const std::pair<unsigned int, unsigned int>         &face_range,
-    const std::vector<Quadrature<dim - 1>>              &quadrature_vector);
+    const std::vector<unsigned int>                     &quadrature_sizes);
 
   /**
    * This function stores given communication objects
@@ -317,8 +317,8 @@ public:
   void
   reinit_faces(
     const std::vector<FERemoteCommunicationObjectTwoLevel<dim>> &comm_objects,
-    const IteratorRange<Iterator>                       &cell_iterator_range,
-    const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector);
+    const IteratorRange<Iterator>                &cell_iterator_range,
+    const std::vector<std::vector<unsigned int>> &quadrature_sizes);
 
 
 
@@ -760,7 +760,7 @@ FERemoteEvaluationCommunicator<dim>::reinit_faces(
   const std::vector<FERemoteCommunicationObjectEntityBatches<dim>>
                                               &comm_objects,
   const std::pair<unsigned int, unsigned int> &face_batch_range,
-  const std::vector<Quadrature<dim>>          &quadrature_vector)
+  const std::vector<unsigned int>             &quadrature_sizes)
 {
   // erase type by converting to the base object
   communication_objects.clear();
@@ -768,7 +768,7 @@ FERemoteEvaluationCommunicator<dim>::reinit_faces(
     communication_objects.push_back(co);
 
   // fetch points and update communication patterns
-  const unsigned int n_cells = quadrature_vector.size();
+  const unsigned int n_cells = quadrature_sizes.size();
   AssertDimension(n_cells, face_batch_range.second - face_batch_range.first);
 
   // construct view:
@@ -779,7 +779,7 @@ FERemoteEvaluationCommunicator<dim>::reinit_faces(
   view.ptrs[0] = 0;
   for (unsigned int face = 0; face < n_cells; ++face)
     {
-      view.ptrs[face + 1] = view.ptrs[face] + quadrature_vector[face].size();
+      view.ptrs[face + 1] = view.ptrs[face] + quadrature_sizes[face];
     }
 }
 
@@ -788,14 +788,14 @@ void
 FERemoteEvaluationCommunicator<dim>::reinit_faces(
   const std::vector<FERemoteCommunicationObject<dim>> &comm_objects,
   const std::pair<unsigned int, unsigned int>         &face_range,
-  const std::vector<Quadrature<dim - 1>>              &quadrature_vector)
+  const std::vector<unsigned int>                     &quadrature_sizes)
 {
   // erase type
   communication_objects.clear();
   for (const auto &co : comm_objects)
     communication_objects.push_back(co);
 
-  const unsigned int n_faces = quadrature_vector.size();
+  const unsigned int n_faces = quadrature_sizes.size();
   AssertDimension(n_faces, face_range.second - face_range.first);
 
   // construct view:
@@ -805,7 +805,7 @@ FERemoteEvaluationCommunicator<dim>::reinit_faces(
 
   view.ptrs[0] = 0;
   for (unsigned int face = 0; face < n_faces; ++face)
-    view.ptrs[face + 1] = view.ptrs[face] + quadrature_vector[face].size();
+    view.ptrs[face + 1] = view.ptrs[face] + quadrature_sizes[face];
 }
 
 template <int dim>
@@ -813,15 +813,15 @@ template <typename Iterator>
 void
 FERemoteEvaluationCommunicator<dim>::reinit_faces(
   const std::vector<FERemoteCommunicationObjectTwoLevel<dim>> &comm_objects,
-  const IteratorRange<Iterator>                       &cell_iterator_range,
-  const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector)
+  const IteratorRange<Iterator>                &cell_iterator_range,
+  const std::vector<std::vector<unsigned int>> &quadrature_sizes)
 {
   // erase type
   communication_objects.clear();
   for (const auto &co : comm_objects)
     communication_objects.push_back(co);
 
-  const unsigned int n_cells = quadrature_vector.size();
+  const unsigned int n_cells = quadrature_sizes.size();
   AssertDimension(n_cells,
                   std::distance(cell_iterator_range.begin(),
                                 cell_iterator_range.end()));
@@ -850,7 +850,7 @@ FERemoteEvaluationCommunicator<dim>::reinit_faces(
 
           face_ptrs[face_index + 1] =
             face_ptrs[face_index] +
-            quadrature_vector[cell->active_cell_index()][f].size();
+            quadrature_sizes[cell->active_cell_index()][f];
         }
     }
 }
@@ -1108,12 +1108,12 @@ namespace Utilities
     std::vector<FERemoteCommunicationObjectEntityBatches<dim>> comm_objects;
 
     // Additionally to the communication objects we need a vector
-    // that stores quadrature rules for every face batch.
-    // The quadrature can be empty in case of non non-matching faces,
+    // that stores quadrature rule sizes for every face batch.
+    // The quadrature can have size zero in case of non non-matching faces,
     // i.e. boundary faces. Internally this information is needed to correctly
     // access values over multiple communication objects.
-    std::vector<Quadrature<dim>> global_quadrature_vector(
-      matrix_free.n_boundary_face_batches());
+    std::vector<unsigned int> global_quadrature_sizes(
+      matrix_free.n_boundary_face_batches(), numbers::invalid_unsigned_int);
 
     // Get the range of face batches we have to look at during construction of
     // the communication objects. We only have to look at boundary faces.
@@ -1180,15 +1180,14 @@ namespace Utilities
                       }
                   }
 
-                // Insert a quadrature rule of correct size into the global
-                // quadrature vector. First check that each face is only
-                // considered once.
-                Assert(global_quadrature_vector[bface].size() == 0,
+                // Insert the quadrature size into the global vector.
+                // First check that each face is only considered once.
+                Assert(global_quadrature_sizes[bface] ==
+                         numbers::invalid_unsigned_int,
                        ExcMessage(
                          "Quadrature for given face already provided."));
 
-                global_quadrature_vector[bface] =
-                  Quadrature<dim>(phi.n_q_points);
+                global_quadrature_sizes[bface] = phi.n_q_points;
               }
           }
 
@@ -1210,7 +1209,7 @@ namespace Utilities
 
     remote_communicator.reinit_faces(comm_objects,
                                      face_batch_range,
-                                     global_quadrature_vector);
+                                     global_quadrature_sizes);
 
     return remote_communicator;
   }
@@ -1388,10 +1387,17 @@ namespace Utilities
     // Reinit the communicator with the communication objects.
     FERemoteEvaluationCommunicator<dim> remote_communicator;
 
+    std::vector<unsigned int> global_quadrature_sizes(
+      global_quadrature_vector.size());
+    std::transform(global_quadrature_vector.cbegin(),
+                   global_quadrature_vector.cend(),
+                   global_quadrature_sizes.begin(),
+                   [](const auto &q) { return q.size(); });
+
     remote_communicator.reinit_faces(
       comm_objects,
       std::make_pair(0, global_quadrature_vector.size()),
-      global_quadrature_vector);
+      global_quadrature_sizes);
 
     if (nm_mapping_info != nullptr)
       {
