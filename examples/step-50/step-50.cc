@@ -106,7 +106,7 @@ namespace ChangeVectorTypes
     rwv.import_elements(in, VectorOperation::insert);
 #ifdef USE_PETSC_LA
     AssertThrow(false,
-                ExcMessage("CopyVectorTypes::copy() not implemented for "
+                ExcMessage("ChangeVectorTypes::copy() not implemented for "
                            "PETSc vector types."));
 #else
     out.import_elements(rwv, VectorOperation::insert);
@@ -123,7 +123,7 @@ namespace ChangeVectorTypes
 #ifdef USE_PETSC_LA
     (void)in;
     AssertThrow(false,
-                ExcMessage("CopyVectorTypes::copy() not implemented for "
+                ExcMessage("ChangeVectorTypes::copy() not implemented for "
                            "PETSc vector types."));
 #else
     rwv.reinit(in);
