@@ -860,9 +860,11 @@ public:
                  << "Supported elements are: \n"
                  << "ELM-TYPE\n"
                  << "1 Line (2 nodes, 1 edge).\n"
+                 << "2 Triangle (3 nodes, 3 edges).\n"
                  << "3 Quadrilateral (4 nodes, 4 edges).\n"
+                 << "4 Tetrahedron (4 nodes, 6 edges, 4 faces) when in 3d.\n"
                  << "5 Hexahedron (8 nodes, 12 edges, 6 faces) when in 3d.\n"
-                 << "15 Point (1 node, ignored when read)");
+                 << "15 Point (1 node, ignored when read).");
 
 
   DeclException2(
