@@ -1,9 +1,10 @@
 subsection Running parameters
   set initial time      = 1.0
   set final time        = 6.0
-  set solver type       = bdf 
+  set solver type       = bdf
   set initial step size = 0.0625
 end
+
 subsection Error control
   set minimum step size = 1e-7
   set maximum step size = 1e+7
