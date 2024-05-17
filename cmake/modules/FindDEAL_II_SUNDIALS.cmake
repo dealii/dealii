@@ -38,6 +38,11 @@
 set(SUNDIALS_DIR "" CACHE PATH "An optional hint to a SUNDIALS_DIR installation")
 set_if_empty(SUNDIALS_DIR "$ENV{SUNDIALS_DIR}")
 
+deal_ii_find_library(SUNDIALS_LIB_CORE NAMES sundials_core
+  HINTS ${SUNDIALS_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
+
 deal_ii_find_library(SUNDIALS_LIB_IDAS NAMES sundials_idas
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
@@ -121,8 +126,17 @@ if(NOT SUNDIALS_CONFIG_H MATCHES "-NOTFOUND")
     )
 endif()
 
+#
+# sundials_core is only required as of version 7.0.0.
+#
+set(_sundials_lib_core)
+if(SUNDIALS_VERSION VERSION_GREATER_EQUAL 7)
+  set(_sundials_lib_core "SUNDIALS_LIB_CORE")
+endif()
+
 process_feature(SUNDIALS
   LIBRARIES REQUIRED
+    ${_sundials_lib_core}
     ${_sundials_lib_ida}
     SUNDIALS_LIB_ARKODE
     SUNDIALS_LIB_KINSOL
@@ -131,6 +145,7 @@ process_feature(SUNDIALS
   INCLUDE_DIRS REQUIRED
     SUNDIALS_INCLUDE_DIR
   CLEAR
+    SUNDIALS_LIB_CORE
     SUNDIALS_LIB_IDA
     SUNDIALS_LIB_IDAS
     SUNDIALS_LIB_ARKODE
