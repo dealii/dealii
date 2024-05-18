@@ -537,16 +537,29 @@ private:
  * Jacobi, SOR and SSOR preconditioners are implemented. For preconditioning,
  * refer to derived classes.
  *
- * The relaxation parameter can be set manually or can be automatically
- * determined by:
+ * One iteration is given as:
  * @f[
- *    \alpha^n_1 := \frac{2}{\lambda_{\max}+\lambda_{\min}}.
+ *  x^{n+1} = x^{n} + \alpha P^{-1} (b-Ax^n).
  * @f]
- * For this purpose, the user needs to set the relaxation parameter to zero.
- * Internally, the minimum and maximum eigenvalues of the preconditioned
- * system are estimated by an eigenvalue algorithm, and the resulting estimate
- * is multiplied by the 1.2 for safety reasons. For more details on the
- * underlying algorithms, see PreconditionChebyshev.
+ *
+ * The relaxation parameter $\alpha$ has to be in the range:
+ * @f[
+ *  0 < \alpha < \frac{2}{\lambda_{\max}(P^{-1}A)}.
+ * @f]
+ * Its theoretically optimal value is given by:
+ * @f[
+ *    \alpha := \frac{2}{\lambda_{\min}(P^{-1}A)+\lambda_{\max}(P^{-1}A)}.
+ * @f]
+ *
+ * For details on the algorithm, see @cite Varga2009.
+ *
+ * The relaxation parameter can be set manually or can be automatically
+ * determined, for which we use the theoretically optimal value.
+ * For this purpose, the user needs to set the relaxation parameter
+ * to zero. Internally, the minimum and maximum eigenvalues of the
+ * preconditioned system are estimated by an eigenvalue algorithm, and the
+ * resulting estimate is multiplied by the 1.2 for safety reasons. For more
+ * details on the underlying algorithms, see PreconditionChebyshev.
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename PreconditionerType = IdentityMatrix>
@@ -1998,7 +2011,7 @@ public:
  * contains all eigenvalues of the preconditioned matrix system and the degree
  * (i.e., number of iterations) is high enough, this class can also be used as
  * a direct solver. For an error estimation of the Chebyshev iteration that
- * can be used to determine the number of iteration, see Varga (2009).
+ * can be used to determine the number of iteration, see @cite Varga2009.
  *
  * In order to use Chebyshev as a solver, set the degree to
  * numbers::invalid_unsigned_int to force the automatic computation of the
@@ -2009,17 +2022,7 @@ public:
  * PreconditionChebyshev::AdditionalData::smoothing_range (it needs to be a
  * number less than one to force any iterations obviously).
  *
- * For details on the algorithm, see section 5.1 of
- * @code{.bib}
- * @book{Varga2009,
- *   Title     = {Matrix iterative analysis},
- *   Author    = {Varga, R. S.},
- *   Publisher = {Springer},
- *   Address   = {Berlin},
- *   Edition   = {2nd},
- *   Year      = {2009},
- * }
- * @endcode
+ * For details on the algorithm, see section 5.1 of @cite Varga2009.
  *
  * <h4>Requirements on the templated classes</h4>
  *
