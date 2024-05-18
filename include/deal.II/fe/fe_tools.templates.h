@@ -379,23 +379,19 @@ namespace FETools
       const FiniteElement<dim, spacedim> *fe5,
       const unsigned int                  N5)
     {
-      std::vector<const FiniteElement<dim, spacedim> *> fe_list;
-      std::vector<unsigned int>                         multiplicities;
+      std::vector<const FiniteElement<dim, spacedim> *> fe_list = {
+        fe1, fe2, fe3, fe4, fe5};
+      std::vector<unsigned int> multiplicities = {N1, N2, N3, N4, N5};
 
-      fe_list.push_back(fe1);
-      multiplicities.push_back(N1);
+      // This function is occasionally called with nullptr values for the
+      // finite elements. Drop those again.
+      while ((fe_list.size() > 0) && (fe_list.back() == nullptr))
+        {
+          Assert(multiplicities.back() == 0, ExcInternalError());
+          fe_list.pop_back();
+          multiplicities.pop_back();
+        }
 
-      fe_list.push_back(fe2);
-      multiplicities.push_back(N2);
-
-      fe_list.push_back(fe3);
-      multiplicities.push_back(N3);
-
-      fe_list.push_back(fe4);
-      multiplicities.push_back(N4);
-
-      fe_list.push_back(fe5);
-      multiplicities.push_back(N5);
       return compute_restriction_is_additive_flags(fe_list, multiplicities);
     }
 
@@ -621,23 +617,18 @@ namespace FETools
                                const unsigned int                  N5,
                                const bool do_tensor_product)
     {
-      std::vector<const FiniteElement<dim, spacedim> *> fe_list;
-      std::vector<unsigned int>                         multiplicities;
+      std::vector<const FiniteElement<dim, spacedim> *> fe_list = {
+        fe1, fe2, fe3, fe4, fe5};
+      std::vector<unsigned int> multiplicities = {N1, N2, N3, N4, N5};
 
-      fe_list.push_back(fe1);
-      multiplicities.push_back(N1);
-
-      fe_list.push_back(fe2);
-      multiplicities.push_back(N2);
-
-      fe_list.push_back(fe3);
-      multiplicities.push_back(N3);
-
-      fe_list.push_back(fe4);
-      multiplicities.push_back(N4);
-
-      fe_list.push_back(fe5);
-      multiplicities.push_back(N5);
+      // This function is occasionally called with nullptr values for the
+      // finite elements. Drop those again.
+      while ((fe_list.size() > 0) && (fe_list.back() == nullptr))
+        {
+          Assert(multiplicities.back() == 0, ExcInternalError());
+          fe_list.pop_back();
+          multiplicities.pop_back();
+        }
 
       return compute_nonzero_components(fe_list,
                                         multiplicities,
