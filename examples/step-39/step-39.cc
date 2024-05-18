@@ -94,67 +94,191 @@ namespace Step39
   class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    void cell(MeshWorker::DoFInfo<dim>                  &dinfo,
-              typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void
-         boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
-                  typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void face(MeshWorker::DoFInfo<dim>                  &dinfo1,
-              MeshWorker::DoFInfo<dim>                  &dinfo2,
-              typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
+    void cell(MeshWorker::DoFInfo<dim>         &dinfo,
+              MeshWorker::IntegrationInfo<dim> &info) const override;
+    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                  MeshWorker::IntegrationInfo<dim> &info) const override;
+    void face(MeshWorker::DoFInfo<dim>         &dinfo1,
+              MeshWorker::DoFInfo<dim>         &dinfo2,
+              MeshWorker::IntegrationInfo<dim> &info1,
+              MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
 
-  // On each cell, we integrate the Dirichlet form. We use the library of
-  // ready made integrals in LocalIntegrators to avoid writing these loops
-  // ourselves. Similarly, we implement Nitsche boundary conditions and the
-  // interior penalty fluxes between cells.
+  // On each cell, we integrate the Dirichlet form as well as the
+  // Nitsche boundary conditions and the interior penalty fluxes between
+  // cells.
   //
   // The boundary and flux terms need a penalty parameter, which should be
-  // adjusted to the cell size and the polynomial degree. A safe choice of
-  // this parameter for constant coefficients can be found in
-  // LocalIntegrators::Laplace::compute_penalty() and we use this below.
+  // adjusted to the cell size and the polynomial degree. We compute it
+  // in two steps: First, we compute on each cell
+  // $K_i$ the value $P_i = p_i(p_i+1)/h_i$, where
+  // $p_i$ is the polynomial degree on cell $K_i$ and $h_i$ is the length of
+  // $K_i$ orthogonal to the current face. Second, if exactly one of the two
+  // cells adjacent to the face has children, its penalty is multiplied
+  // by two (to account for the fact that the mesh size $h_i$ there is
+  // only half that previously computed); it is possible that both adjacent
+  // cells are refined, in which case we are integrating over a non-active
+  // face and no adjustment is necessary. Finally, we return the average
+  // of the two penalty values.
   template <int dim>
-  void MatrixIntegrator<dim>::cell(
-    MeshWorker::DoFInfo<dim>                  &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+  double ip_penalty_factor(const MeshWorker::DoFInfo<dim> &dinfo1,
+                           const MeshWorker::DoFInfo<dim> &dinfo2,
+                           unsigned int                    deg1,
+                           unsigned int                    deg2)
   {
-    LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
-                                           info.fe_values());
+    const unsigned int normal1 =
+      GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
+    const unsigned int normal2 =
+      GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
+    const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1 + 1);
+    const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2 + 1);
+
+    double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
+    double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
+    if (dinfo1.cell->has_children() && !dinfo2.cell->has_children())
+      penalty1 *= 2;
+    else if (!dinfo1.cell->has_children() && dinfo2.cell->has_children())
+      penalty2 *= 2;
+
+    const double penalty = 0.5 * (penalty1 + penalty2);
+    return penalty;
   }
 
 
   template <int dim>
-  void MatrixIntegrator<dim>::boundary(
-    MeshWorker::DoFInfo<dim>                  &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+  void MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>         &dinfo,
+                                   MeshWorker::IntegrationInfo<dim> &info) const
   {
-    const unsigned int degree = info.fe_values(0).get_fe().tensor_degree();
-    LocalIntegrators::Laplace::nitsche_matrix(
-      dinfo.matrix(0, false).matrix,
-      info.fe_values(0),
-      LocalIntegrators::Laplace::compute_penalty(dinfo, dinfo, degree, degree));
+    FullMatrix<double> &M = dinfo.matrix(0, false).matrix;
+
+    for (unsigned int k = 0; k < info.fe_values().n_quadrature_points; ++k)
+      {
+        const double dx = info.fe_values().JxW(k);
+
+        for (unsigned int i = 0; i < info.fe_values().dofs_per_cell; ++i)
+          {
+            const double Mii = (info.fe_values().shape_grad(i, k) *
+                                info.fe_values().shape_grad(i, k) * dx);
+
+            M(i, i) += Mii;
+
+            for (unsigned int j = i + 1; j < info.fe_values().dofs_per_cell;
+                 ++j)
+              {
+                const double Mij = info.fe_values().shape_grad(j, k) *
+                                   info.fe_values().shape_grad(i, k) * dx;
+
+                M(i, j) += Mij;
+                M(j, i) += Mij;
+              }
+          }
+      }
   }
 
-  // Interior faces use the interior penalty method
+
+  // Boundary faces use the Nitsche method to impose boundary values:
   template <int dim>
-  void MatrixIntegrator<dim>::face(
-    MeshWorker::DoFInfo<dim>                  &dinfo1,
-    MeshWorker::DoFInfo<dim>                  &dinfo2,
-    typename MeshWorker::IntegrationInfo<dim> &info1,
-    typename MeshWorker::IntegrationInfo<dim> &info2) const
+  void
+  MatrixIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                                  MeshWorker::IntegrationInfo<dim> &info) const
   {
-    const unsigned int degree = info1.fe_values(0).get_fe().tensor_degree();
-    LocalIntegrators::Laplace::ip_matrix(
-      dinfo1.matrix(0, false).matrix,
-      dinfo1.matrix(0, true).matrix,
-      dinfo2.matrix(0, true).matrix,
-      dinfo2.matrix(0, false).matrix,
-      info1.fe_values(0),
-      info2.fe_values(0),
-      LocalIntegrators::Laplace::compute_penalty(
-        dinfo1, dinfo2, degree, degree));
+    const FEValuesBase<dim> &fe_face_values = info.fe_values(0);
+
+    FullMatrix<double> &M = dinfo.matrix(0, false).matrix;
+    AssertDimension(M.n(), fe_face_values.dofs_per_cell);
+    AssertDimension(M.m(), fe_face_values.dofs_per_cell);
+
+    const unsigned int polynomial_degree =
+      info.fe_values(0).get_fe().tensor_degree();
+
+    const double ip_penalty =
+      ip_penalty_factor(dinfo, dinfo, polynomial_degree, polynomial_degree);
+
+    for (unsigned int k = 0; k < fe_face_values.n_quadrature_points; ++k)
+      {
+        const double          dx = fe_face_values.JxW(k);
+        const Tensor<1, dim> &n  = fe_face_values.normal_vector(k);
+
+        for (unsigned int i = 0; i < fe_face_values.dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < fe_face_values.dofs_per_cell; ++j)
+            M(i, j) += (2. * fe_face_values.shape_value(i, k) * ip_penalty *
+                          fe_face_values.shape_value(j, k) -
+                        (n * fe_face_values.shape_grad(i, k)) *
+                          fe_face_values.shape_value(j, k) -
+                        (n * fe_face_values.shape_grad(j, k)) *
+                          fe_face_values.shape_value(i, k)) *
+                       dx;
+      }
+  }
+
+  // Interior faces use the interior penalty method:
+  template <int dim>
+  void
+  MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim>         &dinfo1,
+                              MeshWorker::DoFInfo<dim>         &dinfo2,
+                              MeshWorker::IntegrationInfo<dim> &info1,
+                              MeshWorker::IntegrationInfo<dim> &info2) const
+  {
+    const FEValuesBase<dim> &fe_face_values_1 = info1.fe_values(0);
+    const FEValuesBase<dim> &fe_face_values_2 = info2.fe_values(0);
+
+    FullMatrix<double> &M11 = dinfo1.matrix(0, false).matrix;
+    FullMatrix<double> &M12 = dinfo1.matrix(0, true).matrix;
+    FullMatrix<double> &M21 = dinfo2.matrix(0, true).matrix;
+    FullMatrix<double> &M22 = dinfo2.matrix(0, false).matrix;
+
+    AssertDimension(M11.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M11.m(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M12.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M12.m(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M21.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M21.m(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M22.n(), fe_face_values_1.dofs_per_cell);
+    AssertDimension(M22.m(), fe_face_values_1.dofs_per_cell);
+
+    const unsigned int polynomial_degree =
+      info1.fe_values(0).get_fe().tensor_degree();
+    const double ip_penalty =
+      ip_penalty_factor(dinfo1, dinfo2, polynomial_degree, polynomial_degree);
+
+    const double nui = 1.;
+    const double nue = 1.;
+    const double nu  = .5 * (nui + nue);
+
+    for (unsigned int k = 0; k < fe_face_values_1.n_quadrature_points; ++k)
+      {
+        const double          dx = fe_face_values_1.JxW(k);
+        const Tensor<1, dim> &n  = fe_face_values_1.normal_vector(k);
+
+        for (unsigned int i = 0; i < fe_face_values_1.dofs_per_cell; ++i)
+          {
+            for (unsigned int j = 0; j < fe_face_values_1.dofs_per_cell; ++j)
+              {
+                const double vi   = fe_face_values_1.shape_value(i, k);
+                const double dnvi = n * fe_face_values_1.shape_grad(i, k);
+                const double ve   = fe_face_values_2.shape_value(i, k);
+                const double dnve = n * fe_face_values_2.shape_grad(i, k);
+                const double ui   = fe_face_values_1.shape_value(j, k);
+                const double dnui = n * fe_face_values_1.shape_grad(j, k);
+                const double ue   = fe_face_values_2.shape_value(j, k);
+                const double dnue = n * fe_face_values_2.shape_grad(j, k);
+
+                M11(i, j) += (-.5 * nui * dnvi * ui - .5 * nui * dnui * vi +
+                              nu * ip_penalty * ui * vi) *
+                             dx;
+                M12(i, j) += (.5 * nui * dnvi * ue - .5 * nue * dnue * vi -
+                              nu * ip_penalty * vi * ue) *
+                             dx;
+                M21(i, j) += (-.5 * nue * dnve * ui + .5 * nui * dnui * ve -
+                              nu * ip_penalty * ui * ve) *
+                             dx;
+                M22(i, j) += (.5 * nue * dnve * ue + .5 * nue * dnue * ve +
+                              nu * ip_penalty * ue * ve) *
+                             dx;
+              }
+          }
+      }
   }
 
   // The second local integrator builds the right hand side. In our example,
@@ -164,29 +288,27 @@ namespace Step39
   class RHSIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    void cell(MeshWorker::DoFInfo<dim>                  &dinfo,
-              typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void
-         boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
-                  typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void face(MeshWorker::DoFInfo<dim>                  &dinfo1,
-              MeshWorker::DoFInfo<dim>                  &dinfo2,
-              typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
+    void cell(MeshWorker::DoFInfo<dim>         &dinfo,
+              MeshWorker::IntegrationInfo<dim> &info) const override;
+    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                  MeshWorker::IntegrationInfo<dim> &info) const override;
+    void face(MeshWorker::DoFInfo<dim>         &dinfo1,
+              MeshWorker::DoFInfo<dim>         &dinfo2,
+              MeshWorker::IntegrationInfo<dim> &info1,
+              MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
 
   template <int dim>
-  void
-  RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &,
-                           typename MeshWorker::IntegrationInfo<dim> &) const
+  void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &,
+                                MeshWorker::IntegrationInfo<dim> &) const
   {}
 
 
   template <int dim>
-  void RHSIntegrator<dim>::boundary(
-    MeshWorker::DoFInfo<dim>                  &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+  void
+  RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                               MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe           = info.fe_values();
     Vector<double>          &local_vector = dinfo.vector(0).block(0);
@@ -208,11 +330,10 @@ namespace Step39
 
 
   template <int dim>
-  void
-  RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
-                           MeshWorker::DoFInfo<dim> &,
-                           typename MeshWorker::IntegrationInfo<dim> &,
-                           typename MeshWorker::IntegrationInfo<dim> &) const
+  void RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
+                                MeshWorker::DoFInfo<dim> &,
+                                MeshWorker::IntegrationInfo<dim> &,
+                                MeshWorker::IntegrationInfo<dim> &) const
   {}
 
 
@@ -223,24 +344,22 @@ namespace Step39
   class Estimator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    void cell(MeshWorker::DoFInfo<dim>                  &dinfo,
-              typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void
-         boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
-                  typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void face(MeshWorker::DoFInfo<dim>                  &dinfo1,
-              MeshWorker::DoFInfo<dim>                  &dinfo2,
-              typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
+    void cell(MeshWorker::DoFInfo<dim>         &dinfo,
+              MeshWorker::IntegrationInfo<dim> &info) const override;
+    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                  MeshWorker::IntegrationInfo<dim> &info) const override;
+    void face(MeshWorker::DoFInfo<dim>         &dinfo1,
+              MeshWorker::DoFInfo<dim>         &dinfo2,
+              MeshWorker::IntegrationInfo<dim> &info1,
+              MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
 
   // The cell contribution is the Laplacian of the discrete solution, since
   // the right hand side is zero.
   template <int dim>
-  void
-  Estimator<dim>::cell(MeshWorker::DoFInfo<dim>                  &dinfo,
-                       typename MeshWorker::IntegrationInfo<dim> &info) const
+  void Estimator<dim>::cell(MeshWorker::DoFInfo<dim>         &dinfo,
+                            MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
 
@@ -257,9 +376,8 @@ namespace Step39
   // namely the norm of the difference between the finite element solution and
   // the correct boundary condition.
   template <int dim>
-  void Estimator<dim>::boundary(
-    MeshWorker::DoFInfo<dim>                  &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+  void Estimator<dim>::boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                                MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
 
@@ -284,11 +402,10 @@ namespace Step39
   // Finally, on interior faces, the estimator consists of the jumps of the
   // solution and its normal derivative, weighted appropriately.
   template <int dim>
-  void
-  Estimator<dim>::face(MeshWorker::DoFInfo<dim>                  &dinfo1,
-                       MeshWorker::DoFInfo<dim>                  &dinfo2,
-                       typename MeshWorker::IntegrationInfo<dim> &info1,
-                       typename MeshWorker::IntegrationInfo<dim> &info2) const
+  void Estimator<dim>::face(MeshWorker::DoFInfo<dim>         &dinfo1,
+                            MeshWorker::DoFInfo<dim>         &dinfo2,
+                            MeshWorker::IntegrationInfo<dim> &info1,
+                            MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const FEValuesBase<dim>           &fe   = info1.fe_values();
     const std::vector<double>         &uh1  = info1.values[0][0];
@@ -333,15 +450,14 @@ namespace Step39
   class ErrorIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    void cell(MeshWorker::DoFInfo<dim>                  &dinfo,
-              typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void
-         boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
-                  typename MeshWorker::IntegrationInfo<dim> &info) const override;
-    void face(MeshWorker::DoFInfo<dim>                  &dinfo1,
-              MeshWorker::DoFInfo<dim>                  &dinfo2,
-              typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
+    void cell(MeshWorker::DoFInfo<dim>         &dinfo,
+              MeshWorker::IntegrationInfo<dim> &info) const override;
+    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                  MeshWorker::IntegrationInfo<dim> &info) const override;
+    void face(MeshWorker::DoFInfo<dim>         &dinfo1,
+              MeshWorker::DoFInfo<dim>         &dinfo2,
+              MeshWorker::IntegrationInfo<dim> &info1,
+              MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
   // Here we have the integration on cells. There is currently no good
@@ -357,9 +473,8 @@ namespace Step39
   // this one does not have any jump terms and only appears in the integration
   // on cells.
   template <int dim>
-  void ErrorIntegrator<dim>::cell(
-    MeshWorker::DoFInfo<dim>                  &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+  void ErrorIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>         &dinfo,
+                                  MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim>    &fe = info.fe_values();
     std::vector<Tensor<1, dim>> exact_gradients(fe.n_quadrature_points);
@@ -389,9 +504,9 @@ namespace Step39
 
 
   template <int dim>
-  void ErrorIntegrator<dim>::boundary(
-    MeshWorker::DoFInfo<dim>                  &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info) const
+  void
+  ErrorIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim>         &dinfo,
+                                 MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
 
@@ -414,11 +529,10 @@ namespace Step39
 
 
   template <int dim>
-  void ErrorIntegrator<dim>::face(
-    MeshWorker::DoFInfo<dim>                  &dinfo1,
-    MeshWorker::DoFInfo<dim>                  &dinfo2,
-    typename MeshWorker::IntegrationInfo<dim> &info1,
-    typename MeshWorker::IntegrationInfo<dim> &info2) const
+  void ErrorIntegrator<dim>::face(MeshWorker::DoFInfo<dim>         &dinfo1,
+                                  MeshWorker::DoFInfo<dim>         &dinfo2,
+                                  MeshWorker::IntegrationInfo<dim> &info1,
+                                  MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const FEValuesBase<dim>   &fe  = info1.fe_values();
     const std::vector<double> &uh1 = info1.values[0][0];
@@ -453,7 +567,7 @@ namespace Step39
   public:
     using CellInfo = MeshWorker::IntegrationInfo<dim>;
 
-    InteriorPenaltyProblem(const FiniteElement<dim> &fe);
+    InteriorPenaltyProblem();
 
     void run(unsigned int n_steps);
 
@@ -468,10 +582,10 @@ namespace Step39
     void   output_results(const unsigned int cycle) const;
 
     // The member objects related to the discretization are here.
-    Triangulation<dim>        triangulation;
-    const MappingQ1<dim>      mapping;
-    const FiniteElement<dim> &fe;
-    DoFHandler<dim>           dof_handler;
+    Triangulation<dim>   triangulation;
+    const MappingQ1<dim> mapping;
+    const FE_DGQ<2>      fe;
+    DoFHandler<dim>      dof_handler;
 
     // Then, we have the matrices and vectors related to the global discrete
     // system.
@@ -503,14 +617,12 @@ namespace Step39
   };
 
 
-  // The constructor simply sets up the coarse grid and the DoFHandler. The
-  // FiniteElement is provided as a parameter to allow flexibility.
+  // The constructor simply sets up the coarse grid and the DoFHandler.
   template <int dim>
-  InteriorPenaltyProblem<dim>::InteriorPenaltyProblem(
-    const FiniteElement<dim> &fe)
+  InteriorPenaltyProblem<dim>::InteriorPenaltyProblem()
     : triangulation(Triangulation<dim>::limit_level_difference_at_vertices)
     , mapping()
-    , fe(fe)
+    , fe(3)
     , dof_handler(triangulation)
     , estimates(1)
   {
@@ -986,8 +1098,8 @@ int main()
       deallog.depth_console(2);
       std::ofstream logfile("deallog");
       deallog.attach(logfile);
-      const FE_DGQ<2>           fe1(3);
-      InteriorPenaltyProblem<2> test1(fe1);
+
+      InteriorPenaltyProblem<2> test1;
       test1.run(12);
     }
   catch (std::exception &exc)
