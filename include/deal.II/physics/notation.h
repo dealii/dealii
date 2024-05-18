@@ -247,33 +247,7 @@ namespace Physics
      * include no such factors.
      *
      * Some useful references that show how this notation works include, amongst
-     * others,
-     * @code{.bib}
-     * @article{Nagel2016,
-     *   author  = {Nagel, T. and G{\"o}rke, U-J. and Moerman, K. and Kolditz,
-     *              O.},
-     *   title   = {On advantages of the Kelvin mapping in finite element
-     *              implementations of deformation processes},
-     *   journal = {Environmental Earth Sciences},
-     *   year    = {2016},
-     *   volume  = {75},
-     *   number  = {11},
-     *   pages   = {937}
-     * }
-     * @endcode
-     * and
-     * @code{.bib}
-     * @article{Dellinger1998,
-     *   author  = {Dellinger, J. and Vasicek, D. and Sondergeld, C.},
-     *   title   = {Kelvin notation for stabilizing elastic-constant inversion},
-     *   journal = {Revue de l'Institut Fran{\c{c}}ais du P{\'e}trole},
-     *   year    = {1998},
-     *   volume  = {53},
-     *   number  = {5},
-     *   pages   = {709--719},
-     *   url     = {http://sepwww.stanford.edu/oldsep/joe/Reprints/8IWSA.pdf},
-     * }
-     * @endcode
+     * others, @cite Nagel2016 and @cite Dellinger1998
      * as well as the online reference found on
      * <a
      * href="https://en.wikipedia.org/wiki/Voigt_notation#Mandel_notation">this
