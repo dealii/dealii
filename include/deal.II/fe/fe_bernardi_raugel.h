@@ -44,21 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * pressure space to provide additional accuracy commensurate with the
  * cost of the large number of velocity unknowns.
  *
- * The element was introduced in the following paper:
- * @code{.bib}
- * @article{BR85,
- *   author    = {Christine Bernardi and Genevi{\`e}ve Raugel},
- *   title     = {Analysis of some finite elements for the {S}tokes problem},
- *   journal   = {Mathematics of Computation},
- *   publisher = {American Mathematical Society ({AMS})},
- *   volume    = {44},
- *   number    = {169},
- *   pages     = {71--79},
- *   year      = {1985},
- *   doi       = {10.1090/s0025-5718-1985-0771031-7},
- *   url       = {https://doi.org/10.1090/s0025-5718-1985-0771031-7}
- * }
- * @endcode
+ * The element was introduced in the paper @cite BR85.
  *
  *
  * <h3>Degrees of freedom</h3>

@@ -193,46 +193,8 @@ protected:
  * to have basic operations such as additions, scalar product, etc.
  * It also needs to have a copy-constructor.
  *
- * See sections 6.5.2-6.5.3 on pp. 335-338 in
- * @code{.bib}
- * @Book{Golub2013,
- *   title     = {Matrix computations},
- *   publisher = {Johns Hopkins University Press},
- *   year      = {2013},
- *   author    = {Golub, Gene H and Van Loan, Charles F},
- *   edition   = {4},
- *  }
- * @endcode
- * as well as
- * @code{.bib}
- * @article{Daniel1976,
- *   author   = {Daniel, James W and Gragg, Walter Bill and Kaufman, Linda and Stewart, Gilbert W},
- *   title    = {{Reorthogonalization and stable algorithms for updating the Gram-Schmidt QR factorization}},
- *   journal  = {Mathematics of Computation},
- *   year     = {1976},
- *   volume   = {30},
- *   number   = {136},
- *   pages    = {772--795},
- * }
- * @Article{Reichel1990,
- *   author     = {Reichel, L. and Gragg, W. B.},
- *   title      = {{Algorithm 686: FORTRAN Subroutines for Updating the QR Decomposition}},
- *   journal    = {ACM Trans. Math. Softw.},
- *   year       = {1990},
- *   volume     = {16},
- *   number     = {4},
- *   pages      = {369--377},
- *   month      = dec,
- *   issn       = {0098-3500},
- *   acmid      = {98291},
- *   address    = {New York, NY, USA},
- *   doi        = {10.1145/98267.98291},
- *   issue_date = {Dec. 1990},
- *   numpages   = {9},
- *   publisher  = {ACM},
- *   url        = {http://doi.acm.org/10.1145/98267.98291},
- *  }
- * @endcode
+ * See sections 6.5.2-6.5.3 on pp. 335-338 in @cite Golub2013 as well as
+ * @cite Daniel1976 and @cite Reichel1990.
  */
 // clang-format on
 template <typename VectorType>

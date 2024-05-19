@@ -36,19 +36,7 @@ DEAL_II_NAMESPACE_OPEN
  * It offers a mechanism to store any amount of data, of any type,
  * which is then made accessible by an identifier string.
  *
- * When using this class, please cite
- *
- * @code{.bib}
- * @article{SartoriGiulianiBardelloni-2018-a,
- *  Author = {Sartori, Alberto and Giuliani, Nicola and
- *            Bardelloni, Mauro and Heltai, Luca},
- *  Journal = {SoftwareX},
- *  Pages = {318--327},
- *  Title = {{deal2lkit: A toolkit library for high performance
- *            programming in deal.II}},
- *  Volume = {7},
- *  Year = {2018}}
- * @endcode
+ * When using this class, please cite @cite SartoriGiulianiBardelloni-2018-a.
  */
 class GeneralDataStorage : public Subscriptor
 {

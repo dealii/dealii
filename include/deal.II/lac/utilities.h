@@ -108,19 +108,7 @@ namespace Utilities
      * OperatorType has to provide <code>vmult</code> operation with
      * VectorType.
      *
-     * This function implements the algorithm from
-     * @code{.bib}
-     * @article{Zhou2006,
-     *   Title   = {Self-consistent-field Calculations Using Chebyshev-filtered
-     *              Subspace Iteration},
-     *   Author  = {Zhou, Yunkai and Saad, Yousef and Tiago, Murilo L. and
-     *              Chelikowsky, James R.},
-     *   Journal = {Journal of Computational Physics},
-     *   Year    = {2006},
-     *   Volume  = {219},
-     *   Pages   = {172--184},
-     * }
-     * @endcode
+     * This function implements the algorithm from @cite Zhou2006.
      *
      * @note This function uses Lapack routines to compute the largest
      * eigenvalue of $T_k$.
@@ -167,18 +155,7 @@ namespace Utilities
      * @p vector_memory is used to allocate memory for temporary objects.
      *
      * This function implements the algorithm (with a minor fix of sign of
-     * $\sigma_1$) from
-     * @code{.bib}
-     * @article{Zhou2014,
-     *   Title   = {Chebyshev-filtered subspace iteration method free of sparse
-     *              diagonalization for solving the Kohn--Sham equation},
-     *   Author  = {Zhou, Yunkai and Chelikowsky, James R and Saad, Yousef},
-     *   Journal = {Journal of Computational Physics},
-     *   Year    = {2014},
-     *   Volume  = {274},
-     *   Pages   = {770--782},
-     * }
-     * @endcode
+     * $\sigma_1$) from @cite Zhou2014.
      *
      * @note If @p tau is equal to
      * <code>std::numeric_limits<double>::infinity()</code>, no normalization

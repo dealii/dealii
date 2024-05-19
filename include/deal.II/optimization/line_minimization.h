@@ -147,27 +147,8 @@ namespace LineMinimization
    * signature.
    *
    * The function implements Algorithms 2.6.2 and 2.6.4 on pages 34-35 in
-   * @code{.bib}
-   *   @book{Fletcher2013,
-   *   title     = {Practical methods of optimization},
-   *   publisher = {John Wiley \& Sons},
-   *   year      = {2013},
-   *   author    = {Fletcher, Roger},
-   *   isbn      = {978-0-471-49463-8},
-   *   doi       = {10.1002/9781118723203},
-   *   }
-   * @endcode
-   * These are minor variations of  Algorithms 3.5 and 3.6 on pages 60-61 in
-   * @code{.bib}
-   *   @book{Nocedal2006,
-   *   title     = {Numerical Optimization},
-   *   publisher = {Springer New York},
-   *   year      = {2006},
-   *   author    = {Jorge Nocedal and S. Wright},
-   *   address   = {233 Spring Street, New York, NY 10013, USA},
-   *   doi       = {10.1007/978-0-387-40065-5},
-   *   }
-   * @endcode
+   * @cite Fletcher2013. These are minor variations of Algorithms 3.5
+   * and 3.6 on pages 60-61 in @cite Nocedal2006.
    * It consists of a bracketing phase and a zoom phase, where @p interpolate is used.
    *
    * Two examples of use might be as follows:
