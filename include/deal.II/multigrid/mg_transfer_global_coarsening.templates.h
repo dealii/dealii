@@ -1438,13 +1438,21 @@ namespace internal
                   dof_handler_fine.get_triangulation().create_cell_iterator(
                     cell_id);
 
-                if (cell_fine->has_children() == false)
+                if (cell_fine->is_active())
                   {
                     if (cell_fine->subdomain_id() != cell->subdomain_id())
                       flag = false;
                   }
                 else
                   {
+                    Assert(
+                      cell_fine->child(0)->is_active(),
+                      ExcMessage(
+                        "In building a transfer operator, we are "
+                        "expecting that a cell is not or at most once refined "
+                        "on the other multigrid level. But it is refined more than once. "
+                        "Are you trying to build a transfer operator across "
+                        "more than one level of mesh refinement?"));
                     if (cell_fine->child(0)->subdomain_id() !=
                         cell->subdomain_id())
                       flag = false;
