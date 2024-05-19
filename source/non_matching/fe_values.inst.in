@@ -65,6 +65,17 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
   }
 
 // Template reinit functions
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void FEInterfaceValues<deal_II_dimension>::do_reinit(
+      const TriaIterator<CellAccessor<deal_II_dimension, deal_II_dimension>> &,
+      const unsigned int,
+      const unsigned int,
+      const unsigned int,
+      const std::function<void(dealii::FEInterfaceValues<deal_II_dimension> &,
+                               const unsigned int)> &);
+  }
+
 for (deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
     template void FEValues<deal_II_dimension>::reinit(
@@ -77,6 +88,8 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
       const TriaIterator<
         DoFCellAccessor<deal_II_dimension, deal_II_dimension, lda>> &,
       const unsigned int,
-      const std::function<void(dealii::FEInterfaceValues<deal_II_dimension> &)>
-        &);
+      const unsigned int,
+      const unsigned int,
+      const std::function<void(dealii::FEInterfaceValues<deal_II_dimension> &,
+                               const unsigned int)> &);
   }

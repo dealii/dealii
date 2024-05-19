@@ -578,7 +578,10 @@ namespace NonMatching
            const unsigned int              sub_face_no,
            const CellNeighborIteratorType &cell_neighbor,
            const unsigned int              face_no_neighbor,
-           const unsigned int              sub_face_no_neighbor);
+           const unsigned int              sub_face_no_neighbor,
+           const unsigned int q_index       = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
 
     /**
@@ -590,7 +593,11 @@ namespace NonMatching
      */
     template <typename CellIteratorType>
     void
-    reinit(const CellIteratorType &cell, const unsigned int face_no);
+    reinit(const CellIteratorType &cell,
+           const unsigned int      face_no,
+           const unsigned int      q_index  = numbers::invalid_unsigned_int,
+           const unsigned int mapping_index = numbers::invalid_unsigned_int,
+           const unsigned int fe_index      = numbers::invalid_unsigned_int);
 
     /**
      * Return an dealii::FEInterfaceValues object reinitialized with a
@@ -631,12 +638,14 @@ namespace NonMatching
      * reinit on a single dealii::FEInterfaceValues object, which is what
      * differs between the two reinit functions.
      */
-    template <bool level_dof_access>
+    template <typename CellAccessorType>
     void
-    do_reinit(
-      const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
-      const unsigned int                                               face_no,
-      const std::function<void(dealii::FEInterfaceValues<dim> &)> &call_reinit);
+    do_reinit(const TriaIterator<CellAccessorType>          &cell,
+              const unsigned int                             face_no,
+              const unsigned int                             q_index,
+              const unsigned int                             active_fe_index,
+              const std::function<void(dealii::FEInterfaceValues<dim> &,
+                                       const unsigned int)> &call_reinit);
 
     /**
      * A pointer to the collection of mappings to be used.
@@ -660,11 +669,6 @@ namespace NonMatching
     LocationToLevelSet current_face_location;
 
     /**
-     * Active fe index of the last cell that reinit was called with.
-     */
-    unsigned int active_fe_index;
-
-    /**
      * The update flags passed to the constructor.
      */
     const RegionUpdateFlags region_update_flags;
@@ -675,38 +679,17 @@ namespace NonMatching
     const SmartPointer<const MeshClassifier<dim>> mesh_classifier;
 
     /**
-     * For each element in the FECollection passed to the constructor,
-     * this object contains an dealii::FEInterfaceValues object created with a
-     * quadrature rule over the full reference cell: $[0, 1]^{dim-1}$ and
-     * UpdateFlags for the inside region. Thus, these optionals should always
-     * contain a value.
-     *
-     * When LocationToLevelSet of the cell is INSIDE (and we do not need
-     * to generate an immersed quadrature), we return the
-     * dealii::FEInterfaceValues object in this container corresponding to the
-     * cell's active_fe_index.
-     *
-     * This container is a std::deque, which is compatible with the
-     * `FEInterfaceValues` class that does not have a copy-constructor.
+     * FEInterfaceValues corresponding to cells with LocationToLevelSet
+     * INSIDE (not needed to generate an immersed quadrature).
      */
-    std::deque<std::optional<dealii::FEInterfaceValues<dim>>>
+    std::optional<dealii::FEInterfaceValues<dim>>
       fe_values_inside_full_quadrature;
 
     /**
-     * For each element in the FECollection passed to the constructor,
-     * this object contains an dealii::FEInterfaceValues object created with a
-     * quadrature rule over the full reference cell: $[0, 1]^{dim-1}$ and
-     * UpdateFlags for the outside region. Thus, these optionals should always
-     * contain a value.
-     *
-     * When LocationToLevelSet of the cell is OUTSIDE (and we do not need
-     * to generate an immersed quadrature), we return the dealii::FEValues
-     * object in this container corresponding to the cell's active_fe_index.
-     *
-     * This container is a std::deque, which is compatible with the
-     * `FEInterfaceValues` class that does not have a copy-constructor.
+     * FEInterfaceValues corresponding to cells with LocationToLevelSet
+     * OUTSIDE (not needed to generate an immersed quadrature).
      */
-    std::deque<std::optional<dealii::FEInterfaceValues<dim>>>
+    std::optional<dealii::FEInterfaceValues<dim>>
       fe_values_outside_full_quadrature;
 
     /**
@@ -742,16 +725,21 @@ namespace NonMatching
   template <typename CellIteratorType>
   inline void
   FEInterfaceValues<dim>::reinit(const CellIteratorType &cell,
-                                 const unsigned int      face_no)
+                                 const unsigned int      face_no,
+                                 const unsigned int      q_index,
+                                 const unsigned int      mapping_index,
+                                 const unsigned int      active_fe_index)
   {
     // Lambda describing how we should call reinit on a single
     // dealii::FEInterfaceValues object.
     const auto reinit_operation =
-      [&cell, face_no](dealii::FEInterfaceValues<dim> &fe_interface_values) {
-        fe_interface_values.reinit(cell, face_no);
+      [&](dealii::FEInterfaceValues<dim> &fe_interface_values,
+          const unsigned int              q_index) {
+        fe_interface_values.reinit(
+          cell, face_no, q_index, mapping_index, active_fe_index);
       };
 
-    do_reinit(cell, face_no, reinit_operation);
+    do_reinit(cell, face_no, q_index, active_fe_index, reinit_operation);
   }
 
 
@@ -764,7 +752,10 @@ namespace NonMatching
                                  const unsigned int              sub_face_no,
                                  const CellNeighborIteratorType &cell_neighbor,
                                  const unsigned int face_no_neighbor,
-                                 const unsigned int sub_face_no_neighbor)
+                                 const unsigned int sub_face_no_neighbor,
+                                 const unsigned int q_index,
+                                 const unsigned int mapping_index,
+                                 const unsigned int active_fe_index)
   {
     Assert(sub_face_no == numbers::invalid_unsigned_int, ExcNotImplemented());
     Assert(sub_face_no_neighbor == numbers::invalid_unsigned_int,
@@ -773,22 +764,20 @@ namespace NonMatching
     // Lambda describing how we should call reinit on a single
     // dealii::FEInterfaceValues object.
     const auto reinit_operation =
-      [&cell,
-       face_no,
-       sub_face_no,
-       &cell_neighbor,
-       face_no_neighbor,
-       sub_face_no_neighbor](
-        dealii::FEInterfaceValues<dim> &fe_interface_values) {
+      [&](dealii::FEInterfaceValues<dim> &fe_interface_values,
+          const unsigned int              q_index) {
         fe_interface_values.reinit(cell,
                                    face_no,
                                    sub_face_no,
                                    cell_neighbor,
                                    face_no_neighbor,
-                                   sub_face_no_neighbor);
+                                   sub_face_no_neighbor,
+                                   q_index,
+                                   mapping_index,
+                                   active_fe_index);
       };
 
-    do_reinit(cell, face_no, reinit_operation);
+    do_reinit(cell, face_no, q_index, active_fe_index, reinit_operation);
   }
 
 #endif

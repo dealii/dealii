@@ -398,7 +398,6 @@ namespace NonMatching
     const hp::QCollection<dim - 1> &q_collection)
   {
     current_face_location = LocationToLevelSet::unassigned;
-    active_fe_index       = numbers::invalid_unsigned_int;
 
     Assert(fe_collection->size() > 0,
            ExcMessage("Incoming hp::FECollection can not be empty."));
@@ -417,43 +416,31 @@ namespace NonMatching
       ExcMessage(
         "Size of hp::QCollection<1> must be the same as hp::FECollection or 1."));
 
-    // For each element in fe_collection, create dealii::FEInterfaceValues
-    // objects to use on the non-intersected cells.
-    fe_values_inside_full_quadrature.resize(fe_collection->size());
-    fe_values_outside_full_quadrature.resize(fe_collection->size());
-    for (unsigned int fe_index = 0; fe_index < fe_collection->size();
-         ++fe_index)
-      {
-        const unsigned int mapping_index =
-          mapping_collection->size() > 1 ? fe_index : 0;
-        const unsigned int q_index = q_collection.size() > 1 ? fe_index : 0;
-
-        fe_values_inside_full_quadrature[fe_index].emplace(
-          (*mapping_collection)[mapping_index],
-          (*fe_collection)[fe_index],
-          q_collection[q_index],
-          region_update_flags.inside);
-        fe_values_outside_full_quadrature[fe_index].emplace(
-          (*mapping_collection)[mapping_index],
-          (*fe_collection)[fe_index],
-          q_collection[q_index],
-          region_update_flags.outside);
-      }
+    fe_values_inside_full_quadrature.emplace(*mapping_collection,
+                                             *fe_collection,
+                                             q_collection,
+                                             region_update_flags.inside);
+    fe_values_outside_full_quadrature.emplace(*mapping_collection,
+                                              *fe_collection,
+                                              q_collection,
+                                              region_update_flags.outside);
   }
 
 
 
   template <int dim>
-  template <bool level_dof_access>
+  template <typename CellAccessorType>
   void
   FEInterfaceValues<dim>::do_reinit(
-    const TriaIterator<DoFCellAccessor<dim, dim, level_dof_access>> &cell,
-    const unsigned int                                               face_no,
-    const std::function<void(dealii::FEInterfaceValues<dim> &)> &call_reinit)
+    const TriaIterator<CellAccessorType>          &cell,
+    const unsigned int                             face_no,
+    const unsigned int                             q_index_in,
+    const unsigned int                             active_fe_index_in,
+    const std::function<void(dealii::FEInterfaceValues<dim> &,
+                             const unsigned int)> &call_reinit)
   {
     current_face_location =
       mesh_classifier->location_to_level_set(cell, face_no);
-    active_fe_index = cell->active_fe_index();
 
     // These objects were created with a quadrature based on the previous cell
     // and are thus no longer valid.
@@ -464,22 +451,44 @@ namespace NonMatching
       {
         case LocationToLevelSet::inside:
           {
-            call_reinit(*fe_values_inside_full_quadrature.at(active_fe_index));
+            call_reinit(*fe_values_inside_full_quadrature, q_index_in);
             break;
           }
         case LocationToLevelSet::outside:
           {
-            call_reinit(*fe_values_outside_full_quadrature.at(active_fe_index));
+            call_reinit(*fe_values_outside_full_quadrature, q_index_in);
             break;
           }
         case LocationToLevelSet::intersected:
           {
-            const unsigned int mapping_index =
-              mapping_collection->size() > 1 ? active_fe_index : 0;
-            const unsigned int q1D_index =
-              q_collection_1D.size() > 1 ? active_fe_index : 0;
+            unsigned int q_index = q_index_in;
 
-            face_quadrature_generator.set_1D_quadrature(q1D_index);
+            if (q_index == numbers::invalid_unsigned_int)
+              {
+                unsigned int active_fe_index = active_fe_index_in;
+
+                if (active_fe_index == numbers::invalid_unsigned_int)
+                  {
+                    if constexpr (std::is_same_v<
+                                    DoFCellAccessor<dim, dim, true>,
+                                    CellAccessorType> ||
+                                  std::is_same_v<
+                                    DoFCellAccessor<dim, dim, false>,
+                                    CellAccessorType>)
+                      active_fe_index = cell->active_fe_index();
+                    else
+                      active_fe_index = 0;
+                  }
+
+                if (q_collection_1D.size() > 1)
+                  q_index = active_fe_index;
+                else
+                  q_index = 0;
+              }
+
+            AssertIndexRange(q_index, q_collection_1D.size());
+
+            face_quadrature_generator.set_1D_quadrature(q_index);
             face_quadrature_generator.generate(cell, face_no);
 
             const Quadrature<dim - 1> &inside_quadrature =
@@ -492,22 +501,24 @@ namespace NonMatching
             // object if that is the case.
             if (inside_quadrature.size() > 0)
               {
-                fe_values_inside.emplace((*mapping_collection)[mapping_index],
-                                         (*fe_collection)[active_fe_index],
-                                         inside_quadrature,
+                fe_values_inside.emplace(*mapping_collection,
+                                         *fe_collection,
+                                         hp::QCollection<dim - 1>(
+                                           inside_quadrature),
                                          region_update_flags.inside);
 
-                call_reinit(*fe_values_inside);
+                call_reinit(*fe_values_inside, /*q_index=*/0);
               }
 
             if (outside_quadrature.size() > 0)
               {
-                fe_values_outside.emplace((*mapping_collection)[mapping_index],
-                                          (*fe_collection)[active_fe_index],
-                                          outside_quadrature,
+                fe_values_outside.emplace(*mapping_collection,
+                                          *fe_collection,
+                                          hp::QCollection<dim - 1>(
+                                            outside_quadrature),
                                           region_update_flags.outside);
 
-                call_reinit(*fe_values_outside);
+                call_reinit(*fe_values_outside, /*q_index=*/0);
               }
             break;
           }
@@ -526,7 +537,7 @@ namespace NonMatching
   FEInterfaceValues<dim>::get_inside_fe_values() const
   {
     if (current_face_location == LocationToLevelSet::inside)
-      return fe_values_inside_full_quadrature.at(active_fe_index);
+      return fe_values_inside_full_quadrature;
     else
       return fe_values_inside;
   }
@@ -538,7 +549,7 @@ namespace NonMatching
   FEInterfaceValues<dim>::get_outside_fe_values() const
   {
     if (current_face_location == LocationToLevelSet::outside)
-      return fe_values_outside_full_quadrature.at(active_fe_index);
+      return fe_values_outside_full_quadrature;
     else
       return fe_values_outside;
   }
