@@ -333,6 +333,18 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
 {
   const std::vector<const FiniteElement<dim, spacedim> *> fes = {&fe1, &fe2};
   const std::vector<unsigned int> multiplicities              = {n1, n2};
+
+  const ReferenceCell reference_cell = fes.front()->reference_cell();
+  (void)reference_cell;
+  Assert(std::all_of(fes.begin(),
+                     fes.end(),
+                     [reference_cell](const FiniteElement<dim, spacedim> *fe) {
+                       return fe->reference_cell() == reference_cell;
+                     }),
+         ExcMessage("You cannot combine finite elements defined on "
+                    "different reference cells into a combined element "
+                    "such as an FESystem or FE_Enriched object."));
+
   initialize(fes, multiplicities);
 }
 
@@ -363,6 +375,18 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                                                  &fe2,
                                                                  &fe3};
   const std::vector<unsigned int> multiplicities              = {n1, n2, n3};
+
+  const ReferenceCell reference_cell = fes.front()->reference_cell();
+  (void)reference_cell;
+  Assert(std::all_of(fes.begin(),
+                     fes.end(),
+                     [reference_cell](const FiniteElement<dim, spacedim> *fe) {
+                       return fe->reference_cell() == reference_cell;
+                     }),
+         ExcMessage("You cannot combine finite elements defined on "
+                    "different reference cells into a combined element "
+                    "such as an FESystem or FE_Enriched object."));
+
   initialize(fes, multiplicities);
 }
 
@@ -396,6 +420,18 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                                                  &fe3,
                                                                  &fe4};
   const std::vector<unsigned int> multiplicities = {n1, n2, n3, n4};
+
+  const ReferenceCell reference_cell = fes.front()->reference_cell();
+  (void)reference_cell;
+  Assert(std::all_of(fes.begin(),
+                     fes.end(),
+                     [reference_cell](const FiniteElement<dim, spacedim> *fe) {
+                       return fe->reference_cell() == reference_cell;
+                     }),
+         ExcMessage("You cannot combine finite elements defined on "
+                    "different reference cells into a combined element "
+                    "such as an FESystem or FE_Enriched object."));
+
   initialize(fes, multiplicities);
 }
 
@@ -430,6 +466,18 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
   const std::vector<const FiniteElement<dim, spacedim> *> fes = {
     &fe1, &fe2, &fe3, &fe4, &fe5};
   const std::vector<unsigned int> multiplicities = {n1, n2, n3, n4, n5};
+
+  const ReferenceCell reference_cell = fes.front()->reference_cell();
+  (void)reference_cell;
+  Assert(std::all_of(fes.begin(),
+                     fes.end(),
+                     [reference_cell](const FiniteElement<dim, spacedim> *fe) {
+                       return fe->reference_cell() == reference_cell;
+                     }),
+         ExcMessage("You cannot combine finite elements defined on "
+                    "different reference cells into a combined element "
+                    "such as an FESystem or FE_Enriched object."));
+
   initialize(fes, multiplicities);
 }
 
@@ -447,6 +495,17 @@ FESystem<dim, spacedim>::FESystem(
       FETools::Compositing::compute_nonzero_components(fes, multiplicities))
   , base_elements(count_nonzeros(multiplicities))
 {
+  const ReferenceCell reference_cell = fes.front()->reference_cell();
+  (void)reference_cell;
+  Assert(std::all_of(fes.begin(),
+                     fes.end(),
+                     [reference_cell](const FiniteElement<dim, spacedim> *fe) {
+                       return fe->reference_cell() == reference_cell;
+                     }),
+         ExcMessage("You cannot combine finite elements defined on "
+                    "different reference cells into a combined element "
+                    "such as an FESystem or FE_Enriched object."));
+
   initialize(fes, multiplicities);
 }
 

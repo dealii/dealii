@@ -198,8 +198,18 @@ namespace FETools
         for (unsigned int m = 0; m < multiplicities[base]; ++m)
           block_indices.push_back(fes[base]->n_dofs_per_cell());
 
+      const ReferenceCell reference_cell = fes.front()->reference_cell();
+      Assert(std::all_of(fes.begin(),
+                         fes.end(),
+                         [reference_cell](
+                           const FiniteElement<dim, spacedim> *fe) {
+                           return fe->reference_cell() == reference_cell;
+                         }),
+             ExcMessage("You cannot combine finite elements defined on "
+                        "different reference cells into a combined element "
+                        "such as an FESystem or FE_Enriched object."));
       return FiniteElementData<dim>(dpo,
-                                    fes.front()->reference_cell(),
+                                    reference_cell,
                                     (do_tensor_product ?
                                        multiplied_n_components :
                                        n_components),
@@ -249,6 +259,17 @@ namespace FETools
     {
       AssertDimension(fes.size(), multiplicities.size());
 
+      const ReferenceCell reference_cell = fes.front()->reference_cell();
+      Assert(std::all_of(fes.begin(),
+                         fes.end(),
+                         [reference_cell](
+                           const FiniteElement<dim, spacedim> *fe) {
+                           return fe->reference_cell() == reference_cell;
+                         }),
+             ExcMessage("You cannot combine finite elements defined on "
+                        "different reference cells into a combined element "
+                        "such as an FESystem or FE_Enriched object."));
+
       // first count the number of dofs and components that will emerge from the
       // given FEs
       unsigned int n_shape_functions = 0;
@@ -268,8 +289,7 @@ namespace FETools
       // for each shape function, copy the flags from the base element to this
       // one, taking into account multiplicities, and other complications
       unsigned int total_index = 0;
-      for (const unsigned int vertex_number :
-           fes.front()->reference_cell().vertex_indices())
+      for (const unsigned int vertex_number : reference_cell.vertex_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -289,8 +309,7 @@ namespace FETools
         }
 
       // 2. Lines
-      for (const unsigned int line_number :
-           fes.front()->reference_cell().line_indices())
+      for (const unsigned int line_number : reference_cell.line_indices())
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
             for (unsigned int m = 0; m < multiplicities[base]; ++m)
@@ -312,9 +331,7 @@ namespace FETools
       // 3. Quads
       for (unsigned int quad_number = 0;
            quad_number <
-           (dim == 2 ?
-              1 :
-              (dim == 3 ? fes.front()->reference_cell().n_faces() : 0));
+           (dim == 2 ? 1 : (dim == 3 ? reference_cell.n_faces() : 0));
            ++quad_number)
         {
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -409,6 +426,18 @@ namespace FETools
         fes.size() > 0,
         ExcMessage(
           "This function only makes sense if at least one FiniteElement is provided."));
+
+      const ReferenceCell reference_cell = fes.front()->reference_cell();
+      Assert(std::all_of(fes.begin(),
+                         fes.end(),
+                         [reference_cell](
+                           const FiniteElement<dim, spacedim> *fe) {
+                           return fe->reference_cell() == reference_cell;
+                         }),
+             ExcMessage("You cannot combine finite elements defined on "
+                        "different reference cells into a combined element "
+                        "such as an FESystem or FE_Enriched object."));
+
       // first count the number of dofs and components that will emerge from the
       // given FEs
       unsigned int n_shape_functions = 0;
@@ -454,8 +483,7 @@ namespace FETools
       // to this one, taking into account multiplicities, multiple components in
       // base elements, and other complications
       unsigned int total_index = 0;
-      for (const unsigned int vertex_number :
-           fes.front()->reference_cell().vertex_indices())
+      for (const unsigned int vertex_number : reference_cell.vertex_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -487,8 +515,7 @@ namespace FETools
         }
 
       // 2. Lines
-      for (const unsigned int line_number :
-           fes.front()->reference_cell().line_indices())
+      for (const unsigned int line_number : reference_cell.line_indices())
         {
           unsigned int comp_start = 0;
           for (unsigned int base = 0; base < fes.size(); ++base)
@@ -522,9 +549,7 @@ namespace FETools
       // 3. Quads
       for (unsigned int quad_number = 0;
            quad_number <
-           (dim == 2 ?
-              1 :
-              (dim == 3 ? fes.front()->reference_cell().n_faces() : 0));
+           (dim == 2 ? 1 : (dim == 3 ? reference_cell.n_faces() : 0));
            ++quad_number)
         {
           unsigned int comp_start = 0;
