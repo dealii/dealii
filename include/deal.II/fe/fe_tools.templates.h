@@ -86,19 +86,6 @@ namespace FETools
     {
       AssertDimension(fes.size(), multiplicities.size());
 
-      unsigned int multiplied_n_components = 0;
-
-      unsigned int degree = 0; // degree is the maximal degree of the components
-
-      unsigned int n_components = 0;
-      // Get the number of components from the first given finite element.
-      for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0)
-          {
-            n_components = fes[i]->n_components();
-            break;
-          }
-
       dealii::internal::GenericDoFsPerObject dpo;
 
       std::vector<dealii::internal::GenericDoFsPerObject> dpos_in(fes.size());
@@ -159,18 +146,19 @@ namespace FETools
           return dpo.first_object_index_on_face;
         });
 
+      const unsigned int n_components            = fes[0]->n_components();
+      unsigned int       multiplied_n_components = 0;
+      unsigned int degree = 0; // degree is the maximal degree of the components
+
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0)
-          {
-            multiplied_n_components +=
-              fes[i]->n_components() * multiplicities[i];
+        {
+          Assert(do_tensor_product || (n_components == fes[i]->n_components()),
+                 ExcDimensionMismatch(n_components, fes[i]->n_components()));
 
-            Assert(do_tensor_product ||
-                     (n_components == fes[i]->n_components()),
-                   ExcDimensionMismatch(n_components, fes[i]->n_components()));
+          multiplied_n_components += fes[i]->n_components() * multiplicities[i];
 
-            degree = std::max(degree, fes[i]->tensor_degree());
-          }
+          degree = std::max(degree, fes[i]->tensor_degree());
+        }
 
       // assume conformity of the first finite element and then take away
       // bits as indicated by the base elements. if all multiplicities
@@ -274,8 +262,7 @@ namespace FETools
       // given FEs
       unsigned int n_shape_functions = 0;
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0) // check needed as FE might be nullptr
-          n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
+        n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
 
       // generate the array that will hold the output
       std::vector<bool> retval(n_shape_functions, false);
@@ -442,30 +429,22 @@ namespace FETools
       // given FEs
       unsigned int n_shape_functions = 0;
       for (unsigned int i = 0; i < fes.size(); ++i)
-        if (multiplicities[i] > 0) // needed because FE might be nullptr
-          n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
+        n_shape_functions += fes[i]->n_dofs_per_cell() * multiplicities[i];
 
       unsigned int n_components = 0;
       if (do_tensor_product)
         {
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because FE might be nullptr
-              n_components += fes[i]->n_components() * multiplicities[i];
+            n_components += fes[i]->n_components() * multiplicities[i];
         }
       else
         {
-          for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because FE might be nullptr
-              {
-                n_components = fes[i]->n_components();
-                break;
-              }
+          n_components = fes[0]->n_components();
+
           // Now check that all FEs have the same number of components:
           for (unsigned int i = 0; i < fes.size(); ++i)
-            if (multiplicities[i] > 0) // needed because FE might be nullptr
-              Assert(n_components == fes[i]->n_components(),
-                     ExcDimensionMismatch(n_components,
-                                          fes[i]->n_components()));
+            Assert(n_components == fes[i]->n_components(),
+                   ExcDimensionMismatch(n_components, fes[i]->n_components()));
         }
 
       // generate the array that will hold the output
