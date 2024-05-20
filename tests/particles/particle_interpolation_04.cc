@@ -86,15 +86,6 @@ test()
             << "Space FE: " << space_fe.get_name() << std::endl
             << "Space dofs: " << space_dh.n_dofs() << std::endl;
 
-  DynamicSparsityPattern dsp(particle_handler.n_global_particles() * n_comps,
-                             space_dh.n_dofs());
-
-  AffineConstraints<double> constraints;
-
-  // Build the interpolation sparsity
-  Particles::Utilities::create_interpolation_sparsity_pattern(
-    space_dh, particle_handler, dsp, constraints, space_mask);
-
   const auto n_local_particles_dofs =
     particle_handler.n_locally_owned_particles() * n_comps;
 
@@ -113,6 +104,16 @@ test()
 
   auto global_particles_index_set =
     Utilities::MPI::all_gather(MPI_COMM_WORLD, n_local_particles_dofs);
+
+  DynamicSparsityPattern dsp(particle_handler.n_global_particles() * n_comps,
+                             space_dh.n_dofs(),
+                             local_particle_index_set);
+
+  AffineConstraints<double> constraints;
+
+  // Build the interpolation sparsity
+  Particles::Utilities::create_interpolation_sparsity_pattern(
+    space_dh, particle_handler, dsp, constraints, space_mask);
 
   SparsityTools::distribute_sparsity_pattern(dsp,
                                              global_particles_index_set,

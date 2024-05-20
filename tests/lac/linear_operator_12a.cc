@@ -198,7 +198,7 @@ Step4<dim>::setup_system()
   const IndexSet  locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-  DynamicSparsityPattern dsp(dof_handler.n_dofs());
+  DynamicSparsityPattern dsp(locally_relevant_dofs);
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
   SparsityTools::distribute_sparsity_pattern(dsp,
                                              locally_owned_dofs,
