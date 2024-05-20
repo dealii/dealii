@@ -21,6 +21,8 @@
 
 #include <deal.II/base/tensor_product_polynomials.h>
 
+#include <deal.II/fe/fe_tools.h>
+
 #include "../tests.h"
 
 
@@ -153,6 +155,14 @@ check_tensor(const std::vector<Polynomial<double>> &v, const Point<dim> &x)
 
   std::vector<std::vector<Polynomial<double>>> pols(dim, v);
   AnisotropicPolynomials<dim>                  q(pols);
+
+  check_poly(x, p, q);
+
+  const std::vector<unsigned int> renumber =
+    FETools::hierarchic_to_lexicographic_numbering<dim>(v.size() - 1);
+
+  p.set_numbering(renumber);
+  q.set_numbering(renumber);
 
   check_poly(x, p, q);
 }

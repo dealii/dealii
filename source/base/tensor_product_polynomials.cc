@@ -133,6 +133,48 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::output_indices(
 
 
 
+template <int dim>
+inline const std::vector<unsigned int> &
+AnisotropicPolynomials<dim>::get_numbering() const
+{
+  return index_map;
+}
+
+
+
+template <int dim>
+inline const std::vector<unsigned int> &
+AnisotropicPolynomials<dim>::get_numbering_inverse() const
+{
+  return index_map_inverse;
+}
+
+
+
+template <int dim>
+void
+AnisotropicPolynomials<dim>::set_numbering(
+  const std::vector<unsigned int> &renumber)
+{
+  Assert(renumber.size() == index_map.size(),
+         ExcDimensionMismatch(renumber.size(), index_map.size()));
+
+  index_map = renumber;
+  for (unsigned int i = 0; i < index_map.size(); ++i)
+    index_map_inverse[index_map[i]] = i;
+}
+
+
+
+template <>
+void
+AnisotropicPolynomials<0>::set_numbering(const std::vector<unsigned int> &)
+{
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
+}
+
+
+
 template <int dim, typename PolynomialType>
 void
 TensorProductPolynomials<dim, PolynomialType>::set_numbering(
@@ -643,6 +685,8 @@ AnisotropicPolynomials<dim>::AnisotropicPolynomials(
   const std::vector<std::vector<Polynomials::Polynomial<double>>> &pols)
   : ScalarPolynomialsBase<dim>(1, get_n_tensor_pols(pols))
   , polynomials(pols)
+  , index_map(this->n())
+  , index_map_inverse(this->n())
 {
   Assert(pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
   for (const auto &pols_d : pols)
@@ -651,6 +695,14 @@ AnisotropicPolynomials<dim>::AnisotropicPolynomials(
       Assert(pols_d.size() > 0,
              ExcMessage("The number of polynomials must be larger than zero "
                         "for all coordinate directions."));
+    }
+
+  // per default set this index map to identity. This map can be changed by
+  // the user through the set_numbering() function
+  for (unsigned int i = 0; i < this->n(); ++i)
+    {
+      index_map[i]         = i;
+      index_map_inverse[i] = i;
     }
 }
 
@@ -673,12 +725,12 @@ AnisotropicPolynomials<dim>::compute_index(
     {
     }
   else if (dim == 1)
-    internal::compute_tensor_index(i,
+    internal::compute_tensor_index(index_map[i],
                                    polynomials[0].size(),
                                    0 /*not used*/,
                                    indices);
   else
-    internal::compute_tensor_index(i,
+    internal::compute_tensor_index(index_map[i],
                                    polynomials[0].size(),
                                    polynomials[1].size(),
                                    indices);
@@ -894,7 +946,7 @@ AnisotropicPolynomials<dim>::evaluate(
     values_1d,
     polynomials[0].size(),
     indices,
-    {},
+    index_map_inverse,
     values,
     grads,
     grad_grads,
