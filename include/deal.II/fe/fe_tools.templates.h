@@ -223,20 +223,20 @@ namespace FETools
                          const FiniteElement<dim, spacedim> *fe5,
                          const unsigned int                  N5)
     {
-      std::vector<const FiniteElement<dim, spacedim> *> fes;
-      fes.push_back(fe1);
-      fes.push_back(fe2);
-      fes.push_back(fe3);
-      fes.push_back(fe4);
-      fes.push_back(fe5);
+      std::vector<const FiniteElement<dim, spacedim> *> fe_list = {
+        fe1, fe2, fe3, fe4, fe5};
+      std::vector<unsigned int> multiplicities = {N1, N2, N3, N4, N5};
 
-      std::vector<unsigned int> mult;
-      mult.push_back(N1);
-      mult.push_back(N2);
-      mult.push_back(N3);
-      mult.push_back(N4);
-      mult.push_back(N5);
-      return multiply_dof_numbers(fes, mult);
+      // This function is occasionally called with nullptr values for the
+      // finite elements. Drop those again.
+      while ((fe_list.size() > 0) && (fe_list.back() == nullptr))
+        {
+          Assert(multiplicities.back() == 0, ExcInternalError());
+          fe_list.pop_back();
+          multiplicities.pop_back();
+        }
+
+      return multiply_dof_numbers(fe_list, multiplicities);
     }
 
 
