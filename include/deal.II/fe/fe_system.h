@@ -1428,17 +1428,6 @@ FESystem<dim, spacedim>::FESystem(
   for (const auto &p : fe_systems)
     extract(p);
 
-  const ReferenceCell reference_cell = fes.front()->reference_cell();
-  (void)reference_cell;
-  Assert(std::all_of(fes.begin(),
-                     fes.end(),
-                     [reference_cell](const FiniteElement<dim, spacedim> *fe) {
-                       return fe->reference_cell() == reference_cell;
-                     }),
-         ExcMessage("You cannot combine finite elements defined on "
-                    "different reference cells into a combined element "
-                    "such as an FESystem or FE_Enriched object."));
-
   initialize(fes, multiplicities);
 }
 #  endif
