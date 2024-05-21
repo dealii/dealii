@@ -60,8 +60,9 @@
 // mass and Laplace matrices, although it would have only taken copying the
 // relevant code from any number of previous tutorial programs. Rather, we
 // want to focus on the things that are truly new to this program and
-// therefore use the MatrixCreator::create_mass_matrix and
-// MatrixCreator::create_laplace_matrix functions. They are declared here:
+// therefore use the MatrixCreator::create_mass_matrix() and
+// MatrixCreator::create_laplace_matrix() functions. They are declared here:
+#include <deal.II/numerics/matrix_creator.h>
 #include <deal.II/numerics/matrix_tools.h>
 
 // Finally, here is an include file that contains all sorts of tool functions
