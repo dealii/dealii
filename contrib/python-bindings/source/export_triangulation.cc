@@ -776,7 +776,7 @@ namespace python
       .def("generate_truncated_cone",
            &TriangulationWrapper::generate_truncated_cone,
            generate_truncated_cone_overloads(
-             boost::python::args("self", "radius_0", "radius", "half_length"),
+             boost::python::args("self", "radius_0", "radius_2", "half_length"),
              generate_truncated_cone_docstring))
       .def("generate_hyper_shell",
            &TriangulationWrapper::generate_hyper_shell,
