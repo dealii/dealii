@@ -764,16 +764,12 @@ namespace Step9
     preconditioner.initialize(system_matrix, 1.0);
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    Vector<double> residual(dof_handler.n_dofs());
+    hanging_node_constraints.distribute(solution);
 
-    system_matrix.vmult(residual, solution);
-    residual -= system_rhs;
     std::cout << "   Iterations required for convergence: "
               << solver_control.last_step() << '\n'
-              << "   Max norm of residual:                "
-              << residual.linfty_norm() << '\n';
-
-    hanging_node_constraints.distribute(solution);
+              << "   Norm of residual at convergence:     "
+              << solver_control.last_value() << '\n';
   }
 
   // The following function refines the grid according to the quantity
@@ -796,21 +792,23 @@ namespace Step9
     triangulation.execute_coarsening_and_refinement();
   }
 
-  // This function is similar to the one in step 6, but since we use a higher
+  // This function is similar to the one in step-6, but since we use a higher
   // degree finite element we save the solution in a different
   // way. Visualization programs like VisIt and Paraview typically only
   // understand data that is associated with nodes: they cannot plot
   // fifth-degree basis functions, which results in a very inaccurate picture
   // of the solution we computed. To get around this we save multiple
-  // <em>patches</em> per cell: in 2d we save 64 bilinear `cells' to the VTU
-  // file for each cell, and in 3d we save 512. The end result is that the
+  // <em>patches</em> per cell: in 2d we save $8\times 8=64$ bilinear
+  // `sub-cells' to the VTU file for each cell, and in 3d we save
+  // $8\times 8\times 8 = 512$. The end result is that the
   // visualization program will use a piecewise linear interpolation of the
-  // cubic basis functions: this captures the solution detail and, with most
+  // cubic basis functions on a 3 times refined mesh:
+  // This captures the solution detail and, with most
   // screen resolutions, looks smooth. We save the grid in a separate step
   // with no extra patches so that we have a visual representation of the cell
   // faces.
   //
-  // Version 9.1 of deal.II gained the ability to write higher degree
+  // @note Version 9.1 of deal.II gained the ability to write higher degree
   // polynomials (i.e., write piecewise bicubic visualization data for our
   // piecewise bicubic solution) VTK and VTU output: however, not all recent
   // versions of ParaView and VisIt (as of 2018) can read this format, so we
