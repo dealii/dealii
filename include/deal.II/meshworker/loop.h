@@ -491,13 +491,17 @@ namespace MeshWorker
    * Simplified interface for loop() if specialized for integration, using the
    * virtual functions in LocalIntegrator.
    *
+   * @deprecated This function is deprecated, along with the LocalIntegrator
+   *   class. Use the MeshWorker::loop() function directly, with three function
+   *   objects that perform the cell, boundary, and interior face integration.
+   *
    * @ingroup MeshWorker
    */
   template <int dim,
             int spacedim,
             typename IteratorType,
             typename AssemblerType>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   integration_loop(IteratorType                             begin,
                    std_cxx20::type_identity_t<IteratorType> end,
                    DoFInfo<dim, spacedim>                  &dof_info,

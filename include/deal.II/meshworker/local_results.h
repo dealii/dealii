@@ -39,14 +39,12 @@ class BlockIndices;
  * ubiquitous part of each finite element program.
  *
  * The workhorse of this namespace is the loop() function, which implements a
- * completely generic loop over all mesh cells. Since the calls to loop() are
- * error-prone due to its generality, for many applications it is advisable to
- * derive a class from MeshWorker::LocalIntegrator and use the less general
- * integration_loop() instead.
- *
- * The loop() depends on certain objects handed to it as arguments. These
+ * completely generic loop over all mesh cells.
+ * The loop() function depends on certain objects handed to it as arguments.
+ * These
  * objects are of two types, @p info objects like DoFInfo and IntegrationInfo and
- * worker objects like LocalWorker and IntegrationWorker.
+ * function objects ("workers") that perform the local operations on cells,
+ * faces, and boundaries.
  *
  * Worker objects usually do two different jobs: first, they compute the local
  * contribution of a cell or face to the global operation. Second, they
@@ -154,23 +152,6 @@ class BlockIndices;
  *     void reinit(const DOFINFO& i);
  * };
  * @endcode
- *
- * <h3>Simplified interfaces</h3>
- *
- * Since the loop() is fairly general, a specialization integration_loop() is
- * available, which is a wrapper around loop() with a simplified interface.
- *
- * The integration_loop() function loop takes most of the information that it
- * needs to pass to loop() from an IntegrationInfoBox object. Its use is
- * explained in step-12, but in short it requires functions that do the local
- * integration on a cell, interior or boundary face, and it needs an object
- * (called "assembler") that copies these local contributions into the global
- * matrix and right hand side objects.
- *
- * Before we can run the integration loop, we have to initialize several data
- * structures in our IntegrationWorker and assembler objects. For instance, we
- * have to decide on the quadrature rule or we may need more than the default
- * update flags.
  *
  * @ingroup MeshWorker
  * @ingroup Integrators

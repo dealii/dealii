@@ -42,9 +42,6 @@ namespace MeshWorker
    * those, which are actually used in computing residuals etc. This class
    * organizes the selection.
    *
-   * It is used for instance in IntegrationWorker to determine which values,
-   * derivatives or second derivatives are actually computed.
-   *
    * @ingroup MeshWorker
    */
   class VectorSelector : public Subscriptor
