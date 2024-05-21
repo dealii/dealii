@@ -41,7 +41,6 @@ middle()
 {
   deallog << "    Starting task in the middle" << std::endl;
   auto t = Threads::new_task([]() { bottom(); });
-  deallog << "    Waiting for sub-task in the middle" << std::endl;
   t.join();
   deallog << "    Ending task in the middle" << std::endl;
 }
@@ -51,7 +50,6 @@ top()
 {
   deallog << "  Starting task at the top" << std::endl;
   auto t = Threads::new_task([]() { middle(); });
-  deallog << "  Waiting for sub-task at the top" << std::endl;
   t.join();
   deallog << "  Ending task at the top" << std::endl;
 }
@@ -66,7 +64,6 @@ main()
 
   deallog << "Starting task in main()" << std::endl;
   auto t = Threads::new_task([]() { top(); });
-  deallog << "Waiting for task in main" << std::endl;
   t.join();
   deallog << "Done in main" << std::endl;
 }
