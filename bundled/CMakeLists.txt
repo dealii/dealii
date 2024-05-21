@@ -70,7 +70,7 @@ endif()
 
 
 if(DEAL_II_FEATURE_TASKFLOW_BUNDLED_CONFIGURED)
-  install(DIRECTORY ${TASKFLOW_FOLDER}/include/taskflow
+  install(DIRECTORY ${TASKFLOW_FOLDER}/taskflow
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     )
