@@ -296,16 +296,19 @@ template <int dim, int spacedim>
 FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe,
                                   const unsigned int n_elements)
   : FiniteElement<dim, spacedim>(
-      FETools::Compositing::multiply_dof_numbers(&fe, n_elements),
-      FETools::Compositing::compute_restriction_is_additive_flags(&fe,
-                                                                  n_elements),
-      FETools::Compositing::compute_nonzero_components(&fe, n_elements))
+      FETools::Compositing::multiply_dof_numbers<dim, spacedim>({&fe},
+                                                                {n_elements}),
+      FETools::Compositing::compute_restriction_is_additive_flags<dim,
+                                                                  spacedim>(
+        {&fe},
+        {n_elements}),
+      FETools::Compositing::compute_nonzero_components<dim, spacedim>(
+        {&fe},
+        {n_elements}))
   , base_elements((n_elements > 0))
 {
-  std::vector<const FiniteElement<dim, spacedim> *> fes;
-  fes.push_back(&fe);
-  std::vector<unsigned int> multiplicities;
-  multiplicities.push_back(n_elements);
+  const std::vector<const FiniteElement<dim, spacedim> *> fes = {&fe};
+  const std::vector<unsigned int> multiplicities              = {n_elements};
   initialize(fes, multiplicities);
 }
 
@@ -317,20 +320,19 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const FiniteElement<dim, spacedim> &fe2,
                                   const unsigned int                  n2)
   : FiniteElement<dim, spacedim>(
-      FETools::Compositing::multiply_dof_numbers(&fe1, n1, &fe2, n2),
-      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                  n1,
-                                                                  &fe2,
-                                                                  n2),
-      FETools::Compositing::compute_nonzero_components(&fe1, n1, &fe2, n2))
+      FETools::Compositing::multiply_dof_numbers<dim, spacedim>({&fe1, &fe2},
+                                                                {n1, n2}),
+      FETools::Compositing::compute_restriction_is_additive_flags<dim,
+                                                                  spacedim>(
+        {&fe1, &fe2},
+        {n1, n2}),
+      FETools::Compositing::compute_nonzero_components<dim, spacedim>({&fe1,
+                                                                       &fe2},
+                                                                      {n1, n2}))
   , base_elements(static_cast<int>(n1 > 0) + static_cast<int>(n2 > 0))
 {
-  std::vector<const FiniteElement<dim, spacedim> *> fes;
-  fes.push_back(&fe1);
-  fes.push_back(&fe2);
-  std::vector<unsigned int> multiplicities;
-  multiplicities.push_back(n1);
-  multiplicities.push_back(n2);
+  const std::vector<const FiniteElement<dim, spacedim> *> fes = {&fe1, &fe2};
+  const std::vector<unsigned int> multiplicities              = {n1, n2};
   initialize(fes, multiplicities);
 }
 
@@ -344,30 +346,23 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const FiniteElement<dim, spacedim> &fe3,
                                   const unsigned int                  n3)
   : FiniteElement<dim, spacedim>(
-      FETools::Compositing::multiply_dof_numbers(&fe1, n1, &fe2, n2, &fe3, n3),
-      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                  n1,
-                                                                  &fe2,
-                                                                  n2,
-                                                                  &fe3,
-                                                                  n3),
-      FETools::Compositing::compute_nonzero_components(&fe1,
-                                                       n1,
-                                                       &fe2,
-                                                       n2,
-                                                       &fe3,
-                                                       n3))
+      FETools::Compositing::multiply_dof_numbers<dim, spacedim>(
+        {&fe1, &fe2, &fe3},
+        {n1, n2, n3}),
+      FETools::Compositing::compute_restriction_is_additive_flags<dim,
+                                                                  spacedim>(
+        {&fe1, &fe2, &fe3},
+        {n1, n2, n3}),
+      FETools::Compositing::compute_nonzero_components<dim, spacedim>(
+        {&fe1, &fe2, &fe3},
+        {n1, n2, n3}))
   , base_elements(static_cast<int>(n1 > 0) + static_cast<int>(n2 > 0) +
                   static_cast<int>(n3 > 0))
 {
-  std::vector<const FiniteElement<dim, spacedim> *> fes;
-  fes.push_back(&fe1);
-  fes.push_back(&fe2);
-  fes.push_back(&fe3);
-  std::vector<unsigned int> multiplicities;
-  multiplicities.push_back(n1);
-  multiplicities.push_back(n2);
-  multiplicities.push_back(n3);
+  const std::vector<const FiniteElement<dim, spacedim> *> fes = {&fe1,
+                                                                 &fe2,
+                                                                 &fe3};
+  const std::vector<unsigned int> multiplicities              = {n1, n2, n3};
   initialize(fes, multiplicities);
 }
 
@@ -383,43 +378,24 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const FiniteElement<dim, spacedim> &fe4,
                                   const unsigned int                  n4)
   : FiniteElement<dim, spacedim>(
-      FETools::Compositing::multiply_dof_numbers(&fe1,
-                                                 n1,
-                                                 &fe2,
-                                                 n2,
-                                                 &fe3,
-                                                 n3,
-                                                 &fe4,
-                                                 n4),
-      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                  n1,
-                                                                  &fe2,
-                                                                  n2,
-                                                                  &fe3,
-                                                                  n3,
-                                                                  &fe4,
-                                                                  n4),
-      FETools::Compositing::compute_nonzero_components(&fe1,
-                                                       n1,
-                                                       &fe2,
-                                                       n2,
-                                                       &fe3,
-                                                       n3,
-                                                       &fe4,
-                                                       n4))
+      FETools::Compositing::multiply_dof_numbers<dim, spacedim>(
+        {&fe1, &fe2, &fe3, &fe4},
+        {n1, n2, n3, n4}),
+      FETools::Compositing::compute_restriction_is_additive_flags<dim,
+                                                                  spacedim>(
+        {&fe1, &fe2, &fe3, &fe4},
+        {n1, n2, n3, n4}),
+      FETools::Compositing::compute_nonzero_components<dim, spacedim>(
+        {&fe1, &fe2, &fe3, &fe4},
+        {n1, n2, n3, n4}))
   , base_elements(static_cast<int>(n1 > 0) + static_cast<int>(n2 > 0) +
                   static_cast<int>(n3 > 0) + static_cast<int>(n4 > 0))
 {
-  std::vector<const FiniteElement<dim, spacedim> *> fes;
-  fes.push_back(&fe1);
-  fes.push_back(&fe2);
-  fes.push_back(&fe3);
-  fes.push_back(&fe4);
-  std::vector<unsigned int> multiplicities;
-  multiplicities.push_back(n1);
-  multiplicities.push_back(n2);
-  multiplicities.push_back(n3);
-  multiplicities.push_back(n4);
+  const std::vector<const FiniteElement<dim, spacedim> *> fes = {&fe1,
+                                                                 &fe2,
+                                                                 &fe3,
+                                                                 &fe4};
+  const std::vector<unsigned int> multiplicities = {n1, n2, n3, n4};
   initialize(fes, multiplicities);
 }
 
@@ -437,44 +413,23 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
                                   const FiniteElement<dim, spacedim> &fe5,
                                   const unsigned int                  n5)
   : FiniteElement<dim, spacedim>(
-      FETools::Compositing::
-        multiply_dof_numbers(&fe1, n1, &fe2, n2, &fe3, n3, &fe4, n4, &fe5, n5),
-      FETools::Compositing::compute_restriction_is_additive_flags(&fe1,
-                                                                  n1,
-                                                                  &fe2,
-                                                                  n2,
-                                                                  &fe3,
-                                                                  n3,
-                                                                  &fe4,
-                                                                  n4,
-                                                                  &fe5,
-                                                                  n5),
-      FETools::Compositing::compute_nonzero_components(&fe1,
-                                                       n1,
-                                                       &fe2,
-                                                       n2,
-                                                       &fe3,
-                                                       n3,
-                                                       &fe4,
-                                                       n4,
-                                                       &fe5,
-                                                       n5))
+      FETools::Compositing::multiply_dof_numbers<dim, spacedim>(
+        {&fe1, &fe2, &fe3, &fe4, &fe5},
+        {n1, n2, n3, n4, n5}),
+      FETools::Compositing::compute_restriction_is_additive_flags<dim,
+                                                                  spacedim>(
+        {&fe1, &fe2, &fe3, &fe4, &fe5},
+        {n1, n2, n3, n4, n5}),
+      FETools::Compositing::compute_nonzero_components<dim, spacedim>(
+        {&fe1, &fe2, &fe3, &fe4, &fe5},
+        {n1, n2, n3, n4, n5}))
   , base_elements(static_cast<int>(n1 > 0) + static_cast<int>(n2 > 0) +
                   static_cast<int>(n3 > 0) + static_cast<int>(n4 > 0) +
                   static_cast<int>(n5 > 0))
 {
-  std::vector<const FiniteElement<dim, spacedim> *> fes;
-  fes.push_back(&fe1);
-  fes.push_back(&fe2);
-  fes.push_back(&fe3);
-  fes.push_back(&fe4);
-  fes.push_back(&fe5);
-  std::vector<unsigned int> multiplicities;
-  multiplicities.push_back(n1);
-  multiplicities.push_back(n2);
-  multiplicities.push_back(n3);
-  multiplicities.push_back(n4);
-  multiplicities.push_back(n5);
+  const std::vector<const FiniteElement<dim, spacedim> *> fes = {
+    &fe1, &fe2, &fe3, &fe4, &fe5};
+  const std::vector<unsigned int> multiplicities = {n1, n2, n3, n4, n5};
   initialize(fes, multiplicities);
 }
 
