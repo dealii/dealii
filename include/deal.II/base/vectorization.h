@@ -6588,17 +6588,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   sin(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    // put values in an array and later read in that array with an unaligned
-    // read. This should save some instructions as compared to directly
-    // setting the individual elements and also circumvents a compiler
-    // optimization bug in gcc-4.6 with SSE2 (see also deal.II developers list
-    // from April 2014, topic "matrix_free/step-48 Test").
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::sin(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::sin(x[i]);
     return out;
   }
 
@@ -6615,12 +6608,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   cos(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::cos(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::cos(x[i]);
     return out;
   }
 
@@ -6637,12 +6628,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   tan(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::tan(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::tan(x[i]);
     return out;
   }
 
@@ -6839,12 +6828,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   exp(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::exp(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::exp(x[i]);
     return out;
   }
 
@@ -6861,12 +6848,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   log(const ::dealii::VectorizedArray<Number, width> &x)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::log(x[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::log(x[i]);
     return out;
   }
 
@@ -6899,12 +6884,10 @@ namespace std
   inline ::dealii::VectorizedArray<Number, width>
   pow(const ::dealii::VectorizedArray<Number, width> &x, const Number p)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::pow(x[i], p);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::pow(x[i], p);
     return out;
   }
 
@@ -6923,12 +6906,10 @@ namespace std
   pow(const ::dealii::VectorizedArray<Number, width> &x,
       const ::dealii::VectorizedArray<Number, width> &p)
   {
-    Number values[::dealii::VectorizedArray<Number, width>::size()];
+    ::dealii::VectorizedArray<Number, width> out;
     for (unsigned int i = 0; i < dealii::VectorizedArray<Number, width>::size();
          ++i)
-      values[i] = std::pow(x[i], p[i]);
-    ::dealii::VectorizedArray<Number, width> out;
-    out.load(&values[0]);
+      out[i] = std::pow(x[i], p[i]);
     return out;
   }
 
