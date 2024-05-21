@@ -1658,7 +1658,7 @@ namespace internal
                   "You ask for information on children of this cell which is only "
                   "available for active cells. One of its children is not active."));
 
-              // Ghost siblings might occur on parallel::shared::Triangulation
+              // Ghost siblings might occur on parallel Triangulation
               // objects. The public interface does not allow to access future
               // FE indices on ghost cells. However, we need this information
               // here and thus call the internal function that does not check
@@ -2771,11 +2771,6 @@ void DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 
       // refinement signals
       this->tria_listeners_for_transfer.push_back(
-        this->tria->signals.pre_refinement.connect([this]() {
-          internal::hp::DoFHandlerImplementation::Implementation::
-            communicate_future_fe_indices(*this);
-        }));
-      this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_refinement.connect(
           [this]() { this->pre_transfer_action(); }));
       this->tria_listeners_for_transfer.push_back(
@@ -2893,6 +2888,9 @@ void DoFHandler<dim, spacedim>::pre_transfer_action()
 
   this->active_fe_index_transfer = std::make_unique<ActiveFEIndexTransfer>();
 
+  internal::hp::DoFHandlerImplementation::Implementation::
+    communicate_future_fe_indices(*this);
+
   dealii::internal::hp::DoFHandlerImplementation::Implementation::
     collect_fe_indices_on_cells_to_be_refined(*this);
 }
@@ -2930,10 +2928,18 @@ void DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
   active_fe_index_transfer->active_fe_indices.resize(
     get_triangulation().n_active_cells(), numbers::invalid_fe_index);
 
+  // Collect future FE indices on locally owned and ghost cells.
+  // The public interface does not allow to access future FE indices
+  // on ghost cells. However, we need this information here and thus
+  // call the internal function that does not check for cell ownership.
+  internal::hp::DoFHandlerImplementation::Implementation::
+    communicate_future_fe_indices(*this);
+
   for (const auto &cell : active_cell_iterators())
-    if (cell->is_locally_owned())
+    if (cell->is_artificial() == false)
       active_fe_index_transfer->active_fe_indices[cell->active_cell_index()] =
-        cell->future_fe_index();
+        dealii::internal::DoFCellAccessorImplementation::Implementation::
+          future_fe_index<dim, spacedim, false>(*cell);
 
   // Create transfer object and attach to it.
   const auto *distributed_tria =
