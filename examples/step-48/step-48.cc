@@ -17,7 +17,6 @@
 
 
 // The necessary files from the deal.II library.
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>

@@ -22,7 +22,6 @@
 // contained in `fe_evaluation.h`.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/timer.h>
 
 #include <deal.II/lac/affine_constraints.h>

@@ -21,7 +21,6 @@
 // The following have all been covered previously:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/vector.h>

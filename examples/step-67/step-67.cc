@@ -19,7 +19,6 @@
 // step-37, step-48, and step-59
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/time_stepping.h>
 #include <deal.II/base/utilities.h>

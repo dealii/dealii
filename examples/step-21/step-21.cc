@@ -25,7 +25,6 @@
 
 // All of these include files have been used before:
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 
 #include <deal.II/lac/block_vector.h>

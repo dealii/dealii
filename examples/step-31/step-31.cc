@@ -22,7 +22,6 @@
 // The first step, as always, is to include the functionality of these
 // well-known deal.II library files and some C++ header files.
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/full_matrix.h>

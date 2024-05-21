@@ -21,7 +21,6 @@
 // in the order base-lac-grid-dofs-fe-numerics, followed by C++ standard
 // include files:
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 
 #include <deal.II/lac/block_vector.h>

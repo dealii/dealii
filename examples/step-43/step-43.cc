@@ -26,7 +26,6 @@
 // preconditioner classes that implement interfaces to the respective Trilinos
 // classes; some more information on these may be found in step-31.
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
