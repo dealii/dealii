@@ -746,9 +746,9 @@ namespace Step9
       system_rhs);
   }
 
-  // Here comes the linear solver routine. As the system is no longer
+  // The next function is the linear solver routine. As the system is no longer
   // symmetric positive definite as in all the previous examples, we cannot
-  // use the Conjugate Gradient method anymore. Rather, we use a solver that
+  // use the Conjugate Gradient method any more. Rather, we use a solver that
   // is more general and does not rely on any special properties of the
   // matrix: the GMRES method. GMRES, like the conjugate gradient method,
   // requires a decent preconditioner: we use a Jacobi preconditioner here,
@@ -823,7 +823,7 @@ namespace Step9
       const std::string filename = "grid-" + std::to_string(cycle) + ".vtu";
       std::ofstream     output(filename);
       grid_out.write_vtu(triangulation, output);
-      std::cout << "Grid written to " << filename << std::endl;
+      std::cout << "   Grid written to " << filename << std::endl;
     }
 
     {
@@ -842,7 +842,7 @@ namespace Step9
       const std::string filename = "solution-" + std::to_string(cycle) + ".vtu";
       std::ofstream     output(filename);
       data_out.write_vtu(output);
-      std::cout << "Solution written to " << filename << std::endl;
+      std::cout << "   Solution written to " << filename << std::endl;
     }
   }
 
