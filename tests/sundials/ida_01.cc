@@ -30,7 +30,7 @@
  * u (0) = 0
  * u'(0) = k
  *
- * write in terms of a first order ode:
+ * written in terms of a first order ode:
  *
  * y[0]' -     y[1]  = 0
  * y[1]' + k^2 y[0]  = 0
@@ -89,8 +89,8 @@ public:
 
       J = A;
 
-      J(0, 0) = alpha;
-      J(1, 1) = alpha;
+      J(0, 0) += alpha;
+      J(1, 1) += alpha;
 
       Jinv.invert(J);
     };

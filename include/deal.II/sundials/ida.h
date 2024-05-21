@@ -151,10 +151,10 @@ namespace SUNDIALS
    * \end{matrix}
    * \f]
    *
-   * That is $F(y', y, t) = y' + A y = 0 $
+   * That is, $F(y', y, t) = y' + A y = 0 $
    * where
-   * A =
    * \f[
+   * A =
    * \begin{pmatrix}
    * 0 & -1 \\
    * k^2 &0
@@ -206,8 +206,8 @@ namespace SUNDIALS
    * {
    *   J = A;
    *
-   *   J(0,0) = alpha;
-   *   J(1,1) = alpha;
+   *   J(0,0) += alpha;
+   *   J(1,1) += alpha;
    *
    *   Jinv.invert(J);
    * };
