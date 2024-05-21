@@ -439,16 +439,16 @@ namespace MeshWorker
             typename AssemblerType,
             typename IteratorType>
   void
-  loop(IteratorType                             begin,
-       std_cxx20::type_identity_t<IteratorType> end,
-       DOFINFO                                 &dinfo,
-       INFOBOX                                 &info,
-       const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
-         &cell_worker,
-       const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
-                                                               &boundary_worker,
-       const std::function<void(DOFINFO &,
-                                DOFINFO &,
+  loop(IteratorType                                             begin,
+       std_cxx20::type_identity_t<IteratorType>                 end,
+       DOFINFO                                                 &dinfo,
+       INFOBOX                                                 &info,
+       const std::function<void(std_cxx20::type_identity_t<DOFINFO> &,
+                                typename INFOBOX::CellInfo &)> &cell_worker,
+       const std::function<void(std_cxx20::type_identity_t<DOFINFO> &,
+                                typename INFOBOX::CellInfo &)> &boundary_worker,
+       const std::function<void(std_cxx20::type_identity_t<DOFINFO> &,
+                                std_cxx20::type_identity_t<DOFINFO> &,
                                 typename INFOBOX::CellInfo &,
                                 typename INFOBOX::CellInfo &)> &face_worker,
        AssemblerType                                           &assembler,
