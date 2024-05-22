@@ -26,7 +26,6 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/vector_tools.h>
 
 // These are the headers of the opencascade support classes and
 // functions. Notice that these will contain sensible data only if you

@@ -49,7 +49,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
 // Include all relevant multilevel files:
