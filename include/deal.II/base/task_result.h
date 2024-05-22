@@ -112,7 +112,7 @@ namespace Threads
      * represents the task's result, whereas the old object no longer
      * represents anything and is left as if default-constructed.
      */
-    TaskResult(TaskResult<T> &&other);
+    TaskResult(TaskResult<T> &&other) noexcept;
 
     /**
      * Destructor. If the current object was associated with a task,
@@ -300,7 +300,7 @@ namespace Threads
 
 
   template <typename T>
-  inline TaskResult<T>::TaskResult(TaskResult<T> &&other)
+  inline TaskResult<T>::TaskResult(TaskResult<T> &&other) noexcept
   {
     // First lock the other object, then move the members of the other
     // object and reset it. Note that we do not have to wait for
