@@ -2302,8 +2302,6 @@ int main(int argc, char **argv)
 
   try
     {
-      deallog.depth_console(0);
-
       EulerProblem<dimension> euler_problem;
       euler_problem.run();
     }
