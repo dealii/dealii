@@ -1702,6 +1702,17 @@ FESystem<dim, spacedim>::initialize(
   Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
+  const ReferenceCell reference_cell = fes.front()->reference_cell();
+  (void)reference_cell;
+  Assert(std::all_of(fes.begin(),
+                     fes.end(),
+                     [reference_cell](const FiniteElement<dim, spacedim> *fe) {
+                       return fe->reference_cell() == reference_cell;
+                     }),
+         ExcMessage("You cannot combine finite elements defined on "
+                    "different reference cells into a combined element "
+                    "such as an FESystem or FE_Enriched object."));
+
   // Note that we need to skip every FE with multiplicity 0 in the following
   // block of code
 
