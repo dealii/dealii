@@ -1170,8 +1170,7 @@ namespace Euler_DG
 
         for (unsigned int v = 0; v < data.n_active_entries_per_cell_batch(cell);
              ++v)
-          for (unsigned int d = 0; d < 3; ++d)
-            max_transport = std::max(max_transport, local_max[v]);
+          max_transport = std::max(max_transport, local_max[v]);
       }
 
     max_transport = Utilities::MPI::max(max_transport, MPI_COMM_WORLD);
