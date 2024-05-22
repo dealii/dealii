@@ -73,7 +73,7 @@ construct_comm_for_face_batches(const MatrixFree<dim, Number> &matrix_free)
 
   // Fill a quadrature vector to keep track of the quadrature sizes on each
   // face
-  std::vector<Quadrature<dim>> quadrature_vector(
+  std::vector<unsigned int> quadrature_sizes(
     matrix_free.n_boundary_face_batches());
 
   // Points that are searched by rpe.
@@ -108,8 +108,8 @@ construct_comm_for_face_batches(const MatrixFree<dim, Number> &matrix_free)
             }
         }
 
-      // append quadrature of correct size
-      quadrature_vector[bface] = Quadrature<dim>(phi.n_q_points);
+      // append quadrature size
+      quadrature_sizes[bface] = phi.n_q_points;
     }
 
   // use rpe to search for stored points
@@ -127,7 +127,7 @@ construct_comm_for_face_batches(const MatrixFree<dim, Number> &matrix_free)
   // Renit the communicator `FERemoteEvaluationCommunicator`
   // with the communication objects.
   FERemoteEvaluationCommunicator<dim> remote_communicator;
-  remote_communicator.reinit_faces({co}, face_batch_range, quadrature_vector);
+  remote_communicator.reinit_faces({co}, face_batch_range, quadrature_sizes);
 
   return remote_communicator;
 }
@@ -212,14 +212,12 @@ construct_comm_for_cell_face_nos(const MatrixFree<dim, Number> &matrix_free)
                    matrix_free.n_inner_face_batches() +
                      matrix_free.n_boundary_face_batches());
 
-  // Fill a quadrature vector to keep track of the quadrature sizes on each
-  // cell, face pair
-  std::vector<std::vector<Quadrature<dim - 1>>> quadrature_vector;
+  // Fill a vector of quadrature sizes for each cell, face pair
+  std::vector<std::vector<unsigned int>> quadrature_sizes;
   for (const auto &cell : matrix_free.get_dof_handler()
                             .get_triangulation()
                             .active_cell_iterators())
-    quadrature_vector.emplace_back(
-      std::vector<Quadrature<dim - 1>>(cell->n_faces()));
+    quadrature_sizes.emplace_back(std::vector<unsigned int>(cell->n_faces()));
 
   // Points that are searched by rpe.
   std::vector<Point<dim>> points;
@@ -248,9 +246,8 @@ construct_comm_for_cell_face_nos(const MatrixFree<dim, Number> &matrix_free)
               points.push_back(temp);
             }
 
-          // append quadrature of correct size
-          quadrature_vector[cell->active_cell_index()][f] =
-            Quadrature<dim - 1>(phi.n_q_points);
+          // append correct quadrature size
+          quadrature_sizes[cell->active_cell_index()][f] = phi.n_q_points;
         }
     }
 
@@ -272,7 +269,7 @@ construct_comm_for_cell_face_nos(const MatrixFree<dim, Number> &matrix_free)
   remote_communicator.reinit_faces(
     {co},
     matrix_free.get_dof_handler().get_triangulation().active_cell_iterators(),
-    quadrature_vector);
+    quadrature_sizes);
 
   return remote_communicator;
 }
