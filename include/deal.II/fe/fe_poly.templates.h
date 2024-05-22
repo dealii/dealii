@@ -582,6 +582,11 @@ FE_Poly<dim, spacedim>::get_poly_space_numbering() const
   if (space_tensor_prod != nullptr)
     return space_tensor_prod->get_numbering();
 
+  auto *const space_tensor_prod_aniso =
+    dynamic_cast<AnisotropicPolynomials<dim> *>(this->poly_space.get());
+  if (space_tensor_prod_aniso != nullptr)
+    return space_tensor_prod_aniso->get_numbering();
+
   auto *const space_tensor_prod_piecewise = dynamic_cast<
     TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>> *>(
     this->poly_space.get());

@@ -341,6 +341,25 @@ public:
       &base_polynomials);
 
   /**
+   * Set the ordering of the polynomials. Requires
+   * <tt>renumber.size()==n()</tt>.  Stores a copy of <tt>renumber</tt>.
+   */
+  void
+  set_numbering(const std::vector<unsigned int> &renumber);
+
+  /**
+   * Give read access to the renumber vector.
+   */
+  const std::vector<unsigned int> &
+  get_numbering() const;
+
+  /**
+   * Give read access to the inverse renumber vector.
+   */
+  const std::vector<unsigned int> &
+  get_numbering_inverse() const;
+
+  /**
    * Compute the value and the first and second derivatives of each tensor
    * product polynomial at <tt>unit_point</tt>.
    *
@@ -469,6 +488,16 @@ private:
    * Copy of the vector <tt>pols</tt> of polynomials given to the constructor.
    */
   const std::vector<std::vector<Polynomials::Polynomial<double>>> polynomials;
+
+  /**
+   * Index map for reordering the polynomials.
+   */
+  std::vector<unsigned int> index_map;
+
+  /**
+   * Index map for reordering the polynomials.
+   */
+  std::vector<unsigned int> index_map_inverse;
 
   /**
    * Each tensor product polynomial $p_i$ is a product of one-dimensional
