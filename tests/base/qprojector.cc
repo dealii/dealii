@@ -180,7 +180,7 @@ main()
   deallog << std::setprecision(2);
 
 
-  Quadrature<1> none(0);
+  Quadrature<1> none;
   check(none);
 
   QGauss<1> midpoint(1);

@@ -48,7 +48,10 @@ test()
     hp::FECollection<dim> fe_collection(
       FESystem<dim>(FE_Q<dim>(1), FE_Q<dim>(1)),
       FESystem<dim>(FE_Nothing<dim>(1, true), FE_Nothing<dim>(1, false)));
-    hp::QCollection<dim> q_collection(QGauss<dim>(2), Quadrature<dim>(1));
+    hp::QCollection<dim> q_collection(
+      QGauss<dim>(2),
+      Quadrature<dim>(std::vector<Point<dim>>{Point<dim>()},
+                      std::vector<double>{0.}));
     project(fe_collection, q_collection, function);
   }
   {
@@ -56,7 +59,10 @@ test()
     hp::FECollection<dim> fe_collection(
       FESystem<dim>(FE_Nothing<dim>(1, true), FE_Nothing<dim>(1, false)),
       FESystem<dim>(FE_Q<dim>(1), FE_Q<dim>(1)));
-    hp::QCollection<dim> q_collection(Quadrature<dim>(1), QGauss<dim>(2));
+    hp::QCollection<dim> q_collection(
+      Quadrature<dim>(std::vector<Point<dim>>{Point<dim>()},
+                      std::vector<double>{0.}),
+      QGauss<dim>(2));
     project(fe_collection, q_collection, function);
   }
 }
