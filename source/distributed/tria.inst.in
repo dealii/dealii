@@ -29,4 +29,23 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #endif
       \}
     \}
+
+    namespace internal
+    \{
+      namespace parallel
+      \{
+        namespace distributed
+        \{
+          namespace TriangulationImplementation
+          \{
+#if deal_II_dimension <= deal_II_space_dimension
+            template void
+            exchange_refinement_flags(
+              dealii::parallel::distributed::
+                Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+#endif
+          \}
+        \}
+      \}
+    \}
   }

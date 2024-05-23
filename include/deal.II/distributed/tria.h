@@ -48,10 +48,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_P4EST
-
 // Forward declarations
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 
 namespace FETools
 {
@@ -77,7 +75,28 @@ namespace parallel
     class TemporarilyMatchRefineFlags;
   }
 } // namespace parallel
-#  endif
+
+namespace internal
+{
+  namespace parallel
+  {
+    namespace distributed
+    {
+      namespace TriangulationImplementation
+      {
+        template <int dim, int spacedim>
+        void
+        exchange_refinement_flags(
+          dealii::parallel::distributed::Triangulation<dim, spacedim> &);
+      }
+    } // namespace distributed
+  }   // namespace parallel
+} // namespace internal
+#endif
+
+
+
+#ifdef DEAL_II_WITH_P4EST
 
 namespace parallel
 {
@@ -1094,6 +1113,7 @@ namespace parallel
 
 
 #endif
+
 
 
 namespace parallel

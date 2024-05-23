@@ -19,6 +19,7 @@
 
 #include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/dofs/dof_accessor.templates.h>
@@ -704,17 +705,29 @@ namespace hp
       Assert(dof_handler.has_hp_capabilities(),
              (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-      // Ghost siblings might occur on parallel::shared::Triangulation objects.
-      // We need information about future FE indices on all locally relevant
-      // cells here, and thus communicate them.
-      if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-            &dof_handler.get_triangulation()) != nullptr)
-        internal::hp::DoFHandlerImplementation::communicate_future_fe_indices(
-          const_cast<DoFHandler<dim, spacedim> &>(dof_handler));
+      // Ghost siblings might occur on parallel Triangulation objects.
+      // We need information about refinement flags and future FE indices
+      // on all locally relevant cells here, and thus communicate them.
+      if (dealii::parallel::distributed::Triangulation<dim, spacedim> *tria =
+            dynamic_cast<
+              dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
+              const_cast<dealii::Triangulation<dim, spacedim> *>(
+                &dof_handler.get_triangulation())))
+        {
+          dealii::internal::parallel::distributed::TriangulationImplementation::
+            exchange_refinement_flags(*tria);
+        }
 
+      internal::hp::DoFHandlerImplementation::communicate_future_fe_indices(
+        const_cast<DoFHandler<dim, spacedim> &>(dof_handler));
+
+      // Now: choose p-adaptation over h-adaptation.
       for (const auto &cell : dof_handler.active_cell_iterators())
         if (cell->is_locally_owned() && cell->future_fe_index_set())
           {
+            // This cell is flagged for p-adaptation.
+
+            // Remove any h-refinement flags.
             cell->clear_refine_flag();
 
             // A cell will only be coarsened into its parent if all of its
@@ -740,43 +753,22 @@ namespace hp
                   {
                     if (child->is_active())
                       {
-                        if (child->is_locally_owned())
-                          {
-                            if (child->coarsen_flag_set())
-                              ++h_flagged_children;
-                            if (child->future_fe_index_set())
-                              ++p_flagged_children;
-                          }
-                        else if (child->is_ghost())
-                          {
-                            // The case of siblings being owned by different
-                            // processors can only occur for
-                            // parallel::shared::Triangulation objects.
-                            Assert(
-                              (dynamic_cast<const parallel::shared::
-                                              Triangulation<dim, spacedim> *>(
-                                 &dof_handler.get_triangulation()) != nullptr),
-                              ExcInternalError());
+                        Assert(child->is_artificial() == false,
+                               ExcInternalError());
 
-                            if (child->coarsen_flag_set())
-                              ++h_flagged_children;
-                            // The public interface does not allow to access
-                            // future FE indices on ghost cells. However, we
-                            // need this information here and thus call the
-                            // internal function that does not check for cell
-                            // ownership.
-                            if (internal::DoFCellAccessorImplementation::
-                                  Implementation::
-                                    future_fe_index_set<dim, spacedim, false>(
-                                      *child))
-                              ++p_flagged_children;
-                          }
-                        else
-                          {
-                            // Siblings of locally owned cells are all
-                            // either also locally owned or ghost cells.
-                            DEAL_II_ASSERT_UNREACHABLE();
-                          }
+                        if (child->coarsen_flag_set())
+                          ++h_flagged_children;
+
+                        // The public interface does not allow to access
+                        // future FE indices on ghost cells. However, we
+                        // need this information here and thus call the
+                        // internal function that does not check for cell
+                        // ownership.
+                        if (internal::DoFCellAccessorImplementation::
+                              Implementation::
+                                future_fe_index_set<dim, spacedim, false>(
+                                  *child))
+                          ++p_flagged_children;
                       }
                   }
 
@@ -796,7 +788,7 @@ namespace hp
                   }
                 else
                   {
-                    // Perform p-adaptation on all children and
+                    // Perform p-adaptation (if scheduled) and
                     // drop all h-coarsening flags.
                     for (const auto &child : parent->child_iterators())
                       {
