@@ -19,7 +19,6 @@
 // @sect3{Include files}
 // The program starts with the usual include files, all of which you should
 // have seen before by now:
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>

@@ -39,12 +39,6 @@
 #include <fstream>
 #include <iostream>
 
-// This is new, however: in the previous example we got some unwanted output
-// from the linear solvers. If we want to suppress it, we have to include this
-// file and add a single line somewhere to the program (see the main()
-// function below for that):
-#include <deal.II/base/logstream.h>
-
 // The final step, as in previous programs, is to import all the deal.II class
 // and function names into the global namespace:
 using namespace dealii;

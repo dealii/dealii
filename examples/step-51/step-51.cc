@@ -24,7 +24,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/lac/vector.h>

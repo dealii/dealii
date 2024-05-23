@@ -22,7 +22,6 @@
 // slightly revised version of step-4. As a consequence, most of the following
 // include files are as used there, or at least as used already in previous
 // tutorial programs:
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>

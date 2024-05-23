@@ -20,7 +20,6 @@
 
 // As usual, we start by including some well-known files:
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/tensor_function.h>
