@@ -302,9 +302,9 @@ namespace Step55
     void refine_grid();
     void output_results(const unsigned int cycle) const;
 
-    unsigned int velocity_degree;
-    double       viscosity;
-    MPI_Comm     mpi_communicator;
+    const unsigned int velocity_degree;
+    const double       viscosity;
+    MPI_Comm           mpi_communicator;
 
     const FESystem<dim>                       fe;
     parallel::distributed::Triangulation<dim> triangulation;
@@ -387,15 +387,13 @@ namespace Step55
     // into two IndexSets based on how we want to create the block matrices
     // and vectors.
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-    owned_partitioning.resize(2);
-    owned_partitioning[0] = locally_owned_dofs.get_view(0, n_u);
-    owned_partitioning[1] = locally_owned_dofs.get_view(n_u, n_u + n_p);
+    owned_partitioning                 = {locally_owned_dofs.get_view(0, n_u),
+                                          locally_owned_dofs.get_view(n_u, n_u + n_p)};
 
     const IndexSet locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
-    relevant_partitioning.resize(2);
-    relevant_partitioning[0] = locally_relevant_dofs.get_view(0, n_u);
-    relevant_partitioning[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
+    relevant_partitioning = {locally_relevant_dofs.get_view(0, n_u),
+                             locally_relevant_dofs.get_view(n_u, n_u + n_p)};
 
     // Setting up the constraints for boundary conditions and hanging nodes
     // is identical to step-40. Even though we don't have any hanging nodes
