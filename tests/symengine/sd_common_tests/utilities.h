@@ -27,7 +27,7 @@ make_tensor(const NumberType &val)
     out[i][i] = 1.0;
 
   for (unsigned int i = 0; i < out.n_independent_components; ++i)
-    out[out.unrolled_to_component_indices(i)] += i + val;
+    out[out.unrolled_to_component_indices(i)] += NumberType(i) + val;
   return out;
 }
 
@@ -41,7 +41,7 @@ make_symm_tensor(const NumberType &val)
     out[i][i] = 1.0;
 
   for (unsigned int i = 0; i < out.n_independent_components; ++i)
-    out[out.unrolled_to_component_indices(i)] += i + val;
+    out[out.unrolled_to_component_indices(i)] += NumberType(i) + val;
   return out;
 }
 
