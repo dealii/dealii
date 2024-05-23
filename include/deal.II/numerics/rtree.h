@@ -498,9 +498,17 @@ RTree<typename ContainerType::size_type,
       IndexableGetterFromIndices<ContainerType>>
 pack_rtree_of_indices(const ContainerType &container)
 {
-  std_cxx20::ranges::iota_view<typename ContainerType::size_type,
-                               typename ContainerType::size_type>
-    indices(0, container.size());
+  // We need an array that holds the indices we want to pack. The rtree
+  // implementation in BOOST, for reasons not entirely clear, insists
+  // on using a reference to the elements of the range. This is fine if
+  // the indices are stored in a container, so that's what we do.
+  // (It would be nice if we could just pass a std::ranges::iota_view
+  // instead, but that has no nested 'reference' type, and this then
+  // trips up BOOST rtree.)
+  std::vector<typename ContainerType::size_type> indices(container.size());
+  for (typename ContainerType::size_type i = 0; i < container.size(); ++i)
+    indices[i] = i;
+
   return RTree<typename ContainerType::size_type,
                IndexType,
                IndexableGetterFromIndices<ContainerType>>(
