@@ -1,0 +1,22 @@
+<a name="step-91-Intro"></a>
+<h1>Introduction</h1>
+
+
+In this example, our aims are the following:
+<ol>
+  <li>
+  <li>
+  <li>
+</ol>
+
+
+<h3> The data set used </h3>
+
+https://portal.opentopography.org/dataCatalog, Copernicus Global Digital Elevation Models 90 meters, downsampled to XXXX meters
+
+https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.032021.4326.1
+
+https://desktop.arcgis.com/en/arcmap/latest/manage-data/raster-and-images/esri-ascii-raster-format.htm
+
+
+Dataset Citation: European Space Agency, Sinergise (2021).  <i>Copernicus Global Digital Elevation Model</i>.  Distributed by OpenTopography.  https://doi.org/10.5069/G9028PQB.
