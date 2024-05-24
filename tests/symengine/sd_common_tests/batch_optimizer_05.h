@@ -35,7 +35,7 @@ template <int dim,
           enum SD::OptimizerType     opt_method,
           enum SD::OptimizationFlags opt_flags>
 void
-test_serialization(const int n_runs, TimerOutput &timer)
+test_serialization(const unsigned int n_runs, TimerOutput &timer)
 {
   deallog << std::string(80, '-') << std::endl;
   deallog << "Dim: " << dim << std::endl;
