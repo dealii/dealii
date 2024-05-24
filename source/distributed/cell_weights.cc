@@ -277,12 +277,6 @@ namespace parallel
              "Triangulation associated with the DoFHandler has changed!"));
     (void)triangulation;
 
-    // Check if the cache is still valid by comparing FECollection.
-    Assert(fe_collection == dof_handler.get_fe_collection(),
-           ExcMessage(
-             "FECollection has changed, with which the cache was built."));
-    (void)fe_collection;
-
     // Skip if the DoFHandler has not been initialized yet.
     if (dof_handler.get_fe_collection().size() == 0)
       return 0;
@@ -319,6 +313,12 @@ namespace parallel
           Assert(false, ExcInternalError());
           break;
       }
+
+    // Check if the cache is valid by comparing FECollection.
+    Assert(fe_collection[fe_index] == dof_handler.get_fe(fe_index),
+           ExcMessage(
+             "FECollection has changed, with which the cache was built."));
+    (void)fe_collection;
 
     // Return the cell weight determined from cache.
     return weight_cache[fe_index];
