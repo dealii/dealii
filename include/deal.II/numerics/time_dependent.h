@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <utility>
 #include <vector>
