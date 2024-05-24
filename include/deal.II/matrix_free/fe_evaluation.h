@@ -1634,8 +1634,8 @@ public:
    * polynomial interpolation from the DoF values in the input vector to the
    * quadrature points on the unit cell.  The function arguments specify which
    * parts shall actually be computed. This function has to be called first so
-   * that the access functions @p get_value(), @p get_gradient() or @p
-   * get_laplacian give useful information (unless these values have been set
+   * that the access functions get_value(), get_gradient() or
+   * get_laplacian() give useful information (unless these values have been set
    * manually).
    */
   void
@@ -1650,7 +1650,7 @@ public:
    * component come first, then all degrees of freedom for the second, and so
    * on. The function arguments specify which parts shall actually be
    * computed. This function has to be called first so that the access
-   * functions @p get_value(), @p get_gradient() or @p get_laplacian give
+   * functions get_value(), get_gradient() or get_laplacian() give
    * useful information (unless these values have been set manually).
    */
   void
@@ -1663,8 +1663,8 @@ public:
    * entries from @p input_vector associated with the current cell to the
    * quadrature points on the unit cell. The function arguments specify which
    * parts shall actually be computed. This function has to be called first so
-   * that the access functions @p get_value(), @p get_gradient() or @p
-   * get_laplacian give useful information (unless these values have been set
+   * that the access functions get_value(), get_gradient() or
+   * get_laplacian() give useful information (unless these values have been set
    * manually).
    *
    * This call is equivalent to calling read_dof_values() followed by
@@ -1678,12 +1678,11 @@ public:
   /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
-   * cell and performs the cell integration. The two function arguments
-   * @p integrate_values and @p integrate_gradients are used to enable/disable
-   * summation of the contributions submitted to the values or gradients slots,
-   * respectively. The result is written into the internal data field
-   * @p dof_values (that is usually written into the result vector by the
-   * distribute_local_to_global() or set_dof_values() methods).
+   * cell and performs the cell integration. The function argument
+   * @p integration_flag is used to control which of the submitted contributions
+   * are used during the integration. The result is written into the internal
+   * data field dof_values (that is usually written into the result vector by
+   * the distribute_local_to_global() or set_dof_values() methods).
    */
   void
   integrate(const EvaluationFlags::EvaluationFlags integration_flag);
@@ -1691,10 +1690,10 @@ public:
   /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
-   * cell and performs the cell integration. The two function arguments @p
-   * integrate_values and @p integrate_gradients are used to enable/disable
-   * summation of the contributions submitted to the values or gradients
-   * slots, respectively. As opposed to the other integrate() method, this
+   * cell and performs the cell integration. The function argument
+   * @p integration_flag is used to control which of the submitted contributions
+   * are used during the integration. As opposed to the other integrate()
+   * method, this
    * call stores the result of the testing in the given array @p values_array,
    * whose previous results is overwritten, rather than writing it on the
    * internal data structures behind begin_dof_values().
@@ -1709,9 +1708,9 @@ public:
    * quadrature points, tests them by all the basis functions/gradients on the
    * cell, performs the cell integration, and adds the result into the global
    * vector @p output_vector on the degrees of freedom associated with the
-   * present cell index. The two function arguments @p integrate_values and
-   * @p integrate_gradients are used to enable/disable summation of the
-   * contributions submitted to the values or gradients slots, respectively.
+   * present cell index. The function argument
+   * @p integration_flag is used to control which of the submitted contributions
+   * are used during the integration.
    *
    * This call is equivalent to calling integrate() followed by
    * distribute_local_to_global(), but might internally use
@@ -2082,11 +2081,11 @@ public:
   /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
-   * cell and performs the cell integration. The two function arguments
-   * `integrate_val` and `integrate_grad` are used to enable/disable some of
-   * values or gradients. The result is written into the internal data field
-   * `dof_values` (that is usually written into the result vector by the
-   * distribute_local_to_global() or set_dof_values() methods).
+   * cell and performs the cell integration. The function argument
+   * @p integration_flag is used to control which of the submitted contributions
+   * are used during the integration. The result is written into the internal
+   * data field `dof_values` (that is usually written into the result vector by
+   * the distribute_local_to_global() or set_dof_values() methods).
    */
   void
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
@@ -2095,10 +2094,11 @@ public:
   /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
-   * cell and performs the cell integration. The two function arguments
-   * `integrate_val` and `integrate_grad` are used to enable/disable some of
-   * values or gradients. As opposed to the other integrate() method, this
-   * call stores the result of the testing in the given array `values_array`.
+   * cell and performs the cell integration. The function argument
+   * @p integration_flag is used to control which of the submitted contributions
+   * are used during the integration. As opposed to the other integrate()
+   * method, this
+   * call stores the result of the testing in the given array @p values_array.
    */
   void
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
@@ -2134,9 +2134,9 @@ public:
   /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
-   * cell and performs the cell integration. The two function arguments
-   * `integrate_val` and `integrate_grad` are used to enable/disable some of
-   * values or gradients.
+   * cell and performs the cell integration. The function argument
+   * @p integration_flag is used to control which of the submitted contributions
+   * are used during the integration.
    *
    * This call is equivalent to calling integrate() followed by
    * distribute_local_to_global(), but might internally use some additional
