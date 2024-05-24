@@ -1208,6 +1208,12 @@ namespace Utilities
     // with the communication objects.
     FERemoteEvaluationCommunicator<dim> remote_communicator;
 
+    // if no quadrature size is set, an empty quadrature is considered
+    std::replace(global_quadrature_sizes.begin(),
+                 global_quadrature_sizes.end(),
+                 numbers::invalid_unsigned_int,
+                 0u);
+
     remote_communicator.reinit_faces(comm_objects,
                                      face_batch_range,
                                      global_quadrature_sizes);
