@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,17 +14,7 @@
 
 
 
-// Cell Weights Test
-// -----------------
-// Create a 4x4(x4) grid, on which all cells are associated with a Q1
-// element besides the very first one, which has a Q5 element.
-// We choose a cell weighting algorithm based on the number of degrees
-// of freedom and check if load is balanced as expected after
-// repartitioning the triangulation. The expected accumulated weight on
-// each processor should correlate to the sum of all degrees of
-// freedom on all cells of the corresponding subdomain.
-//
-// This test works on a parallel::distributed::Triangulation.
+// Same as test _01, but with precomputed weights.
 
 
 #include <deal.II/distributed/cell_weights.h>
@@ -74,8 +64,12 @@ test()
   }
 
 
-  const parallel::CellWeights<dim> cell_weights(
-    dh, parallel::CellWeights<dim>::ndofs_weighting({1, 1}));
+  const auto weighting_function =
+    parallel::CellWeights<dim>::ndofs_weighting({1, 1});
+  const auto precomputed_weights =
+    parallel::CellWeights<dim>::precompute_weights(fe_collection,
+                                                   weighting_function);
+  const parallel::CellWeights<dim> cell_weights(dh, precomputed_weights);
 
   tria.repartition();
 
@@ -90,28 +84,6 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
-#ifdef DEBUG
-  parallel::distributed::Triangulation<dim> other_tria(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube(other_tria);
-  other_tria.refine_global(2);
-
-  dh.reinit(other_tria);
-  dh.distribute_dofs(fe_collection);
-
-  try
-    {
-      tria.repartition();
-    }
-  catch (const ExceptionBase &e)
-    {
-      deallog << e.get_exc_name() << std::endl;
-    }
-#else
-  deallog
-    << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
-    << std::endl;
-#endif
-
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -124,8 +96,6 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
-
-  deal_II_exceptions::disable_abort_on_exception();
 
   deallog.push("2d");
   test<2>();

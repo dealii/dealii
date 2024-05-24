@@ -871,8 +871,8 @@ namespace Step75
     LinearAlgebra::distributed::Vector<double> locally_relevant_solution;
     LinearAlgebra::distributed::Vector<double> system_rhs;
 
-    std::unique_ptr<FESeries::Legendre<dim>>    legendre;
-    std::unique_ptr<parallel::CellWeights<dim>> cell_weights;
+    std::unique_ptr<FESeries::Legendre<dim>> legendre;
+    parallel::CellWeights<dim>               cell_weights;
 
     Vector<float> estimated_error_per_cell;
     Vector<float> hp_decision_indicators;
@@ -981,19 +981,19 @@ namespace Step75
     //
     // Since we are only using information about the number of degrees of
     // freedom per cell, which is a quantity unique to every finite element, we
-    // can compute the weights in advance. A cache can be set up automatically
-    // with the `enable_fe_cache` parameter.
+    // can compute the weights in advance.
     //
     // For load balancing, efficient solvers like the one we use should scale
     // linearly with the number of degrees of freedom owned. We set the
     // parameters for cell weighting correspondingly: A weighting factor of $1$
     // and an exponent of $1$ (see the definitions of the `weighting_factor` and
     // `weighting_exponent` above).
-    cell_weights = std::make_unique<parallel::CellWeights<dim>>(
-      dof_handler,
-      parallel::CellWeights<dim>::ndofs_weighting(
-        {prm.weighting_factor, prm.weighting_exponent}),
-      /*enable_fe_cache=*/true);
+    const auto weighting_function = parallel::CellWeights<dim>::ndofs_weighting(
+      {prm.weighting_factor, prm.weighting_exponent});
+    const auto precomputed_weights =
+      parallel::CellWeights<dim>::precompute_weights(fe_collection,
+                                                     weighting_function);
+    cell_weights.reinit(dof_handler, precomputed_weights);
 
     // In h-adaptive applications, we ensure a 2:1 mesh balance by limiting the
     // difference of refinement levels of neighboring cells to one. With the

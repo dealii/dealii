@@ -1,4 +1,4 @@
-New: parallel::CellWeights is now able to optionally cache weights.
+New: parallel::CellWeights can now work with pre-computed weights.
 This requires that the weights are determined only by information
 about finite elements.
 <br>

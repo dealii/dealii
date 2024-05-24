@@ -88,15 +88,44 @@ namespace parallel
 
 
 
+  // ---------- precompute weights ----------
+
+  template <int dim, int spacedim>
+  std::vector<unsigned int>
+  CellWeights<dim, spacedim>::precompute_weights(
+    const hp::FECollection<dim, spacedim> &fe_collection,
+    const WeightingFunction               &weighting_function)
+  {
+    std::vector<unsigned int> precomputed_weights;
+    precomputed_weights.reserve(fe_collection.size());
+
+    const typename DoFHandler<dim, spacedim>::cell_iterator dummy;
+    for (const auto &fe : fe_collection)
+      precomputed_weights.push_back(weighting_function(dummy, fe));
+
+    return precomputed_weights;
+  }
+
+
+
   // ---------- handle connection ----------
 
   template <int dim, int spacedim>
   CellWeights<dim, spacedim>::CellWeights(
     const DoFHandler<dim, spacedim> &dof_handler,
-    const WeightingFunction         &weighting_function,
-    const bool                       enable_fe_cache)
+    const WeightingFunction         &weighting_function)
   {
-    reinit(dof_handler, weighting_function, enable_fe_cache);
+    reinit(dof_handler, weighting_function);
+  }
+
+
+
+  template <int dim, int spacedim>
+  CellWeights<dim, spacedim>::CellWeights(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const std::vector<unsigned int> &precomputed_weights)
+  {
+    reinit(dof_handler, precomputed_weights);
   }
 
 
@@ -113,17 +142,26 @@ namespace parallel
   void
   CellWeights<dim, spacedim>::reinit(
     const DoFHandler<dim, spacedim> &dof_handler,
-    const WeightingFunction         &weighting_function,
-    const bool                       enable_fe_cache)
+    const WeightingFunction         &weighting_function)
   {
     connection.disconnect();
 
-    if (enable_fe_cache)
-      connection = dof_handler.get_triangulation().signals.weight.connect(
-        make_weighting_callback_with_cache(dof_handler, weighting_function));
-    else
-      connection = dof_handler.get_triangulation().signals.weight.connect(
-        make_weighting_callback(dof_handler, weighting_function));
+    connection = dof_handler.get_triangulation().signals.weight.connect(
+      make_weighting_callback(dof_handler, weighting_function));
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  CellWeights<dim, spacedim>::reinit(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const std::vector<unsigned int> &precomputed_weights)
+  {
+    connection.disconnect();
+
+    connection = dof_handler.get_triangulation().signals.weight.connect(
+      make_weighting_callback(dof_handler, precomputed_weights));
   }
 
 
@@ -221,18 +259,10 @@ namespace parallel
   std::function<unsigned int(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellStatus                                                    status)>
-  CellWeights<dim, spacedim>::make_weighting_callback_with_cache(
+  CellWeights<dim, spacedim>::make_weighting_callback(
     const DoFHandler<dim, spacedim> &dof_handler,
-    const WeightingFunction         &weighting_function)
+    const std::vector<unsigned int> &precomputed_weights)
   {
-    // build cache for weights
-    std::vector<unsigned int> weight_cache;
-    weight_cache.reserve(dof_handler.get_fe_collection().size());
-
-    const typename DoFHandler<dim, spacedim>::cell_iterator dummy;
-    for (const auto &fe : dof_handler.get_fe_collection())
-      weight_cache.push_back(weighting_function(dummy, fe));
-
     // create callback function
     const parallel::TriangulationBase<dim, spacedim> *tria =
       dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
@@ -243,18 +273,18 @@ namespace parallel
       ExcMessage(
         "parallel::CellWeights requires a parallel::TriangulationBase object."));
 
-    // capture the cache by copy
+    // capture the weights by copy
     // for validation purposes, also capture the fe_collection by copy
-    // with which the cache has been built
+    // with which the weights were computed
     return [&dof_handler,
             tria,
             fe_collection = dof_handler.get_fe_collection(),
-            weight_cache](
+            precomputed_weights](
              const typename dealii::Triangulation<dim, spacedim>::cell_iterator
                              &cell,
              const CellStatus status) -> unsigned int {
-      return CellWeights<dim, spacedim>::weighting_callback_with_cache(
-        cell, status, dof_handler, *tria, fe_collection, weight_cache);
+      return CellWeights<dim, spacedim>::weighting_callback(
+        cell, status, dof_handler, *tria, fe_collection, precomputed_weights);
     };
   }
 
@@ -262,13 +292,13 @@ namespace parallel
 
   template <int dim, int spacedim>
   unsigned int
-  CellWeights<dim, spacedim>::weighting_callback_with_cache(
+  CellWeights<dim, spacedim>::weighting_callback(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell_,
     const CellStatus                                                    status,
     const DoFHandler<dim, spacedim>                  &dof_handler,
     const parallel::TriangulationBase<dim, spacedim> &triangulation,
     const hp::FECollection<dim, spacedim>            &fe_collection,
-    const std::vector<unsigned int>                  &weight_cache)
+    const std::vector<unsigned int>                  &precomputed_weights)
   {
     // Check if we are still working with the correct combination of
     // Triangulation and DoFHandler.
@@ -314,14 +344,16 @@ namespace parallel
           break;
       }
 
-    // Check if the cache is valid by comparing FECollection.
-    Assert(fe_collection[fe_index] == dof_handler.get_fe(fe_index),
-           ExcMessage(
-             "FECollection has changed, with which the cache was built."));
+    // Check if the weights are valid by comparing the current finite element
+    // with the one they have been computed with.
+    Assert(
+      fe_collection[fe_index] == dof_handler.get_fe(fe_index),
+      ExcMessage(
+        "FECollection has changed, with which the weights were computed."));
     (void)fe_collection;
 
-    // Return the cell weight determined from cache.
-    return weight_cache[fe_index];
+    // Return the precomputed weight.
+    return precomputed_weights[fe_index];
   }
 } // namespace parallel
 
