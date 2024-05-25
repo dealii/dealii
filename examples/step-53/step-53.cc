@@ -128,7 +128,7 @@ namespace Step53
   // just another input stream that, for all practical purposes, looks just like
   // the ones we always use.
   //
-  // When reading the data, we read the three columns but throw ignore the
+  // When reading the data, we read the three columns but ignore the
   // first two. The datum in the last column is appended to an array that we
   // the return and that will be copied into the table from which
   // <code>topography_data</code> is initialized. Since the BOOST.iostreams
@@ -146,7 +146,6 @@ namespace Step53
   {
     std::vector<double> data;
 
-    // create a stream where we read from gzipped data
     boost::iostreams::filtering_istream in;
     in.push(boost::iostreams::basic_gzip_decompressor<>());
     in.push(boost::iostreams::file_source("topography.txt.gz"));
