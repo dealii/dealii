@@ -28,12 +28,24 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
 template <>
+Quadrature<0>::Quadrature()
+  : is_tensor_product_flag(false)
+{}
+
+template <>
 Quadrature<0>::Quadrature(const unsigned int n_q)
   : quadrature_points(n_q)
   , weights(n_q, 0)
   , is_tensor_product_flag(false)
 {}
 #endif
+
+
+
+template <int dim>
+Quadrature<dim>::Quadrature()
+  : is_tensor_product_flag(dim == 1)
+{}
 
 
 

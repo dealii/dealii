@@ -46,7 +46,10 @@ test(const bool fe_nothing_dominates)
     hp::FECollection<dim> fe_collection(FE_Nothing<dim>(/*n_components=*/1,
                                                         fe_nothing_dominates),
                                         FE_Q<dim>(1));
-    hp::QCollection<dim>  q_collection(Quadrature<dim>(1), QGauss<dim>(2));
+    hp::QCollection<dim>  q_collection(
+      Quadrature<dim>(std::vector<Point<dim>>{Point<dim>()},
+                      std::vector<double>{0.}),
+      QGauss<dim>(2));
     project(fe_collection, q_collection, function);
   }
 
@@ -55,7 +58,10 @@ test(const bool fe_nothing_dominates)
     hp::FECollection<dim> fe_collection(FE_Q<dim>(1),
                                         FE_Nothing<dim>(/*n_components=*/1,
                                                         fe_nothing_dominates));
-    hp::QCollection<dim>  q_collection(QGauss<dim>(2), Quadrature<dim>(1));
+    hp::QCollection<dim>  q_collection(
+      QGauss<dim>(2),
+      Quadrature<dim>(std::vector<Point<dim>>{Point<dim>()},
+                      std::vector<double>{0.}));
     project(fe_collection, q_collection, function);
   }
 }

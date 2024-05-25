@@ -26,7 +26,8 @@ template <int dim>
 void
 print_is_tensor_product()
 {
-  Quadrature<dim> q_0(1);
+  Quadrature<dim> q_0(std::vector<Point<dim>>{Point<dim>()},
+                      std::vector<double>{0.});
   deallog << "Quadrature<" << dim << ">: " << q_0.is_tensor_product()
           << std::endl;
 
