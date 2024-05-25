@@ -2828,29 +2828,33 @@ namespace internal
                                                     vector_ptr + ind,
                                                     dof_indices);
                     }
-                else if (n_face_orientations == 1)
-                  for (unsigned int i = 0; i < dofs_per_face; ++i)
-                    {
-                      const unsigned int ind = index_array_nodal[0][i];
-                      const unsigned int i_  = reorientate(0, i);
-
-                      for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                        proc.value(temp1[i_][v], vector_ptrs[v][ind]);
-
-                      if (integrate == false)
-                        for (unsigned int v = n_filled_lanes; v < n_lanes; ++v)
-                          temp1[i_][v] = 0.0;
-                    }
                 else
                   {
-                    if (integrate == false && n_filled_lanes < n_lanes)
+                    if constexpr (n_face_orientations == 1)
                       for (unsigned int i = 0; i < dofs_per_face; ++i)
-                        temp1[i] = Number();
+                        {
+                          const unsigned int ind = index_array_nodal[0][i];
+                          const unsigned int i_  = reorientate(0, i);
 
-                    for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                      for (unsigned int i = 0; i < dofs_per_face; ++i)
-                        proc.value(temp1[reorientate(v, i)][v],
-                                   vector_ptrs[v][index_array_nodal[v][i]]);
+                          for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                            proc.value(temp1[i_][v], vector_ptrs[v][ind]);
+
+                          if constexpr (integrate == false)
+                            for (unsigned int v = n_filled_lanes; v < n_lanes;
+                                 ++v)
+                              temp1[i_][v] = 0.0;
+                        }
+                    else
+                      {
+                        if (integrate == false && n_filled_lanes < n_lanes)
+                          for (unsigned int i = 0; i < dofs_per_face; ++i)
+                            temp1[i] = Number();
+
+                        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                          for (unsigned int i = 0; i < dofs_per_face; ++i)
+                            proc.value(temp1[reorientate(v, i)][v],
+                                       vector_ptrs[v][index_array_nodal[v][i]]);
+                      }
                   }
               }
           }
