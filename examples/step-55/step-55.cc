@@ -300,7 +300,7 @@ namespace Step55
     void assemble_system();
     void solve();
     void refine_grid();
-    void output_results(const unsigned int cycle) const;
+    void output_results(const unsigned int cycle);
 
     const unsigned int velocity_degree;
     const double       viscosity;
@@ -675,8 +675,10 @@ namespace Step55
 
 
   template <int dim>
-  void StokesProblem<dim>::output_results(const unsigned int cycle) const
+  void StokesProblem<dim>::output_results(const unsigned int cycle)
   {
+    TimerOutput::Scope t(computing_timer, "output");
+
     {
       const ComponentSelectFunction<dim> pressure_mask(dim, dim + 1);
       const ComponentSelectFunction<dim> velocity_mask(std::make_pair(0, dim),
@@ -786,10 +788,7 @@ namespace Step55
         solve();
 
         if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
-          {
-            TimerOutput::Scope t(computing_timer, "output");
-            output_results(cycle);
-          }
+          output_results(cycle);
 
         computing_timer.print_summary();
         computing_timer.reset();
