@@ -507,8 +507,8 @@ namespace Step55
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> cell_matrix2(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> system_cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> preconditioner_cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
 
     const RightHandSide<dim>    right_hand_side;
@@ -525,9 +525,9 @@ namespace Step55
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          cell_matrix  = 0;
-          cell_matrix2 = 0;
-          cell_rhs     = 0;
+          system_cell_matrix         = 0;
+          preconditioner_cell_matrix = 0;
+          cell_rhs                   = 0;
 
           fe_values.reinit(cell);
           right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
@@ -545,14 +545,15 @@ namespace Step55
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
-                      cell_matrix(i, j) +=
+                      system_cell_matrix(i, j) +=
                         (viscosity *
                            scalar_product(grad_phi_u[i], grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
                         fe_values.JxW(q);
 
-                      cell_matrix2(i, j) += 1.0 / viscosity * phi_p[i] *
-                                            phi_p[j] * fe_values.JxW(q);
+                      preconditioner_cell_matrix(i, j) += 1.0 / viscosity *
+                                                          phi_p[i] * phi_p[j] *
+                                                          fe_values.JxW(q);
                     }
 
                   const unsigned int component_i =
@@ -564,13 +565,13 @@ namespace Step55
 
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
+          constraints.distribute_local_to_global(system_cell_matrix,
                                                  cell_rhs,
                                                  local_dof_indices,
                                                  system_matrix,
                                                  system_rhs);
 
-          constraints.distribute_local_to_global(cell_matrix2,
+          constraints.distribute_local_to_global(preconditioner_cell_matrix,
                                                  local_dof_indices,
                                                  preconditioner_matrix);
         }
