@@ -94,6 +94,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_cube(left = 0., right = 1., colorize =
+   * false)`.
    */
   template <int dim, int spacedim>
   void
@@ -132,6 +136,9 @@ namespace GridGenerator
    *
    * @note Implemented for <tt>Triangulation@<2,2@></tt>,
    * <tt>Triangulation@<3,3@></tt>.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_simplex(vertices)`.
    */
   template <int dim>
   void
@@ -174,6 +181,9 @@ namespace GridGenerator
    * @param right Upper bound for the interval used to create the hyper cube.
    *
    * @param colorize Assign different boundary ids if set to true.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_hyper_cube(left = 0., right = 1.)`.
    */
   template <int dim, int spacedim>
   void
@@ -217,6 +227,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_rectangle(p1, p2, colorize = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -273,6 +286,10 @@ namespace GridGenerator
    *
    * @param colorize Assign different boundary ids if set to true. The same
    * comments apply as for the hyper_rectangle() function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_hyper_rectangle(repetitions, p1, p2,
+   * colorize = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -296,6 +313,10 @@ namespace GridGenerator
    *
    * The step sizes have to add up to the dimensions of the hyper rectangle
    * specified by the points @p p1 and @p p2.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_steps_hyper_rectangle(step_sizes, p1,
+   * p2, colorize = false)`.
    */
   template <int dim>
   void
@@ -314,6 +335,10 @@ namespace GridGenerator
    * the domain will have a void there.
    *
    * @note If you need a lot of holes, you may consider cheese().
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_material_hyper_rectangle(spacing, p,
+   * material_id, colorize = false)`.
    */
   template <int dim>
   void
@@ -346,6 +371,9 @@ namespace GridGenerator
    * calling this function.
    *
    * @param holes Positive number of holes in each of the dim directions.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_cheese(holes)`.
    */
   template <int dim, int spacedim>
   void
@@ -394,6 +422,12 @@ namespace GridGenerator
    *
    * @p tria is the triangulation to be created. It needs to be empty upon
    * calling this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_plate_with_a_holes(inner_radius = 0.4, outer_radius
+   * = 1, pad_bottom = 2, pad_top = 2., pad_left = 1., pad_right, center =
+   * Point(), polar_manifold = 0, tfi_manifold = 1, L = 1, n_slices = 2,
+   * colorize = false)`.
    */
   template <int dim>
   void
@@ -498,6 +532,10 @@ namespace GridGenerator
    * url       = {https://doi.org/10.1007/978-3-322-89849-4_39}
    * }
    * @endcode
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_channel_with_cylinder(shell_region_width = 0.03,
+   * n_shellsa = 2, skewness = 2., colorize = false)`.
    */
   template <int dim>
   void
@@ -526,6 +564,9 @@ namespace GridGenerator
    * @param tria The triangulation that will be created
    * @param vertices The 2^dim vertices of the cell
    * @param colorize If true, set different boundary ids.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_general_cell(vertices, colorize = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -548,6 +589,9 @@ namespace GridGenerator
    *
    * @param colorize Assign different boundary ids if true. (see
    * @ref GlossColorization "the glossary entry on colorization").
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_parallelogram(vertices, colorize = false)`.
    */
   template <int dim>
   void
@@ -569,6 +613,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_parallelepiped(vertices, colorize = false)`.
    */
   template <int dim>
   void
@@ -586,6 +633,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_fixed_subdivided_parallelepiped(n_subdivisions,
+   * corners, colorize = false)`.
    */
   template <int dim>
   void
@@ -601,6 +652,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_varying_subdivided_parallelepiped(n_subdivisions,
+   * corners, colorize = false)`.
    */
   template <int dim>
   void
@@ -659,6 +714,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_cube(left = 0, right = 1., thickness = 1.,
+   * colorize = false)`.
    */
   template <int dim>
   void
@@ -743,6 +802,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_ball(point, radius = 1.)`.
    */
   template <int dim>
   void
@@ -782,6 +844,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_ball_balanced(point = Point(), radius = 1.)`.
    */
   template <int dim>
   void
@@ -864,6 +929,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_sphere(center, radius = 1.)`.
    */
   template <int spacedim>
   void
@@ -903,6 +971,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_quarter_hyper_ball(center, radius = 1.)`.
    */
   template <int dim>
   void
@@ -921,6 +992,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_half_hyper_ball(center, radius = 1.)`.
    */
   template <int dim>
   void
@@ -950,6 +1024,9 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_cylinder(radius = 1., half_length = 1.)`.
    */
   template <int dim>
   void
@@ -990,6 +1067,10 @@ namespace GridGenerator
    * @param radius The radius of the circle in the yz-plane used to extrude the cylinder.
    *
    * @param half_length The half-length of the cylinder in the x direction.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_subdivided_cylinder(x_subdivisions, radius = 1.,
+   * half_length = 1.)`.
    */
   template <int dim>
   void
@@ -1028,6 +1109,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_truncated_cone(radius_0 = 1., radius_2 = 0.5,
+   * half_length = 1.)`.
    */
   template <int dim>
   void
@@ -1361,6 +1446,10 @@ namespace GridGenerator
    *
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_shell(center, inner_radius, outer_radius,
+   * n_cells = 0, colorize = false)`.
    */
   template <int dim>
   void
@@ -1612,6 +1701,10 @@ namespace GridGenerator
    * flat faces (0 to 3 in 2d, 0 to 5 in 3d) plus the curved hole (4 in 2d,
    * and 6 in 3d). If @p colorize is set to false, then flat faces get the
    * number 0 and the hole gets number 1.
+   *
+   * @note This function is available through the python interface as
+   * `triangulation.generate_hyper_cube_with_cylindrical_hole(inner_radius =
+   * 0.25, outer_radius = 0.5, L = 0.5, repetitions = 1, colorize = false)`.
    */
   template <int dim>
   void
@@ -1934,6 +2027,10 @@ namespace GridGenerator
    *                                       false,
    *                                       false);
    * @endcode
+   *
+   * @note This function is available through the python interface as
+   * `result.merge_triangulations(triangulations, duplicated_vertex_tolerance =
+   * 1e-12, copy_manifold_ids = false)`.
    */
   template <int dim, int spacedim>
   void
@@ -1990,6 +2087,9 @@ namespace GridGenerator
    * are not aligned with the coordinate axes then the copies might not share
    * common faces; i.e., this function is intended for simple geometries with
    * boundary faces aligned along the coordinate axes.
+   *
+   * @note This function is available through the python interface as
+   * `result.replicate_triangulation(input, extents)`.
    */
   template <int dim, int spacedim = dim>
   void
@@ -2151,6 +2251,9 @@ namespace GridGenerator
    * @note Since @p input and @p output have different spatial dimensions, no
    * manifold objects are copied by this function regardless of the value of
    * @p copy_manifold_ids.
+   *
+   * @note This function is available through the python interface as
+   * `input.extrude_triangulation(n_slices, height, result)`.
    */
   void
   extrude_triangulation(
@@ -2254,6 +2357,9 @@ namespace GridGenerator
    * @note Since @p input and @p output have different spatial dimensions, no
    * manifold objects are copied by this function: you must attach new
    * manifold objects to @p out_tria.
+   *
+   * @note This function is available through the python interface as
+   * `in_tria.flatten_triangulation(out_tria)`.
    */
   template <int dim, int spacedim1, int spacedim2>
   void
@@ -2295,6 +2401,9 @@ namespace GridGenerator
    *
    * Also see
    * @ref simplex "Simplex support".
+   *
+   * @note This function is available through the python interface as
+   * `in_tria.convert_hypercube_to_simplex_mesh(out_tria)`.
    */
   template <int dim, int spacedim>
   void
