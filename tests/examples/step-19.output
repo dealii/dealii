@@ -1,0 +1,70 @@
+Timestep 1
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  20
+  Number of particles lost this time step:  0
+
+  Now at t=2.12647e-07, dt=2.12647e-07.
+
+Timestep 2
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  40
+  Number of particles lost this time step:  0
+
+  Now at t=4.14362e-07, dt=2.01715e-07.
+
+Timestep 3
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  60
+  Number of particles lost this time step:  0
+
+  Now at t=5.23066e-07, dt=1.08704e-07.
+
+Timestep 4
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  80
+  Number of particles lost this time step:  0
+
+  Now at t=6.08431e-07, dt=8.53649e-08.
+
+Timestep 5
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  100
+  Number of particles lost this time step:  0
+
+  Now at t=6.81935e-07, dt=7.35039e-08.
+
+Timestep 6
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  120
+  Number of particles lost this time step:  0
+
+  Now at t=7.47864e-07, dt=6.59294e-08.
+
+Timestep 7
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  140
+  Number of particles lost this time step:  0
+
+  Now at t=8.2516e-07, dt=7.72957e-08.
+
+Timestep 8
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  158
+  Number of particles lost this time step:  0
+
+  Now at t=8.95325e-07, dt=7.01652e-08.
+
+Timestep 9
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  172
+  Number of particles lost this time step:  0
+
+  Now at t=9.67852e-07, dt=7.25269e-08.
+
+Timestep 10
+  Field degrees of freedom:                 4989
+  Total number of particles in simulation:  186
+  Number of particles lost this time step:  0
+
+  Now at t=1e-06, dt=3.21481e-08.
+

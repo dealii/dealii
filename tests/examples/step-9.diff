@@ -1,0 +1,9 @@
+850c850
+<     for (unsigned int cycle = 0; cycle < 10; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 5; ++cycle)
+875c875
+<         output_results(cycle);
+---
+>       //output_results(cycle);
+
