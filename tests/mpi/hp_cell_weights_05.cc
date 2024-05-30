@@ -39,9 +39,9 @@ test()
   tria.refine_global(2);
 
   // Apply ndof cell weights.
-  hp::FECollection<dim> fe_collection;
-  fe_collection.push_back(FE_Q<dim>(1));
-  fe_collection.push_back(FE_Q<dim>(5));
+  hp::FECollection<dim> fes;
+  fes.push_back(FE_Q<dim>(1));
+  fes.push_back(FE_Q<dim>(5));
 
   DoFHandler<dim> dh(tria);
 
@@ -51,7 +51,7 @@ test()
       if (cell->id().to_string() == "0_2:00")
         cell->set_active_fe_index(1);
 
-  dh.distribute_dofs(fe_collection);
+  dh.distribute_dofs(fes);
 
   deallog << "Number of cells before repartitioning: "
           << tria.n_locally_owned_active_cells() << std::endl;
@@ -67,8 +67,7 @@ test()
   const auto weighting_function =
     parallel::CellWeights<dim>::ndofs_weighting({1, 1});
   const auto precomputed_weights =
-    parallel::CellWeights<dim>::precompute_weights(fe_collection,
-                                                   weighting_function);
+    parallel::CellWeights<dim>::precompute_weights(fes, weighting_function);
   const parallel::CellWeights<dim> cell_weights(dh, precomputed_weights);
 
   tria.repartition();
@@ -84,6 +83,27 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
+#ifdef DEBUG
+  hp::FECollection<dim> other_fes;
+  other_fes.push_back(FE_Q<dim>(5));
+  other_fes.push_back(FE_Q<dim>(1));
+
+  dh.distribute_dofs(other_fes);
+
+  try
+    {
+      tria.repartition();
+    }
+  catch (const ExceptionBase &e)
+    {
+      deallog << e.get_exc_name() << std::endl;
+    }
+#else
+  deallog
+    << "ExcMessage(\"FECollection has changed, with which the weights were computed.\")"
+    << std::endl;
+#endif
+
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -96,6 +116,8 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
+
+  deal_II_exceptions::disable_abort_on_exception();
 
   deallog.push("2d");
   test<2>();
