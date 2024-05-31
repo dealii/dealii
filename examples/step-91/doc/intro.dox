@@ -10,6 +10,12 @@ In this example, our aims are the following:
 </ol>
 
 
+<h3> Loading large data sets </h3>
+
+Table::replicate_across_communicator()
+
+
+
 <h3> The data set used </h3>
 
 https://portal.opentopography.org/dataCatalog, Copernicus Global Digital Elevation Models 90 meters, downsampled to XXXX meters
