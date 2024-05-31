@@ -85,7 +85,7 @@ namespace Step55
   class ColoradoTopography : public Function<2>
   {
   public:
-    ColoradoTopography();
+    ColoradoTopography(const MPI_Comm mpi_communicator);
 
     virtual double value(const Point<2> &p,
                          const unsigned int /*component*/ = 0) const override
@@ -100,76 +100,95 @@ namespace Step55
 
   // TODO: share data among processors
   // Exact: -109 to -102, 37 to 41
-  ColoradoTopography::ColoradoTopography()
+  ColoradoTopography::ColoradoTopography(const MPI_Comm mpi_communicator)
   {
-    const std::string filename = "colorado-topography-1800m.txt.gz";
-
-    boost::iostreams::filtering_istream in;
-    in.push(boost::iostreams::basic_gzip_decompressor<>());
-    in.push(boost::iostreams::file_source(filename));
-
     unsigned int n_rows;
     unsigned int n_columns;
     Point<2>     lower_left_corner;
     double       pixel_size;
 
-    std::string word;
+    Table<2, double> elevation_data;
 
-    in >> word;
-    AssertThrow(word == "ncols",
-                ExcMessage("The first line of the input file needs to start "
-                           "with the word 'ncols', but starts with '" +
-                           word + "'."));
-    in >> n_columns;
+    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+      {
+        const std::string filename = "colorado-topography-1800m.txt.gz";
 
-    in >> word;
-    AssertThrow(word == "nrows",
-                ExcMessage("The second line of the input file needs to start "
-                           "with the word 'nrows', but starts with '" +
-                           word + "'."));
-    in >> n_rows;
+        boost::iostreams::filtering_istream in;
+        in.push(boost::iostreams::basic_gzip_decompressor<>());
+        in.push(boost::iostreams::file_source(filename));
 
-    in >> word;
-    AssertThrow(word == "xllcorner",
-                ExcMessage("The third line of the input file needs to start "
-                           "with the word 'xllcorner', but starts with '" +
-                           word + "'."));
-    in >> lower_left_corner[0];
+        std::string word;
 
-    in >> word;
-    AssertThrow(word == "yllcorner",
-                ExcMessage("The fourth line of the input file needs to start "
-                           "with the word 'yllcorner', but starts with '" +
-                           word + "'."));
-    in >> lower_left_corner[1];
+        in >> word;
+        AssertThrow(word == "ncols",
+                    ExcMessage(
+                      "The first line of the input file needs to start "
+                      "with the word 'ncols', but starts with '" +
+                      word + "'."));
+        in >> n_columns;
+
+        in >> word;
+        AssertThrow(word == "nrows",
+                    ExcMessage(
+                      "The second line of the input file needs to start "
+                      "with the word 'nrows', but starts with '" +
+                      word + "'."));
+        in >> n_rows;
+
+        in >> word;
+        AssertThrow(word == "xllcorner",
+                    ExcMessage(
+                      "The third line of the input file needs to start "
+                      "with the word 'xllcorner', but starts with '" +
+                      word + "'."));
+        in >> lower_left_corner[0];
+
+        in >> word;
+        AssertThrow(word == "yllcorner",
+                    ExcMessage(
+                      "The fourth line of the input file needs to start "
+                      "with the word 'yllcorner', but starts with '" +
+                      word + "'."));
+        in >> lower_left_corner[1];
 
 
-    in >> word;
-    AssertThrow(word == "cellsize",
-                ExcMessage("The fourth line of the input file needs to start "
-                           "with the word 'cellsize', but starts with '" +
-                           word + "'."));
-    in >> pixel_size;
+        in >> word;
+        AssertThrow(word == "cellsize",
+                    ExcMessage(
+                      "The fourth line of the input file needs to start "
+                      "with the word 'cellsize', but starts with '" +
+                      word + "'."));
+        in >> pixel_size;
 
-    Table<2, double> elevation_data(n_columns, n_rows);
-    for (unsigned int row = 0; row < n_rows; ++row)
-      for (unsigned int column = 0; column < n_columns; ++column)
-        {
-          try
+        elevation_data.reinit(n_columns, n_rows);
+        for (unsigned int row = 0; row < n_rows; ++row)
+          for (unsigned int column = 0; column < n_columns; ++column)
             {
-              double elevation;
-              in >> elevation;
+              try
+                {
+                  double elevation;
+                  in >> elevation;
 
-              elevation_data(column, n_rows - row - 1) = elevation;
+                  elevation_data(column, n_rows - row - 1) = elevation;
+                }
+              catch (...)
+                {
+                  AssertThrow(false,
+                              ExcMessage(
+                                "Could not read all expected data points "
+                                "from the file <" +
+                                filename + ">!"));
+                }
             }
-          catch (...)
-            {
-              AssertThrow(false,
-                          ExcMessage("Could not read all expected data points "
-                                     "from the file <" +
-                                     filename + ">!"));
-            }
-        }
+      }
+
+    n_rows    = Utilities::MPI::broadcast(mpi_communicator, n_rows, 0);
+    n_columns = Utilities::MPI::broadcast(mpi_communicator, n_columns, 0);
+    lower_left_corner =
+      Utilities::MPI::broadcast(mpi_communicator, lower_left_corner, 0);
+    pixel_size = Utilities::MPI::broadcast(mpi_communicator, pixel_size, 0);
+
+    elevation_data.replicate_across_communicator(mpi_communicator, 0);
 
     data = std::make_unique<Functions::InterpolatedUniformGridData<2>>(
       std::array<std::pair<double, double>, 2>{
@@ -264,7 +283,7 @@ namespace Step55
                                               {7, 4},
                                               Point<2>(-109., 37.),
                                               Point<2>(-102., 41.));
-    triangulation.refine_global(7);
+    triangulation.refine_global(4);
   }
 
 
@@ -338,7 +357,7 @@ namespace Step55
   {
     TimerOutput::Scope t(computing_timer, "interpolating initial conditions");
 
-    const ColoradoTopography                          colorado_topography;
+    const ColoradoTopography colorado_topography(mpi_communicator);
     const VectorFunctionFromScalarFunctionObject<dim> initial_values(
       [&](const Point<dim> &p) { return colorado_topography.value(p); }, 0, 2);
 
