@@ -157,7 +157,8 @@ namespace FETools
 
           multiplied_n_components += fes[i]->n_components() * multiplicities[i];
 
-          degree = std::max(degree, fes[i]->tensor_degree());
+          if (multiplicities[i] > 0)
+            degree = std::max(degree, fes[i]->tensor_degree());
         }
 
       // assume conformity of the first finite element and then take away
