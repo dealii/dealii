@@ -4,10 +4,12 @@
 
 In this example, our aims are the following:
 <ol>
-  <li>
-  <li>
-  <li>
+  <li> Solving the streampower erosion model
+  <li> Interfacing with the SUNDIALS::IDA class
+  <li> Dealing with large data sets.
 </ol>
+
+<h3> The streampower erosion model </h3>
 
 
 <h3> Loading large data sets </h3>
