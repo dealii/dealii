@@ -477,11 +477,12 @@ namespace Step55
 
 
   template <int dim>
-  class DirectionPostprocessor : public DataPostprocessorVector<dim>
+  class DownhillFlowPostprocessor : public DataPostprocessorVector<dim>
   {
   public:
-    DirectionPostprocessor()
-      : DataPostprocessorVector<dim>("direction", update_gradients)
+    DownhillFlowPostprocessor()
+      : DataPostprocessorVector<dim>("direction",
+                                     update_values | update_gradients)
     {}
 
     virtual void evaluate_vector_field(
@@ -494,10 +495,12 @@ namespace Step55
       for (unsigned int p = 0; p < input_data.solution_gradients.size(); ++p)
         {
           AssertDimension(computed_quantities[p].size(), dim);
+
+          const double catchment_area = 1.; // input_data.solution_values[p][1];
           for (unsigned int d = 0; d < dim; ++d)
             computed_quantities[p][d] =
-              input_data.solution_gradients[0][p][d] /
-              input_data.solution_gradients[0][p].norm();
+              -catchment_area * input_data.solution_gradients[p][0][d] /
+              input_data.solution_gradients[p][0].norm();
         }
     }
   };
@@ -515,15 +518,15 @@ namespace Step55
         DataComponentInterpretation::component_is_scalar,
         DataComponentInterpretation::component_is_scalar};
 
-    DirectionPostprocessor<dim> direction_postprocessor;
-    DataOut<dim>                data_out;
+    DownhillFlowPostprocessor<dim> downhill_flow_postprocessor;
+    DataOut<dim>                   data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(locally_relevant_solution,
                              solution_names,
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);
     data_out.add_data_vector(locally_relevant_solution,
-                             direction_postprocessor);
+                             downhill_flow_postprocessor);
 
     Vector<float> subdomain(triangulation.n_active_cells());
     for (unsigned int i = 0; i < subdomain.size(); ++i)
