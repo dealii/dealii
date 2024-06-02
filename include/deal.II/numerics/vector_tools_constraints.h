@@ -50,9 +50,6 @@ namespace VectorTools
    * i.e., normal flux constraints where $\vec u$ is a vector-valued solution
    * variable and $\vec u_\Gamma$ is a prescribed vector field whose normal
    * component we want to be equal to the normal component of the solution.
-   * This function can also be used on level meshes in the multigrid method
-   * if @p refinement_edge_indices and @p level are provided, and the former
-   * can be obtained by MGConstrainedDoFs::get_refinement_edge_indices().
    * These conditions have exactly the form handled by the
    * AffineConstraints class, in that they relate a <i>linear
    * combination</i> of boundary degrees of freedom to a corresponding
@@ -114,9 +111,9 @@ namespace VectorTools
    * Each function in @p function_map is expected to have @p dim
    * components, which are used independent of @p first_vector_component.
    *
-   * The mapping argument is used to compute the boundary points at which the
-   * function needs to request the normal vector $\vec n$ from the boundary
-   * description.
+   * The mapping argument is used to compute the location of points on the
+   * boundary at which the function needs to request the normal vector
+   * $\vec n$ from the Manifold description.
    *
    * @note When combining adaptively refined meshes with hanging node
    * constraints and boundary conditions like from the current function within
@@ -334,9 +331,10 @@ namespace VectorTools
    * information), but for the simpler case of homogeneous normal-flux
    * constraints, i.e., for imposing the condition
    * $\vec u \cdot \vec n= 0$. This function is used in step-31 and step-32.
-   * This function can also be used on level meshes in the multigrid method
-   * if @p refinement_edge_indices and @p level are provided, and the former
-   * can be obtained by MGConstrainedDoFs::get_refinement_edge_indices().
+   *
+   * To compute no normal-flux constraints for a specific multigrid level for
+   * the geometric multigrid method, see
+   * compute_no_normal_flux_constraints_on_level().
    *
    * @ingroup constraints
    *
@@ -361,8 +359,15 @@ namespace VectorTools
 
   /**
    * This function does the same as
-   * compute_no_normal_flux_constraints(), but for the case of multigrid
-   * levels.
+   * compute_no_normal_flux_constraints(), but for the case of geometric
+   * multigrid on the specified @p level. The  @p refinement_edge_indices
+   * can be obtained by MGConstrainedDoFs::get_refinement_edge_indices()
+   * and should contain all indices of DoFs that are on refinement edges
+   * of the adaptively refined mesh.
+   *
+   * Also see compute_nonzero_normal_flux_constraints() for a detailed
+   * description about the implementation of this routine.
+   *
    * @ingroup constraints
    *
    * @see
