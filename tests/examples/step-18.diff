@@ -1,0 +1,32 @@
+26a27
+> #include "../example_test.h"
+699c700
+<     , end_time(10.0)
+---
+>     , end_time(1.0)
+1088,1089c1089,1091
+<     pcout << "    Solver converged in " << n_iterations << " iterations."
+<           << std::endl;
+---
+>     //pcout << "    Solver converged in " << n_iterations << " iterations."
+>     //      << std::endl;
+>     (void)n_iterations;
+1126,1129c1128,1132
+<     cg.solve(system_matrix,
+<              distributed_incremental_displacement,
+<              system_rhs,
+<              preconditioner);
+---
+>     check_solver_within_range(std::cout,
+> 			   cg.solve(system_matrix, distributed_incremental_displacement, system_rhs, preconditioner),
+> 			   solver_control.last_step(),
+> 			   114,
+> 			   130);
+1330c1333
+<     output_results();
+---
+>   //output_results();
+1358c1361
+<     output_results();
+---
+>   //output_results();
