@@ -1026,7 +1026,7 @@ namespace SUNDIALS
     /**
      * Internal routine to call ARKode repeatedly.
      */
-    int
+    unsigned int
     do_evolve_time(VectorType           &solution,
                    dealii::DiscreteTime &time,
                    const bool            do_reset);
