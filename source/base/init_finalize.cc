@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include "deal.II/base/types.h"
 #include <deal.II/base/init_finalize.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/multithread_info.h>
@@ -124,15 +125,18 @@ InitFinalize::InitFinalize(int                     &argc,
         if (strcmp(arg, "--help") != 0)
           argv_new.push_back(arg);
 
-      std::stringstream threads_flag;
+      if (max_num_threads != numbers::invalid_unsigned_int)
+        {
+          std::stringstream threads_flag;
 #if KOKKOS_VERSION >= 30700
-      threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
+          threads_flag << "--kokkos-num-threads=" << max_num_threads;
 #else
-      threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
+          threads_flag << "--kokkos-threads=" << max_num_threads;
 #endif
-      const std::string threads_flag_string = threads_flag.str();
-      argv_new.push_back(const_cast<char *>(threads_flag_string.c_str()));
-      argv_new.push_back(nullptr);
+          const std::string threads_flag_string = threads_flag.str();
+          argv_new.push_back(const_cast<char *>(threads_flag_string.c_str()));
+          argv_new.push_back(nullptr);
+        }
 
       // The first argument in Kokkos::initialize is of type int&. Hence, we
       // need to define a new variable to pass to it (instead of using argc+1
