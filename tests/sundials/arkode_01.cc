@@ -74,9 +74,12 @@ main()
 
   double kappa = 1.0;
 
+  unsigned int n_rhs_evaluations = 0;
   ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = y[1];
     ydot[1] = -kappa * kappa * y[0];
+
+    ++n_rhs_evaluations;
   };
 
   ode.output_step =
@@ -87,5 +90,9 @@ main()
   Vector<double> y(2);
   y[0] = 0;
   y[1] = kappa;
-  ode.solve_ode(y);
+
+  const unsigned int n_timesteps = ode.solve_ode(y);
+
+  deallog << "n_rhs_evaluations=" << n_rhs_evaluations << std::endl;
+  deallog << "n_timesteps=" << n_timesteps << std::endl;
 }
