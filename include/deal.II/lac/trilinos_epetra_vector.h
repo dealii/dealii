@@ -261,7 +261,7 @@ namespace LinearAlgebra
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning. The flag
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-       * filled with zero (false) or left untouched (true).
+       * filled with zeros (`false`) or left in an undetermined state (`true`).
        */
       void
       reinit(const IndexSet &parallel_partitioner,

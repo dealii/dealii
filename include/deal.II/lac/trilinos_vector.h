@@ -530,7 +530,7 @@ namespace TrilinosWrappers
        * Reinit functionality. This function sets the calling vector to the
        * dimension and the parallel distribution of the input vector, but does
        * not copy the elements in <tt>v</tt>. If <tt>omit_zeroing_entries</tt>
-       * is not <tt>true</tt>, the elements in the vector are initialized with
+       * is <tt>false</tt>, the elements in the vector are initialized with
        * zero. If it is set to <tt>true</tt>, the vector entries are in an
        * unspecified state and the user has to set all elements. In the
        * current implementation, this method does not touch the vector entries
