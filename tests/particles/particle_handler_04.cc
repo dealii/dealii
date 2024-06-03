@@ -73,7 +73,7 @@ test()
 
         for (const auto &particle : particle_handler)
           deallog << "Before sort particle id " << particle.get_id()
-                  << " is in cell " << particle.get_surrounding_cell(tr)
+                  << " is in cell " << particle.get_surrounding_cell()
                   << " on process "
                   << Utilities::MPI::this_mpi_process(tr.get_communicator())
                   << std::flush << std::endl;
@@ -85,7 +85,7 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "After sort particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
+              << " is in cell " << particle.get_surrounding_cell()
               << " on process "
               << Utilities::MPI::this_mpi_process(tr.get_communicator())
               << std::flush << std::endl;
@@ -101,7 +101,7 @@ test()
     particle_handler.sort_particles_into_subdomains_and_cells();
     for (const auto &particle : particle_handler)
       deallog << "After shift particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
+              << " is in cell " << particle.get_surrounding_cell()
               << " on process "
               << Utilities::MPI::this_mpi_process(tr.get_communicator())
               << std::flush << std::endl;

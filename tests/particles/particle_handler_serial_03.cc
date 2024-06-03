@@ -69,15 +69,13 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "Before sort particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
 
     particle_handler.sort_particles_into_subdomains_and_cells();
 
     for (const auto &particle : particle_handler)
       deallog << "After sort particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
 
     // Move all points up by 0.5. This will change cell for particle 1, and will
     // move particle 2 out of the domain. Note that we need to change the
@@ -90,8 +88,7 @@ test()
     particle_handler.sort_particles_into_subdomains_and_cells();
     for (const auto &particle : particle_handler)
       deallog << "After shift particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
   }
 
   deallog << "OK" << std::endl;

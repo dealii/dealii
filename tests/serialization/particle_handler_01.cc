@@ -99,8 +99,7 @@ test()
        particle != particle_handler.end();
        ++particle)
     deallog << "Before serialization particle id " << particle->get_id()
-            << " is in cell " << particle->get_surrounding_cell(tr)
-            << std::endl;
+            << " is in cell " << particle->get_surrounding_cell() << std::endl;
 
   // save data to archive
   std::ostringstream oss;
@@ -129,7 +128,7 @@ test()
        particle != particle_handler.end();
        ++particle)
     deallog << "In between particle id " << particle->get_id() << " is in cell "
-            << particle->get_surrounding_cell(tr) << std::endl;
+            << particle->get_surrounding_cell() << std::endl;
 
   // verify correctness of the serialization. Note that the deserialization of
   // the particle handler has to happen before the triangulation (otherwise it
@@ -148,8 +147,7 @@ test()
        particle != particle_handler.end();
        ++particle)
     deallog << "After serialization particle id " << particle->get_id()
-            << " is in cell " << particle->get_surrounding_cell(tr)
-            << std::endl;
+            << " is in cell " << particle->get_surrounding_cell() << std::endl;
 
   deallog << "OK" << std::endl << std::endl;
 }
