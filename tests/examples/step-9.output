@@ -1,25 +1,20 @@
 Cycle 0:
    Number of active cells:              64
    Number of degrees of freedom:        1681
-   Iterations required for convergence: 338
-   Norm of residual at convergence:     2.91757e-11
+Solver stopped within 335 - 1050 iterations
 Cycle 1:
    Number of active cells:              121
    Number of degrees of freedom:        3436
-   Iterations required for convergence: 448
-   Norm of residual at convergence:     2.40051e-11
+Solver stopped within 335 - 1050 iterations
 Cycle 2:
    Number of active cells:              238
    Number of degrees of freedom:        6487
-   Iterations required for convergence: 535
-   Norm of residual at convergence:     2.06943e-11
+Solver stopped within 335 - 1050 iterations
 Cycle 3:
    Number of active cells:              481
    Number of degrees of freedom:        13510
-   Iterations required for convergence: 669
-   Norm of residual at convergence:     1.39588e-11
+Solver stopped within 335 - 1050 iterations
 Cycle 4:
    Number of active cells:              958
    Number of degrees of freedom:        26137
-   Iterations required for convergence: 1049
-   Norm of residual at convergence:     1.19601e-11
+Solver stopped within 335 - 1050 iterations
