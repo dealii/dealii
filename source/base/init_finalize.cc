@@ -107,40 +107,6 @@ InitFinalize::InitFinalize(int                     &argc,
   (void)ierr;
 #endif
 
-  // Initialize Kokkos
-  if (static_cast<bool>(libraries & InitializeLibrary::Kokkos))
-    {
-      // argv has argc+1 elements and the last one is a nullptr. For appending
-      // one element we thus create a new argv by copying the first argc
-      // elements, append the new option, and then a nullptr.
-      //
-      // We do get in trouble, though, if a user program is called with
-      // '--help' as a command line argument. This '--help' gets passed on to
-      // Kokkos, which promptly responds with a lengthy message that the user
-      // likely did not intend. As a consequence, filter out this specific
-      // flag.
-      std::vector<char *> argv_new;
-      for (auto *const arg : make_array_view(&argv[0], &argv[0] + argc))
-        if (strcmp(arg, "--help") != 0)
-          argv_new.push_back(arg);
-
-      std::stringstream threads_flag;
-#if KOKKOS_VERSION >= 30700
-      threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
-#else
-      threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
-#endif
-      const std::string threads_flag_string = threads_flag.str();
-      argv_new.push_back(const_cast<char *>(threads_flag_string.c_str()));
-      argv_new.push_back(nullptr);
-
-      // The first argument in Kokkos::initialize is of type int&. Hence, we
-      // need to define a new variable to pass to it (instead of using argc+1
-      // inline).
-      int argc_new = argv_new.size() - 1;
-      Kokkos::initialize(argc_new, argv_new.data());
-    }
-
     // we are allowed to call MPI_Init ourselves and PETScInitialize will
     // detect this. This allows us to use MPI_Init_thread instead.
 #ifdef DEAL_II_WITH_PETSC
@@ -297,6 +263,40 @@ InitFinalize::InitFinalize(int                     &argc,
 
       // finally set this number of threads
       MultithreadInfo::set_thread_limit(n_threads);
+    }
+
+  // Initialize Kokkos
+  if (static_cast<bool>(libraries & InitializeLibrary::Kokkos))
+    {
+      // argv has argc+1 elements and the last one is a nullptr. For appending
+      // one element we thus create a new argv by copying the first argc
+      // elements, append the new option, and then a nullptr.
+      //
+      // We do get in trouble, though, if a user program is called with
+      // '--help' as a command line argument. This '--help' gets passed on to
+      // Kokkos, which promptly responds with a lengthy message that the user
+      // likely did not intend. As a consequence, filter out this specific
+      // flag.
+      std::vector<char *> argv_new;
+      for (auto *const arg : make_array_view(&argv[0], &argv[0] + argc))
+        if (strcmp(arg, "--help") != 0)
+          argv_new.push_back(arg);
+
+      std::stringstream threads_flag;
+#if KOKKOS_VERSION >= 30700
+      threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
+#else
+      threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
+#endif
+      const std::string threads_flag_string = threads_flag.str();
+      argv_new.push_back(const_cast<char *>(threads_flag_string.c_str()));
+      argv_new.push_back(nullptr);
+
+      // The first argument in Kokkos::initialize is of type int&. Hence, we
+      // need to define a new variable to pass to it (instead of using argc+1
+      // inline).
+      int argc_new = argv_new.size() - 1;
+      Kokkos::initialize(argc_new, argv_new.data());
     }
 
   // As a final step call the at_mpi_init() signal handler.
