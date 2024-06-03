@@ -1,0 +1,15 @@
+Number of active cells: 81920
+Number of degrees of freedom: 82177
+
+
+time_step 1 @ t=0.00318473
+Solver stopped within 8 - 10 iterations
+Solver stopped within 29 - 39 iterations
+
+time_step 2 @ t=0.00636946
+Solver stopped within 8 - 10 iterations
+Solver stopped within 29 - 39 iterations
+
+time_step 3 @ t=0.00955419
+Solver stopped within 8 - 10 iterations
+Solver stopped within 29 - 39 iterations

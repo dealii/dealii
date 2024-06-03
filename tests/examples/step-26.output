@@ -1,0 +1,51 @@
+
+===========================================
+Number of active cells: 48
+Number of degrees of freedom: 65
+
+Time step 1 at t=0.002
+Solver stopped within 6 - 9 iterations
+
+===========================================
+Number of active cells: 60
+Number of degrees of freedom: 81
+
+
+Time step 1 at t=0.002
+Solver stopped within 6 - 9 iterations
+
+===========================================
+Number of active cells: 99
+Number of degrees of freedom: 130
+
+
+Time step 1 at t=0.002
+Solver stopped within 6 - 9 iterations
+
+===========================================
+Number of active cells: 174
+Number of degrees of freedom: 223
+
+
+Time step 1 at t=0.002
+Solver stopped within 6 - 9 iterations
+
+===========================================
+Number of active cells: 306
+Number of degrees of freedom: 385
+
+
+Time step 1 at t=0.002
+Solver stopped within 6 - 9 iterations
+Time step 2 at t=0.004
+Solver stopped within 6 - 9 iterations
+Time step 3 at t=0.006
+Solver stopped within 6 - 9 iterations
+Time step 4 at t=0.008
+Solver stopped within 6 - 9 iterations
+Time step 5 at t=0.01
+Solver stopped within 6 - 9 iterations
+
+===========================================
+Number of active cells: 543
+Number of degrees of freedom: 660

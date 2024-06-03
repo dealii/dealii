@@ -1,0 +1,20 @@
+Refinement cycle 0
+   Number of active cells: 64
+   Number of degrees of freedom: 679 (594+85)
+   Assembling...
+   Computing preconditioner...
+   Solving...Solver stopped within 10 - 13 iterations
+
+Refinement cycle 1
+   Number of active cells: 160
+   Number of degrees of freedom: 1683 (1482+201)
+   Assembling...
+   Computing preconditioner...
+   Solving...Solver stopped within 10 - 13 iterations
+
+Refinement cycle 2
+   Number of active cells: 376
+   Number of degrees of freedom: 3813 (3370+443)
+   Assembling...
+   Computing preconditioner...
+   Solving...Solver stopped within 10 - 13 iterations

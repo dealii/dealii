@@ -1,0 +1,8 @@
+396c396
+<       data_out.write_vtk(output);
+---
+>     //data_out.write_vtk(output);
+512c512
+<     for (unsigned int cycle = 0; cycle < 6; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 3; ++cycle)

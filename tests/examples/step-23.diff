@@ -1,0 +1,40 @@
+25c25
+< 
+---
+> #include "../example_test.h"
+367c367,371
+<     cg.solve(matrix_u, solution_u, system_rhs, PreconditionIdentity());
+---
+>     check_solver_within_range(std::cout,
+>                               cg.solve(matrix_u, solution_u, system_rhs, PreconditionIdentity()),
+>                               solver_control.last_step(),
+>                               7, 9);
+>     //cg.solve(matrix_u, solution_u, system_rhs, PreconditionIdentity());
+369,370c373,374
+<     std::cout << "   u-equation: " << solver_control.last_step()
+<               << " CG iterations." << std::endl;
+---
+> //    std::cout << "   u-equation: " << solver_control.last_step()
+> //              << " CG iterations." << std::endl;
+381c385,389
+<     cg.solve(matrix_v, solution_v, system_rhs, PreconditionIdentity());
+---
+>     check_solver_within_range(std::cout,
+>                               cg.solve(matrix_v, solution_v, system_rhs, PreconditionIdentity()),
+>                               solver_control.last_step(),
+>                               19, 23);
+> //    cg.solve(matrix_v, solution_v, system_rhs, PreconditionIdentity());
+383,384c391,392
+<     std::cout << "   v-equation: " << solver_control.last_step()
+<               << " CG iterations." << std::endl;
+---
+> //    std::cout << "   v-equation: " << solver_control.last_step()
+> //              << " CG iterations." << std::endl;
+473c481
+<     for (; time <= 5; time += time_step, ++timestep_number)
+---
+>     for (; time <= 0.05; time += time_step, ++timestep_number)
+583c591
+<         output_results();
+---
+>       //output_results();

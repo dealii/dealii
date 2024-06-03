@@ -1,0 +1,47 @@
+30c30
+< 
+---
+> #include "../example_test.h"
+265c265
+<     , final_time(2.7207)
+---
+>     , final_time(-4.5)
+540c540,544
+<     cg.solve(system_matrix, solution_update, system_rhs, preconditioner);
+---
+>     //cg.solve(system_matrix, solution_update, system_rhs, preconditioner);
+>     check_solver_within_range(std::cout,
+>                               cg.solve(system_matrix, solution_update, system_rhs, preconditioner),
+>                               solver_control.last_step(),
+>                              6, 13);
+602c606
+<     output_results(0);
+---
+>   //output_results(0);
+637,638c641,643
+<             const unsigned int n_iterations = solve();
+< 
+---
+>             //const unsigned int n_iterations = solve();
+>             solve();
+>             
+641,644c646,649
+<             if (first_iteration == true)
+<               std::cout << "    " << n_iterations;
+<             else
+<               std::cout << '+' << n_iterations;
+---
+> //            if (first_iteration == true)
+> //              std::cout << "    " << n_iterations;
+> //            else
+> //              std::cout << '+' << n_iterations;
+649c654
+<         std::cout << " CG iterations per nonlinear step." << std::endl;
+---
+>         //std::cout << " CG iterations per nonlinear step." << std::endl;
+673,674c678,679
+<         if (timestep_number % output_timestep_skip == 0)
+<           output_results(timestep_number);
+---
+>       //if (timestep_number % output_timestep_skip == 0)
+>          //output_results(timestep_number);

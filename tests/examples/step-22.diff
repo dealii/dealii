@@ -1,0 +1,28 @@
+26c26
+< 
+---
+> #include "../example_test.h"
+854c854,858
+<       cg.solve(schur_complement, solution.block(1), schur_rhs, m_inverse);
+---
+>       check_solver_within_range(std::cout,
+>                                 cg.solve(schur_complement, solution.block(1), schur_rhs, m_inverse),
+>                                 solver_control.last_step(),
+>                                 10, 13);
+>       //cg.solve(schur_complement, solution.block(1), schur_rhs, m_inverse);
+861,863c865,867
+<       std::cout << "  " << solver_control.last_step()
+<                 << " outer CG Schur complement iterations for pressure"
+<                 << std::endl;
+---
+> //      std::cout << "  " << solver_control.last_step()
+> //                << " outer CG Schur complement iterations for pressure"
+> //                << std::endl;
+1022c1026
+<     for (unsigned int refinement_cycle = 0; refinement_cycle < 6;
+---
+>     for (unsigned int refinement_cycle = 0; refinement_cycle < 3;
+1038c1042
+<         output_results(refinement_cycle);
+---
+>       //output_results(refinement_cycle);
