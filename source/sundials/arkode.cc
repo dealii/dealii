@@ -142,7 +142,7 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  int
+  unsigned int
   ARKode<VectorType>::do_evolve_time(VectorType   &solution,
                                      DiscreteTime &time,
                                      const bool    do_reset)
