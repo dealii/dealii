@@ -83,27 +83,6 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
-#ifdef DEBUG
-  hp::FECollection<dim> other_fes;
-  other_fes.push_back(FE_Q<dim>(5));
-  other_fes.push_back(FE_Q<dim>(1));
-
-  dh.distribute_dofs(other_fes);
-
-  try
-    {
-      tria.repartition();
-    }
-  catch (const ExceptionBase &e)
-    {
-      deallog << e.get_exc_name() << std::endl;
-    }
-#else
-  deallog
-    << "ExcMessage(\"FECollection has changed, with which the weights were computed.\")"
-    << std::endl;
-#endif
-
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -116,8 +95,6 @@ main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
-
-  deal_II_exceptions::disable_abort_on_exception();
 
   deallog.push("2d");
   test<2>();

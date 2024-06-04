@@ -274,17 +274,12 @@ namespace parallel
         "parallel::CellWeights requires a parallel::TriangulationBase object."));
 
     // capture the weights by copy
-    // for validation purposes, also capture the fe_collection by copy
-    // with which the weights were computed
-    return [&dof_handler,
-            tria,
-            fe_collection = dof_handler.get_fe_collection(),
-            precomputed_weights](
+    return [&dof_handler, tria, precomputed_weights](
              const typename dealii::Triangulation<dim, spacedim>::cell_iterator
                              &cell,
              const CellStatus status) -> unsigned int {
       return CellWeights<dim, spacedim>::weighting_callback(
-        cell, status, dof_handler, *tria, fe_collection, precomputed_weights);
+        cell, status, dof_handler, *tria, precomputed_weights);
     };
   }
 
@@ -297,7 +292,6 @@ namespace parallel
     const CellStatus                                                    status,
     const DoFHandler<dim, spacedim>                  &dof_handler,
     const parallel::TriangulationBase<dim, spacedim> &triangulation,
-    const hp::FECollection<dim, spacedim>            &fe_collection,
     const std::vector<unsigned int>                  &precomputed_weights)
   {
     // Check if we are still working with the correct combination of
@@ -343,14 +337,6 @@ namespace parallel
           Assert(false, ExcInternalError());
           break;
       }
-
-    // Check if the weights are valid by comparing the current finite element
-    // with the one they have been computed with.
-    Assert(
-      fe_collection[fe_index] == dof_handler.get_fe(fe_index),
-      ExcMessage(
-        "FECollection has changed, with which the weights were computed."));
-    (void)fe_collection;
 
     // Return the precomputed weight.
     return precomputed_weights[fe_index];
