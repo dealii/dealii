@@ -178,7 +178,7 @@ namespace SUNDIALS
         time.set_desired_next_step_size(data.output_period);
 
         // Having set up all of the ancillary things, finally call the main
-        // ARKode function. One we return, check that what happened:
+        // ARKode function. Once we return, check what happened:
         // - If we have a pending recoverable exception, ignore it if SUNDIAL's
         //   return code was zero -- in that case, SUNDIALS managed to indeed
         //   recover and we no longer need the exception
