@@ -115,8 +115,8 @@ using automatic differentiation
 to compute the linearization of the residual vector. To this end, let
 us change notation for a moment and denote by $F(U)$ not the residual
 of the differential equation, but in fact the *residual vector* --
-i.e., the *discrete residual*. We do so because that is what we
-*actually* do when we discretize the problem on a given mesh: We solve
+i.e., the *discrete residual*. We do so because that is what we *actually*
+do when we discretize the problem on a given mesh: We solve
 the problem $F(U)=0$ where $U$ is the vector of unknowns.
 
 More precisely, the $i$th component of the residual is given by
@@ -153,8 +153,8 @@ clear that they are distinct from each other and from $j$ above.
 Because in this formula, $F(U)$ only depends on the coefficients
 $U_j$, we can compute the derivative $J(U)_{ij}^K$ as a matrix via
 automatic differentiation of $F(U)_i^K$. By the same argument as we
-always use, it is clear that $F(U)^K$ does not actually depend on
-*all* unknowns $U_j$, but only on those unknowns for which $j$ is a
+always use, it is clear that $F(U)^K$ does not actually depend on *all*
+unknowns $U_j$, but only on those unknowns for which $j$ is a
 shape function that lives on cell $K$, and so in practice, we restrict
 $F(U)^K$ and $J(U)^K$ to that part of the vector and matrix that
 corresponds to the *local* DoF indices, and then distribute from the
