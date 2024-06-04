@@ -115,8 +115,8 @@ namespace LinearAlgebra
 
       /**
        * Reinit functionality. The flag <tt>omit_zeroing_entries</tt>
-       * determines whether the vector should be filled with zero (false) or
-       * left untouched (true).
+       * determines whether the vector should be filled with zeros (`false`) or
+       * left in an undetermined state (`true`).
        */
       void
       reinit(const size_type n, const bool omit_zeroing_entries = false);
