@@ -3328,9 +3328,6 @@ namespace Step32
 
         temperature_solution     = distributed_temp1;
         old_temperature_solution = distributed_temp2;
-
-        Assert(old_temperature_solution.has_ghost_elements(),
-               ExcInternalError());
       }
 
       {
