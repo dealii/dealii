@@ -132,8 +132,8 @@ main()
   const double df_dx_ad = x_ad.adj();  // df/dx
   const double df_dy_ad = y_ad.adj();  // df/dy
 
-  deallog << "df_dx: " << df_dx << "  df_dx_ad: " << df_dx_ad << std::endl;
-  deallog << "df_dy: " << df_dy << "  df_dy_ad: " << df_dy_ad << std::endl;
+  std::cout << "df_dx: " << df_dx << "  df_dx_ad: " << df_dx_ad << std::endl;
+  std::cout << "df_dy: " << df_dy << "  df_dy_ad: " << df_dy_ad << std::endl;
 
   // Configure the AD number to perform gradient computations
   // related to the dependent function "g"
@@ -147,8 +147,8 @@ main()
     (y_ad.adj() -
      df_dy_ad); // dg/dy ; Note: Accumulation of partial derivatives
 
-  deallog << "dg_dx: " << dg_dx << "  dg_dx_ad: " << dg_dx_ad << std::endl;
-  deallog << "dg_dy: " << dg_dy << "  dg_dy_ad: " << dg_dy_ad << std::endl;
+  std::cout << "dg_dx: " << dg_dx << "  dg_dx_ad: " << dg_dx_ad << std::endl;
+  std::cout << "dg_dy: " << dg_dy << "  dg_dy_ad: " << dg_dy_ad << std::endl;
 
   // Configure the AD number to perform gradient computations
   // related to the dependent function "h"
@@ -166,8 +166,8 @@ main()
   // variables the adjoints are computed for), rather than the order in
   // which the functions themselves are evaluated.
 
-  deallog << "dh_dx: " << dh_dx << "  dh_dx_ad: " << dh_dx_ad << std::endl;
-  deallog << "dh_dy: " << dh_dy << "  dh_dy_ad: " << dh_dy_ad << std::endl;
+  std::cout << "dh_dx: " << dh_dx << "  dh_dx_ad: " << dh_dx_ad << std::endl;
+  std::cout << "dh_dy: " << dh_dy << "  dh_dy_ad: " << dh_dy_ad << std::endl;
 
   const double tol = 1.0e-14;
   Assert(std::fabs(f - f_ad) < tol,

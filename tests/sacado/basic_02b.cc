@@ -199,8 +199,8 @@ main()
   const double                    d2f_dx_dy_ad = y_ad.adj().dx(0); // d^2f/dx_dy
   const double                    d2f_dy_dy_ad = y_ad.adj().dx(1); // d^2f/dy^2
 
-  deallog << "df_dx: " << df_dx << "  df_dx_ad: " << df_dx_ad << std::endl;
-  deallog << "df_dy: " << df_dy << "  df_dy_ad: " << df_dy_ad << std::endl;
+  std::cout << "df_dx: " << df_dx << "  df_dx_ad: " << df_dx_ad << std::endl;
+  std::cout << "df_dy: " << df_dy << "  df_dy_ad: " << df_dy_ad << std::endl;
 
   // Configure the AD number to perform gradient computations
   // related to the dependent function "g"
@@ -222,8 +222,8 @@ main()
   const double d2g_dx_dy_ad = dg_dy_fad.dx(0); // d^2g/dx_dy
   const double d2g_dy_dy_ad = dg_dy_fad.dx(1); // d^2g/dy^2
 
-  deallog << "dg_dx: " << dg_dx << "  dg_dx_ad: " << dg_dx_ad << std::endl;
-  deallog << "dg_dy: " << dg_dy << "  dg_dy_ad: " << dg_dy_ad << std::endl;
+  std::cout << "dg_dx: " << dg_dx << "  dg_dx_ad: " << dg_dx_ad << std::endl;
+  std::cout << "dg_dy: " << dg_dy << "  dg_dy_ad: " << dg_dy_ad << std::endl;
 
   // Configure the AD number to perform gradient computations
   // related to the dependent function "h"
@@ -249,8 +249,8 @@ main()
   // variables the adjoints are computed for), rather than the order in
   // which the functions themselves are evaluated.
 
-  deallog << "dh_dx: " << dh_dx << "  dh_dx_ad: " << dh_dx_ad << std::endl;
-  deallog << "dh_dy: " << dh_dy << "  dh_dy_ad: " << dh_dy_ad << std::endl;
+  std::cout << "dh_dx: " << dh_dx << "  dh_dx_ad: " << dh_dx_ad << std::endl;
+  std::cout << "dh_dy: " << dh_dy << "  dh_dy_ad: " << dh_dy_ad << std::endl;
 
   const double tol = 1.0e-12;
   Assert(std::fabs(f - f_ad) < tol,

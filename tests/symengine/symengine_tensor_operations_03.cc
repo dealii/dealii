@@ -506,37 +506,39 @@ test_symmetric_tensor_tensor_vector_scalar_coupled(
   symb_d2psi_ds_x_dv  = SD::differentiate(symb_dpsi_ds, symb_v);
   symb_d2psi_ds_x_ds  = SD::differentiate(symb_dpsi_ds, symb_s);
 
-  print(deallog, "symb_st", symb_st);
-  print(deallog, "symb_t", symb_t);
-  print(deallog, "symb_v", symb_v);
-  print(deallog, "symb_s", symb_s);
+#ifdef DEBUG
+  print(std::cout, "symb_st", symb_st);
+  print(std::cout, "symb_t", symb_t);
+  print(std::cout, "symb_v", symb_v);
+  print(std::cout, "symb_s", symb_s);
 
-  print(deallog, "symb_psi", symb_psi);
+  print(std::cout, "symb_psi", symb_psi);
 
-  print(deallog, "symb_dpsi_dst", symb_dpsi_dst);
-  print(deallog, "symb_dpsi_dt", symb_dpsi_dt);
-  print(deallog, "symb_dpsi_dv", symb_dpsi_dv);
-  print(deallog, "symb_dpsi_ds", symb_dpsi_ds);
+  print(std::cout, "symb_dpsi_dst", symb_dpsi_dst);
+  print(std::cout, "symb_dpsi_dt", symb_dpsi_dt);
+  print(std::cout, "symb_dpsi_dv", symb_dpsi_dv);
+  print(std::cout, "symb_dpsi_ds", symb_dpsi_ds);
 
-  print(deallog, "symb_d2psi_dst_x_dst", symb_d2psi_dst_x_dst);
-  print(deallog, "symb_d2psi_dst_x_dt", symb_d2psi_dst_x_dt);
-  print(deallog, "symb_d2psi_dst_x_dv", symb_d2psi_dst_x_dv);
-  print(deallog, "symb_d2psi_dst_x_ds", symb_d2psi_dst_x_ds);
+  print(std::cout, "symb_d2psi_dst_x_dst", symb_d2psi_dst_x_dst);
+  print(std::cout, "symb_d2psi_dst_x_dt", symb_d2psi_dst_x_dt);
+  print(std::cout, "symb_d2psi_dst_x_dv", symb_d2psi_dst_x_dv);
+  print(std::cout, "symb_d2psi_dst_x_ds", symb_d2psi_dst_x_ds);
 
-  print(deallog, "symb_d2psi_dt_x_dst", symb_d2psi_dt_x_dst);
-  print(deallog, "symb_d2psi_dt_x_dt", symb_d2psi_dt_x_dt);
-  print(deallog, "symb_d2psi_dt_x_dv", symb_d2psi_dt_x_dv);
-  print(deallog, "symb_d2psi_dt_x_ds", symb_d2psi_dt_x_ds);
+  print(std::cout, "symb_d2psi_dt_x_dst", symb_d2psi_dt_x_dst);
+  print(std::cout, "symb_d2psi_dt_x_dt", symb_d2psi_dt_x_dt);
+  print(std::cout, "symb_d2psi_dt_x_dv", symb_d2psi_dt_x_dv);
+  print(std::cout, "symb_d2psi_dt_x_ds", symb_d2psi_dt_x_ds);
 
-  print(deallog, "symb_d2psi_dv_x_dst", symb_d2psi_dv_x_dst);
-  print(deallog, "symb_d2psi_dv_x_dt", symb_d2psi_dv_x_dt);
-  print(deallog, "symb_d2psi_dv_x_dv", symb_d2psi_dv_x_dv);
-  print(deallog, "symb_d2psi_dv_x_ds", symb_d2psi_dv_x_ds);
+  print(std::cout, "symb_d2psi_dv_x_dst", symb_d2psi_dv_x_dst);
+  print(std::cout, "symb_d2psi_dv_x_dt", symb_d2psi_dv_x_dt);
+  print(std::cout, "symb_d2psi_dv_x_dv", symb_d2psi_dv_x_dv);
+  print(std::cout, "symb_d2psi_dv_x_ds", symb_d2psi_dv_x_ds);
 
-  print(deallog, "symb_d2psi_ds_x_dst", symb_d2psi_ds_x_dst);
-  print(deallog, "symb_d2psi_ds_x_dt", symb_d2psi_ds_x_dt);
-  print(deallog, "symb_d2psi_ds_x_dv", symb_d2psi_ds_x_dv);
-  print(deallog, "symb_d2psi_ds_x_ds", symb_d2psi_ds_x_ds);
+  print(std::cout, "symb_d2psi_ds_x_dst", symb_d2psi_ds_x_dst);
+  print(std::cout, "symb_d2psi_ds_x_dt", symb_d2psi_ds_x_dt);
+  print(std::cout, "symb_d2psi_ds_x_dv", symb_d2psi_ds_x_dv);
+  print(std::cout, "symb_d2psi_ds_x_ds", symb_d2psi_ds_x_ds);
+#endif
 
   // It pains me to do this manually...
   // This is why we have utility functions to create substitution maps

@@ -37,7 +37,7 @@ same_number(const NumberType1 &val1,
             const double       tol_eps = 10.0)
 {
   if (print == true)
-    deallog << "Diff: " << std::abs(val1 - val2) << std::endl;
+    std::cout << "Diff: " << std::abs(val1 - val2) << std::endl;
   const long double eps1 = std::numeric_limits<NumberType1>::epsilon();
   const long double eps2 = std::numeric_limits<NumberType2>::epsilon();
   return std::abs(val1 - val2) <= tol_eps * std::max(eps1, eps2);

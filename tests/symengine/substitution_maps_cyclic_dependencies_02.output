@@ -1,8 +1,2 @@
 
-DEAL::Original map:
-DEAL::a = b
-b = a
-Resolved map:
-DEAL::a = a
-b = a
-OK
+DEAL::OK
