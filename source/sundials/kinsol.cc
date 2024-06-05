@@ -519,7 +519,7 @@ namespace SUNDIALS
 
 
     // Having set up all of the ancillary things, finally call the main KINSol
-    // function. One we return, check that what happened:
+    // function. Once we return, check what happened:
     // - If we have a pending recoverable exception, ignore it if SUNDIAL's
     //   return code was zero -- in that case, SUNDIALS managed to indeed
     //   recover and we no longer need the exception
