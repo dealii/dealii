@@ -154,6 +154,14 @@ class Vector;
  * is explained in detail at the homepage of the underlying muparser library
  * at https://beltoforion.de/en/muparser/.
  *
+ * If you would like to check that muparser is parsing your functions correctly,
+ * and to evaluate the functions at given parameter values, you may consider
+ * running your expressions through pymuparser
+ * (https://github.com/bobmyhill/pymuparser),
+ * which can be installed using pip (python -m pip install pymuparser).
+ * This module also allows users to define functions not included in MuParser,
+ * such as the extended library provided by deal.II.
+ *
  * For a wrapper of the FunctionParser class that supports ParameterHandler,
  * see Functions::ParsedFunction.
  *
