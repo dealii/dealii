@@ -94,7 +94,7 @@ test()
     for (const auto &particle : particle_handler)
       {
         deallog << "Particle index " << particle.get_id() << " is in cell "
-                << particle.get_surrounding_cell(tr) << std::endl;
+                << particle.get_surrounding_cell() << std::endl;
         deallog << "Particle location: " << particle.get_location()
                 << std::endl;
       }

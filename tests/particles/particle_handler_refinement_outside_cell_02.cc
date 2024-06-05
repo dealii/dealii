@@ -64,8 +64,7 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "Before refinement particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
 
     // Check that all particles are moved to children
     particle_handler.prepare_for_coarsening_and_refinement();
@@ -74,8 +73,7 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "After refinement particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
 
     // Reverse the refinement and check again
     for (auto cell = tr.begin_active(); cell != tr.end(); ++cell)
@@ -87,8 +85,7 @@ test()
 
     for (const auto &particle : particle_handler)
       deallog << "After coarsening particle id " << particle.get_id()
-              << " is in cell " << particle.get_surrounding_cell(tr)
-              << std::endl;
+              << " is in cell " << particle.get_surrounding_cell() << std::endl;
   }
 
   deallog << "OK" << std::endl;

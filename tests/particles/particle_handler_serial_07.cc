@@ -60,7 +60,7 @@ test()
          particle != particle_handler.end();
          ++particle)
       deallog << "Particle id " << particle->get_id() << " is in cell "
-              << particle->get_surrounding_cell(tr) << std::endl
+              << particle->get_surrounding_cell() << std::endl
               << "     at location " << particle->get_location() << std::endl
               << "     at reference location "
               << particle->get_reference_location() << std::endl;

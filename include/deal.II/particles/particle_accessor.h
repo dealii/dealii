@@ -361,21 +361,9 @@ namespace Particles
 
     /**
      * Get a cell iterator to the cell surrounding the current particle.
-     * As particles are organized in the structure of a triangulation,
-     * but the triangulation itself is not stored in the particle this
-     * operation requires a reference to the triangulation.
      */
     const typename Triangulation<dim, spacedim>::cell_iterator &
     get_surrounding_cell() const;
-
-    /**
-     * @deprecated Deprecated version of the function with the same
-     * name above.
-     */
-    DEAL_II_DEPRECATED
-    const typename Triangulation<dim, spacedim>::cell_iterator &
-    get_surrounding_cell(
-      const Triangulation<dim, spacedim> &triangulation) const;
 
     /**
      * Write the data of this object to a stream for the purpose of
@@ -842,20 +830,6 @@ namespace Particles
   template <int dim, int spacedim>
   inline const typename Triangulation<dim, spacedim>::cell_iterator &
   ParticleAccessor<dim, spacedim>::get_surrounding_cell() const
-  {
-    Assert(state() == IteratorState::valid, ExcInternalError());
-    Assert(particles_in_cell->cell.state() == IteratorState::valid,
-           ExcInternalError());
-
-    return particles_in_cell->cell;
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline const typename Triangulation<dim, spacedim>::cell_iterator &
-  ParticleAccessor<dim, spacedim>::get_surrounding_cell(
-    const Triangulation<dim, spacedim> & /*triangulation*/) const
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
     Assert(particles_in_cell->cell.state() == IteratorState::valid,
