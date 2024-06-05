@@ -47,82 +47,6 @@
  * J = dF/dY + alpha dF/dY' = [0 -a ; -1 1] + alpha [1 0 ; 0 0]
  *   = [alpha -a ; -1 1]
  */
-class ExponentialGrowth
-{
-public:
-  ExponentialGrowth(
-    double                                                        a_,
-    const typename SUNDIALS::IDA<Vector<double>>::AdditionalData &data)
-    : time_stepper(data)
-    , y(2)
-    , y_dot(2)
-    , J(2, 2)
-    , A(2, 2)
-    , Jinv(2, 2)
-    , a(a_)
-  {
-    using VectorType = Vector<double>;
-
-    deallog << "Exponential growth factor = " << a << std::endl;
-
-    time_stepper.reinit_vector = [&](VectorType &v) { v.reinit(2); };
-
-
-    time_stepper.residual = [&](const double      t,
-                                const VectorType &y,
-                                const VectorType &y_dot,
-                                VectorType       &res) {
-      //  F(Y', Y, t) = [1 0 ; 0 0] Y' + [0 -a ; -1 1] Y
-      res    = 0;
-      res[0] = y_dot[0] - a * y[0];
-      res[1] = -y[0] + y[1];
-    };
-
-    time_stepper.setup_jacobian = [&](const double,
-                                      const VectorType &,
-                                      const VectorType &,
-                                      const double alpha) {
-      // J = [alpha -a ; -1 1]
-      J(0, 0) = alpha;
-      J(0, 1) = -a;
-      J(1, 0) = -1;
-      J(1, 1) = 1;
-
-      Jinv.invert(J);
-    };
-
-    time_stepper.solve_with_jacobian =
-      [&](const VectorType &src, VectorType &dst, const double) {
-        Jinv.vmult(dst, src);
-      };
-
-    time_stepper.output_step = [&](const double       t,
-                                   const VectorType  &sol,
-                                   const VectorType  &sol_dot,
-                                   const unsigned int step_number) {
-      deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
-              << sol_dot[1] << std::endl;
-    };
-  }
-
-  void
-  run()
-  {
-    y[0] = y[1] = 1;
-    y_dot[0] = y_dot[1] = a;
-    time_stepper.solve_dae(y, y_dot);
-  }
-  SUNDIALS::IDA<Vector<double>> time_stepper;
-
-private:
-  Vector<double>     y;
-  Vector<double>     y_dot;
-  FullMatrix<double> J;
-  FullMatrix<double> A;
-  FullMatrix<double> Jinv;
-  double             a;
-};
-
 
 int
 main()
@@ -137,7 +61,60 @@ main()
   std::ifstream ifile(SOURCE_DIR "/ida_06_in.prm");
   prm.parse_input(ifile);
 
+  const double a = 1.0;
+  deallog << "Exponential growth factor = " << a << std::endl;
 
-  ExponentialGrowth ode(1.0, data);
-  ode.run();
+  using VectorType = Vector<double>;
+
+  VectorType         y(2);
+  VectorType         y_dot(2);
+  FullMatrix<double> J(2, 2);
+  FullMatrix<double> A(2, 2);
+  FullMatrix<double> Jinv(2, 2);
+
+  SUNDIALS::IDA<Vector<double>> time_stepper(data);
+
+  time_stepper.reinit_vector = [&](VectorType &v) { v.reinit(2); };
+
+
+  time_stepper.residual = [&](const double      t,
+                              const VectorType &y,
+                              const VectorType &y_dot,
+                              VectorType       &res) {
+    //  F(Y', Y, t) = [1 0 ; 0 0] Y' + [0 -a ; -1 1] Y
+    res    = 0;
+    res[0] = y_dot[0] - a * y[0];
+    res[1] = -y[0] + y[1];
+  };
+
+  time_stepper.setup_jacobian = [&](const double,
+                                    const VectorType &,
+                                    const VectorType &,
+                                    const double alpha) {
+    // J = [alpha -a ; -1 1]
+    J(0, 0) = alpha;
+    J(0, 1) = -a;
+    J(1, 0) = -1;
+    J(1, 1) = 1;
+
+    Jinv.invert(J);
+  };
+
+  time_stepper.solve_with_jacobian =
+    [&](const VectorType &src, VectorType &dst, const double) {
+      Jinv.vmult(dst, src);
+    };
+
+  time_stepper.output_step = [&](const double       t,
+                                 const VectorType  &sol,
+                                 const VectorType  &sol_dot,
+                                 const unsigned int step_number) {
+    deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
+            << sol_dot[1] << std::endl;
+  };
+
+
+  y[0] = y[1] = 1;
+  y_dot[0] = y_dot[1] = a;
+  time_stepper.solve_dae(y, y_dot);
 }
