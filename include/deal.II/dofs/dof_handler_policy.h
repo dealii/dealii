@@ -73,7 +73,7 @@ namespace internal
          * argument.
          */
         virtual NumberCache
-        distribute_dofs() const = 0;
+        distribute_dofs(const types::global_dof_index virtual_dofs) const = 0;
 
         /**
          * Distribute the multigrid dofs on each level of the DoFHandler
@@ -124,7 +124,8 @@ namespace internal
 
         // documentation is inherited
         virtual NumberCache
-        distribute_dofs() const override;
+        distribute_dofs(
+          const types::global_dof_index virtual_dofs) const override;
 
         // documentation is inherited
         virtual std::vector<NumberCache>
@@ -174,7 +175,8 @@ namespace internal
          * number_cache.locally_owned_dofs are updated consistently.
          */
         virtual NumberCache
-        distribute_dofs() const override;
+        distribute_dofs(
+          const types::global_dof_index virtual_dofs) const override;
 
         /**
          * This function is not yet implemented.
@@ -226,7 +228,8 @@ namespace internal
 
         // documentation is inherited
         virtual NumberCache
-        distribute_dofs() const override;
+        distribute_dofs(
+          const types::global_dof_index virtual_dofs) const override;
 
         // documentation is inherited
         virtual std::vector<NumberCache>

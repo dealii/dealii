@@ -2141,9 +2141,10 @@ std::size_t DoFHandler<dim, spacedim>::memory_consumption() const
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::distribute_dofs(
-  const FiniteElement<dim, spacedim> &fe)
+  const FiniteElement<dim, spacedim>    &fe,
+  const dealii::types::global_dof_index &virtual_dofs)
 {
-  this->distribute_dofs(hp::FECollection<dim, spacedim>(fe));
+  this->distribute_dofs(hp::FECollection<dim, spacedim>(fe), virtual_dofs);
 }
 
 
@@ -2151,7 +2152,8 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::distribute_dofs(
-  const hp::FECollection<dim, spacedim> &ff)
+  const hp::FECollection<dim, spacedim> &ff,
+  const dealii::types::global_dof_index &virtual_dofs)
 {
   Assert(this->tria != nullptr,
          ExcMessage(
@@ -2262,7 +2264,7 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
   }
 
   // hand the actual work over to the policy
-  this->number_cache = this->policy->distribute_dofs();
+  this->number_cache = this->policy->distribute_dofs(virtual_dofs);
 
   // do some housekeeping: compress indices
   // if(hp_capability_enabled)

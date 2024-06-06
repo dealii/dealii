@@ -157,6 +157,13 @@ namespace internal
       IndexSet locally_owned_dofs;
 
       /**
+       * An index set denoting the set of locally owned virtual dofs. These
+       * are locally owned degrees of freedom that are not associated with
+       * a finite element.
+       */
+      IndexSet locally_owned_virtual_dofs;
+
+      /**
        * The number of dofs owned by each of the various MPI processes. If
        * this is a sequential computation, then the vector contains a single
        * element equal to n_global_dofs. (Here, "sequential" means that either

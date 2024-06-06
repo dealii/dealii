@@ -713,13 +713,15 @@ public:
    * function set_fe().
    */
   void
-  distribute_dofs(const FiniteElement<dim, spacedim> &fe);
+  distribute_dofs(const FiniteElement<dim, spacedim>    &fe,
+                  const dealii::types::global_dof_index &virtual_dofs = 0);
 
   /**
    * Same as above but taking an hp::FECollection object.
    */
   void
-  distribute_dofs(const hp::FECollection<dim, spacedim> &fe);
+  distribute_dofs(const hp::FECollection<dim, spacedim> &fe,
+                  const dealii::types::global_dof_index &virtual_dofs = 0);
 
   /**
    * Distribute level degrees of freedom on each level for geometric
@@ -1210,6 +1212,12 @@ public:
    */
   const IndexSet &
   locally_owned_dofs() const;
+
+  /**
+   * Return an IndexSet describing the subset of locally owned virtual DoFs.
+   */
+  const IndexSet &
+  locally_owned_virtual_dofs() const;
 
   /**
    * Return an IndexSet describing the set of locally owned DoFs used for the
@@ -1874,6 +1882,15 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 const IndexSet &DoFHandler<dim, spacedim>::locally_owned_dofs() const
 {
   return number_cache.locally_owned_dofs;
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const IndexSet &DoFHandler<dim, spacedim>::locally_owned_virtual_dofs() const
+{
+  return number_cache.locally_owned_virtual_dofs;
 }
 
 

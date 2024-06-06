@@ -2649,7 +2649,8 @@ namespace internal
 
       template <int dim, int spacedim>
       NumberCache
-      Sequential<dim, spacedim>::distribute_dofs() const
+      Sequential<dim, spacedim>::distribute_dofs(
+        const types::global_dof_index n_virtual_dofs) const
       {
         const types::global_dof_index n_initial_dofs =
           Implementation::distribute_dofs(numbers::invalid_subdomain_id,
@@ -2661,7 +2662,16 @@ namespace internal
                                             /*check_validity=*/true);
 
         // return a sequential, complete index set
-        return NumberCache(n_dofs);
+        NumberCache number_cache(n_dofs + n_virtual_dofs);
+
+        number_cache.locally_owned_virtual_dofs =
+          IndexSet(n_dofs + n_virtual_dofs);
+        number_cache.locally_owned_virtual_dofs.add_range(n_dofs,
+                                                          n_dofs +
+                                                            n_virtual_dofs);
+        number_cache.locally_owned_virtual_dofs.compress();
+
+        return number_cache;
       }
 
 
@@ -2880,8 +2890,11 @@ namespace internal
 
       template <int dim, int spacedim>
       NumberCache
-      ParallelShared<dim, spacedim>::distribute_dofs() const
+      ParallelShared<dim, spacedim>::distribute_dofs(
+        const types::global_dof_index virtual_dofs [[maybe_unused]]) const
       {
+        Assert(virtual_dofs == 0, ExcNotImplemented());
+
         const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<
             const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
@@ -3601,7 +3614,8 @@ namespace internal
 
       template <int dim, int spacedim>
       NumberCache
-      ParallelDistributed<dim, spacedim>::distribute_dofs() const
+      ParallelDistributed<dim, spacedim>::distribute_dofs(
+        const types::global_dof_index n_locally_virtual [[maybe_unused]]) const
       {
 #ifndef DEAL_II_WITH_MPI
         DEAL_II_NOT_IMPLEMENTED();
@@ -3697,10 +3711,13 @@ namespace internal
           Utilities::MPI::partial_and_total_sum(
             n_locally_owned_dofs, triangulation->get_communicator());
 
+        const auto [my_shift_virtual, n_global_virtual] =
+          Utilities::MPI::partial_and_total_sum(
+            n_locally_virtual, triangulation->get_communicator());
 
         // make dof indices globally consecutive
         Implementation::enumerate_dof_indices_for_renumbering(
-          renumbering, all_constrained_indices, my_shift);
+          renumbering, all_constrained_indices, my_shift + my_shift_virtual);
 
         // now re-enumerate all dofs to this shifted and condensed
         // numbering form.  we renumber some dofs as invalid, so
@@ -3710,14 +3727,28 @@ namespace internal
                                       *dof_handler,
                                       /*check_validity=*/false);
 
+
         NumberCache number_cache;
-        number_cache.n_global_dofs        = n_global_dofs;
-        number_cache.n_locally_owned_dofs = n_locally_owned_dofs;
-        number_cache.locally_owned_dofs   = IndexSet(n_global_dofs);
-        number_cache.locally_owned_dofs.add_range(my_shift,
-                                                  my_shift +
-                                                    n_locally_owned_dofs);
+        number_cache.n_global_dofs = n_global_dofs + n_global_virtual;
+        number_cache.n_locally_owned_dofs =
+          n_locally_owned_dofs + n_locally_virtual;
+
+        number_cache.locally_owned_dofs =
+          IndexSet(n_global_dofs + n_global_virtual);
+        number_cache.locally_owned_dofs.add_range( //
+          my_shift + my_shift_virtual,
+          my_shift + my_shift_virtual + n_locally_owned_dofs +
+            n_locally_virtual);
         number_cache.locally_owned_dofs.compress();
+
+        number_cache.locally_owned_virtual_dofs =
+          IndexSet(n_global_dofs + n_global_virtual);
+        number_cache.locally_owned_virtual_dofs.add_range(
+          my_shift + my_shift_virtual + n_locally_owned_dofs,
+          my_shift + my_shift_virtual + n_locally_owned_dofs +
+            n_locally_virtual);
+        number_cache.locally_owned_virtual_dofs.compress();
+
 
         // this ends the phase where we enumerate degrees of freedom on
         // each processor. what is missing is communicating DoF indices
