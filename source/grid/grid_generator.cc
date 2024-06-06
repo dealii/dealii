@@ -3420,10 +3420,8 @@ namespace GridGenerator
                    min_line_length(cylinder_tria)) /
           2.0;
 
-        GridGenerator::merge_triangulations(tria_without_cylinder,
-                                            cylinder_tria,
-                                            tria,
-                                            tolerance);
+        GridGenerator::merge_triangulations(
+          tria_without_cylinder, cylinder_tria, tria, tolerance, true);
       }
 
     // now set manifold ids:
