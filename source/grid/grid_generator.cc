@@ -6639,6 +6639,9 @@ namespace GridGenerator
     result.clear();
     result.create_triangulation(vertices, cells, subcell_data);
 
+    if (!copy_manifold_ids)
+      result.set_all_manifold_ids(numbers::flat_manifold_id);
+
     if (copy_boundary_ids)
       {
         auto result_cell = result.begin();
