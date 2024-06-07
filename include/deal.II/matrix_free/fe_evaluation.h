@@ -2744,6 +2744,20 @@ namespace internal
       return vec[component];
     }
   };
+
+  template <typename VectorType, std::size_t N>
+  struct BlockVectorSelector<std::array<VectorType *, N>, false>
+  {
+    using BaseVectorType = VectorType;
+
+    static BaseVectorType *
+    get_vector_component(std::array<VectorType *, N> &vec,
+                         const unsigned int           component)
+    {
+      AssertIndexRange(component, vec.size());
+      return vec[component];
+    }
+  };
 } // namespace internal
 
 
