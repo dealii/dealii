@@ -90,8 +90,8 @@ namespace FEValuesViews
             const double *shape_value_ptr =
               &shape_values(shape_function_data[shape_function].row_index, 0);
             for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                 ++q_point)
-              values[q_point] += value * (*shape_value_ptr++);
+                 ++q_point, ++shape_value_ptr)
+              values[q_point] += value * (*shape_value_ptr);
           }
     }
 
@@ -224,8 +224,8 @@ namespace FEValuesViews
                                           .single_nonzero_component_index;
               const double *shape_value_ptr = &shape_values(snc, 0);
               for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                   ++q_point)
-                values[q_point][comp] += value * (*shape_value_ptr++);
+                   ++q_point, ++shape_value_ptr)
+                values[q_point][comp] += value * (*shape_value_ptr);
             }
           else
             for (unsigned int d = 0; d < spacedim; ++d)
@@ -235,8 +235,8 @@ namespace FEValuesViews
                   const double *shape_value_ptr = &shape_values(
                     shape_function_data[shape_function].row_index[d], 0);
                   for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                       ++q_point)
-                    values[q_point][d] += value * (*shape_value_ptr++);
+                       ++q_point, ++shape_value_ptr)
+                    values[q_point][d] += value * (*shape_value_ptr);
                 }
         }
     }
@@ -819,8 +819,8 @@ namespace FEValuesViews
                     .single_nonzero_component_index);
               const double *shape_value_ptr = &shape_values(snc, 0);
               for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                   ++q_point)
-                values[q_point][comp] += value * (*shape_value_ptr++);
+                   ++q_point, ++shape_value_ptr)
+                values[q_point][comp] += value * (*shape_value_ptr);
             }
           else
             for (unsigned int d = 0;
@@ -836,8 +836,8 @@ namespace FEValuesViews
                   const double *shape_value_ptr = &shape_values(
                     shape_function_data[shape_function].row_index[d], 0);
                   for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                       ++q_point)
-                    values[q_point][comp] += value * (*shape_value_ptr++);
+                       ++q_point, ++shape_value_ptr)
+                    values[q_point][comp] += value * (*shape_value_ptr);
                 }
         }
     }
@@ -934,14 +934,15 @@ namespace FEValuesViews
                          q_point < n_quadrature_points;
                          ++q_point, ++shape_gradient_ptr)
                       {
-                        for (unsigned int j = 0; j < spacedim; ++j)
+                        for (unsigned int j = 0; j < spacedim;
+                             ++j, ++shape_gradient_ptr)
                           {
                             const unsigned int vector_component =
                               dealii::SymmetricTensor<2, spacedim>::
                                 component_to_unrolled_index(
                                   TableIndices<2>(comp, j));
                             divergences[q_point][vector_component] +=
-                              value * (*shape_gradient_ptr++)[j];
+                              value * (*shape_gradient_ptr)[j];
                           }
                       }
                   }
@@ -998,8 +999,8 @@ namespace FEValuesViews
 
               const double *shape_value_ptr = &shape_values(snc, 0);
               for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                   ++q_point)
-                values[q_point][indices] += value * (*shape_value_ptr++);
+                   ++q_point, ++shape_value_ptr)
+                values[q_point][indices] += value * (*shape_value_ptr);
             }
           else
             for (unsigned int d = 0; d < dim * dim; ++d)
@@ -1013,8 +1014,8 @@ namespace FEValuesViews
                   const double *shape_value_ptr = &shape_values(
                     shape_function_data[shape_function].row_index[d], 0);
                   for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                       ++q_point)
-                    values[q_point][indices] += value * (*shape_value_ptr++);
+                       ++q_point, ++shape_value_ptr)
+                    values[q_point][indices] += value * (*shape_value_ptr);
                 }
         }
     }
