@@ -3420,10 +3420,8 @@ namespace GridGenerator
                    min_line_length(cylinder_tria)) /
           2.0;
 
-        GridGenerator::merge_triangulations(tria_without_cylinder,
-                                            cylinder_tria,
-                                            tria,
-                                            tolerance);
+        GridGenerator::merge_triangulations(
+          tria_without_cylinder, cylinder_tria, tria, tolerance, true);
       }
 
     // now set manifold ids:
@@ -6638,6 +6636,9 @@ namespace GridGenerator
       GridTools::consistently_order_cells(cells);
     result.clear();
     result.create_triangulation(vertices, cells, subcell_data);
+
+    if (!copy_manifold_ids)
+      result.set_all_manifold_ids(numbers::flat_manifold_id);
 
     if (copy_boundary_ids)
       {
