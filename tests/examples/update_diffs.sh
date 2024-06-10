@@ -34,8 +34,7 @@ for file in ${diff_files}; do
     echo diff "${source_file}" "${modified_file}" \> "${file}"
     diff "${source_file}" "${modified_file}" > "${file}"
   else
-    echo "No matching .cc files found for ${file}"
-    exit 1
+    echo "No matching .cc files found for ${file}: source=${source_file} modified=${modified_file}"
   fi
 done
 
