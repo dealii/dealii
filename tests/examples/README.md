@@ -25,5 +25,6 @@ For development of new examples, we suggest first creating an empty
 
 To modify the source code, go into ``build/tests/examples/source/``
 and edit the .cc file there. Afterwards, you can update the .diff
-files by running the ``update_diffs`` target in that folder that calls
-the ``update_diffs.sh`` script in the current directory.
+files by running the ``update_diffs`` target in the folder
+``build/tests/examples/``, which runs the ``update_diffs.sh`` script
+to update the diffs.
