@@ -177,8 +177,10 @@ namespace SUNDIALS
 
         output_step(t, solution, solution_dot, step_number);
       }
-
-    return step_number;
+    long int n_steps;
+    status = IDAGetNumSteps(ida_mem, &n_steps);
+    AssertIDA(status);
+    return n_steps;
   }
 
 

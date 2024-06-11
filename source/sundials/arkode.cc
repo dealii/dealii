@@ -231,7 +231,13 @@ namespace SUNDIALS
                       time.get_step_number());
       }
     last_end_time = time.get_current_time();
-    return time.get_step_number();
+
+    long int   n_steps;
+    const auto status = ARKStepGetNumSteps(arkode_mem, &n_steps);
+    (void)status;
+    AssertARKode(status);
+
+    return n_steps;
   }
 
 
