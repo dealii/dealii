@@ -1,0 +1,37 @@
+<h1>Results</h1>
+
+The numerical solution $u_h$ for a very fine mesh $\Gamma_h$ is shown below by plotting in Paraview the zero contour of
+the approximate level set $\psi_h$ and restricting the discrete solution $u_h$ to the resulting surface approximation $\Gamma_h$.
+
+@image html step-90-solution.png width=50%
+
+Next, we demonstrate the corresponding set of intersected cells with active degrees of freedom. Note that not all cells
+are of the same refinement level which is attributed to the insufficiently fine initial uniform grid.
+
+@image html step-90_mesh_cut.png width=50%
+
+<h3>Convergence test </h3>
+
+The results of the convergence study are shown in the following table. The experimental orders of convergence (EOC)
+are reported for the surface errors and the stabilization.
+
+| Cycle |   DOFS   | Rate | Iterations | $L^2$-Error |  EOC  | $H^1$-Error | EOC  |$s_h^{1/2}(u_h)$|  EOC  |
+|:-----:|:--------:|:----:|:----------:|:-----------:|:-----:|:-----------:|:----:|:--------------:|:-----:|
+| 0     |    12370 |   -  |   15       | 7.6322e-02  |  -    | 3.6212e-01  |  -   |   2.2423e-01   |    -  |
+| 1     |    49406 | 2.00 |   18       | 1.1950e-02  | 2.68  | 1.4752e-01  | 1.30 |   1.1238e-01   | 1.00  |
+| 2     |   196848 | 1.99 |   19       | 1.7306e-03  | 2.79  | 7.4723e-02  | 0.98 |   6.1131e-02   | 0.88  |
+| 3     |   785351 | 2.00 |   22       | 3.6276e-04  | 2.25  | 3.9329e-02  | 0.93 |   3.0185e-02   | 1.02  |
+| 4     |  3136501 | 2.00 |   25       | 7.5910e-05  | 2.26  | 1.9694e-02  | 1.00 |   1.4875e-02   | 1.02  |
+| 5     | 12536006 | 2.00 |   26       | 1.7279e-05  | 2.14  | 9.8443e-03  | 1.00 |   7.4067e-03   | 1.01  |
+| 6     | 50122218 | 2.00 |   30       | 4.3891e-06  | 1.98  | 4.9219e-03  | 1.00 |   3.7042e-03   | 1.00  |
+
+In this test we refine the mesh near the surface and, as a result, the number of degrees of freedom scales in the two-dimensional fashion.
+The optimal rates of error convergence in $L^2(\Gamma)$ and $H^1(\Gamma)$ norms are clearly observable. We also note
+the first order convergence of the stabilization $s_h^{1/2}(u_h)=\sqrt{s_h(u_h, u_h)}$ evaluated at the solution $u_h$.
+
+<h3>Parallel scalability</h3>
+
+The weak and strong scalability test results are shown in the following figure. Clearly, the refine() method is
+responsible for the certain lack of parallel scalability.
+
+@image html step-90_weak-vs-strong.png width=100%
