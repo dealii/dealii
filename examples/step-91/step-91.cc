@@ -82,6 +82,18 @@ namespace Step55
 
 
 
+  namespace ModelParameters
+  {
+    constexpr double stream_power_exponent_m    = 0.4;
+    constexpr double stream_power_exponent_n    = 1;
+    constexpr double stream_power_coefficient_k = 2e-5;
+    constexpr double diffusion_coefficient_Kd   = 0.01;
+    constexpr double rainfall_rate_p            = 0.6;
+    constexpr double regularization_epsilon     = 0.0001;
+    constexpr double stabilization_c            = 0.1;
+  } // namespace ModelParameters
+
+
   class ColoradoTopography : public Function<2>
   {
   public:
@@ -215,7 +227,7 @@ namespace Step55
   double RainFallRate<dim>::value(const Point<dim> & /*p*/,
                                   const unsigned int /*component*/) const
   {
-    return 1;
+    return ModelParameters::rainfall_rate_p;
   }
 
 
@@ -231,9 +243,16 @@ namespace Step55
   private:
     void make_grid();
     void setup_system();
+
     void interpolate_initial_elevation();
-    void assemble_system();
-    void solve();
+    void compute_initial_constraints();
+    void assemble_initial_waterflow_system();
+    void solve_initial_waterflow_system();
+
+    void assemble_residual(LA::MPI::BlockVector &residual);
+    void assemble_jacobian();
+    void solve_with_jacobian();
+
     void refine_grid();
     void output_results(const unsigned int cycle);
 
@@ -283,7 +302,7 @@ namespace Step55
                                               {7, 4},
                                               Point<2>(-109., 37.),
                                               Point<2>(-102., 41.));
-    triangulation.refine_global(4);
+    triangulation.refine_global(6);
   }
 
 
@@ -316,21 +335,6 @@ namespace Step55
                                n_elevation, n_elevation + n_waterflow_rate)};
 
     {
-      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-
-      // TODO: Figure out boundary values
-      //      const FEValuesExtractors::Scalar waterflow_rate(1);
-      //      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-      //      VectorTools::interpolate_boundary_values(dof_handler,
-      //                                               0,
-      //                                               ExactSolution<dim>(),
-      //                                               constraints,
-      //                                               fe.component_mask(waterflow_rate));
-
-      constraints.close();
-    }
-
-    {
       system_matrix.clear();
 
       BlockDynamicSparsityPattern dsp(relevant_partitioning);
@@ -355,7 +359,8 @@ namespace Step55
   template <int dim>
   void StreamPowerErosionProblem<dim>::interpolate_initial_elevation()
   {
-    TimerOutput::Scope t(computing_timer, "interpolating initial conditions");
+    TimerOutput::Scope t(computing_timer,
+                         "initial conditions: interpolate elevation");
 
     const ColoradoTopography colorado_topography(mpi_communicator);
     const VectorFunctionFromScalarFunctionObject<dim> initial_values(
@@ -369,10 +374,210 @@ namespace Step55
   }
 
 
+
   template <int dim>
-  void StreamPowerErosionProblem<dim>::assemble_system()
+  void StreamPowerErosionProblem<dim>::compute_initial_constraints()
   {
-    TimerOutput::Scope t(computing_timer, "assembly");
+    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+    constraints.reinit(locally_owned_dofs, DoFTools::extract_locally_relevant_dofs(dof_handler));
+
+    Assert (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1, ExcNotImplemented());
+
+    std::vector<bool> locally_owned_elevation_dofs_that_are_maxima (locally_owned_dofs.n_elements(), true);
+    std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell->get_dof_indices (local_dof_indices);
+
+          for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+            if (fe.system_to_component_index(i).first == 0) // is elevation
+              {
+                const types::global_dof_index elevation_dof_index = local_dof_indices[i];
+
+                if (locally_owned_elevation_dofs_that_are_maxima[locally_owned_dofs.nth_index_in_set(elevation_dof_index)]
+                                                                 == true)
+                  {
+                    const double elevation = locally_relevant_solution(elevation_dof_index);
+
+                    for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+                      if (j != i)
+                        if (fe.system_to_component_index(j).first == 0) // is also elevation
+                          {
+                            const types::global_dof_index other_elevation_dof_index = local_dof_indices[j];
+                            const double other_elevation = locally_relevant_solution(other_elevation_dof_index);
+                            if (other_elevation > elevation)
+                              {
+                                locally_owned_elevation_dofs_that_are_maxima[locally_owned_dofs.nth_index_in_set(elevation_dof_index)] = false;
+                                break;
+                              }
+                          }
+                  }
+              }
+        }
+
+    LA::MPI::BlockVector distributed_solution(owned_partitioning,
+                                              mpi_communicator);
+    for (unsigned int i=0; i<dof_handler.n_dofs()/2; ++i) // could be done better
+      if (locally_owned_elevation_dofs_that_are_maxima[locally_owned_dofs.nth_index_in_set(i)])
+        {
+          constraints.add_constraint (i+system_rhs.block(0).size(), {}, 0.); // could probably do better
+          distributed_solution(i+system_rhs.block(0).size()) = 42;
+        }
+    constraints.close();
+
+    distributed_solution.compress(VectorOperation::insert);
+    locally_relevant_solution.block(1) = distributed_solution.block(1);
+  }
+
+
+
+  template <int dim>
+  void StreamPowerErosionProblem<dim>::assemble_initial_waterflow_system()
+  {
+    TimerOutput::Scope t(computing_timer,
+                         "initial conditions: assemble waterflow system");
+
+    system_matrix = 0;
+    system_rhs    = 0;
+
+    const QGauss<dim> quadrature_formula(fe.degree + 1);
+
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values_at_node_points(
+      fe,
+      Quadrature<dim>(FE_Q<dim>(1).get_unit_support_points()),
+      update_gradients);
+
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
+    const unsigned int n_q_points    = quadrature_formula.size();
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
+
+    const RainFallRate<dim> rain_fall_rate_rhs;
+    std::vector<double>     rain_fall_rate_rhs_values(n_q_points);
+
+    std::vector<Tensor<1, dim>> elevation_grad_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<Tensor<1, dim>> d_at_q_points(fe_values.n_quadrature_points);
+
+    std::vector<Tensor<1, dim>> elevation_grad_at_node_points(dofs_per_cell);
+    std::vector<Tensor<1, dim>> d_at_node_points(dofs_per_cell);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+    const FEValuesExtractors::Scalar     elevation(0);
+    const FEValuesExtractors::Scalar     water_flow_rate(1);
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell_matrix = 0;
+          cell_rhs    = 0;
+
+          fe_values.reinit(cell);
+          fe_values_at_node_points.reinit(cell);
+
+          rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
+                                        rain_fall_rate_rhs_values);
+
+          fe_values[elevation].get_function_gradients(
+            locally_relevant_solution, elevation_grad_at_q_points);
+          for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+            d_at_q_points[q] =
+              -elevation_grad_at_q_points[q] /
+              std::sqrt(elevation_grad_at_q_points[q] *
+                          elevation_grad_at_q_points[q] +
+                        ModelParameters::regularization_epsilon *
+                          ModelParameters::regularization_epsilon);
+
+          fe_values_at_node_points[elevation].get_function_gradients(
+            locally_relevant_solution, elevation_grad_at_node_points);
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            d_at_node_points[j] =
+              -elevation_grad_at_node_points[j] /
+              std::sqrt(elevation_grad_at_node_points[j] *
+                          elevation_grad_at_node_points[j] +
+                        ModelParameters::regularization_epsilon *
+                          ModelParameters::regularization_epsilon);
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                {
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    {
+                      cell_matrix(i, j) +=
+                        ((fe_values[water_flow_rate].value(i, q) +
+                          ModelParameters::stabilization_c * cell->diameter() *
+                            d_at_q_points[q] *
+                            fe_values[water_flow_rate].gradient(i, q)) *
+                         (d_at_node_points[j] *
+                          fe_values[water_flow_rate].gradient(j, q)) *
+                         fe_values.JxW(q));
+                    }
+
+                  cell_rhs(i) +=
+                    ((fe_values[water_flow_rate].value(i, q) +
+                      ModelParameters::stabilization_c * cell->diameter() *
+                        d_at_q_points[q] *
+                        fe_values[water_flow_rate].gradient(i, q)) *
+                     rain_fall_rate_rhs_values[q] * fe_values.JxW(q));
+                }
+            }
+
+          cell->get_dof_indices(local_dof_indices);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 cell_rhs,
+                                                 local_dof_indices,
+                                                 system_matrix,
+                                                 system_rhs);
+        }
+
+    system_matrix.compress(VectorOperation::add);
+    system_rhs.compress(VectorOperation::add);
+  }
+
+
+  template <int dim>
+  void StreamPowerErosionProblem<dim>::solve_initial_waterflow_system()
+  {
+    TimerOutput::Scope t(computing_timer,
+                         "initial conditions: solve waterflow system");
+
+    std::cout << "Initial residual=" << system_rhs.block(1).l2_norm() << std::endl;
+    SolverControl solver_control(system_matrix.block(1,1).m(),
+                                 1e-6 * system_rhs.block(1).l2_norm());
+
+    SolverGMRES<LA::MPI::Vector> solver(solver_control);
+
+    LA::MPI::BlockVector distributed_solution(owned_partitioning,
+                                              mpi_communicator);
+
+    constraints.set_zero(distributed_solution);
+
+    solver.solve(system_matrix.block(1, 1),
+                 distributed_solution.block(1),
+                 system_rhs.block(1),
+                 PreconditionIdentity());
+
+    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+          << std::endl;
+
+    constraints.distribute(distributed_solution);
+
+    locally_relevant_solution.block(1) = distributed_solution.block(1);
+  }
+
+
+
+  template <int dim>
+  void StreamPowerErosionProblem<dim>::assemble_jacobian()
+  {
+    TimerOutput::Scope t(computing_timer, "assemble Jacobian matrix");
 
     system_matrix = 0;
     system_rhs    = 0;
@@ -436,7 +641,7 @@ namespace Step55
 
 
   template <int dim>
-  void StreamPowerErosionProblem<dim>::solve()
+  void StreamPowerErosionProblem<dim>::solve_with_jacobian()
   {
     return;
 
@@ -547,12 +752,10 @@ namespace Step55
     make_grid();
     setup_system();
     interpolate_initial_elevation();
-
-    assemble_system();
-    solve();
-
-    if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
-      output_results(/*cycle*/ 0);
+    compute_initial_constraints();
+    assemble_initial_waterflow_system();
+//    solve_initial_waterflow_system();
+    output_results(/*cycle*/ 0);
 
     computing_timer.print_summary();
     computing_timer.reset();
