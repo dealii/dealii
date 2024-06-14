@@ -1274,25 +1274,28 @@ public:
 
   /**
    * Return the string that identifies the current path into the property
-   * tree. This is only a path, i.e. it is not terminated by the
-   * path_separator character.
+   * tree. The path elements are seperated by the path_separator, which is a
+   * '.'. This is only a path, i.e., it is not terminated by the path_separator
+   * character.
    *
    * This function simply calls collate_path_string() with
-   * @p subsection_path as argument
+   * @p subsection_path as argument.
    */
   std::string
   get_current_path() const;
 
   /**
    * Given the name of an entry as argument, the function computes a full path
-   * into the parameter tree using the current subsection.
+   * into the parameter tree using the current subsection. The path elements are
+   * seperated by the path_separator, which is a '.'.
    */
   std::string
   get_current_full_path(const std::string &name) const;
 
   /**
    * This function computes a full path into the parameter tree given a path
-   * from the current subsection and the name of an entry.
+   * from the current subsection and the name of an entry. The path elements are
+   * seperated by the path_separator, which is a '.'.
    */
   std::string
   get_current_full_path(const std::vector<std::string> &sub_path,
