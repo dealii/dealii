@@ -27,6 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 namespace GridTools
 {
+  template <int dim, int spacedim>
+  class Cache;
+
   namespace internal
   {
     template <int dim, int spacedim>
@@ -150,6 +153,20 @@ namespace Utilities
       reinit(const std::vector<Point<spacedim>> &points,
              const Triangulation<dim, spacedim> &tria,
              const Mapping<dim, spacedim>       &mapping);
+
+      /**
+       * Set up internal data structures and communication pattern based on
+       * an existing Cache and a list of points @p points.
+       *
+       * @warning This is a collective call that needs to be executed by all
+       *   processors in the communicator.
+       *
+       * @note If you want to be sure that all points have been found, call
+       *   all_points_found() after calling this function.
+       */
+      void
+      reinit(const GridTools::Cache<dim, spacedim> &cache,
+             const std::vector<Point<spacedim>>    &points);
 
       /**
        * Set up internal data structures and communication pattern based on
