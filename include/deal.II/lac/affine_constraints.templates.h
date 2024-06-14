@@ -469,7 +469,7 @@ namespace internal
     }
 
     // step 3: communicate constraints so that each process know how the
-    // locally locally relevant dofs are constrained
+    // locally relevant dofs are constrained
     {
       const unsigned int tag = Utilities::MPI::internal::Tags::
         affine_constraints_make_consistent_in_parallel_1;
@@ -845,15 +845,12 @@ AffineConstraints<number>::close()
             // have appended in this go around) and see whether they are
             // further constrained. ignore elements that we don't store on
             // the current processor.
-            const unsigned int n_original_entries  = line.entries.size();
-            bool               has_sub_constraints = false;
-            const size_type    lines_cache_size    = lines_cache.size();
-            for (unsigned int entry = 0; entry < n_original_entries; ++entry)
+            bool has_sub_constraints = false;
+            for (auto &entry : line.entries)
               {
-                const size_type dof_index =
-                  calculate_line_index(line.entries[entry].first);
+                const size_type dof_index = calculate_line_index(entry.first);
 
-                if (dof_index < lines_cache_size &&
+                if (dof_index < lines_cache.size() &&
                     lines_cache[dof_index] != numbers::invalid_size_type)
                   {
                     // Now we found an index that is further constrained, so
@@ -866,13 +863,13 @@ AffineConstraints<number>::close()
                     // around of the outer iteration.
                     has_sub_constraints = true;
 
-                    const number weight = line.entries[entry].second;
-                    Assert(line.entries[entry].first != line.index,
+                    const number weight = entry.second;
+                    Assert(entry.first != line.index,
                            ExcMessage("Cycle in constraints detected!"));
 
                     const ConstraintLine &constrained_line =
                       lines[lines_cache[dof_index]];
-                    Assert(constrained_line.index == line.entries[entry].first,
+                    Assert(constrained_line.index == entry.first,
                            ExcInternalError());
 
                     // now we have to replace an entry by its expansion. we do
@@ -888,13 +885,13 @@ AffineConstraints<number>::close()
                         for (size_type i = 0;
                              i < constrained_line.entries.size();
                              ++i)
-                          Assert(line.entries[entry].first !=
+                          Assert(entry.first !=
                                    constrained_line.entries[i].first,
                                  ExcMessage("Cycle in constraints detected!"));
 
                         // replace first entry, then tack the rest to the end
                         // of the list
-                        line.entries[entry] = std::pair<size_type, number>(
+                        entry = std::pair<size_type, number>(
                           constrained_line.entries[0].first,
                           constrained_line.entries[0].second * weight);
 
@@ -925,7 +922,7 @@ AffineConstraints<number>::close()
                       // invalid_size_type here to finally remove entries in a
                       // second loop
                       {
-                        line.entries[entry].first = numbers::invalid_size_type;
+                        entry.first = numbers::invalid_size_type;
                       }
 
                     line.inhomogeneity +=
