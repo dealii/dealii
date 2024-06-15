@@ -1,0 +1,46 @@
+29c29
+< 
+---
+> #include "../example_test.h"
+512c512
+<     , time(/*start time*/ 0., /*end time*/ 1.)
+---
+>     , time(/*start time*/ 0., /*end time*/ .1)
+906c906,910
+<       cg.solve(schur_complement, solution.block(1), schur_rhs, preconditioner);
+---
+>       check_solver_within_range(std::cout,
+>         cg.solve(schur_complement, solution.block(1), schur_rhs, preconditioner),
+>         solver_control.last_step(),
+>         16, 23);
+> //    cg.solve(schur_complement, solution.block(1), schur_rhs, preconditioner);
+908,909c912,913
+<       std::cout << "   " << solver_control.last_step()
+<                 << " CG Schur complement iterations for pressure." << std::endl;
+---
+> //      std::cout << "   " << solver_control.last_step()
+> //                << " CG Schur complement iterations for pressure." << std::endl;
+950,953c954,961
+<       cg.solve(system_matrix.block(2, 2),
+<                solution.block(2),
+<                system_rhs.block(2),
+<                PreconditionIdentity());
+---
+>       check_solver_within_range(std::cout,
+>                                 cg.solve(system_matrix.block(2, 2), solution.block(2), system_rhs.block(2), PreconditionIdentity()),
+>                                 solver_control.last_step(),
+>                                 1, 2);
+> //      cg.solve(system_matrix.block(2, 2),
+> //               solution.block(2),
+> //               system_rhs.block(2),
+> //               PreconditionIdentity());
+957,958c965,966
+<       std::cout << "   " << solver_control.last_step()
+<                 << " CG iterations for saturation." << std::endl;
+---
+> //      std::cout << "   " << solver_control.last_step()
+> //                << " CG iterations for saturation." << std::endl;
+1127c1135
+<         output_results();
+---
+>       //output_results();

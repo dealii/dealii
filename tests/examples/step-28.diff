@@ -1,0 +1,28 @@
+1584c1584
+<     for (unsigned int cycle = 0; cycle < parameters.n_refinement_cycles;
+---
+>     for (unsigned int cycle = 0; cycle < 1;
+1630c1630
+<             for (unsigned int group = 0; group < parameters.n_groups; ++group)
+---
+>             for (unsigned int group = 0; group < 1; ++group)
+1671,1672c1671,1672
+<         for (unsigned int group = 0; group < parameters.n_groups; ++group)
+<           energy_groups[group]->output_results(cycle);
+---
+>       //for (unsigned int group = 0; group < parameters.n_groups; ++group)
+>       //  energy_groups[group]->output_results(cycle);
+1679,1682c1679,1682
+<         std::cout << "   Cycle=" << cycle << ", n_dofs="
+<                   << energy_groups[0]->n_dofs() + energy_groups[1]->n_dofs()
+<                   << ",  k_eff=" << k_eff << ", time=" << timer.cpu_time()
+<                   << std::endl;
+---
+>       //std::cout << "   Cycle=" << cycle << ", n_dofs="
+>       //          << energy_groups[0]->n_dofs() + energy_groups[1]->n_dofs()
+>       //          << ",  k_eff=" << k_eff << ", time=" << timer.cpu_time()
+>       //          << std::endl;
+1717c1717
+<         filename = "project.prm";
+---
+>         filename = "../../../source/step-28/project.prm";
