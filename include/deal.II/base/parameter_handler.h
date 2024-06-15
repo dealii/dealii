@@ -1273,6 +1273,35 @@ public:
   subsection_path_exists(const std::vector<std::string> &sub_path) const;
 
   /**
+   * Return the string that identifies the current path into the property
+   * tree. The path elements are seperated by the path_separator, which is a
+   * '.'. This is only a path, i.e., it is not terminated by the path_separator
+   * character.
+   *
+   * This function simply calls collate_path_string() with
+   * @p subsection_path as argument.
+   */
+  std::string
+  get_current_path() const;
+
+  /**
+   * Given the name of an entry as argument, the function computes a full path
+   * into the parameter tree using the current subsection. The path elements are
+   * seperated by the path_separator, which is a '.'.
+   */
+  std::string
+  get_current_full_path(const std::string &name) const;
+
+  /**
+   * This function computes a full path into the parameter tree given a path
+   * from the current subsection and the name of an entry. The path elements are
+   * seperated by the path_separator, which is a '.'.
+   */
+  std::string
+  get_current_full_path(const std::vector<std::string> &sub_path,
+                        const std::string              &name) const;
+
+  /**
    * Return value of entry @p entry_string.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
    * value of an undeclared entry is required, an @p Assert will fail.
@@ -1784,32 +1813,6 @@ private:
    * store indices into this array in order to reference specific actions.
    */
   std::vector<std::function<void(const std::string &)>> actions;
-
-  /**
-   * Return the string that identifies the current path into the property
-   * tree. This is only a path, i.e. it is not terminated by the
-   * path_separator character.
-   *
-   * This function simply calls collate_path_string() with
-   * @p subsection_path as argument
-   */
-  std::string
-  get_current_path() const;
-
-  /**
-   * Given the name of an entry as argument, the function computes a full path
-   * into the parameter tree using the current subsection.
-   */
-  std::string
-  get_current_full_path(const std::string &name) const;
-
-  /**
-   * This function computes a full path into the parameter tree given a path
-   * from the current subsection and the name of an entry.
-   */
-  std::string
-  get_current_full_path(const std::vector<std::string> &sub_path,
-                        const std::string              &name) const;
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and
