@@ -83,7 +83,7 @@ public:
           for (unsigned int i = 0; i < n_dofs; ++i)
             gradients[n_q_points * d + q] +=
               shape_info.data[0]
-                .shape_gradients[d * n_dofs * n_q_points + i * n_q_points + q] *
+                .shape_gradients[i * dim * n_q_points + q * dim + d] *
               dof_values[i];
         }
   }
