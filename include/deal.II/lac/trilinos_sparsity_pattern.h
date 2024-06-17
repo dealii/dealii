@@ -22,6 +22,7 @@
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/utilities.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/sparsity_pattern_base.h>
@@ -1277,9 +1278,10 @@ namespace TrilinosWrappers
         // thread-safety)
         Assert(nonlocal_graph->RowMap().LID(
                  static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
-               ExcMessage("Attempted to write into off-processor matrix row "
-                          "that has not be specified as being writable upon "
-                          "initialization"));
+               ExcMessage("Attempted to write into off-processor matrix row " +
+                          Utilities::to_string(row) +
+                          " that has not been specified as being writable upon "
+                          "initialization."));
         ierr = nonlocal_graph->InsertGlobalIndices(trilinos_row_index,
                                                    n_cols,
                                                    col_index_ptr);
