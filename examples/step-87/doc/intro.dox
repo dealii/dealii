@@ -44,7 +44,7 @@ the evaluation of the solution at an arbitrary point boils down to a cell-local
 evaluation
 @f[
 u(\boldsymbol{x}_q) = \sum_{i} \hat{N}^K_i(\hat{\boldsymbol{x}}_q) u_i^K
-\quad\text{with}\quad i\in[0,n_{\text{dofs_per_cell}}),
+\quad\text{with}\quad i\in[0,n_{\text{dofs\_per\_cell}}),
 @f]
 with $\hat{N}^K_i$ being the shape functions defined on the reference cell and
 $u_i^{K}$ the solution coefficients

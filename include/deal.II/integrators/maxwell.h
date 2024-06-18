@@ -72,7 +72,9 @@ namespace LocalIntegrators
      * \partial_1\partial_2 u_2 - \partial_2^2 u_1 \\
      * \partial_1\partial_2 u_1 - \partial_1^2 u_2
      * \end{pmatrix}
-     *
+     * @f]
+     * and
+     * @f[
      * \nabla\times\nabla\times \mathbf u = \begin{pmatrix}
      * \partial_1\partial_2 u_2 + \partial_1\partial_3 u_3
      * - (\partial_2^2+\partial_3^2) u_1 \\
@@ -80,7 +82,7 @@ namespace LocalIntegrators
      * - (\partial_3^2+\partial_1^2) u_2 \\
      * \partial_3\partial_1 u_1 + \partial_3\partial_2 u_2
      * - (\partial_1^2+\partial_2^2) u_3
-     * \end{pmatrix}
+     * \end{pmatrix}.
      * @f]
      *
      * @note The third tensor argument is not used in two dimensions and can

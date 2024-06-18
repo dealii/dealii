@@ -185,7 +185,7 @@
  * }
  * @endcode
  *
- * ### Exploitation of the chain-rule
+ * @subsection Exploitation of the chain-rule
  *
  * In the most practical sense, any of the above categories exploit the chain-rule to compute the total
  * derivative of a composite function. To perform this action, they typically use one of two mechanisms to

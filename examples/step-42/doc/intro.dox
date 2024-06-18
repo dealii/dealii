@@ -321,7 +321,7 @@ method for the contact. It works as follows:
  Here,
  $P_{\mathcal{A}}(U)$ is the projection of the active
  components in $\mathcal{A}$ to the gap
- @f{gather*}P_{\mathcal{A}}(U)_p \dealcoloneq \begin{cases}{
+ @f{gather*}P_{\mathcal{A}}(U)_p \dealcoloneq \begin{cases}
  U_p, & \textrm{if}\quad p\notin\mathcal{A}\\
  g_{h,p}, & \textrm{if}\quad
  p\in\mathcal{A},
@@ -346,7 +346,7 @@ we can choose $B$ to be a matrix that has only one entry per row,
 set strategy for non-linear multibody contact problems, Comput. Methods Appl. Mech. Engrg.
 194, 2005, pp. 3147-3166).
 The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
-@f{gather*}G_p = \begin{cases}{
+@f{gather*}G_p = \begin{cases}
 g_{h,p}, & \text{if}\quad p\in\mathcal{S}\\
 0, & \text{if}\quad p\notin\mathcal{S}.
 \end{cases}@f}

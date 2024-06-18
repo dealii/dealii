@@ -866,7 +866,7 @@ namespace Step87
         // =
         // \sum_i\text{tr}\left({\nabla \boldsymbol{N}_i (\boldsymbol{x}_q)
         // \boldsymbol n_i}\right)
-        // \;\text{with}\; i\in[0,n_{\text{dofs_per_cell}}),
+        // \;\text{with}\; i\in[0,n_{\text{dofs\_per\_cell}}),
         // @f]
         // which we can apply since the immersed mesh is consistently
         // orientated. The surface tension coefficient is set to 1 for the
