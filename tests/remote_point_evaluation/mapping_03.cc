@@ -23,6 +23,7 @@
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/numerics/vector_tools_evaluate.h>
 
@@ -32,7 +33,7 @@
 
 template <int dim>
 void
-test(const bool enforce_unique_map)
+test(const bool enforce_unique_map, const bool use_cache)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_cube(tria, 2);
@@ -59,6 +60,11 @@ test(const bool enforce_unique_map)
   additional_data.tolerance              = 1e-6;
 
   Utilities::MPI::RemotePointEvaluation<dim> eval(additional_data);
+  if (use_cache)
+    {
+      GridTools::Cache<dim> cache(tria, mapping);
+      eval.reinit(cache, evaluation_points);
+    }
 
   const auto result_avg =
     VectorTools::point_values<1>(mapping,
@@ -89,6 +95,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;
 
-  test<2>(false);
-  test<2>(true);
+  test<2>(false, false);
+  test<2>(true, false);
+  test<2>(true, true);
 }
