@@ -1148,10 +1148,7 @@ namespace StokesClass
     stokes_matrix.initialize_dof_vector(solution);
     stokes_matrix.initialize_dof_vector(system_rhs);
 
-    solution.update_ghost_values();
     solution.collect_sizes();
-
-    system_rhs.update_ghost_values();
     system_rhs.collect_sizes();
   }
 
