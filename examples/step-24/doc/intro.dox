@@ -156,7 +156,6 @@ From this we obtain the discrete model by introducing a finite number of shape
 functions, and get
 @f{eqnarray*}{
 M\bar{p}^{n}-k \theta M v^n & = & M\bar{p}^{n-1}+k (1-\theta)Mv^{n-1},\\
-
 (-c_0^2k \theta A-c_0 B)\bar{p}^n-Mv^{n} & = &
 (c_0^2k(1-\theta)A-c_0B)\bar{p}^{n-1}-Mv^{n-1}+c_0^2k(\theta F^{n}+(1-\theta)F^{n-1}).
 @f}

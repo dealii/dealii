@@ -519,12 +519,12 @@ enum class QuadratureCouplingType
  *
  * \f[
  * \phi_{1,i}(x) = \begin{cases} v_i(x) & \text{ if } i \in [0,n_l) \\
- * 0 & \text{ if ) i \in [n_1, n_1+n_2] \end{cases},\quad \phi_{1,i}(x) =
+ * 0 & \text{ if } i \in [n_1, n_1+n_2] \end{cases},\quad \phi_{1,i}(x) =
  * \begin{cases} 0(x) & \text{ if } i \in [0,n_1) \\
- * w_{i-n_1}(x) & \text{ if ) i \in [n_1, n_1+n_2] \end{cases},
+ * w_{i-n_1}(x) & \text{ if } i \in [n_1, n_1+n_2] \end{cases},
  * \f]
  *
- * where $phi_{1,i}$ is the first basis function with index $i$ and $n_{1,2}$
+ * where $\phi_{1,i}$ is the first basis function with index $i$ and $n_{1,2}$
  * are the number of local dofs on the first and second FEValuesBase objects.
  *
  * This enum is used in the constructor of FECouplingValues to specify how to

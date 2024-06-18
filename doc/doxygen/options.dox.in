@@ -190,6 +190,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING=1 \
                          DEAL_II_ADOLC_WITH_ATRIG_ERF=1 \
                          DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING=1 \
+                         DEAL_II_CXX20_REQUIRES(x)= \
                          DEAL_II_DEPRECATED_EARLY= \
                          DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(x)= \
                          DEAL_II_WITH_ARBORX=1 \
