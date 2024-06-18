@@ -1151,13 +1151,15 @@ namespace internal
                 typename VectorizedDouble>
       void
       mapping_q_compute_range(
-        const unsigned int               begin_cell,
-        const unsigned int               end_cell,
-        const std::vector<GeometryType> &cell_type,
-        const std::vector<bool>         &process_cell,
-        const UpdateFlags                update_flags_cells,
-        const AlignedVector<double>     &plain_quadrature_points,
-        const ShapeInfo<double>         &shape_info,
+        const unsigned int                                        begin_cell,
+        const unsigned int                                        end_cell,
+        const dealii::Triangulation<dim>                         &tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cell_array,
+        const std::vector<GeometryType>                          &cell_type,
+        const std::vector<bool>                                  &process_cell,
+        const UpdateFlags            update_flags_cells,
+        const AlignedVector<double> &plain_quadrature_points,
+        const ShapeInfo<double>     &shape_info,
         MappingInfoStorage<dim, dim, VectorizedArrayType> &my_data)
       {
         constexpr unsigned int n_lanes   = VectorizedArrayType::size();
@@ -1239,6 +1241,28 @@ namespace internal
                             jac[d][e] = 0.;
 
                     const VectorizedDouble jac_det = determinant(jac);
+
+#ifdef DEBUG
+                    for (unsigned int v = 0; v < n_lanes_d; ++v)
+                      {
+                        const typename Triangulation<dim>::cell_iterator
+                          cell_iterator(
+                            &tria,
+                            cell_array[cell * n_lanes + vv + v].first,
+                            cell_array[cell * n_lanes + vv + v].second);
+
+                        Assert(jac_det[v] >
+                                 1e-12 * Utilities::fixed_power<dim>(
+                                           cell_iterator->diameter() /
+                                           std::sqrt(double(dim))),
+                               (typename Mapping<dim>::ExcDistortedMappedCell(
+                                 cell_iterator->center(), jac_det[v], q)));
+                      }
+#else
+                    (void)tria;
+                    (void)cell_array;
+#endif
+
                     const Tensor<2, dim, VectorizedDouble> inv_jac =
                       transpose(invert(jac));
 
@@ -2308,6 +2332,11 @@ namespace internal
                        1. :
                        my_data.descriptor[0].quadrature.weight(q));
 
+#ifdef DEBUG
+                  for (unsigned int v = 0; v < n_lanes_d; ++v)
+                    Assert(JxW[v] > 0.0, ExcInternalError());
+#endif
+
                   store_vectorized_array(JxW,
                                          vv,
                                          my_data.JxW_values[offset + q]);
@@ -2792,6 +2821,8 @@ namespace internal
                                                          VectorizedDouble>(
                 begin,
                 end,
+                tria,
+                cell_array,
                 cell_type,
                 process_cell,
                 update_flags_cells,
