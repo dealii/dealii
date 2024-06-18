@@ -2,7 +2,9 @@
 This program was contributed by Vladimir Yushutin and Timo Heister, Clemson University, 2023.
 
 This material is based upon work partly supported by the National
-Science Foundation Award DMS-
+Science Foundation Award DMS-2028346, OAC-2015848, EAR-1925575, and by the Computational
+Infrastructure in Geodynamics initiative (CIG), through the NSF under Award
+EAR-0949446, EAR-1550901, EAR-2149126 via the University of California -- Davis.
 </i>
 
 <a name="step-90-Intro"></a>
@@ -24,7 +26,7 @@ arbitrary shape and size manifesting in the so-called ``small cut" problem and r
 form that restores well-conditioning of the problem.
 
 Two aspects are of our focus. First, the surface approximation is separated from the discretization of the surface PDE,
-e.g. a $Q_2$ discrete level-set and a $Q_1$ solution are possible on the same bulk triangulation.
+e.g., a $Q_2$ discrete level-set and a $Q_1$ solution are possible on the same bulk triangulation.
 Second, we make sure that the performance of TraceFEM in the parallel implementation corresponds to that of a classical
 fitted FEM for a two-dimensional problem. We demonstrate how to achieve both goals by using a combination of MeshWorker
 and NonMatching capabilities.
@@ -54,7 +56,7 @@ at support points. Notice also that the mesh is graded: any cell has at most 4 n
 
 Once a desired geometry approximation $\Gamma_h$ is achieved using the iterative approach above, we can start forming the linear system
 using the constructed normals and quadratures. For the purposes of the tutorial we choose a non-trivial surface $\Gamma$ given by
-@f{equation*}
+@f{equation*}{
   \frac{x^2}{4}+ y^2 + \frac{4  z^2} {(1 + 0.5  \sin(\pi  x))^{2}} = 1
 @f}
 The OY and OX views of this tamarind-shaped, exact surface $\Gamma$ are shown below along with the mesh after
@@ -66,7 +68,7 @@ three iterations (the approximation $\Gamma_h$ is not shown).
 <h3>Model problem</h3>
 
 We would like to solve the simplest possible problem  defined on a surface, namely the Laplace--Beltrami equation,
-@f{equation*}
+@f{equation*}{
  -\Delta_\Gamma u + c u = f \qquad  \text{in }\, \Gamma,
 @f}
 where we take $c=1$ for concreteness. We added the term $cu$ to the left-hand side so the problem becomes well-posed
@@ -75,7 +77,7 @@ in the absence of any boundary; an alternative could be to take $c=0$ but impose
 <h3>Manufactured exact solution</h3>
 We choose the test solution and the right-hand side forcing
  as the restriction to $\Gamma$ of
-@f{equation*}
+@f{equation*}{
  u(x,y,z)=xy\,,\quad
  f(x,y,z)=xy + 2.0\,\mathbf{n}_x \mathbf{n}_y + \kappa  (y \mathbf{n}_x + x\mathbf{n}_y),
 @f}
@@ -90,11 +92,11 @@ the cells of the background mesh with the iso surface of an approximation of the
 never actually create any two-dimensional meshes for the surface but only compute approximate quadrature points and surface normals.
 Next we distribute degrees of freedom over a thin subdomain $\Omega_h$
 that completely covers $\Gamma_h$ and that consists of the intersected cells $\mathcal{T}_\Gamma^h$,
-@f{equation*}
+@f{equation*}{
  \mathcal{T}_\Gamma^h = \{ T \in \mathcal{T}^{h} : T \cap \Gamma_h \neq \emptyset \}.
 @f}
 The finite element space where we want to find our numerical solution, $u_h$, is now
-@f{equation*}
+@f{equation*}{
  V_h = \{ v \in C(\Omega_h) : v \in Q_p(T), \, T \in \mathcal{T}_\Gamma^h \},
 @f}
 where $\Omega_h$ is the union of all intersected cells from $\bigcup_{T \in \mathcal{T}_\Gamma^h} \overline{T}$.
@@ -106,7 +108,7 @@ we set the active_fe_index to either 0 or 1.
 To determine whether a cell is intersected or not, we use the class NonMatching::MeshClassifier.
 
 A natural candidate for a weak formulation  involves the following (bi)linear forms
-@f{align*}
+@f{align*}{
  a_h(u_h, v_h) =  (\nabla_{\Gamma_h} u_h, \nabla_{\Gamma_h} v_h)_{\Gamma_h}+(u_h, v_h)_{\Gamma_h}\,,\qquad
  L_h(v_h)      =  (f^e,v_h)_{\Gamma_h}.
 @f}
@@ -118,11 +120,11 @@ The latter is identified with $f^e$ on $\Gamma_h$ and it is not the normal exten
 
 However, the so-called "small-cut problem" may arise and one should
 introduce the stabilized version of TraceFEM: Find $u_h \in V_h$ such that
-@f{equation*}
+@f{equation*}{
  a_h(u_h,v_h) + s_h(u_h, v_h) = L_h(v_h), \quad \forall v_h \in V_\Omega^h.
 @f}
 Here the normal-gradient stabilization $s_h$ involves the three-dimensional integration over whole (but intersected) cells and is given by
-@f{equation*}
+@f{equation*}{
  s_h(u_h,v_h) = h^{-1}(\mathbf{n}_h\cdot\nabla u_h, \mathbf{n}_h\cdot\nabla v_h)_{\Omega_h},
 @f}
 Note that the $h^{-1}$ scaling may be relaxed for sufficiently smooth solutions such as the manufactured one, but we
@@ -130,7 +132,7 @@ choose the strong scaling to demonstrate the extreme case @cite traceFEM_review_
 
 <h3>Discrete Level Set Function</h3>
 In TraceFEM we construct the approximation $\Gamma_h$ using the interpolant $\psi_h$ of the exact level-set function on the bulk triangulation:
-@f{align*}
+@f{align*}{
  \Gamma_h &= \{x \in \mathbb{R}^{\text{3}} : \psi_h(x) = 0 \}.
 @f}
 The exact normal vector $\mathbf{n}$ is approximated by $\mathbf{n}_h=\nabla\psi_h/\|\nabla\psi_h\|$ which, together
