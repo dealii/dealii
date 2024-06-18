@@ -597,6 +597,14 @@ namespace internal
 
 
 
+      /**
+       * This function computes and tabulates the mapping information for
+       * generic mappings on a range of cells by a call to FEValues with the
+       * respective UpdateFlags set. There is a specialized function
+       * mapping_q_compute_range function that provides a faster
+       * initialization for mappings derived from MappingQ and suitable
+       * quadrature formulas.
+       */
       template <int dim, typename Number, typename VectorizedArrayType>
       void
       initialize_cell_range(
@@ -984,9 +992,11 @@ namespace internal
 
 
       /**
-       * This invokes the FEValues part of the initialization of MappingQ,
-       * storing the resulting quadrature points and an initial representation
-       * of Jacobians in two arrays.
+       * This function is the preparatory step for the faster MappingQ-based
+       * setup of the data structures in Mapping Info, using FEValues as an
+       * initial query mechanism into MappingQ, storing the resulting
+       * quadrature points and an initial representation of the Jacobians in
+       * two arrays.
        */
       template <int dim>
       void
@@ -1140,10 +1150,11 @@ namespace internal
 
 
       /**
-       * This evaluates the mapping information on a range of cells calling
-       * into the tensor product interpolators of the matrix-free framework,
-       * using a polynomial expansion of the cell geometry in terms of
-       * MappingQ.
+       * This function computes and tabulates the mapping information for
+       * MappingQ-derived mappings on a range of cells calling into the tensor
+       * product evaluators of the matrix-free framework, using a
+       * polynomial expansion of the cell geometry underlying the MappingQ
+       * class.
        */
       template <int dim,
                 typename Number,
@@ -1570,6 +1581,14 @@ namespace internal
 
 
 
+      /**
+       * This function computes and tabulates the mapping information for
+       * generic mappings on a range of faces by a call to FEFaceValues with
+       * the respective UpdateFlags set. There is a specialized function
+       * mapping_q_compute_range function that provides a faster
+       * initialization for mappings derived from MappingQ and suitable
+       * quadrature formulas.
+       */
       template <int dim, typename Number, typename VectorizedArrayType>
       void
       initialize_face_range(
@@ -2069,10 +2088,11 @@ namespace internal
 
 
       /**
-       * This evaluates the mapping information on a range of cells calling
-       * into the tensor product interpolators of the matrix-free framework,
-       * using a polynomial expansion of the cell geometry in terms of
-       * MappingQ.
+       * This function computes and tabulates the mapping information for
+       * MappingQ-derived mappings on a range of faces calling into the tensor
+       * product face evaluators interpolators of the matrix-free framework,
+       * using a polynomial expansion of the cell geometry underlying the
+       * MappingQ class.
        */
       template <int dim,
                 typename Number,
