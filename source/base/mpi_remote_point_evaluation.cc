@@ -233,6 +233,31 @@ namespace Utilities
       cell_data->reference_point_ptrs.emplace_back(
         cell_data->reference_point_values.size());
 
+      unsigned int max_size_recv = 0;
+      for (unsigned int i = 0; i < recv_ranks.size(); ++i)
+        max_size_recv =
+          std::max(max_size_recv, recv_ptrs[i + 1] - recv_ptrs[i]);
+
+      unsigned int max_size_send = 0;
+      for (unsigned int i = 0; i < send_ranks.size(); ++i)
+        max_size_send =
+          std::max(max_size_send, send_ptrs[i + 1] - send_ptrs[i]);
+
+      this->buffer_size_with_sorting =
+        std::max(send_permutation.size() * 2 + max_size_recv,
+                 point_ptrs.back() + send_permutation.size() + max_size_send);
+
+      this->buffer_size_without_sorting = send_permutation.size();
+
+      // invert permutation matrices
+      recv_permutation_inv.resize(recv_permutation.size());
+      for (unsigned int c = 0; c < recv_permutation.size(); ++c)
+        recv_permutation_inv[recv_permutation[c]] = c;
+
+      send_permutation_inv.resize(send_permutation.size());
+      for (unsigned int c = 0; c < send_permutation.size(); ++c)
+        send_permutation_inv[send_permutation[c]] = c;
+
       this->ready_flag = true;
     }
 
@@ -352,6 +377,24 @@ namespace Utilities
     RemotePointEvaluation<dim, spacedim>::is_ready() const
     {
       return ready_flag;
+    }
+
+
+
+    template <int dim, int spacedim>
+    const std::vector<unsigned int> &
+    RemotePointEvaluation<dim, spacedim>::get_send_permutation() const
+    {
+      return send_permutation;
+    }
+
+
+
+    template <int dim, int spacedim>
+    const std::vector<unsigned int> &
+    RemotePointEvaluation<dim, spacedim>::get_inverse_recv_permutation() const
+    {
+      return recv_permutation_inv;
     }
 
   } // end of namespace MPI

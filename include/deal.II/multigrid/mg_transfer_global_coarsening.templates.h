@@ -3559,7 +3559,7 @@ namespace internal
 
 template <typename VectorType>
 template <int dim, std::size_t width, typename IndexType>
-void
+std::pair<bool, bool>
 MGTwoLevelTransferBase<VectorType>::
   internal_enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
@@ -3572,11 +3572,14 @@ MGTwoLevelTransferBase<VectorType>::
                               &constraint_info_coarse,
     std::vector<unsigned int> &dof_indices_fine)
 {
+  std::pair<bool, bool> success_flags = {false, false};
+
   if (this->partitioner_coarse->is_globally_compatible(
         *external_partitioner_coarse))
     {
       this->vec_coarse.reinit(0);
       this->partitioner_coarse = external_partitioner_coarse;
+      success_flags.first      = true;
     }
   else if (internal::is_partitioner_contained(this->partitioner_coarse,
                                               external_partitioner_coarse))
@@ -3596,6 +3599,7 @@ MGTwoLevelTransferBase<VectorType>::
                                               external_partitioner_coarse);
 
       this->partitioner_coarse = external_partitioner_coarse;
+      success_flags.first      = true;
     }
 
   vec_fine_needs_ghost_update =
@@ -3607,6 +3611,7 @@ MGTwoLevelTransferBase<VectorType>::
     {
       this->vec_fine.reinit(0);
       this->partitioner_fine = external_partitioner_fine;
+      success_flags.second   = true;
     }
   else if (internal::is_partitioner_contained(this->partitioner_fine,
                                               external_partitioner_fine))
@@ -3622,20 +3627,23 @@ MGTwoLevelTransferBase<VectorType>::
                                               external_partitioner_fine);
 
       this->partitioner_fine = external_partitioner_fine;
+      success_flags.second   = true;
     }
+
+  return success_flags;
 }
 
 
 
 template <int dim, typename VectorType>
-void
+std::pair<bool, bool>
 MGTwoLevelTransfer<dim, VectorType>::enable_inplace_operations_if_possible(
   const std::shared_ptr<const Utilities::MPI::Partitioner>
     &external_partitioner_coarse,
   const std::shared_ptr<const Utilities::MPI::Partitioner>
     &external_partitioner_fine)
 {
-  this->internal_enable_inplace_operations_if_possible(
+  return this->internal_enable_inplace_operations_if_possible(
     external_partitioner_coarse,
     external_partitioner_fine,
     this->vec_fine_needs_ghost_update,
@@ -5059,16 +5067,14 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
   VectorType       &dst,
   const VectorType &src) const
 {
-  using Traits = internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, dim, n_components, Number>;
-  using value_type = typename Traits::value_type;
-
   const auto evaluation_function = [&](auto &values, const auto &cell_data) {
     this->signals_non_nested.prolongation_cell_loop(true);
     std::vector<Number> solution_values;
 
     FEPointEvaluation<n_components, dim, dim, Number> evaluator(*mapping_info,
                                                                 *fe_coarse);
+
+    const auto &send_permutation = rpe.get_send_permutation();
 
     for (unsigned int cell = 0; cell < cell_data.cells.size(); ++cell)
       {
@@ -5091,19 +5097,25 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
         evaluator.evaluate(solution_values, dealii::EvaluationFlags::values);
 
         for (const auto q : evaluator.quadrature_point_indices())
-          values[q + cell_data.reference_point_ptrs[cell]] =
-            evaluator.get_value(q);
+          {
+            const unsigned int index =
+              send_permutation[q + cell_data.reference_point_ptrs[cell]];
+
+            for (unsigned int c = 0; c < n_components; ++c)
+              values[index * n_components + c] =
+                internal::access(evaluator.get_value(q), c);
+          }
       }
     this->signals_non_nested.prolongation_cell_loop(false);
   };
 
   this->signals_non_nested.prolongation(true);
 
-  std::vector<value_type> evaluation_point_results;
-  std::vector<value_type> buffer;
-  rpe.template evaluate_and_process<value_type>(evaluation_point_results,
-                                                buffer,
-                                                evaluation_function);
+  std::vector<Number> &evaluation_point_results = this->rpe_input_output;
+  std::vector<Number> &buffer                   = this->rpe_buffer;
+
+  rpe.template evaluate_and_process<Number, n_components>(
+    evaluation_point_results, buffer, evaluation_function, false);
   this->signals_non_nested.prolongation(false);
 
   // Keep a vector of typical inverse touch counts that avoid divisions, all
@@ -5112,11 +5124,12 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
   for (unsigned int i = 0; i < typical_weights.size(); ++i)
     typical_weights[i] = Number(1) / Number(i + 1);
 
-  const bool  must_interpolate = (rpe.is_map_unique() == false);
-  const auto &ptr              = rpe.get_point_ptrs();
+  const bool  must_interpolate     = (rpe.is_map_unique() == false);
+  const auto &ptr                  = rpe.get_point_ptrs();
+  const auto &recv_permutation_inv = rpe.get_inverse_recv_permutation();
   for (unsigned int j = 0; j < ptr.size() - 1; ++j)
     {
-      value_type result;
+      std::array<Number, n_components> result;
       // Weight operator in case some points are owned by multiple cells.
       if (must_interpolate)
         {
@@ -5126,19 +5139,33 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
             {
               result = {};
               for (unsigned int k = 0; k < n_entries; ++k)
-                result += evaluation_point_results[ptr[j] + k];
+                {
+                  const unsigned int index = recv_permutation_inv[ptr[j] + k];
+
+                  for (unsigned int c = 0; c < n_components; ++c)
+                    result[c] +=
+                      evaluation_point_results[index * n_components + c];
+                }
               if (n_entries <= typical_weights.size())
-                result *= typical_weights[n_entries - 1];
+                for (unsigned int c = 0; c < n_components; ++c)
+                  result[c] *= typical_weights[n_entries - 1];
               else
-                result /= Number(n_entries);
+                for (unsigned int c = 0; c < n_components; ++c)
+                  result[c] *= Number(1) / Number(n_entries);
             }
           else if (n_entries == 1)
-            result = evaluation_point_results[ptr[j]];
+            {
+              const unsigned int index = recv_permutation_inv[ptr[j]];
+
+              for (unsigned int c = 0; c < n_components; ++c)
+                result[c] = evaluation_point_results[index * n_components + c];
+            }
           else
             result = {};
         }
       else
-        result = evaluation_point_results[j];
+        for (unsigned int c = 0; c < n_components; ++c)
+          result[c] = evaluation_point_results[j * n_components + c];
 
       if (level_dof_indices_fine_ptrs.empty())
         {
@@ -5148,7 +5175,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
                                this->level_dof_indices_fine.size());
               dst.local_element(
                 this->level_dof_indices_fine[n_components * j + c]) +=
-                internal::access(result, c);
+                result[c];
             }
         }
       else
@@ -5162,7 +5189,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::prolongate_and_add_internal_comp(
                                  this->level_dof_indices_fine.size());
                 dst.local_element(
                   this->level_dof_indices_fine[n_components * i + c]) +=
-                  internal::access(result, c);
+                  result[c];
               }
         }
     }
@@ -5197,20 +5224,21 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
     EvaluatorTypeTraits<dim, dim, n_components, Number>;
   using value_type = typename Traits::value_type;
 
-  std::vector<value_type> evaluation_point_results;
-  std::vector<value_type> buffer;
+  std::vector<Number> &evaluation_point_results = this->rpe_input_output;
+  std::vector<Number> &buffer                   = this->rpe_buffer;
 
   std::array<Number, 8> typical_weights;
   for (unsigned int i = 0; i < typical_weights.size(); ++i)
     typical_weights[i] = Number(1) / Number(i + 1);
 
-  const bool  must_interpolate = (rpe.is_map_unique() == false);
-  const auto &ptr              = rpe.get_point_ptrs();
-  evaluation_point_results.resize(ptr.size() - 1);
+  const bool  must_interpolate     = (rpe.is_map_unique() == false);
+  const auto &ptr                  = rpe.get_point_ptrs();
+  const auto &recv_permutation_inv = rpe.get_inverse_recv_permutation();
+  evaluation_point_results.resize(ptr.back() * n_components);
 
-  for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
+  for (unsigned int j = 0; j < ptr.size() - 1; ++j)
     {
-      value_type result;
+      std::array<Number, n_components> result;
       if (level_dof_indices_fine_ptrs.empty())
         {
           for (unsigned int c = 0; c < n_components; ++c)
@@ -5218,24 +5246,26 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
               AssertIndexRange(n_components * j + c,
                                this->level_dof_indices_fine.size());
 
-              internal::access(result, c) = src.local_element(
+              result[c] = src.local_element(
                 this->level_dof_indices_fine[n_components * j + c]);
             }
         }
       else
         {
-          result = value_type();
+          result = {};
 
           for (unsigned int i = this->level_dof_indices_fine_ptrs[j];
                i < this->level_dof_indices_fine_ptrs[j + 1];
                ++i)
-            for (unsigned int c = 0; c < n_components; ++c)
-              {
-                AssertIndexRange(n_components * i + c,
-                                 this->level_dof_indices_fine.size());
-                internal::access(result, c) += src.local_element(
-                  this->level_dof_indices_fine[n_components * i + c]);
-              }
+            {
+              for (unsigned int c = 0; c < n_components; ++c)
+                {
+                  AssertIndexRange(n_components * i + c,
+                                   this->level_dof_indices_fine.size());
+                  result[c] += src.local_element(
+                    this->level_dof_indices_fine[n_components * i + c]);
+                }
+            }
         }
       if (must_interpolate)
         {
@@ -5243,12 +5273,21 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
           if (n_entries > 1)
             {
               if (n_entries <= typical_weights.size())
-                result *= typical_weights[n_entries - 1];
+                for (unsigned int c = 0; c < n_components; ++c)
+                  result[c] *= typical_weights[n_entries - 1];
               else
-                result /= Number(n_entries);
+                for (unsigned int c = 0; c < n_components; ++c)
+                  result[c] /= Number(n_entries);
             }
         }
-      evaluation_point_results[j] = result;
+
+      for (unsigned int i = ptr[j]; i < ptr[j + 1]; ++i)
+        {
+          const unsigned int index = recv_permutation_inv[i];
+
+          for (unsigned int c = 0; c < n_components; ++c)
+            evaluation_point_results[index * n_components + c] = result[c];
+        }
     }
 
   const auto evaluation_function = [&](const auto &values,
@@ -5258,6 +5297,8 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
     FEPointEvaluation<n_components, dim, dim, Number> evaluator(*mapping_info,
                                                                 *fe_coarse);
 
+    const auto &send_permutation = rpe.get_send_permutation();
+
     for (unsigned int cell = 0; cell < cell_data.cells.size(); ++cell)
       {
         solution_values.resize(fe_coarse->n_dofs_per_cell());
@@ -5266,8 +5307,19 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
         evaluator.reinit(cell);
 
         for (const auto q : evaluator.quadrature_point_indices())
-          evaluator.submit_value(
-            values[q + cell_data.reference_point_ptrs[cell]], q);
+          {
+            typename internal::FEPointEvaluation::
+              EvaluatorTypeTraits<dim, dim, n_components, Number>::value_type
+                value;
+
+            const unsigned int index =
+              send_permutation[q + cell_data.reference_point_ptrs[cell]];
+
+            for (unsigned int c = 0; c < n_components; ++c)
+              internal::access(value, c) = values[index * n_components + c];
+
+            evaluator.submit_value(value, q);
+          }
 
         evaluator.test_and_sum(solution_values, EvaluationFlags::values);
 
@@ -5287,9 +5339,8 @@ MGTwoLevelTransferNonNested<dim, VectorType>::restrict_and_add_internal_comp(
   };
 
   this->signals_non_nested.restriction(true);
-  rpe.template process_and_evaluate<value_type>(evaluation_point_results,
-                                                buffer,
-                                                evaluation_function);
+  rpe.template process_and_evaluate<Number, n_components>(
+    evaluation_point_results, buffer, evaluation_function, false);
   this->signals_non_nested.restriction(false);
 }
 
@@ -5325,7 +5376,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::interpolate(
 
 
 template <int dim, typename VectorType>
-void
+std::pair<bool, bool>
 MGTwoLevelTransferNonNested<dim, VectorType>::
   enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
@@ -5333,7 +5384,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &external_partitioner_fine)
 {
-  this->internal_enable_inplace_operations_if_possible(
+  return this->internal_enable_inplace_operations_if_possible(
     external_partitioner_coarse,
     external_partitioner_fine,
     this->vec_fine_needs_ghost_update,
