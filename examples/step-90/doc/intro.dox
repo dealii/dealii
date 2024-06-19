@@ -22,7 +22,7 @@ given by the zero contour of a level-set function. At the same time, it easily p
 discrete solution to a neighborhood of the surface which turns out to be very handy in case of non-stationary interfaces and films.
 Certainly, this flexibility comes with a price: one needs to design the nodes and weights for a quadrature customized
 for each implicit intersection of the zero level-set and the background mesh. Moreover, these intersections may be of
-arbitrary shape and size manifesting in the so-called ``small cut" problem and requiring addition of a stabilization
+arbitrary shape and size manifesting in the so-called "small cut" problem and requiring addition of a stabilization
 form that restores well-conditioning of the problem.
 
 Two aspects are of our focus. First, the surface approximation is separated from the discretization of the surface PDE,
