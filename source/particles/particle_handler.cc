@@ -1348,7 +1348,12 @@ namespace Particles
               current_cell, out_particle->get_location(), *mapping);
           Tensor<1, spacedim> vertex_to_particle =
             out_particle->get_location() - current_cell->vertex(closest_vertex);
-          vertex_to_particle /= vertex_to_particle.norm();
+
+          // Only normalize if vector is larger than zero, the algorithm below
+          // works fine for zero vectors.
+          if (vertex_to_particle.norm() >
+              100. * std::numeric_limits<double>::epsilon())
+            vertex_to_particle /= vertex_to_particle.norm();
 
           const unsigned int closest_vertex_index =
             current_cell->vertex_index(closest_vertex);
