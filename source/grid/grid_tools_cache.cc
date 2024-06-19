@@ -69,7 +69,10 @@ namespace GridTools
     if (update_flags & update_vertex_to_cell_map)
       {
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
-        update_flags    = update_flags & ~update_vertex_to_cell_map;
+
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_vertex_to_cell_map;
       }
     return vertex_to_cells;
   }
@@ -91,7 +94,10 @@ namespace GridTools
       {
         vertex_to_cell_centers = GridTools::vertex_to_cell_centers_directions(
           *tria, get_vertex_to_cell_map());
-        update_flags = update_flags & ~update_vertex_to_cell_centers_directions;
+
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_vertex_to_cell_centers_directions;
       }
     return vertex_to_cell_centers;
   }
@@ -112,7 +118,10 @@ namespace GridTools
     if (update_flags & update_used_vertices)
       {
         used_vertices = GridTools::extract_used_vertices(*tria, *mapping);
-        update_flags  = update_flags & ~update_used_vertices;
+
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_used_vertices;
       }
     return used_vertices;
   }
@@ -139,7 +148,10 @@ namespace GridTools
         for (const auto &it : used_vertices)
           vertices[i++] = std::make_pair(it.second, it.first);
         used_vertices_rtree = pack_rtree(vertices);
-        update_flags        = update_flags & ~update_used_vertices_rtree;
+
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_used_vertices_rtree;
       }
     return used_vertices_rtree;
   }
@@ -170,7 +182,10 @@ namespace GridTools
           boxes.emplace_back(mapping->get_bounding_box(cell), cell);
 
         cell_bounding_boxes_rtree = pack_rtree(boxes);
-        update_flags = update_flags & ~update_cell_bounding_boxes_rtree;
+
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_cell_bounding_boxes_rtree;
       }
     return cell_bounding_boxes_rtree;
   }
@@ -208,8 +223,10 @@ namespace GridTools
           boxes.emplace_back(mapping->get_bounding_box(cell), cell);
 
         locally_owned_cell_bounding_boxes_rtree = pack_rtree(boxes);
-        update_flags =
-          update_flags & ~update_locally_owned_cell_bounding_boxes_rtree;
+
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_locally_owned_cell_bounding_boxes_rtree;
       }
     return locally_owned_cell_bounding_boxes_rtree;
   }
@@ -246,7 +263,10 @@ namespace GridTools
             covering_rtree[level] =
               GridTools::build_global_description_tree(boxes, MPI_COMM_SELF);
           }
-        update_flags = update_flags & ~update_covering_rtree;
+
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_covering_rtree;
       }
 
     return covering_rtree[level];
@@ -276,7 +296,9 @@ namespace GridTools
                 vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
                   cell->subdomain_id());
           }
-        update_flags = update_flags & ~update_vertex_to_neighbor_subdomain;
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_vertex_to_neighbor_subdomain;
       }
     return vertex_to_neighbor_subdomain;
   }
@@ -299,7 +321,9 @@ namespace GridTools
         vertices_with_ghost_neighbors =
           GridTools::compute_vertices_with_ghost_neighbors(*tria);
 
-        update_flags = update_flags & ~update_vertex_with_ghost_neighbors;
+        // Atomically clear the flag that indicates that this data member
+        // needs to be updated:
+        update_flags &= ~update_vertex_with_ghost_neighbors;
       }
 
     return vertices_with_ghost_neighbors;

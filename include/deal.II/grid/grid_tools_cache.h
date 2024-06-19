@@ -33,7 +33,9 @@
 
 #include <boost/signals2.hpp>
 
+#include <atomic>
 #include <cmath>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -227,8 +229,13 @@ namespace GridTools
      * corresponding flag. The constructor as well as the signal slot
      * that is called whenever the triangulation changes the re-sets this
      * flag to `update_all` again.
+     *
+     * The various get_() member functions may be reading and updating this
+     * variable from different threads, but are only ever reading or writing
+     * individual bits. We can make that thread-safe by using std::atomic
+     * with the correct integer type for the `enum` type of `CacheUpdateFlags`.
      */
-    mutable CacheUpdateFlags update_flags;
+    mutable std::atomic<std::underlying_type_t<CacheUpdateFlags>> update_flags;
 
     /**
      * A pointer to the Triangulation.
