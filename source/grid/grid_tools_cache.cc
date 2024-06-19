@@ -37,7 +37,7 @@ namespace GridTools
   template <int dim, int spacedim>
   Cache<dim, spacedim>::~Cache()
   {
-    // Make sure that the signals that was attached to the triangulation
+    // Make sure that the signal that was attached to the triangulation
     // is removed here.
     if (tria_signal.connected())
       tria_signal.disconnect();
@@ -59,6 +59,13 @@ namespace GridTools
     std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_vertex_to_cell_map() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(vertex_to_cells_mutex);
+
     if (update_flags & update_vertex_to_cell_map)
       {
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
@@ -73,6 +80,13 @@ namespace GridTools
   const std::vector<std::vector<Tensor<1, spacedim>>> &
   Cache<dim, spacedim>::get_vertex_to_cell_centers_directions() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(vertex_to_cell_centers_mutex);
+
     if (update_flags & update_vertex_to_cell_centers_directions)
       {
         vertex_to_cell_centers = GridTools::vertex_to_cell_centers_directions(
@@ -88,6 +102,13 @@ namespace GridTools
   const std::map<unsigned int, Point<spacedim>> &
   Cache<dim, spacedim>::get_used_vertices() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(used_vertices_mutex);
+
     if (update_flags & update_used_vertices)
       {
         used_vertices = GridTools::extract_used_vertices(*tria, *mapping);
@@ -102,6 +123,13 @@ namespace GridTools
   const RTree<std::pair<Point<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_used_vertices_rtree() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(used_vertices_rtree_mutex);
+
     if (update_flags & update_used_vertices_rtree)
       {
         const auto &used_vertices = get_used_vertices();
@@ -124,6 +152,13 @@ namespace GridTools
               typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_cell_bounding_boxes_rtree() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(cell_bounding_boxes_rtree_mutex);
+
     if (update_flags & update_cell_bounding_boxes_rtree)
       {
         std::vector<std::pair<
@@ -148,6 +183,14 @@ namespace GridTools
               typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_locally_owned_cell_bounding_boxes_rtree() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(
+      locally_owned_cell_bounding_boxes_rtree_mutex);
+
     if (update_flags & update_locally_owned_cell_bounding_boxes_rtree)
       {
         std::vector<std::pair<
@@ -177,6 +220,13 @@ namespace GridTools
   const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_covering_rtree(const unsigned int level) const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(covering_rtree_mutex);
+
     if (update_flags & update_covering_rtree ||
         covering_rtree.find(level) == covering_rtree.end())
       {
@@ -202,10 +252,19 @@ namespace GridTools
     return covering_rtree[level];
   }
 
+
+
   template <int dim, int spacedim>
   const std::vector<std::set<unsigned int>> &
   Cache<dim, spacedim>::get_vertex_to_neighbor_subdomain() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(vertex_to_neighbor_subdomain_mutex);
+
     if (update_flags & update_vertex_to_neighbor_subdomain)
       {
         vertex_to_neighbor_subdomain.clear();
@@ -222,10 +281,19 @@ namespace GridTools
     return vertex_to_neighbor_subdomain;
   }
 
+
+
   template <int dim, int spacedim>
   const std::map<unsigned int, std::set<types::subdomain_id>> &
   Cache<dim, spacedim>::get_vertices_with_ghost_neighbors() const
   {
+    // In the following, we will first check whether the data structure
+    // in question needs to be updated (in which case we update it, and
+    // reset the flag that indices that this needs to happen to zero), and
+    // then return it. Make this thread-safe by using a mutex to guard
+    // all of this:
+    std::lock_guard<std::mutex> lock(vertices_with_ghost_neighbors_mutex);
+
     if (update_flags & update_vertex_with_ghost_neighbors)
       {
         vertices_with_ghost_neighbors =
