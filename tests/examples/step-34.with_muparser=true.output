@@ -1,0 +1,36 @@
+DEAL::
+DEAL::Parsing parameter file ../../../source/step-34/parameters.prm
+DEAL::for a 2 dimensional simulation. 
+DEAL:GMRES::Starting value 2.21576
+DEAL:GMRES::Convergence step 2 value 2.26240e-15
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       20
+DEAL::   Number of degrees of freedom: 20
+DEAL:GMRES::Starting value 3.15543
+DEAL:GMRES::Convergence step 2 value 1.06169e-15
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       40
+DEAL::   Number of degrees of freedom: 40
+DEAL:GMRES::Starting value 4.46977
+DEAL:GMRES::Convergence step 2 value 3.97965e-16
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       80
+DEAL::   Number of degrees of freedom: 80
+DEAL::
+DEAL::Parsing parameter file ../../../source/step-34/parameters.prm
+DEAL::for a 3 dimensional simulation. 
+DEAL:GMRES::Starting value 1.42333
+DEAL:GMRES::Convergence step 3 value 0.00000
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       24
+DEAL::   Number of degrees of freedom: 26
+DEAL:GMRES::Starting value 3.17156
+DEAL:GMRES::Convergence step 5 value 6.61025e-12
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       96
+DEAL::   Number of degrees of freedom: 98
+DEAL:GMRES::Starting value 6.48904
+DEAL:GMRES::Convergence step 5 value 1.44933e-11
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       384
+DEAL::   Number of degrees of freedom: 386
