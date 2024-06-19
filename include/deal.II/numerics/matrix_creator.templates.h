@@ -781,7 +781,14 @@ namespace MatrixCreator
                                                       &rhs_vector);
       },
       assembler_data,
-      copy_data);
+      copy_data
+#ifdef DEBUG
+      // use chunk_size = 1 to make multithreading bugs/races more likely:
+      ,
+      /* queue_length (default) = */ 2 * MultithreadInfo::n_threads(),
+      /* chunk_size = */ 1
+#endif
+    );
 
     matrix.compress(VectorOperation::add);
   }
