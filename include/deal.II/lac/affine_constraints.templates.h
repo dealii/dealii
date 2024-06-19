@@ -4592,6 +4592,11 @@ AffineConstraints<number>::distribute_local_to_global(
       if (n_values > 0)
         global_matrix.add(row, n_values, cols.data(), vals.data(), false, true);
     }
+
+  Vector<typename MatrixType::value_type> dummy(0);
+
+  internal::AffineConstraints::set_matrix_diagonals(
+    global_rows, row_indices, local_matrix, *this, global_matrix, dummy, false);
 }
 
 
