@@ -49,6 +49,8 @@ namespace GridTools
   void
   Cache<dim, spacedim>::mark_for_update(const CacheUpdateFlags &flags)
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
+
     update_flags |= flags;
   }
 
@@ -59,6 +61,7 @@ namespace GridTools
     std::set<typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_vertex_to_cell_map() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_vertex_to_cell_map)
       {
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
@@ -73,6 +76,7 @@ namespace GridTools
   const std::vector<std::vector<Tensor<1, spacedim>>> &
   Cache<dim, spacedim>::get_vertex_to_cell_centers_directions() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_vertex_to_cell_centers_directions)
       {
         vertex_to_cell_centers = GridTools::vertex_to_cell_centers_directions(
@@ -88,6 +92,7 @@ namespace GridTools
   const std::map<unsigned int, Point<spacedim>> &
   Cache<dim, spacedim>::get_used_vertices() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_used_vertices)
       {
         used_vertices = GridTools::extract_used_vertices(*tria, *mapping);
@@ -102,6 +107,7 @@ namespace GridTools
   const RTree<std::pair<Point<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_used_vertices_rtree() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_used_vertices_rtree)
       {
         const auto &used_vertices = get_used_vertices();
@@ -124,6 +130,7 @@ namespace GridTools
               typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_cell_bounding_boxes_rtree() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_cell_bounding_boxes_rtree)
       {
         std::vector<std::pair<
@@ -148,6 +155,7 @@ namespace GridTools
               typename Triangulation<dim, spacedim>::active_cell_iterator>> &
   Cache<dim, spacedim>::get_locally_owned_cell_bounding_boxes_rtree() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_locally_owned_cell_bounding_boxes_rtree)
       {
         std::vector<std::pair<
@@ -177,6 +185,7 @@ namespace GridTools
   const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
   Cache<dim, spacedim>::get_covering_rtree(const unsigned int level) const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_covering_rtree ||
         covering_rtree.find(level) == covering_rtree.end())
       {
@@ -206,6 +215,7 @@ namespace GridTools
   const std::vector<std::set<unsigned int>> &
   Cache<dim, spacedim>::get_vertex_to_neighbor_subdomain() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_vertex_to_neighbor_subdomain)
       {
         vertex_to_neighbor_subdomain.clear();
@@ -226,6 +236,7 @@ namespace GridTools
   const std::map<unsigned int, std::set<types::subdomain_id>> &
   Cache<dim, spacedim>::get_vertices_with_ghost_neighbors() const
   {
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     if (update_flags & update_vertex_with_ghost_neighbors)
       {
         vertices_with_ghost_neighbors =

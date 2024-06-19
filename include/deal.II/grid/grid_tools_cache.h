@@ -34,6 +34,7 @@
 #include <boost/signals2.hpp>
 
 #include <cmath>
+#include <mutex>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -219,6 +220,11 @@ namespace GridTools
     get_covering_rtree(const unsigned int level = 0) const;
 
   private:
+    /**
+     * Thread mutex for supporting evaluation in multi-threaded contexts.
+     */
+    mutable std::recursive_mutex mutex;
+
     /**
      * Keep track of what needs to be updated next.
      */
