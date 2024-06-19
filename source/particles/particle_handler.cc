@@ -1317,7 +1317,7 @@ namespace Particles
         &vertex_to_cell_centers =
           triangulation_cache->get_vertex_to_cell_centers_directions();
 
-      std::vector<unsigned int> neighbor_permutation;
+      std::vector<unsigned int> search_order;
 
       // Reuse these vectors below, but only with a single element.
       // Avoid resizing for every particle.
@@ -1346,58 +1346,70 @@ namespace Particles
           const unsigned int closest_vertex =
             GridTools::find_closest_vertex_of_cell<dim, spacedim>(
               current_cell, out_particle->get_location(), *mapping);
+          const unsigned int closest_vertex_index =
+            current_cell->vertex_index(closest_vertex);
+
+          const auto &candidate_cells = vertex_to_cells[closest_vertex_index];
+          const unsigned int n_candidate_cells = candidate_cells.size();
+
+          // The order of searching through the candidate cells matters for
+          // performance reasons. Start with a simple order.
+          search_order.resize(n_candidate_cells);
+          for (unsigned int i = 0; i < n_candidate_cells; ++i)
+            search_order[i] = i;
+
+          // If the particle is not on a vertex, we can do better by
+          // sorting the candidate cells by alignment with
+          // the vertex_to_particle direction.
           Tensor<1, spacedim> vertex_to_particle =
             out_particle->get_location() - current_cell->vertex(closest_vertex);
 
-          // Only normalize if vector is larger than zero, the algorithm below
-          // works fine for zero vectors.
-          if (vertex_to_particle.norm() >
-              100. * std::numeric_limits<double>::epsilon())
-            vertex_to_particle /= vertex_to_particle.norm();
-
-          const unsigned int closest_vertex_index =
-            current_cell->vertex_index(closest_vertex);
-          const unsigned int n_neighbor_cells =
-            vertex_to_cells[closest_vertex_index].size();
-
-          neighbor_permutation.resize(n_neighbor_cells);
-          for (unsigned int i = 0; i < n_neighbor_cells; ++i)
-            neighbor_permutation[i] = i;
-
-          const auto &cell_centers =
-            vertex_to_cell_centers[closest_vertex_index];
-          std::sort(neighbor_permutation.begin(),
-                    neighbor_permutation.end(),
-                    [&vertex_to_particle, &cell_centers](const unsigned int a,
-                                                         const unsigned int b) {
-                      return compare_particle_association(a,
-                                                          b,
-                                                          vertex_to_particle,
-                                                          cell_centers);
-                    });
-
-          // Search all of the cells adjacent to the closest vertex of the
-          // previous cell. Most likely we will find the particle in them.
-          for (unsigned int i = 0; i < n_neighbor_cells; ++i)
+          // Only do this if the particle is not on a vertex, otherwise we
+          // cannot normalize
+          if (vertex_to_particle.norm_square() >
+              1e4 * std::numeric_limits<double>::epsilon() *
+                std::numeric_limits<double>::epsilon() *
+                vertex_to_cell_centers[closest_vertex_index][0].norm_square())
             {
-              typename std::set<typename Triangulation<dim, spacedim>::
-                                  active_cell_iterator>::const_iterator cell =
-                vertex_to_cells[closest_vertex_index].begin();
+              vertex_to_particle /= vertex_to_particle.norm();
+              const auto &vertex_to_cells =
+                vertex_to_cell_centers[closest_vertex_index];
 
-              std::advance(cell, neighbor_permutation[i]);
-              mapping->transform_points_real_to_unit_cell(*cell,
+              std::sort(search_order.begin(),
+                        search_order.end(),
+                        [&vertex_to_particle,
+                         &vertex_to_cells](const unsigned int a,
+                                           const unsigned int b) {
+                          return compare_particle_association(
+                            a, b, vertex_to_particle, vertex_to_cells);
+                        });
+            }
+
+          // Search all of the candidate cells according to the determined
+          // order. Most likely we will find the particle in them.
+          for (unsigned int i = 0; i < n_candidate_cells; ++i)
+            {
+              typename std::set<
+                typename Triangulation<dim, spacedim>::active_cell_iterator>::
+                const_iterator candidate_cell = candidate_cells.begin();
+
+              std::advance(candidate_cell, search_order[i]);
+              mapping->transform_points_real_to_unit_cell(*candidate_cell,
                                                           real_locations,
                                                           reference_locations);
 
               if (GeometryInfo<dim>::is_inside_unit_cell(reference_locations[0],
                                                          tolerance_inside_cell))
                 {
-                  current_cell = *cell;
+                  current_cell = *candidate_cell;
                   found_cell   = true;
                   break;
                 }
             }
 
+          // If we did not find a cell the particle is not in a neighbor of
+          // its old cell. Look for the new cell in the whole local domain.
+          // This case should be rare.
           if (!found_cell)
             {
               // For some clang-based compilers and boost versions the call to
@@ -1408,9 +1420,7 @@ namespace Particles
 #if defined(DEAL_II_WITH_BOOST_BUNDLED) ||                \
   !(defined(__clang_major__) && __clang_major__ >= 16) || \
   BOOST_VERSION >= 108100
-              // The particle is not in a neighbor of the old cell.
-              // Look for the new cell in the whole local domain.
-              // This case is rare.
+
               std::vector<std::pair<Point<spacedim>, unsigned int>>
                 closest_vertex_in_domain;
               triangulation_cache->get_used_vertices_rtree().query(
