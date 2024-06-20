@@ -77,7 +77,7 @@ public:
   /**
    * Default constructor.
    */
-  MGLevelObject() = default;
+  MGLevelObject();
 
   /**
    * Access object on level @p level.
@@ -199,6 +199,12 @@ private:
 
 /* ------------------------------------------------------------------- */
 
+template <class Object>
+MGLevelObject<Object>::MGLevelObject()
+  : minlevel(0)
+{
+  this->objects.resize(1);
+}
 
 template <class Object>
 template <class... Args>
