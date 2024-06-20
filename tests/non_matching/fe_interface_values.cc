@@ -55,9 +55,11 @@ private:
   void
   setup_discrete_level_set();
 
+  template <typename IteratorType>
   void
   print_which_optionals_have_values_on_cell_0(
-    NonMatching::FEInterfaceValues<dim> &fe_values);
+    NonMatching::FEInterfaceValues<dim> &fe_values,
+    IteratorType                         cell);
 
   Triangulation<dim>    triangulation;
   hp::FECollection<dim> fe_collection;
@@ -106,7 +108,10 @@ Test<dim>::run()
                                                   mesh_classifier,
                                                   dof_handler,
                                                   level_set);
-    print_which_optionals_have_values_on_cell_0(fe_values);
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                triangulation.begin_active());
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                dof_handler.begin_active());
   }
   {
     deallog << "Advanced constructor:" << std::endl;
@@ -118,7 +123,10 @@ Test<dim>::run()
                                                   mesh_classifier,
                                                   dof_handler,
                                                   level_set);
-    print_which_optionals_have_values_on_cell_0(fe_values);
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                triangulation.begin_active());
+    print_which_optionals_have_values_on_cell_0(fe_values,
+                                                dof_handler.begin_active());
   }
 }
 
@@ -166,12 +174,12 @@ Test<dim>::setup_discrete_level_set()
 
 
 template <int dim>
+template <typename IteratorType>
 void
 Test<dim>::print_which_optionals_have_values_on_cell_0(
-  NonMatching::FEInterfaceValues<dim> &fe_values)
+  NonMatching::FEInterfaceValues<dim> &fe_values,
+  IteratorType                         cell)
 {
-  const auto cell = dof_handler.begin_active();
-
   for (const unsigned int face_index : cell->face_indices())
     {
       deallog << "face " << face_index << std::endl;
