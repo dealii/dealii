@@ -235,11 +235,11 @@ namespace SUNDIALS
    * A more interesting example is a situation where the form $F(y', y, t) = 0$
    * provides something genuinely more flexible than a typical ordinary
    * differential equation. Specifically, consider the equation
-   * @f[
+   * @f{align*}{
    *   u'(t) &= av(t),
    *   \\
    *   0 &= v(t) - u(t).
-   * @f]
+   * @f}
    * One can combine the two variables into $y(t) = [u(t), v(t)]^T$.
    * Here, one of the two variables does not have a time derivative. In
    * applications, this is often the case when one variable evolves in
@@ -249,19 +249,19 @@ namespace SUNDIALS
    * using the second equation, and would then just be left with the
    * equation
    * @f[
-   *   u'(t) &= au(t)
+   *   u'(t) = au(t)
    * @f]
    * which has solution $u(t) = u(0)e^{at}$. But this is, in general, not
    * easily possible if the two variables are related by differential
    * operators. In fact, this happens quite frequently in application. Take,
    * for example, the time-dependent Stokes equations:
-   * @f[
+   * @f{align*}{
    *   \frac{\partial \mathbf u(\mathbf x,t)}{\partial t}
    *   - \nu \Delta \mathbf u(\mathbf x,t) + \nabla p(\mathbf x,t)
    *   &= \mathbf f(\mathbf x,t),
    *   \\
    *   \nabla \cdot \mathbf u(\mathbf x,t) &= 0.
-   * @f]
+   * @f}
    * Here, the fluid velocity $\mathbf u(\mathbf x,t)$ evolves over time,
    * and the pressure is always in equilibrium with the flow because the Stokes
    * equations are derived under the assumption that the speed of sound (at
@@ -276,16 +276,16 @@ namespace SUNDIALS
    * Rather than show how to solve the trivial (linear) case above, let us
    * instead consider the situation where we introduce another variable $v$ that
    * is related to $u$ by the nonlinear relationship $v=u^p$, $p\ge 1$:
-   * @f[
+   * @f{align*}{
    *   u'(t) &= a v(t)^{1/p},
    *   \\
    *   0 &= v(t) - u(t)^p.
-   * @f]
+   * @f}
    * We will impose initial conditions as
-   * @f[
+   * @f{align*}{
    *   u(0) &= 1 \\
    *   v(0) &= 1.
-   * @f]
+   * @f}
    * The problem continues to have the solution $u(t)=e^{at}$ with the
    * auxiliary variable satisfying $v(t)=[e^{at}]^p$. One would implement
    * all of this using the following little program where you have to recall
@@ -367,13 +367,13 @@ namespace SUNDIALS
    * initial values in the form of a vector for $y(0)$, but also for
    * $y'(0)$, this is not a common situation. For example, for the Stokes
    * equations mentioned above,
-   * @f[
+   * @f{align*}{
    *   \frac{\partial \mathbf u(\mathbf x,t)}{\partial t}
    *   - \nu \Delta \mathbf u(\mathbf x,t) + \nabla p(\mathbf x,t)
    *   &= \mathbf f(\mathbf x,t),
    *   \\
    *   \nabla \cdot \mathbf u(\mathbf x,t) &= 0,
-   * @f]
+   * @f}
    * one generally might have an initial velocity field for
    * $\mathbf u(\mathbf x,0)$, but typically one does not have an initial
    * pressure field $p(\mathbf x,0)$ nor either of these variables' time
@@ -382,17 +382,17 @@ namespace SUNDIALS
    * Fortunately, they can typically be computed via the relationship
    * $F(t,y,\dot y) = 0$. To illustrate how this can is done, let us
    * re-use the nonlinear example from the previous section:
-   * @f[
+   * @f{align*}{
    *   u'(t) &= a v(t)^{1/p},
    *   \\
    *   0 &= v(t) - u(t)^p.
-   * @f]
+   * @f}
    * If we now impose initial conditions for both variables, for
    * example
-   * @f[
+   * @f{align*}{
    *   u(0) &= 1 \\
    *   v(0) &= 1,
-   * @f]
+   * @f}
    * then the only change necessary is to create the time stepper via
    * @code
    *   SUNDIALS::IDA<VectorType>::AdditionalData data;
