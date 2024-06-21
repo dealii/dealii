@@ -1961,18 +1961,18 @@ public:
    *
    * This method checks if all processors agree on the constraints for their
    * local lines as given by @p locally_active_dofs. This method is a collective
-   * operation and will return @p true only if all processors are consistent.
+   * operation and will return `true` only if all processors are consistent.
    *
    * Please supply the owned DoFs per processor as returned by
-   * Utilities::MPI::all_gather(MPI_Comm, DoFHandler::locally_owned_dofs()) as
+   * `Utilities::MPI::all_gather(MPI_Comm, DoFHandler::locally_owned_dofs())` as
    * @p locally_owned_dofs and the result of
    * DoFTools::extract_locally_active_dofs() as
    * @p locally_active_dofs. The former is used to determine ownership of the
    * specific DoF, while the latter is used as the set of rows that need to be
    * checked.
    *
-   * If @p verbose is set to @p true, additional debug information is written
-   * to std::cout.
+   * If @p verbose is set to `true`, additional debug information is written
+   * to `std::cout`.
    *
    * @note This method exchanges all constraint information of locally active
    * lines and is as such slow for large computations and should probably
