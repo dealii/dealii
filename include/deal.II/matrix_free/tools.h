@@ -1956,7 +1956,7 @@ namespace MatrixFreeTools
       data_cell;
 
     data_cell.dof_numbers               = {dof_no};
-    data_cell.quad_numbers              = {dof_no};
+    data_cell.quad_numbers              = {quad_no};
     data_cell.first_selected_components = {first_selected_component};
     data_cell.batch_type                = {0};
 
@@ -1992,7 +1992,7 @@ namespace MatrixFreeTools
       data_face;
 
     data_face.dof_numbers               = {dof_no, dof_no};
-    data_face.quad_numbers              = {dof_no, quad_no};
+    data_face.quad_numbers              = {quad_no, quad_no};
     data_face.first_selected_components = {first_selected_component,
                                            first_selected_component};
     data_face.batch_type                = {1, 2};
@@ -2054,7 +2054,7 @@ namespace MatrixFreeTools
       data_boundary;
 
     data_boundary.dof_numbers               = {dof_no};
-    data_boundary.quad_numbers              = {dof_no};
+    data_boundary.quad_numbers              = {quad_no};
     data_boundary.first_selected_components = {first_selected_component};
     data_boundary.batch_type                = {1};
 
