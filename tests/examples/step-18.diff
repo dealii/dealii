@@ -17,7 +17,7 @@
 <              system_rhs,
 <              preconditioner);
 ---
->     check_solver_within_range(std::cout,
+>     check_solver_within_range(pcout,
 > 			   cg.solve(system_matrix, distributed_incremental_displacement, system_rhs, preconditioner),
 > 			   solver_control.last_step(),
 > 			   114,
