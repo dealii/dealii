@@ -1699,8 +1699,8 @@ int main(int argc, char *argv[])
   // Construct non-matching triangulation and fill non-matching boundary IDs.
 
   // Similar to step-87, the minimum requirement of this tutorial is MPI.
-  // parallel::distributed::Triangulation is used if deal.II is configured
-  // with p4est. Otherwise parallel::shared::Triangulation is used.
+  // The parallel::distributed::Triangulation class is used if deal.II is
+  // configured with p4est. Otherwise parallel::shared::Triangulation is used.
 #ifdef DEAL_II_WITH_P4EST
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
 #else
@@ -1721,7 +1721,7 @@ int main(int argc, char *argv[])
 
   pcout << "Create DoFHandler..." << std::endl;
   DoFHandler<dim> dof_handler(tria);
-  dof_handler.distribute_dofs(FESystem<dim>(FE_DGQ<dim>(degree), dim + 1));
+  dof_handler.distribute_dofs(FESystem<dim>(FE_DGQ<dim>(degree) ^ (dim + 1)));
   pcout << " - Number of DoFs: " << dof_handler.n_dofs() << std::endl;
 
   AffineConstraints<Number> constraints;
