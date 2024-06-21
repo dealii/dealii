@@ -1467,50 +1467,46 @@ namespace internal
       const std::size_t  n_dofs     = shape_info.dofs_per_component_on_cell;
       const std::size_t  n_q_points = shape_info.n_q_points_faces[face_no];
 
-      using Eval =
-        EvaluatorTensorProduct<evaluate_general, 1, 0, 0, Number, Number2>;
-
       if (evaluation_flag & EvaluationFlags::values)
         {
           const auto *const shape_values =
             &shape_data.shape_values_face(face_no, face_orientation, 0);
 
-          auto *values_quad_ptr        = fe_eval.begin_values();
-          auto *values_dofs_actual_ptr = values_dofs;
+          auto *out = fe_eval.begin_values();
+          auto *in  = values_dofs;
 
-          Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
           for (unsigned int c = 0; c < n_components; ++c)
             {
-              eval.template values<0, true, false>(values_dofs_actual_ptr,
-                                                   values_quad_ptr);
+              apply_matrix_vector_product<evaluate_general,
+                                          EvaluatorQuantity::value,
+                                          /*transpose_matrix*/ true,
+                                          /*add*/ false,
+                                          /*consider_strides*/ false>(
+                shape_values, in, out, n_dofs, n_q_points, 1, 1);
 
-              values_quad_ptr += n_q_points;
-              values_dofs_actual_ptr += n_dofs;
+              out += n_q_points;
+              in += n_dofs;
             }
         }
 
       if (evaluation_flag & EvaluationFlags::gradients)
         {
-          auto       *gradients_quad_ptr     = fe_eval.begin_gradients();
-          const auto *values_dofs_actual_ptr = values_dofs;
+          auto       *out = fe_eval.begin_gradients();
+          const auto *in  = values_dofs;
 
-          std::array<const Number2 *, dim> shape_gradients;
-          for (unsigned int d = 0; d < dim; ++d)
-            shape_gradients[d] =
-              &shape_data.shape_gradients_face(face_no, face_orientation, d, 0);
+          const auto *const shape_gradients =
+            &shape_data.shape_gradients_face(face_no, face_orientation, 0);
 
           for (unsigned int c = 0; c < n_components; ++c)
             {
-              for (unsigned int d = 0; d < dim; ++d)
-                {
-                  Eval eval(
-                    nullptr, shape_gradients[d], nullptr, n_dofs, n_q_points);
-
-                  eval.template gradients<0, true, false, dim>(
-                    values_dofs_actual_ptr, gradients_quad_ptr + d);
-                }
-              gradients_quad_ptr += n_q_points * dim;
-              values_dofs_actual_ptr += n_dofs;
+              apply_matrix_vector_product<evaluate_general,
+                                          EvaluatorQuantity::value,
+                                          /*transpose_matrix*/ true,
+                                          /*add*/ false,
+                                          /*consider_strides*/ false>(
+                shape_gradients, in, out, n_dofs, n_q_points * dim, 1, 1);
+              out += n_q_points * dim;
+              in += n_dofs;
             }
         }
 
@@ -1879,58 +1875,63 @@ namespace internal
       const std::size_t  n_dofs     = shape_info.dofs_per_component_on_cell;
       const std::size_t  n_q_points = shape_info.n_q_points_faces[face_no];
 
-      using Eval =
-        EvaluatorTensorProduct<evaluate_general, 1, 0, 0, Number, Number2>;
 
       if (integration_flag & EvaluationFlags::values)
         {
           const auto *const shape_values =
             &shape_data.shape_values_face(face_no, face_orientation, 0);
 
-          auto *values_quad_ptr        = fe_eval.begin_values();
-          auto *values_dofs_actual_ptr = values_dofs;
+          auto *in  = fe_eval.begin_values();
+          auto *out = values_dofs;
 
-          Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
           for (unsigned int c = 0; c < n_components; ++c)
             {
               if (sum_into_values)
-                eval.template values<0, false, true>(values_quad_ptr,
-                                                     values_dofs_actual_ptr);
+                apply_matrix_vector_product<evaluate_general,
+                                            EvaluatorQuantity::value,
+                                            /*transpose_matrix*/ false,
+                                            /*add*/ true,
+                                            /*consider_strides*/ false>(
+                  shape_values, in, out, n_dofs, n_q_points, 1, 1);
               else
-                eval.template values<0, false, false>(values_quad_ptr,
-                                                      values_dofs_actual_ptr);
-              values_quad_ptr += n_q_points;
-              values_dofs_actual_ptr += n_dofs;
+                apply_matrix_vector_product<evaluate_general,
+                                            EvaluatorQuantity::value,
+                                            /*transpose_matrix*/ false,
+                                            /*add*/ false,
+                                            /*consider_strides*/ false>(
+                  shape_values, in, out, n_dofs, n_q_points, 1, 1);
+              in += n_q_points;
+              out += n_dofs;
             }
         }
 
       if (integration_flag & EvaluationFlags::gradients)
         {
-          auto *gradients_quad_ptr     = fe_eval.begin_gradients();
-          auto *values_dofs_actual_ptr = values_dofs;
+          auto *in  = fe_eval.begin_gradients();
+          auto *out = values_dofs;
 
-          std::array<const Number2 *, dim> shape_gradients;
-          for (unsigned int d = 0; d < dim; ++d)
-            shape_gradients[d] =
-              &shape_data.shape_gradients_face(face_no, face_orientation, d, 0);
+          const auto *const shape_gradients =
+            &shape_data.shape_gradients_face(face_no, face_orientation, 0);
 
           for (unsigned int c = 0; c < n_components; ++c)
             {
-              for (unsigned int d = 0; d < dim; ++d)
-                {
-                  Eval eval(
-                    nullptr, shape_gradients[d], nullptr, n_dofs, n_q_points);
-
-                  if (!sum_into_values &&
-                      !(integration_flag & EvaluationFlags::values) && d == 0)
-                    eval.template gradients<0, false, false, dim>(
-                      gradients_quad_ptr + d, values_dofs_actual_ptr);
-                  else
-                    eval.template gradients<0, false, true, dim>(
-                      gradients_quad_ptr + d, values_dofs_actual_ptr);
-                }
-              gradients_quad_ptr += n_q_points * dim;
-              values_dofs_actual_ptr += n_dofs;
+              if (!sum_into_values &&
+                  !(integration_flag & EvaluationFlags::values))
+                apply_matrix_vector_product<evaluate_general,
+                                            EvaluatorQuantity::value,
+                                            /*transpose_matrix*/ false,
+                                            /*add*/ false,
+                                            /*consider_strides*/ false>(
+                  shape_gradients, in, out, n_dofs, n_q_points * dim, 1, 1);
+              else
+                apply_matrix_vector_product<evaluate_general,
+                                            EvaluatorQuantity::value,
+                                            /*transpose_matrix*/ false,
+                                            /*add*/ true,
+                                            /*consider_strides*/ false>(
+                  shape_gradients, in, out, n_dofs, n_q_points * dim, 1, 1);
+              in += n_q_points * dim;
+              out += n_dofs;
             }
         }
 

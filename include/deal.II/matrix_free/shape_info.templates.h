@@ -425,10 +425,10 @@ namespace internal
                                           n_max_face_orientations,
                                           n_dofs * n_q_points_face_max});
 
-                shape_gradients_face.reinit({n_faces,
-                                             n_max_face_orientations,
-                                             dim,
-                                             n_dofs * n_q_points_face_max});
+                shape_gradients_face.reinit(
+                  {n_faces,
+                   n_max_face_orientations,
+                   dim * n_dofs * n_q_points_face_max});
 
                 for (unsigned int f = 0; f < n_faces; ++f)
                   {
@@ -464,8 +464,10 @@ namespace internal
                               const auto grad = fe.shape_grad(i, point);
 
                               for (unsigned int d = 0; d < dim; ++d)
-                                shape_gradients_face(
-                                  f, o, d, i * n_q_points_face + q) = grad[d];
+                                shape_gradients_face(f,
+                                                     o,
+                                                     i * dim * n_q_points_face +
+                                                       q * dim + d) = grad[d];
                             }
                       }
                   }
