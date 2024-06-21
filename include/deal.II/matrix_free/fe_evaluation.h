@@ -355,7 +355,7 @@ public:
   submit_value(const value_type val_in, const unsigned int q_point);
 
   /**
-   * In 1D, the value_type and gradient_type can be unintentionally be mixed
+   * In 1D, the value_type and gradient_type can be unintentionally mixed
    * up because FEEvaluationBase does not distinguish between scalar accessors
    * and vector-valued accessors and the respective types, but solely in terms
    * of the number of components and dimension. Thus, enable the use of
@@ -410,7 +410,7 @@ public:
   submit_gradient(const gradient_type grad_in, const unsigned int q_point);
 
   /**
-   * In 1D, the value_type and gradient_type can be unintentionally be mixed
+   * In 1D, the value_type and gradient_type can be unintentionally mixed
    * up because FEEvaluationBase does not distinguish between scalar accessors
    * and vector-valued accessors and the respective types, but solely in terms
    * of the number of components and dimension. Thus, enable the use of
