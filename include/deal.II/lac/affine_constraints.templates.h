@@ -321,25 +321,22 @@ namespace internal
       Utilities::MPI::this_mpi_process(mpi_communicator);
 
     // helper function
-    const auto sort_and_make_unique = [](std::vector<ConstraintType>
-                                           &constraints) {
-      std::sort(
-        constraints.begin(),
-        constraints.end(),
-        [](const typename dealii::AffineConstraints<number>::ConstraintLine &l1,
-           const typename dealii::AffineConstraints<number>::ConstraintLine
-             &l2) { return l1.index < l2.index; });
+    const auto sort_and_make_unique =
+      [](std::vector<ConstraintType> &constraints) {
+        std::sort(constraints.begin(),
+                  constraints.end(),
+                  [](const ConstraintType &l1, const ConstraintType &l2) {
+                    return l1.index < l2.index;
+                  });
 
-      constraints.erase(
-        std::unique(
-          constraints.begin(),
-          constraints.end(),
-          [](const typename dealii::AffineConstraints<number>::ConstraintLine
-               &l1,
-             const typename dealii::AffineConstraints<number>::ConstraintLine
-               &l2) { return l1.index == l2.index; }),
-        constraints.end());
-    };
+        constraints.erase(std::unique(constraints.begin(),
+                                      constraints.end(),
+                                      [](const ConstraintType &l1,
+                                         const ConstraintType &l2) {
+                                        return l1.index == l2.index;
+                                      }),
+                          constraints.end());
+      };
 
     // 0) collect constrained indices of the current object
     IndexSet constrained_indices(locally_owned_dofs.size());
