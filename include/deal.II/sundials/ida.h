@@ -61,7 +61,8 @@ namespace SUNDIALS
    *
    * The class IDA is a wrapper to SUNDIALS Implicit Differential-Algebraic
    * solver which is a general purpose solver for systems of
-   * Differential-Algebraic Equations (DAEs).
+   * Differential-Algebraic Equations (DAEs). Another class that can solve
+   * this set of equations is PETScWrappers::TS.
    *
    * The user has to provide the implementation of the following std::functions:
    *  - reinit_vector;
