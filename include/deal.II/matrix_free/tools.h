@@ -2221,11 +2221,20 @@ namespace MatrixFreeTools
 
                   for (unsigned int v = 0; v < n_filled_lanes; ++v)
                     for (unsigned int bi = 0; bi < n_blocks; ++bi)
-                      constraints.distribute_local_to_global(
-                        matrices[bi][bj][v],
-                        dof_indices_mf[bi][v],
-                        dof_indices_mf[bj][v],
-                        matrix);
+                      if (bi == bj)
+                        // specialization for blocks on the diagonal
+                        // to writing into diagonal elements of the
+                        // matrix if the corresponding degree of freedom
+                        // is constrained, see also the documentation
+                        // of AffineConstraints::distribute_local_to_global()
+                        constraints.distribute_local_to_global(
+                          matrices[bi][bi][v], dof_indices_mf[bi][v], matrix);
+                      else
+                        constraints.distribute_local_to_global(
+                          matrices[bi][bj][v],
+                          dof_indices_mf[bi][v],
+                          dof_indices_mf[bj][v],
+                          matrix);
                 }
             }
         };
