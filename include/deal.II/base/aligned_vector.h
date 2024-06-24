@@ -787,13 +787,10 @@ namespace internal
       if (end == begin)
         return;
 
-      // for classes trivial assignment can use memcpy. cast element to
-      // (void*) to silence compiler warning for virtual classes (they will
-      // never arrive here because they are non-trivial).
-
-      if (std::is_trivial_v<T> == true)
-        std::memcpy(static_cast<void *>(destination_ + begin),
-                    static_cast<const void *>(source_ + begin),
+      // Classes with trivial assignment can use memcpy.
+      if constexpr (std::is_trivial_v<T> == true)
+        std::memcpy(destination_ + begin,
+                    source_ + begin,
                     (end - begin) * sizeof(T));
       else
         for (std::size_t i = begin; i < end; ++i)
@@ -856,12 +853,10 @@ namespace internal
       if (end == begin)
         return;
 
-      // Classes with trivial assignment can use memcpy. cast element to
-      // (void*) to silence compiler warning for virtual classes (they will
-      // never arrive here because they are non-trivial).
-      if (std::is_trivial_v<T> == true)
-        std::memcpy(static_cast<void *>(destination_ + begin),
-                    static_cast<void *>(source_ + begin),
+      // Classes with trivial assignment can use memcpy.
+      if constexpr (std::is_trivial_v<T> == true)
+        std::memcpy(destination_ + begin,
+                    source_ + begin,
                     (end - begin) * sizeof(T));
       else
         // For everything else just use the move constructor. The original
@@ -918,16 +913,11 @@ namespace internal
       // do not use memcmp for long double because on some systems it does not
       // completely fill its memory and may lead to false positives in
       // e.g. valgrind
-      if (std::is_trivial_v<T> == true &&
-          std::is_same_v<T, long double> == false)
+      if constexpr (std::is_trivial_v<T> == true &&
+                    std::is_same_v<T, long double> == false)
         {
           const unsigned char zero[sizeof(T)] = {};
-          // cast element to (void*) to silence compiler warning for virtual
-          // classes (they will never arrive here because they are
-          // non-trivial).
-          if (std::memcmp(zero,
-                          static_cast<const void *>(&element),
-                          sizeof(T)) == 0)
+          if (std::memcmp(zero, &element, sizeof(T)) == 0)
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
@@ -943,18 +933,17 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // for classes with trivial assignment of zero can use memset. cast
-      // element to (void*) to silence compiler warning for virtual
-      // classes (they will never arrive here because they are
-      // non-trivial).
-      if (std::is_trivial_v<T> == true && trivial_element)
-        std::memset(static_cast<void *>(destination_ + begin),
-                    0,
-                    (end - begin) * sizeof(T));
-      else
-        copy_construct_or_assign(begin,
-                                 end,
-                                 std::bool_constant<initialize_memory>());
+      // Classes with trivial assignment of zero can use memset.
+      if constexpr (std::is_trivial_v<T> == true)
+        if (trivial_element)
+          {
+            std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
+            return;
+          }
+
+      copy_construct_or_assign(begin,
+                               end,
+                               std::bool_constant<initialize_memory>());
     }
 
   private:
@@ -1029,14 +1018,9 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // for classes with trivial assignment of zero can use memset. cast
-      // element to (void*) to silence compiler warning for virtual
-      // classes (they will never arrive here because they are
-      // non-trivial).
-      if (std::is_trivial_v<T> == true)
-        std::memset(static_cast<void *>(destination_ + begin),
-                    0,
-                    (end - begin) * sizeof(T));
+      // Classes with trivial assignment of zero can use memset.
+      if constexpr (std::is_trivial_v<T> == true)
+        std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
       else
         default_construct_or_assign(begin,
                                     end,
