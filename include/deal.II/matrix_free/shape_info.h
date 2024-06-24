@@ -374,7 +374,7 @@ namespace internal
        * quadrature points for all faces, orientations, and directions
        * (no tensor-product structure exploited).
        */
-      Table<4, Number> shape_gradients_face;
+      Table<3, Number> shape_gradients_face;
     };
 
 
