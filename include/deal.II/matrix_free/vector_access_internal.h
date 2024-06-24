@@ -35,30 +35,28 @@ namespace internal
 {
   // below we use type-traits from matrix-free/type_traits.h
 
-  // access to generic const vectors that have operator ().
-  // FIXME: this is wrong for Trilinos/PETSc MPI vectors
-  // where we should first do Partitioner::local_to_global()
-  template <
-    typename VectorType,
-    std::enable_if_t<!has_local_element<VectorType>, VectorType> * = nullptr>
+
+
+  // access to serial const vectors that have operator[].
+  template <typename VectorType,
+            std::enable_if_t<is_serial_vector_or_array<VectorType>::value,
+                             VectorType> * = nullptr>
   inline typename VectorType::value_type
   vector_access(const VectorType &vec, const unsigned int entry)
   {
-    return vec(entry);
+    return vec[entry];
   }
 
 
 
-  // access to generic non-const vectors that have operator ().
-  // FIXME: this is wrong for Trilinos/PETSc MPI vectors
-  // where we should first do Partitioner::local_to_global()
-  template <
-    typename VectorType,
-    std::enable_if_t<!has_local_element<VectorType>, VectorType> * = nullptr>
+  // access to serial non-const vectors that have operator[].
+  template <typename VectorType,
+            std::enable_if_t<is_serial_vector_or_array<VectorType>::value,
+                             VectorType> * = nullptr>
   inline typename VectorType::value_type &
   vector_access(VectorType &vec, const unsigned int entry)
   {
-    return vec(entry);
+    return vec[entry];
   }
 
 
@@ -136,7 +134,7 @@ namespace internal
                            const types::global_dof_index          entry,
                            const typename VectorType::value_type &val)
   {
-    vec(entry) += val;
+    vec[entry] += val;
   }
 
 
@@ -483,7 +481,7 @@ namespace internal
                        const VectorType             &vec,
                        Number                       &res) const
     {
-      res = vec(index);
+      res = vec[index];
     }
 
 
@@ -953,7 +951,7 @@ namespace internal
                        VectorType                   &vec,
                        Number                       &res) const
     {
-      vec(index) = res;
+      vec[index] = res;
     }
 
 

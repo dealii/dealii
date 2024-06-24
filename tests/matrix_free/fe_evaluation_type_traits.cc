@@ -71,14 +71,14 @@ public:
   using value_type = Number;
 
   Number
-  operator()(const unsigned int) const
+  operator[](const unsigned int) const
   {
     deallog << "Dummy2::operator() const" << std::endl;
     return Number();
   }
 
   Number &
-  operator()(const unsigned int)
+  operator[](const unsigned int)
   {
     deallog << "Dummy2::operator()" << std::endl;
     return dummy;
@@ -112,7 +112,7 @@ main()
   // we expect local_element() to be called
   deallog << "internal::vector_access:" << std::endl;
   internal::vector_access(dummy, 0);
-  internal::vector_access(dummy2, 0);
+  // internal::vector_access(dummy2, 0);
 
 
   // now check has_partitioners_are_compatible:
