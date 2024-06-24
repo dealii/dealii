@@ -228,8 +228,11 @@ namespace PETScWrappers
    *   \end{cases}
    * \f]
    *
-   * The interface to PETSc is realized by means of std::function callbacks
-   * like in the SUNDIALS::IDA and SUNDIALS::ARKode classes.
+   * The interface to PETSc is realized by means of std::function
+   * callbacks like in the SUNDIALS::IDA (which also solves implicit
+   * ODES) and SUNDIALS::ARKode classes (which solves a slightly
+   * generalized form of the explicit formulation above that also
+   * allows for a mass matrix on the left hand side).
    *
    * TimeStepper supports any vector and matrix type having constructors and
    * methods:
