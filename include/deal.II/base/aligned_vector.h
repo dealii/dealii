@@ -743,7 +743,7 @@ namespace internal
    *
    * @relatesalso AlignedVector
    */
-  template <typename T>
+  template <typename RandomAccessIterator, typename T>
   class AlignedVectorCopyConstruct
     : private dealii::parallel::ParallelForInteger
   {
@@ -760,9 +760,9 @@ namespace internal
      * The elements from the source array are simply copied via the placement
      * new copy constructor.
      */
-    AlignedVectorCopyConstruct(const T *const source_begin,
-                               const T *const source_end,
-                               T *const       destination)
+    AlignedVectorCopyConstruct(RandomAccessIterator source_begin,
+                               RandomAccessIterator source_end,
+                               T *const             destination)
       : source_(source_begin)
       , destination_(destination)
     {
@@ -787,19 +787,21 @@ namespace internal
       if (end == begin)
         return;
 
-      // Classes with trivial assignment can use memcpy.
-      if constexpr (std::is_trivial_v<T> == true)
+      // for classes trivial assignment can use memcpy.
+      if constexpr (std::is_trivial_v<T> == true &&
+                    (std::is_same_v<T *, RandomAccessIterator> ||
+                     std::is_same_v<const T *, RandomAccessIterator>) == true)
         std::memcpy(destination_ + begin,
                     source_ + begin,
                     (end - begin) * sizeof(T));
       else
         for (std::size_t i = begin; i < end; ++i)
-          new (&destination_[i]) T(source_[i]);
+          new (&destination_[i]) T(*(source_ + i));
     }
 
   private:
-    const T *const source_;
-    T *const       destination_;
+    RandomAccessIterator source_;
+    T *const             destination_;
   };
 
 
@@ -809,7 +811,7 @@ namespace internal
    *
    * @relatesalso AlignedVector
    */
-  template <typename T>
+  template <typename RandomAccessIterator, typename T>
   class AlignedVectorMoveConstruct
     : private dealii::parallel::ParallelForInteger
   {
@@ -826,9 +828,9 @@ namespace internal
      * The data is moved between the two arrays by invoking the destructor on
      * the source range (preparing for a subsequent call to free).
      */
-    AlignedVectorMoveConstruct(T *const source_begin,
-                               T *const source_end,
-                               T *const destination)
+    AlignedVectorMoveConstruct(RandomAccessIterator source_begin,
+                               RandomAccessIterator source_end,
+                               T *const             destination)
       : source_(source_begin)
       , destination_(destination)
     {
@@ -854,7 +856,9 @@ namespace internal
         return;
 
       // Classes with trivial assignment can use memcpy.
-      if constexpr (std::is_trivial_v<T> == true)
+      if constexpr (std::is_trivial_v<T> == true &&
+                    (std::is_same_v<T *, RandomAccessIterator> ||
+                     std::is_same_v<const T *, RandomAccessIterator>) == true)
         std::memcpy(destination_ + begin,
                     source_ + begin,
                     (end - begin) * sizeof(T));
@@ -862,12 +866,12 @@ namespace internal
         // For everything else just use the move constructor. The original
         // object remains alive and will be destroyed elsewhere.
         for (std::size_t i = begin; i < end; ++i)
-          new (&destination_[i]) T(std::move(source_[i]));
+          new (&destination_[i]) T(std::move(*(source_ + i)));
     }
 
   private:
-    T *const source_;
-    T *const destination_;
+    RandomAccessIterator source_;
+    T *const             destination_;
   };
 
 
@@ -1206,9 +1210,9 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
   // copy the data from vec
   reserve(vec.size());
   used_elements_end = allocated_elements_end;
-  internal::AlignedVectorCopyConstruct<T>(vec.elements.get(),
-                                          vec.used_elements_end,
-                                          elements.get());
+  internal::AlignedVectorCopyConstruct<T *, T>(vec.elements.get(),
+                                               vec.used_elements_end,
+                                               elements.get());
 }
 
 
@@ -1236,9 +1240,9 @@ AlignedVector<T>::operator=(const AlignedVector<T> &vec)
 
   // Then copy the elements over by using the copy constructor on these
   // elements:
-  internal::AlignedVectorCopyConstruct<T>(vec.elements.get(),
-                                          vec.used_elements_end,
-                                          elements.get());
+  internal::AlignedVectorCopyConstruct<T *, T>(vec.elements.get(),
+                                               vec.used_elements_end,
+                                               elements.get());
 
   // Finally adjust the pointer to the end of the elements that are used:
   used_elements_end = elements.get() + new_size;
@@ -1404,9 +1408,8 @@ AlignedVector<T>::allocate_and_move(const size_t old_size,
 
   // copy whatever elements we need to retain
   if (new_allocated_size > 0)
-    dealii::internal::AlignedVectorMoveConstruct<T>(elements.get(),
-                                                    elements.get() + old_size,
-                                                    new_data_ptr);
+    dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+      elements.get(), elements.get() + old_size, new_data_ptr);
 
   // Now reset all the member variables of the current object
   // based on the allocation above. Assigning to a std::unique_ptr
