@@ -133,7 +133,12 @@ public:
   void
   vmult(VectorType &dst, const VectorType &src) const
   {
-    dst = 0;
+    if constexpr (std::is_same_v<VectorType, dealii::ArrayView<Number>>)
+      for (unsigned int i = 0; i < dst.size(); ++i)
+        dst[i] = 0;
+    else
+      dst = 0;
+
     const std::function<
       void(const MatrixFree<dim, typename VectorType::value_type> &,
            VectorType &,
