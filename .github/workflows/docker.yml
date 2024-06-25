@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy]
+        ubuntu_version: [focal, jammy]
         # Use only 1 job to build, as more jobs
         # would starve the github machine for memory.
         include:
