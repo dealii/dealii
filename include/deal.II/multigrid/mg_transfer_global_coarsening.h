@@ -25,6 +25,7 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/constraint_info.h>
+#include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
@@ -399,9 +400,29 @@ protected:
 
 
 /**
- * Class for transfer between two multigrid levels for p- or global coarsening.
+ * Class for transfer between two multigrid levels for p- or global
+ * coarsening. It relies on a list of DoF indices associated with the cells on
+ * the coarse and fine side of the transfer, and implements a cell-by-cell
+ * (matrix-free) interpolation setup with the reference-cell embedding
+ * matrices.
  *
  * The implementation of this class is explained in detail in @cite munch2022gc.
+ *
+ * There are two possible ways to use this class. In the first option, the
+ * transfer is built from the underlying DoFHandler and AffineConstraints
+ * objects on the coarse and fine side, collecting an explicit copy of all
+ * indices on both sides. This works for a relatively wide set of
+ * FiniteElement combinations, including p-adaptive schemes using
+ * hp::FECollection. The second, more setup-efficient approach is to build the
+ * transfer between two multigrid levels for polynomial coarsening
+ * (p-coarsening) from two MatrixFree objects that might already exist from
+ * other parts of the code. In this case, we require that both objects share
+ * the same triangulation (but differ through their DoFHandler descriptions)
+ * and are described by the respective DoFHandler/AffineConstraints pair. This
+ * second variant is more efficient because no queries to the DoFHandler need
+ * to be made, reducing both the setup time and the overall memory
+ * consumption. Note that not all options are supported for the second entry
+ * point, and we fall back to the first option in such a case.
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransfer : public MGTwoLevelTransferBase<VectorType>
@@ -462,7 +483,7 @@ public:
     const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
 
   /**
-   * Set up transfer operator between the given DoFHandler objects (
+   * Set up the transfer operator between the given DoFHandler objects (
    * @p dof_handler_fine and @p dof_handler_coarse). Depending on the
    * underlying Triangulation objects polynomial or geometrical global
    * coarsening is performed.
@@ -483,6 +504,21 @@ public:
            AffineConstraints<Number>(),
          const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
          const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
+
+  /**
+   * Set up polynomial coarsening between the DoFHandler objects underlying
+   * two MatrixFree objects and the respective numbers for the DoFHandler
+   * objects within MatrixFree. This reinit() function allows for a more
+   * efficient setup of the transfer operator and reduces the overall memory
+   * consumption of a multigrid cycle in case the same MatrixFree objects are
+   * also used for smoothers and residual evaluation on the two involved
+   * levels.
+   */
+  void
+  reinit(const MatrixFree<dim, Number> &matrix_free_fine,
+         const unsigned int             dof_no_fine,
+         const MatrixFree<dim, Number> &matrix_free_coarse,
+         const unsigned int             dof_no_coarse);
 
   /**
    * Check if a fast templated version of the polynomial transfer between
@@ -572,24 +608,15 @@ private:
     unsigned int degree_fine;
 
     /**
-     * Prolongation matrix for non-tensor-product elements.
+     * Prolongation matrix used for the prolongate_and_add() and
+     * restrict_and_add() functions.
      */
     AlignedVector<double> prolongation_matrix;
 
     /**
-     * 1d prolongation matrix for tensor-product elements.
-     */
-    AlignedVector<double> prolongation_matrix_1d;
-
-    /**
-     * Restriction matrix for non-tensor-product elements.
+     * Restriction matrix used for the interpolate() function.
      */
     AlignedVector<double> restriction_matrix;
-
-    /**
-     * 1d restriction matrix for tensor-product elements.
-     */
-    AlignedVector<double> restriction_matrix_1d;
 
     /**
      * ShapeInfo description of the coarse cell. Needed during the
@@ -618,16 +645,63 @@ private:
     ConstraintInfo<dim, VectorizedArrayType, types::global_dof_index>
       constraint_info_fine;
 
-  /**
-   * Weights for continuous elements.
-   */
-  std::vector<Number> weights; // TODO: vectorize
+  struct MatrixFreeRelatedData
+  {
+    /**
+     * Matrix-free object on the fine side.
+     */
+    SmartPointer<const MatrixFree<dim, Number>> matrix_free_fine;
+
+    /**
+     * Index within the list of DoFHandler objects in the matrix_free_fine
+     * object.
+     */
+    unsigned int dof_handler_index_fine;
+
+    /**
+     * Matrix-free object on the coarse side.
+     */
+    SmartPointer<const MatrixFree<dim, Number>> matrix_free_coarse;
+
+    /**
+     * Index within the list of DoFHandler objects in the matrix_free_coarse
+     * object.
+     */
+    unsigned int dof_handler_index_coarse;
+
+    /**
+     * The two matrix-free objects will in general not agree on the order the
+     * cells are traversed. Thus, the loop will be run by the matrix-free object
+     * on the fine side, and the coarse side will adapt to those cell indices.
+     */
+    std::vector<std::array<unsigned int, VectorizedArrayType::size()>>
+      cell_list_fine_to_coarse;
+  };
 
   /**
-   * Weights for continuous elements, compressed into 3^dim doubles per
-   * cell if possible.
+   * In case this class is built with MatrixFree objects (see the respective
+   * reinit() function), we set up this data structure and skip the other
+   * fields of the class.
    */
-  AlignedVector<VectorizedArrayType> weights_compressed;
+  std::unique_ptr<MatrixFreeRelatedData> matrix_free_data;
+
+  /**
+   * CRS-like pointer to the start into the weights array, as that array can
+   * be compressed or in full format.
+   */
+  std::vector<unsigned int> weights_start;
+
+  /**
+   * Weights for continuous elements, either in full format or compressed into
+   * 3^dim doubles per cell if possible.
+   */
+  AlignedVector<VectorizedArrayType> weights;
+
+  /**
+   * Store whether the weights are in compressed format or not, in the
+   * ordering of the weights_start array.
+   */
+  std::vector<unsigned char> weights_are_compressed;
 
   /**
    * Number of components.
@@ -640,7 +714,7 @@ private:
   SmartPointer<const DoFHandler<dim>> dof_handler_fine;
 
   /**
-   * Muligird level used during initialization.
+   * Multigrid level used during initialization.
    */
   unsigned int mg_level_fine;
 
