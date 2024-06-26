@@ -597,36 +597,97 @@ template <typename number>
 void
 AffineConstraints<number>::make_consistent_in_parallel(
   const IndexSet &locally_owned_dofs,
-  const IndexSet &locally_relevant_dofs,
+  const IndexSet &constraints_to_make_consistent_,
   const MPI_Comm  mpi_communicator)
 {
   if (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
-    return; // nothing to do, since serial
+    return; // Nothing to do, since serial.
 
   Assert(sorted == false, ExcMatrixIsClosed());
 
-  // 1) get all locally relevant constraints ("temporal constraint matrix")
-  const auto temporal_constraint_matrix =
-    internal::compute_locally_relevant_constraints(*this,
-                                                   locally_owned_dofs,
-                                                   locally_relevant_dofs,
-                                                   mpi_communicator);
+  Assert(this->local_lines.is_empty() == false,
+         ExcMessage(
+           "This functionality requires that the AffineConstraints object "
+           "knows for which degrees of freedom it can store constraints. "
+           "Please initialize this object with the corresponding index sets."));
 
-  // 2) clear the content of this constraint matrix
-  lines.clear();
-  lines_cache.clear();
+  // Container for indices that are constrained or that other indices are
+  // constrained against. Generously reserve memory for it, assuming the worst
+  // case that each constraint line involves two distinct DoF indices.
+  std::vector<types::global_dof_index> constrained_indices;
+  constrained_indices.reserve(2 * n_constraints());
 
-  // 3) refill this constraint matrix
-  for (const auto &line : temporal_constraint_matrix)
-    this->add_constraint(line.index, line.entries, line.inhomogeneity);
+  // This IndexSet keeps track of the locally stored constraints on this
+  // AffineConstraints object: If we have received constrained indices that we
+  // don't know of, we need to expand our playing field.
+  IndexSet locally_stored_constraints;
 
-#ifdef DEBUG
+  // This IndexSet contains those DoFs about which we want to know all
+  // constraints. We will receive constraints for these DoFs against other DoFs,
+  // which might be constrained themselves. To successfully resolve all chains
+  // of constraints, we need to know the constraints of all these DoFs, and we
+  // keep track of the relevant DoFs here.
+  IndexSet constraints_to_make_consistent = constraints_to_make_consistent_;
+
+  // This IndexSet stores DoFs from the previous iteration. If the old and new
+  // index sets match, we have converged.
+  IndexSet constraints_made_consistent;
+
+  const unsigned int max_iterations  = 10;
+  unsigned int       iteration_count = 0;
+  for (; iteration_count < max_iterations; ++iteration_count)
+    {
+      // 1) Get all locally relevant constraints ("temporal constraint matrix").
+      const auto temporal_constraint_matrix =
+        internal::compute_locally_relevant_constraints(
+          *this,
+          locally_owned_dofs,
+          constraints_to_make_consistent,
+          mpi_communicator);
+
+      // 2) Add untracked DoFs to the index sets.
+      constrained_indices.clear();
+      for (const auto &line : temporal_constraint_matrix)
+        {
+          constrained_indices.push_back(line.index);
+          for (const auto &entry : line.entries)
+            constrained_indices.push_back(entry.first);
+        }
+      std::sort(constrained_indices.begin(), constrained_indices.end());
+
+      locally_stored_constraints = this->local_lines;
+      locally_stored_constraints.add_indices(constrained_indices.begin(),
+                                             constrained_indices.end());
+
+      constraints_made_consistent = constraints_to_make_consistent;
+      constraints_to_make_consistent.add_indices(constrained_indices.begin(),
+                                                 constrained_indices.end());
+
+      // 3) Clear and refill this constraint matrix.
+      this->reinit(locally_owned_dofs, locally_stored_constraints);
+      for (const auto &line : temporal_constraint_matrix)
+        this->add_constraint(line.index, line.entries, line.inhomogeneity);
+
+      // 4) Stop loop if converged.
+      const auto constraints_converged =
+        Utilities::MPI::min(static_cast<unsigned int>(
+                              constraints_to_make_consistent ==
+                              constraints_made_consistent),
+                            mpi_communicator);
+      if (constraints_converged)
+        break;
+    }
+
+  AssertThrow(iteration_count < max_iterations,
+              ExcMessage(
+                "make_consistent_in_parallel() did not converge after " +
+                Utilities::to_string(max_iterations) + " iterations."));
+
   Assert(this->is_consistent_in_parallel(
            Utilities::MPI::all_gather(mpi_communicator, locally_owned_dofs),
-           locally_relevant_dofs,
+           constraints_to_make_consistent,
            mpi_communicator),
          ExcInternalError());
-#endif
 }
 
 
