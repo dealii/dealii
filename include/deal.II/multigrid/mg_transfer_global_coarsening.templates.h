@@ -41,7 +41,9 @@
 
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
+#include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/fe_point_evaluation.h>
+#include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 #include <deal.II/matrix_free/vector_access_internal.h>
 
@@ -1510,8 +1512,9 @@ namespace internal
 
       // ... invert valence
       for (unsigned int i = 0; i < weight_vector.locally_owned_size(); ++i)
-        weight_vector.local_element(i) =
-          Number(1.) / weight_vector.local_element(i);
+        if (weight_vector.local_element(i) > 0.)
+          weight_vector.local_element(i) =
+            Number(1.) / weight_vector.local_element(i);
 
       // ... clear constrained indices
       for (const auto &i : constraints_fine.get_lines())
@@ -2184,22 +2187,18 @@ namespace internal
       MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &transfer)
     {
-      Assert(
-        mg_level_fine == numbers::invalid_unsigned_int ||
-          mg_level_fine <= MGTools::max_level_for_coarse_mesh(
-                             dof_handler_fine.get_triangulation()),
-        ExcMessage(
-          "Polynomial transfer is only allowed on the active level "
-          "(numbers::invalid_unsigned_int) or on refinement levels without "
-          "hanging nodes."));
-      Assert(
-        mg_level_coarse == numbers::invalid_unsigned_int ||
-          mg_level_coarse <= MGTools::max_level_for_coarse_mesh(
-                               dof_handler_coarse.get_triangulation()),
-        ExcMessage(
-          "Polynomial transfer is only allowed on the active level "
-          "(numbers::invalid_unsigned_int) or on refinement levels without "
-          "hanging nodes."));
+      Assert(mg_level_fine == numbers::invalid_unsigned_int ||
+               mg_level_fine <= MGTools::max_level_for_coarse_mesh(
+                                  dof_handler_fine.get_triangulation()),
+             ExcMessage("Polynomial transfer is only allowed on the active "
+                        "level (numbers::invalid_unsigned_int) or on "
+                        "refinement levels without hanging nodes."));
+      Assert(mg_level_coarse == numbers::invalid_unsigned_int ||
+               mg_level_coarse <= MGTools::max_level_for_coarse_mesh(
+                                    dof_handler_coarse.get_triangulation()),
+             ExcMessage("Polynomial transfer is only allowed on the active "
+                        "level (numbers::invalid_unsigned_int) or on "
+                        "refinement levels without hanging nodes."));
 
       AssertDimension(constraints_fine.n_inhomogeneities(), 0);
       AssertDimension(constraints_coarse.n_inhomogeneities(), 0);
@@ -2290,7 +2289,7 @@ namespace internal
       for (auto &f : fe_index_pairs)
         f.second = counter++;
 
-      transfer.schemes.resize(fe_index_pairs.size());
+      transfer.schemes.resize(counter);
 
       // extract number of coarse cells
       {
@@ -3831,6 +3830,491 @@ MGTwoLevelTransfer<dim, VectorType>::memory_consumption() const
 
 
 
+namespace internal
+{
+  namespace
+  {
+    // Helper class to compute correct weights, which works by simply using
+    // the degrees of freedom stored in MatrixFree, bypassing the hanging node
+    // interpolation matrices.
+    template <int dim, typename Number>
+    class FEEvaluationNoConstraints : public FEEvaluation<dim, -1, 0, 1, Number>
+    {
+    public:
+      FEEvaluationNoConstraints(const MatrixFree<dim, Number> &data,
+                                const unsigned int             dof_index)
+        : FEEvaluation<dim, -1, 0, 1, Number>(data, dof_index)
+      {}
+
+      template <typename VectorType>
+      void
+      read_dof_values_unconstrained(VectorType &src)
+      {
+        std::array<VectorType *, 1> src_vector{{&src}};
+        internal::VectorReader<Number, VectorizedArray<Number>> reader;
+        this->template read_write_operation<VectorType>(
+          reader,
+          src_vector,
+          {},
+          std::bitset<VectorizedArray<Number>::size()>().flip(),
+          false);
+      }
+
+      template <typename VectorType>
+      void
+      distribute_local_to_global_unconstrained(VectorType &dst)
+      {
+        std::array<VectorType *, 1> dst_vector{{&dst}};
+        internal::VectorDistributorLocalToGlobal<Number,
+                                                 VectorizedArray<Number>>
+          writer;
+        this->template read_write_operation<VectorType>(
+          writer,
+          dst_vector,
+          {},
+          std::bitset<VectorizedArray<Number>::size()>().flip(),
+          false);
+      }
+    };
+  } // namespace
+} // namespace internal
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferPrebuilt<dim, VectorType>::reinit(
+  const MatrixFree<dim, Number> &matrix_free_fine,
+  const unsigned int             dof_no_fine,
+  const MatrixFree<dim, Number> &matrix_free_coarse,
+  const unsigned int             dof_no_coarse)
+{
+  this->matrix_free_fine   = &matrix_free_fine;
+  this->matrix_free_coarse = &matrix_free_coarse;
+  AssertIndexRange(dof_no_fine, matrix_free_fine.n_components());
+  this->dof_handler_index_fine = dof_no_fine;
+  AssertIndexRange(dof_no_coarse, matrix_free_coarse.n_components());
+  this->dof_handler_index_coarse = dof_no_coarse;
+
+  const DoFHandler<dim> &dof_fine =
+    matrix_free_fine.get_dof_handler(dof_no_fine);
+  const DoFHandler<dim> &dof_coarse =
+    matrix_free_coarse.get_dof_handler(dof_no_coarse);
+
+  Assert(&dof_fine.get_triangulation() == &dof_coarse.get_triangulation(),
+         ExcMessage("You can only use this class if both MatrixFree objects "
+                    "use the same underlying triangulation!"));
+  AssertDimension(matrix_free_fine.get_mg_level(),
+                  matrix_free_coarse.get_mg_level());
+
+  AssertDimension(matrix_free_fine.n_physical_cells(),
+                  matrix_free_coarse.n_physical_cells());
+
+  Assert(dof_fine.get_fe_collection().size() == 1,
+         ExcMessage("hp finite element objects are currently not supported "
+                    "by this class."));
+  Assert(dof_coarse.get_fe_collection().size() == 1,
+         ExcMessage("hp finite element objects are currently not supported "
+                    "by this class."));
+
+  this->dof_handler_fine = &dof_fine;
+  this->mg_level_fine    = matrix_free_fine.get_mg_level();
+
+  const FiniteElement<dim> &fe_fine = dof_fine.get_fe();
+
+  Assert(fe_fine.n_components() == 1, ExcNotImplemented());
+
+  // Compute the link between cells on matrix_free_coarse and
+  // matrix_free_fine, with the latter controlling the loop
+  const Triangulation<dim> &tria = dof_fine.get_triangulation();
+  std::vector<unsigned int> coarse_cell_indices(tria.n_active_cells());
+  for (unsigned int cell = 0; cell < matrix_free_coarse.n_cell_batches();
+       ++cell)
+    for (unsigned int v = 0;
+         v < matrix_free_coarse.n_active_entries_per_cell_batch(cell);
+         ++v)
+      {
+        coarse_cell_indices[matrix_free_coarse.get_cell_iterator(cell, v)
+                              ->active_cell_index()] =
+          cell * VectorizedArrayType::size() + v;
+      }
+
+  std::array<unsigned int, VectorizedArrayType::size()> default_entry;
+  default_entry.fill(numbers::invalid_unsigned_int);
+  cell_list_fine_to_coarse.resize(matrix_free_fine.n_cell_batches(),
+                                  default_entry);
+  for (unsigned int cell = 0; cell < matrix_free_fine.n_cell_batches(); ++cell)
+    for (unsigned int v = 0;
+         v < matrix_free_fine.n_active_entries_per_cell_batch(cell);
+         ++v)
+      {
+        cell_list_fine_to_coarse[cell][v] =
+          coarse_cell_indices[matrix_free_fine.get_cell_iterator(cell, v)
+                                ->active_cell_index()];
+      }
+
+  // Compute weights
+  if (fe_fine.dofs_per_vertex > 0)
+    {
+      VectorType weight_vector;
+      matrix_free_fine.initialize_dof_vector(weight_vector, dof_no_fine);
+
+      internal::FEEvaluationNoConstraints<dim, Number> evaluator(
+        matrix_free_fine, dof_no_fine);
+      for (unsigned int cell = 0; cell < matrix_free_fine.n_cell_batches();
+           ++cell)
+        {
+          evaluator.reinit(cell);
+          for (unsigned int i = 0; i < evaluator.dofs_per_cell; ++i)
+            evaluator.begin_dof_values()[i] = 1.;
+          evaluator.distribute_local_to_global_unconstrained(weight_vector);
+        }
+      weight_vector.compress(VectorOperation::add);
+
+      for (unsigned int i = 0; i < weight_vector.locally_owned_size(); ++i)
+        if (weight_vector.local_element(i) > 0.)
+          weight_vector.local_element(i) =
+            Number(1.) / weight_vector.local_element(i);
+      for (const unsigned int index :
+           matrix_free_fine.get_constrained_dofs(dof_no_fine))
+        weight_vector.local_element(index) = 0;
+      weight_vector.update_ghost_values();
+
+      weights.clear();
+      weights.reserve(matrix_free_fine.n_cell_batches() *
+                      Utilities::pow(3, dim));
+      weights_start.clear();
+      weights_start.resize(matrix_free_fine.n_cell_batches());
+      std::array<VectorizedArrayType, Utilities::pow(3, dim)>
+        weights_compressed;
+      for (unsigned int cell = 0; cell < matrix_free_fine.n_cell_batches();
+           ++cell)
+        {
+          weights_start[cell] = weights.size();
+
+          weights_compressed.fill(VectorizedArray<Number>());
+          evaluator.reinit(cell);
+          evaluator.read_dof_values_unconstrained(weight_vector);
+
+          const bool can_compress_weights =
+            internal::compute_weights_fe_q_dofs_by_entity<dim, -1>(
+              evaluator.begin_dof_values(),
+              1,
+              fe_fine.degree + 1,
+              weights_compressed.data());
+          if (can_compress_weights && fe_fine.degree > 1)
+            for (const VectorizedArrayType weight : weights_compressed)
+              weights.push_back(weight);
+          else
+            for (unsigned int i = 0; i < evaluator.dofs_per_cell; ++i)
+              weights.push_back(evaluator.begin_dof_values()[i]);
+        }
+      weights_start.push_back(weights.size());
+    }
+
+  // Compute interpolation matrices, possibly in the 1D version
+  const FiniteElement<dim> &fe_coarse = dof_coarse.get_fe();
+
+  const auto reference_cell = fe_fine.reference_cell();
+
+  Assert(reference_cell == fe_coarse.reference_cell(), ExcNotImplemented());
+
+  if (reference_cell == ReferenceCells::get_hypercube<dim>())
+    {
+      const std::unique_ptr<FiniteElement<1>> fe_fine_1d =
+        internal::create_1D_fe(fe_fine);
+      std::vector<unsigned int> renumbering_fine(fe_fine_1d->n_dofs_per_cell());
+      {
+        AssertIndexRange(fe_fine_1d->n_dofs_per_vertex(), 2);
+        renumbering_fine[0] = 0;
+        for (unsigned int i = 0; i < fe_fine_1d->dofs_per_line; ++i)
+          renumbering_fine[i + fe_fine_1d->n_dofs_per_vertex()] =
+            GeometryInfo<1>::vertices_per_cell *
+              fe_fine_1d->n_dofs_per_vertex() +
+            i;
+        if (fe_fine_1d->n_dofs_per_vertex() > 0)
+          renumbering_fine[fe_fine_1d->n_dofs_per_cell() -
+                           fe_fine_1d->n_dofs_per_vertex()] =
+            fe_fine_1d->n_dofs_per_vertex();
+      }
+
+      const std::unique_ptr<FiniteElement<1>> fe_coarse_1d =
+        internal::create_1D_fe(fe_coarse);
+      std::vector<unsigned int> renumbering_coarse(
+        fe_coarse_1d->n_dofs_per_cell());
+      {
+        AssertIndexRange(fe_coarse_1d->n_dofs_per_vertex(), 2);
+        renumbering_coarse[0] = 0;
+        for (unsigned int i = 0; i < fe_coarse_1d->dofs_per_line; ++i)
+          renumbering_coarse[i + fe_coarse_1d->n_dofs_per_vertex()] =
+            GeometryInfo<1>::vertices_per_cell *
+              fe_coarse_1d->n_dofs_per_vertex() +
+            i;
+        if (fe_coarse_1d->n_dofs_per_vertex() > 0)
+          renumbering_coarse[fe_coarse_1d->n_dofs_per_cell() -
+                             fe_coarse_1d->n_dofs_per_vertex()] =
+            fe_coarse_1d->n_dofs_per_vertex();
+      }
+      {
+        FullMatrix<double> matrix(fe_fine_1d->n_dofs_per_cell(),
+                                  fe_coarse_1d->n_dofs_per_cell());
+        FETools::get_projection_matrix(*fe_coarse_1d, *fe_fine_1d, matrix);
+        prolongation_matrix.resize(fe_fine_1d->n_dofs_per_cell() *
+                                   fe_coarse_1d->n_dofs_per_cell());
+
+        for (unsigned int i = 0, k = 0; i < fe_coarse_1d->n_dofs_per_cell();
+             ++i)
+          for (unsigned int j = 0; j < fe_fine_1d->n_dofs_per_cell(); ++j, ++k)
+            prolongation_matrix[k] =
+              matrix(renumbering_fine[j], renumbering_coarse[i]);
+      }
+
+      {
+        FullMatrix<double> matrix(fe_coarse_1d->n_dofs_per_cell(),
+                                  fe_fine_1d->n_dofs_per_cell());
+        FETools::get_projection_matrix(*fe_fine_1d, *fe_coarse_1d, matrix);
+        restriction_matrix.resize(fe_fine_1d->n_dofs_per_cell() *
+                                  fe_coarse_1d->n_dofs_per_cell());
+
+        for (unsigned int i = 0, k = 0; i < fe_coarse_1d->n_dofs_per_cell();
+             ++i)
+          for (unsigned int j = 0; j < fe_fine_1d->n_dofs_per_cell(); ++j, ++k)
+            restriction_matrix[k] =
+              matrix(renumbering_coarse[i], renumbering_fine[j]);
+      }
+    }
+  else
+    {
+      {
+        FullMatrix<double> matrix(fe_fine.n_dofs_per_cell(),
+                                  fe_coarse.n_dofs_per_cell());
+        FETools::get_projection_matrix(fe_coarse, fe_fine, matrix);
+        prolongation_matrix.resize(fe_fine.n_dofs_per_cell() *
+                                   fe_coarse.n_dofs_per_cell());
+
+        for (unsigned int i = 0, k = 0; i < fe_coarse.n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < fe_fine.n_dofs_per_cell(); ++j, ++k)
+            prolongation_matrix[k] = matrix(j, i);
+      }
+
+      {
+        FullMatrix<double> matrix(fe_coarse.n_dofs_per_cell(),
+                                  fe_fine.n_dofs_per_cell());
+        FETools::get_projection_matrix(fe_fine, fe_coarse, matrix);
+        restriction_matrix.resize(fe_fine.n_dofs_per_cell() *
+                                  fe_coarse.n_dofs_per_cell());
+
+        for (unsigned int i = 0, k = 0; i < fe_coarse.n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < fe_fine.n_dofs_per_cell(); ++j, ++k)
+            restriction_matrix[k] = matrix(i, j);
+      }
+    }
+
+  // We internally call the ghost updates through the matrix-free framework
+  this->vec_fine_needs_ghost_update = false;
+
+  this->partitioner_fine = matrix_free_fine.get_vector_partitioner(dof_no_fine);
+  this->partitioner_coarse =
+    matrix_free_coarse.get_vector_partitioner(dof_no_coarse);
+}
+
+
+
+template <int dim, typename VectorType>
+std::size_t
+MGTwoLevelTransferPrebuilt<dim, VectorType>::memory_consumption() const
+{
+  return prolongation_matrix.memory_consumption() +
+         restriction_matrix.memory_consumption() +
+         weights.memory_consumption() +
+         MemoryConsumption::memory_consumption(weights_start) +
+         MemoryConsumption::memory_consumption(cell_list_fine_to_coarse);
+}
+
+
+
+template <int dim, typename VectorType>
+std::pair<bool, bool>
+MGTwoLevelTransferPrebuilt<dim, VectorType>::
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &)
+{
+  return std::make_pair(true, true);
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferPrebuilt<dim, VectorType>::prolongate_and_add_internal(
+  VectorType       &dst,
+  const VectorType &src) const
+{
+  src.update_ghost_values();
+  matrix_free_fine->template cell_loop<VectorType, int>(
+    [&](const MatrixFree<dim, Number> &data,
+        VectorType                    &dst,
+        const int &,
+        const std::pair<unsigned int, unsigned int> &range) {
+      FEEvaluation<dim, -1, 0, 1, Number> eval_fine(data,
+                                                    dof_handler_index_fine);
+      FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(*matrix_free_coarse,
+                                                      dof_handler_index_coarse);
+
+      CellTransferFactory cell_transfer(
+        eval_fine.get_shape_info().data[0].fe_degree,
+        eval_coarse.get_shape_info().data[0].fe_degree);
+      for (unsigned int cell = range.first; cell < range.second; ++cell)
+        {
+          eval_fine.reinit(cell);
+          eval_coarse.reinit(cell_list_fine_to_coarse[cell]);
+
+          eval_coarse.read_dof_values(src);
+          CellProlongator<dim, double, VectorizedArrayType> cell_prolongator(
+            prolongation_matrix,
+            prolongation_matrix,
+            eval_coarse.begin_dof_values(),
+            eval_fine.begin_dof_values());
+
+          if (prolongation_matrix.size() <
+              eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
+            cell_transfer.run(cell_prolongator);
+          else
+            cell_prolongator.run_full(eval_fine.dofs_per_cell,
+                                      eval_coarse.dofs_per_cell);
+
+          if (weights.size() > 0)
+            {
+              if (weights_start[cell + 1] - weights_start[cell] ==
+                  Utilities::pow(3U, dim))
+                internal::
+                  weight_fe_q_dofs_by_entity<dim, -1, VectorizedArrayType>(
+                    weights.data() + weights_start[cell],
+                    1,
+                    eval_fine.get_shape_info().data[0].fe_degree + 1,
+                    eval_fine.begin_dof_values());
+              else
+                for (unsigned int i = 0; i < eval_fine.dofs_per_cell; ++i)
+                  eval_fine.begin_dof_values()[i] *=
+                    weights[weights_start[cell] + i];
+            }
+          eval_fine.distribute_local_to_global(dst);
+        }
+    },
+    dst,
+    0);
+  src.zero_out_ghost_values();
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferPrebuilt<dim, VectorType>::restrict_and_add_internal(
+  VectorType       &dst,
+  const VectorType &src) const
+{
+  int dummy = 0;
+  matrix_free_fine->template cell_loop<int, VectorType>(
+    [&](const MatrixFree<dim, Number> &data,
+        int &,
+        const VectorType                            &src,
+        const std::pair<unsigned int, unsigned int> &range) {
+      FEEvaluation<dim, -1, 0, 1, Number> eval_fine(data,
+                                                    dof_handler_index_fine);
+      FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(*matrix_free_coarse,
+                                                      dof_handler_index_coarse);
+
+      CellTransferFactory cell_transfer(
+        eval_fine.get_shape_info().data[0].fe_degree,
+        eval_coarse.get_shape_info().data[0].fe_degree);
+      for (unsigned int cell = range.first; cell < range.second; ++cell)
+        {
+          eval_fine.reinit(cell);
+          eval_coarse.reinit(cell_list_fine_to_coarse[cell]);
+
+          eval_fine.read_dof_values(src);
+          if (weights.size() > 0)
+            {
+              if (weights_start[cell + 1] - weights_start[cell] ==
+                  Utilities::pow(3U, dim))
+                internal::
+                  weight_fe_q_dofs_by_entity<dim, -1, VectorizedArrayType>(
+                    weights.data() + weights_start[cell],
+                    1,
+                    eval_fine.get_shape_info().data[0].fe_degree + 1,
+                    eval_fine.begin_dof_values());
+              else
+                for (unsigned int i = 0; i < eval_fine.dofs_per_cell; ++i)
+                  eval_fine.begin_dof_values()[i] *=
+                    weights[weights_start[cell] + i];
+            }
+
+          CellRestrictor<dim, double, VectorizedArrayType> cell_restrictor(
+            prolongation_matrix,
+            prolongation_matrix,
+            eval_fine.begin_dof_values(),
+            eval_coarse.begin_dof_values());
+
+          if (prolongation_matrix.size() <
+              eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
+            cell_transfer.run(cell_restrictor);
+          else
+            cell_restrictor.run_full(eval_fine.dofs_per_cell,
+                                     eval_coarse.dofs_per_cell);
+
+          eval_coarse.distribute_local_to_global(dst);
+        }
+    },
+    dummy,
+    src);
+  dst.compress(VectorOperation::add);
+}
+
+
+
+template <int dim, typename VectorType>
+void
+MGTwoLevelTransferPrebuilt<dim, VectorType>::interpolate(
+  VectorType       &dst,
+  const VectorType &src) const
+{
+  FEEvaluation<dim, -1, 0, 1, Number> eval_fine(*matrix_free_fine,
+                                                dof_handler_index_fine);
+  FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(*matrix_free_coarse,
+                                                  dof_handler_index_coarse);
+
+  CellTransferFactory cell_transfer(
+    eval_fine.get_shape_info().data[0].fe_degree,
+    eval_coarse.get_shape_info().data[0].fe_degree);
+  for (unsigned int cell = 0; cell < matrix_free_fine->n_cell_batches(); ++cell)
+    {
+      eval_fine.reinit(cell);
+      eval_coarse.reinit(cell_list_fine_to_coarse[cell]);
+
+      eval_fine.read_dof_values(src);
+
+      CellRestrictor<dim, double, VectorizedArrayType> cell_restrictor(
+        restriction_matrix,
+        restriction_matrix,
+        eval_fine.begin_dof_values(),
+        eval_coarse.begin_dof_values());
+
+      if (prolongation_matrix.size() <
+          eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
+        cell_transfer.run(cell_restrictor);
+      else
+        cell_restrictor.run_full(eval_fine.dofs_per_cell,
+                                 eval_coarse.dofs_per_cell);
+
+      eval_coarse.set_dof_values(dst);
+    }
+  dst.zero_out_ghost_values();
+}
+
+
+
 template <typename VectorType>
 void
 MGTwoLevelTransferBase<VectorType>::update_ghost_values(
@@ -3971,6 +4455,13 @@ MGTransferMF<dim, Number>::get_dof_handler_fine() const
         const MGTwoLevelTransfer<dim,
                                  LinearAlgebra::distributed::Vector<Number>> *>(
         this->transfer[this->transfer.max_level()].get()))
+    {
+      return {t->dof_handler_fine, t->mg_level_fine};
+    }
+  else if (const auto t = dynamic_cast<const MGTwoLevelTransferPrebuilt<
+             dim,
+             LinearAlgebra::distributed::Vector<Number>> *>(
+             this->transfer[this->transfer.max_level()].get()))
     {
       return {t->dof_handler_fine, t->mg_level_fine};
     }
