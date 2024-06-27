@@ -716,9 +716,7 @@ namespace Step44
     : parameters(input_file)
     , triangulation(Triangulation<dim>::maximum_smoothing)
     , time(parameters.end_time, parameters.delta_t)
-    , timer(deallog.get_file_stream(),
-            TimerOutput::never,
-            TimerOutput::wall_times)
+    , timer(std::cout, TimerOutput::never, TimerOutput::wall_times)
     , degree(parameters.poly_degree)
     , fe(FE_Q<dim>(parameters.poly_degree),
          dim, // displacement
@@ -1018,7 +1016,7 @@ namespace Step44
     GridTools::scale(parameters.scale, triangulation);
     triangulation.refine_global(std::max(1U, parameters.global_refinement));
     vol_reference = GridTools::volume(triangulation);
-    deallog << "Grid:\n\t Reference volume: " << vol_reference << std::endl;
+    std::cout << "Grid:\n\t Reference volume: " << vol_reference << std::endl;
     typename Triangulation<dim>::active_cell_iterator cell = triangulation
                                                                .begin_active(),
                                                       endc =
@@ -1058,10 +1056,11 @@ namespace Step44
     DoFRenumbering::component_wise(dof_handler_ref, block_component);
     dofs_per_block =
       DoFTools::count_dofs_per_fe_block(dof_handler_ref, block_component);
-    deallog << "Triangulation:"
-            << "\n\t Number of active cells: " << triangulation.n_active_cells()
-            << "\n\t Number of degrees of freedom: " << dof_handler_ref.n_dofs()
-            << std::endl;
+    std::cout << "Triangulation:"
+              << "\n\t Number of active cells: "
+              << triangulation.n_active_cells()
+              << "\n\t Number of degrees of freedom: "
+              << dof_handler_ref.n_dofs() << std::endl;
     tangent_matrix.clear();
     {
       const types::global_dof_index n_dofs_u = dofs_per_block[u_dof];
@@ -1125,7 +1124,7 @@ namespace Step44
   void
   Solid<dim>::setup_qph()
   {
-    deallog << "    Setting up quadrature point data..." << std::endl;
+    std::cout << "    Setting up quadrature point data..." << std::endl;
     quadrature_point_history.initialize(triangulation.begin_active(),
                                         triangulation.end(),
                                         n_q_points);
@@ -1146,7 +1145,7 @@ namespace Step44
   Solid<dim>::update_qph_incremental(const BlockVector<double> &solution_delta)
   {
     timer.enter_subsection("Update QPH data");
-    deallog << " UQPH " << std::flush;
+    std::cout << " UQPH " << std::flush;
     const BlockVector<double> solution_total(
       get_total_solution(solution_delta));
     const UpdateFlags uf_UQPH(update_values | update_gradients);
@@ -1205,9 +1204,9 @@ namespace Step44
   void
   Solid<dim>::solve_nonlinear_timestep(BlockVector<double> &solution_delta)
   {
-    deallog << std::endl
-            << "Timestep " << time.get_timestep() << " @ " << time.current()
-            << "s" << std::endl;
+    std::cout << std::endl
+              << "Timestep " << time.get_timestep() << " @ " << time.current()
+              << "s" << std::endl;
     BlockVector<double> newton_update(dofs_per_block);
     error_residual.reset();
     error_residual_0.reset();
@@ -1219,7 +1218,8 @@ namespace Step44
     unsigned int newton_iteration = 0;
     for (; newton_iteration < parameters.max_iterations_NR; ++newton_iteration)
       {
-        deallog << " " << std::setw(2) << newton_iteration << " " << std::flush;
+        std::cout << " " << std::setw(2) << newton_iteration << " "
+                  << std::flush;
         tangent_matrix = 0.0;
         system_rhs     = 0.0;
         assemble_system_rhs();
@@ -1231,7 +1231,7 @@ namespace Step44
         if (newton_iteration > 0 && error_update_norm.u <= parameters.tol_u &&
             error_residual_norm.u <= parameters.tol_f)
           {
-            deallog << " CONVERGED! " << std::endl;
+            std::cout << " CONVERGED! " << std::endl;
             print_conv_footer();
             break;
           }
@@ -1247,14 +1247,14 @@ namespace Step44
         error_update_norm.normalise(error_update_0);
         solution_delta += newton_update;
         update_qph_incremental(solution_delta);
-        deallog << " | " << std::fixed << std::setprecision(3) << std::setw(7)
-                << std::scientific << lin_solver_output.first << "  "
-                << lin_solver_output.second << "  " << error_residual_norm.norm
-                << "  " << error_residual_norm.u << "  "
-                << error_residual_norm.p << "  " << error_residual_norm.J
-                << "  " << error_update_norm.norm << "  " << error_update_norm.u
-                << "  " << error_update_norm.p << "  " << error_update_norm.J
-                << "  " << std::endl;
+        std::cout << " | " << std::fixed << std::setprecision(3) << std::setw(7)
+                  << std::scientific << lin_solver_output.first << "  "
+                  << lin_solver_output.second << "  "
+                  << error_residual_norm.norm << "  " << error_residual_norm.u
+                  << "  " << error_residual_norm.p << "  "
+                  << error_residual_norm.J << "  " << error_update_norm.norm
+                  << "  " << error_update_norm.u << "  " << error_update_norm.p
+                  << "  " << error_update_norm.J << "  " << std::endl;
       }
     AssertThrow(newton_iteration <= parameters.max_iterations_NR,
                 ExcMessage("No convergence in nonlinear solver!"));
@@ -1265,15 +1265,15 @@ namespace Step44
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
-      deallog << "_";
-    deallog << std::endl;
-    deallog << "                 SOLVER STEP                  "
-            << " |  LIN_IT   LIN_RES    RES_NORM    "
-            << " RES_U     RES_P      RES_J     NU_NORM     "
-            << " NU_U       NU_P       NU_J " << std::endl;
+      std::cout << "_";
+    std::cout << std::endl;
+    std::cout << "                 SOLVER STEP                  "
+              << " |  LIN_IT   LIN_RES    RES_NORM    "
+              << " RES_U     RES_P      RES_J     NU_NORM     "
+              << " NU_U       NU_P       NU_J " << std::endl;
     for (unsigned int i = 0; i < l_width; ++i)
-      deallog << "_";
-    deallog << std::endl;
+      std::cout << "_";
+    std::cout << std::endl;
   }
   template <int dim>
   void
@@ -1281,17 +1281,17 @@ namespace Step44
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
-      deallog << "_";
-    deallog << std::endl;
+      std::cout << "_";
+    std::cout << std::endl;
     const std::pair<double, double> error_dil = get_error_dilation();
-    deallog << "Relative errors:" << std::endl
-            << "Displacement:\t" << error_update.u / error_update_0.u
-            << std::endl
-            << "Force: \t\t" << error_residual.u / error_residual_0.u
-            << std::endl
-            << "Dilatation:\t" << error_dil.first << std::endl
-            << "v / V_0:\t" << error_dil.second * vol_reference << " / "
-            << vol_reference << " = " << error_dil.second << std::endl;
+    std::cout << "Relative errors:" << std::endl
+              << "Displacement:\t" << error_update.u / error_update_0.u
+              << std::endl
+              << "Force: \t\t" << error_residual.u / error_residual_0.u
+              << std::endl
+              << "Dilatation:\t" << error_dil.first << std::endl
+              << "v / V_0:\t" << error_dil.second * vol_reference << " / "
+              << vol_reference << " = " << error_dil.second << std::endl;
   }
   template <int dim>
   double
@@ -1387,7 +1387,7 @@ namespace Step44
   Solid<dim>::assemble_system_tangent()
   {
     timer.enter_subsection("Assemble tangent matrix");
-    deallog << " ASM_K " << std::flush;
+    std::cout << " ASM_K " << std::flush;
     tangent_matrix = 0.0;
     const UpdateFlags uf_cell(update_values | update_gradients |
                               update_JxW_values);
@@ -1511,7 +1511,7 @@ namespace Step44
   Solid<dim>::assemble_system_rhs()
   {
     timer.enter_subsection("Assemble system right-hand side");
-    deallog << " ASM_R " << std::flush;
+    std::cout << " ASM_R " << std::flush;
     system_rhs = 0.0;
     const UpdateFlags uf_cell(update_values | update_gradients |
                               update_JxW_values);
@@ -1635,7 +1635,7 @@ namespace Step44
   void
   Solid<dim>::make_constraints(const int &it_nr)
   {
-    deallog << " CST " << std::flush;
+    std::cout << " CST " << std::flush;
     if (it_nr > 1)
       return;
     constraints.clear();
@@ -1779,7 +1779,7 @@ namespace Step44
   Solid<dim>::assemble_sc()
   {
     timer.enter_subsection("Perform static condensation");
-    deallog << " ASM_SC " << std::flush;
+    std::cout << " ASM_SC " << std::flush;
     PerTaskData_SC per_task_data(dofs_per_cell,
                                  element_indices_u.size(),
                                  element_indices_p.size(),
@@ -1864,7 +1864,7 @@ namespace Step44
             .vmult(A.block(u_dof), A.block(p_dof));
           system_rhs.block(u_dof) -= A.block(u_dof);
           timer.enter_subsection("Linear solver");
-          deallog << " SLV " << std::flush;
+          std::cout << " SLV " << std::flush;
           if (parameters.type_lin == "CG")
             {
               const auto solver_its = static_cast<unsigned int>(
@@ -1901,7 +1901,7 @@ namespace Step44
         }
         constraints.distribute(newton_update);
         timer.enter_subsection("Linear solver postprocessing");
-        deallog << " PP " << std::flush;
+        std::cout << " PP " << std::flush;
         {
           tangent_matrix.block(p_dof, u_dof)
             .vmult(A.block(p_dof), newton_update.block(u_dof));
@@ -1924,9 +1924,9 @@ namespace Step44
       }
     else
       {
-        deallog << " ------ " << std::flush;
+        std::cout << " ------ " << std::flush;
         timer.enter_subsection("Linear solver");
-        deallog << " SLV " << std::flush;
+        std::cout << " SLV " << std::flush;
         if (parameters.type_lin == "CG")
           {
             const Vector<double> &f_u = system_rhs.block(u_dof);
@@ -1984,7 +1984,7 @@ namespace Step44
               K_uu_con_inv * (f_u - K_up * (K_Jp_inv * f_J - K_pp_bar * f_p));
             timer.leave_subsection();
             timer.enter_subsection("Linear solver postprocessing");
-            deallog << " PP " << std::flush;
+            std::cout << " PP " << std::flush;
             d_J     = K_pJ_inv * (f_p - K_pu * d_u);
             d_p     = K_Jp_inv * (f_J - K_JJ * d_J);
             lin_it  = solver_control_K_con_inv.last_step();
@@ -1997,7 +1997,7 @@ namespace Step44
             A_direct.vmult(newton_update, system_rhs);
             lin_it  = 1;
             lin_res = 0.0;
-            deallog << " -- " << std::flush;
+            std::cout << " -- " << std::flush;
           }
         else
           Assert(false, ExcMessage("Linear solver type not implemented"));

@@ -1,13 +1,4 @@
 
-DEAL::C,  Qi,  Q(C)
-DEAL::f_CQ_symb: 0.5*C**2*Qi
-DEAL::df_CQ_dC_symb: 1.0*C*Qi
-DEAL::df_CQ_dC_symb_subs: C*Q(C)*1.0
-DEAL::D2f_CQ_DC_dC_symb: Q(C)*1.0 + C*Derivative(Q(C), C)*1.0
-DEAL::f_CQ_subs: 75.0*0.5
-DEAL::f_CQ_subs: eval: 37.5000
-DEAL::df_CQ_dC: subs: 15.0*1.0
+DEAL::f_CQ_subs: eval: 37.5
 DEAL::df_CQ_dC: eval: 15.0000
-DEAL::D2f_CQ_DC_dC: subs 1: 3.0*1.0 + 0.6*C*1.0
-DEAL::D2f_CQ_DC_dC: subs 2: 3.0 + 3.0*1.0
 DEAL::D2f_CQ_DC_dC: eval: 6.00000

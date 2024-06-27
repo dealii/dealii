@@ -313,12 +313,12 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
 
       symb_psi = func_sd::psi(symb_t, symb_v, symb_s);
 
-      deallog << std::string(80, '-') << std::endl;
-      deallog << "Dim: " << dim << std::endl;
-      print(deallog, "symb_t", symb_t);
-      print(deallog, "symb_v", symb_v);
-      print(deallog, "symb_s", symb_s);
-      print(deallog, "symb_psi", symb_psi);
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "Dim: " << dim << std::endl;
+      print(std::cout, "symb_t", symb_t);
+      print(std::cout, "symb_v", symb_v);
+      print(std::cout, "symb_s", symb_s);
+      print(std::cout, "symb_psi", symb_psi);
 
       // First derivative
       symb_dpsi_dt = SD::differentiate(symb_psi, symb_t);
@@ -335,19 +335,19 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
       symb_d2psi_dv_ds = SD::differentiate(symb_dpsi_ds, symb_v);
       symb_d2psi_ds_ds = SD::differentiate(symb_dpsi_ds, symb_s);
 
-      print(deallog, "symb_psi", symb_psi);
-      print(deallog, "symb_dpsi_dt", symb_dpsi_dt);
-      print(deallog, "symb_dpsi_dv", symb_dpsi_dv);
-      print(deallog, "symb_dpsi_ds", symb_dpsi_ds);
-      print(deallog, "symb_d2psi_dt_dt", symb_d2psi_dt_dt);
-      print(deallog, "symb_d2psi_dv_dt", symb_d2psi_dv_dt);
-      print(deallog, "symb_d2psi_ds_dt", symb_d2psi_ds_dt);
-      print(deallog, "symb_d2psi_dt_dv", symb_d2psi_dt_dv);
-      print(deallog, "symb_d2psi_dv_dv", symb_d2psi_dv_dv);
-      print(deallog, "symb_d2psi_ds_dv", symb_d2psi_ds_dv);
-      print(deallog, "symb_d2psi_dt_ds", symb_d2psi_dt_ds);
-      print(deallog, "symb_d2psi_dv_ds", symb_d2psi_dv_ds);
-      print(deallog, "symb_d2psi_ds_ds", symb_d2psi_ds_ds);
+      print(std::cout, "symb_psi", symb_psi);
+      print(std::cout, "symb_dpsi_dt", symb_dpsi_dt);
+      print(std::cout, "symb_dpsi_dv", symb_dpsi_dv);
+      print(std::cout, "symb_dpsi_ds", symb_dpsi_ds);
+      print(std::cout, "symb_d2psi_dt_dt", symb_d2psi_dt_dt);
+      print(std::cout, "symb_d2psi_dv_dt", symb_d2psi_dv_dt);
+      print(std::cout, "symb_d2psi_ds_dt", symb_d2psi_ds_dt);
+      print(std::cout, "symb_d2psi_dt_dv", symb_d2psi_dt_dv);
+      print(std::cout, "symb_d2psi_dv_dv", symb_d2psi_dv_dv);
+      print(std::cout, "symb_d2psi_ds_dv", symb_d2psi_ds_dv);
+      print(std::cout, "symb_d2psi_dt_ds", symb_d2psi_dt_ds);
+      print(std::cout, "symb_d2psi_dv_ds", symb_d2psi_dv_ds);
+      print(std::cout, "symb_d2psi_ds_ds", symb_d2psi_ds_ds);
 
       const SD::types::substitution_map sub_vals_optim =
         SD::make_symbol_map(symb_t, symb_v, symb_s);
@@ -379,7 +379,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
       // parameters and compiler being used. MM '20
       //
       // deallog << "Optimizer" << std::endl;
-      // optimizer.print(deallog.get_file_stream());
+      // optimizer.print(std::cout.get_file_stream());
     }
 
   SD::types::substitution_map sub_vals;

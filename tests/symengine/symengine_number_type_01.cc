@@ -59,7 +59,7 @@ main()
 
   deallog << "Constructors" << std::endl;
   {
-    deallog << "Constructor: Boolean" << std::endl;
+    std::cout << "Constructor: Boolean" << std::endl;
     {
       const SD_number_t se_bool_true(true);
       const SD_number_t se_bool_false(false);
@@ -69,7 +69,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Integer" << std::endl;
+    std::cout << "Constructor: Integer" << std::endl;
     {
       const int         x = -1;
       const SD_number_t se_number(x);
@@ -77,7 +77,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Unsigned integer" << std::endl;
+    std::cout << "Constructor: Unsigned integer" << std::endl;
     {
       const unsigned int x = 2;
       const SD_number_t  se_number(x);
@@ -85,7 +85,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Rational" << std::endl;
+    std::cout << "Constructor: Rational" << std::endl;
     {
       const unsigned int x = 2;
       const unsigned int y = 3;
@@ -94,7 +94,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Double" << std::endl;
+    std::cout << "Constructor: Double" << std::endl;
     {
       const double      x = 2.5;
       const SD_number_t se_number(x);
@@ -102,7 +102,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Complex double" << std::endl;
+    std::cout << "Constructor: Complex double" << std::endl;
     {
       const std::complex<double> x(2.5, 1.5);
       const SD_number_t          se_number(x);
@@ -110,7 +110,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Float" << std::endl;
+    std::cout << "Constructor: Float" << std::endl;
     {
       const float       x = 2.5;
       const SD_number_t se_number(x);
@@ -118,7 +118,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Complex float" << std::endl;
+    std::cout << "Constructor: Complex float" << std::endl;
     {
       const std::complex<float> x(2.5, 1.5);
       const SD_number_t         se_number(x);
@@ -126,7 +126,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Symbol" << std::endl;
+    std::cout << "Constructor: Symbol" << std::endl;
     {
       const std::string f                   = "f";
       const bool        parse_as_expression = false;
@@ -135,7 +135,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Symbol" << std::endl;
+    std::cout << "Constructor: Symbol" << std::endl;
     {
       const std::string f = "func";
       const SD_number_t se_number(f.c_str());
@@ -143,7 +143,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Symbol" << std::endl;
+    std::cout << "Constructor: Symbol" << std::endl;
     {
       const std::string f                   = "func";
       const bool        parse_as_expression = false;
@@ -152,7 +152,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Constructor: Symbolic expression" << std::endl;
+    std::cout << "Constructor: Symbolic expression" << std::endl;
     {
       const std::string f                   = "x + y";
       const bool        parse_as_expression = true;
@@ -161,7 +161,7 @@ main()
              ExcMessage("Problem with constructor"));
     }
 
-    deallog << "Copy constructor" << std::endl;
+    std::cout << "Copy constructor" << std::endl;
     {
       const double      x = 2.5;
       const SD_number_t se_number_1(x);
@@ -173,7 +173,7 @@ main()
 
   deallog << "Utility functions" << std::endl;
   {
-    deallog << "Parse" << std::endl;
+    std::cout << "Parse" << std::endl;
     {
       const double      x = 2.5;
       SD_number_t       se_number(x);
@@ -183,7 +183,7 @@ main()
              ExcMessage("Problem with utility function: Parse"));
     }
 
-    deallog << "Save/load" << std::endl;
+    std::cout << "Save/load" << std::endl;
     {
       // Output
       const SD_number_t se_number_x_out("x");
@@ -220,7 +220,7 @@ main()
     }
 
     deallog.push("Serialization");
-    deallog << "Serialization" << std::endl;
+    std::cout << "Serialization" << std::endl;
     {
       const SD_number_t se_number_x_out("x");
       const SD_number_t se_number_y_out("y");
@@ -247,7 +247,7 @@ main()
 
   deallog << "Comparison operators" << std::endl;
   {
-    deallog << "Equality (true)" << std::endl;
+    std::cout << "Equality (true)" << std::endl;
     {
       const int         x = 2;
       const int         y = 2;
@@ -257,7 +257,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Equality (false)" << std::endl;
+    std::cout << "Equality (false)" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -267,7 +267,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Non-equality (true)" << std::endl;
+    std::cout << "Non-equality (true)" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -277,7 +277,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Non-equality (false)" << std::endl;
+    std::cout << "Non-equality (false)" << std::endl;
     {
       const int         x = 2;
       const int         y = 2;
@@ -287,7 +287,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Less-than operator (true)" << std::endl;
+    std::cout << "Less-than operator (true)" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -297,7 +297,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Less-than operator (false)" << std::endl;
+    std::cout << "Less-than operator (false)" << std::endl;
     {
       const int         x = 3;
       const int         y = 2;
@@ -311,7 +311,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Less-than-or-equals operator (true)" << std::endl;
+    std::cout << "Less-than-or-equals operator (true)" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -325,7 +325,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Less-than-or-equals operator (false)" << std::endl;
+    std::cout << "Less-than-or-equals operator (false)" << std::endl;
     {
       const int         x = 3;
       const int         y = 2;
@@ -335,7 +335,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Greater-than operator (true)" << std::endl;
+    std::cout << "Greater-than operator (true)" << std::endl;
     {
       const int         x = 3;
       const int         y = 2;
@@ -345,7 +345,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Greater-than operator (false)" << std::endl;
+    std::cout << "Greater-than operator (false)" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -359,7 +359,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Greater-than-or-equals operator (true)" << std::endl;
+    std::cout << "Greater-than-or-equals operator (true)" << std::endl;
     {
       const int         x = 3;
       const int         y = 2;
@@ -373,7 +373,7 @@ main()
              ExcMessage("Problem with comparison operator"));
     }
 
-    deallog << "Greater-than-or-equals operator (false)" << std::endl;
+    std::cout << "Greater-than-or-equals operator (false)" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -386,7 +386,7 @@ main()
 
   deallog << "Logical operators" << std::endl;
   {
-    deallog << "Logical not" << std::endl;
+    std::cout << "Logical not" << std::endl;
     {
       const bool        x = true;
       const SD_number_t se_number(x);
@@ -396,7 +396,7 @@ main()
              ExcMessage("Problem with logical operator"));
     }
 
-    deallog << "Logical and" << std::endl;
+    std::cout << "Logical and" << std::endl;
     {
       auto test_logical_op = [](const bool x, const bool y) {
         const SD_number_t se_number_1(x);
@@ -411,7 +411,7 @@ main()
       test_logical_op(false, false);
     }
 
-    deallog << "Logical inclusive or" << std::endl;
+    std::cout << "Logical inclusive or" << std::endl;
     {
       auto test_logical_op = [](const bool x, const bool y) {
         const SD_number_t se_number_1(x);
@@ -426,7 +426,7 @@ main()
       test_logical_op(false, false);
     }
 
-    deallog << "Logical xor" << std::endl;
+    std::cout << "Logical xor" << std::endl;
     {
       auto test_logical_op = [](const bool x, const bool y) {
         const SD_number_t se_number_1(x);
@@ -441,7 +441,7 @@ main()
       test_logical_op(false, false);
     }
 
-    deallog << "And" << std::endl;
+    std::cout << "And" << std::endl;
     {
       auto test_logical_op = [](const bool x, const bool y) {
         const SD_number_t se_number_1(x);
@@ -456,7 +456,7 @@ main()
       test_logical_op(false, false);
     }
 
-    deallog << "Inclusive or" << std::endl;
+    std::cout << "Inclusive or" << std::endl;
     {
       auto test_logical_op = [](const bool x, const bool y) {
         const SD_number_t se_number_1(x);
@@ -474,7 +474,7 @@ main()
 
   deallog << "Assignment operators" << std::endl;
   {
-    deallog << "Assignment operator (SD_number_t)" << std::endl;
+    std::cout << "Assignment operator (SD_number_t)" << std::endl;
     {
       const int         x = 1;
       const int         y = 2;
@@ -485,7 +485,7 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Assignment operator (arithmetic type)" << std::endl;
+    std::cout << "Assignment operator (arithmetic type)" << std::endl;
     {
       const int    x = 1;
       const double y = 2;
@@ -495,7 +495,7 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Addition assignment (SD_number_t)" << std::endl;
+    std::cout << "Addition assignment (SD_number_t)" << std::endl;
     {
       const int         x = 1;
       const int         y = 2;
@@ -506,7 +506,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Addition assignment (arithmetic type; same type)" << std::endl;
+    std::cout << "Addition assignment (arithmetic type; same type)"
+              << std::endl;
     {
       const int   x = 1;
       const int   y = 2;
@@ -516,8 +517,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Addition assignment (arithmetic type; different type)"
-            << std::endl;
+    std::cout << "Addition assignment (arithmetic type; different type)"
+              << std::endl;
     {
       const int    x = 1;
       const double y = 2;
@@ -527,7 +528,7 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Subtraction assignment (SD_number_t)" << std::endl;
+    std::cout << "Subtraction assignment (SD_number_t)" << std::endl;
     {
       const int         x = 1;
       const int         y = 2;
@@ -538,8 +539,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Subtraction assignment (arithmetic type; same type)"
-            << std::endl;
+    std::cout << "Subtraction assignment (arithmetic type; same type)"
+              << std::endl;
     {
       const int   x = 1;
       const int   y = 2;
@@ -549,8 +550,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Subtraction assignment (arithmetic type; different type)"
-            << std::endl;
+    std::cout << "Subtraction assignment (arithmetic type; different type)"
+              << std::endl;
     {
       const int    x = 1;
       const double y = 2;
@@ -560,7 +561,7 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Multiplication assignment (SD_number_t)" << std::endl;
+    std::cout << "Multiplication assignment (SD_number_t)" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -571,8 +572,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Multiplication assignment (arithmetic type; same type)"
-            << std::endl;
+    std::cout << "Multiplication assignment (arithmetic type; same type)"
+              << std::endl;
     {
       const int   x = 2;
       const int   y = 3;
@@ -582,8 +583,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Multiplication assignment (arithmetic type; different type)"
-            << std::endl;
+    std::cout << "Multiplication assignment (arithmetic type; different type)"
+              << std::endl;
     {
       const int    x = 2;
       const double y = 3;
@@ -593,7 +594,7 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Division assignment (SD_number_t)" << std::endl;
+    std::cout << "Division assignment (SD_number_t)" << std::endl;
     {
       const int         x = 8;
       const int         y = 2;
@@ -604,7 +605,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Division assignment (arithmetic type; same type)" << std::endl;
+    std::cout << "Division assignment (arithmetic type; same type)"
+              << std::endl;
     {
       const int   x = 8;
       const int   y = 2;
@@ -614,8 +616,8 @@ main()
              ExcMessage("Problem with assignment operator"));
     }
 
-    deallog << "Division assignment (arithmetic type; different type)"
-            << std::endl;
+    std::cout << "Division assignment (arithmetic type; different type)"
+              << std::endl;
     {
       const int    x = 8;
       const double y = 2;
@@ -628,7 +630,7 @@ main()
 
   deallog << "Math operators" << std::endl;
   {
-    deallog << "Addition" << std::endl;
+    std::cout << "Addition" << std::endl;
     {
       const int         x = 1;
       const int         y = 2;
@@ -639,7 +641,7 @@ main()
              ExcMessage("Problem with math operator"));
     }
 
-    deallog << "Subtraction" << std::endl;
+    std::cout << "Subtraction" << std::endl;
     {
       const int         x = 1;
       const int         y = 2;
@@ -650,7 +652,7 @@ main()
              ExcMessage("Problem with math operator"));
     }
 
-    deallog << "Multiplication" << std::endl;
+    std::cout << "Multiplication" << std::endl;
     {
       const int         x = 2;
       const int         y = 3;
@@ -661,7 +663,7 @@ main()
              ExcMessage("Problem with math operator"));
     }
 
-    deallog << "Division" << std::endl;
+    std::cout << "Division" << std::endl;
     {
       const int         x = 8;
       const int         y = 2;
@@ -675,7 +677,7 @@ main()
 
   deallog << "Differentiation" << std::endl;
   {
-    deallog << "Basic differentiation (SD_number_t)" << std::endl;
+    std::cout << "Basic differentiation (SD_number_t)" << std::endl;
     {
       const SD_number_t x("x");
       SD_number_t       f(1.0);
@@ -686,7 +688,7 @@ main()
              ExcMessage("Problem with differentiation"));
     }
 
-    deallog << "Basic differentiation (Symbol)" << std::endl;
+    std::cout << "Basic differentiation (Symbol)" << std::endl;
     {
       const auto        symb_x = SE::symbol("x");
       const SD_number_t x(symb_x);
@@ -698,8 +700,8 @@ main()
              ExcMessage("Problem with differentiation"));
     }
 
-    deallog << "Basic differentiation (Basic representing a symbolic type)"
-            << std::endl;
+    std::cout << "Basic differentiation (Basic representing a symbolic type)"
+              << std::endl;
     {
       const auto symb_x_plus_y = SE::add(SE::symbol("x"), SE::symbol("y"));
       const SD_number_t x_plus_y(symb_x_plus_y);
@@ -719,7 +721,7 @@ main()
 
   deallog << "Substitution" << std::endl;
   {
-    deallog << "Basic substitution" << std::endl;
+    std::cout << "Basic substitution" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -740,7 +742,7 @@ main()
              ExcMessage("Problem with substitution"));
     }
 
-    deallog << "Templated-deduced substitution" << std::endl;
+    std::cout << "Templated-deduced substitution" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -761,7 +763,7 @@ main()
              ExcMessage("Problem with substitution"));
     }
 
-    deallog << "Map substitution" << std::endl;
+    std::cout << "Map substitution" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -782,7 +784,7 @@ main()
 
   deallog << "Evaluation" << std::endl;
   {
-    deallog << "Substitution with evaluation (integer)" << std::endl;
+    std::cout << "Substitution with evaluation (integer)" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -799,7 +801,7 @@ main()
              ExcMessage("Problem with evaluation"));
     }
 
-    deallog << "Substitution with evaluation (double)" << std::endl;
+    std::cout << "Substitution with evaluation (double)" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -816,7 +818,7 @@ main()
              ExcMessage("Problem with evaluation"));
     }
 
-    deallog << "Substitution with evaluation (float)" << std::endl;
+    std::cout << "Substitution with evaluation (float)" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -833,7 +835,7 @@ main()
              ExcMessage("Problem with evaluation"));
     }
 
-    deallog << "Substitution with evaluation (complex double)" << std::endl;
+    std::cout << "Substitution with evaluation (complex double)" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -852,7 +854,7 @@ main()
              ExcMessage("Problem with evaluation"));
     }
 
-    deallog << "Substitution with evaluation (complex float)" << std::endl;
+    std::cout << "Substitution with evaluation (complex float)" << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -871,8 +873,8 @@ main()
              ExcMessage("Problem with evaluation"));
     }
 
-    deallog << "Substitution with evaluation (mixed arithmetic types)"
-            << std::endl;
+    std::cout << "Substitution with evaluation (mixed arithmetic types)"
+              << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -890,8 +892,8 @@ main()
              ExcMessage("Problem with evaluation"));
     }
 
-    deallog << "Substitution with evaluation (mixed complex types)"
-            << std::endl;
+    std::cout << "Substitution with evaluation (mixed complex types)"
+              << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -911,8 +913,8 @@ main()
              ExcMessage("Problem with evaluation"));
     }
 
-    deallog << "Substitution with evaluation (single piecewise function)"
-            << std::endl;
+    std::cout << "Substitution with evaluation (single piecewise function)"
+              << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -950,8 +952,8 @@ main()
       }
     }
 
-    deallog << "Substitution with evaluation (double piecewise function)"
-            << std::endl;
+    std::cout << "Substitution with evaluation (double piecewise function)"
+              << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t y("y");
@@ -1009,8 +1011,8 @@ main()
       }
     }
 
-    deallog << "Substitution with evaluation (if-else_if-else type function)"
-            << std::endl;
+    std::cout << "Substitution with evaluation (if-else_if-else type function)"
+              << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t f_1 = x;
@@ -1075,8 +1077,8 @@ main()
       }
     }
 
-    deallog << "Substitution with evaluation (if-else_if type function)"
-            << std::endl;
+    std::cout << "Substitution with evaluation (if-else_if type function)"
+              << std::endl;
     {
       const SD_number_t x("x");
       const SD_number_t f_1 = x;

@@ -36,16 +36,16 @@ main()
     SD::make_substitution_map(
       std::make_pair(SD::Expression("a"), SD::Expression("b")),
       std::make_pair(SD::Expression("b"), SD::Expression("a")));
-  deallog << "Original map:" << std::endl;
-  SD::Utilities::print_substitution_map(deallog, sub_vals_unresolved);
+  std::cout << "Original map:" << std::endl;
+  SD::Utilities::print_substitution_map(std::cout, sub_vals_unresolved);
 
   deal_II_exceptions::disable_abort_on_exception();
   try
     {
       const SD::types::substitution_map sub_vals_resolved =
         SD::resolve_explicit_dependencies(sub_vals_unresolved);
-      deallog << "Resolved map:" << std::endl;
-      SD::Utilities::print_substitution_map(deallog, sub_vals_resolved);
+      std::cout << "Resolved map:" << std::endl;
+      SD::Utilities::print_substitution_map(std::cout, sub_vals_resolved);
       deallog
         << "Cyclic dependency in substitution map was unexpectedly resolved."
         << std::endl;

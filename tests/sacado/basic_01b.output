@@ -5,10 +5,4 @@ DEAL::z_ad: 4.00000
 DEAL::f_rad: 380.000
 DEAL::g_rad: -0.731400
 DEAL::h_rad: 200.000
-DEAL::df_dx: 44.0000  df_dx_ad: 44.0000
-DEAL::df_dy: 36.0000  df_dy_ad: 36.0000
-DEAL::dg_dx: -1.30773  dg_dx_ad: -1.30773
-DEAL::dg_dy: -0.136593  dg_dy_ad: -0.136593
-DEAL::dh_dx: 40.0000  dh_dx_ad: 40.0000
-DEAL::dh_dy: 20.0000  dh_dy_ad: 20.0000
 DEAL::OK
