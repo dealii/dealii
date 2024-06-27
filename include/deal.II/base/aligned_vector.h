@@ -256,6 +256,24 @@ public:
   insert_back(ForwardIterator begin, ForwardIterator end);
 
   /**
+   * Insert the range specified by @p begin and @p end after the element @p position.
+   *
+   * @note Unlike std::vector, this function uses random-access iterators so
+   * that the copy may be parallelized.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  template <
+    typename RandomAccessIterator,
+    typename = std::enable_if_t<std::is_convertible_v<
+      typename std::iterator_traits<RandomAccessIterator>::iterator_category,
+      std::random_access_iterator_tag>>>
+  iterator
+  insert(const_iterator       position,
+         RandomAccessIterator begin,
+         RandomAccessIterator end);
+
+  /**
    * Fills the vector with size() copies of a default constructed object.
    *
    * @note Unlike the other fill() function, this method can also be
@@ -1568,6 +1586,53 @@ AlignedVector<T>::insert_back(ForwardIterator begin, ForwardIterator end)
         new (used_elements_end) T;
       *used_elements_end = *begin;
     }
+}
+
+
+
+template <class T>
+template <typename RandomAccessIterator, typename>
+inline typename AlignedVector<T>::iterator
+AlignedVector<T>::insert(const_iterator       position,
+                         RandomAccessIterator begin,
+                         RandomAccessIterator end)
+{
+  Assert(replicated_across_communicator == false,
+         ExcAlignedVectorChangeAfterReplication());
+  Assert(this->begin() <= position && position <= this->end(),
+         ExcMessage("The position iterator is not valid."));
+  const auto offset = position - this->begin();
+
+  const size_type old_size   = size();
+  const size_type range_size = end - begin;
+  const size_type new_size   = old_size + range_size;
+  if (range_size != 0)
+    {
+      // This is similar to allocate_and_move(), except that we need to move
+      // whatever was before position and whatever is after it into two
+      // different places
+      T *new_data_ptr = nullptr;
+      Utilities::System::posix_memalign(
+        reinterpret_cast<void **>(&new_data_ptr), 64, new_size * sizeof(T));
+
+      // Correctly handle the case where the range is inside the present array
+      // by creating a temporary.
+      AlignedVector<T> temporary(begin, end);
+      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+        elements.get(), elements.get() + offset, new_data_ptr);
+      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+        temporary.begin(), temporary.end(), new_data_ptr + offset);
+      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+        elements.get() + offset,
+        elements.get() + old_size,
+        new_data_ptr + offset + range_size);
+
+      Deleter deleter(this);
+      elements          = decltype(elements)(new_data_ptr, std::move(deleter));
+      used_elements_end = elements.get() + new_size;
+      allocated_elements_end = elements.get() + new_size;
+    }
+  return this->begin() + offset;
 }
 
 
