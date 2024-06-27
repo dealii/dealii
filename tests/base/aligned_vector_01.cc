@@ -18,8 +18,9 @@
 
 #include <deal.II/base/aligned_vector.h>
 
-#include "../tests.h"
+#include <deque>
 
+#include "../tests.h"
 
 void
 test()
@@ -38,6 +39,28 @@ test()
   VEC b(a);
   b.push_back(27);
   a.insert_back(b.begin(), b.end());
+
+  // Check the range constructor with and without conversion.
+  {
+    VEC c(b.begin(), b.end());
+    AssertThrow(c == b, ExcInternalError());
+
+    std::vector<int> temp(b.begin(), b.end());
+    VEC              d(temp.begin(), temp.end());
+    AssertThrow(c == d, ExcInternalError());
+  }
+
+  // Check the range constructor with a random-access iterator which is not
+  // contiguous
+  {
+    // Use a large enough deque to guarantee that we have multiple blocks
+    std::deque<unsigned int> temp(8192);
+    std::iota(temp.begin(), temp.end(), 0u);
+
+    VEC e(temp.begin(), temp.end());
+    AssertThrow(std::equal(e.begin(), e.end(), temp.begin()),
+                ExcInternalError());
+  }
 
   deallog << "Insertion: ";
   for (unsigned int i = 0; i < a.size(); ++i)

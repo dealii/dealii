@@ -79,6 +79,21 @@ public:
   AlignedVector();
 
   /**
+   * Range constructor.
+   *
+   * @note Unlike std::vector, this constructor uses random-access iterators so
+   * that the copy may be parallelized.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  template <
+    typename RandomAccessIterator,
+    typename = std::enable_if_t<std::is_convertible_v<
+      typename std::iterator_traits<RandomAccessIterator>::iterator_category,
+      std::random_access_iterator_tag>>>
+  AlignedVector(RandomAccessIterator begin, RandomAccessIterator end);
+
+  /**
    * Set the vector size to the given size and initializes all elements with
    * T().
    *
@@ -1181,6 +1196,23 @@ inline AlignedVector<T>::AlignedVector()
 #  endif
 {}
 
+
+
+template <class T>
+template <typename RandomAccessIterator, typename>
+inline AlignedVector<T>::AlignedVector(RandomAccessIterator begin,
+                                       RandomAccessIterator end)
+  : elements(nullptr, Deleter(this))
+  , used_elements_end(nullptr)
+  , allocated_elements_end(nullptr)
+  , replicated_across_communicator(false)
+{
+  allocate_and_move(0u, end - begin, end - begin);
+  used_elements_end = allocated_elements_end;
+  dealii::internal::AlignedVectorCopyConstruct<RandomAccessIterator, T>(begin,
+                                                                        end,
+                                                                        data());
+}
 
 
 template <class T>
