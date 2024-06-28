@@ -31,8 +31,8 @@ namespace Functions
 {
   /**
    * Friendly interface to the FunctionParser class. This class is meant as a
-   * wrapper for the FunctionParser class. It is used in the step-34 tutorial
-   * program.
+   * wrapper for the FunctionParser class. It is used in the step-34 and step-86
+   * tutorial programs.
    *
    * It provides two methods to declare and parse a ParameterHandler object
    * and creates the Function object declared in the parameter file. This
