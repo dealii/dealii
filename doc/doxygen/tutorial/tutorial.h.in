@@ -672,6 +672,13 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-86</td>
+ *       <td> The heat equation, solved with an external time stepping
+ *       library
+ *       <br/> Keywords: PETScWrappers::TimeStepper
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-87</td>
  *       <td> Evaluation of finite element solutions at arbitrary points within a distributed
  *       mesh with application to two-phase flow.
@@ -810,7 +817,8 @@
  *       step-18,
  *       step-40,
  *       step-50,
- *       step-55
+ *       step-55,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -858,7 +866,8 @@
  *       step-67,
  *       step-69,
  *       step-70,
- *       step-75
+ *       step-75,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -880,7 +889,8 @@
  *       step-69,
  *       step-70,
  *       step-71,
- *       step-72
+ *       step-72,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -907,7 +917,8 @@
  *       step-14,
  *       step-39,
  *       step-50,
- *       step-74
+ *       step-74,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1058,6 +1069,8 @@
  *   </tr>
  *
  * </table>
+ *
+ *
  * <h4><b>Linear solvers</b></h4>
  * <table align="center" width="90%">
  *
@@ -1129,7 +1142,8 @@
  *       step-55,
  *       step-59,
  *       step-66,
- *       step-75
+ *       step-75,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1161,6 +1175,7 @@
  *     <td> Linear Newton systems from nonlinear equations
  *     </td>
  *     <td>
+ *       step-15,
  *       step-33,
  *       step-41,
  *       step-42,
@@ -1427,7 +1442,9 @@
  *   <tr valign="top">
  *     <td> The heat equation
  *     </td>
- *     <td>step-26
+ *     <td>
+ *       step-26,
+ *       step-86
  *     </td>
  *   </tr>
  *
