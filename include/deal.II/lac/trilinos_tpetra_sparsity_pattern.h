@@ -27,7 +27,7 @@
 #  include <deal.II/lac/sparsity_pattern_base.h>
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
-#  include <Tpetra_CrsGraph.hpp>
+#  include <Tpetra_FECrsGraph.hpp>
 
 #  include <cmath>
 #  include <memory>
@@ -291,11 +291,11 @@ namespace LinearAlgebra
 
     /**
      * This class implements a wrapper class to use the Trilinos distributed
-     * sparsity pattern class Tpetra::CrsGraph. This class is designed to be
-     * used for construction of %parallel Trilinos matrices. The functionality
-     * of this class is modeled after the existing sparsity pattern classes,
-     * with the difference that this class can work fully in %parallel according
-     * to a partitioning of the sparsity pattern rows.
+     * sparsity pattern class Tpetra::FECrsGraph. This class is designed to be
+     * used for construction of %parallel finite element Trilinos matrices. The
+     * functionality of this class is modeled after the existing sparsity
+     * pattern classes, with the difference that this class can work fully in
+     * %parallel according to a partitioning of the sparsity pattern rows.
      *
      * This class has many similarities to the  DynamicSparsityPattern, since it
      * can dynamically add elements to the pattern without any memory being
@@ -342,8 +342,8 @@ namespace LinearAlgebra
       /**
        * Typedef for Tpetra::Graph
        */
-      using GraphType =
-        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
+      using FEGraphType = Tpetra::
+        FECrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
 
 
       /**
@@ -851,10 +851,10 @@ namespace LinearAlgebra
       /** @{ */
 
       /**
-       * Return a Teuchos::RCP to the underlying Trilinos Tpetra::CrsGraph
+       * Return a Teuchos::RCP to the underlying Trilinos Tpetra::FECrsGraph
        * data that stores the sparsity pattern.
        */
-      Teuchos::RCP<GraphType>
+      Teuchos::RCP<FEGraphType>
       trilinos_sparsity_pattern() const;
 
       /**
@@ -1042,16 +1042,14 @@ namespace LinearAlgebra
        * A sparsity pattern object in Trilinos to be used for finite element
        * based problems which allows for adding non-local elements to the
        * pattern.
-       */
-      Teuchos::RCP<GraphType> graph;
-
-      /**
-       * A sparsity pattern object for the non-local part of the sparsity
+       * The Tpetra::FECrsGraph can also store the non-local part of the
+       sparsity
        * pattern that is going to be sent to the owning processor. Only used
        * when the particular constructor or reinit method with writable_rows
        * argument is set
+
        */
-      Teuchos::RCP<GraphType> nonlocal_graph;
+      Teuchos::RCP<FEGraphType> graph;
 
       // TODO: currently only for double
       friend class SparseMatrix<double, MemorySpace>;
@@ -1370,32 +1368,24 @@ namespace LinearAlgebra
       Teuchos::Array<TrilinosWrappers::types::int_type> array(
         col_index_ptr_begin, col_index_ptr_end);
 
-      if (row_is_stored_locally(row))
-        graph->insertGlobalIndices(trilinos_row_index, array());
-      else if (nonlocal_graph.get() != nullptr)
-        {
-          // this is the case when we have explicitly set the off-processor rows
-          // and want to create a separate matrix object for them (to retain
-          // thread-safety)
-          Assert(nonlocal_graph->getRowMap()->getLocalElement(row) !=
-                   Teuchos::OrdinalTraits<
-                     dealii::types::signed_global_dof_index>::invalid(),
-                 ExcMessage("Attempted to write into off-processor matrix row "
-                            "that has not be specified as being writable upon "
-                            "initialization"));
-          nonlocal_graph->insertGlobalIndices(trilinos_row_index, array);
-        }
-      else
-        graph->insertGlobalIndices(trilinos_row_index, array);
+      Assert(graph->getRowMap()->getLocalElement(row) !=
+               Teuchos::OrdinalTraits<
+                 dealii::types::signed_global_dof_index>::invalid(),
+             ExcMessage("Attempted to write into off-processor matrix row "
+                        "that has not be specified as being writable upon "
+                        "initialization"));
+
+      graph->insertGlobalIndices(trilinos_row_index, array());
+
     }
 
 
 
     template <typename MemorySpace>
     inline Teuchos::RCP<
-      Tpetra::CrsGraph<int,
-                       dealii::types::signed_global_dof_index,
-                       typename SparsityPattern<MemorySpace>::NodeType>>
+      Tpetra::FECrsGraph<int,
+                         dealii::types::signed_global_dof_index,
+                         typename SparsityPattern<MemorySpace>::NodeType>>
     SparsityPattern<MemorySpace>::trilinos_sparsity_pattern() const
     {
       return graph;
@@ -1420,7 +1410,7 @@ namespace LinearAlgebra
     }
 
 #  endif // DOXYGEN
-  }      // namespace TpetraWrappers
+  } // namespace TpetraWrappers
 
 } // namespace LinearAlgebra
 
