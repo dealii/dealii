@@ -70,8 +70,8 @@ element faces but also as non-matching coupling conditions.
 
 The discretized equations read
 @f[
-  \int_{\Omega} q_h\frac{\partial \, p_h}{\partial \, t} +\int_{\Omega} q_h \rho c^2 \nabla\cdot\mathbf{u}_h +\int_{\partial\Omega} q_h\mathbf{n}\cdot\rho c^2(\mathbf{u}^*_h-\mathbf{u}_h)=0,\\
-  \int_{\Omega} \mathbf{w}_h\cdot\frac{\partial \,\mathbf{u}_h}{\partial \, t} +\int_{\Omega} \mathbf{w}_h\cdot \frac{1}{\rho} \nabla p_h +\int_{\partial\Omega} \mathbf{w}_h \cdot\mathbf{n} \frac{1}{\rho}(p^*_h-p_h)=\mathbf{0},
+  \int_{K} q_h\frac{\partial \, p_h}{\partial \, t} +\int_{K} q_h \rho c^2 \nabla\cdot\mathbf{u}_h +\int_{\partial K} q_h\mathbf{n}\cdot\rho c^2(\mathbf{u}^*_h-\mathbf{u}_h)=0,\\
+  \int_{K} \mathbf{w}_h\cdot\frac{\partial \,\mathbf{u}_h}{\partial \, t} +\int_{K} \mathbf{w}_h\cdot \frac{1}{\rho} \nabla p_h +\int_{\partial K} \mathbf{w}_h \cdot\mathbf{n} \frac{1}{\rho}(p^*_h-p_h)=\mathbf{0},
 @f]
 where $\mathbf{w}_h$ and $q_h$ are test functions. The numerical fluxes are
 defined as follows @cite hochbruck2014efficient :
@@ -215,22 +215,34 @@ faces between two cells reads as follows (where
 `_m` corresponds to $K^{-}$, the current cell in *minus* normal
 direction, and `_p` corresponds to $K^{+}$, the neighbor cell in
 *plus* normal direction):
+
+In DG methods we have to evaluate fluxes over element faces.
+Exemplarily for an upwind like flux $u^*(\mathbf{x}) = u^+(\mathbf{x})$ over element face $\partial K$ we have to compute
+@f[
+  F^{\partial K} = \left(\varphi^-, u^+\right)_{\partial K} \approx \sum_q \varphi^-(\mathbf{x}_q^{\partial K})\ u^+(\mathbf{x}_q^{\partial K})\ w_q^{\partial K} |J_q|^{\partial K}.
+@f]
+`FEFaceEvaluation::gather_evaluate(src, EvaluationFlags::values)` and `FEFaceEvaluation::get_value(q)` extract
+the value at quadrature point $\mathbf{x}_q^{\partial K}$ from `src`. `FEFaceEvaluation::submit_value(value, q)`
+multiplies the value with the quadrature weight and the Jacobi determinant at $\mathbf{x}_q^{\partial K}$.
+Eventually `FEFaceEvaluation::integrate_scatter(EvaluationFlags::values, dst)` tests all submitted values by the
+basis function and writes the result to `dst`. The corresponding code reads
+
 @code
 const auto face_function =
-  [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+  [&](const MatrixFree &data, VectorType &dst, const VectorType &src, const std::pair<unsigned int, unsigned int> face_range) {
 
-    FEFaceEvaluation phi_m(data, true);    // this cell
-    FEFaceEvaluation phi_p(data, false);   // neighbor cell
+    FEFaceEvaluation phi_m(data, true);  // this cell
+    FEFaceEvaluation u_p(data, false);   // neighbor cell
 
     for (unsigned int f = face_range.first; f < face_range.second; ++f)
     {
       phi_m.reinit(f);
-      phi_p.reinit(f);
+      u_p.reinit(f);
 
-      phi_p.gather_evaluate(src, EvaluationFlags::values); // compute values on face f
+      u_p.gather_evaluate(src, EvaluationFlags::values);   //compute values on face f
 
       for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
-        phi_m.submit_value(phi_p.get_value(q), q);         // access values with phi_p
+        phi_m.submit_value(u_p.get_value(q), q);           //access values with u_p
 
       phi_m.integrate_scatter(EvaluationFlags::values, dst);
      }
@@ -242,7 +254,7 @@ matrix_free.template loop<VectorType, VectorType>(/* cell_operation= */{},
                                                   dst, src);
 @endcode
 
-The code to evaluate fluxes via FERemoteEvaluation is shown below.
+The code to do the same with FERemoteEvaluation is shown below.
 For brevity, we assume all boundary faces are somehow connected via non-conforming interfaces for FERemoteEvaluation.
 
 @code
@@ -251,29 +263,29 @@ For brevity, we assume all boundary faces are somehow connected via non-conformi
 // should be initialized only once to avoid frequent memory
 // allocation/deallocation. At this point, remote_communicator is assumed
 // to be initialized.
-FERemoteEvaluation<dim,Number> phi_p_evaluator(remote_communicator);
+FERemoteEvaluation<dim,Number> u_p_evaluator(remote_communicator);
 
 // Precompute the interpolated values of the finite element solution at all
 // the quadrature points outside the loop, invoking the vector entries and
 // respective basis function at possibly remote MPI processes before communication.
-phi_p_evaluator.gather_evaluate(src, EvaluationFlags::values);
+u_p_evaluator.gather_evaluate(src, EvaluationFlags::values);
 
 const auto boundary_function =
-  [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
+  [&](const MatrixFree &data, VectorType &dst, const VectorType &src, const std::pair<unsigned int, unsigned int> face_range) {
 
     FEFaceEvaluation phi_m(data, true);
     // To access the values in a thread safe way each thread has
     // to create a own accessor object. A small helper function
     // provides the accessor.
-    auto phi_p = phi_p_evaluator.get_data_accessor();
+    internal::PrecomputedEvaluationDataAccessor u_p = u_p_evaluator.get_data_accessor();
 
     for (unsigned int f = face_range.first; f < face_range.second; ++f)
     {
       phi_m.reinit(f);
-      phi_p.reinit(f);
+      u_p.reinit(f);
 
       for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
-        phi_m.submit_value(phi_p.get_value(q), q); // access values with phi_p
+        phi_m.submit_value(u_p.get_value(q), q); // access values with phi_p
 
       phi_m.integrate_scatter(EvaluationFlags::values, dst);
     }
