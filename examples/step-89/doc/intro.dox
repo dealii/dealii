@@ -217,15 +217,17 @@ direction, and `_p` corresponds to $K^{+}$, the neighbor cell in
 *plus* normal direction):
 
 In DG methods we have to evaluate fluxes over element faces.
-Exemplarily for an upwind like flux $u^*(\mathbf{x}) = u^+(\mathbf{x})$ over element face $\partial K$ we have to compute
+Exemplarily for an upwind-like flux $u^*(\mathbf{x}) = u^+(\mathbf{x})$
+over element face $\partial K$ we have to compute
 @f[
   F^{\partial K} = \left(\varphi^-, u^+\right)_{\partial K} \approx \sum_q \varphi^-(\mathbf{x}_q^{\partial K})\ u^+(\mathbf{x}_q^{\partial K})\ w_q^{\partial K} |J_q|^{\partial K}.
 @f]
 `FEFaceEvaluation::gather_evaluate(src, EvaluationFlags::values)` and `FEFaceEvaluation::get_value(q)` extract
 the value at quadrature point $\mathbf{x}_q^{\partial K}$ from `src`. `FEFaceEvaluation::submit_value(value, q)`
-multiplies the value with the quadrature weight and the Jacobi determinant at $\mathbf{x}_q^{\partial K}$.
-Eventually `FEFaceEvaluation::integrate_scatter(EvaluationFlags::values, dst)` tests all submitted values by the
-basis function and writes the result to `dst`. The corresponding code reads
+multiplies the value with the quadrature weight and the Jacobian determinant at $\mathbf{x}_q^{\partial K}$.
+Eventually `FEFaceEvaluation::integrate_scatter(EvaluationFlags::values, dst)` multiplies the values
+queued for evaluation by `FEFaceEvaluation::submit_value()` by the value of the
+basis functions and writes the result to `dst`. The corresponding code reads
 
 @code
 const auto face_function =
