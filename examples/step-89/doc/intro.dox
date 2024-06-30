@@ -1,18 +1,19 @@
 <br>
 
 <i>
-This program was contributed by Johannes Heinz, Maximilian Bergbauer, Marco Feder, and Peter Munch.
-Many ideas presented here are the result of common code development with
-Niklas Fehn, Luca Heltai, Martin Kronbichler,
-and Magdalena Schreter-Fleischhacker.
+This program was contributed by Johannes Heinz, Maximilian Bergbauer, Marco
+Feder, and Peter Munch. Many ideas presented here are the result of common code
+development with Niklas Fehn, Luca Heltai, Martin Kronbichler, and Magdalena
+Schreter-Fleischhacker.
 
 This tutorial is loosely based on the publication
-"High-order non-conforming discontinuous Galerkin methods for the acoustic conservation equations"
-by Johannes Heinz, Peter Munch, and Manfred Kaltenbacher @cite heinz2022high.
+"High-order non-conforming discontinuous Galerkin methods for the acoustic
+conservation equations" by Johannes Heinz, Peter Munch, and Manfred Kaltenbacher
+@cite heinz2022high.
 
-Johannes Heinz was supported by the European Union’s Framework Programme for Research
-and Innovation Horizon 2020 (2014-2020) under the Marie Skłodowská--Curie Grant
-Agreement No. [812719].
+Johannes Heinz was supported by the European Union’s Framework Programme for
+Research and Innovation Horizon 2020 (2014-2020) under the Marie Skłodowská--Curie
+Grant Agreement No. [812719].
 </i>
 
 @dealiiTutorialDOI{10.5281/zenodo.10033975,https://zenodo.org/badge/DOI/10.5281/zenodo.10033975.svg}
@@ -21,9 +22,10 @@ Agreement No. [812719].
 
 This tutorial presents one way how to apply non-matching and/or Chimera methods
 within matrix-free loops in deal.II.
-We are following @cite heinz2022high to show that in some cases a simple point-to-point
-interpolation is not sufficient. As a remedy, Nitsche-type mortaring is used to suppress
-artificial modes observed for the acoustic conservation equations @cite heinz2022high.
+We are following @cite heinz2022high to show that in some cases a simple
+point-to-point interpolation is not sufficient. As a remedy, Nitsche-type
+mortaring is used to suppress artificial modes observed for the acoustic
+conservation equations @cite heinz2022high.
 
 <h3>%Acoustic conservation equations</h3>
 
@@ -33,11 +35,11 @@ The set of equations consists of the conservation of mass and momentum
   \frac{\partial \, p}{\partial \, t} + \rho c^2 \nabla\cdot \mathbf{u} = 0,\\
   \frac{\partial \, \mathbf{u}}{\partial \, t} + \frac{1}{\rho}\nabla p = \mathbf{0}.
 @f]
-Here, $p$ is the acoustic pressure, $\mathbf{u}$ the acoustic particle velocity, $c$ the
-speed of sound, and $\rho$ the mean density of the fluid in which waves are propagating. As stated
-above, the two equations are simply a different way of writing the wave equation: If
-you take the time derivative of the first equation, and the divergence of the second,
-i.e., compute
+Here, $p$ is the acoustic pressure, $\mathbf{u}$ the acoustic particle velocity,
+$c$ the speed of sound, and $\rho$ the mean density of the fluid in which waves
+are propagating. As stated above, the two equations are simply a different way of
+writing the wave equation: If you take the time derivative of the first equation,
+and the divergence of the second, i.e., compute
 @f[
   \frac{\partial^2 \, p}{\partial \, t^2} + \rho c^2 \nabla\cdot \frac{\partial \mathbf{u}}{\partial t} = 0,\\
   \frac{\partial \, \nabla \cdot \mathbf{u}}{\partial \, t} + \nabla \cdot \frac{1}{\rho}\nabla p = \mathbf{0},
@@ -46,8 +48,8 @@ then you can substitute the second equation into the first one to obtain
 @f[
   \frac{\partial^2 \, p}{\partial \, t^2} - \rho c^2 \nabla \cdot \frac{1}{\rho}\nabla p = \mathbf{0},
 @f]
-which in the case of constant density $\rho$ results in the more familiar form of the wave
-equation that we have previously solved in step-23:
+which in the case of constant density $\rho$ results in the more familiar form
+of the wave equation that we have previously solved in step-23:
 @f[
   \frac{\partial^2 \, p}{\partial \, t^2} - c^2 \Delta p = \mathbf{0}.
 @f]
@@ -57,15 +59,16 @@ used in step-23) is that it has the form of a
 [hyperbolic conservation law](https://en.wikipedia.org/wiki/Hyperbolic_partial_differential_equation#Hyperbolic_system_and_conservation_laws)
 in which only first temporal and spatial derivatives
 appear. Whereas both the more familiar, second order form of the wave equation
-and the formulation as a first-order system conserve energy, it is often easier to
-devise numerical schemes that have the right amount of dissipation (necessary
-for numerical stability) using the well-developed machinery available for first-order
-systems.
+and the formulation as a first-order system conserve energy, it is often easier
+to devise numerical schemes that have the right amount of dissipation (necessary
+for numerical stability) using the well-developed machinery available for
+first-order systems.
 
-For the discretization of this form, we make use of discontinuous Galerkin (DG) methods. DG methods are
-especially attractive for the acoustic conservation equations due to their low numerical
-dispersion errors. More importantly for this tutorial, DG methods natively extend to non-matching
-Nitsche-type methods @cite arnold2002unified. I.e., numerical fluxes are not only used on interior
+For the discretization of this form, we make use of discontinuous Galerkin (DG)
+methods. DG methods are especially attractive for the acoustic conservation
+equations due to their low numerical dispersion errors. More importantly for this
+tutorial, DG methods natively extend to non-matching Nitsche-type methods
+@cite arnold2002unified. I.e., numerical fluxes are not only used on interior
 element faces but also as non-matching coupling conditions.
 
 The discretized equations read
@@ -95,55 +98,61 @@ The expression $\average{a}=\frac{a^- + a^+}{2}$ denotes the averaging operator.
 
 <h3>%Non-matching discretizations</h3>
 
-Non-matching discretizations can be used to connect mesh regions with different element sizes
-without the need for a transition region. Therefore, they are highly desirable in multiphysics
-applications. One example is a plate that radiates sound. The plate needs a much finer
-discretization than the surrounding air because -- due to the vastly different speeds
-of sound in the two media -- the wavelengths of sound of the same frequently is very different
-in the two media, and the mesh size needs to be proportional to the wavelength. We will simulate this example later on.
+Non-matching discretizations can be used to connect mesh regions with different
+element sizes without the need for a transition region. Therefore, they are
+highly desirable in multiphysics applications. One example is a plate that
+radiates sound. The plate needs a much finer discretization than the surrounding
+air because -- due to the vastly different speeds of sound in the two media --
+the wavelengths of sound of the same frequently is very different in the two
+media, and the mesh size needs to be proportional to the wavelength. We will
+simulate this example later on.
 
-A different example of the usefulness of non-matching grids is where one wants to move the mesh
-in parts of the domain, but not others. A typical example is the simulation of windmills:
-One might want to enclose the rotating wings into a co-rotating mesh (to avoid having to
-remesh with every time step) but of course the mesh that describes the air above the
-surrounding landscape and around the tower on which the windmill is located should not
-rotate. In a case like this, one considers
-sliding rotating interfaces @cite duerrwaechter2021an between the co-rotating part of the
-mesh and the stationary part of the mesh, but this also requires the ability to
-handle non-matching discretizations.
+A different example of the usefulness of non-matching grids is where one wants
+to move the mesh in parts of the domain, but not others. A typical example is
+the simulation of windmills: One might want to enclose the rotating wings into a
+co-rotating mesh (to avoid having to remesh with every time step) but of course
+the mesh that describes the air above the surrounding landscape and around the
+tower on which the windmill is located should not rotate. In a case like this,
+one considers sliding rotating interfaces @cite duerrwaechter2021an between the
+co-rotating part of the mesh and the stationary part of the mesh, but this also
+requires the ability to handle non-matching discretizations.
 
-Besides this, non-matching methods can be extended to Chimera methods where elements overlap.
-Chimera methods can help reduce the pressure on mesh generation tools since different regions
-of a mesh (that may overlap) can be meshed independently.
+Besides this, non-matching methods can be extended to Chimera methods where
+elements overlap. Chimera methods can help reduce the pressure on mesh
+generation tools since different regions of a mesh (that may overlap) can be
+meshed independently.
 
-Different methods exist to treat non-matching interfaces. Within this tutorial, we concentrate on
-two methods: Point-to-point interpolation and Nitsche-type mortaring.
+Different methods exist to treat non-matching interfaces. Within this tutorial,
+we concentrate on two methods: Point-to-point interpolation and Nitsche-type
+mortaring.
 
 
 <h4>%Point-to-point interpolation</h4>
 
 @image html https://www.dealii.org/images/steps/developer/step_89_intro_point_to_point.svg "" width=25%
 
-Point-to-point interpolation is a naive approach. Whenever you need to compute integrals over the boundary
-of the cell at the left, for a coupled problem you then need to evaluate the solution or
-shape functions on the right at quadrature points of the face on the left, i.e., of the face of
-element $K^-$. You can just evaluate these be interpolating the information on the right
-at these points, but this is in general expensive (read, for example, the documentation of
-VectorTools::point_value(), which implements this kind of functionality). As can be seen
-from the picture this approach might be subject to aliasing
-in some cases.
+Point-to-point interpolation is a naive approach. Whenever you need to compute
+integrals over the boundary of the cell at the left, for a coupled problem you
+then need to evaluate the solution or shape functions on the right at quadrature
+points of the face on the left, i.e., of the face of element $K^-$. You can just
+evaluate these be interpolating the information on the right at these points,
+but this is in general expensive (read, for example, the documentation of
+`VectorTools::point_value()`, which implements this kind of functionality). As
+can be seen from the picture this approach might be subject to aliasing in some
+cases.
 
 
 <h4>%Nitsche-type mortaring</h4>
 
 @image html https://www.dealii.org/images/steps/developer/step_89_intro_mortaring.svg "" width=25%
 
-Mortaring is the process of computing intersections and is not related to the Mortar method which
-enforces the coupling via Lagrange multipliers. Instead, in mortaring methods one refers to obtained
-intersections as
-"mortars". On each mortar a new integration rule is defined. The integral of the face of element
-$K^-$ is computed on the intersections. The idea is that if we want to integrate something
-over a face $f\subset \partial K^-$, that we break that integral into pieces:
+Mortaring is the process of computing intersections and is not related to the
+Mortar method which enforces the coupling via Lagrange multipliers. Instead, in
+mortaring methods one refers to obtained intersections as "mortars". On each
+mortar a new integration rule is defined. The integral of the face of element
+$K^-$ is computed on the intersections. The idea is that if we want to integrate
+something over a face $f\subset \partial K^-$, that we break that integral into
+pieces:
 @f[
   \int_f \cdots dx = \sum_i \int_{f_i} \cdots dx
 @f]
@@ -156,28 +165,30 @@ The point of this approach is first, that splitting the integral this way is
 exact. Secondly, and maybe more importantly, the terms we are integrating
 (the dots in the formula above) are now defined on one cell on each side, and
 consequently are smooth (whereas a finite element solution considered across
-multiple cells is, in general, *not* smooth). As a consequence, if we approximate
-the integrals via numerical integration (quadrature), then the
+multiple cells is, in general, *not* smooth). As a consequence, if we
+approximate the integrals via numerical integration (quadrature), then the
 result is exact as long as a sufficient number of integration points is used
 (at least for affine element shapes; for general curved elements, the integrand
 will contain rational expressions that are difficult to integrate exactly).
 
 In this tutorial, the intersections are computed using
-[CGAL, the Computational Geometry Algorithms Library](https://www.cgal.org/). Therefore, `deal.II` has
-to be configured with `DEAL_II_WITH_CGAL` for the Nitsche-type mortaring implementation. See the deal.II
-[Readme file](https://dealii.org/current/readme.html) for information about installation.
+[CGAL, the Computational Geometry Algorithms Library](https://www.cgal.org/).
+Therefore, `deal.II` has to be configured with `DEAL_II_WITH_CGAL` for the
+Nitsche-type mortaring implementation. See the `deal.II`
+[Readme file](https://dealii.org/current/readme.html) for information about
+installation.
 
 
 <h3>%FERemoteEvaluation</h3>
 
-In practice, for integrals as those mentioned above, we need to evaluate solutions
-(and shape functions) from cells across the non-matching interface. This is awkward
-enough if the other side is on the same processor, but outright difficult if the
-cells on the other side of the interface are owned by a different process in a parallel
-computation.
+In practice, for integrals as those mentioned above, we need to evaluate
+solutions (and shape functions) from cells across the non-matching interface.
+This is awkward enough if the other side is on the same processor, but outright
+difficult if the cells on the other side of the interface are owned by a
+different process in a parallel computation.
 
-On regular meshes (say, doing things as we do in step-40), this is addressed by making
-sure that we are only computing integrals on
+On regular meshes (say, doing things as we do in step-40), this is addressed by
+making sure that we are only computing integrals on
 @ref GlossLocallyOwnedCell "locally owned cells" and keeping around one layer of
 @ref GlossGhostCell "ghost cells" for which we can query information.
 Ghost cells are the neighbors of locally owned cells, but in cases like
@@ -187,47 +198,53 @@ they happen to be geometrically located adjacently. As a consequence,
 we need to find a way to efficiently query information on cells that
 are perhaps located on a different process.
 
-FERemoteEvaluation is a wrapper class which provides a similar interface to, e.g., the
-FEEvaluation and FEFaceEvaluation classes to
-access values over non-matching interfaces in matrix-free loops. A detailed description on how to set up
-the class and how to use it in actual code is given below using hands-on examples. Within this tutorial we only
-show the usage for non-matching discretizations. Note however, that FERemoteEvaluation can also be used in
-other settings such as volume coupling. Under the hood, Utilities::MPI::RemotePointEvaluation is used to query
-the solution or gradients at quadrature points. A detailed description how this is done can be found in step-87.
-The main difference in the usage of FERemoteEvaluation compared to FEEvaluation is that the interpolated
-values/gradients of the finite element solution at all the quadrature points are precomputed globally <i>before</i>
-the loop over the cells/faces of the mesh (i.e., near the place where the communication takes place)
-instead of performing the interpolation on a cell-by-cell basis. (The principal reason for this
-design is that MPI has a communication model where you can send messages, but you won't
-hear back unless the other side is actually listening. As a consequence, you can't generally
-write code where each process is doing its thing until it needs some information at
-which point it sends a message to another process to ask for something; because
-the other process doesn't know that there are such messages, or how many, that
-have been sent to it, it doesn't respond and so the first process is stuck. Instead,
-the programming model used with MPI is generally to collect information about everything
-one will need up front; then each process sends it to all the others; then each process
-works on these combined requests and sends the required information back to the
-senders; and at this point everyone has everything they need for their work and can
-actually do that work.)
+`FERemoteEvaluation` is a wrapper class which provides a similar interface to,
+e.g., the `FEEvaluation` and `FEFaceEvaluation` classes to access values over
+non-matching interfaces in matrix-free loops. A detailed description on how to
+set up the class and how to use it in actual code is given below using hands-on
+examples. Within this tutorial we only show the usage for non-matching
+discretizations. Note however, that `FERemoteEvaluation` can also be used in
+other settings such as volume coupling. Under the hood,
+`Utilities::MPI::RemotePointEvaluation` is used to query the solution or
+gradients at quadrature points. A detailed description how this is done can be
+found in step-87. The main difference in the usage of `FERemoteEvaluation`
+compared to `FEEvaluation` is that the interpolated values/gradients of the
+finite element solution at all the quadrature points are precomputed globally
+<i>before</i> the loop over the cells/faces of the mesh (i.e., near the place
+where the communication takes place) instead of performing the interpolation on
+a cell-by-cell basis. (The principal reason for this design is that MPI has a
+communication model where you can send messages, but you won't hear back unless
+the other side is actually listening. As a consequence, you can't generally
+write code where each process is doing its thing until it needs some information
+at which point it sends a message to another process to ask for something;
+because the other process doesn't know that there are such messages, or how many,
+that have been sent to it, it doesn't respond and so the first process is stuck.
+Instead, the programming model used with MPI is generally to collect information
+about everything one will need up front; then each process sends it to all the
+others; then each process works on these combined requests and sends the
+required information back to the senders; and at this point everyone has
+everything they need for their work and can actually do that work.)
 
-The standard code to evaluate fluxes via FEEvaluation on interior
-faces between two cells reads as follows (where
-`_m` corresponds to $K^{-}$, the current cell in *minus* normal
-direction, and `_p` corresponds to $K^{+}$, the neighbor cell in
-*plus* normal direction):
+The standard code to evaluate fluxes via FEEvaluation on interior faces between
+two cells reads as follows (where `_m` corresponds to $K^{-}$, the current cell
+in *minus* normal direction, and `_p` corresponds to $K^{+}$, the neighbor cell
+in *plus* normal direction):
 
-In DG methods we have to evaluate fluxes over element faces.
-Exemplarily for an upwind-like flux $u^*(\mathbf{x}) = u^+(\mathbf{x})$
-over element face $\partial K$ we have to compute
+In DG methods we have to evaluate fluxes over element faces. Exemplarily for an
+upwind-like flux $u^*(\mathbf{x}) = u^+(\mathbf{x})$ over element face
+$\partial K$ we have to compute
 @f[
   F^{\partial K} = \left(\varphi^-, u^+\right)_{\partial K} \approx \sum_q \varphi^-(\mathbf{x}_q^{\partial K})\ u^+(\mathbf{x}_q^{\partial K})\ w_q^{\partial K} |J_q|^{\partial K}.
 @f]
-`FEFaceEvaluation::gather_evaluate(src, EvaluationFlags::values)` and `FEFaceEvaluation::get_value(q)` extract
-the value at quadrature point $\mathbf{x}_q^{\partial K}$ from `src`. `FEFaceEvaluation::submit_value(value, q)`
-multiplies the value with the quadrature weight and the Jacobian determinant at $\mathbf{x}_q^{\partial K}$.
-Eventually `FEFaceEvaluation::integrate_scatter(EvaluationFlags::values, dst)` multiplies the values
-queued for evaluation by `FEFaceEvaluation::submit_value()` by the value of the
-basis functions and writes the result to `dst`. The corresponding code reads
+`FEFaceEvaluation::gather_evaluate(src, EvaluationFlags::values)` and
+`FEFaceEvaluation::get_value(q)` extract the value at quadrature point
+$\mathbf{x}_q^{\partial K}$ from `src`.
+`FEFaceEvaluation::submit_value(value, q)` multiplies the value with the
+quadrature weight and the Jacobian determinant at $\mathbf{x}_q^{\partial K}$.
+Eventually `FEFaceEvaluation::integrate_scatter(EvaluationFlags::values, dst)`
+multiplies the values queued for evaluation by `FEFaceEvaluation::submit_value()`
+by the value of the basis functions and writes the result to `dst`.
+The corresponding code reads
 
 @code
 const auto face_function =
@@ -257,7 +274,8 @@ matrix_free.template loop<VectorType, VectorType>(/* cell_operation= */{},
 @endcode
 
 The code to do the same with FERemoteEvaluation is shown below.
-For brevity, we assume all boundary faces are somehow connected via non-conforming interfaces for FERemoteEvaluation.
+For brevity, we assume all boundary faces are somehow connected via
+non-conforming interfaces for FERemoteEvaluation.
 
 @code
 // Initialize FERemoteEvaluation: Note, that FERemoteEvaluation internally manages
@@ -295,46 +313,52 @@ const auto boundary_function =
 
 matrix_free.template loop<VectorType, VectorType>({}, {}, boundary_function, dst, src);
 @endcode
-The object @c remote_communicator is of type FERemoteEvaluationCommunicator and assumed
-to be correctly initialized prior to the above code snippet.
-FERemoteEvaluationCommunicator internally manages the update of ghost values over non-matching interfaces and keeps track of the
-mapping between quadrature point index and corresponding values/gradients. As mentioned above,
-the update of the values/gradients happens
-<i>before</i> the actual matrix-free loop. FERemoteEvaluationCommunicator, as well as FERemoteEvaluation, behaves differently for
-the given template parameter @c value_type. If we want to access values at arbitrary points (e.g. in combination with
-@c FEPointEvaluation), then we need to choose @c value_type=Number. If the values are defined at quadrature points of a @c FEEvaluation object
-it is possible to get the values at the quadrature points of <i>batches</i> and
-we need to choose @c value_type=VectorizedArray<Number>.
+The object @c remote_communicator is of type `FERemoteEvaluationCommunicator`
+and assumed to be correctly initialized prior to the above code snippet.
+`FERemoteEvaluationCommunicator` internally manages the update of ghost values
+over non-matching interfaces and keeps track of the mapping between quadrature
+point index and corresponding values/gradients. As mentioned above, the update
+of the values/gradients happens <i>before</i> the actual matrix-free loop.
+`FERemoteEvaluationCommunicator`, as well as `FERemoteEvaluation`, behaves
+differently for the given template parameter @c value_type. If we want to access
+values at arbitrary points (e.g. in combination with @c FEPointEvaluation), then
+we need to choose @c value_type=Number. If the values are defined at quadrature
+points of a @c FEEvaluation object it is possible to get the values at the
+quadrature points of <i>batches</i> and we need to choose
+@c value_type=VectorizedArray<Number>.
 
 
 <h3>Overview of the test case</h3>
 
-In this program, we implemented both the point-to-point interpolation and Nitsche-type mortaring
-mentioned in the introduction.
+In this program, we implemented both the point-to-point interpolation and
+Nitsche-type mortaring mentioned in the introduction.
 
-At first we are considering the test case of a vibrating membrane, see e.g. @cite nguyen2011high.
-Standing waves of length $\lambda=2/M$ are oscillating with a time period of
-$T=2 / (M \sqrt{d} c)$ where $d$ is the dimension of the space in which our domain is
-located and $M$ is the number of modes per meter, i.e. the number of half-waves
-per meter. The corresponding analytical solution reads as
+At first we are considering the test case of a vibrating membrane, see e.g.
+@cite nguyen2011high. Standing waves of length $\lambda=2/M$ are oscillating
+with a time period of $T=2 / (M \sqrt{d} c)$ where $d$ is the dimension of the
+space in which our domain is located and $M$ is the number of modes per meter,
+i.e. the number of half-waves per meter. The corresponding analytical solution
+reads as
 
 @f{align*}{
   p &=\cos(M \sqrt{d} \pi c t)\prod_{i=1}^{d} \sin(M \pi x_i),\\
   u_i&=-\frac{\sin(M \sqrt{d} \pi c t)}{\sqrt{d}\rho c} \cos(M \pi x_i)\prod_{j=1,j\neq i}^{d} \sin(M \pi x_j),
 @f}
 
-For simplicity, we are using homogeneous pressure Dirichlet boundary conditions within this tutorial.
-To be able to do so we have to tailor the domain size as well as the number of modes to conform with
-the homogeneous pressure Dirichlet boundary conditions. Within this tutorial we are using $M=10$ and
-a domain $\Omega=(0,1)^2$. The domain will be meshed so that the left and right parts of the domain
-consist of separate meshes that do not match at the interface.
+For simplicity, we are using homogeneous pressure Dirichlet boundary conditions
+within this tutorial. To be able to do so we have to tailor the domain size as
+well as the number of modes to conform with the homogeneous pressure Dirichlet
+boundary conditions. Within this tutorial we are using $M=10$ and a domain
+$\Omega=(0,1)^2$. The domain will be meshed so that the left and right parts of
+the domain consist of separate meshes that do not match at the interface.
 
-As will become clear from the results,
-the point-to-point interpolation will result in aliasing, which can be resolved using Nitsche-type mortaring.
+As will become clear from the results, the point-to-point interpolation will
+result in aliasing, which can be resolved using Nitsche-type mortaring.
 
-In a more realistic second example, we apply this implementation to a test case in which a wave
-is propagating from one fluid into another fluid. The speed of sound in the left part of the domain
-is $c=1$ and in the right part it is $c=3$. Since the wavelength is directly proportional
-to the speed of sound, three times larger elements can be used in the right part of the domain to resolve waves
-up to the same frequency. A test case like this has been simulated with a different domain and different initial
-conditions, e.g., in @cite bangerth2010adaptive.
+In a more realistic second example, we apply this implementation to a test case
+in which a wave is propagating from one fluid into another fluid. The speed of
+sound in the left part of the domain is $c=1$ and in the right part it is $c=3$.
+Since the wavelength is directly proportional to the speed of sound, three times
+larger elements can be used in the right part of the domain to resolve waves up
+to the same frequency. A test case like this has been simulated with a different
+domain and different initial conditions, e.g., in @cite bangerth2010adaptive.
