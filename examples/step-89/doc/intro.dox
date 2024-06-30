@@ -41,12 +41,15 @@ are propagating. As stated above, the two equations are simply a different way o
 writing the wave equation: If you take the time derivative of the first equation,
 and the divergence of the second, i.e., compute
 @f[
-  \frac{\partial^2 \, p}{\partial \, t^2} + \rho c^2 \nabla\cdot \frac{\partial \mathbf{u}}{\partial t} = 0,\\
-  \frac{\partial \, \nabla \cdot \mathbf{u}}{\partial \, t} + \nabla \cdot \frac{1}{\rho}\nabla p = \mathbf{0},
+  \frac{\partial^2 \, p}{\partial \, t^2} + \rho c^2 \nabla\cdot
+     \frac{\partial \mathbf{u}}{\partial t} = 0,\\
+  \frac{\partial \, \nabla \cdot \mathbf{u}}{\partial \, t} +
+     \nabla \cdot \frac{1}{\rho}\nabla p = \mathbf{0},
 @f]
 then you can substitute the second equation into the first one to obtain
 @f[
-  \frac{\partial^2 \, p}{\partial \, t^2} - \rho c^2 \nabla \cdot \frac{1}{\rho}\nabla p = \mathbf{0},
+  \frac{\partial^2 \, p}{\partial \, t^2} - \rho c^2 \nabla \cdot
+     \frac{1}{\rho}\nabla p = \mathbf{0},
 @f]
 which in the case of constant density $\rho$ results in the more familiar form
 of the wave equation that we have previously solved in step-23:
@@ -73,14 +76,22 @@ element faces but also as non-matching coupling conditions.
 
 The discretized equations read
 @f[
-  \int_{K} q_h\frac{\partial \, p_h}{\partial \, t} +\int_{K} q_h \rho c^2 \nabla\cdot\mathbf{u}_h +\int_{\partial K} q_h\mathbf{n}\cdot\rho c^2(\mathbf{u}^*_h-\mathbf{u}_h)=0,\\
-  \int_{K} \mathbf{w}_h\cdot\frac{\partial \,\mathbf{u}_h}{\partial \, t} +\int_{K} \mathbf{w}_h\cdot \frac{1}{\rho} \nabla p_h +\int_{\partial K} \mathbf{w}_h \cdot\mathbf{n} \frac{1}{\rho}(p^*_h-p_h)=\mathbf{0},
+  \int_{K} q_h\frac{\partial \, p_h}{\partial \, t} +
+     \int_{K} q_h \rho c^2 \nabla \cdot\mathbf{u}_h +
+        \int_{\partial K} q_h\mathbf{n}\cdot\rho c^2 (\mathbf{u}^*_h-\mathbf{u}_h)
+           = 0,\\
+  \int_{K} \mathbf{w}_h\cdot\frac{\partial \,\mathbf{u}_h}{\partial \, t} +
+     \int_{K} \mathbf{w}_h\cdot \frac{1}{\rho} \nabla p_h +
+        \int_{\partial K} \mathbf{w}_h \cdot\mathbf{n} \frac{1}{\rho}(p^*_h-p_h)
+           = \mathbf{0},
 @f]
 where $\mathbf{w}_h$ and $q_h$ are test functions. The numerical fluxes are
 defined as follows @cite hochbruck2014efficient :
 @f[
-  p_h^*=p_h-\frac{\tau^-}{\tau^-+\tau^+}[p_h]+\frac{\tau^-\tau^+}{\tau^-+\tau^+}\jump{\mathbf{u}_h},\\
-  \mathbf{u}_h^*=\mathbf{u}_h-\frac{\gamma^-}{\gamma^-+\gamma^+}[\mathbf{u}_h]+\frac{\gamma^-\gamma^+}{\gamma^-+\gamma^+}\jump{p_h},
+  p_h^*=p_h-\frac{\tau^-}{\tau^-+\tau^+}[p_h] +
+     \frac{\tau^-\tau^+}{\tau^-+\tau^+}\jump{\mathbf{u}_h},\\
+  \mathbf{u}_h^*=\mathbf{u}_h-\frac{\gamma^-}{\gamma^-+\gamma^+}[\mathbf{u}_h]
+     +\frac{\gamma^-\gamma^+}{\gamma^-+\gamma^+}\jump{p_h},
 @f]
 with the penalty parameters $\tau=\frac{\rho c}{2}$ and $\gamma=\frac{1}{2\rho c}$.
 In these formulas,
@@ -234,7 +245,9 @@ In DG methods we have to evaluate fluxes over element faces. Exemplarily for an
 upwind-like flux $u^*(\mathbf{x}) = u^+(\mathbf{x})$ over element face
 $\partial K$ we have to compute
 @f[
-  F^{\partial K} = \left(\varphi^-, u^+\right)_{\partial K} \approx \sum_q \varphi^-(\mathbf{x}_q^{\partial K})\ u^+(\mathbf{x}_q^{\partial K})\ w_q^{\partial K} |J_q|^{\partial K}.
+  F^{\partial K} = \left(\varphi^-, u^+\right)_{\partial K} \approx
+     \sum_q \varphi^-(\mathbf{x}_q^{\partial K})\ u^+(\mathbf{x}_q^{\partial K})\
+        w_q^{\partial K} |J_q|^{\partial K}.
 @f]
 `FEFaceEvaluation::gather_evaluate(src, EvaluationFlags::values)` and
 `FEFaceEvaluation::get_value(q)` extract the value at quadrature point
@@ -248,7 +261,8 @@ The corresponding code reads
 
 @code
 const auto face_function =
-  [&](const MatrixFree &data, VectorType &dst, const VectorType &src, const std::pair<unsigned int, unsigned int> face_range) {
+  [&](const MatrixFree &data, VectorType &dst, const VectorType &src,
+      const std::pair<unsigned int, unsigned int> face_range) {
 
     FEFaceEvaluation phi_m(data, true);  // this cell
     FEFaceEvaluation u_p(data, false);   // neighbor cell
@@ -258,10 +272,10 @@ const auto face_function =
       phi_m.reinit(f);
       u_p.reinit(f);
 
-      u_p.gather_evaluate(src, EvaluationFlags::values);   //compute values on face f
+      u_p.gather_evaluate(src, EvaluationFlags::values); //compute values on face f
 
       for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
-        phi_m.submit_value(u_p.get_value(q), q);           //access values with u_p
+        phi_m.submit_value(u_p.get_value(q), q);         //access values with u_p
 
       phi_m.integrate_scatter(EvaluationFlags::values, dst);
      }
@@ -291,7 +305,8 @@ FERemoteEvaluation<dim,Number> u_p_evaluator(remote_communicator);
 u_p_evaluator.gather_evaluate(src, EvaluationFlags::values);
 
 const auto boundary_function =
-  [&](const MatrixFree &data, VectorType &dst, const VectorType &src, const std::pair<unsigned int, unsigned int> face_range) {
+  [&](const MatrixFree &data, VectorType &dst, const VectorType &src,
+      const std::pair<unsigned int, unsigned int> face_range) {
 
     FEFaceEvaluation phi_m(data, true);
     // To access the values in a thread safe way each thread has
@@ -342,7 +357,8 @@ reads as
 
 @f{align*}{
   p &=\cos(M \sqrt{d} \pi c t)\prod_{i=1}^{d} \sin(M \pi x_i),\\
-  u_i&=-\frac{\sin(M \sqrt{d} \pi c t)}{\sqrt{d}\rho c} \cos(M \pi x_i)\prod_{j=1,j\neq i}^{d} \sin(M \pi x_j),
+  u_i&=-\frac{\sin(M \sqrt{d} \pi c t)}{\sqrt{d}\rho c}
+     \cos(M \pi x_i)\prod_{j=1,j\neq i}^{d} \sin(M \pi x_j),
 @f}
 
 For simplicity, we are using homogeneous pressure Dirichlet boundary conditions
