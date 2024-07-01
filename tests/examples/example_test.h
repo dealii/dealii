@@ -24,6 +24,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <fstream>
+#include <iostream>
 
 /*
  * Given the name of a file, copy it to std::cout
