@@ -272,6 +272,15 @@ provide the ability to take a solution vector and set its constrained
 (algebraic) entries to their correct values; for us, that will mean
 setting boundary values and hanging node constraints correctly.
 
+(We note that when dealing with Differential-Algebraic Equations (DAEs),
+the algebraic components identified by the first callback mentioned
+above contain hanging nodes, Dirichlet boundary nodes, *and degrees
+of freedom for which the equation does not provide time derivatives*.
+This is not of concern to us here, and so we will not dwell on
+the issue -- or the fact that the second callback in the case of DAEs
+should set only a subset of the algebraic components -- and instead
+refer to the examples shown in the SUNDIALS::IDA class documentation.)
+
 
 <h3> Complication 2: Mesh refinement </h3>
 
