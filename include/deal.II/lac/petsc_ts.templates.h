@@ -608,7 +608,11 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        user->distribute,
+        // Call the user-provided callback. Use the new name if used,
+        // or the legacy name otherwise.
+        (user->update_constrained_components ?
+              user->update_constrained_components :
+              user->distribute),
         user->pending_exception,
         [user, ts]() -> void {
           user->error_in_function = true;
@@ -623,7 +627,7 @@ namespace PETScWrappers
         return PetscError(
           PetscObjectComm((PetscObject)ts),
           lineno + 1,
-          "distribute",
+          "update_constrained_components",
           __FILE__,
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
@@ -1025,8 +1029,17 @@ namespace PETScWrappers
         AssertPETSc(KSPSetPC(ksp, solve_with_jacobian_pc.get_pc()));
       }
 
-    if (distribute)
-      AssertPETSc(TSSetPostStage(ts, ts_poststage));
+    if (distribute || update_constrained_components)
+      {
+        if (update_constrained_components)
+          Assert(!distribute,
+                 ExcMessage(
+                   "The 'distribute' callback name of the TimeStepper "
+                   "class is deprecated. If you are setting the equivalent "
+                   "'update_constrained_components' callback, you cannot also "
+                   "set the 'distribute' callback."));
+        AssertPETSc(TSSetPostStage(ts, ts_poststage));
+      }
 
     // Attach user monitoring routine.
     if (monitor)
