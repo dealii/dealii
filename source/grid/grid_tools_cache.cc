@@ -30,17 +30,47 @@ namespace GridTools
     , tria(&tria)
     , mapping(&mapping)
   {
-    tria_signal =
+    tria_change_signal =
       tria.signals.any_change.connect([&]() { mark_for_update(update_all); });
+  }
+
+
+
+  template <int dim, int spacedim>
+  Cache<dim, spacedim>::Cache(const Triangulation<dim, spacedim> &tria)
+    : update_flags(update_all)
+    , tria(&tria)
+  {
+    tria_change_signal =
+      tria.signals.any_change.connect([&]() { mark_for_update(update_all); });
+
+    // Allow users to set this class up with an empty Triangulation and no
+    // Mapping argument by deferring Mapping assignment until after the
+    // Triangulation exists.
+    if (tria.get_reference_cells().size() == 0)
+      {
+        tria_create_signal = tria.signals.create.connect([&]() {
+          Assert(tria.get_reference_cells().size() > 0, ExcInternalError());
+          Assert(tria.get_reference_cells().size() == 1, ExcNotImplemented());
+          mapping = &tria.get_reference_cells()[0]
+                       .template get_default_linear_mapping<dim, spacedim>();
+        });
+      }
+    else
+      {
+        Assert(tria.get_reference_cells().size() == 1, ExcNotImplemented());
+        mapping = &tria.get_reference_cells()[0]
+                     .template get_default_linear_mapping<dim, spacedim>();
+      }
   }
 
   template <int dim, int spacedim>
   Cache<dim, spacedim>::~Cache()
   {
-    // Make sure that the signal that was attached to the triangulation
-    // is removed here.
-    if (tria_signal.connected())
-      tria_signal.disconnect();
+    if (tria_change_signal.connected())
+      tria_change_signal.disconnect();
+    if (tria_create_signal.connected())
+      tria_create_signal.disconnect();
   }
 
 
