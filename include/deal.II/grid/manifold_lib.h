@@ -446,12 +446,6 @@ public:
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
                 const ArrayView<const double>          &weights) const override;
 
-private:
-  /**
-   * A vector orthogonal to the normal direction.
-   */
-  const Tensor<1, spacedim> normal_direction;
-
   /**
    * The direction vector of the axis.
    */
@@ -466,6 +460,12 @@ private:
    * Relative tolerance to measure zero distances.
    */
   const double tolerance;
+
+private:
+  /**
+   * A vector orthogonal to the normal direction.
+   */
+  const Tensor<1, spacedim> normal_direction;
 
   /**
    * The direction vector perpendicular to both direction and normal_direction.
