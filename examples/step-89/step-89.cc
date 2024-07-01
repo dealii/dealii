@@ -58,19 +58,21 @@ namespace Step89
 
   // @sect3{Initial conditions for vibrating membrane}
   //
-  // Function that provides the initial condition for the vibrating membrane
-  // test case.
+  // In the following, let us first define a function that provides
+  // the initial condition for the vibrating membrane test case.  It
+  // implementes both the initial pressure (component 0) and velocity
+  // (components 1 to 1 + dim).
+  //
+  // There is also a function that computes the duration of one
+  // oscillation.
   template <int dim>
   class InitialConditionVibratingMembrane : public Function<dim>
   {
   public:
     InitialConditionVibratingMembrane(const double modes);
 
-    // Function that the gives the initial pressure (comp 0) and velocity (comp
-    // 1 to 1 + dim).
     double value(const Point<dim> &p, const unsigned int comp) const final;
 
-    // Function that calculates the duration of one oscillation.
     double get_period_duration(const double speed_of_sound) const;
 
   private:
@@ -107,15 +109,16 @@ namespace Step89
 
   // @sect3{Gauss pulse}
   //
-  // Function that provides the values of a pressure Gauss pulse.
+  // Next up is a function that provides the values of a pressure
+  // Gauss pulse.  As with the previous function, it implements both
+  // the initial pressure (component 0) and velocity (components 1 to
+  // 1 + dim).
   template <int dim>
   class GaussPulse : public Function<dim>
   {
   public:
     GaussPulse(const double shift_x, const double shift_y);
 
-    // Function that the gives the initial pressure (comp 0) and velocity (comp
-    // 1 to 1 + dim).
     double value(const Point<dim> &p, const unsigned int comp) const final;
 
   private:
@@ -132,8 +135,6 @@ namespace Step89
     static_assert(dim == 2, "Only implemented for dim==2");
   }
 
-  // Function that the gives the initial pressure (comp 0) and velocity (comp 1
-  // to 1 + dim).
   template <int dim>
   double GaussPulse<dim>::value(const Point<dim>  &p,
                                 const unsigned int comp) const
@@ -153,9 +154,7 @@ namespace Step89
   {
     // Helper function to check if a boundary ID is related to a non-matching
     // face. A @c std::set that contains all non-matching boundary IDs is
-    // handed over additionally to the face ID under question. This function
-    // could certainly also be defined inline but this way the code is more easy
-    // to read.
+    // handed over in addition to the face ID under question.
     bool is_non_matching_face(
       const std::set<types::boundary_id> &non_matching_face_ids,
       const types::boundary_id            face_id)
@@ -213,12 +212,27 @@ namespace Step89
     }
   } // namespace HelperFunctions
 
-  //@sect3{Material access}
+  // @sect3{Material parameter description}
   //
-  // This class stores the information if the fluid is homogeneous
-  // as well as the material properties at every cell.
-  // This class helps to access the correct values without accessing
-  // a large vector of materials in the homogeneous case.
+  // The following class stores the information if the fluid is
+  // homogeneous as well as the material properties at every cell.
+  // This class helps access the correct values without accessing a
+  // large vector of materials in the homogeneous case.
+  //
+  // The class is provided a map from material ids to material
+  // properties (given as a pair of values for the speed of sound and
+  // the density).  If the map has only one entry, the material is
+  // homogeneous -- using the same values everywhere -- and we can
+  // remember that fact in the `homogeneous` member variable and use it
+  // to optimize some code paths below. If the material is not
+  // homogeneous, we will fill a vector with the correct materials for
+  // each batch of cells; this information can then be access via
+  // FEEvaluationData::read_cell_data().
+  //
+  // As is usual when working with the MatrixFree framework, we will
+  // not only access material parameters at a single site, but for
+  // whole "batches" of cells. As a consequence, the functions below
+  // returned VectorizedArray objects for a batch at a time.
   template <typename Number>
   class CellwiseMaterialData
   {
@@ -228,24 +242,18 @@ namespace Step89
       const MatrixFree<dim, Number, VectorizedArray<Number>> &matrix_free,
       const std::map<types::material_id, std::pair<double, double>>
         &material_id_map)
-      // If the map is of size 1, the material is constant in every cell.
       : homogeneous(material_id_map.size() == 1)
     {
       Assert(material_id_map.size() > 0,
-             ExcMessage("No materials given to CellwiseMaterialData"));
+             ExcMessage("No materials given to CellwiseMaterialData."));
 
       if (homogeneous)
         {
-          // In the homogeneous case we know the materials in the whole domain.
           speed_of_sound_homogeneous = material_id_map.begin()->second.first;
           density_homogeneous        = material_id_map.begin()->second.second;
         }
       else
         {
-          // In the in-homogeneous case materials vary between cells. We are
-          // filling a vector with the correct materials, that can be processed
-          // via
-          // @c read_cell_data().
           const auto n_cell_batches =
             matrix_free.n_cell_batches() + matrix_free.n_ghost_cell_batches();
 
@@ -278,47 +286,49 @@ namespace Step89
 
     const AlignedVector<VectorizedArray<Number>> &get_speed_of_sound() const
     {
-      Assert(!homogeneous, ExcMessage("Use get_homogeneous_speed_of_sound()"));
+      Assert(!homogeneous, ExcMessage("Use get_homogeneous_speed_of_sound()."));
       return speed_of_sound;
     }
 
     const AlignedVector<VectorizedArray<Number>> &get_density() const
     {
-      Assert(!homogeneous, ExcMessage("Use get_homogeneous_density()"));
+      Assert(!homogeneous, ExcMessage("Use get_homogeneous_density()."));
       return density;
     }
 
     VectorizedArray<Number> get_homogeneous_speed_of_sound() const
     {
-      Assert(homogeneous, ExcMessage("Use get_speed_of_sound()"));
+      Assert(homogeneous, ExcMessage("Use get_speed_of_sound()."));
       return speed_of_sound_homogeneous;
     }
 
     VectorizedArray<Number> get_homogeneous_density() const
     {
-      Assert(homogeneous, ExcMessage("Use get_density()"));
+      Assert(homogeneous, ExcMessage("Use get_density()."));
       return density_homogeneous;
     }
 
   private:
     const bool homogeneous;
 
-    // Materials in the in-homogeneous case.
+    /* Materials in the inhomogeneous case. */
     AlignedVector<VectorizedArray<Number>> speed_of_sound;
     AlignedVector<VectorizedArray<Number>> density;
 
-    // Materials in the homogeneous case.
+    /* Materials in the homogeneous case. */
     VectorizedArray<Number> speed_of_sound_homogeneous;
     VectorizedArray<Number> density_homogeneous;
   };
 
-  // To be able to access the material data in every cell in a thread safe way
-  // @c MaterialEvaluation is used. Similar to @c FEEvaluation, every thread
-  // creates its own instance and thus, there are no race conditions. For
-  // in-homogeneous materials, a @c reinit_cell() or @c reinit_face() function
-  // is used to set the correct material at the current cell batch. In the
-  // homogeneous case the @c _reinit() functions don't have to reset the
-  // materials.
+  // To be able to access the material data in every cell in a thread
+  // safe way, the following class @c MaterialEvaluation is
+  // used. Similar to @c FEEvaluation, functions below will create
+  // their own instances of this class; thus, there can be no race
+  // conditions even if these functions run multiple times in
+  // parallel. For inhomogeneous materials, a @c reinit_cell() or @c
+  // reinit_face() function is used to set the correct material at the
+  // current cell batch. In the homogeneous case the @c _reinit()
+  // functions don't have to reset the materials.
   template <int dim, typename Number>
   class MaterialEvaluation
   {
@@ -332,7 +342,6 @@ namespace Step89
     {
       if (material_data.is_homogeneous())
         {
-          // Set the material that is used in every cell.
           speed_of_sound = material_data.get_homogeneous_speed_of_sound();
           density        = material_data.get_homogeneous_density();
         }
@@ -343,13 +352,14 @@ namespace Step89
       return material_data.is_homogeneous();
     }
 
-    // Update the cell data, given a cell batch index.
+    // The following two functions update the data for the current
+    // cell or face, given a cell batch index. If the material is
+    // homogeneous, there is nothing to do.  Otherwise, we reinit the
+    // FEEvaluation object and store the data for the current object.
     void reinit_cell(const unsigned int cell)
     {
-      // In the homogeneous case we do not have to reset the cell data.
       if (!material_data.is_homogeneous())
         {
-          // Reinit the FEEvaluation object and set the cell data.
           phi.reinit(cell);
           speed_of_sound =
             phi.read_cell_data(material_data.get_speed_of_sound());
@@ -357,13 +367,10 @@ namespace Step89
         }
     }
 
-    // Update the cell data, given a face batch index.
     void reinit_face(const unsigned int face)
     {
-      // In the homogeneous case we do not have to reset the cell data.
       if (!material_data.is_homogeneous())
         {
-          // Reinit the FEFaceEvaluation object and set the cell data.
           phi_face.reinit(face);
           speed_of_sound =
             phi_face.read_cell_data(material_data.get_speed_of_sound());
@@ -371,33 +378,33 @@ namespace Step89
         }
     }
 
-    // Return the speed of sound at the current cell batch.
+    // The following functions then return the speed of sound and
+    // density for the current cell batch.
     VectorizedArray<Number> get_speed_of_sound() const
     {
       return speed_of_sound;
     }
 
-    // Return the density at the current cell batch.
     VectorizedArray<Number> get_density() const
     {
       return density;
     }
 
   private:
-    // Members needed for the in-homogeneous case.
+    /* Members needed for the inhomogeneous case. */
     FEEvaluation<dim, -1, 0, 1, Number>     phi;
     FEFaceEvaluation<dim, -1, 0, 1, Number> phi_face;
 
-    // Material defined at every cell.
+    /* Material defined at every cell. */
     const CellwiseMaterialData<Number> &material_data;
 
-    // Materials at current cell.
+    /* Materials at current cell. */
     VectorizedArray<Number> speed_of_sound;
     VectorizedArray<Number> density;
   };
 
 
-  //@sect3{Boundary conditions}
+  // @sect3{Boundary conditions}
   //
   // To be able to use the same kernel, for all face integrals we define
   // a class that returns the needed values at boundaries. In this tutorial
@@ -441,17 +448,23 @@ namespace Step89
     const FEFaceEvaluation<dim, -1, 0, dim, Number> &velocity_m;
   };
 
-  //@sect3{Acoustic operator}
+  // @sect3{Acoustic operator}
   //
-  // Class that defines the acoustic operator. The class is heavily based on
-  // matrix-free methods. For a better understanding in matrix-free methods
-  // please refer to step-67.
+  // The following class then defines the acoustic operator. The class is
+  // heavily based on matrix-free methods. For a better understanding in
+  // matrix-free methods please refer to step-67.
+  //
+  // At the top we define a flag that decides whether we want to use
+  // mortaring. If the remote evaluators are set up with a
+  // VectorizedArray we are using point-to-point interpolation;
+  // otherwise we make use of Nitsche-type mortaring. The decision is
+  // made using `std::is_floating_point_v`, which is a variable that
+  // is true if the template argument is a floating point type (such
+  // as `float` or `double`) and false otherwise (in particular if the
+  // template argument is a vectorized array type).
   template <int dim, typename Number, typename remote_value_type>
   class AcousticOperator
   {
-    // If the remote evaluators are set up with a VectorizedArray we are
-    // using point-to-point interpolation. Otherwise we make use of
-    // Nitsche-type mortaring.
     static constexpr bool use_mortaring =
       std::is_floating_point_v<remote_value_type>;
 
@@ -486,20 +499,26 @@ namespace Step89
                   has to be provided."));
     }
 
-    // Function to evaluate the acoustic operator.
+    // The following function then evaluates the acoustic operator.
+    // It first updates the precomputed values in corresponding the
+    // FERemoteEvaluation objects. The material parameters do not change and
+    // thus, we do not have to update precomputed values in @c c_r_eval and @c
+    // rho_r_eval.
+    //
+    // It then either performs a matrix-free loop with Nitsche-type
+    // mortaring at non-matching faces (if `use_mortaring` is true) or
+    // with point-to-point interpolation at non-matching faces (in the
+    // `else` branch). The difference is only in the third argument to
+    // the loop function, denoting the function object that is
+    // executed at boundary faces.
     template <typename VectorType>
     void evaluate(VectorType &dst, const VectorType &src) const
     {
-      // Update the precomputed values in corresponding the FERemoteEvaluation
-      // objects. The material parameters do not change and thus, we do
-      // not have to update precomputed values in @c c_r_eval and @c rho_r_eval.
       pressure_r_eval->gather_evaluate(src, EvaluationFlags::values);
       velocity_r_eval->gather_evaluate(src, EvaluationFlags::values);
 
       if constexpr (use_mortaring)
         {
-          // Perform matrix free loop with Nitsche-type mortaring at
-          // non-matching faces.
           matrix_free.loop(
             &AcousticOperator::local_apply_cell<VectorType>,
             &AcousticOperator::local_apply_face<VectorType>,
@@ -513,8 +532,6 @@ namespace Step89
         }
       else
         {
-          // Perform matrix free loop with point-to-point interpolation at
-          // non-matching faces.
           matrix_free.loop(
             &AcousticOperator::local_apply_cell<VectorType>,
             &AcousticOperator::local_apply_face<VectorType>,
@@ -529,8 +546,14 @@ namespace Step89
         }
     }
 
+    // In the `private` section of the class, we then define the
+    // functions that evaluate volume, interior face, and boundary
+    // face integrals. The concrete terms these functions evaluate are
+    // stated in the documentation at the top of this tutorial
+    // program. Each of these functions has its own object of type
+    // `MaterialEvaluation` that provides access to the material at
+    // each cell or face.
   private:
-    // This function evaluates the volume integrals.
     template <typename VectorType>
     void local_apply_cell(
       const MatrixFree<dim, Number>               &matrix_free,
@@ -541,7 +564,6 @@ namespace Step89
       FEEvaluation<dim, -1, 0, 1, Number>   pressure(matrix_free, 0, 0, 0);
       FEEvaluation<dim, -1, 0, dim, Number> velocity(matrix_free, 0, 0, 1);
 
-      // Class that gives access to the material at each cell
       MaterialEvaluation material(matrix_free, *material_data);
 
       for (unsigned int cell = cell_range.first; cell < cell_range.second;
@@ -553,13 +575,15 @@ namespace Step89
           pressure.gather_evaluate(src, EvaluationFlags::gradients);
           velocity.gather_evaluate(src, EvaluationFlags::gradients);
 
-          // Get the materials at the corresponding cell. Since we
+          // Get the materials on the corresponding cell. Since we
           // introduced @c MaterialEvaluation we can write the code
-          // independent if the material is homogeneous or in-homogeneous.
+          // independent of whether the material is homogeneous or
+          // inhomogeneous.
           material.reinit_cell(cell);
           const auto c   = material.get_speed_of_sound();
           const auto rho = material.get_density();
-          for (unsigned int q : pressure.quadrature_point_indices())
+
+          for (const unsigned int q : pressure.quadrature_point_indices())
             {
               pressure.submit_value(rho * c * c * velocity.get_divergence(q),
                                     q);
@@ -571,13 +595,18 @@ namespace Step89
         }
     }
 
-    // This function evaluates the fluxes at faces between cells with the same
-    // material. If boundary faces are under consideration fluxes into
+    // This next function evaluates the fluxes at faces between cells with the
+    // same material. If boundary faces are under consideration fluxes into
     // neighboring faces do not have to be considered which is enforced via
     // `weight_neighbor=false`. For non-matching faces the fluxes into
     // neighboring faces are not considered as well. This is because we iterate
     // over each side of the non-matching face separately (similar to a cell
     // centric loop).
+    //
+    // In this and following functions, we also introduce the factors
+    // $\tau$ and $\gamma$ that are computed from $\rho$ and $c$ along
+    // interfaces and that appear in the bilinear forms. Their
+    // definitions are provided in the introduction.
     template <bool weight_neighbor,
               typename InternalFaceIntegratorPressure,
               typename InternalFaceIntegratorVelocity,
@@ -591,11 +620,10 @@ namespace Step89
       const typename InternalFaceIntegratorPressure::value_type c,
       const typename InternalFaceIntegratorPressure::value_type rho) const
     {
-      // Compute penalty parameters from material parameters.
       const auto tau   = 0.5 * rho * c;
       const auto gamma = 0.5 / (rho * c);
 
-      for (unsigned int q : pressure_m.quadrature_point_indices())
+      for (const unsigned int q : pressure_m.quadrature_point_indices())
         {
           const auto n  = pressure_m.normal_vector(q);
           const auto pm = pressure_m.get_value(q);
@@ -638,14 +666,11 @@ namespace Step89
       const MaterialIntegrator                                 &c_r,
       const MaterialIntegrator                                 &rho_r) const
     {
-      // Interior material information is constant over quadrature points
       const auto tau_m   = 0.5 * rho * c;
       const auto gamma_m = 0.5 / (rho * c);
 
-      for (unsigned int q : pressure_m.quadrature_point_indices())
+      for (const unsigned int q : pressure_m.quadrature_point_indices())
         {
-          // The material at the neighboring face might vary in every quadrature
-          // point.
           const auto c_p           = c_r.get_value(q);
           const auto rho_p         = rho_r.get_value(q);
           const auto tau_p         = 0.5 * rho_p * c_p;
@@ -694,11 +719,10 @@ namespace Step89
       FEFaceEvaluation<dim, -1, 0, dim, Number> velocity_p(
         matrix_free, false, 0, 0, 1);
 
-      // Class that gives access to the material at each cell
       MaterialEvaluation material(matrix_free, *material_data);
 
       for (unsigned int face = face_range.first; face < face_range.second;
-           face++)
+           ++face)
         {
           velocity_m.reinit(face);
           velocity_p.reinit(face);
@@ -728,9 +752,9 @@ namespace Step89
     }
 
 
-    //@sect4{Matrix-free boundary function for point-to-point interpolation}
+    // @sect4{Matrix-free boundary function for point-to-point interpolation}
     //
-    // This function evaluates the boundary face integrals and the
+    // The following function then evaluates the boundary face integrals and the
     // non-matching face integrals using point-to-point interpolation.
     template <typename VectorType>
     void local_apply_boundary_face_point_to_point(
@@ -739,17 +763,14 @@ namespace Step89
       const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &face_range) const
     {
-      // Standard face evaluators.
       FEFaceEvaluation<dim, -1, 0, 1, Number> pressure_m(
         matrix_free, true, 0, 0, 0);
       FEFaceEvaluation<dim, -1, 0, dim, Number> velocity_m(
         matrix_free, true, 0, 0, 1);
 
-      // Classes that return the correct BC values.
       BCEvaluationP pressure_bc(pressure_m);
       BCEvaluationU velocity_bc(velocity_m);
 
-      // Class that gives access to the material at each cell
       MaterialEvaluation material(matrix_free, *material_data);
 
       // Remote evaluators.
@@ -759,7 +780,7 @@ namespace Step89
       auto rho_r      = rho_r_eval->get_data_accessor();
 
       for (unsigned int face = face_range.first; face < face_range.second;
-           face++)
+           ++face)
         {
           velocity_m.reinit(face);
           pressure_m.reinit(face);
@@ -787,12 +808,12 @@ namespace Step89
 
               material.reinit_face(face);
 
+              // If we are considering a homogeneous material, do not use the
+              // inhomogeneous fluxes. While it would be possible
+              // to use the inhomogeneous fluxes they are more expensive to
+              // compute.
               if (material.is_homogeneous())
                 {
-                  // If homogeneous material is considered do not use the
-                  // inhomogeneous fluxes. While it would be possible
-                  // to use the inhomogeneous fluxes they are more expensive to
-                  // compute.
                   evaluate_face_kernel<false>(pressure_m,
                                               velocity_m,
                                               pressure_r,
@@ -802,8 +823,6 @@ namespace Step89
                 }
               else
                 {
-                  // If inhomogeneous material is considered use the
-                  // in-homogeneous fluxes.
                   c_r.reinit(face);
                   rho_r.reinit(face);
                   evaluate_face_kernel_inhomogeneous(
@@ -838,7 +857,7 @@ namespace Step89
         }
     }
 
-    //@sect4{Matrix-free boundary function for Nitsche-type mortaring}
+    // @sect4{Matrix-free boundary function for Nitsche-type mortaring}
     //
     // This function evaluates the boundary face integrals and the
     // non-matching face integrals using Nitsche-type mortaring.
@@ -849,7 +868,6 @@ namespace Step89
       const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &face_range) const
     {
-      // Standard face evaluators for BCs.
       FEFaceEvaluation<dim, -1, 0, 1, Number> pressure_m(
         matrix_free, true, 0, 0, 0);
       FEFaceEvaluation<dim, -1, 0, dim, Number> velocity_m(
@@ -929,13 +947,12 @@ namespace Step89
                   velocity_r_mortar.reinit(face * n_lanes + v);
                   pressure_r_mortar.reinit(face * n_lanes + v);
 
+                  // As above, if we are considering a homogeneous
+                  // material, do not use the inhomogeneous
+                  // fluxes. Since we are operating on face @c v we
+                  // call @c material.get_density()[v].
                   if (material.is_homogeneous())
                     {
-                      // If homogeneous material is considered do not use the
-                      // inhomogeneous fluxes. While it would be possible
-                      // to use the inhomogeneous fluxes they are more
-                      // expensive to compute. Since we are operating on face @c
-                      // v we call @c material.get_density()[v].
                       evaluate_face_kernel<false>(
                         pressure_m_mortar,
                         velocity_m_mortar,
@@ -983,7 +1000,6 @@ namespace Step89
             }
           else
             {
-              // Same as in @c local_apply_boundary_face_point_to_point().
               velocity_m.reinit(face);
               pressure_m.reinit(face);
 
@@ -1006,8 +1022,6 @@ namespace Step89
 
     const MatrixFree<dim, Number> &matrix_free;
 
-    // CellwiseMaterialData is stored as shared pointer with the same
-    // argumentation.
     const std::shared_ptr<CellwiseMaterialData<Number>> material_data;
 
     const std::set<types::boundary_id> remote_face_ids;
@@ -1064,9 +1078,12 @@ namespace Step89
     }
   };
 
-  //@sect3{Inverse mass operator}
+  // @sect3{Inverse mass operator}
   //
-  // Class to apply the inverse mass operator.
+  // For the time stepping methods below, we need the inverse mass
+  // operator. We apply it via a loop over all (batches of) cells as
+  // always, where the contribution of each cell is computed in a
+  // matrix-free way:
   template <int dim, typename Number>
   class InverseMassOperator
   {
@@ -1075,7 +1092,6 @@ namespace Step89
       : matrix_free(matrix_free)
     {}
 
-    // Function to apply the inverse mass operator.
     template <typename VectorType>
     void apply(VectorType &dst, const VectorType &src) const
     {
@@ -1087,7 +1103,6 @@ namespace Step89
     }
 
   private:
-    // Apply the inverse mass operator onto every cell batch.
     template <typename VectorType>
     void local_apply_cell(
       const MatrixFree<dim, Number>               &mf,
@@ -1112,7 +1127,7 @@ namespace Step89
     const MatrixFree<dim, Number> &matrix_free;
   };
 
-  //@sect3{Runge-Kutta time-stepping}
+  // @sect3{Runge-Kutta time-stepping}
   //
   // This class implements a Runge-Kutta scheme of order 2.
   template <int dim, typename Number, typename remote_value_type>
@@ -1130,7 +1145,14 @@ namespace Step89
       , acoustic_operator(acoustic_operator)
     {}
 
-    // Set up and run time loop.
+    // The `run()` function of this class contains the time loop. It
+    // starts by initializing some member variables (such as
+    // short-cuts to objects that describe the finite element, its
+    // properties, and the mapping; an by initializing vectors). It
+    // then computes the time step size via minimum element edge
+    // length.  Assuming non-distorted elements, we can compute the
+    // edge length as the distance between two vertices.  From this,
+    // we can then obtain the time step size via the CFL condition.
     void run(const MatrixFree<dim, Number> &matrix_free,
              const double                   cr,
              const double                   end_time,
@@ -1138,25 +1160,19 @@ namespace Step89
              const Function<dim>           &initial_condition,
              const std::string             &vtk_prefix)
     {
-      // Get needed members of matrix free.
       const auto &dof_handler = matrix_free.get_dof_handler();
       const auto &mapping     = *matrix_free.get_mapping_info().mapping;
       const auto  degree      = dof_handler.get_fe().degree;
 
-      // Initialize needed Vectors.
       VectorType solution;
       matrix_free.initialize_dof_vector(solution);
       VectorType solution_temp;
       matrix_free.initialize_dof_vector(solution_temp);
 
-      // Set the initial condition.
       HelperFunctions::set_initial_condition(matrix_free,
                                              initial_condition,
                                              solution);
 
-      // Compute time step size: Compute minimum element edge length.
-      //  We assume non-distorted elements, therefore we only compute
-      //  the distance between two vertices
       double h_local_min = std::numeric_limits<double>::max();
       for (const auto &cell : dof_handler.active_cell_iterators())
         h_local_min =
@@ -1166,16 +1182,14 @@ namespace Step89
       const double h_min =
         Utilities::MPI::min(h_local_min, dof_handler.get_communicator());
 
-      // Compute constant time step size via the CFL condition.
       const double dt =
         cr * HelperFunctions::compute_dt_cfl(h_min, degree, speed_of_sound);
 
-      // Perform time integration loop.
+      // We can then perform the time integration loop:
       double       time     = 0.0;
       unsigned int timestep = 0;
       while (time < end_time)
         {
-          // Write output.
           HelperFunctions::write_vtu(solution,
                                      matrix_free.get_dof_handler(),
                                      mapping,
@@ -1183,40 +1197,48 @@ namespace Step89
                                      "step_89-" + vtk_prefix +
                                        std::to_string(timestep));
 
-          // Perform a single time step.
           std::swap(solution, solution_temp);
           time += dt;
-          timestep++;
+          ++timestep;
           perform_time_step(dt, solution, solution_temp);
         }
     }
 
+    // The main work of this class is done by a `private` member
+    // function that performs one Runge-Kutta 2 time step. Recall that
+    // this method requires two sub-steps ("stages") computing
+    // intermediate values `k1` and `k2`, after which the intermediate
+    // values are summed with weights to obtain the new solution at
+    // the end of the time step. The RK2 method allows for the
+    // elimination of the intermediate vector `k2` by utilizing the
+    // `dst` vector as temporary storage.
   private:
-    // Perform one Runge-Kutta 2 time step.
     void
     perform_time_step(const double dt, VectorType &dst, const VectorType &src)
     {
       VectorType k1 = src;
 
-      // First stage.
+      /* First stage. */
       evaluate_stage(k1, src);
 
-      // Second stage.
+      /* Second stage. */
       k1.sadd(0.5 * dt, 1.0, src);
       evaluate_stage(dst, k1);
+
+      /* Summing things into the output vector. */
       dst.sadd(dt, 1.0, src);
     }
 
-    // Evaluate a single Runge-Kutta stage.
+    // Evaluating a single Runge-Kutta stage is a straightforward step
+    // that really only requires applying the operator once, and then
+    // applying the inverse of the mass matrix.
     void evaluate_stage(VectorType &dst, const VectorType &src)
     {
-      // Evaluate the stage
       acoustic_operator->evaluate(dst, src);
       dst *= -1.0;
       inverse_mass_operator->apply(dst, dst);
     }
 
-    // Needed operators.
     const std::shared_ptr<InverseMassOperator<dim, Number>>
       inverse_mass_operator;
     const std::shared_ptr<AcousticOperator<dim, Number, remote_value_type>>
@@ -1226,11 +1248,40 @@ namespace Step89
 
   // @sect3{Construction of non-matching triangulations}
   //
-  // This function creates a two dimensional squared triangulation
-  // that spans from (0,0) to (1,1). It consists of two sub-domains.
-  // The left sub-domain spans from (0,0) to (0.525,1). The right
-  // sub-domain spans from (0.525,0) to (1,1). The left sub-domain has
-  // three times smaller elements compared to the right sub-domain.
+  // Let us now make our way to the higher-level functions of this program.
+  //
+  // The first of these functions creates a two dimensional square
+  // triangulation that spans from $(0,0)$ to $(1,1)$. It consists of
+  // two sub-domains.  The left sub-domain spans from $(0,0)$ to
+  // $(0.525,1)$. The right sub-domain spans from $(0.525,0)$ to
+  // $(1,1)$. The left sub-domain has elements that are three times
+  // smaller compared to the ones for the right sub-domain.
+  //
+  // At non-matching interfaces, we need to provide different boundary
+  // IDs for the cells that make up the two parts (because, while they
+  // may be physically adjacent, they are not logically neighbors
+  // given that the faces of cells on both sides do not match, and the
+  // Triangulation class will therefore treat the interface between
+  // the two parts as a "boundary"). These boundary IDs have to differ
+  // because later on RemotePointEvaluation has to search for remote
+  // points for each face, that are defined in the same mesh (since we
+  // merge the mesh) but not on the same side of the non-matching
+  // interface. As a consequence, we declare at the top symbolic names
+  // for these boundary indicators, and ensure that we return a set
+  // with these values to the caller for later use.
+  //
+  // The actual mesh is then constructed by first constructing the
+  // left and right parts separately (setting material ids to zero and
+  // one, respectively), and using the appropriate boundary ids for
+  // all parts of the mesh. We then use
+  // GridGenerator::merge_triangulations() to combine them into one
+  // (non-matching) mesh. We have to pay attention that should the two
+  // sub-triangulations have vertices at the same locations, that they
+  // are not merged (connecting the two triangulations logically)
+  // since we want the interface to be an actual boundary. We achieve
+  // this by providing a tolerance of zero for the merge, see the
+  // documentation of the function
+  // GridGenerator::merge_triangulations().
   template <int dim>
   void build_non_matching_triangulation(
     Triangulation<dim>           &tria,
@@ -1239,19 +1290,12 @@ namespace Step89
   {
     const double length = 1.0;
 
-    // At non-matching interfaces, we provide different boundary
-    // IDs. These boundary IDs have to differ because later on
-    // RemotePointEvaluation has to search for remote points for
-    // each face, that are defined in the same mesh (since we merge
-    // the mesh) but not on the same side of the non-matching interface.
     const types::boundary_id non_matching_id_left  = 98;
     const types::boundary_id non_matching_id_right = 99;
 
-    // Provide this information to the caller.
-    non_matching_faces.insert(non_matching_id_left);
-    non_matching_faces.insert(non_matching_id_right);
+    non_matching_faces = {non_matching_id_left, non_matching_id_right};
 
-    // Construct left part of mesh.
+    /* Construct left part of mesh. */
     Triangulation<dim> tria_left;
     const unsigned int subdiv_left = 11;
     GridGenerator::subdivided_hyper_rectangle(tria_left,
@@ -1259,12 +1303,8 @@ namespace Step89
                                               {0.0, 0.0},
                                               {0.525 * length, length});
 
-    // The left part of the mesh has the material ID 0.
     for (const auto &cell : tria_left.active_cell_iterators())
       cell->set_material_id(0);
-
-    // The right face is non-matching. All other boundary IDs
-    // are set to 0.
     for (const auto &face : tria_left.active_face_iterators())
       if (face->at_boundary())
         {
@@ -1273,7 +1313,7 @@ namespace Step89
             face->set_boundary_id(non_matching_id_left);
         }
 
-    // Construct right part of mesh.
+    /* Construct right part of mesh. */
     Triangulation<dim> tria_right;
     const unsigned int subdiv_right = 4;
     GridGenerator::subdivided_hyper_rectangle(tria_right,
@@ -1281,12 +1321,8 @@ namespace Step89
                                               {0.525 * length, 0.0},
                                               {length, length});
 
-    // The right part of the mesh has the material ID 1.
     for (const auto &cell : tria_right.active_cell_iterators())
       cell->set_material_id(1);
-
-    // The left face is non-matching. All other boundary IDs
-    // are set to 0.
     for (const auto &face : tria_right.active_face_iterators())
       if (face->at_boundary())
         {
@@ -1295,26 +1331,29 @@ namespace Step89
             face->set_boundary_id(non_matching_id_right);
         }
 
-    // Merge triangulations with tolerance 0 to ensure no vertices
-    // are merged, see the documentation of the function
-    // @c merge_triangulations().
+    /* Merge triangulations. */
     GridGenerator::merge_triangulations(tria_left,
                                         tria_right,
                                         tria,
                                         /*tolerance*/ 0.,
                                         /*copy_manifold_ids*/ false,
                                         /*copy_boundary_ids*/ true);
+
+    /* Refine the result. */
     tria.refine_global(refinements);
   }
 
-  // @sect3{Set up and run point-to-point interpolation}
+  // @sect3{Set up and running of the two schemes}
+
+  // @sect4{Setup and running of the point-to-point interpolation scheme}
   //
-  // The main purpose of this function is to fill a
-  // `FERemoteEvaluationCommunicator` object that is needed for point-to-point
-  // interpolation. Additionally, the corresponding remote evaluators are set up
-  // using this remote communicator. Eventually, the operators are handed to the
-  // time integrator that runs the simulation.
-  //
+  // We are now at the two functions that run the overall schemes (the
+  // point-to-point and the mortaring schemes).  The first of these
+  // functions fills a FERemoteEvaluationCommunicator object that is
+  // needed for point-to-point interpolation. Additionally, the
+  // corresponding remote evaluators are set up using this remote
+  // communicator. Eventually, the operators are handed to the time
+  // integrator that runs the simulation.
   template <int dim, typename Number>
   void run_with_point_to_point_interpolation(
     const MatrixFree<dim, Number>      &matrix_free,
@@ -1327,7 +1366,7 @@ namespace Step89
     const auto &dof_handler = matrix_free.get_dof_handler();
     const auto &tria        = dof_handler.get_triangulation();
 
-    // Communication objects know about the communication pattern. I.e.,
+    // Communication objects know about the communication pattern. That is,
     // they know about the cells and quadrature points that have to be
     // evaluated at remote faces. This information is given via
     // RemotePointEvaluation. Additionally, the communication objects
@@ -1346,21 +1385,22 @@ namespace Step89
     //
     // For the standard case of point to point-to-point interpolation without
     // any heuristic we make use of the utility function
-    // @c compute_remote_communicator_faces_point_to_point_interpolation().
-    // Please refer to this function to see how to manually set up the
-    // remote communicator from outside.
-
+    // Utilities::compute_remote_communicator_faces_point_to_point_interpolation().
+    // Please refer to the documentation of this function to see how to manually
+    // set up the remote communicator from outside.
+    //
+    // Among the inputs for the remote communicator we need a list of
+    // boundary ids for the non-matching faces, along with a function
+    // object for each boundary id that returns a vector of true/false
+    // flags in which exactly the vertices of cells of the
+    // triangulation are marked that have a face at the boundary id in
+    // question.
     std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
       non_matching_faces_marked_vertices;
-
     for (const auto &nm_face : non_matching_faces)
       {
-        // Sufficient lambda, that rules out all cells connected to the current
-        // side of the non-matching interface to avoid self intersections.
-        auto marked_vertices = [&]() {
-          // only search points at cells that are not connected to
-          // @c nm_face
+        auto marked_vertices = [&nm_face, &tria]() -> std::vector<bool> {
           std::vector<bool> mask(tria.n_vertices(), true);
 
           for (const auto &cell : tria.active_cell_iterators())
@@ -1383,22 +1423,20 @@ namespace Step89
 
     // We are using point-to-point interpolation and can therefore
     // easily access the corresponding data at face batches. This
-    // is why we use a @c VectorizedArray as @c remote_value_type
+    // is why we use a @c VectorizedArray as @c remote_value_type:
     using remote_value_type = VectorizedArray<Number>;
 
-    // Set up FERemoteEvaluation object that accesses the pressure
-    // at remote faces.
+    // We then set up FERemoteEvaluation objects that access the
+    // pressure and velocity at remote faces, along with an object to
+    // describe cell-wise material data.
     const auto pressure_r =
       std::make_shared<FERemoteEvaluation<dim, 1, remote_value_type>>(
         remote_communicator, dof_handler, /*first_selected_component*/ 0);
 
-    // Set up FERemoteEvaluation object that accesses the velocity
-    // at remote faces.
     const auto velocity_r =
       std::make_shared<FERemoteEvaluation<dim, dim, remote_value_type>>(
         remote_communicator, dof_handler, /*first_selected_component*/ 1);
 
-    // Set up cell-wise material data.
     const auto material_data =
       std::make_shared<CellwiseMaterialData<Number>>(matrix_free, materials);
 
@@ -1415,9 +1453,14 @@ namespace Step89
         matrix_free.get_dof_handler().get_triangulation(),
         /*first_selected_component*/ 0);
 
+    // If the domain is not homogeneous, i.e., if material parameters
+    // change from cell to cell, we initialize and fill DoF vectors
+    // that contain the material properties.  Materials do not change
+    // during the simulation, therefore there is no need to ever
+    // compute the values after the first @c gather_evaluate() (at the
+    // end of the following block) again.
     if (!material_data->is_homogeneous())
       {
-        // Initialize and fill DoF vectors that contain the materials.
         Vector<Number> c(
           matrix_free.get_dof_handler().get_triangulation().n_active_cells());
         Vector<Number> rho(
@@ -1433,21 +1476,26 @@ namespace Step89
               materials.at(cell->material_id()).second;
           }
 
-        // Materials do not change during the simulation, therefore
-        // there is no need to precompute the values after
-        // the first @c gather_evaluate() again.
         c_r->gather_evaluate(c, EvaluationFlags::values);
         rho_r->gather_evaluate(rho, EvaluationFlags::values);
       }
 
 
-    // Set up inverse mass operator.
+    // Next, we set up the inverse mass operator and the acoustic
+    // operator. Using `remote_value_type=VectorizedArray<Number>`
+    // makes the operator use point-to-point interpolation. These two
+    // objects are then used to create a `RungeKutta2` object to
+    // perform the time integration.
+    //
+    // We also compute the maximum speed of sound, needed for the
+    // computation of the time-step size, and then run the time integrator.
+    // For the examples considered here, we found a limiting Courant number of
+    // $\mathrm{Cr}\approx 0.36$ to maintain stability. To ensure, the
+    // error of the temporal discretization is small, we use a considerably
+    // smaller Courant number of $0.2$.
     const auto inverse_mass_operator =
       std::make_shared<InverseMassOperator<dim, Number>>(matrix_free);
 
-    // Set up the acoustic operator. Using
-    // `remote_value_type=VectorizedArray<Number>` makes the operator use
-    // point-to-point interpolation.
     const auto acoustic_operator =
       std::make_shared<AcousticOperator<dim, Number, remote_value_type>>(
         matrix_free,
@@ -1458,20 +1506,14 @@ namespace Step89
         c_r,
         rho_r);
 
-    // Compute the the maximum speed of sound, needed for the computation of
-    // the time-step size.
+    RungeKutta2<dim, Number, remote_value_type> time_integrator(
+      inverse_mass_operator, acoustic_operator);
+
     double speed_of_sound_max = 0.0;
     for (const auto &mat : materials)
       speed_of_sound_max = std::max(speed_of_sound_max, mat.second.first);
 
-    // Set up time integrator.
-    RungeKutta2<dim, Number, remote_value_type> time_integrator(
-      inverse_mass_operator, acoustic_operator);
 
-    // For considered examples, we found a limiting Courant number of
-    // $\mathrm{Cr}\approx 0.36$ to maintain stability. To ensure, the
-    // error of the temporal discretization is small, we use a considerably
-    // smaller Courant number of $0.2$.
     time_integrator.run(matrix_free,
                         /*Cr*/ 0.2,
                         end_time,
@@ -1480,14 +1522,13 @@ namespace Step89
                         vtk_prefix);
   }
 
-  // @sect3{Set up and run Nitsche-type mortaring}
+  // @sect4{Setup and running of the Nitsche-type mortaring scheme}
   //
-  // The main purpose of this function is to fill a
-  // `FERemoteEvaluationCommunicator` object that is needed for Nitsche-type
-  // mortaring. Additionally, the corresponding remote evaluators are set up
-  // using this remote communicator. Eventually, the operators are handed to the
-  // time integrator that runs the simulation.
-  //
+  // The alternative to the previous function is to use the mortaring
+  // scheme -- implemented in the following function.  This function
+  // can only be run when deal.II is configured using CGAL (but the
+  // previous function can still be used without CGAL), and so errors
+  // out if CGAL is not available.
   template <int dim, typename Number>
   void run_with_nitsche_type_mortaring(
     const MatrixFree<dim, Number>      &matrix_free,
@@ -1519,29 +1560,13 @@ namespace Step89
     const auto &mapping           = *matrix_free.get_mapping_info().mapping;
     const auto  n_quadrature_pnts = matrix_free.get_quadrature().size();
 
-    // In case of Nitsche-type mortaring a vector of pairs with cell iterator
-    // and face number is needed as communication object.
-    // @c FERemoteCommunicationObjectFaces is a container to store this
-    // information.
-    //
-    // For the standard case of Nitsche-type mortaring without
-    // any heuristic we make use of the utility function
-    // @c compute_remote_communicator_faces_nitsche_type_mortaring().
-    // Please refer to this function to see how to manually set up the
-    // remote communicator from outside and how to reinit
-    // NonMatching::MappingInfo.
-
     std::vector<
       std::pair<types::boundary_id, std::function<std::vector<bool>()>>>
       non_matching_faces_marked_vertices;
 
     for (const auto &nm_face : non_matching_faces)
       {
-        // Sufficient lambda, that rules out all cells connected to the current
-        // side of the non-matching interface to avoid self intersections.
         auto marked_vertices = [&]() {
-          // only search points at cells that are not connected to
-          // @c nm_face
           std::vector<bool> mask(tria.n_vertices(), true);
 
           for (const auto &cell : tria.active_cell_iterators())
@@ -1558,7 +1583,10 @@ namespace Step89
           std::make_pair(nm_face, marked_vertices));
       }
 
-    // Quadrature points are arbitrarily distributed on each non-matching
+    // The only parts in this function that are functionally different
+    // from the previous one follow here.
+    //
+    // First, quadrature points are arbitrarily distributed on each non-matching
     // face. Therefore, we have to make use of FEFacePointEvaluation.
     // FEFacePointEvaluation needs NonMatching::MappingInfo to work at the
     // correct quadrature points that are in sync with used FERemoteEvaluation
@@ -1589,11 +1617,14 @@ namespace Step89
         0,
         nm_mapping_info.get());
 
-    // Same as above but since quadrature points are aribtrarily distributed
-    // we have to consider each face in a batch separately and can not make
-    // use of @c VecorizedArray.
+    // Second, since quadrature points are arbitrarily distributed we
+    // have to consider each face in a batch separately and can not
+    // make use of @c VecorizedArray.
     using remote_value_type = Number;
 
+    // The rest of the code is then identical to what we had in the
+    // previous function (though it functions differently because of
+    // the difference in `remote_value_type`).
     const auto pressure_r =
       std::make_shared<FERemoteEvaluation<dim, 1, remote_value_type>>(
         remote_communicator, dof_handler, /*first_selected_component*/ 0);
@@ -1637,12 +1668,9 @@ namespace Step89
         rho_r->gather_evaluate(rho, EvaluationFlags::values);
       }
 
-    // Set up inverse mass operator.
     const auto inverse_mass_operator =
       std::make_shared<InverseMassOperator<dim, Number>>(matrix_free);
 
-    // Set up the acoustic operator. Using `remote_value_type=Number`
-    // makes the operator use Nitsche-type mortaring.
     const auto acoustic_operator =
       std::make_shared<AcousticOperator<dim, Number, remote_value_type>>(
         matrix_free,
@@ -1654,18 +1682,13 @@ namespace Step89
         rho_r,
         nm_mapping_info);
 
-    // Compute the the maximum speed of sound, needed for the computation of
-    // the time-step size.
+    RungeKutta2<dim, Number, remote_value_type> time_integrator(
+      inverse_mass_operator, acoustic_operator);
+
     double speed_of_sound_max = 0.0;
     for (const auto &mat : materials)
       speed_of_sound_max = std::max(speed_of_sound_max, mat.second.first);
 
-
-    // Set up time integrator.
-    RungeKutta2<dim, Number, remote_value_type> time_integrator(
-      inverse_mass_operator, acoustic_operator);
-
-    // Run time loop with Courant number $0.2$.
     time_integrator.run(matrix_free,
                         /*Cr*/ 0.2,
                         end_time,
@@ -1681,6 +1704,10 @@ namespace Step89
 //
 // Finally, the `main()` function executes the different versions of handling
 // non-matching interfaces.
+//
+// Similar to step-87, the minimum requirement of this tutorial is MPI.
+// The parallel::distributed::Triangulation class is used if deal.II is
+// configured with p4est. Otherwise parallel::shared::Triangulation is used.
 int main(int argc, char *argv[])
 {
   using namespace dealii;
@@ -1696,11 +1723,6 @@ int main(int argc, char *argv[])
   const unsigned int refinements = 1;
   const unsigned int degree      = 3;
 
-  // Construct non-matching triangulation and fill non-matching boundary IDs.
-
-  // Similar to step-87, the minimum requirement of this tutorial is MPI.
-  // The parallel::distributed::Triangulation class is used if deal.II is
-  // configured with p4est. Otherwise parallel::shared::Triangulation is used.
 #ifdef DEAL_II_WITH_P4EST
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
 #else
@@ -1716,8 +1738,6 @@ int main(int argc, char *argv[])
 
   pcout << " - Refinement level: " << refinements << std::endl;
   pcout << " - Number of cells: " << tria.n_cells() << std::endl;
-
-  // Set up MatrixFree.
 
   pcout << "Create DoFHandler..." << std::endl;
   DoFHandler<dim> dof_handler(tria);
@@ -1739,21 +1759,18 @@ int main(int argc, char *argv[])
     MappingQ1<dim>(), dof_handler, constraints, QGauss<dim>(degree + 1), data);
 
 
-  //@sect4{Run vibrating membrane test case}
+  // @sect4{Run vibrating membrane test case} Homogeneous pressure}
+  // Dirichlet boundary conditions are applied for
+  // simplicity. Therefore, modes can not be chosen arbitrarily.
   pcout << "Run vibrating membrane test case..." << std::endl;
-  // Vibrating membrane test case:
-  //
-  // Homogeneous pressure DBCs are applied for simplicity. Therefore,
-  // modes can not be chosen arbitrarily.
   const double                                            modes = 10.0;
   std::map<types::material_id, std::pair<double, double>> homogeneous_material;
   homogeneous_material[numbers::invalid_material_id] = std::make_pair(1.0, 1.0);
   const auto initial_solution_membrane =
     Step89::InitialConditionVibratingMembrane<dim>(modes);
 
+  /* Run vibrating membrane test case using point-to-point interpolation: */
   pcout << " - Point-to-point interpolation: " << std::endl;
-  // Run vibrating membrane test case using point-to-point interpolation:
-
   Step89::run_with_point_to_point_interpolation(
     matrix_free,
     non_matching_faces,
@@ -1763,8 +1780,8 @@ int main(int argc, char *argv[])
     initial_solution_membrane,
     "vm-p2p");
 
+  /* Run vibrating membrane test case using Nitsche-type mortaring: */
   pcout << " - Nitsche-type mortaring: " << std::endl;
-  // Run vibrating membrane test case using Nitsche-type mortaring:
   Step89::run_with_nitsche_type_mortaring(
     matrix_free,
     non_matching_faces,
@@ -1774,12 +1791,10 @@ int main(int argc, char *argv[])
     initial_solution_membrane,
     "vm-nitsche");
 
-  //@sect4{Run test case with in-homogeneous material}
-  pcout << "Run test case with in-homogeneous material..." << std::endl;
-  // In-homogeneous material test case:
-  //
-  // Run simple test case with in-homogeneous material and Nitsche-type
+  // @sect4{Run test case with inhomogeneous material}
+  // Run simple test case with inhomogeneous material and Nitsche-type
   // mortaring:
+  pcout << "Run test case with inhomogeneous material..." << std::endl;
   std::map<types::material_id, std::pair<double, double>>
     inhomogeneous_material;
   inhomogeneous_material[0] = std::make_pair(1.0, 1.0);
