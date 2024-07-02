@@ -322,20 +322,110 @@ namespace internal
 
     // helper function
     const auto sort_and_make_unique =
-      [](std::vector<ConstraintType> &constraints) {
-        std::sort(constraints.begin(),
-                  constraints.end(),
+      [&constraints_in, &locally_owned_dofs](
+        std::vector<ConstraintType> &locally_relevant_constraints) {
+        if (locally_relevant_constraints.empty())
+          return;
+
+        for (auto &entry : locally_relevant_constraints)
+          std::sort(entry.entries.begin(),
+                    entry.entries.end(),
+                    [](const auto &l1, const auto &l2) {
+                      return l1.first < l2.first;
+                    });
+
+        std::sort(locally_relevant_constraints.begin(),
+                  locally_relevant_constraints.end(),
                   [](const ConstraintType &l1, const ConstraintType &l2) {
                     return l1.index < l2.index;
                   });
 
-        constraints.erase(std::unique(constraints.begin(),
-                                      constraints.end(),
-                                      [](const ConstraintType &l1,
-                                         const ConstraintType &l2) {
-                                        return l1.index == l2.index;
-                                      }),
-                          constraints.end());
+        auto equal_with_tol = [](const number d, const number e) {
+          if (std::abs(std::real(d - e)) <
+              100000. *
+                std::numeric_limits<
+                  typename numbers::NumberTraits<number>::real_type>::epsilon())
+            return true;
+          else
+            return false;
+        };
+
+        auto read_ptr  = locally_relevant_constraints.begin();
+        auto write_ptr = locally_relevant_constraints.begin();
+        // go through sorted locally relevant constraints and look out for
+        // duplicates (same constrained index, same entries) or cases that need
+        // to be augmented (same index, different entries)
+        while (++read_ptr != locally_relevant_constraints.end())
+          {
+            if (read_ptr->index != write_ptr->index)
+              {
+                // if we have a different index, use it here
+                if (++write_ptr != read_ptr)
+                  *write_ptr = std::move(*read_ptr);
+              }
+            else // equal global dof index
+              {
+                auto       &a = *write_ptr;
+                const auto &b = *read_ptr;
+                Assert(a.index == b.index, ExcInternalError());
+                if (!equal_with_tol(a.inhomogeneity, b.inhomogeneity) &&
+                    locally_owned_dofs.is_element(b.index))
+                  {
+                    Assert(equal_with_tol(b.inhomogeneity,
+                                          constraints_in.get_inhomogeneity(
+                                            b.index)),
+                           ExcInternalError());
+                    a.inhomogeneity = b.inhomogeneity;
+                  }
+
+                auto       &av = a.entries;
+                const auto &bv = b.entries;
+                // check if entries vectors are equal
+                bool vectors_are_equal = (av.size() == bv.size());
+                for (unsigned int i = 0; vectors_are_equal && i < av.size();
+                     ++i)
+                  {
+                    if (av[i].first != bv[i].first)
+                      vectors_are_equal = false;
+                    else
+                      Assert(equal_with_tol(av[i].second, bv[i].second),
+                             ExcInternalError());
+                  }
+
+                // merge entries vectors if different, otherwise ignore the
+                // second entry
+                if (!vectors_are_equal)
+                  {
+                    const auto sizea = av.size();
+                    const auto sizeb = bv.size();
+
+                    // TODO: use "merge" of "merge sort" to prevent quadratic
+                    // complexity
+                    for (unsigned int j = 0; j < sizeb; ++j)
+                      {
+                        bool new_entry = true;
+
+                        for (unsigned int i = 0; i < sizea; ++i)
+                          {
+                            if (av[i].first == bv[j].first)
+                              {
+                                Assert(equal_with_tol(av[i].second,
+                                                      bv[j].second),
+                                       ExcInternalError());
+
+                                new_entry = false;
+                              }
+                          }
+
+                        if (new_entry)
+                          av.push_back(bv[j]);
+                      }
+                  }
+              }
+          }
+        ++write_ptr;
+        locally_relevant_constraints.erase(write_ptr,
+                                           locally_relevant_constraints.end());
       };
 
     // 0) collect constrained indices of the current object
