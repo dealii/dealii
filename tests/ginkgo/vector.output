@@ -1,0 +1,11 @@
+
+DEAL:can_create_from_executor:OK
+DEAL:can_create_from_ginkgo_object:OK
+DEAL:can_create_from_size:OK
+DEAL:can_create_from_initializer_list:OK
+DEAL:can_copy_construct:OK
+DEAL:can_move_construct:OK
+DEAL:can_access_ginkgo_object:OK
+DEAL:wrapper_same_as_ginkgo_object:OK
+DEAL:can_create_view_of_dealii_object:OK
+DEAL:can_create_view_of_const_dealii_object:OK
