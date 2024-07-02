@@ -1026,10 +1026,10 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(
   const Point<spacedim>     &point_on_axis,
   const double               tolerance)
   : ChartManifold<dim, spacedim, 3>(Tensor<1, 3>({0, 2. * numbers::PI, 0}))
-  , normal_direction(internal::compute_normal(direction, true))
   , direction(direction / direction.norm())
   , point_on_axis(point_on_axis)
   , tolerance(tolerance)
+  , normal_direction(internal::compute_normal(direction, true))
   , dxn(cross_product_3d(this->direction, normal_direction))
 {
   // do not use static_assert to make dimension-independent programming
