@@ -22,7 +22,7 @@ set(FEATURE_TRILINOS_DEPENDS MPI)
 # A list of optional Trilinos modules we use:
 #
 set(_deal_ii_trilinos_optional_modules
-  Amesos2 Belos EpetraExt Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan 
+  Amesos2 Belos EpetraExt Ifpack2 Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan 
 )
 
 #
