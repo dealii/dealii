@@ -780,8 +780,8 @@ namespace parallel
        * the refinement process. With this information, we can prepare all
        * buffers for data transfer accordingly.
        */
-      virtual void
-      update_cell_relations() override;
+      void
+      update_cell_relations();
 
       /**
        * Two arrays that store which p4est tree corresponds to which coarse
@@ -964,8 +964,8 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      virtual void
-      update_cell_relations() override;
+      void
+      update_cell_relations();
 
       /**
        * Dummy arrays. This class isn't usable but the compiler wants to see
@@ -1104,8 +1104,8 @@ namespace parallel
        * Dummy replacement to allow for better error messages when compiling
        * this class.
        */
-      virtual void
-      update_cell_relations() override
+      void
+      update_cell_relations()
       {}
     };
   } // namespace distributed
