@@ -591,6 +591,13 @@ namespace PETScWrappers
     std::function<IndexSet()> algebraic_components;
 
     /**
+     * This callback is equivalent to `update_constrained_components`, but is
+     * deprecated. Use `update_constrained_components` instead.
+     */
+    DEAL_II_DEPRECATED_EARLY
+    std::function<void(const real_type t, VectorType &y)> distribute;
+
+    /**
      * Callback to distribute solution to hanging nodes.
      *
      * Implementation of this function is optional.
@@ -603,7 +610,8 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const real_type t, VectorType &y)> distribute;
+    std::function<void(const real_type t, VectorType &y)>
+      update_constrained_components;
 
     /**
      * Callback to set up mesh adaption.
