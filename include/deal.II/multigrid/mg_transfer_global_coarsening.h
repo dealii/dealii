@@ -25,6 +25,7 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/constraint_info.h>
+#include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <deal.II/multigrid/mg_base.h>
@@ -621,7 +622,7 @@ private:
   /**
    * Weights for continuous elements.
    */
-  std::vector<Number> weights; // TODO: vectorize
+  std::vector<Number> weights;
 
   /**
    * Weights for continuous elements, compressed into 3^dim doubles per
@@ -645,6 +646,152 @@ private:
   unsigned int mg_level_fine;
 
   friend class internal::MGTwoLevelTransferImplementation;
+
+  friend class MGTransferMF<dim, Number>;
+};
+
+
+
+/**
+ * Class for transfer between two multigrid levels for p- or global coarsening
+ * in a specialized way, taking two MatrixFree objects to describe the
+ * hierarchy. This class assumes that both objects share the same
+ * triangulation (but differ through their DoFHandler) and are described by
+ * the respective DoFHandler/AffineConstraints pair, so the only available
+ * option is polynomial coarsening. On the other hand, the initialization is
+ * much more efficient because no queries to the DoFHandler need to be made,
+ * and FEEvaluation is used for the access to the vector. For supporting
+ * multiple components, the code loops over the various components in a vector
+ * way.
+ */
+template <int dim, typename VectorType>
+class MGTwoLevelTransferPrebuilt : public MGTwoLevelTransferBase<VectorType>
+{
+public:
+  static_assert(
+    std::is_same_v<
+      VectorType,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type>>,
+    "This class is currently only implemented for vectors of "
+    "type LinearAlgebra::distributed::Vector.");
+
+  /**
+   * The scalar type used by the vector-type template argument.
+   */
+  using Number = typename VectorType::value_type;
+
+  /**
+   * A data type representing a vectorized array of the same kind of objects
+   * stored in the `VectorType`.
+   */
+  using VectorizedArrayType = VectorizedArray<Number>;
+
+  /**
+   * Set up polynomial coarsening between the DoFHandler objects involved via
+   * the two MatrixFree objects and the respective numbers to pick the
+   * specific DoFHandler. The algorithm will then use the optimized operators
+   * available through the matrix-free framework of deal.II, without the need
+   * for further expensive setup operations.
+   */
+  void
+  reinit(const MatrixFree<dim, Number> &matrix_free_fine,
+         const unsigned int             dof_no_fine,
+         const MatrixFree<dim, Number> &matrix_free_coarse,
+         const unsigned int             dof_no_coarse);
+
+  /**
+   * @copydoc MGTwoLevelTransferBase::interpolate
+   */
+  void
+  interpolate(VectorType &dst, const VectorType &src) const override;
+
+  /**
+   * @copydoc MGTwoLevelTransferBase::enable_inplace_operations_if_possible
+   */
+  virtual std::pair<bool, bool>
+  enable_inplace_operations_if_possible(
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &partitioner_coarse,
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine)
+    override;
+
+  /**
+   * Return the memory consumption of the allocated memory in this class.
+   */
+  std::size_t
+  memory_consumption() const override;
+
+protected:
+  void
+  prolongate_and_add_internal(VectorType       &dst,
+                              const VectorType &src) const override;
+
+  void
+  restrict_and_add_internal(VectorType       &dst,
+                            const VectorType &src) const override;
+
+private:
+  /**
+   * Prolongation matrix for the multigrid transfer.
+   */
+  AlignedVector<double> prolongation_matrix;
+
+  /**
+   * Restriction matrix for the multigrid interpolation.
+   */
+  AlignedVector<double> restriction_matrix;
+
+  /**
+   * Matrix-free object on the fine side.
+   */
+  SmartPointer<const MatrixFree<dim, Number>> matrix_free_fine;
+
+  /**
+   * Index within the list of DoFHandler objects in the matrix_free_fine
+   * object.
+   */
+  unsigned int dof_handler_index_fine;
+
+  /**
+   * Matrix-free object on the coarse side.
+   */
+  SmartPointer<const MatrixFree<dim, Number>> matrix_free_coarse;
+
+  /**
+   * Index within the list of DoFHandler objects in the matrix_free_coarse
+   * object.
+   */
+  unsigned int dof_handler_index_coarse;
+
+  /**
+   * Pointer to the start into the weights array, as that array can be
+   * compressed or in full format.
+   */
+  std::vector<unsigned int> weights_start;
+
+  /**
+   * Weights for continuous elements, either in full format or compressed into
+   * 3^dim doubles per cell if possible.
+   */
+  AlignedVector<VectorizedArrayType> weights;
+
+  /**
+   * The two matrix-free objects will in general not agree on the order the
+   * cells are traversed. Thus, the loop will be run by the matrix-free object
+   * on the fine side, and the coarse side will adapt to those cell indices.
+   */
+  std::vector<std::array<unsigned int, VectorizedArrayType::size()>>
+    cell_list_fine_to_coarse;
+
+  /**
+   * Pointer to the DoFHandler object used during initialization.
+   */
+  SmartPointer<const DoFHandler<dim>> dof_handler_fine;
+
+  /**
+   * Muligird level used during initialization.
+   */
+  unsigned int mg_level_fine;
 
   friend class MGTransferMF<dim, Number>;
 };
