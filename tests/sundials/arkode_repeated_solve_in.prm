@@ -1,10 +1,12 @@
 set Final time                        = 2.0
 set Initial time                      = 0
 set Time interval between each output = 0.1
+
 subsection Error control
   set Absolute error tolerance = 1e-8
   set Relative error tolerance = 1e-8
 end
+
 subsection Running parameters
   set Initial step size                      = 1e-6
   set Maximum number of nonlinear iterations = 10

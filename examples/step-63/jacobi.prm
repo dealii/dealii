@@ -1,20 +1,27 @@
 # Diffusion parameter
-set Epsilon                   = 0.005
+
+set Epsilon = 0.005
 
 # Finite Element degree
-set Fe degree                 = 1
+
+set Fe degree = 1
 
 # Select smoother: SOR|Jacobi|block SOR|block Jacobi
-set Smoother type             = Jacobi
+
+set Smoother type = Jacobi
 
 # Select DoF renumbering: none|downstream|upstream|random
-set DoF renumbering           = downstream
+
+set DoF renumbering = downstream
 
 # Number of smoothing steps
-set Smoothing steps           = 6
+
+set Smoothing steps = 6
 
 # Enable streamline diffusion stabilization: true|false
+
 set With streamline diffusion = true
 
 # Generate graphical output: true|false
-set Output                    = true
+
+set Output = true
