@@ -89,6 +89,8 @@ main()
   SolverControl                 control(100, 1.e-3);
   SolverControl                 verbose_control(100, 1.e-3, true);
   SolverCG<>                    cg(control, mem);
+  SolverCG<>::AdditionalData    data0(false);
+  SolverCG<>                    cg_add_data(control, mem, data0);
   SolverGMRES<>::AdditionalData data1(6);
   SolverGMRES<>                 gmres(control, mem, data1);
   SolverGMRES<>::AdditionalData data2(6, true);
@@ -170,6 +172,7 @@ main()
 
           control.set_max_steps(10);
           check_solve(cg, A, u, f, prec_no);
+          check_solve(cg_add_data, A, u, f, prec_no);
           check_solve(bicgstab, A, u, f, prec_no);
           check_solve(gmres, A, u, f, prec_no);
           check_solve(gmresright, A, u, f, prec_no);
@@ -189,6 +192,7 @@ main()
           rich.set_omega(1. / A.diag_element(0));
           check_solve(rich, A, u, f, prec_no);
           check_solve(cg, A, u, f, prec_no);
+          check_solve(cg_add_data, A, u, f, prec_no);
           check_solve(bicgstab, A, u, f, prec_no);
           check_solve(gmres, A, u, f, prec_no);
           check_solve(gmresright, A, u, f, prec_no);
@@ -204,6 +208,7 @@ main()
           rich.set_omega(1. / A.diag_element(0));
           check_solve(rich, A, u, f, prec_richardson);
           check_solve(cg, A, u, f, prec_richardson);
+          check_solve(cg_add_data, A, u, f, prec_richardson);
           check_solve(bicgstab, A, u, f, prec_richardson);
           check_solve(gmres, A, u, f, prec_richardson);
           check_solve(gmresright, A, u, f, prec_richardson);
@@ -219,6 +224,7 @@ main()
           check_Tsolve(rich, A, u, f, prec_ssor);
           check_solve(rich, A, u, f, prec_ssor);
           check_solve(cg, A, u, f, prec_ssor);
+          check_solve(cg_add_data, A, u, f, prec_ssor);
           check_solve(bicgstab, A, u, f, prec_ssor);
           check_solve(gmres, A, u, f, prec_ssor);
           check_solve(gmresright, A, u, f, prec_ssor);
@@ -233,6 +239,7 @@ main()
           check_Tsolve(rich, A, u, f, prec_sor);
           check_solve(rich, A, u, f, prec_sor);
           check_solve(cg, A, u, f, prec_sor);
+          check_solve(cg_add_data, A, u, f, prec_sor);
           check_solve(bicgstab, A, u, f, prec_sor);
           check_solve(gmres, A, u, f, prec_sor);
           check_solve(gmresright, A, u, f, prec_sor);
@@ -246,6 +253,7 @@ main()
           check_Tsolve(rich, A, u, f, prec_psor);
           check_solve(rich, A, u, f, prec_psor);
           check_solve(cg, A, u, f, prec_psor);
+          check_solve(cg_add_data, A, u, f, prec_psor);
           check_solve(bicgstab, A, u, f, prec_psor);
           check_solve(gmres, A, u, f, prec_psor);
           check_solve(gmresright, A, u, f, prec_psor);
