@@ -1,0 +1,17 @@
+Working on rank 0 of 3
+Output 0
+Working on rank 1 of 3
+Working on rank 2 of 3
+Output 1
+    0 1:  0.5
+    0 3:  0.5
+    0 2:  0.5
+    2 3:  1.5
+Output 2
+    0 1:  0.5
+    0 3:  1.25
+    2 3:  1.5
+Output proc2
+    0 1:  0.5
+    0 3:  1.25
+    2 3:  1.5
