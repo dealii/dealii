@@ -66,13 +66,22 @@ namespace Threads
    * hand, copying a TaskResult object after the computing task has finished
    * results in two copies of the returned object.
    *
-   * This class can also be compared with `std::future<T>`. That class also
-   * represents the result of a pending operation, but it lacks the specifics
-   * of what kind of operation that is. As a consequence, it can *wait* for
+   * This class can also be compared with
+   * [`std::future`](https://en.cppreference.com/w/cpp/thread/future). That
+   * class also represents the result of a pending operation, but it lacks the
+   * specifics of what kind of operation that is (in particular, it does not
+   * know whether a task, a thread, or a `std::packaged_task` will eventually
+   * produce the value). As a consequence, it can *wait* for
    * the result to become available, but it lacks the knowledge to detect
    * certain common programming mistakes such as those described in the
    * documentation of the destructor of this class, or of this class's
-   * `operator=()`.
+   * `operator=()`. Another significant difference is that
+   * one can only call `std::future::get()` once, whereas one
+   * can call Threads::Task::return_value() as many times as desired. It is,
+   * thus, comparable to the
+   * [`std::shared_future`](https://en.cppreference.com/w/cpp/thread/shared_future)
+   * class. However, `std::shared_future` can not be used for types that can not
+   * be copied -- a particular restriction for `std::unique_ptr`, for example.
    */
   template <typename T>
   class TaskResult
