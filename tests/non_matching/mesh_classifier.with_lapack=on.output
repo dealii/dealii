@@ -24,6 +24,17 @@ DEAL::cell outside
 DEAL::face 0 outside
 DEAL::face 1 outside
 DEAL::
+DEAL::test_zero_function
+DEAL::discrete:
+DEAL::cell aligned
+DEAL::face 0 aligned
+DEAL::face 1 aligned
+DEAL::
+DEAL::analytic:
+DEAL::cell aligned
+DEAL::face 0 aligned
+DEAL::face 1 aligned
+DEAL::
 DEAL::test_intersection_x_eq_0_plane
 DEAL::
 DEAL::discrete:
@@ -44,6 +55,28 @@ DEAL::face 1 inside
 DEAL::Level set positive
 DEAL::cell outside
 DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::
+DEAL::test_negative_but_face_aligned
+DEAL::discrete:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 aligned
+DEAL::
+DEAL::analytic:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 aligned
+DEAL::
+DEAL::test_positive_but_face_aligned
+DEAL::discrete:
+DEAL::cell outside
+DEAL::face 0 aligned
+DEAL::face 1 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell outside
+DEAL::face 0 aligned
 DEAL::face 1 outside
 DEAL::
 DEAL::dim = 2
@@ -79,6 +112,21 @@ DEAL::face 1 outside
 DEAL::face 2 outside
 DEAL::face 3 outside
 DEAL::
+DEAL::test_zero_function
+DEAL::discrete:
+DEAL::cell aligned
+DEAL::face 0 aligned
+DEAL::face 1 aligned
+DEAL::face 2 aligned
+DEAL::face 3 aligned
+DEAL::
+DEAL::analytic:
+DEAL::cell aligned
+DEAL::face 0 aligned
+DEAL::face 1 aligned
+DEAL::face 2 aligned
+DEAL::face 3 aligned
+DEAL::
 DEAL::test_intersection_x_eq_0_plane
 DEAL::
 DEAL::discrete:
@@ -102,6 +150,22 @@ DEAL::face 1 outside
 DEAL::face 2 intersected
 DEAL::face 3 outside
 DEAL::
+DEAL::test_intersection_diagonally_through_vertices
+DEAL::
+DEAL::discrete:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::face 2 inside
+DEAL::face 3 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 outside
+DEAL::face 2 inside
+DEAL::face 3 outside
+DEAL::
 DEAL::test_reclassify_called_multiple_times
 DEAL::Level set negative
 DEAL::cell inside
@@ -112,6 +176,36 @@ DEAL::face 3 inside
 DEAL::Level set positive
 DEAL::cell outside
 DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::
+DEAL::test_negative_but_face_aligned
+DEAL::discrete:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 aligned
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::
+DEAL::analytic:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 aligned
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::
+DEAL::test_positive_but_face_aligned
+DEAL::discrete:
+DEAL::cell outside
+DEAL::face 0 aligned
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell outside
+DEAL::face 0 aligned
 DEAL::face 1 outside
 DEAL::face 2 outside
 DEAL::face 3 outside
@@ -157,6 +251,25 @@ DEAL::face 3 outside
 DEAL::face 4 outside
 DEAL::face 5 outside
 DEAL::
+DEAL::test_zero_function
+DEAL::discrete:
+DEAL::cell aligned
+DEAL::face 0 aligned
+DEAL::face 1 aligned
+DEAL::face 2 aligned
+DEAL::face 3 aligned
+DEAL::face 4 aligned
+DEAL::face 5 aligned
+DEAL::
+DEAL::analytic:
+DEAL::cell aligned
+DEAL::face 0 aligned
+DEAL::face 1 aligned
+DEAL::face 2 aligned
+DEAL::face 3 aligned
+DEAL::face 4 aligned
+DEAL::face 5 aligned
+DEAL::
 DEAL::test_intersection_x_eq_0_plane
 DEAL::
 DEAL::discrete:
@@ -198,6 +311,44 @@ DEAL::face 5 inside
 DEAL::Level set positive
 DEAL::cell outside
 DEAL::face 0 outside
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::face 4 outside
+DEAL::face 5 outside
+DEAL::
+DEAL::test_negative_but_face_aligned
+DEAL::discrete:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 aligned
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::face 4 inside
+DEAL::face 5 inside
+DEAL::
+DEAL::analytic:
+DEAL::cell intersected
+DEAL::face 0 inside
+DEAL::face 1 aligned
+DEAL::face 2 inside
+DEAL::face 3 inside
+DEAL::face 4 inside
+DEAL::face 5 inside
+DEAL::
+DEAL::test_positive_but_face_aligned
+DEAL::discrete:
+DEAL::cell outside
+DEAL::face 0 aligned
+DEAL::face 1 outside
+DEAL::face 2 outside
+DEAL::face 3 outside
+DEAL::face 4 outside
+DEAL::face 5 outside
+DEAL::
+DEAL::analytic:
+DEAL::cell outside
+DEAL::face 0 aligned
 DEAL::face 1 outside
 DEAL::face 2 outside
 DEAL::face 3 outside
