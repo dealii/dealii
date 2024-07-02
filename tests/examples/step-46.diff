@@ -1,0 +1,6 @@
+1011,1012c1011,1012
+<         std::cout << "   Writing output..." << std::endl;
+<         output_results(refinement_cycle);
+---
+>          std::cout << "   Writing output..." << std::endl;
+> //        output_results(refinement_cycle);
