@@ -1,0 +1,43 @@
+497c497
+<           in.open("coarse_circle.inp");
+---
+>           in.open("../../../source/step-34/coarse_circle.inp");
+501c501
+<           in.open("coarse_sphere.inp");
+---
+>           in.open("../../../source/step-34/coarse_sphere.inp");
+974,983c974,983
+<     DataOut<dim> data_out;
+< 
+<     data_out.attach_dof_handler(external_dh);
+<     data_out.add_data_vector(external_phi, "external_phi");
+<     data_out.build_patches();
+< 
+<     const std::string filename = std::to_string(dim) + "d_external.vtk";
+<     std::ofstream     file(filename);
+< 
+<     data_out.write_vtk(file);
+---
+> //    DataOut<dim> data_out;
+> //
+> //    data_out.attach_dof_handler(external_dh);
+> //    data_out.add_data_vector(external_phi, "external_phi");
+> //    data_out.build_patches();
+> //
+> //    const std::string filename = std::to_string(dim) + "d_external.vtk";
+> //    std::ofstream     file(filename);
+> //
+> //    data_out.write_vtk(file);
+1036c1036,1037
+<     read_parameters("parameters.prm");
+---
+>     //read_parameters("parameters.prm");
+>     read_parameters("../../../source/step-34/parameters.prm");
+1047c1048
+<     for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 3; ++cycle)
+1053c1054
+<         output_results(cycle);
+---
+>         //output_results(cycle);
