@@ -1990,13 +1990,38 @@ public:
                             const bool                   verbose = false) const;
 
   /**
-   * Make the current object consistent on all processors
-   * in a distributed computation. One should call this function before
-   * calling close().
+   * Make the constraints that are locally stored on the current object
+   * consistent on all MPI processes in a distributed computation.
+   *
+   * The IndexSet @p locally_owned_dofs conforms to all DoFs that are locally
+   * owned on the current process, i.e., DoFHandler::locally_owned_dofs().
+   *
+   * The IndexSet @p constraints_to_make_consistent shall contain all DoF
+   * indices for which we want to store the complete constraints for. Which DoFs
+   * these might be depends on your actual use case: For most applications in
+   * which you are using continuous Galerkin methods, you would want to use
+   * locally active DoFs here, obtained via
+   * DoFTools::extract_locally_active_dofs(). However in discontinuous Galerkin
+   * methods, you might need consistent information on all locally relevant
+   * DoFs due to the need to compute face integrals against ghosted cells,
+   * for which you need DoFTools::extract_locally_relevant_dofs().
+   *
+   * This function updates the locally stored constraints (or local_lines) of
+   * this object, whenever a DoF is constrained against another that we have not
+   * known of before. After calling this function, it might be necessary to use
+   * the IndexSet retrieved by get_local_lines() when initializing data
+   * structures built on top of the AffineConstraints object, for example:
+   * @code
+   * DynamicSparsityPattern dsp(constraints.get_local_lines());
+   * LinearAlgebra::distributed::Vector<double> solution(
+   *   locally_owned_dofs, constraints.get_local_lines(), mpi_communicator);
+   * @endcode
+   *
+   * @note One should call this function before calling close().
    */
   void
   make_consistent_in_parallel(const IndexSet &locally_owned_dofs,
-                              const IndexSet &locally_relevant_dofs,
+                              const IndexSet &constraints_to_make_consistent,
                               const MPI_Comm  mpi_communicator);
 
   /**
