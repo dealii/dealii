@@ -1882,6 +1882,24 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
             b);
   }
 
+  bool overlap_communication_computation =
+    additional_data.overlap_communication_computation;
+
+  if (overlap_communication_computation)
+    {
+      for (unsigned int no = 0; no < dof_handlers.size(); ++no)
+        for (unsigned int fe_no = 0;
+             fe_no < dof_handlers[no]->get_fe_collection().size();
+             ++fe_no)
+          if ((additional_data.mapping_update_flags_inner_faces !=
+               update_default) &&
+              (dof_handlers[no]->get_fe(fe_no).n_dofs_per_cell() == 0))
+            // disable overlapping of communication and computation if
+            // FE_Nothing is used and face integrals are performed
+            // see #14342 and #14553.
+            overlap_communication_computation = false;
+    }
+
   const unsigned int n_lanes     = VectorizedArrayType::size();
   task_info.vectorization_length = n_lanes;
   internal::MatrixFreeFunctions::ConstraintValues<double> constraint_values;
@@ -1897,7 +1915,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
     additional_data.cell_vectorization_categories_strict,
     do_face_integrals,
     additional_data.mapping_update_flags_inner_faces != update_default,
-    additional_data.overlap_communication_computation,
+    overlap_communication_computation,
     task_info,
     cell_level_index,
     dof_info,
