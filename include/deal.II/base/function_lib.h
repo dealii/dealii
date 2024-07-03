@@ -1774,30 +1774,30 @@ namespace Functions
    * to strong rotation and elongation of the fluid @cite Blais2013.
    *
    * The stream function $\Psi$ of this Rayleigh-Kothe vortex is defined as:
-@f[
-\Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T}
-\right)
-@f]
+   * @f[
+   * \Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi
+   * \frac{t}{T} \right)
+   * @f]
    * where $T$ is half the period of the flow. The velocity profile in 2D
-($\textbf{u}=[u,v]^T$) is :
-@f{eqnarray*}{
-   u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y)
-\cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\ v &=&
-\frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos
-\left( \pi \frac{t}{T} \right)
-@f}
+   * ($\textbf{u}=[u,v]^T$) is:
+   * @f{eqnarray*}{
+   * u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y)
+   * \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\ v &=&
+   * \frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y)
+   * \cos \left( \pi \frac{t}{T} \right)
+   * @f}
    * where $T$ is half the period of the flow.
    *
    * The velocity profile is illustrated in the following animation:
    *
-@htmlonly
-<p align="center">
-  <iframe width="560" height="500"
-src="https://www.youtube.com/embed/m6hQm7etji8" frameborder="0"
-   allow="accelerometer; autoplay; encrypted-media; gyroscope;
-picture-in-picture" allowfullscreen></iframe>
- </p>
-@endhtmlonly
+   * @htmlonly
+   * <p align="center">
+   *   <iframe width="560" height="500"
+   * src="https://www.youtube.com/embed/m6hQm7etji8" frameborder="0"
+   *    allow="accelerometer; autoplay; encrypted-media; gyroscope;
+   * picture-in-picture" allowfullscreen></iframe>
+   *  </p>
+   * @endhtmlonly
    *
    * It can be seen that this velocity reverses periodically due to the term
    * $\cos \left( \pi \frac{t}{T} \right)$ and that material will end up at its
