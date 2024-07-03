@@ -1926,7 +1926,7 @@ public:
      * Swap function.
      */
     friend void
-    swap(ConstraintLine &l1, ConstraintLine &l2)
+    swap(ConstraintLine &l1, ConstraintLine &l2) noexcept
     {
       std::swap(l1.index, l2.index);
       std::swap(l1.entries, l2.entries);

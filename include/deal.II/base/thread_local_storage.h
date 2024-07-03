@@ -104,8 +104,8 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_copy_constructible<
-        typename internal::unpack_container<T>::type>::value ||
+      std::is_copy_constructible_v<
+        typename internal::unpack_container<T>::type> ||
         std::is_default_constructible_v<T>,
       "The stored type must be either copyable, or default constructible");
 

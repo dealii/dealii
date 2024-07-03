@@ -157,7 +157,7 @@ BlockVector<Number>::operator=(const TrilinosWrappers::MPI::BlockVector &v)
 
 template <typename Number>
 void
-BlockVector<Number>::swap(BlockVector<Number> &v)
+BlockVector<Number>::swap(BlockVector<Number> &v) noexcept
 {
   std::swap(this->components, v.components);
 

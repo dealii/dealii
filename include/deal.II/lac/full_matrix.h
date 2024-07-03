@@ -86,8 +86,7 @@ public:
    * std::complex.
    */
   static_assert(
-    std::is_arithmetic<
-      typename numbers::NumberTraits<number>::real_type>::value,
+    std::is_arithmetic_v<typename numbers::NumberTraits<number>::real_type>,
     "The FullMatrix class only supports basic numeric types. In particular, it "
     "does not support automatically differentiated numbers.");
 

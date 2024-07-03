@@ -1772,13 +1772,13 @@ namespace MatrixFreeTools
      * If value type of matrix and constrains equals, return a reference
      * to the given AffineConstraint instance.
      */
-    template <typename MatrixType,
-              typename Number,
-              std::enable_if_t<std::is_same_v<
-                typename std::remove_const<typename std::remove_reference<
-                  typename MatrixType::value_type>::type>::type,
-                typename std::remove_const<typename std::remove_reference<
-                  Number>::type>::type>> * = nullptr>
+    template <
+      typename MatrixType,
+      typename Number,
+      std::enable_if_t<std::is_same_v<
+        std::remove_const_t<
+          std::remove_reference_t<typename MatrixType::value_type>>,
+        std::remove_const_t<std::remove_reference_t<Number>>>> * = nullptr>
     const AffineConstraints<typename MatrixType::value_type> &
     create_new_affine_constraints_if_needed(
       const MatrixType &,
@@ -1793,13 +1793,13 @@ namespace MatrixFreeTools
      * AffineConstraint instance with the value type of the matrix is
      * created and a reference to it is returned.
      */
-    template <typename MatrixType,
-              typename Number,
-              std::enable_if_t<!std::is_same_v<
-                typename std::remove_const<typename std::remove_reference<
-                  typename MatrixType::value_type>::type>::type,
-                typename std::remove_const<typename std::remove_reference<
-                  Number>::type>::type>> * = nullptr>
+    template <
+      typename MatrixType,
+      typename Number,
+      std::enable_if_t<!std::is_same_v<
+        std::remove_const_t<
+          std::remove_reference_t<typename MatrixType::value_type>>,
+        std::remove_const_t<std::remove_reference_t<Number>>>> * = nullptr>
     const AffineConstraints<typename MatrixType::value_type> &
     create_new_affine_constraints_if_needed(
       const MatrixType &,

@@ -312,7 +312,7 @@ namespace TrilinosWrappers
        * functions.
        */
       void
-      swap(BlockVector &v);
+      swap(BlockVector &v) noexcept;
 
       /**
        * Print to a stream.
@@ -427,7 +427,7 @@ namespace TrilinosWrappers
 
 
     inline void
-    BlockVector::swap(BlockVector &v)
+    BlockVector::swap(BlockVector &v) noexcept
     {
       std::swap(this->components, v.components);
 
@@ -444,7 +444,7 @@ namespace TrilinosWrappers
      * @relatesalso TrilinosWrappers::MPI::BlockVector
      */
     inline void
-    swap(BlockVector &u, BlockVector &v)
+    swap(BlockVector &u, BlockVector &v) noexcept
     {
       u.swap(v);
     }

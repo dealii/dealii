@@ -1367,7 +1367,8 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::swap(Vector<Number, MemorySpaceType> &v)
+    Vector<Number, MemorySpaceType>::swap(
+      Vector<Number, MemorySpaceType> &v) noexcept
     {
 #ifdef DEAL_II_WITH_MPI
 

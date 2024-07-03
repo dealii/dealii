@@ -358,7 +358,7 @@ public:
    * Swaps the given vector with the calling vector.
    */
   void
-  swap(AlignedVector<T> &vec);
+  swap(AlignedVector<T> &vec) noexcept;
 
   /**
    * Return whether the vector is empty, i.e., its size is zero.
@@ -1964,7 +1964,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
 
 template <class T>
 inline void
-AlignedVector<T>::swap(AlignedVector<T> &vec)
+AlignedVector<T>::swap(AlignedVector<T> &vec) noexcept
 {
   // Swap the data in the 'elements' objects. Then also make sure that
   // their respective deleter objects point to the right place.

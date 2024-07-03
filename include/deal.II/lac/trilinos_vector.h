@@ -1303,7 +1303,7 @@ namespace TrilinosWrappers
        * analogy to standard functions.
        */
       void
-      swap(Vector &v);
+      swap(Vector &v) noexcept;
 
       /**
        * Estimate for the memory consumption in bytes.
@@ -1419,7 +1419,7 @@ namespace TrilinosWrappers
      * @relatesalso TrilinosWrappers::MPI::Vector
      */
     inline void
-    swap(Vector &u, Vector &v)
+    swap(Vector &u, Vector &v) noexcept
     {
       u.swap(v);
     }

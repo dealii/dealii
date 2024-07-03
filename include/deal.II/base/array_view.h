@@ -943,9 +943,9 @@ namespace internal
  * @relatesalso ArrayView
  */
 template <typename Iterator, typename MemorySpaceType = MemorySpace::Host>
-ArrayView<typename std::remove_reference<
-            typename std::iterator_traits<Iterator>::reference>::type,
-          MemorySpaceType>
+ArrayView<
+  std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>,
+  MemorySpaceType>
 make_array_view(const Iterator begin, const Iterator end)
 {
   static_assert(
@@ -964,9 +964,9 @@ make_array_view(const Iterator begin, const Iterator end)
   Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
          ExcMessage("The provided range isn't contiguous in memory!"));
   // the reference type, not the value type, knows the constness of the iterator
-  return ArrayView<typename std::remove_reference<
-                     typename std::iterator_traits<Iterator>::reference>::type,
-                   MemorySpaceType>(std::addressof(*begin), end - begin);
+  return ArrayView<
+    std::remove_reference_t<typename std::iterator_traits<Iterator>::reference>,
+    MemorySpaceType>(std::addressof(*begin), end - begin);
 }
 
 

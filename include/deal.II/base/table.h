@@ -740,7 +740,7 @@ public:
    * functions.
    */
   void
-  swap(TableBase<N, T> &v);
+  swap(TableBase<N, T> &v) noexcept;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -986,8 +986,8 @@ namespace MatrixTableIterators
     /**
      * Type of the stored pointer to the table.
      */
-    using container_pointer_type = typename std::
-      conditional<Constness, const TableType *, TableType *>::type;
+    using container_pointer_type =
+      std::conditional_t<Constness, const TableType *, TableType *>;
 
     /**
      * Value type of the underlying container.
@@ -1198,8 +1198,8 @@ namespace MatrixTableIterators
     /**
      * Type of the stored pointer to the table.
      */
-    using container_pointer_type = typename std::
-      conditional<Constness, const TableType *, TableType *>::type;
+    using container_pointer_type =
+      std::conditional_t<Constness, const TableType *, TableType *>;
 
     /**
      * Constructor from an accessor.
@@ -2558,7 +2558,7 @@ TableBase<N, T>::fill(InputIterator entries, const bool C_style_indexing)
 
 template <int N, typename T>
 inline void
-TableBase<N, T>::swap(TableBase<N, T> &v)
+TableBase<N, T>::swap(TableBase<N, T> &v) noexcept
 {
   values.swap(v.values);
   std::swap(table_size, v.table_size);
@@ -3712,7 +3712,7 @@ Table<7, T>::operator()(const size_type i,
  */
 template <int N, typename T>
 inline void
-swap(TableBase<N, T> &u, TableBase<N, T> &v)
+swap(TableBase<N, T> &u, TableBase<N, T> &v) noexcept
 {
   u.swap(v);
 }

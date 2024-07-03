@@ -3684,7 +3684,7 @@ namespace
         for (auto &pair : face_side_sets)
           {
             Assert(pair.second.size() > 0, ExcInternalError());
-            face_id_to_side_sets.push_back(std::move(pair));
+            face_id_to_side_sets.emplace_back(std::move(pair));
           }
 
         // sort by side sets:

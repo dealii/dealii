@@ -423,7 +423,7 @@ namespace LinearAlgebra
        * handle memory separately.
        */
       virtual void
-      swap(Vector &v);
+      swap(Vector &v) noexcept;
 
       /**
        * Extract a range of elements all at once.
@@ -1086,7 +1086,8 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     inline void
-    swap(Vector<Number, MemorySpace> &u, Vector<Number, MemorySpace> &v)
+    swap(Vector<Number, MemorySpace> &u,
+         Vector<Number, MemorySpace> &v) noexcept
     {
       u.swap(v);
     }
@@ -1110,7 +1111,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     inline void
-    Vector<Number, MemorySpace>::swap(Vector<Number, MemorySpace> &v)
+    Vector<Number, MemorySpace>::swap(Vector<Number, MemorySpace> &v) noexcept
     {
       vector.swap(v.vector);
     }

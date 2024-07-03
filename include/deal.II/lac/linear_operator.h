@@ -507,8 +507,8 @@ operator*(typename Range::value_type                    number,
           const LinearOperator<Range, Domain, Payload> &op)
 {
   static_assert(
-    std::is_convertible<typename Range::value_type,
-                        typename Domain::value_type>::value,
+    std::is_convertible_v<typename Range::value_type,
+                          typename Domain::value_type>,
     "Range and Domain must have implicitly convertible 'value_type's");
 
   if (op.is_null_operator)
@@ -574,8 +574,8 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
           typename Domain::value_type                   number)
 {
   static_assert(
-    std::is_convertible<typename Range::value_type,
-                        typename Domain::value_type>::value,
+    std::is_convertible_v<typename Range::value_type,
+                          typename Domain::value_type>,
     "Range and Domain must have implicitly convertible 'value_type's");
 
   return number * op;
