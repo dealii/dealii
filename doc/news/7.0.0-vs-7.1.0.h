@@ -224,7 +224,7 @@ to an output stream and later retrieved to restore the state of the program.
 <li> New/deprecated: The Triangulation class offers ways to get informed
 whenever the triangulation changes. Previously, the mechanism doing this
 was through the Triangulation::RefinementListener class. This has been
-deprecated and has been superceded by a BOOST signals based mechanism
+deprecated and has been superseded by a BOOST signals based mechanism
 that is generally more powerful and does not rely on overloading
 particular virtual functions inherited from a base class.
 
@@ -657,7 +657,7 @@ number of components. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2011/03/07)
 
-<li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existant SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
+<li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existent SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
 <br>
 (Timo Heister, 2011/02/23)
 

@@ -347,7 +347,7 @@ public:
    * integral of product of the test function multiplied by the data passed to
    * this function.
    *
-   * @note This function accessses the same field as through get_value(), so
+   * @note This function accesses the same field as through get_value(), so
    * make sure to not call it after calling submit_value() for a specific
    * quadrature point index.
    */
@@ -402,7 +402,7 @@ public:
    * of the test function gradient multiplied by the values passed to this
    * function.
    *
-   * @note This function accessses the same field as through get_gradient(),
+   * @note This function accesses the same field as through get_gradient(),
    * so make sure to not call it after calling submit_gradient() for a
    * specific quadrature point index.
    */
@@ -478,7 +478,7 @@ public:
    * of the test function Hessian multiplied by the values passed to this
    * function.
    *
-   * @note This function accessses the same field as through get_hessian(),
+   * @note This function accesses the same field as through get_hessian(),
    * so make sure to not call it after calling submit_hessian() for a
    * specific quadrature point index.
    */

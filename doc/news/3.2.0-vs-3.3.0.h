@@ -383,7 +383,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: <code>GridGenerator</code> has a function
        <code>cylinder</code> for cylinders in three
-       space dimensions. Accoridngly, a class <code
+       space dimensions. Accordingly, a class <code
        class="class">CylinderBoundary</code> has been created.
        <br>
        (GK 2001/12/07)

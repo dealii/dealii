@@ -1279,7 +1279,7 @@ inconvenience this causes.
   <li> <p>
        Extended: The <code>GridIn</code> class can now
        read in tecplot files in ASCII format (block and point format,
-       ordered and unstructured grids, format specifiers acccording to
+       ordered and unstructured grids, format specifiers according to
        Tecplot 10 and younger versions). At the moment the
        implementation is restricted to 2d grids but can easily be
        extended to 3d as well.

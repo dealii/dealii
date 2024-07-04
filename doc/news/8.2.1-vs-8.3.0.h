@@ -1032,7 +1032,7 @@ inconvenience this causes.
   </li>
 
   <li> New: A new macro <code>DEAL_II_QUERY_GIT_INFORMATION</code> is
-  provided to query user projects for git repository information simmilarly
+  provided to query user projects for git repository information similarly
   to those exported by deal.II.
   <br>
   (Matthias Maier, 2015/01/21)

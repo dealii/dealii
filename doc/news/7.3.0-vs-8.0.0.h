@@ -592,7 +592,7 @@ MPI/PETSc/Slepc in all cases.
 
 <li> Added/fixed: IterativeInverse::vmult() can now handle vectors
 using a different number type than the matrix type. As usual, the
-number types must be compatible. Addtitionally, the initial guess is
+number types must be compatible. Additionally, the initial guess is
 always set to zero, since starting with the incoming vector makes no
 sense.
 <br>

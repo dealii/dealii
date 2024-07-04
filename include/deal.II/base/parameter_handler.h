@@ -1274,7 +1274,7 @@ public:
 
   /**
    * Return the string that identifies the current path into the property
-   * tree. The path elements are seperated by the path_separator, which is a
+   * tree. The path elements are separated by the path_separator, which is a
    * '.'. This is only a path, i.e., it is not terminated by the path_separator
    * character.
    *
@@ -1287,7 +1287,7 @@ public:
   /**
    * Given the name of an entry as argument, the function computes a full path
    * into the parameter tree using the current subsection. The path elements are
-   * seperated by the path_separator, which is a '.'.
+   * separated by the path_separator, which is a '.'.
    */
   std::string
   get_current_full_path(const std::string &name) const;
@@ -1295,7 +1295,7 @@ public:
   /**
    * This function computes a full path into the parameter tree given a path
    * from the current subsection and the name of an entry. The path elements are
-   * seperated by the path_separator, which is a '.'.
+   * separated by the path_separator, which is a '.'.
    */
   std::string
   get_current_full_path(const std::vector<std::string> &sub_path,

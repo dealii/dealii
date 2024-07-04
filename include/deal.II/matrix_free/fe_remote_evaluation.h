@@ -1350,7 +1350,7 @@ namespace Utilities
             const auto idx = indices[i];
 
             // We do not use a structural binding here, since with
-            // C++17 caputuring structural bindings in lambdas leads
+            // C++17 capturing structural bindings in lambdas leads
             // to an ill formed program.
             const auto &cell = std::get<0>(cell_face_pairs[i]);
             const auto &f    = std::get<1>(cell_face_pairs[i]);

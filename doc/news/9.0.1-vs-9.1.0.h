@@ -965,7 +965,7 @@ inconvenience this causes.
   requested, i.e., perform `degree+1` matrix-vector products rather than
   `degree` which is the convention in literature. This is now fixed. Note that
   the quality of PreconditionChebyshev is obviously slightly reduced by this
-  change, and some solvers might need more outer iterations due to a ligher
+  change, and some solvers might need more outer iterations due to a lighter
   Chebyshev iteration.
   <br>
   (Martin Kronbichler, 2019/02/08)

@@ -81,7 +81,7 @@ inconvenience this causes.
  <li>
   Fixed: Callback functions attached to any weighted load balancing signal
   of parallel::distributed::Triangulation objects now need to handle cells
-  with CELL_INVALID status explicitely.
+  with CELL_INVALID status explicitly.
   <br>
   If a cell gets refined, only the first child has the CELL_REFINE status,
   while all other children are CELL_INVALID.
@@ -91,7 +91,7 @@ inconvenience this causes.
 
  <li>
   Changed: For weighted load balancing with parallel::distributed::Triangulation
-  objects, an intial weight of `1000` will no longer be assigned to each cell.
+  objects, an initial weight of `1000` will no longer be assigned to each cell.
   <br>
   The old signal Triangulation::Signals::cell_weight has been deprecated.
   Please use the new signal Triangulation::Signals::weight instead.
@@ -376,7 +376,7 @@ inconvenience this causes.
 
  <li>
   Removed: The overloads in CUDAWrappers::FEEvaluation that take a local dof index
-  or a quadrature point as arguement have been removed.
+  or a quadrature point as argument have been removed.
   Use the ones that don't use these arguments in their interface instead.
   <br>
   (Daniel Arndt, 2021/05/26)
@@ -501,9 +501,9 @@ inconvenience this causes.
   New: Added support for the CGAL library (www.cgal.org). The following features
   are supported:
   <ul>
-    <li>Conversion from deal.II to CGAL point types and viceversa</li>
-    <li>Conversion from deal.II cell types to CGAL::Surface_mesh and viceversa</li>
-    <li>Conversion from deal.II Triangulation to CGAL::Surface_mesh and viceversa</li>
+    <li>Conversion from deal.II to CGAL point types and vice-versa</li>
+    <li>Conversion from deal.II cell types to CGAL::Surface_mesh and vice-versa</li>
+    <li>Conversion from deal.II Triangulation to CGAL::Surface_mesh and vice-versa</li>
     <li>Insertion of deal.II points in CGAL triangulation types</li>
     <li>Conversion from CGAL::Triangulation_2 to Triangulation<dim, 2></li>
     <li>Conversion from CGAL::Triangulation_3 to Triangulation<dim, 3></li>
@@ -1360,7 +1360,7 @@ inconvenience this causes.
 
  <li>
   Fixed: The payload for Trilinos-based linear operators is now able to use its
-  own type as an examplar operator. This means that one can now use linear
+  own type as an exemplar operator. This means that one can now use linear
   operators based on Trilinos matrices as exampler operators when initializing
   a LinearOperator for a Trilinos preconditioner.
   <br>
@@ -1404,7 +1404,7 @@ inconvenience this causes.
  <li>
   New: The hp::FECollection::hp_vertex_dof_identities() function (and
   related functions for lines and quads) allows for the computation of
-  multiway computations of DoF indentities in the hp-context.
+  multiway computations of DoF identities in the hp-context.
   <br>
   (Wolfgang Bangerth, 2021/08/20)
  </li>
@@ -1628,7 +1628,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Addes conformity tests for several vector elements
+  Added conformity tests for several vector elements
   in 2D/3D as well as minor fixes for 2d Nedelec and
   Raviart-Thomas to make them work on non-standard meshes.
   <br>

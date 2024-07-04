@@ -688,7 +688,7 @@ namespace internal
           if (this->mg_level_fine == numbers::invalid_unsigned_int)
             {
               // create fine cell in two steps, since the coarse cell and
-              // the fine cell are associated to different Trinagulation
+              // the fine cell are associated to different Triangulation
               // objects
               const auto cell_id = cell->id();
               const auto cell_fine_raw =

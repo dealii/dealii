@@ -60,7 +60,7 @@ namespace Step89
   //
   // In the following, let us first define a function that provides
   // the initial condition for the vibrating membrane test case.  It
-  // implementes both the initial pressure (component 0) and velocity
+  // implements both the initial pressure (component 0) and velocity
   // (components 1 to 1 + dim).
   //
   // There is also a function that computes the duration of one
@@ -633,7 +633,7 @@ namespace Step89
           const auto up = velocity_p.get_value(q);
 
           // Compute homogeneous local Lax-Friedrichs fluxes and submit the
-          // corrsponding values to the integrators.
+          // corresponding values to the integrators.
           const auto momentum_flux =
             0.5 * (pm + pp) + 0.5 * tau * (um - up) * n;
           velocity_m.submit_value(1.0 / rho * (momentum_flux - pm) * n, q);
@@ -1026,7 +1026,7 @@ namespace Step89
 
     const std::set<types::boundary_id> remote_face_ids;
 
-    // FERemoteEvaluation objects are strored as shared pointers. This way,
+    // FERemoteEvaluation objects are stored as shared pointers. This way,
     // they can also be used for other operators without precomputing the values
     // multiple times.
     const std::shared_ptr<FERemoteEvaluation<dim, 1, remote_value_type>>

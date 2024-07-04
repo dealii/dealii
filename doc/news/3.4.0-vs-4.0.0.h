@@ -773,7 +773,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <code>SparseDirectMA27</code> class now has a detached
        mode, in which it forks off a separate program that will do the
        computations using this solver. The actual operations are therefore
-       distributed to distint programs that have separate address spaces. This
+       distributed to distinct programs that have separate address spaces. This
        allows to have as many concurrent instances of this solver in parallel
        as you want. For more information, read the documentation of the
        <code>SparseDirectMA27</code> class.
@@ -1220,7 +1220,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">integrate_difference</code> can compute <i>L<sup>p</sup></i>
        and <i>W<sup>1,p</sup></i> norms for arbitrary <i>p</i>. The function
        receives an additional optional argument <i>p</i> for this. All previous
-       fuctionality remains unchanged, although the code has been cleaned up a bit.
+       functionality remains unchanged, although the code has been cleaned up a bit.
        <br>
        (GK 2002/08/01)
        </p>

@@ -743,7 +743,7 @@ inconvenience this causes.
  <li>
   New: The FEInterfaceValues class provides a new abstraction to assemble
   interface terms between two neighboring cells. This is commonly used in
-  Discontinous Galerkin methods.
+  Discontinuous Galerkin methods.
   <br>
   (Timo Heister, 2019/08/24)
  </li>

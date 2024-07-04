@@ -1612,7 +1612,7 @@ inconvenience this causes.
 
  <li>
   Fixed: Allow to use FETools::get_fe_by_name for all
-  availabale FiniteElements.
+  available FiniteElements.
   <br>
   (Daniel Arndt, 2016/07/10)
  </li>
