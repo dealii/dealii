@@ -1,0 +1,25 @@
+
+DEAL::Testing projection in direction normal to CAD surface
+DEAL:: Read ../../../source/step-54/input/DTMB-5415_bulbous_bow.iges
+DEAL:: Wrote 3d_mesh_normal_projection_0.vtk
+DEAL:: Wrote 3d_mesh_normal_projection_1.vtk
+DEAL:: Wrote 3d_mesh_normal_projection_2.vtk
+DEAL:: Wrote 3d_mesh_normal_projection_3.vtk
+DEAL:: Wrote 3d_mesh_normal_projection_4.vtk
+DEAL:: Wrote 3d_mesh_normal_projection_5.vtk
+DEAL::Testing projection in y-axis direction
+DEAL:: Read ../../../source/step-54/input/DTMB-5415_bulbous_bow.iges
+DEAL:: Wrote 3d_mesh_directional_projection_0.vtk
+DEAL:: Wrote 3d_mesh_directional_projection_1.vtk
+DEAL:: Wrote 3d_mesh_directional_projection_2.vtk
+DEAL:: Wrote 3d_mesh_directional_projection_3.vtk
+DEAL:: Wrote 3d_mesh_directional_projection_4.vtk
+DEAL:: Wrote 3d_mesh_directional_projection_5.vtk
+DEAL::Testing projection in direction normal to mesh elements
+DEAL:: Read ../../../source/step-54/input/DTMB-5415_bulbous_bow.iges
+DEAL:: Wrote 3d_mesh_normal_to_mesh_projection_0.vtk
+DEAL:: Wrote 3d_mesh_normal_to_mesh_projection_1.vtk
+DEAL:: Wrote 3d_mesh_normal_to_mesh_projection_2.vtk
+DEAL:: Wrote 3d_mesh_normal_to_mesh_projection_3.vtk
+DEAL:: Wrote 3d_mesh_normal_to_mesh_projection_4.vtk
+DEAL:: Wrote 3d_mesh_normal_to_mesh_projection_5.vtk

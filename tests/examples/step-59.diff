@@ -1,30 +1,41 @@
-74c74
+26c26
+< 
+---
+> #include "../example_test.h"
+73c73
 <   const unsigned int degree_finite_element = 8;
 ---
 >   const unsigned int degree_finite_element = 5;
-1232c1232
+1231c1231
 <             smoother_data[level].eig_cg_n_iterations = 10;
 ---
 >             smoother_data[level].eig_cg_n_iterations = 15;
-1236,1237c1236,1238
+1235,1236c1235,1237
 <             smoother_data[0].smoothing_range = 2e-2;
 <             smoother_data[0].degree          = numbers::invalid_unsigned_int;
 ---
 >             smoother_data[0].smoothing_range = 100;
 >             smoother_data[0].degree          = 15;
 >             smoother_data[0].max_eigenvalue  = 4;
-1239a1241,1242
+1238a1240,1241
 >         smoother_data[level].eigenvalue_algorithm =
 >           internal::EigenvalueAlgorithm::power_iteration;
-1266d1268
+1265d1267
 <     pcout << "Total setup time              " << setup_time << " s\n";
-1272,1273c1274,1275
+1269,1272c1271,1277
+<     cg.solve(system_matrix, solution, system_rhs, preconditioner);
+< 
 <     pcout << "Time solve (" << solver_control.last_step() << " iterations)    "
 <           << time.wall_time() << " s" << std::endl;
 ---
->     pcout << "Time solve (" << solver_control.last_step() << " iterations) "
->           << std::endl;
-1320c1322
+>     //cg.solve(system_matrix, solution, system_rhs, preconditioner);
+>     check_solver_within_range(pcout,
+>                               cg.solve(system_matrix, solution, system_rhs, preconditioner),
+>                               solver_control.last_step(),
+>                               12, 15);
+> //    pcout << "Time solve (" << solver_control.last_step() << " iterations) "
+> //          << std::endl;
+1319c1324
 <     for (unsigned int cycle = 0; cycle < 9 - dim; ++cycle)
 ---
 >     for (unsigned int cycle = 0; cycle < 3; ++cycle)
