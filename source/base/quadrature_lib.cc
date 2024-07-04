@@ -1351,13 +1351,13 @@ QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
   Assert(n > 0, ExcMessage("Need at least one point for quadrature rules."));
   std::vector<double> points =
     internal::QGaussRadauChebyshev::get_quadrature_points(n, end_point);
-  std::vector<double> weights =
+  std::vector<double> new_weights =
     internal::QGaussRadauChebyshev::get_quadrature_weights(n, end_point);
 
   for (unsigned int i = 0; i < this->size(); ++i)
     {
       this->quadrature_points[i] = Point<1>(points[i]);
-      this->weights[i]           = weights[i];
+      this->weights[i]           = new_weights[i];
     }
 }
 

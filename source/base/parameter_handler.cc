@@ -315,7 +315,7 @@ namespace
     current_section.sort(compare);
 
     // Now transverse subsections tree recursively.
-    for (auto &p : current_section)
+    for (const auto &p : current_section)
       {
         if ((is_parameter_node(p.second) == false) &&
             (is_alias_node(p.second) == false))

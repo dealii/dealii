@@ -302,8 +302,8 @@ namespace parallel
           cell_iterator &cell,
         const CellStatus status,
         const boost::iterator_range<std::vector<char>::const_iterator>
-                                  &data_range,
-        std::vector<VectorType *> &all_out);
+                                        &data_range,
+        const std::vector<VectorType *> &all_out);
     };
   } // namespace distributed
 } // namespace parallel

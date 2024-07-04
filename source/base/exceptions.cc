@@ -285,7 +285,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       std::string functionname =
         stacktrace_entry.substr(pos_start + 1, pos_end - pos_start - 1);
 
-      stacktrace_entry = stacktrace_entry.substr(0, pos_start);
+      stacktrace_entry.resize(pos_start);
       stacktrace_entry += ": ";
 
       // demangle, and if successful replace old mangled string by

@@ -84,7 +84,7 @@ namespace Algorithms
      * the parameters just read.
      */
     void
-    parse_parameters(ParameterHandler &param);
+    parse_parameters(const ParameterHandler &param);
 
     /**
      * Return the left end of the time interval.

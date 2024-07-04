@@ -56,21 +56,13 @@ namespace internal
   {
     std::string policy_name;
     if (dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::
-                       Policy::Sequential<dim, spacedim> *>(&policy) ||
-        dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::
                        Policy::Sequential<dim, spacedim> *>(&policy))
       policy_name = "Policy::Sequential<";
     else if (dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelDistributed<dim, spacedim> *>(&policy) ||
-             dynamic_cast<
-               const typename dealii::internal::DoFHandlerImplementation::
                  Policy::ParallelDistributed<dim, spacedim> *>(&policy))
       policy_name = "Policy::ParallelDistributed<";
     else if (dynamic_cast<
-               const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelShared<dim, spacedim> *>(&policy) ||
-             dynamic_cast<
                const typename dealii::internal::DoFHandlerImplementation::
                  Policy::ParallelShared<dim, spacedim> *>(&policy))
       policy_name = "Policy::ParallelShared<";

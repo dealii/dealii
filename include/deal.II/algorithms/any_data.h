@@ -230,7 +230,7 @@ inline type
 AnyData::entry(const unsigned int i)
 {
   AssertIndexRange(i, size());
-  type *p = std::any_cast<type>(&data[i]);
+  const type *p = std::any_cast<type>(&data[i]);
   Assert(p != nullptr,
          ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
@@ -349,7 +349,7 @@ inline type
 AnyData::entry(const std::string &n)
 {
   const unsigned int i = find(n);
-  type              *p = std::any_cast<type>(&data[i]);
+  const type        *p = std::any_cast<type>(&data[i]);
   Assert(p != 0, ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
