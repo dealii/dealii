@@ -1843,7 +1843,7 @@ namespace GridTools
   template <int dim, int spacedim>
   std::map<unsigned int, types::global_vertex_index>
   compute_local_to_global_vertex_index_map(
-    const parallel::distributed::Triangulation<dim, spacedim> &triangulation);
+    const Triangulation<dim, spacedim> &triangulation);
 
   /** @} */
   /**
