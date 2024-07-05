@@ -717,7 +717,7 @@ All entries are signed with the names of the author.
        Removed: The
        <code>DataOut_Old</code> class has finally gone for
        good. It was already deprecated in version 3.0, and has been
-       superceded for a long time by the framework of classes around
+       superseded for a long time by the framework of classes around
        <code>DataOutBase</code> and
        <code>DataOut</code>.
        <br>

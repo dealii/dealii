@@ -28,7 +28,7 @@ author.
 <ol>
 
  <li>
-  Fixed: Various compatiblity issues and minor bugfixes have been resolved:
+  Fixed: Various compatibility issues and minor bugfixes have been resolved:
   <ol>
   <li>fixes a Sundials/Kinsol issue</li>
   <li>fixes a bug for plain_copy in MGTransferMatrixFree</li>

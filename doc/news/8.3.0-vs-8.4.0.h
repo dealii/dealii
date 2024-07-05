@@ -221,7 +221,7 @@ inconvenience this causes.
 <h3>General</h3>
 <ol>
   <li> New: A variant for GridGenerator::subdivided_parallelepiped() was added
-  that supports meshes embedded in higher dimesional spaces.
+  that supports meshes embedded in higher dimensional spaces.
   <br>
   (Timo Heister, 2016/02/04)
   </li>

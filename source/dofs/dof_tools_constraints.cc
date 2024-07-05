@@ -3230,7 +3230,7 @@ namespace DoFTools
             return;
           }
 
-      // In the case of shared Trinagulation with artificial cells all
+      // In the case of shared Triangulation with artificial cells all
       // cells have valid DoF indices, i.e., the check above does not work.
       if (const auto tria = dynamic_cast<
             const parallel::shared::Triangulation<dim, spacedim> *>(

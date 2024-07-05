@@ -279,7 +279,7 @@ inconvenience this causes.
    rather than how these jobs have to be mapped onto threads. We then
    use the <a href="https://www.threadingbuildingblocks.org">Threading
    Building Blocks (TBB) library</a> to schedule tasks onto available
-   hardware resources. This new scheme of describing parallism and
+   hardware resources. This new scheme of describing parallelism and
    various abstractions to make programming in this framework easier
    are described in great detail in the
    @ref threads "Parallel computing with multiple processors" module.

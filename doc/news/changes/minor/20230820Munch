@@ -1,5 +1,5 @@
 New: The Rayleigh--Kothe vortex has been extracted
-from step-68 and is now availabe as the new class
+from step-68 and is now available as the new class
 Functions::RayleighKotheVortex.
 <br>
 (Bruno Blais, Peter Munch, 2023/08/20)

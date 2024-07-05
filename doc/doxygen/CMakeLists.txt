@@ -281,7 +281,7 @@ endif()
 # doxygen version 1.9.1 can not correctly parse C++20-style 'requires'
 # clauses and just drops certain classes and shows documentation for
 # DEAL_II_CXX20_REQUIRES instead. 1.9.7 gets this right, but has other
-# bugs. It's unclear for versions inbetween. Err on the safe side, and
+# bugs. It's unclear for versions in between. Err on the safe side, and
 # only make them visible to doxygen if we have at least 1.9.8.
 if(${DOXYGEN_VERSION} VERSION_LESS 1.9.8)
   message(STATUS "Suppressing 'requires' clause parsing because doxygen is too old")

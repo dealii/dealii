@@ -421,7 +421,7 @@ inconvenience this causes.
   the compiler. This is (as of May 2020) C++14 for all compilers. If you want
   to override that behavior, please set the C++ standard directly for example
   by configuring with <code>-DDEAL_II_CXX_FLAGS="-std=c++17"</code>, or by
-  setting the environement variable <code>CXXFLAGS="-std=c++17"</code>.
+  setting the environment variable <code>CXXFLAGS="-std=c++17"</code>.
   <br>
   (Matthias Maier, 2020/05/21)
  </li>
@@ -546,7 +546,7 @@ inconvenience this causes.
 
  <li>
   New: The behavior of the local_size() member function is not consistent across
-  all vector classes that support ghost elements. As a remedy theis member
+  all vector classes that support ghost elements. As a remedy this member
   function is deprecated and replaced by locally_owned_size() that returns the
   number of locally owned elements (in particular without ghost elements).
   <br>
@@ -618,7 +618,7 @@ inconvenience this causes.
   Changed: The internal data structures of DoFHandler have been modified to use
   compressed row storage, enabling it to also handle hp::DoFHandler functionalities.
   Currently, the user can choose between the normal mode and the hp mode during
-  calling the constructur. Please note that the multigrid functionalities are only
+  calling the constructor. Please note that the multigrid functionalities are only
   available during normal mode.
   <br>
   (Peter Munch, 2020/05/23)
@@ -1511,7 +1511,7 @@ inconvenience this causes.
  <li>
   New: BoundingBox::real_to_unit() and BoundingBox::unit_to_real() allow one to
   apply both the direct and the inverse transformation that are needed to map the
-  unit bounding box to the current box, and viceversa.
+  unit bounding box to the current box, and vice-versa.
   <br>
   (Luca Heltai, 2020/06/29)
  </li>
@@ -1684,7 +1684,7 @@ inconvenience this causes.
 
  <li>
   New: When executing a task on a separate thread, if that task ends
-  with throwing an exception instead of returing a value, then this
+  with throwing an exception instead of returning a value, then this
   exception will be obtained when you wait for the task using
   Threads::Task::join() or Threads::Task::return_value().
   <br>

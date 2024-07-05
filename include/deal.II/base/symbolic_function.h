@@ -120,7 +120,7 @@ namespace Functions
    * Partial substitution is possible (i.e., you can define the function using
    * additional symbols). However, as soon as you evaluate the function, you
    * have to make sure that all extraneous symbols (i.e., those not referring
-   * to the spacial @p coordinate_symbols or to the @p time_symbol variable)
+   * to the spatial @p coordinate_symbols or to the @p time_symbol variable)
    * have been substituted with numerical values, or expressions of the spatial
    * or temporal argument, by calling the update_user_substitution_map() or the
    * set_additional_function_arguments() methods.
