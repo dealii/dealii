@@ -2947,6 +2947,46 @@ namespace FETools
 
 
 
+  template <int dim, int spacedim>
+  Quadrature<dim>
+  compute_nodal_quadrature(const FiniteElement<dim, spacedim> &fe)
+  {
+    Assert(fe.has_support_points(), ExcNotImplemented());
+    Assert(fe.n_blocks() == 1, ExcNotImplemented());
+    Assert(fe.n_components() == 1, ExcNotImplemented());
+
+    const ReferenceCell type = fe.reference_cell();
+
+    const Quadrature<dim> q_gauss =
+      type.get_gauss_type_quadrature<dim>(fe.tensor_degree() + 1);
+    Triangulation<dim, spacedim> tria;
+    GridGenerator::reference_cell(tria, type);
+    const Mapping<dim, spacedim> &mapping =
+      type.template get_default_linear_mapping<dim, spacedim>();
+
+    auto                    cell = tria.begin_active();
+    FEValues<dim, spacedim> fe_values(mapping,
+                                      fe,
+                                      q_gauss,
+                                      update_values | update_JxW_values);
+    fe_values.reinit(cell);
+
+    const std::vector<Point<dim>> &nodal_quad_points =
+      fe.get_unit_support_points();
+    std::vector<double> nodal_quad_weights(nodal_quad_points.size());
+    Assert(nodal_quad_points.size() > 0, ExcNotImplemented());
+    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+      {
+        double integral = 0.0;
+        for (unsigned int q = 0; q < q_gauss.size(); ++q)
+          integral += fe_values.shape_value(i, q) * fe_values.JxW(q);
+        nodal_quad_weights[i] = integral;
+      }
+    return {nodal_quad_points, nodal_quad_weights};
+  }
+
+
+
   namespace internal
   {
     namespace FEToolsConvertHelper
