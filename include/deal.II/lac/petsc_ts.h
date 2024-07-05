@@ -614,26 +614,40 @@ namespace PETScWrappers
       update_constrained_components;
 
     /**
-     * Callback to set up mesh adaption.
-     *
-     * Implementation of this function is optional.
-     * @p resize must be set to true if mesh adaption is to be performed, false
-     * otherwise.
-     * The @p y vector contains the current solution, @p t the current time,
-     * @ step the step number.
-     * Solution transfer and actual mesh adaption must be performed in a
-     * separate callback, TimeStepper::interpolate
-     *
-     * @note This variable represents a
-     * @ref GlossUserProvidedCallBack "user provided callback".
-     * See there for a description of how to deal with errors and other
-     * requirements and conventions.
+     * This callback is equivalent to `decide_and_prepare_for_remeshing`
+     * except that it returns the decision whether or not to stop
+     * operations via the last reference argument of the function
+     * object instead of a plain return value. This callback is
+     * deprecated. Use `decide_and_prepare_for_remeshing` instead.
      */
     std::function<void(const real_type    t,
                        const unsigned int step,
                        const VectorType  &y,
                        bool              &resize)>
       decide_for_coarsening_and_refinement;
+
+    /**
+     * A callback that returns whether or not to stop time stepping at the
+     * current moment for mesh adaptation. If the callback returns `true`,
+     * then the time stepper stops time integration for now, saves some state,
+     * calls the `interpolate` callback, and then resumes time integration.
+     * Either in the current callback or the `interpolate` callback, the
+     * user code needs to perform the mesh refinement.
+     *
+     * Implementation of this function is optional. The callback
+     * must return `true` if mesh adaption is to be performed, `false`
+     * otherwise.
+     * The @p y vector contains the current solution, @p t the current time,
+     * @ step the step number.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
+     */
+    std::function<
+      bool(const real_type t, const unsigned int step, const VectorType &y)>
+      decide_and_prepare_for_remeshing;
 
     /**
      * Callback to interpolate vectors and perform mesh adaption.
