@@ -59,6 +59,9 @@ ParameterAcceptor::ParameterAcceptor(const std::string &name)
 ParameterAcceptor::~ParameterAcceptor()
 {
   std::lock_guard<std::mutex> l(class_list_mutex);
+  // Notice that it is possible that the class is no longer in the static list.
+  // This happens when the clear() method has been called. erase() does the
+  // righy thing anyway by only removing this class if it's still in the list.
   class_list.erase(this);
 }
 
