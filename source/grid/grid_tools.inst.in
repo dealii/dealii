@@ -77,8 +77,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
       template std::map<unsigned int, types::global_vertex_index>
       compute_local_to_global_vertex_index_map(
-        const parallel::distributed::Triangulation<deal_II_dimension,
-                                                   deal_II_space_dimension>
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
           &triangulation);
 
       template std::pair<

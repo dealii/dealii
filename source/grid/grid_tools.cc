@@ -1411,21 +1411,16 @@ namespace GridTools
   template <int dim, int spacedim>
   std::map<unsigned int, types::global_vertex_index>
   compute_local_to_global_vertex_index_map(
-    const parallel::distributed::Triangulation<dim, spacedim> &triangulation)
+    const Triangulation<dim, spacedim> &triangulation)
   {
     std::map<unsigned int, types::global_vertex_index>
       local_to_global_vertex_index;
 
 #ifndef DEAL_II_WITH_MPI
 
-    // without MPI, this function doesn't make sense because on cannot
-    // use parallel::distributed::Triangulation in any meaningful
-    // way
-    (void)triangulation;
-    Assert(false,
-           ExcMessage("This function does not make any sense "
-                      "for parallel::distributed::Triangulation "
-                      "objects if you do not have MPI enabled."));
+    // If we don't have MPI then all vertices are local
+    for (unsigned int i = 0; i < triangulation.n_vertices(); ++i)
+      local_to_global_vertex_index[i] = i;
 
 #else
 
