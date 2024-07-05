@@ -1,7 +1,3 @@
-1042c1042
-<         output_results(s);
----
-> //        output_results(s);
 1061c1061
 <       test1.run(12);
 ---

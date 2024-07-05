@@ -1,7 +1,7 @@
    Number of active cells:       1024
    Number of degrees of freedom: 1089
    Spurious eigenvalues are all in the interval [1536,1536]
-Solver stopped within 56 - 58 iterations
+Solver stopped within 56 - 68 iterations
 
       Eigenvalue 0 : 4.93877
       Eigenvalue 1 : 12.3707

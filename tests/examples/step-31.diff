@@ -28,10 +28,6 @@
 ---
 >     //std::cout << "   " << solver_control.last_step()
 >     //          << " CG iterations for temperature." << std::endl;       
-2073c2073
-<         output_results();
----
->       //output_results();
 2095c2095
 <     while (time <= 100);
 ---

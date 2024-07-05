@@ -17,7 +17,7 @@
 <                        preconditioner);
 < 
 ---
->     check_solver_within_range(std::cout,
+>     check_solver_within_range(pcout,
 > 	   solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs, preconditioner),
 > 	   solver_control.last_step(),
 > 	   22,
@@ -33,7 +33,7 @@
 <                *T_preconditioner);
 < 
 ---
->     check_solver_within_range(std::cout,
+>     check_solver_within_range(pcout,
 > 	   cg.solve(temperature_matrix, distributed_temperature_solution, temperature_rhs, *T_preconditioner),
 > 	   solver_control.last_step(),
 > 	   16,
@@ -44,42 +44,12 @@
 ---
 >       //pcout << "   " << solver_control.last_step()
 >       //      << " CG iterations for temperature" << std::endl;                    
-3213,3220c3213,3220
-<     DataOut<dim> data_out;
-<     data_out.attach_dof_handler(joint_dof_handler);
-<     data_out.add_data_vector(locally_relevant_joint_solution, postprocessor);
-<     data_out.build_patches();
-< 
-<     static int out_index = 0;
-<     data_out.write_vtu_with_pvtu_record(
-<       "./", "solution", out_index, MPI_COMM_WORLD, 5);
----
->   //DataOut<dim> data_out;
->   //data_out.attach_dof_handler(joint_dof_handler);
->   //data_out.add_data_vector(locally_relevant_joint_solution, postprocessor);
->   //data_out.build_patches();
-> 
->   //static int out_index = 0;
->   //data_out.write_vtu_with_pvtu_record(
->   //  "./", "solution", out_index, MPI_COMM_WORLD, 5);
-3222c3222
-<     ++out_index;
----
->   //++out_index;
 3494,3495c3494,3495
 <         if ((timestep_number > 0) && (timestep_number % 100 == 0))
 <           computing_timer.print_summary();
 ---
 >       //if ((timestep_number > 0) && (timestep_number % 100 == 0))
 >       computing_timer.disable_output();// computing_timer.print_summary();
-3504,3506c3504,3506
-<     if ((parameters.generate_graphical_output == true) &&
-<         !((timestep_number - 1) % parameters.graphical_output_interval == 0))
-<       output_results();
----
->   //if ((parameters.generate_graphical_output == true) &&
->   //    !((timestep_number - 1) % parameters.graphical_output_interval == 0))
->   //  output_results();      
 3538c3538
 <         parameter_filename = "step-32.prm";
 ---

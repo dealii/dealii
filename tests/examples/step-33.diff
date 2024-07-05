@@ -7,14 +7,6 @@
 ---
 >       //std::ifstream input_file(parameters.mesh_filename);
 >       std::ifstream input_file("../../../source/step-33/slide.inp");
-2412c2413
-<     output_results();
----
-> //    output_results();
-2421c2422
-<     double next_output = time + parameters.output_step;
----
-> //    double next_output = time + parameters.output_step;
 2471c2472
 <                 std::printf("   %-16.3e (converged)\n\n", res_norm);
 ---
@@ -36,22 +28,6 @@
 > //                            res_norm,
 > //                            convergence.first,
 > //                            convergence.second);
-2510,2516c2519,2525
-<         if (parameters.output_step < 0)
-<           output_results();
-<         else if (time >= next_output)
-<           {
-<             output_results();
-<             next_output += parameters.output_step;
-<           }
----
-> //        if (parameters.output_step < 0)
-> //          output_results();
-> //        else if (time >= next_output)
-> //          {
-> //            output_results();
-> //            next_output += parameters.output_step;
-> //          }
 2550,2554c2559,2563
 <       if (argc != 2)
 <         {

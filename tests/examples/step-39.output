@@ -11,6 +11,8 @@ DEAL:cg::Convergence step 13 value 1.64974e-13
 DEAL::energy-error: 0.297419
 DEAL::L2-error:     0.00452447
 DEAL::Estimate 0.990460
+DEAL::Writing solution to <sol-00.gnuplot>...
+DEAL::
 DEAL::Step 1
 DEAL::Triangulation 25 cells, 3 levels
 DEAL::DoFHandler 400 dofs, level dofs 64 256 192
@@ -23,6 +25,8 @@ DEAL:cg::Convergence step 14 value 3.72262e-13
 DEAL::energy-error: 0.258559
 DEAL::L2-error:     0.00288510
 DEAL::Estimate 0.738624
+DEAL::Writing solution to <sol-01.gnuplot>...
+DEAL::
 DEAL::Step 2
 DEAL::Triangulation 34 cells, 4 levels
 DEAL::DoFHandler 544 dofs, level dofs 64 256 256 128
@@ -35,3 +39,5 @@ DEAL:cg::Convergence step 15 value 1.91610e-13
 DEAL::energy-error: 0.189234
 DEAL::L2-error:     0.00147954
 DEAL::Estimate 0.657507
+DEAL::Writing solution to <sol-02.gnuplot>...
+DEAL::

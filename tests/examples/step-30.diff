@@ -8,7 +8,3 @@
 ---
 >       //std::cout << "   Time of assemble_system: " << assemble_timer.cpu_time()
 >       //          << std::endl;
-984c984
-<         output_results(cycle);
----
->       //output_results(cycle);

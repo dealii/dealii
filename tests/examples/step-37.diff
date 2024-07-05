@@ -47,7 +47,3 @@
 <     for (unsigned int cycle = 0; cycle < 9 - dim; ++cycle)
 ---
 >     for (unsigned int cycle = 0; cycle < 5; ++cycle)
-1174c1169
-<         output_results(cycle);
----
-> //        output_results(cycle);

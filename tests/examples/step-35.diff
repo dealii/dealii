@@ -6,42 +6,6 @@
 <     for (unsigned int n = 2; n <= n_steps; ++n)
 ---
 >     for (unsigned int n = 2; n <= 4; ++n)
-1346,1362c1346,1362
-<     DataOut<dim> data_out;
-<     data_out.attach_dof_handler(joint_dof_handler);
-<     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-<       component_interpretation(
-<         dim + 2, DataComponentInterpretation::component_is_part_of_vector);
-<     component_interpretation[dim] =
-<       DataComponentInterpretation::component_is_scalar;
-<     component_interpretation[dim + 1] =
-<       DataComponentInterpretation::component_is_scalar;
-<     data_out.add_data_vector(joint_solution,
-<                              joint_solution_names,
-<                              DataOut<dim>::type_dof_data,
-<                              component_interpretation);
-<     data_out.build_patches(deg + 1);
-<     std::ofstream output("solution-" + Utilities::int_to_string(step, 5) +
-<                          ".vtk");
-<     data_out.write_vtk(output);
----
-> //    DataOut<dim> data_out;
-> //    data_out.attach_dof_handler(joint_dof_handler);
-> //    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-> //      component_interpretation(
-> //        dim + 2, DataComponentInterpretation::component_is_part_of_vector);
-> //    component_interpretation[dim] =
-> //      DataComponentInterpretation::component_is_scalar;
-> //    component_interpretation[dim + 1] =
-> //      DataComponentInterpretation::component_is_scalar;
-> //    data_out.add_data_vector(joint_solution,
-> //                             joint_solution_names,
-> //                             DataOut<dim>::type_dof_data,
-> //                             component_interpretation);
-> //    data_out.build_patches(deg + 1);
-> //    std::ofstream output("solution-" + Utilities::int_to_string(step, 5) +
-> //                         ".vtk");
-> //    data_out.write_vtk(output);
 1427c1427
 <       data.read_data("parameter-file.prm");
 ---
