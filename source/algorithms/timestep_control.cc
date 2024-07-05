@@ -60,7 +60,7 @@ namespace Algorithms
 
 
   void
-  TimestepControl::parse_parameters(ParameterHandler &param)
+  TimestepControl::parse_parameters(const ParameterHandler &param)
   {
     start(param.get_double("Start"));
     start_step(param.get_double("First step"));

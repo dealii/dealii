@@ -4724,7 +4724,7 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   // they are easy enough to rebuild upon re-loading data. do
   // this here. don't forget to first resize the fields appropriately
   {
-    for (auto &level : levels)
+    for (const auto &level : levels)
       {
         level->active_cell_indices.resize(level->refine_flags.size());
         level->global_active_cell_indices.resize(level->refine_flags.size());

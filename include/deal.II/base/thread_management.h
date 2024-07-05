@@ -393,7 +393,7 @@ namespace Threads
     struct maybe_make_ref
     {
       static T
-      act(T &t)
+      act(const T &t)
       {
         return t;
       }
@@ -1432,7 +1432,7 @@ namespace Threads
     void
     join_all() const
     {
-      for (auto &t : tasks)
+      for (const auto &t : tasks)
         t.join();
     }
 

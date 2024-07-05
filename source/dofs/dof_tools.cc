@@ -489,7 +489,7 @@ namespace DoFTools
           index_per_comp[comp_i].add_index(
             locally_owned_dofs.nth_index_in_set(i));
       }
-    for (auto &c : index_per_comp)
+    for (const auto &c : index_per_comp)
       c.compress();
     return index_per_comp;
   }

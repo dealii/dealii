@@ -674,7 +674,8 @@ namespace parallel
        * again.
        */
       void
-      release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p);
+      release_one_partitioner(
+        const std::shared_ptr<tbb::affinity_partitioner> &p);
 
     private:
       /**
