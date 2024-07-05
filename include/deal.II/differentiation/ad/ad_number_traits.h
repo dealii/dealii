@@ -741,8 +741,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<
-           typename internal::RemoveComplexWrapper<ScalarType>::type>)>>
+         std::is_floating_point<
+           typename internal::RemoveComplexWrapper<ScalarType>::type>::value)>>
     {
       /**
        * The type of taping used
@@ -862,8 +862,8 @@ namespace Differentiation
       /**
        * The actual auto-differentiable number type
        */
-      using ad_type =
-        std::conditional_t<is_real_valued, real_type, complex_type>;
+      using ad_type = typename std::
+        conditional<is_real_valued, real_type, complex_type>::type;
 
       /**
        * The actual auto-differentiable number directional derivative type
@@ -940,8 +940,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_taped =
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_taped =
       internal::ADNumberInfoFromEnum<
         typename internal::RemoveComplexWrapper<ScalarType>::type,
         ADNumberTypeCode>::is_taped;
@@ -954,8 +954,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_tapeless =
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_tapeless =
       !(NumberTraits<ScalarType, ADNumberTypeCode>::is_taped);
 
 
@@ -966,8 +966,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_real_valued =
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_real_valued =
       (!boost::is_complex<ScalarType>::value);
 
 
@@ -978,8 +978,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_complex_valued =
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_complex_valued =
       !(NumberTraits<ScalarType, ADNumberTypeCode>::is_real_valued);
 
 
@@ -990,8 +990,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::n_supported_derivative_levels =
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::n_supported_derivative_levels =
       internal::ADNumberInfoFromEnum<
         typename internal::RemoveComplexWrapper<ScalarType>::type,
         ADNumberTypeCode>::n_supported_derivative_levels;
@@ -1072,8 +1072,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<
-           typename internal::RemoveComplexWrapper<ScalarType>::type>)>>
+         std::is_floating_point<
+           typename internal::RemoveComplexWrapper<ScalarType>::type>::value)>>
     {
       /**
        * The internal number type code.
@@ -1241,8 +1241,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_taped = false;
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_taped = false;
 
 
     template <typename ScalarType>
@@ -1252,8 +1252,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_tapeless = false;
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_tapeless = false;
 
 
     template <typename ScalarType>
@@ -1263,8 +1263,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_real_valued =
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_real_valued =
       (!boost::is_complex<ScalarType>::value);
 
 
@@ -1275,8 +1275,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::is_complex_valued =
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::is_complex_valued =
       !(NumberTraits<ScalarType, NumberTypes::none>::is_real_valued);
 
 
@@ -1287,8 +1287,8 @@ namespace Differentiation
       std::enable_if_t<
         std::is_floating_point_v<ScalarType> ||
         (boost::is_complex<ScalarType>::value &&
-         std::is_floating_point_v<typename internal::RemoveComplexWrapper<
-           ScalarType>::type>)>>::n_supported_derivative_levels = 0;
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>>::n_supported_derivative_levels = 0;
 
 #  else
 
