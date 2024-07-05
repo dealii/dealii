@@ -41,12 +41,6 @@
 ---
 > //      std::cout << "        ..." << solver_control.last_step()
 > //                << " CG iterations." << std::endl;
-2161,2162c2170,2171
-<         if (timestep_number % 200 == 0)
-<           output_results();
----
-> //        if (timestep_number % 200 == 0)
-> //          output_results();
 2164c2173,2174
 <         if (timestep_number % 25 == 0)
 ---

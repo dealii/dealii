@@ -6,13 +6,9 @@
 <     , final_time(10.)
 ---
 >     , final_time(-5.)
-495,497c495,497
-<     data_out.write_vtu_with_pvtu_record(
-<       "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
+497c497
 < 
 ---
-> //    data_out.write_vtu_with_pvtu_record(
-> //      "./", "solution", timestep_number, MPI_COMM_WORLD, 3);
 >     (void)timestep_number;
 521,533d520
 <     {

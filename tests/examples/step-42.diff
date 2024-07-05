@@ -32,10 +32,6 @@
 <     for (; current_refinement_cycle < n_refinement_cycles;
 ---
 >     for (; current_refinement_cycle < 1;
-2149c2155
-<         output_results(current_refinement_cycle);
----
->  //       output_results(current_refinement_cycle);
 2151,2152c2157,2158
 <         computing_timer.print_summary();
 <         computing_timer.reset();

@@ -6,22 +6,10 @@
 <     , timer(std::cout, TimerOutput::summary, TimerOutput::wall_times)
 ---
 >     , timer(std::cout, TimerOutput::never, TimerOutput::wall_times)
-1105c1105
-<     output_results();
----
-> //    output_results();
 1114c1114
 <     while (time.current() < time.end())
 ---
 >     while (time.current() < 0.3)
-1126c1126
-<         output_results();
----
-> //        output_results();
-1543c1543
-<     std::cout << "    Setting up quadrature point data..." << std::endl;
----
->    // std::cout << "    Setting up quadrature point data..." << std::endl;
 1660c1660
 <     print_conv_header();
 ---

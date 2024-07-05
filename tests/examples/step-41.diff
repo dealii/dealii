@@ -24,7 +24,3 @@
 <     for (unsigned int iteration = 0; iteration <= solution.size(); ++iteration)
 ---
 >     for (unsigned int iteration = 0; iteration <= 5; ++iteration)
-602c606
-<         output_results(iteration);
----
-> //        output_results(iteration);
