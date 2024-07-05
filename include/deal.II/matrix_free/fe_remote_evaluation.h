@@ -573,17 +573,17 @@ public:
 
   /**
    * @c FERemoteEvaluation does not provide the functions `get_value()` and
-   *`get_gradient()`. To access values and/or gradients call @c
-   *get_data_accessor() on every thread, e.g., `auto remote_evaluator =
-   *get_data_accessor();` The returned object can be used as follows.
-   *@code
+   * `get_gradient()`. To access values and/or gradients call @c
+   * get_data_accessor() on every thread, e.g., `auto remote_evaluator =
+   * get_data_accessor();` The returned object can be used as follows.
+   * @code
    * for (unsigned int entity = range.first; entity < range.second; ++entity)
    * {
    *    remote_evaluator.reinit(entity);
    *    for(unsigned int q : quadrature_point_indices())
    *      remote_evaluator.get_value(q)
    * }
-   *@endcode
+   * @endcode
    */
   internal::PrecomputedEvaluationDataAccessor<dim, n_components, value_type>
   get_data_accessor() const;
