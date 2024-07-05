@@ -452,7 +452,7 @@ namespace LinearAlgebra
        * analogy to standard functions.
        */
       void
-      swap(Vector<Number, MemorySpace> &v);
+      swap(Vector<Number, MemorySpace> &v) noexcept;
 
       /**
        * Move assignment operator.
@@ -1790,7 +1790,7 @@ namespace LinearAlgebra
 template <typename Number, typename MemorySpace>
 inline void
 swap(LinearAlgebra::distributed::Vector<Number, MemorySpace> &u,
-     LinearAlgebra::distributed::Vector<Number, MemorySpace> &v)
+     LinearAlgebra::distributed::Vector<Number, MemorySpace> &v) noexcept
 {
   u.swap(v);
 }

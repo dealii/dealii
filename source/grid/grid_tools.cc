@@ -3671,6 +3671,7 @@ namespace GridTools
               ArborXWrappers::DistributedTree distributed_tree(
                 comm, global_bboxes[0]);
               std::vector<BoundingBox<spacedim>> query_bounding_boxes;
+              query_bounding_boxes.reserve(entities.size());
               for (const auto &entity : entities)
                 query_bounding_boxes.emplace_back(
                   BoundingBox<spacedim>(entity).create_extended(tolerance));

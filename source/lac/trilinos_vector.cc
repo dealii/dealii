@@ -892,7 +892,7 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::swap(Vector &v)
+    Vector::swap(Vector &v) noexcept
     {
       std::swap(last_action, v.last_action);
       std::swap(compressed, v.compressed);

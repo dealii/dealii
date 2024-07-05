@@ -833,7 +833,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline void
-    BlockVector<Number>::swap(BlockVector<Number> &v)
+    BlockVector<Number>::swap(BlockVector<Number> &v) noexcept
     {
       Assert(this->n_blocks() == v.n_blocks(),
              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));

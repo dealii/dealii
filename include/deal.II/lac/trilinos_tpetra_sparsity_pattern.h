@@ -1353,11 +1353,11 @@ namespace LinearAlgebra
 
       const TrilinosWrappers::types::int_type *col_index_ptr_begin =
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          const_cast<typename std::decay<decltype(*begin)>::type *>(&*begin));
+          const_cast<std::decay_t<decltype(*begin)> *>(&*begin));
 
       const TrilinosWrappers::types::int_type *col_index_ptr_end =
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          const_cast<typename std::decay<decltype(*end)>::type *>(&*end));
+          const_cast<std::decay_t<decltype(*end)> *>(&*end));
 
       // Check at least for the first index that the conversion actually works
       AssertDimension(*col_index_ptr_begin, *begin);

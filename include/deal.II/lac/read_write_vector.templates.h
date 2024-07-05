@@ -942,7 +942,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::swap(ReadWriteVector<Number> &v)
+  ReadWriteVector<Number>::swap(ReadWriteVector<Number> &v) noexcept
   {
     std::swap(stored_elements, v.stored_elements);
     std::swap(values, v.values);

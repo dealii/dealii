@@ -323,7 +323,7 @@ public:
    * <tt>u.swap(v)</tt>, again in analogy to standard functions.
    */
   void
-  swap(BlockVector<Number> &v);
+  swap(BlockVector<Number> &v) noexcept;
 
   /**
    * Print to a stream.
@@ -481,7 +481,7 @@ BlockVector<Number>::scale(const BlockVector2 &v)
  */
 template <typename Number>
 inline void
-swap(BlockVector<Number> &u, BlockVector<Number> &v)
+swap(BlockVector<Number> &u, BlockVector<Number> &v) noexcept
 {
   u.swap(v);
 }

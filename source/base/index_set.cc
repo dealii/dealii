@@ -40,7 +40,8 @@ DEAL_II_NAMESPACE_OPEN
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 IndexSet::IndexSet(
-  Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>> map)
+  const Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>>
+    &map)
   : is_compressed(true)
   , index_space_size(1 + map->getMaxAllGlobalIndex())
   , largest_range(numbers::invalid_unsigned_int)

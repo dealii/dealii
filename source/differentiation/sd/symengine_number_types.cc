@@ -93,17 +93,17 @@ namespace Differentiation
           Assert(SE::is_a_Boolean(entry.first.get_value()),
                  ExcMessage(
                    "The conditional expression must return a boolean type."));
-          piecewise_function.push_back(
-            {entry.second.get_RCP(),
-             SE::rcp_static_cast<const SE::Boolean>(entry.first.get_RCP())});
+          piecewise_function.emplace_back(
+            entry.second.get_RCP(),
+            SE::rcp_static_cast<const SE::Boolean>(entry.first.get_RCP()));
         }
 
       // Add default value
-      piecewise_function.push_back(
-        {expression_otherwise.get_RCP(), SE::boolTrue});
+      piecewise_function.emplace_back(expression_otherwise.get_RCP(),
+                                      SE::boolTrue);
 
       // Initialize
-      expression = SE::piecewise(std::move(piecewise_function));
+      expression = SE::piecewise(piecewise_function);
     }
 
 

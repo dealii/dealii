@@ -204,7 +204,7 @@ public:
    * Swap the contents of these two objects.
    */
   void
-  swap(BlockIndices &b);
+  swap(BlockIndices &b) noexcept;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -441,7 +441,7 @@ BlockIndices::operator==(const BlockIndices &b) const
 
 
 inline void
-BlockIndices::swap(BlockIndices &b)
+BlockIndices::swap(BlockIndices &b) noexcept
 {
   std::swap(n_blocks, b.n_blocks);
   std::swap(start_indices, b.start_indices);
@@ -468,7 +468,7 @@ BlockIndices::memory_consumption() const
  * @relatesalso BlockIndices
  */
 inline void
-swap(BlockIndices &u, BlockIndices &v)
+swap(BlockIndices &u, BlockIndices &v) noexcept
 {
   u.swap(v);
 }

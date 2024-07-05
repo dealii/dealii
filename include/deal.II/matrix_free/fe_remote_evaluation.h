@@ -1163,8 +1163,7 @@ namespace Utilities
                 // the batch to the corresponding data structure.
                 const unsigned int n_faces =
                   matrix_free.n_active_entries_per_face_batch(face);
-                face_batch_id_n_faces.emplace_back(
-                  std::make_pair(face, n_faces));
+                face_batch_id_n_faces.emplace_back(face, n_faces);
 
                 // Append the quadrature points to the points we need to search
                 // for.

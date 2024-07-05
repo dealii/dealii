@@ -137,7 +137,8 @@ public:
    * Constructor from a Trilinos Teuchos::RCP<Tpetra::Map>.
    */
   explicit IndexSet(
-    Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>> map);
+    const Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>>
+      &map);
 #  endif // DEAL_II_TRILINOS_WITH_TPETRA
 
   /**

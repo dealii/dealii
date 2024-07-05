@@ -519,7 +519,7 @@ namespace LinearAlgebra
        * functions.
        */
       void
-      swap(BlockVector<Number> &v);
+      swap(BlockVector<Number> &v) noexcept;
       /** @} */
 
       /**
@@ -819,7 +819,7 @@ namespace LinearAlgebra
 template <typename Number>
 inline void
 swap(LinearAlgebra::distributed::BlockVector<Number> &u,
-     LinearAlgebra::distributed::BlockVector<Number> &v)
+     LinearAlgebra::distributed::BlockVector<Number> &v) noexcept
 {
   u.swap(v);
 }

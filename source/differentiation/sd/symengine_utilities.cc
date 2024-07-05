@@ -75,7 +75,7 @@ namespace Differentiation
         SD::types::symbol_vector symb_vec;
         symb_vec.reserve(symbol_vector.size());
         for (const auto &entry : symbol_vector)
-          symb_vec.push_back(SD::Expression(entry));
+          symb_vec.emplace_back(entry);
         return symb_vec;
       }
 
