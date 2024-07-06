@@ -348,10 +348,21 @@ public:
 
   /**
    * The center of the spherical coordinate system.
+   *
+   * @deprecated Use get_center() instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Access the center with get_center() instead.")
   const Point<spacedim> center;
 
 private:
+  /**
+   * The center of the spherical coordinate system.
+   *
+   * @note This exists to avoid warnings when using center internally.
+   */
+  const Point<spacedim> p_center;
+
   /**
    * Return a point on the spherical manifold which is intermediate
    * with respect to the surrounding points. This function uses a linear
