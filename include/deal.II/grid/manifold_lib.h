@@ -135,6 +135,12 @@ public:
     const Point<spacedim> &p) const override;
 
   /**
+   * Return the center of the spherical coordinate system.
+   */
+  const Point<spacedim> &
+  get_center() const;
+
+  /**
    * The center of the spherical coordinate system.
    */
   const Point<spacedim> center;
@@ -324,6 +330,12 @@ public:
                 const ArrayView<const double>          &weights) const override;
 
   /**
+   * Return the center of the spherical coordinate system.
+   */
+  const Point<spacedim> &
+  get_center() const;
+
+  /**
    * The center of the spherical coordinate system.
    */
   const Point<spacedim> center;
@@ -446,6 +458,27 @@ public:
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
                 const ArrayView<const double>          &weights) const override;
 
+  /**
+   * Get the Tensor parallel to the cylinder's axis.
+   */
+  const Tensor<1, spacedim> &
+  get_direction() const;
+
+  /**
+   * Get a point on the Cylinder's axis.
+   *
+   * @note This argument, like get_direction() and get_tolerance(), just returns
+   * the arguments set in the three-argument constructor.
+   */
+  const Point<spacedim> &
+  get_point_on_axis() const;
+
+  /**
+   * Get the tolerance which determines if a point is on the Cylinder's axis.
+   */
+  double
+  get_tolerance() const;
+
 private:
   /**
    * A vector orthogonal to the normal direction.
@@ -544,16 +577,40 @@ public:
   virtual DerivativeForm<1, spacedim, spacedim>
   push_forward_gradient(const Point<spacedim> &chart_point) const override;
 
+  /**
+   * Get the Tensor parallel to the cylinder's major axis.
+   */
+  const Tensor<1, spacedim> &
+  get_major_axis_direction() const;
+
+  /**
+   * Return the center of the elliptical coordinate system.
+   */
+  const Point<spacedim> &
+  get_center() const;
+
+  /**
+   * Return the ellipse's eccentricity.
+   */
+  double
+  get_eccentricity() const;
 
 private:
   /**
    * The direction vector of the major axis.
    */
-  Tensor<1, spacedim> direction;
+  const Tensor<1, spacedim> direction;
+
   /**
    * The center of the manifold.
    */
   const Point<spacedim> center;
+
+  /**
+   * The eccentricity.
+   */
+  const double eccentricity;
+
   /**
    * Parameters deriving from the eccentricity of the manifold.
    */
@@ -815,6 +872,18 @@ public:
    */
   virtual DerivativeForm<1, 3, 3>
   push_forward_gradient(const Point<3> &chart_point) const override;
+
+  /**
+   * Get the radius of the centerline.
+   */
+  double
+  get_centerline_radius() const;
+
+  /**
+   * Get the inner radius of the torus.
+   */
+  double
+  get_inner_radius() const;
 
 private:
   double centerline_radius;
@@ -1158,6 +1227,96 @@ private:
    */
   boost::signals2::connection clear_signal;
 };
+
+/*----------------------------- inline functions -----------------------------*/
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+PolarManifold<dim, spacedim>::get_center() const
+{
+  return center;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+SphericalManifold<dim, spacedim>::get_center() const
+{
+  return center;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Tensor<1, spacedim> &
+CylindricalManifold<dim, spacedim>::get_direction() const
+{
+  return direction;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+CylindricalManifold<dim, spacedim>::get_point_on_axis() const
+{
+  return point_on_axis;
+}
+
+
+
+template <int dim, int spacedim>
+inline double
+CylindricalManifold<dim, spacedim>::get_tolerance() const
+{
+  return tolerance;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Tensor<1, spacedim> &
+EllipticalManifold<dim, spacedim>::get_major_axis_direction() const
+{
+  return direction;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Point<spacedim> &
+EllipticalManifold<dim, spacedim>::get_center() const
+{
+  return center;
+}
+
+
+
+template <int dim, int spacedim>
+inline double
+EllipticalManifold<dim, spacedim>::get_eccentricity() const
+{
+  return eccentricity;
+}
+
+
+
+template <int dim>
+inline double
+TorusManifold<dim>::get_centerline_radius() const
+{
+  return centerline_radius;
+}
+
+
+
+template <int dim>
+inline double
+TorusManifold<dim>::get_inner_radius() const
+{
+  return inner_radius;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

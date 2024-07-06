@@ -1165,6 +1165,20 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
 
 
 
+namespace
+{
+  template <int dim>
+  Tensor<1, dim>
+  check_and_normalize(const Tensor<1, dim> &t)
+  {
+    const double norm = t.norm();
+    Assert(norm > 0.0, ExcMessage("The major axis must have a positive norm."));
+    return t / norm;
+  }
+} // namespace
+
+
+
 // ============================================================
 // EllipticalManifold
 // ============================================================
@@ -1175,8 +1189,9 @@ EllipticalManifold<dim, spacedim>::EllipticalManifold(
   const double               eccentricity)
   : ChartManifold<dim, spacedim, spacedim>(
       EllipticalManifold<dim, spacedim>::get_periodicity())
-  , direction(major_axis_direction)
+  , direction(check_and_normalize(major_axis_direction))
   , center(center)
+  , eccentricity(eccentricity)
   , cosh_u(1.0 / eccentricity)
   , sinh_u(std::sqrt(cosh_u * cosh_u - 1.0))
 {
@@ -1186,11 +1201,6 @@ EllipticalManifold<dim, spacedim>::EllipticalManifold(
   Assert(std::signbit(cosh_u * cosh_u - 1.0) == false,
          ExcMessage(
            "Invalid eccentricity: It must satisfy 0 < eccentricity < 1."));
-  const double direction_norm = direction.norm();
-  Assert(direction_norm != 0.0,
-         ExcMessage(
-           "Invalid major axis direction vector: Null vector not allowed."));
-  direction /= direction_norm;
 }
 
 
