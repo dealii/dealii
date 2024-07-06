@@ -128,6 +128,7 @@ PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
   : ChartManifold<dim, spacedim, spacedim>(
       PolarManifold<dim, spacedim>::get_periodicity())
   , center(center)
+  , p_center(center)
 {}
 
 
@@ -187,7 +188,7 @@ PolarManifold<dim, spacedim>::push_forward(
         default:
           DEAL_II_NOT_IMPLEMENTED();
       }
-  return p + center;
+  return p + p_center;
 }
 
 
@@ -197,7 +198,7 @@ Point<spacedim>
 PolarManifold<dim, spacedim>::pull_back(
   const Point<spacedim> &space_point) const
 {
-  const Tensor<1, spacedim> R   = space_point - center;
+  const Tensor<1, spacedim> R   = space_point - p_center;
   const double              rho = R.norm();
 
   Point<spacedim> p;
@@ -358,6 +359,7 @@ template <int dim, int spacedim>
 SphericalManifold<dim, spacedim>::SphericalManifold(
   const Point<spacedim> center)
   : center(center)
+  , p_center(center)
   , polar_manifold(center)
 {}
 
@@ -391,8 +393,8 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
   if (spacedim == 1)
     return Point<spacedim>(w * p2 + (1 - w) * p1);
 
-  const Tensor<1, spacedim> v1 = p1 - center;
-  const Tensor<1, spacedim> v2 = p2 - center;
+  const Tensor<1, spacedim> v1 = p1 - p_center;
+  const Tensor<1, spacedim> v2 = p2 - p_center;
   const double              r1 = v1.norm();
   const double              r2 = v2.norm();
 
@@ -407,11 +409,11 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
 
   // Points are collinear with the center (allow for 8*eps as a tolerance)
   if (cosgamma < -1 + 8. * std::numeric_limits<double>::epsilon())
-    return center;
+    return p_center;
 
   // Points are along a line, in which case e1 and e2 are essentially the same.
   if (cosgamma > 1 - 8. * std::numeric_limits<double>::epsilon())
-    return Point<spacedim>(center + w * v2 + (1 - w) * v1);
+    return Point<spacedim>(p_center + w * v2 + (1 - w) * v1);
 
   // Find the angle sigma that corresponds to arclength equal to w. acos
   // should never be undefined because we have ruled out the two special cases
@@ -433,7 +435,7 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
   const Tensor<1, spacedim> P = std::cos(sigma) * e1 + std::sin(sigma) * n;
 
   // Project this point on the manifold.
-  return Point<spacedim>(center + (w * r2 + (1.0 - w) * r1) * P);
+  return Point<spacedim>(p_center + (w * r2 + (1.0 - w) * r1) * P);
 }
 
 
@@ -449,8 +451,8 @@ SphericalManifold<dim, spacedim>::get_tangent_vector(
 
   Assert(p1 != p2, ExcMessage("p1 and p2 should not concide."));
 
-  const Tensor<1, spacedim> v1 = p1 - center;
-  const Tensor<1, spacedim> v2 = p2 - center;
+  const Tensor<1, spacedim> v1 = p1 - p_center;
+  const Tensor<1, spacedim> v2 = p2 - p_center;
   const double              r1 = v1.norm();
   const double              r2 = v2.norm();
 
@@ -499,12 +501,12 @@ SphericalManifold<dim, spacedim>::normal_vector(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
+  if (spherical_face_is_horizontal<dim, spacedim>(face, p_center))
     {
       // So, if this is a "horizontal" face, then just compute the normal
       // vector as the one from the center to the point 'p', adequately
       // scaled.
-      const Tensor<1, spacedim> unnormalized_spherical_normal = p - center;
+      const Tensor<1, spacedim> unnormalized_spherical_normal = p - p_center;
       const Tensor<1, spacedim> normalized_spherical_normal =
         unnormalized_spherical_normal / unnormalized_spherical_normal.norm();
       return normalized_spherical_normal;
@@ -552,7 +554,7 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
   // (tangential to the sphere).  In this case, the normal vector is
   // easy to compute since it is proportional to the vector from the
   // center to the point 'p'.
-  if (spherical_face_is_horizontal<dim, spacedim>(face, center))
+  if (spherical_face_is_horizontal<dim, spacedim>(face, p_center))
     {
       // So, if this is a "horizontal" face, then just compute the normal
       // vector as the one from the center to the point 'p', adequately
@@ -560,7 +562,7 @@ SphericalManifold<dim, spacedim>::get_normals_at_vertices(
       for (unsigned int vertex = 0;
            vertex < GeometryInfo<spacedim>::vertices_per_face;
            ++vertex)
-        face_vertex_normals[vertex] = face->vertex(vertex) - center;
+        face_vertex_normals[vertex] = face->vertex(vertex) - p_center;
     }
   else
     Manifold<dim, spacedim>::get_normals_at_vertices(face, face_vertex_normals);
@@ -782,7 +784,7 @@ SphericalManifold<dim, spacedim>::do_get_new_points(
   double max_distance = 0.;
   for (unsigned int i = 0; i < surrounding_points.size(); ++i)
     {
-      directions[i] = surrounding_points[i] - center;
+      directions[i] = surrounding_points[i] - p_center;
       distances[i]  = directions[i].norm();
 
       if (distances[i] != 0.)
@@ -823,7 +825,7 @@ SphericalManifold<dim, spacedim>::do_get_new_points(
       // the Newton iteration in step 2, which would crash.
       if (new_candidates[row].first == 0.0)
         {
-          new_points[row]               = center;
+          new_points[row]               = p_center;
           accurate_point_was_found[row] = true;
           continue;
         }
@@ -851,7 +853,7 @@ SphericalManifold<dim, spacedim>::do_get_new_points(
         {
           for (unsigned int row = 0; row < weight_rows; ++row)
             new_points[row] =
-              center + new_candidates[row].first * new_candidates[row].second;
+              p_center + new_candidates[row].first * new_candidates[row].second;
 
           return;
         }
@@ -959,7 +961,7 @@ SphericalManifold<dim, spacedim>::do_get_new_points(
                 new_candidates[merged_weights_index[row]].second;
 
             new_points[row] =
-              center + new_candidates[row].first * new_candidates[row].second;
+              p_center + new_candidates[row].first * new_candidates[row].second;
           }
     }
 }
@@ -1165,6 +1167,20 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
 
 
 
+namespace
+{
+  template <int dim>
+  Tensor<1, dim>
+  check_and_normalize(const Tensor<1, dim> &t)
+  {
+    const double norm = t.norm();
+    Assert(norm > 0.0, ExcMessage("The major axis must have a positive norm."));
+    return t / norm;
+  }
+} // namespace
+
+
+
 // ============================================================
 // EllipticalManifold
 // ============================================================
@@ -1175,8 +1191,9 @@ EllipticalManifold<dim, spacedim>::EllipticalManifold(
   const double               eccentricity)
   : ChartManifold<dim, spacedim, spacedim>(
       EllipticalManifold<dim, spacedim>::get_periodicity())
-  , direction(major_axis_direction)
+  , direction(check_and_normalize(major_axis_direction))
   , center(center)
+  , eccentricity(eccentricity)
   , cosh_u(1.0 / eccentricity)
   , sinh_u(std::sqrt(cosh_u * cosh_u - 1.0))
 {
@@ -1186,11 +1203,6 @@ EllipticalManifold<dim, spacedim>::EllipticalManifold(
   Assert(std::signbit(cosh_u * cosh_u - 1.0) == false,
          ExcMessage(
            "Invalid eccentricity: It must satisfy 0 < eccentricity < 1."));
-  const double direction_norm = direction.norm();
-  Assert(direction_norm != 0.0,
-         ExcMessage(
-           "Invalid major axis direction vector: Null vector not allowed."));
-  direction /= direction_norm;
 }
 
 
@@ -1521,11 +1533,12 @@ TorusManifold<dim>::pull_back(const Point<3> &p) const
   double z     = p[1];
   double y     = p[2];
   double phi   = std::atan2(y, x);
-  double theta = std::atan2(z, std::sqrt(x * x + y * y) - R);
+  double theta = std::atan2(z, std::sqrt(x * x + y * y) - centerline_radius);
   double w =
-    std::sqrt(Utilities::fixed_power<2>(y - std::sin(phi) * R) +
-              Utilities::fixed_power<2>(x - std::cos(phi) * R) + z * z) /
-    r;
+    std::sqrt(Utilities::fixed_power<2>(y - std::sin(phi) * centerline_radius) +
+              Utilities::fixed_power<2>(x - std::cos(phi) * centerline_radius) +
+              z * z) /
+    inner_radius;
   return {phi, theta, w};
 }
 
@@ -1539,23 +1552,26 @@ TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
   double theta = chart_point[1];
   double w     = chart_point[2];
 
-  return {std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi),
-          r * w * std::sin(theta),
-          std::sin(phi) * R + r * w * std::cos(theta) * std::sin(phi)};
+  return {std::cos(phi) * centerline_radius +
+            inner_radius * w * std::cos(theta) * std::cos(phi),
+          inner_radius * w * std::sin(theta),
+          std::sin(phi) * centerline_radius +
+            inner_radius * w * std::cos(theta) * std::sin(phi)};
 }
 
 
 
 template <int dim>
-TorusManifold<dim>::TorusManifold(const double R, const double r)
+TorusManifold<dim>::TorusManifold(const double centerline_radius,
+                                  const double inner_radius)
   : ChartManifold<dim, 3, 3>(Point<3>(2 * numbers::PI, 2 * numbers::PI, 0.0))
-  , r(r)
-  , R(R)
+  , centerline_radius(centerline_radius)
+  , inner_radius(inner_radius)
 {
-  Assert(R > r,
-         ExcMessage("Outer radius R must be greater than the inner "
-                    "radius r."));
-  Assert(r > 0.0, ExcMessage("inner radius must be positive."));
+  Assert(centerline_radius > inner_radius,
+         ExcMessage("The centerline radius must be greater than the "
+                    "inner radius."));
+  Assert(inner_radius > 0.0, ExcMessage("The inner radius must be positive."));
 }
 
 
@@ -1564,7 +1580,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim, 3>>
 TorusManifold<dim>::clone() const
 {
-  return std::make_unique<TorusManifold<dim>>(R, r);
+  return std::make_unique<TorusManifold<dim>>(centerline_radius, inner_radius);
 }
 
 
@@ -1579,17 +1595,19 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
   double theta = chart_point[1];
   double w     = chart_point[2];
 
-  DX[0][0] = -std::sin(phi) * R - r * w * std::cos(theta) * std::sin(phi);
-  DX[0][1] = -r * w * std::sin(theta) * std::cos(phi);
-  DX[0][2] = r * std::cos(theta) * std::cos(phi);
+  DX[0][0] = -std::sin(phi) * centerline_radius -
+             inner_radius * w * std::cos(theta) * std::sin(phi);
+  DX[0][1] = -inner_radius * w * std::sin(theta) * std::cos(phi);
+  DX[0][2] = inner_radius * std::cos(theta) * std::cos(phi);
 
   DX[1][0] = 0;
-  DX[1][1] = r * w * std::cos(theta);
-  DX[1][2] = r * std::sin(theta);
+  DX[1][1] = inner_radius * w * std::cos(theta);
+  DX[1][2] = inner_radius * std::sin(theta);
 
-  DX[2][0] = std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi);
-  DX[2][1] = -r * w * std::sin(theta) * std::sin(phi);
-  DX[2][2] = r * std::cos(theta) * std::sin(phi);
+  DX[2][0] = std::cos(phi) * centerline_radius +
+             inner_radius * w * std::cos(theta) * std::cos(phi);
+  DX[2][1] = -inner_radius * w * std::sin(theta) * std::sin(phi);
+  DX[2][2] = inner_radius * std::cos(theta) * std::sin(phi);
 
   return DX;
 }
