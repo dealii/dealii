@@ -1521,11 +1521,12 @@ TorusManifold<dim>::pull_back(const Point<3> &p) const
   double z     = p[1];
   double y     = p[2];
   double phi   = std::atan2(y, x);
-  double theta = std::atan2(z, std::sqrt(x * x + y * y) - R);
+  double theta = std::atan2(z, std::sqrt(x * x + y * y) - centerline_radius);
   double w =
-    std::sqrt(Utilities::fixed_power<2>(y - std::sin(phi) * R) +
-              Utilities::fixed_power<2>(x - std::cos(phi) * R) + z * z) /
-    r;
+    std::sqrt(Utilities::fixed_power<2>(y - std::sin(phi) * centerline_radius) +
+              Utilities::fixed_power<2>(x - std::cos(phi) * centerline_radius) +
+              z * z) /
+    inner_radius;
   return {phi, theta, w};
 }
 
@@ -1539,23 +1540,26 @@ TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
   double theta = chart_point[1];
   double w     = chart_point[2];
 
-  return {std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi),
-          r * w * std::sin(theta),
-          std::sin(phi) * R + r * w * std::cos(theta) * std::sin(phi)};
+  return {std::cos(phi) * centerline_radius +
+            inner_radius * w * std::cos(theta) * std::cos(phi),
+          inner_radius * w * std::sin(theta),
+          std::sin(phi) * centerline_radius +
+            inner_radius * w * std::cos(theta) * std::sin(phi)};
 }
 
 
 
 template <int dim>
-TorusManifold<dim>::TorusManifold(const double R, const double r)
+TorusManifold<dim>::TorusManifold(const double centerline_radius,
+                                  const double inner_radius)
   : ChartManifold<dim, 3, 3>(Point<3>(2 * numbers::PI, 2 * numbers::PI, 0.0))
-  , r(r)
-  , R(R)
+  , centerline_radius(centerline_radius)
+  , inner_radius(inner_radius)
 {
-  Assert(R > r,
-         ExcMessage("Outer radius R must be greater than the inner "
-                    "radius r."));
-  Assert(r > 0.0, ExcMessage("inner radius must be positive."));
+  Assert(centerline_radius > inner_radius,
+         ExcMessage("The centerline radius must be greater than the "
+                    "inner radius."));
+  Assert(inner_radius > 0.0, ExcMessage("The inner radius must be positive."));
 }
 
 
@@ -1564,7 +1568,7 @@ template <int dim>
 std::unique_ptr<Manifold<dim, 3>>
 TorusManifold<dim>::clone() const
 {
-  return std::make_unique<TorusManifold<dim>>(R, r);
+  return std::make_unique<TorusManifold<dim>>(centerline_radius, inner_radius);
 }
 
 
@@ -1579,17 +1583,19 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
   double theta = chart_point[1];
   double w     = chart_point[2];
 
-  DX[0][0] = -std::sin(phi) * R - r * w * std::cos(theta) * std::sin(phi);
-  DX[0][1] = -r * w * std::sin(theta) * std::cos(phi);
-  DX[0][2] = r * std::cos(theta) * std::cos(phi);
+  DX[0][0] = -std::sin(phi) * centerline_radius -
+             inner_radius * w * std::cos(theta) * std::sin(phi);
+  DX[0][1] = -inner_radius * w * std::sin(theta) * std::cos(phi);
+  DX[0][2] = inner_radius * std::cos(theta) * std::cos(phi);
 
   DX[1][0] = 0;
-  DX[1][1] = r * w * std::cos(theta);
-  DX[1][2] = r * std::sin(theta);
+  DX[1][1] = inner_radius * w * std::cos(theta);
+  DX[1][2] = inner_radius * std::sin(theta);
 
-  DX[2][0] = std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi);
-  DX[2][1] = -r * w * std::sin(theta) * std::sin(phi);
-  DX[2][2] = r * std::cos(theta) * std::sin(phi);
+  DX[2][0] = std::cos(phi) * centerline_radius +
+             inner_radius * w * std::cos(theta) * std::cos(phi);
+  DX[2][1] = -inner_radius * w * std::sin(theta) * std::sin(phi);
+  DX[2][2] = inner_radius * std::cos(theta) * std::sin(phi);
 
   return DX;
 }

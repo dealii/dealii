@@ -786,11 +786,11 @@ public:
   static const int spacedim = 3;
 
   /**
-   * Constructor. Specify the radius of the centerline @p R and the radius
-   * of the torus itself (@p r). The variables have the same meaning as
-   * the parameters in GridGenerator::torus().
+   * Constructor. Specify the radius of the centerline @p centerline_radius and
+   * the radius of the torus' inner circle (@p inner_radius). The variables have
+   * the same meaning as the parameters in GridGenerator::torus().
    */
-  TorusManifold(const double R, const double r);
+  TorusManifold(const double centerline_radius, const double inner_radius);
 
   /**
    * Make a clone of this Manifold object.
@@ -817,7 +817,9 @@ public:
   push_forward_gradient(const Point<3> &chart_point) const override;
 
 private:
-  double r, R;
+  double centerline_radius;
+
+  double inner_radius;
 };
 
 

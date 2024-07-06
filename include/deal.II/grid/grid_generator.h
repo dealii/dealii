@@ -1648,10 +1648,12 @@ namespace GridGenerator
    *
    * @param tria The triangulation to be filled.
    *
-   * @param R The radius of the circle, which forms the middle line of the
-   * torus containing the loop of cells. Must be greater than @p r.
+   * @param centerline_radius The radius of the circle which forms the center
+   * line of the torus containing the loop of cells. Must be greater than @p
+   * inner_radius.
    *
-   * @param r The inner radius of the torus.
+   * @param inner_radius The distance between the inner edge of the torus and
+   * origin.
    *
    * @param n_cells_toroidal Optional argument to set the number of cell
    * layers in toroidal direction. The default is 6 cell layers.
@@ -1668,8 +1670,8 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   torus(Triangulation<dim, spacedim> &tria,
-        const double                  R,
-        const double                  r,
+        const double                  centerline_radius,
+        const double                  inner_radius,
         const unsigned int            n_cells_toroidal = 6,
         const double                  phi              = 2.0 * numbers::PI);
 
