@@ -22,6 +22,8 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/fe/fe_simplex_p.h>
+
 #include <deal.II/grid/reference_cell.h>
 
 #include <deal.II/hp/q_collection.h>
@@ -56,6 +58,15 @@ namespace internal
               return {ReferenceCells::get_simplex<dim>(),
                       dealii::hp::QCollection<dim - 1>(
                         QWitherdenVincentSimplex<dim - 1>(i))};
+
+          for (unsigned int i = 1; i <= 3; ++i)
+            {
+              FE_SimplexP<dim> fe(i);
+              if (quad == Quadrature<dim>(fe.get_unit_support_points()))
+                return {ReferenceCells::get_simplex<dim>(),
+                        dealii::hp::QCollection<dim - 1>(Quadrature<dim - 1>(
+                          fe.get_unit_face_support_points()))};
+            }
         }
 
       if (dim == 3)
@@ -138,6 +149,22 @@ namespace internal
                   return {Quadrature<dim - 1>(),
                           QWitherdenVincentSimplex<dim - 1>(i)};
               }
+
+          for (unsigned int i = 1; i <= 3; ++i)
+            {
+              FE_SimplexP<dim> fe(i);
+              if (quad == Quadrature<dim>(fe.get_unit_support_points()))
+                {
+                  if (dim == 2)
+                    return {Quadrature<dim - 1>(
+                              fe.get_unit_face_support_points()), // line!
+                            Quadrature<dim - 1>()};
+                  else
+                    return {Quadrature<dim - 1>(),
+                            Quadrature<dim - 1>(
+                              fe.get_unit_face_support_points())};
+                }
+            }
         }
 
       if (dim == 3)
