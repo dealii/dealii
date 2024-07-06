@@ -190,6 +190,17 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       )
   endif()
 
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.30")
+    #
+    # Create alias targets "dealii::dealii_release" and "dealii::dealii_debug"
+    # to have the exported target names available when populating the link
+    # interface for our "dealii::dealii" convenience target:
+    #
+    add_library(${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_${build_lowercase}
+      ALIAS ${DEAL_II_TARGET_NAME}_${build_lowercase}
+      )
+  endif()
+
   target_link_libraries(${DEAL_II_TARGET_NAME} INTERFACE
     "$<$<CONFIG:${build_camelcase}>:${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_${build_lowercase}>"
     )
