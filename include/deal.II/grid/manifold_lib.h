@@ -142,10 +142,21 @@ public:
 
   /**
    * The center of the spherical coordinate system.
+   *
+   * @deprecated Use get_center() instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Access the center with get_center() instead.")
   const Point<spacedim> center;
 
 private:
+  /**
+   * The center of the spherical coordinate system.
+   *
+   * @note This exists to avoid warnings when using center internally.
+   */
+  const Point<spacedim> p_center;
+
   /**
    * Helper function which returns the periodicity associated with this
    * coordinate system, according to dim, chartdim, and spacedim.
@@ -1234,7 +1245,7 @@ template <int dim, int spacedim>
 inline const Point<spacedim> &
 PolarManifold<dim, spacedim>::get_center() const
 {
-  return center;
+  return p_center;
 }
 
 

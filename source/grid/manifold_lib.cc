@@ -128,6 +128,7 @@ PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
   : ChartManifold<dim, spacedim, spacedim>(
       PolarManifold<dim, spacedim>::get_periodicity())
   , center(center)
+  , p_center(center)
 {}
 
 
@@ -187,7 +188,7 @@ PolarManifold<dim, spacedim>::push_forward(
         default:
           DEAL_II_NOT_IMPLEMENTED();
       }
-  return p + center;
+  return p + p_center;
 }
 
 
@@ -197,7 +198,7 @@ Point<spacedim>
 PolarManifold<dim, spacedim>::pull_back(
   const Point<spacedim> &space_point) const
 {
-  const Tensor<1, spacedim> R   = space_point - center;
+  const Tensor<1, spacedim> R   = space_point - p_center;
   const double              rho = R.norm();
 
   Point<spacedim> p;
