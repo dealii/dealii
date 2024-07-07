@@ -6,7 +6,7 @@ DEAL:0:2d::cell level=0 index=0 subdomain: 4294967294
 DEAL:0:2d::OK
 DEAL:0:2d::OK
 
-DEAL:1:2d::Checksum: 0
+DEAL:1:2d::Checksum: 426967244
 DEAL:1:2d::cell level=0 index=0
 DEAL:1:2d::cell level=1 index=0
 DEAL:1:2d::cell level=1 index=1 subdomain: 7
@@ -19,32 +19,32 @@ DEAL:1:2d::cell level=2 index=3 subdomain: 1
 DEAL:1:2d::OK
 
 
-DEAL:2:2d::Checksum: 0
+DEAL:2:2d::Checksum: 426967244
 DEAL:2:2d::cell level=0 index=0 subdomain: 4294967294
 DEAL:2:2d::OK
 
 
-DEAL:3:2d::Checksum: 0
+DEAL:3:2d::Checksum: 426967244
 DEAL:3:2d::cell level=0 index=0 subdomain: 4294967294
 DEAL:3:2d::OK
 
 
-DEAL:4:2d::Checksum: 0
+DEAL:4:2d::Checksum: 426967244
 DEAL:4:2d::cell level=0 index=0 subdomain: 4294967294
 DEAL:4:2d::OK
 
 
-DEAL:5:2d::Checksum: 0
+DEAL:5:2d::Checksum: 426967244
 DEAL:5:2d::cell level=0 index=0 subdomain: 4294967294
 DEAL:5:2d::OK
 
 
-DEAL:6:2d::Checksum: 0
+DEAL:6:2d::Checksum: 426967244
 DEAL:6:2d::cell level=0 index=0 subdomain: 4294967294
 DEAL:6:2d::OK
 
 
-DEAL:7:2d::Checksum: 0
+DEAL:7:2d::Checksum: 426967244
 DEAL:7:2d::cell level=0 index=0
 DEAL:7:2d::cell level=1 index=0
 DEAL:7:2d::cell level=1 index=1 subdomain: 7
@@ -57,7 +57,7 @@ DEAL:7:2d::cell level=2 index=3 subdomain: 1
 DEAL:7:2d::OK
 
 
-DEAL:8:2d::Checksum: 0
+DEAL:8:2d::Checksum: 426967244
 DEAL:8:2d::cell level=0 index=0
 DEAL:8:2d::cell level=1 index=0
 DEAL:8:2d::cell level=1 index=1 subdomain: 7
@@ -70,7 +70,7 @@ DEAL:8:2d::cell level=2 index=3 subdomain: 1
 DEAL:8:2d::OK
 
 
-DEAL:9:2d::Checksum: 0
+DEAL:9:2d::Checksum: 426967244
 DEAL:9:2d::cell level=0 index=0
 DEAL:9:2d::cell level=1 index=0
 DEAL:9:2d::cell level=1 index=1 subdomain: 7

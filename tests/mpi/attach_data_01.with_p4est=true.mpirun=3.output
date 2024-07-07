@@ -40,7 +40,7 @@ DEAL:1::unpacking cell 1_1:0 with data=0 status=PERSIST
 DEAL:1::unpacking cell 1_1:1 with data=1 status=PERSIST
 DEAL:1::unpacking cell 1_1:2 with data=2 status=PERSIST
 DEAL:1::unpacking cell 1_1:3 with data=3 status=PERSIST
-DEAL:1::Checksum: 0
+DEAL:1::Checksum: 2822439380
 DEAL:1::OK
 
 
@@ -57,6 +57,6 @@ DEAL:2::unpacking cell 2_1:1 with data=5 status=PERSIST
 DEAL:2::unpacking cell 2_1:2 with data=6 status=PERSIST
 DEAL:2::unpacking cell 2_1:3 with data=7 status=PERSIST
 DEAL:2::unpacking cell 3_0: with data=0 status=COARSEN
-DEAL:2::Checksum: 0
+DEAL:2::Checksum: 2822439380
 DEAL:2::OK
 

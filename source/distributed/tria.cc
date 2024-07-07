@@ -2274,7 +2274,22 @@ namespace parallel
       Assert(parallel_forest != nullptr,
              ExcMessage(
                "Can't produce a check sum when no forest is created yet."));
-      return dealii::internal::p4est::functions<dim>::checksum(parallel_forest);
+
+      auto checksum =
+        dealii::internal::p4est::functions<dim>::checksum(parallel_forest);
+
+#  if !DEAL_II_P4EST_VERSION_GTE(2, 8, 6, 0)
+      /*
+       * p4est prior to 2.8.6 returns the proper checksum only on rank 0
+       * and simply "0" on all other ranks. This is not really what we
+       * want, thus broadcast the correct value to all other ranks:
+       */
+      checksum = Utilities::MPI::broadcast(this->mpi_communicator,
+                                           checksum,
+                                           /*root_process*/ 0);
+#  endif
+
+      return checksum;
     }
 
 
