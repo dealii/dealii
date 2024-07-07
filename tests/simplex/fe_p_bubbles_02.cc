@@ -20,11 +20,10 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
-#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
+#include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_wedge_p.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -35,44 +34,6 @@
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
 #include "../tests.h"
-
-
-template <int dim, int spacedim = dim>
-Quadrature<dim>
-compute_nodal_quadrature(const FiniteElement<dim, spacedim> &fe)
-{
-  Assert(fe.n_blocks() == 1, ExcNotImplemented());
-  Assert(fe.n_components() == 1, ExcNotImplemented());
-
-  const ReferenceCell type = fe.reference_cell();
-
-  const Quadrature<dim> q_gauss =
-    type.get_gauss_type_quadrature<dim>(fe.tensor_degree() + 1);
-  Triangulation<dim, spacedim> tria;
-  GridGenerator::reference_cell(tria, type);
-  const Mapping<dim, spacedim> &mapping =
-    type.template get_default_linear_mapping<dim, spacedim>();
-
-  auto                    cell = tria.begin_active();
-  FEValues<dim, spacedim> fe_values(mapping,
-                                    fe,
-                                    q_gauss,
-                                    update_values | update_JxW_values);
-  fe_values.reinit(cell);
-
-  std::vector<Point<dim>> nodal_quad_points = fe.get_unit_support_points();
-  std::vector<double>     nodal_quad_weights(nodal_quad_points.size());
-  Assert(nodal_quad_points.size() > 0, ExcNotImplemented());
-  for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-    {
-      double integral = 0.0;
-      for (unsigned int q = 0; q < q_gauss.size(); ++q)
-        integral += fe_values.shape_value(i, q) * fe_values.JxW(q);
-      nodal_quad_weights[i] = integral;
-    }
-  return {nodal_quad_points, nodal_quad_weights};
-}
-
 
 
 template <int dim, int spacedim = dim>
@@ -179,8 +140,9 @@ test_lumped_project()
           DoFHandler<dim, spacedim> dh(tria);
           dh.distribute_dofs(fe);
           deallog << "number of dofs = " << dh.n_dofs() << std::endl;
-          const Quadrature<dim> nodal_quad = compute_nodal_quadrature(fe);
-          const Quadrature<dim> cell_quad  = QGaussSimplex<dim>(
+          const Quadrature<dim> nodal_quad =
+            FETools::compute_nodal_quadrature(fe);
+          const Quadrature<dim> cell_quad = QGaussSimplex<dim>(
             std::max<unsigned int>(fe.tensor_degree() + 1, 2));
 
           Vector<double> lumped_mass(dh.n_dofs());

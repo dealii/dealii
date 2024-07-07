@@ -170,6 +170,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Quadrature<deal_II_dimension> &,
         const Quadrature<deal_II_dimension> &,
         FullMatrix<double> &);
+
+      template Quadrature<deal_II_dimension>
+      compute_nodal_quadrature(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
