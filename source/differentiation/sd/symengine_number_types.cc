@@ -102,8 +102,9 @@ namespace Differentiation
       piecewise_function.emplace_back(expression_otherwise.get_RCP(),
                                       SE::boolTrue);
 
-      // Initialize
-      expression = SE::piecewise(piecewise_function);
+      // Initialize. Note that we need to use a std::move() here for
+      // compatibility with older compilers.
+      expression = SE::piecewise(std::move(piecewise_function)); // NOLINT
     }
 
 
