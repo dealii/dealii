@@ -386,8 +386,10 @@ namespace nonlinear_solver_selector_test
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+
   initlog();
 
   using namespace nonlinear_solver_selector_test;
