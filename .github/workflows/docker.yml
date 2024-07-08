@@ -108,7 +108,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: /tmp/digests
-          pattern: digests-${{ matrix.ubuntu_version }}-*
+          pattern: digests-${{ matrix.ubuntu_version }}
           merge-multiple: true
 
       - name: Set up Docker Buildx
