@@ -160,46 +160,6 @@ namespace LinearAlgebra
       using value_type = Number;
 
       /**
-       * Typedef for the NodeType
-       */
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
-      using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#  else
-      using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#  endif
-
-      /**
-       * Typedef for Tpetra::CrsMatrix
-       */
-      using MatrixType =
-        Tpetra::CrsMatrix<Number,
-                          int,
-                          dealii::types::signed_global_dof_index,
-                          NodeType>;
-
-      /**
-       * Typedef for Tpetra::Map
-       */
-      using MapType =
-        Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
-
-      /**
-       * Typedef for Tpetra::CrsGraph
-       */
-      using GraphType =
-        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
-
-      /**
-       * Typedef for Tpetra::Vector
-       */
-      using VectorType = Tpetra::
-        Vector<Number, int, dealii::types::signed_global_dof_index, NodeType>;
-
-      /**
        * @name Constructors and initialization.
        */
       /** @{ */
@@ -1033,7 +993,7 @@ namespace LinearAlgebra
        * href="https://docs.trilinos.org/dev/packages/tpetra/doc/html/classTpetra_1_1CrsMatrix.html">Tpetra::CrsMatrix</a>
        * class.
        */
-      const MatrixType &
+      const TpetraTypes::MatrixType<Number, MemorySpace> &
       trilinos_matrix() const;
 
       /**
@@ -1042,7 +1002,7 @@ namespace LinearAlgebra
        * href="https://docs.trilinos.org/dev/packages/tpetra/doc/html/classTpetra_1_1CrsMatrix.html">Tpetra::CrsMatrix</a>
        * class.
        */
-      MatrixType &
+      TpetraTypes::MatrixType<Number, MemorySpace> &
       trilinos_matrix();
 
       /**
@@ -1054,7 +1014,7 @@ namespace LinearAlgebra
        * href="https://docs.trilinos.org/dev/packages/tpetra/doc/html/classTpetra_1_1CrsMatrix.html">Tpetra::CrsMatrix</a>
        * class.
        */
-      Teuchos::RCP<const MatrixType>
+      Teuchos::RCP<const TpetraTypes::MatrixType<Number, MemorySpace>>
       trilinos_rcp() const;
 
       /**
@@ -1066,7 +1026,7 @@ namespace LinearAlgebra
        * href="https://docs.trilinos.org/dev/packages/tpetra/doc/html/classTpetra_1_1CrsMatrix.html">Tpetra::CrsMatrix</a>
        * class.
        */
-      Teuchos::RCP<MatrixType>
+      Teuchos::RCP<TpetraTypes::MatrixType<Number, MemorySpace>>
       trilinos_rcp();
       /** @} */
 
@@ -1273,14 +1233,14 @@ namespace LinearAlgebra
        * information from the column space map is used to speed up the
        * assembly process.
        */
-      Teuchos::RCP<MapType> column_space_map;
+      Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> column_space_map;
 
       /**
        * A sparse matrix object in Trilinos to be used for finite element based
        * problems which allows for assembling into non-local elements.  The
        * actual type, a sparse matrix, is set in the constructor.
        */
-      Teuchos::RCP<MatrixType> matrix;
+      Teuchos::RCP<TpetraTypes::MatrixType<Number, MemorySpace>> matrix;
 
       /**
        * A boolean variable to hold information on whether the matrix is
@@ -1955,11 +1915,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline const Tpetra::CrsMatrix<
-      Number,
-      int,
-      types::signed_global_dof_index,
-      typename SparseMatrix<Number, MemorySpace>::NodeType> &
+    inline const TpetraTypes::MatrixType<Number, MemorySpace> &
     SparseMatrix<Number, MemorySpace>::trilinos_matrix() const
     {
       return *matrix;
@@ -1968,11 +1924,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline Tpetra::CrsMatrix<
-      Number,
-      int,
-      types::signed_global_dof_index,
-      typename SparseMatrix<Number, MemorySpace>::NodeType> &
+    inline TpetraTypes::MatrixType<Number, MemorySpace> &
     SparseMatrix<Number, MemorySpace>::trilinos_matrix()
     {
       return *matrix;
@@ -1981,11 +1933,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline Teuchos::RCP<const Tpetra::CrsMatrix<
-      Number,
-      int,
-      types::signed_global_dof_index,
-      typename SparseMatrix<Number, MemorySpace>::NodeType>>
+    inline Teuchos::RCP<const TpetraTypes::MatrixType<Number, MemorySpace>>
     SparseMatrix<Number, MemorySpace>::trilinos_rcp() const
     {
       return matrix.getConst();
@@ -1994,11 +1942,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline Teuchos::RCP<
-      Tpetra::CrsMatrix<Number,
-                        int,
-                        types::signed_global_dof_index,
-                        typename SparseMatrix<Number, MemorySpace>::NodeType>>
+    inline Teuchos::RCP<TpetraTypes::MatrixType<Number, MemorySpace>>
     SparseMatrix<Number, MemorySpace>::trilinos_rcp()
     {
       return matrix;
@@ -2102,10 +2046,10 @@ namespace LinearAlgebra
           }
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-        typename SparseMatrix<Number, MemorySpace>::MatrixType::
+        typename TpetraTypes::MatrixType<Number, MemorySpace>::
           nonconst_global_inds_host_view_type col_indices(colnum_cache->data(),
                                                           colnums);
-        typename SparseMatrix<Number, MemorySpace>::MatrixType::
+        typename TpetraTypes::MatrixType<Number, MemorySpace>::
           nonconst_values_host_view_type values(value_cache->data(), colnums);
 #  else
         Teuchos::ArrayView<dealii::types::signed_global_dof_index> col_indices(

@@ -19,6 +19,8 @@
 
 #include "deal.II/grid/grid_generator.h"
 
+#include "deal.II/lac/trilinos_tpetra_types.h"
+
 #include <string>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -70,34 +72,6 @@ namespace LinearAlgebra
     class SolverDirectBase
     {
     public:
-      /**
-       * Declare the type for container size.
-       */
-      using size_type = dealii::types::signed_global_dof_index;
-
-      /**
-       * Typedef for the NodeType
-       */
-#    if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
-      using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#    else
-      using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#    endif
-
-      /**
-       * Typedef for the LinearOperator type
-       */
-      using LinearOperator = Tpetra::Operator<Number, int, size_type, NodeType>;
-
-      /**
-       * Typedef for the MultiVector type
-       */
-      using MultiVector = Tpetra::MultiVector<Number, int, size_type, NodeType>;
-
       /**
        * Destructor.
        */
@@ -172,8 +146,8 @@ namespace LinearAlgebra
        * A structure that contains the Trilinos solver object.
        */
       Teuchos::RCP<
-        Amesos2::Solver<typename SparseMatrix<Number, MemorySpace>::MatrixType,
-                        MultiVector>>
+        Amesos2::Solver<TpetraTypes::MatrixType<Number, MemorySpace>,
+                        TpetraTypes::MultiVectorType<Number, MemorySpace>>>
         solver;
 
       /*

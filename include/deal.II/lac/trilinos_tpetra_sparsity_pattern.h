@@ -17,6 +17,10 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/types.h"
+
+#include "deal.II/lac/trilinos_tpetra_types.h"
+
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/index_set.h>
@@ -83,20 +87,7 @@ namespace LinearAlgebra
         /**
          * Declare type for container size.
          */
-        using size_type = dealii::types::signed_global_dof_index;
-
-        /**
-         * Typedef for the NodeType
-         */
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
-        using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
-          typename MemorySpace::kokkos_space::execution_space,
-          typename MemorySpace::kokkos_space>;
-#  else
-        using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
-          typename MemorySpace::kokkos_space::execution_space,
-          typename MemorySpace::kokkos_space>;
-#  endif
+        using size_type = dealii::types::global_dof_index;
 
         /**
          * Constructor.
@@ -195,20 +186,7 @@ namespace LinearAlgebra
         /**
          * Declare type for container size.
          */
-        using size_type = size_t;
-
-        /**
-         * Typedef for the NodeType
-         */
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
-        using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
-          typename MemorySpace::kokkos_space::execution_space,
-          typename MemorySpace::kokkos_space>;
-#  else
-        using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
-          typename MemorySpace::kokkos_space::execution_space,
-          typename MemorySpace::kokkos_space>;
-#  endif
+        using size_type = types::global_dof_index;
 
         /**
          * Constructor. Create an iterator into the matrix @p matrix for the
@@ -313,38 +291,11 @@ namespace LinearAlgebra
       /**
        * Declare type for container size.
        */
-      using size_type = dealii::types::signed_global_dof_index;
-
-      /**
-       * Typedef for the NodeType
-       */
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
-      using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#  else
-      using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#  endif
-
+      using size_type = dealii::types::global_dof_index;
       /**
        * Declare an alias for the iterator class.
        */
       using const_iterator = SparsityPatternIterators::Iterator<MemorySpace>;
-
-      /**
-       * Typedef for Tpetra::Map
-       */
-      using MapType =
-        Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
-
-      /**
-       * Typedef for Tpetra::Graph
-       */
-      using GraphType =
-        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
-
 
       /**
        * @name Basic constructors and initialization
@@ -854,7 +805,7 @@ namespace LinearAlgebra
        * Return a Teuchos::RCP to the underlying Trilinos Tpetra::CrsGraph
        * data that stores the sparsity pattern.
        */
-      Teuchos::RCP<GraphType>
+      Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>>
       trilinos_sparsity_pattern() const;
 
       /**
@@ -863,7 +814,7 @@ namespace LinearAlgebra
        * pattern, i.e., the partitioning of the vectors matrices based on this
        * sparsity pattern are multiplied with.
        */
-      Teuchos::RCP<const MapType>
+      Teuchos::RCP<const TpetraTypes::MapType<MemorySpace>>
       domain_partitioner() const;
 
       /**
@@ -872,7 +823,7 @@ namespace LinearAlgebra
        * i.e., the partitioning of the vectors that are result from matrix-
        * vector products.
        */
-      Teuchos::RCP<const MapType>
+      Teuchos::RCP<const TpetraTypes::MapType<MemorySpace>>
       range_partitioner() const;
 
       /**
@@ -1036,14 +987,14 @@ namespace LinearAlgebra
        * Teuchos::RCP to the user-supplied Tpetra Trilinos mapping of the matrix
        * columns that assigns parts of the matrix to the individual processes.
        */
-      Teuchos::RCP<MapType> column_space_map;
+      Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> column_space_map;
 
       /**
        * A sparsity pattern object in Trilinos to be used for finite element
        * based problems which allows for adding non-local elements to the
        * pattern.
        */
-      Teuchos::RCP<GraphType> graph;
+      Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph;
 
       /**
        * A sparsity pattern object for the non-local part of the sparsity
@@ -1051,7 +1002,7 @@ namespace LinearAlgebra
        * when the particular constructor or reinit method with writable_rows
        * argument is set
        */
-      Teuchos::RCP<GraphType> nonlocal_graph;
+      Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> nonlocal_graph;
 
       // TODO: currently only for double
       friend class SparseMatrix<double, MemorySpace>;
@@ -1274,9 +1225,7 @@ namespace LinearAlgebra
       // place the iterator on the first entry
       // past this line, or at the end of the
       // matrix
-      for (size_type i = r + 1;
-           i < static_cast<dealii::types::signed_global_dof_index>(n_rows());
-           ++i)
+      for (size_type i = r + 1; i < n_rows(); ++i)
         if (row_length(i) > 0)
           return const_iterator(this, i, 0);
 
@@ -1392,10 +1341,9 @@ namespace LinearAlgebra
 
 
     template <typename MemorySpace>
-    inline Teuchos::RCP<
-      Tpetra::CrsGraph<int,
-                       dealii::types::signed_global_dof_index,
-                       typename SparsityPattern<MemorySpace>::NodeType>>
+    inline Teuchos::RCP<Tpetra::CrsGraph<int,
+                                         dealii::types::signed_global_dof_index,
+                                         TpetraTypes::NodeType<MemorySpace>>>
     SparsityPattern<MemorySpace>::trilinos_sparsity_pattern() const
     {
       return graph;

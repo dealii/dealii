@@ -198,13 +198,13 @@ Vector<Number>::Vector(
       // Copy the distributed vector to
       // a local one at all processors
       // that know about the original vector.
-      typename LinearAlgebra::TpetraWrappers::Vector<OtherNumber,
-                                                     MemorySpace>::VectorType
+      LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
+                                                             MemorySpace>
         localized_vector(complete_index_set(size()).make_tpetra_map_rcp(),
                          v.get_mpi_communicator());
 
-      Teuchos::RCP<const typename LinearAlgebra::TpetraWrappers::
-                     Vector<OtherNumber, MemorySpace>::ImportType>
+      Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
+        MemorySpace>>
         importer = Tpetra::createImport(v.trilinos_vector().getMap(),
                                         localized_vector.getMap());
 
@@ -888,13 +888,13 @@ Vector<Number>::operator=(
       // Copy the distributed vector to
       // a local one at all processors
       // that know about the original vector.
-      typename LinearAlgebra::TpetraWrappers::Vector<OtherNumber,
-                                                     MemorySpace>::VectorType
+      LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
+                                                             MemorySpace>
         localized_vector(complete_index_set(size()).make_tpetra_map_rcp(),
                          v.get_mpi_communicator());
 
-      Teuchos::RCP<const typename LinearAlgebra::TpetraWrappers::
-                     Vector<OtherNumber, MemorySpace>::ImportType>
+      Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
+        MemorySpace>>
         importer = Tpetra::createImport(v.trilinos_vector().getMap(),
                                         localized_vector.getMap());
 
