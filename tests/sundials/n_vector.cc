@@ -380,9 +380,15 @@ test_get_communicator()
   // MPI_CONGRUENT indicates same group but different context (e.g. tags,
   // keyvals, etc.)
 #ifdef DEAL_II_WITH_MPI
-  int  result;
-  auto comm = static_cast<MPI_Comm *>(N_VGetCommunicator(n_vector));
-  MPI_Comm_compare(*comm, MPI_COMM_WORLD, &result);
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+  MPI_Comm comm = N_VGetCommunicator(n_vector);
+#  else
+  MPI_Comm comm = *static_cast<MPI_Comm *>(N_VGetCommunicator(n_vector));
+#  endif
+
+  int result;
+  MPI_Comm_compare(comm, MPI_COMM_WORLD, &result);
   Assert(result == MPI_IDENT || result == MPI_CONGRUENT, NVectorTestError());
 #endif
 
@@ -1099,7 +1105,10 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log_all;
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+  const int ierr = SUNContext_Create(MPI_COMM_WORLD, &global_nvector_context);
+  AssertThrow(ierr == 0, ExcMessage("unable to create SUNContext object"));
+#elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   MPI_Comm  communicator = MPI_COMM_WORLD;
   const int ierr = SUNContext_Create(&communicator, &global_nvector_context);
   AssertThrow(ierr == 0, ExcMessage("unable to create SUNContext object"));
