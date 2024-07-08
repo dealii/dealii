@@ -64,7 +64,7 @@ main()
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
-  kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
+  kinsol.reinit_vector = [N = N](VectorType &v) { v.reinit(N); };
 
   kinsol.residual = [](const VectorType &u, VectorType &F) {
     deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ')'
