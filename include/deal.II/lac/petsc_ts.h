@@ -591,7 +591,7 @@ namespace PETScWrappers
     std::function<IndexSet()> algebraic_components;
 
     /**
-     * This callback is equivalent to `update_constrained_components`, but is
+     * @deprecated This callback is equivalent to `update_constrained_components`, but is
      * deprecated. Use `update_constrained_components` instead.
      */
     DEAL_II_DEPRECATED_EARLY
@@ -614,12 +614,13 @@ namespace PETScWrappers
       update_constrained_components;
 
     /**
-     * This callback is equivalent to `decide_and_prepare_for_remeshing`
+     * @deprecated This callback is equivalent to `decide_and_prepare_for_remeshing`
      * except that it returns the decision whether or not to stop
      * operations via the last reference argument of the function
      * object instead of a plain return value. This callback is
      * deprecated. Use `decide_and_prepare_for_remeshing` instead.
      */
+    DEAL_II_DEPRECATED_EARLY
     std::function<void(const real_type    t,
                        const unsigned int step,
                        const VectorType  &y,
