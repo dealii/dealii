@@ -307,10 +307,7 @@ namespace LinearAlgebra
     if (PointerComparison::equal(this, &in_vector))
       return *this;
 
-    thread_loop_partitioner = in_vector.thread_loop_partitioner;
-    if (locally_owned_size() != in_vector.locally_owned_size())
-      reinit(in_vector, true);
-
+    reinit(in_vector, true);
     if (locally_owned_size() > 0)
       {
         dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
@@ -329,10 +326,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number> &
   ReadWriteVector<Number>::operator=(const ReadWriteVector<Number2> &in_vector)
   {
-    thread_loop_partitioner = in_vector.thread_loop_partitioner;
-    if (locally_owned_size() != in_vector.locally_owned_size())
-      reinit(in_vector, true);
-
+    reinit(in_vector, true);
     if (locally_owned_size() > 0)
       {
         dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
