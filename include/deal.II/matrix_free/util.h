@@ -61,7 +61,7 @@ namespace internal
 
           for (unsigned int i = 1; i <= 3; ++i)
             {
-              FE_SimplexP<dim> fe(i);
+              const FE_SimplexP<dim> fe(i);
               if (quad == Quadrature<dim>(fe.get_unit_support_points()))
                 return {ReferenceCells::get_simplex<dim>(),
                         dealii::hp::QCollection<dim - 1>(Quadrature<dim - 1>(
@@ -152,7 +152,7 @@ namespace internal
 
           for (unsigned int i = 1; i <= 3; ++i)
             {
-              FE_SimplexP<dim> fe(i);
+              const FE_SimplexP<dim> fe(i);
               if (quad == Quadrature<dim>(fe.get_unit_support_points()))
                 {
                   if (dim == 2)
