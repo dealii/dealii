@@ -180,8 +180,10 @@ namespace Step86
     void prepare_for_coarsening_and_refinement(
       const PETScWrappers::MPI::Vector &solution);
 
-    void interpolate(const std::vector<PETScWrappers::MPI::Vector> &all_in,
-                     std::vector<PETScWrappers::MPI::Vector>       &all_out);
+    void transfer_solution_vectors_to_new_mesh(
+      const double                                   time,
+      const std::vector<PETScWrappers::MPI::Vector> &all_in,
+      std::vector<PETScWrappers::MPI::Vector>       &all_out);
 
     // As also discussed in the introduction, we also have to deal with
     // "algebraic" solution components, i.e., degrees of freedom that are not
@@ -830,7 +832,7 @@ namespace Step86
   }
 
 
-  // @sect4{The HeatEquation::interpolate() function}
+  // @sect4{The HeatEquation::transfer_solution_vectors_to_new_mesh() function}
   //
   // The following function then is the second half of the correspond function
   // in step-26. It is called by the time stepper whenever it requires to
@@ -857,7 +859,8 @@ namespace Step86
   // and therefore we enforce them on the output vectors, even if this is not
   // really needed.
   template <int dim>
-  void HeatEquation<dim>::interpolate(
+  void HeatEquation<dim>::transfer_solution_vectors_to_new_mesh(
+    const double                                   time,
     const std::vector<PETScWrappers::MPI::Vector> &all_in,
     std::vector<PETScWrappers::MPI::Vector>       &all_out)
   {
@@ -881,7 +884,7 @@ namespace Step86
     solution_trans.prepare_for_coarsening_and_refinement(all_in_ghosted_ptr);
     triangulation.execute_coarsening_and_refinement();
 
-    setup_system(boundary_values_function.get_time());
+    setup_system(time);
 
     all_out.resize(all_in.size());
     for (unsigned int i = 0; i < all_in.size(); ++i)
@@ -1042,11 +1045,12 @@ namespace Step86
     // calling the `prepare_for_coarsening_and_refinement` function.
     //
     // If the first callback below returns `true`, then PETSc TS will
-    // do some clean-up operations, and call the second of the callback
-    // functions (`petsc_ts.interpolate`) with a collection of vectors that
-    // need to be interpolated from the old to the new mesh. This may include
-    // the current solution, perhaps the current time derivative of the
-    // solution, and in the case of
+    // do some clean-up operations, and call the second of the
+    // callback functions
+    // (`petsc_ts.transfer_solution_vectors_to_new_mesh`) with a
+    // collection of vectors that need to be interpolated from the old
+    // to the new mesh. This may include the current solution, perhaps
+    // the current time derivative of the solution, and in the case of
     // [multistep time
     // integrators](https://en.wikipedia.org/wiki/Linear_multistep_method) also
     // the solutions of some previous time steps. We hand all of these over to
@@ -1066,10 +1070,11 @@ namespace Step86
         return false;
     };
 
-    petsc_ts.interpolate =
-      [&](const std::vector<PETScWrappers::MPI::Vector> &all_in,
+    petsc_ts.transfer_solution_vectors_to_new_mesh =
+      [&](const double                                   time,
+          const std::vector<PETScWrappers::MPI::Vector> &all_in,
           std::vector<PETScWrappers::MPI::Vector>       &all_out) {
-        this->interpolate(all_in, all_out);
+        this->transfer_solution_vectors_to_new_mesh(time, all_in, all_out);
       };
 
     // The final callback is a "monitor" that is called in each
