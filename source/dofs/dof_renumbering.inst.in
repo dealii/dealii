@@ -67,6 +67,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       support_point_wise(
         DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
 
+      template void
+      compute_support_point_wise(
+        std::vector<types::global_dof_index> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
+
     \}
 #endif
   }
@@ -161,6 +166,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const bool);
 
       template void
+      compute_downstream<deal_II_dimension>(
+        std::vector<types::global_dof_index> &,
+        std::vector<types::global_dof_index> &,
+        const DoFHandler<deal_II_dimension> &,
+        const unsigned int,
+        const Tensor<1, DoFHandler<deal_II_dimension>::space_dimension> &,
+        const bool);
+
+      template void
       clockwise_dg<deal_II_dimension>(DoFHandler<deal_II_dimension> &,
                                       const Point<deal_II_dimension> &,
                                       bool);
@@ -220,10 +234,23 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::vector<bool> &);
 
       template void
+      sort_selected_dofs_back<deal_II_dimension>(
+        DoFHandler<deal_II_dimension> &,
+        const std::vector<bool> &,
+        const unsigned int);
+
+      template void
       compute_sort_selected_dofs_back<deal_II_dimension>(
         std::vector<types::global_dof_index> &,
         const DoFHandler<deal_II_dimension> &,
         const std::vector<bool> &);
+
+      template void
+      compute_sort_selected_dofs_back<deal_II_dimension>(
+        std::vector<types::global_dof_index> &,
+        const DoFHandler<deal_II_dimension> &,
+        const std::vector<bool> &,
+        const unsigned int);
 
       template void
       Cuthill_McKee<deal_II_dimension>(
