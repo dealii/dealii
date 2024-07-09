@@ -252,3 +252,23 @@ above that you should take away are:
   likely not gain this ability either. But, again, it doesn't
   have to: We can rely on a library written by experts in that area.
 
+
+
+<a name="step-86-extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+The program actually runs in parallel, even though we have not used
+that above. Specifically, if you have configured deal.II to use MPI,
+then you can do `mpirun -np 8 ./step-86 heat_equation.prm` to run the
+program with 8 processes.
+
+For the program as currently written (and in debug mode), this makes
+little difference: It will run about twice as fast, but take about 8
+times as much CPU time. That is because the problem is just so small:
+Generally between 1000 and 2000 degrees of freedom. A good rule of
+thumb is that programs really only benefit from parallel computing if
+you have somewhere in the range of 50,000 to 100,000 unknowns *per MPI
+process*. But it is not difficult to adapt the program at hand here to
+run with a much finer mesh, or perhaps in 3d, so that one is beyond
+that limit and sees the benefits of parallel computing.
+
