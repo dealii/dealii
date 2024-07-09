@@ -216,8 +216,6 @@ namespace parallel
      * will represent the number of different indicators (which is greater or
      * equal one).
      *
-     * @ingroup boundary
-     *
      * @see
      * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
      *

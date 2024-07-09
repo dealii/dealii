@@ -1160,8 +1160,6 @@ public:
    * the value you are trying to set makes sense under the current
    * circumstances.
    *
-   * @ingroup boundary
-   *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -1192,8 +1190,6 @@ public:
    * that bound the face. This function does all of this at once. You can see
    * the result of not using the correct function in the results section of
    * step-49.
-   *
-   * @ingroup boundary
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -2946,8 +2942,6 @@ public:
    * the value you are trying to set makes sense under the current
    * circumstances.
    *
-   * @ingroup boundary
-   *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -2968,8 +2962,6 @@ public:
    * lower-dimensional sub-objects.  Since this object only represents a single
    * vertex, there are no lower-dimensional object and this function is
    * equivalent to calling set_boundary_id() with the same argument.
-   *
-   * @ingroup boundary
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"

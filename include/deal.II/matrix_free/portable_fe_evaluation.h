@@ -60,7 +60,6 @@ namespace Portable
    * double.
    *
    * @ingroup CUDAWrappers
-   * @ingroup Portable
    */
   template <int dim,
             int fe_degree,
