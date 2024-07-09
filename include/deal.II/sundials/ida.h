@@ -274,6 +274,31 @@ namespace SUNDIALS
    * variables is always in instantaneous equilibrium with another set of
    * variables that evolves on a slower time scale.
    *
+   * Another case where we *could* eliminate a variable but do not want to
+   * is where that additional variable is introduced in the first place to work
+   * around some other problem. As an example, consider the time dependent
+   * version of the biharmonic problem we consider in step-47 (as well as some
+   * later ones). The equations we would then be interested in would read
+   * @f{align*}{
+   *   \frac{\partial u(\mathbf x,t)}{\partial t} + \Delta^2 u(\mathbf x,t) &=
+   *   f(\mathbf x,t).
+   * @f}
+   * As discussed in step-47, the difficulty is the presence of the fourth
+   * derivatives. One way in which one can address this is by introducing
+   * an auxiliary variable $v=\Delta u$ which would render the problem into
+   * the following one that only ever has second derivatives which we know
+   * how to deal with:
+   * @f{align*}{
+   *   \frac{\partial u(\mathbf x,t)}{\partial t} + \Delta v(\mathbf x,t) &=
+   *   f(\mathbf x,t),
+   *   \\
+   *   v(\mathbf x,t)-\Delta u(\mathbf x,t) &= 0.
+   * @f}
+   * Here, the introduction of the additional variable was voluntary, and
+   * could be undone, but we don't want that of course. Rather, we end
+   * up with a differential-algebraic equation because the equations do
+   * not have a time derivative for $v$.
+   *
    * Rather than show how to solve the trivial (linear) case above, let us
    * instead consider the situation where we introduce another variable $v$ that
    * is related to $u$ by the nonlinear relationship $v=u^p$, $p\ge 1$:
