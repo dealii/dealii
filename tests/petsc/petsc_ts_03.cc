@@ -187,8 +187,10 @@ public:
     };
 
     // This callback is called if decide_and_prepare_for_remeshing returns true.
-    time_stepper.interpolate = [&](const std::vector<VectorType> &all_in,
-                                   std::vector<VectorType> &all_out) -> void {
+    time_stepper.transfer_solution_vectors_to_new_mesh =
+      [&](const double /* t */,
+          const std::vector<VectorType> &all_in,
+          std::vector<VectorType>       &all_out) -> void {
       deallog << "Interpolate" << std::endl;
       for (auto &v : all_in)
         all_out.push_back(v);
