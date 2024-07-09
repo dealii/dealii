@@ -581,7 +581,9 @@ ParameterHandler::parse_input(const std::string &filename,
     parse_input_from_json(is, skip_undefined);
   else
     AssertThrow(false,
-                ExcMessage("Unknown input file name extension. Supported types "
+                ExcMessage("The given input file <" + filename +
+                           "> has a file name extension <" + file_ending +
+                           "> that is not recognized. Supported types "
                            "are .prm, .xml, and .json."));
 
   if (assert_mandatory_entries_are_found)
