@@ -1,0 +1,47 @@
+Cycle 0
+  Number of active cells       : 192
+  Number of degrees of freedom : 3072
+  Error in the L2 norm         : 0.000323585
+  Error in the H1 seminorm     : 0.0296202
+  Error in the energy norm     : 0.043578
+  Estimated error              : 0.136067
+
+Cycle 1
+  Number of active cells       : 249
+  Number of degrees of freedom : 3984
+  Error in the L2 norm         : 0.000114739
+  Error in the H1 seminorm     : 0.0186571
+  Error in the energy norm     : 0.027452
+  Estimated error              : 0.0857186
+
+Cycle 2
+  Number of active cells       : 321
+  Number of degrees of freedom : 5136
+  Error in the L2 norm         : 4.17566e-05
+  Error in the H1 seminorm     : 0.0117526
+  Error in the energy norm     : 0.0172936
+  Estimated error              : 0.0540022
+
+Cycle 3
+  Number of active cells       : 417
+  Number of degrees of freedom : 6672
+  Error in the L2 norm         : 1.5555e-05
+  Error in the H1 seminorm     : 0.0074036
+  Error in the energy norm     : 0.0108943
+  Estimated error              : 0.0340226
+
+Cycle 4
+  Number of active cells       : 540
+  Number of degrees of freedom : 8640
+  Error in the L2 norm         : 5.90745e-06
+  Error in the H1 seminorm     : 0.00466398
+  Error in the energy norm     : 0.00686303
+  Estimated error              : 0.021436
+
+degree = 3
+| cycle | cells | dofs | L2        | H1        | Energy    | Estimator | 
+| 0     | 192   | 3072 | 3.236e-04 | 2.962e-02 | 4.358e-02 | 1.361e-01 | 
+| 1     | 249   | 3984 | 1.147e-04 | 1.866e-02 | 2.745e-02 | 8.572e-02 | 
+| 2     | 321   | 5136 | 4.176e-05 | 1.175e-02 | 1.729e-02 | 5.400e-02 | 
+| 3     | 417   | 6672 | 1.556e-05 | 7.404e-03 | 1.089e-02 | 3.402e-02 | 
+| 4     | 540   | 8640 | 5.907e-06 | 4.664e-03 | 6.863e-03 | 2.144e-02 | 

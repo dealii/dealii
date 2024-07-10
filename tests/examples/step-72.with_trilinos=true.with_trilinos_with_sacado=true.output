@@ -1,0 +1,51 @@
+******** Assembly approach ********
+Unassisted implementation (full hand linearization).
+
+Mesh refinement step 0
+  Initial residual: 1.53143
+  Residual: 1.08746
+  Residual: 0.966748
+  Residual: 0.859602
+  Residual: 0.766462
+  Residual: 0.685475
+
+Mesh refinement step 1
+  Initial residual: 0.868959
+  Residual: 0.762125
+  Residual: 0.677792
+  Residual: 0.605762
+  Residual: 0.542748
+  Residual: 0.48704
+
+Mesh refinement step 2
+  Initial residual: 0.426445
+  Residual: 0.382731
+  Residual: 0.343865
+  Residual: 0.30918
+  Residual: 0.278147
+  Residual: 0.250327
+
+Mesh refinement step 3
+  Initial residual: 0.282026
+  Residual: 0.253146
+  Residual: 0.227414
+  Residual: 0.20441
+  Residual: 0.183803
+  Residual: 0.165319
+
+Mesh refinement step 4
+  Initial residual: 0.154404
+  Residual: 0.138723
+  Residual: 0.124694
+  Residual: 0.112124
+  Residual: 0.100847
+  Residual: 0.0907222
+
+Mesh refinement step 5
+  Initial residual: 0.0819655
+  Residual: 0.0737378
+  Residual: 0.0663465
+  Residual: 0.0597032
+  Residual: 0.0537298
+  Residual: 0.0483571
+  

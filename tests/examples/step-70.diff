@@ -1,0 +1,30 @@
+27c27
+< 
+---
+> #include "../example_test.h"
+785c785
+<                       TimerOutput::summary,
+---
+>                       TimerOutput::never,
+1590,1591c1590,1593
+<     solver.solve(system_matrix, solution, system_rhs, P);
+< 
+---
+>     //solver.solve(system_matrix, solution, system_rhs, P);
+>     check_solver_within_range(pcout,solver.solve(system_matrix, solution, system_rhs, P),
+>                               solver_control.last_step(),
+>                               118, 163);
+1593,1594c1595,1596
+<     pcout << "   Solved in " << solver_control.last_step() << " iterations."
+<           << std::endl;
+---
+> //    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+> //          << std::endl;
+1799c1801
+<     for (unsigned int cycle = 0; cycle < par.number_of_time_steps;
+---
+>     for (unsigned int cycle = 0; cycle < 3;
+1939c1941
+<         prm_file = "parameters.prm";
+---
+>         prm_file = "../../../source/step-70/parameters.prm";
