@@ -582,11 +582,33 @@ namespace PETScWrappers
 
     /**
      * Callback to return an index set containing the algebraic components.
+     * Algebraic components are degrees of freedom for which the differential
+     * equation does not provide a time derivative. This can either be because
+     * the degree of freedom is constrained (say, because it is a hanging
+     * node, or because it is part of Dirichlet boundary values), or because
+     * the differential equation simply does not contain time derivatives
+     * for a specific solution variable. An example for the latter case is
+     * the pressure in the time dependent Stokes equations,
+     * @f{align*}{
+     *   \frac{\partial \mathbf u(\mathbf x,t)}{\partial t}
+     *   - \nu \Delta \mathbf u(\mathbf x,t) + \nabla p(\mathbf x,t)
+     *   &= \mathbf f(\mathbf x,t),
+     *   \\
+     *   \nabla \cdot \mathbf u(\mathbf x,t) &= 0.
+     * @f}
+     * The documentation of the SUNDIALS::IDA class has an extensive
+     * documentation of algebraic variables as part of differential-algebraic
+     * equations.
      *
      * Implementation of this function is optional. If your equation is also
      * algebraic (i.e., it contains algebraic constraints, or Lagrange
      * multipliers), you should implement this function in order to return only
      * these components of your system.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
      */
     std::function<IndexSet()> algebraic_components;
 
@@ -598,7 +620,12 @@ namespace PETScWrappers
     std::function<void(const real_type t, VectorType &y)> distribute;
 
     /**
-     * Callback to distribute solution to hanging nodes.
+     * Callback to set the values of constrained components to their correct
+     * values. Constrained components are a subset of the algebraic
+     * components discussed in the documentation of the
+     * TimeStepper::algebraic_components callback. In practice, the constrained
+     * components are typically hanging nodes and degrees of freedom
+     * constrained by Dirichlet boundary conditions.
      *
      * Implementation of this function is optional.
      * It is called at the end of each successful stage.
