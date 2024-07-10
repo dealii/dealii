@@ -193,5 +193,4 @@
  *
  *
  * @ingroup LAC
- * @ingroup MATRICES
  */

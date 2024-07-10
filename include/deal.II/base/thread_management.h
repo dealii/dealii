@@ -1367,8 +1367,6 @@ namespace Threads
    * the calls that add subtasks. Otherwise, there might be a deadlock. In
    * other words, a Task object should never passed on to another task for
    * calling the join() method.
-   *
-   * @ingroup tasks
    */
   template <typename RT = void>
   class TaskGroup

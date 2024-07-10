@@ -42,8 +42,6 @@ namespace GinkgoWrappers
    * available at <a Ginkgo
    * href="https://ginkgo-project.github.io/ginkgo/doc/develop/"> documentation
    * and manual pages</a>.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType, typename IndexType>
   class SolverBase
@@ -207,8 +205,6 @@ namespace GinkgoWrappers
 
   /**
    * An implementation of the solver interface using the Ginkgo CG solver.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverCG : public SolverBase<ValueType, IndexType>
@@ -263,8 +259,6 @@ namespace GinkgoWrappers
 
   /**
    * An implementation of the solver interface using the Ginkgo Bicgstab solver.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverBicgstab : public SolverBase<ValueType, IndexType>
@@ -321,8 +315,6 @@ namespace GinkgoWrappers
    *
    * CGS or the conjugate gradient square method is an iterative type Krylov
    * subspace method which is suitable for general systems.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverCGS : public SolverBase<ValueType, IndexType>
@@ -388,8 +380,6 @@ namespace GinkgoWrappers
    * vectors spanning the Krylov subspace. This increases the computational cost
    * of every Krylov solver iteration but allows for non-constant
    * preconditioners.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverFCG : public SolverBase<ValueType, IndexType>
@@ -443,8 +433,6 @@ namespace GinkgoWrappers
 
   /**
    * An implementation of the solver interface using the Ginkgo GMRES solver.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverGMRES : public SolverBase<ValueType, IndexType>
@@ -513,8 +501,6 @@ namespace GinkgoWrappers
    * Iterative refinement (IR) is an iterative method that uses another coarse
    * method to approximate the error of the current solution via the current
    * residual.
-   *
-   * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
   class SolverIR : public SolverBase<ValueType, IndexType>

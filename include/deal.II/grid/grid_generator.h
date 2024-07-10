@@ -2427,8 +2427,6 @@ namespace GridGenerator
   /**
    * Namespace Airfoil contains classes and functions in order to create a
    * C-type mesh for the (flow) field around Joukowski or NACA airfoils.
-   *
-   * @ingroup GridGenerator
    */
   namespace Airfoil
   {

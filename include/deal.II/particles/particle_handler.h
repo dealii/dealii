@@ -57,8 +57,6 @@ namespace Particles
    * For examples on how to use this class to track particles, store properties
    * on particles, and let the properties on the particles influence the
    * finite-element solution see step-19, step-68, and step-70.
-   *
-   * @ingroup Particle
    */
   template <int dim, int spacedim = dim>
   class ParticleHandler : public Subscriptor

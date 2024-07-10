@@ -68,8 +68,8 @@ namespace TrilinosWrappers
      * elements of each of these blocks to be stored on the local process.
      *
      * @ingroup Vectors
-     * @ingroup TrilinosWrappers @see
-     * @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup TrilinosWrappers
+     * @see @ref GlossBlockLA "Block (linear algebra)"
      */
     class BlockVector : public dealii::BlockVectorBase<MPI::Vector>
     {

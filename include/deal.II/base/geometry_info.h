@@ -479,8 +479,6 @@ private:
  * <code>RefinementPossibilities@<1@></code>,
  * <code>RefinementPossibilities@<2@></code>, and
  * <code>RefinementPossibilities@<3@></code>.
- *
- * @ingroup aniso
  */
 template <int dim>
 struct RefinementPossibilities
@@ -549,8 +547,6 @@ struct RefinementPossibilities
  *
  * This specialization is used for <code>dim=1</code>, where it offers
  * refinement in x-direction.
- *
- * @ingroup aniso
  */
 template <>
 struct RefinementPossibilities<1>
@@ -615,8 +611,6 @@ struct RefinementPossibilities<1>
  * This specialization is used for <code>dim=2</code>, where it offers
  * refinement in x- and y-direction separately, as well as isotropic
  * refinement in both directions at the same time.
- *
- * @ingroup aniso
  */
 template <>
 struct RefinementPossibilities<2>
@@ -690,8 +684,6 @@ struct RefinementPossibilities<2>
  * This specialization is used for <code>dim=3</code>, where it offers
  * refinement in x-, y- and z-direction separately, as well as combinations of
  * these and isotropic refinement in all directions at the same time.
- *
- * @ingroup aniso
  */
 template <>
 struct RefinementPossibilities<3>
@@ -781,8 +773,6 @@ struct RefinementPossibilities<3>
  * <code>dim=2</code>, etc.). Possible values of this class are the ones
  * listed in the enumeration declared within the base class; see there for
  * more information.
- *
- * @ingroup aniso
  */
 template <int dim>
 class RefinementCase : public RefinementPossibilities<dim>
@@ -922,8 +912,6 @@ namespace internal
    * <code>SubfacePossibilities@<1@></code>,
    * <code>SubfacePossibilities@<2@></code> and
    * <code>SubfacePossibilities@<3@></code>.
-   *
-   * @ingroup aniso
    */
   template <int dim>
   struct SubfacePossibilities
@@ -951,8 +939,6 @@ namespace internal
    * space dimension @p dim) might be subdivided into subfaces.
    *
    * For <code>dim=0</code> we provide a dummy implementation only.
-   *
-   * @ingroup aniso
    */
   template <>
   struct SubfacePossibilities<0>
@@ -984,8 +970,6 @@ namespace internal
    *
    * For <code>dim=1</code> there are no faces. Thereby, there are no subface
    * possibilities.
-   *
-   * @ingroup aniso
    */
   template <>
   struct SubfacePossibilities<1>
@@ -1018,8 +1002,6 @@ namespace internal
    * This specialization is used for <code>dim=2</code>, where it offers the
    * following possibilities: a face (line) being refined
    * (<code>case_x</code>) or not refined (<code>case_no</code>).
-   *
-   * @ingroup aniso
    */
   template <>
   struct SubfacePossibilities<2>
@@ -1137,8 +1119,6 @@ namespace internal
    * *---*---*
    *
    * @endcode
-   *
-   * @ingroup aniso
    */
   template <>
   struct SubfacePossibilities<3>
@@ -1171,8 +1151,6 @@ namespace internal
   /**
    * A class that provides all possible cases a face (in the current space
    * dimension @p dim) might be subdivided into subfaces.
-   *
-   * @ingroup aniso
    */
   template <int dim>
   class SubfaceCase : public SubfacePossibilities<dim>
@@ -1248,7 +1226,7 @@ struct GeometryInfo;
  * This information should always replace hard-coded numbers of vertices,
  * neighbors and so on, since it can be used dimension independently.
  *
- * @ingroup grid geomprimitives aniso
+ * @ingroup grid geomprimitives
  */
 template <>
 struct GeometryInfo<0>
@@ -1979,7 +1957,7 @@ struct GeometryInfo<0>
  * @ref Instantiations
  * in the manual).
  *
- * @ingroup grid geomprimitives aniso
+ * @ingroup grid geomprimitives
  */
 template <int dim>
 struct GeometryInfo

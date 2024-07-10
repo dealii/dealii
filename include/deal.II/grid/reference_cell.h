@@ -121,7 +121,7 @@ enum class IsotropicRefinementChoice : std::uint8_t
  * @ref GlossReferenceCell "reference cell"
  * glossary entry.
  *
- * @ingroup grid geomprimitives aniso reordering
+ * @ingroup grid geomprimitives reordering
  */
 class ReferenceCell
 {

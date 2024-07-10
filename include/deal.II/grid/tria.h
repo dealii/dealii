@@ -1307,7 +1307,7 @@ namespace internal
  * object, you should be well aware that you might involuntarily alter the
  * data stored in the triangulation.
  *
- * @ingroup grid aniso
+ * @ingroup grid
  *
  * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
  */
@@ -1958,8 +1958,6 @@ public:
    * boundary indicator is reported only once. The size of the return vector
    * will represent the number of different indicators (which is greater or
    * equal one).
-   *
-   * @ingroup boundary
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"

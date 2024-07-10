@@ -41,8 +41,6 @@ namespace parallel
 {
   /**
    * A namespace for the fully distributed triangulation.
-   *
-   * @ingroup parallel
    */
   namespace fullydistributed
   {
