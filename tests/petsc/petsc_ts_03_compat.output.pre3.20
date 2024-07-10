@@ -1,0 +1,628 @@
+
+DEAL::# Default Parameters
+subsection Error control
+  set absolute error tolerance = -1
+  set adaptor type             = none
+  set ignore algebraic lte     = true
+  set maximum step size        = -1
+  set minimum step size        = -1
+  set relative error tolerance = -1
+end
+subsection Running parameters
+  set final time              = 0
+  set initial step size       = 0
+  set initial time            = 0
+  set match final time        = false
+  set maximum number of steps = -1
+  set options prefix          = 
+  set solver type             = 
+end
+DEAL::# Testing Parameters
+subsection Error control
+  set absolute error tolerance = 0.0001
+  set adaptor type             = none
+  set ignore algebraic lte     = true
+  set maximum step size        = 1e+7
+  set minimum step size        = 1e-7
+  set relative error tolerance = -1
+end
+subsection Running parameters
+  set final time              = 2.0
+  set initial step size       = 0.2
+  set initial time            = 0
+  set match final time        = false
+  set maximum number of steps = -1
+  set options prefix          = 
+  set solver type             = bdf
+end
+DEAL::# Test explicit interface (J 0)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Distribute at time 0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Distribute at time 0.200000
+DEAL::Prepare at time 0.200000 and step 1
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Distribute at time 0.400000
+DEAL::Prepare at time 0.400000 and step 2
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Distribute at time 0.600000
+DEAL::Prepare at time 0.600000 and step 3
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Distribute at time 0.800000
+DEAL::Prepare at time 0.800000 and step 4
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Distribute at time 1.00000
+DEAL::Prepare at time 1.00000 and step 5
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Distribute at time 1.10000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Distribute at time 1.20000
+DEAL::Prepare at time 1.20000 and step 6
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.303189  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Distribute at time 1.40000
+DEAL::Prepare at time 1.40000 and step 7
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.248455  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Distribute at time 1.60000
+DEAL::Prepare at time 1.60000 and step 8
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203127  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Distribute at time 1.80000
+DEAL::Prepare at time 1.80000 and step 9
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.165898  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Distribute at time 2.00000
+DEAL::Prepare at time 2.00000 and step 10
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.135431  (exact: 0.135335)
+DEAL::Evaluating explicit function at t=2.10000
+DEAL::Evaluating explicit function at t=2.10000
+DEAL::Evaluating explicit function at t=2.10000
+DEAL::Evaluating explicit function at t=2.10000
+DEAL::Distribute at time 2.10000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Distribute at time 2.20000
+DEAL::Prepare at time 2.20000 and step 11
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.111577  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
+DEAL::# Test implicit interface (J 0)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Distribute at time 0.100000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Distribute at time 0.200000
+DEAL::Prepare at time 0.200000 and step 1
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Distribute at time 0.400000
+DEAL::Prepare at time 0.400000 and step 2
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Distribute at time 0.600000
+DEAL::Prepare at time 0.600000 and step 3
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Distribute at time 0.800000
+DEAL::Prepare at time 0.800000 and step 4
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Distribute at time 1.00000
+DEAL::Prepare at time 1.00000 and step 5
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Distribute at time 1.10000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Distribute at time 1.20000
+DEAL::Prepare at time 1.20000 and step 6
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.303189  (exact: 0.301194)
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Distribute at time 1.40000
+DEAL::Prepare at time 1.40000 and step 7
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.248455  (exact: 0.246597)
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Distribute at time 1.60000
+DEAL::Prepare at time 1.60000 and step 8
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203127  (exact: 0.201897)
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Distribute at time 1.80000
+DEAL::Prepare at time 1.80000 and step 9
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.165898  (exact: 0.165299)
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Distribute at time 2.00000
+DEAL::Prepare at time 2.00000 and step 10
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.135431  (exact: 0.135335)
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Distribute at time 2.10000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Distribute at time 2.20000
+DEAL::Prepare at time 2.20000 and step 11
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.111577  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
+DEAL::# Test explicit interface (J 1)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Evaluating explicit Jacobian at t=0.100000
+DEAL::Evaluating explicit function at t=0.100000
+DEAL::Distribute at time 0.100000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Evaluating explicit Jacobian at t=0.200000
+DEAL::Evaluating explicit function at t=0.200000
+DEAL::Distribute at time 0.200000
+DEAL::Prepare at time 0.200000 and step 1
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Evaluating explicit Jacobian at t=0.400000
+DEAL::Evaluating explicit function at t=0.400000
+DEAL::Distribute at time 0.400000
+DEAL::Prepare at time 0.400000 and step 2
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Evaluating explicit Jacobian at t=0.600000
+DEAL::Evaluating explicit function at t=0.600000
+DEAL::Distribute at time 0.600000
+DEAL::Prepare at time 0.600000 and step 3
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Evaluating explicit Jacobian at t=0.800000
+DEAL::Evaluating explicit function at t=0.800000
+DEAL::Distribute at time 0.800000
+DEAL::Prepare at time 0.800000 and step 4
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Evaluating explicit Jacobian at t=1.00000
+DEAL::Evaluating explicit function at t=1.00000
+DEAL::Distribute at time 1.00000
+DEAL::Prepare at time 1.00000 and step 5
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Evaluating explicit Jacobian at t=1.10000
+DEAL::Evaluating explicit function at t=1.10000
+DEAL::Distribute at time 1.10000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Evaluating explicit Jacobian at t=1.20000
+DEAL::Evaluating explicit function at t=1.20000
+DEAL::Distribute at time 1.20000
+DEAL::Prepare at time 1.20000 and step 6
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.303189  (exact: 0.301194)
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Evaluating explicit Jacobian at t=1.40000
+DEAL::Evaluating explicit function at t=1.40000
+DEAL::Distribute at time 1.40000
+DEAL::Prepare at time 1.40000 and step 7
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.248455  (exact: 0.246597)
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Evaluating explicit Jacobian at t=1.60000
+DEAL::Evaluating explicit function at t=1.60000
+DEAL::Distribute at time 1.60000
+DEAL::Prepare at time 1.60000 and step 8
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203127  (exact: 0.201897)
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Evaluating explicit Jacobian at t=1.80000
+DEAL::Evaluating explicit function at t=1.80000
+DEAL::Distribute at time 1.80000
+DEAL::Prepare at time 1.80000 and step 9
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.165898  (exact: 0.165299)
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Evaluating explicit Jacobian at t=2.00000
+DEAL::Evaluating explicit function at t=2.00000
+DEAL::Distribute at time 2.00000
+DEAL::Prepare at time 2.00000 and step 10
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.135431  (exact: 0.135335)
+DEAL::Evaluating explicit function at t=2.10000
+DEAL::Evaluating explicit Jacobian at t=2.10000
+DEAL::Evaluating explicit function at t=2.10000
+DEAL::Distribute at time 2.10000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Evaluating explicit Jacobian at t=2.20000
+DEAL::Evaluating explicit function at t=2.20000
+DEAL::Distribute at time 2.20000
+DEAL::Prepare at time 2.20000 and step 11
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.111577  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
+DEAL::# Test implicit interface (J 1)
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit Jacobian at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Distribute at time 0.100000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit Jacobian at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Distribute at time 0.200000
+DEAL::Prepare at time 0.200000 and step 1
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Evaluating implicit Jacobian at t=0.400000
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Distribute at time 0.400000
+DEAL::Prepare at time 0.400000 and step 2
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Evaluating implicit Jacobian at t=0.600000
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Distribute at time 0.600000
+DEAL::Prepare at time 0.600000 and step 3
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Evaluating implicit Jacobian at t=0.800000
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Distribute at time 0.800000
+DEAL::Prepare at time 0.800000 and step 4
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Evaluating implicit Jacobian at t=1.00000
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Distribute at time 1.00000
+DEAL::Prepare at time 1.00000 and step 5
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Evaluating implicit Jacobian at t=1.10000
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Distribute at time 1.10000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Evaluating implicit Jacobian at t=1.20000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Distribute at time 1.20000
+DEAL::Prepare at time 1.20000 and step 6
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.303189  (exact: 0.301194)
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Evaluating implicit Jacobian at t=1.40000
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Distribute at time 1.40000
+DEAL::Prepare at time 1.40000 and step 7
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.248455  (exact: 0.246597)
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Evaluating implicit Jacobian at t=1.60000
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Distribute at time 1.60000
+DEAL::Prepare at time 1.60000 and step 8
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203127  (exact: 0.201897)
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Evaluating implicit Jacobian at t=1.80000
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Distribute at time 1.80000
+DEAL::Prepare at time 1.80000 and step 9
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.165898  (exact: 0.165299)
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Evaluating implicit Jacobian at t=2.00000
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Distribute at time 2.00000
+DEAL::Prepare at time 2.00000 and step 10
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.135431  (exact: 0.135335)
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Evaluating implicit Jacobian at t=2.10000
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Distribute at time 2.10000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Evaluating implicit Jacobian at t=2.20000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Distribute at time 2.20000
+DEAL::Prepare at time 2.20000 and step 11
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.111577  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
+DEAL::# Test user interface
+DEAL::Intermediate output:
+DEAL::  t =0.00000
+DEAL::  y =1.00000  (exact: 1.00000)
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Setting up Jacobian at t=0.100000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Evaluating implicit function at t=0.100000
+DEAL::Distribute at time 0.100000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Setting up Jacobian at t=0.200000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Evaluating implicit function at t=0.200000
+DEAL::Distribute at time 0.200000
+DEAL::Prepare at time 0.200000 and step 1
+DEAL::Intermediate output:
+DEAL::  t =0.200000
+DEAL::  y =0.823864  (exact: 0.818731)
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Setting up Jacobian at t=0.400000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Evaluating implicit function at t=0.400000
+DEAL::Distribute at time 0.400000
+DEAL::Prepare at time 0.400000 and step 2
+DEAL::Intermediate output:
+DEAL::  t =0.400000
+DEAL::  y =0.675134  (exact: 0.670320)
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Setting up Jacobian at t=0.600000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Evaluating implicit function at t=0.600000
+DEAL::Distribute at time 0.600000
+DEAL::Prepare at time 0.600000 and step 3
+DEAL::Intermediate output:
+DEAL::  t =0.600000
+DEAL::  y =0.551962  (exact: 0.548812)
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Setting up Jacobian at t=0.800000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Evaluating implicit function at t=0.800000
+DEAL::Distribute at time 0.800000
+DEAL::Prepare at time 0.800000 and step 4
+DEAL::Intermediate output:
+DEAL::  t =0.800000
+DEAL::  y =0.450798  (exact: 0.449329)
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Setting up Jacobian at t=1.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Evaluating implicit function at t=1.00000
+DEAL::Distribute at time 1.00000
+DEAL::Prepare at time 1.00000 and step 5
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =1.00000
+DEAL::  y =0.368009  (exact: 0.367879)
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Setting up Jacobian at t=1.10000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Evaluating implicit function at t=1.10000
+DEAL::Distribute at time 1.10000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Setting up Jacobian at t=1.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Evaluating implicit function at t=1.20000
+DEAL::Distribute at time 1.20000
+DEAL::Prepare at time 1.20000 and step 6
+DEAL::Intermediate output:
+DEAL::  t =1.20000
+DEAL::  y =0.303189  (exact: 0.301194)
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Setting up Jacobian at t=1.40000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Evaluating implicit function at t=1.40000
+DEAL::Distribute at time 1.40000
+DEAL::Prepare at time 1.40000 and step 7
+DEAL::Intermediate output:
+DEAL::  t =1.40000
+DEAL::  y =0.248455  (exact: 0.246597)
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Setting up Jacobian at t=1.60000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Evaluating implicit function at t=1.60000
+DEAL::Distribute at time 1.60000
+DEAL::Prepare at time 1.60000 and step 8
+DEAL::Intermediate output:
+DEAL::  t =1.60000
+DEAL::  y =0.203127  (exact: 0.201897)
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Setting up Jacobian at t=1.80000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Evaluating implicit function at t=1.80000
+DEAL::Distribute at time 1.80000
+DEAL::Prepare at time 1.80000 and step 9
+DEAL::Intermediate output:
+DEAL::  t =1.80000
+DEAL::  y =0.165898  (exact: 0.165299)
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Setting up Jacobian at t=2.00000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Evaluating implicit function at t=2.00000
+DEAL::Distribute at time 2.00000
+DEAL::Prepare at time 2.00000 and step 10
+DEAL::Interpolate
+DEAL::Intermediate output:
+DEAL::  t =2.00000
+DEAL::  y =0.135431  (exact: 0.135335)
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Setting up Jacobian at t=2.10000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Evaluating implicit function at t=2.10000
+DEAL::Distribute at time 2.10000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Setting up Jacobian at t=2.20000
+DEAL::Solving with Jacobian
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Evaluating implicit function at t=2.20000
+DEAL::Distribute at time 2.20000
+DEAL::Prepare at time 2.20000 and step 11
+DEAL::Intermediate output:
+DEAL::  t =2.20000
+DEAL::  y =0.111577  (exact: 0.110803)
+DEAL::# Number of steps taken: 11
