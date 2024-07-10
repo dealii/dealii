@@ -18,6 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/types.h"
+
+#include <deal.II/lac/trilinos_tpetra_types.h>
+
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/index_set.h>
@@ -100,6 +104,7 @@ namespace LinearAlgebra
    */
   namespace TpetraWrappers
   {
+
     /**
      * This class defines type aliases that are used in vector classes
      * within the TpetraWrappers namespace.
@@ -107,7 +112,7 @@ namespace LinearAlgebra
     class VectorTraits
     {
     public:
-      using size_type = dealii::types::global_dof_index;
+      using size_type = types::global_dof_index;
     };
 
     /**
@@ -125,7 +130,7 @@ namespace LinearAlgebra
       /**
        * Declare type for container size.
        */
-      using size_type = VectorTraits::size_type;
+      using size_type = types::global_dof_index;
 
       /**
        * This class implements a wrapper for accessing the Trilinos Tpetra
@@ -286,29 +291,12 @@ namespace LinearAlgebra
       /**
        * Declare some of the standard types used in all containers.
        */
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
-      using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#  else
-      using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
-        typename MemorySpace::kokkos_space::execution_space,
-        typename MemorySpace::kokkos_space>;
-#  endif
       using value_type = Number;
       using real_type  = typename numbers::NumberTraits<Number>::real_type;
-      using size_type  = VectorTraits::size_type;
+      using size_type  = types::global_dof_index;
       using reference  = internal::VectorReference<Number, MemorySpace>;
       using const_reference =
         const internal::VectorReference<Number, MemorySpace>;
-      using MapType =
-        Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
-      using VectorType = Tpetra::
-        Vector<Number, int, dealii::types::signed_global_dof_index, NodeType>;
-      using ExportType =
-        Tpetra::Export<int, dealii::types::signed_global_dof_index, NodeType>;
-      using ImportType =
-        Tpetra::Import<int, dealii::types::signed_global_dof_index, NodeType>;
 
       /**
        * @name 1: Basic Object-handling
@@ -330,7 +318,8 @@ namespace LinearAlgebra
       /**
        *  Copy constructor from Teuchos::RCP<Tpetra::Vector>.
        */
-      Vector(const Teuchos::RCP<VectorType> V);
+      Vector(
+        const Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>> V);
 
       /**
        * TODO: This is not used
@@ -912,29 +901,28 @@ namespace LinearAlgebra
        * Return a const reference to the underlying Trilinos
        * Tpetra::Vector class.
        */
-      const Tpetra::Vector<Number, int, types::signed_global_dof_index> &
+      const TpetraTypes::VectorType<Number, MemorySpace> &
       trilinos_vector() const;
 
       /**
        * Return a (modifiable) reference to the underlying Trilinos
        * Tpetra::Vector class.
        */
-      Tpetra::Vector<Number, int, types::signed_global_dof_index> &
+      TpetraTypes::VectorType<Number, MemorySpace> &
       trilinos_vector();
 
       /**
        * Return a const Teuchos::RCP to the underlying Trilinos
        * Tpetra::Vector class.
        */
-      Teuchos::RCP<
-        const Tpetra::Vector<Number, int, types::signed_global_dof_index>>
+      Teuchos::RCP<const TpetraTypes::VectorType<Number, MemorySpace>>
       trilinos_rcp() const;
 
       /**
        * Return a (modifiable) Teuchos::RCP to the underlying Trilinos
        * Tpetra::Vector class.
        */
-      Teuchos::RCP<Tpetra::Vector<Number, int, types::signed_global_dof_index>>
+      Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>>
       trilinos_rcp();
 
       /**
@@ -1056,14 +1044,15 @@ namespace LinearAlgebra
       /**
        * Teuchos::RCP to the actual Tpetra vector object.
        */
-      Teuchos::RCP<VectorType> vector;
+      Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>> vector;
 
       /**
        * A vector object in Trilinos to be used for collecting the non-local
        * elements if the vector was constructed with an additional IndexSet
        * describing ghost elements.
        */
-      Teuchos::RCP<VectorType> nonlocal_vector;
+      Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>>
+        nonlocal_vector;
 
       /**
        * IndexSet of the elements of the last imported vector.

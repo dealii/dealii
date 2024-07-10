@@ -99,7 +99,7 @@ namespace LinearAlgebra
       const bool                      exchange_data)
     {
 #  ifdef DEBUG
-      std::vector<typename BlockType::MapType> tpetra_maps;
+      std::vector<typename TpetraTypes::MapType<MemorySpace>> tpetra_maps;
       for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
         tpetra_maps.push_back(
           parallel_partitioning[i].make_tpetra_map(communicator, false));

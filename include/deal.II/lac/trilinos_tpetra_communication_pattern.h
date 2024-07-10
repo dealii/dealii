@@ -18,6 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/memory_space.h"
+
+#include <deal.II/lac/trilinos_tpetra_types.h>
+
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/communication_pattern_base.h>
@@ -39,6 +43,7 @@ namespace LinearAlgebra
     class CommunicationPattern : public Utilities::MPI::CommunicationPatternBase
     {
     public:
+      using MemorySpace = dealii::MemorySpace::Host;
       /**
        * Initialize the communication pattern.
        *
@@ -83,25 +88,25 @@ namespace LinearAlgebra
       /**
        * Return the underlying Tpetra::Import object.
        */
-      const Tpetra::Import<int, types::signed_global_dof_index> &
+      const TpetraTypes::ImportType<MemorySpace> &
       get_tpetra_import() const;
 
       /**
        * Return a Teuchos::RCP to the underlying Tpetra::Import object.
        */
-      Teuchos::RCP<const Tpetra::Import<int, types::signed_global_dof_index>>
+      Teuchos::RCP<TpetraTypes::ImportType<MemorySpace>>
       get_tpetra_import_rcp() const;
 
       /**
        * Return the underlying Tpetra::Export object.
        */
-      const Tpetra::Export<int, types::signed_global_dof_index> &
+      const TpetraTypes::ExportType<MemorySpace> &
       get_tpetra_export() const;
 
       /**
        * Return a Teuchos::RCP to the underlying Tpetra::Export object.
        */
-      Teuchos::RCP<const Tpetra::Export<int, types::signed_global_dof_index>>
+      Teuchos::RCP<TpetraTypes::ExportType<MemorySpace>>
       get_tpetra_export_rcp() const;
 
     private:
@@ -113,14 +118,12 @@ namespace LinearAlgebra
       /**
        * Teuchos::RCP to the Tpetra::Import object used.
        */
-      Teuchos::RCP<Tpetra::Import<int, types::signed_global_dof_index>>
-        tpetra_import;
+      Teuchos::RCP<TpetraTypes::ImportType<MemorySpace>> tpetra_import;
 
       /**
        * Teuchos::RCP to the Tpetra::Export object used.
        */
-      Teuchos::RCP<Tpetra::Export<int, types::signed_global_dof_index>>
-        tpetra_export;
+      Teuchos::RCP<TpetraTypes::ExportType<MemorySpace>> tpetra_export;
     };
   } // end of namespace TpetraWrappers
 } // end of namespace LinearAlgebra

@@ -17,6 +17,10 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/types.h"
+
+#include "deal.II/lac/trilinos_tpetra_types.h"
+
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -97,11 +101,11 @@ namespace LinearAlgebra
         // get a Kokkos::DualView
         auto mirror_view_dst = Kokkos::create_mirror_view_and_copy(
           typename MemorySpace::kokkos_space{}, kokkos_view_dst);
-        typename SparseMatrix<Number, MemorySpace>::VectorType::dual_view_type
+        typename TpetraTypes::VectorType<Number, MemorySpace>::dual_view_type
           kokkos_dual_view_dst(mirror_view_dst, kokkos_view_dst);
 
         // create the Tpetra::Vector
-        typename SparseMatrix<Number, MemorySpace>::VectorType tpetra_dst(
+        typename TpetraTypes::VectorType<Number, MemorySpace> tpetra_dst(
           M.trilinos_matrix().getRangeMap(), kokkos_dual_view_dst);
 
         // For the src vector:
@@ -112,11 +116,11 @@ namespace LinearAlgebra
         // get a Kokkos::DualView
         auto mirror_view_src = Kokkos::create_mirror_view_and_copy(
           typename MemorySpace::kokkos_space{}, kokkos_view_src);
-        typename SparseMatrix<Number, MemorySpace>::VectorType::dual_view_type
+        typename TpetraTypes::VectorType<Number, MemorySpace>::dual_view_type
           kokkos_dual_view_src(mirror_view_src, kokkos_view_src);
 
         // create the Tpetra::Vector
-        typename SparseMatrix<Number, MemorySpace>::VectorType tpetra_src(
+        typename TpetraTypes::VectorType<Number, MemorySpace> tpetra_src(
           M.trilinos_matrix().getDomainMap(), kokkos_dual_view_src);
 
         M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
@@ -144,38 +148,24 @@ namespace LinearAlgebra
     {
       using size_type = dealii::types::signed_global_dof_index;
 
-      template <typename NodeType>
-      using MapType =
-        Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
-
-      template <typename Number, typename NodeType>
-      using MatrixType =
-        Tpetra::CrsMatrix<Number,
-                          int,
-                          dealii::types::signed_global_dof_index,
-                          NodeType>;
-
-      template <typename NodeType>
-      using GraphType =
-        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
-
       template <typename Number,
-                typename NodeType,
+                typename MemorySpace,
                 typename SparsityPatternType>
       void
-      reinit_matrix(const IndexSet            &row_parallel_partitioning,
-                    const IndexSet            &column_parallel_partitioning,
-                    const SparsityPatternType &sparsity_pattern,
-                    const bool                 exchange_data,
-                    const MPI_Comm             communicator,
-                    Teuchos::RCP<MapType<NodeType>> &column_space_map,
-                    Teuchos::RCP<MatrixType<Number, NodeType>> &matrix)
+      reinit_matrix(
+        const IndexSet            &row_parallel_partitioning,
+        const IndexSet            &column_parallel_partitioning,
+        const SparsityPatternType &sparsity_pattern,
+        const bool                 exchange_data,
+        const MPI_Comm             communicator,
+        Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> &column_space_map,
+        Teuchos::RCP<TpetraTypes::MatrixType<Number, MemorySpace>> &matrix)
       {
         // release memory before reallocation
         matrix.reset();
 
         // Get the Tpetra::Maps
-        Teuchos::RCP<MapType<NodeType>> row_space_map =
+        Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> row_space_map =
           row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
 
         column_space_map =
@@ -202,7 +192,7 @@ namespace LinearAlgebra
                                      communicator,
                                      exchange_data);
             matrix = Utilities::Trilinos::internal::make_rcp<
-              MatrixType<Number, NodeType>>(
+              TpetraTypes::MatrixType<Number, MemorySpace>>(
               trilinos_sparsity.trilinos_sparsity_pattern());
 
             return;
@@ -224,12 +214,14 @@ namespace LinearAlgebra
           // internal reordering is done on ints only, and we can leave the
           // doubles aside.
 #  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
-        Teuchos::RCP<GraphType<NodeType>> graph =
-          Utilities::Trilinos::internal::make_rcp<GraphType<NodeType>>(
-            row_space_map, n_entries_per_row);
+        Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
+          Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(row_space_map,
+                                                 n_entries_per_row);
 #  else
-        Teuchos::RCP<GraphType<NodeType>> graph =
-          Utilities::Trilinos::internal::make_rcp<GraphType<NodeType>>(
+        Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
+          Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(
             row_space_map, Teuchos::arcpFromArray(n_entries_per_row));
 #  endif
 
@@ -266,28 +258,28 @@ namespace LinearAlgebra
         AssertDimension(sparsity_pattern.n_cols(), graph->getGlobalNumCols());
 
         // And now finally generate the matrix.
-        matrix =
-          Utilities::Trilinos::internal::make_rcp<MatrixType<Number, NodeType>>(
-            graph);
+        matrix = Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::MatrixType<Number, MemorySpace>>(graph);
       }
 
 
 
-      template <typename Number, typename NodeType>
+      template <typename Number, typename MemorySpace>
       void
-      reinit_matrix(const IndexSet               &row_parallel_partitioning,
-                    const IndexSet               &column_parallel_partitioning,
-                    const DynamicSparsityPattern &sparsity_pattern,
-                    const bool                    exchange_data,
-                    const MPI_Comm                communicator,
-                    Teuchos::RCP<MapType<NodeType>> &column_space_map,
-                    Teuchos::RCP<MatrixType<Number, NodeType>> &matrix)
+      reinit_matrix(
+        const IndexSet               &row_parallel_partitioning,
+        const IndexSet               &column_parallel_partitioning,
+        const DynamicSparsityPattern &sparsity_pattern,
+        const bool                    exchange_data,
+        const MPI_Comm                communicator,
+        Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> &column_space_map,
+        Teuchos::RCP<TpetraTypes::MatrixType<Number, MemorySpace>> &matrix)
       {
         // release memory before reallocation
         matrix.reset();
 
         // Get the Tpetra::Maps
-        Teuchos::RCP<MapType<NodeType>> row_space_map =
+        Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> row_space_map =
           row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
 
         column_space_map =
@@ -314,7 +306,7 @@ namespace LinearAlgebra
                                      communicator,
                                      exchange_data);
             matrix = Utilities::Trilinos::internal::make_rcp<
-              MatrixType<Number, NodeType>>(
+              TpetraTypes::MatrixType<Number, MemorySpace>>(
               trilinos_sparsity.trilinos_sparsity_pattern());
 
             return;
@@ -355,12 +347,14 @@ namespace LinearAlgebra
         // internal reordering is done on ints only, and we can leave the
         // doubles aside.
 #  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
-        Teuchos::RCP<GraphType<NodeType>> graph =
-          Utilities::Trilinos::internal::make_rcp<GraphType<NodeType>>(
-            row_space_map, n_entries_per_row);
+        Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
+          Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(row_space_map,
+                                                 n_entries_per_row);
 #  else
-        Teuchos::RCP<GraphType<NodeType>> graph =
-          Utilities::Trilinos::internal::make_rcp<GraphType<NodeType>>(
+        Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
+          Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(
             row_space_map, Teuchos::arcpFromArray(n_entries_per_row));
 #  endif
 
@@ -396,9 +390,8 @@ namespace LinearAlgebra
         AssertDimension(sparsity_pattern.n_cols(), graph->getGlobalNumCols());
 
         // And now finally generate the matrix.
-        matrix =
-          Utilities::Trilinos::internal::make_rcp<MatrixType<Number, NodeType>>(
-            graph);
+        matrix = Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::MatrixType<Number, MemorySpace>>(graph);
       }
     } // namespace SparseMatrixImpl
 
@@ -413,20 +406,23 @@ namespace LinearAlgebra
     // thread on a configuration with MPI will still get a parallel interface.
     template <typename Number, typename MemorySpace>
     SparseMatrix<Number, MemorySpace>::SparseMatrix()
-      : column_space_map(Utilities::Trilinos::internal::make_rcp<MapType>(
+      : column_space_map(Utilities::Trilinos::internal::make_rcp<
+                         TpetraTypes::MapType<MemorySpace>>(
           0,
           0,
           Utilities::Trilinos::tpetra_comm_self()))
     {
       // Prepare the graph
-      Teuchos::RCP<GraphType> graph =
-        Utilities::Trilinos::internal::make_rcp<GraphType>(column_space_map,
-                                                           column_space_map,
-                                                           0);
+      Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
+        Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::GraphType<MemorySpace>>(column_space_map,
+                                               column_space_map,
+                                               0);
       graph->fillComplete();
 
       // Create the matrix from the graph
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(graph);
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(graph);
 
       compressed = false;
     }
@@ -436,11 +432,13 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     SparseMatrix<Number, MemorySpace>::SparseMatrix(
       const SparsityPattern<MemorySpace> &sparsity_pattern)
-      : matrix(Utilities::Trilinos::internal::make_rcp<MatrixType>(
+      : matrix(Utilities::Trilinos::internal::make_rcp<
+               TpetraTypes::MatrixType<Number, MemorySpace>>(
           sparsity_pattern.trilinos_sparsity_pattern()))
     {
       column_space_map =
-        Teuchos::rcp_const_cast<MapType>(sparsity_pattern.domain_partitioner());
+        Teuchos::rcp_const_cast<TpetraTypes::MapType<MemorySpace>>(
+          sparsity_pattern.domain_partitioner());
       compressed = false;
       compress(VectorOperation::add);
     }
@@ -452,13 +450,16 @@ namespace LinearAlgebra
       const size_type    m,
       const size_type    n,
       const unsigned int n_max_entries_per_row)
-      : column_space_map(Utilities::Trilinos::internal::make_rcp<MapType>(
-          n,
+      : column_space_map(Utilities::Trilinos::internal::make_rcp<
+                         TpetraTypes::MapType<MemorySpace>>(
+          static_cast<dealii::types::signed_global_dof_index>(n),
           0,
           Utilities::Trilinos::tpetra_comm_self()))
-      , matrix(Utilities::Trilinos::internal::make_rcp<MatrixType>(
-          Utilities::Trilinos::internal::make_rcp<MapType>(
-            m,
+      , matrix(Utilities::Trilinos::internal::make_rcp<
+               TpetraTypes::MatrixType<Number, MemorySpace>>(
+          Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::MapType<MemorySpace>>(
+            static_cast<dealii::types::signed_global_dof_index>(m),
             0,
             Utilities::Trilinos::tpetra_comm_self()),
           column_space_map,
@@ -473,7 +474,8 @@ namespace LinearAlgebra
       const size_type                  m,
       const size_type                  n,
       const std::vector<unsigned int> &n_entries_per_row)
-      : column_space_map(Utilities::Trilinos::internal::make_rcp<MapType>(
+      : column_space_map(Utilities::Trilinos::internal::make_rcp<
+                         TpetraTypes::MapType<MemorySpace>>(
           n,
           0,
           Utilities::Trilinos::tpetra_comm_self()))
@@ -481,8 +483,10 @@ namespace LinearAlgebra
     {
       std::vector<size_t> entries_per_row_size_type(n_entries_per_row.begin(),
                                                     n_entries_per_row.end());
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
-        Utilities::Trilinos::internal::make_rcp<MapType>(
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(
+        Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::MapType<MemorySpace>>(
           m, 0, Utilities::Trilinos::tpetra_comm_self()),
         column_space_map,
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
@@ -530,7 +534,7 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace>::reinit(
       const SparsityPatternType &sparsity_pattern)
     {
-      SparseMatrixImpl::reinit_matrix<Number, NodeType, SparsityPatternType>(
+      SparseMatrixImpl::reinit_matrix<Number, MemorySpace, SparsityPatternType>(
         complete_index_set(sparsity_pattern.n_rows()),
         complete_index_set(sparsity_pattern.n_cols()),
         sparsity_pattern,
@@ -555,8 +559,10 @@ namespace LinearAlgebra
 
       // reinit with a (distributed) Trilinos sparsity pattern.
       column_space_map =
-        Teuchos::rcp_const_cast<MapType>(sparsity_pattern.domain_partitioner());
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
+        Teuchos::rcp_const_cast<TpetraTypes::MapType<MemorySpace>>(
+          sparsity_pattern.domain_partitioner());
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(
         sparsity_pattern.trilinos_sparsity_pattern());
 
       compressed = false;
@@ -574,7 +580,8 @@ namespace LinearAlgebra
       const unsigned int n_max_entries_per_row)
       : column_space_map(
           parallel_partitioning.make_tpetra_map_rcp(communicator, false))
-      , matrix(Utilities::Trilinos::internal::make_rcp<MatrixType>(
+      , matrix(Utilities::Trilinos::internal::make_rcp<
+               TpetraTypes::MatrixType<Number, MemorySpace>>(
           column_space_map,
           n_max_entries_per_row))
       , compressed(false)
@@ -594,10 +601,12 @@ namespace LinearAlgebra
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
                                                      n_entries_per_row.end());
 #  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
-        column_space_map, n_entries_per_row_array);
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(column_space_map,
+                                                      n_entries_per_row_array);
 #  else
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(
         column_space_map, Teuchos::arcpFromArray(n_entries_per_row_array));
 #  endif
     }
@@ -612,7 +621,8 @@ namespace LinearAlgebra
       const size_type n_max_entries_per_row)
       : column_space_map(
           col_parallel_partitioning.make_tpetra_map_rcp(communicator, false))
-      , matrix(Utilities::Trilinos::internal::make_rcp<MatrixType>(
+      , matrix(Utilities::Trilinos::internal::make_rcp<
+               TpetraTypes::MatrixType<Number, MemorySpace>>(
           row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
           n_max_entries_per_row))
       , compressed(false)
@@ -633,11 +643,13 @@ namespace LinearAlgebra
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
                                                      n_entries_per_row.end());
 #  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(
         row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
         n_entries_per_row_array);
 #  else
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(
         row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
         Teuchos::arcpFromArray(n_entries_per_row_array));
 #  endif
@@ -675,7 +687,7 @@ namespace LinearAlgebra
       const MPI_Comm             communicator,
       const bool                 exchange_data)
     {
-      SparseMatrixImpl::reinit_matrix<Number, NodeType, SparsityPatternType>(
+      SparseMatrixImpl::reinit_matrix<Number, MemorySpace, SparsityPatternType>(
         row_parallel_partitioning,
         col_parallel_partitioning,
         sparsity_pattern,
@@ -1200,8 +1212,12 @@ namespace LinearAlgebra
                                 matrix->getDomainMap(),
                                 matrix->getRangeMap(),
                                 Teuchos::null);
+      // needs a local typedef or Assert thinks it gets more arguments than it
+      // does...
+      using MatrixType = TpetraTypes::MatrixType<Number, MemorySpace>;
       Assert(dynamic_cast<MatrixType *>(result.get()), ExcInternalError());
-      matrix.reset(dynamic_cast<MatrixType *>(result.release().get()));
+      matrix.reset(dynamic_cast<TpetraTypes::MatrixType<Number, MemorySpace> *>(
+        result.release().get()));
     }
 
 
@@ -1243,10 +1259,12 @@ namespace LinearAlgebra
               col_indices_vector.resize(nnz);
               values_vector.resize(nnz);
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-              typename MatrixType::nonconst_local_inds_host_view_type
-                col_indices(col_indices_vector.data(), nnz);
-              typename MatrixType::nonconst_values_host_view_type values(
-                values_vector.data(), nnz);
+              typename TpetraTypes::MatrixType<Number, MemorySpace>::
+                nonconst_local_inds_host_view_type col_indices(
+                  col_indices_vector.data(), nnz);
+              typename TpetraTypes::MatrixType<Number, MemorySpace>::
+                nonconst_values_host_view_type values(values_vector.data(),
+                                                      nnz);
 #  else
               Teuchos::ArrayView<int>    col_indices(col_indices_vector);
               Teuchos::ArrayView<Number> values(values_vector);
@@ -1293,15 +1311,17 @@ namespace LinearAlgebra
 
       // Perform a deep copy
 #  if DEAL_II_TRILINOS_VERSION_GTE(12, 18, 1)
-      matrix =
-        Utilities::Trilinos::internal::make_rcp<MatrixType>(*source.matrix,
-                                                            Teuchos::Copy);
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(*source.matrix,
+                                                      Teuchos::Copy);
 #  else
       matrix = source.matrix->clone(
         Utilities::Trilinos::internal::make_rcp<NodeType>());
 #  endif
-      column_space_map = Teuchos::rcp_const_cast<MapType>(matrix->getColMap());
-      compressed       = source.compressed;
+      column_space_map =
+        Teuchos::rcp_const_cast<TpetraTypes::MapType<MemorySpace>>(
+          matrix->getColMap());
+      compressed = source.compressed;
     }
 
 
@@ -1313,18 +1333,21 @@ namespace LinearAlgebra
       // When we clear the matrix, reset
       // the pointer and generate an
       // empty matrix.
-      column_space_map = Utilities::Trilinos::internal::make_rcp<MapType>(
+      column_space_map = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MapType<MemorySpace>>(
         0, 0, Utilities::Trilinos::tpetra_comm_self());
 
       // Prepare the graph
-      Teuchos::RCP<GraphType> graph =
-        Utilities::Trilinos::internal::make_rcp<GraphType>(column_space_map,
-                                                           column_space_map,
-                                                           0);
+      Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
+        Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::GraphType<MemorySpace>>(column_space_map,
+                                               column_space_map,
+                                               0);
       graph->fillComplete();
 
       // Create the matrix from the graph
-      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(graph);
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(graph);
 
       compressed = true;
     }
@@ -1402,8 +1425,11 @@ namespace LinearAlgebra
       else
         {
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-          typename MatrixType::values_host_view_type     values;
-          typename MatrixType::local_inds_host_view_type indices;
+          typename TpetraTypes::MatrixType<Number,
+                                           MemorySpace>::values_host_view_type
+            values;
+          typename TpetraTypes::MatrixType<Number, MemorySpace>::
+            local_inds_host_view_type indices;
 #  else
           Teuchos::ArrayView<const Number> values;
           Teuchos::ArrayView<const int>    indices;
@@ -1482,10 +1508,11 @@ namespace LinearAlgebra
           // Prepare pointers for extraction of a view of the row.
           size_t nnz_present = matrix->getNumEntriesInLocalRow(trilinos_i);
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-          typename MatrixType::nonconst_local_inds_host_view_type col_indices(
-            "indices", nnz_present);
-          typename MatrixType::nonconst_values_host_view_type values(
-            "values", nnz_present);
+          typename TpetraTypes::MatrixType<Number, MemorySpace>::
+            nonconst_local_inds_host_view_type col_indices("indices",
+                                                           nnz_present);
+          typename TpetraTypes::MatrixType<Number, MemorySpace>::
+            nonconst_values_host_view_type values("values", nnz_present);
 #  else
           std::vector<int>           col_indices_vector(nnz_present);
           Teuchos::ArrayView<int>    col_indices(col_indices_vector);

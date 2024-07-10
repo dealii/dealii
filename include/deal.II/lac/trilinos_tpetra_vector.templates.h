@@ -81,11 +81,10 @@ namespace LinearAlgebra
       : Subscriptor()
       , compressed(true)
       , has_ghost(false)
-      , vector(Utilities::Trilinos::internal::make_rcp<VectorType>(
-          Utilities::Trilinos::internal::make_rcp<MapType>(
-            0,
-            0,
-            Utilities::Trilinos::tpetra_comm_self())))
+      , vector(Utilities::Trilinos::internal::make_rcp<
+               TpetraTypes::VectorType<Number, MemorySpace>>(
+          Utilities::Trilinos::internal::make_rcp<TpetraTypes::MapType<
+            MemorySpace>>(0, 0, Utilities::Trilinos::tpetra_comm_self())))
     {}
 
 
@@ -95,19 +94,21 @@ namespace LinearAlgebra
       : Subscriptor()
       , compressed(V.compressed)
       , has_ghost(V.has_ghost)
-      , vector(
-          Utilities::Trilinos::internal::make_rcp<VectorType>(*V.vector,
-                                                              Teuchos::Copy))
+      , vector(Utilities::Trilinos::internal::make_rcp<
+               TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
+                                                             Teuchos::Copy))
     {
       if (!V.nonlocal_vector.is_null())
-        nonlocal_vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
-          *V.nonlocal_vector, Teuchos::Copy);
+        nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
+                                                        Teuchos::Copy);
     }
 
 
 
     template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace>::Vector(const Teuchos::RCP<VectorType> V)
+    Vector<Number, MemorySpace>::Vector(
+      const Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>> V)
       : Subscriptor()
       , compressed(true)
       , has_ghost(V->getMap()->isOneToOne() == false)
@@ -122,7 +123,8 @@ namespace LinearAlgebra
       : Subscriptor()
       , compressed(true)
       , has_ghost(false)
-      , vector(Utilities::Trilinos::internal::make_rcp<VectorType>(
+      , vector(Utilities::Trilinos::internal::make_rcp<
+               TpetraTypes::VectorType<Number, MemorySpace>>(
           parallel_partitioner.make_tpetra_map_rcp(communicator, true)))
     {}
 
@@ -140,20 +142,23 @@ namespace LinearAlgebra
           IndexSet parallel_partitioner = locally_owned_entries;
           parallel_partitioner.add_indices(ghost_entries);
 
-          vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+          vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(
             parallel_partitioner.make_tpetra_map_rcp(communicator, true));
 
           compressed = true;
         }
       else
         {
-          Teuchos::RCP<MapType> map =
+          Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> map =
             locally_owned_entries.make_tpetra_map_rcp(communicator, false);
-          vector = Utilities::Trilinos::internal::make_rcp<VectorType>(map);
+          vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(map);
 
           IndexSet nonlocal_entries(ghost_entries);
           nonlocal_entries.subtract_set(locally_owned_entries);
-          nonlocal_vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+          nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(
             nonlocal_entries.make_tpetra_map_rcp(communicator, true));
 
           compressed = false;
@@ -176,8 +181,10 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpace>::clear()
     {
-      vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
-        Utilities::Trilinos::internal::make_rcp<MapType>(
+      vector = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::VectorType<Number, MemorySpace>>(
+        Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::MapType<MemorySpace>>(
           0, 0, Utilities::Trilinos::tpetra_comm_self()));
       has_ghost  = false;
       compressed = true;
@@ -197,7 +204,8 @@ namespace LinearAlgebra
 
       compressed = true;
       has_ghost  = false;
-      vector     = Utilities::Trilinos::internal::make_rcp<VectorType>(
+      vector     = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::VectorType<Number, MemorySpace>>(
         parallel_partitioner.make_tpetra_map_rcp(communicator, true));
     }
 
@@ -220,20 +228,22 @@ namespace LinearAlgebra
           IndexSet parallel_partitioner = locally_owned_entries;
           parallel_partitioner.add_indices(ghost_entries);
 
-          vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+          vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(
             parallel_partitioner.make_tpetra_map_rcp(communicator, true));
 
           compressed = true;
         }
       else
         {
-          Teuchos::RCP<MapType> map =
+          Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> map =
             locally_owned_entries.make_tpetra_map_rcp(communicator, false);
 
           if (!vector->getMap()->isSameAs(*map))
             {
               vector.reset();
-              vector = Utilities::Trilinos::internal::make_rcp<VectorType>(map);
+              vector = Utilities::Trilinos::internal::make_rcp<
+                TpetraTypes::VectorType<Number, MemorySpace>>(map);
             }
           else
             vector->putScalar(0);
@@ -241,7 +251,8 @@ namespace LinearAlgebra
           IndexSet nonlocal_entries(ghost_entries);
           nonlocal_entries.subtract_set(locally_owned_entries);
 
-          nonlocal_vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+          nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(
             nonlocal_entries.make_tpetra_map_rcp(communicator, true));
 
           compressed = false;
@@ -385,7 +396,7 @@ namespace LinearAlgebra
                    "Therefore, compress() must be called on this "
                    "vector first."));
 
-          Teuchos::RCP<const ImportType> importer =
+          Teuchos::RCP<const TpetraTypes::ImportType<MemorySpace>> importer =
             Tpetra::createImport(V.vector->getMap(), vector->getMap());
 
           // Since we are distributing the vector from a one-to-one map
@@ -396,9 +407,9 @@ namespace LinearAlgebra
       else
         {
           vector.reset();
-          vector =
-            Utilities::Trilinos::internal::make_rcp<VectorType>(*V.vector,
-                                                                Teuchos::Copy);
+          vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
+                                                          Teuchos::Copy);
 
           compressed             = V.compressed;
           has_ghost              = V.has_ghost;
@@ -424,7 +435,8 @@ namespace LinearAlgebra
       nonlocal_vector.reset();
 
       Teuchos::Array<OtherNumber> vector_data(V.begin(), V.end());
-      vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+      vector = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::VectorType<Number, MemorySpace>>(
         V.locally_owned_elements().make_tpetra_map_rcp(), vector_data);
 
       has_ghost  = false;
@@ -494,10 +506,11 @@ namespace LinearAlgebra
               "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
         }
 
-      Teuchos::RCP<const ExportType> tpetra_export =
+      Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>> tpetra_export =
         tpetra_comm_pattern->get_tpetra_export_rcp();
 
-      VectorType source_vector(tpetra_export->getSourceMap());
+      TpetraTypes::VectorType<Number, MemorySpace> source_vector(
+        tpetra_export->getSourceMap());
 
       {
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
@@ -605,8 +618,8 @@ namespace LinearAlgebra
           // elements, maybe there is a better workaround.
           Tpetra::Vector<Number, int, types::signed_global_dof_index> dummy(
             vector->getMap(), false);
-          ImportType data_exchange(V.trilinos_vector().getMap(),
-                                   dummy.getMap());
+          TpetraTypes::ImportType<MemorySpace> data_exchange(
+            V.trilinos_vector().getMap(), dummy.getMap());
           dummy.doImport(V.trilinos_vector(), data_exchange, Tpetra::INSERT);
 
           vector->update(1.0, dummy, 1.0);
@@ -1105,7 +1118,7 @@ namespace LinearAlgebra
           else
             DEAL_II_NOT_IMPLEMENTED();
 
-          Teuchos::RCP<const ExportType> exporter =
+          Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>> exporter =
             Tpetra::createExport(nonlocal_vector->getMap(), vector->getMap());
           vector->doExport(*nonlocal_vector, *exporter, tpetra_operation);
 
@@ -1116,7 +1129,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    const Tpetra::Vector<Number, int, types::signed_global_dof_index> &
+    const TpetraTypes::VectorType<Number, MemorySpace> &
     Vector<Number, MemorySpace>::trilinos_vector() const
     {
       return *vector;
@@ -1125,7 +1138,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    Tpetra::Vector<Number, int, types::signed_global_dof_index> &
+    TpetraTypes::VectorType<Number, MemorySpace> &
     Vector<Number, MemorySpace>::trilinos_vector()
     {
       return *vector;
@@ -1134,7 +1147,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    Teuchos::RCP<Tpetra::Vector<Number, int, types::signed_global_dof_index>>
+    Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>>
     Vector<Number, MemorySpace>::trilinos_rcp()
     {
       return vector;
@@ -1143,8 +1156,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    Teuchos::RCP<
-      const Tpetra::Vector<Number, int, types::signed_global_dof_index>>
+    Teuchos::RCP<const TpetraTypes::VectorType<Number, MemorySpace>>
     Vector<Number, MemorySpace>::trilinos_rcp() const
     {
       return vector.getConst();
