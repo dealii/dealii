@@ -192,12 +192,24 @@ namespace Step66
   // <code>std::exp(newton_step[q])</code> and store these values in the table.
   // This skips all evaluations of the nonlinearity in each call of the
   // <code>vmult()</code> function.
+  //
+  // Note that we need to manually call the functions to exchange the ghost
+  // data here, by calling
+  // LinearAlgebra::distributed::Vector::update_ghost_values(), to ensure all
+  // data from neighboring processes is available for evaluating the
+  // finite-element interpolation on cells. In the other functions of this
+  // tutorial program, MatrixFree::cell_loop() made sure to call this
+  // function. Note that we clear the ghost state again at the end of the
+  // function, in order to avoid mixing ghosted and non-ghosted vectors in
+  // other parts of the solver.
   template <int dim, int fe_degree, typename number>
   void JacobianOperator<dim, fe_degree, number>::evaluate_newton_step(
     const LinearAlgebra::distributed::Vector<number> &newton_step)
   {
     const unsigned int n_cells = this->data->n_cell_batches();
     FECellIntegrator   phi(*this->data);
+
+    newton_step.update_ghost_values();
 
     nonlinear_values.reinit(n_cells, phi.n_q_points);
 
@@ -212,6 +224,7 @@ namespace Step66
             nonlinear_values(cell, q) = std::exp(phi.get_value(q));
           }
       }
+    newton_step.zero_out_ghost_values();
   }
 
 
