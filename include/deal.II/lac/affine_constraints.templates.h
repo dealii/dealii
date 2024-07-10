@@ -324,6 +324,7 @@ namespace internal
     const auto sort_and_make_unique = [&constraints_in, &locally_owned_dofs](
                                         std::vector<ConstraintType>
                                           &locally_relevant_constraints) {
+      (void)constraints_in;
       if (locally_relevant_constraints.empty())
         return;
 
