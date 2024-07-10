@@ -1,0 +1,4 @@
+880c880
+<       ParameterAcceptor::initialize("parameters.prm");
+---
+>       ParameterAcceptor::initialize("../../../source/step-81/parameters.prm");

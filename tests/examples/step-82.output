@@ -1,0 +1,8 @@
+Building the mesh.............
+Number of active cells: 64
+Number of degrees of freedom: 576
+Assembling the system.............
+Done. 
+DG H2 norm of the error: 0.0151063
+DG H1 norm of the error: 0.000399747
+   L2 norm of the error: 5.33856e-05
