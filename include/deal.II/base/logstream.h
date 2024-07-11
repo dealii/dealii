@@ -218,11 +218,11 @@ public:
 
 
   /**
-   * Maximum number of levels to be printed on the console. The default is 0,
-   * which will not generate any output. This function allows one to restrict
-   * console output to the highest levels of iterations. Only output with less
-   * than <tt>n</tt> prefixes is printed. By calling this function with
-   * <tt>n=0</tt>, no console output will be written. See step-3 for an
+   * Set the maximum number of levels to be printed on the console. The default
+   * is 0, which will not generate any output. This function allows one to
+   * restrict console output to the highest levels of iterations. Only output
+   * with less than <tt>n</tt> prefixes is printed. By calling this function
+   * with <tt>n=0</tt>, no console output will be written. See step-3 for an
    * example usage of this method.
    *
    * The previous value of this parameter is returned.
@@ -232,9 +232,10 @@ public:
 
 
   /**
-   * Maximum number of levels to be written to the log file. The functionality
-   * is the same as <tt>depth_console</tt>, nevertheless, this function should
-   * be used with care, since it may spoil the value of a log file.
+   * Set the maximum number of levels to be written to the log file. The
+   * functionality is the same as <tt>depth_console</tt>, nevertheless, this
+   * function should be used with care, since it may spoil the value of a log
+   * file.
    *
    * The previous value of this parameter is returned.
    */
@@ -250,7 +251,7 @@ public:
 
 
   /**
-   * set the precision for the underlying stream and returns the previous
+   * Set the precision for the underlying stream and returns the previous
    * stream precision. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
    */
@@ -259,7 +260,7 @@ public:
 
 
   /**
-   * set the width for the underlying stream and returns the previous stream
+   * Set the width for the underlying stream and returns the previous stream
    * width. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
    */
