@@ -393,6 +393,22 @@ public:
   void
   restart();
 
+  /**
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
+   */
+  std::size_t
+  memory_consumption() const;
+
+  /**
+   * Write or read the data of this object to or from a stream for the purpose
+   * of serialization using the [BOOST serialization
+   * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   */
+  template <class Archive>
+  void
+  serialize(Archive &ar, const unsigned int version);
+
 private:
   /**
    * The beginning of the time interval.
@@ -522,6 +538,20 @@ DiscreteTime::get_step_number() const
   return step_number;
 }
 
+
+
+template <class Archive>
+inline void
+DiscreteTime::serialize(Archive &ar, const unsigned int)
+{
+  ar &start_time;
+  ar &end_time;
+  ar &current_time;
+  ar &next_time;
+  ar &previous_time;
+  ar &start_step_size;
+  ar &step_number;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
