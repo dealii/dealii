@@ -135,7 +135,7 @@ namespace Step19
     void create_particles();
     void move_particles();
     void track_lost_particle(
-      const typename Particles::ParticleIterator<dim>         &particle,
+      const Particles::ParticleIterator<dim>                  &particle,
       const typename Triangulation<dim>::active_cell_iterator &cell);
 
 
