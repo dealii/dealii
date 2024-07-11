@@ -1315,8 +1315,8 @@ namespace LinearAlgebra
         TpetraTypes::MatrixType<Number, MemorySpace>>(*source.matrix,
                                                       Teuchos::Copy);
 #  else
-      matrix = source.matrix->clone(
-        Utilities::Trilinos::internal::make_rcp<NodeType>());
+      matrix = source.matrix->clone(Utilities::Trilinos::internal::make_rcp<
+                                    TpetraTypes::NodeType<MemorySpace>>());
 #  endif
       column_space_map =
         Teuchos::rcp_const_cast<TpetraTypes::MapType<MemorySpace>>(
