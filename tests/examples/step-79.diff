@@ -1,0 +1,24 @@
+292c292
+<     , timer(std::cout, TimerOutput::summary, TimerOutput::wall_times)
+---
+>     , timer(std::cout, TimerOutput::never, TimerOutput::wall_times)
+2240c2240
+< 
+---
+>     (void)max_iterations;
+2305,2306c2305,2308
+<                     std::cout << "    found workable step after " << k + 1
+<                               << " iterations" << std::endl;
+---
+>                     if ((0<k+1)&&(k+1<5))
+>                       std::cout<< "     found workable step within 1 to 5 iterations " << std::endl;
+> //                    std::cout << "    found workable step after " << k + 1
+> //                              << " iterations" << std::endl;
+2408c2410
+<         while ((iteration_number < max_iterations) &&
+---
+>         while ((iteration_number < 5) &&
+2431c2433
+<            (iteration_number < max_iterations));
+---
+>            (iteration_number < 5));
