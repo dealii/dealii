@@ -1,0 +1,42 @@
+Mesh info:
+ dimension: 2
+ no. of cells: 11904
+ boundary indicators: 0(624 times) 1(48 times) 2(32 times) 3(32 times) 
+ written to grid-1.vtu
+
+Mesh info:
+ dimension: 2
+ no. of cells: 14
+ boundary indicators: 0(22 times) 
+ written to grid-2.vtu
+
+Mesh info:
+ dimension: 2
+ no. of cells: 128
+ boundary indicators: 0(32 times) 1(32 times) 
+ written to grid-3.vtu
+
+Mesh info:
+ dimension: 3
+ no. of cells: 16
+ boundary indicators: 0(16 times) 1(16 times) 2(8 times) 3(8 times) 
+ written to grid-4.vtu
+
+Mesh info:
+ dimension: 2
+ no. of cells: 28
+ boundary indicators: 0(32 times) 
+ written to grid-5.vtu
+
+Mesh info:
+ dimension: 2
+ no. of cells: 1600
+ boundary indicators: 0(160 times) 
+ written to grid-6.vtu
+
+Mesh info:
+ dimension: 2
+ no. of cells: 256
+ boundary indicators: 0(64 times) 
+ written to grid-7.vtu
+

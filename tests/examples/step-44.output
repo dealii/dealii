@@ -1,0 +1,12 @@
+Grid:
+	 Reference volume: 1e-09
+Triangulation:
+	 Number of active cells: 64
+	 Number of degrees of freedom: 2699
+    Setting up quadrature point data...
+
+Timestep 1 @ 0.1s
+ CST  ASM_SYS  ------  SLV  PP  UQPH  CST  ASM_SYS  ------  SLV  PP  UQPH  ---  ASM_SYS  ------  SLV  PP  UQPH  ---  ASM_SYS  ------  SLV  PP  UQPH  ---  ASM_SYS  CONVERGED! 
+
+Timestep 2 @ 0.2s
+ CST  ASM_SYS  ------  SLV  PP  UQPH  CST  ASM_SYS  ------  SLV  PP  UQPH  ---  ASM_SYS  ------  SLV  PP  UQPH  ---  ASM_SYS  ------  SLV  PP  UQPH  ---  ASM_SYS  CONVERGED! 

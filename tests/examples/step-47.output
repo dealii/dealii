@@ -1,0 +1,34 @@
+Number of active cells: 4
+Total number of cells: 5
+Cycle 0 of 4
+   Number of degrees of freedom: 81
+   Solving system...
+   Writing graphical output...
+   Error in the L2 norm           :     0.00878095
+   Error in the H1 seminorm       : 0.0709546
+   Error in the broken H2 seminorm: 1.64542
+
+Cycle 1 of 4
+   Number of degrees of freedom: 289
+   Solving system...
+   Writing graphical output...
+   Error in the L2 norm           :     0.003515
+   Error in the H1 seminorm       : 0.0217418
+   Error in the broken H2 seminorm: 0.81215
+
+Cycle 2 of 4
+   Number of degrees of freedom: 1089
+   Solving system...
+   Writing graphical output...
+   Error in the L2 norm           :     0.00110394
+   Error in the H1 seminorm       : 0.00610667
+   Error in the broken H2 seminorm: 0.401517
+
+Cycle 3 of 4
+   Number of degrees of freedom: 4225
+   Solving system...
+   Writing graphical output...
+   Error in the L2 norm           :     0.000308433
+   Error in the H1 seminorm       : 0.00162277
+   Error in the broken H2 seminorm: 0.199356
+
