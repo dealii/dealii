@@ -831,6 +831,7 @@ namespace Step87
               VectorTools::point_values<dim>(rpe,
                                              dof_handler_background,
                                              velocity);
+            velocity.zero_out_ghost_values();
 
             for (unsigned int i = 0, c = 0;
                  i < immersed_support_points.locally_owned_size() / dim;
