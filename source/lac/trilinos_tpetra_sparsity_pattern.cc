@@ -420,13 +420,13 @@ namespace LinearAlgebra
                                                  n_entries_per_row);
 #  else
         if (row_map->getComm()->getSize() > 1)
-          graph =
-            Utilities::Trilinos::internal::make_rcp<GraphType<MemorySpace>>(
-              row_map, Teuchos::arcpFromArray(n_entries_per_row));
+          graph = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(
+            row_map, Teuchos::arcpFromArray(n_entries_per_row));
         else
-          graph =
-            Utilities::Trilinos::internal::make_rcp<GraphType<MemorySpace>>(
-              row_map, col_map, Teuchos::arcpFromArray(n_entries_per_row));
+          graph = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(
+            row_map, col_map, Teuchos::arcpFromArray(n_entries_per_row));
 
 #  endif
 
