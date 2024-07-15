@@ -37,12 +37,14 @@ endif()
 #
 # Are all dependencies fulfilled?
 #
-if(NOT DEAL_II_WITH_MPI) # keep in one line
+if(NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_CGAL) # keep in one line
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following option:
     DEAL_II_WITH_MPI = ON
+    DEAL_II_WITH_CGAL = ON
 However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}
+    DEAL_II_WITH_CGAL = ${DEAL_II_WITH_CGAL}
 This conflicts with the requirements."
     )
 endif()
