@@ -143,7 +143,7 @@ namespace Step19
     void output_results() const;
 
     Triangulation<dim>        triangulation;
-    MappingQ<dim>             mapping;
+    const MappingQ<dim>       mapping;
     const FE_Q<dim>           fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
