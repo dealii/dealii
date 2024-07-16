@@ -54,6 +54,13 @@ namespace Particles
    * particles live on which cells) and the SolutionTransfer class (it knows
    * how to transfer particles between cells and subdomains).
    *
+   * This class exposes a serialization interface for saving/loading particle
+   * data to/from file. Note that, in the parallel case, particle data itself is
+   * not serialized. Instead, one should serialize using the save()/load()
+   * interface exposed by the Triangulation class, because this guarantees that
+   * data is immediately shipped to new processes if the domain is distributed
+   * differently after resuming from a checkpoint.
+   *
    * For examples on how to use this class to track particles, store properties
    * on particles, and let the properties on the particles influence the
    * finite-element solution see step-19, step-68, and step-70.
@@ -1320,13 +1327,17 @@ namespace Particles
   inline void
   ParticleHandler<dim, spacedim>::serialize(Archive &ar, const unsigned int)
   {
-    // Note that we do not serialize the particle data itself. Instead we
-    // use the serialization functionality of the triangulation class, because
-    // this guarantees that data is immediately shipped to new processes if
-    // the domain is distributed differently after resuming from a checkpoint.
-    ar //&particles
-      &global_number_of_particles &global_max_particles_per_cell
-        &next_free_particle_index;
+    if (auto *ptr =
+          dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> &>(
+            *triangulation);
+        ptr == nullptr)
+      {
+        // For the parallel case, see the general documentation of the class.
+        ar &particles;
+      }
+
+    ar &global_number_of_particles &global_max_particles_per_cell
+      &next_free_particle_index;
   }
 
 
