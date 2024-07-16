@@ -1,0 +1,8 @@
+Changed: On Windows builds, the compilation of examples is now enabled
+by default. Please note that we are limited to static linking on Windows,
+which means that the binaries are going to be large in filesize.
+<br>
+If you want to infer the old behavior, you can disable the compilation of
+examples with `-D DEAL_II_COMPILE_EXAMPLES=OFF`.
+<br>
+(Marc Fehling, 2024/07/16)
