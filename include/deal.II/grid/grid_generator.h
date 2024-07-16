@@ -1451,14 +1451,14 @@ namespace GridGenerator
    * `triangulation.generate_hyper_shell(center, inner_radius, outer_radius,
    * n_cells = 0, colorize = false)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_shell(Triangulation<dim> &tria,
-              const Point<dim>   &center,
-              const double        inner_radius,
-              const double        outer_radius,
-              const unsigned int  n_cells  = 0,
-              bool                colorize = false);
+  hyper_shell(Triangulation<dim, spacedim> &tria,
+              const Point<spacedim>        &center,
+              const double                  inner_radius,
+              const double                  outer_radius,
+              const unsigned int            n_cells  = 0,
+              bool                          colorize = false);
 
   /**
    * Produce an eccentric hyper-shell, the region between two spheres centered
@@ -1708,14 +1708,14 @@ namespace GridGenerator
    * `triangulation.generate_hyper_cube_with_cylindrical_hole(inner_radius =
    * 0.25, outer_radius = 0.5, L = 0.5, repetitions = 1, colorize = false)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangulation,
-                                   const double        inner_radius = .25,
-                                   const double        outer_radius = .5,
-                                   const double        L            = .5,
-                                   const unsigned int  repetitions  = 1,
-                                   const bool          colorize     = false);
+  hyper_cube_with_cylindrical_hole(Triangulation<dim, spacedim> &triangulation,
+                                   const double       inner_radius = .25,
+                                   const double       outer_radius = .5,
+                                   const double       L            = .5,
+                                   const unsigned int repetitions  = 1,
+                                   const bool         colorize     = false);
 
   /**
    * Produce a grid consisting of concentric shells. The primary difference

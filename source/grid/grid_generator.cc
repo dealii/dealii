@@ -1341,9 +1341,10 @@ namespace GridGenerator
      * Assign boundary number zero to the inner shell boundary and 1 to the
      * outer.
      */
+    template <int spacdim>
     void
-    colorize_hyper_shell(Triangulation<2> &tria,
-                         const Point<2> &,
+    colorize_hyper_shell(Triangulation<2, spacdim> &tria,
+                         const Point<spacdim> &,
                          const double,
                          const double)
     {
@@ -1353,9 +1354,7 @@ namespace GridGenerator
 
       // For the mesh based on cube,
       // this is highly irregular
-      for (Triangulation<2>::cell_iterator cell = tria.begin();
-           cell != tria.end();
-           ++cell)
+      for (auto cell = tria.begin(); cell != tria.end(); ++cell)
         {
           Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face(2)->set_all_boundary_ids(1);
@@ -4340,14 +4339,14 @@ namespace GridGenerator
 
 
 
-  template <>
+  template <int spacedim>
   void
-  hyper_shell(Triangulation<2>  &tria,
-              const Point<2>    &center,
-              const double       inner_radius,
-              const double       outer_radius,
-              const unsigned int n_cells,
-              const bool         colorize)
+  hyper_shell_2D(Triangulation<2, spacedim> &tria,
+                 const Point<spacedim>      &center,
+                 const double                inner_radius,
+                 const double                outer_radius,
+                 const unsigned int          n_cells,
+                 const bool                  colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -4375,12 +4374,14 @@ namespace GridGenerator
     // first N ones are on the
     // outer one, and all are
     // numbered counter-clockwise
-    std::vector<Point<2>> vertices(2 * N);
+    std::vector<Point<spacedim>> vertices(2 * N);
     for (unsigned int i = 0; i < N; ++i)
       {
-        vertices[i] =
-          Point<2>(std::cos(2 * pi * i / N), std::sin(2 * pi * i / N)) *
-          outer_radius;
+        Point<spacedim> point;
+        point[0] = std::cos(2 * pi * i / N);
+        point[1] = std::sin(2 * pi * i / N);
+
+        vertices[i]     = point * outer_radius;
         vertices[i + N] = vertices[i] * (inner_radius / outer_radius);
 
         vertices[i] += center;
@@ -4405,7 +4406,35 @@ namespace GridGenerator
       colorize_hyper_shell(tria, center, inner_radius, outer_radius);
 
     tria.set_all_manifold_ids(0);
-    tria.set_manifold(0, SphericalManifold<2>(center));
+    tria.set_manifold(0, SphericalManifold<2, spacedim>(center));
+  }
+
+
+
+  template <>
+  void
+  hyper_shell(Triangulation<2>  &tria,
+              const Point<2>    &center,
+              const double       inner_radius,
+              const double       outer_radius,
+              const unsigned int n_cells,
+              const bool         colorize)
+  {
+    hyper_shell_2D(tria, center, inner_radius, outer_radius, n_cells, colorize);
+  }
+
+
+
+  template <>
+  void
+  hyper_shell(Triangulation<2, 3> &tria,
+              const Point<3>      &center,
+              const double         inner_radius,
+              const double         outer_radius,
+              const unsigned int   n_cells,
+              const bool           colorize)
+  {
+    hyper_shell_2D(tria, center, inner_radius, outer_radius, n_cells, colorize);
   }
 
 
@@ -7350,21 +7379,21 @@ namespace GridGenerator
 
 
 
-  template <>
+  template <int spacedim>
   void
-  hyper_cube_with_cylindrical_hole(Triangulation<2> &triangulation,
-                                   const double      inner_radius,
-                                   const double      outer_radius,
-                                   const double,       // width,
-                                   const unsigned int, // width_repetition,
-                                   const bool colorize)
+  hyper_cube_with_cylindrical_hole_2D(Triangulation<2, spacedim> &triangulation,
+                                      const double                inner_radius,
+                                      const double                outer_radius,
+                                      const double,       // width,
+                                      const unsigned int, // width_repetition,
+                                      const bool colorize)
   {
     const int dim = 2;
 
     Assert(inner_radius < outer_radius,
            ExcMessage("outer_radius has to be bigger than inner_radius."));
 
-    const Point<dim> center;
+    const Point<spacedim> center;
 
     // We create a hyper_shell (i.e., an annulus) in two dimensions, and then we
     // modify it by pulling the vertices on the diagonals out to where the
@@ -7425,7 +7454,45 @@ namespace GridGenerator
                 }
             }
       }
-    triangulation.set_manifold(0, PolarManifold<2>(center));
+    triangulation.set_manifold(0, PolarManifold<2, spacedim>(center));
+  }
+
+
+
+  template <>
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<2, 2> &triangulation,
+                                   const double         inner_radius,
+                                   const double         outer_radius,
+                                   const double         width,
+                                   const unsigned int   width_repetition,
+                                   const bool           colorize)
+  {
+    hyper_cube_with_cylindrical_hole_2D(triangulation,
+                                        inner_radius,
+                                        outer_radius,
+                                        width,
+                                        width_repetition,
+                                        colorize);
+  }
+
+
+
+  template <>
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<2, 3> &triangulation,
+                                   const double         inner_radius,
+                                   const double         outer_radius,
+                                   const double         width,
+                                   const unsigned int   width_repetition,
+                                   const bool           colorize)
+  {
+    hyper_cube_with_cylindrical_hole_2D(triangulation,
+                                        inner_radius,
+                                        outer_radius,
+                                        width,
+                                        width_repetition,
+                                        colorize);
   }
 
 
