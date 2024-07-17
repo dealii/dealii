@@ -2068,7 +2068,7 @@ namespace parallel
 
       if (this->my_subdomain == 0)
         {
-          std::string   fname = std::string(filename) + ".info";
+          std::string   fname = filename + ".info";
           std::ofstream f(fname);
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_coarse_cells"
             << std::endl
