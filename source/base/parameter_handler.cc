@@ -569,7 +569,7 @@ ParameterHandler::parse_input(const std::string &filename,
                               const bool assert_mandatory_entries_are_found)
 {
   std::ifstream is(filename);
-  AssertThrow(is, PathSearch::ExcFileNotFound(filename, "ParameterHandler"));
+  AssertThrow(is, ExcFileNotOpen(filename));
 
   std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
   boost::algorithm::to_lower(file_ending);
