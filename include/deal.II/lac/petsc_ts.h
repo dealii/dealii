@@ -678,22 +678,33 @@ namespace PETScWrappers
       decide_and_prepare_for_remeshing;
 
     /**
-     * Callback to interpolate vectors and perform mesh adaption.
+     * @deprecated This callback is equivalent to `transfer_solution_vectors_to_new_mesh`, but is
+     * deprecated. Use `transfer_solution_vectors_to_new_mesh` instead.
+     */
+    DEAL_II_DEPRECATED_EARLY
+    std::function<void(const std::vector<VectorType> &all_in,
+                       std::vector<VectorType>       &all_out)>
+      interpolate;
+
+    /**
+     * Callback to perform mesh adaptation and transfer solution vectors
+     * from the old to the new mesh.
      *
      * Implementation of this function is mandatory if
-     * TimeStepper::decide_for_coarsening_and_refinement is used.
+     * TimeStepper::decide_and_prepare_for_remeshing is used.
      * This function must perform mesh adaption and interpolate the discrete
-     * functions that are stored in @p all_in onto the refined and/or coarsenend grid.
-     * Output vectors must be created inside the callback.
+     * functions that are stored in @p all_in onto the refined and/or coarsened grid.
+     * The output vectors must be sized correctly within this callback.
      *
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const std::vector<VectorType> &all_in,
+    std::function<void(const real_type                t,
+                       const std::vector<VectorType> &all_in,
                        std::vector<VectorType>       &all_out)>
-      interpolate;
+      transfer_solution_vectors_to_new_mesh;
 
   private:
     /**
