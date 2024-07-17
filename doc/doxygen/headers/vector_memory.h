@@ -17,7 +17,7 @@
 /**
  * @defgroup VMemory Vector memory management
  *
- * This module groups a few classes that are used to avoid allocating and
+ * This page groups a few classes that are used to avoid allocating and
  * deallocating vectors over and over in iterative procedures. These methods
  * all use an object of the base class VectorMemory to get their auxiliary
  * vectors.

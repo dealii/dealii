@@ -582,7 +582,7 @@ namespace Step19
             // "quadrature" point, and extract the electric field vector from
             // the gradient in the form of a Tensor variable through the methods
             // discussed in the
-            // @ref vector_valued "vector-valued problems" documentation module.
+            // @ref vector_valued "vector-valued problems" documentation topic.
             const FEValuesExtractors::Scalar electric_potential(0);
             fe_face_values[electric_potential].get_function_gradients(
               solution, solution_gradients);

@@ -16,7 +16,7 @@
 /**
  * @defgroup matrixfree Matrix-free infrastructure
  *
- * This module describes the matrix-free infrastructure in deal.II.
+ * This group describes the matrix-free infrastructure in deal.II.
  * An outline of how the primary groups of classes in deal.II interact with the
  * matrix-free infrastructure is given by the following clickable graph,
  * with a more detailed description below:

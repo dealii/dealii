@@ -86,7 +86,7 @@ parallelized because no processor has all the information necessary
 for sequential operations.
 
 A general overview of how this parallelization happens is described in
-the @ref distributed documentation module. You should read it for a
+the @ref distributed documentation topic. You should read it for a
 top-level overview before reading through the source code of this
 program. A concise discussion of many terms we will use in the program
 is also provided in the @ref distributed_paper "Distributed Computing paper".
@@ -197,14 +197,14 @@ picture shown below in the results section.
 
 Rather than continuing here and giving a long introduction, let us go
 straight to the program code. If you have read through step-6 and the
-@ref distributed documentation module, most of things that are going
+@ref distributed documentation topic, most of things that are going
 to happen should be familiar to you already. In fact, comparing the two
 programs you will notice that the additional effort necessary to make things
 work in %parallel is almost insignificant: the two programs have about the
 same number of lines of code (though step-6 spends more space on dealing with
 coefficients and output). In either case, the comments below will only be on
 the things that set step-40 apart from step-6 and that aren't already covered
-in the @ref distributed documentation module.
+in the @ref distributed documentation topic.
 
 
 @note This program will be able to compute on as many processors as you want

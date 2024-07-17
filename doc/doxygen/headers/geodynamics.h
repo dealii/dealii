@@ -125,7 +125,7 @@ problems. In particular, they are aimed at the following goals:
   applications both regarding computing times to solve as well as concerning
   the accuracy of numerical solutions.
 
-  The applications in this module will already have been benchmarked for
+  The applications in this group will already have been benchmarked for
   correctness. Existing tutorial programs typically employ simpler rather than
   more complicated solver schemes for exposition but frequently suggest more
   complicated schemes including hints on how they might be implemented in an

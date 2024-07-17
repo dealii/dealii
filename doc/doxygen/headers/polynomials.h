@@ -16,7 +16,7 @@
 /**
  * @defgroup Polynomials Polynomials and polynomial spaces
  *
- * This module groups classes that define certain families of polynomial
+ * This topic groups classes that define certain families of polynomial
  * functions. In particular, this includes Lagrangian interpolation
  * polynomials for equidistant support points and their tensor products in
  * higher dimensions, but also more exotic ones like Brezzi-Douglas-Marini or

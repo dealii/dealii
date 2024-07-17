@@ -742,7 +742,7 @@ namespace Step20
   // @ref VVOutput "Generating graphical output"
   // section of the
   // @ref vector_valued
-  // module for more information. Finally, it seems inappropriate for higher
+  // topic for more information. Finally, it seems inappropriate for higher
   // order elements to only show a single bilinear quadrilateral per cell in
   // the graphical output. We therefore generate patches of size
   // (degree+1)x(degree+1) to capture the full information content of the

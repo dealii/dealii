@@ -110,7 +110,7 @@ later time when we apply boundary values. There are two basic ways
 of doing this (either using MatrixTools::apply_boundary_values()
 <i>after</i> assembling the linear system, or using
 AffineConstraints::distribute_local_to_global() <i>during</i> assembly;
-see the @ref constraints "constraints module" for more information),
+see the @ref constraints "constraints topic" for more information),
 but both result in the same: a linear system that has a total
 number of rows equal to the number of <i>all</i> degrees of freedom,
 including those that lie on the boundary. However, degrees of

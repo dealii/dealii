@@ -17,11 +17,11 @@
 /**
  * @defgroup LAC Linear algebra classes
  *
- * This module contains classes that involve linear algebra, i.e., those
+ * This group contains classes that involve linear algebra, i.e., those
  * associated with matrices, vectors, and the solution of linear systems.
  *
  * The description of individual groups of classes can be found in
- * sub-modules.
+ * sub-topics.
  *
  * The files implementing linear algebra functionality are in the
  * <code>lac</code> subdirectory, an abbreviation for <em>L</em>inear

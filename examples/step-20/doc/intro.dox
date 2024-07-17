@@ -27,7 +27,7 @@ solve not only the mixed Laplace equation, but add another equation that
 describes the transport of a mixture of two fluids.
 
 The equations covered here fall into the class of vector-valued problems. A
-toplevel overview of this topic can be found in the @ref vector_valued module.
+toplevel overview of this topic can be found in the @ref vector_valued topic.
 
 
 <h3>The equations</h3>
@@ -335,7 +335,7 @@ tuple. Note that the velocity is of course a <code>dim</code>-dimensional tensor
 that the function returns a corresponding object. Similarly, where we
 subscript with the pressure extractor, we extract the scalar pressure
 component. The whole mechanism is described in more detail in the
-@ref vector_valued module.
+@ref vector_valued topic.
 
 In practice, it turns out that we can do a bit better if we evaluate the shape
 functions, their gradients and divergences only once per outermost loop, and

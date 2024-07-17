@@ -40,7 +40,7 @@ Boussinesq equations that read as follows:
   \nabla \cdot \kappa \nabla T &=& \gamma.
 @f}
 These equations fall into the class of vector-valued problems (a
-toplevel overview of this topic can be found in the @ref vector_valued module).
+toplevel overview of this topic can be found in the @ref vector_valued topic).
 Here, $\mathbf u$ is the velocity field, $p$ the pressure, and $T$
 the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
 [(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric

@@ -79,7 +79,7 @@ class FE_Enriched;
  * tutorial programs, for example step-8, step-20, step-21, step-22, and in
  * particular in the
  * @ref vector_valued
- * module.
+ * topic.
  *
  * @dealiiVideoLecture{19,20}
  *
@@ -233,7 +233,7 @@ public:
    *
    * This constructor (or its variants below) is used in essentially all
    * tutorial programs that deal with vector valued problems. See step-8,
-   * step-20, step-22 and others for use cases. Also see the module on
+   * step-20, step-22 and others for use cases. Also see the topic on
    * @ref vector_valued "Handling vector valued problems".
    *
    * @dealiiVideoLecture{19,20}

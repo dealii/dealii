@@ -138,7 +138,7 @@ appear in a triangulation), and `CellAccessor` (which adds a few
 functions that are specific to *cells*).
 
 A more thorough description of the whole iterator concept can be found
-in the @ref Iterators documentation module.
+in the @ref Iterators documentation topic.
 
 
 <h4> Different geometries </h4>
@@ -156,7 +156,7 @@ GridGenerator::hyper_shell or GridGenerator::truncated_cone) attach a Manifold
 object to the part of the triangulation that should be curved (SphericalManifold
 and CylindricalManifold, respectively) and use another manifold on the parts that
 should be flat (FlatManifold). See the documentation
-of Manifold or the @ref manifold "manifold module" for descriptions of the design
+of Manifold or the @ref manifold "manifold topic" for descriptions of the design
 philosophy and interfaces of these classes. Take a look at what they provide and
 see how they could be used in a program like this.
 

@@ -2501,7 +2501,7 @@ namespace DoFTools
    * constraints for degrees of freedom located on the boundary, then this
    * would constitute a conflict. See the
    * @ref constraints
-   * module for handling the case where there are conflicting constraints on
+   * topic for handling the case where there are conflicting constraints on
    * individual degrees of freedom.
    * @param component_mask An optional component mask that restricts the
    * functionality of this function to a subset of an FESystem. For

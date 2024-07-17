@@ -43,7 +43,7 @@ namespace hp
    *
    * It implements the concepts stated in the
    * @ref hpcollection
-   * module described in the doxygen documentation.
+   * topic described in the doxygen documentation.
    *
    * In addition to offering access to the elements of the collection, this
    * class provides access to the maximal number of degrees of freedom per

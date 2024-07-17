@@ -291,7 +291,7 @@ namespace DynamicSparsityPatternIterators
  * certain amount of memory, but grows as necessary.  An extensive description
  * of sparsity patterns can be found in the documentation of the
  * @ref Sparsity
- * module.
+ * topic.
  *
  * This class is an example of the "dynamic" type of
  * @ref Sparsity.

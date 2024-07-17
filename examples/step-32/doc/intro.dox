@@ -721,15 +721,15 @@ are part of Trilinos' Epetra library of basic linear algebra and tool classes:
   possible. Furthermore, the elements of these partitionings do not
   necessarily be mutually exclusive. This is important because when
   postprocessing solutions, we need access to all locally relevant or at least
-  the locally active degrees of freedom (see the module on @ref distributed
+  the locally active degrees of freedom (see the topic on @ref distributed
   for a definition, as well as the discussion in step-40). Which elements the
   Trilinos vector considers as locally owned is not important to us then. All
   we care about is that it stores those elements locally that we need.
 </ul>
 
 There are a number of other concepts relevant to distributing the mesh
-to a number of processors; you may want to take a look at the @ref
-distributed module and step-40 or step-55 before trying to understand this
+to a number of processors; you may want to take a look at the
+@ref distributed topic and step-40 or step-55 before trying to understand this
 program.  The rest of the program is almost completely agnostic about
 the fact that we don't store all objects completely locally. There
 will be a few points where we have to limit loops over all cells to
@@ -779,10 +779,10 @@ href="http://en.wikipedia.org/wiki/Race_condition">race condition</a>.
 
 deal.II has a class that is made for exactly this workflow: WorkStream, first
 discussed in step-9 and step-13. Its
-use is also extensively documented in the module on @ref threads (in the section
+use is also extensively documented in the topic on @ref threads (in the section
 on @ref MTWorkStream "the WorkStream class") and we won't repeat here the
 rationale and detailed instructions laid out there, though you will want to
-read through this module to understand the distinction between scratch space
+read through this topic to understand the distinction between scratch space
 and per-cell data. Suffice it to mention that we need the following:
 
 - An iterator range for those cells on which we are supposed to work. This is

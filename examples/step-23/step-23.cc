@@ -312,7 +312,7 @@ namespace Step23
     // processors are available in a machine: for more information see the
     // documentation of WorkStream or the
     // @ref threads "Parallel computing with multiple processors"
-    // module. The matrices for solving linear systems will be filled in the
+    // topic. The matrices for solving linear systems will be filled in the
     // run() method because we need to re-apply boundary conditions every time
     // step.
     mass_matrix.reinit(sparsity_pattern);

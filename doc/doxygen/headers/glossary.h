@@ -96,8 +96,8 @@
  *
  * Splitting matrices and vectors into blocks is supported by the
  * BlockSparseMatrix, BlockVector, and related classes. See the
- * overview of the various linear algebra classes in the @ref LAC
- * module. The objects present two interfaces: one that makes the
+ * overview of the various linear algebra classes in the
+ * @ref LAC topic. The objects present two interfaces: one that makes the
  * object look like a matrix or vector with global indexing
  * operations, and one that makes the object look like a collection of
  * sub-blocks that can be individually addressed. Depending on
@@ -150,7 +150,7 @@
  * <i>Implementation:</i>
  * deal.II has a number of different finite element classes, all of which are
  * derived from the FiniteElement base class
- * (see the @ref feall "module on finite element classes").
+ * (see the @ref feall "topic on finite element classes").
  * With one exception, whether they are scalar or
  * vector valued, they all define a single block: all vector components the
  * finite element defines through its FiniteElement::n_components() function
@@ -202,7 +202,7 @@
  * of creating the Stokes element with two blocks right away.
  *
  * More information on this topic can be found in the documentation of
- * FESystem, the @ref vector_valued module and the tutorial programs
+ * FESystem, the @ref vector_valued topic and the tutorial programs
  * referenced therein.
  *
  * <i>Selecting blocks:</i>
@@ -576,12 +576,12 @@
  * call the elements of the vector-valued solution <i>components</i> in
  * deal.II. To be well-posed, for the solution to have $n$ components, there
  * need to be $n$ partial differential equations to describe them. This
- * concept is discussed in great detail in the @ref vector_valued module.
+ * concept is discussed in great detail in the @ref vector_valued topic.
  *
  * In finite element programs, one frequently wants to address individual
  * elements (components) of this vector-valued solution, or sets of
  * components. For example, we do this extensively in step-8, and a lot
- * of documentation is also provided in the module on
+ * of documentation is also provided in the topic on
  * @ref vector_valued "Handling vector valued problems". If you are thinking
  * only in terms of the partial differential equation (not in terms of
  * its discretization), then the concept of <i>components</i> is the natural
@@ -1247,7 +1247,7 @@
  *   not possible to ensure that each entry of the vector is counted exactly
  *   once.
  *
- * @note The @ref distributed documentation module provides a brief
+ * @note The @ref distributed documentation topic provides a brief
  * overview of where the different kinds of vectors are typically
  * used.
  * </dd>
@@ -1474,7 +1474,7 @@
  *
  * <dt class="glossary">@anchor GlossLocallyOwnedCell <b>Locally owned cell</b></dt>
  * <dd>This concept identifies a subset of all cells when using
- * distributed meshes, see the @ref distributed module. In such meshes, each
+ * distributed meshes, see the @ref distributed topic. In such meshes, each
  * cell is owned by exactly one processor. The locally owned ones are those
  * owned by the current processor.
  *
@@ -1487,7 +1487,7 @@
  *
  * <dt class="glossary">@anchor GlossLocallyOwnedDof <b>Locally owned degrees of freedom</b></dt>
  * <dd>This concept identifies a subset of all degrees of freedom when using
- * distributed meshes, see the @ref distributed module.  Locally owned degrees
+ * distributed meshes, see the @ref distributed topic.  Locally owned degrees
  * of freedom live on locally owned cells. Since degrees of freedom are owned
  * by only one processor, degrees of freedom on interfaces between cells owned
  * by different processors may be owned by one or the other, so not all
@@ -1501,7 +1501,7 @@
  *
  * <dt class="glossary">@anchor GlossLocallyActiveDof <b>Locally active degrees of freedom</b></dt>
  * <dd>This concept identifies a subset of all degrees of freedom when using
- * distributed meshes, see the @ref distributed module.  Locally active degrees
+ * distributed meshes, see the @ref distributed topic.  Locally active degrees
  * of freedom are those that live on locally owned cells. Degrees of freedom
  * on interfaces between cells owned by different processors therefore belong
  * to the set of locally active degrees of freedom for more than one processor.
@@ -1514,7 +1514,7 @@
  *
  * <dt class="glossary">@anchor GlossLocallyRelevantDof <b>Locally relevant degrees of freedom</b></dt>
  * <dd>This concept identifies a subset of all degrees of freedom when using
- * distributed meshes, see the @ref distributed module.  Locally relevant
+ * distributed meshes, see the @ref distributed topic.  Locally relevant
  * degrees of freedom are those that live on locally owned or ghost cells.
  * Consequently, they may be owned by different processors.
  *
@@ -1630,11 +1630,11 @@
  * children upon mesh refinement. Some more information about manifold
  * indicators is also presented in a section of the documentation of
  * the Triangulation class as well as in the
- * @ref manifold "Manifold documentation module". Manifold indicators
+ * @ref manifold "Manifold documentation topic". Manifold indicators
  * are used in step-53 and step-54.
  * </dd>
  *
- * @see @ref manifold "The module on Manifolds"
+ * @see @ref manifold "The topic on Manifolds"
  *
  *
  * <dt class="glossary">@anchor GlossMassMatrix <b>Mass matrix</b></dt>

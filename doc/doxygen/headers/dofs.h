@@ -16,7 +16,7 @@
 /**
  * @defgroup dofs Degrees of Freedom
  *
- * This module groups classes and namespaces that have to do with
+ * This topic groups classes and namespaces that have to do with
  * handling degrees of freedom. The central class of this group is the
  * DoFHandler class: it is built on top of a triangulation and a
  * finite element class and allocated degrees of freedom on each cell
@@ -35,8 +35,8 @@
  * we can describe functions in this finite dimensional space by vectors
  * of coefficients.
  *
- * DoFHandlers extend Triangulation objects (and the other classes in the @ref
- * grid module) in that they, too, offer iterators that run over all cells,
+ * DoFHandlers extend Triangulation objects (and the other classes in the
+ * @ref grid topic) in that they, too, offer iterators that run over all cells,
  * faces, or other geometric objects that make up a triangulation. These
  * iterators are derived from the triangulation iterators and therefore offer
  * the same functionality, but they also offer additional functions. For
@@ -46,7 +46,7 @@
  * the reason is that there can be more than one DoFHandler object that works
  * on the same Triangulation object.
  *
- * In addition to the DoF handler classes, this module holds a number of
+ * In addition to the DoF handler classes, this group holds a number of
  * auxiliary classes not commonly used in application programs, as well as
  * three classes that are not directly associated with the data structures of
  * the DoFHandler class. The first of these is the AffineConstraints class that
@@ -58,7 +58,7 @@
  * the DoFTools namespace offers a variety of algorithms around handling
  * degrees of freedom.
  *
- * In the grand scheme of things, the pieces of this module interact
+ * In the grand scheme of things, the pieces of this group interact
  * with a variety of other parts of the library:
  * @dot
  digraph G

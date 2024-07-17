@@ -435,7 +435,7 @@ namespace internal
  * constraints on degrees of freedom. The concept and origin of such
  * constraints is extensively described in the
  * @ref constraints
- * module. The class is meant to deal with a limited number of constraints
+ * topic. The class is meant to deal with a limited number of constraints
  * relative to the total number of degrees of freedom, for example a few per
  * cent up to maybe 30 per cent; and with a linear combination of <i>M</i>
  * other degrees of freedom where <i>M</i> is also relatively small (no larger
@@ -448,7 +448,7 @@ namespace internal
  * There is also a significant amount of documentation on how to use this
  * class in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * <h3>Description of constraints</h3>
@@ -1681,7 +1681,7 @@ public:
    * This function can correctly handle inhomogeneous constraints as well. For
    * the parameter use_inhomogeneities_for_rhs see the documentation in
    * @ref constraints
-   * module.
+   * topic.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function

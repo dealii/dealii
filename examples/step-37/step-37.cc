@@ -170,7 +170,7 @@ namespace Step37
   // making sure that only cells are worked on that do not share any degree of
   // freedom (this makes the loop thread-safe when writing into destination
   // vectors). This is a more advanced strategy compared to the WorkStream
-  // class described in the @ref threads module. Of course, to not destroy
+  // class described in the @ref threads topic. Of course, to not destroy
   // thread-safety, we have to be careful when writing into class-global
   // structures.
   //

@@ -25,7 +25,7 @@
  *
  * @note Documentation on coding conventions, relations between
  * classes, and details of the implementation is found in the
- * documentation of namespaces in this module.
+ * documentation of namespaces in this group.
  *
  * <h3>Integration on finite element meshes</h3>
  *

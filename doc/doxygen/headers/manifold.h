@@ -18,7 +18,7 @@
  *
  * <h3>Overview</h3>
  *
- * The classes in this module are concerned with the description of the
+ * The classes in this group are concerned with the description of the
  * manifold in which the domain that a Triangulation describes lives. This
  * manifold description is necessary in several contexts:
  *
@@ -56,7 +56,7 @@
  *   matrix and right hand side of the linear system) using curved
  *   approximations of the boundary, rather than the straight line
  *   approximation. The actual implementation of such curved elements happens
- *   in the Mapping class (see the @ref mapping module), which however obtains
+ *   in the Mapping class (see the @ref mapping topic), which however obtains
  *   its information about the boundary of the domain from the classes
  *   described here. The same is, of course, true when integrating boundary
  *   terms (e.g., inhomogeneous Neumann boundary conditions).
@@ -94,7 +94,7 @@
  * reasonable implementations. More complicated examples can be described
  * using the techniques shown in step-53 and step-54.
  *
- * In the grand scheme of things, the classes of this module interact
+ * In the grand scheme of things, the classes of this group interact
  * with a variety of other parts of the library:
  * @dot
  digraph G

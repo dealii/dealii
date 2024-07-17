@@ -17,7 +17,7 @@
  * @defgroup constraints Constraints on degrees of freedom
  * @ingroup dofs
  *
- * This module deals with constraints on degrees of
+ * This documentation group deals with constraints on degrees of
  * freedom. The central class to deal with constraints is the
  * AffineConstraints class.
  *

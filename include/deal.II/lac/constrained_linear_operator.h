@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  * of linear equations. How to solve a linear system of equations with this
  * approach is explained in detail in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * @note Currently, this function may not work correctly for distributed data
@@ -231,7 +231,7 @@ project_to_constrained_linear_operator(
  *
  * A detailed explanation of this approach is given in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * @note Currently, this function may not work correctly for distributed data
@@ -277,7 +277,7 @@ constrained_linear_operator(
  *
  * A detailed explanation of this approach is given in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * @note Currently, this function may not work correctly for distributed data

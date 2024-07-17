@@ -338,7 +338,7 @@ void Step5<dim>::run()
   // throws an exception (its second argument) which will usually terminate
   // the program giving information where the error occurred and what the
   // reason was. (A longer discussion of what exactly the @p Assert macro
-  // does can be found in the @ref Exceptions "exception documentation module".)
+  // does can be found in the @ref Exceptions "exception documentation topic".)
   // This generally reduces the time to find programming errors
   // dramatically and we have found assertions an invaluable means to program
   // fast.

@@ -1085,7 +1085,7 @@ protected:
  * from MappingQ and MappingCartesian and for finite elements with tensor
  * product structure that work with the
  * @ref matrixfree
- * module. In those cases, the cost implied
+ * topic. In those cases, the cost implied
  * by this class is similar (or sometimes even somewhat lower) than using
  * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
  */

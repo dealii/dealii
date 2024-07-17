@@ -101,7 +101,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * For details on usage of this class, see the description of FEEvaluation or
  * the
- * @ref matrixfree "matrix-free module".
+ * @ref matrixfree "matrix-free topic".
  *
  * @ingroup matrixfree
  */

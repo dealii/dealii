@@ -16,9 +16,9 @@
 /**
  * @defgroup Parallel Parallel computing
  *
- * @brief A module discussing the use of multiple processors.
+ * @brief A group discussing the use of multiple processors.
  *
- * This module contains information on %parallel computing. It is
+ * This group contains information on %parallel computing. It is
  * subdivided into parts on @ref threads and on @ref distributed.
  */
 

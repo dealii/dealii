@@ -16,7 +16,7 @@
 /**
  * @defgroup utilities Utility functions and classes
  *
- * This module simply collects a number of functions and classes that provide
+ * This page simply collects a number of functions and classes that provide
  * general tools for tasks that do not usually have much to do with finite
  * element programs in particular, but happen to be required there just as
  * well.
