@@ -1,0 +1,4 @@
+Changed: ParameterHandler::read_in() now throws a ExcFileNotOpen exception
+instead of PathSearch::ExcFileNotFound.
+<br>
+(Matthias Maier, 2024/01/08)

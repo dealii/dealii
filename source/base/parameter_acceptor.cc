@@ -91,7 +91,7 @@ ParameterAcceptor::initialize(
         {
           prm.parse_input(filename);
         }
-      catch (const dealii::PathSearch::ExcFileNotFound &)
+      catch (const dealii::ExcFileNotOpen &)
         {
           prm.print_parameters(filename, output_style_for_filename);
           AssertThrow(false,
