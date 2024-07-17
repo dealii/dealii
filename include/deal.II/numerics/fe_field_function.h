@@ -123,12 +123,12 @@ namespace Functions
    * letting this class know.
    *
    *
-   * <h3>Using FEFieldFunction with parallel::distributed::Triangulation</h3>
+   * <h3>Using FEFieldFunction with parallel triangulations</h3>
    *
    * When using this class with a parallel distributed triangulation object
    * and evaluating the solution at a particular point, not every processor
-   * will own the cell at which the solution is evaluated. Rather, it may be
-   * that the cell in which this point is found is in fact a ghost or
+   * will own the cell at which the solution should be evaluated. Rather, it may
+   * be that the cell in which this point is found is in fact a ghost or
    * artificial cell (see
    * @ref GlossArtificialCell
    * and
@@ -160,6 +160,23 @@ namespace Functions
    *   if (point_found == true)
    *     ...do something...;
    * @endcode
+   * The last part (the `...do something...`) part needs to be application
+   * specific. If you really do need the information on this process, you need
+   * to communicate with the process that actually owns the cell in which the
+   * point at which you want the solution is located. Since you don't know
+   * which process that may be, this will necessarily require a global
+   * communication step. The FERemoteEvaluation class may be useful in this
+   * context.
+   *
+   * Finally, there is the case of the value_list(), gradient_list(),
+   * and similar functions of this class that take a list of points. For these
+   * functions, it may be that some of the points are on locally owned cells,
+   * and others are not -- in which case, again, you will receive an exception.
+   * Because these functions do not return information about which of the points
+   * can and which cannot be evaluated, the correct approach is to call the
+   * `*_list()` function within a `try` block, and if it fails fall back to
+   * calling value(), gradient(), or similar in a loop over the points you
+   * wanted evaluated to find out for which point the call fails.
    *
    * @ingroup functions
    */
