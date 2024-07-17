@@ -14,7 +14,6 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/path_search.h>
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/utilities.h>
 
@@ -35,8 +34,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <filesystem>
 #include <fstream>
-#include <functional>
 #include <limits>
 #include <map>
 
@@ -4139,39 +4138,32 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read(const std::string &filename, Format format)
 {
-  // Search file class for meshes
-  PathSearch  search("MESH");
-  std::string name;
-  // Open the file and remember its name
-  if (format == Default)
-    name = search.find(filename);
-  else
-    name = search.find(filename, default_suffix(format));
-
+  // Check early that the file actually exists and if not throw ExcFileNotOpen.
+  AssertThrow(std::filesystem::exists(filename), ExcFileNotOpen(filename));
 
   if (format == Default)
     {
-      const std::string::size_type slashpos = name.find_last_of('/');
-      const std::string::size_type dotpos   = name.find_last_of('.');
-      if (dotpos < name.size() &&
+      const std::string::size_type slashpos = filename.find_last_of('/');
+      const std::string::size_type dotpos   = filename.find_last_of('.');
+      if (dotpos < filename.size() &&
           (dotpos > slashpos || slashpos == std::string::npos))
         {
-          std::string ext = name.substr(dotpos + 1);
+          std::string ext = filename.substr(dotpos + 1);
           format          = parse_format(ext);
         }
     }
 
   if (format == assimp)
     {
-      read_assimp(name);
+      read_assimp(filename);
     }
   else if (format == exodusii)
     {
-      read_exodusii(name);
+      read_exodusii(filename);
     }
   else
     {
-      std::ifstream in(name);
+      std::ifstream in(filename);
       read(in, format);
     }
 }
