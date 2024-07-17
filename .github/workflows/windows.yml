@@ -59,6 +59,7 @@ jobs:
     - name: test library
       shell: bash
       run: |
+        cmake --build build --parallel 2 --target setup_tests_a-framework
         cmake --build build --parallel 2 --target test
     - name: archive library
       # run only if a PR is merged into master

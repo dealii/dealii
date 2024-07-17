@@ -68,6 +68,7 @@ jobs:
       run: |
         cd build
         make -j2 \
+          setup_tests_a-framework \
           setup_tests_examples \
           setup_tests_quick_tests
         ctest --output-on-failure -j2 -VV
@@ -131,6 +132,7 @@ jobs:
 
         cd build
         make -j2 \
+          setup_tests_a-framework \
           setup_tests_examples \
           setup_tests_quick_tests \
           setup_tests_simplex \
@@ -269,6 +271,7 @@ jobs:
         source /opt/intel/oneapi/setvars.sh
         cd build
         make -j2 \
+          setup_tests_a-framework \
           setup_tests_examples \
           setup_tests_quick_tests
         ctest --output-on-failure -j2 -VV

@@ -45,7 +45,10 @@ jobs:
     - name: build
       run: |
         make VERBOSE=1 -j2
-        make -j3 test # quicktests
+        make -j2 \
+          setup_tests_a-framework \
+          setup_tests_quick_tests
+        ctest --output-on-failure -j2 -VV
     - name: upload CMakeConfigureLog
       uses: actions/upload-artifact@v4
       if: always()
@@ -89,7 +92,10 @@ jobs:
     - name: build
       run: |
         make VERBOSE=1 -j2
-        make -j3 test #quicktests
+        make -j2 \
+          setup_tests_a-framework \
+          setup_tests_quick_tests
+        ctest --output-on-failure -j2 -VV
     - name: upload CMakeConfigureLog
       uses: actions/upload-artifact@v4
       if: always()
