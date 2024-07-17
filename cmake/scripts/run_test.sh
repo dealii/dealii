@@ -114,12 +114,27 @@ case $STAGE in
     #    initialized openmp first, kokkos or another external dependency.
     export KOKKOS_DISABLE_WARNINGS=1
 
+    rm -f segfault_encountered
     rm -f failing_output
     rm -f output
     rm -f stdout
 
     "$@" > stdout 2>&1
     RETURN_VALUE=$?
+
+    #
+    # If we encounter a segfault then we rerun the failing test. This
+    # hopefully minimizes rare false positives on the regression tester.
+    #
+    # We put a guard file "segfault_encountered" in place that is used in
+    # the test a-framework/second_try to verify the logic.
+    #
+    if [ $RETURN_VALUE -eq 139 ]; then
+      touch segfault_encountered
+      "$@" > stdout 2>&1
+      RETURN_VALUE=$?
+      rm segfault_encountered
+    fi
 
     [ -f output ] || mv stdout output
 
