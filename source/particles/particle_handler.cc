@@ -2194,21 +2194,6 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::register_data_attach()
   {
-    parallel::DistributedTriangulationBase<dim, spacedim>
-      *distributed_triangulation =
-        const_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
-          dynamic_cast<
-            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-            &(*triangulation)));
-    (void)distributed_triangulation;
-
-    Assert(
-      distributed_triangulation != nullptr,
-      ExcMessage(
-        "Mesh refinement in a non-distributed triangulation is not supported "
-        "by the ParticleHandler class. Either insert particles after mesh "
-        "creation and do not refine afterwards, or use a distributed triangulation."));
-
     const auto callback_function =
       [this](const typename Triangulation<dim, spacedim>::cell_iterator
                              &cell_iterator,
@@ -2216,8 +2201,9 @@ namespace Particles
         return this->pack_callback(cell_iterator, cell_status);
       };
 
-    handle = distributed_triangulation->register_data_attach(
-      callback_function, /*returns_variable_size_data=*/true);
+    handle = const_cast<Triangulation<dim, spacedim> *>(&*triangulation)
+               ->register_data_attach(callback_function,
+                                      /*returns_variable_size_data=*/true);
   }
 
 
@@ -2256,21 +2242,6 @@ namespace Particles
   ParticleHandler<dim, spacedim>::notify_ready_to_unpack(
     const bool serialization)
   {
-    parallel::DistributedTriangulationBase<dim, spacedim>
-      *distributed_triangulation =
-        const_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
-          dynamic_cast<
-            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-            &(*triangulation)));
-    (void)distributed_triangulation;
-
-    Assert(
-      distributed_triangulation != nullptr,
-      ExcMessage(
-        "Mesh refinement in a non-distributed triangulation is not supported "
-        "by the ParticleHandler class. Either insert particles after mesh "
-        "creation and do not refine afterwards, or use a distributed triangulation."));
-
     // First prepare container for insertion
     clear();
 
@@ -2293,8 +2264,8 @@ namespace Particles
             this->unpack_callback(cell_iterator, cell_status, range_iterator);
           };
 
-        distributed_triangulation->notify_ready_to_unpack(handle,
-                                                          callback_function);
+        const_cast<Triangulation<dim, spacedim> *>(&*triangulation)
+          ->notify_ready_to_unpack(handle, callback_function);
 
         // Reset handle and update global numbers.
         handle = numbers::invalid_unsigned_int;
