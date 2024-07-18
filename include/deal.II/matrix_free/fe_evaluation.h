@@ -429,7 +429,8 @@ public:
    * further information.
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient(). As a consequence, only one of these two can be
+   * submit_gradient(), submit_divergence(), submit_symmetric_gradient() and
+   * submit_curl(). As a consequence, only one of these functions can be
    * used. Usually, the contribution of a potential call to this function must
    * be added into the contribution for submit_gradient() when both are
    * desired. Furthermore, the data array is the same as for get_gradient()
@@ -504,11 +505,12 @@ public:
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient() or submit_divergence(). As a consequence, only one of
-   * these three can be used. In case several terms of this kind appear in a
-   * weak form, the contribution of a potential call to this function must be
-   * added into the diagonal of the rank-2 tensor contribution passed to
-   * submit_gradient().
+   * submit_gradient(), submit_normal_derivative(),
+   * submit_symmetric_gradient() and submit_curl(). As a consequence, only one
+   * of these functions can be used. In case several terms of this kind appear
+   * in a weak form, the contribution of a potential call to this function
+   * must be added into the diagonal of the rank-2 tensor contribution passed
+   * to submit_gradient().
    */
   template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
   void
@@ -535,12 +537,12 @@ public:
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient() or submit_divergence(). As a consequence, only one of
-   * these three functions can be used. In case several terms of this kind
-   * appear in a weak form, the contribution of a potential call to this
-   * function must be added into the diagonal of the rank-2 tensor
-   * contribution passed to submit_gradient(), in order not to overwrite
-   * information.
+   * submit_gradient(), submit_normal_derivative(), submit_divergence() and
+   * submit_curl(). As a consequence, only one of these functions can be
+   * used. In case several terms of this kind appear in a weak form, the
+   * contribution of a potential call to this function must be added into the
+   * diagonal of the rank-2 tensor contribution passed to submit_gradient(),
+   * in order not to overwrite information.
    */
   template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
   void
@@ -568,10 +570,11 @@ public:
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient() and submit_divergence(). As a consequence, only one of
-   * these can be used. Usually, the contribution of a potential call to this
-   * function must be added to the respective entries of the rank-2 tensor for
-   * submit_gradient().
+   * submit_gradient(), submit_normal_derivative(), submit_divergence() and
+   * submit_symmetric_gradient(). As a consequence, only one of these
+   * functions can be used. Usually, the contribution of a potential call to
+   * this function must be added to the respective entries of the rank-2
+   * tensor for submit_gradient().
    */
   template <int dim_ = dim,
             typename = std::enable_if_t<n_components_ == dim_ && dim != 1>>
