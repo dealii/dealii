@@ -57,7 +57,7 @@ jobs:
     - name: test
       run: |
         cmake --build build --parallel 2 --target setup_tests_a-framework setup_tests_quick_tests
-        ctest --test-dir build --build-config Debug --parallel 2 --output-on-failure --extra-verbose
+        ctest --test-dir build --build-config Debug --output-on-failure --extra-verbose
     - name: archive
       # run only if a PR is merged into master
       if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
