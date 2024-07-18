@@ -1,0 +1,10 @@
+944c944
+<     for (unsigned int cycle = 0; cycle < 6; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 3; ++cycle)
+980,981c980,981
+<         std::cout << "   Time of assemble_system: " << assemble_timer.cpu_time()
+<                   << std::endl;
+---
+>       //std::cout << "   Time of assemble_system: " << assemble_timer.cpu_time()
+>       //          << std::endl;
