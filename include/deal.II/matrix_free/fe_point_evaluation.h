@@ -746,6 +746,34 @@ public:
   submit_gradient(const gradient_type &, const unsigned int point_index);
 
   /**
+   * Return the divergence in real coordinates at the point with index
+   * `point_index` after a call to FEPointEvaluation::evaluate() with
+   * EvaluationFlags::gradients set, or the divergence that has been stored
+   * there with a call to FEPointEvaluationBase::submit_divergence(). This
+   * functions only makes sense for a vector field with dim components.
+   */
+  Number
+  get_divergence(const unsigned int point_index) const;
+
+  /**
+   * Write a contribution that is tested by the divergence to the field
+   * containing the values on points with the given `point_index`. Access to
+   * the same field as through get_divergence(). If applied before the function
+   * FEPointEvaluation::integrate(EvaluationFlags::gradients) is called,
+   * this specifies what is tested by all basis function gradients on the
+   * current cell and integrated over.
+   *
+   * @note This operation writes the data to the same field as
+   * submit_gradient(). As a consequence, only one of these functions can be
+   * used. In case several terms of this kind appear in a weak form, the
+   * contribution of a potential call to this function must be added into the
+   * diagonal of the rank-2 tensor contribution passed to submit_gradient(),
+   * in order not to overwrite information.
+   */
+  void
+  submit_divergence(const Number &value, const unsigned int point_index);
+
+  /**
    * Return the Jacobian of the transformation on the current cell with the
    * given point index. Prerequisite: This class needs to be constructed with
    * UpdateFlags containing `update_jacobian`.
@@ -2119,6 +2147,20 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_gradient(
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
+inline Number
+FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_divergence(
+  const unsigned int point_index) const
+{
+  static_assert(n_components == dim,
+                "Only makes sense for a vector field with dim components");
+
+  AssertIndexRange(point_index, values.size());
+  return trace(gradients[point_index]);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_value(
   const value_type  &value,
@@ -2138,6 +2180,23 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_gradient(
 {
   AssertIndexRange(point_index, n_q_points);
   gradients[point_index] = gradient;
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline void
+FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_divergence(
+  const Number      &value,
+  const unsigned int point_index)
+{
+  static_assert(n_components == dim,
+                "Only makes sense for a vector field with dim components");
+
+  AssertIndexRange(point_index, n_q_points);
+  gradients[point_index] = gradient_type();
+  for (unsigned int d = 0; d < dim; ++d)
+    gradients[point_index][d][d] = value;
 }
 
 
