@@ -859,6 +859,7 @@ namespace internal
             std::string(file_basename) + "_fixed.data";
 
           std::ofstream file(fname_fixed, std::ios::binary | std::ios::out);
+          AssertThrow(file.fail() == false, ExcIO());
 
           // Write header data.
           file.write(reinterpret_cast<const char *>(
@@ -882,6 +883,7 @@ namespace internal
 
             std::ofstream file(fname_variable,
                                std::ios::binary | std::ios::out);
+            AssertThrow(file.fail() == false, ExcIO());
 
             // Write header data.
             file.write(reinterpret_cast<const char *>(
@@ -1075,6 +1077,8 @@ namespace internal
             std::string(file_basename) + "_fixed.data";
 
           std::ifstream file(fname_fixed, std::ios::binary | std::ios::in);
+          AssertThrow(file.fail() == false, ExcIO());
+
           sizes_fixed_cumulative.resize(1 + n_attached_deserialize_fixed +
                                         (variable_size_data_stored ? 1 : 0));
 
@@ -1102,6 +1106,7 @@ namespace internal
               std::string(file_basename) + "_variable.data";
 
             std::ifstream file(fname_variable, std::ios::binary | std::ios::in);
+            AssertThrow(file.fail() == false, ExcIO());
 
             // Read header data.
             dest_sizes_variable.resize(local_num_cells);
@@ -13726,7 +13731,9 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::load(const std::string &file_basename)
 {
   // Load triangulation information.
-  std::ifstream                 ifs(file_basename + "_triangulation.data");
+  std::ifstream ifs(file_basename + "_triangulation.data");
+  AssertThrow(ifs.fail() == false, ExcIO());
+
   boost::archive::text_iarchive ia(ifs, boost::archive::no_header);
   load(ia, 0);
 
