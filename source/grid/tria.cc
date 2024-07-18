@@ -12701,6 +12701,8 @@ void Triangulation<dim, spacedim>::create_triangulation(
       clear_user_flags();
     }
 
+  this->update_cell_relations();
+
   // inform all listeners that the triangulation has been created
   signals.create();
 }
@@ -13691,20 +13693,76 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::save(const std::string &filename) const
 {
-  // Create boost archive then call alternative version of the save function
-  std::ofstream                 ofs(filename);
+  // Save triangulation information.
+  std::ofstream                 ofs(filename + "_triangulation.data");
   boost::archive::text_oarchive oa(ofs, boost::archive::no_header);
   save(oa, 0);
+
+  // Save attached data.
+  {
+    std::ofstream ifs(filename + ".info");
+    ifs
+      << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_active_cells"
+      << std::endl
+      << internal::CellAttachedDataSerializer<dim, spacedim>::version_number
+      << " " << 1 << " " << this->cell_attached_data.pack_callbacks_fixed.size()
+      << " " << this->cell_attached_data.pack_callbacks_variable.size() << " "
+      << this->n_global_active_cells() << std::endl;
+  }
+
+  this->save_attached_data(0, this->n_global_active_cells(), filename);
 }
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::load(const std::string &filename)
 {
-  // Create boost archive then call alternative version of the load function
-  std::ifstream                 ifs(filename);
+  // Load triangulation information.
+  std::ifstream                 ifs(filename + "_triangulation.data");
   boost::archive::text_iarchive ia(ifs, boost::archive::no_header);
   load(ia, 0);
+
+  // Load attached data.
+  unsigned int version, numcpus, attached_count_fixed, attached_count_variable,
+    n_global_active_cells;
+  {
+    std::ifstream ifs(std::string(filename) + ".info");
+    AssertThrow(ifs.fail() == false, ExcIO());
+    std::string firstline;
+    getline(ifs, firstline);
+    ifs >> version >> numcpus >> attached_count_fixed >>
+      attached_count_variable >> n_global_active_cells;
+  }
+
+  AssertThrow(numcpus == 1,
+              ExcMessage("Incompatible number of CPUs found in .info file."));
+
+  const auto expected_version =
+    ::dealii::internal::CellAttachedDataSerializer<dim,
+                                                   spacedim>::version_number;
+  AssertThrow(version == expected_version,
+              ExcMessage(
+                "The information saved in the file you are trying "
+                "to read the triangulation from was written with an "
+                "incompatible file format version and cannot be read."));
+  Assert(this->n_global_active_cells() == n_global_active_cells,
+         ExcMessage("The number of cells of the triangulation differs "
+                    "from the number of cells written into the .info file."));
+
+  // Clear all of the callback data, as explained in the documentation of
+  // register_data_attach().
+  this->cell_attached_data.n_attached_data_sets = 0;
+  this->cell_attached_data.n_attached_deserialize =
+    attached_count_fixed + attached_count_variable;
+
+  this->load_attached_data(0,
+                           this->n_global_active_cells(),
+                           this->n_active_cells(),
+                           filename,
+                           attached_count_fixed,
+                           attached_count_variable);
+
+  this->update_cell_relations();
 }
 
 #endif
@@ -15563,6 +15621,26 @@ const typename std::map<
 }
 
 
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::update_cell_relations()
+{
+  // We only update the cell relations here for serial triangulations.
+  // For other triangulations, this is done at other stages of
+  // mesh creation and mesh refinement.
+  if (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+        this))
+    return;
+
+  this->local_cell_relations.clear();
+  this->local_cell_relations.reserve(this->n_active_cells());
+
+  for (const auto &cell : this->active_cell_iterators())
+    this->local_cell_relations.emplace_back(
+      cell, ::dealii::CellStatus::cell_will_persist);
+}
+
+
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15610,6 +15688,9 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
               cells_with_distorted_children);
 
   update_periodic_face_map();
+
+  if (this->cell_attached_data.n_attached_data_sets == 0)
+    this->update_cell_relations();
 
 #  ifdef DEBUG
 

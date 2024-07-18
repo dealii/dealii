@@ -367,7 +367,7 @@ namespace internal
    * will be, attached to cells via the register_data_attach() function
    * and later retrieved via notify_ready_to_unpack().
    *
-   * This internalclass is dedicated to the data serialization and transfer
+   * This internal class is dedicated to the data serialization and transfer
    * across repartitioned meshes and to/from the file system.
    *
    * It is designed to store all data buffers intended for serialization.
@@ -378,6 +378,12 @@ namespace internal
   {
   public:
     using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
+
+    /**
+     * Version number stored in the .info file written by
+     * Triangulation::save().
+     */
+    static inline constexpr unsigned int version_number = 5;
 
     /**
      * Auxiliary data structure for assigning a CellStatus to a deal.II cell
@@ -3881,18 +3887,16 @@ protected:
                      const unsigned int n_attached_deserialize_variable);
 
   /**
-   * A function to record the CellStatus of currently active cells that
-   * are locally owned. This information is mandatory to transfer data
-   * between meshes during adaptation or serialization, e.g., using
-   * parallel::distributed::SolutionTransfer.
+   * A function to record the CellStatus of currently active cells.
+   * This information is mandatory to transfer data between meshes
+   * during adaptation or serialization, e.g., using SolutionTransfer.
    *
    * Relations will be stored in the private member local_cell_relations. For
    * an extensive description of CellStatus, see the documentation for the
    * member function register_data_attach().
    */
-  virtual void
-  update_cell_relations()
-  {}
+  void
+  update_cell_relations();
 
   /**
    * Vector of pairs, each containing a deal.II cell iterator and its
