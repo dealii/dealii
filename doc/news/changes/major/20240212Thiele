@@ -1,0 +1,9 @@
+New: LinearAlgebra::TpetraWrappers direct solver interfaces
+for Trilinos Amesos2, as listed below
+<dl>
+    <dt>SolverDirect</dt>
+    <dd>- Same interface as TrilinosWrappers, but with the option to pass a parameter list</dd>
+    <dt>SolverDirectKLU2</dt>
+    <dd>- An interface to the KLU2 solver, providing solver-specific AdditionalData</dd>
+</dl>
+(Jan Philipp Thiele, 2024/02/12)
