@@ -29,6 +29,16 @@ DEAL_II_NAMESPACE_OPEN
 namespace hp
 {
   /**
+   * Exception thrown when comparing hp::Collection iterators into different
+   * objects.
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcDifferentCollection,
+                   "You are trying to compare iterators into different "
+                   "hp::Collection objects.");
+
+  /**
    * An iterator for hp::Collection.
    */
   template <typename T>
@@ -64,10 +74,7 @@ namespace hp
     bool
     operator==(const CollectionIterator<T> &other) const
     {
-      Assert(
-        this->data == other.data,
-        ExcMessage(
-          "You are trying to compare iterators into different hp::Collection objects."));
+      Assert(this->data == other.data, ExcDifferentCollection());
       return this->index == other.index;
     }
 
@@ -77,11 +84,48 @@ namespace hp
     bool
     operator!=(const CollectionIterator<T> &other) const
     {
-      Assert(
-        this->data == other.data,
-        ExcMessage(
-          "You are trying to compare iterators into different hp::Collection objects."));
+      Assert(this->data == other.data, ExcDifferentCollection());
       return this->index != other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator<(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index < other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator<=(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index <= other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator>(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index > other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator>=(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index >= other.index;
     }
 
     /**
