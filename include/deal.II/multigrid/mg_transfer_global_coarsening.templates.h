@@ -2173,7 +2173,7 @@ namespace internal
 
 
 
-    template <typename Number, int dim>
+    template <int dim, typename Number>
     static void
     compute_prolongation_and_restriction_matrices(
       const FiniteElement<dim> &fe_fine,
@@ -2593,7 +2593,7 @@ namespace internal
 
       // ------------------------- prolongation matrix -------------------------
       for (const auto &fe_index_pair_ : fe_index_pairs)
-        compute_prolongation_and_restriction_matrices<Number>(
+        compute_prolongation_and_restriction_matrices<dim, Number>(
           dof_handler_fine.get_fe(fe_index_pair_.first.second),
           dof_handler_coarse.get_fe(fe_index_pair_.first.first),
           transfer.schemes[fe_index_pair_.second]);
@@ -4118,9 +4118,8 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
   // Compute interpolation matrices, possibly in the 1D version
   schemes.resize(1);
   internal::MGTwoLevelTransferImplementation::
-    compute_prolongation_and_restriction_matrices<Number>(fe_fine,
-                                                          dof_coarse.get_fe(),
-                                                          schemes[0]);
+    compute_prolongation_and_restriction_matrices<dim, Number>(
+      fe_fine, dof_coarse.get_fe(), schemes[0]);
 
   // We internally call the ghost updates through the matrix-free framework
   this->vec_fine_needs_ghost_update = false;
