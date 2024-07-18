@@ -393,7 +393,7 @@
  *  undesirable and one needs to exit in a somewhat more graceful
  *  way -- even if there is really not very much one can do in these
  *  cases to still produce a meaningful result. An example is if a
- *  deal.II program is run a one module in a bigger framework of
+ *  deal.II program is run as one module in a bigger framework of
  *  software. Think, for example, of a case where a deal.II program
  *  computed the flow field that corresponds to a set of input
  *  variables provided by some optimization routine: if the optimizer
