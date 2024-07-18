@@ -89,6 +89,46 @@ namespace hp
     }
 
     /**
+     * Compare indices.
+     */
+    bool
+    operator<(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index < other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator<=(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index <= other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator>(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index > other.index;
+    }
+
+    /**
+     * Compare indices.
+     */
+    bool
+    operator>=(const CollectionIterator<T> &other) const
+    {
+      Assert(this->data == other.data, ExcDifferentCollection());
+      return this->index >= other.index;
+    }
+
+    /**
      * Dereferencing operator: returns the value of the current index.
      */
     const T &
