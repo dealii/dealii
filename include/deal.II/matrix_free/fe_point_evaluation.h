@@ -1350,7 +1350,7 @@ public:
   normal_vector(const unsigned int point_index) const;
 
   /**
-   * Return the normal gradient in real coordinates at the point with index
+   * Return the normal derivative in real coordinates at the point with index
    * `point_index` after a call to FEPointEvaluation::evaluate() with
    * EvaluationFlags::gradients set.
    */
@@ -1358,7 +1358,7 @@ public:
   get_normal_derivative(const unsigned int point_index) const;
 
   /**
-   * Write a contribution that is tested by the normal gradient to the field
+   * Write a contribution that is tested by the normal derivative to the field
    * containing the values on points with the given `point_index`. Access to
    * the same field as through set_gradient()/get_gradient.
    */
@@ -1724,7 +1724,7 @@ public:
   normal_vector(const unsigned int point_index) const;
 
   /**
-   * Return the normal gradient in real coordinates at the point with index
+   * Return the normal derivative in real coordinates at the point with index
    * `point_index` after a call to FEFacePointEvaluation::evaluate() with
    * EvaluationFlags::gradients set.
    */
@@ -1732,7 +1732,7 @@ public:
   get_normal_derivative(const unsigned int point_index) const;
 
   /**
-   * Write a contribution that is tested by the normal gradient to the field
+   * Write a contribution that is tested by the normal derivative to the field
    * containing the values on points with the given `point_index`. Access to
    * the same field as through set_gradient()/get_gradient.
    */
