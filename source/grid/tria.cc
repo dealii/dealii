@@ -672,7 +672,7 @@ namespace internal
   void CellAttachedDataSerializer<dim, spacedim>::save(
     const unsigned int global_first_cell,
     const unsigned int global_num_cells,
-    const std::string &filename,
+    const std::string &file_basename,
     const MPI_Comm    &mpi_communicator) const
   {
     Assert(sizes_fixed_cumulative.size() > 0,
@@ -694,7 +694,8 @@ namespace internal
         // ---------- Fixed size data ----------
         //
         {
-          const std::string fname_fixed = std::string(filename) + "_fixed.data";
+          const std::string fname_fixed =
+            std::string(file_basename) + "_fixed.data";
 
           MPI_Info info;
           int      ierr = MPI_Info_create(&info);
@@ -765,7 +766,7 @@ namespace internal
         if (variable_size_data_stored)
           {
             const std::string fname_variable =
-              std::string(filename) + "_variable.data";
+              std::string(file_basename) + "_variable.data";
 
             MPI_Info info;
             int      ierr = MPI_Info_create(&info);
@@ -854,7 +855,8 @@ namespace internal
         // ---------- Fixed size data ----------
         //
         {
-          const std::string fname_fixed = std::string(filename) + "_fixed.data";
+          const std::string fname_fixed =
+            std::string(file_basename) + "_fixed.data";
 
           std::ofstream file(fname_fixed, std::ios::binary | std::ios::out);
 
@@ -876,7 +878,7 @@ namespace internal
         if (variable_size_data_stored)
           {
             const std::string fname_variable =
-              std::string(filename) + "_variable.data";
+              std::string(file_basename) + "_variable.data";
 
             std::ofstream file(fname_variable,
                                std::ios::binary | std::ios::out);
@@ -902,7 +904,7 @@ namespace internal
     const unsigned int global_first_cell,
     const unsigned int global_num_cells,
     const unsigned int local_num_cells,
-    const std::string &filename,
+    const std::string &file_basename,
     const unsigned int n_attached_deserialize_fixed,
     const unsigned int n_attached_deserialize_variable,
     const MPI_Comm    &mpi_communicator)
@@ -925,7 +927,8 @@ namespace internal
         // ---------- Fixed size data ----------
         //
         {
-          const std::string fname_fixed = std::string(filename) + "_fixed.data";
+          const std::string fname_fixed =
+            std::string(file_basename) + "_fixed.data";
 
           MPI_Info info;
           int      ierr = MPI_Info_create(&info);
@@ -989,7 +992,7 @@ namespace internal
         if (variable_size_data_stored)
           {
             const std::string fname_variable =
-              std::string(filename) + "_variable.data";
+              std::string(file_basename) + "_variable.data";
 
             MPI_Info info;
             int      ierr = MPI_Info_create(&info);
@@ -1068,7 +1071,8 @@ namespace internal
         // ---------- Fixed size data ----------
         //
         {
-          const std::string fname_fixed = std::string(filename) + "_fixed.data";
+          const std::string fname_fixed =
+            std::string(file_basename) + "_fixed.data";
 
           std::ifstream file(fname_fixed, std::ios::binary | std::ios::in);
           sizes_fixed_cumulative.resize(1 + n_attached_deserialize_fixed +
@@ -1095,7 +1099,7 @@ namespace internal
         if (variable_size_data_stored)
           {
             const std::string fname_variable =
-              std::string(filename) + "_variable.data";
+              std::string(file_basename) + "_variable.data";
 
             std::ifstream file(fname_variable, std::ios::binary | std::ios::in);
 
@@ -13689,18 +13693,20 @@ void Triangulation<dim, spacedim>::load_user_indices(
     DEAL_II_NOT_IMPLEMENTED();
 }
 
+
+
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void Triangulation<dim, spacedim>::save(const std::string &filename) const
+void Triangulation<dim, spacedim>::save(const std::string &file_basename) const
 {
   // Save triangulation information.
-  std::ofstream                 ofs(filename + "_triangulation.data");
+  std::ofstream                 ofs(file_basename + "_triangulation.data");
   boost::archive::text_oarchive oa(ofs, boost::archive::no_header);
   save(oa, 0);
 
   // Save attached data.
   {
-    std::ofstream ifs(filename + ".info");
+    std::ofstream ifs(file_basename + ".info");
     ifs
       << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_active_cells"
       << std::endl
@@ -13710,15 +13716,17 @@ void Triangulation<dim, spacedim>::save(const std::string &filename) const
       << this->n_global_active_cells() << std::endl;
   }
 
-  this->save_attached_data(0, this->n_global_active_cells(), filename);
+  this->save_attached_data(0, this->n_global_active_cells(), file_basename);
 }
+
+
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void Triangulation<dim, spacedim>::load(const std::string &filename)
+void Triangulation<dim, spacedim>::load(const std::string &file_basename)
 {
   // Load triangulation information.
-  std::ifstream                 ifs(filename + "_triangulation.data");
+  std::ifstream                 ifs(file_basename + "_triangulation.data");
   boost::archive::text_iarchive ia(ifs, boost::archive::no_header);
   load(ia, 0);
 
@@ -13726,7 +13734,7 @@ void Triangulation<dim, spacedim>::load(const std::string &filename)
   unsigned int version, numcpus, attached_count_fixed, attached_count_variable,
     n_global_active_cells;
   {
-    std::ifstream ifs(std::string(filename) + ".info");
+    std::ifstream ifs(std::string(file_basename) + ".info");
     AssertThrow(ifs.fail() == false, ExcIO());
     std::string firstline;
     getline(ifs, firstline);
@@ -13758,7 +13766,7 @@ void Triangulation<dim, spacedim>::load(const std::string &filename)
   this->load_attached_data(0,
                            this->n_global_active_cells(),
                            this->n_active_cells(),
-                           filename,
+                           file_basename,
                            attached_count_fixed,
                            attached_count_variable);
 
@@ -16057,7 +16065,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::save_attached_data(
   const unsigned int global_first_cell,
   const unsigned int global_num_cells,
-  const std::string &filename) const
+  const std::string &file_basename) const
 {
   // cast away constness
   auto tria = const_cast<Triangulation<dim, spacedim> *>(this);
@@ -16074,7 +16082,7 @@ void Triangulation<dim, spacedim>::save_attached_data(
       // then store buffers in file
       tria->data_serializer.save(global_first_cell,
                                  global_num_cells,
-                                 filename,
+                                 file_basename,
                                  this->get_communicator());
 
       // and release the memory afterwards
@@ -16097,7 +16105,7 @@ void Triangulation<dim, spacedim>::load_attached_data(
   const unsigned int global_first_cell,
   const unsigned int global_num_cells,
   const unsigned int local_num_cells,
-  const std::string &filename,
+  const std::string &file_basename,
   const unsigned int n_attached_deserialize_fixed,
   const unsigned int n_attached_deserialize_variable)
 {
@@ -16107,7 +16115,7 @@ void Triangulation<dim, spacedim>::load_attached_data(
       this->data_serializer.load(global_first_cell,
                                  global_num_cells,
                                  local_num_cells,
-                                 filename,
+                                 file_basename,
                                  n_attached_deserialize_fixed,
                                  n_attached_deserialize_variable,
                                  this->get_communicator());

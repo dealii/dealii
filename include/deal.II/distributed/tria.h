@@ -628,15 +628,17 @@ namespace parallel
       get_checksum() const;
 
       /**
-       * Save the refinement information from the coarse mesh into the given
-       * file. This file needs to be reachable from all nodes in the
+       * Save the mesh and associated information into a number of files
+       * that all use the provided basename as a starting prefix, plus some
+       * suffixes that indicate the specific use of that file. These files all
+       * need to be reachable from all nodes in the
        * computation on a shared network file system. See the SolutionTransfer
        * class on how to store solution vectors into this file. Additional
        * cell-based data can be saved using
        * DistributedTriangulationBase::DataTransfer::register_data_attach().
        */
       virtual void
-      save(const std::string &filename) const override;
+      save(const std::string &file_basename) const override;
 
       /**
        * Load the refinement information saved with save() back in. The mesh
@@ -646,10 +648,10 @@ namespace parallel
        * You do not need to load with the same number of MPI processes that
        * you saved with. Rather, if a mesh is loaded with a different number
        * of MPI processes than used at the time of saving, the mesh is
-       * repartitioned that the number of cells is balanced among all processes.
-       * Individual repartitioning, e.g., based on the number of dofs or
-       * particles per cell, needs to be invoked manually by calling
-       * repartition() afterwards.
+       * repartitioned so that the number of cells is balanced among all
+       * processes. Individual repartitioning with non-identical weights for
+       * each cell, e.g., based on the number of dofs or particles per cell,
+       * needs to be invoked manually by calling repartition() afterwards.
        *
        * Cell-based data that was saved with
        * DistributedTriangulationBase::DataTransfer::register_data_attach() can
@@ -658,7 +660,7 @@ namespace parallel
        * after calling load().
        */
       virtual void
-      load(const std::string &filename) override;
+      load(const std::string &file_basename) override;
 
       /**
        * @copydoc load()
