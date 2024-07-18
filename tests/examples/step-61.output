@@ -1,0 +1,7 @@
+Solving problem in 2 space dimensions.
+   Number of active cells: 1024
+   Total number of cells: 1365
+   Number of pressure degrees of freedom: 3136
+L2_error_pressure 0.0200372
+L2_error_vel:  0.0629738
+L2_error_flux: 0.0890227
