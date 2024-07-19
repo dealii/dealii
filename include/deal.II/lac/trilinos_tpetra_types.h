@@ -21,10 +21,13 @@
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
+#  include <Kokkos_DualView.hpp>
 #  include <Tpetra_Details_DefaultTypes.hpp>
+
 
 // Forward declarations
 #  ifndef DOXYGEN
+#    include <Ifpack2_Preconditioner.hpp>
 #    include <Tpetra_CrsGraph_fwd.hpp>
 #    include <Tpetra_CrsMatrix_fwd.hpp>
 #    include <Tpetra_Export_fwd.hpp>
@@ -32,8 +35,8 @@
 #    include <Tpetra_Map_fwd.hpp>
 #    include <Tpetra_MultiVector_fwd.hpp>
 #    include <Tpetra_Operator_fwd.hpp>
+#    include <Tpetra_RowMatrix_fwd.hpp>
 #    include <Tpetra_Vector_fwd.hpp>
-
 #  endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -49,6 +52,8 @@ namespace LinearAlgebra
        * local ordinate (processor local indices).
        */
       using LO = int;
+
+
       /**
        * global ordinate (global indices).
        */
@@ -71,7 +76,6 @@ namespace LinearAlgebra
         typename MemorySpace::kokkos_space::execution_space,
         typename MemorySpace::kokkos_space>;
 #  endif
-
 
       /**
        * Communication between processors.
@@ -128,6 +132,55 @@ namespace LinearAlgebra
       template <typename Number, typename MemorySpace>
       using MatrixType =
         Tpetra::CrsMatrix<Number, LO, GO, NodeType<MemorySpace>>;
+
+
+      /**
+       * Tpetra type for a parallel distributed row matrix.
+       */
+      template <typename Number, typename MemorySpace>
+      using RowMatrixType =
+        Tpetra::RowMatrix<Number, LO, GO, NodeType<MemorySpace>>;
+
+
+      /**
+       * @brief Typedef for the Kokkos::View type of unmanaged host memory.
+       *
+       * Unmanaged means that the view is not allocating data itself, but only
+       * uses an external pointer. Consequently, the memory is not freed upon
+       * destruction of the view.
+       * This is needed for shallow copies of deal.II LA structures
+       * to Trilinos LA structures.
+       *
+       */
+      template <typename Number>
+      using HostViewTypeUnmanaged = Kokkos::View<Number **,
+                                                 Kokkos::LayoutLeft,
+                                                 Kokkos::HostSpace,
+                                                 Kokkos::MemoryUnmanaged>;
+
+      /**
+       * @brief Typedef for the Kokkos::View type of unmanaged memory.
+       *
+       * Unmanaged means that the view is not allocating data itself, but only
+       * uses an external pointer. Consequently, the memory is not freed upon
+       * destruction of the view.
+       * This is needed for shallow copies of deal.II LA structures
+       * to Trilinos LA structures.
+       */
+      template <typename Number, typename MemorySpace>
+      using DualViewTypeUnmanaged =
+        Kokkos::DualView<Number **,
+                         Kokkos::LayoutLeft,
+                         typename MemorySpace::kokkos_space::execution_space,
+                         Kokkos::MemoryUnmanaged>;
+
+      /**
+       * Type for a Trilinos preconditioner from the Ifpack2 package.
+       */
+      template <typename Number, typename MemorySpace>
+      using Ifpack2PreconType =
+        Ifpack2::Preconditioner<Number, LO, GO, NodeType<MemorySpace>>;
+
     } // namespace TpetraTypes
   }   // namespace TpetraWrappers
 } // namespace LinearAlgebra
