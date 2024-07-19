@@ -56,7 +56,7 @@ namespace Particles
    *
    * For examples on how to use this class to track particles, store properties
    * on particles, and let the properties on the particles influence the
-   * finite-element solution see step-19, step-68, and step-70.
+   * finite-element solution see step-19, step-68, step-70, and step-83.
    */
   template <int dim, int spacedim = dim>
   class ParticleHandler : public Subscriptor
@@ -821,6 +821,8 @@ namespace Particles
     /**
      * Serialize the contents of this class using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     *
+     * This function is used in step-83.
      */
     template <class Archive>
     void
@@ -1321,13 +1323,15 @@ namespace Particles
   inline void
   ParticleHandler<dim, spacedim>::serialize(Archive &ar, const unsigned int)
   {
-    // Note that we do not serialize the particle data itself. Instead we
+    // Note that we do not serialize the particle data itself (i.e., the
+    // 'particles' member variable). Instead we
     // use the serialization functionality of the triangulation class, because
     // this guarantees that data is immediately shipped to new processes if
     // the domain is distributed differently after resuming from a checkpoint.
-    ar //&particles
-      &global_number_of_particles &global_max_particles_per_cell
-        &next_free_particle_index;
+    //
+    // See step-83 for how to serialize ParticleHandler objects.
+    ar &global_number_of_particles &global_max_particles_per_cell
+      &next_free_particle_index;
   }
 
 
