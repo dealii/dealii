@@ -15,3 +15,7 @@
 <     for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
 ---
 >     for (unsigned int cycle = 0; cycle < 3; ++cycle)
+1075c1076
+<       deallog.depth_console(3);
+---
+>       deallog.depth_console(1);
