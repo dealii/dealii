@@ -1,0 +1,5 @@
+
+DEAL::NumProc=3
+DEAL::i = 0 , j = 0 , el = 3.14159
+DEAL::i = 3 , j = 3 , el = 3.14159
+DEAL::OK
