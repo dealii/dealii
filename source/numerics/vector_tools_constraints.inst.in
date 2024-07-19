@@ -31,7 +31,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::map<types::boundary_id, const Function<deal_II_dimension> *>
                                          &function_map,
         AffineConstraints<double>        &constraints,
-        const Mapping<deal_II_dimension> &mapping);
+        const Mapping<deal_II_dimension> &mapping,
+        const bool                        use_manifold_for_normal);
 
       template void
       compute_nonzero_normal_flux_constraints_on_level(
@@ -43,7 +44,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         AffineConstraints<double>        &constraints,
         const Mapping<deal_II_dimension> &mapping,
         const IndexSet                   &refinement_edge_indices,
-        const unsigned int                level);
+        const unsigned int                level,
+        const bool                        use_manifold_for_normal);
 
 
       template void
@@ -54,7 +56,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::map<types::boundary_id, const Function<deal_II_dimension> *>
                                          &function_map,
         AffineConstraints<double>        &constraints,
-        const Mapping<deal_II_dimension> &mapping);
+        const Mapping<deal_II_dimension> &mapping,
+        const bool                        use_manifold_for_normal);
 
       template void
       compute_no_normal_flux_constraints(
@@ -62,7 +65,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int                   first_vector_component,
         const std::set<types::boundary_id>  &boundary_ids,
         AffineConstraints<double>           &constraints,
-        const Mapping<deal_II_dimension>    &mapping);
+        const Mapping<deal_II_dimension>    &mapping,
+        const bool                           use_manifold_for_normal);
 
       template void
       compute_no_normal_flux_constraints(
@@ -70,7 +74,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int                   first_vector_component,
         const std::set<types::boundary_id>  &boundary_ids,
         AffineConstraints<float>            &constraints,
-        const Mapping<deal_II_dimension>    &mapping);
+        const Mapping<deal_II_dimension>    &mapping,
+        const bool                           use_manifold_for_normal);
 
       template void
       compute_no_normal_flux_constraints_on_level(
@@ -80,7 +85,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         AffineConstraints<double>           &constraints,
         const Mapping<deal_II_dimension>    &mapping,
         const IndexSet                      &refinement_edge_indices,
-        const unsigned int                   level);
+        const unsigned int                   level,
+        const bool                           use_manifold_for_normal);
 
       template void
       compute_normal_flux_constraints(
@@ -88,7 +94,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int                   first_vector_component,
         const std::set<types::boundary_id>  &boundary_ids,
         AffineConstraints<double>           &constraints,
-        const Mapping<deal_II_dimension>    &mapping);
+        const Mapping<deal_II_dimension>    &mapping,
+        const bool                           use_manifold_for_normal);
 #  endif
 #endif
     \}

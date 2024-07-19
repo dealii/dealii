@@ -1,0 +1,9 @@
+New: The functions VectorTools::compute_nonzero_normal_flux_constraints(),
+VectorTools::compute_nonzero_normal_flux_constraints_on_level(),
+VectorTools::compute_no_normal_flux_constraints(),
+VectorTools::compute_no_normal_flux_constraints_on_level(),
+VectorTools::compute_nonzero_tangential_flux_constraints(), and
+VectorTools::compute_normal_flux_constraints() now also can use
+the mapping to compute the normal vectors.
+<br>
+(Peter Munch, 2024/07/19)
