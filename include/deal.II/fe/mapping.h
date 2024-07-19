@@ -717,7 +717,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @see UpdateFlags
    */
@@ -748,7 +748,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @param update_flags A set of flags that define what is expected of the
    * mapping class in future calls to transform() or the fill_fe_values()
@@ -880,7 +880,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @param[in] cell The cell of the triangulation for which this function is
    * to compute a mapping from the reference cell to.

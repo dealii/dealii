@@ -329,7 +329,7 @@ namespace SparsityPatternIterators
  * systems, it is rarely set up directly due to the way it stores its
  * information. Rather, one typically goes through an intermediate format
  * first, see for example the step-2 tutorial program as well as the
- * documentation module
+ * documentation topic
  * @ref Sparsity.
  *
  * You can iterate over entries in the pattern using begin(), end(),

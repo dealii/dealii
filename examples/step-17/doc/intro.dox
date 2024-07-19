@@ -64,8 +64,8 @@ space, for example whenever multiple cores in a single machine work
 on a common task). Some of the fundamentals of distributed memory
 computing are discussed in the
 @ref distributed "Parallel computing with multiple processors using distributed memory"
-documentation module, which is itself a sub-module of the
-@ref Parallel "Parallel computing" module.
+documentation topic, which is itself a sub-topic of the
+@ref Parallel "Parallel computing" topic.
 
 In general, to be truly able to scale to large numbers of processors, one
 needs to split between the available processors <i>every</i> data structure

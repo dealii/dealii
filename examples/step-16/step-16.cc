@@ -281,7 +281,7 @@ namespace Step16
 
     // Now, we have to provide a matrix on each level. To this end, we first use
     // the MGTools::make_sparsity_pattern function to generate a preliminary
-    // compressed sparsity pattern on each level (see the @ref Sparsity module
+    // compressed sparsity pattern on each level (see the @ref Sparsity topic
     // for more information on this topic) and then copy it over to the one we
     // really want. The next step is to initialize the interface matrices with
     // the fitting sparsity pattern.

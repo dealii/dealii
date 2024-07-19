@@ -276,7 +276,7 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on @ref constraints.
+   * the topic on @ref constraints.
    *
    * For further information and details on the other function arguments, see
    * the interpolate_boundary_values() function with `std::map` arguments and
@@ -527,7 +527,7 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on
+   * the topic on
    * @ref constraints.
    *
    * If @p component_mapping is empty, it is assumed that the number of
@@ -632,7 +632,7 @@ namespace VectorTools
    * the Dirichlet conditions should be set first, and then completed by
    * hanging node constraints, in order to make sure that the discretization
    * remains consistent. See the discussion on conflicting constraints in the
-   * module on
+   * topic on
    * @ref constraints.
    *
    * <h4>Arguments to this function</h4>
@@ -716,7 +716,7 @@ namespace VectorTools
    * the Dirichlet conditions should be set first, and then completed by
    * hanging node constraints, in order to make sure that the discretization
    * remains consistent. See the discussion on conflicting constraints in the
-   * module on
+   * topic on
    * @ref constraints.
    *
    * The argument @p first_vector_component denotes the first vector component

@@ -16,7 +16,7 @@
 /**
  * @defgroup numerics Numerical algorithms
  *
- * This module groups a diverse set of classes that generally implement some
+ * This topic groups a diverse set of classes that generally implement some
  * sort of numerical algorithm on top all the basic triangulation, DoFHandler,
  * and finite element classes in the library. They are generally unconnected
  * to each other.

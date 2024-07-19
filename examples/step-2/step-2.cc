@@ -214,7 +214,7 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   // intermediate object of type DynamicSparsityPattern that uses a
   // different %internal data structure and that we can later copy into the
   // SparsityPattern object without much overhead. (Some more information on
-  // these data structures can be found in the @ref Sparsity module.) In order
+  // these data structures can be found in the @ref Sparsity topic.) In order
   // to initialize this intermediate data structure, we have to give it the
   // size of the matrix, which in our case will be square with as many rows
   // and columns as there are degrees of freedom on the grid:

@@ -17,10 +17,10 @@
  * @defgroup threads Parallel computing with multiple processors accessing shared memory
  * @ingroup Parallel
  *
- * @brief A module discussing the use of parallelism on shared memory
+ * @brief A group discussing the use of parallelism on shared memory
  * machines. See the detailed documentation and
  * @ref MTToC "Table of Contents" below the lengthy list of members
- * of this module.
+ * of this group.
  *
  * @dealiiVideoLecture{39,40}
  *

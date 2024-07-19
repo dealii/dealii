@@ -949,7 +949,7 @@ namespace FETools
    * <li> Tensor product construction (<code>do_tensor_product=true</code>):
    * The tensor product construction, in the simplest case, builds a
    * vector-valued element from scalar elements (see
-   * @ref vector_valued "this documentation module"
+   * @ref vector_valued "this documentation topic"
    * and
    * @ref GlossComponent "this glossary entry"
    * for more information).

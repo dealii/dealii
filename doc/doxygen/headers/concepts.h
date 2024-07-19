@@ -18,7 +18,7 @@
  *
  * Sometimes imposing constraints on the type of an object without requiring
  * it to belong to a specific inheritance hierarchy is useful. These are
- * usually referred to as <em>concepts</em> in the C++ community. This module
+ * usually referred to as <em>concepts</em> in the C++ community. This documentation group
  * lists the concepts commonly used in deal.II with brief descriptions of
  * their intent. The convention in deal.II for listing constraints on a type
  * is to provide the name of the concept as a <code>typename</code> in a

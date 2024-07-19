@@ -1000,7 +1000,7 @@ namespace internal
  * inheriting from Manifold; see the documentation of Manifold, step-49, or
  * the
  * @ref manifold
- * module for examples and a complete description of the algorithms. By
+ * topic for examples and a complete description of the algorithms. By
  * default, all cells in a Triangulation have a flat geometry, meaning that
  * all lines in the Triangulation are assumed to be straight. If a cell has a
  * manifold_id that is not equal to numbers::flat_manifold_id then the
@@ -1541,7 +1541,7 @@ public:
   /**
    * An alias that is used to identify cell iterators. The concept of
    * iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies cells in a triangulation. The TriaIterator
    * class works like a pointer that when you dereference it yields an object
@@ -1565,7 +1565,7 @@ public:
    * An alias that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies active cells in a triangulation. The
    * TriaActiveIterator class works like a pointer to active objects that when
@@ -1582,7 +1582,7 @@ public:
   /**
    * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies faces in a triangulation. The
    * TriaIterator class works like a pointer to objects that when
@@ -1612,7 +1612,7 @@ public:
    * An alias that defines an iterator type to iterate over
    * vertices of a mesh.  The concept of iterators is discussed at
    * length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * @ingroup Iterators
    */
@@ -1622,7 +1622,7 @@ public:
    * An alias that defines an iterator type to iterate over
    * vertices of a mesh.  The concept of iterators is discussed at
    * length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * This alias is in fact identical to the @p vertex_iterator alias
    * above since all vertices in a mesh are active (i.e., are a vertex of

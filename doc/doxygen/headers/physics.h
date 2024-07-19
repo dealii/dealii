@@ -15,7 +15,7 @@
 /**
  * @defgroup physics Physics
  *
- * @brief A module dedicated to the implementation of functions and
+ * @brief A group dedicated to the implementation of functions and
  * classes that relate to continuum physics, physical fields and materials.
  */
 

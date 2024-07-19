@@ -529,7 +529,7 @@ namespace SUNDIALS
      * function is never called.
      *
      * The setup_jacobian() function may call a user-supplied function, or a
-     * function within the linear solver module, to compute Jacobian-related
+     * function within the linear solver group, to compute Jacobian-related
      * data that is required by the linear solver. It may also preprocess that
      * data as needed for solve_with_jacobian(), which may involve calling a
      * generic function (such as for LU factorization) or, more generally,

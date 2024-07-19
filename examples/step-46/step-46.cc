@@ -546,7 +546,7 @@ namespace Step46
         //
         // The actual computation of the local matrix is the same as in
         // step-22 as well as that given in the @ref vector_valued
-        // documentation module for the elasticity equations:
+        // documentation topic for the elasticity equations:
         if (cell_is_in_fluid_domain(cell))
           {
             const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();

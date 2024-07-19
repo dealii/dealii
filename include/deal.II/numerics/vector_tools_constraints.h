@@ -122,7 +122,7 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on
+   * the topic on
    * @ref constraints.
    *
    *

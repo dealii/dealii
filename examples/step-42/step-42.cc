@@ -635,7 +635,7 @@ namespace Step42
     // In particular, for this parallel program, the finite element
     // space has associated with it variables that indicate which degrees
     // of freedom live on the current processor (the index sets, see
-    // also step-40 and the @ref distributed documentation module) as
+    // also step-40 and the @ref distributed documentation topic) as
     // well as a variety of constraints: those imposed by hanging nodes,
     // by Dirichlet boundary conditions, and by the active set of
     // contact nodes. Of the three AffineConstraints variables defined

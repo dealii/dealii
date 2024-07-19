@@ -1212,7 +1212,7 @@ public:
    *
    * As explained in the
    * @ref manifold
-   * module, the process involved in finding the appropriate manifold
+   * topic, the process involved in finding the appropriate manifold
    * description involves querying both the manifold or boundary
    * indicators. See there for more information.
    */
@@ -3959,7 +3959,7 @@ public:
    * @ref GlossGhostCell "glossary"
    * and the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_artificial()</code>.
@@ -3996,7 +3996,7 @@ public:
    * @ref GlossGhostCell "glossary"
    * and the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
    *
    * @post The returned value is equal to <code>!is_locally_owned() &&
    * !is_artificial()</code>.
@@ -4039,7 +4039,7 @@ public:
    * @ref GlossArtificialCell "glossary"
    * and the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_locally_owned()</code>.

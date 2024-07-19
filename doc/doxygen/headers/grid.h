@@ -16,7 +16,7 @@
 /**
  * @defgroup grid Grids and Triangulations
  *
- * This module groups functions and classes that have to do with the topology
+ * This topic groups functions and classes that have to do with the topology
  * and geometry of meshes. A mesh can be thought of as a collection of cells;
  * if the mesh has been refined (possibly in an adaptive way), then
  * this collection is grouped into a hierarchy of refinement
@@ -43,7 +43,7 @@
  * (i.e. which cells are neighbors of which other cells, etc). It has nothing
  * to do with finite elements or degrees of freedom that might be defined on a
  * mesh. These functions are performed by the DoFHandler class (see the
- * @ref dofs module) that gets a description of the finite element space and the
+ * @ref dofs topic) that gets a description of the finite element space and the
  * allocates and manages degrees of freedom on vertices, faces, or cells, as
  * described by the finite element class. This separation makes it possible to
  * have multiple DoFHandler classes work on the same mesh at the same time.
@@ -152,7 +152,7 @@
  * Meshes can be written to output files in a number of different formats. If
  * this involves simulation results obtained on this mesh, then this is done
  * using the DataOut class (described in more detail in the @ref output
- * module). On the other hand, if only the geometry and topology of the mesh
+ * topic). On the other hand, if only the geometry and topology of the mesh
  * is to be written to a file, the GridOut class can do this for you.
  *
  *
@@ -170,7 +170,7 @@
  * <h3>Internal classes</h3>
  *
  * In addition to the above, there are a significant number of classes in this
- * module that are only used in the internal data structures of mesh
+ * group that are only used in the internal data structures of mesh
  * handling. They are generally in the internal namespace, and not meant for
  * use in application code.
  */

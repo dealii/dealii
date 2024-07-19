@@ -921,7 +921,7 @@ namespace GridGenerator
    * @endcode
    *
    * See the
-   * @ref manifold "documentation module on manifolds"
+   * @ref manifold "documentation topic on manifolds"
    * for more details.
    *
    * @image html sphere.png

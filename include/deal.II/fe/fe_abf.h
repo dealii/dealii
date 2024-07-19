@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * also BDM and other proposed finite dimensional subspaces of H(div) do not
  * work properly on arbitrary FE grids. I.e. the convergence rates deteriorate
  * on these meshes. As a solution the authors propose the ABF elements, which
- * are implemented in this module.
+ * are implemented in this class.
  *
  * This class is not implemented for the codimension one case (<tt>spacedim !=
  * dim</tt>).

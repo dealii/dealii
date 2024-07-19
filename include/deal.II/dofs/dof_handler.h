@@ -166,7 +166,7 @@ namespace parallel
  * parallel::distributed::Triangulation (see, for example, step-32, step-40
  * and in particular the
  * @ref distributed
- * module) in which case the DoFHandler object will proceed to only manage
+ * topic) in which case the DoFHandler object will proceed to only manage
  * degrees of freedom on locally owned and ghost cells. This process is
  * entirely transparent to the used.
  *
@@ -324,7 +324,7 @@ public:
   /**
    * An alias that is used to identify cell iterators in DoFHandler objects.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias works, in essence, like the corresponding
    * Triangulation::cell_accessor alias. However, it also makes available
@@ -338,7 +338,7 @@ public:
   /**
    * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias works, in essence, like the corresponding
    * Triangulation::face_accessor alias. However, it also makes available
@@ -421,7 +421,7 @@ public:
    * An alias that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies active cells in a DoFHandler object. While
    * the actual data type of the alias is hidden behind a few layers of
@@ -442,7 +442,7 @@ public:
   /**
    * An alias that is used to identify cell iterators. The concept of
    * iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies cells in a DoFHandler object. Some of
    * these cells may in fact be active (see
@@ -470,7 +470,7 @@ public:
   /**
    * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * While the actual data type of the alias is hidden behind a few layers
    * of (unfortunately necessary) indirections, it is in essence
@@ -863,7 +863,7 @@ public:
    * use an intermediate compressed sparsity pattern that only allocates
    * memory on demand. Refer to the step-2 and step-11 example programs on how
    * to do this. The problem is also discussed in the documentation of the
-   * module on
+   * topic on
    * @ref Sparsity.
    */
   unsigned int

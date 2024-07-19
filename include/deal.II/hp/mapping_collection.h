@@ -38,7 +38,7 @@ namespace hp
    *
    * It implements the concepts stated in the
    * @ref hpcollection
-   * module described in the doxygen documentation.
+   * topic described in the doxygen documentation.
    *
    * Although it is recommended to supply an appropriate mapping for each
    * finite element kind used in a hp-computation, the MappingCollection class

@@ -1131,7 +1131,7 @@ namespace Step28
   // several places, we have to do something for all energy groups, in which
   // case we will start tasks for each group to let these things run in
   // parallel if deal.II was configured for multithreading.  For strategies of
-  // parallelization, take a look at the @ref threads module.
+  // parallelization, take a look at the @ref threads topic.
   //
   // The biggest difference to previous example programs is that we also
   // declare a nested class that has member variables for all the run-time

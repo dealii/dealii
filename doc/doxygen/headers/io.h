@@ -16,8 +16,8 @@
 /**
  * @defgroup IO Input/Output
  *
- * This module collects the classes used for reading and writing meshes and
- * data. There are two sub-modules for each of these operations.
+ * This topic collects the classes used for reading and writing meshes and
+ * data. There are two sub-topics for each of these operations.
  */
 
 /**
@@ -31,7 +31,7 @@
  * In addition, deal.II can read an intermediate graphics format using the
  * DataOutReader. This format is used as an intermediate step between data
  * associated with a simulation and is written by the DataOutBase class (or
- * through the more derived classes described in the \ref output module). The
+ * through the more derived classes described in the \ref output topic). The
  * DataOutReader class reads this data back in, and it can then be converted
  * to any of a number of data formats supported by visualization programs.
  *
@@ -125,8 +125,8 @@
  * @defgroup textoutput Textual output
  *
  * In addition to classes that provide graphical output formats (see the @ref
- * output module), deal.II has a number of classes that facilitate textual
- * output in a number of ways. They are collected in this module. See the
+ * output topic), deal.II has a number of classes that facilitate textual
+ * output in a number of ways. They are collected in this topic. See the
  * documentation of these classes for more details.
  *
  * @ingroup IO

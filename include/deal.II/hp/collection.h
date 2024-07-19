@@ -216,7 +216,7 @@ namespace hp
    *
    * It implements the concepts stated in the
    * @ref hpcollection
-   * module described in the doxygen documentation.
+   * topic described in the doxygen documentation.
    *
    * @ingroup hp hpcollection
    */

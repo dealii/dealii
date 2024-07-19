@@ -4,7 +4,7 @@
 data provided by D. Sarah Stamps.</i>
 
 @note This program elaborates on concepts of geometry and the classes that
-implement it. These classes are grouped into the documentation module on @ref
+implement it. These classes are grouped into the documentation topic on @ref
 manifold "Manifold description for triangulations". See there for additional
 information.
 

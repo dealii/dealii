@@ -15,7 +15,7 @@
 /**
  * @defgroup Solvers Linear solver classes
  *
- * This module groups iterative and direct solvers, eigenvalue solvers, and
+ * This page groups iterative and direct solvers, eigenvalue solvers, and
  * some control classes. All these classes operate on objects of the
  * @ref Matrices "matrix" and @ref Vectors "vector classes" defined in deal.II.
  *

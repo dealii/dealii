@@ -28,7 +28,7 @@ keeping everything complex-valued, is demonstrated in a different
 tutorial program: see step-58 for this.)
 When split into real and imaginary parts, the equations covered here
 fall into the class of vector-valued problems. A toplevel overview of
-this topic can be found in the @ref vector_valued module.
+this topic can be found in the @ref vector_valued topic.
 
 In addition to this discussion, we also discuss the ParameterHandler
 class, which provides a convenient way for reading parameters from a

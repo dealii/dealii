@@ -111,7 +111,7 @@ namespace parallel
      * fully distributed mesh. Use of this class is explained in step-40,
      * step-32, the
      * @ref distributed
-     * documentation module, as well as the
+     * documentation topic, as well as the
      * @ref distributed_paper.
      * See there for more information. This class satisfies the
      * @ref ConceptMeshType "MeshType concept".
@@ -270,7 +270,7 @@ namespace parallel
       /**
        * An alias that is used to identify cell iterators. The concept of
        * iterators is discussed at length in the
-       * @ref Iterators "iterators documentation module".
+       * @ref Iterators "iterators documentation topic".
        *
        * The current alias identifies cells in a triangulation. You can find
        * the exact type it refers to in the base class's own alias, but it
@@ -291,7 +291,7 @@ namespace parallel
        * An alias that is used to identify
        * @ref GlossActive "active cell iterators".
        * The concept of iterators is discussed at length in the
-       * @ref Iterators "iterators documentation module".
+       * @ref Iterators "iterators documentation topic".
        *
        * The current alias identifies active cells in a triangulation. You
        * can find the exact type it refers to in the base class's own alias,

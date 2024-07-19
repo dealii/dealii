@@ -16,7 +16,7 @@
 /**
  * @defgroup Quadrature Quadrature formulas
  *
- * This module contains the base class Quadrature as well as the quadrature
+ * This group contains the base class Quadrature as well as the quadrature
  * formulas provided by deal.II. Quadrature formulas provide two essential
  * pieces of data: the locations of quadrature points on the unit cell
  * [0,1]^d, and the weight of each quadrature point.
@@ -29,7 +29,7 @@
  * coordinate direction than in another) through the QAnisotropic class, as
  * well as the definition of quadrature formulas that are not tensor products.
  *
- * In the grand scheme of things, the classes of this module interact
+ * In the grand scheme of things, the classes of this group interact
  * with a variety of other parts of the library:
  * @dot
  digraph G
@@ -132,7 +132,7 @@
  * but it provides functions for computing quadrature formulas on the
  * surfaces of higher dimensional cells.
  *
- * All other classes in this module actually implement quadrature
+ * All other classes in this group actually implement quadrature
  * rules of different order and other characteristics.
  *
  *

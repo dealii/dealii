@@ -116,7 +116,7 @@ the subdomains is aligned with coarse mesh cell faces.
 
 Before going into more details let us state the obvious: this is a
 problem with multiple solution variables; for this, you will probably
-want to read the @ref vector_valued documentation module first, which
+want to read the @ref vector_valued documentation topic first, which
 presents the basic philosophical framework in which we address
 problems with more than one solution variable. But back to the problem
 at hand:
@@ -321,7 +321,7 @@ part of the elastic or fluid region before deciding which terms to
 integrate. Actually integrating these terms is not very difficult; for
 the Stokes equations, the relevant steps have been shown in step-22,
 whereas for the elasticity equation we take essentially the form shown
-in the @ref vector_valued module (rather than the one from step-8).
+in the @ref vector_valued topic (rather than the one from step-8).
 
 The term that is of more interest is the interface term,
 @f[

@@ -13,7 +13,7 @@ program (besides the somewhat strange time-dependence of @ref step_18
 The equations covered here are an extension of the material already covered in
 step-20. In particular, they fall into the class of
 vector-valued problems. A toplevel overview of this topic can be found in the
-@ref vector_valued module.
+@ref vector_valued topic.
 
 
 <h3>The two phase flow problem</h3>

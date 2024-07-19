@@ -268,7 +268,7 @@ namespace Step47
   // that are necessary for this approach. You may look up the WorkStream
   // namespace as well as the
   // @ref threads "Parallel computing with multiple processors"
-  // module for more information on how they typically work.
+  // topic for more information on how they typically work.
   template <int dim>
   struct ScratchData
   {

@@ -16,6 +16,6 @@
 /**
  * @defgroup CUDAWrappers CUDA Wrappers
  *
- * The classes in this module are concerned with the description of features
+ * The classes in this group are concerned with the description of features
  * to be run on GPUs using CUDA.
  */

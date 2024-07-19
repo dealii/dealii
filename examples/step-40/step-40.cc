@@ -92,7 +92,7 @@ namespace LA
 // generate output itself.
 #include <deal.II/base/conditional_ostream.h>
 // After these preliminaries, here is where it becomes more interesting. As
-// mentioned in the @ref distributed module, one of the fundamental truths of
+// mentioned in the @ref distributed topic, one of the fundamental truths of
 // solving problems on large numbers of processors is that there is no way for
 // any processor to store everything (e.g. information about all cells in the
 // mesh, all degrees of freedom, or the values of all elements of the solution
@@ -285,7 +285,7 @@ namespace Step40
     // consequence, we need to tell the AffineConstraints object for which
     // degrees of freedom it can store constraints and for which it may not
     // expect any information to store. In our case, as explained in the
-    // @ref distributed module, the degrees of freedom we need to care about on
+    // @ref distributed topic, the degrees of freedom we need to care about on
     // each processor are the locally relevant ones, so we pass this to the
     // AffineConstraints::reinit() function as a second argument. A further
     // optimization, AffineConstraint can avoid certain operations if you also

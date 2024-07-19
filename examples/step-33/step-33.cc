@@ -1804,7 +1804,7 @@ namespace Step33
     // however, simplify it a bit taking into account that the $i$th
     // (vector-valued) test function $\mathbf{z}_i$ has in reality only a
     // single nonzero component (more on this topic can be found in the @ref
-    // vector_valued module). It will be represented by the variable
+    // vector_valued topic). It will be represented by the variable
     // <code>component_i</code> below. With this, the residual term can be
     // re-written as
     // @f{eqnarray*}{

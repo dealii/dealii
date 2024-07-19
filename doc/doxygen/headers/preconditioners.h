@@ -48,7 +48,7 @@
  * @ref ConceptPreconditionerType "the PreconditionerType concept". In
  * practice, one can usually treat any matrix-like object which defines
  * <code>vmult()</code> and <code>Tvmult()</code> as a preconditioner. All
- * preconditioner classes in this module implement this interface.
+ * preconditioner classes in this group implement this interface.
  *
  * When used
  * in Krylov space methods, it is up to the method, whether it simply
@@ -70,7 +70,7 @@
  * operators mapping the previous iterate <i>x<sup>k</sup></i> to the
  * next iterate in this way relaxation operators. Their generic
  * interface is given by @ref ConceptRelaxationType "the RelaxationType concept".
- * The classes with names starting with <tt>Relaxation</tt> in this module
+ * The classes with names starting with <tt>Relaxation</tt> in this group
  * implement this interface, as well as the preconditioners
  * PreconditionJacobi, PreconditionSOR, PreconditionBlockJacobi,
  * PreconditionBlockSOR, and PreconditionBlockSSOR.
