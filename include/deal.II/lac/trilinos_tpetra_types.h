@@ -27,7 +27,9 @@
 
 // Forward declarations
 #  ifndef DOXYGEN
-#    include <Ifpack2_Preconditioner.hpp>
+#    ifdef DEAL_II_TRILINOS_WITH_IFPACK2
+#      include <Ifpack2_Preconditioner.hpp>
+#    endif
 #    include <Tpetra_CrsGraph_fwd.hpp>
 #    include <Tpetra_CrsMatrix_fwd.hpp>
 #    include <Tpetra_Export_fwd.hpp>
@@ -174,12 +176,15 @@ namespace LinearAlgebra
                          typename MemorySpace::kokkos_space::execution_space,
                          Kokkos::MemoryUnmanaged>;
 
+
+#  ifdef DEAL_II_TRILINOS_WITH_IFPACK2
       /**
        * Type for a Trilinos preconditioner from the Ifpack2 package.
        */
       template <typename Number, typename MemorySpace>
       using Ifpack2PreconType =
         Ifpack2::Preconditioner<Number, LO, GO, NodeType<MemorySpace>>;
+#  endif
 
     } // namespace TpetraTypes
   }   // namespace TpetraWrappers
