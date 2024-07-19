@@ -884,7 +884,8 @@ namespace Particles
      */
     particle_iterator
     insert_particle(
-      const typename PropertyPool<dim, spacedim>::Handle          handle,
+      const typename PropertyPool<dim, spacedim>::Handle
+        tria_attached_data_index,
       const typename Triangulation<dim, spacedim>::cell_iterator &cell);
 
     /**
@@ -1013,7 +1014,7 @@ namespace Particles
      * to check where the particle data was registered in the corresponding
      * triangulation object.
      */
-    unsigned int handle;
+    unsigned int tria_attached_data_index;
 
     /**
      * Tolerance to be used for GeometryInfo<dim>::is_inside_cell().
