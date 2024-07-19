@@ -65,7 +65,7 @@ namespace Particles
     , size_callback()
     , store_callback()
     , load_callback()
-    , handle(numbers::invalid_unsigned_int)
+    , tria_attached_data_index(numbers::invalid_unsigned_int)
     , tria_listeners()
   {
     reset_particle_container(particles);
@@ -89,7 +89,7 @@ namespace Particles
     , size_callback()
     , store_callback()
     , load_callback()
-    , handle(numbers::invalid_unsigned_int)
+    , tria_attached_data_index(numbers::invalid_unsigned_int)
     , triangulation_cache(
         std::make_unique<GridTools::Cache<dim, spacedim>>(triangulation,
                                                           mapping))
@@ -181,7 +181,7 @@ namespace Particles
 
     ghost_particles_cache.ghost_particles_by_domain =
       particle_handler.ghost_particles_cache.ghost_particles_by_domain;
-    handle = particle_handler.handle;
+    tria_attached_data_index = particle_handler.tria_attached_data_index;
   }
 
 
@@ -2201,9 +2201,10 @@ namespace Particles
         return this->pack_callback(cell_iterator, cell_status);
       };
 
-    handle = const_cast<Triangulation<dim, spacedim> *>(&*triangulation)
-               ->register_data_attach(callback_function,
-                                      /*returns_variable_size_data=*/true);
+    tria_attached_data_index =
+      const_cast<Triangulation<dim, spacedim> *>(&*triangulation)
+        ->register_data_attach(callback_function,
+                               /*returns_variable_size_data=*/true);
   }
 
 
@@ -2253,7 +2254,7 @@ namespace Particles
       register_data_attach();
 
     // Check if something was stored and load it
-    if (handle != numbers::invalid_unsigned_int)
+    if (tria_attached_data_index != numbers::invalid_unsigned_int)
       {
         const auto callback_function =
           [this](const typename Triangulation<dim, spacedim>::cell_iterator
@@ -2265,10 +2266,10 @@ namespace Particles
           };
 
         const_cast<Triangulation<dim, spacedim> *>(&*triangulation)
-          ->notify_ready_to_unpack(handle, callback_function);
+          ->notify_ready_to_unpack(tria_attached_data_index, callback_function);
 
         // Reset handle and update global numbers.
-        handle = numbers::invalid_unsigned_int;
+        tria_attached_data_index = numbers::invalid_unsigned_int;
         update_cached_numbers();
       }
   }
