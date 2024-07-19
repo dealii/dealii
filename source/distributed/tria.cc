@@ -2051,7 +2051,8 @@ namespace parallel
 
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    void Triangulation<dim, spacedim>::save(const std::string &filename) const
+    void Triangulation<dim, spacedim>::save(
+      const std::string &file_basename) const
     {
       Assert(
         this->cell_attached_data.n_attached_deserialize == 0,
@@ -2068,7 +2069,7 @@ namespace parallel
 
       if (this->my_subdomain == 0)
         {
-          std::string   fname = filename + ".info";
+          std::string   fname = file_basename + ".info";
           std::ofstream f(fname);
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_coarse_cells"
             << std::endl
@@ -2091,9 +2092,9 @@ namespace parallel
       // Save cell attached data.
       this->save_attached_data(parallel_forest->global_first_quadrant[myrank],
                                parallel_forest->global_num_quadrants,
-                               filename);
+                               file_basename);
 
-      dealii::internal::p4est::functions<dim>::save(filename.c_str(),
+      dealii::internal::p4est::functions<dim>::save(file_basename.c_str(),
                                                     parallel_forest,
                                                     false);
 
@@ -2105,7 +2106,7 @@ namespace parallel
 
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    void Triangulation<dim, spacedim>::load(const std::string &filename)
+    void Triangulation<dim, spacedim>::load(const std::string &file_basename)
     {
       Assert(
         this->n_cells() > 0,
@@ -2137,7 +2138,7 @@ namespace parallel
       unsigned int version, numcpus, attached_count_fixed,
         attached_count_variable, n_coarse_cells;
       {
-        std::string   fname = std::string(filename) + ".info";
+        std::string   fname = std::string(file_basename) + ".info";
         std::ifstream f(fname);
         AssertThrow(f.fail() == false, ExcIO());
         std::string firstline;
@@ -2158,7 +2159,7 @@ namespace parallel
         attached_count_fixed + attached_count_variable;
 
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext(
-        filename.c_str(),
+        file_basename.c_str(),
         this->mpi_communicator,
         0,
         0,
@@ -2190,7 +2191,7 @@ namespace parallel
       this->load_attached_data(parallel_forest->global_first_quadrant[myrank],
                                parallel_forest->global_num_quadrants,
                                parallel_forest->local_num_quadrants,
-                               filename,
+                               file_basename,
                                attached_count_fixed,
                                attached_count_variable);
 

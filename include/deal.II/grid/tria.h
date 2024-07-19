@@ -448,13 +448,13 @@ namespace internal
     /**
      * Serialize data to file system.
      *
-     * The data will be written in a separate file, whose name
-     * consists of the stem @p filename and an attached identifier
+     * The data will be written in a number of file whose names
+     * consists of the stem @p file_basename and an attached identifier
      * <tt>_fixed.data</tt> for fixed size data and <tt>_variable.data</tt>
      * for variable size data.
      *
      * If MPI support is enabled, all processors write into these files
-     * simultaneously via MPIIO. Each processor's position to write to will be
+     * simultaneously via MPI I/O. Each processor's position to write to will be
      * determined from the provided input parameters.
      *
      * Data has to be previously packed with pack_data().
@@ -462,14 +462,14 @@ namespace internal
     void
     save(const unsigned int global_first_cell,
          const unsigned int global_num_cells,
-         const std::string &filename,
+         const std::string &file_basename,
          const MPI_Comm    &mpi_communicator) const;
 
     /**
      * Deserialize data from file system.
      *
-     * The data will be read from separate file, whose name
-     * consists of the stem @p filename and an attached identifier
+     * The data will be read from separate files whose names
+     * consists of the stem @p file_basename and an attached identifier
      * <tt>_fixed.data</tt> for fixed size data and <tt>_variable.data</tt>
      * for variable size data.
      * The @p n_attached_deserialize_fixed and @p n_attached_deserialize_variable
@@ -487,7 +487,7 @@ namespace internal
     load(const unsigned int global_first_cell,
          const unsigned int global_num_cells,
          const unsigned int local_num_cells,
-         const std::string &filename,
+         const std::string &file_basename,
          const unsigned int n_attached_deserialize_fixed,
          const unsigned int n_attached_deserialize_variable,
          const MPI_Comm    &mpi_communicator);
@@ -3594,19 +3594,21 @@ public:
 
 
   /**
+   * Save the mesh and associated information into a number of files
+   * that all use the provided basename as a starting prefix, plus some
+   * suffixes that indicate the specific use of that file.
+   *
    * Save the triangulation into the given file. Internally, this
-   * function calls the save function which uses BOOST archives. This
-   * is a placeholder implementation that, in the near future, will also
-   * attach the data associated with the triangulation
+   * function calls the save function which uses BOOST archives.
    */
   virtual void
-  save(const std::string &filename) const;
+  save(const std::string &file_basename) const;
 
   /**
    * Load the triangulation saved with save() back in.
    */
   virtual void
-  load(const std::string &filename);
+  load(const std::string &file_basename);
 
 
   /**
@@ -3861,7 +3863,8 @@ public:
 
 protected:
   /**
-   * Save additional cell-attached data into the given file. The first
+   * Save additional cell-attached data from files all starting with
+   * the base name given as last argument. The first
    * arguments are used to determine the offsets where to write buffers to.
    *
    * Called by @ref save.
@@ -3869,10 +3872,11 @@ protected:
   void
   save_attached_data(const unsigned int global_first_cell,
                      const unsigned int global_num_cells,
-                     const std::string &filename) const;
+                     const std::string &file_basename) const;
 
   /**
-   * Load additional cell-attached data from the given file, if any was saved.
+   * Load additional cell-attached data files all starting with the
+   * base name given as fourth argument, if any was saved.
    * The first arguments are used to determine the offsets where to read
    * buffers from.
    *
@@ -3882,7 +3886,7 @@ protected:
   load_attached_data(const unsigned int global_first_cell,
                      const unsigned int global_num_cells,
                      const unsigned int local_num_cells,
-                     const std::string &filename,
+                     const std::string &file_basename,
                      const unsigned int n_attached_deserialize_fixed,
                      const unsigned int n_attached_deserialize_variable);
 
