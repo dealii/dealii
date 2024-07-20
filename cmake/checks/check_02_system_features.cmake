@@ -104,15 +104,12 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
   # look up the linker tools error LNK1189.
   #
   # Unfortunately, this means that we are stuck with static linking.
-  # As a consequence each binary will be very large, so we also disable
-  # the compilation of examples.
+  # Note that as a consequence, each binary will be very large.
   #
   message(WARNING "\n"
     "BUILD_SHARED_LIBS forced to OFF\n\n"
-    "DEAL_II_COMPILE_EXAMPLES forced to OFF\n\n"
     )
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-  set(DEAL_II_COMPILE_EXAMPLES OFF CACHE BOOL "" FORCE)
 
   #
   # In case we find a solution to enable dynamic linking in the future,

@@ -53,9 +53,11 @@ jobs:
     - name: print detailed.log
       run: type build/detailed.log
     - name: build library
+      # remove executables due to file size
       shell: bash
       run: |
         cmake --build build --parallel 2 --target install
+        find c:/project/examples/ -type f -name '*.exe' -delete
     - name: test library
       shell: bash
       run: |
