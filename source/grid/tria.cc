@@ -683,8 +683,10 @@ namespace internal
     // DataOutInterface::write_vtu_in_parallel.
     // TODO: Write general MPIIO interface.
 
-    const int myrank  = Utilities::MPI::this_mpi_process(mpi_communicator);
-    const int mpisize = Utilities::MPI::n_mpi_processes(mpi_communicator);
+    const unsigned int myrank =
+      Utilities::MPI::this_mpi_process(mpi_communicator);
+    const unsigned int mpisize =
+      Utilities::MPI::n_mpi_processes(mpi_communicator);
 
     if (mpisize > 1)
       {
@@ -921,7 +923,8 @@ namespace internal
     // DataOutInterface::write_vtu_in_parallel.
     // TODO: Write general MPIIO interface.
 
-    const int mpisize = Utilities::MPI::n_mpi_processes(mpi_communicator);
+    const unsigned int mpisize =
+      Utilities::MPI::n_mpi_processes(mpi_communicator);
 
     if (mpisize > 1)
       {
