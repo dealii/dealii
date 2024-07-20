@@ -1,0 +1,12 @@
+774c774
+<     std::cout << "   Dopri:                    error=" << solution.l2_norm()
+---
+>     std::cout << "   Dopri:                    error=" << ((solution.l2_norm()<1.0e-4) ? "is within 1e-4" : "is NOT within 1e-4")
+782c782
+<     std::cout << "   Fehlberg:                 error=" << solution.l2_norm()
+---
+>     std::cout << "   Fehlberg:                 error=" << ((solution.l2_norm()<1.0e-2) ? "is within 1e-2" : "is NOT within 1e-2")
+790c790
+<     std::cout << "   Cash-Karp:                error=" << solution.l2_norm()
+---
+>     std::cout << "   Cash-Karp:                error=" << ((solution.l2_norm()<1.0e-3) ? "is within 1e-3" : "is NOT within 1e-3")

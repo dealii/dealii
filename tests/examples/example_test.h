@@ -22,6 +22,7 @@
  */
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
 #include <iostream>
@@ -72,5 +73,18 @@ cat_file(const char *filename)
       }                                                                   \
   }
 
+std::string   deallogname;
+std::ofstream deallogfile;
+
+void
+initlog(const bool                    console = false,
+        const std::ios_base::fmtflags flags   = std::ios::showpoint |
+                                              std::ios::left)
+{
+  deallogname = "output";
+  deallogfile.open(deallogname);
+  dealii::deallog.attach(deallogfile, true, flags);
+  dealii::deallog.depth_console(console ? 10 : 0);
+}
 
 #endif // dealii_example_test_h

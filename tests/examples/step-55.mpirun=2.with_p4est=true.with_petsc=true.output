@@ -1,0 +1,26 @@
+Running using PETSc.
+Cycle 0:
+   Number of degrees of freedom: 659 (578+81)
+Solver stopped within 48 - 60 iterations
+error: u_0: 0.0806514 p_0: 0.348625
+
+Cycle 1:
+   Number of degrees of freedom: 2467 (2178+289)
+Solver stopped within 48 - 60 iterations
+error: u_0: 0.0079449 p_0: 0.0907971
+
+Cycle 2:
+   Number of degrees of freedom: 9539 (8450+1089)
+Solver stopped within 48 - 60 iterations
+error: u_0: 0.000806428 p_0: 0.0226065
+
+Cycle 3:
+   Number of degrees of freedom: 37507 (33282+4225)
+Solver stopped within 48 - 60 iterations
+error: u_0: 9.27217e-05 p_0: 0.0056287
+
+Cycle 4:
+   Number of degrees of freedom: 148739 (132098+16641)
+Solver stopped within 48 - 60 iterations
+error: u_0: 1.13218e-05 p_0: 0.00140512
+
