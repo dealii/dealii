@@ -871,8 +871,6 @@ namespace internal
           // Write packed data.
           file.write(reinterpret_cast<const char *>(src_data_fixed.data()),
                      src_data_fixed.size() * sizeof(char));
-
-          file.close();
         }
 
         //
@@ -895,8 +893,6 @@ namespace internal
             // Write packed data.
             file.write(reinterpret_cast<const char *>(src_data_variable.data()),
                        src_data_variable.size() * sizeof(char));
-
-            file.close();
           }
       }
   }
@@ -1096,8 +1092,6 @@ namespace internal
           // Read packed data.
           file.read(reinterpret_cast<char *>(dest_data_fixed.data()),
                     dest_data_fixed.size() * sizeof(char));
-
-          file.close();
         }
 
         //
@@ -1124,8 +1118,6 @@ namespace internal
             dest_data_variable.resize(size);
             file.read(reinterpret_cast<char *>(dest_data_variable.data()),
                       dest_data_variable.size() * sizeof(char));
-
-            file.close();
           }
       }
   }
