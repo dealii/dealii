@@ -96,7 +96,7 @@ DEAL_II_NAMESPACE_OPEN
  *       });
  *   }
  *
- *   const FullMatrix<double> & get_prolongation_matrix() const
+ *   FullMatrix<double> get_prolongation_matrix() const
  *   {
  *     return prolongation_matrix.get();
  *   }
@@ -118,7 +118,11 @@ DEAL_II_NAMESPACE_OPEN
  *   whereas in the scheme with `std::async`, one has to be careful not to
  *   capture information in the lambda function that could be changed by later
  *   calls to member functions but before the lambda function is finally
- *   evaluated in the getter function.
+ *   evaluated in the getter function. (There is another difference:
+ *   `std::future::get()` can only be called once, as the function returns
+ *   the computed object by value and may move the object out of its internal
+ *   storage. As a consequence, the call to `FE::get_prolongation_matrix()`
+ *   is only valid the first time around. Lazy does not have this restriction.)
  *
  * @dealiiConceptRequires{std::is_move_constructible_v<T> &&
                           std::is_move_assignable_v<T >}
