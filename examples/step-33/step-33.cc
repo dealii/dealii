@@ -2556,6 +2556,11 @@ int main(int argc, char *argv[])
       Utilities::MPI::MPI_InitFinalize mpi_initialization(
         argc, argv, numbers::invalid_unsigned_int);
 
+      AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage(
+          "This program does not support parallel computing via MPI."));
+
       ConservationLaw<2> cons(argv[1]);
       cons.run();
     }
