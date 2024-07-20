@@ -3169,10 +3169,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::normal_vector(
          internal::FEPointEvaluation::
            ExcFEPointEvaluationAccessToUninitializedMappingField(
              "update_normal_vectors"));
-  if (this->is_interior)
-    return this->normal_ptr[point_index];
-  else
-    return -this->normal_ptr[point_index];
+  return this->normal_ptr[point_index];
 }
 
 
@@ -3924,17 +3921,12 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::normal_vector(
         normal[d] =
           internal::VectorizedArrayTrait<Number>::get(this->normal_ptr[0][d],
                                                       0);
-      if (this->is_interior)
-        return normal;
-      else
-        return -normal;
+
+      return normal;
     }
   else
     {
-      if (this->is_interior)
-        return this->normal_ptr[point_index];
-      else
-        return -(this->normal_ptr[point_index]);
+      return this->normal_ptr[point_index];
     }
 }
 

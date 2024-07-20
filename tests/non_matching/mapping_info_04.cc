@@ -50,27 +50,26 @@ do_flux_term(Integrator        &evaluator_m,
              const Number2     &tau,
              const unsigned int q)
 {
-  const auto gradient_m = evaluator_m.get_gradient(q);
-  const auto gradient_p = evaluator_p.get_gradient(q);
+  const auto normal_gradient_m = evaluator_m.get_normal_derivative(q);
+  const auto normal_gradient_p = evaluator_p.get_normal_derivative(q);
 
   const auto value_m = evaluator_m.get_value(q);
   const auto value_p = evaluator_p.get_value(q);
 
-  const auto normal = evaluator_m.normal_vector(q);
+  const auto jump_value = value_m - value_p;
 
-  const auto jump_value = (value_m - value_p) * normal;
+  const auto central_flux_gradient =
+    0.5 * (normal_gradient_m + normal_gradient_p);
 
-  const auto central_flux_gradient = 0.5 * (gradient_m + gradient_p);
-
-  const auto value_terms = normal * (central_flux_gradient - tau * jump_value);
+  const auto value_terms = central_flux_gradient - tau * jump_value;
 
   evaluator_m.submit_value(-value_terms, q);
   evaluator_p.submit_value(value_terms, q);
 
   const auto gradient_terms = -0.5 * jump_value;
 
-  evaluator_m.submit_gradient(gradient_terms, q);
-  evaluator_p.submit_gradient(gradient_terms, q);
+  evaluator_m.submit_normal_derivative(gradient_terms, q);
+  evaluator_p.submit_normal_derivative(gradient_terms, q);
 }
 
 template <int dim>
