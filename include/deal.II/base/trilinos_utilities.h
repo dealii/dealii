@@ -24,16 +24,18 @@
 #  include <Epetra_Map.h>
 #  include <Teuchos_Comm.hpp>
 #  include <Teuchos_RCP.hpp>
+
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
 #    include <Epetra_SerialComm.h>
 #  endif
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <Teuchos_RCPDecl.hpp>
+#  endif // DEAL_II_TRILINOS_WITH_TPETRA
 #endif
 
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#  include <Teuchos_RCPDecl.hpp>
-#endif // DEAL_II_TRILINOS_WITH_TPETRA
 
 DEAL_II_NAMESPACE_OPEN
 
