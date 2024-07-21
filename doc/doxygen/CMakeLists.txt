@@ -114,6 +114,23 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
   )
 
+#
+# Set up DoxygenLayout.xml. Note that the "Modules" tab has been renamed to
+# "Topics" in Doxygen 1.9.8 to avoid confusion with C++ modules.
+# Unfortunately, this requires us to play a little bit of a configuration
+# dance:
+#
+if(${DOXYGEN_VERSION} VERSION_LESS 1.9.8)
+  set(_topics_layout_flag "<tab type=\"modules\" visible=\"yes\" title=\"\" intro=\"\"/>")
+else()
+  set(_topics_layout_flag "<tab type=\"topics\" visible=\"yes\" title=\"\" intro=\"\"/>")
+endif()
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml
+  )
+
 # Figure out the last copyright date of any of the deal.II source
 # files. We will use this then to set the copyright date of the
 # doxygen-generated HTML files.
@@ -319,7 +336,7 @@ add_custom_command(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/header.html
     ${CMAKE_CURRENT_BINARY_DIR}/footer.html
-    ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/scripts/filter.pl
     ${_doxygen_depend}
     expand_all_instantiations

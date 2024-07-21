@@ -5,7 +5,7 @@
     <tab type="mainpage" visible="yes" title=""/>
     <tab type="user" visible="yes" title="Tutorial" url="@ref Tutorial" />
     <tab type="user" visible="yes" title="Code gallery" url="@ref CodeGallery" />
-    <tab type="modules" visible="yes" title="" intro=""/>
+    @_topics_layout_flag@
     <tab type="namespaces" visible="yes" title="">
       <tab type="namespacelist" visible="yes" title="" intro=""/>
       <tab type="namespacemembers" visible="yes" title="" intro=""/>
