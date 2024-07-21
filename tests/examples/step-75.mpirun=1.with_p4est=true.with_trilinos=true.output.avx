@@ -1,0 +1,32 @@
+Running with Trilinos on 1 MPI rank(s)...
+Calculating transformation matrices...
+Cycle 0:
+   Number of active cells:       3072
+     by partition:               3072
+   Number of degrees of freedom: 12545
+     by partition:               12545
+   Number of constraints:        512
+     by partition:               512
+   Frequencies of poly. degrees: 2:3072
+Solver stopped within 6 - 8 iterations
+
+Cycle 1:
+   Number of active cells:       3345
+     by partition:               3345
+   Number of degrees of freedom: 18204
+     by partition:               18204
+   Number of constraints:        1122
+     by partition:               1122
+   Frequencies of poly. degrees: 2:2516 3:829
+Solver stopped within 6 - 8 iterations
+
+Cycle 2:
+   Number of active cells:       3645
+     by partition:               3645
+   Number of degrees of freedom: 26447
+     by partition:               26447
+   Number of constraints:        2824
+     by partition:               2824
+   Frequencies of poly. degrees: 2:2395 3:736 4:514
+Solver stopped within 6 - 8 iterations
+
