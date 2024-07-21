@@ -402,7 +402,8 @@ private:
     PreconditionChebyshev<LaplaceOperator<dim, float>, VectorTypeMG>;
   mg::SmootherRelaxation<SmootherType, VectorTypeMG> mg_smoother;
 
-  MGLevelObject<MGTwoLevelTransfer<dim, VectorTypeMG>>           mg_transfers;
+  MGLevelObject<std::unique_ptr<MGTwoLevelTransferBase<VectorTypeMG>>>
+                                                                 mg_transfers;
   std::unique_ptr<MGTransferGlobalCoarsening<dim, VectorTypeMG>> mg_transfer;
 };
 
@@ -621,10 +622,19 @@ LaplaceProblem<dim>::setup_transfer()
   mg_transfers.resize(0, dof_handlers.max_level());
   for (unsigned int level = 1; level <= dof_handlers.max_level(); ++level)
     {
-      mg_transfers[level].reinit(dof_handlers[level],
-                                 dof_handlers[level - 1],
-                                 level_constraints[level],
-                                 level_constraints[level - 1]);
+      auto transfer = std::make_unique<MGTwoLevelTransfer<dim, VectorTypeMG>>();
+      if (level < triangulation.n_global_levels())
+        transfer->reinit(dof_handlers[level],
+                         dof_handlers[level - 1],
+                         level_constraints[level],
+                         level_constraints[level - 1]);
+      else
+        transfer->reinit(level_matrices[level].get_matrix_free(),
+                         0,
+                         level_matrices[level - 1].get_matrix_free(),
+                         0);
+
+      mg_transfers[level] = std::move(transfer);
     }
 
   mg_transfer = std::make_unique<MGTransferGlobalCoarsening<dim, VectorTypeMG>>(
