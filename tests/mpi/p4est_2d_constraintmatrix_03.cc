@@ -49,7 +49,7 @@
 
 template <int dim>
 void
-test()
+test(const bool use_manifold_for_normal, const Mapping<dim> &mapping)
 {
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
@@ -110,10 +110,8 @@ test()
   no_normal_flux_boundaries.insert(1);
 
 
-  VectorTools::compute_no_normal_flux_constraints(dofh,
-                                                  0,
-                                                  no_normal_flux_boundaries,
-                                                  cm);
+  VectorTools::compute_no_normal_flux_constraints(
+    dofh, 0, no_normal_flux_boundaries, cm, mapping, use_manifold_for_normal);
 
   cm.close();
 
@@ -138,5 +136,10 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   mpi_initlog();
-  test<2>();
+  deallog << "Normal with manifold:" << std::endl;
+  test<2>(true, MappingQ1<2>());
+  deallog << std::endl;
+
+  deallog << "Normal with mapping:" << std::endl;
+  test<2>(false, MappingQ<2>(3));
 }
