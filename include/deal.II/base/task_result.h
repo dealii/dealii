@@ -453,34 +453,21 @@ namespace Threads
   inline void
   TaskResult<T>::clear()
   {
-    // If we have waited before, then return immediately:
-    if (result_is_available)
-      return;
-    else
-      // If we have not waited, wait now. We need to use the double-checking
-      // pattern to ensure that if two threads get to this place at the same
-      // time, one returns right away while the other does the work. Note
-      // that this happens under the lock, so only one thread gets to be in
-      // this code block at the same time:
-      {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        if (result_is_available)
-          return;
-        else
-          Assert(task.has_value() == false,
-                 ExcMessage("You cannot destroy a TaskResult object "
-                            "while it is still waiting for its associated task "
-                            "to finish. See the documentation of this class' "
-                            "destructor for more information."));
-      }
     std::lock_guard<std::mutex> lock(mutex);
-    // First make clear that the result is no longer available:
-    result_is_available = false;
-    // Then abandon a previous task, should there have been one. Also abandon
-    // any previously available returned object
-    task.reset();
-    task_result.reset();
+
+    if (result_is_available)
+      {
+        // First make clear that the result is no longer available, then
+        // reset the object:
+        result_is_available = false;
+        task_result.reset();
+      }
+    else
+      Assert(task.has_value() == false,
+             ExcMessage("You cannot destroy a TaskResult object "
+                        "while it is still waiting for its associated task "
+                        "to finish. See the documentation of this class' "
+                        "destructor for more information."));
   }
 
 
