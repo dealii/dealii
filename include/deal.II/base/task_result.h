@@ -337,6 +337,15 @@ namespace Threads
     const T &
     value() const;
 
+    /**
+     * Return whether the object has an associated task result object or not.
+     * Only objects that are default-initialized, or for which clear() has
+     * been called, or that have been moved from, will return `true` in
+     * this function.
+     */
+    bool
+    empty() const;
+
   private:
     /**
      * An atomic flag that allows us to test whether the task has finished
@@ -499,6 +508,35 @@ namespace Threads
 
             result_is_available = true;
           }
+      }
+  }
+
+
+
+  template <typename T>
+  inline bool
+  TaskResult<T>::empty() const
+  {
+    // If we have waited before, then return immediately:
+    if (result_is_available)
+      return false;
+    else
+      // If we have not waited, wait now. We need to use the double-checking
+      // pattern to ensure that if two threads get to this place at the same
+      // time, one returns right away while the other does the work. Note
+      // that this happens under the lock, so only one thread gets to be in
+      // this code block at the same time:
+      {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (result_is_available)
+          return false;
+        else
+          // If there is a task, then this object is not empty. Otherwise, we
+          // have no result and no task, so the object is empty:
+          if (task.has_value())
+            return false;
+          else
+            return true;
       }
   }
 
