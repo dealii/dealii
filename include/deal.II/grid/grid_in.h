@@ -366,9 +366,8 @@ public:
   read(std::istream &in, Format format = Default);
 
   /**
-   * Open the file given by the string and call the previous function read().
-   * This function uses the PathSearch mechanism to find files. The file class
-   * used is <code>MESH</code>.
+   * Open the file given by the string and call the previous function
+   * read() taking a std::istream argument.
    */
   void
   read(const std::string &in, Format format = Default);

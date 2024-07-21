@@ -75,11 +75,11 @@ DEAL_II_NAMESPACE_OPEN
  * characters are not added automatically (allowing you to do some real file
  * name editing).
  *
- * @todo Add support for environment variables like in kpathsea.
+ * @deprecated Use the std::filesystem facilities instead.
  *
  * @ingroup input
  */
-class PathSearch
+class DEAL_II_DEPRECATED PathSearch
 {
 public:
   /**

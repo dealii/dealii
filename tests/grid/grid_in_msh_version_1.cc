@@ -52,9 +52,9 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
 void
 filename_resolution()
 {
-  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v1"),
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v1.msh"),
                 GridIn<2>::msh);
-  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v2"),
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v2.msh"),
                 GridIn<2>::msh);
 }
 
