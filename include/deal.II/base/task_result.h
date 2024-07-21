@@ -483,6 +483,10 @@ namespace Threads
   inline void
   TaskResult<T>::join() const
   {
+    Assert(empty() == false,
+           ExcMessage("You can't join a TaskResult object that has not "
+                      "been associated with a task."));
+
     // If we have waited before, then return immediately:
     if (result_is_available)
       return;
@@ -546,6 +550,11 @@ namespace Threads
   inline const T &
   TaskResult<T>::value() const
   {
+    Assert(empty() == false,
+           ExcMessage(
+             "You can't ask for the result of a TaskResult object that "
+             "has not been associated with a task."));
+
     if (!result_is_available)
       join();
     return task_result.value();
