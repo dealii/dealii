@@ -311,6 +311,12 @@ namespace Threads
      * assignment operator, this function considers it an
      * error (and throws an exception) if there is still a
      * currently running task associated with the object.
+     * Because you cannot know when a task associated with an
+     * object finishes, the practical realization of there not being
+     * a currently still running task is that you can only call this
+     * function on an object that has an associated task *after* you
+     * have either called join() or asked for the return value by
+     * having called value() (which internally calls join()).
      */
     void
     clear();
