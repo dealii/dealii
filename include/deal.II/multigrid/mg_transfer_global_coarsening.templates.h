@@ -3049,57 +3049,65 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
             VectorType                    &dst,
             const int &,
             const std::pair<unsigned int, unsigned int> &range) {
-          FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
-            data, matrix_free_data->dof_handler_index_fine);
-          FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
-            *matrix_free_data->matrix_free_coarse,
-            matrix_free_data->dof_handler_index_coarse);
-
-          CellTransferFactory cell_transfer(
-            eval_fine.get_shape_info().data[0].fe_degree,
-            eval_coarse.get_shape_info().data[0].fe_degree);
-          for (unsigned int cell = range.first; cell < range.second; ++cell)
+          for (unsigned int comp = 0; comp < n_components; ++comp)
             {
-              eval_fine.reinit(cell);
-              eval_coarse.reinit(
-                matrix_free_data->cell_list_fine_to_coarse[cell]);
+              FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
+                data, matrix_free_data->dof_handler_index_fine, 0, comp);
+              FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
+                *matrix_free_data->matrix_free_coarse,
+                matrix_free_data->dof_handler_index_coarse,
+                0,
+                comp);
 
-              eval_coarse.read_dof_values(src);
-              if (schemes[0].prolongation_matrix.empty() == false)
+              CellTransferFactory cell_transfer(
+                eval_fine.get_shape_info().data[0].fe_degree,
+                eval_coarse.get_shape_info().data[0].fe_degree);
+              for (unsigned int cell = range.first; cell < range.second; ++cell)
                 {
-                  CellProlongator<dim, double, VectorizedArrayType>
-                    cell_prolongator(schemes[0].prolongation_matrix,
-                                     eval_coarse.begin_dof_values(),
-                                     eval_fine.begin_dof_values());
+                  eval_fine.reinit(cell);
+                  eval_coarse.reinit(
+                    matrix_free_data->cell_list_fine_to_coarse[cell]);
 
-                  if (schemes[0].prolongation_matrix.size() <
-                      eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
-                    cell_transfer.run(cell_prolongator);
-                  else
-                    cell_prolongator.run_full(eval_fine.dofs_per_cell,
-                                              eval_coarse.dofs_per_cell);
-                }
-              else
-                for (unsigned int i = 0; i < eval_coarse.dofs_per_cell; ++i)
-                  eval_fine.begin_dof_values()[i] =
-                    eval_coarse.begin_dof_values()[i];
+                  eval_coarse.read_dof_values(src);
+                  if (schemes[0].prolongation_matrix.empty() == false)
+                    {
+                      CellProlongator<dim, double, VectorizedArrayType>
+                        cell_prolongator(schemes[0].prolongation_matrix,
+                                         eval_coarse.begin_dof_values(),
+                                         eval_fine.begin_dof_values());
 
-              if (weights.size() > 0)
-                {
-                  const VectorizedArrayType *cell_weights =
-                    weights.data() + weights_start[cell];
-                  if (weights_are_compressed[cell])
-                    internal::
-                      weight_fe_q_dofs_by_entity<dim, -1, VectorizedArrayType>(
-                        cell_weights,
-                        1,
-                        eval_fine.get_shape_info().data[0].fe_degree + 1,
-                        eval_fine.begin_dof_values());
+                      if (schemes[0].prolongation_matrix.size() <
+                          eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
+                        cell_transfer.run(cell_prolongator);
+                      else
+                        cell_prolongator.run_full(eval_fine.dofs_per_cell,
+                                                  eval_coarse.dofs_per_cell);
+                    }
                   else
-                    for (unsigned int i = 0; i < eval_fine.dofs_per_cell; ++i)
-                      eval_fine.begin_dof_values()[i] *= cell_weights[i];
+                    for (unsigned int i = 0; i < eval_coarse.dofs_per_cell; ++i)
+                      eval_fine.begin_dof_values()[i] =
+                        eval_coarse.begin_dof_values()[i];
+
+                  if (weights.size() > 0)
+                    {
+                      const VectorizedArrayType *cell_weights =
+                        weights.data() + weights_start[cell];
+                      if (weights_are_compressed[cell])
+                        internal::weight_fe_q_dofs_by_entity<
+                          dim,
+                          -1,
+                          VectorizedArrayType>(
+                          cell_weights,
+                          1,
+                          eval_fine.get_shape_info().data[0].fe_degree + 1,
+                          eval_fine.begin_dof_values());
+                      else
+                        for (unsigned int i = 0; i < eval_fine.dofs_per_cell;
+                             ++i)
+                          eval_fine.begin_dof_values()[i] *= cell_weights[i];
+                    }
+                  eval_fine.distribute_local_to_global(dst);
                 }
-              eval_fine.distribute_local_to_global(dst);
             }
         },
         dst,
@@ -3287,58 +3295,66 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
             int &,
             const VectorType                            &src,
             const std::pair<unsigned int, unsigned int> &range) {
-          FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
-            data, matrix_free_data->dof_handler_index_fine);
-          FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
-            *matrix_free_data->matrix_free_coarse,
-            matrix_free_data->dof_handler_index_coarse);
-
-          CellTransferFactory cell_transfer(
-            eval_fine.get_shape_info().data[0].fe_degree,
-            eval_coarse.get_shape_info().data[0].fe_degree);
-          for (unsigned int cell = range.first; cell < range.second; ++cell)
+          for (unsigned int comp = 0; comp < n_components; ++comp)
             {
-              eval_fine.reinit(cell);
-              eval_coarse.reinit(
-                matrix_free_data->cell_list_fine_to_coarse[cell]);
+              FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
+                data, matrix_free_data->dof_handler_index_fine, 0, comp);
+              FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
+                *matrix_free_data->matrix_free_coarse,
+                matrix_free_data->dof_handler_index_coarse,
+                0,
+                comp);
 
-              eval_fine.read_dof_values(src);
-              if (weights.size() > 0)
+              CellTransferFactory cell_transfer(
+                eval_fine.get_shape_info().data[0].fe_degree,
+                eval_coarse.get_shape_info().data[0].fe_degree);
+              for (unsigned int cell = range.first; cell < range.second; ++cell)
                 {
-                  const VectorizedArrayType *cell_weights =
-                    weights.data() + weights_start[cell];
-                  if (weights_are_compressed[cell])
-                    internal::
-                      weight_fe_q_dofs_by_entity<dim, -1, VectorizedArrayType>(
-                        cell_weights,
-                        1,
-                        eval_fine.get_shape_info().data[0].fe_degree + 1,
-                        eval_fine.begin_dof_values());
+                  eval_fine.reinit(cell);
+                  eval_coarse.reinit(
+                    matrix_free_data->cell_list_fine_to_coarse[cell]);
+
+                  eval_fine.read_dof_values(src);
+                  if (weights.size() > 0)
+                    {
+                      const VectorizedArrayType *cell_weights =
+                        weights.data() + weights_start[cell];
+                      if (weights_are_compressed[cell])
+                        internal::weight_fe_q_dofs_by_entity<
+                          dim,
+                          -1,
+                          VectorizedArrayType>(
+                          cell_weights,
+                          1,
+                          eval_fine.get_shape_info().data[0].fe_degree + 1,
+                          eval_fine.begin_dof_values());
+                      else
+                        for (unsigned int i = 0; i < eval_fine.dofs_per_cell;
+                             ++i)
+                          eval_fine.begin_dof_values()[i] *= cell_weights[i];
+                    }
+
+                  if (schemes[0].prolongation_matrix.empty() == false)
+                    {
+                      CellRestrictor<dim, double, VectorizedArrayType>
+                        cell_restrictor(schemes[0].prolongation_matrix,
+                                        eval_fine.begin_dof_values(),
+                                        eval_coarse.begin_dof_values());
+
+                      if (schemes[0].prolongation_matrix.size() <
+                          eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
+                        cell_transfer.run(cell_restrictor);
+                      else
+                        cell_restrictor.run_full(eval_fine.dofs_per_cell,
+                                                 eval_coarse.dofs_per_cell);
+                    }
                   else
                     for (unsigned int i = 0; i < eval_fine.dofs_per_cell; ++i)
-                      eval_fine.begin_dof_values()[i] *= cell_weights[i];
+                      eval_coarse.begin_dof_values()[i] =
+                        eval_fine.begin_dof_values()[i];
+
+                  eval_coarse.distribute_local_to_global(dst);
                 }
-
-              if (schemes[0].prolongation_matrix.empty() == false)
-                {
-                  CellRestrictor<dim, double, VectorizedArrayType>
-                    cell_restrictor(schemes[0].prolongation_matrix,
-                                    eval_fine.begin_dof_values(),
-                                    eval_coarse.begin_dof_values());
-
-                  if (schemes[0].prolongation_matrix.size() <
-                      eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
-                    cell_transfer.run(cell_restrictor);
-                  else
-                    cell_restrictor.run_full(eval_fine.dofs_per_cell,
-                                             eval_coarse.dofs_per_cell);
-                }
-              else
-                for (unsigned int i = 0; i < eval_fine.dofs_per_cell; ++i)
-                  eval_coarse.begin_dof_values()[i] =
-                    eval_fine.begin_dof_values()[i];
-
-              eval_coarse.distribute_local_to_global(dst);
             }
         },
         dummy,
@@ -3469,46 +3485,54 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
 {
   if (matrix_free_data.get() != nullptr)
     {
-      FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
-        *matrix_free_data->matrix_free_fine,
-        matrix_free_data->dof_handler_index_fine);
-      FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
-        *matrix_free_data->matrix_free_coarse,
-        matrix_free_data->dof_handler_index_coarse);
       src.update_ghost_values();
-
-      CellTransferFactory cell_transfer(
-        eval_fine.get_shape_info().data[0].fe_degree,
-        eval_coarse.get_shape_info().data[0].fe_degree);
-      for (unsigned int cell = 0;
-           cell < matrix_free_data->matrix_free_fine->n_cell_batches();
-           ++cell)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
         {
-          eval_fine.reinit(cell);
-          eval_coarse.reinit(matrix_free_data->cell_list_fine_to_coarse[cell]);
+          FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
+            *matrix_free_data->matrix_free_fine,
+            matrix_free_data->dof_handler_index_fine,
+            0,
+            comp);
+          FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
+            *matrix_free_data->matrix_free_coarse,
+            matrix_free_data->dof_handler_index_coarse,
+            0,
+            comp);
 
-          eval_fine.read_dof_values(src);
-
-          if (schemes[0].restriction_matrix.empty() == false)
+          CellTransferFactory cell_transfer(
+            eval_fine.get_shape_info().data[0].fe_degree,
+            eval_coarse.get_shape_info().data[0].fe_degree);
+          for (unsigned int cell = 0;
+               cell < matrix_free_data->matrix_free_fine->n_cell_batches();
+               ++cell)
             {
-              CellRestrictor<dim, double, VectorizedArrayType> cell_restrictor(
-                schemes[0].restriction_matrix,
-                eval_fine.begin_dof_values(),
-                eval_coarse.begin_dof_values());
+              eval_fine.reinit(cell);
+              eval_coarse.reinit(
+                matrix_free_data->cell_list_fine_to_coarse[cell]);
 
-              if (schemes[0].prolongation_matrix.size() <
-                  eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
-                cell_transfer.run(cell_restrictor);
+              eval_fine.read_dof_values(src);
+
+              if (schemes[0].restriction_matrix.empty() == false)
+                {
+                  CellRestrictor<dim, double, VectorizedArrayType>
+                    cell_restrictor(schemes[0].restriction_matrix,
+                                    eval_fine.begin_dof_values(),
+                                    eval_coarse.begin_dof_values());
+
+                  if (schemes[0].prolongation_matrix.size() <
+                      eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
+                    cell_transfer.run(cell_restrictor);
+                  else
+                    cell_restrictor.run_full(eval_fine.dofs_per_cell,
+                                             eval_coarse.dofs_per_cell);
+                }
               else
-                cell_restrictor.run_full(eval_fine.dofs_per_cell,
-                                         eval_coarse.dofs_per_cell);
-            }
-          else
-            for (unsigned int i = 0; i < eval_fine.dofs_per_cell; ++i)
-              eval_coarse.begin_dof_values()[i] =
-                eval_fine.begin_dof_values()[i];
+                for (unsigned int i = 0; i < eval_fine.dofs_per_cell; ++i)
+                  eval_coarse.begin_dof_values()[i] =
+                    eval_fine.begin_dof_values()[i];
 
-          eval_coarse.set_dof_values(dst);
+              eval_coarse.set_dof_values(dst);
+            }
         }
       src.zero_out_ghost_values();
       dst.zero_out_ghost_values();
@@ -4021,7 +4045,8 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
 
   const FiniteElement<dim> &fe_fine = dof_fine.get_fe();
 
-  Assert(fe_fine.n_components() == 1, ExcNotImplemented());
+  AssertDimension(fe_fine.n_components(), dof_coarse.get_fe().n_components());
+  this->n_components = fe_fine.n_components();
 
   // Compute the link between cells on matrix_free_coarse and
   // matrix_free_fine, with the latter controlling the loop
