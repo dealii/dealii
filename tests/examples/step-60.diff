@@ -10,7 +10,3 @@
 <         parameter_file = "parameters.prm";
 ---
 >         parameter_file = "../../../source/step-60/parameters.prm";
-1094c1094
-<       ParameterAcceptor::initialize(parameter_file, "used_parameters.prm");
----
->       ParameterAcceptor::initialize(parameter_file, "../../../source/step-60/used_parameters.prm");
