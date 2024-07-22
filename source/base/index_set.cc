@@ -1005,7 +1005,7 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
         communicator)
 #    else
       Utilities::Trilinos::internal::make_rcp<Teuchos::Comm<int>>()
-#    endif // DEAL_WITH_MPI
+#    endif // DEAL_II_WITH_MPI
     );
   else
     {
