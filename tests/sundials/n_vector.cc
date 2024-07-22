@@ -355,8 +355,10 @@ test_get_communicator()
                                     global_nvector_context
 #endif
   );
+#if DEAL_II_SUNDIALS_VERSION_LT(7, 0, 0)
   // required by SUNDIALS: MPI-unaware vectors should return the nullptr
   Assert(N_VGetCommunicator(n_vector) == nullptr, NVectorTestError());
+#endif
 
   deallog << "test_get_communicator OK" << std::endl;
 }
