@@ -3036,6 +3036,57 @@ MGTwoLevelTransferBase<VectorType>::prolongate_and_add(
 
 
 
+namespace internal
+{
+  namespace
+  {
+
+    // Helper class to compute correct weights, which works by simply using
+    // the degrees of freedom stored in MatrixFree, bypassing the hanging node
+    // interpolation matrices.
+    template <int dim, typename Number>
+    class FEEvaluationNoConstraints : public FEEvaluation<dim, -1, 0, 1, Number>
+    {
+    public:
+      FEEvaluationNoConstraints(const MatrixFree<dim, Number> &data,
+                                const unsigned int             dof_index,
+                                const unsigned int             component = 0)
+        : FEEvaluation<dim, -1, 0, 1, Number>(data, dof_index, 0, component)
+      {}
+
+      template <typename VectorType>
+      void
+      read_dof_values_unconstrained(VectorType &src)
+      {
+        std::array<VectorType *, 1> src_vector{{&src}};
+        internal::VectorReader<Number, VectorizedArray<Number>> reader;
+        this->template read_write_operation<VectorType>(
+          reader,
+          src_vector,
+          {},
+          std::bitset<VectorizedArray<Number>::size()>().flip(),
+          false);
+      }
+
+      template <typename VectorType>
+      void
+      distribute_local_to_global_unconstrained(VectorType &dst)
+      {
+        std::array<VectorType *, 1> dst_vector{{&dst}};
+        internal::VectorDistributorLocalToGlobal<Number,
+                                                 VectorizedArray<Number>>
+          writer;
+        this->template read_write_operation<VectorType>(
+          writer,
+          dst_vector,
+          {},
+          std::bitset<VectorizedArray<Number>::size()>().flip(),
+          false);
+      }
+    };
+  } // namespace
+} // namespace internal
+
 template <int dim, typename VectorType>
 void
 MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
@@ -3051,8 +3102,8 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
             const std::pair<unsigned int, unsigned int> &range) {
           for (unsigned int comp = 0; comp < n_components; ++comp)
             {
-              FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
-                data, matrix_free_data->dof_handler_index_fine, 0, comp);
+              internal::FEEvaluationNoConstraints<dim, Number> eval_fine(
+                data, matrix_free_data->dof_handler_index_fine, comp);
               FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
                 *matrix_free_data->matrix_free_coarse,
                 matrix_free_data->dof_handler_index_coarse,
@@ -3297,8 +3348,8 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
             const std::pair<unsigned int, unsigned int> &range) {
           for (unsigned int comp = 0; comp < n_components; ++comp)
             {
-              FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
-                data, matrix_free_data->dof_handler_index_fine, 0, comp);
+              internal::FEEvaluationNoConstraints<dim, Number> eval_fine(
+                data, matrix_free_data->dof_handler_index_fine, comp);
               FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
                 *matrix_free_data->matrix_free_coarse,
                 matrix_free_data->dof_handler_index_coarse,
@@ -3488,10 +3539,9 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
       src.update_ghost_values();
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
-          FEEvaluation<dim, -1, 0, 1, Number> eval_fine(
+          internal::FEEvaluationNoConstraints<dim, Number> eval_fine(
             *matrix_free_data->matrix_free_fine,
             matrix_free_data->dof_handler_index_fine,
-            0,
             comp);
           FEEvaluation<dim, -1, 0, 1, Number> eval_coarse(
             *matrix_free_data->matrix_free_coarse,
@@ -3715,49 +3765,6 @@ namespace internal
 
       return embedded_partitioner;
     }
-
-    // Helper class to compute correct weights, which works by simply using
-    // the degrees of freedom stored in MatrixFree, bypassing the hanging node
-    // interpolation matrices.
-    template <int dim, typename Number>
-    class FEEvaluationNoConstraints : public FEEvaluation<dim, -1, 0, 1, Number>
-    {
-    public:
-      FEEvaluationNoConstraints(const MatrixFree<dim, Number> &data,
-                                const unsigned int             dof_index)
-        : FEEvaluation<dim, -1, 0, 1, Number>(data, dof_index)
-      {}
-
-      template <typename VectorType>
-      void
-      read_dof_values_unconstrained(VectorType &src)
-      {
-        std::array<VectorType *, 1> src_vector{{&src}};
-        internal::VectorReader<Number, VectorizedArray<Number>> reader;
-        this->template read_write_operation<VectorType>(
-          reader,
-          src_vector,
-          {},
-          std::bitset<VectorizedArray<Number>::size()>().flip(),
-          false);
-      }
-
-      template <typename VectorType>
-      void
-      distribute_local_to_global_unconstrained(VectorType &dst)
-      {
-        std::array<VectorType *, 1> dst_vector{{&dst}};
-        internal::VectorDistributorLocalToGlobal<Number,
-                                                 VectorizedArray<Number>>
-          writer;
-        this->template read_write_operation<VectorType>(
-          writer,
-          dst_vector,
-          {},
-          std::bitset<VectorizedArray<Number>::size()>().flip(),
-          false);
-      }
-    };
   } // namespace
 } // namespace internal
 
