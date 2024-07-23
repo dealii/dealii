@@ -47,11 +47,6 @@ if(NOT BUILD_SHARED_LIBS)
   set(Boost_USE_STATIC_LIBS TRUE)
 endif()
 
-# Work around a CMake compatibility issue with boost-1.70.0
-# compare https://gitlab.kitware.com/cmake/cmake/issues/18865
-# and https://lists.boost.org/Archives/boost/2019/02/245016.php
-set(Boost_NO_BOOST_CMAKE ON)
-
 set(Boost_NO_WARN_NEW_VERSIONS TRUE)
 if(DEAL_II_WITH_ZLIB)
   find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
@@ -63,24 +58,6 @@ else()
     )
 endif()
 
-#
-# Fall back to dynamic libraries if no static libraries could be found:
-#
-if(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
-  set(Boost_USE_STATIC_LIBS FALSE)
-
-  # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-  list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-  if(DEAL_II_WITH_ZLIB)
-    find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS iostreams serialization system thread)
-  else()
-    find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS serialization system thread)
-  endif()
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-endif()
-
-unset(Boost_NO_BOOST_CMAKE)
-
 if(Boost_FOUND)
   set(BOOST_VERSION_MAJOR "${Boost_MAJOR_VERSION}")
   set(BOOST_VERSION_MINOR "${Boost_MINOR_VERSION}")
@@ -91,8 +68,7 @@ if(Boost_FOUND)
 endif()
 
 process_feature(BOOST
-  LIBRARIES REQUIRED Boost_LIBRARIES
-  INCLUDE_DIRS REQUIRED Boost_INCLUDE_DIRS
+  TARGETS REQUIRED Boost_LIBRARIES
   CLEAR
     Boost_DIR Boost_INCLUDE_DIRS Boost_IOSTREAMS_LIBRARY_DEBUG
     Boost_IOSTREAMS_LIBRARY_RELEASE Boost_LIBRARY_DIR

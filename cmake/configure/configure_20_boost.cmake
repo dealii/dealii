@@ -42,7 +42,7 @@ macro(feature_boost_find_external var)
       # Test that Boost.Iostreams is usable.
       #
       reset_cmake_required()
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${BOOST_TARGETS})
       list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
 
       CHECK_CXX_SOURCE_COMPILES(
