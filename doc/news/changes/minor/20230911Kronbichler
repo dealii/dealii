@@ -1,0 +1,7 @@
+Improved: The internal implementation of the tensor-product evaluators used
+for FEEvaluation and FEFaceEvaluation has been cleaned up. This reduces the
+compile times for both the deal.II library and code using FEEvaluation with
+template parameters on the polynomial degrees. Also, the code is now simpler
+to maintain, especially for the evaluators for Raviart-Thomas elements.
+<br>
+(Martin Kronbichler, 2023/09/11)
