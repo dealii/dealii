@@ -21,7 +21,6 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -1642,90 +1641,46 @@ namespace FETools
 
 
 
-  namespace internal
+  template <int dim, typename number, int spacedim>
+  void
+  compute_embedding_matrices(
+    const FiniteElement<dim, spacedim>           &fe,
+    std::vector<std::vector<FullMatrix<number>>> &matrices,
+    const bool                                    isotropic_only,
+    const double                                  threshold)
   {
-    namespace FEToolsComputeEmbeddingMatricesHelper
-    {
-      template <int dim, typename number, int spacedim>
-      void
-      compute_embedding_for_shape_function(
-        const unsigned int                  i,
-        const FiniteElement<dim, spacedim> &fe,
-        const FEValues<dim, spacedim>      &coarse,
-        const Householder<double>          &H,
-        FullMatrix<number>                 &this_matrix,
-        const double                        threshold)
+    // loop over all possible refinement cases
+    unsigned int ref_case_start, ref_case_end;
+
+    if (fe.reference_cell() == ReferenceCells::Tetrahedron)
       {
-        const unsigned int n  = fe.n_dofs_per_cell();
-        const unsigned int nd = fe.n_components();
-        const unsigned int nq = coarse.n_quadrature_points;
-
-        Vector<number> v_coarse(nq * nd);
-        Vector<number> v_fine(n);
-
-        // The right hand side of
-        // the least squares
-        // problem consists of the
-        // function values of the
-        // coarse grid function in
-        // each quadrature point.
-        if (fe.is_primitive())
-          {
-            const unsigned int d     = fe.system_to_component_index(i).first;
-            const double      *phi_i = &coarse.shape_value(i, 0);
-
-            for (unsigned int k = 0; k < nq; ++k)
-              v_coarse(k * nd + d) = phi_i[k];
-          }
-
-        else
-          for (unsigned int d = 0; d < nd; ++d)
-            for (unsigned int k = 0; k < nq; ++k)
-              v_coarse(k * nd + d) = coarse.shape_value_component(i, k, d);
-
-        // solve the least squares
-        // problem.
-        const double result = H.least_squares(v_fine, v_coarse);
-        Assert(result <= threshold, FETools::ExcLeastSquaresError(result));
-        // Avoid warnings in release mode
-        (void)result;
-        (void)threshold;
-
-        // Copy into the result
-        // matrix. Since the matrix
-        // maps a coarse grid
-        // function to a fine grid
-        // function, the columns
-        // are fine grid.
-        for (unsigned int j = 0; j < n; ++j)
-          this_matrix(j, i) = v_fine(j);
+        ref_case_start =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_68);
+        ref_case_end =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_49);
       }
-
-
-
-      template <int dim, typename number, int spacedim>
-      void
-      compute_embedding_matrices_for_refinement_case(
-        const FiniteElement<dim, spacedim> &fe,
-        std::vector<FullMatrix<number>>    &matrices,
-        const unsigned int                  ref_case,
-        const double                        threshold)
+    else
+      {
+        ref_case_start = isotropic_only ?
+                           RefinementCase<dim>::isotropic_refinement :
+                           RefinementCase<dim>::cut_x;
+        ref_case_end   = RefinementCase<dim>::isotropic_refinement;
+      }
+    for (unsigned int ref_case = ref_case_start; ref_case <= ref_case_end;
+         ++ref_case)
       {
         const unsigned int  n              = fe.n_dofs_per_cell();
         const ReferenceCell reference_cell = fe.reference_cell();
         const unsigned int  nc =
           reference_cell.n_children(RefinementCase<dim>(ref_case));
 
-        AssertDimension(matrices.size(), nc);
+        AssertDimension(matrices[ref_case - 1].size(), nc);
 
         for (unsigned int i = 0; i < nc; ++i)
           {
-            Assert(matrices[i].n() == n,
-                   ExcDimensionMismatch(matrices[i].n(), n));
-            Assert(matrices[i].m() == n,
-                   ExcDimensionMismatch(matrices[i].m(), n));
+            AssertDimension(matrices[ref_case - 1][i].n(), n);
+            AssertDimension(matrices[ref_case - 1][i].m(), n);
           }
-
 
         // Set up meshes, one with a single
         // reference cell and refine it once
@@ -1755,16 +1710,12 @@ namespace FETools
                                      update_quadrature_points |
                                        update_JxW_values | update_values);
 
-        // We search for the polynomial on
-        // the small cell, being equal to
-        // the coarse polynomial in all
-        // quadrature points.
+        // We search for the polynomial on the small cell, being equal to the
+        // coarse polynomial in all quadrature points.
 
-        // First build the matrix for this
-        // least squares problem. This
-        // contains the values of the fine
-        // cell polynomials in the fine
-        // cell grid points.
+        // First build the matrix for this least squares problem. This
+        // contains the values of the fine cell polynomials in the fine cell
+        // grid points.
 
         // This matrix is the same for all
         // children.
@@ -1779,16 +1730,14 @@ namespace FETools
 
         Householder<double> H(A);
 
-        Threads::TaskGroup<void> task_group;
-
         for (const auto &fine_cell : tria.active_cell_iterators())
           {
             fine.reinit(fine_cell);
 
-            // evaluate on the coarse cell (which
-            // is the first -- inactive -- cell on
-            // the lowest level of the
-            // triangulation we have created)
+            // evaluate on the coarse cell (which is the first -- inactive --
+            // cell on the lowest level of the triangulation we have created)
+
+            // TODO: Convert this to FEPointEvaluation
             const std::vector<Point<spacedim>> &q_points_fine =
               fine.get_quadrature_points();
             std::vector<Point<dim>> q_points_coarse(q_points_fine.size());
@@ -1805,93 +1754,52 @@ namespace FETools
             coarse.reinit(tria.begin(0));
 
             FullMatrix<double> &this_matrix =
-              matrices[fine_cell->active_cell_index()];
+              matrices[ref_case - 1][fine_cell->active_cell_index()];
 
-            // Compute this once for each
-            // coarse grid basis function. can
-            // spawn subtasks if n is
-            // sufficiently large so that there
-            // are more than about 5000
-            // operations in the inner loop
-            // (which is basically const * n^2
-            // operations).
-            if (n > 30)
+            // Compute this once for each coarse grid basis function.
+
+            Vector<double> v_coarse(nq * nd);
+            Vector<double> v_fine(n);
+
+            for (unsigned int i = 0; i < n; ++i)
               {
-                for (unsigned int i = 0; i < n; ++i)
+                // The right hand side of the least squares problem consists
+                // of the function values of the coarse grid function in each
+                // quadrature point.
+                if (fe.is_primitive())
                   {
-                    task_group += Threads::new_task(
-                      &compute_embedding_for_shape_function<dim,
-                                                            number,
-                                                            spacedim>,
-                      i,
-                      fe,
-                      coarse,
-                      H,
-                      this_matrix,
-                      threshold);
+                    const unsigned int d =
+                      fe.system_to_component_index(i).first;
+                    const double *phi_i = &coarse.shape_value(i, 0);
+
+                    for (unsigned int k = 0; k < nq; ++k)
+                      v_coarse(k * nd + d) = phi_i[k];
                   }
-                task_group.join_all();
-              }
-            else
-              {
-                for (unsigned int i = 0; i < n; ++i)
-                  {
-                    compute_embedding_for_shape_function<dim, number, spacedim>(
-                      i, fe, coarse, H, this_matrix, threshold);
-                  }
+
+                else
+                  for (unsigned int d = 0; d < nd; ++d)
+                    for (unsigned int k = 0; k < nq; ++k)
+                      v_coarse(k * nd + d) =
+                        coarse.shape_value_component(i, k, d);
+
+                // solve the least squares problem.
+                const double result = H.least_squares(v_fine, v_coarse);
+                Assert(result <= threshold,
+                       FETools::ExcLeastSquaresError(result));
+                (void)result;
+                (void)threshold;
+
+                for (unsigned int j = 0; j < n; ++j)
+                  this_matrix(j, i) = v_fine(j);
               }
 
-            // Remove small entries from
-            // the matrix
+            // Remove small entries from the matrix
             for (unsigned int i = 0; i < this_matrix.m(); ++i)
               for (unsigned int j = 0; j < this_matrix.n(); ++j)
                 if (std::fabs(this_matrix(i, j)) < 1e-12)
                   this_matrix(i, j) = 0.;
           }
       }
-    } // namespace FEToolsComputeEmbeddingMatricesHelper
-  }   // namespace internal
-
-
-
-  template <int dim, typename number, int spacedim>
-  void
-  compute_embedding_matrices(
-    const FiniteElement<dim, spacedim>           &fe,
-    std::vector<std::vector<FullMatrix<number>>> &matrices,
-    const bool                                    isotropic_only,
-    const double                                  threshold)
-  {
-    Threads::TaskGroup<void> task_group;
-
-    // loop over all possible refinement cases
-    unsigned int ref_case_start, ref_case_end;
-
-    if (fe.reference_cell() == ReferenceCells::Tetrahedron)
-      {
-        ref_case_start =
-          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_68);
-        ref_case_end =
-          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_49);
-      }
-    else
-      {
-        ref_case_start = isotropic_only ?
-                           RefinementCase<dim>::isotropic_refinement :
-                           RefinementCase<dim>::cut_x;
-        ref_case_end   = RefinementCase<dim>::isotropic_refinement;
-      }
-    for (unsigned int ref_case = ref_case_start; ref_case <= ref_case_end;
-         ++ref_case)
-      task_group += Threads::new_task(
-        &internal::FEToolsComputeEmbeddingMatricesHelper::
-          compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
-        fe,
-        matrices[ref_case - 1],
-        ref_case,
-        threshold);
-
-    task_group.join_all();
   }
 
 
@@ -2178,21 +2086,33 @@ namespace FETools
       mass.gauss_jordan();
     }
 
+    // finally loop over all possible refinement cases
+    unsigned int ref_case_start, ref_case_end;
+    if (reference_cell == ReferenceCells::Tetrahedron)
+      {
+        ref_case_start =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_68);
+        ref_case_end =
+          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_49);
+      }
+    else
+      {
+        ref_case_start =
+          (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
+                            RefinementCase<dim>::cut_x);
+        ref_case_end = RefinementCase<dim>::isotropic_refinement;
+      }
 
-    const auto compute_one_case =
-      [&reference_cell, &mapping, &fe, &q_fine, n, nd, nq](
-        const unsigned int               ref_case,
-        const FullMatrix<double>        &inverse_mass_matrix,
-        std::vector<FullMatrix<double>> &matrices) {
+    for (unsigned int ref_case = ref_case_start; ref_case <= ref_case_end;
+         ++ref_case)
+      {
         const unsigned int nc =
           reference_cell.n_children(RefinementCase<dim>(ref_case));
 
         for (unsigned int i = 0; i < nc; ++i)
           {
-            Assert(matrices[i].n() == n,
-                   ExcDimensionMismatch(matrices[i].n(), n));
-            Assert(matrices[i].m() == n,
-                   ExcDimensionMismatch(matrices[i].m(), n));
+            AssertDimension(matrices[ref_case - 1][i].n(), n);
+            AssertDimension(matrices[ref_case - 1][i].m(), n);
           }
 
         // create a respective refinement on the triangulation
@@ -2223,7 +2143,8 @@ namespace FETools
 
         for (unsigned int cell_number = 0; cell_number < nc; ++cell_number)
           {
-            FullMatrix<double> &this_matrix = matrices[cell_number];
+            FullMatrix<double> &this_matrix =
+              matrices[ref_case - 1][cell_number];
 
             // Compute right hand side, which is a fine level basis
             // function tested with the coarse level functions.
@@ -2275,7 +2196,7 @@ namespace FETools
                   }
 
                 // RHS ready. Solve system and enter row into matrix
-                inverse_mass_matrix.vmult(v_coarse, v_fine);
+                mass.vmult(v_coarse, v_fine);
                 for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                   this_matrix(i, j) = v_coarse(i);
               }
@@ -2286,33 +2207,7 @@ namespace FETools
                 if (std::fabs(this_matrix(i, j)) < 1e-12)
                   this_matrix(i, j) = 0.;
           }
-      };
-
-
-    // finally loop over all possible refinement cases
-    Threads::TaskGroup<> tasks;
-    unsigned int         ref_case_start, ref_case_end;
-    if (reference_cell == ReferenceCells::Tetrahedron)
-      {
-        ref_case_start =
-          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_68);
-        ref_case_end =
-          static_cast<unsigned int>(IsotropicRefinementChoice::cut_tet_49);
       }
-    else
-      {
-        ref_case_start =
-          (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
-                            RefinementCase<dim>::cut_x);
-        ref_case_end = RefinementCase<dim>::isotropic_refinement;
-      }
-    for (unsigned int ref_case = ref_case_start; ref_case <= ref_case_end;
-         ++ref_case)
-      tasks += Threads::new_task([&, ref_case]() {
-        compute_one_case(ref_case, mass, matrices[ref_case - 1]);
-      });
-
-    tasks.join_all();
   }
 
 
