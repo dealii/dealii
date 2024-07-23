@@ -1,0 +1,5 @@
+Compatibility: deal.II's interface to CGAL has been updated to ensure
+compatibility with the upcoming CGAL 6.0 release.
+<br>
+(Sébastien Loriot, 2024/07/22)
+
