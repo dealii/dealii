@@ -2623,41 +2623,33 @@ namespace parallel
         // {0,0,0,0,0,0,0,0}.
         using cell_iterator =
           typename Triangulation<dim, spacedim>::cell_iterator;
-        typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    unsigned char>>::const_iterator it;
-        for (it = tria.get_periodic_face_map().begin();
-             it != tria.get_periodic_face_map().end();
-             ++it)
+        for (const auto &it : tria.get_periodic_face_map())
           {
-            const cell_iterator &cell_1               = it->first.first;
-            const unsigned int   face_no_1            = it->first.second;
-            const cell_iterator &cell_2               = it->second.first.first;
-            const unsigned int   face_no_2            = it->second.first.second;
-            const unsigned char  combined_orientation = it->second.second;
-            const auto [orientation, rotation, flip] =
-              ::dealii::internal::split_face_orientation(combined_orientation);
+            const cell_iterator &cell_1               = it.first.first;
+            const unsigned int   face_no_1            = it.first.second;
+            const cell_iterator &cell_2               = it.second.first.first;
+            const unsigned int   face_no_2            = it.second.first.second;
+            const unsigned char  combined_orientation = it.second.second;
 
             if (cell_1->level() == cell_2->level())
               {
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim - 1>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v :
+                     cell_1->face(face_no_1)->vertex_indices())
                   {
                     // take possible non-standard orientation of face on
                     // cell[0] into account
-                    const unsigned int vface0 =
-                      GeometryInfo<dim>::standard_to_real_face_vertex(
-                        v, orientation, flip, rotation);
-                    const unsigned int vi0 =
-                      topological_vertex_numbering[cell_1->face(face_no_1)
-                                                     ->vertex_index(vface0)];
+                    const unsigned int vface1 =
+                      cell_1->reference_cell().standard_to_real_face_vertex(
+                        v, face_no_1, combined_orientation);
                     const unsigned int vi1 =
+                      topological_vertex_numbering[cell_1->face(face_no_1)
+                                                     ->vertex_index(vface1)];
+                    const unsigned int vi2 =
                       topological_vertex_numbering[cell_2->face(face_no_2)
                                                      ->vertex_index(v)];
-                    const unsigned int min_index = std::min(vi0, vi1);
+                    const unsigned int min_index = std::min(vi1, vi2);
                     topological_vertex_numbering[cell_1->face(face_no_1)
-                                                   ->vertex_index(vface0)] =
+                                                   ->vertex_index(vface1)] =
                       topological_vertex_numbering[cell_2->face(face_no_2)
                                                      ->vertex_index(v)] =
                         min_index;
@@ -2669,8 +2661,12 @@ namespace parallel
         for (unsigned int i = 0; i < topological_vertex_numbering.size(); ++i)
           {
             const unsigned int j = topological_vertex_numbering[i];
-            if (j != i)
-              Assert(topological_vertex_numbering[j] == j, ExcInternalError());
+            Assert(j == i || topological_vertex_numbering[j] == j,
+                   ExcMessage("Got inconclusive constraints with chain: " +
+                              std::to_string(i) + " vs " + std::to_string(j) +
+                              " which should be equal to " +
+                              std::to_string(topological_vertex_numbering[j])));
+            (void)j;
           }
 
 
