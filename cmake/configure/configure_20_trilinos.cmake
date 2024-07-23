@@ -277,7 +277,7 @@ macro(feature_trilinos_find_external var)
         message(STATUS "Tpetra was found but is not usable due to a mismatch in ordinal number types.")
         set(TRILINOS_WITH_TPETRA OFF)
 
-        check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h"_tpetra_int_int)
+        check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h" _tpetra_int_int)
         check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" _tpetra_int_long_long)
 
         if(NOT _tpetra_int_long_long AND DEAL_II_WITH_64BIT_INDICES)
