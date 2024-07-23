@@ -1,6 +1,0 @@
-New: Added get_shape_value_component(), get_shape_grad_component() 
-and get_shape_grad_grad_component() to FE_NedelecSZ.
-
-<br>
-(Sebastian Kinnewig, 2024/04/16)
-

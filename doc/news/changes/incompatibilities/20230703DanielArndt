@@ -1,5 +1,0 @@
-Removed: The deprecated functions GridReordering::reorder_cells()
-and GridReordering::invert_all_cells_of_negative_grid()
-have been removed.
-<br>
-(Daniel Arndt, 2023/07/03)

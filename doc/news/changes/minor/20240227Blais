@@ -1,3 +1,0 @@
-Fixed: The colorize option for the cylinder shell could yield inadequate boundary ID for some aspect ratios that were very different from the default one.
-<br>
-(Bruno Blais, 2024/02/27)

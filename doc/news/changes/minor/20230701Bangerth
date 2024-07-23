@@ -1,8 +1,0 @@
-Fixed: The SolutionTransfer class writes into output vectors, but does
-not call compress() on them. This is of no consequence for deal.II
-vectors for which this class is mostly used (in contrast to the
-parallel::distributed::SolutionTransfer class), but leads to awkward
-downstream failures with, for example, PETSc vectors. This is now
-fixed.
-<br>
-(Wolfgang Bangerth, 2023/07/01)

@@ -1,6 +1,0 @@
-New: The new tutorial step-89 presents the use of FERemoteEvaluation during matrix-free operator
-evaluation for non-matching and Chimera methods. The acoustic conservation equations are solved
-using Nitsche-type mortaring and point-to-point interpolation to demonstrate that
-a simple point-to-point interpolation approach is sometimes not sufficient.
-<br>
-(Johannes Heinz, Maximilian Bergbauer, Marco Feder, Peter Munch, 2023/11/27)

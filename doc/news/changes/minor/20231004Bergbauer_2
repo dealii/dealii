@@ -1,4 +1,0 @@
-Added: An option to sum into the solution values vector was added
-to FEPointEvaluation integrate() and test_and_sum().
-<br>
-(Maximilian Bergbauer, 2023/10/04)

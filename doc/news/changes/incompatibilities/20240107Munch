@@ -1,5 +1,0 @@
-Removed: The function FEPointEvaluation::real_point() has been
-renamed to FEPointEvaluation::quadrature_point(). The old function
-has been deprecated.
-<br>
-(Peter Munch, 2024/01/01)

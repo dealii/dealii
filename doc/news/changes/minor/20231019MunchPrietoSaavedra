@@ -1,6 +1,0 @@
-Fixed: There was an inconsistency between the way
-DoFTools::make_periodicity_constraints() and MGConstrainedDoFs
-set up the constraints for periodic constraints. This is fixed
-now.
-<br>
-(Peter Munch, Laura Prieto Saavedra, 2023/10/19)

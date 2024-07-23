@@ -1,4 +1,0 @@
-Removed: The LinearAlgebra::Vector class has been removed without deprecation.
-Users should use the standard Vector class instead.
-<br>
-(David Wells, 2023/07/03)

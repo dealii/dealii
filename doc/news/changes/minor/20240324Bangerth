@@ -1,4 +1,0 @@
-Fixed: Utilities::unpack() could result in a segmentation fault for
-objects that have alignment greater than the default. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2024/03/24)

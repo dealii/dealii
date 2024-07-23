@@ -1,6 +1,0 @@
-Fixed: The identification of periodic boundaries for
-parallel::distributed::Triangulation did not work properly for some meshes
-that had different face orientations on the two sides of a periodic
-boundary. This is now fixed.
-<br>
-(Martin Kronbichler, Paras Kumar, 2024/07/16)

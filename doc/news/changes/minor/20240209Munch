@@ -1,6 +1,0 @@
-New: If the relaxation parameter is set to 0, 
-PreconditionRelaxation now determines it based on
-estimated eigenvalues, similarly as PreconditionChebyshev
-does.
-<br>
-(Peter Munch, Laura Prieto Saavedra, 2024/03/09)

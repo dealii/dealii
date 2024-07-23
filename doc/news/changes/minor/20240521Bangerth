@@ -1,4 +1,0 @@
-New: There is a new class Threads::TaskResult that represents the
-result of a background task.
-<br>
-(Wolfgang Bangerth, 2024/05/21)

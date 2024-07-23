@@ -1,4 +1,0 @@
-Fixed: In a special case where a particle lies on a vertex, the ParticleHandler detected it as lost.
-We introduce a tolerance for GeometryInfo<dim>::is_inside_cell() inside the ParticleHandler to fix this issue.
-<br>
-(Magdalena Schreter-Fleischhacker, Julian Brotz, 2024/02/22)

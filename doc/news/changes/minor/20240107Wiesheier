@@ -1,5 +1,0 @@
-Fixed: In parallel computations, it was not possible to take the end
-iterator of a Trilinos sparsity pattern for the last locally-owned
-row. This is now fixed.
-<br>
-(Simon Wiesheier, Peter Munch, 2024/01/07)

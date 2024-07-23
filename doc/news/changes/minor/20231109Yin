@@ -1,4 +1,0 @@
-Improved: Point now supports constexpr construction and evaluation,
-just like Tensor.
-<br>
-(Chengjiang Yin, 2023/11/09)

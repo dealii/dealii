@@ -1,9 +1,0 @@
-Improved: The implementations of SolverGMRES and SolverFGMRES have been
-overhauled and made more similar. In particular, SolverFGMRES now uses the
-same internal algorithm to solve the minimization problem in the Arnoldi
-basis, employing Givens rotations in analogy to the setting used by
-SolverGMRES. Since the Arnoldi process is sensitive to roundoff errors, this
-change might slightly affect iteration counts (often giving slightly better
-results).
-<br>
-(Martin Kronbichler, 2024/03/12)

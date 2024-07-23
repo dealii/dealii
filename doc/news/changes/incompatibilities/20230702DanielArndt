@@ -1,4 +1,0 @@
-Removed: The deprecated overloads for DoFTools::extract_boundary_dofs
-returning void have been removed.
-<br>
-(Daniel Arndt, 2023/07/02)

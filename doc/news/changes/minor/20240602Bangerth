@@ -1,9 +1,0 @@
-Fixed: The SUNDIALS::ARKODE::solve_ode() function returned the number
-of time steps at which the intermediate output function was called,
-rather than the number of time steps performed as promised in the
-documentation. This has now been fixed.
-<br>
-The same bug also existed in the SUNDIALS::IDA::solve_dae() function,
-where it has also been fixed.
-<br>
-(Wolfgang Bangerth, 2024/06/02)

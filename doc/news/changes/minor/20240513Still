@@ -1,4 +1,0 @@
-Fixed: FE_SimplexP::get_restriction_matrix() now returns the correct restriction matrix 
-for continuous elements, which differs compared to discontinuous elements.
-<br>
-(Dominik Still, Martin Kronbichler, 2024/05/15)

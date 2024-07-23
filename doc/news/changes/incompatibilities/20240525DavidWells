@@ -1,8 +1,0 @@
-Changed: GridTools::orthogonal_equality() now returns a
-std::optional<unsigned char> instead of a
-std::optional<std::bitset<3>>. As a consequence,
-PeriodicFacePair now also stores an unsigned char instead of
-a std::bitset<3> to represent the relative orientation of the first face to the
-second face.
-<br>
-(David Wells, 2024/05/25)

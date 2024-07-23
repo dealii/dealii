@@ -1,8 +1,0 @@
-New: There is a new initialization function MGTwoLevelTransfer::reinit() that
-takes two MatrixFree objects to describe a p-coarsening transfer operation,
-besides the previous option of computing the information via two separate
-DoFHandler objects. The new option is faster to set up and more memory
-efficient in case the MatrixFree objects already are available, such as when
-using those to define the level operators.
-<br>
-(Martin Kronbichler, 2024/07/22)

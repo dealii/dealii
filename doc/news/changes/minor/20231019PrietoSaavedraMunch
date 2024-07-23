@@ -1,4 +1,0 @@
-Fixed: The periodic faces information was not being copied
-when using the `Triangulation::copy_triangulation()` function. This is now fixed.
-<br>
-(Laura Prieto Saavedra, Peter Munch, 2023/10/19)

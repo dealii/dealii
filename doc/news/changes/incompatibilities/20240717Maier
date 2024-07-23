@@ -1,7 +1,0 @@
-Changed: The GridIn::read() function variant taking a filename string no
-longer uses PathSearch to try to find an appropriate file. Instead, the
-function requires now that the filename string is a valid relative or
-absolute path to mesh file in question. Additionally, GridIn::read() now
-throws ExcFileNotOpen instead of PathSearch::FileNotFound.
-<br>
-(Matthias Maier, 2024/01/08)

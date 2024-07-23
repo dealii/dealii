@@ -1,4 +1,0 @@
-Fixed: InitFinalize would initially Kokkos without taking into account the final
-number of threads that are used in deal.II.
-<br>
-(Daniel Arndt, 2024/06/04)

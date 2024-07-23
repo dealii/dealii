@@ -1,7 +1,0 @@
-Changed:
-parallel::distributed::Triangulation::prepare_coarsening_and_refinement()
-is now a collective call that exchanges coarsen/refinement flags on
-ghost cells. This makes adaptive refinement independent of the number
-of MPI ranks involved.
-<br>
-(Timo Heister, Quang Hoang, Vladimir Yushutin, 2024/01/15)

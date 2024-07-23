@@ -1,5 +1,0 @@
-New: Added a function FETools::compute_nodal_quadrature()
-which computes the nodal Quadrature rule for an interpolatory
-FiniteElement.
-<br>
-(David Wells, 2023/07/05)

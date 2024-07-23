@@ -1,5 +1,0 @@
-New: All the basic Manifold objects describing a coordinate system now make
-their essential geometric properties (e.g., the center) available through member
-functions.
-<br>
-(David Wells, 2024/07/06)

@@ -1,4 +1,0 @@
-New: The new class FEValuesViews::RenumberedView allows one to filter an existing
-FEValuesViews object via two renumbering vectors, one acting on the degrees of
-freedom, and the other acting on the quadrature points. 
-<br> (Luca Heltai, 2023/08/02)

@@ -1,4 +1,0 @@
-Added: A new function shink_to_fit() was added to AlignedVector
-in analogy to std::vector.
-<br>
-(Maximilian Bergbauer, 2023/09/14)

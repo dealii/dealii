@@ -1,6 +1,0 @@
-New: New constructor for IndexSet that takes a
-Teuchos::RCP<Tpetra::Map> as input. And the
-function IndexSet::make_tpetra_map_rcp()
-returning a Teuchos::RCP<Tpetra::Map>.
-<br>
-(Sebastian Kinnewig, 2023/10/17)

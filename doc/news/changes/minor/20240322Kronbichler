@@ -1,8 +1,0 @@
-Changed: The class FEEvaluationAccess, which was previously used to control
-access to values, gradients and Hessians at quadrature points in specialized
-form for scalar, vector-valued and general n-component system, has been merged
-into the class FEEvaluationBase, using conditional types deduced from
-std::conditional. This should not change any application code, but reduced the
-amount of code by 1,500 lines, thus making the library simpler to maintain.
-<br>
-(Martin Kronbichler, Magdalena Schreter-Fleischhacker, 2024/03/22)

@@ -1,6 +1,0 @@
-New: There is now functions VectorTools::interpolate_to_coarser_mesh()
-and VectorTools::interpolate_to_finer_mesh() that, different from
-VectorTools::interpolate_to_different_mesh() also work for parallel
-triangulations.
-<br>
-(Wolfgang Bangerth, 2024/02/20)

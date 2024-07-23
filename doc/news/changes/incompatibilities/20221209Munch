@@ -1,8 +1,0 @@
-Changed: When calling Triangulation::get_manifold(manifold_id) for
-a non-existing manifold_id, the function returned a flat manifold.
-This behaviour has been changed and an assert is thrown in this case.
-Furthermore, the functions Triangulation::reset_manifold() and
-Triangulation::reset_all_manifolds() do not actually remove the manifolds
-but make them flat.
-<br>
-(Peter Munch, 2022/12/09)

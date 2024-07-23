@@ -1,4 +1,0 @@
-Fixed: ReadWriteVector's copy constructor now correctly sets up its IndexSet
-when it has zero locally owned elements.
-<br>
-(David Wells, Laryssa Abdala, 2023/07/08)

@@ -1,7 +1,0 @@
-Deprecated: The `distribute` callback of the
-PETScWrappers::TimeStepper class has been renamed to
-PETScWrappers::TimeStepper::update_constrained_components. The former
-name is still available for backward compatibility, but is now
-deprecated.
-<br>
-(Wolfgang Bangerth, 2024/06/30)

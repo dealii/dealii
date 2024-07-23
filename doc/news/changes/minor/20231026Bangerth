@@ -1,4 +1,0 @@
-New: The new function RefinementCase::all_refinement_cases() returns
-an array of all possible refinement options of a cell.
-<br>
-(Wolfgang Bangerth, 2023/10/26)

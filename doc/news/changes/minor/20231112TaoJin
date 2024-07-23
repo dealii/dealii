@@ -1,6 +1,0 @@
-Fixed: In step-41, the mass matrix B is missing in the expressions
-of the residuals of the nonlinear system. See the equation under the
-line "This suggest a semismooth Newton step of the form" in the tutorial.
-This is fixed.
-<br>
-(Tao Jin, 2023/11/12)
