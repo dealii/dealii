@@ -58,7 +58,7 @@ cat_file(const char *filename)
       {                                                                   \
         SolverType_COMMAND;                                               \
       }                                                                   \
-    catch (SolverControl::NoConvergence & exc)                            \
+    catch (SolverControl::NoConvergence &)                                \
       {}                                                                  \
     const unsigned int steps = CONTROL_COMMAND;                           \
     if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                     \
