@@ -311,6 +311,12 @@ namespace Threads
      * assignment operator, this function considers it an
      * error (and throws an exception) if there is still a
      * currently running task associated with the object.
+     * Because you cannot know when a task associated with an
+     * object finishes, the practical realization of there not being
+     * a currently still running task is that you can only call this
+     * function on an object that has an associated task *after* you
+     * have either called join() or asked for the return value by
+     * having called value() (which internally calls join()).
      */
     void
     clear();
@@ -320,7 +326,7 @@ namespace Threads
      * it isn't associated with a task, just return.
      */
     void
-    join();
+    join() const;
 
     /**
      * Return a reference to the object computed by the task. This
@@ -356,14 +362,6 @@ namespace Threads
      * A lock object that guards access to all of the `mutable` objects above.
      */
     mutable std::mutex mutex;
-
-    /**
-     * Wait for the task to finish, move its result into the `task_result`
-     * object, and then release all information still associated with the
-     * task that originally computed the result.
-     */
-    void
-    wait_and_move_result() const;
   };
 
 
@@ -474,7 +472,7 @@ namespace Threads
 
   template <typename T>
   inline void
-  TaskResult<T>::join()
+  TaskResult<T>::join() const
   {
     // If we have waited before, then return immediately:
     if (result_is_available)
@@ -490,11 +488,17 @@ namespace Threads
         if (result_is_available)
           return;
         else
-          // If there is a task, wait for it to finish. We could then move
-          // the result, but it's fine to postpone that until someone actually
-          // asks for the result.
-          if (task.has_value())
+          {
+            // The object is not empty and it has not received its result yet.
+            // So it must have a task object:
+            Assert(task.has_value(), ExcInternalError());
+
             task.value().join();
+            task_result = std::move(task.value().return_value());
+            task.reset();
+
+            result_is_available = true;
+          }
       }
   }
 
@@ -505,44 +509,9 @@ namespace Threads
   TaskResult<T>::value() const
   {
     if (!result_is_available)
-      wait_and_move_result();
+      join();
     return task_result.value();
   }
-
-
-
-  template <typename T>
-  inline void
-  TaskResult<T>::wait_and_move_result() const
-  {
-    // If we have waited before, then return immediately:
-    if (result_is_available)
-      return;
-    else
-      // If we have not waited, wait now. We need to use the double-checking
-      // pattern to ensure that if two threads get to this place at the same
-      // time, one returns right away while the other does the work. Note
-      // that this happens under the lock, so only one thread gets to be in
-      // this code block at the same time:
-      {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        if (result_is_available)
-          return;
-        else
-          {
-            Assert(task.has_value(),
-                   ExcMessage("You cannot wait for the result of a TaskResult "
-                              "object that has no task associated with it."));
-            task.value().join();
-            task_result = std::move(task.value().return_value());
-            task.reset();
-
-            result_is_available = true;
-          }
-      }
-  }
-
 } // namespace Threads
 
 /**
