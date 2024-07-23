@@ -383,26 +383,40 @@ namespace LinearAlgebra
         }
       else if (size() == V.size())
         {
-          // We expect the origin vector to have a one-to-one map, otherwise
-          // we can not call Import
-          Assert(V.vector->getMap()->isOneToOne(),
-                 ExcMessage(
-                   "You are trying to map one vector distributed "
-                   "between processors, where some elements belong "
-                   "to multiple processors, onto another distribution "
-                   "pattern, where some elements belong to multiple "
-                   "processors. It is unclear how to deal with elements "
-                   "in the vector belonging to multiple processors. "
-                   "Therefore, compress() must be called on this "
-                   "vector first."));
+          // We expect that at least one vector has a one-to-one map, otherwise
+          // we can neither call Import nor Export.
+          if (V.vector->getMap()->isOneToOne())
+            {
+              Teuchos::RCP<const TpetraTypes::ImportType<MemorySpace>>
+                importer =
+                  Tpetra::createImport(V.vector->getMap(), vector->getMap());
 
-          Teuchos::RCP<const TpetraTypes::ImportType<MemorySpace>> importer =
-            Tpetra::createImport(V.vector->getMap(), vector->getMap());
+              // Since we are distributing the vector from a one-to-one map
+              // we can always use the VectorOperation::insert / Tpetra::INSERT
+              // here.
+              vector->doImport(*V.vector, *importer, Tpetra::INSERT);
+            }
+          else if (vector->getMap()->isOneToOne())
+            {
+              Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>>
+                exporter =
+                  Tpetra::createExport(V.vector->getMap(), vector->getMap());
 
-          // Since we are distributing the vector from a one-to-one map
-          // we can always use the VectorOperation::insert / Tpetra::INSERT
-          // here.
-          vector->doImport(*V.vector, *importer, Tpetra::INSERT);
+              vector->doExport(*V.vector, *exporter, Tpetra::INSERT);
+            }
+          else
+            {
+              Assert(false,
+                     ExcMessage(
+                       "You are trying to map one vector distributed "
+                       "between processors, where some elements belong "
+                       "to multiple processors, onto another distribution "
+                       "pattern, where some elements belong to multiple "
+                       "processors. It is unclear how to deal with elements "
+                       "in the vector belonging to multiple processors. "
+                       "Therefore, compress() must be called on this "
+                       "vector first."));
+            }
         }
       else
         {
