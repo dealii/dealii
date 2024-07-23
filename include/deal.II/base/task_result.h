@@ -183,6 +183,22 @@ namespace Threads
     ~TaskResult();
 
     /**
+     * Copy operator. Like the copy constructor, this function is deleted
+     * because TaskResult corresponds to the output of a specific task,
+     * not a copy of that tasks's outcome.
+     */
+    TaskResult &
+    operator=(const TaskResult &) = delete;
+
+    /**
+     * Move assignment operator. Following this call, the newly created object
+     * represents the task's result, whereas the old object no longer
+     * represents anything and is left as if default-constructed.
+     */
+    TaskResult &
+    operator=(TaskResult &&);
+
+    /**
      * Copy assignment operator from a Task object. By assigning the Task
      * object to the current object, the current object is set to represent
      * the result of that task.
@@ -424,6 +440,33 @@ namespace Threads
       task = t;
     }
   }
+
+
+  template <typename T>
+  inline TaskResult<T> &
+  TaskResult<T>::operator=(TaskResult<T> &&other)
+  {
+    // First clear the current object before we put new content into it:
+    clear();
+
+    // Then lock the other object and move the members of the other
+    // object, and finally reset it. Note that we do not have to wait for
+    // the other object's task to finish (nor should we): We may simply
+    // inherit the other object's task.
+    std::lock_guard<std::mutex> lock(other.mutex);
+
+    result_is_available       = other.result_is_available.load();
+    other.result_is_available = false;
+
+    task = std::move(other.task);
+    other.task.reset();
+
+    task_result = std::move(other.task_result);
+    other.task_result.reset();
+
+    return *this;
+  }
+
 
 
   template <typename T>
