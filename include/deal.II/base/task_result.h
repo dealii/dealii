@@ -337,6 +337,15 @@ namespace Threads
     const T &
     value() const;
 
+    /**
+     * Return whether the object has an associated task result object or not.
+     * Only objects that are default-initialized, or for which clear() has
+     * been called, or that have been moved from, will return `true` in
+     * this function.
+     */
+    bool
+    empty() const;
+
   private:
     /**
      * An atomic flag that allows us to test whether the task has finished
@@ -474,6 +483,10 @@ namespace Threads
   inline void
   TaskResult<T>::join() const
   {
+    Assert(empty() == false,
+           ExcMessage("You can't join a TaskResult object that has not "
+                      "been associated with a task."));
+
     // If we have waited before, then return immediately:
     if (result_is_available)
       return;
@@ -505,9 +518,50 @@ namespace Threads
 
 
   template <typename T>
+  inline bool
+  TaskResult<T>::empty() const
+  {
+    // If we have waited for a task to complete, then the object is not empty:
+    if (result_is_available)
+      return false;
+    // Otherwise, if result_is_available has not been set, but we have a task
+    // associated (i.e., the task is still running, or at least we haven't
+    // waited for it to complete), then the object is also not empty:
+    else if (task.has_value())
+      return false;
+    else
+      // If when we asked above we had not joined a task, and if there was
+      // no task currently associated with the object, then one of two cases
+      // could have happened: either, there never was a task, and the object
+      // is consequently empty. Or there was a task and somewhere between the
+      // checks above and now, join() has flipped the state to
+      // result_is_available==true and task.has_value()==false. We can
+      // check that, but only under a lock.
+      {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (result_is_available)
+          return false;
+        else
+          // We know from getting into the above 'else that no task was
+          // associated with this object at the time. This cannot have
+          // changed since then in a way that is thread-safe (i.e., by
+          // way of other 'const' functions), so if the result is still
+          // not available, then the object must necessarily be empty:
+          return true;
+      }
+  }
+
+
+
+  template <typename T>
   inline const T &
   TaskResult<T>::value() const
   {
+    Assert(empty() == false,
+           ExcMessage(
+             "You can't ask for the result of a TaskResult object that "
+             "has not been associated with a task."));
+
     if (!result_is_available)
       join();
     return task_result.value();
