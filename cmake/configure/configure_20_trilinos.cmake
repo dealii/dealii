@@ -264,59 +264,41 @@ macro(feature_trilinos_find_external var)
       )
 
       if(TRILINOS_TPETRA_IS_FUNCTIONAL)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_FLOAT)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_DOUBLE)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_COMPLEX_FLOAT)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INST_COMPLEX_DOUBLE)
+        #
+        # We need to figure out what instantiations are used in Tpetra so
+        # that we can populate our DEAL_II_EXPAND_TPETRA correctly. We need
+        # to dof this here prior to the call to reset_cmake_required().
+        #
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE "TpetraCore_config.h" _tpetra_inst_double)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT "TpetraCore_config.h" _tpetra_inst_float)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" _tpetra_inst_complex_double)
+        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" _tpetra_inst_complex_float)
       else()
-        message(
-          STATUS
-          "Tpetra was found but is not usable! Disabling Tpetra support and searching for common errors."
-        )
+        message(STATUS "Tpetra was found but is not usable due to a mismatch in ordinal number types.")
         set(TRILINOS_WITH_TPETRA OFF)
 
-        check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INT_INT)
-        check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INT_LONG)
-        check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INT_LONG_LONG)
+        check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h"_tpetra_int_int)
+        check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" _tpetra_int_long_long)
 
-        if(NOT DEAL_II_HAVE_TPETRA_INT_LONG_LONG AND DEAL_II_WITH_64BIT_INDICES)
-          message(
-            STATUS
-            "  Tpetra wasn't configured with support for 64-bit global indices\n"
-            "  but deal.II is configured to use 64-bit global indices.\n"
-            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF\n"
-            "  or rebuild Trilinos with -DTpetra_INST_INT_LONG_LONG=ON"
-          )
-          if(DEAL_II_HAVE_TPETRA_INT_LONG)
-            message(
-              STATUS
-              "  and -DTpetra_INST_INT_LONG=OFF."
+        if(NOT _tpetra_int_long_long AND DEAL_II_WITH_64BIT_INDICES)
+          message( STATUS
+            "  Tpetra was configured *without* support for 64-bit global indices"
+            "but deal.II is configured to use 64-bit global indices."
             )
-          elseif(DEAL_II_HAVE_TPETRA_INT_INT)
-            message(
-              STATUS
-              "  and -DTpetra_INST_INT_INT=OFF."
+          message(STATUS
+            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF"
+            " or rebuild Trilinos with -DTpetra_INST_INT_LONG_LONG=ON"
             )
-          endif()
-        elseif(NOT DEAL_II_HAVE_TPETRA_INT_INT AND NOT DEAL_II_WITH_64BIT_INDICES)
-          message(
-            STATUS
-            "  Tpetra wasn't configured with support for 32-bit global indices\n"
-            "  but deal.II is configured to use 32-bit global indices.\n"
-            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON\n"
-            "  or rebuild Trilinos with -DTpetra_INST_INT_INT=ON"
-          )
-          if(DEAL_II_HAVE_TPETRA_INT_LONG)
-            message(
-              STATUS
-              "  and -DTpetra_INST_INT_LONG=OFF."
+
+        elseif(NOT _tpetra_int_int AND NOT DEAL_II_WITH_64BIT_INDICES)
+          message( STATUS
+            "  Tpetra was configured *without* support for 32-bit global indices"
+            "but deal.II is configured to use 32-bit global indices."
             )
-          elseif(DEAL_II_HAVE_TPETRA_INT_LONG_LONG)
-            message(
-              STATUS
-              "  and -DTpetra_INST_INT_LONG_LONG=OFF."
+          message(STATUS
+            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON"
+            " or rebuild Trilinos with -DTpetra_INST_INT_INT=ON"
             )
-          endif()
         endif()
 
         reset_cmake_required()
@@ -462,18 +444,21 @@ macro(feature_trilinos_configure_external)
   set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
 
   if(${DEAL_II_TRILINOS_WITH_TPETRA})
-    if(DEAL_II_HAVE_TPETRA_INST_DOUBLE)
+    if(_tpetra_inst_double)
       set(DEAL_II_EXPAND_TPETRA_TYPES "double")
       set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
     endif()
-    if(DEAL_II_HAVE_TPETRA_INST_FLOAT)
+
+    if(_tpetra_inst_float)
       set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
     endif()
+
     if(${DEAL_II_WITH_COMPLEX_NUMBERS})
-      if(DEAL_II_HAVE_TPETRA_INST_COMPLEX_DOUBLE)
+      if(_tpetra_inst_complex_double)
         set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
       endif()
-      if(DEAL_II_HAVE_TPETRA_INST_COMPLEX_FLOAT)
+
+      if(_tpetra_inst_complex_float)
         set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
       endif()
     endif()
@@ -485,13 +470,13 @@ macro(feature_trilinos_configure_external)
       "Sacado::Fad::DFad<float>"
       "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
       "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>"
-    )
+      )
     set(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
       "Sacado::Rad::ADvar<double>"
       "Sacado::Rad::ADvar<float>"
       "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
       "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>"
-    )
+      )
     if(TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
       set(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
     endif()
