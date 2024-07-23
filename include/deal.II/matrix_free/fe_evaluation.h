@@ -355,14 +355,14 @@ public:
   submit_value(const value_type val_in, const unsigned int q_point);
 
   /**
-   * In 1D, the value_type and gradient_type can be unintentionally mixed
-   * up because FEEvaluationBase does not distinguish between scalar accessors
-   * and vector-valued accessors and the respective types, but solely in terms
-   * of the number of components and dimension. Thus, enable the use of
-   * submit_value() also for tensors with a single component.
+   * For scalar elements, the value_type and gradient_type can be
+   * unintentionally mixed up because FEEvaluationBase does not distinguish
+   * between scalar accessors and vector-valued accessors and the respective
+   * types, but solely in terms of the number of components and dimension. Thus,
+   * enable the use of submit_value() also for tensors with a single component.
    */
-  template <int dim_ = dim,
-            typename = std::enable_if_t<dim_ == 1 && n_components == dim_>>
+  template <int n_components_local = n_components,
+            typename = std::enable_if_t<n_components == n_components_local>>
   void
   submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
                const unsigned int                      q_point);
@@ -4911,7 +4911,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
                const unsigned int                      q_point)
 {
-  static_assert(n_components == 1 && dim == 1,
+  static_assert(n_components == 1,
                 "Do not try to modify the default template parameters used for"
                 " selectively enabling this function via std::enable_if!");
   submit_value(val_in[0], q_point);
