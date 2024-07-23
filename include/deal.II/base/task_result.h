@@ -521,26 +521,33 @@ namespace Threads
   inline bool
   TaskResult<T>::empty() const
   {
-    // If we have waited before, then return immediately:
+    // If we have waited for a task to complete, then the object is not empty:
     if (result_is_available)
       return false;
+    // Otherwise, if result_is_available has not been set, but we have a task
+    // associated (i.e., the task is still running, or at least we haven't
+    // waited for it to complete), then the object is also not empty:
+    else if (task.has_value())
+      return false;
     else
-      // If we have not waited, wait now. We need to use the double-checking
-      // pattern to ensure that if two threads get to this place at the same
-      // time, one returns right away while the other does the work. Note
-      // that this happens under the lock, so only one thread gets to be in
-      // this code block at the same time:
+      // If when we asked above we had not joined a task, and if there was
+      // no task currently associated with the object, then one of two cases
+      // could have happened: either, there never was a task, and the object
+      // is consequently empty. Or there was a task and somewhere between the
+      // checks above and now, join() has flipped the state to
+      // result_is_available==true and task.has_value()==false. We can
+      // check that, but only under a lock.
       {
         std::lock_guard<std::mutex> lock(mutex);
         if (result_is_available)
           return false;
         else
-          // If there is a task, then this object is not empty. Otherwise, we
-          // have no result and no task, so the object is empty:
-          if (task.has_value())
-            return false;
-          else
-            return true;
+          // We know from getting into the above 'else that no task was
+          // associated with this object at the time. This cannot have
+          // changed since then in a way that is thread-safe (i.e., by
+          // way of other 'const' functions), so if the result is still
+          // not available, then the object must necessarily be empty:
+          return true;
       }
   }
 
