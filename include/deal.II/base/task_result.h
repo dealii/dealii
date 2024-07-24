@@ -196,7 +196,7 @@ namespace Threads
      * represents anything and is left as if default-constructed.
      */
     TaskResult &
-    operator=(TaskResult &&) noexcept;
+    operator=(TaskResult &&other) noexcept;
 
     /**
      * Copy assignment operator from a Task object. By assigning the Task
