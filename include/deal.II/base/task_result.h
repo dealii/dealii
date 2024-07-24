@@ -121,7 +121,8 @@ namespace Threads
      * represents the task's result, whereas the old object no longer
      * represents anything and is left as if default-constructed.
      */
-    TaskResult(TaskResult<T> &&other) noexcept;
+    TaskResult(TaskResult<T> &&other) noexcept DEAL_II_CXX20_REQUIRES(
+      std::is_move_constructible_v<T> &&std::is_move_assignable_v<T>);
 
     /**
      * Destructor. If the current object was associated with a task,
@@ -196,7 +197,8 @@ namespace Threads
      * represents anything and is left as if default-constructed.
      */
     TaskResult &
-    operator=(TaskResult &&other) noexcept;
+    operator=(TaskResult &&other) noexcept DEAL_II_CXX20_REQUIRES(
+      std::is_move_constructible_v<T> &&std::is_move_assignable_v<T>);
 
     /**
      * Copy assignment operator from a Task object. By assigning the Task
@@ -395,6 +397,8 @@ namespace Threads
 
   template <typename T>
   inline TaskResult<T>::TaskResult(TaskResult<T> &&other) noexcept
+    DEAL_II_CXX20_REQUIRES(
+      std::is_move_constructible_v<T> &&std::is_move_assignable_v<T>)
   {
     // First lock the other object, then move the members of the other
     // object and reset it. Note that we do not have to wait for
@@ -445,6 +449,8 @@ namespace Threads
   template <typename T>
   inline TaskResult<T> &
   TaskResult<T>::operator=(TaskResult<T> &&other) noexcept
+    DEAL_II_CXX20_REQUIRES(
+      std::is_move_constructible_v<T> &&std::is_move_assignable_v<T>)
   {
     // First clear the current object before we put new content into it:
     clear();
