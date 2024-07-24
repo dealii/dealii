@@ -470,6 +470,18 @@ public:
   get_laplacian(const unsigned int q_point) const;
 
   /**
+   * Return the second derivative along the normal direction $\partial_{n}^2
+   * u_h$ (i.e., the Hessian of the function $u_h$ contracted twice with the
+   * direction of the normal vector) of the finite element
+   * function interpolated to the quadrature point with index
+   * @p q_point after a call to @p evaluate(EvaluationFlags::hessians).
+   * Compared to the case when computing the full Hessian, some operations can
+   * be saved when only the normal Hessian is requested.
+   */
+  value_type
+  get_normal_hessian(const unsigned int q_point) const;
+
+  /**
    * Write a contribution that gets multiplied by the Hessian of the test
    * function to the field containing the Hessians at quadrature points with
    * index @p q_point. When this function has queued information for all
@@ -485,6 +497,25 @@ public:
    */
   void
   submit_hessian(const hessian_type hessian_in, const unsigned int q_point);
+
+  /**
+   * Write a contribution that gets multiplied by the Hessian of the test
+   * function times the normal projector to the field containing the Hessians at
+   * quadrature points with index @p q_point. When this function has queued
+   * information for all quadrature points and followed by a call to the
+   * function @p integrate(EvaluationFlags::hessians), the result is an
+   * array of entries, each representing the result of the integral of product
+   * of the test function Hessian multiplied by the values times the normal
+   * projector passed to this function.
+   *
+   * @note This function accesses the same field as through get_hessian() and
+   * get_normal_hessian() so make sure to not call it after calling
+   * submit_hessian() or submit_normal_hessian() for a specific quadrature point
+   * index.
+   */
+  void
+  submit_normal_hessian(const value_type   normal_hessian_in,
+                        const unsigned int q_point);
 
   /**
    * Return the divergence of a vector-valued finite element at quadrature
@@ -4782,6 +4813,85 @@ template <int dim,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
+inline typename FEEvaluationBase<dim,
+                                 n_components_,
+                                 Number,
+                                 is_face,
+                                 VectorizedArrayType>::value_type
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  get_normal_hessian(const unsigned int q_point) const
+{
+#  ifdef DEBUG
+  Assert(this->hessians_quad_initialized == true,
+         internal::ExcAccessToUninitializedField());
+#  endif
+  AssertIndexRange(q_point, this->n_quadrature_points);
+
+  Assert(this->normal_x_jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+
+  Tensor<1, n_components, VectorizedArrayType> hessian_out;
+
+  const std::size_t      nqp  = this->n_quadrature_points;
+  constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
+
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+    {
+      const auto nxj = this->normal_x_jacobian[0];
+
+      for (unsigned int comp = 0; comp < n_components; ++comp)
+        {
+          for (unsigned int d = 0; d < dim; ++d)
+            hessian_out[comp] +=
+              this->hessians_quad[(comp * hdim + d) * nqp + q_point] *
+              (nxj[d]) * (nxj[d]);
+
+          switch (dim)
+            {
+              case 1:
+                break;
+              case 2:
+                hessian_out[comp] +=
+                  this->hessians_quad[(comp * hdim + 2) * nqp + q_point] *
+                  (nxj[0] * nxj[1]);
+                break;
+              case 3:
+                hessian_out[comp] +=
+                  2. * this->hessians_quad[(comp * hdim + 3) * nqp + q_point] *
+                  (nxj[0] * nxj[1]);
+                hessian_out[comp] +=
+                  2. * this->hessians_quad[(comp * hdim + 4) * nqp + q_point] *
+                  (nxj[0] * nxj[2]);
+                hessian_out[comp] +=
+                  2. * this->hessians_quad[(comp * hdim + 5) * nqp + q_point] *
+                  (nxj[1] * nxj[2]);
+                break;
+              default:
+                DEAL_II_NOT_IMPLEMENTED();
+            }
+        }
+
+      if constexpr (n_components == 1)
+        return hessian_out[0];
+      else
+        return hessian_out;
+    }
+  // cell with general Jacobian
+  else
+    {
+      const auto normal = this->normal_vector(q_point);
+      return get_hessian(q_point) * normal * normal;
+    }
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_dof_value(const value_type val_in, const unsigned int dof)
@@ -5423,6 +5533,84 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                                                  d] = sum * JxW;
             }
         }
+    }
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  submit_normal_hessian(const value_type   normal_hessian_in,
+                        const unsigned int q_point)
+{
+#  ifdef DEBUG
+  Assert(this->is_reinitialized, ExcNotInitialized());
+#  endif
+  AssertIndexRange(q_point, this->n_quadrature_points);
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+#  ifdef DEBUG
+  this->hessians_quad_submitted = true;
+#  endif
+
+  // compute hessian_unit = J^T * hessian_in(u) * J
+  const std::size_t      nqp  = this->n_quadrature_points;
+  constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+    {
+      const VectorizedArrayType JxW =
+        this->J_value[0] * this->quadrature_weights[q_point];
+
+      const auto nxj = this->normal_x_jacobian[0];
+
+      // diagonal part
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          const auto                nxj_d  = nxj[d];
+          const VectorizedArrayType factor = nxj_d * nxj_d * JxW;
+          for (unsigned int comp = 0; comp < n_components; ++comp)
+            if constexpr (n_components == 1)
+              this->hessians_quad[d * nqp + q_point] =
+                normal_hessian_in * factor;
+            else
+              this->hessians_quad[(comp * hdim + d) * nqp + q_point] =
+                normal_hessian_in[comp] * factor;
+        }
+
+      // off diagonal part
+      for (unsigned int d = 1, off_dia = dim; d < dim; ++d)
+        for (unsigned int e = 0; e < d; ++e, ++off_dia)
+          {
+            const auto                jac_d  = nxj[d];
+            const auto                jac_e  = nxj[e];
+            const VectorizedArrayType factor = jac_d * jac_e * JxW;
+            for (unsigned int comp = 0; comp < n_components; ++comp)
+              if constexpr (n_components == 1)
+                this->hessians_quad[off_dia * nqp + q_point] =
+                  2. * normal_hessian_in * factor;
+              else
+                this->hessians_quad[(comp * hdim + off_dia) * nqp + q_point] =
+                  2. * normal_hessian_in[comp] * factor;
+          }
+    }
+  else
+    {
+      const auto normal           = this->normal_vector(q_point);
+      const auto normal_projector = outer_product(normal, normal);
+      if constexpr (n_components == 1)
+        submit_hessian(normal_hessian_in * normal_projector, q_point);
+      else
+        submit_hessian(outer_product(normal_hessian_in, normal_projector),
+                       q_point);
     }
 }
 
