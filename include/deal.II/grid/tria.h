@@ -2225,34 +2225,34 @@ public:
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  using CellStatus DEAL_II_DEPRECATED_EARLY = ::dealii::CellStatus;
+  using CellStatus DEAL_II_DEPRECATED = ::dealii::CellStatus;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_PERSIST DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_PERSIST DEAL_II_DEPRECATED =
     ::dealii::CellStatus::cell_will_persist;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_REFINE DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_REFINE DEAL_II_DEPRECATED =
     ::dealii::CellStatus::cell_will_be_refined;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_COARSEN DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_COARSEN DEAL_II_DEPRECATED =
     ::dealii::CellStatus::children_will_be_coarsened;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_INVALID DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_INVALID DEAL_II_DEPRECATED =
     ::dealii::CellStatus::cell_invalid;
 
 

@@ -125,7 +125,7 @@ namespace Utilities
        *
        * @deprecated
        */
-      DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      DEAL_II_DEPRECATED_WITH_COMMENT(
         "Use the constructor with AdditionalData struct.")
       RemotePointEvaluation(
         const double       tolerance,

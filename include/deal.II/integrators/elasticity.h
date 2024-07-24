@@ -46,7 +46,7 @@ namespace LocalIntegrators
      * \f[ \int_Z \varepsilon(u): \varepsilon(v)\,dx \f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const double             factor = 1.)
@@ -79,7 +79,7 @@ namespace LocalIntegrators
      * \f[ - \int_Z \varepsilon(u): \varepsilon(v) \,dx \f]
      */
     template <int dim, typename number>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<number>                                     &result,
                   const FEValuesBase<dim>                            &fe,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -118,7 +118,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    double                   penalty,
@@ -173,7 +173,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_tangential_matrix(FullMatrix<double>      &M,
                               const FEValuesBase<dim> &fe,
                               double                   penalty,
@@ -252,7 +252,7 @@ namespace LocalIntegrators
      * the usual penalty parameter.
      */
     template <int dim, typename number>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<number>                                     &result,
                      const FEValuesBase<dim>                            &fe,
                      const ArrayView<const std::vector<double>>         &input,
@@ -304,7 +304,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim, typename number>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_tangential_residual(
       Vector<number>                                     &result,
       const FEValuesBase<dim>                            &fe,
@@ -382,7 +382,7 @@ namespace LocalIntegrators
      * penalty parameter.
      */
     template <int dim, typename number>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     nitsche_residual_homogeneous(
       Vector<number>                                     &result,
       const FEValuesBase<dim>                            &fe,
@@ -427,7 +427,7 @@ namespace LocalIntegrators
      * The interior penalty flux for symmetric gradients.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     ip_matrix(FullMatrix<double>      &M11,
               FullMatrix<double>      &M12,
               FullMatrix<double>      &M21,
@@ -535,7 +535,7 @@ namespace LocalIntegrators
      * Elasticity residual term for the symmetric interior penalty method.
      */
     template <int dim, typename number>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<number>                                     &result1,
                 Vector<number>                                     &result2,
                 const FEValuesBase<dim>                            &fe1,

@@ -804,8 +804,8 @@ public:
    *
    * @deprecated Use the function quadrature_point() instead.
    */
-  DEAL_II_DEPRECATED_EARLY Point<spacedim, Number>
-                           real_point(const unsigned int point_index) const;
+  DEAL_II_DEPRECATED Point<spacedim, Number>
+                     real_point(const unsigned int point_index) const;
 
   /**
    * Return the position in real coordinates of the given point index among

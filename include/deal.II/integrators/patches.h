@@ -36,7 +36,7 @@ namespace LocalIntegrators
   namespace Patches
   {
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     points_and_values(Table<2, double>                           &result,
                       const FEValuesBase<dim>                    &fe,
                       const ArrayView<const std::vector<double>> &input)

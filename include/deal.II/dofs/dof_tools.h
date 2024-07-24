@@ -1537,7 +1537,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                               IndexSet                        &dof_set);
 
@@ -1562,7 +1562,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_active_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
     IndexSet                        &dof_set,
@@ -1592,7 +1592,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                                 IndexSet                        &dof_set);
 
@@ -1664,7 +1664,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_relevant_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
     const unsigned int               level,

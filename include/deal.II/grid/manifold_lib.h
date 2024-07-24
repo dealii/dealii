@@ -145,7 +145,7 @@ public:
    *
    * @deprecated Use get_center() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Access the center with get_center() instead.")
   const Point<spacedim> center;
 
@@ -351,7 +351,7 @@ public:
    *
    * @deprecated Use get_center() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Access the center with get_center() instead.")
   const Point<spacedim> center;
 

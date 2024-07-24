@@ -56,7 +56,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim, typename number = double>
-  class DEAL_II_DEPRECATED_EARLY LocalIntegrator : public Subscriptor
+  class DEAL_II_DEPRECATED LocalIntegrator : public Subscriptor
   {
   public:
     /**
@@ -128,7 +128,7 @@ namespace MeshWorker
      * @deprecated Because the library itself does not use this field, it is
      *   better placed in derived classes.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     std::vector<std::string> input_vector_names;
 
     /**
@@ -142,7 +142,7 @@ namespace MeshWorker
      * @deprecated Because the library itself does not use this field, it is
      *   better placed in derived classes.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     std::vector<std::string> output_names;
 
     /**

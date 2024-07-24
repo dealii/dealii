@@ -623,7 +623,7 @@ namespace MeshWorker
             int spacedim,
             typename IteratorType,
             typename AssemblerType>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   integration_loop(IteratorType                             begin,
                    std_cxx20::type_identity_t<IteratorType> end,
                    DoFInfo<dim, spacedim>                  &dof_info,

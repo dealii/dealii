@@ -47,7 +47,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 double                   factor = 1.)
@@ -81,7 +81,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim, typename number>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     cell_residual(Vector<number>                                     &result,
                   const FEValuesBase<dim>                            &fetest,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -117,7 +117,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     nitsche_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    double                   penalty,
@@ -169,7 +169,7 @@ namespace LocalIntegrators
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<double>                                     &result,
                      const FEValuesBase<dim>                            &fe,
                      const ArrayView<const std::vector<double>>         &input,
@@ -216,7 +216,7 @@ namespace LocalIntegrators
      * ip_residual() for details.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     ip_matrix(FullMatrix<double>      &M11,
               FullMatrix<double>      &M12,
               FullMatrix<double>      &M21,
@@ -296,7 +296,7 @@ namespace LocalIntegrators
      * See for instance Hansbo and Larson, 2002
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<double>                                     &result1,
                 Vector<double>                                     &result2,
                 const FEValuesBase<dim>                            &fe1,

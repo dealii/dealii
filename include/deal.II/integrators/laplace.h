@@ -47,7 +47,7 @@ namespace LocalIntegrators
      * latter case, the Laplacian is applied to each component separately.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const double             factor = 1.)
@@ -87,7 +87,7 @@ namespace LocalIntegrators
      * \f[ \int_Z \nu \nabla u \cdot \nabla v \, dx. \f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                    &result,
                   const FEValuesBase<dim>           &fe,
                   const std::vector<Tensor<1, dim>> &input,
@@ -114,7 +114,7 @@ namespace LocalIntegrators
      * \f[ \int_Z \nu \nabla u : \nabla v \, dx. \f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                                     &result,
                   const FEValuesBase<dim>                            &fe,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -152,7 +152,7 @@ namespace LocalIntegrators
      * compute_penalty().
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     nitsche_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    double                   penalty,
@@ -193,7 +193,7 @@ namespace LocalIntegrators
      * compute_penalty().
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     nitsche_tangential_matrix(FullMatrix<double>      &M,
                               const FEValuesBase<dim> &fe,
                               double                   penalty,
@@ -256,7 +256,7 @@ namespace LocalIntegrators
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<double>                    &result,
                      const FEValuesBase<dim>           &fe,
                      const std::vector<double>         &input,
@@ -303,7 +303,7 @@ namespace LocalIntegrators
      * argument <tt>data</tt>. $\gamma$ is the usual penalty parameter.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     nitsche_residual(Vector<double>                                     &result,
                      const FEValuesBase<dim>                            &fe,
                      const ArrayView<const std::vector<double>>         &input,
@@ -354,7 +354,7 @@ namespace LocalIntegrators
      * has to be computed accordingly.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     ip_matrix(FullMatrix<double>      &M11,
               FullMatrix<double>      &M12,
               FullMatrix<double>      &M21,
@@ -427,7 +427,7 @@ namespace LocalIntegrators
      * @warning This function is still under development!
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     ip_tangential_matrix(FullMatrix<double>      &M11,
                          FullMatrix<double>      &M12,
                          FullMatrix<double>      &M21,
@@ -539,7 +539,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<double>                    &result1,
                 Vector<double>                    &result2,
                 const FEValuesBase<dim>           &fe1,
@@ -606,7 +606,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     ip_residual(Vector<double>                                     &result1,
                 Vector<double>                                     &result2,
                 const FEValuesBase<dim>                            &fe1,
@@ -680,7 +680,7 @@ namespace LocalIntegrators
      * <i>Z<sub>i</sub></i> orthogonal to the current face.
      */
     template <int dim, int spacedim, typename number>
-    DEAL_II_DEPRECATED_EARLY double
+    DEAL_II_DEPRECATED double
     compute_penalty(const MeshWorker::DoFInfo<dim, spacedim, number> &dinfo1,
                     const MeshWorker::DoFInfo<dim, spacedim, number> &dinfo2,
                     unsigned int                                      deg1,

@@ -193,6 +193,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_CXX20_REQUIRES(x)= \
                          DEAL_II_DEPRECATED_EARLY= \
                          DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(x)= \
+                         DEAL_II_DEPRECATED_WITH_COMMENT(x)= \
                          DEAL_II_WITH_ARBORX=1 \
                          DEAL_II_ARBORX_WITH_MPI=1 \
                          DEAL_II_WITH_ARPACK=1 \
