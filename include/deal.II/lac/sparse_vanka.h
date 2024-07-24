@@ -15,8 +15,6 @@
 #ifndef dealii_sparse_vanka_h
 #define dealii_sparse_vanka_h
 
-
-
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/multithread_info.h>
@@ -217,6 +215,12 @@ public:
   Tvmult(Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
+   * Clear all memory.
+   */
+  void
+  clear();
+
+  /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    *
@@ -240,9 +244,11 @@ protected:
   /**
    * Apply the inverses corresponding to those degrees of freedom that have a
    * @p true value in @p dof_mask, to the @p src vector and move the result
-   * into @p dst. Actually, only values for allowed indices are written to @p
-   * dst, so the application of this function only does what is announced in
-   * the general documentation if the given mask sets all values to zero
+   * into @p dst. The transpose of the inverse is applied instead if
+   * @p transpose equals true. Actually, only values for allowed indices are
+   * written to @p dst, so the application of this function only does what is
+   * announced in the general documentation if the given mask sets all values
+   * to zero.
    *
    * The reason for providing the mask anyway is that in derived classes we
    * may want to apply the preconditioner to parts of the matrix only, in
@@ -258,10 +264,12 @@ protected:
    * The @p vmult of this class of course calls this function with a null
    * pointer
    */
+
   template <typename number2>
   void
   apply_preconditioner(Vector<number2>               &dst,
                        const Vector<number2>         &src,
+                       const bool                     transpose = false,
                        const std::vector<bool> *const dof_mask = nullptr) const;
 
   /**
@@ -511,6 +519,14 @@ public:
   void
   vmult(Vector<number2> &dst, const Vector<number2> &src) const;
 
+
+  /**
+   * Apply the transpose preconditioner.
+   */
+  template <typename number2>
+  void
+  Tvmult(Vector<number2> &dst, const Vector<number2> &src) const;
+
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
@@ -562,15 +578,6 @@ SparseVanka<number>::n() const
 {
   Assert(_n != 0, ExcNotInitialized());
   return _n;
-}
-
-template <typename number>
-template <typename number2>
-inline void
-SparseVanka<number>::Tvmult(Vector<number2> & /*dst*/,
-                            const Vector<number2> & /*src*/) const
-{
-  AssertThrow(false, ExcNotImplemented());
 }
 
 #endif // DOXYGEN

@@ -27,6 +27,12 @@ SparseVanka<double>::vmult<float>(Vector<float>       &dst,
 template void
 SparseVanka<double>::vmult<double>(Vector<double>       &dst,
                                    const Vector<double> &src) const;
+template void
+SparseVanka<double>::Tvmult<float>(Vector<float>       &dst,
+                                   const Vector<float> &src) const;
+template void
+SparseVanka<double>::Tvmult<double>(Vector<double>       &dst,
+                                    const Vector<double> &src) const;
 
 
 template class SparseBlockVanka<float>;
@@ -38,5 +44,11 @@ SparseBlockVanka<double>::vmult<float>(Vector<float>       &dst,
 template void
 SparseBlockVanka<double>::vmult<double>(Vector<double>       &dst,
                                         const Vector<double> &src) const;
+template void
+SparseBlockVanka<double>::Tvmult<float>(Vector<float>       &dst,
+                                        const Vector<float> &src) const;
+template void
+SparseBlockVanka<double>::Tvmult<double>(Vector<double>       &dst,
+                                         const Vector<double> &src) const;
 
 DEAL_II_NAMESPACE_CLOSE

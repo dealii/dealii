@@ -215,9 +215,42 @@ SparseVanka<number>::vmult(Vector<number2>       &dst,
   dst = 0;
   // then pass on to the function
   // that actually does the work
-  apply_preconditioner(dst, src);
+  apply_preconditioner(dst, src, false);
 }
 
+template <typename number>
+template <typename number2>
+void
+SparseVanka<number>::Tvmult(Vector<number2>       &dst,
+                            const Vector<number2> &src) const
+{
+  Assert(matrix != nullptr, ExcNotInitialized());
+  Assert(selected != nullptr, ExcNotInitialized());
+
+  // first set output vector to zero
+  dst = 0;
+  // then pass on to the function
+  // that actually does the work
+  apply_preconditioner(dst, src, true);
+}
+
+
+template <typename number>
+void
+SparseVanka<number>::clear()
+{ // Clear the inverses vector and deallocate memory
+  inverses.clear();
+
+  // Reset the matrix pointer
+  matrix = nullptr;
+
+  // Reset the selected pointer
+  selected = nullptr;
+
+  // Reset the sizes
+  _m = 0;
+  _n = 0;
+}
 
 template <typename number>
 template <typename number2>
@@ -225,6 +258,7 @@ void
 SparseVanka<number>::apply_preconditioner(
   Vector<number2>               &dst,
   const Vector<number2>         &src,
+  const bool                     transpose,
   const std::vector<bool> *const dof_mask) const
 {
   Assert(dst.size() == src.size(),
@@ -336,7 +370,10 @@ SparseVanka<number>::apply_preconditioner(
           }
 
         // apply preconditioner
-        inverses[row]->vmult(x, b);
+        if (transpose)
+          inverses[row]->Tvmult(x, b);
+        else
+          inverses[row]->vmult(x, b);
 
         // Distribute new values
         for (std::map<size_type, size_type>::const_iterator is =
@@ -567,8 +604,24 @@ SparseBlockVanka<number>::vmult(Vector<number2>       &dst,
 
   Threads::TaskGroup<> tasks;
   for (unsigned int block = 0; block < n_blocks; ++block)
-    tasks += Threads::new_task([&, block]() {
-      this->apply_preconditioner(dst, src, &dof_masks[block]);
+    tasks += Threads::new_task([&, block] {
+      this->apply_preconditioner(dst, src, false, &dof_masks[block]);
+    });
+  tasks.join_all();
+}
+
+template <typename number>
+template <typename number2>
+void
+SparseBlockVanka<number>::Tvmult(Vector<number2>       &dst,
+                                 const Vector<number2> &src) const
+{
+  dst = 0;
+
+  Threads::TaskGroup<> tasks;
+  for (unsigned int block = 0; block < n_blocks; ++block)
+    tasks += Threads::new_task([&, block] {
+      this->apply_preconditioner(dst, src, true, &dof_masks[block]);
     });
   tasks.join_all();
 }
