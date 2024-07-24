@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 #if defined(__GNUC__) && (__GNUC__ < 10)
 namespace CUDAWrappers
 #else
-namespace DEAL_II_DEPRECATED_EARLY CUDAWrappers
+namespace DEAL_II_DEPRECATED CUDAWrappers
 #endif
 {
   using namespace Portable;

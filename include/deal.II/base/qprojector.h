@@ -305,7 +305,7 @@ public:
      * @deprecated Use the version of this function which takes a
      * combined_orientation argument instead.
      */
-    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    DEAL_II_DEPRECATED_WITH_COMMENT(
       "Use the version of this function which takes a combined_orientation "
       "argument instead.")
     static DataSetDescriptor
@@ -340,7 +340,7 @@ public:
      * @deprecated Use the version of this function which takes a
      * combined_orientation argument instead.
      */
-    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    DEAL_II_DEPRECATED_WITH_COMMENT(
       "Use the version of this function which takes a combined_orientation "
       "argument instead.")
     static DataSetDescriptor
@@ -378,7 +378,7 @@ public:
      * @deprecated Use the version of this function which takes a
      * combined_orientation argument instead.
      */
-    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    DEAL_II_DEPRECATED_WITH_COMMENT(
       "Use the version of this function which takes a combined_orientation "
       "argument instead.")
     static DataSetDescriptor

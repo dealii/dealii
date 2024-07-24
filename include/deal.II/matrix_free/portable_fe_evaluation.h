@@ -149,8 +149,7 @@ namespace Portable
      * computed. This function needs to be called before the functions
      * @p get_value() or @p get_gradient() give useful information.
      */
-    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-      "Use the version taking EvaluationFlags.")
+    DEAL_II_DEPRECATED_WITH_COMMENT("Use the version taking EvaluationFlags.")
     DEAL_II_HOST_DEVICE
     void
     evaluate(const bool evaluate_val, const bool evaluate_grad);
@@ -172,8 +171,7 @@ namespace Portable
      * @p integrate_val and @p integrate_grad are used to enable/disable some
      * of the values or the gradients.
      */
-    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-      "Use the version taking EvaluationFlags.")
+    DEAL_II_DEPRECATED_WITH_COMMENT("Use the version taking EvaluationFlags.")
     DEAL_II_HOST_DEVICE
     void
     integrate(const bool integrate_val, const bool integrate_grad);

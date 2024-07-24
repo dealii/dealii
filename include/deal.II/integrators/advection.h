@@ -70,7 +70,7 @@ namespace LocalIntegrators
      * @param factor is an optional multiplication factor for the result.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     cell_matrix(FullMatrix<double>                         &M,
                 const FEValuesBase<dim>                    &fe,
                 const FEValuesBase<dim>                    &fetest,
@@ -126,7 +126,7 @@ namespace LocalIntegrators
      * with its transpose.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                             &result,
                   const FEValuesBase<dim>                    &fe,
                   const std::vector<Tensor<1, dim>>          &input,
@@ -169,7 +169,7 @@ namespace LocalIntegrators
      * with its transpose.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                                     &result,
                   const FEValuesBase<dim>                            &fe,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
@@ -211,7 +211,7 @@ namespace LocalIntegrators
      * \f[ r_i = \int_Z  (\mathbf w \cdot \nabla)v\, u_i \, dx. \f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                             &result,
                   const FEValuesBase<dim>                    &fe,
                   const std::vector<double>                  &input,
@@ -251,7 +251,7 @@ namespace LocalIntegrators
      * \cdot\mathbf u_i \, dx. \f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     cell_residual(Vector<double>                             &result,
                   const FEValuesBase<dim>                    &fe,
                   const ArrayView<const std::vector<double>> &input,
@@ -305,7 +305,7 @@ namespace LocalIntegrators
      * component is advected by the same velocity.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     upwind_value_matrix(FullMatrix<double>                         &M,
                         const FEValuesBase<dim>                    &fe,
                         const FEValuesBase<dim>                    &fetest,
@@ -378,7 +378,7 @@ namespace LocalIntegrators
      * component is advected by the same velocity.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     upwind_value_residual(Vector<double>                             &result,
                           const FEValuesBase<dim>                    &fe,
                           const std::vector<double>                  &input,
@@ -445,7 +445,7 @@ namespace LocalIntegrators
      * component is advected by the same velocity.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     upwind_value_residual(Vector<double>                             &result,
                           const FEValuesBase<dim>                    &fe,
                           const ArrayView<const std::vector<double>> &input,
@@ -512,7 +512,7 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     upwind_value_matrix(FullMatrix<double>                         &M11,
                         FullMatrix<double>                         &M12,
                         FullMatrix<double>                         &M21,
@@ -597,7 +597,7 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     upwind_face_residual(Vector<double>                             &result1,
                          Vector<double>                             &result2,
                          const FEValuesBase<dim>                    &fe1,
@@ -674,7 +674,7 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     upwind_face_residual(Vector<double>                             &result1,
                          Vector<double>                             &result2,
                          const FEValuesBase<dim>                    &fe1,

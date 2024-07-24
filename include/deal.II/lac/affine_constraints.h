@@ -580,7 +580,7 @@ public:
    *   both of its arguments equal to the index set provided here. This
    *   is not wrong, but inefficient. Use the following constructor instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the constructor with two index set arguments.")
   explicit AffineConstraints(const IndexSet &locally_stored_constraints);
 
@@ -677,7 +677,7 @@ public:
    *
    * @deprecated Use the reinit() function with two index set arguments instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the reinit() function with two index set arguments.")
   void
   reinit(const IndexSet &locally_stored_constraints);
@@ -753,7 +753,7 @@ public:
    *   that should probably be considered a bug. Use get_view() and merge()
    *   instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use get_view() and merge() instead.")
+  DEAL_II_DEPRECATED_WITH_COMMENT("Use get_view() and merge() instead.")
   void
   add_selected_constraints(const AffineConstraints &constraints_in,
                            const IndexSet          &filter);

@@ -629,28 +629,28 @@ public:
   /**
    * Return a pointer to the first element of the underlying storage.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   Number *
   begin_raw();
 
   /**
    * Return a const pointer to the first element of the underlying storage.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   const Number *
   begin_raw() const;
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   Number *
   end_raw();
 
   /**
    * Return a pointer to the element past the end of the underlying storage.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   const Number *
   end_raw() const;
 

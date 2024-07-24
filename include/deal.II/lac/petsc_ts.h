@@ -617,7 +617,7 @@ namespace PETScWrappers
      * @deprecated This callback is equivalent to `update_constrained_components`, but is
      * deprecated. Use `update_constrained_components` instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     std::function<void(const real_type t, VectorType &y)> distribute;
 
     /**
@@ -648,7 +648,7 @@ namespace PETScWrappers
      * object instead of a plain return value. This callback is
      * deprecated. Use `decide_and_prepare_for_remeshing` instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     std::function<void(const real_type    t,
                        const unsigned int step,
                        const VectorType  &y,
@@ -682,7 +682,7 @@ namespace PETScWrappers
      * @deprecated This callback is equivalent to `transfer_solution_vectors_to_new_mesh`, but is
      * deprecated. Use `transfer_solution_vectors_to_new_mesh` instead.
      */
-    DEAL_II_DEPRECATED_EARLY
+    DEAL_II_DEPRECATED
     std::function<void(const std::vector<VectorType> &all_in,
                        std::vector<VectorType>       &all_out)>
       interpolate;
