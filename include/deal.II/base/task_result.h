@@ -196,7 +196,7 @@ namespace Threads
      * represents anything and is left as if default-constructed.
      */
     TaskResult &
-    operator=(TaskResult &&);
+    operator=(TaskResult &&) noexcept;
 
     /**
      * Copy assignment operator from a Task object. By assigning the Task
@@ -444,7 +444,7 @@ namespace Threads
 
   template <typename T>
   inline TaskResult<T> &
-  TaskResult<T>::operator=(TaskResult<T> &&other)
+  TaskResult<T>::operator=(TaskResult<T> &&other) noexcept
   {
     // First clear the current object before we put new content into it:
     clear();
