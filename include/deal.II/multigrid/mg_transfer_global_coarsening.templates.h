@@ -3157,7 +3157,7 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
                              ++i)
                           eval_fine.begin_dof_values()[i] *= cell_weights[i];
                     }
-                  eval_fine.distribute_local_to_global(dst);
+                  eval_fine.distribute_local_to_global_unconstrained(dst);
                 }
             }
         },
@@ -3365,7 +3365,7 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
                   eval_coarse.reinit(
                     matrix_free_data->cell_list_fine_to_coarse[cell]);
 
-                  eval_fine.read_dof_values(src);
+                  eval_fine.read_dof_values_unconstrained(src);
                   if (weights.size() > 0)
                     {
                       const VectorizedArrayType *cell_weights =
@@ -3560,7 +3560,7 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
               eval_coarse.reinit(
                 matrix_free_data->cell_list_fine_to_coarse[cell]);
 
-              eval_fine.read_dof_values(src);
+              eval_fine.read_dof_values_unconstrained(src);
 
               if (schemes[0].restriction_matrix.empty() == false)
                 {
