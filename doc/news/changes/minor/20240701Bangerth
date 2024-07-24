@@ -1,7 +1,0 @@
-Deprecated: The `decide_for_coarsening_and_refinement` callback of the
-PETScWrappers::TimeStepper class has been renamed to
-PETScWrappers::TimeStepper::decide_and_prepare_for_remeshing. The former
-name is still available for backward compatibility, but is now
-deprecated.
-<br>
-(Wolfgang Bangerth, 2024/07/01)

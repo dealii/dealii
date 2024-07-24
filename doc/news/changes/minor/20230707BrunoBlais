@@ -1,3 +1,0 @@
-Improvement: Step-68 now uses the FEPointEvaluation to calculate the particle velocity from the velocity solution instead of manually interpolating at the particle location.
-<br>
-(Bruno Blais, 2023/07/0)

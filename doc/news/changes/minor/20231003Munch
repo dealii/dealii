@@ -1,7 +1,0 @@
-Improved: MGTransferMF can now permute DoFs during
-MGTransferMF::copy_to_mg(), MGTransferMF::copy_to_mg(),
-and MGTransferMF::interpolate_to_mg() if the outer
-solver and the multigrid preconditioner have been set up
-with different DoFHandler objects.
-<br>
-(Peter Munch, Laura Prieto Saavedra, 2023/10/03)

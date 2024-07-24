@@ -1,6 +1,0 @@
-Fixed: Added some instantiations to "sparse_matrix.inst.in"
-such that copying real sparse matrices into complex sparse matrices 
-and performing matrix vector operations of a complex sparse matrix 
-with a real vector into a complex vector are possible now.
-<br>
-(Malik Scheifinger, 2024/02/16)

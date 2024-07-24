@@ -1,9 +1,0 @@
-MatrixFree::reinit() would always set up the data structures for inner faces,
-also in case only
-MatrixFree::AdditionalData::mapping_updates_flags_boundary_faces was set. As
-this can lead to considerably higher memory consumption, the inner faces are
-now only set up when requested, increasing efficiency. When inner faces are
-desired, make sure to set
-MatrixFree::AdditionalData::mapping_updates_flags_inner_faces.
-<br>
-(Martin Kronbichler, 2023/06/19)

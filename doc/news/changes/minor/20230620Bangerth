@@ -1,5 +1,0 @@
-Fixed: The function IndexSet::add_indices() was not efficient when
-adding sets of indices that are sorted but contain duplicates. This is
-now fixed.
-<br>
-(Wolfgang Bangerth, 2023/06/20)

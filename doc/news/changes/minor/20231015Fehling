@@ -1,7 +1,0 @@
-New: The print_formatted() functions of the following matrix classes
-now offer the option to specify a string that separates row entries:
-<br>
-SparseMatrixEZ, SparseMatrix, LAPACKFullMatrix, FullMatrix,
-ChunkSparseMatrix, BlockSparseMatrix, CUDAWrappers::SparseMatrix
-<br>
-(Marc Fehling, 2023/10/15)

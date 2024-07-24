@@ -1,3 +1,0 @@
-Deprecated: The CellStatus enumeration has been deprecated in the Triangulation<dim, spacedim> class and moved to the global deal.II namespace. As a consequence, all references to Triangulation<dim, spacedim>, parallel::distributed::Triangulation<dim, spacedim>::CellStatus, and similar should be updated to use CellStatus directly. Also, the enumeration values have been renamed: CELL_PERSIST -> cell_will_persist, CELL_REFINE -> cell_will_be_refined, CELL_COARSEN -> children_will_be_coarsened, CELL_INVALID -> cell_invalid).
-<br>
-(Pasquale Claudio Africa, 2023/07/03)

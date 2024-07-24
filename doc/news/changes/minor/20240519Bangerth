@@ -1,9 +1,0 @@
-Deprecated: Namespace FETools::Compositing had three functions
-FETools::Compositing::multiply_dof_numbers(),
-FETools::Compositing::compute_restriction_is_additive(), and
-FETools::Compositing::compute_nonzero_components() that took pointers to five
-finite elements and five multiplicities. These have now been
-deprecated in favor of the versions of these functions that take a
-vector of elements and a vector of multiplicities.
-<br>
-(Wolfgang Bangerth, 2024/05/19)

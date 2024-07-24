@@ -1,3 +1,0 @@
-Fixed: FETools::get_fe_by_name() now works also for simplex finite elements.
-<br>
-(Luca Heltai, 2023/07/08)

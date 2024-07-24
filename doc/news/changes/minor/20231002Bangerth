@@ -1,4 +1,0 @@
-New: The function IndexSet::get_view() now has an overload that
-computes the view with regard to an arbitrary mask.
-<br>
-(Wolfgang Bangerth, 2023/10/02)

@@ -1,5 +1,0 @@
-New: LinearAlgebra::TpetraWrappers::SparseMatrix class
-that implements a wrapper for Tpetra::CrsMatrix.
-<br>
-(Sebastian Kinnewig, 2023/11/22)
-

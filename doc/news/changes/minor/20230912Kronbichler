@@ -1,7 +1,0 @@
-Improved: FEEvaluation::get_gradient() and FEEvaluation::submit_gradient() are
-now considerably faster for Raviart-Thomas elements on non-Cartesian meshes.
-The previous algorithm used non-optimal loop layouts for the local tensor
-contractions in the derivative of the Piola transform, which have been
-transformed to optimal-complexity variants.
-<br>
-(Martin Kronbichler, 2023/09/12)

@@ -1,5 +1,0 @@
-Fixed: IndexSet::add_index() would not recognize single indices already added,
-leading to an unnecessary quadratic complexity in case the same entry is added
-many times. This is now fixed.
-<br>
-(Martin Kronbichler, 2023/06/30)

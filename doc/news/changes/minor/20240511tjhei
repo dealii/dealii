@@ -1,5 +1,0 @@
-Changed: Several tutorials (step-15, step-72, step-77) dealing with
-nonlinear problems have been simplified by using AffineConstraints
-for boundary conditions.
-<br>
-(Timo Heister, 2024/05/11)

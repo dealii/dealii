@@ -1,3 +1,0 @@
-Fixed: Fix make_flux_sparsity_pattern for a FECollection containing FE_Nothing elements. 
-<br>
-(Magdalena Schreter-Fleischhacker, Andreas Ritthaler, 2024/02/19)

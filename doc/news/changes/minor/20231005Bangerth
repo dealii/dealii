@@ -1,5 +1,0 @@
-New: The function AffineConstraints::get_view() can be used to obtain
-the constraints that correspond to a specific subset of degrees of
-freedom.
-<br>
-(Wolfgang Bangerth, 2023/10/05)

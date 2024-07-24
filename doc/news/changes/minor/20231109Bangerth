@@ -1,5 +1,0 @@
-Fixed: A mistake in marking a `private` member function of the
-SphericalManifold class made it impossible to derive from this class
-in any meaningful way. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2023/11/09)

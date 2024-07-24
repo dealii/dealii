@@ -1,5 +1,0 @@
-New: The functions GridGenerator::hyper_shell() and
-GridGenerator::hyper_cube_with_cylindrical_hole() now support
-dim=2 and spacedim=3.
-<br>
-(Peter Munch, 2024/07/16)

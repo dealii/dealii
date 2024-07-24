@@ -1,5 +1,0 @@
-New: Add GridGenerator::plate_with_a_hole, GridGenerator::channel_with_cylinder,
-and GridGenerator::hyper_ball_balanced to the python wrappers
-<br>
-(Bruno Turcksin, 2024/03/27)
-

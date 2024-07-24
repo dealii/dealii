@@ -1,5 +1,0 @@
-Improved: Several functions in MappingCartesian have been carefully rewritten
-for better performance, e.g., by avoiding divisions and making use of recurring
-operations.
-<br>
-(Martin Kronbichler, 2024/04/01)

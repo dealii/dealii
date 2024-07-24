@@ -1,6 +1,0 @@
-Improved: convert_to_distributed_compute_point_locations_internal() takes a pointer to a vector
-of quadratures as an additional argument. In case this pointer is not a null pointer, the vector is
-populated by the mapped quadratures that are internally used during the conversion.
-<br>
-(Johannes Heinz, 2023/12/29)
-

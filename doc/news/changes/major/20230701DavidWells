@@ -1,4 +1,0 @@
-New: All vector classes in deal.II now inherit from ReadVector, which provides
-some common read operations.
-<br>
-(David Wells, 2023/07/01)

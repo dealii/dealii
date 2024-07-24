@@ -1,4 +1,0 @@
-New: Add alternative interfaces to RemotePointEvaluation::evaluate_and_process and
-RemotePointEvaluation::process_and_evaluate.
-<br>
-(Magdalena Schreter, Peter Munch, 2023/09/17)

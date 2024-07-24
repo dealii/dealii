@@ -1,4 +1,0 @@
-New: Added overloads of missing trigonometric functions (acos, asin, atan) and 
-hyperbolic functions (cosh, sinh, tanh, acosh, asinh, atanh) for VectorizedArray.
-<br>
-(Magdalena Schreter-Fleischhacker, Johannes Resch, Martin Kronbichler 2024/05/15)
