@@ -38,10 +38,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: set up path
+      # needed to use GNU patch instead of Strawberry Perl patch
+      run: |
+        echo "c:\program files\git\usr\bin" >> $env:GITHUB_PATH
     - name: info
       run: |
+        patch --version
         cmake --version
-        cmake -h
         wmic logicaldisk get size, freespace, caption
     - name: configure
       run: |
