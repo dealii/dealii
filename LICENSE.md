@@ -4,8 +4,7 @@ deal.II Copyright and License
 This directory contains the deal.II library.
 
 The deal.II library is copyrighted by the deal.II authors. This term refers
-to the people listed in the file `AUTHORS` and in the [authors
-list](https://www.dealii.org/authors.html) on the webpage.
+to the people listed in the file `AUTHORS.md`.
 
 The deal.II library is free software; it is licensed under the <b>GNU
 Lesser General Public License v2.1 or later</b>. The deal.II authors are in
