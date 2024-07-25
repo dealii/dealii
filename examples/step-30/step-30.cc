@@ -339,20 +339,18 @@ namespace Step30
   template <int dim>
   DGMethod<dim>::DGMethod(const bool anisotropic)
     : mapping()
-    ,
     // Change here for DG methods of different degrees.
-    degree(1)
+    , degree(1)
     , fe(degree)
     , dof_handler(triangulation)
     , anisotropic_threshold_ratio(3.)
     , anisotropic(anisotropic)
-    ,
     // As beta is a linear function, we can choose the degree of the
     // quadrature for which the resulting integration is correct. Thus, we
     // choose to use <code>degree+1</code> Gauss points, which enables us to
     // integrate exactly polynomials of degree <code>2*degree+1</code>, enough
     // for all the integrals we will perform in this program.
-    quadrature(degree + 1)
+    , quadrature(degree + 1)
     , face_quadrature(degree + 1)
     , dg()
   {}
