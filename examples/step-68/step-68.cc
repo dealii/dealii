@@ -231,7 +231,7 @@ namespace Step68
 
     DoFHandler<dim>                            fluid_dh;
     const FESystem<dim>                        fluid_fe;
-    MappingQ1<dim>                             mapping;
+    const MappingQ1<dim>                       mapping;
     LinearAlgebra::distributed::Vector<double> velocity_field;
 
     Functions::RayleighKotheVortex<dim> velocity;

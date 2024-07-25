@@ -688,7 +688,7 @@ namespace Step37
     const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     AffineConstraints<double> constraints;
     using SystemMatrixType =

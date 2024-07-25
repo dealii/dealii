@@ -161,7 +161,7 @@ namespace Step47
 
     Triangulation<dim> triangulation;
 
-    MappingQ<dim> mapping;
+    const MappingQ<dim> mapping;
 
     const FE_Q<dim>           fe;
     DoFHandler<dim>           dof_handler;

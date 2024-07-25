@@ -610,7 +610,7 @@ namespace Step65
                 << std::endl
                 << std::endl;
 
-      MappingQ<dim> mapping(fe.degree + 1);
+      const MappingQ<dim> mapping(fe.degree + 1);
       setup_system(mapping);
       assemble_system(mapping);
       solve();

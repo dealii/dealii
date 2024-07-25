@@ -926,7 +926,7 @@ namespace Step59
     const FE_DGQHermite<dim> fe;
     DoFHandler<dim>          dof_handler;
 
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     using SystemMatrixType = LaplaceOperator<dim, fe_degree, double>;
     SystemMatrixType system_matrix;

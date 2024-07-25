@@ -3219,7 +3219,7 @@ namespace Step44
     Vector<double> soln(solution_n.size());
     for (unsigned int i = 0; i < soln.size(); ++i)
       soln(i) = solution_n(i);
-    MappingQEulerian<dim> q_mapping(degree, dof_handler, soln);
+    const MappingQEulerian<dim> q_mapping(degree, dof_handler, soln);
     data_out.build_patches(q_mapping, degree);
 
     std::ofstream output("solution-" + std::to_string(dim) + "d-" +

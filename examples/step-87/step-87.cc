@@ -161,8 +161,8 @@ namespace Step87
     constexpr unsigned int dim       = 2;
     constexpr unsigned int fe_degree = 3;
 
-    MappingQ1<dim>     mapping;
-    Triangulation<dim> tria;
+    const MappingQ1<dim> mapping;
+    Triangulation<dim>   tria;
     GridGenerator::subdivided_hyper_cube(tria, 7);
 
     const FE_Q<dim> fe(fe_degree);
@@ -299,7 +299,7 @@ namespace Step87
 
     pcout << "Running: example 1" << std::endl;
 
-    MappingQ1<dim>                mapping;
+    const MappingQ1<dim>          mapping;
     DistributedTriangulation<dim> tria(MPI_COMM_WORLD);
     GridGenerator::subdivided_hyper_cube(tria, 7);
 
@@ -466,7 +466,7 @@ namespace Step87
     pcout << "  - create system" << std::endl;
 
     const FE_Q<dim>               fe(fe_degree);
-    MappingQ1<dim>                mapping;
+    const MappingQ1<dim>          mapping;
     DistributedTriangulation<dim> tria(MPI_COMM_WORLD);
     GridGenerator::subdivided_hyper_cube(tria, 50);
 
@@ -736,9 +736,9 @@ namespace Step87
     GridGenerator::hyper_cube(tria_background);
     tria_background.refine_global(5);
 
-    MappingQ1<dim>      mapping_background;
-    const FESystem<dim> fe_background(FE_Q<dim>(degree), dim);
-    DoFHandler<dim>     dof_handler_background(tria_background);
+    const MappingQ1<dim> mapping_background;
+    const FESystem<dim>  fe_background(FE_Q<dim>(degree), dim);
+    DoFHandler<dim>      dof_handler_background(tria_background);
     dof_handler_background.distribute_dofs(fe_background);
 
     // and, similarly, for the immersed surface mesh.
@@ -758,8 +758,8 @@ namespace Step87
     // that is updated in every time step according to the nodal
     // displacements. Two types of finite elements are used to
     // represent scalar and vector-valued DoF values.
-    MappingQ<dim - 1, dim>      mapping_immersed_base(3);
-    MappingQCache<dim - 1, dim> mapping_immersed(3);
+    const MappingQ<dim - 1, dim> mapping_immersed_base(3);
+    MappingQCache<dim - 1, dim>  mapping_immersed(3);
     mapping_immersed.initialize(mapping_immersed_base, tria_immersed);
     const QGauss<dim - 1> quadrature_immersed(degree + 1);
 
