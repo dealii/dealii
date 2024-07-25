@@ -278,6 +278,7 @@ private:
 
 // ------------------------------- inline functions --------------------------
 
+#ifndef DOXYGEN
 
 template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
@@ -399,9 +400,9 @@ inline DEAL_II_ALWAYS_INLINE
   // https://en.cppreference.com/w/cpp/atomic/memory_order#Release-Acquire_ordering
   //
   if (!object_is_initialized.load(std::memory_order_acquire))
-#ifdef DEAL_II_HAVE_CXX20
+#  ifdef DEAL_II_HAVE_CXX20
     [[unlikely]]
-#endif
+#  endif
     {
       // Check again. If this thread won the race to the lock then we
       // would like to initialize the object. Otherwise another thread has
@@ -506,6 +507,7 @@ std::size_t Lazy<T>::memory_consumption() const
          sizeof(*this) - sizeof(task_result);
 }
 
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 #endif

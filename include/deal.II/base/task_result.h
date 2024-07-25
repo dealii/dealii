@@ -394,6 +394,7 @@ namespace Threads
 
   // ------------------------------- inline functions --------------------------
 
+#ifndef DOXYGEN
 
   template <typename T>
   inline TaskResult<T>::TaskResult(TaskResult<T> &&other) noexcept
@@ -615,7 +616,11 @@ namespace Threads
       join();
     return task_result.value();
   }
+
+#endif
+
 } // namespace Threads
+
 
 /**
  * @}
