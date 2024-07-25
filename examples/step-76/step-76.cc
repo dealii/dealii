@@ -1203,7 +1203,7 @@ namespace Euler_DG
 #endif
 
     const FESystem<dim> fe;
-    MappingQ<dim>       mapping;
+    const MappingQ<dim> mapping;
     DoFHandler<dim>     dof_handler;
 
     TimerOutput timer;

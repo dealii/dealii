@@ -273,7 +273,7 @@ namespace Step64
     const DoFHandler<dim>           &dof_handler,
     const AffineConstraints<double> &constraints)
   {
-    MappingQ<dim> mapping(fe_degree);
+    const MappingQ<dim> mapping(fe_degree);
     typename Portable::MatrixFree<dim, double>::AdditionalData additional_data;
     additional_data.mapping_update_flags = update_values | update_gradients |
                                            update_JxW_values |

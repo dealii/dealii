@@ -373,7 +373,7 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_system()
   {
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     auto cell_worker =
       [&](const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -425,8 +425,8 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid()
   {
-    MappingQ1<dim>     mapping;
-    const unsigned int n_levels = triangulation.n_levels();
+    const MappingQ1<dim> mapping;
+    const unsigned int   n_levels = triangulation.n_levels();
 
     std::vector<AffineConstraints<double>> boundary_constraints(n_levels);
     for (unsigned int level = 0; level < n_levels; ++level)

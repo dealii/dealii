@@ -81,10 +81,10 @@ namespace Step11
     void solve();
     void write_high_order_mesh(const unsigned cycle);
 
-    Triangulation<dim> triangulation;
-    const FE_Q<dim>    fe;
-    DoFHandler<dim>    dof_handler;
-    MappingQ<dim>      mapping;
+    Triangulation<dim>  triangulation;
+    const FE_Q<dim>     fe;
+    DoFHandler<dim>     dof_handler;
+    const MappingQ<dim> mapping;
 
     SparsityPattern           sparsity_pattern;
     SparseMatrix<double>      system_matrix;

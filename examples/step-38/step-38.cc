@@ -111,10 +111,10 @@ namespace Step38
     void compute_error() const;
 
 
-    Triangulation<dim, spacedim> triangulation;
-    const FE_Q<dim, spacedim>    fe;
-    DoFHandler<dim, spacedim>    dof_handler;
-    MappingQ<dim, spacedim>      mapping;
+    Triangulation<dim, spacedim>  triangulation;
+    const FE_Q<dim, spacedim>     fe;
+    DoFHandler<dim, spacedim>     dof_handler;
+    const MappingQ<dim, spacedim> mapping;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;

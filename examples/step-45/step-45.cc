@@ -103,7 +103,7 @@ namespace Step45
 
     ConditionalOStream pcout;
 
-    MappingQ<dim> mapping;
+    const MappingQ<dim> mapping;
   };
 
 
