@@ -467,7 +467,7 @@ namespace LinearAlgebra
         Teuchos::ParameterList &relaxParams =
           this->parameter_list.sublist("schwarz: subdomain solver parameters",
                                        false);
-        relaxParams.set("relaxation: type", "Symmetric Gauss-Seidel");
+        relaxParams.set("relaxation: type", "Gauss-Seidel");
         relaxParams.set("relaxation: damping factor", ad.omega);
         relaxParams.set("relaxation: sweeps", ad.n_sweeps);
         relaxParams.set("relaxation: fix tiny diagonal entries",

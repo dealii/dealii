@@ -334,7 +334,7 @@ Step4<dim>::solve(int cycle)
     solution = 0;
 
     SolverControl solver_control(1000, 1e-5);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
+    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
       solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(

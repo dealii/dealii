@@ -4,7 +4,7 @@ DEAL:01089:CustomSGS::Solver stopped after 41 iterations
 DEAL:01089:Jacobi::Solver stopped within 49 - 51 iterations
 DEAL:01089:l1Jacobi::Solver stopped within 49 - 51 iterations
 DEAL:01089:l1GaussSeidel::Solver stopped after 48 iterations
-DEAL:01089:SOR::Solver stopped after 25 iterations
+DEAL:01089:SOR::Solver stopped within 31 - 33 iterations
 DEAL:01089:SSOR::Solver stopped within 40 - 42 iterations
 DEAL:01089:BlockJacobi::Solver stopped after 58 iterations
 DEAL:01089:BlockSOR::Solver stopped after 16 iterations
@@ -25,7 +25,7 @@ DEAL:04225:CustomSGS::Solver stopped after 78 iterations
 DEAL:04225:Jacobi::Solver stopped within 100 - 102 iterations
 DEAL:04225:l1Jacobi::Solver stopped within 100 - 102 iterations
 DEAL:04225:l1GaussSeidel::Solver stopped after 98 iterations
-DEAL:04225:SOR::Solver stopped after 46 iterations
+DEAL:04225:SOR::Solver stopped within 62 - 64 iterations
 DEAL:04225:SSOR::Solver stopped within 77 - 79 iterations
 DEAL:04225:BlockJacobi::Solver stopped after 82 iterations
 DEAL:04225:BlockSOR::Solver stopped after 20 iterations
