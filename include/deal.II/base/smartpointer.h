@@ -367,16 +367,19 @@ template <typename T, typename P>
 inline SmartPointer<T, P> &
 SmartPointer<T, P>::operator=(T *tt)
 {
-  // optimize if no real action is
-  // requested
+  // optimize if no real action is requested
   if (t == tt)
     return *this;
 
+  // Let us unsubscribe from the current object
   if (pointed_to_object_is_alive && t != nullptr)
     t->unsubscribe(&pointed_to_object_is_alive, id);
+
+  // Then reset to the new object, and subscribe to it
   t = tt;
   if (tt != nullptr)
-    tt->subscribe(&pointed_to_object_is_alive, id);
+    t->subscribe(&pointed_to_object_is_alive, id);
+
   return *this;
 }
 
@@ -393,11 +396,14 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, Q> &tt)
   if (&tt == this)
     return *this;
 
+  // Let us unsubscribe from the current object
   if (pointed_to_object_is_alive && t != nullptr)
     t->unsubscribe(&pointed_to_object_is_alive, id);
-  t = static_cast<T *>(tt);
+
+  // Then reset to the new object, and subscribe to it
+  t = tt.get();
   if (tt.pointed_to_object_is_alive && tt != nullptr)
-    tt->subscribe(&pointed_to_object_is_alive, id);
+    t->subscribe(&pointed_to_object_is_alive, id);
   return *this;
 }
 
@@ -413,11 +419,15 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, P> &tt)
   if (&tt == this)
     return *this;
 
+  // Let us unsubscribe from the current object
   if (pointed_to_object_is_alive && t != nullptr)
     t->unsubscribe(&pointed_to_object_is_alive, id);
-  t = static_cast<T *>(tt);
+
+  // Then reset to the new object, and subscribe to it
+  t = tt.get();
   if (tt.pointed_to_object_is_alive && tt != nullptr)
-    tt->subscribe(&pointed_to_object_is_alive, id);
+    t->subscribe(&pointed_to_object_is_alive, id);
+
   return *this;
 }
 
