@@ -1,0 +1,7 @@
+Deprecated: SmartPointer is clearly documented as not owning the
+object it points to. Yet, SmartPointer::clear() deletes the object
+pointed to, thereby assuming that the SmartPointer object actually
+owns the object. This must surely be confusing. As a consequence the
+function is now deprecated.
+<br>
+(Wolfgang Bangerth, 2024/07/25)
