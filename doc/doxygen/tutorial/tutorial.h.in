@@ -477,12 +477,6 @@
  *       </td></tr>
  *
  *   <tr valign="top">
- *       <td>step-52</td>
- *       <td> Solving the time dependent neutron diffusion equation using
- *       Runge-Kutta methods. Explicit and implicit time stepping.
- *       </td></tr>
- *
- *   <tr valign="top">
  *       <td>step-53</td>
  *       <td> Describing the geometry of complex domains and curved boundaries.
  *       </td></tr>
@@ -1503,12 +1497,6 @@
  *     <td> The nonlinear Schr&ouml;dinger equation
  *     </td>
  *     <td>step-58</td>
- *   </tr>
- *
- *   <tr valign="top">
- *     <td> Time dependent neutron diffusion equation
- *     </td>
- *     <td>step-52</td>
  *   </tr>
  *
  *   <tr valign="top">

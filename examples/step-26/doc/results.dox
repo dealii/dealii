@@ -90,7 +90,7 @@ more widely used (and even less accurate) implicit (=backward) Euler method,
 but many other, more accurate methods such as BDF or
 Runge-Kutta methods are available and should be used as they do not represent
 much additional effort. It is not difficult to implement this for the current
-program, if one wanted; a more systematic treatment is also given in step-52.
+program, if one wanted; a more systematic treatment is also given in step-86.
 
 As a general rule, however, one should not be implementing time stepping
 methods by hand, as we do here, for problems that do not require
