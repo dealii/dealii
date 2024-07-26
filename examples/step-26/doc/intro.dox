@@ -52,7 +52,7 @@ the explicit Euler ($\theta=0$), implicit Euler ($\theta=1$) and
 Crank-Nicolson ($\theta=\frac 12$) time discretizations. Since the latter has
 the highest convergence order, we will choose $\theta=\frac 12$ in the program
 below, but make it so that playing with this parameter remains simple. (If you
-are interested in playing with higher order methods, take a look at step-52.)
+are interested in playing with higher order methods, take a look at step-86.)
 
 Given this time discretization, space discretization happens as it always
 does, by multiplying with test functions, integrating by parts, and then
