@@ -15,6 +15,12 @@ step-26 but, since the purpose of this program is only to demonstrate using
 more advanced ways to interface with deal.II's time stepping algorithms, only
 solves a simple problem on a uniformly refined mesh.
 
+@note At the end of the day, time stepping is a problem that is only
+  solved efficiently if you use adaptive time step selection and error
+  control.  This is implemented in many external libraries, but not in
+  deal.II itself.  You may want to consider looking at step-86 for a
+  worked out example. In the meantime, this program is deprecated and
+  will be removed after the deal.II 9.6 release.
 
 <h3>Problem statement</h3>
 
