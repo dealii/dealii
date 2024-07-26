@@ -28,7 +28,8 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,
-        const ComponentMask &);
+        const ComponentMask &,
+        const unsigned int);
 
       template void
       interpolate(
@@ -36,14 +37,16 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,
-        const ComponentMask &);
+        const ComponentMask &,
+        const unsigned int);
 
       template void
       interpolate(
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const Function<deal_II_space_dimension, VEC::value_type> &,
         VEC &,
-        const ComponentMask &);
+        const ComponentMask &,
+        const unsigned int);
 
       template void
       interpolate(

@@ -36,7 +36,7 @@
 
 template <int dim>
 void
-do_test()
+do_test(const bool interpolate_with_vector_tools)
 {
   parallel::distributed::Triangulation<dim> triangulation(
     MPI_COMM_WORLD,
@@ -87,6 +87,19 @@ do_test()
     transfer.build(dof_handler);
     transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);
 
+    if (interpolate_with_vector_tools)
+      for (unsigned int level = 0; level < triangulation.n_global_levels();
+           ++level)
+        {
+          dof_vector[level] = 0.0;
+
+          VectorTools::interpolate(dof_handler,
+                                   Functions::SquareFunction<dim>(),
+                                   dof_vector[level],
+                                   {},
+                                   level);
+        }
+
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
@@ -115,7 +128,9 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    log;
 
-  do_test<2>();
+  do_test<2>(true);
+  do_test<2>(true);
+
   //  do_test<3>();
   return 0;
 }
