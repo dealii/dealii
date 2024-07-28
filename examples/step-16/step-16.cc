@@ -74,10 +74,10 @@
 #include <iostream>
 #include <fstream>
 
-using namespace dealii;
-
 namespace Step16
 {
+  using namespace dealii;
+
   // @sect3{The Scratch and Copy objects}
   //
   // We use MeshWorker::mesh_loop() to assemble our matrices. For this, we

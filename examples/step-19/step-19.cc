@@ -61,8 +61,6 @@
 
 #include <fstream>
 
-using namespace dealii;
-
 
 // @sect3{Global definitions}
 
@@ -87,6 +85,8 @@ using namespace dealii;
 // they had started at 0).
 namespace Step19
 {
+  using namespace dealii;
+
   namespace BoundaryIds
   {
     constexpr types::boundary_id open          = 101;
