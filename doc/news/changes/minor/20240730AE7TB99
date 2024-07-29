@@ -1,0 +1,6 @@
+Uniformly apply the practice of importing the 'dealii' namespace
+only within the StepXX namespace across all tutorial programs,
+except for step-49 and step-50. These steps will be handled separately
+to ensure proper integration and testing.
+<br>
+(Lóránt Hadnagy, 2024/07/30)

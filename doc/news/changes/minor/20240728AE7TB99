@@ -1,4 +1,0 @@
-Uniformly apply the practice of importing the 'dealii' namespace
-only within the StepXX namespace across all tutorial programs.
-<br>
-(Lóránt Hadnagy, 2024/07/28)
