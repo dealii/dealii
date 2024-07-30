@@ -197,6 +197,7 @@ foreach(_feature ${_deal_ii_features_sorted})
     endif()
 
     if(_feature MATCHES "KOKKOS")
+      _detailed("#            KOKKOS_VERSION = ${Kokkos_VERSION}\n")
       _detailed("#            KOKKOS_BACKENDS = ${Kokkos_DEVICES}\n")
       _detailed("#            KOKKOS_ARCHITECTURES = ${Kokkos_ARCH}\n")
     endif()
