@@ -48,6 +48,24 @@ namespace LinearAlgebra
      *
      * @note Only float and double are supported.
      *
+     * <h4>Moving data</h4>
+     * You can move data to/from the device as follows:
+     * @code
+     *   unsigned int size = 10;
+     *   LinearAlgebra::ReadWriteVector<double> rw_vector(size);
+     *
+     *   ...do something with the rw_vector...
+     *
+     *   // Move the data to the device:
+     *   LinearAlgebra::CUDAWrappers::Vector<double> vector_dev(size);
+     *   vector_dev.import_elements(rw_vector, VectorOperations::insert);
+     *
+     *   ...do some computations on the device...
+     *
+     *   // Move the data back to the host:
+     *   rw_vector.import_elements(vector_dev, VectorOperations::insert);
+     * @endcode
+     *
      * @see CUDAWrappers
      * @ingroup Vectors
      */
