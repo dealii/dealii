@@ -555,7 +555,7 @@
  *       <td>step-64</td>
  *       <td> Solving a Helmholtz problem using matrix-free methods on the GPU
  *       with MPI parallelization.
- *       <br/> Keywords: LinearAlgebra::CUDAWrappers, CUDAWrappers::MatrixFree
+ *       <br/> Keywords: Portable::MatrixFree, Portable::FEEvaluation, Kokkos
  *       </td></tr>
  *
  *   <tr valign="top">
