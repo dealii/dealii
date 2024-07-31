@@ -3547,6 +3547,109 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
 
 
 /**
+ * Return the symmetrized version of a full rank-4 tensor, i.e.
+ * as a symmetric rank-4 tensor.
+ * @param symmetry_type decides the type of symmetry - 
+ * only minor symmetry ( @param symmetry_type = 0 ) or 
+ * both major and minor symmetry ( @param symmetry_type = 1 ). 
+ * The symmetries are defined as follows:
+ * Minor symmetry - $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$
+ * Major symmetry = $A_{ijkl}=A_{klij}$.
+ * This is the version for general dimensions.
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number>
+DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<4, dim, Number>
+  symmetrize(const Tensor<4, dim, Number> &t,
+             const unsigned int            symmetry_type = 0)
+{
+  SymmetricTensor<4, dim, Number> result;
+  for (unsigned int i = 0; i < dim; ++i)
+    result[i][i][i][i] = t[i][i][i][i];
+
+  const Number half = internal::NumberType<Number>::value(0.5);
+
+  if (symmetry_type == 0)
+    {
+      // only minor symmetry - A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}
+
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = 0; l < dim; ++l)
+              {
+                if (i != j && k == l)
+                  {
+                    // A_{ijkk}=A_{jikk}
+                    result[i][j][k][k] = (t[i][j][k][k] + t[j][i][k][k]) * half;
+                  }
+                else if (i == j && k != l)
+                  {
+                    // A_{iikl}=A_{iilk}
+                    result[i][i][k][l] = (t[i][i][k][l] + t[i][i][l][k]) * half;
+                  }
+                else if (i != j && k != l)
+                  {
+                    // A_{ijkl}=A_{jilk}
+                    result[i][j][k][l] = (t[i][j][k][l] + t[j][i][k][l] +
+                                          t[i][j][l][k] + t[j][i][l][k]) *
+                                         half * half;
+                  }
+                else
+                  {
+                    // A_{iijj} unchanged
+                    result[i][j][k][l] = t[i][j][k][l];
+                  }
+              }
+    }
+  else if (symmetry_type == 1)
+    {
+      std::cout << "both major and minor symmetry" << std::endl;
+
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = 0; l < dim; ++l)
+              {
+                if (i != j && k == l)
+                  {
+                    // A_{ijkk}=A_{jikk}
+                    result[i][j][k][k] = (t[i][j][k][k] + t[j][i][k][k]) * half;
+                  }
+                else if (i == j && k != l)
+                  {
+                    // A_{iikl}=A_{iilk}
+                    result[i][i][k][l] = (t[i][i][k][l] + t[i][i][l][k]) * half;
+                  }
+                else if (i != j && k != l)
+                  {
+                    // A_{ijkl}=A_{jilk}
+                    result[i][j][k][l] = (t[i][j][k][l] + t[j][i][k][l] +
+                                          t[i][j][l][k] + t[j][i][l][k]) *
+                                         half * half;
+                  }
+                else
+                  {
+                    // A_{iijj} unchanged
+                    result[i][j][k][l] = t[i][j][k][l];
+                  }
+              }
+
+      // major symmetry
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = i; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = k; l < dim; ++l)
+              result[i][j][k][l] = (t[i][j][k][l] + t[k][l][i][j]) * half;
+    }
+  return result;
+}
+
+
+
+/**
  * Multiplication of a symmetric tensor of general rank with a scalar from the
  * right. This version of the operator is used if the scalar has the same data
  * type as is used to store the elements of the symmetric tensor.
