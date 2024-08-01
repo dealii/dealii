@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/task_result.h>
 
 #include <atomic>
 #include <mutex>
@@ -229,26 +230,16 @@ public:
 
 
   /**
-   * Return a reference to the contained object.
-   *
-   * @pre The object has been initialized with a call to
-   * ensure_initialized() or value_or_initialize().
-   */
-  T &
-  value();
-
-
-  /**
    * If the underlying object is initialized the function simply returns a
    * const reference to the contained value. Otherwise, the @p creator()
    * function object is called to initialize the object first.
    *
    * This function mimics the syntax of the std::optional<T> interface and
    * is functionally equivalent to calling ensure_initialized() followed by
-   * value().
-   *
-   * @note This method can be called from a context where the Lazy<T>
-   * wrapper itself is marked const. FIXME
+   * value(). It returns a `const` reference to make clear that the object
+   * created by the `creator` function is what it is, and is not subject
+   * to later modification unless one calls reset() and creates a new
+   * object.
    *
    * @post The underlying object is initialized, meaning, has_value()
    * returns true.
@@ -260,18 +251,6 @@ public:
   value_or_initialize(const Callable &creator) const
     DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>));
 
-
-  /**
-   * Variant of above function that returns a non-const reference.
-   *
-   * @dealiiConceptRequires{std::is_invocable_r_v<T, Callable>}
-   */
-  template <typename Callable>
-  DEAL_II_ALWAYS_INLINE inline T &
-  value_or_initialize(const Callable &creator)
-    DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>));
-
-
   /**
    * Compute the memory consumption of this structure.
    */
@@ -280,9 +259,9 @@ public:
 
 private:
   /**
-   * The lazily initialized object stored as a std::optional<T>.
+   * A handle to the task used to create the lazily initialized object.
    */
-  mutable std::optional<T> object;
+  mutable Threads::TaskResult<T> task_result;
 
 
   /**
@@ -290,12 +269,6 @@ private:
    * a thread-safe manner.
    */
   mutable std::atomic<bool> object_is_initialized;
-
-
-  /**
-   * A mutex used for protecting the initialization of the object.
-   */
-  mutable Threads::Mutex initialization_mutex;
 };
 
 /**
@@ -305,6 +278,7 @@ private:
 
 // ------------------------------- inline functions --------------------------
 
+#ifndef DOXYGEN
 
 template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
@@ -314,32 +288,39 @@ inline Lazy<T>::Lazy()
 {}
 
 
+
 template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
 inline Lazy<T>::Lazy(const Lazy &other)
-  : object(other.object)
 {
-  object_is_initialized.store(other.object_is_initialized.load());
+  // If the other object has a value stored, then get it and set our
+  // own object to a copy of it:
+  if (other.has_value())
+    {
+      object_is_initialized.store(true);
+      task_result =
+        Threads::new_task([&other]() -> T { return other.value(); });
+      task_result.join();
+    }
+  else
+    object_is_initialized.store(false);
 }
+
 
 
 template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
 inline Lazy<T>::Lazy(Lazy &&other) noexcept
-  : object(std::move(other.object))
+  : task_result(std::move(other.task_result))
 {
   object_is_initialized.store(other.object_is_initialized.load());
 
-  // Mark the other object as uninitialized. This is marginally non-trivial
-  // because moving from std::optional<T> does *not* result in an empty
-  // std::optional<T> but instead one that does contain a T, but one that
-  // has been moved from -- typically something akin to a default-initialized
-  // T. That seems undesirable, so reset everything to an empty state.
+  // Mark the other object as uninitialized.
   other.object_is_initialized.store(false);
-  other.object.reset();
 }
+
 
 
 template <typename T>
@@ -347,10 +328,23 @@ DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
 inline Lazy<T> &Lazy<T>::operator=(const Lazy &other)
 {
-  object = other.object;
-  object_is_initialized.store(other.object_is_initialized.load());
+  // If the other object has a value stored, then get it and set our
+  // own object to a copy of it:
+  if (other.has_value())
+    {
+      object_is_initialized.store(true);
+      task_result =
+        Threads::new_task([&other]() -> T { return other.value(); });
+    }
+  else
+    {
+      object_is_initialized.store(false);
+      task_result.clear();
+    }
+
   return *this;
 }
+
 
 
 template <typename T>
@@ -358,19 +352,15 @@ DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
 inline Lazy<T> &Lazy<T>::operator=(Lazy &&other) noexcept
 {
-  object = std::move(other.object);
+  task_result = std::move(other.task_result);
   object_is_initialized.store(other.object_is_initialized.load());
 
-  // Mark the other object as uninitialized. This is marginally non-trivial
-  // because moving from std::optional<T> does *not* result in an empty
-  // std::optional<T> but instead one that does contain a T, but one that
-  // has been moved from -- typically something akin to a default-initialized
-  // T. That seems undesirable, so reset everything to an empty state.
+  // Mark the other object as uninitialized.
   other.object_is_initialized.store(false);
-  other.object.reset();
 
   return *this;
 }
+
 
 
 template <typename T>
@@ -379,7 +369,7 @@ DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
 inline void Lazy<T>::reset() noexcept
 {
   object_is_initialized.store(false);
-  object.reset();
+  task_result.clear();
 }
 
 
@@ -410,41 +400,58 @@ inline DEAL_II_ALWAYS_INLINE
   // https://en.cppreference.com/w/cpp/atomic/memory_order#Release-Acquire_ordering
   //
   if (!object_is_initialized.load(std::memory_order_acquire))
-#ifdef DEAL_II_HAVE_CXX20
+#  ifdef DEAL_II_HAVE_CXX20
     [[unlikely]]
-#endif
+#  endif
     {
-      std::lock_guard<std::mutex> lock(initialization_mutex);
-
-      //
       // Check again. If this thread won the race to the lock then we
-      // initialize the object. Otherwise another thread has already
-      // initialized the object and flipped the object_is_initialized
+      // would like to initialize the object. Otherwise another thread has
+      // already initialized the object and flipped the object_is_initialized
       // bit. (Here, the initialization_mutex ensures consistent ordering
       // with a memory fence, so we will observe the updated bool without
       // acquire semantics.)
       //
+      // Naively, we should think that we can check again for
+      // object_is_initialized to be true, and if it is false just execute
+      // the 'creator' function object. The problem with this approach is that
+      // if we have N worker threads and spawn N+1 tasks that all want to
+      // end querying the Lazy object, then N will be run right away of which
+      // N-1 will block. The one remaining task will have gotten into the
+      // locked section and run the 'creator' object. But if the 'creator'
+      // itself spawns tasks, the scheduler may decide to first execute
+      // the (N+1)st task from above which will then promptly get stuck
+      // here as well -- and we're in a deadlock situation.
+      //
+      // The solution to the problem is to use a scheme whereby the
+      // work we do in setting up 'creator' cannot block, and where we block
+      // below is in a context where it's the *scheduler* that blocks to ensure
+      // that it can continue to schedule tasks.
+      //
+      // This is what TaskResult::try_emplace_task() does:
       if (!object_is_initialized.load(std::memory_order_relaxed))
-        {
-          Assert(object.has_value() == false, ExcInternalError());
-          object.emplace(std::move(creator()));
+        task_result.try_emplace_task(creator);
 
-          //
-          // Flip the object_is_initialized boolean with "release"
-          // semantics [1].
-          //
-          // This ensures that the above move is visible on all threads
-          // before checking the atomic bool with acquire semantics.
-          //
-          object_is_initialized.store(true, std::memory_order_release);
-        }
+      // At this point, either this or another thread have emplaced a
+      // task and we wait for it to complete. If we do need to wait, then
+      // the waiting happens in the task scheduler, which can run other
+      // tasks in the meantime, ensuring progress:
+      task_result.join();
+
+      // At this point, we know that the task has completed (whether set by
+      // this or another thread), and we can flip the object_is_initialized
+      // boolean with "release" semantics [1].
+      //
+      // This ensures that the above move is visible on all threads
+      // before checking the atomic bool with acquire semantics.
+      // If another thread that had also been waiting in the join() call
+      // above has gotten here first and set the flag to 'true', that
+      // ok.
+      object_is_initialized.store(true, std::memory_order_release);
     }
 
-  Assert(
-    object.has_value(),
-    dealii::ExcMessage(
-      "The internal std::optional<T> object does not contain a valid object "
-      "even though we have just initialized it."));
+  Assert(has_value(),
+         ExcMessage("The current object does not contain a valid object "
+                    "even though we have just initialized it."));
 }
 
 
@@ -459,7 +466,7 @@ inline DEAL_II_ALWAYS_INLINE bool Lazy<T>::has_value() const
   // semantics. But just in case let's check the object.has_value() boolean
   // as well:
   //
-  return (object_is_initialized && object.has_value());
+  return (object_is_initialized && (task_result.empty() == false));
 }
 
 
@@ -469,27 +476,12 @@ DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
 inline DEAL_II_ALWAYS_INLINE const T &Lazy<T>::value() const
 {
   Assert(
-    object_is_initialized && object.has_value(),
-    dealii::ExcMessage(
+    has_value(),
+    ExcMessage(
       "value() has been called but the contained object has not been "
       "initialized. Did you forget to call 'ensure_initialized()' first?"));
 
-  return object.value();
-}
-
-
-template <typename T>
-DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
-                        std::is_move_assignable_v<T>))
-inline DEAL_II_ALWAYS_INLINE T &Lazy<T>::value()
-{
-  Assert(
-    object_is_initialized && object.has_value(),
-    dealii::ExcMessage(
-      "value() has been called but the contained object has not been "
-      "initialized. Did you forget to call 'ensure_initialized()' first?"));
-
-  return object.value();
+  return task_result.value();
 }
 
 
@@ -502,20 +494,7 @@ inline DEAL_II_ALWAYS_INLINE const T &Lazy<T>::value_or_initialize(
   DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
 {
   ensure_initialized(creator);
-  return object.value();
-}
-
-
-template <typename T>
-DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
-                        std::is_move_assignable_v<T>))
-template <typename Callable>
-inline DEAL_II_ALWAYS_INLINE T &Lazy<T>::value_or_initialize(
-  const Callable &creator)
-  DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
-{
-  ensure_initialized(creator);
-  return object.value();
+  return task_result.value();
 }
 
 
@@ -524,10 +503,11 @@ DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
 std::size_t Lazy<T>::memory_consumption() const
 {
-  return MemoryConsumption::memory_consumption(object) + //
-         sizeof(*this) - sizeof(object);
+  return MemoryConsumption::memory_consumption(task_result) + //
+         sizeof(*this) - sizeof(task_result);
 }
 
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 #endif
