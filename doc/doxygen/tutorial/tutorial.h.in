@@ -849,7 +849,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Parallelization via CUDA and MPI
+ *     <td> Parallelization via Kokkos and MPI
  *     </td>
  *     <td>
  *       step-64
