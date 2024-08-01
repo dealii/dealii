@@ -3328,7 +3328,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     dof_info.dof_indices_contiguous[ind];
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
-  std::array<VectorizedArrayType *, n_components> values_dofs;
+  std::array<VectorizedArrayType *, n_components> values_dofs{{nullptr}};
   for (unsigned int c = 0; c < n_components; ++c)
     values_dofs[c] = const_cast<VectorizedArrayType *>(this->values_dofs) +
                      c * dofs_per_component;
@@ -3383,7 +3383,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   if (vectors_sm[0] != nullptr)
     {
       const auto compute_vector_ptrs = [&](const unsigned int comp) {
-        std::array<typename VectorType::value_type *, n_lanes> vector_ptrs = {};
+        std::array<typename VectorType::value_type *, n_lanes> vector_ptrs{
+          {nullptr}};
 
         const auto upper_bound =
           std::min<unsigned int>(n_filled_lanes, n_lanes);
@@ -3478,11 +3479,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       return;
     }
 
-  std::array<unsigned int, n_lanes> dof_indices;
-  std::fill(dof_indices.begin(),
-            dof_indices.end(),
-            numbers::invalid_unsigned_int);
-
+  std::array<unsigned int, n_lanes> dof_indices{
+    {numbers::invalid_unsigned_int}};
   Assert(n_filled_lanes <= n_lanes, ExcInternalError());
   for (unsigned int v = 0; v < n_filled_lanes; ++v)
     {
@@ -3524,7 +3522,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                  interleaved_contiguous_strided)
         {
-          std::array<typename VectorType::value_type *, n_components> src_ptrs;
+          std::array<typename VectorType::value_type *, n_components> src_ptrs{
+            {nullptr}};
           if (n_components == 1 || this->n_fe_components == 1)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
@@ -3563,7 +3562,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                    internal::MatrixFreeFunctions::DoFInfo::
                      IndexStorageVariants::interleaved_contiguous_mixed_strides,
                  ExcNotImplemented());
-          std::array<typename VectorType::value_type *, n_components> src_ptrs;
+          std::array<typename VectorType::value_type *, n_components> src_ptrs{
+            {nullptr}};
           if (n_components == 1 || this->n_fe_components == 1)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
@@ -3842,7 +3842,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     return; // nothing to do with faces
 
   std::array<internal::MatrixFreeFunctions::compressed_constraint_kind, n_lanes>
-    constraint_mask;
+    constraint_mask{{internal::MatrixFreeFunctions::
+                       unconstrained_compressed_constraint_kind}};
 
   bool hn_available = false;
 
