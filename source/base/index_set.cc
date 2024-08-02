@@ -17,6 +17,7 @@
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #include <vector>
 
@@ -39,9 +40,10 @@ DEAL_II_NAMESPACE_OPEN
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
+template <typename NodeType>
 IndexSet::IndexSet(
-  const Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>>
-    &map)
+  const Teuchos::RCP<
+    const Tpetra::Map<int, types::signed_global_dof_index, NodeType>> &map)
   : is_compressed(true)
   , index_space_size(1 + map->getMaxAllGlobalIndex())
   , largest_range(numbers::invalid_unsigned_int)
@@ -950,16 +952,18 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
-Tpetra::Map<int, types::signed_global_dof_index>
+template <typename NodeType>
+Tpetra::Map<int, types::signed_global_dof_index, NodeType>
 IndexSet::make_tpetra_map(const MPI_Comm communicator,
                           const bool     overlapping) const
 {
-  return *make_tpetra_map_rcp(communicator, overlapping);
+  return *make_tpetra_map_rcp<NodeType>(communicator, overlapping);
 }
 
 
 
-Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index>>
+template <typename NodeType>
+Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index, NodeType>>
 IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
                               const bool     overlapping) const
 {
@@ -996,7 +1000,7 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
     overlapping ? false : is_ascending_and_one_to_one(communicator);
   if (linear)
     return Utilities::Trilinos::internal::make_rcp<
-      Tpetra::Map<int, types::signed_global_dof_index>>(
+      Tpetra::Map<int, types::signed_global_dof_index, NodeType>>(
       size(),
       n_elements(),
       0,
@@ -1016,7 +1020,7 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
         int_indices);
 
       return Utilities::Trilinos::internal::make_rcp<
-        Tpetra::Map<int, types::signed_global_dof_index>>(
+        Tpetra::Map<int, types::signed_global_dof_index, NodeType>>(
         size(),
         arr_view,
         0,
@@ -1197,6 +1201,54 @@ IndexSet::memory_consumption() const
           sizeof(compress_mutex));
 }
 
+// explicit template instantiations
 
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+template IndexSet::IndexSet(
+  const Teuchos::RCP<const Tpetra::Map<
+    int,
+    types::signed_global_dof_index,
+    LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>>
+    &);
+template IndexSet::IndexSet(
+  const Teuchos::RCP<const Tpetra::Map<
+    int,
+    types::signed_global_dof_index,
+    LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>>
+    &);
+
+template LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Host>
+dealii::IndexSet::make_tpetra_map<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>(
+  int,
+  bool) const;
+template LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<
+  MemorySpace::Default>
+dealii::IndexSet::make_tpetra_map<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>(
+  int,
+  bool) const;
+
+template Teuchos::RCP<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Host>>
+dealii::IndexSet::make_tpetra_map_rcp<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>(
+  int,
+  bool) const;
+template Teuchos::RCP<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Default>>
+dealii::IndexSet::make_tpetra_map_rcp<
+  LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>(
+  int,
+  bool) const;
+
+
+#  endif
+
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

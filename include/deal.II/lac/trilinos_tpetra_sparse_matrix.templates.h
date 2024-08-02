@@ -166,10 +166,14 @@ namespace LinearAlgebra
 
         // Get the Tpetra::Maps
         Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> row_space_map =
-          row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
+          row_parallel_partitioning
+            .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+              communicator, false);
 
         column_space_map =
-          column_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
+          column_parallel_partitioning
+            .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+              communicator, false);
 
         if (column_space_map->getComm()->getRank() == 0)
           {
@@ -280,10 +284,14 @@ namespace LinearAlgebra
 
         // Get the Tpetra::Maps
         Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> row_space_map =
-          row_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
+          row_parallel_partitioning
+            .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+              communicator, false);
 
         column_space_map =
-          column_parallel_partitioning.make_tpetra_map_rcp(communicator, false);
+          column_parallel_partitioning
+            .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+              communicator, false);
 
         if (column_space_map->getComm()->getRank() == 0)
           {
@@ -579,7 +587,8 @@ namespace LinearAlgebra
       const MPI_Comm     communicator,
       const unsigned int n_max_entries_per_row)
       : column_space_map(
-          parallel_partitioning.make_tpetra_map_rcp(communicator, false))
+          parallel_partitioning.template make_tpetra_map_rcp<
+            TpetraTypes::NodeType<MemorySpace>>(communicator, false))
       , matrix(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::MatrixType<Number, MemorySpace>>(
           column_space_map,
@@ -595,7 +604,8 @@ namespace LinearAlgebra
       const MPI_Comm                   communicator,
       const std::vector<unsigned int> &n_entries_per_row)
       : column_space_map(
-          parallel_partitioning.make_tpetra_map_rcp(communicator, false))
+          parallel_partitioning.template make_tpetra_map_rcp<
+            TpetraTypes::NodeType<MemorySpace>>(communicator, false))
       , compressed(false)
     {
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
@@ -620,10 +630,12 @@ namespace LinearAlgebra
       const MPI_Comm  communicator,
       const size_type n_max_entries_per_row)
       : column_space_map(
-          col_parallel_partitioning.make_tpetra_map_rcp(communicator, false))
+          col_parallel_partitioning.template make_tpetra_map_rcp<
+            TpetraTypes::NodeType<MemorySpace>>(communicator, false))
       , matrix(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::MatrixType<Number, MemorySpace>>(
-          row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
+          row_parallel_partitioning.template make_tpetra_map_rcp<
+            TpetraTypes::NodeType<MemorySpace>>(communicator, false),
           n_max_entries_per_row))
       , compressed(false)
     {}
@@ -637,7 +649,8 @@ namespace LinearAlgebra
       const MPI_Comm                   communicator,
       const std::vector<unsigned int> &n_entries_per_row)
       : column_space_map(
-          col_parallel_partitioning.make_tpetra_map_rcp(communicator, false))
+          col_parallel_partitioning.template make_tpetra_map_rcp<
+            TpetraTypes::NodeType<MemorySpace>>(communicator, false))
       , compressed(false)
     {
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
@@ -645,12 +658,16 @@ namespace LinearAlgebra
 #  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
       matrix = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::MatrixType<Number, MemorySpace>>(
-        row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
+        row_parallel_partitioning
+          .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+            communicator, false),
         n_entries_per_row_array);
 #  else
       matrix = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::MatrixType<Number, MemorySpace>>(
-        row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
+        row_parallel_partitioning
+          .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+            communicator, false),
         Teuchos::arcpFromArray(n_entries_per_row_array));
 #  endif
     }
