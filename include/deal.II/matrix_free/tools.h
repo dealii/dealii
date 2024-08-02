@@ -21,8 +21,9 @@
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/matrix_free/portable_fe_evaluation.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/vector_access_internal.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -104,7 +105,27 @@ namespace MatrixFreeTools
     const unsigned int first_selected_component = 0,
     const unsigned int first_vector_component   = 0);
 
-
+  /**
+   * Same as above but for Portable::MatrixFree.
+   */
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename Number,
+            typename MemorySpace,
+            typename QuadOperation>
+  void
+  compute_diagonal(
+    const Portable::MatrixFree<dim, Number>                 &matrix_free,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace> &diagonal_global,
+    const QuadOperation                                     &quad_operation,
+    EvaluationFlags::EvaluationFlags                         evaluation_flags,
+    EvaluationFlags::EvaluationFlags                         integration_flags,
+    const unsigned int                                       dof_no  = 0,
+    const unsigned int                                       quad_no = 0,
+    const unsigned int first_selected_component                      = 0,
+    const unsigned int first_vector_component                        = 0);
 
   /**
    * Same as above but with a class and a function pointer.
@@ -1339,6 +1360,98 @@ namespace MatrixFreeTools
     }
 
   } // namespace internal
+
+
+  template <int dim, int fe_degree, typename Number, typename QuadOperation>
+  class CellAction
+  {
+  public:
+    CellAction(const QuadOperation                   &quad_operation,
+               const EvaluationFlags::EvaluationFlags evaluation_flags,
+               const EvaluationFlags::EvaluationFlags integration_flags)
+      : m_quad_operation(quad_operation)
+      , m_evaluation_flags(evaluation_flags)
+      , m_integration_flags(integration_flags)
+    {}
+
+    KOKKOS_FUNCTION void
+    operator()(const unsigned int /*cell*/,
+               const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+               Portable::SharedData<dim, Number> *shared_data,
+               const Number *,
+               Number *dst) const
+    {
+      Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(
+        gpu_data, shared_data);
+      constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
+      double        diagonal[dofs_per_cell] = {};
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          Kokkos::parallel_for(
+            Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
+            [&](int j) { fe_eval.submit_dof_value(i == j ? 1 : 0, j); });
+          fe_eval.evaluate(m_evaluation_flags);
+          fe_eval.apply_for_each_quad_point(m_quad_operation);
+          fe_eval.integrate(m_integration_flags);
+          Kokkos::single(Kokkos::PerTeam(shared_data->team_member),
+                         [&] { diagonal[i] = fe_eval.get_dof_value(i); });
+        }
+
+      Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          fe_eval.submit_dof_value(diagonal[i], i);
+      });
+      fe_eval.distribute_local_to_global(dst);
+    };
+
+    static constexpr unsigned int n_local_dofs = QuadOperation::n_local_dofs;
+
+  private:
+    const QuadOperation                   &m_quad_operation;
+    const EvaluationFlags::EvaluationFlags m_evaluation_flags;
+    const EvaluationFlags::EvaluationFlags m_integration_flags;
+  };
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename Number,
+            typename MemorySpace,
+            typename QuadOperation>
+  void
+  compute_diagonal(
+    const Portable::MatrixFree<dim, Number>                 &matrix_free,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace> &diagonal_global,
+    const QuadOperation                                     &quad_operation,
+    EvaluationFlags::EvaluationFlags                         evaluation_flags,
+    EvaluationFlags::EvaluationFlags                         integration_flags,
+    const unsigned int                                       dof_no,
+    const unsigned int                                       quad_no,
+    const unsigned int first_selected_component,
+    const unsigned int first_vector_component)
+  {
+    (void)dof_no;
+    (void)quad_no;
+    (void)first_selected_component;
+    (void)first_vector_component;
+    Assert(dof_no == 0, ExcNotImplemented());
+    Assert(quad_no == 0, ExcNotImplemented());
+    Assert(first_selected_component == 0, ExcNotImplemented());
+    Assert(first_vector_component == 0, ExcNotImplemented());
+
+    matrix_free.initialize_dof_vector(diagonal_global);
+
+
+    CellAction<dim, fe_degree, Number, QuadOperation> cell_action(
+      quad_operation, evaluation_flags, integration_flags);
+    // diagonal_global.zero_out_ghost_values();
+    LinearAlgebra::distributed::Vector<Number, MemorySpace> dummy;
+    matrix_free.cell_loop(cell_action, dummy, diagonal_global);
+
+    matrix_free.set_constrained_values(Number(1.), diagonal_global);
+  }
 
   template <int dim,
             int fe_degree,
