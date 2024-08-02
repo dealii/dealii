@@ -88,12 +88,10 @@ namespace PETScWrappers
                                const IndexSet &ghost_indices,
                                const MPI_Comm  communicator)
   {
-    std::vector<types::global_dof_index> in_deal;
-    locally_owned_indices.fill_index_vector(in_deal);
+    const auto            in_deal = locally_owned_indices.get_index_vector();
     std::vector<PetscInt> in_petsc(in_deal.begin(), in_deal.end());
 
-    std::vector<types::global_dof_index> out_deal;
-    ghost_indices.fill_index_vector(out_deal);
+    const auto            out_deal = ghost_indices.get_index_vector();
     std::vector<PetscInt> out_petsc(out_deal.begin(), out_deal.end());
 
     std::vector<PetscInt> dummy;
@@ -400,9 +398,6 @@ namespace PETScWrappers
                       const IndexSet &larger_ghost_indices,
                       const MPI_Comm  communicator)
   {
-    std::vector<types::global_dof_index> local_indices;
-    locally_owned_indices.fill_index_vector(local_indices);
-
     ghost_indices_data = ghost_indices;
     ghost_indices_data.subtract_set(locally_owned_indices);
     ghost_indices_data.compress();
@@ -419,7 +414,9 @@ namespace PETScWrappers
       }
 
     ghost.reinit(locally_owned_indices, ghost_indices_data, communicator);
-    larger_ghost.reinit(local_indices, expanded_ghost_indices, communicator);
+    larger_ghost.reinit(locally_owned_indices.get_index_vector(),
+                        expanded_ghost_indices,
+                        communicator);
     n_ghost_indices_data   = ghost_indices_data.n_elements();
     n_ghost_indices_larger = larger_ghost_indices.n_elements();
   }
