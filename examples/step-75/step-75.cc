@@ -637,14 +637,14 @@ namespace Step75
   // particular the operators, and the transfer operator as a
   // MGTransferGlobalCoarsening object.
   template <typename VectorType, typename OperatorType, int dim>
-  void solve_with_gmg(SolverControl                   &solver_control,
-                      const OperatorType              &system_matrix,
-                      VectorType                      &dst,
-                      const VectorType                &src,
-                      const MultigridParameters       &mg_data,
-                      const hp::MappingCollection<dim> mapping_collection,
-                      const DoFHandler<dim>           &dof_handler,
-                      const hp::QCollection<dim>      &quadrature_collection)
+  void solve_with_gmg(SolverControl                    &solver_control,
+                      const OperatorType               &system_matrix,
+                      VectorType                       &dst,
+                      const VectorType                 &src,
+                      const MultigridParameters        &mg_data,
+                      const hp::MappingCollection<dim> &mapping_collection,
+                      const DoFHandler<dim>            &dof_handler,
+                      const hp::QCollection<dim>       &quadrature_collection)
   {
     // Create a DoFHandler and operator for each multigrid level,
     // as well as, create transfer operators. To be able to
