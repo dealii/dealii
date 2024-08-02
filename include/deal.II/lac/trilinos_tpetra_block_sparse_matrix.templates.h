@@ -102,7 +102,10 @@ namespace LinearAlgebra
       std::vector<typename TpetraTypes::MapType<MemorySpace>> tpetra_maps;
       for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
         tpetra_maps.push_back(
-          parallel_partitioning[i].make_tpetra_map(communicator, false));
+          parallel_partitioning[i]
+            .template make_tpetra_map<
+              typename TpetraTypes::NodeType<MemorySpace>>(communicator,
+                                                           false));
 
       Assert(tpetra_maps.size() == block_sparsity_pattern.n_block_rows(),
              ExcDimensionMismatch(tpetra_maps.size(),

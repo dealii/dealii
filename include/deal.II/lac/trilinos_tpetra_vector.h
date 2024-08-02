@@ -1063,7 +1063,7 @@ namespace LinearAlgebra
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */
-      Teuchos::RCP<const TpetraWrappers::CommunicationPattern>
+      Teuchos::RCP<const TpetraWrappers::CommunicationPattern<MemorySpace>>
         tpetra_comm_pattern;
 
       // Make the reference class a friend.

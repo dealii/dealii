@@ -417,25 +417,25 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      */
-    template <typename Dummy = Number>
+    template <typename MemorySpace, typename Dummy = Number>
     std::enable_if_t<std::is_same_v<Dummy, Number> &&
                      dealii::is_tpetra_type<Number>::value>
     import_elements(
-      const TpetraWrappers::Vector<Number> &tpetra_vec,
-      VectorOperation::values               operation,
+      const TpetraWrappers::Vector<Number, MemorySpace> &tpetra_vec,
+      VectorOperation::values                            operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
     /**
      * @deprecated Use import_elements() instead.
      */
-    template <typename Dummy = Number>
+    template <typename MemorySpace, typename Dummy = Number>
     DEAL_II_DEPRECATED std::enable_if_t<std::is_same_v<Dummy, Number> &&
                                         dealii::is_tpetra_type<Number>::value>
-                       import(const TpetraWrappers::Vector<Number> &V,
-                              VectorOperation::values               operation,
-                              const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-                                &communication_pattern = {})
+    import(const TpetraWrappers::Vector<Number, MemorySpace> &V,
+           VectorOperation::values                            operation,
+           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+             &communication_pattern = {})
     {
       import_elements(V, operation, communication_pattern);
     }
@@ -741,11 +741,12 @@ namespace LinearAlgebra
      * vector @p tpetra_vector. This is an helper function and it should not be
      * used directly.
      */
-    template <typename Dummy = Number>
+    template <typename MemorySpace, typename Dummy = Number>
     std::enable_if_t<std::is_same_v<Dummy, Number> &&
                      dealii::is_tpetra_type<Number>::value>
     import_elements(
-      const Tpetra::Vector<Number, int, types::signed_global_dof_index>
+      const Tpetra::
+        Vector<Number, int, types::signed_global_dof_index, MemorySpace>
                              &tpetra_vector,
       const IndexSet         &locally_owned_elements,
       VectorOperation::values operation,
@@ -781,7 +782,8 @@ namespace LinearAlgebra
      * Return a TpetraWrappers::CommunicationPattern and store it for future
      * use.
      */
-    TpetraWrappers::CommunicationPattern
+    template <typename MemorySpace = dealii::MemorySpace::Host>
+    TpetraWrappers::CommunicationPattern<MemorySpace>
     create_tpetra_comm_pattern(const IndexSet &source_index_set,
                                const MPI_Comm  mpi_comm);
 #  endif

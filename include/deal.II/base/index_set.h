@@ -136,9 +136,10 @@ public:
   /**
    * Constructor from a Trilinos Teuchos::RCP<Tpetra::Map>.
    */
+  template <typename NodeType>
   explicit IndexSet(
-    const Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>>
-      &map);
+    const Teuchos::RCP<
+      const Tpetra::Map<int, types::signed_global_dof_index, NodeType>> &map);
 #  endif // DEAL_II_TRILINOS_WITH_TPETRA
 
   /**
@@ -608,11 +609,13 @@ public:
                     const bool     overlapping  = false) const;
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  Tpetra::Map<int, types::signed_global_dof_index>
+  template <typename NodeType>
+  Tpetra::Map<int, types::signed_global_dof_index, NodeType>
   make_tpetra_map(const MPI_Comm communicator = MPI_COMM_WORLD,
                   const bool     overlapping  = false) const;
 
-  Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index>>
+  template <typename NodeType>
+  Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index, NodeType>>
   make_tpetra_map_rcp(const MPI_Comm communicator = MPI_COMM_WORLD,
                       const bool     overlapping  = false) const;
 #  endif
