@@ -18,9 +18,12 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/trilinos_utilities.h>
+
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -609,12 +612,16 @@ public:
                     const bool     overlapping  = false) const;
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  template <typename NodeType>
+  template <
+    typename NodeType =
+      LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>
   Tpetra::Map<int, types::signed_global_dof_index, NodeType>
   make_tpetra_map(const MPI_Comm communicator = MPI_COMM_WORLD,
                   const bool     overlapping  = false) const;
 
-  template <typename NodeType>
+  template <
+    typename NodeType =
+      LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>
   Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index, NodeType>>
   make_tpetra_map_rcp(const MPI_Comm communicator = MPI_COMM_WORLD,
                       const bool     overlapping  = false) const;
