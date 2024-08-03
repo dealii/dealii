@@ -1203,10 +1203,9 @@ IndexSet::memory_consumption() const
 
 // explicit template instantiations
 
-
-#ifdef DEAL_II_WITH_TRILINOS
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_TRILINOS
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 template IndexSet::IndexSet(
   const Teuchos::RCP<const Tpetra::Map<
@@ -1246,9 +1245,8 @@ dealii::IndexSet::make_tpetra_map_rcp<
   int,
   bool) const;
 
-
+#    endif
 #  endif
-
 #endif
 
 DEAL_II_NAMESPACE_CLOSE
