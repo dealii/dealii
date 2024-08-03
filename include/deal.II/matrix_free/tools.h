@@ -76,6 +76,9 @@ namespace MatrixFreeTools
    *
    * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
    * passed to the constructor of the FEEvaluation that is internally set up.
+   *
+   * The parameter @p first_vector_component is used to select the right
+   * starting block in a block vector.
    */
   template <int dim,
             int fe_degree,
@@ -97,7 +100,8 @@ namespace MatrixFreeTools
                       &cell_operation,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
-    const unsigned int first_selected_component = 0);
+    const unsigned int first_selected_component = 0,
+    const unsigned int first_vector_component   = 0);
 
 
 
@@ -125,7 +129,8 @@ namespace MatrixFreeTools
     const CLASS       *owning_class,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
-    const unsigned int first_selected_component = 0);
+    const unsigned int first_selected_component = 0,
+    const unsigned int first_vector_component   = 0);
 
 
 
@@ -179,7 +184,8 @@ namespace MatrixFreeTools
                       &boundary_operation,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
-    const unsigned int first_selected_component = 0);
+    const unsigned int first_selected_component = 0,
+    const unsigned int first_vector_component   = 0);
 
 
 
@@ -227,7 +233,8 @@ namespace MatrixFreeTools
     const CLASS       *owning_class,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
-    const unsigned int first_selected_component = 0);
+    const unsigned int first_selected_component = 0,
+    const unsigned int first_vector_component   = 0);
 
 
 
@@ -1352,7 +1359,8 @@ namespace MatrixFreeTools
                       &cell_operation,
     const unsigned int dof_no,
     const unsigned int quad_no,
-    const unsigned int first_selected_component)
+    const unsigned int first_selected_component,
+    const unsigned int first_vector_component)
   {
     compute_diagonal<dim,
                      fe_degree,
@@ -1367,7 +1375,8 @@ namespace MatrixFreeTools
                                  {},
                                  dof_no,
                                  quad_no,
-                                 first_selected_component);
+                                 first_selected_component,
+                                 first_vector_component);
   }
 
   template <typename CLASS,
@@ -1391,7 +1400,8 @@ namespace MatrixFreeTools
     const CLASS       *owning_class,
     const unsigned int dof_no,
     const unsigned int quad_no,
-    const unsigned int first_selected_component)
+    const unsigned int first_selected_component,
+    const unsigned int first_vector_component)
   {
     compute_diagonal<dim,
                      fe_degree,
@@ -1405,7 +1415,8 @@ namespace MatrixFreeTools
       [&](auto &phi) { (owning_class->*cell_operation)(phi); },
       dof_no,
       quad_no,
-      first_selected_component);
+      first_selected_component,
+      first_vector_component);
   }
 
   template <int dim,
@@ -1448,7 +1459,8 @@ namespace MatrixFreeTools
                       &boundary_operation,
     const unsigned int dof_no,
     const unsigned int quad_no,
-    const unsigned int first_selected_component)
+    const unsigned int first_selected_component,
+    const unsigned int first_vector_component)
   {
     int dummy = 0;
 
@@ -1461,7 +1473,7 @@ namespace MatrixFreeTools
     for (unsigned int d = 0; d < n_components; ++d)
       diagonal_global_components[d] = dealii::internal::
         BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::
-          get_vector_component(diagonal_global, d + first_selected_component);
+          get_vector_component(diagonal_global, d + first_vector_component);
 
     const auto &dof_info = matrix_free.get_dof_info(dof_no);
 
@@ -1745,7 +1757,8 @@ namespace MatrixFreeTools
     const CLASS       *owning_class,
     const unsigned int dof_no,
     const unsigned int quad_no,
-    const unsigned int first_selected_component)
+    const unsigned int first_selected_component,
+    const unsigned int first_vector_component)
   {
     compute_diagonal<dim,
                      fe_degree,
@@ -1763,7 +1776,8 @@ namespace MatrixFreeTools
       [&](auto &phi) { (owning_class->*boundary_operation)(phi); },
       dof_no,
       quad_no,
-      first_selected_component);
+      first_selected_component,
+      first_vector_component);
   }
 
   namespace internal

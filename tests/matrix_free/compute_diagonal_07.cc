@@ -29,7 +29,7 @@ template <int dim,
           typename Number              = double,
           typename VectorizedArrayType = VectorizedArray<Number>>
 void
-test()
+test(const unsigned int first_vector_component)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball(tria);
@@ -104,9 +104,10 @@ test()
 
   diagonal_global.print(deallog.get_file_stream());
 
-  LinearAlgebra::distributed::BlockVector<Number> diagonal_global_block(dim);
+  LinearAlgebra::distributed::BlockVector<Number> diagonal_global_block(
+    dim + first_vector_component);
 
-  for (unsigned int comp = 0; comp < dim; ++comp)
+  for (unsigned int comp = 0; comp < dim + first_vector_component; ++comp)
     matrix_free.initialize_dof_vector(diagonal_global_block.block(comp), 1);
 
   MatrixFreeTools::compute_diagonal<dim,
@@ -114,10 +115,14 @@ test()
                                     n_points,
                                     n_components,
                                     Number,
-                                    VectorizedArrayType>(matrix_free,
-                                                         diagonal_global_block,
-                                                         kernel,
-                                                         1);
+                                    VectorizedArrayType>(
+    matrix_free,
+    diagonal_global_block,
+    kernel,
+    1,
+    0,
+    0,
+    first_vector_component);
 
   diagonal_global_block.print(deallog.get_file_stream());
 }
@@ -128,5 +133,6 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    all;
 
-  test<2, 1>();
+  test<2, 1>(0);
+  test<2, 1>(1 /*test first vector component*/);
 }
