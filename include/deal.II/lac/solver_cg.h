@@ -205,7 +205,14 @@ public:
   {
     /**
      * Constructor. By default, set the residual of the stopping criterion
-     * to the default residual.
+     * to the implicit residual. A <tt>true</tt> value of
+     * AdditionalData::use_default_residual refers to the
+     * implicit residual, while <tt>false</tt> reverts
+     * it. More information on explicit and implicit residual stopping criteria
+     * can be found
+     * <a
+     * href="https://en.wikipedia.org/wiki/Conjugate_gradient_method#Explicit_residual_calculation">link
+     * here</a>.
      */
     explicit AdditionalData(const bool use_default_residual = true);
 
@@ -396,7 +403,14 @@ public:
   {
     /**
      * Constructor. By default, set the residual of the stopping criterion
-     * to the default residual.
+     * to the implicit residual. A <tt>true</tt> value of
+     * AdditionalData::use_default_residual refers to the
+     * implicit residual, while <tt>false</tt> reverts
+     * it. More information on explicit and implicit residual stopping criteria
+     * can be found
+     * <a
+     * href="https://en.wikipedia.org/wiki/Conjugate_gradient_method#Explicit_residual_calculation">link
+     * here</a>.
      */
     explicit AdditionalData(const bool use_default_residual = true);
 
