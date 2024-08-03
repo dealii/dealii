@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// Copyright (C) 2000 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -586,7 +586,41 @@ namespace FETools
     const unsigned int                                              face,
     FullMatrix<double>                                             &X);
 
-
+  /**
+   * @brief Compute the nodal quadrature rule associated with an element.
+   *
+   * Many common finite elements (e.g., FE_Q) are interpolatory - i.e., they are
+   * multidimensional generalizations of Lagrange interpolating polynomials and
+   * are collectively referred to as @ref GlossLagrange "Lagrange elements".
+   *
+   * Since these elements define a polynomial interpolation, they implicitly
+   * also define a Quadrature rule. For example, the weights of QTrapezoid are
+   * the integrals of multilinear shape functions and the quadrature points are
+   * the vertices of the reference hypercube - i.e., QTrapezoid is the nodal
+   * rule corresponding to FE_Q(1). Some elements, such as FE_SimplexP(2), do
+   * not correspond to useful nodal quadrature rules since the integrals of some
+   * shape functions (in this case, the ones with support points at vertices)
+   * are zero. Other elements, like FE_RaviartThomas, are noninterpolatory and
+   * therefore also do not correspond to nodal quadrature rules.
+   *
+   * Given a FiniteElement with support points, this function determines the
+   * associated quadrature rule by setting the weights equal to the integrals of
+   * its shape functions (even if they are zero or negative) and points equal to
+   * the support points of the FiniteElement.
+   *
+   * @note If @p fe is an FE_Q or FE_DGQ with the default support points (i.e.,
+   * it was constructed with a polynomial order argument and not with a custom
+   * list of support points) then the corresponding nodal quadrature rule has
+   * the same points and weights as QGaussLobatto (but they will generally be in
+   * a different order).
+   *
+   * @note This function is only implemented for scalar (i.e., one block and one
+   * component) elements which have
+   * @ref GlossSupport "support points".
+   */
+  template <int dim, int spacedim = dim>
+  Quadrature<dim>
+  compute_nodal_quadrature(const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Wrapper around
@@ -915,7 +949,7 @@ namespace FETools
    * <li> Tensor product construction (<code>do_tensor_product=true</code>):
    * The tensor product construction, in the simplest case, builds a
    * vector-valued element from scalar elements (see
-   * @ref vector_valued "this documentation module"
+   * @ref vector_valued "this documentation topic"
    * and
    * @ref GlossComponent "this glossary entry"
    * for more information).
@@ -1017,7 +1051,7 @@ namespace FETools
      *   vector of elements or an initializer list as arguments.
      */
     template <int dim, int spacedim>
-    DEAL_II_DEPRECATED_EARLY FiniteElementData<dim>
+    DEAL_II_DEPRECATED FiniteElementData<dim>
     multiply_dof_numbers(const FiniteElement<dim, spacedim> *fe1,
                          const unsigned int                  N1,
                          const FiniteElement<dim, spacedim> *fe2 = nullptr,
@@ -1077,18 +1111,18 @@ namespace FETools
      *   vector of elements or an initializer list as arguments.
      */
     template <int dim, int spacedim>
-    DEAL_II_DEPRECATED_EARLY std::vector<bool>
-                             compute_restriction_is_additive_flags(
-                               const FiniteElement<dim, spacedim> *fe1,
-                               const unsigned int                  N1,
-                               const FiniteElement<dim, spacedim> *fe2 = nullptr,
-                               const unsigned int                  N2 = 0,
-                               const FiniteElement<dim, spacedim> *fe3 = nullptr,
-                               const unsigned int                  N3 = 0,
-                               const FiniteElement<dim, spacedim> *fe4 = nullptr,
-                               const unsigned int                  N4 = 0,
-                               const FiniteElement<dim, spacedim> *fe5 = nullptr,
-                               const unsigned int                  N5 = 0);
+    DEAL_II_DEPRECATED std::vector<bool>
+                       compute_restriction_is_additive_flags(
+                         const FiniteElement<dim, spacedim> *fe1,
+                         const unsigned int                  N1,
+                         const FiniteElement<dim, spacedim> *fe2 = nullptr,
+                         const unsigned int                  N2  = 0,
+                         const FiniteElement<dim, spacedim> *fe3 = nullptr,
+                         const unsigned int                  N3  = 0,
+                         const FiniteElement<dim, spacedim> *fe4 = nullptr,
+                         const unsigned int                  N4  = 0,
+                         const FiniteElement<dim, spacedim> *fe5 = nullptr,
+                         const unsigned int                  N5  = 0);
 
 
     /**
@@ -1148,19 +1182,19 @@ namespace FETools
      *   vector of elements or an initializer list as arguments.
      */
     template <int dim, int spacedim>
-    DEAL_II_DEPRECATED_EARLY std::vector<ComponentMask>
-                             compute_nonzero_components(
-                               const FiniteElement<dim, spacedim> *fe1,
-                               const unsigned int                  N1,
-                               const FiniteElement<dim, spacedim> *fe2 = nullptr,
-                               const unsigned int                  N2 = 0,
-                               const FiniteElement<dim, spacedim> *fe3 = nullptr,
-                               const unsigned int                  N3 = 0,
-                               const FiniteElement<dim, spacedim> *fe4 = nullptr,
-                               const unsigned int                  N4 = 0,
-                               const FiniteElement<dim, spacedim> *fe5 = nullptr,
-                               const unsigned int                  N5 = 0,
-                               const bool                          do_tensor_product = true);
+    DEAL_II_DEPRECATED std::vector<ComponentMask>
+                       compute_nonzero_components(
+                         const FiniteElement<dim, spacedim> *fe1,
+                         const unsigned int                  N1,
+                         const FiniteElement<dim, spacedim> *fe2 = nullptr,
+                         const unsigned int                  N2  = 0,
+                         const FiniteElement<dim, spacedim> *fe3 = nullptr,
+                         const unsigned int                  N3  = 0,
+                         const FiniteElement<dim, spacedim> *fe4 = nullptr,
+                         const unsigned int                  N4  = 0,
+                         const FiniteElement<dim, spacedim> *fe5 = nullptr,
+                         const unsigned int                  N5  = 0,
+                         const bool                          do_tensor_product = true);
 
     /**
      * For a given (composite) @p finite_element build @p

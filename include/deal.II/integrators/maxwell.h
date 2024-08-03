@@ -89,10 +89,10 @@ namespace LocalIntegrators
      * for instance duplicate one of the previous.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY Tensor<1, dim>
-                             curl_curl(const Tensor<2, dim> &h0,
-                                       const Tensor<2, dim> &h1,
-                                       const Tensor<2, dim> &h2)
+    DEAL_II_DEPRECATED Tensor<1, dim>
+                       curl_curl(const Tensor<2, dim> &h0,
+                                 const Tensor<2, dim> &h1,
+                                 const Tensor<2, dim> &h2)
     {
       Tensor<1, dim> result;
       switch (dim)
@@ -123,11 +123,11 @@ namespace LocalIntegrators
      * for instance duplicate one of the previous.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY Tensor<1, dim>
-                             tangential_curl(const Tensor<1, dim> &g0,
-                                             const Tensor<1, dim> &g1,
-                                             const Tensor<1, dim> &g2,
-                                             const Tensor<1, dim> &normal)
+    DEAL_II_DEPRECATED Tensor<1, dim>
+                       tangential_curl(const Tensor<1, dim> &g0,
+                                       const Tensor<1, dim> &g1,
+                                       const Tensor<1, dim> &g2,
+                                       const Tensor<1, dim> &normal)
     {
       Tensor<1, dim> result;
 
@@ -160,7 +160,7 @@ namespace LocalIntegrators
      * in weak form.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     curl_curl_matrix(FullMatrix<double>      &M,
                      const FEValuesBase<dim> &fe,
                      const double             factor = 1.)
@@ -213,7 +213,7 @@ namespace LocalIntegrators
      * functions.
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     curl_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const FEValuesBase<dim> &fetest,
@@ -325,7 +325,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY void
+    DEAL_II_DEPRECATED void
     tangential_trace_matrix(FullMatrix<double>      &M,
                             const FEValuesBase<dim> &fe,
                             double                   factor = 1.)
@@ -382,7 +382,7 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     ip_curl_matrix(FullMatrix<double>      &M11,
                    FullMatrix<double>      &M12,
                    FullMatrix<double>      &M21,

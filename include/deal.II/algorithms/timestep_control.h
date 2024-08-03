@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2010 - 2022 by the deal.II authors
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,7 @@ namespace Algorithms
      * the parameters just read.
      */
     void
-    parse_parameters(ParameterHandler &param);
+    parse_parameters(const ParameterHandler &param);
 
     /**
      * Return the left end of the time interval.

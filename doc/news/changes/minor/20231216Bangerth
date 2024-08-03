@@ -1,5 +1,0 @@
-Fixed: When creating triangulations in dim=1 and spacedim=3, the
-Triangulation class would sometimes crash because of a code path that
-should not have been taken. This is now fixed.
-<br>
-(Vinayak Vijay, Wolfgang Bangerth, 2023/11/28)

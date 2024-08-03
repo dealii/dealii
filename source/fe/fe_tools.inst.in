@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -170,6 +170,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Quadrature<deal_II_dimension> &,
         const Quadrature<deal_II_dimension> &,
         FullMatrix<double> &);
+
+      template Quadrature<deal_II_dimension>
+      compute_nodal_quadrature(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension

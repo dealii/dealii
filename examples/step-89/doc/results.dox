@@ -23,26 +23,26 @@ are plotted along the horizontal line that spans from (0,0.69) to (1,0.69).
 <table align="center" class="doxtable">
   <tr>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_pressure.svg "" width=100%
+        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_pressure.svg "" width=150%
     </td>
     <td>
-        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_velocity_Y.svg "" width=100%
+        @image html https://www.dealii.org/images/steps/developer/step_89_membrane_test_case_mortaring_vs_point_to_point_velocity_Y.svg "" width=150%
     </td>
   </tr>
 </table>
 
-While the results of the pressure is similar, $u_y$ differs clearly. At certain
+While the results of the pressure are similar, $u_y$ clearly differs. At certain
 positions we can see aliasing errors for the point-to-point interpolation.
 For different mesh configurations and/or longer run times, the aliasing effects
-of the point-to-point simulation accumulate and the simulation gets instable.
+of the point-to-point simulation accumulate and the simulation becomes instable.
 To keep the tutorial short we have chosen one mesh that can be used for all
 examples. For a configuration that yields instable results for a wide range of
 polynomial degrees, see @cite heinz2022high.
 
 <h3>Wave propagation through in-homogeneous fluid</h3>
 
-This is just one example in which non-matching discretizations can be efficiently
-used to reduce the amount of DoFs. The example is nice, since results for a similar
+The example that follows is just one example in which non-matching discretizations can be efficiently
+used to reduce the number of DoFs. The example is nice, since results for a similar
 test case are shown in multiple publications. As before, we slightly adapted the
 test case to be able to use the same mesh for all simulations. The pressure field
 at $t=0.3$ is depicted below.
@@ -56,12 +56,12 @@ resolved with a coarser discretization.
 Using the same element size in the whole domain, we can compute a reference result.
 The displayed reference result is obtained by choosing the same subdivision level
 for both sub-domains, i.e. @c subdiv_right = 11. In this particular example the
-reference result uses $92928$ DoFs, while the non-matching result uses $52608$ DoFs.
+reference result uses $92,928$ DoFs, while the non-matching result uses $52,608$ DoFs.
 The pressure result is plotted along the horizontal line that spans from (0,0.5) to (1,0.5).
 
 @image html https://www.dealii.org/images/steps/developer/step_89_inhomogenous_test_case_conforming_vs_nonmatching.svg "" width=60%
 
-The results, obtained with the non-matching discretization is in good agreement with
+The results computed using the non-matching discretization are clearly in good agreement with
 the reference result.
 
 <h3>Possibilities for extensions</h3>
@@ -72,9 +72,9 @@ for overlapping triangulations. For this the intersection requests are of dimens
 The cells which are intersected with the intersection requests are of dimension $dim$. For the
 simple case of non-conforming interfaces it would be sufficient to compute the intersections
 between $dim-1$ and $dim-1$ entities. Furthermore, the lambda could be adapted, such that cells are
-only marked if they are connected to a certain boundary ID (in this case, e.g. 99) instead of
-marking every cell that is <i>not</i> connected to the opposite boundary ID (in this case, e.g. 98).
-Marking less cells can reduce the setup costs significantly.
+only marked if they are connected to a certain boundary ID (in this case, e.g., 99) instead of
+marking every cell that is <i>not</i> connected to the opposite boundary ID (in this case, e.g., 98).
+Marking fewer cells can reduce the setup costs significantly.
 
-Note that for in-homogeneous material in this procedure is questionable, since it is not clear which
+Note that the use of inhomogeneous materials in this procedure is questionable, since it is not clear which
 material is present in the overlapping part of the mesh.

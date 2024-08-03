@@ -83,7 +83,7 @@ public:
    * Deprecated constructor allowing implicit conversion.
    */
   template <typename = void>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Implicit conversions from std::vector<bool> to BlockMask are deprecated!")
   BlockMask(const std::vector<bool> &block_mask);
 

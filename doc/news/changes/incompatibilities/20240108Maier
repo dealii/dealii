@@ -1,7 +1,0 @@
-Removed: The rarely used long double variants `std_cxx17::legendrel` and
-`std_cxx17::cyl_bessel_jl` have been removed due to a compatibility issue
-with boost-1.83. If you happen to use these functions in your project
-you can change to using `std::legendrel` and `std::cyl_bessel_jl` directly,
-which are provided by the C++ standard template library.
-<br>
-(Matthias Maier, 2024/01/08)

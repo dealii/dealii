@@ -292,7 +292,7 @@ namespace Step32
   // @sect3{Definition of assembly data structures}
   //
   // As described in the introduction, we will use the WorkStream mechanism
-  // discussed in the @ref threads module to parallelize operations among the
+  // discussed in the @ref threads topic to parallelize operations among the
   // processors of a single machine. The WorkStream class requires that data
   // is passed around in two kinds of data structures, one for scratch data
   // and one to pass data from the assembly function to the function that
@@ -1975,7 +1975,7 @@ namespace Step32
   // @sect4{The BoussinesqFlowProblem assembly functions}
   //
   // Following the discussion in the introduction and in the @ref threads
-  // module, we split the assembly functions into different parts:
+  // topic, we split the assembly functions into different parts:
   //
   // <ul> <li> The local calculations of matrices and right hand sides, given
   // a certain cell as input (these functions are named

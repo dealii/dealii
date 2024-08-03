@@ -435,7 +435,7 @@ namespace internal
  * constraints on degrees of freedom. The concept and origin of such
  * constraints is extensively described in the
  * @ref constraints
- * module. The class is meant to deal with a limited number of constraints
+ * topic. The class is meant to deal with a limited number of constraints
  * relative to the total number of degrees of freedom, for example a few per
  * cent up to maybe 30 per cent; and with a linear combination of <i>M</i>
  * other degrees of freedom where <i>M</i> is also relatively small (no larger
@@ -448,7 +448,7 @@ namespace internal
  * There is also a significant amount of documentation on how to use this
  * class in the
  * @ref constraints
- * module.
+ * topic.
  *
  *
  * <h3>Description of constraints</h3>
@@ -580,7 +580,7 @@ public:
    *   both of its arguments equal to the index set provided here. This
    *   is not wrong, but inefficient. Use the following constructor instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the constructor with two index set arguments.")
   explicit AffineConstraints(const IndexSet &locally_stored_constraints);
 
@@ -677,7 +677,7 @@ public:
    *
    * @deprecated Use the reinit() function with two index set arguments instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the reinit() function with two index set arguments.")
   void
   reinit(const IndexSet &locally_stored_constraints);
@@ -753,7 +753,7 @@ public:
    *   that should probably be considered a bug. Use get_view() and merge()
    *   instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use get_view() and merge() instead.")
+  DEAL_II_DEPRECATED_WITH_COMMENT("Use get_view() and merge() instead.")
   void
   add_selected_constraints(const AffineConstraints &constraints_in,
                            const IndexSet          &filter);
@@ -1681,7 +1681,7 @@ public:
    * This function can correctly handle inhomogeneous constraints as well. For
    * the parameter use_inhomogeneities_for_rhs see the documentation in
    * @ref constraints
-   * module.
+   * topic.
    *
    * @note This function in itself is thread-safe, i.e., it works properly
    * also when several threads call it simultaneously. However, the function
@@ -1926,7 +1926,7 @@ public:
      * Swap function.
      */
     friend void
-    swap(ConstraintLine &l1, ConstraintLine &l2)
+    swap(ConstraintLine &l1, ConstraintLine &l2) noexcept
     {
       std::swap(l1.index, l2.index);
       std::swap(l1.entries, l2.entries);
@@ -1990,13 +1990,38 @@ public:
                             const bool                   verbose = false) const;
 
   /**
-   * Make the current object consistent on all processors
-   * in a distributed computation. One should call this function before
-   * calling close().
+   * Make the constraints that are locally stored on the current object
+   * consistent on all MPI processes in a distributed computation.
+   *
+   * The IndexSet @p locally_owned_dofs conforms to all DoFs that are locally
+   * owned on the current process, i.e., DoFHandler::locally_owned_dofs().
+   *
+   * The IndexSet @p constraints_to_make_consistent shall contain all DoF
+   * indices for which we want to store the complete constraints for. Which DoFs
+   * these might be depends on your actual use case: For most applications in
+   * which you are using continuous Galerkin methods, you would want to use
+   * locally active DoFs here, obtained via
+   * DoFTools::extract_locally_active_dofs(). However in discontinuous Galerkin
+   * methods, you might need consistent information on all locally relevant
+   * DoFs due to the need to compute face integrals against ghosted cells,
+   * for which you need DoFTools::extract_locally_relevant_dofs().
+   *
+   * This function updates the locally stored constraints (or local_lines) of
+   * this object, whenever a DoF is constrained against another that we have not
+   * known of before. After calling this function, it might be necessary to use
+   * the IndexSet retrieved by get_local_lines() when initializing data
+   * structures built on top of the AffineConstraints object, for example:
+   * @code
+   * DynamicSparsityPattern dsp(constraints.get_local_lines());
+   * LinearAlgebra::distributed::Vector<double> solution(
+   *   locally_owned_dofs, constraints.get_local_lines(), mpi_communicator);
+   * @endcode
+   *
+   * @note One should call this function before calling close().
    */
   void
   make_consistent_in_parallel(const IndexSet &locally_owned_dofs,
-                              const IndexSet &locally_relevant_dofs,
+                              const IndexSet &constraints_to_make_consistent,
                               const MPI_Comm  mpi_communicator);
 
   /**

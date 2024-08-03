@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -833,7 +833,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline void
-    BlockVector<Number>::swap(BlockVector<Number> &v)
+    BlockVector<Number>::swap(BlockVector<Number> &v) noexcept
     {
       Assert(this->n_blocks() == v.n_blocks(),
              ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));

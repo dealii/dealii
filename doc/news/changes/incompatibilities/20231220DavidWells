@@ -1,4 +1,0 @@
-Changed: Meshes in 2D now use the face_orientation boolean (instead of the
-face_flip boolean) to represent their orientation.
-<br>
-(David Wells, 2023/12/20)

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2016 - 2023 by the deal.II authors
+// Copyright (C) 2016 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -519,7 +519,7 @@ namespace LinearAlgebra
        * functions.
        */
       void
-      swap(BlockVector<Number> &v);
+      swap(BlockVector<Number> &v) noexcept;
       /** @} */
 
       /**
@@ -819,7 +819,7 @@ namespace LinearAlgebra
 template <typename Number>
 inline void
 swap(LinearAlgebra::distributed::BlockVector<Number> &u,
-     LinearAlgebra::distributed::BlockVector<Number> &v)
+     LinearAlgebra::distributed::BlockVector<Number> &v) noexcept
 {
   u.swap(v);
 }

@@ -37,8 +37,8 @@ template <int dim,
 void
 test_serialization(const unsigned int n_runs, TimerOutput &timer)
 {
-  deallog << std::string(80, '-') << std::endl;
-  deallog << "Dim: " << dim << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Dim: " << dim << std::endl;
 
   namespace SD           = Differentiation::SD;
   using SD_number_t      = SD::Expression;
@@ -55,14 +55,14 @@ test_serialization(const unsigned int n_runs, TimerOutput &timer)
     a + NumberType(2.0) * std::pow(x, determinant(y)) +
     a * determinant(y) * std::log((z * z) / determinant(y)) +
     std::sin((z * symmetrize(y)) / a);
-  deallog << "symb_s: " << symb_s << std::endl;
+  std::cout << "symb_s: " << symb_s << std::endl;
   timer.leave_subsection("Value calculation");
 
   timer.enter_subsection("Differentiation");
   const SD_number_t      symb_ds_dx = SD::differentiate(symb_s, x);
   const SD_tensor_t      symb_ds_dy = SD::differentiate(symb_s, y);
   const SD_symm_tensor_t symb_ds_dz = SD::differentiate(symb_s, z);
-  deallog << "symb_ds_dy: " << symb_ds_dy << std::endl;
+  std::cout << "symb_ds_dy: " << symb_ds_dy << std::endl;
   timer.leave_subsection("Differentiation");
 
   SD::types::substitution_map sub_vals;
@@ -101,10 +101,10 @@ test_serialization(const unsigned int n_runs, TimerOutput &timer)
 
         if (i == 0)
           {
-            deallog << "evaluation: "
-                    << "  s: " << val_s << "  ds_dx: " << val_ds_dx
-                    << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
-                    << std::endl;
+            std::cout << "evaluation: "
+                      << "  s: " << val_s << "  ds_dx: " << val_ds_dx
+                      << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
+                      << std::endl;
           }
       }
     timer.leave_subsection("Optimised substitution");
@@ -118,10 +118,10 @@ test_serialization(const unsigned int n_runs, TimerOutput &timer)
       const SymmetricTensor<2, dim, NumberType> val_ds_dz =
         optimizer.evaluate(symb_ds_dz);
 
-      deallog << "Evaluation (pre-serialization): "
-              << "  s: " << val_s << "  ds_dx: " << val_ds_dx
-              << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
-              << std::endl;
+      std::cout << "Evaluation (pre-serialization): "
+                << "  s: " << val_s << "  ds_dx: " << val_ds_dx
+                << "  ds_dy: " << val_ds_dy << "  ds_dz: " << val_ds_dz
+                << std::endl;
 
       // The result is not stable and depends on standard library, number
       // type, optimization parameters and compiler being used. However, we
@@ -154,7 +154,7 @@ test_serialization(const unsigned int n_runs, TimerOutput &timer)
         }
 
       // From serialization.h
-      deallog << "Serializing..." << std::endl;
+      std::cout << "Serializing..." << std::endl;
       SD::BatchOptimizer<NumberType> new_optimizer;
       if (opt_method == SD::OptimizerType::llvm)
         {
@@ -166,7 +166,7 @@ test_serialization(const unsigned int n_runs, TimerOutput &timer)
           verify_no_logging(optimizer, new_optimizer);
         }
 
-      deallog << "Checking deserialisation..." << std::endl;
+      std::cout << "Checking deserialisation..." << std::endl;
       {
         // Check that the original settings persist.
         Assert(new_optimizer.optimization_method() ==
@@ -185,10 +185,10 @@ test_serialization(const unsigned int n_runs, TimerOutput &timer)
         const SymmetricTensor<2, dim, NumberType> new_val_ds_dz =
           new_optimizer.evaluate(symb_ds_dz);
 
-        deallog << "Evaluation (post-serialization): "
-                << "  s: " << new_val_s << "  ds_dx: " << new_val_ds_dx
-                << "  ds_dy: " << new_val_ds_dy << "  ds_dz: " << new_val_ds_dz
-                << std::endl;
+        std::cout << "Evaluation (post-serialization): "
+                  << "  s: " << new_val_s << "  ds_dx: " << new_val_ds_dx
+                  << "  ds_dy: " << new_val_ds_dy
+                  << "  ds_dz: " << new_val_ds_dz << std::endl;
 
         constexpr double tol = 1e-9;
         AssertThrow(std::abs(new_val_s - val_s) < tol,
@@ -253,9 +253,7 @@ run_tests(const int n_runs = 1)
 
   deallog.push("Serialization");
   {
-    TimerOutput timer(deallog.get_file_stream(),
-                      TimerOutput::never,
-                      TimerOutput::wall_times);
+    TimerOutput timer(std::cout, TimerOutput::summary, TimerOutput::wall_times);
 
     // deallog.push("Integer");
     // test_tensor<dim,int>(n_runs, timer);

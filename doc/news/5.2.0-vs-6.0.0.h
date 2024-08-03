@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1279,7 +1279,7 @@ inconvenience this causes.
   <li> <p>
        Extended: The <code>GridIn</code> class can now
        read in tecplot files in ASCII format (block and point format,
-       ordered and unstructured grids, format specifiers acccording to
+       ordered and unstructured grids, format specifiers according to
        Tecplot 10 and younger versions). At the moment the
        implementation is restricted to 2d grids but can easily be
        extended to 3d as well.

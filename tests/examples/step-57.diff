@@ -1,0 +1,26 @@
+25c25
+< 
+---
+> #include "../example_test.h"
+262c262
+<     : viscosity(1.0 / 7500.0)
+---
+>     : viscosity(1.0 / 750.0)
+562,563c562,567
+<     gmres.solve(system_matrix, newton_update, system_rhs, preconditioner);
+<     std::cout << "FGMRES steps: " << solver_control.last_step() << std::endl;
+---
+>     //gmres.solve(system_matrix, newton_update, system_rhs, preconditioner);
+>     check_solver_within_range(std::cout,
+>                               gmres.solve(system_matrix, newton_update, system_rhs, preconditioner),
+>                               solver_control.last_step(),
+>                               2, 7);
+> //    std::cout << "FGMRES steps: " << solver_control.last_step() << std::endl;
+844c848
+<         newton_iteration(1e-12, 50, refinement, true, true);
+---
+>         newton_iteration(1e-3, 50, refinement, true, true);
+856c860
+<       flow.run(4);
+---
+>       flow.run(2);

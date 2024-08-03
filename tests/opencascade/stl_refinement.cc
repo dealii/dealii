@@ -33,6 +33,16 @@ using namespace OpenCASCADE;
 int
 main()
 {
+  // This test might trigger spurious floating point exception despite
+  // functioning properly. Simply disable floating point exceptions again
+  // (after they had been enabled int tests.h)
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  {
+    const int current_fe_except = fegetexcept();
+    fedisableexcept(current_fe_except);
+  }
+#endif
+
   TopoDS_Shape        sh = read_STL(SOURCE_DIR "/stl_files/sphere_refined.stl");
   Triangulation<2, 3> tria;
   GridIn<2, 3>        gridin;

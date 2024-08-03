@@ -1,5 +1,0 @@
-Removed: The file `include/deal.II/multigrid/mg_constrained_dofs.h`
-used to include `deal.II/dofs/dof_tools.h` and
-`deal.II/multigrid/mg_tools.h`. This is not the case any more.
-<br>
-(Peter Munch, 2023/10/31)

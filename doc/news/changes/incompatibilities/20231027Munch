@@ -1,6 +1,0 @@
-Removed: The functions evaluate() and integrate() of
-CUDAWrappers::FEEvaluation that take Bools have been
-deprecated and replaced by versions that take
-EvaluationFlags.
-<br>
-(Peter Munch, 2023/10/27)

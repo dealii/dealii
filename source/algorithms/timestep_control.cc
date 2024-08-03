@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2010 - 2022 by the deal.II authors
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ namespace Algorithms
 
 
   void
-  TimestepControl::parse_parameters(ParameterHandler &param)
+  TimestepControl::parse_parameters(const ParameterHandler &param)
   {
     start(param.get_double("Start"));
     start_step(param.get_double("First step"));

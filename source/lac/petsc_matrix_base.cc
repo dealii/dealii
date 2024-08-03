@@ -726,11 +726,13 @@ namespace PETScWrappers
 
     // Set options
     PetscErrorCode ierr =
-      PetscViewerSetFormat(PETSC_VIEWER_STDOUT_(comm), format);
+      PetscViewerPushFormat(PETSC_VIEWER_STDOUT_(comm), format);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Write to screen
     ierr = MatView(matrix, PETSC_VIEWER_STDOUT_(comm));
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = PetscViewerPopFormat(PETSC_VIEWER_STDOUT_(comm));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 

@@ -1,5 +1,0 @@
-Updated: Tetrahedral meshes are now refined quasi-uniformly, preventing degradation
-with higher refinement levels. The changes also include the relevant adjustments in the
-geometric multigrid infrastructure.
-<br>
-(Dominik Still, Niklas Fehn, Peter Munch, Martin Kronbichler, Wolfgang Bangerth, 2024/05/10)

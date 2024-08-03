@@ -12,6 +12,9 @@
 //
 // ------------------------------------------------------------------------
 
+#include "deal.II/base/memory_space.h"
+
+#include "deal.II/lac/trilinos_tpetra_types.h"
 #include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -84,7 +87,7 @@ namespace LinearAlgebra
 
 
 
-    Teuchos::RCP<const Tpetra::Import<int, types::signed_global_dof_index>>
+    Teuchos::RCP<TpetraTypes::ImportType<dealii::MemorySpace::Host>>
     CommunicationPattern::get_tpetra_import_rcp() const
     {
       return tpetra_import;
@@ -100,7 +103,7 @@ namespace LinearAlgebra
 
 
 
-    Teuchos::RCP<const Tpetra::Export<int, types::signed_global_dof_index>>
+    Teuchos::RCP<TpetraTypes::ExportType<dealii::MemorySpace::Host>>
     CommunicationPattern::get_tpetra_export_rcp() const
     {
       return tpetra_export;

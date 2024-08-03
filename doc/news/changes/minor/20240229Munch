@@ -1,6 +1,0 @@
-Improved: The parse functions of ParameterHandler used to add subsections
-if subsections/parameters have not been defined. This led to an output
-of ParameterHandler::print_parameters() that also contained these subsections.
-This is not the case anymore.
-<br>
-(Peter Munch, Magdalena Schreter-Fleischhacker, 2024/02/12)

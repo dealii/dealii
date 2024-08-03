@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2023 by the deal.II authors
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,8 +22,10 @@
  */
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
+#include <iostream>
 
 /*
  * Given the name of a file, copy it to std::cout
@@ -56,7 +58,7 @@ cat_file(const char *filename)
       {                                                                   \
         SolverType_COMMAND;                                               \
       }                                                                   \
-    catch (SolverControl::NoConvergence & exc)                            \
+    catch (SolverControl::NoConvergence &)                                \
       {}                                                                  \
     const unsigned int steps = CONTROL_COMMAND;                           \
     if (steps >= MIN_ALLOWED && steps <= MAX_ALLOWED)                     \
@@ -71,5 +73,18 @@ cat_file(const char *filename)
       }                                                                   \
   }
 
+std::string   deallogname;
+std::ofstream deallogfile;
+
+void
+initlog(const bool                    console = false,
+        const std::ios_base::fmtflags flags   = std::ios::showpoint |
+                                              std::ios::left)
+{
+  deallogname = "output";
+  deallogfile.open(deallogname);
+  dealii::deallog.attach(deallogfile, true, flags);
+  dealii::deallog.depth_console(console ? 10 : 0);
+}
 
 #endif // dealii_example_test_h

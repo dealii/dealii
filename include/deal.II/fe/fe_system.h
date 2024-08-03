@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ class FE_Enriched;
  * tutorial programs, for example step-8, step-20, step-21, step-22, and in
  * particular in the
  * @ref vector_valued
- * module.
+ * topic.
  *
  * @dealiiVideoLecture{19,20}
  *
@@ -233,7 +233,7 @@ public:
    *
    * This constructor (or its variants below) is used in essentially all
    * tutorial programs that deal with vector valued problems. See step-8,
-   * step-20, step-22 and others for use cases. Also see the module on
+   * step-20, step-22 and others for use cases. Also see the topic on
    * @ref vector_valued "Handling vector valued problems".
    *
    * @dealiiVideoLecture{19,20}
@@ -572,11 +572,10 @@ public:
    */
   FESystem(FESystem<dim, spacedim> &&other_fe_system) noexcept
     : FiniteElement<dim, spacedim>(std::move(other_fe_system))
-  {
-    base_elements = std::move(other_fe_system.base_elements);
-    generalized_support_points_index_table =
-      std::move(other_fe_system.generalized_support_points_index_table);
-  }
+    , base_elements(std::move(other_fe_system.base_elements))
+    , generalized_support_points_index_table(
+        std::move(other_fe_system.generalized_support_points_index_table))
+  {}
 
   /**
    * Destructor.

@@ -1,8 +1,0 @@
-New: Introduce FERemoteEvaluation. This new class provides similar
-interfaces as FEEvaluation, FEFaceEvaluation, and FEPointEvaluation.
-It can be used to access values and/or gradients in quadrature points
-at remote triangulations. In particular the class is designed such that
-it can also be used for Nitsche-type mortaring or L2-Projection with
-CGAL in the future.
-<br>
-(Johannes Heinz, Peter Munch, 2023/11/27)

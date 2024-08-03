@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -717,7 +717,7 @@ All entries are signed with the names of the author.
        Removed: The
        <code>DataOut_Old</code> class has finally gone for
        good. It was already deprecated in version 3.0, and has been
-       superceded for a long time by the framework of classes around
+       superseded for a long time by the framework of classes around
        <code>DataOutBase</code> and
        <code>DataOut</code>.
        <br>

@@ -125,8 +125,6 @@ namespace Utilities
      * an MPI communicator, a list of targets, and function objects that
      * encode and decode the messages to be sent, but no functions for
      * encoding a reply, or processing a reply.
-     *
-     * @ingroup MPI
      */
     namespace ConsensusAlgorithms
     {

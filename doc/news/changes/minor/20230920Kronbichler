@@ -1,4 +1,0 @@
-Improved: SparsityTools::reorder_Cuthill_McKee now runs considerably faster,
-especially for the case with many couplings between matrix rows.
-<br>
-(Martin Kronbichler, 2023/09/20)

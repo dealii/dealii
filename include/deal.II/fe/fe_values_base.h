@@ -1406,7 +1406,7 @@ public:
    * concept of views is explained in the documentation of the namespace
    * FEValuesViews and in particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::Scalar<dim, spacedim> &
   operator[](const FEValuesExtractors::Scalar &scalar) const;
@@ -1417,7 +1417,7 @@ public:
    * finite element. The concept of views is explained in the documentation of
    * the namespace FEValuesViews and in particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::Vector<dim, spacedim> &
   operator[](const FEValuesExtractors::Vector &vector) const;
@@ -1429,7 +1429,7 @@ public:
    * is explained in the documentation of the namespace FEValuesViews and in
    * particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::SymmetricTensor<2, dim, spacedim> &
   operator[](const FEValuesExtractors::SymmetricTensor<2> &tensor) const;
@@ -1441,7 +1441,7 @@ public:
    * vector-valued finite element. The concept of views is explained in the
    * documentation of the namespace FEValuesViews and in particular in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   const FEValuesViews::Tensor<2, dim, spacedim> &
   operator[](const FEValuesExtractors::Tensor<2> &tensor) const;

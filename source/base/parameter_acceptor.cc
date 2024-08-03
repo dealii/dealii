@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,11 +60,9 @@ ParameterAcceptor::~ParameterAcceptor()
 {
   std::lock_guard<std::mutex> l(class_list_mutex);
   // Notice that it is possible that the class is no longer in the static list.
-  // This happens when the clear() method has been called. We must guard that
-  // this is not the case, and therefore we only remove ourselves from the list
-  // if we are actually there.
-  if (class_list.find(this) != class_list.end())
-    class_list.erase(this);
+  // This happens when the clear() method has been called. erase() does the
+  // righy thing anyway by only removing this class if it's still in the list.
+  class_list.erase(this);
 }
 
 
@@ -93,7 +91,7 @@ ParameterAcceptor::initialize(
         {
           prm.parse_input(filename);
         }
-      catch (const dealii::PathSearch::ExcFileNotFound &)
+      catch (const dealii::ExcFileNotOpen &)
         {
           prm.print_parameters(filename, output_style_for_filename);
           AssertThrow(false,
@@ -198,7 +196,7 @@ ParameterAcceptor::get_section_path() const
            acceptor_it != class_list.rend();
            ++acceptor_it)
         {
-          auto *const acceptor = *acceptor_it;
+          const auto *const acceptor = *acceptor_it;
           if (acceptor->get_acceptor_id() >= get_acceptor_id())
             continue;
           bool has_trailing  = acceptor->get_section_name().back() == sep;

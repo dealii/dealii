@@ -206,22 +206,14 @@ public:
             phi.reinit(cell);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
-                if constexpr (n_components == 1)
+                Tensor<1, n_components, VectorizedArray<Number>> temp;
+                for (unsigned int v = 0; v < VectorizedArray<Number>::size();
+                     ++v)
                   {
-                    phi.submit_value(1.0, q);
+                    for (unsigned int i = 0; i < n_components; i++)
+                      temp[i][v] = 1.;
                   }
-                else
-                  {
-                    Tensor<1, n_components, VectorizedArray<Number>> temp;
-                    for (unsigned int v = 0;
-                         v < VectorizedArray<Number>::size();
-                         ++v)
-                      {
-                        for (unsigned int i = 0; i < n_components; i++)
-                          temp[i][v] = 1.;
-                      }
-                    phi.submit_value(temp, q);
-                  }
+                phi.submit_value(temp, q);
               }
 
             phi.integrate_scatter(EvaluationFlags::values, dst);

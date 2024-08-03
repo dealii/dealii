@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// Copyright (C) 2000 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -393,7 +393,7 @@ namespace Threads
     struct maybe_make_ref
     {
       static T
-      act(T &t)
+      act(const T &t)
       {
         return t;
       }
@@ -465,21 +465,22 @@ namespace Threads
    * run things in the background when there is no immediate need for the
    * result, or if there are other things that could well be done in parallel.
    * Whenever the result of that background task is needed, one can call either
-   * join() to just wait for the task to finish, or return_value() to obtain the
-   * value that was returned by the function that was run on that background
-   * task.
+   * Threads::Task::join() to just wait for the task to finish, or
+   * Threads::Task::return_value() to obtain the value that was returned by the
+   * function that was run on that background task. In both of these cases, one
+   * continues to reference the *operation* (namely, the Task object) that was
+   * in charge of computing the returned value. An alternative is to use the
+   * Threads::TaskResult class that references the *object* being computed
+   * rather than the task that computes it.
    *
-   * This class is conceptually similar to the
+   * This class is related to, but semantically not the same as, the
    * [`std::future`](https://en.cppreference.com/w/cpp/thread/future) class that
    * is returned by
    * [`std::async`](https://en.cppreference.com/w/cpp/thread/async) (which is
    * itself similar to what Threads::new_task() does). The principal conceptual
-   * difference is that one can only call `std::future::get()` once, whereas one
-   * can call Threads::Task::return_value() as many times as desired. It is,
-   * thus, comparable to the
-   * [`std::shared_future`](https://en.cppreference.com/w/cpp/thread/shared_future)
-   * class. However, `std::shared_future` can not be used for types that can not
-   * be copied -- a particular restriction for `std::unique_ptr`, for example.
+   * difference is that `std::future` references the *returned object* (like
+   * Threads::TaskResult) whereas the current object references the task that
+   * computes that result.
    *
    * @ingroup threads
    */
@@ -1366,8 +1367,6 @@ namespace Threads
    * the calls that add subtasks. Otherwise, there might be a deadlock. In
    * other words, a Task object should never passed on to another task for
    * calling the join() method.
-   *
-   * @ingroup tasks
    */
   template <typename RT = void>
   class TaskGroup
@@ -1431,7 +1430,7 @@ namespace Threads
     void
     join_all() const
     {
-      for (auto &t : tasks)
+      for (const auto &t : tasks)
         t.join();
     }
 

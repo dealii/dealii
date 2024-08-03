@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -296,7 +296,7 @@ class FESystem;
  * do with how they interact with mappings, quadrature, and the FEValues
  * class, you will also want to read through the
  * @ref FE_vs_Mapping_vs_FEValues
- * documentation module.
+ * documentation topic.
  *
  *
  * <h4>Interpolation matrices in one dimension</h4>
@@ -1442,7 +1442,7 @@ public:
    * @ref step_20 "step-20"
    * tutorial programs as well as in the
    * @ref vector_valued
-   * module.
+   * topic.
    */
   std::pair<unsigned int, unsigned int>
   system_to_component_index(const unsigned int index) const;
@@ -2643,7 +2643,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @see UpdateFlags
    */
@@ -2694,7 +2694,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module. See also the documentation of the InternalDataBase
+   * documentation topic. See also the documentation of the InternalDataBase
    * class.
    *
    * @param[in] update_flags A set of UpdateFlags values that describe what
@@ -2875,7 +2875,7 @@ protected:
    * An extensive discussion of the interaction between this function and
    * FEValues can be found in the
    * @ref FE_vs_Mapping_vs_FEValues
-   * documentation module.
+   * documentation topic.
    *
    * @param[in] cell The cell of the triangulation for which this function is
    * to compute a mapping from the reference cell to.

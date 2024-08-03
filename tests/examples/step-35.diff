@@ -1,0 +1,12 @@
+726c726
+<       std::string   filename = "nsbench2.inp";
+---
+>       std::string   filename = "../../../source/step-35/nsbench2.inp";
+975c975
+<     for (unsigned int n = 2; n <= n_steps; ++n)
+---
+>     for (unsigned int n = 2; n <= 4; ++n)
+1427c1427
+<       data.read_data("parameter-file.prm");
+---
+>       data.read_data("../../../source/step-35/parameter-file.prm");

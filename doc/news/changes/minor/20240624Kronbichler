@@ -1,6 +1,0 @@
-New: MatrixFree::loop() and MatrixFree::cell_loop() as well as
-FEEvaluation/FEFaceEvaluation can now also be used with ArrayView
-arguments. This allows to wrap externally managed vectors into the matrix-free
-facilities of deal.II.
-<br>
-(Martin Kronbichler, 2024/06/24)

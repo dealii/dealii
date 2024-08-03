@@ -1,0 +1,32 @@
+29c29
+< 
+---
+> #include "../example_test.h"
+173c173
+<     std::cout << " Read " << cad_file_name << std::endl;
+---
+>     deallog << " Read " << cad_file_name << std::endl;
+357c357
+<     std::cout << " Wrote " << filename << std::endl;
+---
+>     deallog << " Wrote " << filename << std::endl;
+389,391c389,391
+< 
+<       const std::string in_mesh_filename = "input/initial_mesh_3d.vtk";
+<       const std::string cad_file_name    = "input/DTMB-5415_bulbous_bow.iges";
+---
+>       initlog();
+>       const std::string in_mesh_filename = "../../../source/step-54/input/initial_mesh_3d.vtk";
+>       const std::string cad_file_name    = "../../../source/step-54/input/DTMB-5415_bulbous_bow.iges";
+395c395
+<       std::cout << "Testing projection in direction normal to CAD surface"
+---
+>       deallog << "Testing projection in direction normal to CAD surface"
+412c412
+<       std::cout << "Testing projection in y-axis direction" << std::endl;
+---
+>       deallog << "Testing projection in y-axis direction" << std::endl;
+429c429
+<       std::cout << "Testing projection in direction normal to mesh elements"
+---
+>       deallog << "Testing projection in direction normal to mesh elements"

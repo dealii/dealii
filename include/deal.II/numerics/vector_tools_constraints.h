@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -113,7 +113,10 @@ namespace VectorTools
    *
    * The mapping argument is used to compute the location of points on the
    * boundary at which the function needs to request the normal vector
-   * $\vec n$ from the Manifold description.
+   * $\vec n$ from the Manifold description if @p use_manifold_for_normal is
+   * set. If this parameter is not set, the mapping is used for computing the
+   * normal. This is useful, e.g., in the case that the mapping describes
+   * a deformation (e.g., MappingQCache, MappingQEulerian, MappingFEField).
    *
    * @note When combining adaptively refined meshes with hanging node
    * constraints and boundary conditions like from the current function within
@@ -122,7 +125,7 @@ namespace VectorTools
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on
+   * the topic on
    * @ref constraints.
    *
    *
@@ -294,7 +297,8 @@ namespace VectorTools
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
-         ));
+         ),
+    const bool use_manifold_for_normal = true);
 
   /**
    * This function does the same as
@@ -323,7 +327,8 @@ namespace VectorTools
 #endif
          ),
     const IndexSet    &refinement_edge_indices = IndexSet(),
-    const unsigned int level                   = numbers::invalid_unsigned_int);
+    const unsigned int level                   = numbers::invalid_unsigned_int,
+    const bool         use_manifold_for_normal = true);
 
   /**
    * This function does the same as the
@@ -355,7 +360,8 @@ namespace VectorTools
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
-         ));
+         ),
+    const bool use_manifold_for_normal = true);
 
   /**
    * This function does the same as
@@ -389,7 +395,8 @@ namespace VectorTools
 #endif
          ),
     const IndexSet    &refinement_edge_indices = IndexSet(),
-    const unsigned int level                   = numbers::invalid_unsigned_int);
+    const unsigned int level                   = numbers::invalid_unsigned_int,
+    const bool         use_manifold_for_normal = true);
 
   /**
    * Compute the constraints that correspond to boundary conditions of the
@@ -430,7 +437,8 @@ namespace VectorTools
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
-         ));
+         ),
+    const bool use_manifold_for_normal = true);
 
   /**
    * Same as above for homogeneous tangential-flux constraints.
@@ -454,7 +462,8 @@ namespace VectorTools
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
-         ));
+         ),
+    const bool use_manifold_for_normal = true);
 
   /** @} */
 } // namespace VectorTools

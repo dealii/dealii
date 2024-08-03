@@ -1160,8 +1160,6 @@ public:
    * the value you are trying to set makes sense under the current
    * circumstances.
    *
-   * @ingroup boundary
-   *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -1193,8 +1191,6 @@ public:
    * the result of not using the correct function in the results section of
    * step-49.
    *
-   * @ingroup boundary
-   *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -1216,7 +1212,7 @@ public:
    *
    * As explained in the
    * @ref manifold
-   * module, the process involved in finding the appropriate manifold
+   * topic, the process involved in finding the appropriate manifold
    * description involves querying both the manifold or boundary
    * indicators. See there for more information.
    */
@@ -1356,7 +1352,7 @@ public:
   set_user_pointer(void *p) const;
 
   /**
-   * Reset the user pointer to a @p nullptr pointer. See
+   * Reset the user pointer to `nullptr`. See
    * @ref GlossUserData
    * for more information.
    */
@@ -1365,14 +1361,16 @@ public:
 
   /**
    * Access the value of the user pointer. It is in the responsibility of the
-   * user to make sure that the pointer points to something useful. You should
-   * use the new style cast operator to maintain a minimum of type safety,
-   * e.g.
+   * user to make sure that the pointer points to something useful and always
+   * requires casting to a known type, e.g.,
    *
-   * @note User pointers and user indices are mutually exclusive. Therefore,
-   * you can only use one of them, unless you call
-   * Triangulation::clear_user_data() in between. <tt>A
-   * *a=static_cast<A*>(cell->user_pointer());</tt>.
+   * @code
+   * auto *a = static_cast<A*>(cell->user_pointer());
+   * @endcode
+   *
+   * @note User pointers and user indices are mutually exclusive. Therefore, you
+   * can only use one of them, unless you call Triangulation::clear_user_data()
+   * in between.
    *
    * See
    * @ref GlossUserData
@@ -2680,7 +2678,7 @@ public:
   set_user_pointer(void *p) const;
 
   /**
-   * Reset the user pointer to a @p nullptr pointer. See
+   * Reset the user pointer to `nullptr`. See
    * @ref GlossUserData
    * for more information.
    */
@@ -2944,8 +2942,6 @@ public:
    * the value you are trying to set makes sense under the current
    * circumstances.
    *
-   * @ingroup boundary
-   *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -2966,8 +2962,6 @@ public:
    * lower-dimensional sub-objects.  Since this object only represents a single
    * vertex, there are no lower-dimensional object and this function is
    * equivalent to calling set_boundary_id() with the same argument.
-   *
-   * @ingroup boundary
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -3965,7 +3959,7 @@ public:
    * @ref GlossGhostCell "glossary"
    * and the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_artificial()</code>.
@@ -4002,7 +3996,7 @@ public:
    * @ref GlossGhostCell "glossary"
    * and the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
    *
    * @post The returned value is equal to <code>!is_locally_owned() &&
    * !is_artificial()</code>.
@@ -4045,7 +4039,7 @@ public:
    * @ref GlossArtificialCell "glossary"
    * and the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_locally_owned()</code>.

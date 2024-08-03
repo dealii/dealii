@@ -71,11 +71,11 @@ main()
 
   deallog << "... [ reset ] ... " << std::endl;
   lazy_integer_4.reset();
-  deallog << "value_or_initialize: "
-          << lazy_integer_4.value_or_initialize([&]() {
-               deallog << "... [ initialized ] ... ";
-               return 45;
-             })
+  deallog << "value_or_initialize: " +
+               std::to_string(lazy_integer_4.value_or_initialize([&]() {
+                 deallog << "... [ initialized ] ... " << std::endl;
+                 return 45;
+               }))
           << std::endl;
 
   deallog << "OK!" << std::endl;

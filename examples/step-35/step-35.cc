@@ -1122,7 +1122,7 @@ namespace Step35
   // is the part of the system matrix for the diffusion step that changes at
   // every time step. As mentioned above, we will run the assembly loop over all
   // cells in %parallel, using the WorkStream class and other
-  // facilities as described in the documentation module on @ref threads.
+  // facilities as described in the documentation topic on @ref threads.
   template <int dim>
   void NavierStokesProjection<dim>::assemble_advection_term()
   {

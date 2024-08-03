@@ -90,7 +90,7 @@ namespace Step13
   // old one).  On a related note, you can reuse the evaluation classes for
   // other projects, solving different equations.
   //
-  // In order to improve separation of code into different modules, we put the
+  // In order to improve separation of code into different groups, we put the
   // evaluation classes into a namespace of their own. This makes it easier to
   // actually solve different equations in the same program, by assembling it
   // from existing building blocks. The reason for this is that classes for
@@ -708,7 +708,7 @@ namespace Step13
     // assemble both the matrix and the right hand side. These are
     // independent operations, and we should do this in parallel. To
     // this end, we use the concept of "tasks" that is discussed in
-    // the @ref threads documentation module. In essence, what we want
+    // the @ref threads documentation topic. In essence, what we want
     // to say "here is something that needs to be worked on, go do it
     // whenever a CPU core is available", then do something else, and
     // when we need the result of the first operation wait for its

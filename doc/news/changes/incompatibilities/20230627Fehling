@@ -1,5 +1,0 @@
-Removed: The deprecated signal Triangulation::Signals::cell_weight
-has been removed along with the deprecated class LegacySignal. Use
-Triangulation::Signals::weight instead.
-<br>
-(Marc Fehling, 2023/06/27)

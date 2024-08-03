@@ -1,0 +1,34 @@
+26c26
+< 
+---
+> #include "../example_test.h"
+1723c1723
+<       gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner);
+---
+>       check_solver_within_range(std::cout,gmres.solve(stokes_matrix, stokes_solution, stokes_rhs, preconditioner), solver_control.last_step(),1,60);
+1727,1728c1727,1728
+<       std::cout << "   " << solver_control.last_step()
+<                 << " GMRES iterations for Stokes subsystem." << std::endl;
+---
+>     //std::cout << "   " << solver_control.last_step()
+>     //          << " GMRES iterations for Stokes subsystem." << std::endl;
+1793,1796c1793,1796
+<       cg.solve(temperature_matrix,
+<                temperature_solution,
+<                temperature_rhs,
+<                preconditioner);
+---
+>     check_solver_within_range(std::cout,
+> 	   cg.solve(temperature_matrix, temperature_solution, temperature_rhs, preconditioner),
+> 	   solver_control.last_step(),
+> 	   7, 10);    
+1800,1801c1800,1801
+<       std::cout << "   " << solver_control.last_step()
+<                 << " CG iterations for temperature." << std::endl;
+---
+>     //std::cout << "   " << solver_control.last_step()
+>     //          << " CG iterations for temperature." << std::endl;       
+2095c2095
+<     while (time <= 100);
+---
+>     while (time <= 0.2);

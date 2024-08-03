@@ -321,22 +321,125 @@ namespace internal
       Utilities::MPI::this_mpi_process(mpi_communicator);
 
     // helper function
-    const auto sort_and_make_unique =
-      [](std::vector<ConstraintType> &constraints) {
-        std::sort(constraints.begin(),
-                  constraints.end(),
-                  [](const ConstraintType &l1, const ConstraintType &l2) {
-                    return l1.index < l2.index;
+    const auto sort_and_make_unique = [&constraints_in, &locally_owned_dofs](
+                                        std::vector<ConstraintType>
+                                          &locally_relevant_constraints) {
+      (void)constraints_in;
+      if (locally_relevant_constraints.empty())
+        return;
+
+      for (auto &entry : locally_relevant_constraints)
+        std::sort(entry.entries.begin(),
+                  entry.entries.end(),
+                  [](const auto &l1, const auto &l2) {
+                    return l1.first < l2.first;
                   });
 
-        constraints.erase(std::unique(constraints.begin(),
-                                      constraints.end(),
-                                      [](const ConstraintType &l1,
-                                         const ConstraintType &l2) {
-                                        return l1.index == l2.index;
-                                      }),
-                          constraints.end());
+      std::sort(locally_relevant_constraints.begin(),
+                locally_relevant_constraints.end(),
+                [](const ConstraintType &l1, const ConstraintType &l2) {
+                  return l1.index < l2.index;
+                });
+
+      auto equal_with_tol = [](const number d, const number e) {
+        if (std::abs(std::real(d - e)) <
+            std::sqrt(
+              std::numeric_limits<
+                typename numbers::NumberTraits<number>::real_type>::epsilon()))
+          return true;
+        else
+          return false;
       };
+
+      auto read_ptr  = locally_relevant_constraints.begin();
+      auto write_ptr = locally_relevant_constraints.begin();
+      // go through sorted locally relevant constraints and look out for
+      // duplicates (same constrained index, same entries) or cases that need
+      // to be augmented (same index, different entries)
+      while (++read_ptr != locally_relevant_constraints.end())
+        {
+          if (read_ptr->index != write_ptr->index)
+            {
+              // if we have a different index, use it here
+              if (++write_ptr != read_ptr)
+                *write_ptr = std::move(*read_ptr);
+            }
+          else // equal global dof index
+            {
+              auto       &a = *write_ptr;
+              const auto &b = *read_ptr;
+              Assert(a.index == b.index, ExcInternalError());
+              if (!equal_with_tol(a.inhomogeneity, b.inhomogeneity) &&
+                  locally_owned_dofs.is_element(b.index))
+                {
+                  Assert(equal_with_tol(b.inhomogeneity,
+                                        constraints_in.get_inhomogeneity(
+                                          b.index)),
+                         ExcInternalError());
+                  a.inhomogeneity = b.inhomogeneity;
+                }
+
+              auto       &av = a.entries;
+              const auto &bv = b.entries;
+              // check if entries vectors are equal
+              bool vectors_are_equal = (av.size() == bv.size());
+              for (unsigned int i = 0; vectors_are_equal && i < av.size(); ++i)
+                {
+                  if (av[i].first != bv[i].first)
+                    vectors_are_equal = false;
+                  else
+                    Assert(equal_with_tol(av[i].second, bv[i].second),
+                           ExcInternalError());
+                }
+
+              // merge entries vectors if different, otherwise ignore the
+              // second entry
+              if (!vectors_are_equal)
+                {
+                  typename dealii::AffineConstraints<
+                    number>::ConstraintLine::Entries cv;
+                  cv.reserve(av.size() + bv.size());
+
+                  unsigned int i = 0;
+                  unsigned int j = 0;
+
+                  for (; (i < av.size()) && (j < bv.size());)
+                    {
+                      if (av[i].first == bv[j].first)
+                        {
+                          Assert(equal_with_tol(av[i].second, bv[j].second),
+                                 ExcInternalError());
+
+                          cv.push_back(av[i]);
+                          ++i;
+                          ++j;
+                        }
+                      else if (av[i].first < bv[j].first)
+                        {
+                          cv.push_back(av[i]);
+                          ++i;
+                        }
+                      else
+                        {
+                          cv.push_back(bv[j]);
+                          ++j;
+                        }
+                    }
+
+                  for (; i < av.size(); ++i)
+                    cv.push_back(av[i]);
+
+                  for (; j < bv.size(); ++j)
+                    cv.push_back(bv[j]);
+
+                  std::swap(av, cv);
+                }
+            }
+        }
+      ++write_ptr;
+      locally_relevant_constraints.erase(write_ptr,
+                                         locally_relevant_constraints.end());
+    };
 
     // 0) collect constrained indices of the current object
     IndexSet constrained_indices(locally_owned_dofs.size());
@@ -597,36 +700,97 @@ template <typename number>
 void
 AffineConstraints<number>::make_consistent_in_parallel(
   const IndexSet &locally_owned_dofs,
-  const IndexSet &locally_relevant_dofs,
+  const IndexSet &constraints_to_make_consistent_,
   const MPI_Comm  mpi_communicator)
 {
   if (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
-    return; // nothing to do, since serial
+    return; // Nothing to do, since serial.
 
   Assert(sorted == false, ExcMatrixIsClosed());
 
-  // 1) get all locally relevant constraints ("temporal constraint matrix")
-  const auto temporal_constraint_matrix =
-    internal::compute_locally_relevant_constraints(*this,
-                                                   locally_owned_dofs,
-                                                   locally_relevant_dofs,
-                                                   mpi_communicator);
+  Assert(this->local_lines.is_empty() == false,
+         ExcMessage(
+           "This functionality requires that the AffineConstraints object "
+           "knows for which degrees of freedom it can store constraints. "
+           "Please initialize this object with the corresponding index sets."));
 
-  // 2) clear the content of this constraint matrix
-  lines.clear();
-  lines_cache.clear();
+  // Container for indices that are constrained or that other indices are
+  // constrained against. Generously reserve memory for it, assuming the worst
+  // case that each constraint line involves two distinct DoF indices.
+  std::vector<types::global_dof_index> constrained_indices;
+  constrained_indices.reserve(2 * n_constraints());
 
-  // 3) refill this constraint matrix
-  for (const auto &line : temporal_constraint_matrix)
-    this->add_constraint(line.index, line.entries, line.inhomogeneity);
+  // This IndexSet keeps track of the locally stored constraints on this
+  // AffineConstraints object: If we have received constrained indices that we
+  // don't know of, we need to expand our playing field.
+  IndexSet locally_stored_constraints;
 
-#ifdef DEBUG
+  // This IndexSet contains those DoFs about which we want to know all
+  // constraints. We will receive constraints for these DoFs against other DoFs,
+  // which might be constrained themselves. To successfully resolve all chains
+  // of constraints, we need to know the constraints of all these DoFs, and we
+  // keep track of the relevant DoFs here.
+  IndexSet constraints_to_make_consistent = constraints_to_make_consistent_;
+
+  // This IndexSet stores DoFs from the previous iteration. If the old and new
+  // index sets match, we have converged.
+  IndexSet constraints_made_consistent;
+
+  const unsigned int max_iterations  = 10;
+  unsigned int       iteration_count = 0;
+  for (; iteration_count < max_iterations; ++iteration_count)
+    {
+      // 1) Get all locally relevant constraints ("temporal constraint matrix").
+      const auto temporal_constraint_matrix =
+        internal::compute_locally_relevant_constraints(
+          *this,
+          locally_owned_dofs,
+          constraints_to_make_consistent,
+          mpi_communicator);
+
+      // 2) Add untracked DoFs to the index sets.
+      constrained_indices.clear();
+      for (const auto &line : temporal_constraint_matrix)
+        {
+          constrained_indices.push_back(line.index);
+          for (const auto &entry : line.entries)
+            constrained_indices.push_back(entry.first);
+        }
+      std::sort(constrained_indices.begin(), constrained_indices.end());
+
+      locally_stored_constraints = this->local_lines;
+      locally_stored_constraints.add_indices(constrained_indices.begin(),
+                                             constrained_indices.end());
+
+      constraints_made_consistent = constraints_to_make_consistent;
+      constraints_to_make_consistent.add_indices(constrained_indices.begin(),
+                                                 constrained_indices.end());
+
+      // 3) Clear and refill this constraint matrix.
+      this->reinit(locally_owned_dofs, locally_stored_constraints);
+      for (const auto &line : temporal_constraint_matrix)
+        this->add_constraint(line.index, line.entries, line.inhomogeneity);
+
+      // 4) Stop loop if converged.
+      const auto constraints_converged =
+        Utilities::MPI::min(static_cast<unsigned int>(
+                              constraints_to_make_consistent ==
+                              constraints_made_consistent),
+                            mpi_communicator);
+      if (constraints_converged)
+        break;
+    }
+
+  AssertThrow(iteration_count < max_iterations,
+              ExcMessage(
+                "make_consistent_in_parallel() did not converge after " +
+                Utilities::to_string(max_iterations) + " iterations."));
+
   Assert(this->is_consistent_in_parallel(
            Utilities::MPI::all_gather(mpi_communicator, locally_owned_dofs),
-           locally_relevant_dofs,
+           constraints_to_make_consistent,
            mpi_communicator),
          ExcInternalError());
-#endif
 }
 
 

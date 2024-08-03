@@ -1,4 +1,0 @@
-Fixed: The GridTools::Cache class accessed its members in ways that
-were not thread-safe. This should now be fixed.
-<br>
-(Wolfgang Bangerth, 2024/06/19)

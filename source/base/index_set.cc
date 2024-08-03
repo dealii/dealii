@@ -40,7 +40,8 @@ DEAL_II_NAMESPACE_OPEN
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 IndexSet::IndexSet(
-  Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>> map)
+  const Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>>
+    &map)
   : is_compressed(true)
   , index_space_size(1 + map->getMaxAllGlobalIndex())
   , largest_range(numbers::invalid_unsigned_int)
@@ -1004,7 +1005,7 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
         communicator)
 #    else
       Utilities::Trilinos::internal::make_rcp<Teuchos::Comm<int>>()
-#    endif // DEAL_WITH_MPI
+#    endif // DEAL_II_WITH_MPI
     );
   else
     {

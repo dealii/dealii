@@ -1,4 +1,0 @@
-New: Created a new class FECouplingValues, that helps with assembling of coupled 
-finite element methods across different dimensions or different grids.
-<br>
-(Luca Heltai, 2023/07/21)

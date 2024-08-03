@@ -1,6 +1,0 @@
-New: LinearAlgebra::TpetraWrappers::VectorReference for easier access
-to LinearAlgebra::TpetraWrappers::Vector. Moreover, several
-new member functions are introduced to LinearAlgebra::TpetraWrappers::Vector
-to be used as the "VectorType" template argument in AffineConstraints.
-<br>
-(Sebastian Kinnewig, 2023/10/18)

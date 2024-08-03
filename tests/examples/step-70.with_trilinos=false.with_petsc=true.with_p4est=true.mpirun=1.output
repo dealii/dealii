@@ -1,0 +1,14 @@
+Running StokesImmersedProblem<2> using PETSc.
+Cycle 0:
+Time : 0, time step: 0.002
+   Number of degrees of freedom: 9539 (8450+1089 -- 0+0)
+Tracer particles: 1313
+Solid particles: 9216
+Solver stopped within 118 - 163 iterations
+   Number of degrees of freedom: 9845 (8722+1123 -- 9216+1313)
+Cycle 1:
+Time : 0.002, time step: 0.002
+Solver stopped within 118 - 163 iterations
+Cycle 2:
+Time : 0.004, time step: 0.002
+Solver stopped within 118 - 163 iterations

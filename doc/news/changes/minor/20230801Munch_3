@@ -1,5 +1,0 @@
-Improved: GridTools::find_active_cell_around_point() and
-GridTools::find_all_active_cells_around_point() now also work
-for simplices.
-<br>
-(Peter Munch, David Wells, 2023/07/25)

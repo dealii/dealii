@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,7 +86,7 @@ main(int argc, char *argv[])
                          h->diff(t_02),
                          h->diff(s)};
 
-  deallog << *h << std::endl;
+  std::cout << *h << std::endl;
 
   SE::map_basic_basic dict;
   std::vector<double> vals(v.size());

@@ -1,0 +1,113 @@
+
+DEAL::Uniform grid
+DEAL::
+DEAL::Testing FESystem<2>[FE_Q<2>(2)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 13.663649 13.663649 2.7962968e-16
+DEAL::Restrict: 25.420254 25.420254 0.0000000
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(2)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 20.269046 20.269046 0.0000000
+DEAL::Restrict: 56.395388 56.395388 0.0000000
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(2)^2] <-> FESystem<2>[FE_DGQ<2>(1)^2]
+DEAL::Prolongate: 18.775923 18.775923 0.0000000
+DEAL::Restrict: 27.500564 27.500564 0.0000000
+DEAL::
+DEAL::Adaptively refined grid
+DEAL::
+DEAL::Testing FESystem<2>[FE_Q<2>(2)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 22.524324 22.524324 5.3797688e-16
+DEAL::Restrict: 42.637382 42.637382 1.1749496e-15
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(2)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 33.899239 33.899239 0.0000000
+DEAL::Restrict: 96.747920 96.747920 3.2023728e-15
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQHermite<2>(2)^2] <-> FESystem<2>[FE_DGQ<2>(1)^2]
+DEAL::Prolongate: 33.672479 33.672479 0.0000000
+DEAL::Restrict: 49.253827 49.253827 0.0000000
+DEAL::
+DEAL::Uniform grid
+DEAL::
+DEAL::Testing FESystem<2>[FE_Q<2>(3)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 19.757343 19.757343 3.2671802e-16
+DEAL::Restrict: 54.074714 54.074714 0.0000000
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(3)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 25.082979 25.082979 0.0000000
+DEAL::Restrict: 92.116340 92.116340 0.0000000
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(3)^2] <-> FESystem<2>[FE_DGQ<2>(1)^2]
+DEAL::Prolongate: 24.715226 24.715226 0.0000000
+DEAL::Restrict: 48.264625 48.264625 0.0000000
+DEAL::
+DEAL::Adaptively refined grid
+DEAL::
+DEAL::Testing FESystem<2>[FE_Q<2>(3)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 34.600965 34.600965 7.6179449e-16
+DEAL::Restrict: 98.563611 98.563611 2.0350724e-15
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(3)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 43.956683 43.956683 0.0000000
+DEAL::Restrict: 166.90548 166.90548 3.3528000e-15
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQHermite<2>(3)^2] <-> FESystem<2>[FE_DGQ<2>(1)^2]
+DEAL::Prolongate: 45.004243 45.004243 0.0000000
+DEAL::Restrict: 87.866557 87.866557 0.0000000
+DEAL::
+DEAL::Uniform grid
+DEAL::
+DEAL::Testing FESystem<2>[FE_Q<2>(1)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 7.3364299 7.3364299 0.0000000
+DEAL::Restrict: 7.3364299 7.3364299 0.0000000
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(1)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 13.244635 13.244635 0.0000000
+DEAL::Restrict: 24.977650 24.977650 0.0000000
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(1)^2] <-> FESystem<2>[FE_DGQ<2>(1)^2]
+DEAL::Prolongate: 12.972939 12.972939 0.0000000
+DEAL::Restrict: 12.972939 12.972939 0.0000000
+DEAL::
+DEAL::Adaptively refined grid
+DEAL::
+DEAL::Testing FESystem<2>[FE_Q<2>(1)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 12.653242 12.653242 0.0000000
+DEAL::Restrict: 12.653242 12.653242 0.0000000
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQ<2>(1)^2] <-> FESystem<2>[FE_Q<2>(1)^2]
+DEAL::Prolongate: 22.803418 22.803418 0.0000000
+DEAL::Restrict: 44.733710 44.733710 1.4054301e-15
+DEAL::
+DEAL::Testing FESystem<2>[FE_DGQHermite<2>(1)^2] <-> FESystem<2>[FE_DGQ<2>(1)^2]
+DEAL::Prolongate: 23.131741 23.131741 0.0000000
+DEAL::Restrict: 23.131741 23.131741 0.0000000
+DEAL::
+DEAL::Uniform grid
+DEAL::
+DEAL::Testing FESystem<3>[FE_Q<3>(2)^3] <-> FESystem<3>[FE_Q<3>(1)^3]
+DEAL::Prolongate: 25.768428 25.768428 6.3656552e-16
+DEAL::Restrict: 61.986736 61.986736 0.0000000
+DEAL::
+DEAL::Testing FESystem<3>[FE_DGQ<3>(2)^3] <-> FESystem<3>[FE_Q<3>(1)^3]
+DEAL::Prolongate: 39.653205 39.653205 0.0000000
+DEAL::Restrict: 162.26875 162.26875 0.0000000
+DEAL::
+DEAL::Testing FESystem<3>[FE_DGQ<3>(2)^3] <-> FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL::Prolongate: 38.581375 38.581375 0.0000000
+DEAL::Restrict: 68.771113 68.771113 0.0000000
+DEAL::
+DEAL::Adaptively refined grid
+DEAL::
+DEAL::Testing FESystem<3>[FE_Q<3>(2)^3] <-> FESystem<3>[FE_Q<3>(1)^3]
+DEAL::Prolongate: 61.402632 61.402632 1.7178432e-15
+DEAL::Restrict: 159.07644 159.07644 5.5288661e-15
+DEAL::
+DEAL::Testing FESystem<3>[FE_DGQ<3>(2)^3] <-> FESystem<3>[FE_Q<3>(1)^3]
+DEAL::Prolongate: 101.67905 101.67905 0.0000000
+DEAL::Restrict: 482.16372 482.16372 2.7818565e-14
+DEAL::
+DEAL::Testing FESystem<3>[FE_DGQHermite<3>(2)^3] <-> FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL::Prolongate: 104.98305 104.98305 0.0000000
+DEAL::Restrict: 187.36024 187.36024 0.0000000
+DEAL::

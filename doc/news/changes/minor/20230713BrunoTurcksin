@@ -1,5 +1,0 @@
-New: Added InitFinalize class. This class is similar to MPI_InitFinalize but it
-allows users to decide which libraries should be initialized/finalized by the
-class.
-<br>
-(Bruno Turcksin, 2023/07/13)

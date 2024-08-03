@@ -60,8 +60,8 @@ namespace PETScWrappers
      * collect_sizes() function, for much the same reason as is documented
      * with the BlockSparsityPattern class.
      *
-     * @ingroup Matrix1 @see
-     * @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup Matrix1
+     * @see @ref GlossBlockLA "Block (linear algebra)"
      */
     class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix>
     {

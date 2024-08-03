@@ -1,8 +1,0 @@
-Changed: For Triangulations created with
-MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(),
-the MeshSmoothing flag Triangulation::eliminate_unrefined_islands will
-be removed. It caused unintentional refinement during coarsening which
-led to problems in GlobalCoarseningFineDoFHandlerView. See also
-<a href="https://github.com/dealii/dealii/issues/15541">#15541</a>.
-<br>
-(Marc Fehling, 2023/08/22)

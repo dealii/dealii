@@ -358,7 +358,7 @@ namespace nonlinear_solver_selector_test
       typename NLSolve::AdditionalData additional_data;
       additional_data.solver_type = SOLVER;
 
-      NLSolve nonlinear_solver(additional_data);
+      NLSolve nonlinear_solver(additional_data, MPI_COMM_WORLD);
 
       nonlinear_solver.reinit_vector = [&](Vector<double> &x) {
         x.reinit(dof_handler.n_dofs());
@@ -386,8 +386,10 @@ namespace nonlinear_solver_selector_test
 
 
 int
-main()
+main(int argc, char *argv[])
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+
   initlog();
 
   using namespace nonlinear_solver_selector_test;

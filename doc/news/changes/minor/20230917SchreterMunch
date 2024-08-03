@@ -1,4 +1,0 @@
-New: Added helper class RemotePointEvaluation::CellData to store
-and access data of cell-specific points.
-<br>
-(Magdalena Schreter, Peter Munch, 2023/09/17)

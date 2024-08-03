@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,6 @@
 #  include <boost/type_traits.hpp>
 
 #  include <algorithm>
-#  include <iosfwd>
 #  include <map>
 #  include <memory>
 #  include <type_traits>
@@ -115,8 +114,9 @@ namespace Differentiation
     /**
      * Output operator that outputs the selected optimizer type.
      */
-    inline std::ostream &
-    operator<<(std::ostream &s, OptimizerType o)
+    template <typename StreamType>
+    inline StreamType &
+    operator<<(StreamType &s, OptimizerType o)
     {
       if (o == OptimizerType::dictionary)
         s << "dictionary";
@@ -266,8 +266,9 @@ namespace Differentiation
      * Output operator that outputs optimization flags as a set of or'd
      * text values.
      */
-    inline std::ostream &
-    operator<<(std::ostream &s, OptimizationFlags o)
+    template <typename StreamType>
+    inline StreamType &
+    operator<<(StreamType &s, OptimizationFlags o)
     {
       s << " OptimizationFlags|";
       if (static_cast<unsigned int>(o & OptimizationFlags::optimize_cse))
@@ -369,8 +370,8 @@ namespace Differentiation
       {
         static const bool is_supported = true;
 
-        using ReturnType = typename std::
-          conditional<std::is_same_v<ReturnType_, float>, float, double>::type;
+        using ReturnType =
+          std::conditional_t<std::is_same_v<ReturnType_, float>, float, double>;
       };
 
 
@@ -595,8 +596,8 @@ namespace Differentiation
       struct LLVMOptimizer<ReturnType_,
                            std::enable_if_t<std::is_arithmetic_v<ReturnType_>>>
       {
-        using ReturnType = typename std::
-          conditional<std::is_same_v<ReturnType_, float>, float, double>::type;
+        using ReturnType =
+          std::conditional_t<std::is_same_v<ReturnType_, float>, float, double>;
         using OptimizerType =
           std::conditional_t<std::is_same_v<ReturnType_, float>,
                              SymEngine::LLVMFloatVisitor,
@@ -2270,14 +2271,12 @@ namespace Differentiation
       // Serialize enum classes...
       {
         const auto m =
-          static_cast<typename std::underlying_type<OptimizerType>::type>(
-            method);
+          static_cast<std::underlying_type_t<OptimizerType>>(method);
         ar &m;
       }
       {
         const auto f =
-          static_cast<typename std::underlying_type<OptimizationFlags>::type>(
-            flags);
+          static_cast<std::underlying_type_t<OptimizationFlags>>(flags);
         ar &f;
       }
 
@@ -2353,13 +2352,13 @@ namespace Differentiation
 
       // Deserialize enum classes...
       {
-        typename std::underlying_type<OptimizerType>::type m;
-        ar                                                &m;
+        std::underlying_type_t<OptimizerType> m;
+        ar                                   &m;
         method = static_cast<OptimizerType>(m);
       }
       {
-        typename std::underlying_type<OptimizationFlags>::type f;
-        ar                                                    &f;
+        std::underlying_type_t<OptimizationFlags> f;
+        ar                                       &f;
         flags = static_cast<OptimizationFlags>(f);
       }
 

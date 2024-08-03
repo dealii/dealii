@@ -1,0 +1,55 @@
+
+DEAL::Testing: FE_SimplexP<2>(1)
+DEAL::Ok Ok 
+DEAL::Ok Ok 
+DEAL::Ok Ok 
+DEAL::Testing: FE_SimplexDGP<2>(1)
+DEAL::Ok Ok 
+DEAL::Ok Ok 
+DEAL::Ok Ok 
+DEAL::Testing: FE_SimplexP<3>(1)
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Testing: FE_SimplexDGP<3>(1)
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Testing: FE_SimplexP<2>(2)
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Testing: FE_SimplexDGP<2>(2)
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Ok Ok Ok 
+DEAL::Testing: FE_SimplexP<3>(2)
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Testing: FE_SimplexDGP<3>(2)
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok 
+DEAL::Testing: FE_SimplexP<2>(3)
+DEAL::Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok 
+DEAL::Testing: FE_SimplexDGP<2>(3)
+DEAL::Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok 
+DEAL::Testing: FE_SimplexP<3>(3)
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 
+DEAL::Testing: FE_SimplexDGP<3>(3)
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 
+DEAL::Ok Ok Ok Ok Ok Ok Ok Ok Ok Ok 

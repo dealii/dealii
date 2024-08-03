@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2020 - 2023 by the deal.II authors
+ * Copyright (C) 2020 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -61,8 +61,6 @@
 
 #include <fstream>
 
-using namespace dealii;
-
 
 // @sect3{Global definitions}
 
@@ -87,6 +85,8 @@ using namespace dealii;
 // they had started at 0).
 namespace Step19
 {
+  using namespace dealii;
+
   namespace BoundaryIds
   {
     constexpr types::boundary_id open          = 101;
@@ -135,7 +135,7 @@ namespace Step19
     void create_particles();
     void move_particles();
     void track_lost_particle(
-      const typename Particles::ParticleIterator<dim>         &particle,
+      const Particles::ParticleIterator<dim>                  &particle,
       const typename Triangulation<dim>::active_cell_iterator &cell);
 
 
@@ -143,7 +143,7 @@ namespace Step19
     void output_results() const;
 
     Triangulation<dim>        triangulation;
-    MappingQ<dim>             mapping;
+    const MappingQ<dim>       mapping;
     const FE_Q<dim>           fe;
     DoFHandler<dim>           dof_handler;
     AffineConstraints<double> constraints;
@@ -582,7 +582,7 @@ namespace Step19
             // "quadrature" point, and extract the electric field vector from
             // the gradient in the form of a Tensor variable through the methods
             // discussed in the
-            // @ref vector_valued "vector-valued problems" documentation module.
+            // @ref vector_valued "vector-valued problems" documentation topic.
             const FEValuesExtractors::Scalar electric_potential(0);
             fe_face_values[electric_potential].get_function_gradients(
               solution, solution_gradients);

@@ -1,9 +1,0 @@
-New: Add two tensor functions for the split of a 2nd-order symmetric tensor
-into a positive part and a negative part based on the signs of the eigenvalues
-obtained from the spectrum decomposition. The function positive_negative_split()
-performs the positive-negative split of the 2nd-order symmetric tensor given as
-the input. The function positive_negative_projectors() not only performs the split,
-but also provides the derivatives (two fourth-order tensors) of the positive/negative
-part of the tensor with respect to the input tensor.
-<br>
-(Tao Jin, 2023/08/22)

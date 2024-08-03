@@ -1,6 +1,0 @@
-New: Add AdditionalData struct for configuring the RemotePointEvaluation class. 
-The latter is passed into a new constructor.
-Deprecated: The old constructor of RemotePointEvaluation class taking the 
-parameters value-by-value is marked as deprecated.
-<br>
-(Magdalena Schreter-Fleischhacker, Peter Munch, 2023/12/06)

@@ -921,7 +921,7 @@ namespace GridGenerator
    * @endcode
    *
    * See the
-   * @ref manifold "documentation module on manifolds"
+   * @ref manifold "documentation topic on manifolds"
    * for more details.
    *
    * @image html sphere.png
@@ -1451,14 +1451,14 @@ namespace GridGenerator
    * `triangulation.generate_hyper_shell(center, inner_radius, outer_radius,
    * n_cells = 0, colorize = false)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_shell(Triangulation<dim> &tria,
-              const Point<dim>   &center,
-              const double        inner_radius,
-              const double        outer_radius,
-              const unsigned int  n_cells  = 0,
-              bool                colorize = false);
+  hyper_shell(Triangulation<dim, spacedim> &tria,
+              const Point<spacedim>        &center,
+              const double                  inner_radius,
+              const double                  outer_radius,
+              const unsigned int            n_cells  = 0,
+              bool                          colorize = false);
 
   /**
    * Produce an eccentric hyper-shell, the region between two spheres centered
@@ -1648,10 +1648,12 @@ namespace GridGenerator
    *
    * @param tria The triangulation to be filled.
    *
-   * @param R The radius of the circle, which forms the middle line of the
-   * torus containing the loop of cells. Must be greater than @p r.
+   * @param centerline_radius The radius of the circle which forms the center
+   * line of the torus containing the loop of cells. Must be greater than @p
+   * inner_radius.
    *
-   * @param r The inner radius of the torus.
+   * @param inner_radius The distance between the inner edge of the torus and
+   * origin.
    *
    * @param n_cells_toroidal Optional argument to set the number of cell
    * layers in toroidal direction. The default is 6 cell layers.
@@ -1668,8 +1670,8 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   torus(Triangulation<dim, spacedim> &tria,
-        const double                  R,
-        const double                  r,
+        const double                  centerline_radius,
+        const double                  inner_radius,
         const unsigned int            n_cells_toroidal = 6,
         const double                  phi              = 2.0 * numbers::PI);
 
@@ -1706,14 +1708,14 @@ namespace GridGenerator
    * `triangulation.generate_hyper_cube_with_cylindrical_hole(inner_radius =
    * 0.25, outer_radius = 0.5, L = 0.5, repetitions = 1, colorize = false)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangulation,
-                                   const double        inner_radius = .25,
-                                   const double        outer_radius = .5,
-                                   const double        L            = .5,
-                                   const unsigned int  repetitions  = 1,
-                                   const bool          colorize     = false);
+  hyper_cube_with_cylindrical_hole(Triangulation<dim, spacedim> &triangulation,
+                                   const double       inner_radius = .25,
+                                   const double       outer_radius = .5,
+                                   const double       L            = .5,
+                                   const unsigned int repetitions  = 1,
+                                   const bool         colorize     = false);
 
   /**
    * Produce a grid consisting of concentric shells. The primary difference
@@ -2425,8 +2427,6 @@ namespace GridGenerator
   /**
    * Namespace Airfoil contains classes and functions in order to create a
    * C-type mesh for the (flow) field around Joukowski or NACA airfoils.
-   *
-   * @ingroup GridGenerator
    */
   namespace Airfoil
   {

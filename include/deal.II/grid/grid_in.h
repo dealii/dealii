@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -366,9 +366,8 @@ public:
   read(std::istream &in, Format format = Default);
 
   /**
-   * Open the file given by the string and call the previous function read().
-   * This function uses the PathSearch mechanism to find files. The file class
-   * used is <code>MESH</code>.
+   * Open the file given by the string and call the previous function
+   * read() taking a std::istream argument.
    */
   void
   read(const std::string &in, Format format = Default);

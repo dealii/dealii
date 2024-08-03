@@ -114,10 +114,8 @@ namespace Utilities
             }
           else
             {
-              if (data_map.find(index) == data_map.end())
-                data_map[index] = invalid_index_value;
-
-              return data_map[index];
+              return data_map.try_emplace(index, invalid_index_value)
+                .first->second;
             }
         }
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2023 by the deal.II authors
+// Copyright (C) 2023 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -786,7 +786,7 @@ public:
    *
    * This method computes the actual renumbering of the degrees of freedom and
    * quadrature points. If you change the underlying FEValuesBase objects after
-   * calling this method, you mey need to call the reinit() function to update
+   * calling this method, you may need to call the reinit() function to update
    * the renumbering. This may or may not be necessary, depending on the type of
    * coupling that you are using.
    *

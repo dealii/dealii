@@ -1,6 +1,0 @@
-New: The FEValuesBase class now lazily computes the FEValuesViews
-objects it returns when you do something like `fe_values[velocities]`,
-whenever they are needed first, rather than *always* creating these
-objects.
-<br>
-(Wolfgang Bangerth, 2023/11/28)

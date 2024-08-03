@@ -1,6 +1,0 @@
-Deprecated: The member variables `input_vector_names` and
-`output_names` of MeshWorker::LocalIntegrator are not used in the
-library. They are now deprecated. If you use them, simply introduce
-variables of the same name and type in your own derived class.
-<br>
-(Wolfgang Bangerth, 2024/05/14)

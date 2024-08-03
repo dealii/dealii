@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2009 - 2023 by the deal.II authors
+ * Copyright (C) 2009 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -170,7 +170,7 @@ namespace Step37
   // making sure that only cells are worked on that do not share any degree of
   // freedom (this makes the loop thread-safe when writing into destination
   // vectors). This is a more advanced strategy compared to the WorkStream
-  // class described in the @ref threads module. Of course, to not destroy
+  // class described in the @ref threads topic. Of course, to not destroy
   // thread-safety, we have to be careful when writing into class-global
   // structures.
   //
@@ -688,7 +688,7 @@ namespace Step37
     const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     AffineConstraints<double> constraints;
     using SystemMatrixType =

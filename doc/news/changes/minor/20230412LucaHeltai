@@ -1,7 +1,0 @@
-New: Added a function DoFTools::map_boundary_to_bulk_dof_iterators() that
-generates a mapping of codimension-1 active DoFHandler cell iterators to
-codimension-0 cells and face indices, to couple DoFHandler objects of different
-co-dimensions, initialized on grids generated with
-GridTools::extract_boundary_mesh()
-<br>
-(Luca Heltai, 2023/04/12)

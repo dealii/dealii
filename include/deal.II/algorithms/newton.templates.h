@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2010 - 2019 by the deal.II authors
+// Copyright (C) 2010 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -156,7 +156,7 @@ namespace Algorithms
           {
             (*inverse_derivative)(out2, src2);
           }
-        catch (SolverControl::NoConvergence &e)
+        catch (const SolverControl::NoConvergence &e)
           {
             deallog << "Inner iteration failed after " << e.last_step
                     << " steps with residual " << e.last_residual << std::endl;

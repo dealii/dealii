@@ -1,4 +1,0 @@
-Fixed: The function hp::Refinement::limit_p_level_difference() now
-correctly sets future FE indices in case of p-coarsening.
-<br>
-(Marc Fehling, 2024/02/29)

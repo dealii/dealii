@@ -555,7 +555,7 @@
  *       <td>step-64</td>
  *       <td> Solving a Helmholtz problem using matrix-free methods on the GPU
  *       with MPI parallelization.
- *       <br/> Keywords: LinearAlgebra::CUDAWrappers, CUDAWrappers::MatrixFree
+ *       <br/> Keywords: Portable::MatrixFree, Portable::FEEvaluation, Kokkos
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -666,9 +666,21 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-83</td>
+ *       <td> Serialization, checkpoint/restart.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-85</td>
  *       <td> Solving the Poisson equation using the cut finite element method.
  *       <br/> Keywords: FEInterfaceValues, NonMatching::FEImmersedSurfaceValues
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-86</td>
+ *       <td> The heat equation, solved with an external time stepping
+ *       library
+ *       <br/> Keywords: PETScWrappers::TimeStepper
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -810,7 +822,8 @@
  *       step-18,
  *       step-40,
  *       step-50,
- *       step-55
+ *       step-55,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -836,7 +849,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> Parallelization via CUDA and MPI
+ *     <td> Parallelization via Kokkos and MPI
  *     </td>
  *     <td>
  *       step-64
@@ -858,7 +871,8 @@
  *       step-67,
  *       step-69,
  *       step-70,
- *       step-75
+ *       step-75,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -880,7 +894,8 @@
  *       step-69,
  *       step-70,
  *       step-71,
- *       step-72
+ *       step-72,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -907,7 +922,8 @@
  *       step-14,
  *       step-39,
  *       step-50,
- *       step-74
+ *       step-74,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1058,6 +1074,8 @@
  *   </tr>
  *
  * </table>
+ *
+ *
  * <h4><b>Linear solvers</b></h4>
  * <table align="center" width="90%">
  *
@@ -1129,7 +1147,8 @@
  *       step-55,
  *       step-59,
  *       step-66,
- *       step-75
+ *       step-75,
+ *       step-86
  *     </td>
  *   </tr>
  *
@@ -1161,6 +1180,7 @@
  *     <td> Linear Newton systems from nonlinear equations
  *     </td>
  *     <td>
+ *       step-15,
  *       step-33,
  *       step-41,
  *       step-42,
@@ -1427,7 +1447,9 @@
  *   <tr valign="top">
  *     <td> The heat equation
  *     </td>
- *     <td>step-26
+ *     <td>
+ *       step-26,
+ *       step-86
  *     </td>
  *   </tr>
  *

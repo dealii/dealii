@@ -55,7 +55,7 @@ class FiniteElement;
  * <h3>Use of these flags flags</h3>
  *
  * More information on the use of this type both in user code as well as
- * internally can be found in the documentation modules on
+ * internally can be found in the documentation topics pages on
  * @ref UpdateFlags "The interplay of UpdateFlags, Mapping, and FiniteElement in FEValues"
  * and
  * @ref FE_vs_Mapping_vs_FEValues "How Mapping, FiniteElement, and FEValues work together".

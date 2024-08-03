@@ -442,7 +442,7 @@ step-49, step-53, and step-54, among other tutorial programs that cover
 the issue. step-65 shows another, less manual way to achieve a mesh
 well fit to the problem here.
 Information on curved domains can also be found in the
-documentation module on @ref manifold "Manifold descriptions".
+documentation topic on @ref manifold "Manifold descriptions".
 
 Why does it make sense to choose a mesh that tracks the internal
 interface? There are a number of reasons, but the most essential one

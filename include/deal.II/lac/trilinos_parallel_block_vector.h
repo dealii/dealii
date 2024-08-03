@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2023 by the deal.II authors
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -68,8 +68,8 @@ namespace TrilinosWrappers
      * elements of each of these blocks to be stored on the local process.
      *
      * @ingroup Vectors
-     * @ingroup TrilinosWrappers @see
-     * @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup TrilinosWrappers
+     * @see @ref GlossBlockLA "Block (linear algebra)"
      */
     class BlockVector : public dealii::BlockVectorBase<MPI::Vector>
     {
@@ -312,7 +312,7 @@ namespace TrilinosWrappers
        * functions.
        */
       void
-      swap(BlockVector &v);
+      swap(BlockVector &v) noexcept;
 
       /**
        * Print to a stream.
@@ -427,7 +427,7 @@ namespace TrilinosWrappers
 
 
     inline void
-    BlockVector::swap(BlockVector &v)
+    BlockVector::swap(BlockVector &v) noexcept
     {
       std::swap(this->components, v.components);
 
@@ -444,7 +444,7 @@ namespace TrilinosWrappers
      * @relatesalso TrilinosWrappers::MPI::BlockVector
      */
     inline void
-    swap(BlockVector &u, BlockVector &v)
+    swap(BlockVector &u, BlockVector &v) noexcept
     {
       u.swap(v);
     }

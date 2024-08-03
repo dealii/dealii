@@ -1,6 +1,0 @@
-Fixed: The memory of particles which are deleted during refinement was not
-correctly freed in the memory pool.  This could lead to a minor memory leak and
-error messages about an inconsistent state during destruction of the property
-pool. This is fixed now.
-<br>
-(Rene Gassmoeller, 2024/03/07)

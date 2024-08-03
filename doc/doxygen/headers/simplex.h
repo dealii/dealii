@@ -16,7 +16,7 @@
 /**
  * @defgroup simplex Simplex support (experimental)
  *
- * This module describes the experimental simplex support in deal.II.
+ * This group describes the experimental simplex support in deal.II.
  *
  * Simplex and mixed meshes in deal.II are still experimental, i.e., work
  * in progress. Large parts of the library have been ported to be able to

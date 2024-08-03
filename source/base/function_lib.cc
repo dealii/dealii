@@ -1811,7 +1811,8 @@ namespace Functions
         case 2:
           angle = std::atan2(direction[0], direction[1]);
           break;
-        case 3:
+        default:
+          angle = std::numeric_limits<double>::signaling_NaN();
           DEAL_II_NOT_IMPLEMENTED();
       }
     sine   = std::sin(angle);

@@ -495,7 +495,7 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
 
       const auto &child_cell = tria.begin(0)->child(child);
 
-      // iterate over all support points and transfom them to the unit cell of
+      // iterate over all support points and transform them to the unit cell of
       // the child
       for (unsigned int i = 0; i < unit_support_points.size(); i++)
         {

@@ -1,4 +1,0 @@
-New: MatrixFreeTools::compute_diagonal() and MatrixFreeTools::compute_matrix()
-can now handle face and boundary integrals needed for DG.
-<br>
-(Peter Munch, Magdalena Schreter-Fleischhacker, 2024/05/16)

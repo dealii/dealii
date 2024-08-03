@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2009 - 2020 by the deal.II authors
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,7 @@ namespace parallel
 
     void
     TBBPartitioner::release_one_partitioner(
-      std::shared_ptr<tbb::affinity_partitioner> &p)
+      const std::shared_ptr<tbb::affinity_partitioner> &p)
     {
       if (p.get() == my_partitioner.get())
         {

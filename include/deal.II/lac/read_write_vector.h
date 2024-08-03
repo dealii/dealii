@@ -266,7 +266,7 @@ namespace LinearAlgebra
      * analogy to standard functions.
      */
     void
-    swap(ReadWriteVector<Number> &v);
+    swap(ReadWriteVector<Number> &v) noexcept;
 
     /**
      * Copies the data and the IndexSet of the input vector @p in_vector.
@@ -1179,7 +1179,7 @@ namespace LinearAlgebra
 template <typename Number>
 inline void
 swap(LinearAlgebra::ReadWriteVector<Number> &u,
-     LinearAlgebra::ReadWriteVector<Number> &v)
+     LinearAlgebra::ReadWriteVector<Number> &v) noexcept
 {
   u.swap(v);
 }

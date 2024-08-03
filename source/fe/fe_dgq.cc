@@ -870,7 +870,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   bool                equidistant = true;
   std::vector<double> points(this->degree + 1);
 
-  auto *const polynomial_space =
+  const auto *const polynomial_space =
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =
@@ -987,7 +987,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 {
   // Construct a dummy quadrature formula containing the FE's nodes:
   std::vector<Point<1>> qpoints(this->degree + 1);
-  auto *const           polynomial_space =
+  const auto *const     polynomial_space =
     dynamic_cast<TensorProductPolynomials<dim> *>(this->poly_space.get());
   Assert(polynomial_space != nullptr, ExcInternalError());
   std::vector<unsigned int> lexicographic =

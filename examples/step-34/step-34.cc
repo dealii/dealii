@@ -230,10 +230,10 @@ namespace Step34
     // finite element space. The order of the finite element space and of the
     // mapping can be selected in the constructor of the class.
 
-    Triangulation<dim - 1, dim> tria;
-    const FE_Q<dim - 1, dim>    fe;
-    DoFHandler<dim - 1, dim>    dof_handler;
-    MappingQ<dim - 1, dim>      mapping;
+    Triangulation<dim - 1, dim>  tria;
+    const FE_Q<dim - 1, dim>     fe;
+    DoFHandler<dim - 1, dim>     dof_handler;
+    const MappingQ<dim - 1, dim> mapping;
 
     // In BEM methods, the matrix that is generated is dense. Depending on the
     // size of the problem, the final system might be solved by direct LU

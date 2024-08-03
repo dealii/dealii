@@ -1,4 +1,0 @@
-Deprecated: Matrix Free classes previously in the CUDAWrappers namespace have
-been moved to the Portable namespace.
-<br>
-(Bruno Turcksin, 2024/02/09)

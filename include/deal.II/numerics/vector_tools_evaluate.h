@@ -121,7 +121,7 @@ namespace VectorTools
    *
    * The function can also be used to evaluate cell-data vectors. For this
    * purpose, one passes in a Triangulation instead of a DoFHandler and a
-   * vector of size Trinagulation::n_active_cells() or a vector, which
+   * vector of size Triangulation::n_active_cells() or a vector, which
    * has been initialized with the partitioner returned by
    * parallel::TriangulationBase::global_active_cell_index_partitioner().
    *

@@ -17,7 +17,7 @@
  * @defgroup distributed Parallel computing with multiple processors using distributed memory
  * @ingroup Parallel
  *
- * @brief A module discussing the use of parallelism on distributed memory
+ * @brief A group discussing the use of parallelism on distributed memory
  * clusters.
  *
  * @dealiiVideoLecture{39,41,41.25,41.5}
@@ -26,7 +26,7 @@
  *
  * deal.II can use multiple machines connected via MPI to parallelize
  * computations, in addition to the parallelization within a shared
- * memory machine discussed in the @ref threads module. There are
+ * memory machine discussed in the @ref threads topic. There are
  * essentially two ways to utilize multiple machines:
  *
  * - Each machine keeps the entire mesh and DoF handler locally, but
@@ -51,7 +51,7 @@
  *
  * The use of truly distributed meshes is somewhat more complex because it
  * changes or makes impossible some of the things that can otherwise be done
- * with deal.II triangulations, DoF handlers, etc. This module documents these
+ * with deal.II triangulations, DoF handlers, etc. This topic documents these
  * issues with a vantage point at 50,000 ft above ground without going into
  * too many details. All the algorithms described below are implement in
  * classes and functions in namespace parallel::distributed.
@@ -66,7 +66,7 @@
  * A complete discussion of the algorithms used in this namespace, as well as
  * a thorough description of many of the terms used here, can be found in the
  * @ref distributed_paper "Distributed Computing paper". In particular, the
- * paper shows that the methods discussed in this module scale to thousands of
+ * paper shows that the methods discussed in this group scale to thousands of
  * processors and well over a billion degrees of freedom. The paper also gives a
  * concise definition of many of the terms that are used here and in other
  * places of the library related to distributed computing.  The step-40
@@ -426,8 +426,7 @@ namespace parallel
    * A namespace for class and
    * functions that support %parallel
    * computing on %distributed memory
-   * machines. See the @ref
-   * distributed module for an
+   * machines. See the @ref distributed topic for an
    * overview of the facilities this
    * namespace offers.
    *

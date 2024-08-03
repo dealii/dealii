@@ -1,4 +1,0 @@
-New: Add potentially more efficient vector operation to SUNDIALS wrappers. These operations are used automatically
-for deal.II's distributed vectors.
-<br>
-(Sebastian Proell, 2024/02/15)

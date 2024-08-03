@@ -57,7 +57,7 @@ namespace Differentiation
      * indicating the @p ADNumberTypeCode . The @p ADNumberTypeCode dictates
      * which auto-differentiation library is to be used, and what the nature of
      * the underlying auto-differentiable number is. Refer to the
-     * @ref auto_symb_diff module for more details in this regard.
+     * @ref auto_symb_diff topic for more details in this regard.
      *
      * For all of the classes derived from this base class, there are two
      * possible ways that the code in which they are used can be structured.

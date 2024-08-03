@@ -1,22 +1,6 @@
 
 DEAL::Constructors
-DEAL::Constructor: Boolean
-DEAL::Constructor: Integer
-DEAL::Constructor: Unsigned integer
-DEAL::Constructor: Rational
-DEAL::Constructor: Double
-DEAL::Constructor: Complex double
-DEAL::Constructor: Float
-DEAL::Constructor: Complex float
-DEAL::Constructor: Symbol
-DEAL::Constructor: Symbol
-DEAL::Constructor: Symbol
-DEAL::Constructor: Symbolic expression
-DEAL::Copy constructor
 DEAL::Utility functions
-DEAL::Parse
-DEAL::Save/load
-DEAL:Serialization::Serialization
 DEAL:Serialization::0 0 1 x
 
 DEAL:Serialization::0 0 1 y
@@ -24,63 +8,10 @@ DEAL:Serialization::0 0 1 y
 DEAL:Serialization::0 0 11 2.5 + x + y
 
 DEAL::Comparison operators
-DEAL::Equality (true)
-DEAL::Equality (false)
-DEAL::Non-equality (true)
-DEAL::Non-equality (false)
-DEAL::Less-than operator (true)
-DEAL::Less-than operator (false)
-DEAL::Less-than-or-equals operator (true)
-DEAL::Less-than-or-equals operator (false)
-DEAL::Greater-than operator (true)
-DEAL::Greater-than operator (false)
-DEAL::Greater-than-or-equals operator (true)
-DEAL::Greater-than-or-equals operator (false)
 DEAL::Logical operators
-DEAL::Logical not
-DEAL::Logical and
-DEAL::Logical inclusive or
-DEAL::Logical xor
-DEAL::And
-DEAL::Inclusive or
 DEAL::Assignment operators
-DEAL::Assignment operator (SD_number_t)
-DEAL::Assignment operator (arithmetic type)
-DEAL::Addition assignment (SD_number_t)
-DEAL::Addition assignment (arithmetic type; same type)
-DEAL::Addition assignment (arithmetic type; different type)
-DEAL::Subtraction assignment (SD_number_t)
-DEAL::Subtraction assignment (arithmetic type; same type)
-DEAL::Subtraction assignment (arithmetic type; different type)
-DEAL::Multiplication assignment (SD_number_t)
-DEAL::Multiplication assignment (arithmetic type; same type)
-DEAL::Multiplication assignment (arithmetic type; different type)
-DEAL::Division assignment (SD_number_t)
-DEAL::Division assignment (arithmetic type; same type)
-DEAL::Division assignment (arithmetic type; different type)
 DEAL::Math operators
-DEAL::Addition
-DEAL::Subtraction
-DEAL::Multiplication
-DEAL::Division
 DEAL::Differentiation
-DEAL::Basic differentiation (SD_number_t)
-DEAL::Basic differentiation (Symbol)
-DEAL::Basic differentiation (Basic representing a symbolic type)
 DEAL::Substitution
-DEAL::Basic substitution
-DEAL::Templated-deduced substitution
-DEAL::Map substitution
 DEAL::Evaluation
-DEAL::Substitution with evaluation (integer)
-DEAL::Substitution with evaluation (double)
-DEAL::Substitution with evaluation (float)
-DEAL::Substitution with evaluation (complex double)
-DEAL::Substitution with evaluation (complex float)
-DEAL::Substitution with evaluation (mixed arithmetic types)
-DEAL::Substitution with evaluation (mixed complex types)
-DEAL::Substitution with evaluation (single piecewise function)
-DEAL::Substitution with evaluation (double piecewise function)
-DEAL::Substitution with evaluation (if-else_if-else type function)
-DEAL::Substitution with evaluation (if-else_if type function)
 DEAL::OK

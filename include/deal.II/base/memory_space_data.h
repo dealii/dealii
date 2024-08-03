@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -99,7 +99,8 @@ namespace MemorySpace
    */
   template <typename T, typename MemorySpace>
   inline void
-  swap(MemorySpaceData<T, MemorySpace> &u, MemorySpaceData<T, MemorySpace> &v);
+  swap(MemorySpaceData<T, MemorySpace> &u,
+       MemorySpaceData<T, MemorySpace> &v) noexcept;
 
 
 #ifndef DOXYGEN
@@ -169,7 +170,8 @@ namespace MemorySpace
    */
   template <typename T, typename MemorySpace>
   inline void
-  swap(MemorySpaceData<T, MemorySpace> &u, MemorySpaceData<T, MemorySpace> &v)
+  swap(MemorySpaceData<T, MemorySpace> &u,
+       MemorySpaceData<T, MemorySpace> &v) noexcept
   {
     std::swap(u.values_host_buffer, v.values_host_buffer);
     std::swap(u.values, v.values);

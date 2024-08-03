@@ -14,11 +14,12 @@ Jenkinsfile export-ignore
 
 /.github/ export-ignore
 
-/tests/* export-ignore
 /tests/CMakeLists.txt -export-ignore
+/tests/examples -export-ignore
+/tests/* export-ignore
 /tests/quick_tests -export-ignore
 /tests/run_*.cmake -export-ignore
-/tests/setup_testsubproject.cmake -export-ignore
+/tests/scripts -export-ignore
 /tests/tests.h -export-ignore
 
 #

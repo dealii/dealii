@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -323,7 +323,7 @@ public:
    * <tt>u.swap(v)</tt>, again in analogy to standard functions.
    */
   void
-  swap(BlockVector<Number> &v);
+  swap(BlockVector<Number> &v) noexcept;
 
   /**
    * Print to a stream.
@@ -481,7 +481,7 @@ BlockVector<Number>::scale(const BlockVector2 &v)
  */
 template <typename Number>
 inline void
-swap(BlockVector<Number> &u, BlockVector<Number> &v)
+swap(BlockVector<Number> &u, BlockVector<Number> &v) noexcept
 {
   u.swap(v);
 }

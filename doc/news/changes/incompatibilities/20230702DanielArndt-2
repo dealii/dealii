@@ -1,6 +1,0 @@
-Removed: The deprecated member variables
-SUNDIALS::KINSOL::solve_jacobian_system,
-and SUNDIALS::IDA::solve_jacobian_system
-have been removed.
-<br>
-(Daniel Arndt, 2023/07/02)

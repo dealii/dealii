@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,7 @@ namespace Differentiation
         SD::types::symbol_vector symb_vec;
         symb_vec.reserve(symbol_vector.size());
         for (const auto &entry : symbol_vector)
-          symb_vec.push_back(SD::Expression(entry));
+          symb_vec.emplace_back(entry);
         return symb_vec;
       }
 

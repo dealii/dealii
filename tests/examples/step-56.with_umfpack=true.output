@@ -1,0 +1,68 @@
+Now running with Multigrid
+Refinement cycle 0
+   Set-up...
+	Number of active cells: 16
+	Number of degrees of freedom: 187 (162+25)
+   Assembling...
+   Assembling Multigrid...
+   Solving...Solver stopped within 13 - 17 iterations
+
+   Velocity L2 Error: 0.00340778
+   Pressure L2 Error: 0.017624
+   Velocity H1 Error: 0.105243
+Refinement cycle 1
+   Set-up...
+	Number of active cells: 64
+	Number of degrees of freedom: 659 (578+81)
+   Assembling...
+   Assembling Multigrid...
+   Solving...Solver stopped within 13 - 17 iterations
+
+   Velocity L2 Error: 0.000426317
+   Pressure L2 Error: 0.00414007
+   Velocity H1 Error: 0.0264094
+Refinement cycle 2
+   Set-up...
+	Number of active cells: 256
+	Number of degrees of freedom: 2467 (2178+289)
+   Assembling...
+   Assembling Multigrid...
+   Solving...Solver stopped within 13 - 17 iterations
+
+   Velocity L2 Error: 5.33246e-05
+   Pressure L2 Error: 0.00102063
+   Velocity H1 Error: 0.00660864
+Now running with ILU
+Refinement cycle 0
+   Set-up...
+	Number of active cells: 16
+	Number of degrees of freedom: 187 (162+25)
+   Assembling...
+   Solving...   Computing preconditioner...
+Solver stopped within 13 - 17 iterations
+
+   Velocity L2 Error: 0.00340778
+   Pressure L2 Error: 0.017624
+   Velocity H1 Error: 0.105243
+Refinement cycle 1
+   Set-up...
+	Number of active cells: 64
+	Number of degrees of freedom: 659 (578+81)
+   Assembling...
+   Solving...   Computing preconditioner...
+Solver stopped within 13 - 17 iterations
+
+   Velocity L2 Error: 0.000426317
+   Pressure L2 Error: 0.00414007
+   Velocity H1 Error: 0.0264094
+Refinement cycle 2
+   Set-up...
+	Number of active cells: 256
+	Number of degrees of freedom: 2467 (2178+289)
+   Assembling...
+   Solving...   Computing preconditioner...
+Solver stopped within 13 - 17 iterations
+
+   Velocity L2 Error: 5.33247e-05
+   Pressure L2 Error: 0.00102063
+   Velocity H1 Error: 0.00660864

@@ -67,7 +67,7 @@ Our goal here is to construct a very simple (maybe the simplest?) optimal
 preconditioner for the linear system. A preconditioner is called "optimal" or
 "of optimal complexity", if the number of iterations of the preconditioned
 system is independent of the mesh size $h$. You can extend that definition to
-also require indepence of the number of processors used (we will discuss that
+also require independence of the number of processors used (we will discuss that
 in the results section), the computational domain and the mesh quality, the
 test case itself, the polynomial degree of the finite element space, and more.
 

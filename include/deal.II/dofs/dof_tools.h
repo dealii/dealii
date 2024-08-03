@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -132,8 +132,9 @@ namespace DoFTools
  * With this vector, one can get, for any given degree of freedom, a unique
  * number among those DoFs that sit on the boundary; or, if your DoF was
  * interior to the domain, the result would be numbers::invalid_dof_index. We
- * need this mapping, for example, to build the @ref GlossMassMatrix "mass
- * matrix" on the boundary (for this, see make_boundary_sparsity_pattern()
+ * need this mapping, for example, to build the
+ * @ref GlossMassMatrix "mass matrix"
+ * on the boundary (for this, see make_boundary_sparsity_pattern()
  * function, the corresponding section below, as well as the MatrixCreator
  * namespace documentation).
  *
@@ -1536,7 +1537,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_active_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                               IndexSet                        &dof_set);
 
@@ -1561,7 +1562,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_active_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
     IndexSet                        &dof_set,
@@ -1591,7 +1592,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_relevant_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                                 IndexSet                        &dof_set);
 
@@ -1663,7 +1664,7 @@ namespace DoFTools
    * @deprecated Use the previous function instead.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   extract_locally_relevant_level_dofs(
     const DoFHandler<dim, spacedim> &dof_handler,
     const unsigned int               level,
@@ -2500,7 +2501,7 @@ namespace DoFTools
    * constraints for degrees of freedom located on the boundary, then this
    * would constitute a conflict. See the
    * @ref constraints
-   * module for handling the case where there are conflicting constraints on
+   * topic for handling the case where there are conflicting constraints on
    * individual degrees of freedom.
    * @param component_mask An optional component mask that restricts the
    * functionality of this function to a subset of an FESystem. For

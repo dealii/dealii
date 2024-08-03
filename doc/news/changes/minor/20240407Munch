@@ -1,4 +1,0 @@
-New: The new function DoFTools::extract_level_constant_modes()
-allows to extract constant modes on multigrid levels.
-<br>
-(Peter Munch, 2024/04/07)

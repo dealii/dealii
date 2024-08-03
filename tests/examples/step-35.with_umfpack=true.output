@@ -1,0 +1,12 @@
+Number of refines = 3
+Number of active cells: 3840
+dim (X_h) = 31424
+dim (M_h) = 4016
+Re        = 100
+
+Step = 2 Time = 0.01
+Step = 3 Time = 0.015
+Step = 4 Time = 0.02
+----------------------------------------------------
+Apparently everything went fine!
+Don't forget to brush your teeth :-)

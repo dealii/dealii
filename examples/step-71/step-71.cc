@@ -79,7 +79,7 @@ namespace Step71
   // will be a simplified view as to what they *might* be doing in the
   // background. This description will be very much one designed to aid
   // understanding, and the reader is encouraged to view the @ref auto_symb_diff
-  // module documentation for a far more formal description into how these tools
+  // documentation topic for a far more formal description into how these tools
   // actually work.
   //
   // @sect4{An analytical function}

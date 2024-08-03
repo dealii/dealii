@@ -65,7 +65,7 @@ namespace Particles
     , size_callback()
     , store_callback()
     , load_callback()
-    , handle(numbers::invalid_unsigned_int)
+    , tria_attached_data_index(numbers::invalid_unsigned_int)
     , tria_listeners()
   {
     reset_particle_container(particles);
@@ -89,7 +89,7 @@ namespace Particles
     , size_callback()
     , store_callback()
     , load_callback()
-    , handle(numbers::invalid_unsigned_int)
+    , tria_attached_data_index(numbers::invalid_unsigned_int)
     , triangulation_cache(
         std::make_unique<GridTools::Cache<dim, spacedim>>(triangulation,
                                                           mapping))
@@ -181,7 +181,7 @@ namespace Particles
 
     ghost_particles_cache.ghost_particles_by_domain =
       particle_handler.ghost_particles_cache.ghost_particles_by_domain;
-    handle = particle_handler.handle;
+    tria_attached_data_index = particle_handler.tria_attached_data_index;
   }
 
 
@@ -2194,21 +2194,6 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::register_data_attach()
   {
-    parallel::DistributedTriangulationBase<dim, spacedim>
-      *distributed_triangulation =
-        const_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
-          dynamic_cast<
-            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-            &(*triangulation)));
-    (void)distributed_triangulation;
-
-    Assert(
-      distributed_triangulation != nullptr,
-      ExcMessage(
-        "Mesh refinement in a non-distributed triangulation is not supported "
-        "by the ParticleHandler class. Either insert particles after mesh "
-        "creation and do not refine afterwards, or use a distributed triangulation."));
-
     const auto callback_function =
       [this](const typename Triangulation<dim, spacedim>::cell_iterator
                              &cell_iterator,
@@ -2216,8 +2201,10 @@ namespace Particles
         return this->pack_callback(cell_iterator, cell_status);
       };
 
-    handle = distributed_triangulation->register_data_attach(
-      callback_function, /*returns_variable_size_data=*/true);
+    tria_attached_data_index =
+      const_cast<Triangulation<dim, spacedim> *>(&*triangulation)
+        ->register_data_attach(callback_function,
+                               /*returns_variable_size_data=*/true);
   }
 
 
@@ -2256,21 +2243,6 @@ namespace Particles
   ParticleHandler<dim, spacedim>::notify_ready_to_unpack(
     const bool serialization)
   {
-    parallel::DistributedTriangulationBase<dim, spacedim>
-      *distributed_triangulation =
-        const_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
-          dynamic_cast<
-            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-            &(*triangulation)));
-    (void)distributed_triangulation;
-
-    Assert(
-      distributed_triangulation != nullptr,
-      ExcMessage(
-        "Mesh refinement in a non-distributed triangulation is not supported "
-        "by the ParticleHandler class. Either insert particles after mesh "
-        "creation and do not refine afterwards, or use a distributed triangulation."));
-
     // First prepare container for insertion
     clear();
 
@@ -2282,7 +2254,7 @@ namespace Particles
       register_data_attach();
 
     // Check if something was stored and load it
-    if (handle != numbers::invalid_unsigned_int)
+    if (tria_attached_data_index != numbers::invalid_unsigned_int)
       {
         const auto callback_function =
           [this](const typename Triangulation<dim, spacedim>::cell_iterator
@@ -2293,11 +2265,11 @@ namespace Particles
             this->unpack_callback(cell_iterator, cell_status, range_iterator);
           };
 
-        distributed_triangulation->notify_ready_to_unpack(handle,
-                                                          callback_function);
+        const_cast<Triangulation<dim, spacedim> *>(&*triangulation)
+          ->notify_ready_to_unpack(tria_attached_data_index, callback_function);
 
         // Reset handle and update global numbers.
-        handle = numbers::invalid_unsigned_int;
+        tria_attached_data_index = numbers::invalid_unsigned_int;
         update_cached_numbers();
       }
   }

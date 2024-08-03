@@ -166,7 +166,7 @@ namespace GridTools
    *
    * The expectations on orientation and a discussion of this function are
    * available in the
-   * @ref reordering "reordering module".
+   * @ref reordering "reordering topic".
    *
    * @param cells The array of CellData objects that describe the mesh's topology.
    * @ingroup reordering

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1612,7 +1612,7 @@ inconvenience this causes.
 
  <li>
   Fixed: Allow to use FETools::get_fe_by_name for all
-  availabale FiniteElements.
+  available FiniteElements.
   <br>
   (Daniel Arndt, 2016/07/10)
  </li>

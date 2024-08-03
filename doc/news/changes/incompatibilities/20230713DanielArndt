@@ -1,7 +1,0 @@
-Removed: The deprecated header files
-- deal.II/base/std_cxx14/algorithm.h
-- deal.II/base/std_cxx14/memory.h
-- deal.II/base/std_cxx14/utility.h
-have been removed.
-<br>
-(Daniel Arndt, 2023/07/13)

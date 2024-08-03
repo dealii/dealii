@@ -30,6 +30,8 @@ main()
   initlog();
 
   {
+    deallog << "Part 1:" << std::endl;
+
     Lazy<int> lazy_integer;
     deallog << "lazy_integer.has_value() = " << lazy_integer.has_value()
             << std::endl;
@@ -38,7 +40,15 @@ main()
       deallog << "[initializing object]" << std::endl;
       return 42;
     });
-    deallog << "lazy_integer.has_value() = " << lazy_integer.has_value()
+
+    // Lazy computes the result on a different task, which may be on a
+    // different thread. To avoid producing unreliable output, make
+    // sure we don't say
+    //   deallog << "lazy_integer.has_value() = " << lazy_integer.has_value()
+    // but the following, where the order of computation and output are
+    // clear and well defined:
+    deallog << "lazy_integer.has_value() = " +
+                 std::to_string(lazy_integer.has_value())
             << std::endl;
     deallog << "lazy_integer.value() = " << lazy_integer.value() << std::endl;
 
@@ -47,17 +57,20 @@ main()
       return -1;
     });
 
-    deallog << "lazy_integer.value() = " << lazy_integer.value() << std::endl;
+    deallog << "lazy_integer.value() = " + std::to_string(lazy_integer.value())
+            << std::endl;
   }
 
   {
+    deallog << "Part 2:" << std::endl;
+
     Lazy<int> lazy_integer;
 
-    deallog << "lazy_integer.value() = "
-            << lazy_integer.value_or_initialize([&]() {
-                 deallog << "... [initializing object] ... ";
-                 return 42;
-               })
+    deallog << "lazy_integer.value() = " +
+                 std::to_string(lazy_integer.value_or_initialize([&]() {
+                   deallog << "... [initializing object] ... " << std::endl;
+                   return 42;
+                 }))
             << std::endl;
   }
 

@@ -5,10 +5,4 @@ DEAL::z_ad: 7.00000 [ ]
 DEAL::f_rfad: -35.0000 [ 203.000 154.000 ]
 DEAL::g_rfad: -0.802738 [ -3.67867 0.0336865 ]
 DEAL::h_rfad: 252.000 [ -168.000 252.000 ]
-DEAL::df_dx: 203.000  df_dx_ad: 203.000
-DEAL::df_dy: 154.000  df_dy_ad: 154.000
-DEAL::dg_dx: -3.67867  dg_dx_ad: -3.67867
-DEAL::dg_dy: 0.0336865  dg_dy_ad: 0.0336865
-DEAL::dh_dx: -168.000  dh_dx_ad: -168.000
-DEAL::dh_dy: 252.000  dh_dy_ad: 252.000
 DEAL::OK

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -215,8 +215,6 @@ namespace parallel
      * boundary indicator is reported only once. The size of the return vector
      * will represent the number of different indicators (which is greater or
      * equal one).
-     *
-     * @ingroup boundary
      *
      * @see
      * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"

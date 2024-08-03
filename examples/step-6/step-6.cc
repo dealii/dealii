@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2000 - 2023 by the deal.II authors
+ * Copyright (C) 2000 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -474,7 +474,7 @@ void Step6<dim>::output_results(const unsigned int cycle) const
     std::ofstream         output("grid-" + std::to_string(cycle) + ".gnuplot");
     GridOutFlags::Gnuplot gnuplot_flags(false, 5);
     grid_out.set_flags(gnuplot_flags);
-    MappingQ<dim> mapping(3);
+    const MappingQ<dim> mapping(3);
     grid_out.write_gnuplot(triangulation, output, &mapping);
   }
 

@@ -28,6 +28,7 @@
 #  include <deal.II/lac/vector_operation.h>
 
 #  include <boost/serialization/split_member.hpp>
+#  include <boost/serialization/utility.hpp>
 
 #  include <petscvec.h>
 

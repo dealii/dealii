@@ -3,7 +3,7 @@
 
    Number of active cells:       832
    Number of degrees of freedom: 22981
-   Number of solver iterations:  138
+Solver stopped within 137 - 228 iterations
    L2 error vs exact solution:   1.39878e-06
    H1 error vs exact solution:   5.16394e-05
    Max cell-wise error estimate: 0.0217657
@@ -11,7 +11,7 @@
 
    Number of active cells:       832
    Number of degrees of freedom: 22981
-   Number of solver iterations:  138
+Solver stopped within 137 - 228 iterations
    L2 error vs exact solution:   1.39878e-06
    H1 error vs exact solution:   5.16394e-05
    Max cell-wise error estimate: 0.0217657

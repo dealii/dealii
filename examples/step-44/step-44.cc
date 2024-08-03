@@ -816,7 +816,7 @@ namespace Step44
   private:
     // In the private section of this class, we first forward declare a number
     // of objects that are used in parallelizing work using the WorkStream
-    // object (see the @ref threads module for more information on this).
+    // object (see the @ref threads topic for more information on this).
     //
     // We declare such structures for the computation of tangent (stiffness)
     // matrix and right hand side vector, static condensation, and for updating
@@ -1139,7 +1139,7 @@ namespace Step44
   // assemble the tangent matrix and right hand side vector, the static
   // condensation contributions, and update data stored at the quadrature points
   // using TBB. Our main tool for this is the WorkStream class (see the @ref
-  // threads module for more information).
+  // threads topic for more information).
 
   // Firstly we deal with the tangent matrix and right-hand side assembly
   // structures. The PerTaskData object stores local contributions to the global
@@ -3219,7 +3219,7 @@ namespace Step44
     Vector<double> soln(solution_n.size());
     for (unsigned int i = 0; i < soln.size(); ++i)
       soln(i) = solution_n(i);
-    MappingQEulerian<dim> q_mapping(degree, dof_handler, soln);
+    const MappingQEulerian<dim> q_mapping(degree, dof_handler, soln);
     data_out.build_patches(q_mapping, degree);
 
     std::ofstream output("solution-" + std::to_string(dim) + "d-" +

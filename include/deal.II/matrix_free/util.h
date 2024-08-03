@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2020 - 2023 by the deal.II authors
+// Copyright (C) 2020 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,6 +21,8 @@
 
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/fe/fe_simplex_p.h>
 
 #include <deal.II/grid/reference_cell.h>
 
@@ -56,6 +58,15 @@ namespace internal
               return {ReferenceCells::get_simplex<dim>(),
                       dealii::hp::QCollection<dim - 1>(
                         QWitherdenVincentSimplex<dim - 1>(i))};
+
+          for (unsigned int i = 1; i <= 3; ++i)
+            {
+              const FE_SimplexP<dim> fe(i);
+              if (quad == Quadrature<dim>(fe.get_unit_support_points()))
+                return {ReferenceCells::get_simplex<dim>(),
+                        dealii::hp::QCollection<dim - 1>(Quadrature<dim - 1>(
+                          fe.get_unit_face_support_points()))};
+            }
         }
 
       if (dim == 3)
@@ -138,6 +149,22 @@ namespace internal
                   return {Quadrature<dim - 1>(),
                           QWitherdenVincentSimplex<dim - 1>(i)};
               }
+
+          for (unsigned int i = 1; i <= 3; ++i)
+            {
+              const FE_SimplexP<dim> fe(i);
+              if (quad == Quadrature<dim>(fe.get_unit_support_points()))
+                {
+                  if (dim == 2)
+                    return {Quadrature<dim - 1>(
+                              fe.get_unit_face_support_points()), // line!
+                            Quadrature<dim - 1>()};
+                  else
+                    return {Quadrature<dim - 1>(),
+                            Quadrature<dim - 1>(
+                              fe.get_unit_face_support_points())};
+                }
+            }
         }
 
       if (dim == 3)

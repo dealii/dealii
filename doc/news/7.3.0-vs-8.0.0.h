@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -592,7 +592,7 @@ MPI/PETSc/Slepc in all cases.
 
 <li> Added/fixed: IterativeInverse::vmult() can now handle vectors
 using a different number type than the matrix type. As usual, the
-number types must be compatible. Addtitionally, the initial guess is
+number types must be compatible. Additionally, the initial guess is
 always set to zero, since starting with the incoming vector makes no
 sense.
 <br>

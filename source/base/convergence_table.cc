@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,8 +36,9 @@ ConvergenceTable::evaluate_convergence_rates(
   // the top that don't yet exist
   set_auto_fill_mode(false);
 
-  std::vector<internal::TableEntry> &entries = columns[data_column_key].entries;
-  std::vector<internal::TableEntry> &ref_entries =
+  const std::vector<internal::TableEntry> &entries =
+    columns[data_column_key].entries;
+  const std::vector<internal::TableEntry> &ref_entries =
     columns[reference_column_key].entries;
   std::string rate_key = data_column_key + "...";
 
@@ -132,8 +133,9 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
   // the top that don't yet exist
   set_auto_fill_mode(false);
 
-  std::vector<internal::TableEntry> &entries = columns[data_column_key].entries;
-  std::string                        rate_key = data_column_key + "...";
+  const std::vector<internal::TableEntry> &entries =
+    columns[data_column_key].entries;
+  std::string rate_key = data_column_key + "...";
 
   const unsigned int n = entries.size();
 

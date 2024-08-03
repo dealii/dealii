@@ -1,4 +1,0 @@
-New: Add utility functions that setup FERemoteEvaluationCommunicator for point-to-point
-interpolation and Nitsche-type mortaring.
-<br>
-(Johannes Heinz, 2023/12/31)

@@ -207,9 +207,12 @@ public:
   NonlinearSolverSelector();
 
   /**
-   * Constructor, selecting the solver and other parametersspecified in
+   * Constructor, selecting the solver and other parameters specified in
    * @p additional_data.
+   *
+   * @deprecated Use the other constructor with MPI_Comm instead.
    */
+  DEAL_II_DEPRECATED
   NonlinearSolverSelector(const AdditionalData &additional_data);
 
   /**
@@ -482,7 +485,9 @@ NonlinearSolverSelector<VectorType>::set_data(
 
 
 template <typename VectorType>
-NonlinearSolverSelector<VectorType>::NonlinearSolverSelector() = default;
+NonlinearSolverSelector<VectorType>::NonlinearSolverSelector()
+  : mpi_communicator(MPI_COMM_SELF)
+{}
 
 
 
@@ -490,6 +495,7 @@ template <typename VectorType>
 NonlinearSolverSelector<VectorType>::NonlinearSolverSelector(
   const AdditionalData &additional_data)
   : additional_data(additional_data)
+  , mpi_communicator(MPI_COMM_SELF)
 {
   set_data(additional_data);
 }

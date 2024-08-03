@@ -88,8 +88,6 @@ namespace Particles
    * 1.0, "blue" to 2.0, and "green" to 3.0. The conversion functions
    * to translate between these two representations should then not be very
    * difficult to write either.
-   *
-   * @ingroup Particle
    */
   template <int dim, int spacedim = dim>
   class Particle

@@ -1,5 +1,0 @@
-Changed: step-39 now implements the local integration routines itself,
-rather than relying on deprecated concepts from namespace
-LocalIntegrator.
-<br>
-(Wolfgang Bangerth, 2024/05/13)

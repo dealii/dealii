@@ -47,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * See the
  * @ref Exceptions
- * module for more details on this class and what can be done with classes
+ * topic for more details on this class and what can be done with classes
  * derived from it.
  *
  * @ingroup Exceptions
@@ -1534,7 +1534,7 @@ namespace deal_II_exceptions
  *
  * A more detailed description can be found in the
  * @ref Exceptions
- * module. It is first used in step-5 and step-6.
+ * topic. It is first used in step-5 and step-6.
  * See also the <tt>ExceptionBase</tt> class for more information.
  *
  * @note Active in DEBUG mode only
@@ -1664,7 +1664,7 @@ namespace deal_II_exceptions
  *
  * A more detailed description can be found in the
  * @ref Exceptions
- * module, in the discussion about the corner case at the bottom of the page.
+ * topic, in the discussion about the corner case at the bottom of the page.
  *
  * @note This and similar macro names are examples of preprocessor definitions
  * in the deal.II library that are not prefixed by a string that likely makes
@@ -1718,7 +1718,7 @@ namespace deal_II_exceptions
  *
  * A more detailed description can be found in the
  * @ref Exceptions
- * module. It is first used in step-9 and step-13.
+ * topic. It is first used in step-9 and step-13.
  * See also the <tt>ExceptionBase</tt> class for more information.
  *
  * @note This and similar macro names are examples of preprocessor definitions

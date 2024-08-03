@@ -353,7 +353,7 @@ namespace numbers
    * @ref GlossArtificialCell "artificial cells"
    * as well as the
    * @ref distributed
-   * module for more information.
+   * topic for more information.
    *
    * This value is an example of an
    * @ref GlossInvalidValue "invalid value".

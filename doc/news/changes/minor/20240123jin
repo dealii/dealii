@@ -1,3 +1,0 @@
-Fixed: The function DoFCellAccessor::distribute_local_to_global(local_matrix, local_vector, global_matrix, global_vector) mistook the argument type when calling OutputMatrix::add(row, n_cols, col_indices, values), which causes compile errors. This is now fixed.
-<br>
-(Yimin Jin, 2024/01/23)

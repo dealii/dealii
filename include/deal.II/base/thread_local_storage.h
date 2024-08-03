@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// Copyright (C) 2011 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -104,8 +104,8 @@ namespace Threads
   class ThreadLocalStorage
   {
     static_assert(
-      std::is_copy_constructible<
-        typename internal::unpack_container<T>::type>::value ||
+      std::is_copy_constructible_v<
+        typename internal::unpack_container<T>::type> ||
         std::is_default_constructible_v<T>,
       "The stored type must be either copyable, or default constructible");
 

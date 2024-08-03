@@ -167,10 +167,9 @@ namespace internal
       // which is initialized with the seed itself
       static std::map<double, std::mt19937> rng_map;
 
-      if (rng_map.find(seed) == rng_map.end())
-        rng_map[seed] = std::mt19937(static_cast<unsigned int>(seed));
-
-      return uniform_distribution(rng_map[seed]);
+      return uniform_distribution(
+        rng_map.try_emplace(seed, std::mt19937(static_cast<unsigned int>(seed)))
+          .first->second);
     }
 
 

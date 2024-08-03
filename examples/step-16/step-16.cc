@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2003 - 2023 by the deal.II authors
+ * Copyright (C) 2003 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -74,10 +74,10 @@
 #include <iostream>
 #include <fstream>
 
-using namespace dealii;
-
 namespace Step16
 {
+  using namespace dealii;
+
   // @sect3{The Scratch and Copy objects}
   //
   // We use MeshWorker::mesh_loop() to assemble our matrices. For this, we
@@ -281,7 +281,7 @@ namespace Step16
 
     // Now, we have to provide a matrix on each level. To this end, we first use
     // the MGTools::make_sparsity_pattern function to generate a preliminary
-    // compressed sparsity pattern on each level (see the @ref Sparsity module
+    // compressed sparsity pattern on each level (see the @ref Sparsity topic
     // for more information on this topic) and then copy it over to the one we
     // really want. The next step is to initialize the interface matrices with
     // the fitting sparsity pattern.
@@ -373,7 +373,7 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_system()
   {
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     auto cell_worker =
       [&](const typename DoFHandler<dim>::active_cell_iterator &cell,
@@ -425,8 +425,8 @@ namespace Step16
   template <int dim>
   void LaplaceProblem<dim>::assemble_multigrid()
   {
-    MappingQ1<dim>     mapping;
-    const unsigned int n_levels = triangulation.n_levels();
+    const MappingQ1<dim> mapping;
+    const unsigned int   n_levels = triangulation.n_levels();
 
     std::vector<AffineConstraints<double>> boundary_constraints(n_levels);
     for (unsigned int level = 0; level < n_levels; ++level)

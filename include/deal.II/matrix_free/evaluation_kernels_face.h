@@ -2696,12 +2696,12 @@ namespace internal
             const bool vectorization_possible =
               all_faces_are_same && (sm_ptr == nullptr);
 
-            std::array<Number2_ *, n_lanes>   vector_ptrs;
-            std::array<unsigned int, n_lanes> reordered_indices;
+            std::array<Number2_ *, n_lanes>   vector_ptrs{{nullptr}};
+            std::array<unsigned int, n_lanes> reordered_indices{
+              {numbers::invalid_unsigned_int}};
 
             if (vectorization_possible == false)
               {
-                vector_ptrs = {};
                 if (n_face_orientations == 1)
                   {
                     for (unsigned int v = 0; v < n_filled_lanes; ++v)

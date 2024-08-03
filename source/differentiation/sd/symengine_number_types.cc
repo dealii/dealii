@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// Copyright (C) 2019 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -93,17 +93,18 @@ namespace Differentiation
           Assert(SE::is_a_Boolean(entry.first.get_value()),
                  ExcMessage(
                    "The conditional expression must return a boolean type."));
-          piecewise_function.push_back(
-            {entry.second.get_RCP(),
-             SE::rcp_static_cast<const SE::Boolean>(entry.first.get_RCP())});
+          piecewise_function.emplace_back(
+            entry.second.get_RCP(),
+            SE::rcp_static_cast<const SE::Boolean>(entry.first.get_RCP()));
         }
 
       // Add default value
-      piecewise_function.push_back(
-        {expression_otherwise.get_RCP(), SE::boolTrue});
+      piecewise_function.emplace_back(expression_otherwise.get_RCP(),
+                                      SE::boolTrue);
 
-      // Initialize
-      expression = SE::piecewise(std::move(piecewise_function));
+      // Initialize. Note that we need to use a std::move() here for
+      // compatibility with older compilers.
+      expression = SE::piecewise(std::move(piecewise_function)); // NOLINT
     }
 
 

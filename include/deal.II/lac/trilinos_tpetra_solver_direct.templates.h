@@ -18,6 +18,7 @@
 #include <deal.II/base/config.h>
 
 #include "deal.II/lac/solver_control.h"
+#include "deal.II/lac/trilinos_tpetra_types.h"
 
 #include <string>
 
@@ -68,8 +69,9 @@ namespace LinearAlgebra
     {
       // Allocate the Amesos2 solver with the concrete solver, if possible.
       solver =
-        Amesos2::create<typename SparseMatrix<Number, MemorySpace>::MatrixType,
-                        MultiVector>(solver_type, A.trilinos_rcp());
+        Amesos2::create<TpetraTypes::MatrixType<Number, MemorySpace>,
+                        TpetraTypes::MultiVectorType<Number, MemorySpace>>(
+          solver_type, A.trilinos_rcp());
 
       solver->setParameters(Teuchos::rcpFromRef(parameter_list));
       // Now do the actual factorization, which is a two step procedure.
@@ -140,11 +142,9 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpace>       &b)
     {
       solver =
-        Amesos2::create<typename SparseMatrix<Number, MemorySpace>::MatrixType,
-                        MultiVector>(solver_type,
-                                     A.trilinos_rcp(),
-                                     x.trilinos_rcp(),
-                                     b.trilinos_rcp());
+        Amesos2::create<TpetraTypes::MatrixType<Number, MemorySpace>,
+                        TpetraTypes::MultiVectorType<Number, MemorySpace>>(
+          solver_type, A.trilinos_rcp(), x.trilinos_rcp(), b.trilinos_rcp());
       do_solve();
     }
 

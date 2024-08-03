@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2012 - 2023 by the deal.II authors
+ * Copyright (C) 2012 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -309,7 +309,7 @@ namespace Step48
     const FE_Q<dim> fe;
     DoFHandler<dim> dof_handler;
 
-    MappingQ1<dim> mapping;
+    const MappingQ1<dim> mapping;
 
     AffineConstraints<double> constraints;
     IndexSet                  locally_relevant_dofs;

@@ -38,32 +38,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: set up path
+      # needed to use GNU patch instead of Strawberry Perl patch
+      run: |
+        echo "c:\program files\git\usr\bin" >> $env:GITHUB_PATH
     - name: info
       run: |
+        patch --version
         cmake --version
-        cmake -h
         wmic logicaldisk get size, freespace, caption
     - name: configure
-      shell: bash
       run: |
-        mkdir build
-        mkdir c:/project
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_WITH_ZLIB=off -DDEAL_II_CXX_FLAGS="-WX /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64 ..
+        cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=c:/project -DDEAL_II_CXX_FLAGS="-WX /D FE_EVAL_FACTORY_DEGREE_MAX=2" -T host=x64 -A x64
     - name: print detailed.log
       run: type build/detailed.log
-    - name: build library
-      shell: bash
+    - name: build
       run: |
         cmake --build build --parallel 2 --target install
-    - name: test library
-      shell: bash
+    - name: test
+      # test only in serial to avoid file locking error on ZERO_CHECK.lastbuildstate
       run: |
-        cmake --build build --parallel 2 --target test
-    - name: archive library
+        cmake --build build --parallel 2 --target setup_tests_a-framework setup_tests_quick_tests
+        ctest --test-dir build --build-config Debug --output-on-failure --extra-verbose
+    - name: archive
       # run only if a PR is merged into master
       if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
-      shell: bash
       run: |
         cd c:/project
         7z a dealii-windows.zip *

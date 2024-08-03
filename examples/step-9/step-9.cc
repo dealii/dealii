@@ -201,11 +201,11 @@ namespace Step9
     // matrix.
     //
     // The strategy for parallelization we choose here is one of the
-    // possibilities mentioned in detail in the @ref threads module in
+    // possibilities mentioned in detail in the @ref threads topic in
     // the documentation. Specifically, we will use the WorkStream
     // approach discussed there. Since there is so much documentation
-    // in this module, we will not repeat the rationale for the design
-    // choices here (for example, if you read through the module
+    // in this group, we will not repeat the rationale for the design
+    // choices here (for example, if you read through the topic
     // mentioned above, you will understand what the purpose of the
     // <code>AssemblyScratchData</code> and
     // <code>AssemblyCopyData</code> structures is). Rather, we will
@@ -484,7 +484,7 @@ namespace Step9
   // does not do this itself, but rather delegates to the function following
   // next, utilizing the WorkStream concept discussed in @ref threads .
   //
-  // If you have looked through the @ref threads module, you will have
+  // If you have looked through the @ref threads topic, you will have
   // seen that assembling in parallel does not take an incredible
   // amount of extra code as long as you diligently describe what the
   // scratch and copy data objects are, and if you define suitable
@@ -1192,7 +1192,7 @@ namespace Step9
 
 // The <code>main</code> function is similar to the previous examples. The
 // primary difference is that we use MultithreadInfo to set the maximum
-// number of threads (see the documentation module @ref threads
+// number of threads (see the documentation topic @ref threads
 // "Parallel computing with multiple processors accessing shared memory"
 // for more information). The number of threads used is the minimum of the
 // environment variable DEAL_II_NUM_THREADS and the parameter of

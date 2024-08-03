@@ -347,7 +347,7 @@ public:
    * integral of product of the test function multiplied by the data passed to
    * this function.
    *
-   * @note This function accessses the same field as through get_value(), so
+   * @note This function accesses the same field as through get_value(), so
    * make sure to not call it after calling submit_value() for a specific
    * quadrature point index.
    */
@@ -355,14 +355,14 @@ public:
   submit_value(const value_type val_in, const unsigned int q_point);
 
   /**
-   * In 1D, the value_type and gradient_type can be unintentionally mixed
-   * up because FEEvaluationBase does not distinguish between scalar accessors
-   * and vector-valued accessors and the respective types, but solely in terms
-   * of the number of components and dimension. Thus, enable the use of
-   * submit_value() also for tensors with a single component.
+   * For scalar elements, the value_type and gradient_type can be
+   * unintentionally mixed up because FEEvaluationBase does not distinguish
+   * between scalar accessors and vector-valued accessors and the respective
+   * types, but solely in terms of the number of components and dimension. Thus,
+   * enable the use of submit_value() also for tensors with a single component.
    */
-  template <int dim_ = dim,
-            typename = std::enable_if_t<dim_ == 1 && n_components == dim_>>
+  template <int n_components_local = n_components,
+            typename = std::enable_if_t<n_components == n_components_local>>
   void
   submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
                const unsigned int                      q_point);
@@ -402,7 +402,7 @@ public:
    * of the test function gradient multiplied by the values passed to this
    * function.
    *
-   * @note This function accessses the same field as through get_gradient(),
+   * @note This function accesses the same field as through get_gradient(),
    * so make sure to not call it after calling submit_gradient() for a
    * specific quadrature point index.
    */
@@ -429,7 +429,8 @@ public:
    * further information.
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient(). As a consequence, only one of these two can be
+   * submit_gradient(), submit_divergence(), submit_symmetric_gradient() and
+   * submit_curl(). As a consequence, only one of these functions can be
    * used. Usually, the contribution of a potential call to this function must
    * be added into the contribution for submit_gradient() when both are
    * desired. Furthermore, the data array is the same as for get_gradient()
@@ -469,6 +470,18 @@ public:
   get_laplacian(const unsigned int q_point) const;
 
   /**
+   * Return the second derivative along the normal direction $\partial_{n}^2
+   * u_h$ (i.e., the Hessian of the function $u_h$ contracted twice with the
+   * direction of the normal vector) of the finite element
+   * function interpolated to the quadrature point with index
+   * @p q_point after a call to @p evaluate(EvaluationFlags::hessians).
+   * Compared to the case when computing the full Hessian, some operations can
+   * be saved when only the normal Hessian is requested.
+   */
+  value_type
+  get_normal_hessian(const unsigned int q_point) const;
+
+  /**
    * Write a contribution that gets multiplied by the Hessian of the test
    * function to the field containing the Hessians at quadrature points with
    * index @p q_point. When this function has queued information for all
@@ -478,12 +491,31 @@ public:
    * of the test function Hessian multiplied by the values passed to this
    * function.
    *
-   * @note This function accessses the same field as through get_hessian(),
+   * @note This function accesses the same field as through get_hessian(),
    * so make sure to not call it after calling submit_hessian() for a
    * specific quadrature point index.
    */
   void
   submit_hessian(const hessian_type hessian_in, const unsigned int q_point);
+
+  /**
+   * Write a contribution that gets multiplied by the Hessian of the test
+   * function times the normal projector to the field containing the Hessians at
+   * quadrature points with index @p q_point. When this function has queued
+   * information for all quadrature points and followed by a call to the
+   * function @p integrate(EvaluationFlags::hessians), the result is an
+   * array of entries, each representing the result of the integral of product
+   * of the test function Hessian multiplied by the values times the normal
+   * projector passed to this function.
+   *
+   * @note This function accesses the same field as through get_hessian() and
+   * get_normal_hessian() so make sure to not call it after calling
+   * submit_hessian() or submit_normal_hessian() for a specific quadrature point
+   * index.
+   */
+  void
+  submit_normal_hessian(const value_type   normal_hessian_in,
+                        const unsigned int q_point);
 
   /**
    * Return the divergence of a vector-valued finite element at quadrature
@@ -504,11 +536,12 @@ public:
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient() or submit_divergence(). As a consequence, only one of
-   * these three can be used. In case several terms of this kind appear in a
-   * weak form, the contribution of a potential call to this function must be
-   * added into the diagonal of the rank-2 tensor contribution passed to
-   * submit_gradient().
+   * submit_gradient(), submit_normal_derivative(),
+   * submit_symmetric_gradient() and submit_curl(). As a consequence, only one
+   * of these functions can be used. In case several terms of this kind appear
+   * in a weak form, the contribution of a potential call to this function
+   * must be added into the diagonal of the rank-2 tensor contribution passed
+   * to submit_gradient().
    */
   template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
   void
@@ -535,12 +568,12 @@ public:
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient() or submit_divergence(). As a consequence, only one of
-   * these three functions can be used. In case several terms of this kind
-   * appear in a weak form, the contribution of a potential call to this
-   * function must be added into the diagonal of the rank-2 tensor
-   * contribution passed to submit_gradient(), in order not to overwrite
-   * information.
+   * submit_gradient(), submit_normal_derivative(), submit_divergence() and
+   * submit_curl(). As a consequence, only one of these functions can be
+   * used. In case several terms of this kind appear in a weak form, the
+   * contribution of a potential call to this function must be added into the
+   * diagonal of the rank-2 tensor contribution passed to submit_gradient(),
+   * in order not to overwrite information.
    */
   template <int dim_ = dim, typename = std::enable_if_t<n_components_ == dim_>>
   void
@@ -568,10 +601,11 @@ public:
    * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
-   * submit_gradient() and submit_divergence(). As a consequence, only one of
-   * these can be used. Usually, the contribution of a potential call to this
-   * function must be added to the respective entries of the rank-2 tensor for
-   * submit_gradient().
+   * submit_gradient(), submit_normal_derivative(), submit_divergence() and
+   * submit_symmetric_gradient(). As a consequence, only one of these
+   * functions can be used. Usually, the contribution of a potential call to
+   * this function must be added to the respective entries of the rank-2
+   * tensor for submit_gradient().
    */
   template <int dim_ = dim,
             typename = std::enable_if_t<n_components_ == dim_ && dim != 1>>
@@ -3294,7 +3328,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     dof_info.dof_indices_contiguous[ind];
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
-  std::array<VectorizedArrayType *, n_components> values_dofs;
+  std::array<VectorizedArrayType *, n_components> values_dofs{{nullptr}};
   for (unsigned int c = 0; c < n_components; ++c)
     values_dofs[c] = const_cast<VectorizedArrayType *>(this->values_dofs) +
                      c * dofs_per_component;
@@ -3349,7 +3383,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   if (vectors_sm[0] != nullptr)
     {
       const auto compute_vector_ptrs = [&](const unsigned int comp) {
-        std::array<typename VectorType::value_type *, n_lanes> vector_ptrs = {};
+        std::array<typename VectorType::value_type *, n_lanes> vector_ptrs{
+          {nullptr}};
 
         const auto upper_bound =
           std::min<unsigned int>(n_filled_lanes, n_lanes);
@@ -3444,11 +3479,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       return;
     }
 
-  std::array<unsigned int, n_lanes> dof_indices;
-  std::fill(dof_indices.begin(),
-            dof_indices.end(),
-            numbers::invalid_unsigned_int);
-
+  std::array<unsigned int, n_lanes> dof_indices{
+    {numbers::invalid_unsigned_int}};
   Assert(n_filled_lanes <= n_lanes, ExcInternalError());
   for (unsigned int v = 0; v < n_filled_lanes; ++v)
     {
@@ -3490,7 +3522,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                  interleaved_contiguous_strided)
         {
-          std::array<typename VectorType::value_type *, n_components> src_ptrs;
+          std::array<typename VectorType::value_type *, n_components> src_ptrs{
+            {nullptr}};
           if (n_components == 1 || this->n_fe_components == 1)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
@@ -3529,7 +3562,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                    internal::MatrixFreeFunctions::DoFInfo::
                      IndexStorageVariants::interleaved_contiguous_mixed_strides,
                  ExcNotImplemented());
-          std::array<typename VectorType::value_type *, n_components> src_ptrs;
+          std::array<typename VectorType::value_type *, n_components> src_ptrs{
+            {nullptr}};
           if (n_components == 1 || this->n_fe_components == 1)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
@@ -3808,7 +3842,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     return; // nothing to do with faces
 
   std::array<internal::MatrixFreeFunctions::compressed_constraint_kind, n_lanes>
-    constraint_mask;
+    constraint_mask{{internal::MatrixFreeFunctions::
+                       unconstrained_compressed_constraint_kind}};
 
   bool hn_available = false;
 
@@ -4779,6 +4814,85 @@ template <int dim,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
+inline typename FEEvaluationBase<dim,
+                                 n_components_,
+                                 Number,
+                                 is_face,
+                                 VectorizedArrayType>::value_type
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  get_normal_hessian(const unsigned int q_point) const
+{
+#  ifdef DEBUG
+  Assert(this->hessians_quad_initialized == true,
+         internal::ExcAccessToUninitializedField());
+#  endif
+  AssertIndexRange(q_point, this->n_quadrature_points);
+
+  Assert(this->normal_x_jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+
+  Tensor<1, n_components, VectorizedArrayType> hessian_out;
+
+  const std::size_t      nqp  = this->n_quadrature_points;
+  constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
+
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+    {
+      const auto nxj = this->normal_x_jacobian[0];
+
+      for (unsigned int comp = 0; comp < n_components; ++comp)
+        {
+          for (unsigned int d = 0; d < dim; ++d)
+            hessian_out[comp] +=
+              this->hessians_quad[(comp * hdim + d) * nqp + q_point] *
+              (nxj[d]) * (nxj[d]);
+
+          switch (dim)
+            {
+              case 1:
+                break;
+              case 2:
+                hessian_out[comp] +=
+                  this->hessians_quad[(comp * hdim + 2) * nqp + q_point] *
+                  (nxj[0] * nxj[1]);
+                break;
+              case 3:
+                hessian_out[comp] +=
+                  2. * this->hessians_quad[(comp * hdim + 3) * nqp + q_point] *
+                  (nxj[0] * nxj[1]);
+                hessian_out[comp] +=
+                  2. * this->hessians_quad[(comp * hdim + 4) * nqp + q_point] *
+                  (nxj[0] * nxj[2]);
+                hessian_out[comp] +=
+                  2. * this->hessians_quad[(comp * hdim + 5) * nqp + q_point] *
+                  (nxj[1] * nxj[2]);
+                break;
+              default:
+                DEAL_II_NOT_IMPLEMENTED();
+            }
+        }
+
+      if constexpr (n_components == 1)
+        return hessian_out[0];
+      else
+        return hessian_out;
+    }
+  // cell with general Jacobian
+  else
+    {
+      const auto normal = this->normal_vector(q_point);
+      return get_hessian(q_point) * normal * normal;
+    }
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_dof_value(const value_type val_in, const unsigned int dof)
@@ -4908,7 +5022,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_value(const Tensor<1, 1, VectorizedArrayType> val_in,
                const unsigned int                      q_point)
 {
-  static_assert(n_components == 1 && dim == 1,
+  static_assert(n_components == 1,
                 "Do not try to modify the default template parameters used for"
                 " selectively enabling this function via std::enable_if!");
   submit_value(val_in[0], q_point);
@@ -5420,6 +5534,84 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                                                  d] = sum * JxW;
             }
         }
+    }
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
+inline DEAL_II_ALWAYS_INLINE void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  submit_normal_hessian(const value_type   normal_hessian_in,
+                        const unsigned int q_point)
+{
+#  ifdef DEBUG
+  Assert(this->is_reinitialized, ExcNotInitialized());
+#  endif
+  AssertIndexRange(q_point, this->n_quadrature_points);
+  Assert(this->J_value != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+  Assert(this->jacobian != nullptr,
+         internal::ExcMatrixFreeAccessToUninitializedMappingField(
+           "update_hessians"));
+#  ifdef DEBUG
+  this->hessians_quad_submitted = true;
+#  endif
+
+  // compute hessian_unit = J^T * hessian_in(u) * J
+  const std::size_t      nqp  = this->n_quadrature_points;
+  constexpr unsigned int hdim = (dim * (dim + 1)) / 2;
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+    {
+      const VectorizedArrayType JxW =
+        this->J_value[0] * this->quadrature_weights[q_point];
+
+      const auto nxj = this->normal_x_jacobian[0];
+
+      // diagonal part
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          const auto                nxj_d  = nxj[d];
+          const VectorizedArrayType factor = nxj_d * nxj_d * JxW;
+          for (unsigned int comp = 0; comp < n_components; ++comp)
+            if constexpr (n_components == 1)
+              this->hessians_quad[d * nqp + q_point] =
+                normal_hessian_in * factor;
+            else
+              this->hessians_quad[(comp * hdim + d) * nqp + q_point] =
+                normal_hessian_in[comp] * factor;
+        }
+
+      // off diagonal part
+      for (unsigned int d = 1, off_dia = dim; d < dim; ++d)
+        for (unsigned int e = 0; e < d; ++e, ++off_dia)
+          {
+            const auto                jac_d  = nxj[d];
+            const auto                jac_e  = nxj[e];
+            const VectorizedArrayType factor = jac_d * jac_e * JxW;
+            for (unsigned int comp = 0; comp < n_components; ++comp)
+              if constexpr (n_components == 1)
+                this->hessians_quad[off_dia * nqp + q_point] =
+                  2. * normal_hessian_in * factor;
+              else
+                this->hessians_quad[(comp * hdim + off_dia) * nqp + q_point] =
+                  2. * normal_hessian_in[comp] * factor;
+          }
+    }
+  else
+    {
+      const auto normal           = this->normal_vector(q_point);
+      const auto normal_projector = outer_product(normal, normal);
+      if constexpr (n_components == 1)
+        submit_hessian(normal_hessian_in * normal_projector, q_point);
+      else
+        submit_hessian(outer_product(normal_hessian_in, normal_projector),
+                       q_point);
     }
 }
 

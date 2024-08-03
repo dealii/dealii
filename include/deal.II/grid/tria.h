@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// Copyright (C) 1998 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -367,7 +367,7 @@ namespace internal
    * will be, attached to cells via the register_data_attach() function
    * and later retrieved via notify_ready_to_unpack().
    *
-   * This internalclass is dedicated to the data serialization and transfer
+   * This internal class is dedicated to the data serialization and transfer
    * across repartitioned meshes and to/from the file system.
    *
    * It is designed to store all data buffers intended for serialization.
@@ -378,6 +378,12 @@ namespace internal
   {
   public:
     using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
+
+    /**
+     * Version number stored in the .info file written by
+     * Triangulation::save().
+     */
+    static inline constexpr unsigned int version_number = 5;
 
     /**
      * Auxiliary data structure for assigning a CellStatus to a deal.II cell
@@ -442,13 +448,13 @@ namespace internal
     /**
      * Serialize data to file system.
      *
-     * The data will be written in a separate file, whose name
-     * consists of the stem @p filename and an attached identifier
+     * The data will be written in a number of file whose names
+     * consists of the stem @p file_basename and an attached identifier
      * <tt>_fixed.data</tt> for fixed size data and <tt>_variable.data</tt>
      * for variable size data.
      *
      * If MPI support is enabled, all processors write into these files
-     * simultaneously via MPIIO. Each processor's position to write to will be
+     * simultaneously via MPI I/O. Each processor's position to write to will be
      * determined from the provided input parameters.
      *
      * Data has to be previously packed with pack_data().
@@ -456,14 +462,14 @@ namespace internal
     void
     save(const unsigned int global_first_cell,
          const unsigned int global_num_cells,
-         const std::string &filename,
+         const std::string &file_basename,
          const MPI_Comm    &mpi_communicator) const;
 
     /**
      * Deserialize data from file system.
      *
-     * The data will be read from separate file, whose name
-     * consists of the stem @p filename and an attached identifier
+     * The data will be read from separate files whose names
+     * consists of the stem @p file_basename and an attached identifier
      * <tt>_fixed.data</tt> for fixed size data and <tt>_variable.data</tt>
      * for variable size data.
      * The @p n_attached_deserialize_fixed and @p n_attached_deserialize_variable
@@ -481,7 +487,7 @@ namespace internal
     load(const unsigned int global_first_cell,
          const unsigned int global_num_cells,
          const unsigned int local_num_cells,
-         const std::string &filename,
+         const std::string &file_basename,
          const unsigned int n_attached_deserialize_fixed,
          const unsigned int n_attached_deserialize_variable,
          const MPI_Comm    &mpi_communicator);
@@ -994,7 +1000,7 @@ namespace internal
  * inheriting from Manifold; see the documentation of Manifold, step-49, or
  * the
  * @ref manifold
- * module for examples and a complete description of the algorithms. By
+ * topic for examples and a complete description of the algorithms. By
  * default, all cells in a Triangulation have a flat geometry, meaning that
  * all lines in the Triangulation are assumed to be straight. If a cell has a
  * manifold_id that is not equal to numbers::flat_manifold_id then the
@@ -1307,7 +1313,7 @@ namespace internal
  * object, you should be well aware that you might involuntarily alter the
  * data stored in the triangulation.
  *
- * @ingroup grid aniso
+ * @ingroup grid
  *
  * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
  */
@@ -1535,7 +1541,7 @@ public:
   /**
    * An alias that is used to identify cell iterators. The concept of
    * iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies cells in a triangulation. The TriaIterator
    * class works like a pointer that when you dereference it yields an object
@@ -1559,7 +1565,7 @@ public:
    * An alias that is used to identify
    * @ref GlossActive "active cell iterators".
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies active cells in a triangulation. The
    * TriaActiveIterator class works like a pointer to active objects that when
@@ -1576,7 +1582,7 @@ public:
   /**
    * An alias that is used to identify iterators that point to faces.
    * The concept of iterators is discussed at length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * The current alias identifies faces in a triangulation. The
    * TriaIterator class works like a pointer to objects that when
@@ -1606,7 +1612,7 @@ public:
    * An alias that defines an iterator type to iterate over
    * vertices of a mesh.  The concept of iterators is discussed at
    * length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * @ingroup Iterators
    */
@@ -1616,7 +1622,7 @@ public:
    * An alias that defines an iterator type to iterate over
    * vertices of a mesh.  The concept of iterators is discussed at
    * length in the
-   * @ref Iterators "iterators documentation module".
+   * @ref Iterators "iterators documentation topic".
    *
    * This alias is in fact identical to the @p vertex_iterator alias
    * above since all vertices in a mesh are active (i.e., are a vertex of
@@ -1959,8 +1965,6 @@ public:
    * will represent the number of different indicators (which is greater or
    * equal one).
    *
-   * @ingroup boundary
-   *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -2221,34 +2225,34 @@ public:
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  using CellStatus DEAL_II_DEPRECATED_EARLY = ::dealii::CellStatus;
+  using CellStatus DEAL_II_DEPRECATED = ::dealii::CellStatus;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_PERSIST DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_PERSIST DEAL_II_DEPRECATED =
     ::dealii::CellStatus::cell_will_persist;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_REFINE DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_REFINE DEAL_II_DEPRECATED =
     ::dealii::CellStatus::cell_will_be_refined;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_COARSEN DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_COARSEN DEAL_II_DEPRECATED =
     ::dealii::CellStatus::children_will_be_coarsened;
 
   /**
    * @deprecated This is an alias for backward compatibility. Use
    * ::dealii::CellStatus directly.
    */
-  static constexpr auto CELL_INVALID DEAL_II_DEPRECATED_EARLY =
+  static constexpr auto CELL_INVALID DEAL_II_DEPRECATED =
     ::dealii::CellStatus::cell_invalid;
 
 
@@ -3590,19 +3594,21 @@ public:
 
 
   /**
+   * Save the mesh and associated information into a number of files
+   * that all use the provided basename as a starting prefix, plus some
+   * suffixes that indicate the specific use of that file.
+   *
    * Save the triangulation into the given file. Internally, this
-   * function calls the save function which uses BOOST archives. This
-   * is a placeholder implementation that, in the near future, will also
-   * attach the data associated with the triangulation
+   * function calls the save function which uses BOOST archives.
    */
   virtual void
-  save(const std::string &filename) const;
+  save(const std::string &file_basename) const;
 
   /**
    * Load the triangulation saved with save() back in.
    */
   virtual void
-  load(const std::string &filename);
+  load(const std::string &file_basename);
 
 
   /**
@@ -3666,6 +3672,8 @@ public:
    * Write and read the data of this object from a stream for the purpose
    * of serialization. using the [BOOST serialization
    * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+   *
+   * This function is used in step-83.
    */
   template <class Archive>
   void
@@ -3857,7 +3865,8 @@ public:
 
 protected:
   /**
-   * Save additional cell-attached data into the given file. The first
+   * Save additional cell-attached data from files all starting with
+   * the base name given as last argument. The first
    * arguments are used to determine the offsets where to write buffers to.
    *
    * Called by @ref save.
@@ -3865,10 +3874,11 @@ protected:
   void
   save_attached_data(const unsigned int global_first_cell,
                      const unsigned int global_num_cells,
-                     const std::string &filename) const;
+                     const std::string &file_basename) const;
 
   /**
-   * Load additional cell-attached data from the given file, if any was saved.
+   * Load additional cell-attached data files all starting with the
+   * base name given as fourth argument, if any was saved.
    * The first arguments are used to determine the offsets where to read
    * buffers from.
    *
@@ -3878,23 +3888,21 @@ protected:
   load_attached_data(const unsigned int global_first_cell,
                      const unsigned int global_num_cells,
                      const unsigned int local_num_cells,
-                     const std::string &filename,
+                     const std::string &file_basename,
                      const unsigned int n_attached_deserialize_fixed,
                      const unsigned int n_attached_deserialize_variable);
 
   /**
-   * A function to record the CellStatus of currently active cells that
-   * are locally owned. This information is mandatory to transfer data
-   * between meshes during adaptation or serialization, e.g., using
-   * parallel::distributed::SolutionTransfer.
+   * A function to record the CellStatus of currently active cells.
+   * This information is mandatory to transfer data between meshes
+   * during adaptation or serialization, e.g., using SolutionTransfer.
    *
    * Relations will be stored in the private member local_cell_relations. For
    * an extensive description of CellStatus, see the documentation for the
    * member function register_data_attach().
    */
-  virtual void
-  update_cell_relations()
-  {}
+  void
+  update_cell_relations();
 
   /**
    * Vector of pairs, each containing a deal.II cell iterator and its
@@ -4724,7 +4732,7 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   // they are easy enough to rebuild upon re-loading data. do
   // this here. don't forget to first resize the fields appropriately
   {
-    for (auto &level : levels)
+    for (const auto &level : levels)
       {
         level->active_cell_indices.resize(level->refine_flags.size());
         level->global_active_cell_indices.resize(level->refine_flags.size());

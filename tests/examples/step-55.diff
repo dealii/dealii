@@ -1,0 +1,32 @@
+74c74
+< 
+---
+> #include "../example_test.h"
+639,645c639,651
+<     solver.solve(system_matrix,
+<                  distributed_solution,
+<                  system_rhs,
+<                  preconditioner);
+< 
+<     pcout << "   Solved in " << solver_control.last_step() << " iterations."
+<           << std::endl;
+---
+> //    solver.solve(system_matrix,
+> //                 distributed_solution,
+> //                 system_rhs,
+> //                 preconditioner);
+>     check_solver_within_range(pcout,
+>                               solver.solve(system_matrix,
+>                                            distributed_solution,
+>                                            system_rhs,
+>                                            preconditioner),
+>                               solver_control.last_step(),
+>                               48, 60);
+> //    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+> //          << std::endl;
+794,795c800,801
+<         computing_timer.print_summary();
+<         computing_timer.reset();
+---
+> //        computing_timer.print_summary();
+> //        computing_timer.reset();

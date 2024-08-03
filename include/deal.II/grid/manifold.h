@@ -779,6 +779,12 @@ public:
   const Tensor<1, spacedim> &
   get_periodicity() const;
 
+  /**
+   * Return the relative tolerance set in the constructor.
+   */
+  double
+  get_tolerance() const;
+
 private:
   /**
    * The periodicity of this Manifold. Periodicity affects the way a middle
@@ -1132,6 +1138,15 @@ Manifold<3, 3>::get_new_point_on_hex(
   const Triangulation<3, 3>::hex_iterator &) const;
 
 /*---Templated functions---*/
+
+template <int dim, int spacedim>
+inline double
+FlatManifold<dim, spacedim>::get_tolerance() const
+{
+  return tolerance;
+}
+
+
 
 namespace Manifolds
 {

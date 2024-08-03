@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2015 - 2023 by the deal.II authors
+// Copyright (C) 2015 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -507,8 +507,8 @@ operator*(typename Range::value_type                    number,
           const LinearOperator<Range, Domain, Payload> &op)
 {
   static_assert(
-    std::is_convertible<typename Range::value_type,
-                        typename Domain::value_type>::value,
+    std::is_convertible_v<typename Range::value_type,
+                          typename Domain::value_type>,
     "Range and Domain must have implicitly convertible 'value_type's");
 
   if (op.is_null_operator)
@@ -574,8 +574,8 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
           typename Domain::value_type                   number)
 {
   static_assert(
-    std::is_convertible<typename Range::value_type,
-                        typename Domain::value_type>::value,
+    std::is_convertible_v<typename Range::value_type,
+                          typename Domain::value_type>,
     "Range and Domain must have implicitly convertible 'value_type's");
 
   return number * op;

@@ -90,7 +90,7 @@ namespace internal
     else
       ss.setf(std::ios::fixed, std::ios::floatfield);
 
-    std::visit([&ss](auto &v) { ss << v; }, value);
+    std::visit([&ss](const auto &v) { ss << v; }, value);
 
     cached_value = ss.str();
     if (cached_value.empty())
@@ -155,7 +155,7 @@ TableHandler::Column::pad_column_below(const unsigned int size)
   while (entries.size() < size)
     {
       entries.push_back(entries.back().get_default_constructed_copy());
-      internal::TableEntry &entry = entries.back();
+      const internal::TableEntry &entry = entries.back();
       entry.cache_string(scientific, precision);
       max_length =
         std::max(max_length,
@@ -218,7 +218,7 @@ TableHandler::start_new_row()
     while (column.second.entries.size() < max_col_length)
       {
         column.second.entries.emplace_back("");
-        internal::TableEntry &entry = column.second.entries.back();
+        const internal::TableEntry &entry = column.second.entries.back();
         entry.cache_string(column.second.scientific, column.second.precision);
         column.second.max_length =
           std::max(column.second.max_length,
@@ -701,7 +701,8 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           else
             out.setf(std::ios::fixed, std::ios::floatfield);
 
-          std::visit([&out](auto &v) { out << v; }, column.entries[i].value);
+          std::visit([&out](const auto &v) { out << v; },
+                     column.entries[i].value);
 
           if (j < n_cols - 1)
             out << " & ";

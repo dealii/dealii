@@ -34,7 +34,6 @@ namespace Portable
      * products are implemented.
      *
      * @ingroup CUDAWrappers
-     * @ingroup Portable
      */
     // TODO: for now only the general variant is implemented
     enum EvaluatorVariant
@@ -338,7 +337,6 @@ namespace Portable
      * Generic evaluator framework.
      *
      * @ingroup CUDAWrappers
-     * @ingroup Portable
      */
     template <EvaluatorVariant variant,
               int              dim,
@@ -355,7 +353,6 @@ namespace Portable
      * of the basis functions.
      *
      * @ingroup CUDAWrappers
-     * @ingroup Portable
      */
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     struct EvaluatorTensorProduct<evaluate_general,

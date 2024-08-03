@@ -1,0 +1,56 @@
+
+===========================================
+Cycle 0:
+Number of active cells: 1
+Number of degrees of freedom: 2
+
+Time step 0 at t=0.0002
+Time step 1000 at t=0.2002
+Time step 2000 at t=0.4002
+Time step 3000 at t=0.6002
+Time step 4000 at t=0.8002
+
+===========================================
+Cycle 1:
+Number of active cells: 2
+Number of degrees of freedom: 3
+
+Time step 0 at t=0.0002
+Time step 1000 at t=0.2002
+Time step 2000 at t=0.4002
+Time step 3000 at t=0.6002
+Time step 4000 at t=0.8002
+
+===========================================
+Cycle 2:
+Number of active cells: 4
+Number of degrees of freedom: 5
+
+Time step 0 at t=0.0002
+Time step 1000 at t=0.2002
+Time step 2000 at t=0.4002
+Time step 3000 at t=0.6002
+Time step 4000 at t=0.8002
+
+===========================================
+Cycle 3:
+Number of active cells: 8
+Number of degrees of freedom: 9
+
+Time step 0 at t=0.0002
+Time step 1000 at t=0.2002
+Time step 2000 at t=0.4002
+Time step 3000 at t=0.6002
+Time step 4000 at t=0.8002
+
+cells dofs    L2        H1      Linfty   
+    1    2 1.667e-01 5.774e-01 2.222e-01 
+    2    3 3.906e-02 2.889e-01 5.380e-02 
+    4    5 9.679e-03 1.444e-01 1.357e-02 
+    8    9 2.405e-03 7.218e-02 3.419e-03 
+
+n cells         H1                  L2          
+      1 5.774e-01    -    - 1.667e-01    -    - 
+      2 2.889e-01 2.00 1.00 3.906e-02 4.27 2.09 
+      4 1.444e-01 2.00 1.00 9.679e-03 4.04 2.01 
+      8 7.218e-02 2.00 1.00 2.405e-03 4.02 2.01 

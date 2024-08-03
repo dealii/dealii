@@ -1,5 +1,0 @@
-New: The new tutorial step-87 presents the advanced point evaluation
-functionalities of deal.II, specifically useful for evaluating
-finite element solutions at arbitrary points on distributed meshes.
-<br>
-(Magdalena Schreter-Fleischhacker, Peter Munch, 2023/09/05)

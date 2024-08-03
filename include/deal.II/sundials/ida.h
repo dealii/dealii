@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@ namespace SUNDIALS
    * The class IDA is a wrapper to SUNDIALS Implicit Differential-Algebraic
    * solver which is a general purpose solver for systems of
    * Differential-Algebraic Equations (DAEs). Another class that can solve
-   * this set of equations is PETScWrappers::TS.
+   * this set of equations is PETScWrappers::TimeStepper.
    *
    * The user has to provide the implementation of the following std::functions:
    *  - reinit_vector;
@@ -273,6 +273,31 @@ namespace SUNDIALS
    * happen in step-21, step-31, step-32, step-43, and others, where a subset of
    * variables is always in instantaneous equilibrium with another set of
    * variables that evolves on a slower time scale.
+   *
+   * Another case where we *could* eliminate a variable but do not want to
+   * is where that additional variable is introduced in the first place to work
+   * around some other problem. As an example, consider the time dependent
+   * version of the biharmonic problem we consider in step-47 (as well as some
+   * later ones). The equations we would then be interested in would read
+   * @f{align*}{
+   *   \frac{\partial u(\mathbf x,t)}{\partial t} + \Delta^2 u(\mathbf x,t) &=
+   *   f(\mathbf x,t).
+   * @f}
+   * As discussed in step-47, the difficulty is the presence of the fourth
+   * derivatives. One way in which one can address this is by introducing
+   * an auxiliary variable $v=\Delta u$ which would render the problem into
+   * the following one that only ever has second derivatives which we know
+   * how to deal with:
+   * @f{align*}{
+   *   \frac{\partial u(\mathbf x,t)}{\partial t} + \Delta v(\mathbf x,t) &=
+   *   f(\mathbf x,t),
+   *   \\
+   *   v(\mathbf x,t)-\Delta u(\mathbf x,t) &= 0.
+   * @f}
+   * Here, the introduction of the additional variable was voluntary, and
+   * could be undone, but we don't want that of course. Rather, we end
+   * up with a differential-algebraic equation because the equations do
+   * not have a time derivative for $v$.
    *
    * Rather than show how to solve the trivial (linear) case above, let us
    * instead consider the situation where we introduce another variable $v$ that

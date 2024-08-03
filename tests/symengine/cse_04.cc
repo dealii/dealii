@@ -103,16 +103,16 @@ test_explicit()
       l.init(independents, dependents, with_cse);
       std::vector<double> result(dependents.size());
 
-      deallog << "Explicit: eval_symengine: "
-              << "  with_lambda_opt: " << (true) << "  with_cse: " << with_cse
-              << "  n_evals: " << n_evals << std::endl;
+      std::cout << "Explicit: eval_symengine: "
+                << "  with_lambda_opt: " << (true) << "  with_cse: " << with_cse
+                << "  n_evals: " << n_evals << std::endl;
       double res = 0.0;
       for (unsigned int r = 0; r < n_evals; ++r)
         {
           l.call(result.data(), vals.data());
           for (unsigned int i = 0; i < result.size(); ++i)
             {
-              deallog << "Result[" << i << "]: " << result[i] << std::endl;
+              std::cout << "Result[" << i << "]: " << result[i] << std::endl;
               res += result[i];
             }
         }
@@ -145,10 +145,10 @@ test_explicit()
     optimiser.optimize();
 
     // Substitute and get result
-    deallog << "Explicit: eval_deal_II: "
-            << "  with_lambda_opt: " << with_lambda_opt
-            << "  with_cse: " << with_cse << "  n_evals: " << n_evals
-            << std::endl;
+    std::cout << "Explicit: eval_deal_II: "
+              << "  with_lambda_opt: " << with_lambda_opt
+              << "  with_cse: " << with_cse << "  n_evals: " << n_evals
+              << std::endl;
     double res = 0.0;
     for (unsigned int r = 0; r < n_evals; ++r)
       {
@@ -157,7 +157,7 @@ test_explicit()
 
         for (unsigned int i = 0; i < result.size(); ++i)
           {
-            deallog << "Result[" << i << "]: " << result[i] << std::endl;
+            std::cout << "Result[" << i << "]: " << result[i] << std::endl;
             res += result[i];
           }
       }

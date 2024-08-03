@@ -1,0 +1,48 @@
+31c31
+< 
+---
+> #include "../example_test.h"
+1236,1246c1236,1256
+<     solve_with_gmg(solver_control,
+<                    laplace_operator,
+<                    completely_distributed_solution,
+<                    system_rhs,
+<                    prm.mg_data,
+<                    mapping_collection,
+<                    dof_handler,
+<                    quadrature_collection);
+< 
+<     pcout << "   Solved in " << solver_control.last_step() << " iterations."
+<           << std::endl;
+---
+> //    solve_with_gmg(solver_control,
+> //                   laplace_operator,
+> //                   completely_distributed_solution,
+> //                   system_rhs,
+> //                   prm.mg_data,
+> //                   mapping_collection,
+> //                   dof_handler,
+> //                   quadrature_collection);
+>     check_solver_within_range(pcout,
+>                               solve_with_gmg(solver_control,
+>                                              laplace_operator,
+>                                              completely_distributed_solution,
+>                                              system_rhs,
+>                                              prm.mg_data,
+>                                              mapping_collection,
+>                                              dof_handler,
+>                                              quadrature_collection),
+>                               solver_control.last_step(),
+>                               6, 8);
+> //    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+> //          << std::endl;
+1460c1470
+<     for (unsigned int cycle = 0; cycle < prm.n_cycles; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 3; ++cycle)
+1480,1481c1490,1491
+<         computing_timer.print_summary();
+<         computing_timer.reset();
+---
+> //        computing_timer.print_summary();
+> //        computing_timer.reset();

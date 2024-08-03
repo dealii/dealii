@@ -1,0 +1,88 @@
+Number of active cells: 1024 (on 6 levels)
+Number of degrees of freedom: 13764 (8450+1089+4225)
+
+Timestep 0:  t=0, dt=0
+   Solving Darcy (pressure-velocity) system...
+   Rebuilding darcy preconditioner...
+Solver stopped within 44 - 62 iterations
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Number of active cells: 1036 (on 7 levels)
+Number of degrees of freedom: 13960 (8570+1105+4285)
+
+Timestep 0:  t=0, dt=0
+   Solving Darcy (pressure-velocity) system...
+   Rebuilding darcy preconditioner...
+Solver stopped within 44 - 62 iterations
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Number of active cells: 1072 (on 8 levels)
+Number of degrees of freedom: 14508 (8906+1149+4453)
+
+Timestep 0:  t=0, dt=0
+   Solving Darcy (pressure-velocity) system...
+   Rebuilding darcy preconditioner...
+Solver stopped within 44 - 62 iterations
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Number of active cells: 1132 (on 9 levels)
+Number of degrees of freedom: 15408 (9458+1221+4729)
+
+Timestep 0:  t=0, dt=0
+   Solving Darcy (pressure-velocity) system...
+   Rebuilding darcy preconditioner...
+Solver stopped within 44 - 62 iterations
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Number of active cells: 1180 (on 9 levels)
+Number of degrees of freedom: 16112 (9890+1277+4945)
+
+Timestep 1:  t=2.99468e-05, dt=2.99468e-05
+   Solving Darcy (pressure-velocity) system...
+   Rebuilding darcy preconditioner...
+Solver stopped within 44 - 62 iterations
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Timestep 2:  t=5.98955e-05, dt=2.99487e-05
+   Solving Darcy (pressure-velocity) system...
+   Rebuilding darcy preconditioner...
+Solver stopped within 44 - 62 iterations
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Timestep 3:  t=8.98429e-05, dt=2.99474e-05
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Timestep 4:  t=0.000119789, dt=2.99462e-05
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Timestep 5:  t=0.000149734, dt=2.99451e-05
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Number of active cells: 1228 (on 9 levels)
+Number of degrees of freedom: 16836 (10334+1335+5167)
+
+Timestep 6:  t=0.000179678, dt=2.9944e-05
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Timestep 7:  t=0.000209621, dt=2.99429e-05
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Timestep 8:  t=0.000239563, dt=2.99419e-05
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+
+Timestep 9:  t=0.000269504, dt=2.99409e-05
+   Solving saturation transport equation...
+Solver stopped within 15 - 19 iterations
+ 

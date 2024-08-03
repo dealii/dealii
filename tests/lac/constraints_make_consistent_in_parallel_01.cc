@@ -61,7 +61,8 @@ void
 test(const DoFHandler<dim, spacedim> &dof_handler,
      const IndexSet                  &locally_relevant_dofs)
 {
-  AffineConstraints<double> constraints;
+  AffineConstraints<double> constraints(dof_handler.locally_owned_dofs(),
+                                        locally_relevant_dofs);
 
   std::vector<types::global_dof_index> dof_indices(
     dof_handler.get_fe().n_dofs_per_face());

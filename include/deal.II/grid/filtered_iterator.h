@@ -187,7 +187,7 @@ namespace IteratorFilters
    *
    * This class is used in step-32, in connection with the methods of the
    * @ref distributed
-   * module.
+   * topic.
    *
    * @ingroup Iterators
    */

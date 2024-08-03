@@ -573,17 +573,17 @@ public:
 
   /**
    * @c FERemoteEvaluation does not provide the functions `get_value()` and
-   *`get_gradient()`. To access values and/or gradients call @c
-   *get_data_accessor() on every thread, e.g., `auto remote_evaluator =
-   *get_data_accessor();` The returned object can be used as follows.
-   *@code
+   * `get_gradient()`. To access values and/or gradients call @c
+   * get_data_accessor() on every thread, e.g., `auto remote_evaluator =
+   * get_data_accessor();` The returned object can be used as follows.
+   * @code
    * for (unsigned int entity = range.first; entity < range.second; ++entity)
    * {
    *    remote_evaluator.reinit(entity);
    *    for(unsigned int q : quadrature_point_indices())
    *      remote_evaluator.get_value(q)
    * }
-   *@endcode
+   * @endcode
    */
   internal::PrecomputedEvaluationDataAccessor<dim, n_components, value_type>
   get_data_accessor() const;
@@ -1163,8 +1163,7 @@ namespace Utilities
                 // the batch to the corresponding data structure.
                 const unsigned int n_faces =
                   matrix_free.n_active_entries_per_face_batch(face);
-                face_batch_id_n_faces.emplace_back(
-                  std::make_pair(face, n_faces));
+                face_batch_id_n_faces.emplace_back(face, n_faces);
 
                 // Append the quadrature points to the points we need to search
                 // for.
@@ -1350,7 +1349,7 @@ namespace Utilities
             const auto idx = indices[i];
 
             // We do not use a structural binding here, since with
-            // C++17 caputuring structural bindings in lambdas leads
+            // C++17 capturing structural bindings in lambdas leads
             // to an ill formed program.
             const auto &cell = std::get<0>(cell_face_pairs[i]);
             const auto &f    = std::get<1>(cell_face_pairs[i]);

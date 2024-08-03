@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,8 @@ namespace CUDAWrappers
       /**
        * Set the solver type. Possibilities are:
        * <ul>
-       * <li> "Cholesky" which performs a Cholesky decomposition on the @ref GlossDevice "device"
+       * <li> "Cholesky" which performs a Cholesky decomposition on the
+       * @ref GlossDevice "device"
        * </li>
        * <li> "LU_dense" which converts the sparse matrix to a dense
        * matrix and uses LU factorization </li>

@@ -1,4 +1,0 @@
-Improvement: Added gradient() implementation to VectorFunctionFromTensorFunction in
-function.h file.
-<br>
-(Abbas Ballout, 2023/07/30)

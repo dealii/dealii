@@ -1,0 +1,8 @@
+635c635
+<     DiscreteTime discrete_time(0, par.final_time, par.time_step);
+---
+>     DiscreteTime discrete_time(0, 0.04, par.time_step);
+723c723
+<         prm_file = "parameters.prm";
+---
+>         prm_file = "../../../source/step-68/parameters.prm";

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2009 - 2023 by the deal.II authors
+// Copyright (C) 2009 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -147,7 +147,7 @@ namespace parallel
    * For a discussion of the kind of problems to which this function is
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
-   * module.
+   * topic.
    *
    * @dealiiConceptRequires{(std::invocable<Function,
    *    decltype(*std::declval<InputIterator>())> &&
@@ -214,7 +214,7 @@ namespace parallel
    * For a discussion of the kind of problems to which this function is
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
-   * module.
+   * topic.
    *
    * @dealiiConceptRequires{(std::invocable<Function,
    *    decltype(*std::declval<InputIterator1>()),
@@ -291,7 +291,7 @@ namespace parallel
    * For a discussion of the kind of problems to which this function is
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
-   * module.
+   * topic.
    *
    * @dealiiConceptRequires{(std::invocable<Function,
    *    decltype(*std::declval<InputIterator1>()),
@@ -443,7 +443,7 @@ namespace parallel
    * For a discussion of the kind of problems to which this function is
    * applicable, see also the
    * @ref threads "Parallel computing with multiple processors"
-   * module.
+   * topic.
    *
    * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator>)}
    */
@@ -593,7 +593,7 @@ namespace parallel
    * For a discussion of the kind of problems to which this function is
    * applicable, see also the
    * @ref threads "Parallel computing with multiple processors"
-   * module.
+   * topic.
    *
    * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator> &&
    *    std::convertible_to<std::invoke_result_t<Function, Iterator, Iterator>,
@@ -674,7 +674,8 @@ namespace parallel
        * again.
        */
       void
-      release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p);
+      release_one_partitioner(
+        const std::shared_ptr<tbb::affinity_partitioner> &p);
 
     private:
       /**

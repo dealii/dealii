@@ -60,15 +60,16 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
 
-using namespace dealii;
-using VectorType = TrilinosWrappers::MPI::Vector;
-using MatrixType = TrilinosWrappers::SparseMatrix;
 namespace Step90
 {
-  // The parallization in this tutorial relies on the Trilinos library. We will
-  // grant to some cells empty finite element spaces FE_Nothing as done
-  // in step-85, but this time active DoFs will be only assigned to cell which
-  // are intersected by the surface approximation.
+  using namespace dealii;
+  using VectorType = TrilinosWrappers::MPI::Vector;
+  using MatrixType = TrilinosWrappers::SparseMatrix;
+
+  // The parallelization in this tutorial relies on the Trilinos library. We
+  // will grant to some cells empty finite element spaces FE_Nothing as done in
+  // step-85, but this time active DoFs will be only assigned to cell which are
+  // intersected by the surface approximation.
   enum class ActiveFEIndex : types::fe_index
   {
     lagrange = 0,

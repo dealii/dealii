@@ -156,9 +156,8 @@ BarycentricPolynomials<dim>::BarycentricPolynomials(
   const std::vector<PolyType> &polynomials)
   : ScalarPolynomialsBase<dim>(internal::get_degree<dim>(polynomials),
                                polynomials.size())
+  , polys(polynomials)
 {
-  polys = polynomials;
-
   poly_grads.resize(polynomials.size());
   poly_hessians.resize(polynomials.size());
   poly_third_derivatives.resize(polynomials.size());

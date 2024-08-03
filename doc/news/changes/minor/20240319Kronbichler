@@ -1,8 +1,0 @@
-New: SolverGMRES and SolverFGMRES can now use an additional orthogonalization
-strategy, controlled by
-LinearAlgebra::OrthogonalizationStrategy::delayed_classical_gram_schmidt. This
-implements the classical Gram-Schmidt method with delayed reorthogonalization,
-a low-synchronization algorithm (performing one global reduction per GMRES
-iteration for deal.II's own vectors) that has excellent stability properties.
-<br>
-(Martin Kronbichler, 2024/03/19)

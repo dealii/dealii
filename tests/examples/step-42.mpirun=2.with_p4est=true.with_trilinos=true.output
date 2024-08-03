@@ -1,0 +1,66 @@
+    Using output directory 'p1_adaptive/'
+    FE degree 1
+    transfer solution false
+
+Cycle 0:
+   Number of active cells: 512
+   Number of degrees of freedom: 2187
+ 
+   Newton iteration 1
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+Solver stopped within 6 - 8 iterations
+      Accepting Newton solution with residual: 2.77494e-07
+ 
+   Newton iteration 2
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+Solver stopped within 6 - 8 iterations
+      Accepting Newton solution with residual: 24.9028
+      Active set did not change!
+ 
+   Newton iteration 3
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+Solver stopped within 6 - 8 iterations
+      Residual of the non-contact part of the system: 1.63333
+         with a damping parameter alpha = 1
+      Active set did not change!
+ 
+   Newton iteration 4
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+Solver stopped within 6 - 8 iterations
+      Residual of the non-contact part of the system: 0.00457586
+         with a damping parameter alpha = 1
+      Active set did not change!
+ 
+   Newton iteration 5
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+Solver stopped within 6 - 8 iterations
+      Residual of the non-contact part of the system: 1.43188e-07
+         with a damping parameter alpha = 1
+      Active set did not change!
+ 
+   Newton iteration 6
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+Solver stopped within 6 - 8 iterations
+      Residual of the non-contact part of the system: 8.20097e-14
+         with a damping parameter alpha = 1
+      Active set did not change!
+      Writing graphical output... solution_00.pvtu
+Contact force = 37.3058

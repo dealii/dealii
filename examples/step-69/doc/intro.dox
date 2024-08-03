@@ -220,7 +220,7 @@ this step maximizes the use of finite element software infrastructure,
 works on any mesh, in any space dimension, and is theoretically guaranteed
 to always work, all the time, no exception. This illustrates that deal.II
 can be used far beyond the context of variational schemes in Hilbert spaces
-and that a large number of classes, modules and namespaces from deal.II can
+and that a large number of classes, topics, and namespaces from deal.II can
 be adapted for such a purpose.
 
 

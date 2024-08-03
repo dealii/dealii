@@ -1,4 +1,4 @@
-set Final time                        = 10
+set Final time                        = 3.0
 set Initial time                      = 0
 set Time interval between each output = 0.2
 subsection Error control

@@ -85,7 +85,7 @@ equations. What boundary conditions are readily possible here will
 become clear once we discuss the weak form of the equations.
 
 The equations covered here fall into the class of vector-valued problems. A
-toplevel overview of this topic can be found in the @ref vector_valued module.
+toplevel overview of this topic can be found in the @ref vector_valued topic.
 
 
 <h3>Weak form</h3>
@@ -400,7 +400,7 @@ that
 for all test functions $\textbf{v}_h, q_h$. Assembling the linear system
 associated with this problem follows the same lines used in @ref step_20
 "step-20", step-21, and explained in detail in the @ref
-vector_valued module.
+vector_valued topic.
 
 
 
@@ -630,7 +630,7 @@ $S=B A^{-1} B^T$. But this is not quite correct.
 Think of what would happen if there are constraints on some
 pressure variables (see the
 @ref constraints "Constraints on degrees of freedom" documentation
-module), for example because we use adaptively
+topic), for example because we use adaptively
 refined meshes and continuous pressure finite elements so that there
 are hanging nodes. Another cause for such constraints are Dirichlet
 boundary conditions on the pressure. Then the AffineConstraints

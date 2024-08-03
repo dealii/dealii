@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2023 by the deal.II authors
+// Copyright (C) 2004 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,8 +54,8 @@ namespace PETScWrappers
      * specify the sizes of the individual blocks, but also the number of
      * elements of each of these blocks to be stored on the local process.
      *
-     * @ingroup Vectors @see
-     * @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup Vectors
+     * @see @ref GlossBlockLA "Block (linear algebra)"
      */
     class BlockVector : public BlockVectorBase<Vector>
     {

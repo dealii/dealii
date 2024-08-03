@@ -1,3 +1,0 @@
-Fixed: Fix initialization of FEFaceEvaluation for hp in 3D.
-<br>
-(Maximilian Bergbauer, Peter Munch, Andreas Ritthaler, Magdalena Schreter-Fleischhacker, 2024/02/09)

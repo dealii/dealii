@@ -1180,7 +1180,7 @@ namespace Step63
   template <int dim>
   void AdvectionProblem<dim>::run()
   {
-    for (unsigned int cycle = 0; cycle < (settings.fe_degree == 1 ? 7 : 5);
+    for (unsigned int cycle = 0; cycle < (settings.fe_degree == 1 ? 7u : 5u);
          ++cycle)
       {
         std::cout << "  Cycle " << cycle << ':' << std::endl;

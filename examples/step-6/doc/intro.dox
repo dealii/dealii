@@ -233,7 +233,7 @@ In the program below, we will show how we can get these
 constraints from deal.II, and how to use them in the solution of the
 linear system of equations. Before going over the details of the program
 below, you may want to take a look at the @ref constraints documentation
-module that explains how these constraints can be computed and what classes in
+topic that explains how these constraints can be computed and what classes in
 deal.II work on them.
 
 

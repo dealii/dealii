@@ -1,5 +1,0 @@
-Fixed: It was not possible to compare non-const iterators into block
-sparse matrices because a `friend` declaration referred to the wrong
-class. This is now fixed.
-<br>
-(Wolfgang Bangerth, Simon Wiesheier, 2023/10/31)

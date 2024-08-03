@@ -1,5 +1,5 @@
 
-DEAL::grid_in_msh_version_1/input_v1	64	49
+DEAL::grid_in_msh_version_1/input_v1.msh	64	49
 -1.0000 -1.0000 0 0
 -0.71429 -1.0000 0 0
 -0.71429 -0.71429 0 0
@@ -343,7 +343,7 @@ DEAL::grid_in_msh_version_1/input_v1	64	49
 0.71429 0.71429 0 0
 
 
-DEAL::grid_in_msh_version_1/input_v2	64	49
+DEAL::grid_in_msh_version_1/input_v2.msh	64	49
 -1.0000 -1.0000 0 0
 -0.71429 -1.0000 0 0
 -0.71429 -0.71429 0 0

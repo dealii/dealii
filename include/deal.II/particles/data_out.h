@@ -38,8 +38,6 @@ namespace Particles
    * The class does, in essence, for particles what ::DataOut does for
    * finite element fields, using a similar interface. It is used in
    * step-19, for example.
-   *
-   * @ingroup Particle
    */
   template <int dim, int spacedim = dim>
   class DataOut : public dealii::DataOutInterface<0, spacedim>

@@ -68,8 +68,8 @@ namespace LinearAlgebra
      * function, for much the same reason as is documented with the
      * BlockSparsityPattern class.
      *
-     * @ingroup Matrix1 @see
-     * @ref GlossBlockLA "Block (linear algebra)"
+     * @ingroup Matrix1
+     * @see @ref GlossBlockLA "Block (linear algebra)"
      */
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
     class BlockSparseMatrix

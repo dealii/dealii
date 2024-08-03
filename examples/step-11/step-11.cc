@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2001 - 2023 by the deal.II authors
+ * Copyright (C) 2001 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -81,10 +81,10 @@ namespace Step11
     void solve();
     void write_high_order_mesh(const unsigned cycle);
 
-    Triangulation<dim> triangulation;
-    const FE_Q<dim>    fe;
-    DoFHandler<dim>    dof_handler;
-    MappingQ<dim>      mapping;
+    Triangulation<dim>  triangulation;
+    const FE_Q<dim>     fe;
+    DoFHandler<dim>     dof_handler;
+    const MappingQ<dim> mapping;
 
     SparsityPattern           sparsity_pattern;
     SparseMatrix<double>      system_matrix;

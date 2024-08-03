@@ -1,9 +1,0 @@
-Fixed: When accessing elements of Trilinos vectors that do not exist
-on the current MPI process (for example because a function *expects* a
-vector with ghost elements but got a completely distributed vector
-instead), deal.II tries to produce a reasonable error message pointing
-out the cause. But when using 64-bit indices, the logic that creates
-the error message was faulty, resulting in errors that were very hard
-to debug and not helpful at all. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2024/04/17)

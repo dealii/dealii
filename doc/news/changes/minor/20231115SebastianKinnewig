@@ -1,4 +1,0 @@
-New: Introduce a new function, Utilities::Trilinos::internal::make_rcp(),
-to create Teuchos::RCP objects, avoiding the usage of 'operator new'.
-<br>
-(Sebastian Kinnewig, 2023/11/15)

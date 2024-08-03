@@ -49,8 +49,9 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
 void
 filename_resolution()
 {
-  check_file<3>(std::string(SOURCE_DIR "/grid_in_unv_3d/3D"), GridIn<3>::unv);
-  check_file<3>(std::string(SOURCE_DIR "/grid_in_unv_3d/salome_cube"),
+  check_file<3>(std::string(SOURCE_DIR "/grid_in_unv_3d/3D.unv"),
+                GridIn<3>::unv);
+  check_file<3>(std::string(SOURCE_DIR "/grid_in_unv_3d/salome_cube.unv"),
                 GridIn<3>::unv);
 }
 

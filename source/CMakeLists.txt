@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: LGPL-2.1-or-later
-## Copyright (C) 2012 - 2023 by the deal.II authors
+## Copyright (C) 2012 - 2024 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -187,6 +187,17 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
       LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
       RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+      )
+  endif()
+
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.30")
+    #
+    # Create alias targets "dealii::dealii_release" and "dealii::dealii_debug"
+    # to have the exported target names available when populating the link
+    # interface for our "dealii::dealii" convenience target:
+    #
+    add_library(${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_${build_lowercase}
+      ALIAS ${DEAL_II_TARGET_NAME}_${build_lowercase}
       )
   endif()
 

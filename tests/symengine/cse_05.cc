@@ -71,8 +71,8 @@ test_derived()
   // using CSE they do not..
   //  const SD::Expression psi_wrong = H*C*H;
   //  const SD::Expression psi_fixed = contract3(H,C,H);
-  //  deallog << "psi_wrong: " << psi_wrong << std::endl;
-  //  deallog << "psi_fixed: " << psi_fixed << std::endl;
+  //  std::cout << "psi_wrong: " << psi_wrong << std::endl;
+  //  std::cout << "psi_fixed: " << psi_fixed << std::endl;
   // // psi_wrong: H_0*(H_0*C_00 + H_1*C_01 + H_2*C_02) + H_1*(H_0*C_01 +
   // H_1*C_11 + H_2*C_12) + H_2*(H_0*C_02 + H_1*C_12 + H_2*C_22)
   // // psi_fixed: H_0**2*C_00 + H_1**2*C_11 + H_2**2*C_22 + 2*H_0*H_1*C_01 +
@@ -131,10 +131,10 @@ test_derived()
       optimiser.optimize();
 
       // Substitute and get result
-      deallog << "Derived: eval_deal_II: "
-              << "  with_lambda_opt: " << with_lambda_opt
-              << "  with_cse: " << with_cse << "  n_evals: " << n_evals
-              << std::endl;
+      std::cout << "Derived: eval_deal_II: "
+                << "  with_lambda_opt: " << with_lambda_opt
+                << "  with_cse: " << with_cse << "  n_evals: " << n_evals
+                << std::endl;
       double res = 0.0;
       for (unsigned int r = 0; r < n_evals; ++r)
         {
@@ -143,15 +143,15 @@ test_derived()
 
           for (unsigned int i = 0; i < result.size(); ++i)
             {
-              deallog << "Result[" << i << "]: " << result[i] << std::endl;
+              std::cout << "Result[" << i << "]: " << result[i] << std::endl;
               res += result[i];
             }
         }
       deallog << "res: " << std::setprecision(9) << res << std::endl;
 
-      //       deallog << std::string(100,'-') << std::endl;
-      //       optimiser.print(deallog,with_cse);
-      //       deallog << std::string(100,'-') << std::endl;
+      //       std::cout << std::string(100,'-') << std::endl;
+      //       optimiser.print(std::cout,with_cse);
+      //       std::cout << std::string(100,'-') << std::endl;
     };
 
   // Perform more than one evaluation to check that all relevant internal

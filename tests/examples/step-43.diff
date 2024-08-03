@@ -1,0 +1,53 @@
+39c39
+< 
+---
+> #include "../example_test.h"
+1497,1498c1497,1501
+<           gmres.solve(darcy_matrix, darcy_solution, darcy_rhs, preconditioner);
+< 
+---
+>           //gmres.solve(darcy_matrix, darcy_solution, darcy_rhs, preconditioner);
+>           check_solver_within_range(std::cout,
+>                                     gmres.solve(darcy_matrix, darcy_solution, darcy_rhs, preconditioner);,
+>                                     solver_control.last_step(),
+>                                     44, 62);
+1501,1502c1504,1505
+<           std::cout << "        ..." << solver_control.last_step()
+<                     << " GMRES iterations." << std::endl;
+---
+> //          std::cout << "        ..." << solver_control.last_step()
+> //                    << " GMRES iterations." << std::endl;
+1586,1590c1589,1599
+<       cg.solve(saturation_matrix,
+<                saturation_solution,
+<                saturation_rhs,
+<                preconditioner);
+< 
+---
+> //      cg.solve(saturation_matrix,
+> //               saturation_solution,
+> //               saturation_rhs,
+> //               preconditioner);
+>       check_solver_within_range(std::cout,
+>                                 cg.solve(saturation_matrix,
+>                                          saturation_solution,
+>                                          saturation_rhs,
+>                                          preconditioner),
+>                                 solver_control.last_step(),
+>                                 15, 19);
+1594,1595c1603,1604
+<       std::cout << "        ..." << solver_control.last_step()
+<                 << " CG iterations." << std::endl;
+---
+> //      std::cout << "        ..." << solver_control.last_step()
+> //                << " CG iterations." << std::endl;
+2164c2173,2174
+<         if (timestep_number % 25 == 0)
+---
+> //        if (timestep_number % 25 == 0)
+>           if (timestep_number % 5 == 0)
+2181c2191,2192
+<     while (time <= end_time);
+---
+> //    while (time <= end_time);
+>     while (timestep_number<10);

@@ -64,7 +64,7 @@ main()
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
-  kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
+  kinsol.reinit_vector = [N = N](VectorType &v) { v.reinit(N); };
 
   kinsol.residual = [](const VectorType &u, VectorType &F) {
     deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ')'
@@ -112,10 +112,14 @@ main()
       J_inverse.vmult(dst, rhs);
     };
 
-  kinsol.custom_setup = [](void *kinsol_mem) {
-    // test custom_setup callback by querying some information from KINSOL
+  kinsol.custom_setup = [](void *kinsol_mem [[maybe_unused]]) {
+  // test custom_setup callback by querying some information from KINSOL
+#if DEAL_II_SUNDIALS_VERSION_LT(7, 0, 0)
+    // TODO: KINSetInfoHandlerFn and KINSetPrintLevel have been removed in
+    // version 7.0, so ideally do something else here. MM
     KINSetInfoHandlerFn(kinsol_mem, kinsol_info_callback, nullptr);
     KINSetPrintLevel(kinsol_mem, 1);
+#endif
   };
 
   VectorType v(N);

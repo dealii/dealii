@@ -746,6 +746,34 @@ public:
   submit_gradient(const gradient_type &, const unsigned int point_index);
 
   /**
+   * Return the divergence in real coordinates at the point with index
+   * `point_index` after a call to FEPointEvaluation::evaluate() with
+   * EvaluationFlags::gradients set, or the divergence that has been stored
+   * there with a call to FEPointEvaluationBase::submit_divergence(). This
+   * functions only makes sense for a vector field with dim components.
+   */
+  Number
+  get_divergence(const unsigned int point_index) const;
+
+  /**
+   * Write a contribution that is tested by the divergence to the field
+   * containing the values on points with the given `point_index`. Access to
+   * the same field as through get_divergence(). If applied before the function
+   * FEPointEvaluation::integrate(EvaluationFlags::gradients) is called,
+   * this specifies what is tested by all basis function gradients on the
+   * current cell and integrated over.
+   *
+   * @note This operation writes the data to the same field as
+   * submit_gradient(). As a consequence, only one of these functions can be
+   * used. In case several terms of this kind appear in a weak form, the
+   * contribution of a potential call to this function must be added into the
+   * diagonal of the rank-2 tensor contribution passed to submit_gradient(),
+   * in order not to overwrite information.
+   */
+  void
+  submit_divergence(const Number &value, const unsigned int point_index);
+
+  /**
    * Return the Jacobian of the transformation on the current cell with the
    * given point index. Prerequisite: This class needs to be constructed with
    * UpdateFlags containing `update_jacobian`.
@@ -776,8 +804,8 @@ public:
    *
    * @deprecated Use the function quadrature_point() instead.
    */
-  DEAL_II_DEPRECATED_EARLY Point<spacedim, Number>
-                           real_point(const unsigned int point_index) const;
+  DEAL_II_DEPRECATED Point<spacedim, Number>
+                     real_point(const unsigned int point_index) const;
 
   /**
    * Return the position in real coordinates of the given point index among
@@ -1085,7 +1113,7 @@ protected:
  * from MappingQ and MappingCartesian and for finite elements with tensor
  * product structure that work with the
  * @ref matrixfree
- * module. In those cases, the cost implied
+ * topic. In those cases, the cost implied
  * by this class is similar (or sometimes even somewhat lower) than using
  * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
  */
@@ -1348,6 +1376,22 @@ public:
    */
   Tensor<1, spacedim, Number>
   normal_vector(const unsigned int point_index) const;
+
+  /**
+   * Return the normal derivative in real coordinates at the point with index
+   * `point_index` after a call to FEPointEvaluation::evaluate() with
+   * EvaluationFlags::gradients set.
+   */
+  const value_type
+  get_normal_derivative(const unsigned int point_index) const;
+
+  /**
+   * Write a contribution that is tested by the normal derivative to the field
+   * containing the values on points with the given `point_index`. Access to
+   * the same field as through set_gradient()/get_gradient.
+   */
+  void
+  submit_normal_derivative(const value_type &, const unsigned int point_index);
 
 private:
   static constexpr std::size_t n_lanes_user_interface =
@@ -1706,6 +1750,22 @@ public:
    */
   Tensor<1, spacedim, Number>
   normal_vector(const unsigned int point_index) const;
+
+  /**
+   * Return the normal derivative in real coordinates at the point with index
+   * `point_index` after a call to FEFacePointEvaluation::evaluate() with
+   * EvaluationFlags::gradients set.
+   */
+  const value_type
+  get_normal_derivative(const unsigned int point_index) const;
+
+  /**
+   * Write a contribution that is tested by the normal derivative to the field
+   * containing the values on points with the given `point_index`. Access to
+   * the same field as through set_gradient()/get_gradient.
+   */
+  void
+  submit_normal_derivative(const value_type &, const unsigned int point_index);
 
 private:
   static constexpr std::size_t n_lanes_user_interface =
@@ -2119,6 +2179,20 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_gradient(
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
+inline Number
+FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_divergence(
+  const unsigned int point_index) const
+{
+  static_assert(n_components == dim,
+                "Only makes sense for a vector field with dim components");
+
+  AssertIndexRange(point_index, values.size());
+  return trace(gradients[point_index]);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_value(
   const value_type  &value,
@@ -2138,6 +2212,23 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_gradient(
 {
   AssertIndexRange(point_index, n_q_points);
   gradients[point_index] = gradient;
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline void
+FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_divergence(
+  const Number      &value,
+  const unsigned int point_index)
+{
+  static_assert(n_components == dim,
+                "Only makes sense for a vector field with dim components");
+
+  AssertIndexRange(point_index, n_q_points);
+  gradients[point_index] = gradient_type();
+  for (unsigned int d = 0; d < dim; ++d)
+    gradients[point_index][d][d] = value;
 }
 
 
@@ -3078,10 +3169,37 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::normal_vector(
          internal::FEPointEvaluation::
            ExcFEPointEvaluationAccessToUninitializedMappingField(
              "update_normal_vectors"));
-  if (this->is_interior)
-    return this->normal_ptr[point_index];
+  return this->normal_ptr[point_index];
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline const typename FEPointEvaluation<n_components_,
+                                        dim,
+                                        spacedim,
+                                        Number>::value_type
+FEPointEvaluation<n_components_, dim, spacedim, Number>::get_normal_derivative(
+  const unsigned int point_index) const
+{
+  AssertIndexRange(point_index, this->gradients.size());
+  return this->gradients[point_index] * normal_vector(point_index);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::
+  submit_normal_derivative(const value_type  &value,
+                           const unsigned int point_index)
+{
+  AssertIndexRange(point_index, this->gradients.size());
+  if constexpr (n_components == 1)
+    this->gradients[point_index] = value * normal_vector(point_index);
   else
-    return -this->normal_ptr[point_index];
+    this->gradients[point_index] =
+      outer_product(value, normal_vector(point_index));
 }
 
 
@@ -3803,18 +3921,43 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::normal_vector(
         normal[d] =
           internal::VectorizedArrayTrait<Number>::get(this->normal_ptr[0][d],
                                                       0);
-      if (this->is_interior)
-        return normal;
-      else
-        return -normal;
+
+      return normal;
     }
   else
     {
-      if (this->is_interior)
-        return this->normal_ptr[point_index];
-      else
-        return -(this->normal_ptr[point_index]);
+      return this->normal_ptr[point_index];
     }
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline const typename FEFacePointEvaluation<n_components_,
+                                            dim,
+                                            spacedim,
+                                            Number>::value_type
+FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
+  get_normal_derivative(const unsigned int point_index) const
+{
+  AssertIndexRange(point_index, this->gradients.size());
+  return this->gradients[point_index] * normal_vector(point_index);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+inline void
+FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
+  submit_normal_derivative(const value_type  &value,
+                           const unsigned int point_index)
+{
+  AssertIndexRange(point_index, this->gradients.size());
+  if constexpr (n_components == 1)
+    this->gradients[point_index] = value * normal_vector(point_index);
+  else
+    this->gradients[point_index] =
+      outer_product(value, normal_vector(point_index));
 }
 
 DEAL_II_NAMESPACE_CLOSE

@@ -123,7 +123,7 @@ check_renumbering(DoFHandler<dim> &mgdof)
 
   Tensor<1, dim> direction;
   for (unsigned int i = 0; i < dim; ++i)
-    direction[i] = -5.0001 + 1.13 * i;
+    direction[i] = -std::pow(1e-5, i);
 
   deallog << std::endl << "Downstream numbering cell-wise" << std::endl;
   DoFRenumbering::downstream(dof, direction);
@@ -189,7 +189,7 @@ int
 main()
 {
   initlog();
-  deallog << std::setprecision(2) << std::fixed;
+  deallog << std::setprecision(8) << std::fixed;
 
   deallog.push("1d");
   check<1>();

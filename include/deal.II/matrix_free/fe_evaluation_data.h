@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2021 - 2023 by the deal.II authors
+// Copyright (C) 2021 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -234,7 +234,7 @@ public:
    *
    * @deprecated Use normal_vector() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use normal_vector() instead.")
+  DEAL_II_DEPRECATED_WITH_COMMENT("Use normal_vector() instead.")
   Tensor<1, dim, Number>
   get_normal_vector(const unsigned int q_point) const;
 

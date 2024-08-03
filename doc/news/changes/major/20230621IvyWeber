@@ -1,3 +1,0 @@
-New: Added classes for conforming Hermite interpolation polynomials, allowing for higher levels of regularity between elements to be directly enforced.
-<br>
-(Ivy Weber, 2023/06/21)

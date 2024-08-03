@@ -1,5 +1,0 @@
-New: The function Triangulation::contains_cell()
-allows to check if Tringulation::create_cell_iterator()
-can be called for a specific cell id.
-<br>
-(Peter Munch, 2023/08/01)

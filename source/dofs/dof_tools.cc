@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -489,7 +489,7 @@ namespace DoFTools
           index_per_comp[comp_i].add_index(
             locally_owned_dofs.nth_index_in_set(i));
       }
-    for (auto &c : index_per_comp)
+    for (const auto &c : index_per_comp)
       c.compress();
     return index_per_comp;
   }

@@ -481,8 +481,6 @@ namespace TriangulationDescription
 
   /**
    * A namespace for TriangulationDescription::Description utility functions.
-   *
-   * @ingroup TriangulationDescription
    */
   namespace Utilities
   {

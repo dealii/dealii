@@ -1,4 +1,0 @@
-New: The new function Triangulation::as_dof_handler_level_iterator()
-allows to create level iterators based on other cell iterators.
-<br>
-(Peter Munch, 2023/08/01)

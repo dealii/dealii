@@ -1341,9 +1341,10 @@ namespace GridGenerator
      * Assign boundary number zero to the inner shell boundary and 1 to the
      * outer.
      */
+    template <int spacdim>
     void
-    colorize_hyper_shell(Triangulation<2> &tria,
-                         const Point<2> &,
+    colorize_hyper_shell(Triangulation<2, spacdim> &tria,
+                         const Point<spacdim> &,
                          const double,
                          const double)
     {
@@ -1353,9 +1354,7 @@ namespace GridGenerator
 
       // For the mesh based on cube,
       // this is highly irregular
-      for (Triangulation<2>::cell_iterator cell = tria.begin();
-           cell != tria.end();
-           ++cell)
+      for (auto cell = tria.begin(); cell != tria.end(); ++cell)
         {
           Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face(2)->set_all_boundary_ids(1);
@@ -1848,36 +1847,37 @@ namespace GridGenerator
   template <>
   void
   torus<2, 3>(Triangulation<2, 3> &tria,
-              const double         R,
-              const double         r,
+              const double         centerline_radius,
+              const double         inner_radius,
               const unsigned int,
               const double)
   {
-    Assert(R > r,
-           ExcMessage("Outer radius R must be greater than the inner "
-                      "radius r."));
-    Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
+    Assert(centerline_radius > inner_radius,
+           ExcMessage("The centerline radius must be greater than the "
+                      "inner radius."));
+    Assert(inner_radius > 0.0,
+           ExcMessage("The inner radius must be positive."));
 
     const unsigned int           dim      = 2;
     const unsigned int           spacedim = 3;
     std::vector<Point<spacedim>> vertices(16);
 
-    vertices[0]  = Point<spacedim>(R - r, 0, 0);
-    vertices[1]  = Point<spacedim>(R, -r, 0);
-    vertices[2]  = Point<spacedim>(R + r, 0, 0);
-    vertices[3]  = Point<spacedim>(R, r, 0);
-    vertices[4]  = Point<spacedim>(0, 0, R - r);
-    vertices[5]  = Point<spacedim>(0, -r, R);
-    vertices[6]  = Point<spacedim>(0, 0, R + r);
-    vertices[7]  = Point<spacedim>(0, r, R);
-    vertices[8]  = Point<spacedim>(-(R - r), 0, 0);
-    vertices[9]  = Point<spacedim>(-R, -r, 0);
-    vertices[10] = Point<spacedim>(-(R + r), 0, 0);
-    vertices[11] = Point<spacedim>(-R, r, 0);
-    vertices[12] = Point<spacedim>(0, 0, -(R - r));
-    vertices[13] = Point<spacedim>(0, -r, -R);
-    vertices[14] = Point<spacedim>(0, 0, -(R + r));
-    vertices[15] = Point<spacedim>(0, r, -R);
+    vertices[0]  = Point<spacedim>(centerline_radius - inner_radius, 0, 0);
+    vertices[1]  = Point<spacedim>(centerline_radius, -inner_radius, 0);
+    vertices[2]  = Point<spacedim>(centerline_radius + inner_radius, 0, 0);
+    vertices[3]  = Point<spacedim>(centerline_radius, inner_radius, 0);
+    vertices[4]  = Point<spacedim>(0, 0, centerline_radius - inner_radius);
+    vertices[5]  = Point<spacedim>(0, -inner_radius, centerline_radius);
+    vertices[6]  = Point<spacedim>(0, 0, centerline_radius + inner_radius);
+    vertices[7]  = Point<spacedim>(0, inner_radius, centerline_radius);
+    vertices[8]  = Point<spacedim>(-(centerline_radius - inner_radius), 0, 0);
+    vertices[9]  = Point<spacedim>(-centerline_radius, -inner_radius, 0);
+    vertices[10] = Point<spacedim>(-(centerline_radius + inner_radius), 0, 0);
+    vertices[11] = Point<spacedim>(-centerline_radius, inner_radius, 0);
+    vertices[12] = Point<spacedim>(0, 0, -(centerline_radius - inner_radius));
+    vertices[13] = Point<spacedim>(0, -inner_radius, -centerline_radius);
+    vertices[14] = Point<spacedim>(0, 0, -(centerline_radius + inner_radius));
+    vertices[15] = Point<spacedim>(0, inner_radius, -centerline_radius);
 
     std::vector<CellData<dim>> cells(16);
     // Right Hand Orientation
@@ -1981,7 +1981,7 @@ namespace GridGenerator
     tria.create_triangulation(vertices, cells, SubCellData());
 
     tria.set_all_manifold_ids(0);
-    tria.set_manifold(0, TorusManifold<2>(R, r));
+    tria.set_manifold(0, TorusManifold<2>(centerline_radius, inner_radius));
   }
 
 
@@ -2000,15 +2000,16 @@ namespace GridGenerator
   template <>
   void
   torus<3, 3>(Triangulation<3, 3> &tria,
-              const double         R,
-              const double         r,
+              const double         centerline_radius,
+              const double         inner_radius,
               const unsigned int   n_cells_toroidal,
               const double         phi)
   {
-    Assert(R > r,
-           ExcMessage("Outer radius R must be greater than the inner "
-                      "radius r."));
-    Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
+    Assert(centerline_radius > inner_radius,
+           ExcMessage("The centerline radius must be greater than the "
+                      "inner radius."));
+    Assert(inner_radius > 0.0,
+           ExcMessage("The inner radius must be positive."));
     Assert(n_cells_toroidal > static_cast<unsigned int>(phi / numbers::PI),
            ExcMessage("Number of cells in toroidal direction has "
                       "to be at least 3 for a torus of polar extent 2*pi."));
@@ -2016,7 +2017,7 @@ namespace GridGenerator
                 ExcMessage("Invalid angle phi specified."));
 
     // the first 8 vertices are in the x-y-plane
-    const Point<3> p = Point<3>(R, 0.0, 0.0);
+    const Point<3> p = Point<3>(centerline_radius, 0.0, 0.0);
     const double   a = 1. / (1 + std::sqrt(2.0));
     // A value of 1 indicates "open" torus with angle < 2*pi, which
     // means that we need an additional layer of vertices
@@ -2027,14 +2028,14 @@ namespace GridGenerator
     const unsigned int n_point_layers_toroidal =
       n_cells_toroidal + additional_layer;
     std::vector<Point<3>> vertices(8 * n_point_layers_toroidal);
-    vertices[0] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0)),
-    vertices[1] = p + Point<3>(+1, -1, 0) * (r / std::sqrt(2.0)),
-    vertices[2] = p + Point<3>(-1, -1, 0) * (r / std::sqrt(2.0) * a),
-    vertices[3] = p + Point<3>(+1, -1, 0) * (r / std::sqrt(2.0) * a),
-    vertices[4] = p + Point<3>(-1, +1, 0) * (r / std::sqrt(2.0) * a),
-    vertices[5] = p + Point<3>(+1, +1, 0) * (r / std::sqrt(2.0) * a),
-    vertices[6] = p + Point<3>(-1, +1, 0) * (r / std::sqrt(2.0)),
-    vertices[7] = p + Point<3>(+1, +1, 0) * (r / std::sqrt(2.0));
+    vertices[0] = p + Point<3>(-1, -1, 0) * (inner_radius / std::sqrt(2.0)),
+    vertices[1] = p + Point<3>(+1, -1, 0) * (inner_radius / std::sqrt(2.0)),
+    vertices[2] = p + Point<3>(-1, -1, 0) * (inner_radius / std::sqrt(2.0) * a),
+    vertices[3] = p + Point<3>(+1, -1, 0) * (inner_radius / std::sqrt(2.0) * a),
+    vertices[4] = p + Point<3>(-1, +1, 0) * (inner_radius / std::sqrt(2.0) * a),
+    vertices[5] = p + Point<3>(+1, +1, 0) * (inner_radius / std::sqrt(2.0) * a),
+    vertices[6] = p + Point<3>(-1, +1, 0) * (inner_radius / std::sqrt(2.0)),
+    vertices[7] = p + Point<3>(+1, +1, 0) * (inner_radius / std::sqrt(2.0));
 
     // create remaining vertices by rotating around negative y-axis (the
     // direction is to ensure positive cell measures)
@@ -2043,10 +2044,10 @@ namespace GridGenerator
       {
         for (unsigned int v = 0; v < 8; ++v)
           {
-            const double r_2d      = vertices[v][0];
-            vertices[8 * c + v][0] = r_2d * std::cos(phi_cell * c);
+            const double inner_radius_2d = vertices[v][0];
+            vertices[8 * c + v][0] = inner_radius_2d * std::cos(phi_cell * c);
             vertices[8 * c + v][1] = vertices[v][1];
-            vertices[8 * c + v][2] = r_2d * std::sin(phi_cell * c);
+            vertices[8 * c + v][2] = inner_radius_2d * std::sin(phi_cell * c);
           }
       }
 
@@ -2101,7 +2102,7 @@ namespace GridGenerator
           }
       }
 
-    tria.set_manifold(1, TorusManifold<3>(R, r));
+    tria.set_manifold(1, TorusManifold<3>(centerline_radius, inner_radius));
     tria.set_manifold(2,
                       CylindricalManifold<3>(Tensor<1, 3>({0., 1., 0.}),
                                              Point<3>()));
@@ -4338,14 +4339,14 @@ namespace GridGenerator
 
 
 
-  template <>
+  template <int spacedim>
   void
-  hyper_shell(Triangulation<2>  &tria,
-              const Point<2>    &center,
-              const double       inner_radius,
-              const double       outer_radius,
-              const unsigned int n_cells,
-              const bool         colorize)
+  hyper_shell_2D(Triangulation<2, spacedim> &tria,
+                 const Point<spacedim>      &center,
+                 const double                inner_radius,
+                 const double                outer_radius,
+                 const unsigned int          n_cells,
+                 const bool                  colorize)
   {
     Assert((inner_radius > 0) && (inner_radius < outer_radius),
            ExcInvalidRadii());
@@ -4373,12 +4374,14 @@ namespace GridGenerator
     // first N ones are on the
     // outer one, and all are
     // numbered counter-clockwise
-    std::vector<Point<2>> vertices(2 * N);
+    std::vector<Point<spacedim>> vertices(2 * N);
     for (unsigned int i = 0; i < N; ++i)
       {
-        vertices[i] =
-          Point<2>(std::cos(2 * pi * i / N), std::sin(2 * pi * i / N)) *
-          outer_radius;
+        Point<spacedim> point;
+        point[0] = std::cos(2 * pi * i / N);
+        point[1] = std::sin(2 * pi * i / N);
+
+        vertices[i]     = point * outer_radius;
         vertices[i + N] = vertices[i] * (inner_radius / outer_radius);
 
         vertices[i] += center;
@@ -4403,7 +4406,35 @@ namespace GridGenerator
       colorize_hyper_shell(tria, center, inner_radius, outer_radius);
 
     tria.set_all_manifold_ids(0);
-    tria.set_manifold(0, SphericalManifold<2>(center));
+    tria.set_manifold(0, SphericalManifold<2, spacedim>(center));
+  }
+
+
+
+  template <>
+  void
+  hyper_shell(Triangulation<2>  &tria,
+              const Point<2>    &center,
+              const double       inner_radius,
+              const double       outer_radius,
+              const unsigned int n_cells,
+              const bool         colorize)
+  {
+    hyper_shell_2D(tria, center, inner_radius, outer_radius, n_cells, colorize);
+  }
+
+
+
+  template <>
+  void
+  hyper_shell(Triangulation<2, 3> &tria,
+              const Point<3>      &center,
+              const double         inner_radius,
+              const double         outer_radius,
+              const unsigned int   n_cells,
+              const bool           colorize)
+  {
+    hyper_shell_2D(tria, center, inner_radius, outer_radius, n_cells, colorize);
   }
 
 
@@ -7348,21 +7379,21 @@ namespace GridGenerator
 
 
 
-  template <>
+  template <int spacedim>
   void
-  hyper_cube_with_cylindrical_hole(Triangulation<2> &triangulation,
-                                   const double      inner_radius,
-                                   const double      outer_radius,
-                                   const double,       // width,
-                                   const unsigned int, // width_repetition,
-                                   const bool colorize)
+  hyper_cube_with_cylindrical_hole_2D(Triangulation<2, spacedim> &triangulation,
+                                      const double                inner_radius,
+                                      const double                outer_radius,
+                                      const double,       // width,
+                                      const unsigned int, // width_repetition,
+                                      const bool colorize)
   {
     const int dim = 2;
 
     Assert(inner_radius < outer_radius,
            ExcMessage("outer_radius has to be bigger than inner_radius."));
 
-    const Point<dim> center;
+    const Point<spacedim> center;
 
     // We create a hyper_shell (i.e., an annulus) in two dimensions, and then we
     // modify it by pulling the vertices on the diagonals out to where the
@@ -7423,7 +7454,45 @@ namespace GridGenerator
                 }
             }
       }
-    triangulation.set_manifold(0, PolarManifold<2>(center));
+    triangulation.set_manifold(0, PolarManifold<2, spacedim>(center));
+  }
+
+
+
+  template <>
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<2, 2> &triangulation,
+                                   const double         inner_radius,
+                                   const double         outer_radius,
+                                   const double         width,
+                                   const unsigned int   width_repetition,
+                                   const bool           colorize)
+  {
+    hyper_cube_with_cylindrical_hole_2D(triangulation,
+                                        inner_radius,
+                                        outer_radius,
+                                        width,
+                                        width_repetition,
+                                        colorize);
+  }
+
+
+
+  template <>
+  void
+  hyper_cube_with_cylindrical_hole(Triangulation<2, 3> &triangulation,
+                                   const double         inner_radius,
+                                   const double         outer_radius,
+                                   const double         width,
+                                   const unsigned int   width_repetition,
+                                   const bool           colorize)
+  {
+    hyper_cube_with_cylindrical_hole_2D(triangulation,
+                                        inner_radius,
+                                        outer_radius,
+                                        width,
+                                        width_repetition,
+                                        colorize);
   }
 
 

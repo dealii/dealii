@@ -1,6 +1,0 @@
-Improved: The `deal_ii_pickup_tests()` macro now prints a status line at
-the end summarizing how many tests have been configured for the given test
-category. Similarly, the top level target `setup_tests` concatenates these
-status lines and prints a summary after invocation.
-<br>
-(Matthias Maier, 2023/06/30)

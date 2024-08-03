@@ -127,8 +127,7 @@ public:
    * std::complex.
    */
   static_assert(
-    std::is_arithmetic<
-      typename numbers::NumberTraits<Number>::real_type>::value,
+    std::is_arithmetic_v<typename numbers::NumberTraits<Number>::real_type>,
     "The Vector class only supports basic numeric types. In particular, it "
     "does not support automatically differentiated numbers.");
 
@@ -387,7 +386,7 @@ public:
    * memory separately.
    */
   virtual void
-  swap(Vector<Number> &v);
+  swap(Vector<Number> &v) noexcept;
 
   /**
    * Set all components of the vector to the given number @p s.
@@ -1436,7 +1435,7 @@ Vector<Number>::reinit(const Vector<Number2> &v,
 // swap virtual.
 template <typename Number>
 inline void
-Vector<Number>::swap(Vector<Number> &v)
+Vector<Number>::swap(Vector<Number> &v) noexcept
 {
   values.swap(v.values);
   std::swap(thread_loop_partitioner, v.thread_loop_partitioner);
@@ -1485,7 +1484,7 @@ Vector<Number>::load(Archive &ar, const unsigned int)
  */
 template <typename Number>
 inline void
-swap(Vector<Number> &u, Vector<Number> &v)
+swap(Vector<Number> &u, Vector<Number> &v) noexcept
 {
   u.swap(v);
 }

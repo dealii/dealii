@@ -1,0 +1,5 @@
+
+DEAL::Before serialization start time = 0.000, end time = 1.000, current time = 0.6000, next time = 1.000, previous time = 0.000, next step size = 0.4000, previous step size = 0.6000, step number = 1
+DEAL::After serialization start time = 0.000, end time = 1.000, current time = 0.6000, next time = 1.000, previous time = 0.000, next step size = 0.4000, previous step size = 0.6000, step number = 1
+DEAL::OK
+DEAL::

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -157,7 +157,7 @@ BlockVector<Number>::operator=(const TrilinosWrappers::MPI::BlockVector &v)
 
 template <typename Number>
 void
-BlockVector<Number>::swap(BlockVector<Number> &v)
+BlockVector<Number>::swap(BlockVector<Number> &v) noexcept
 {
   std::swap(this->components, v.components);
 

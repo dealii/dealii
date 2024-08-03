@@ -1,0 +1,21 @@
+497c497
+<           in.open("coarse_circle.inp");
+---
+>           in.open("../../../source/step-34/coarse_circle.inp");
+501c501
+<           in.open("coarse_sphere.inp");
+---
+>           in.open("../../../source/step-34/coarse_sphere.inp");
+1036c1036,1037
+<     read_parameters("parameters.prm");
+---
+>     //read_parameters("parameters.prm");
+>     read_parameters("../../../source/step-34/parameters.prm");
+1047c1048
+<     for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 3; ++cycle)
+1075c1076
+<       deallog.depth_console(3);
+---
+>       deallog.depth_console(1);

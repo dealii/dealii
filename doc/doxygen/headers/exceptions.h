@@ -16,7 +16,7 @@
 /**
  * @defgroup Exceptions Exceptions and assertions
  *
- * This module contains classes that are used in the exception mechanism of
+ * This group contains classes that are used in the exception mechanism of
  * deal.II.
  *
  * <h2>Brief overview</h2>
@@ -72,7 +72,7 @@
  *   introduced in step-9, step-13, and
  *   following tutorial programs. The macro checks a condition, and if
  *   violated throws an exception of one of the types declared in this
- *   module, using the C++ <code>throw</code> mechanism. Since these
+ *   group, using the C++ <code>throw</code> mechanism. Since these
  *   are run-time exceptions, this gives the program the chance to
  *   catch the exception and, for example, write the output to a
  *   writable file instead.
@@ -393,7 +393,7 @@
  *  undesirable and one needs to exit in a somewhat more graceful
  *  way -- even if there is really not very much one can do in these
  *  cases to still produce a meaningful result. An example is if a
- *  deal.II program is run a one module in a bigger framework of
+ *  deal.II program is run as one module in a bigger framework of
  *  software. Think, for example, of a case where a deal.II program
  *  computed the flow field that corresponds to a set of input
  *  variables provided by some optimization routine: if the optimizer

@@ -18,7 +18,7 @@ DEAL:1:2D-Test::   Number of this MPI processes = 1
 DEAL:1:2D-Test::   Number of cells = 256
 DEAL:1:2D-Test::   Number of levels = 4
 DEAL:1:2D-Test::   Number of global levels = 4
-DEAL:1:2D-Test::   Triangulation checksum = 0
+DEAL:1:2D-Test::   Triangulation checksum = 1754413825
 DEAL:1:2D-Test::   points = 0.230000 0.230000    0.230000 0.770000    0.770000 0.230000    0.770000 0.770000    1.10000 1.10000    
 DEAL:1:2D-Test::   >>> Reached end of test <<<
 
@@ -29,7 +29,7 @@ DEAL:2:2D-Test::   Number of this MPI processes = 2
 DEAL:2:2D-Test::   Number of cells = 256
 DEAL:2:2D-Test::   Number of levels = 4
 DEAL:2:2D-Test::   Number of global levels = 4
-DEAL:2:2D-Test::   Triangulation checksum = 0
+DEAL:2:2D-Test::   Triangulation checksum = 1754413825
 DEAL:2:2D-Test::   points = 0.230000 0.230000    0.230000 0.770000    0.770000 0.230000    0.770000 0.770000    1.10000 1.10000    
 DEAL:2:2D-Test::   >>> Reached end of test <<<
 
@@ -40,7 +40,7 @@ DEAL:3:2D-Test::   Number of this MPI processes = 3
 DEAL:3:2D-Test::   Number of cells = 256
 DEAL:3:2D-Test::   Number of levels = 4
 DEAL:3:2D-Test::   Number of global levels = 4
-DEAL:3:2D-Test::   Triangulation checksum = 0
+DEAL:3:2D-Test::   Triangulation checksum = 1754413825
 DEAL:3:2D-Test::   points = 0.230000 0.230000    0.230000 0.770000    0.770000 0.230000    0.770000 0.770000    1.10000 1.10000    
 DEAL:3:2D-Test::   >>> Reached end of test <<<
 
@@ -51,7 +51,7 @@ DEAL:4:2D-Test::   Number of this MPI processes = 4
 DEAL:4:2D-Test::   Number of cells = 256
 DEAL:4:2D-Test::   Number of levels = 4
 DEAL:4:2D-Test::   Number of global levels = 4
-DEAL:4:2D-Test::   Triangulation checksum = 0
+DEAL:4:2D-Test::   Triangulation checksum = 1754413825
 DEAL:4:2D-Test::   points = 0.230000 0.230000    0.230000 0.770000    0.770000 0.230000    0.770000 0.770000    1.10000 1.10000    
 DEAL:4:2D-Test::   >>> Reached end of test <<<
 

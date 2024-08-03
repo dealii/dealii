@@ -1,4 +1,0 @@
-New: There is a new function ThreadLocalStorage::get_for_thread() that
-returns the thread-local object of another thread.
-<br>
-(Wolfgang Bangerth, 2024/04/24)

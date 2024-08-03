@@ -496,6 +496,84 @@ namespace internal
 
           univariate_shape_data.nodal_at_cell_boundaries = true;
 
+          const ReferenceCell reference_cell = fe.reference_cell();
+          if (reference_cell.is_simplex())
+            {
+              if (dim == 2)
+                dofs_per_component_on_face = fe.degree + 1;
+              else
+                dofs_per_component_on_face =
+                  (fe.degree + 1) * (fe.degree + 2) / 2;
+
+              face_to_cell_index_nodal.reinit(reference_cell.n_faces(),
+                                              dofs_per_component_on_face);
+
+
+              for (unsigned int face = 0; face < reference_cell.n_faces();
+                   ++face)
+                {
+                  // first get info from reference cell, i.e. the linear case
+                  unsigned int d = 0;
+                  for (; d < dim; ++d)
+                    face_to_cell_index_nodal[face][d] =
+                      reference_cell.face_to_cell_vertices(face, d, 1);
+
+                  // now fill the rest of the indices, start with the lines
+                  if (fe.degree == 2)
+                    for (; d < dofs_per_component_on_face; ++d)
+                      face_to_cell_index_nodal[face][d] =
+                        reference_cell.n_vertices() +
+                        reference_cell.face_to_cell_lines(face, d - dim, 1);
+
+                  // in the cubic case it is more complicated as more DoFs are
+                  // on the lines
+                  else if (fe.degree == 3)
+                    {
+                      for (unsigned int line = 0;
+                           d < dofs_per_component_on_face - 1;
+                           ++line, d += 2)
+                        {
+                          const unsigned int face_to_cell_lines =
+                            reference_cell.face_to_cell_lines(face, line, 1);
+                          // check the direction of the line
+                          // is it 0 -> 1 or 1 -> 0
+                          // as DoFs on the line are ordered differently
+                          if (reference_cell.line_to_cell_vertices(
+                                face_to_cell_lines, 0) ==
+                              reference_cell.face_to_cell_vertices(face,
+                                                                   line,
+                                                                   1))
+                            {
+                              face_to_cell_index_nodal[face][d] =
+                                reference_cell.n_vertices() +
+                                2 * face_to_cell_lines;
+                              face_to_cell_index_nodal[face][d + 1] =
+                                reference_cell.n_vertices() +
+                                2 * face_to_cell_lines + 1;
+                            }
+                          else
+                            {
+                              face_to_cell_index_nodal[face][d + 1] =
+                                reference_cell.n_vertices() +
+                                2 * face_to_cell_lines;
+                              face_to_cell_index_nodal[face][d] =
+                                reference_cell.n_vertices() +
+                                2 * face_to_cell_lines + 1;
+                            }
+                        }
+                      //  in 3D we also need the DoFs on the quads
+                      if (dim == 3)
+                        {
+                          face_to_cell_index_nodal
+                            [face][dofs_per_component_on_face - 1] =
+                              reference_cell.n_vertices() +
+                              2 * reference_cell.n_lines() + face;
+                        }
+                    }
+                  else if (fe.degree > 3)
+                    DEAL_II_NOT_IMPLEMENTED();
+                }
+            }
           // TODO: set up face_to_cell_index_nodal, face_to_cell_index_hermite,
           //  face_orientations
 

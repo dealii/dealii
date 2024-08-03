@@ -1,9 +1,0 @@
-New: The new function AffineConstraints::add_constraint() adds an
-entire constraint all at once, rather than splitting the task across
-AffineConstraint::add_line(), multiple calls to
-AffineConstraint::add_entry(), and
-AffineConstraint::set_inhomogeneity(). The new function
-AffineConstraints::constrain_dof_to_zero() is a short-cut that adds a
-constraint that requires a specific degree of freedom to be zero.
-<br>
-(Wolfgang Bangerth, 2023/10/05)

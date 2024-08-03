@@ -1,4 +1,0 @@
-New: Introduce a new function, Utilities::Trilinos::teuchos_comm_to_mpi_comm(),
-to convert a Teuchos::RCP<Teuchos::Comm<int>> communicator into an MPI_Comm communicator.
-<br>
-(Sebastian Kinnewig, 2023/11/20)

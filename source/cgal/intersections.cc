@@ -100,6 +100,20 @@ namespace CGALWrappers
   using Vertex_handle = CDT::Vertex_handle;
   using Face_handle   = CDT::Face_handle;
 
+  template <class T, class... Types>
+  const T *
+  get_if_(const std::variant<Types...> *v)
+  {
+    return std::get_if<T>(v);
+  }
+
+  template <class T, class... Types>
+  const T *
+  get_if_(const boost::variant<Types...> *v)
+  {
+    return boost::get<T>(v);
+  }
+
   namespace internal
   {
     namespace
@@ -145,6 +159,13 @@ namespace CGALWrappers
             // std::optional object.
             return {};
           }
+      }
+
+      template <typename... Types>
+      const std::optional<std::variant<Types...>> &
+      convert_boost_to_std(const std::optional<std::variant<Types...>> &opt)
+      {
+        return opt;
       }
     } // namespace
 
@@ -489,8 +510,7 @@ namespace CGALWrappers
             {
               const auto intersection =
                 CGAL::intersection(segm, cdt.triangle(f));
-              if (const CGALSegment2 *s =
-                    boost::get<CGALSegment2>(&*intersection))
+              if (const CGALSegment2 *s = get_if_<CGALSegment2>(&*intersection))
                 {
                   vertices.push_back(
                     {{CGALWrappers::cgal_point_to_dealii_point<2>((*s)[0]),
@@ -538,7 +558,7 @@ namespace CGALWrappers
               const auto intersection =
                 CGAL::intersection(cgal_segment, cgal_tetrahedron);
               if (const CGALSegment3_exact *s =
-                    boost::get<CGALSegment3_exact>(&*intersection))
+                    get_if_<CGALSegment3_exact>(&*intersection))
                 {
                   if (s->squared_length() > tol * tol)
                     {
@@ -610,7 +630,7 @@ namespace CGALWrappers
                     CGAL::intersection(triangulation_quad.triangle(f), tet);
 
                   if (const CGALTriangle3_exact *t =
-                        boost::get<CGALTriangle3_exact>(&*intersection))
+                        get_if_<CGALTriangle3_exact>(&*intersection))
                     {
                       if (CGAL::to_double(t->squared_area()) > tol * tol)
                         {
@@ -622,8 +642,7 @@ namespace CGALWrappers
                     }
 
                   if (const std::vector<CGALPoint3_exact> *vps =
-                        boost::get<std::vector<CGALPoint3_exact>>(
-                          &*intersection))
+                        get_if_<std::vector<CGALPoint3_exact>>(&*intersection))
                     {
                       Triangulation3_exact tria_inter;
                       tria_inter.insert(vps->begin(), vps->end());

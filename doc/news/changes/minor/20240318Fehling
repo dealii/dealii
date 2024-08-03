@@ -1,6 +1,0 @@
-Changed: hp::Refinement::choose_p_over_h() now communicates
-refinement flags and future FE indices on ghost cells for
-all types of parallel Triangulation objects to decide between
-p- and h-refinement.
-<br>
-(Marc Fehling, 2024/03/18)

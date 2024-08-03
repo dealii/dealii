@@ -1,0 +1,12 @@
+573c573
+<     , monitor(std::cout, TimerOutput::summary, TimerOutput::cpu_and_wall_times)
+---
+>     , monitor(std::cout, TimerOutput::never, TimerOutput::cpu_and_wall_times)
+1050c1050
+<     deallog.depth_console(parameters.verbosity_level);
+---
+>     deallog.depth_console(1);
+1092c1092
+<         parameter_file = "parameters.prm";
+---
+>         parameter_file = "../../../source/step-60/parameters.prm";

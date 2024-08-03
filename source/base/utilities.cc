@@ -1012,8 +1012,8 @@ namespace Utilities
     std::string
     get_time()
     {
-      std::time_t time1 = std::time(nullptr);
-      std::tm    *time  = std::localtime(&time1);
+      std::time_t    time1 = std::time(nullptr);
+      const std::tm *time  = std::localtime(&time1);
 
       std::ostringstream o;
       o << time->tm_hour << ":" << (time->tm_min < 10 ? "0" : "")
@@ -1028,8 +1028,8 @@ namespace Utilities
     std::string
     get_date()
     {
-      std::time_t time1 = std::time(nullptr);
-      std::tm    *time  = std::localtime(&time1);
+      std::time_t    time1 = std::time(nullptr);
+      const std::tm *time  = std::localtime(&time1);
 
       std::ostringstream o;
       o << time->tm_year + 1900 << "/" << time->tm_mon + 1 << "/"

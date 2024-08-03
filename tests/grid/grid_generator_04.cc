@@ -24,13 +24,13 @@
 
 
 
-template <int dim>
+template <int dim, int spacdim = dim>
 void
 test(std::ostream &out)
 {
   GridOut go;
   go.set_flags(GridOutFlags::Ucd(false, true));
-  Triangulation<dim> tr;
+  Triangulation<dim, spacdim> tr;
 
   std::vector<double> radii;
   radii.push_back(.2);
@@ -105,6 +105,9 @@ main()
 
   deallog.push("2d");
   test<2>(deallog.get_file_stream());
+  deallog.pop();
+  deallog.push("2d-3d");
+  test<2, 3>(deallog.get_file_stream());
   deallog.pop();
   deallog.push("3d");
   test<3>(deallog.get_file_stream());

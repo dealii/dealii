@@ -1,0 +1,43 @@
+
+DEAL:0:2d::make_hanging_node_constraints
+{}
+{[0,26], 28}
+DEAL:0:2d::make_consistent_in_parallel on active dofs
+{}
+{[0,26], 28}
+DEAL:0:2d::make_consistent_in_parallel on relevant dofs
+{[16,17]}
+{[0,26], 28, 30}
+DEAL:0:2d::OK
+DEAL:0:3d::make_hanging_node_constraints
+{}
+{[0,108], 110, 112, 114}
+DEAL:0:3d::make_consistent_in_parallel on active dofs
+{}
+{[0,108], 110, 112, 114}
+DEAL:0:3d::make_consistent_in_parallel on relevant dofs
+{[64,65], [70,71], [76,83]}
+{[0,108], 110, 112, 114, 116, 120, 124, 126, 128}
+DEAL:0:3d::OK
+
+DEAL:1:2d::make_hanging_node_constraints
+{[16,17]}
+{[0,34]}
+DEAL:1:2d::make_consistent_in_parallel on active dofs
+{[16,17]}
+{[0,34]}
+DEAL:1:2d::make_consistent_in_parallel on relevant dofs
+{[16,17]}
+{[0,34]}
+DEAL:1:2d::OK
+DEAL:1:3d::make_hanging_node_constraints
+{[64,65], [70,71], [76,83]}
+{[0,134]}
+DEAL:1:3d::make_consistent_in_parallel on active dofs
+{[64,65], [70,71], [76,83]}
+{[0,134]}
+DEAL:1:3d::make_consistent_in_parallel on relevant dofs
+{[64,65], [70,71], [76,83]}
+{[0,134]}
+DEAL:1:3d::OK
+

@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2007 - 2023 by the deal.II authors
+ * Copyright (C) 2007 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -598,7 +598,7 @@ namespace Step29
                 // but this information is not relevant here. If you want to
                 // know more about this function and the underlying scheme
                 // behind primitive vector valued elements, take a look at
-                // step-8 or the @ref vector_valued module, where these topics
+                // step-8 or the @ref vector_valued topic, where these topics
                 // are explained in depth.
                 if (fe.system_to_component_index(i).first ==
                     fe.system_to_component_index(j).first)

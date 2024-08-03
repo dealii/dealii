@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// Copyright (C) 2018 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1671,7 +1671,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: DynamicSparsityPattern::compute_mmult_pattern(left, right) with two arguents of either
+  New: DynamicSparsityPattern::compute_mmult_pattern(left, right) with two arguments of either
   a DynamicSparsityPattern or a SparsityPattern; or any combination of those.
   The result is the pattern which is obtained by multiplying the two sparse matrices on
   the given sparsity patterns.
@@ -2503,7 +2503,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Deprecated: internal::bool2type and int2type has been depreated
+  Deprecated: internal::bool2type and int2type has been deprecated
   in favor of std::intergral_constant.
   <br>
   (Daniel Arndt, 2017/08/10)

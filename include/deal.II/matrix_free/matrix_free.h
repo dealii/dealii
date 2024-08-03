@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2023 by the deal.II authors
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,7 +101,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * For details on usage of this class, see the description of FEEvaluation or
  * the
- * @ref matrixfree "matrix-free module".
+ * @ref matrixfree "matrix-free topic".
  *
  * @ingroup matrixfree
  */

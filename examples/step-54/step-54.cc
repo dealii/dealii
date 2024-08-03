@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2014 - 2023 by the deal.II authors
+ * Copyright (C) 2014 - 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -170,6 +170,7 @@ namespace Step54
   void TriangulationOnCAD::read_domain()
   {
     TopoDS_Shape bow_surface = OpenCASCADE::read_IGES(cad_file_name, 1e-3);
+    std::cout << " Read " << cad_file_name << std::endl;
 
     // Each CAD geometrical object is defined along with a tolerance,
     // which indicates possible inaccuracy of its placement. For
@@ -350,9 +351,10 @@ namespace Step54
   {
     const std::string filename =
       (output_filename + "_" + Utilities::int_to_string(cycle) + ".vtk");
-    std::ofstream logfile(filename);
+    std::ofstream vtk_file(filename);
     GridOut       grid_out;
-    grid_out.write_vtk(tria, logfile);
+    grid_out.write_vtk(tria, vtk_file);
+    std::cout << " Wrote " << filename << std::endl;
   }
 
 

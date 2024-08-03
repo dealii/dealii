@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 /**
  * @defgroup auto_symb_diff Automatic and symbolic differentiation
  *
- * @brief A module dedicated to the implementation of functions and classes that relate
+ * @brief A group dedicated to the implementation of functions and classes that relate
  * to automatic and symbolic differentiation.
  *
  * Below we provide a very brief introduction as to what automatic and symbolic differentiation are,

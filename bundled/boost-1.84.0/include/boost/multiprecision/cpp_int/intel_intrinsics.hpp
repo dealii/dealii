@@ -50,6 +50,11 @@
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
 
+#if defined(__CUDACC__)
+// @tjhei: nvcc, at least with CUDA 12.5 is not happy with these intrinsics
+#undef BOOST_MP_HAS_IMMINTRIN_H
+#endif
+
 
 //
 // If the compiler supports the intrinsics used by GCC internally

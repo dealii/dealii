@@ -752,7 +752,7 @@ namespace SAND
     system_rhs    = 0;
 
 
-    MappingQ<dim>         mapping(1);
+    const MappingQ<dim>   mapping(1);
     const QGauss<dim>     quadrature_formula(fe.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
     FEValues<dim>         fe_values(mapping,
@@ -1300,7 +1300,7 @@ namespace SAND
     BlockVector<double> test_rhs;
     test_rhs.reinit(system_rhs);
 
-    MappingQ<dim>         mapping(1);
+    const MappingQ<dim>   mapping(1);
     const QGauss<dim>     quadrature_formula(fe.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
     FEValues<dim>         fe_values(mapping,
@@ -1626,7 +1626,7 @@ namespace SAND
     // Start with computing the objective function:
     double objective_function_merit = 0;
     {
-      MappingQ<dim>         mapping(1);
+      const MappingQ<dim>   mapping(1);
       const QGauss<dim>     quadrature_formula(fe.degree + 1);
       const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
       FEValues<dim>         fe_values(mapping,

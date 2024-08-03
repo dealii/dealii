@@ -1,5 +1,0 @@
-New: There is a new overload of Threads::new_task() that takes lambda
-functions taking arguments, followed by the arguments the lambda
-function is to be called with on a new task.
-<br>
-(Wolfgang Bangerth, 2023/10/30)

@@ -1388,13 +1388,13 @@ namespace internal
         std::array<Number, array_size> shape_values_x;
         for (unsigned int i1 = 0; i1 < array_size; ++i1)
           shape_values_x[i1] = shapes[i1][0][0];
-        for (unsigned int i1 = 0; i1 < (dim > 1 ? length : 1); ++i1)
+        for (int i1 = 0; i1 < (dim > 1 ? length : 1); ++i1)
           {
             const Number2 test_value_y =
               dim > 1 ? test_value * shapes[i1][0][1] : test_value;
 
             Number2 *values_ptr = values + i + i1 * length;
-            for (unsigned int i0 = 0; i0 < length; ++i0)
+            for (int i0 = 0; i0 < length; ++i0)
               {
                 if (add)
                   values_ptr[i0] += shape_values_x[i0] * test_value_y;

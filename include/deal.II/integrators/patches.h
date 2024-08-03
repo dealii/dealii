@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2011 - 2023 by the deal.II authors
+// Copyright (C) 2011 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ namespace LocalIntegrators
   namespace Patches
   {
     template <int dim>
-    DEAL_II_DEPRECATED_EARLY inline void
+    DEAL_II_DEPRECATED inline void
     points_and_values(Table<2, double>                           &result,
                       const FEValuesBase<dim>                    &fe,
                       const ArrayView<const std::vector<double>> &input)

@@ -1,5 +1,0 @@
-Fixed: Meshes created with GridGenerator::torus() would previously run
-into an assertion in p4est when using parallel::distributed::Triangulation. This
-is now fixed.
-<br>
-(Martin Kronbichler, Mathias Anselmann, Peter Munch, 2023/11/22)

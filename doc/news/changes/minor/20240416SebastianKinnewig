@@ -1,5 +1,0 @@
-New: Added get_prolongation_matrix() to FE_NedelecSZ.
-
-<br>
-(Sebastian Kinnewig, 2024/04/16)
-

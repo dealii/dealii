@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// Copyright (C) 2013 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -383,7 +383,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: <code>GridGenerator</code> has a function
        <code>cylinder</code> for cylinders in three
-       space dimensions. Accoridngly, a class <code
+       space dimensions. Accordingly, a class <code
        class="class">CylinderBoundary</code> has been created.
        <br>
        (GK 2001/12/07)

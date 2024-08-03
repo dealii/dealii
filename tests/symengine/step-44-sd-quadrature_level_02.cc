@@ -76,13 +76,13 @@ namespace Step44
 
         if (debug)
           {
-            deallog << "symbolic_psi: " << symbolic_psi << std::endl;
-            // deallog << "symbolic_S: " << symbolic_S << std::endl;
-            // deallog << "symbolic_H: " << symbolic_H << std::endl;
+            std::cout << "symbolic_psi: " << symbolic_psi << std::endl;
+            // std::cout << "symbolic_S: " << symbolic_S << std::endl;
+            // std::cout << "symbolic_H: " << symbolic_H << std::endl;
             for (unsigned int i = 0; i < symbolic_S.n_independent_components;
                  ++i)
-              deallog << "symbolic_S [" << i
-                      << "]: " << symbolic_S.access_raw_entry(i) << std::endl;
+              std::cout << "symbolic_S [" << i
+                        << "]: " << symbolic_S.access_raw_entry(i) << std::endl;
           }
       }
 
@@ -98,9 +98,9 @@ namespace Step44
 
         if (debug)
           {
-            deallog << "symbolic_dPsi_vol_dJ: " << symbolic_dPsi_vol_dJ
-                    << std::endl;
-            // deallog << "symbolic_d2Psi_vol_dJ2: " << symbolic_d2Psi_vol_dJ2
+            std::cout << "symbolic_dPsi_vol_dJ: " << symbolic_dPsi_vol_dJ
+                      << std::endl;
+            // std::cout << "symbolic_d2Psi_vol_dJ2: " << symbolic_d2Psi_vol_dJ2
             // << std::endl;
             throw;
           }
@@ -147,7 +147,7 @@ namespace Step44
 
       if (debug)
         {
-          SD::Utilities::print_substitution_map(deallog, sub_vals);
+          SD::Utilities::print_substitution_map(std::cout, sub_vals);
         }
 
       // Step 1: Update stress and material tangent
@@ -160,8 +160,8 @@ namespace Step44
 
         if (debug)
           {
-            deallog << "substitution_S: " << substitution_S << std::endl;
-            deallog << "substitution_H: " << substitution_H << std::endl;
+            std::cout << "substitution_S: " << substitution_S << std::endl;
+            std::cout << "substitution_H: " << substitution_H << std::endl;
           }
 
         // Compute real-valued deal.II tensors
@@ -185,10 +185,10 @@ namespace Step44
 
         if (debug)
           {
-            deallog << "substitution_dPsi_vol_dJ: " << substitution_dPsi_vol_dJ
-                    << std::endl;
-            deallog << "substitution_d2Psi_vol_dJ2: "
-                    << substitution_d2Psi_vol_dJ2 << std::endl;
+            std::cout << "substitution_dPsi_vol_dJ: "
+                      << substitution_dPsi_vol_dJ << std::endl;
+            std::cout << "substitution_d2Psi_vol_dJ2: "
+                      << substitution_d2Psi_vol_dJ2 << std::endl;
           }
 
         // Compute real values
@@ -198,20 +198,21 @@ namespace Step44
 
       if (debug)
         {
-          deallog << "dPsi_vol_dJ:                   " << dPsi_vol_dJ
-                  << std::endl;
-          deallog << "material->get_dPsi_vol_dJ():   "
-                  << material->get_dPsi_vol_dJ() << std::endl;
-          deallog << "d2Psi_vol_dJ2:                 " << d2Psi_vol_dJ2
-                  << std::endl;
-          deallog << "material->get_d2Psi_vol_dJ2(): "
-                  << material->get_d2Psi_vol_dJ2() << std::endl;
+          std::cout << "dPsi_vol_dJ:                   " << dPsi_vol_dJ
+                    << std::endl;
+          std::cout << "material->get_dPsi_vol_dJ():   "
+                    << material->get_dPsi_vol_dJ() << std::endl;
+          std::cout << "d2Psi_vol_dJ2:                 " << d2Psi_vol_dJ2
+                    << std::endl;
+          std::cout << "material->get_d2Psi_vol_dJ2(): "
+                    << material->get_d2Psi_vol_dJ2() << std::endl;
 
-          deallog << "tau:                 " << tau << std::endl;
-          deallog << "material->get_tau(): " << material->get_tau()
-                  << std::endl;
-          deallog << "Jc:                  " << Jc << std::endl;
-          deallog << "material->get_Jc():  " << material->get_Jc() << std::endl;
+          std::cout << "tau:                 " << tau << std::endl;
+          std::cout << "material->get_tau(): " << material->get_tau()
+                    << std::endl;
+          std::cout << "Jc:                  " << Jc << std::endl;
+          std::cout << "material->get_Jc():  " << material->get_Jc()
+                    << std::endl;
         }
 
       {

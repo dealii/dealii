@@ -315,7 +315,7 @@ namespace
     current_section.sort(compare);
 
     // Now transverse subsections tree recursively.
-    for (auto &p : current_section)
+    for (const auto &p : current_section)
       {
         if ((is_parameter_node(p.second) == false) &&
             (is_alias_node(p.second) == false))
@@ -569,7 +569,7 @@ ParameterHandler::parse_input(const std::string &filename,
                               const bool assert_mandatory_entries_are_found)
 {
   std::ifstream is(filename);
-  AssertThrow(is, PathSearch::ExcFileNotFound(filename, "ParameterHandler"));
+  AssertThrow(is, ExcFileNotOpen(filename));
 
   std::string file_ending = filename.substr(filename.find_last_of('.') + 1);
   boost::algorithm::to_lower(file_ending);
@@ -581,7 +581,9 @@ ParameterHandler::parse_input(const std::string &filename,
     parse_input_from_json(is, skip_undefined);
   else
     AssertThrow(false,
-                ExcMessage("Unknown input file name extension. Supported types "
+                ExcMessage("The given input file <" + filename +
+                           "> has a file name extension <" + file_ending +
+                           "> that is not recognized. Supported types "
                            "are .prm, .xml, and .json."));
 
   if (assert_mandatory_entries_are_found)

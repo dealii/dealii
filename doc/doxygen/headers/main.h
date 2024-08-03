@@ -21,9 +21,8 @@
  * system, can be found elsewhere. In addition, there are
  * <a href="Tutorial.html">Tutorial programs on the use of the library</a>.
  *
- * Many of the classes in the deal.II library can be grouped into modules (see
- * the <a href="modules.html">Modules page</a> or the corresponding entry in
- * the menu at the top of this page). These modules form around the building
+ * Many of the classes in the deal.II library can be grouped into topics (see
+ * the "Topics" tab at the top of this page). These topics form around the building
  * blocks of any finite element program. An outline of how the primary groups
  * of classes in deal.II interact is given by the following clickable graph,
  * with a more detailed description below (gray boxes denote a subset of the
@@ -113,7 +112,7 @@
  *   <li> <b>%Triangulation</b>: Triangulations are collections of
  *   cells and their lower-dimensional boundary objects. Cells are
  *   images of the reference hypercube [0,1]<sup>dim</sup> under a
- *   suitable mapping in the module on @ref mapping.
+ *   suitable mapping in the topic on @ref mapping.
  *
  *   The triangulation stores geometric and topological
  *   properties of a mesh: how are the cells connected and where are
@@ -134,8 +133,8 @@
  *   information about the cell it presently points to.
  *
  *   The classes that describe triangulations and cells are located
- *   and documented in the @ref grid module. Iterators are described
- *   in the @ref Iterators module.
+ *   and documented in the @ref grid topic. Iterators are described
+ *   in the @ref Iterators topic.
  *
  *   <li> <b>%Manifold</b>: Manifolds describe the shape of cells and,
  *   more generally, the geometry of the domain on which one wants
@@ -150,7 +149,7 @@
  *   provide values and gradients of individual shape functions at
  *   points on the unit cell.
  *
- *   The finite element classes are described in the @ref feall module.
+ *   The finite element classes are described in the @ref feall topic.
  *
  *   <li> <b>%Quadrature</b>: As with finite elements, quadrature
  *   objects are defined on the unit cell. They only describe the
@@ -158,7 +157,7 @@
  *   of quadrature points thereon.
  *
  *   The documentation of the classes describing particular quadrature
- *   formulas is found in the @ref Quadrature module.
+ *   formulas is found in the @ref Quadrature topic.
  *
  *   <li> <b>%DoFHandler</b>: %DoFHandler objects are the confluence
  *   of triangulations and finite elements: the finite element class
@@ -198,13 +197,13 @@
  *   specifics is relevant to the DoFHandler class with the exception of
  *   the fact that they exist.
  *
- *   The DoFHandler class and its associates are described in the @ref
- *   dofs module. In addition, there are specialized versions that can
+ *   The DoFHandler class and its associates are described in the
+ *   @ref dofs topic. In addition, there are specialized versions that can
  *   handle multilevel and hp-discretizations. These are described in
- *   the @ref mg and @ref hp modules. Finite element methods frequently
+ *   the @ref mg and @ref hp topics. Finite element methods frequently
  *   imply constraints on degrees of freedom, such as for hanging nodes
  *   or nodes at which boundary conditions apply; dealing with such
- *   constraints is described in the @ref constraints module.
+ *   constraints is described in the @ref constraints topic.
  *
  *   <li> <b>%Mapping</b>: The next step in a finite element program
  *   is that one would want to compute matrix and right hand side
@@ -218,7 +217,7 @@
  *   real space and back, as well as provide gradients of this
  *   derivative and Jacobian determinants.
  *
- *   These classes are all described in the @ref mapping module.
+ *   These classes are all described in the @ref mapping topic.
  *
  *   <li> <b>%FEValues</b>: The next step is to actually take a finite
  *   element and evaluate its shape functions and their gradients at
@@ -246,7 +245,7 @@
  *   evaluation on cells, FEFaceValues for evaluation on faces of
  *   cells, and FESubfaceValues for evaluation on parts of faces of
  *   cells. All these classes are described in the @ref feaccess
- *   module.
+ *   topic.
  *
  *   <li> <b>Linear Systems</b>: If one knows how to evaluate the
  *   values and gradients of shape functions on individual cells using
@@ -261,14 +260,14 @@
  *   entries of matrices and vectors. deal.II comes with a whole set
  *   of classes for this purpose, as well as with interfaces to other
  *   software packages that offer similar functionality. Documentation
- *   to this end can be found in the @ref LAC module.
+ *   to this end can be found in the @ref LAC topic.
  *
  *   <li> <b>Linear Solvers</b>: In order to determine the solution of
  *   a finite-dimensional, linear system of equations, one needs
  *   linear solvers. In finite element applications, they are
  *   frequently iterative, but sometimes one may also want to use
  *   direct or sparse direct solvers. deal.II has quite a number of
- *   these. They are documented in the @ref Solvers module.
+ *   these. They are documented in the @ref Solvers topic.
  *
  *   <li> <b>Output</b>: Finally, once one has obtained a solution of
  *   a finite element problem on a given triangulation, one will often
@@ -277,8 +276,8 @@
  *   files in a variety of graphics formats understood by widely
  *   available visualization tools.
  *
- *   A description of the classes that do so is given in the @ref
- *   output module.
+ *   A description of the classes that do so is given in the
+ *   @ref output topic.
  * </ol>
  *
  * In addition, deal.II has a number of groups of classes that go
@@ -288,8 +287,7 @@
  * finite element programs, but appear there as well. These classes
  * are all listed in the Classes and Namespaces views reachable from
  * the menu bar at the top of this page, and are also grouped into
- * modules of their own (see the <a href="modules.html">Modules link</a>
- * at the top of this page).
+ * topics of their own (see the "Topics" tab at the top of this page).
  *
  * We provide the Doxygen tag file for those of you who would like to directly link the
  * documentation of application programs to the deal.II online documentation. The tag file

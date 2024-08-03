@@ -57,7 +57,7 @@ namespace internal
      * internal::TriangulationImplementation::Iterators<1,spacedim>, only the
      * treatment of templates is a little more complicated. See the
      * @ref Iterators
-     * module for more information.
+     * topic for more information.
      */
     template <int spacedim, bool lda>
     struct Iterators<1, spacedim, lda>
@@ -99,7 +99,7 @@ namespace internal
      * internal::TriangulationImplementation::Iterators<2,spacedim>, only the
      * treatment of templates is a little more complicated. See the
      * @ref Iterators
-     * module for more information.
+     * topic for more information.
      */
     template <int spacedim, bool lda>
     struct Iterators<2, spacedim, lda>
@@ -139,7 +139,7 @@ namespace internal
      * internal::TriangulationImplementation::Iterators<3,spacedim>, only the
      * treatment of templates is a little more complicated. See the
      * @ref Iterators
-     * module for more information.
+     * topic for more information.
      */
     template <int spacedim, bool lda>
     struct Iterators<3, spacedim, lda>

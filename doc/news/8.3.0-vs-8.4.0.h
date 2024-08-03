@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2014 - 2023 by the deal.II authors
+// Copyright (C) 2014 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -221,7 +221,7 @@ inconvenience this causes.
 <h3>General</h3>
 <ol>
   <li> New: A variant for GridGenerator::subdivided_parallelepiped() was added
-  that supports meshes embedded in higher dimesional spaces.
+  that supports meshes embedded in higher dimensional spaces.
   <br>
   (Timo Heister, 2016/02/04)
   </li>

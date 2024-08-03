@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// Copyright (C) 2017 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ author.
 <ol>
 
  <li>
-  Fixed: Various compatiblity issues and minor bugfixes have been resolved:
+  Fixed: Various compatibility issues and minor bugfixes have been resolved:
   <ol>
   <li>fixes a Sundials/Kinsol issue</li>
   <li>fixes a bug for plain_copy in MGTransferMatrixFree</li>

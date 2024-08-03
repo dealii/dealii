@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2000 - 2023 by the deal.II authors
+// Copyright (C) 2000 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -329,7 +329,7 @@ namespace SparsityPatternIterators
  * systems, it is rarely set up directly due to the way it stores its
  * information. Rather, one typically goes through an intermediate format
  * first, see for example the step-2 tutorial program as well as the
- * documentation module
+ * documentation topic
  * @ref Sparsity.
  *
  * You can iterate over entries in the pattern using begin(), end(),
@@ -1408,14 +1408,15 @@ SparsityPattern::operator==(const SparsityPattern &sp2) const
     return false;
 
   if (rows > 0)
-    for (size_type i = 0; i < rows + 1; ++i)
-      if (rowstart[i] != sp2.rowstart[i])
-        return false;
+    {
+      for (size_type i = 0; i < rows + 1; ++i)
+        if (rowstart[i] != sp2.rowstart[i])
+          return false;
 
-  if (rows > 0)
-    for (size_type i = 0; i < rowstart[rows]; ++i)
-      if (colnums[i] != sp2.colnums[i])
-        return false;
+      for (size_type i = 0; i < rowstart[rows]; ++i)
+        if (colnums[i] != sp2.colnums[i])
+          return false;
+    }
 
   return true;
 }

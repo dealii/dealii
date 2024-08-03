@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1999 - 2023 by the deal.II authors
+// Copyright (C) 1999 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -86,8 +86,7 @@ public:
    * std::complex.
    */
   static_assert(
-    std::is_arithmetic<
-      typename numbers::NumberTraits<number>::real_type>::value,
+    std::is_arithmetic_v<typename numbers::NumberTraits<number>::real_type>,
     "The FullMatrix class only supports basic numeric types. In particular, it "
     "does not support automatically differentiated numbers.");
 

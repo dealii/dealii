@@ -2051,7 +2051,8 @@ namespace parallel
 
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    void Triangulation<dim, spacedim>::save(const std::string &filename) const
+    void Triangulation<dim, spacedim>::save(
+      const std::string &file_basename) const
     {
       Assert(
         this->cell_attached_data.n_attached_deserialize == 0,
@@ -2068,7 +2069,7 @@ namespace parallel
 
       if (this->my_subdomain == 0)
         {
-          std::string   fname = std::string(filename) + ".info";
+          std::string   fname = file_basename + ".info";
           std::ofstream f(fname);
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_coarse_cells"
             << std::endl
@@ -2091,9 +2092,9 @@ namespace parallel
       // Save cell attached data.
       this->save_attached_data(parallel_forest->global_first_quadrant[myrank],
                                parallel_forest->global_num_quadrants,
-                               filename);
+                               file_basename);
 
-      dealii::internal::p4est::functions<dim>::save(filename.c_str(),
+      dealii::internal::p4est::functions<dim>::save(file_basename.c_str(),
                                                     parallel_forest,
                                                     false);
 
@@ -2105,7 +2106,7 @@ namespace parallel
 
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    void Triangulation<dim, spacedim>::load(const std::string &filename)
+    void Triangulation<dim, spacedim>::load(const std::string &file_basename)
     {
       Assert(
         this->n_cells() > 0,
@@ -2137,7 +2138,7 @@ namespace parallel
       unsigned int version, numcpus, attached_count_fixed,
         attached_count_variable, n_coarse_cells;
       {
-        std::string   fname = std::string(filename) + ".info";
+        std::string   fname = std::string(file_basename) + ".info";
         std::ifstream f(fname);
         AssertThrow(f.fail() == false, ExcIO());
         std::string firstline;
@@ -2158,7 +2159,7 @@ namespace parallel
         attached_count_fixed + attached_count_variable;
 
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext(
-        filename.c_str(),
+        file_basename.c_str(),
         this->mpi_communicator,
         0,
         0,
@@ -2190,7 +2191,7 @@ namespace parallel
       this->load_attached_data(parallel_forest->global_first_quadrant[myrank],
                                parallel_forest->global_num_quadrants,
                                parallel_forest->local_num_quadrants,
-                               filename,
+                               file_basename,
                                attached_count_fixed,
                                attached_count_variable);
 
@@ -2274,7 +2275,22 @@ namespace parallel
       Assert(parallel_forest != nullptr,
              ExcMessage(
                "Can't produce a check sum when no forest is created yet."));
-      return dealii::internal::p4est::functions<dim>::checksum(parallel_forest);
+
+      auto checksum =
+        dealii::internal::p4est::functions<dim>::checksum(parallel_forest);
+
+#  if !DEAL_II_P4EST_VERSION_GTE(2, 8, 6, 0)
+      /*
+       * p4est prior to 2.8.6 returns the proper checksum only on rank 0
+       * and simply "0" on all other ranks. This is not really what we
+       * want, thus broadcast the correct value to all other ranks:
+       */
+      checksum = Utilities::MPI::broadcast(this->mpi_communicator,
+                                           checksum,
+                                           /*root_process*/ 0);
+#  endif
+
+      return checksum;
     }
 
 
@@ -2607,41 +2623,33 @@ namespace parallel
         // {0,0,0,0,0,0,0,0}.
         using cell_iterator =
           typename Triangulation<dim, spacedim>::cell_iterator;
-        typename std::map<std::pair<cell_iterator, unsigned int>,
-                          std::pair<std::pair<cell_iterator, unsigned int>,
-                                    unsigned char>>::const_iterator it;
-        for (it = tria.get_periodic_face_map().begin();
-             it != tria.get_periodic_face_map().end();
-             ++it)
+        for (const auto &it : tria.get_periodic_face_map())
           {
-            const cell_iterator &cell_1               = it->first.first;
-            const unsigned int   face_no_1            = it->first.second;
-            const cell_iterator &cell_2               = it->second.first.first;
-            const unsigned int   face_no_2            = it->second.first.second;
-            const unsigned char  combined_orientation = it->second.second;
-            const auto [orientation, rotation, flip] =
-              ::dealii::internal::split_face_orientation(combined_orientation);
+            const cell_iterator &cell_1               = it.first.first;
+            const unsigned int   face_no_1            = it.first.second;
+            const cell_iterator &cell_2               = it.second.first.first;
+            const unsigned int   face_no_2            = it.second.first.second;
+            const unsigned char  combined_orientation = it.second.second;
 
             if (cell_1->level() == cell_2->level())
               {
-                for (unsigned int v = 0;
-                     v < GeometryInfo<dim - 1>::vertices_per_cell;
-                     ++v)
+                for (const unsigned int v :
+                     cell_1->face(face_no_1)->vertex_indices())
                   {
                     // take possible non-standard orientation of face on
                     // cell[0] into account
-                    const unsigned int vface0 =
-                      GeometryInfo<dim>::standard_to_real_face_vertex(
-                        v, orientation, flip, rotation);
-                    const unsigned int vi0 =
-                      topological_vertex_numbering[cell_1->face(face_no_1)
-                                                     ->vertex_index(vface0)];
+                    const unsigned int vface1 =
+                      cell_1->reference_cell().standard_to_real_face_vertex(
+                        v, face_no_1, combined_orientation);
                     const unsigned int vi1 =
+                      topological_vertex_numbering[cell_1->face(face_no_1)
+                                                     ->vertex_index(vface1)];
+                    const unsigned int vi2 =
                       topological_vertex_numbering[cell_2->face(face_no_2)
                                                      ->vertex_index(v)];
-                    const unsigned int min_index = std::min(vi0, vi1);
+                    const unsigned int min_index = std::min(vi1, vi2);
                     topological_vertex_numbering[cell_1->face(face_no_1)
-                                                   ->vertex_index(vface0)] =
+                                                   ->vertex_index(vface1)] =
                       topological_vertex_numbering[cell_2->face(face_no_2)
                                                      ->vertex_index(v)] =
                         min_index;
@@ -2653,8 +2661,12 @@ namespace parallel
         for (unsigned int i = 0; i < topological_vertex_numbering.size(); ++i)
           {
             const unsigned int j = topological_vertex_numbering[i];
-            if (j != i)
-              Assert(topological_vertex_numbering[j] == j, ExcInternalError());
+            Assert(j == i || topological_vertex_numbering[j] == j,
+                   ExcMessage("Got inconclusive constraints with chain: " +
+                              std::to_string(i) + " vs " + std::to_string(j) +
+                              " which should be equal to " +
+                              std::to_string(topological_vertex_numbering[j])));
+            (void)j;
           }
 
 

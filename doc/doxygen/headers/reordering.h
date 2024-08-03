@@ -15,12 +15,12 @@
 /**
  * @defgroup reordering Grid reordering and cell orientation
  *
- * @brief A module describing how deal.II consistently orients Triangulation
+ * @brief A group describing how deal.II consistently orients Triangulation
  * objects.
  *
  * @warning The implementation of orientation should be considered an internal
  * detail of the library. Normal users should not need to use the features
- * describd in this module: instead, classes like QProjector use orientation
+ * describd in this group: instead, classes like QProjector use orientation
  * information to consistently compute values on faces and lines.
  *
  * <h2>Orientation of Lines</h2>

@@ -1,5 +1,0 @@
-Fixed: MGTwoLevelTransfer used within the global coarsening multigrid
-framework did not work when deal.II was compiled without MPI or when MPI_Init
-was not called. This is now fixed.
-<br>
-(Martin Kronbichler, 2023/06/28)

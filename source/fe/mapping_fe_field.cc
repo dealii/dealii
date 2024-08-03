@@ -291,6 +291,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
 {
+  AssertDimension(euler_dof_handler.n_dofs(), euler_vector.size());
   unsigned int size = 0;
   for (unsigned int i = 0; i < fe_mask.size(); ++i)
     {
@@ -337,7 +338,10 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
   this->euler_vector.clear();
   this->euler_vector.resize(euler_vector.size());
   for (unsigned int i = 0; i < euler_vector.size(); ++i)
-    this->euler_vector[i] = &euler_vector[i];
+    {
+      AssertDimension(euler_dof_handler.n_dofs(i), euler_vector[i].size());
+      this->euler_vector[i] = &euler_vector[i];
+    }
 }
 
 
@@ -379,7 +383,10 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
     euler_dof_handler.get_triangulation().n_global_levels());
   for (unsigned int i = euler_vector.min_level(); i <= euler_vector.max_level();
        ++i)
-    this->euler_vector[i] = &euler_vector[i];
+    {
+      AssertDimension(euler_dof_handler.n_dofs(i), euler_vector[i].size());
+      this->euler_vector[i] = &euler_vector[i];
+    }
 }
 
 

@@ -1,5 +1,0 @@
-Improved: VectorTools::interpolate is now faster for the case of a DoFHandler
-based on an FESystem with a single base element that has classical support
-points (like FE_Q or FE_DGQ).
-<br>
-(Martin Kronbichler, 2024/04/03)

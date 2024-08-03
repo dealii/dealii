@@ -12,14 +12,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/fe/fe_pyramid_p.h>
-#include <deal.II/fe/fe_simplex_p.h>
-#include <deal.II/fe/fe_simplex_p_bubbles.h>
-#include <deal.II/fe/fe_tools.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_wedge_p.h>
-#include <deal.II/fe/mapping_fe.h>
-
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
@@ -27,7 +19,7 @@
 #include "../tests.h"
 
 // Create a simplex mesh in the unit cube. Check points distribute to each cell
-// via GridTools::compute_point_locations
+// via GridTools::compute_point_locations()
 
 
 template <int dim>
@@ -37,13 +29,9 @@ test_in_unit_cube(const std::vector<Point<dim>> &points)
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
 
-  MappingFE<dim> mapping(FE_SimplexP<dim>(1));
-
-  const auto tria_cache =
-    std::make_unique<GridTools::Cache<dim>>(tria, mapping);
-
-  const auto point_locations =
-    GridTools::compute_point_locations(*tria_cache, points);
+  GridTools::Cache<dim> cache(tria);
+  const auto            point_locations =
+    GridTools::compute_point_locations(cache, points);
 
   const auto cells   = std::get<0>(point_locations);
   const auto qpoints = std::get<1>(point_locations);
@@ -61,8 +49,8 @@ test_in_unit_cube(const std::vector<Point<dim>> &points)
           deallog << "        physical position   : (" << points[indices[i][j]]
                   << ')' << std::endl;
           deallog << "        FE mapping position : ("
-                  << mapping.transform_unit_to_real_cell(cells[i],
-                                                         qpoints[i][j])
+                  << cache.get_mapping().transform_unit_to_real_cell(
+                       cells[i], qpoints[i][j])
                   << ')' << std::endl;
         }
     }

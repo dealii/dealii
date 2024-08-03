@@ -1,6 +1,0 @@
-Fixed: MatrixFree::get_cell_active_fe_index did not
-return the correct value when used with categorization
-of cells. This affects also MFTools::compute_diagonal().
-This is now fixed.
-<br>
-(David Schneider, 2023/11/13)

@@ -1,9 +1,0 @@
-Changed: IndexSet objects could only be compared for equality or
-inequality against other IndexSet objects that had the same size. This
-did not allow for comparison against default-constructed objects, for
-example to test whether an object had been initialized. The
-restriction is therefore relaxed: IndexSet objects can be compared for
-equality and inequality against objects of the same size, or or size
-zero.
-<br>
-(Wolfgang Bangerth, 2023/09/07)

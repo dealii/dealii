@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2012 - 2023 by the deal.II authors
+// Copyright (C) 2012 - 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -628,7 +628,7 @@ first two of these functions. It has therefore been removed.
 
 <li> Improved: Objects of the type LogStream::Prefix can now be used
 as a safe implementation of the push and pop mechanism for log
-prefices.
+prefixes.
 <br>
 (Guido Kanschat, 2011/12/09)
 

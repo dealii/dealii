@@ -1,5 +1,0 @@
-Fixed: The ParticleHandler could cause a division by zero
-for certain mappings when sorting particles that are
-located almost exactly on mesh vertices. This is fixed now.
-<br>
-(Rene Gassmoeller, 2024/06/18)

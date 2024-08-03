@@ -649,16 +649,18 @@ namespace internal
           for (unsigned int vv = 0; vv < macro_size; ++vv)
             offsets_nm[vv] = nm * vv;
 
-          vectorized_transpose_and_store(false,
-                                         nm,
-                                         &(mass_matrix[dir](0, 0)),
-                                         offsets_nm.cbegin(),
-                                         mass_matrix_flat.data());
-          vectorized_transpose_and_store(false,
-                                         nm,
-                                         &(derivative_matrix[dir](0, 0)),
-                                         offsets_nm.cbegin(),
-                                         deriv_matrix_flat.data());
+          vectorized_transpose_and_store<Number, n_lanes>(
+            false,
+            nm,
+            &(mass_matrix[dir](0, 0)),
+            offsets_nm.data(),
+            mass_matrix_flat.data());
+          vectorized_transpose_and_store<Number, n_lanes>(
+            false,
+            nm,
+            &(derivative_matrix[dir](0, 0)),
+            offsets_nm.data(),
+            deriv_matrix_flat.data());
 
           const Number *mass_cbegin    = mass_matrix_flat.data();
           const Number *deriv_cbegin   = deriv_matrix_flat.data();
@@ -677,14 +679,16 @@ namespace internal
           eigenvectors[dir].reinit(n_rows, n_cols);
           for (unsigned int vv = 0; vv < macro_size; ++vv)
             offsets_n[vv] = n_rows * vv;
-          vectorized_load_and_transpose(n_rows,
-                                        eigenvalues_flat.data(),
-                                        offsets_n.cbegin(),
-                                        eigenvalues[dir].begin());
-          vectorized_load_and_transpose(nm,
-                                        eigenvectors_flat.data(),
-                                        offsets_nm.cbegin(),
-                                        &(eigenvectors[dir](0, 0)));
+          vectorized_load_and_transpose<Number, n_lanes>(
+            n_rows,
+            eigenvalues_flat.data(),
+            offsets_n.data(),
+            eigenvalues[dir].begin());
+          vectorized_load_and_transpose<Number, n_lanes>(
+            nm,
+            eigenvectors_flat.data(),
+            offsets_nm.data(),
+            &(eigenvectors[dir](0, 0)));
         }
     }
 

@@ -88,7 +88,6 @@ namespace Portable
    * @note Only float and double are supported.
    *
    * @ingroup CUDAWrappers
-   * @ingroup Portable
    */
   template <int dim, typename Number = double>
   class MatrixFree : public Subscriptor

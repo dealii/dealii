@@ -15,6 +15,7 @@
 
 #include <deal.II/base/discrete_time.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -102,6 +103,20 @@ DiscreteTime::restart()
   current_time  = start_time;
   next_time     = calculate_next_time(current_time, start_step_size, end_time);
   step_number   = 0;
+}
+
+
+
+std::size_t
+DiscreteTime::memory_consumption() const
+{
+  return (MemoryConsumption::memory_consumption(start_time) +
+          MemoryConsumption::memory_consumption(end_time) +
+          MemoryConsumption::memory_consumption(current_time) +
+          MemoryConsumption::memory_consumption(next_time) +
+          MemoryConsumption::memory_consumption(previous_time) +
+          MemoryConsumption::memory_consumption(start_step_size) +
+          MemoryConsumption::memory_consumption(step_number));
 }
 
 DEAL_II_NAMESPACE_CLOSE
