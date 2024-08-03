@@ -1213,37 +1213,49 @@ template IndexSet::IndexSet(
     types::signed_global_dof_index,
     LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>>
     &);
+
+#      if defined(HAVE_TPETRA_INST_CUDA) || defined(HAVE_TPETRA_INST_HIP) || \
+        defined(HAVE_TPETRA_INST_SYCL)
 template IndexSet::IndexSet(
   const Teuchos::RCP<const Tpetra::Map<
     int,
     types::signed_global_dof_index,
     LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>>
     &);
+#      endif
 
 template LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Host>
 dealii::IndexSet::make_tpetra_map<
   LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>(
-  int,
+  const MPI_Comm,
   bool) const;
+
+#      if defined(HAVE_TPETRA_INST_CUDA) || defined(HAVE_TPETRA_INST_HIP) || \
+        defined(HAVE_TPETRA_INST_SYCL)
 template LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<
   MemorySpace::Default>
 dealii::IndexSet::make_tpetra_map<
   LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>(
-  int,
+  const MPI_Comm,
   bool) const;
+#      endif
 
 template Teuchos::RCP<
   LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Host>>
 dealii::IndexSet::make_tpetra_map_rcp<
   LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>(
-  int,
+  const MPI_Comm,
   bool) const;
+
+#      if defined(HAVE_TPETRA_INST_CUDA) || defined(HAVE_TPETRA_INST_HIP) || \
+        defined(HAVE_TPETRA_INST_SYCL)
 template Teuchos::RCP<
   LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Default>>
 dealii::IndexSet::make_tpetra_map_rcp<
   LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>(
-  int,
+  const MPI_Comm,
   bool) const;
+#      endif
 
 #    endif
 #  endif
