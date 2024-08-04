@@ -42,6 +42,7 @@ namespace MatrixFreeTools
 
       std::vector<unsigned int> dof_numbers;
       std::vector<unsigned int> quad_numbers;
+      std::vector<unsigned int> n_components;
       std::vector<unsigned int> first_selected_components;
       std::vector<unsigned int> batch_type;
       static const bool         is_face = is_face_;
@@ -1971,6 +1972,7 @@ namespace MatrixFreeTools
 
     data_cell.dof_numbers               = {dof_no};
     data_cell.quad_numbers              = {quad_no};
+    data_cell.n_components              = {n_components};
     data_cell.first_selected_components = {first_selected_component};
     data_cell.batch_type                = {0};
 
@@ -2007,6 +2009,7 @@ namespace MatrixFreeTools
 
     data_face.dof_numbers               = {dof_no, dof_no};
     data_face.quad_numbers              = {quad_no, quad_no};
+    data_face.n_components              = {n_components, n_components};
     data_face.first_selected_components = {first_selected_component,
                                            first_selected_component};
     data_face.batch_type                = {1, 2};
@@ -2069,6 +2072,7 @@ namespace MatrixFreeTools
 
     data_boundary.dof_numbers               = {dof_no};
     data_boundary.quad_numbers              = {quad_no};
+    data_boundary.n_components              = {n_components};
     data_boundary.first_selected_components = {first_selected_component};
     data_boundary.batch_type                = {1};
 
@@ -2155,22 +2159,39 @@ namespace MatrixFreeTools
 
           for (unsigned int b = 0; b < n_blocks; ++b)
             {
+              const auto &fe = matrix_free.get_dof_handler(data.dof_numbers[b])
+                                 .get_fe(phi[b]->get_active_fe_index());
+
+              const auto component_base =
+                matrix_free.get_dof_info(data.dof_numbers[b])
+                  .component_to_base_index[data.first_selected_components[b]];
+              const auto component_in_base =
+                data.first_selected_components[b] -
+                matrix_free.get_dof_info(data.dof_numbers[b])
+                  .start_components[component_base];
+
               const auto &shape_info = matrix_free.get_shape_info(
                 data.dof_numbers[b],
                 data.quad_numbers[b],
-                data.first_selected_components[b],
+                component_base,
                 phi[b]->get_active_fe_index(),
                 phi[b]->get_active_quadrature_index());
 
               dofs_per_cell[b] =
-                shape_info.dofs_per_component_on_cell * shape_info.n_components;
+                shape_info.dofs_per_component_on_cell * data.n_components[b];
 
-              dof_indices[b].resize(dofs_per_cell[b]);
+              dof_indices[b].resize(fe.n_dofs_per_cell());
 
               for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
                 dof_indices_mf[b][v].resize(dofs_per_cell[b]);
 
-              lexicographic_numbering[b] = shape_info.lexicographic_numbering;
+              lexicographic_numbering[b].insert(
+                lexicographic_numbering[b].begin(),
+                shape_info.lexicographic_numbering.begin() +
+                  component_in_base * shape_info.dofs_per_component_on_cell,
+                shape_info.lexicographic_numbering.begin() +
+                  (component_in_base + data.n_components[b]) *
+                    shape_info.dofs_per_component_on_cell);
             }
 
           for (unsigned int bj = 0; bj < n_blocks; ++bj)
@@ -2210,7 +2231,7 @@ namespace MatrixFreeTools
                     else
                       cell_iterator->get_dof_indices(dof_indices[b]);
 
-                    for (unsigned int j = 0; j < dof_indices[b].size(); ++j)
+                    for (unsigned int j = 0; j < dofs_per_cell[b]; ++j)
                       dof_indices_mf[b][v][j] =
                         dof_indices[b][lexicographic_numbering[b][j]];
                   }
