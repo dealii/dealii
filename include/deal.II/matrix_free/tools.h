@@ -303,6 +303,27 @@ namespace MatrixFreeTools
   namespace internal
   {
     /**
+     * Compute the diagonal of a linear operator (@p diagonal_global), given
+     * @p matrix_free and the local cell, face and boundary integral operation.
+     */
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename VectorType,
+              typename VectorType2>
+    void
+    compute_diagonal(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, false>
+        &data_cell,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+        &data_face,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+                                 &data_boundary,
+      VectorType                 &diagonal_global,
+      std::vector<VectorType2 *> &diagonal_global_components);
+
+    /**
      * Compute the matrix representation of a linear operator (@p matrix), given
      * @p matrix_free and the local cell, face and boundary integral operation.
      */
@@ -701,49 +722,58 @@ namespace MatrixFreeTools
       std::vector<std::pair<unsigned int, unsigned int>> inverse_lookup_origins;
     };
 
-    template <typename FEEvaluationType, bool is_face>
+    template <int dim, typename VectorizedArrayType, bool is_face>
     class ComputeDiagonalHelper
     {
     public:
-      using Number              = typename FEEvaluationType::number_type;
-      using VectorizedArrayType = typename FEEvaluationType::NumberType;
+      using FEEvaluationType =
+        FEEvaluationData<dim, VectorizedArrayType, is_face>;
 
-      static const unsigned int dim          = FEEvaluationType::dimension;
-      static const unsigned int n_components = FEEvaluationType::n_components;
-      static const unsigned int n_lanes      = VectorizedArrayType::size();
+      using Number = typename VectorizedArrayType::value_type;
+      static const unsigned int n_lanes = VectorizedArrayType::size();
 
       ComputeDiagonalHelper()
         : phi(nullptr)
+        , matrix_free(nullptr)
         , dofs_per_component(0)
+        , n_components(0)
       {}
 
       ComputeDiagonalHelper(const ComputeDiagonalHelper &)
         : phi(nullptr)
+        , matrix_free(nullptr)
         , dofs_per_component(0)
+        , n_components(0)
       {}
 
       void
-      initialize(FEEvaluationType &phi)
+      initialize(
+        FEEvaluationType                                   &phi,
+        const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+        const unsigned int                                  n_components)
       {
         // if we are in hp mode and the number of unknowns changed, we must
         // clear the map of entries
-        if (dofs_per_component != phi.dofs_per_component)
+        if (dofs_per_component !=
+            phi.get_shape_info().dofs_per_component_on_cell)
           {
             locally_relevant_constraints_hn_map.clear();
-            dofs_per_component = phi.dofs_per_component;
+            dofs_per_component =
+              phi.get_shape_info().dofs_per_component_on_cell;
           }
-        this->phi = &phi;
+        this->n_components  = n_components;
+        this->dofs_per_cell = n_components * dofs_per_component;
+        this->phi           = &phi;
+        this->matrix_free   = &matrix_free;
       }
 
       void
       reinit(const unsigned int cell)
       {
-        this->phi->reinit(cell);
-
         // STEP 1: get relevant information from FEEvaluation
+        const auto        &matrix_free     = *this->matrix_free;
         const auto        &dof_info        = phi->get_dof_info();
         const unsigned int n_fe_components = dof_info.start_components.back();
-        const auto        &matrix_free     = phi->get_matrix_free();
 
         // if we have a block vector with components with the same DoFHandler,
         // each component is described with same set of constraints and
@@ -763,7 +793,7 @@ namespace MatrixFreeTools
         // constraints, weight)
         std::vector<std::tuple<unsigned int, unsigned int, Number>>
           locally_relevant_constraints, locally_relevant_constraints_tmp;
-        locally_relevant_constraints.reserve(phi->dofs_per_cell);
+        locally_relevant_constraints.reserve(dofs_per_cell);
         std::vector<unsigned int>  constraint_position;
         std::vector<unsigned char> is_constrained_hn;
 
@@ -923,7 +953,7 @@ namespace MatrixFreeTools
                     // combine with other constraints: to avoid binary
                     // searches, we first build a list of where constraints
                     // are pointing to, and then merge the two lists
-                    constraint_position.assign(phi->dofs_per_cell,
+                    constraint_position.assign(dofs_per_cell,
                                                numbers::invalid_unsigned_int);
                     for (auto &a : locally_relevant_constraints)
                       if (constraint_position[std::get<0>(a)] ==
@@ -931,7 +961,7 @@ namespace MatrixFreeTools
                         constraint_position[std::get<0>(a)] =
                           std::distance(locally_relevant_constraints.data(),
                                         &a);
-                    is_constrained_hn.assign(phi->dofs_per_cell, false);
+                    is_constrained_hn.assign(dofs_per_cell, false);
                     for (auto &hn : locally_relevant_constraints_hn)
                       is_constrained_hn[std::get<0>(hn)] = 1;
 
@@ -1004,7 +1034,7 @@ namespace MatrixFreeTools
                 c_pool.row.push_back(c_pool.val.size());
 
               c_pool.inverse_lookup_rows.clear();
-              c_pool.inverse_lookup_rows.resize(1 + phi->dofs_per_cell);
+              c_pool.inverse_lookup_rows.resize(1 + dofs_per_cell);
               for (const unsigned int i : c_pool.col)
                 c_pool.inverse_lookup_rows[1 + i]++;
               // transform to offsets
@@ -1015,8 +1045,7 @@ namespace MatrixFreeTools
                               c_pool.col.size());
 
               c_pool.inverse_lookup_origins.resize(c_pool.col.size());
-              std::vector<unsigned int> inverse_lookup_count(
-                phi->dofs_per_cell);
+              std::vector<unsigned int> inverse_lookup_count(dofs_per_cell);
               for (unsigned int row = 0; row < c_pool.row.size() - 1; ++row)
                 for (unsigned int col = c_pool.row[row];
                      col < c_pool.row[row + 1];
@@ -1087,15 +1116,7 @@ namespace MatrixFreeTools
               break;
           }
 
-        if (use_fast_path)
-          {
-            temp_values.resize(phi->dofs_per_cell);
-            return;
-          }
-        else
-          {
-            temp_values.clear();
-          }
+        this->has_simple_constraints_ = use_fast_path;
       }
 
       void
@@ -1170,7 +1191,7 @@ namespace MatrixFreeTools
         // this could be simply performed as done at the moment with
         // matrix-free operator evaluation applied to a ith-basis vector
         VectorizedArrayType *dof_values = phi->begin_dof_values();
-        for (const unsigned int j : phi->dof_indices())
+        for (unsigned int j = 0; j < dofs_per_cell; ++j)
           dof_values[j] = VectorizedArrayType();
         dof_values[i] = Number(1);
       }
@@ -1179,19 +1200,13 @@ namespace MatrixFreeTools
       zero_basis_vector()
       {
         VectorizedArrayType *dof_values = phi->begin_dof_values();
-        for (const unsigned int j : phi->dof_indices())
+        for (unsigned int j = 0; j < dofs_per_cell; ++j)
           dof_values[j] = VectorizedArrayType();
       }
 
       void
       submit()
       {
-        if (!temp_values.empty())
-          {
-            temp_values[i] = phi->begin_dof_values()[i];
-            return;
-          }
-
         // if we have a block vector with components with the same DoFHandler,
         // we need to figure out which component and which DoF within the
         // component are we currently considering
@@ -1230,22 +1245,14 @@ namespace MatrixFreeTools
 
       template <typename VectorType>
       inline void
-      distribute_local_to_global(
-        std::array<VectorType *, n_components> &diagonal_global)
+      distribute_local_to_global(std::vector<VectorType *> &diagonal_global)
       {
-        if (!temp_values.empty())
-          {
-            for (unsigned int j = 0; j < temp_values.size(); ++j)
-              phi->begin_dof_values()[j] = temp_values[j];
-
-            phi->distribute_local_to_global(diagonal_global);
-
-            return;
-          }
-
         // STEP 4: assembly results: add into global vector
         const unsigned int n_fe_components =
           phi->get_dof_info().start_components.back();
+
+        if (n_fe_components == 1)
+          AssertDimension(diagonal_global.size(), n_components);
 
         for (unsigned int v = 0; v < n_lanes_filled; ++v)
           // if we have a block vector with components with the same
@@ -1265,15 +1272,18 @@ namespace MatrixFreeTools
       }
 
       bool
-      use_fast_path() const
+      has_simple_constraints() const
       {
-        return !temp_values.empty();
+        return has_simple_constraints_;
       }
 
     private:
-      FEEvaluationType *phi;
+      FEEvaluationType                                   *phi;
+      const MatrixFree<dim, Number, VectorizedArrayType> *matrix_free;
 
       unsigned int dofs_per_component;
+      unsigned int dofs_per_cell;
+      unsigned int n_components;
 
       unsigned int i;
 
@@ -1292,8 +1302,9 @@ namespace MatrixFreeTools
         locally_relevant_constraints_hn_map;
 
       // scratch array
-      AlignedVector<VectorizedArrayType> temp_values;
       AlignedVector<VectorizedArrayType> values_dofs;
+
+      bool has_simple_constraints_;
     };
 
     template <bool is_face,
@@ -1463,13 +1474,10 @@ namespace MatrixFreeTools
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
-    int dummy = 0;
-
-    std::array<typename dealii::internal::BlockVectorSelector<
-                 VectorType,
-                 IsBlockVector<VectorType>::value>::BaseVectorType *,
-               n_components>
-      diagonal_global_components;
+    std::vector<typename dealii::internal::BlockVectorSelector<
+      VectorType,
+      IsBlockVector<VectorType>::value>::BaseVectorType *>
+      diagonal_global_components(n_components);
 
     for (unsigned int d = 0; d < n_components; ++d)
       diagonal_global_components[d] = dealii::internal::
@@ -1498,224 +1506,286 @@ namespace MatrixFreeTools
           *diagonal_global_components[0], matrix_free, dof_info);
       }
 
-    using Helper =
-      internal::ComputeDiagonalHelper<FEEvaluation<dim,
-                                                   fe_degree,
-                                                   n_q_points_1d,
-                                                   n_components,
-                                                   Number,
-                                                   VectorizedArrayType>,
-                                      false>;
+    using FEEvalType = FEEvaluation<dim,
+                                    fe_degree,
+                                    n_q_points_1d,
+                                    n_components,
+                                    Number,
+                                    VectorizedArrayType>;
 
-    using HelperFace =
-      internal::ComputeDiagonalHelper<FEFaceEvaluation<dim,
-                                                       fe_degree,
-                                                       n_q_points_1d,
-                                                       n_components,
-                                                       Number,
-                                                       VectorizedArrayType>,
-                                      true>;
+    using FEFaceEvalType = FEFaceEvaluation<dim,
+                                            fe_degree,
+                                            n_q_points_1d,
+                                            n_components,
+                                            Number,
+                                            VectorizedArrayType>;
 
-    Threads::ThreadLocalStorage<Helper>     scratch_data;
-    Threads::ThreadLocalStorage<HelperFace> scratch_data_m;
-    Threads::ThreadLocalStorage<HelperFace> scratch_data_p;
+    internal::ComputeMatrixScratchData<dim, VectorizedArrayType, false>
+      data_cell;
 
-    const auto cell_operation_wrapped =
-      [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-          VectorType &,
-          const int &,
-          const std::pair<unsigned int, unsigned int> &range) {
-        if (!cell_operation)
-          return;
+    data_cell.dof_numbers               = {dof_no};
+    data_cell.quad_numbers              = {quad_no};
+    data_cell.n_components              = {n_components};
+    data_cell.first_selected_components = {first_selected_component};
+    data_cell.batch_type                = {0};
 
-        // shortcut for FE_Nothing cells
-        if (internal::is_fe_nothing<false>(matrix_free,
+    data_cell.op_create =
+      [&](const std::pair<unsigned int, unsigned int> &range) {
+        std::vector<
+          std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, false>>>
+          phi;
+
+        if (!internal::is_fe_nothing<false>(matrix_free,
+                                            range,
+                                            dof_no,
+                                            quad_no,
+                                            first_selected_component,
+                                            fe_degree,
+                                            n_q_points_1d))
+          phi.emplace_back(std::make_unique<FEEvalType>(
+            matrix_free, range, dof_no, quad_no, first_selected_component));
+
+        return phi;
+      };
+
+    data_cell.op_reinit = [](auto &phi, const unsigned batch) {
+      static_cast<FEEvalType &>(*phi[0]).reinit(batch);
+    };
+
+    if (cell_operation)
+      data_cell.op_compute = [&](auto &phi) {
+        cell_operation(static_cast<FEEvalType &>(*phi[0]));
+      };
+
+    internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+      data_face;
+
+    data_face.dof_numbers               = {dof_no, dof_no};
+    data_face.quad_numbers              = {quad_no, quad_no};
+    data_face.n_components              = {n_components, n_components};
+    data_face.first_selected_components = {first_selected_component,
+                                           first_selected_component};
+    data_face.batch_type                = {1, 2};
+
+    data_face.op_create =
+      [&](const std::pair<unsigned int, unsigned int> &range) {
+        std::vector<
+          std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
+          phi;
+
+        if (!internal::is_fe_nothing<true>(matrix_free,
                                            range,
                                            dof_no,
                                            quad_no,
                                            first_selected_component,
                                            fe_degree,
-                                           n_q_points_1d))
-          return;
-
-        Helper &helper = scratch_data.get();
-
-        FEEvaluation<dim,
-                     fe_degree,
-                     n_q_points_1d,
-                     n_components,
-                     Number,
-                     VectorizedArrayType>
-          phi(matrix_free, range, dof_no, quad_no, first_selected_component);
-        helper.initialize(phi);
-
-        for (unsigned int cell = range.first; cell < range.second; ++cell)
+                                           n_q_points_1d,
+                                           true) &&
+            !internal::is_fe_nothing<true>(matrix_free,
+                                           range,
+                                           dof_no,
+                                           quad_no,
+                                           first_selected_component,
+                                           fe_degree,
+                                           n_q_points_1d,
+                                           false))
           {
-            helper.reinit(cell);
-
-            for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-              {
-                helper.prepare_basis_vector(i);
-                cell_operation(phi);
-                helper.submit();
-              }
-
-            helper.distribute_local_to_global(diagonal_global_components);
+            phi.emplace_back(
+              std::make_unique<FEFaceEvalType>(matrix_free,
+                                               range,
+                                               true,
+                                               dof_no,
+                                               quad_no,
+                                               first_selected_component));
+            phi.emplace_back(
+              std::make_unique<FEFaceEvalType>(matrix_free,
+                                               range,
+                                               false,
+                                               dof_no,
+                                               quad_no,
+                                               first_selected_component));
           }
+
+        return phi;
       };
 
-    const auto face_operation_wrapped =
-      [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-          VectorType &,
-          const int &,
-          const std::pair<unsigned int, unsigned int> &range) {
-        if (!face_operation)
-          return;
+    data_face.op_reinit = [](auto &phi, const unsigned batch) {
+      static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
+      static_cast<FEFaceEvalType &>(*phi[1]).reinit(batch);
+    };
 
-        // shortcut for faces containing purely FE_Nothing
-        if (internal::is_fe_nothing<true>(matrix_free,
-                                          range,
-                                          dof_no,
-                                          quad_no,
-                                          first_selected_component,
-                                          fe_degree,
-                                          n_q_points_1d,
-                                          true) ||
-            internal::is_fe_nothing<true>(matrix_free,
-                                          range,
-                                          dof_no,
-                                          quad_no,
-                                          first_selected_component,
-                                          fe_degree,
-                                          n_q_points_1d,
-                                          false))
-          return;
-
-        HelperFace &helper_m = scratch_data_m.get();
-        HelperFace &helper_p = scratch_data_p.get();
-
-        FEFaceEvaluation<dim,
-                         fe_degree,
-                         n_q_points_1d,
-                         n_components,
-                         Number,
-                         VectorizedArrayType>
-          phi_m(matrix_free,
-                range,
-                true,
-                dof_no,
-                quad_no,
-                first_selected_component);
-        FEFaceEvaluation<dim,
-                         fe_degree,
-                         n_q_points_1d,
-                         n_components,
-                         Number,
-                         VectorizedArrayType>
-          phi_p(matrix_free,
-                range,
-                false,
-                dof_no,
-                quad_no,
-                first_selected_component);
-
-        helper_m.initialize(phi_m);
-        helper_p.initialize(phi_p);
-
-        for (unsigned int face = range.first; face < range.second; ++face)
-          {
-            helper_m.reinit(face);
-            helper_p.reinit(face);
-
-            // make check only if both adjacent cells have DoFs
-            Assert(helper_m.use_fast_path() && helper_p.use_fast_path(),
-                   ExcNotImplemented());
-
-            for (unsigned int i = 0; i < phi_m.dofs_per_cell; ++i)
-              {
-                helper_m.prepare_basis_vector(i);
-                helper_p.zero_basis_vector();
-                face_operation(phi_m, phi_p);
-                helper_m.submit();
-              }
-
-            helper_m.distribute_local_to_global(diagonal_global_components);
-
-            for (unsigned int i = 0; i < phi_p.dofs_per_cell; ++i)
-              {
-                helper_m.zero_basis_vector();
-                helper_p.prepare_basis_vector(i);
-                face_operation(phi_m, phi_p);
-                helper_p.submit();
-              }
-
-            helper_p.distribute_local_to_global(diagonal_global_components);
-          }
+    if (face_operation)
+      data_face.op_compute = [&](auto &phi) {
+        face_operation(static_cast<FEFaceEvalType &>(*phi[0]),
+                       static_cast<FEFaceEvalType &>(*phi[1]));
       };
 
-    const auto boundary_operation_wrapped =
-      [&](const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-          VectorType &,
-          const int &,
-          const std::pair<unsigned int, unsigned int> &range) {
-        if (!boundary_operation)
-          return;
+    internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+      data_boundary;
 
-        // shortcut for faces containing purely FE_Nothing
-        if (internal::is_fe_nothing<true>(matrix_free,
-                                          range,
-                                          dof_no,
-                                          quad_no,
-                                          first_selected_component,
-                                          fe_degree,
-                                          n_q_points_1d,
-                                          true))
-          return;
+    data_boundary.dof_numbers               = {dof_no};
+    data_boundary.quad_numbers              = {quad_no};
+    data_boundary.n_components              = {n_components};
+    data_boundary.first_selected_components = {first_selected_component};
+    data_boundary.batch_type                = {1};
 
-        HelperFace &helper = scratch_data_m.get();
+    data_boundary
+      .op_create = [&](const std::pair<unsigned int, unsigned int> &range) {
+      std::vector<
+        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
+        phi;
 
-        FEFaceEvaluation<dim,
-                         fe_degree,
-                         n_q_points_1d,
-                         n_components,
-                         Number,
-                         VectorizedArrayType>
-          phi(matrix_free,
-              range,
-              true,
-              dof_no,
-              quad_no,
-              first_selected_component);
-        helper.initialize(phi);
+      if (!internal::is_fe_nothing<true>(matrix_free,
+                                         range,
+                                         dof_no,
+                                         quad_no,
+                                         first_selected_component,
+                                         fe_degree,
+                                         n_q_points_1d,
+                                         true))
+        phi.emplace_back(std::make_unique<FEFaceEvalType>(
+          matrix_free, range, true, dof_no, quad_no, first_selected_component));
 
-        for (unsigned int face = range.first; face < range.second; ++face)
-          {
-            helper.reinit(face);
+      return phi;
+    };
 
-            for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-              {
-                helper.prepare_basis_vector(i);
-                boundary_operation(phi);
-                helper.submit();
-              }
+    data_boundary.op_reinit = [](auto &phi, const unsigned batch) {
+      static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
+    };
 
-            helper.distribute_local_to_global(diagonal_global_components);
-          }
+    if (boundary_operation)
+      data_boundary.op_compute = [&](auto &phi) {
+        boundary_operation(static_cast<FEFaceEvalType &>(*phi[0]));
       };
 
-    if (face_operation || boundary_operation)
-      matrix_free.template loop<VectorType, int>(cell_operation_wrapped,
-                                                 face_operation_wrapped,
-                                                 boundary_operation_wrapped,
-                                                 diagonal_global,
-                                                 dummy,
-                                                 false);
-    else
-      matrix_free.template cell_loop<VectorType, int>(cell_operation_wrapped,
-                                                      diagonal_global,
-                                                      dummy,
-                                                      false);
+    internal::compute_diagonal(matrix_free,
+                               data_cell,
+                               data_face,
+                               data_boundary,
+                               diagonal_global,
+                               diagonal_global_components);
   }
+
+  namespace internal
+  {
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename VectorType,
+              typename VectorType2>
+    void
+    compute_diagonal(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, false>
+        &data_cell,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+        &data_face,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+                                 &data_boundary,
+      VectorType                 &diagonal_global,
+      std::vector<VectorType2 *> &diagonal_global_components)
+    {
+      // TODO: can we remove diagonal_global_components as argument?
+
+      int dummy = 0;
+
+      using Helper =
+        internal::ComputeDiagonalHelper<dim, VectorizedArrayType, false>;
+
+      using HelperFace =
+        internal::ComputeDiagonalHelper<dim, VectorizedArrayType, true>;
+
+      Threads::ThreadLocalStorage<std::vector<Helper>> scratch_data;
+      Threads::ThreadLocalStorage<std::vector<HelperFace>>
+        scratch_data_internal;
+      Threads::ThreadLocalStorage<std::vector<HelperFace>> scratch_data_bc;
+
+      const auto batch_operation =
+        [&](auto                                        &data,
+            auto                                        &scratch_data,
+            const std::pair<unsigned int, unsigned int> &range) {
+          if (!data.op_compute)
+            return; // nothing to do
+
+          auto phi = data.op_create(range);
+
+          const unsigned int n_blocks = phi.size();
+
+          auto &helpers = scratch_data.get();
+          helpers.resize(n_blocks);
+
+          for (unsigned int b = 0; b < n_blocks; ++b)
+            helpers[b].initialize(*phi[b], matrix_free, data.n_components[b]);
+
+          for (unsigned int batch = range.first; batch < range.second; ++batch)
+            {
+              data.op_reinit(phi, batch);
+
+              for (unsigned int b = 0; b < n_blocks; ++b)
+                helpers[b].reinit(batch);
+
+              if (n_blocks > 1)
+                {
+                  Assert(std::all_of(helpers.begin(),
+                                     helpers.end(),
+                                     [](const auto &helper) {
+                                       return helper.has_simple_constraints();
+                                     }),
+                         ExcNotImplemented());
+                }
+
+              for (unsigned int b = 0; b < n_blocks; ++b)
+                {
+                  for (unsigned int i = 0;
+                       i < phi[b]->get_shape_info().dofs_per_component_on_cell *
+                             data.n_components[b];
+                       ++i)
+                    {
+                      for (unsigned int bb = 0; bb < n_blocks; ++bb)
+                        if (b == bb)
+                          helpers[bb].prepare_basis_vector(i);
+                        else
+                          helpers[bb].zero_basis_vector();
+
+                      data.op_compute(phi);
+                      helpers[b].submit();
+                    }
+
+                  helpers[b].distribute_local_to_global(
+                    diagonal_global_components);
+                }
+            }
+        };
+
+      const auto cell_operation_wrapped =
+        [&](const auto &, auto &, const auto &, const auto range) {
+          batch_operation(data_cell, scratch_data, range);
+        };
+
+      const auto face_operation_wrapped =
+        [&](const auto &, auto &, const auto &, const auto range) {
+          batch_operation(data_face, scratch_data_internal, range);
+        };
+
+      const auto boundary_operation_wrapped =
+        [&](const auto &, auto &, const auto &, const auto range) {
+          batch_operation(data_boundary, scratch_data_bc, range);
+        };
+
+      if (data_face.op_compute || data_boundary.op_compute)
+        matrix_free.template loop<VectorType, int>(cell_operation_wrapped,
+                                                   face_operation_wrapped,
+                                                   boundary_operation_wrapped,
+                                                   diagonal_global,
+                                                   dummy,
+                                                   false);
+      else
+        matrix_free.template cell_loop<VectorType, int>(cell_operation_wrapped,
+                                                        diagonal_global,
+                                                        dummy,
+                                                        false);
+    }
+  } // namespace internal
 
   template <typename CLASS,
             int dim,
