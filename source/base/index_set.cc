@@ -1214,8 +1214,8 @@ template IndexSet::IndexSet(
     LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>>
     &);
 
-#      if defined(HAVE_TPETRA_INST_CUDA) || defined(HAVE_TPETRA_INST_HIP) || \
-        defined(HAVE_TPETRA_INST_SYCL)
+#      if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || \
+        defined(KOKKOS_ENABLE_SYCL)
 template IndexSet::IndexSet(
   const Teuchos::RCP<const Tpetra::Map<
     int,
@@ -1230,8 +1230,8 @@ dealii::IndexSet::make_tpetra_map<
   const MPI_Comm,
   bool) const;
 
-#      if defined(HAVE_TPETRA_INST_CUDA) || defined(HAVE_TPETRA_INST_HIP) || \
-        defined(HAVE_TPETRA_INST_SYCL)
+#      if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || \
+        defined(KOKKOS_ENABLE_SYCL)
 template LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<
   MemorySpace::Default>
 dealii::IndexSet::make_tpetra_map<
@@ -1247,8 +1247,8 @@ dealii::IndexSet::make_tpetra_map_rcp<
   const MPI_Comm,
   bool) const;
 
-#      if defined(HAVE_TPETRA_INST_CUDA) || defined(HAVE_TPETRA_INST_HIP) || \
-        defined(HAVE_TPETRA_INST_SYCL)
+#      if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP) || \
+        defined(KOKKOS_ENABLE_SYCL)
 template Teuchos::RCP<
   LinearAlgebra::TpetraWrappers::TpetraTypes::MapType<MemorySpace::Default>>
 dealii::IndexSet::make_tpetra_map_rcp<
