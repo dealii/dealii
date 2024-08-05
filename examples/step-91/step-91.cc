@@ -13,6 +13,7 @@
  * ------------------------------------------------------------------------
  *
  * Author: Wolfgang Bangerth, Colorado State University, 2024
+ *         Jean-Paul Pelteret, 2024.
  */
 
 #include <deal.II/base/quadrature_lib.h>
@@ -23,19 +24,6 @@
 #include <deal.II/lac/generic_linear_algebra.h>
 
 /* #define FORCE_USE_OF_TRILINOS */
-
-namespace LA
-{
-#if defined(DEAL_II_WITH_PETSC) && !defined(DEAL_II_PETSC_WITH_COMPLEX) && \
-  !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
-  using namespace dealii::LinearAlgebraPETSc;
-#  define USE_PETSC_LA
-#elif defined(DEAL_II_WITH_TRILINOS)
-  using namespace dealii::LinearAlgebraTrilinos;
-#else
-#  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
-#endif
-} // namespace LA
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -72,6 +60,8 @@ namespace LA
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
 
+#include <deal.II/sundials/ida.h>
+
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -80,6 +70,20 @@ namespace Step55
 {
   using namespace dealii;
 
+  namespace LA
+  {
+#if defined(DEAL_II_WITH_PETSC) && !defined(DEAL_II_PETSC_WITH_COMPLEX) && \
+  !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
+    using namespace LinearAlgebraPETSc;
+#  define USE_PETSC_LA
+#elif defined(DEAL_II_WITH_TRILINOS)
+    using namespace LinearAlgebraTrilinos;
+#else
+#  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
+#endif
+  } // namespace LA
+
+  using VectorType = LA::MPI::BlockVector;
 
 
   namespace ModelParameters
@@ -249,9 +253,19 @@ namespace Step55
     void assemble_initial_waterflow_system();
     void solve_initial_waterflow_system();
 
-    void assemble_residual(LA::MPI::BlockVector &residual);
+    void assemble_residual(VectorType &residual);
     void assemble_jacobian();
     void solve_with_jacobian();
+
+    template <typename NumberType>
+    void local_residual(
+      const std::vector<NumberType> &local_solution_elevation_at_q_points,
+      const std::vector<NumberType> &local_solution_water_at_q_points,
+      const std::vector<Tensor<1, dim, NumberType>>
+                                    &local_gradient_elevation_at_q_points,
+      const std::vector<NumberType> &local_solution_dot_elevation_at_q_points,
+      const double                   time,
+      std::vector<NumberType>       &cell_residual) const;
 
     void refine_grid();
     void output_results(const unsigned int cycle);
@@ -268,8 +282,8 @@ namespace Step55
     AffineConstraints<double> constraints;
 
     LA::MPI::BlockSparseMatrix system_matrix;
-    LA::MPI::BlockVector       locally_relevant_solution;
-    LA::MPI::BlockVector       system_rhs;
+    VectorType                 locally_relevant_solution;
+    VectorType                 system_rhs;
 
     ConditionalOStream pcout;
     TimerOutput        computing_timer;
@@ -366,7 +380,7 @@ namespace Step55
     const VectorFunctionFromScalarFunctionObject<dim> initial_values(
       [&](const Point<dim> &p) { return colorado_topography.value(p); }, 0, 2);
 
-    LA::MPI::BlockVector interpolated;
+    VectorType interpolated;
     interpolated.reinit(owned_partitioning, MPI_COMM_WORLD);
     VectorTools::interpolate(dof_handler, initial_values, interpolated);
 
@@ -379,36 +393,48 @@ namespace Step55
   void StreamPowerErosionProblem<dim>::compute_initial_constraints()
   {
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-    constraints.reinit(locally_owned_dofs, DoFTools::extract_locally_relevant_dofs(dof_handler));
+    constraints.reinit(locally_owned_dofs,
+                       DoFTools::extract_locally_relevant_dofs(dof_handler));
 
-    Assert (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1, ExcNotImplemented());
+    Assert(Utilities::MPI::n_mpi_processes(mpi_communicator) == 1,
+           ExcNotImplemented());
 
-    std::vector<bool> locally_owned_elevation_dofs_that_are_maxima (locally_owned_dofs.n_elements(), true);
-    std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+    std::vector<bool> locally_owned_elevation_dofs_that_are_maxima(
+      locally_owned_dofs.n_elements(), true);
+    std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
     for (const auto &cell : dof_handler.active_cell_iterators())
-      if (cell->is_locally_owned())
+      if (cell->is_locally_owned() || cell->is_ghost())
         {
-          cell->get_dof_indices (local_dof_indices);
+          cell->get_dof_indices(local_dof_indices);
 
-          for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
             if (fe.system_to_component_index(i).first == 0) // is elevation
               {
-                const types::global_dof_index elevation_dof_index = local_dof_indices[i];
+                const types::global_dof_index elevation_dof_index =
+                  local_dof_indices[i];
 
-                if (locally_owned_elevation_dofs_that_are_maxima[locally_owned_dofs.nth_index_in_set(elevation_dof_index)]
-                                                                 == true)
+                if (locally_owned_elevation_dofs_that_are_maxima
+                      [locally_owned_dofs.nth_index_in_set(
+                        elevation_dof_index)] == true)
                   {
-                    const double elevation = locally_relevant_solution(elevation_dof_index);
+                    const double elevation =
+                      locally_relevant_solution(elevation_dof_index);
 
-                    for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+                    for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
                       if (j != i)
-                        if (fe.system_to_component_index(j).first == 0) // is also elevation
+                        if (fe.system_to_component_index(j).first ==
+                            0) // is also elevation
                           {
-                            const types::global_dof_index other_elevation_dof_index = local_dof_indices[j];
-                            const double other_elevation = locally_relevant_solution(other_elevation_dof_index);
+                            const types::global_dof_index
+                              other_elevation_dof_index = local_dof_indices[j];
+                            const double other_elevation =
+                              locally_relevant_solution(
+                                other_elevation_dof_index);
                             if (other_elevation > elevation)
                               {
-                                locally_owned_elevation_dofs_that_are_maxima[locally_owned_dofs.nth_index_in_set(elevation_dof_index)] = false;
+                                locally_owned_elevation_dofs_that_are_maxima
+                                  [locally_owned_dofs.nth_index_in_set(
+                                    elevation_dof_index)] = false;
                                 break;
                               }
                           }
@@ -416,15 +442,22 @@ namespace Step55
               }
         }
 
-    LA::MPI::BlockVector distributed_solution(owned_partitioning,
-                                              mpi_communicator);
-    for (unsigned int i=0; i<dof_handler.n_dofs()/2; ++i) // could be done better
-      if (locally_owned_elevation_dofs_that_are_maxima[locally_owned_dofs.nth_index_in_set(i)])
+    VectorType distributed_solution(owned_partitioning, mpi_communicator);
+    for (unsigned int i = 0; i < dof_handler.n_dofs() / 2;
+         ++i) // could be done better
+      if (locally_owned_elevation_dofs_that_are_maxima[locally_owned_dofs
+                                                         .nth_index_in_set(i)])
         {
-          constraints.add_constraint (i+system_rhs.block(0).size(), {}, 0.); // could probably do better
-          distributed_solution(i+system_rhs.block(0).size()) = 42;
+          constraints.add_constraint(i + system_rhs.block(0).size(),
+                                     {},
+                                     0.); // could probably do better
+          distributed_solution(i + system_rhs.block(0).size()) = 42;
         }
     constraints.close();
+    constraints.make_consistent_in_parallel(
+      locally_owned_dofs,
+      DoFTools::extract_locally_relevant_dofs(dof_handler),
+      mpi_communicator);
 
     distributed_solution.compress(VectorOperation::insert);
     locally_relevant_solution.block(1) = distributed_solution.block(1);
@@ -548,14 +581,14 @@ namespace Step55
     TimerOutput::Scope t(computing_timer,
                          "initial conditions: solve waterflow system");
 
-    std::cout << "Initial residual=" << system_rhs.block(1).l2_norm() << std::endl;
-    SolverControl solver_control(system_matrix.block(1,1).m(),
+    std::cout << "Initial residual=" << system_rhs.block(1).l2_norm()
+              << std::endl;
+    SolverControl solver_control(system_matrix.block(1, 1).m(),
                                  1e-6 * system_rhs.block(1).l2_norm());
 
     SolverGMRES<LA::MPI::Vector> solver(solver_control);
 
-    LA::MPI::BlockVector distributed_solution(owned_partitioning,
-                                              mpi_communicator);
+    VectorType distributed_solution(owned_partitioning, mpi_communicator);
 
     constraints.set_zero(distributed_solution);
 
@@ -650,10 +683,9 @@ namespace Step55
     SolverControl solver_control(system_matrix.m(),
                                  1e-6 * system_rhs.l2_norm());
 
-    SolverGMRES<LA::MPI::BlockVector> solver(solver_control);
+    SolverGMRES<VectorType> solver(solver_control);
 
-    LA::MPI::BlockVector distributed_solution(owned_partitioning,
-                                              mpi_communicator);
+    VectorType distributed_solution(owned_partitioning, mpi_communicator);
 
     constraints.set_zero(distributed_solution);
 
@@ -753,12 +785,50 @@ namespace Step55
     setup_system();
     interpolate_initial_elevation();
     compute_initial_constraints();
+
+    // Get rid of these three lines eventually (?):
     assemble_initial_waterflow_system();
-//    solve_initial_waterflow_system();
+    solve_initial_waterflow_system();
     output_results(/*cycle*/ 0);
 
+    const SUNDIALS::IDA<VectorType>::AdditionalData time_integrator_parameters(
+      /* initial_time     */ 0.0, // Initial time is today
+      /* final_time       */ 1e6, // End time is one million years from now
+      /* initial_step_size*/ 10,  // Start with a time step of ten years
+      /* output_period    */ 100, // Produce output every 100 years
+                                  // Running parameters
+      /* minimum_step_size            */ 1,
+      /* maximum_order                */ 5, // Is this the time stepping order?
+      /* maximum_non_linear_iterations*/ 10,
+      /* ls_norm_factor               */ 0,       // What is this??
+                                                  // Error parameters
+      /* absolute_tolerance               */ 0.1, // 0.1 meters is a good
+                                                  // absolute tolerance
+      /* relative_tolerance               */ 1e-5,
+      /* ignore_algebraic_terms_for_errors*/ true,
+      // Initial conditions parameters
+      /* const InitialConditionCorrection */
+      SUNDIALS::IDA<VectorType>::AdditionalData::use_y_diff, // ???
+      /* const InitialConditionCorrection */
+      SUNDIALS::IDA<VectorType>::AdditionalData::use_y_diff, // ???
+      /* maximum_non_linear_iterations_ic*/ 5);
+    SUNDIALS::IDA<VectorType> time_integrator(time_integrator_parameters);
+    // TODO: Fill these in:
+    //    time_integrator.reinit_vector;
+    //    time_integrator.residual;
+    //    time_integrator.setup_jacobian;
+    //    time_integrator.solve_with_jacobian;
+    //    time_integrator.output_step;
+    //    time_integrator.differential_components;
+
+    // TODO: Figure out whether the following vectors need to be fully
+    // distributed, ghosted, or otherwise. Set to the correct vector as computed
+    // above.
+    VectorType solution = locally_relevant_solution;
+    VectorType solution_dot;
+    time_integrator.solve_dae(solution, solution_dot);
+
     computing_timer.print_summary();
-    computing_timer.reset();
   }
 } // namespace Step55
 
