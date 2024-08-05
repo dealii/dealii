@@ -59,7 +59,7 @@ main()
 
   SymmetricTensor<4, dim, double> st_minor;
 
-  st_minor = symmetrize(t, 0);
+  st_minor = symmetrize(t, SymmetryType::minor);
 
   // test minor symmetry
   for (unsigned int i = 0; i < dim; ++i)
@@ -78,7 +78,7 @@ main()
 
   SymmetricTensor<4, dim, double> st_major;
 
-  st_major = symmetrize(t, 1);
+  st_major = symmetrize(t, SymmetryType::minor_major);
 
   // test major symmetry
   for (unsigned int i = 0; i < dim; ++i)

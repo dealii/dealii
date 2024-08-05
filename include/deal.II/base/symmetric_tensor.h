@@ -3544,17 +3544,29 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
   return result;
 }
 
-
+/**
+ * An enumeration to describe the desired symmetry of the
+ * symmetric fourth order tensor
+ */
+enum class SymmetryType
+{
+  /**
+   * Only minor symmetry of the form:
+   * $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$.
+   */
+  minor,
+  /** 
+   * Both minor and major symmetry of the form:
+   * Minor - $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$
+   * Major - $A_{ijkl}=A_{klij}$.
+   */
+  minor_major,
+};
 
 /**
  * Return the symmetrized version of a full rank-4 tensor, i.e.
  * as a symmetric rank-4 tensor.
- * @param symmetry_type decides the type of symmetry - 
- * only minor symmetry ( @param symmetry_type = 0 ) or 
- * both major and minor symmetry ( @param symmetry_type = 1 ). 
- * The symmetries are defined as follows:
- * Minor symmetry - $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$
- * Major symmetry = $A_{ijkl}=A_{klij}$.
+ * @param symmetry_type decides the type of symmetry.
  * This is the version for general dimensions.
  *
  * @relatesalso SymmetricTensor
@@ -3563,7 +3575,7 @@ template <int dim, typename Number>
 DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
   SymmetricTensor<4, dim, Number>
   symmetrize(const Tensor<4, dim, Number> &t,
-             const unsigned int            symmetry_type = 0)
+             const SymmetryType &symmetry_type = SymmetryType::minor)
 {
   SymmetricTensor<4, dim, Number> result;
   for (unsigned int i = 0; i < dim; ++i)
@@ -3571,9 +3583,9 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
 
   const Number half = internal::NumberType<Number>::value(0.5);
 
-  if (symmetry_type == 0)
+  if (symmetry_type == SymmetryType::minor)
     {
-      // only minor symmetry - A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}
+      // minor symmetry - A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}
 
       for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int j = 0; j < dim; ++j)
@@ -3604,10 +3616,10 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
                   }
               }
     }
-  else if (symmetry_type == 1)
+  else if (symmetry_type == SymmetryType::minor_major)
     {
-      std::cout << "both major and minor symmetry" << std::endl;
 
+      // minor symmetry - A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}
       for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int j = 0; j < dim; ++j)
           for (unsigned int k = 0; k < dim; ++k)
@@ -3637,7 +3649,7 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
                   }
               }
 
-      // major symmetry
+      // major symmetry - A_{ijkl}=A_{klij}
       for (unsigned int i = 0; i < dim; ++i)
         for (unsigned int j = i; j < dim; ++j)
           for (unsigned int k = 0; k < dim; ++k)
