@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ## ------------------------------------------------------------------------
 ##
@@ -77,7 +77,7 @@ class DeprecatedDeclaration(object):
         self.commit_hash = self.git_log_output[0].split(' ')[0]
         self.commit_summary = self.git_log_output[9][len("summary "):]
         self.epoch_time = int(self.git_log_output[7][len("commiter-time "):])
-        self.output_time = datetime.datetime.utcfromtimestamp(self.epoch_time)
+        self.output_time = datetime.datetime.fromtimestamp(self.epoch_time, datetime.UTC)
 
         git_tag_output = subprocess.check_output(["git", "tag", "--contains",
                                                   self.commit_hash,
