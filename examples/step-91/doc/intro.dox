@@ -623,7 +623,7 @@ then come back to the issue of initial conditions.
 
 <h4> Assembling the residual vector </h4>
 
-Recall that we want to compute 
+Recall that we want to compute
 @f{align*}{
   {\cal F}(t,y,\dot y) =
   {\cal F}([V,W],[\dot V,\dot W]) =
