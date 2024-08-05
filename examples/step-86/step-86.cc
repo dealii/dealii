@@ -591,7 +591,7 @@ namespace Step86
     // the constrained dofs corresponding to hanging nodes (i.e., those for
     // which the lines of the `current_constraints` contain at least one other
     // entry), and to the difference between the input vector and the actual
-    // solution on those constraints that correspond to boundary conditions. 
+    // solution on those constraints that correspond to boundary conditions.
     for (const auto &c : current_constraints.get_lines())
       if (locally_owned_dofs.is_element(c.index))
         {
