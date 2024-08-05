@@ -21,6 +21,8 @@
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
+#  include <deal.II/base/memory_space.h>
+
 #  include <Kokkos_DualView.hpp>
 #  include <Tpetra_Details_DefaultTypes.hpp>
 
@@ -145,36 +147,23 @@ namespace LinearAlgebra
 
 
       /**
-       * @brief Typedef for the Kokkos::View type of unmanaged host memory.
-       *
-       * Unmanaged means that the view is not allocating data itself, but only
-       * uses an external pointer. Consequently, the memory is not freed upon
-       * destruction of the view.
+       * @brief Typedef for the Kokkos::View type.
        * This is needed for shallow copies of deal.II LA structures
        * to Trilinos LA structures.
        *
        */
       template <typename Number>
-      using HostViewTypeUnmanaged = Kokkos::View<Number **,
-                                                 Kokkos::LayoutLeft,
-                                                 Kokkos::HostSpace,
-                                                 Kokkos::MemoryUnmanaged>;
+      using HostViewType =
+        typename VectorType<Number, dealii::MemorySpace::Host>::host_view_type;
 
       /**
-       * @brief Typedef for the Kokkos::View type of unmanaged memory.
-       *
-       * Unmanaged means that the view is not allocating data itself, but only
-       * uses an external pointer. Consequently, the memory is not freed upon
-       * destruction of the view.
+       * @brief Typedef for the Kokkos::DualView type.
        * This is needed for shallow copies of deal.II LA structures
        * to Trilinos LA structures.
        */
       template <typename Number, typename MemorySpace>
-      using DualViewTypeUnmanaged =
-        Kokkos::DualView<Number **,
-                         Kokkos::LayoutLeft,
-                         typename MemorySpace::kokkos_space::execution_space,
-                         Kokkos::MemoryUnmanaged>;
+      using DualViewType =
+        typename VectorType<Number, MemorySpace>::dual_view_type;
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_IFPACK2
