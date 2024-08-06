@@ -87,7 +87,7 @@ test()
   IndexSet           locally_owned_dofs(N);
   locally_owned_dofs.add_range(start_row[my_id], local_rows_per_process[my_id]);
 
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> m;
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> m;
   m.reinit(locally_owned_dofs, locally_owned_dofs, csp, MPI_COMM_WORLD);
   // now write into the exact same matrix
   // entries as have been created by the

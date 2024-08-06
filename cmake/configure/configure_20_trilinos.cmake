@@ -446,20 +446,28 @@ macro(feature_trilinos_configure_external)
   if(${DEAL_II_TRILINOS_WITH_TPETRA})
     if(_tpetra_inst_double)
       set(DEAL_II_EXPAND_TPETRA_TYPES "double")
-      set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE
+        "LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>")
     endif()
 
     if(_tpetra_inst_float)
-      set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+      set(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT
+        "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default>")
     endif()
 
     if(${DEAL_II_WITH_COMPLEX_NUMBERS})
       if(_tpetra_inst_complex_double)
-        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>>")
+        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<double>, MemorySpace::Default>")
       endif()
 
       if(_tpetra_inst_complex_float)
-        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>>")
+        set(DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::Vector<std::complex<float>, MemorySpace::Default>")
       endif()
     endif()
   endif()

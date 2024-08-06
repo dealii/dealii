@@ -46,28 +46,37 @@ namespace LinearAlgebra
             Number alpha = Teuchos::ScalarTraits<Number>::one(),
             Number beta  = Teuchos::ScalarTraits<Number>::zero())
       {
-        Assert(&src != &dst,
-               SparseMatrix<double>::ExcSourceEqualsDestination());
+        Assert(
+          &src != &dst,
+          (typename SparseMatrix<double,
+                                 MemorySpace>::ExcSourceEqualsDestination()));
         Assert(M.trilinos_matrix().isFillComplete(),
-               SparseMatrix<double>::ExcMatrixNotCompressed());
+               (typename SparseMatrix<double,
+                                      MemorySpace>::ExcMatrixNotCompressed()));
 
         if (mode == Teuchos::NO_TRANS)
           {
             Assert(src.trilinos_vector().getMap()->isSameAs(
                      *M.trilinos_matrix().getDomainMap()),
-                   SparseMatrix<double>::ExcColMapMismatch());
-            Assert(dst.trilinos_vector().getMap()->isSameAs(
-                     *M.trilinos_matrix().getRangeMap()),
-                   SparseMatrix<double>::ExcDomainMapMismatch());
+                   (typename SparseMatrix<double,
+                                          MemorySpace>::ExcColMapMismatch()));
+            Assert(
+              dst.trilinos_vector().getMap()->isSameAs(
+                *M.trilinos_matrix().getRangeMap()),
+              (typename SparseMatrix<double,
+                                     MemorySpace>::ExcDomainMapMismatch()));
           }
         else
           {
             Assert(dst.trilinos_vector().getMap()->isSameAs(
                      *M.trilinos_matrix().getDomainMap()),
-                   SparseMatrix<double>::ExcColMapMismatch());
-            Assert(src.trilinos_vector().getMap()->isSameAs(
-                     *M.trilinos_matrix().getRangeMap()),
-                   SparseMatrix<double>::ExcDomainMapMismatch());
+                   (typename SparseMatrix<double,
+                                          MemorySpace>::ExcColMapMismatch()));
+            Assert(
+              src.trilinos_vector().getMap()->isSameAs(
+                *M.trilinos_matrix().getRangeMap()),
+              (typename SparseMatrix<double,
+                                     MemorySpace>::ExcDomainMapMismatch()));
           }
 
         M.trilinos_matrix().apply(
@@ -85,10 +94,13 @@ namespace LinearAlgebra
             Number alpha = Teuchos::ScalarTraits<Number>::one(),
             Number beta  = Teuchos::ScalarTraits<Number>::zero())
       {
-        Assert(&src != &dst,
-               SparseMatrix<double>::ExcSourceEqualsDestination());
+        Assert(
+          &src != &dst,
+          (typename SparseMatrix<double,
+                                 MemorySpace>::ExcSourceEqualsDestination()));
         Assert(M.trilinos_matrix().isFillComplete(),
-               SparseMatrix<double>::ExcMatrixNotCompressed());
+               (typename SparseMatrix<double,
+                                      MemorySpace>::ExcMatrixNotCompressed()));
 
         // get the size of the input vectors:
         const size_type dst_local_size = dst.end() - dst.begin();
@@ -189,7 +201,7 @@ namespace LinearAlgebra
         // correct number of indices right from the start
         if (exchange_data)
           {
-            SparsityPattern trilinos_sparsity;
+            SparsityPattern<MemorySpace> trilinos_sparsity;
             trilinos_sparsity.reinit(row_parallel_partitioning,
                                      column_parallel_partitioning,
                                      sparsity_pattern,
@@ -307,7 +319,7 @@ namespace LinearAlgebra
         // correct number of indices right from the start
         if (exchange_data)
           {
-            SparsityPattern trilinos_sparsity;
+            SparsityPattern<MemorySpace> trilinos_sparsity;
             trilinos_sparsity.reinit(row_parallel_partitioning,
                                      column_parallel_partitioning,
                                      sparsity_pattern,

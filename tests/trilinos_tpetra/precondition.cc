@@ -70,10 +70,12 @@ private:
 
   AffineConstraints<double> constraints;
 
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> system_matrix;
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>
+    system_matrix;
 
-  LinearAlgebra::TpetraWrappers::Vector<double> solution;
-  LinearAlgebra::TpetraWrappers::Vector<double> system_rhs;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> solution;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>
+    system_rhs;
 };
 
 
@@ -236,8 +238,9 @@ Step4<dim>::solve(int cycle)
     LinearAlgebra::TpetraWrappers::PreconditionIdentity<double> preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+                           solver(solver_control);
     Teuchos::ParameterList precon_params;
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
@@ -258,8 +261,9 @@ Step4<dim>::solve(int cycle)
       "RELAXATION");
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+                           solver(solver_control);
     Teuchos::ParameterList precon_params;
     precon_params.set("relaxation: type", "Symmetric Gauss-Seidel");
     preconditioner.set_parameter_list(precon_params);
@@ -279,8 +283,9 @@ Step4<dim>::solve(int cycle)
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -297,8 +302,9 @@ Step4<dim>::solve(int cycle)
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -316,8 +322,9 @@ Step4<dim>::solve(int cycle)
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -334,8 +341,9 @@ Step4<dim>::solve(int cycle)
     solution = 0;
 
     SolverControl solver_control(1000, 1e-5);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -352,8 +360,9 @@ Step4<dim>::solve(int cycle)
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -373,8 +382,9 @@ Step4<dim>::solve(int cycle)
     data.n_local_parts = 16;
     solution           = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -394,8 +404,9 @@ Step4<dim>::solve(int cycle)
     data.omega         = 0.8;
     solution           = 0;
     SolverControl solver_control(1000, 1e-5);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -415,8 +426,9 @@ Step4<dim>::solve(int cycle)
     data.omega         = 1.2;
     solution           = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -432,8 +444,9 @@ Step4<dim>::solve(int cycle)
     LinearAlgebra::TpetraWrappers::PreconditionILU<double> preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -453,8 +466,9 @@ Step4<dim>::solve(int cycle)
     data.ilut_fill = 3;
     solution       = 0;
     SolverControl solver_control(1000, 1e-5);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -474,8 +488,9 @@ Step4<dim>::solve(int cycle)
     data.degree         = 3;
     solution            = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),

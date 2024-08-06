@@ -26,7 +26,8 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::SparseMatrix<double> &m)
+test(
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> &m)
 {
   AssertThrow(m.m() == 100, ExcInternalError());
   AssertThrow(m.n() == 100, ExcInternalError());
@@ -53,7 +54,9 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::SparseMatrix<double> v(100U, 100U, 5U);
+        LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                    MemorySpace::Default>
+          v(100U, 100U, 5U);
         test(v);
       }
     }

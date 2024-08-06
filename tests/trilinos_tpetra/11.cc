@@ -26,7 +26,7 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::Vector<double> &v)
+test(LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &v)
 {
   // set only certain elements of the vector
   for (unsigned int i = 0; i < v.size(); i += 1 + i)
@@ -53,7 +53,7 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::Vector<double> v;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v;
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test(v);
       }
