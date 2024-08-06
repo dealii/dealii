@@ -698,7 +698,7 @@ namespace Step55
                                  1e-6 * system_rhs.block(1).l2_norm());
 
     SolverGMRES<LA::MPI::Vector>       solver(solver_control);
-    TrilinosWrappers::PreconditionSSOR preconditioner;
+    LA::MPI::PreconditionILU preconditioner;
     preconditioner.initialize(system_matrix.block(1, 1));
 
     VectorType distributed_solution(owned_partitioning, mpi_communicator);
