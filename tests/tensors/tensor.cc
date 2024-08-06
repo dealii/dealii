@@ -38,7 +38,7 @@ main()
 
   Vector<double> unrolled(9);
 
-  t.unroll(unrolled);
+  t.unroll(unrolled.data(), unrolled.data() + 9);
   deallog << "unrolled:";
   for (unsigned i = 0; i < 9; ++i)
     deallog << ' ' << unrolled(i);

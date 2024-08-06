@@ -795,55 +795,6 @@ public:
     const SymmetricTensor<rank_, dim, OtherNumber> &initializer);
 
   /**
-   * Return a pointer to the first element of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a SymmetricTensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  begin_raw();
-
-  /**
-   * Return a const pointer to the first element of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a SymmetricTensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  begin_raw() const;
-
-  /**
-   * Return a pointer to the element past the end of the underlying storage.
-   *
-   * @deprecated This function suggests that the elements of a SymmetricTensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  end_raw();
-
-  /**
-   * Return a const pointer to the element past the end of the underlying
-   * storage.
-   *
-   * @deprecated This function suggests that the elements of a SymmetricTensor
-   *   object are stored as a contiguous array, but this is not in fact true
-   *   and one should not pretend that this so. As a consequence, this function
-   *   is deprecated.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  end_raw() const;
-
-  /**
    * Assignment operator from symmetric tensors with different underlying scalar
    * type.
    * This obviously requires that the @p OtherNumber type is convertible to
@@ -2306,42 +2257,6 @@ SymmetricTensor<rank_, dim, Number>::operator[](
   const TableIndices<rank_> &indices)
 {
   return operator()(indices);
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline Number *
-SymmetricTensor<rank_, dim, Number>::begin_raw()
-{
-  return std::addressof(this->access_raw_entry(0));
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline const Number *
-SymmetricTensor<rank_, dim, Number>::begin_raw() const
-{
-  return std::addressof(this->access_raw_entry(0));
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline Number *
-SymmetricTensor<rank_, dim, Number>::end_raw()
-{
-  return begin_raw() + n_independent_components;
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline const Number *
-SymmetricTensor<rank_, dim, Number>::end_raw() const
-{
-  return begin_raw() + n_independent_components;
 }
 
 

@@ -2206,17 +2206,6 @@ namespace parallel
 
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    void Triangulation<dim, spacedim>::load(const std::string &filename,
-                                            const bool         autopartition)
-    {
-      (void)autopartition;
-      load(filename);
-    }
-
-
-
-    template <int dim, int spacedim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::load(
       const typename dealii::internal::p4est::types<dim>::forest *forest)
     {
@@ -4239,15 +4228,6 @@ namespace parallel
     template <int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     void Triangulation<1, spacedim>::load(const std::string &)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
-
-
-
-    template <int spacedim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
-    void Triangulation<1, spacedim>::load(const std::string &, const bool)
     {
       DEAL_II_NOT_IMPLEMENTED();
     }

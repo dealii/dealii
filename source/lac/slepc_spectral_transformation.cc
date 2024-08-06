@@ -97,27 +97,6 @@ namespace SLEPcWrappers
     AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
 
-  /* --------------- TransformationSpectrumFolding ----------------- */
-
-  TransformationSpectrumFolding::AdditionalData::AdditionalData(
-    const double shift_parameter)
-    : shift_parameter(shift_parameter)
-  {}
-
-  TransformationSpectrumFolding::TransformationSpectrumFolding(
-    const MPI_Comm        mpi_communicator,
-    const AdditionalData &data)
-    : TransformationBase(mpi_communicator)
-    , additional_data(data)
-  {
-    // This feature is only in PETSc/SLEPc versions 3.4 or older, which we no
-    // longer support.
-    Assert(false,
-           ExcMessage(
-             "Folding transformation has been removed in SLEPc 3.5.0 and newer."
-             " You cannot use this transformation anymore."));
-  }
-
   /* ------------------- TransformationCayley --------------------- */
 
   TransformationCayley::AdditionalData::AdditionalData(

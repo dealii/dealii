@@ -117,15 +117,6 @@ public:
   MappingQ(const unsigned int polynomial_degree);
 
   /**
-   * The second argument is here for backward compatibility with previous
-   * versions of deal.II, but it does not have any effect on the workings of
-   * this class.
-   */
-  DEAL_II_DEPRECATED
-  MappingQ(const unsigned int polynomial_degree,
-           const bool         use_mapping_q_on_all_cells);
-
-  /**
    * Copy constructor.
    */
   MappingQ(const MappingQ<dim, spacedim> &mapping);

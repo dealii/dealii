@@ -40,7 +40,6 @@ namespace Utilities
        * - MPI_Isend, MPI_Irecv
        * - MPI_Probe, MPI_Iprobe
        * - MPI_Comm_create_group, MPI_Intercomm_create,
-       * Utilities::MPI::create_group
        */
       namespace Tags
       {

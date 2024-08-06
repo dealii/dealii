@@ -505,16 +505,6 @@ namespace parallel
      * spacedim>::load.
      */
     using Triangulation<dim, spacedim>::load;
-
-
-    /**
-     * Same as the function above.
-     *
-     * @deprecated The autopartition parameter has been removed.
-     */
-    DEAL_II_DEPRECATED
-    virtual void
-    load(const std::string &filename, const bool autopartition) = 0;
   };
 
 } // namespace parallel

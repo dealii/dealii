@@ -199,51 +199,6 @@ namespace SLEPcWrappers
   };
 
   /**
-   * An implementation of the transformation interface using the SLEPc
-   * Spectrum Folding. This transformation type has been removed in SLEPc
-   * 3.5.0 and thus cannot be used in the newer versions.
-   *
-   * @deprecated Since deal.II requires PETSc 3.7 or newer this class no longer
-   * does anything.
-   *
-   * @ingroup SLEPcWrappers
-   */
-  class DEAL_II_DEPRECATED TransformationSpectrumFolding
-    : public TransformationBase
-  {
-  public:
-    /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {
-      /**
-       * Constructor. By default, set the shift parameter to zero.
-       */
-      explicit AdditionalData(const double shift_parameter = 0);
-
-      /**
-       * Shift parameter.
-       */
-      const double shift_parameter;
-    };
-
-
-    /**
-     * Constructor.
-     */
-    explicit TransformationSpectrumFolding(
-      const MPI_Comm        mpi_communicator,
-      const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
-  };
-
-  /**
    * An implementation of the transformation interface using the SLEPc Cayley.
    *
    * @ingroup SLEPcWrappers

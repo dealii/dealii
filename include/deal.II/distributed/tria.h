@@ -663,15 +663,6 @@ namespace parallel
       load(const std::string &file_basename) override;
 
       /**
-       * @copydoc load()
-       *
-       * @deprecated The autopartition parameter has been removed.
-       */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string &filename, const bool autopartition) override;
-
-      /**
        * Load the refinement information from a given parallel forest. This
        * forest might be obtained from the function call to
        * parallel::distributed::Triangulation::get_p4est().
@@ -937,14 +928,6 @@ namespace parallel
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string &filename, const bool autopartition) override;
-
-      /**
-       * This function is not implemented, but needs to be present for the
-       * compiler.
-       */
       virtual void
       save(const std::string &filename) const override;
 
@@ -1090,16 +1073,6 @@ namespace parallel
        */
       virtual void
       load(const std::string & /*filename*/) override
-      {}
-
-      /**
-       * Dummy replacement to allow for better error messages when compiling
-       * this class.
-       */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string & /*filename*/,
-           const bool /*autopartition*/) override
       {}
 
       /**

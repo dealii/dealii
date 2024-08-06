@@ -792,20 +792,6 @@ public:
     norm_square() const;
 
   /**
-   * Fill a vector with all tensor elements.
-   *
-   * This function unrolls all tensor entries into a single, linearly numbered
-   * vector. As usual in C++, the rightmost index of the tensor marches
-   * fastest.
-   *
-   * @deprecated Use the more general function that takes a pair of iterators
-   * instead.
-   */
-  template <typename OtherNumber>
-  DEAL_II_DEPRECATED void
-  unroll(Vector<OtherNumber> &result) const;
-
-  /**
    * Fill a range with all tensor elements.
    *
    * This function unrolls all tensor entries into a single, linearly numbered
@@ -1803,16 +1789,6 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 
       return s;
     }
-}
-
-
-
-template <int rank_, int dim, typename Number>
-template <typename OtherNumber>
-inline void
-Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
-{
-  unroll(result.begin(), result.end());
 }
 
 
