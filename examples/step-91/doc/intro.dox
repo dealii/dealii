@@ -476,6 +476,8 @@ This gives us a way to compute the matrix:
 This is easily computable.
 
 
+TODO: Also write out what the residual looks like with this interpolant thingy.
+
 
 
 

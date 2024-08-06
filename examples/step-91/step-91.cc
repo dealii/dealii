@@ -776,6 +776,7 @@ namespace Step55
                 const auto stabNx_i =
                   (Nx_i + c * cell_diameter * d * grad_Nx_i);
 
+                // TODO: Get this right with the I_h part
                 cell_residual[i] -=
                   (stabNx_i * (p - d * grad_w)) * fe_values.JxW(q);
               }
@@ -845,6 +846,7 @@ namespace Step55
           fe_values[water_flow_rate].get_function_gradients(
             locally_relevant_solution, water_grad_at_q_points);
 
+          // TODO: Move this variable out of the loop
           std::vector<double> cell_residual(dofs_per_cell);
           compute_local_residual(fe_values,
                                  elevation_at_q_points,
