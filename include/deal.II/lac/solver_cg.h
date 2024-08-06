@@ -177,12 +177,15 @@ namespace LinearAlgebra
  * <h3>Preconditioned residual</h3>
  *
  * @p AdditionalData allows you to choose between using the explicit
- * or implicit residual as stopping condition for the iterative
+ * or implicit residual as a stopping condition for the iterative
  * solver. This behavior can be overridden by using the flag
  * AdditionalData::use_default_residual. A <tt>true</tt> value refers to the
  * implicit residual, while <tt>false</tt> reverts
- * it. More information on explicit and implicit residual stopping criteria
- * can be found
+ * it. The former explicitly calculates the system residual with an additional
+ * matrix-vector product, whereas the latter uses the result of the matrix-vector
+ * product already computed in other algorithm steps to derive the residual by
+ * a mere vector update. More information on explicit and implicit residual stopping
+ * criteria can be found
  * <a
  * href="https://en.wikipedia.org/wiki/Conjugate_gradient_method#Explicit_residual_calculation">link
  * here</a>.
@@ -208,8 +211,11 @@ public:
      * to the implicit residual. A <tt>true</tt> value of
      * AdditionalData::use_default_residual refers to the
      * implicit residual, while <tt>false</tt> reverts
-     * it. More information on explicit and implicit residual stopping criteria
-     * can be found
+     * it. The former explicitly calculates the system residual with an additional
+     * matrix-vector product, whereas the latter uses the result of the matrix-vector
+     * product already computed in other algorithm steps to derive the residual by
+     * a mere vector update. More information on explicit and implicit residual stopping
+     * criteria can be found
      * <a
      * href="https://en.wikipedia.org/wiki/Conjugate_gradient_method#Explicit_residual_calculation">link
      * here</a>.
@@ -406,8 +412,11 @@ public:
      * to the implicit residual. A <tt>true</tt> value of
      * AdditionalData::use_default_residual refers to the
      * implicit residual, while <tt>false</tt> reverts
-     * it. More information on explicit and implicit residual stopping criteria
-     * can be found
+     * it. The former explicitly calculates the system residual with an additional
+     * matrix-vector product, whereas the latter uses the result of the matrix-vector
+     * product already computed in other algorithm steps to derive the residual by
+     * a mere vector update. More information on explicit and implicit residual stopping
+     * criteria can be found
      * <a
      * href="https://en.wikipedia.org/wiki/Conjugate_gradient_method#Explicit_residual_calculation">link
      * here</a>.
