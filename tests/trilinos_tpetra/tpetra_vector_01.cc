@@ -44,10 +44,10 @@ test()
     }
   parallel_partitioner_1.compress();
   parallel_partitioner_2.compress();
-  LinearAlgebra::TpetraWrappers::Vector<Number> a;
-  LinearAlgebra::TpetraWrappers::Vector<Number> b(parallel_partitioner_1,
-                                                  MPI_COMM_WORLD);
-  LinearAlgebra::TpetraWrappers::Vector<Number> c(b);
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> a;
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> b(
+    parallel_partitioner_1, MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> c(b);
 
   AssertThrow(a.size() == 0, ExcMessage("Vector has the wrong size."));
   AssertThrow(b.size() == 10, ExcMessage("Vector has the wrong size."));

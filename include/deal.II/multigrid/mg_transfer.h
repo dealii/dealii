@@ -121,8 +121,9 @@ namespace internal
 
 #  ifdef DEAL_II_WITH_MPI
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  template <typename Number>
-  struct MatrixSelector<dealii::LinearAlgebra::TpetraWrappers::Vector<Number>>
+  template <typename Number, typename MemorySpace>
+  struct MatrixSelector<
+    dealii::LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>>
   {
     using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
     using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;

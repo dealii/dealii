@@ -246,53 +246,110 @@ for (S : REAL_AND_COMPLEX_SCALARS)
 for (S : TRILINOS_SCALARS)
   {
     template void AffineConstraints<S>::distribute_local_to_global<
-      LinearAlgebra::TpetraWrappers::SparseMatrix<S>,
-      LinearAlgebra::TpetraWrappers::Vector<S>>(
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Host>,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Host>>(
       const FullMatrix<S> &,
       const Vector<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
-      LinearAlgebra::TpetraWrappers::SparseMatrix<S> &,
-      LinearAlgebra::TpetraWrappers::Vector<S> &,
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Host> &,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Host> &,
       bool,
       std::integral_constant<bool, false>) const;
 
     // BlockSparseMatrix
     template void AffineConstraints<S>::distribute_local_to_global<
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S>,
-      LinearAlgebra::TpetraWrappers::Vector<S>>(
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host>,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Host>>(
       const FullMatrix<S> &,
       const Vector<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S> &,
-      LinearAlgebra::TpetraWrappers::Vector<S> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host> &,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Host> &,
       bool,
       std::bool_constant<true>) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S>,
-      LinearAlgebra::TpetraWrappers::BlockVector<S>>(
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host>,
+      LinearAlgebra::TpetraWrappers::BlockVector<S, MemorySpace::Host>>(
       const FullMatrix<S> &,
       const Vector<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S> &,
-      LinearAlgebra::TpetraWrappers::BlockVector<S> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host> &,
+      LinearAlgebra::TpetraWrappers::BlockVector<S, MemorySpace::Host> &,
       bool,
       std::bool_constant<true>) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S>>(
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host>>(
       const FullMatrix<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
       const std::vector<AffineConstraints<S>::size_type> &,
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S> &) const;
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host> &)
+      const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S>>(
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host>>(
       const FullMatrix<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
       const AffineConstraints<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
-      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S> &) const;
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host> &)
+      const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default>,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Default>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default> &,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Default> &,
+      bool,
+      std::integral_constant<bool, false>) const;
+
+    // BlockSparseMatrix
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Default>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>
+        &,
+      LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Default> &,
+      bool,
+      std::bool_constant<true>) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>,
+      LinearAlgebra::TpetraWrappers::BlockVector<S, MemorySpace::Default>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>
+        &,
+      LinearAlgebra::TpetraWrappers::BlockVector<S, MemorySpace::Default> &,
+      bool,
+      std::bool_constant<true>) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S,
+                                                       MemorySpace::Default>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>
+        &) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S,
+                                                       MemorySpace::Default>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>
+        &) const;
   }
 
 

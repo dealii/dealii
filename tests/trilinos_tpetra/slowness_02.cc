@@ -38,7 +38,8 @@ test()
   const unsigned int N = 200;
 
   // build the sparse matrix
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> matrix(N * N, N * N, 5U);
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>
+    matrix(N * N, N * N, 5U);
   for (unsigned int i = 0; i < N; ++i)
     for (unsigned int j = 0; j < N; ++j)
       {
@@ -71,9 +72,9 @@ test()
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  LinearAlgebra::TpetraWrappers::Vector<double> v1;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v1;
   v1.reinit(complete_index_set(N * N), MPI_COMM_WORLD);
-  LinearAlgebra::TpetraWrappers::Vector<double> v2;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v2;
   v2.reinit(complete_index_set(N * N), MPI_COMM_WORLD);
   for (unsigned int i = 0; i < N * N; ++i)
     v1(i) = i;

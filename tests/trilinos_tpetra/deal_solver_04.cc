@@ -60,23 +60,26 @@ main(int argc, char **argv)
     FDMatrix               testproblem(size, size);
     DynamicSparsityPattern csp(dim, dim);
     testproblem.five_point_structure(csp);
-    LinearAlgebra::TpetraWrappers::SparseMatrix<double> A;
+    LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> A;
     A.reinit(csp);
     testproblem.five_point(A);
 
-    LinearAlgebra::TpetraWrappers::Vector<double> f;
+    LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> f;
     f.reinit(complete_index_set(dim), MPI_COMM_WORLD);
-    LinearAlgebra::TpetraWrappers::Vector<double> u;
+    LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> u;
     u.reinit(complete_index_set(dim), MPI_COMM_WORLD);
     f.trilinos_rcp()->putScalar(1.0);
     A.compress(VectorOperation::insert);
     f.compress(VectorOperation::insert);
     u.compress(VectorOperation::insert);
 
-    GrowingVectorMemory<LinearAlgebra::TpetraWrappers::Vector<double>> mem;
-    SolverMinRes<LinearAlgebra::TpetraWrappers::Vector<double>> solver(control,
-                                                                       mem);
-    PreconditionIdentity                                        preconditioner;
+    GrowingVectorMemory<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      mem;
+    SolverMinRes<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+                         solver(control, mem);
+    PreconditionIdentity preconditioner;
 
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
 

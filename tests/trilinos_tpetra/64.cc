@@ -61,10 +61,11 @@ main(int argc, char **argv)
       {
         const unsigned int n_dofs = 420;
         // check
-        // LinearAlgebra::TpetraWrappers::SparseMatrix<double>
-        LinearAlgebra::TpetraWrappers::SparseMatrix<double> v1(n_dofs,
-                                                               n_dofs,
-                                                               5U);
+        // LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+        // MemorySpace::Default>
+        LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                    MemorySpace::Default>
+          v1(n_dofs, n_dofs, 5U);
         test(v1);
 
         // check
@@ -77,9 +78,9 @@ main(int argc, char **argv)
         const unsigned int n_local_dofs = n_dofs / n_jobs;
         IndexSet           local_rows(n_dofs);
         local_rows.add_range(n_local_dofs * my_id, n_local_dofs * (my_id + 1));
-        LinearAlgebra::TpetraWrappers::SparseMatrix<double> v2(local_rows,
-                                                               MPI_COMM_WORLD,
-                                                               5);
+        LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                    MemorySpace::Default>
+          v2(local_rows, MPI_COMM_WORLD, 5);
         test(v2);
       }
     }

@@ -30,15 +30,14 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::Vector<double> &v,
-     LinearAlgebra::TpetraWrappers::Vector<double> &w)
+test(LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &v,
+     LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &w)
 {
   LinearAlgebra::ReadWriteVector<double> read_write_v(v.size());
   LinearAlgebra::ReadWriteVector<double> read_write_w(w.size());
 
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> m(v.size(),
-                                                        w.size(),
-                                                        w.size());
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> m(
+    v.size(), w.size(), w.size());
   for (unsigned int i = 0; i < m.m(); ++i)
     for (unsigned int j = 0; j < m.n(); ++j)
       m.set(i, j, i + 2 * j);
@@ -90,10 +89,10 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::Vector<double> v(complete_index_set(95),
-                                                        MPI_COMM_SELF);
-        LinearAlgebra::TpetraWrappers::Vector<double> w(complete_index_set(100),
-                                                        MPI_COMM_SELF);
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v(
+          complete_index_set(95), MPI_COMM_SELF);
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> w(
+          complete_index_set(100), MPI_COMM_SELF);
         test(v, w);
       }
     }

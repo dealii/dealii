@@ -58,7 +58,7 @@ test()
 
   IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
 
-  LinearAlgebra::TpetraWrappers::Vector<double> vector_Re;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> vector_Re;
   vector_Re.reinit(locally_owned_dofs, mpi_communicator);
 
   deallog << "OK" << std::endl;

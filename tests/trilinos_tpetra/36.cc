@@ -27,8 +27,8 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::Vector<double> &v,
-     LinearAlgebra::TpetraWrappers::Vector<double> &w)
+test(LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &v,
+     LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &w)
 {
   // set only certain elements of each
   // vector
@@ -77,9 +77,9 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::Vector<double> v;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v;
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        LinearAlgebra::TpetraWrappers::Vector<double> w;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> w;
         w.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test(v, w);
       }

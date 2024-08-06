@@ -31,9 +31,11 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::SparseMatrix<double> &m)
+test(
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> &m)
 {
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> m2(m.m(), m.n(), 3U);
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> m2(
+    m.m(), m.n(), 3U);
 
   // first set a few entries one-by-one and
   // initialize the sparsity pattern for m2
@@ -98,7 +100,9 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::SparseMatrix<double> m(16U, 16U, 3U);
+        LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                    MemorySpace::Default>
+          m(16U, 16U, 3U);
         test(m);
       }
     }

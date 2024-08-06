@@ -70,10 +70,12 @@ private:
 
   AffineConstraints<double> constraints;
 
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> system_matrix;
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>
+    system_matrix;
 
-  LinearAlgebra::TpetraWrappers::Vector<double> solution;
-  LinearAlgebra::TpetraWrappers::Vector<double> system_rhs;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> solution;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>
+    system_rhs;
 };
 
 
@@ -233,11 +235,14 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("Identity");
     static constexpr std::array<unsigned int, 2> lower{{49, 100}};
-    LinearAlgebra::TpetraWrappers::PreconditionIdentity<double> preconditioner;
+    LinearAlgebra::TpetraWrappers::PreconditionIdentity<double,
+                                                        MemorySpace::Default>
+      preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+                           solver(solver_control);
     Teuchos::ParameterList precon_params;
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
@@ -253,13 +258,15 @@ Step4<dim>::solve(int cycle)
     // For this we use the point relaxation (SSOR)
     // with default parameters, resulting in symmetric Gauss-Seidel (SGS)
     deallog.push("CustomSGS");
-    static constexpr std::array<unsigned int, 2>              lower{{49, 100}};
-    LinearAlgebra::TpetraWrappers::PreconditionIfpack<double> preconditioner(
-      "RELAXATION");
+    static constexpr std::array<unsigned int, 2> lower{{49, 100}};
+    LinearAlgebra::TpetraWrappers::PreconditionIfpack<double,
+                                                      MemorySpace::Default>
+      preconditioner("RELAXATION");
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+                           solver(solver_control);
     Teuchos::ParameterList precon_params;
     precon_params.set("relaxation: type", "Symmetric Gauss-Seidel");
     preconditioner.set_parameter_list(precon_params);
@@ -274,13 +281,16 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("Jacobi");
-    static constexpr std::array<unsigned int, 2>              lower{{49, 100}};
-    LinearAlgebra::TpetraWrappers::PreconditionJacobi<double> preconditioner;
+    static constexpr std::array<unsigned int, 2> lower{{49, 100}};
+    LinearAlgebra::TpetraWrappers::PreconditionJacobi<double,
+                                                      MemorySpace::Default>
+      preconditioner;
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -293,12 +303,15 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("l1Jacobi");
     static constexpr std::array<unsigned int, 2> lower{{49, 100}};
-    LinearAlgebra::TpetraWrappers::PreconditionL1Jacobi<double> preconditioner;
+    LinearAlgebra::TpetraWrappers::PreconditionL1Jacobi<double,
+                                                        MemorySpace::Default>
+      preconditioner;
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -311,13 +324,15 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("l1GaussSeidel");
     static constexpr std::array<unsigned int, 2> lower{{31, 62}};
-    LinearAlgebra::TpetraWrappers::PreconditionL1GaussSeidel<double>
-      preconditioner;
+    LinearAlgebra::TpetraWrappers::
+      PreconditionL1GaussSeidel<double, MemorySpace::Default>
+        preconditioner;
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -329,13 +344,15 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("SOR");
-    static constexpr std::array<unsigned int, 2>           lower{{31, 62}};
-    LinearAlgebra::TpetraWrappers::PreconditionSOR<double> preconditioner;
+    static constexpr std::array<unsigned int, 2> lower{{31, 62}};
+    LinearAlgebra::TpetraWrappers::PreconditionSOR<double, MemorySpace::Default>
+      preconditioner;
     solution = 0;
 
     SolverControl solver_control(1000, 1e-5);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -347,13 +364,16 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("SSOR");
-    static constexpr std::array<unsigned int, 2>            lower{{40, 77}};
-    LinearAlgebra::TpetraWrappers::PreconditionSSOR<double> preconditioner;
+    static constexpr std::array<unsigned int, 2> lower{{40, 77}};
+    LinearAlgebra::TpetraWrappers::PreconditionSSOR<double,
+                                                    MemorySpace::Default>
+      preconditioner;
     solution = 0;
 
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -366,15 +386,18 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("BlockJacobi");
     static constexpr std::array<unsigned int, 2> lower{{73, 145}};
-    LinearAlgebra::TpetraWrappers::PreconditionBlockJacobi<double>
+    LinearAlgebra::TpetraWrappers::PreconditionBlockJacobi<double,
+                                                           MemorySpace::Default>
       preconditioner;
     LinearAlgebra::TpetraWrappers::PreconditionBlockJacobi<
-      double>::AdditionalData data;
+      double,
+      MemorySpace::Default>::AdditionalData data;
     data.n_local_parts = 16;
     solution           = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -386,16 +409,19 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("BlockSOR");
-    static constexpr std::array<unsigned int, 2>                lower{{18, 37}};
-    LinearAlgebra::TpetraWrappers::PreconditionBlockSOR<double> preconditioner;
-    LinearAlgebra::TpetraWrappers::PreconditionBlockSOR<double>::AdditionalData
-      data;
+    static constexpr std::array<unsigned int, 2> lower{{18, 37}};
+    LinearAlgebra::TpetraWrappers::PreconditionBlockSOR<double,
+                                                        MemorySpace::Default>
+      preconditioner;
+    LinearAlgebra::TpetraWrappers::
+      PreconditionBlockSOR<double, MemorySpace::Default>::AdditionalData data;
     data.n_local_parts = 16;
     data.omega         = 0.8;
     solution           = 0;
     SolverControl solver_control(1000, 1e-5);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -408,15 +434,18 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("BlockSSOR");
     static constexpr std::array<unsigned int, 2> lower{{30, 59}};
-    LinearAlgebra::TpetraWrappers::PreconditionBlockSSOR<double> preconditioner;
-    LinearAlgebra::TpetraWrappers::PreconditionBlockSSOR<double>::AdditionalData
-      data;
+    LinearAlgebra::TpetraWrappers::PreconditionBlockSSOR<double,
+                                                         MemorySpace::Default>
+      preconditioner;
+    LinearAlgebra::TpetraWrappers::
+      PreconditionBlockSSOR<double, MemorySpace::Default>::AdditionalData data;
     data.n_local_parts = 16;
     data.omega         = 1.2;
     solution           = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -429,11 +458,13 @@ Step4<dim>::solve(int cycle)
   {
     static constexpr std::array<unsigned int, 2> lower{{30, 56}};
     deallog.push("ILU");
-    LinearAlgebra::TpetraWrappers::PreconditionILU<double> preconditioner;
+    LinearAlgebra::TpetraWrappers::PreconditionILU<double, MemorySpace::Default>
+      preconditioner;
     solution = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -445,16 +476,19 @@ Step4<dim>::solve(int cycle)
 
   {
     deallog.push("ILUT");
-    static constexpr std::array<unsigned int, 2>            lower{{11, 19}};
-    LinearAlgebra::TpetraWrappers::PreconditionILUT<double> preconditioner;
-    LinearAlgebra::TpetraWrappers::PreconditionILUT<double>::AdditionalData
-      data;
+    static constexpr std::array<unsigned int, 2> lower{{11, 19}};
+    LinearAlgebra::TpetraWrappers::PreconditionILUT<double,
+                                                    MemorySpace::Default>
+      preconditioner;
+    LinearAlgebra::TpetraWrappers::
+      PreconditionILUT<double, MemorySpace::Default>::AdditionalData data;
     data.ilut_drop = 1e-6;
     data.ilut_fill = 3;
     solution       = 0;
     SolverControl solver_control(1000, 1e-5);
-    SolverBicgstab<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverBicgstab<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -467,15 +501,18 @@ Step4<dim>::solve(int cycle)
   {
     deallog.push("Chebyshev");
     static constexpr std::array<unsigned int, 2> lower{{23, 46}};
-    LinearAlgebra::TpetraWrappers::PreconditionChebyshev<double> preconditioner;
-    LinearAlgebra::TpetraWrappers::PreconditionChebyshev<double>::AdditionalData
-      data;
+    LinearAlgebra::TpetraWrappers::PreconditionChebyshev<double,
+                                                         MemorySpace::Default>
+      preconditioner;
+    LinearAlgebra::TpetraWrappers::
+      PreconditionChebyshev<double, MemorySpace::Default>::AdditionalData data;
     data.max_eigenvalue = 2.5;
     data.degree         = 3;
     solution            = 0;
     SolverControl solver_control(1000, 1e-10);
-    SolverCG<LinearAlgebra::TpetraWrappers::Vector<double>> solver(
-      solver_control);
+    SolverCG<
+      LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>
+      solver(solver_control);
     preconditioner.initialize(system_matrix, data);
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
@@ -510,7 +547,8 @@ Step4<dim>::solve(int cycle)
     deallog.push("CustomIGLOO");
     try
       {
-        LinearAlgebra::TpetraWrappers::PreconditionIfpack<double>
+        LinearAlgebra::TpetraWrappers::PreconditionIfpack<double,
+                                                          MemorySpace::Default>
           preconditioner("IGLOO");
       }
     catch (dealii::ExceptionBase &exc)

@@ -28,7 +28,7 @@
 #include "../tests.h"
 
 void
-print(LinearAlgebra::TpetraWrappers::Vector<double> &v)
+print(LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &v)
 {
   deallog << "size= " << v.size() << " el(0)= " << v(0)
           << " l2norm()= " << v.l2_norm() << std::endl;
@@ -38,11 +38,11 @@ print(LinearAlgebra::TpetraWrappers::Vector<double> &v)
 void
 test()
 {
-  LinearAlgebra::TpetraWrappers::Vector<double> v;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v;
   v.reinit(complete_index_set(5), MPI_COMM_WORLD);
   for (unsigned int i = 0; i < v.size(); ++i)
     v(i) = 1;
-  LinearAlgebra::TpetraWrappers::Vector<double> w;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> w;
   w.reinit(complete_index_set(9), MPI_COMM_WORLD);
   for (unsigned int i = 0; i < w.size(); ++i)
     w(i) = 2;

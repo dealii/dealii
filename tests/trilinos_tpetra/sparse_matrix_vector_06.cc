@@ -28,11 +28,10 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::Vector<double> &v)
+test(LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &v)
 {
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> m(v.size(),
-                                                        v.size(),
-                                                        v.size());
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> m(
+    v.size(), v.size(), v.size());
   for (unsigned int i = 0; i < m.m(); ++i)
     for (unsigned int j = 0; j < m.m(); ++j)
       m.set(i, j, i + 2 * j);
@@ -74,7 +73,7 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::Vector<double> v;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v;
         v.reinit(complete_index_set(30), MPI_COMM_WORLD);
         test(v);
       }
