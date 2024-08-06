@@ -151,12 +151,18 @@ namespace LinearAlgebra
 
       // 1. Make host view with underlying dealii::Vector data.
       //    (This is always a n x 1 matrix since multivector expects that.)
-      TpetraTypes::HostViewTypeUnmanaged<Number> host_src(src.data(),
-                                                          src.size(),
-                                                          1);
-      TpetraTypes::HostViewTypeUnmanaged<Number> host_dst(dst.data(),
-                                                          dst.size(),
-                                                          1);
+
+      // Tpetra uses Kokkos::complex<> internally for std::complex<>
+      using value_type = typename TpetraTypes::HostViewType<Number>::value_type;
+      static_assert((numbers::NumberTraits<Number>::is_complex &&
+                     sizeof(value_type) == sizeof(Number)) ||
+                    (!numbers::NumberTraits<Number>::is_complex &&
+                     std::is_same_v<value_type, Number>));
+
+      TpetraTypes::HostViewType<Number> host_src(
+        reinterpret_cast<value_type *>(src.data()), src.size(), 1);
+      TpetraTypes::HostViewType<Number> host_dst(
+        reinterpret_cast<value_type *>(dst.data()), dst.size(), 1);
 
       // 2. Create device mirror (if Device == Host, no alloc )
       auto dev_src = Kokkos::create_mirror_view_and_copy(
@@ -166,10 +172,10 @@ namespace LinearAlgebra
         typename MemorySpace::kokkos_space::execution_space(), host_dst);
 
       // 3. Create dual views from the previous ones
-      TpetraTypes::DualViewTypeUnmanaged<Number, MemorySpace> dual_src(
-        dev_src, host_src);
-      TpetraTypes::DualViewTypeUnmanaged<Number, MemorySpace> dual_dst(
-        dev_dst, host_dst);
+      TpetraTypes::DualViewType<Number, MemorySpace> dual_src(dev_src,
+                                                              host_src);
+      TpetraTypes::DualViewType<Number, MemorySpace> dual_dst(dev_dst,
+                                                              host_dst);
 
       // 4. Create Tpetra Vector from
       TpetraTypes::VectorType<Number, MemorySpace> tpetra_dst(
@@ -201,12 +207,18 @@ namespace LinearAlgebra
 
       // 1. Make host view with underlying dealii::Vector data.
       //    (This is always a n x 1 matrix since multivector expects that.)
-      TpetraTypes::HostViewTypeUnmanaged<Number> host_src(src.data(),
-                                                          src.size(),
-                                                          1);
-      TpetraTypes::HostViewTypeUnmanaged<Number> host_dst(dst.data(),
-                                                          dst.size(),
-                                                          1);
+
+      // Tpetra uses Kokkos::complex<> internally for std::complex<>
+      using value_type = typename TpetraTypes::HostViewType<Number>::value_type;
+      static_assert((numbers::NumberTraits<Number>::is_complex &&
+                     sizeof(value_type) == sizeof(Number)) ||
+                    (!numbers::NumberTraits<Number>::is_complex &&
+                     std::is_same_v<value_type, Number>));
+
+      TpetraTypes::HostViewType<Number> host_src(
+        reinterpret_cast<value_type *>(src.data()), src.size(), 1);
+      TpetraTypes::HostViewType<Number> host_dst(
+        reinterpret_cast<value_type *>(dst.data()), dst.size(), 1);
 
       // 2. Create device mirror (if Device == Host, no alloc )
       auto dev_src = Kokkos::create_mirror_view_and_copy(
@@ -216,10 +228,10 @@ namespace LinearAlgebra
         typename MemorySpace::kokkos_space::execution_space(), host_dst);
 
       // 3. Create dual views from the previous ones
-      TpetraTypes::DualViewTypeUnmanaged<Number, MemorySpace> dual_src(
-        dev_src, host_src);
-      TpetraTypes::DualViewTypeUnmanaged<Number, MemorySpace> dual_dst(
-        dev_dst, host_dst);
+      TpetraTypes::DualViewType<Number, MemorySpace> dual_src(dev_src,
+                                                              host_src);
+      TpetraTypes::DualViewType<Number, MemorySpace> dual_dst(dev_dst,
+                                                              host_dst);
 
       // 4. Create Tpetra Vector from
       TpetraTypes::VectorType<Number, MemorySpace> tpetra_dst(
