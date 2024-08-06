@@ -145,17 +145,6 @@ namespace LinearAlgebra
       using RowMatrixType =
         Tpetra::RowMatrix<Number, LO, GO, NodeType<MemorySpace>>;
 
-
-      /**
-       * @brief Typedef for the Kokkos::View type.
-       * This is needed for shallow copies of deal.II LA structures
-       * to Trilinos LA structures.
-       *
-       */
-      template <typename Number>
-      using HostViewType =
-        typename VectorType<Number, dealii::MemorySpace::Host>::host_view_type;
-
       /**
        * @brief Typedef for the Kokkos::DualView type.
        * This is needed for shallow copies of deal.II LA structures
@@ -165,6 +154,15 @@ namespace LinearAlgebra
       using DualViewType =
         typename VectorType<Number, MemorySpace>::dual_view_type;
 
+      /**
+       * @brief Typedef for the Kokkos::View type.
+       * This is needed for shallow copies of deal.II LA structures
+       * to Trilinos LA structures.
+       *
+       */
+      template <typename Number>
+      using HostViewType =
+        typename DualViewType<Number, dealii::MemorySpace::Host>::t_host;
 
 #  ifdef DEAL_II_TRILINOS_WITH_IFPACK2
       /**
