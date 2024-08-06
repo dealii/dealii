@@ -335,7 +335,18 @@ inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&tt) noexcept
              ExcMessage("You can't move a smart pointer object that "
                         "is pointing to an object that is no longer alive."));
 
-      t->subscribe(&pointed_to_object_is_alive, id);
+      try
+        {
+          t->subscribe(&pointed_to_object_is_alive, id);
+        }
+      catch (...)
+        {
+          Assert(false,
+                 ExcMessage(
+                   "Calling subscribe() failed with an exception, but we "
+                   "are in a function that cannot throw exceptions. "
+                   "Aborting the program here."));
+        }
 
       // Release the rhs object as if we had moved all members away from
       // it directly:
@@ -460,7 +471,18 @@ SmartPointer<T, P>::operator=(SmartPointer<T, P> &&tt) noexcept
              ExcMessage("You can't move a smart pointer object that "
                         "is pointing to an object that is no longer alive."));
       t = tt.get();
-      t->subscribe(&pointed_to_object_is_alive, id);
+      try
+        {
+          t->subscribe(&pointed_to_object_is_alive, id);
+        }
+      catch (...)
+        {
+          Assert(false,
+                 ExcMessage(
+                   "Calling subscribe() failed with an exception, but we "
+                   "are in a function that cannot throw exceptions. "
+                   "Aborting the program here."));
+        }
 
       // Finally release the rhs object since we moved its contents
       tt = nullptr;
