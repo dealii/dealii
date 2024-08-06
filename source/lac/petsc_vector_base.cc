@@ -636,7 +636,7 @@ namespace PETScWrappers
       // allowing pipelined commands to be
       // executed in parallel
       const PetscScalar *ptr  = start_ptr;
-      const PetscScalar *eptr = ptr + (size() / 4) * 4;
+      const PetscScalar *eptr = ptr + (locally_owned_size() / 4) * 4;
       while (ptr != eptr)
         {
           sum0 += *ptr++;
@@ -645,10 +645,12 @@ namespace PETScWrappers
           sum3 += *ptr++;
         }
       // add up remaining elements
-      while (ptr != start_ptr + size())
+      while (ptr != start_ptr + locally_owned_size())
         sum0 += *ptr++;
 
-      mean = (sum0 + sum1 + sum2 + sum3) / static_cast<PetscReal>(size());
+      mean =
+        Utilities::MPI::sum(sum0 + sum1 + sum2 + sum3, get_mpi_communicator()) /
+        static_cast<PetscReal>(size());
     }
 
     // restore the representation of the
@@ -703,7 +705,7 @@ namespace PETScWrappers
       // allowing pipelined commands to be
       // executed in parallel
       const PetscScalar *ptr  = start_ptr;
-      const PetscScalar *eptr = ptr + (size() / 4) * 4;
+      const PetscScalar *eptr = ptr + (locally_owned_size() / 4) * 4;
       while (ptr != eptr)
         {
           sum0 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
@@ -712,10 +714,12 @@ namespace PETScWrappers
           sum3 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
         }
       // add up remaining elements
-      while (ptr != start_ptr + size())
+      while (ptr != start_ptr + locally_owned_size())
         sum0 += std::pow(numbers::NumberTraits<value_type>::abs(*ptr++), p);
 
-      norm = std::pow(sum0 + sum1 + sum2 + sum3, 1. / p);
+      norm = std::pow(Utilities::MPI::sum(sum0 + sum1 + sum2 + sum3,
+                                          get_mpi_communicator()),
+                      1. / p);
     }
 
     // restore the representation of the
