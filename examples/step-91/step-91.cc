@@ -21,6 +21,8 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/function_lib.h>
 
+#include <deal.II/differentiation/ad.h>
+
 #include <deal.II/lac/generic_linear_algebra.h>
 
 /* #define FORCE_USE_OF_TRILINOS */
@@ -84,6 +86,7 @@ namespace Step55
   } // namespace LA
 
   using VectorType = LA::MPI::BlockVector;
+  using MatrixType = LA::MPI::BlockSparseMatrix;
 
 
   namespace ModelParameters
@@ -253,22 +256,39 @@ namespace Step55
     void assemble_initial_waterflow_system();
     void solve_initial_waterflow_system();
 
-    void assemble_residual(VectorType &residual);
-    void assemble_jacobian();
-    void solve_with_jacobian();
-
     template <typename NumberType>
-    void local_residual(
+    void compute_local_residual(
+      const FEValues<dim> &fe_values,
       const std::vector<NumberType> &local_solution_elevation_at_q_points,
       const std::vector<NumberType> &local_solution_water_at_q_points,
       const std::vector<Tensor<1, dim, NumberType>>
                                     &local_gradient_elevation_at_q_points,
-      const std::vector<NumberType> &local_solution_dot_elevation_at_q_points,
+      const std::vector<Tensor<1, dim, NumberType>>
+                                    &local_gradient_water_at_q_points,
+      const std::vector<double> &local_solution_dot_elevation_at_q_points,
+      const std::vector<double>     &rain_fall_rate_rhs_values,
+      const double                   cell_diameter,
       const double                   time,
       std::vector<NumberType>       &cell_residual) const;
 
+    void assemble_residual(const double time,
+                           const VectorType &locally_relevant_solution,
+                           const VectorType &locally_relevant_solution_dot,
+                           VectorType &residual);
+    void assemble_jacobian(const double time,
+                           const VectorType &locally_relevant_solution,
+                           const VectorType &locally_relevant_solution_dot,
+                           const double alpha,
+                           MatrixType &jacobian);
+    void solve_with_jacobian(const VectorType &rhs,
+                             VectorType &dst,
+                             const double tolerance);
+
     void refine_grid();
-    void output_results(const unsigned int cycle);
+    void output_results(const double time,
+                        const VectorType &locally_relevant_solution,
+                        const VectorType &locally_relevant_solution_dot,
+                        const unsigned int step_number);
 
     MPI_Comm mpi_communicator;
 
@@ -281,9 +301,10 @@ namespace Step55
 
     AffineConstraints<double> constraints;
 
-    LA::MPI::BlockSparseMatrix system_matrix;
-    VectorType                 locally_relevant_solution;
-    VectorType                 system_rhs;
+    MatrixType system_matrix;
+    VectorType locally_relevant_solution;
+    VectorType locally_relevant_solution_dot;
+    VectorType system_rhs;
 
     ConditionalOStream pcout;
     TimerOutput        computing_timer;
@@ -366,6 +387,9 @@ namespace Step55
     locally_relevant_solution.reinit(owned_partitioning,
                                      relevant_partitioning,
                                      mpi_communicator);
+    locally_relevant_solution_dot.reinit(owned_partitioning,
+                                     relevant_partitioning,
+                                     mpi_communicator);      
     system_rhs.reinit(owned_partitioning, mpi_communicator);
   }
 
@@ -608,12 +632,93 @@ namespace Step55
 
 
   template <int dim>
-  void StreamPowerErosionProblem<dim>::assemble_jacobian()
-  {
-    TimerOutput::Scope t(computing_timer, "assemble Jacobian matrix");
+  template <typename NumberType>
+  void StreamPowerErosionProblem<dim>::compute_local_residual(
+    const FEValues<dim> &fe_values,
+    const std::vector<NumberType> &local_solution_elevation_at_q_points,
+    const std::vector<NumberType> &local_solution_water_at_q_points,
+    const std::vector<Tensor<1, dim, NumberType>>
+                                  &local_gradient_elevation_at_q_points,
+    const std::vector<Tensor<1, dim, NumberType>>
+                                  &local_gradient_water_at_q_points,
+    const std::vector<double>     &local_solution_dot_elevation_at_q_points,
+    const std::vector<double>     &rain_fall_rate_rhs_values,
+    const double                   cell_diameter,
+    const double                   time,
+    std::vector<NumberType>       &cell_residual) const
+    {
+      (void)time; // TODO
 
-    system_matrix = 0;
-    system_rhs    = 0;
+      const FEValuesExtractors::Scalar     elevation(0);
+      const FEValuesExtractors::Scalar     water_flow_rate(1);
+      
+      const unsigned int H_dof = 0;
+      const unsigned int w_dof = 1;
+
+      for (const unsigned int q : fe_values.quadrature_point_indices())
+        {
+          const NumberType &H = local_solution_elevation_at_q_points[q];
+          const NumberType &H_dot = local_solution_dot_elevation_at_q_points[q]; 
+          const NumberType &w = local_solution_water_at_q_points[q];
+          const Tensor<1,dim, NumberType> &grad_H = local_gradient_elevation_at_q_points[q];
+          const Tensor<1,dim, NumberType> &grad_w = local_gradient_water_at_q_points[q];
+          const double p = rain_fall_rate_rhs_values[q];
+
+          (void)H;
+
+          const NumberType S = std::sqrt(local_gradient_elevation_at_q_points[q] *
+                                         local_gradient_elevation_at_q_points[q] +
+                                         ModelParameters::regularization_epsilon *
+                                         ModelParameters::regularization_epsilon);
+          const Tensor<1, dim, NumberType> d = -local_gradient_elevation_at_q_points[q]/S;
+
+          constexpr double m = ModelParameters::stream_power_exponent_m;
+          constexpr double n = ModelParameters::stream_power_exponent_n;
+          constexpr double k = ModelParameters::stream_power_coefficient_k;
+          constexpr double Kd = ModelParameters::diffusion_coefficient_Kd;
+          constexpr double c = ModelParameters::stabilization_c;
+
+          for (const unsigned int i : fe_values.dof_indices())
+          {
+            const unsigned int i_group = fe.system_to_base_index(i).first.first;
+
+            if (i_group == H_dof)
+            {
+              const double Nx_i = fe_values[elevation].value(i, q);
+              const Tensor<1,dim> grad_Nx_i = fe_values[elevation].gradient(i, q);
+
+              cell_residual[i] -= ( Nx_i * (H_dot + k * std::pow(w, m) * std::pow(S, n)) + 
+                                    grad_Nx_i * (Kd * grad_H) ) 
+                                  * fe_values.JxW(q);
+            }
+            else if (i_group == w_dof)
+            {
+              const double Nx_i = fe_values[water_flow_rate].value(i, q);
+              const Tensor<1,dim> grad_Nx_i = fe_values[water_flow_rate].gradient(i, q);
+              const auto stabNx_i = (Nx_i + c * cell_diameter * d * grad_Nx_i);
+
+              cell_residual[i] -= ( stabNx_i * (p - d * grad_w) ) * fe_values.JxW(q);
+            }
+            else
+            {
+              AssertThrow(i_group <= w_dof, ExcMessage("Unknown DoF group"));
+            }
+          }
+        }
+    }
+
+
+
+  template <int dim>
+  void StreamPowerErosionProblem<dim>::assemble_residual(const double time,
+                                                         const VectorType &locally_relevant_solution,
+                                                         const VectorType &locally_relevant_solution_dot,
+                                                         VectorType &residual)
+  {
+    TimerOutput::Scope t(computing_timer,
+                         "linear system: assemble residual");
+
+    residual    = 0;
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
 
@@ -625,63 +730,195 @@ namespace Step55
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>     cell_rhs(dofs_per_cell);
-
     const RainFallRate<dim> rain_fall_rate_rhs;
     std::vector<double>     rain_fall_rate_rhs_values(n_q_points);
 
+    std::vector<double> elevation_at_q_points(
+      fe_values.n_quadrature_points); 
+    std::vector<double> elevation_dot_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<double> water_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<Tensor<1, dim>> elevation_grad_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<Tensor<1, dim>> water_grad_at_q_points(
+      fe_values.n_quadrature_points);
+
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     const FEValuesExtractors::Scalar     elevation(0);
-    const FEValuesExtractors::Scalar     rain_fall_rate(1);
+    const FEValuesExtractors::Scalar     water_flow_rate(1);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          cell_matrix = 0;
-          cell_rhs    = 0;
-
           fe_values.reinit(cell);
+
           rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
                                         rain_fall_rate_rhs_values);
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                {
-                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    {
-                      cell_matrix(i, j) += (0) * fe_values.JxW(q);
-                    }
 
-                  cell_rhs(i) += fe_values[rain_fall_rate].value(i, q) *
-                                 rain_fall_rate_rhs_values[q] *
-                                 fe_values.JxW(q);
-                }
-            }
+          fe_values[elevation].get_function_values(
+            locally_relevant_solution, elevation_at_q_points);
+          fe_values[elevation].get_function_values(
+            locally_relevant_solution_dot, elevation_dot_at_q_points);
+          fe_values[elevation].get_function_gradients(
+            locally_relevant_solution, elevation_grad_at_q_points);
+          fe_values[water_flow_rate].get_function_values(
+            locally_relevant_solution, water_at_q_points);
+          fe_values[water_flow_rate].get_function_gradients(
+            locally_relevant_solution, water_grad_at_q_points);
+
+          std::vector<double> cell_residual(dofs_per_cell);
+          compute_local_residual(
+              fe_values,
+              elevation_at_q_points,
+              water_at_q_points,
+              elevation_grad_at_q_points,
+              water_grad_at_q_points,
+              elevation_dot_at_q_points,
+              rain_fall_rate_rhs_values,
+              cell->diameter(),
+              time,
+              cell_residual);
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
-                                                 cell_rhs,
+          constraints.distribute_local_to_global(cell_residual,
                                                  local_dof_indices,
-                                                 system_matrix,
-                                                 system_rhs);
+                                                 residual);
         }
-
-    system_matrix.compress(VectorOperation::add);
-    system_rhs.compress(VectorOperation::add);
+    
+    residual.compress(VectorOperation::add);
   }
 
 
 
   template <int dim>
-  void StreamPowerErosionProblem<dim>::solve_with_jacobian()
+  void StreamPowerErosionProblem<dim>::assemble_jacobian(const double time,
+                                                         const VectorType &locally_relevant_solution,
+                                                         const VectorType &locally_relevant_solution_dot,
+                                                         const double alpha,
+                                                         MatrixType &jacobian)
   {
-    return;
+    using ADHelper = Differentiation::AD::ResidualLinearization<
+      Differentiation::AD::NumberTypes::sacado_dfad,
+      double>;
+    using ADNumberType = typename ADHelper::ad_type;
 
+    TimerOutput::Scope t(computing_timer,
+                         "linear system: assemble jacobian");
+
+    jacobian    = 0;
+
+    const QGauss<dim> quadrature_formula(fe.degree + 1);
+
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
+
+    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
+    const unsigned int n_q_points    = quadrature_formula.size();
+
+    const unsigned int n_independent_variables = dofs_per_cell;
+    const unsigned int n_dependent_variables   = dofs_per_cell;
+    ADHelper ad_helper(n_independent_variables, n_dependent_variables);
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+
+    const RainFallRate<dim> rain_fall_rate_rhs;
+    std::vector<double>     rain_fall_rate_rhs_values(n_q_points);
+
+    std::vector<ADNumberType> elevation_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<double> elevation_dot_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<ADNumberType> water_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_q_points(
+      fe_values.n_quadrature_points);
+    std::vector<Tensor<1, dim, ADNumberType>> water_grad_at_q_points(
+      fe_values.n_quadrature_points);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+    const FEValuesExtractors::Scalar     elevation(0);
+    const FEValuesExtractors::Scalar     water_flow_rate(1);
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell_matrix = 0;
+
+          fe_values.reinit(cell);
+
+          cell->get_dof_indices(local_dof_indices);
+          ad_helper.register_dof_values(locally_relevant_solution, local_dof_indices);
+
+          const std::vector<ADNumberType> &dof_values_ad =
+            ad_helper.get_sensitive_dof_values();
+
+          rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
+                                        rain_fall_rate_rhs_values);
+
+          fe_values[elevation].get_function_values_from_local_dof_values(
+            dof_values_ad, elevation_at_q_points);
+          fe_values[elevation].get_function_values(
+            locally_relevant_solution_dot, elevation_dot_at_q_points);
+          fe_values[elevation].get_function_gradients_from_local_dof_values(
+            dof_values_ad, elevation_grad_at_q_points);
+          fe_values[water_flow_rate].get_function_values_from_local_dof_values(
+            dof_values_ad, water_at_q_points);
+          fe_values[water_flow_rate].get_function_gradients_from_local_dof_values(
+            dof_values_ad, water_grad_at_q_points);
+
+          std::vector<ADNumberType> residual_ad(n_dependent_variables,
+                                                ADNumberType(0.0));
+          compute_local_residual(
+              fe_values,
+              elevation_at_q_points,
+              water_at_q_points,
+              elevation_grad_at_q_points,
+              water_grad_at_q_points,
+              elevation_dot_at_q_points,
+              rain_fall_rate_rhs_values,
+              cell->diameter(),
+              time,
+              residual_ad);
+
+          ad_helper.register_residual_vector(residual_ad);
+          ad_helper.compute_linearization(cell_matrix);
+
+          // Assemble the local contribution to the Jacobian that accounts
+          // for the time integration scheme adopted by SUNDIALS:
+          // J = K + alpha K'
+          for (const unsigned int q : fe_values.quadrature_point_indices())
+            for (const unsigned int i : fe_values.dof_indices())
+              for (const unsigned int j : fe_values.dof_indices())
+                cell_matrix(i,j) += alpha *
+                                    fe_values[elevation].value(i, q) *
+                                    fe_values[elevation].value(j, q) *
+                                    fe_values.JxW(q);
+
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 local_dof_indices,
+                                                 jacobian);
+        }
+
+    jacobian.compress(VectorOperation::add);
+  }
+
+
+
+  template <int dim>
+  void StreamPowerErosionProblem<dim>::solve_with_jacobian(const VectorType &rhs,
+                                                           VectorType &dst,
+                                                           const double tolerance)
+  {
     TimerOutput::Scope t(computing_timer, "solve");
 
+    // SolverControl solver_control(system_matrix.m(),
+    //                              1e-6 * system_rhs.l2_norm());
+
     SolverControl solver_control(system_matrix.m(),
-                                 1e-6 * system_rhs.l2_norm());
+                                 tolerance * rhs.l2_norm());
 
     SolverGMRES<VectorType> solver(solver_control);
 
@@ -699,7 +936,7 @@ namespace Step55
 
     constraints.distribute(distributed_solution);
 
-    locally_relevant_solution = distributed_solution;
+    dst = distributed_solution;
   }
 
 
@@ -744,12 +981,18 @@ namespace Step55
 
 
   template <int dim>
-  void StreamPowerErosionProblem<dim>::output_results(const unsigned int cycle)
+  void StreamPowerErosionProblem<dim>::output_results(const double time,
+                                                      const VectorType &locally_relevant_solution,
+                                                      const VectorType &locally_relevant_solution_dot,
+                                                      const unsigned int step_number)
   {
+    (void)time; // TODO: Incorporate this into the PVTU data?
     TimerOutput::Scope t(computing_timer, "output");
 
     const std::vector<std::string> solution_names = {"elevation",
                                                      "water_flow_rate"};
+    const std::vector<std::string> solution_dot_names = {"elevation_rate",
+                                                         "water_flow_rate_dot"};
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
       data_component_interpretation = {
         DataComponentInterpretation::component_is_scalar,
@@ -762,6 +1005,10 @@ namespace Step55
                              solution_names,
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);
+    data_out.add_data_vector(locally_relevant_solution_dot,
+                             solution_dot_names,
+                             DataOut<dim>::type_dof_data,
+                             data_component_interpretation); // TODO: Limit this to the elevation component only
     data_out.add_data_vector(locally_relevant_solution,
                              downhill_flow_postprocessor);
 
@@ -773,7 +1020,7 @@ namespace Step55
     data_out.build_patches();
 
     data_out.write_vtu_with_pvtu_record(
-      "./", "solution", cycle, mpi_communicator, 2);
+      "./", "solution", step_number, mpi_communicator, 2);
   }
 
 
@@ -789,7 +1036,7 @@ namespace Step55
     // Get rid of these three lines eventually (?):
     assemble_initial_waterflow_system();
     solve_initial_waterflow_system();
-    output_results(/*cycle*/ 0);
+    // output_results(/*cycle*/ 0);
 
     const SUNDIALS::IDA<VectorType>::AdditionalData time_integrator_parameters(
       /* initial_time     */ 0.0, // Initial time is today
@@ -813,12 +1060,48 @@ namespace Step55
       SUNDIALS::IDA<VectorType>::AdditionalData::use_y_diff, // ???
       /* maximum_non_linear_iterations_ic*/ 5);
     SUNDIALS::IDA<VectorType> time_integrator(time_integrator_parameters);
-    // TODO: Fill these in:
-    //    time_integrator.reinit_vector;
-    //    time_integrator.residual;
-    //    time_integrator.setup_jacobian;
-    //    time_integrator.solve_with_jacobian;
-    //    time_integrator.output_step;
+
+  
+    time_integrator.reinit_vector = [this](VectorType &vector)
+    {
+      vector.reinit(owned_partitioning,
+                    relevant_partitioning,
+                    mpi_communicator);
+    };
+
+    time_integrator.residual = [this](const double time,
+                                      const VectorType &locally_relevant_solution,
+                                      const VectorType &locally_relevant_solution_dot,
+                                      VectorType &residual)
+    {
+      this->assemble_residual(time, locally_relevant_solution, locally_relevant_solution_dot, residual);
+    };
+
+    time_integrator.setup_jacobian = [this](const double time,
+                                            const VectorType &locally_relevant_solution,
+                                            const VectorType &locally_relevant_solution_dot,
+                                            const double alpha)
+    {
+      this->assemble_jacobian(time, locally_relevant_solution, locally_relevant_solution_dot, alpha, system_matrix);
+    };
+
+    time_integrator.solve_with_jacobian = [this](const VectorType &rhs,
+                                                 VectorType &dst,
+                                                 const double tolerance)
+    {
+      this->solve_with_jacobian(rhs, dst, tolerance);
+    };
+
+    time_integrator.output_step = [this](const double time,
+                                         const VectorType &locally_relevant_solution,
+                                         const VectorType &locally_relevant_solution_dot,
+                                         const unsigned int step_number)
+    {
+      (void)time;
+      (void)locally_relevant_solution;
+      this->output_results(time, locally_relevant_solution, locally_relevant_solution_dot, step_number);
+    };
+
     //    time_integrator.differential_components;
 
     // TODO: Figure out whether the following vectors need to be fully
