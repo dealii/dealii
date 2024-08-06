@@ -219,6 +219,27 @@ are obvious, some not so much:
   from which they receive water. In the program, we will therefore have to find
   those points that are higher than all of their neighbors and impose zero flow
   rates at these points.
+- If we were solving for the entire earth surface, that would be enough: The
+  only places without inflowing water are indeed mountain tops. But since we
+  rather arbitrarily cut out Colorado from the rest of the world, there are
+  of course also places along the boundary of our domain where the terrain slopes
+  down into the domain. In these places, water would flow from Wyoming, Nebraska,
+  Kansas, Oklahoma, New Mexico, or Utah into Colorado (ignoring for a moment
+  the issue of whether water from Arizona could reach Colorado at the
+  [Four Corners point](https://en.wikipedia.org/wiki/Four_Corners)). How
+  much water that would flow into Colorado at these points is, of course,
+  something we cannot really know without also solving for the "outside
+  world"; that is, whatever we impose is an "artificial boundary condition"
+  in that it makes assumptions about the world outside the domain on which
+  we pose our equations. Because we do not know better, we will simply
+  assume zero boundary conditions there: We assume that no water
+  enters Colorado at these boundaries. In practice, this is of course
+  wrong, but not majorly so: None of the major rivers in Colorado enter the
+  state from somewhere else (perhaps ignoring the
+  [Little Snake River](https://en.wikipedia.org/wiki/Little_Snake_River)
+  that enters Colorado from Wyoming, and the
+  [Green River](https://en.wikipedia.org/wiki/Green_River_(Colorado_River_tributary))
+  that briefly crosses Colorado from Utah).
 
 
 <h4> The coefficients in the model </h4>
@@ -686,22 +707,22 @@ right now already:
 
 The other term is not so nice. Conceptually, it has the form
 @f[
-  \frac{\partial {\cal F}(t,y,y)}{\partial y}
+  \frac{\partial {\cal F}(t,y,\dot y)}{\partial y}
   =
   \begin{pmatrix}
-    \frac{\partial {\cal F}^H(t,y,y)}{\partial y}
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial y}
     \\
-    \frac{\partial {\cal F}^w(t,y,y)}{\partial y}
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial y}
   \end{pmatrix}
   =
   \begin{pmatrix}
-    \frac{\partial {\cal F}^H(t,y,y)}{\partial V}
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial V}
     &
-    \frac{\partial {\cal F}^H(t,y,y)}{\partial W}
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial W}
     \\
-    \frac{\partial {\cal F}^w(t,y,y)}{\partial V}
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial V}
     &
-    \frac{\partial {\cal F}^w(t,y,y)}{\partial W}
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial W}
   \end{pmatrix}
   =
   \begin{pmatrix}
@@ -715,18 +736,50 @@ The other term is not so nice. Conceptually, it has the form
     A^w(V)
   \end{pmatrix}.
 @f]
-Not all of these terms are easy to compute, and not all are necessary
-either. As is common in nonlinear solvers, it is often acceptable to
+Not all of these terms are easy to compute, and we have to make a choice
+whether we want to compute and implement all of these derivatives by
+hand, or whether we want the computer to help us.
+
+If one were to implement the derivatives by hand, one could observe that
+perhaps not terms all are really necessary. As is common in nonlinear
+solvers, it is often acceptable to
 "fudge" a bit by providing a Jacobian that is an *approximation* of
 the true Jacobian by omitting terms considered unimportant. Here, the
-term we will omit is $\frac{\partial F^w(V)}{\partial V}$ because the
+term could consider omitting is $\frac{\partial F^w(V)}{\partial V}$ because the
 right hand side of the water flow equation only depends on the
 elevation expansion coefficients $V$ via the flow direction vector
 $\mathbf d$ that only shows up in the stabilization term for the shape
 function; the whole term is consequently proportional to the mesh size
-$h$ -- i.e., it is small.
+$h$ -- i.e., it is small. Perhaps we could also see whether other
+terms could be considered if they are too cumbersome to derive or
+implement.
 
+At the end, however, computing derivatives is something computers can
+do for us: We shouldn't spend our time doing this ourselves, in
+particular because if we ever change the equations (i.e., the
+function ${\cal F}(t,y,\dot y)$) we also have to update the
+implementation of the Jacobian. Rather, we will use symbolic
+differentiation (see step-71) in a way where we only
+have to describe ${\cal F}(t,y,\dot y)$ once, and use this
+description to compute both the residual and its derivative
+$\frac{\partial {\cal F}(t,y,\dot y)}{\partial y}$. We will not
+describe how we do this here, instead pointing to step-71
+and the implementation of the code below.
 
+As mentioned above, computing the other term in the Jacobian,
+$\alpha \frac{\partial {\cal F}(t,y,\dot y)}{\partial \dot y}
+  =
+  \alpha
+  \begin{pmatrix}
+    M
+    &
+    0
+    \\
+    0
+    &
+    0
+  \end{pmatrix}$,
+is easy enough, and we will do this part by hand.
 
 
 <h4> Providing IDA with initial conditions </h4>
