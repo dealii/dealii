@@ -177,7 +177,7 @@ namespace LinearAlgebra
  * <h3>Preconditioned residual</h3>
  *
  * @p AdditionalData allows you to choose between using the explicit
- * or implicit residual as stopping condition for the interative
+ * or implicit residual as stopping condition for the iterative
  * solver. This behavior can be overridden by using the flag
  * AdditionalData::use_default_residual. A <tt>true</tt> value refers to the
  * implicit residual, while <tt>false</tt> reverts
