@@ -77,7 +77,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask &component_mask = {});
+    const ComponentMask &component_mask = {},
+    const unsigned int   level          = numbers::invalid_unsigned_int);
 
   /**
    * Same as above but in an hp-context.
@@ -91,7 +92,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask &component_mask = {});
+    const ComponentMask &component_mask = {},
+    const unsigned int   level          = numbers::invalid_unsigned_int);
 
 
   /**
@@ -106,7 +108,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask &component_mask = {});
+    const ComponentMask &component_mask = {},
+    const unsigned int   level          = numbers::invalid_unsigned_int);
 
   /**
    * Interpolate different finite element spaces. The interpolation of vector

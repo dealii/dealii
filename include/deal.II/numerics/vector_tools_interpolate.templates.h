@@ -231,7 +231,8 @@ namespace VectorTools
       const DoFHandler<dim, spacedim>            &dof_handler,
       T                                          &function,
       VectorType                                 &vec,
-      const ComponentMask                        &component_mask)
+      const ComponentMask                        &component_mask,
+      const unsigned int level = numbers::invalid_unsigned_int)
     {
       Assert(component_mask.represents_n_components(
                dof_handler.get_fe_collection().n_components()),
@@ -240,7 +241,10 @@ namespace VectorTools
                "zero or equal to the number of components in the finite "
                "element."));
 
-      AssertDimension(vec.size(), dof_handler.n_dofs());
+      if (level == numbers::invalid_unsigned_int)
+        AssertDimension(vec.size(), dof_handler.n_dofs());
+      else
+        AssertDimension(vec.size(), dof_handler.n_dofs(level));
 
       Assert(component_mask.n_selected_components(
                dof_handler.get_fe_collection().n_components()) > 0,
@@ -354,143 +358,152 @@ namespace VectorTools
       //
       // Now loop over all locally owned, active cells.
       //
+      const auto runner = [&](const auto &cell) {
+        const unsigned int fe_index = cell->active_fe_index();
 
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        {
-          // If this cell is not locally owned, do nothing.
-          if (!cell->is_locally_owned())
-            continue;
+        // Do nothing if there are no local degrees of freedom.
+        if (fe[fe_index].n_dofs_per_cell() == 0)
+          return;
 
-          const unsigned int fe_index = cell->active_fe_index();
+        // Skip processing of the current cell if the function object is
+        // invalid. This is used by interpolate_by_material_id to skip
+        // interpolating over cells with unknown material id.
+        if (!function(cell))
+          return;
 
-          // Do nothing if there are no local degrees of freedom.
-          if (fe[fe_index].n_dofs_per_cell() == 0)
-            continue;
+        // Get transformed, generalized support points
+        fe_values.reinit(cell);
+        const std::vector<Point<spacedim>> &generalized_support_points =
+          fe_values.get_present_fe_values().get_quadrature_points();
 
-          // Skip processing of the current cell if the function object is
-          // invalid. This is used by interpolate_by_material_id to skip
-          // interpolating over cells with unknown material id.
-          if (!function(cell))
-            continue;
+        // Get indices of the dofs on this cell
+        const auto n_dofs = fe[fe_index].n_dofs_per_cell();
+        dofs_on_cell.resize(n_dofs);
+        cell->get_active_or_mg_dof_indices(dofs_on_cell);
 
-          // Get transformed, generalized support points
-          fe_values.reinit(cell);
-          const std::vector<Point<spacedim>> &generalized_support_points =
-            fe_values.get_present_fe_values().get_quadrature_points();
+        // Prepare temporary storage
+        auto &function_values = fe_function_values[fe_index];
+        auto &dof_values      = fe_dof_values[fe_index];
 
-          // Get indices of the dofs on this cell
-          const auto n_dofs = fe[fe_index].n_dofs_per_cell();
-          dofs_on_cell.resize(n_dofs);
-          cell->get_dof_indices(dofs_on_cell);
+        const auto n_components = fe[fe_index].n_components();
+        // Only resize (and create sample entry) if sizes do not match
+        if (function_values.size() != generalized_support_points.size())
+          function_values.resize(generalized_support_points.size(),
+                                 Vector<number>(n_components));
 
-          // Prepare temporary storage
-          auto &function_values = fe_function_values[fe_index];
-          auto &dof_values      = fe_dof_values[fe_index];
+        // Get all function values:
+        AssertDimension(n_components, function(cell)->n_components);
+        function(cell)->vector_value_list(generalized_support_points,
+                                          function_values);
 
-          const auto n_components = fe[fe_index].n_components();
-          // Only resize (and create sample entry) if sizes do not match
-          if (function_values.size() != generalized_support_points.size())
-            function_values.resize(generalized_support_points.size(),
-                                   Vector<number>(n_components));
+        // For the simple case with elements with support points, we will
+        // simply use the interpolated DoF values in the access loop further
+        // down. Otherwise, we have to transform all function values from
+        // the real cell back to the unit cell. We query the finite element
+        // for the correct transformation. Matters get a bit more
+        // complicated because we have to apply said transformation for
+        // every base element.
+        if (needs_expensive_algorithm[fe_index])
+          {
+            dof_values.resize(n_dofs);
+            const unsigned int offset =
+              apply_transform(fe[fe_index],
+                              /* starting_offset = */ 0,
+                              fe_values,
+                              function_values);
+            (void)offset;
+            Assert(offset == n_components, ExcInternalError());
 
-          // Get all function values:
-          AssertDimension(n_components, function(cell)->n_components);
-          function(cell)->vector_value_list(generalized_support_points,
-                                            function_values);
+            FETools::convert_generalized_support_point_values_to_dof_values(
+              fe[fe_index], function_values, dof_values);
+          }
 
-          // For the simple case with elements with support points, we will
-          // simply use the interpolated DoF values in the access loop further
-          // down. Otherwise, we have to transform all function values from
-          // the real cell back to the unit cell. We query the finite element
-          // for the correct transformation. Matters get a bit more
-          // complicated because we have to apply said transformation for
-          // every base element.
-          if (needs_expensive_algorithm[fe_index])
-            {
-              dof_values.resize(n_dofs);
-              const unsigned int offset =
-                apply_transform(fe[fe_index],
-                                /* starting_offset = */ 0,
-                                fe_values,
-                                function_values);
-              (void)offset;
-              Assert(offset == n_components, ExcInternalError());
+        for (unsigned int i = 0; i < n_dofs; ++i)
+          {
+            const auto &nonzero_components =
+              fe[fe_index].get_nonzero_components(i);
 
-              FETools::convert_generalized_support_point_values_to_dof_values(
-                fe[fe_index], function_values, dof_values);
-            }
+            // Figure out whether the component mask applies. We assume
+            // that we are allowed to set degrees of freedom if at least
+            // one of the components (of the dof) is selected.
+            bool selected = false;
+            for (unsigned int c = 0; c < nonzero_components.size(); ++c)
+              selected =
+                selected || (nonzero_components[c] && component_mask[c]);
 
-          for (unsigned int i = 0; i < n_dofs; ++i)
-            {
-              const auto &nonzero_components =
-                fe[fe_index].get_nonzero_components(i);
-
-              // Figure out whether the component mask applies. We assume
-              // that we are allowed to set degrees of freedom if at least
-              // one of the components (of the dof) is selected.
-              bool selected = false;
-              for (unsigned int c = 0; c < nonzero_components.size(); ++c)
-                selected =
-                  selected || (nonzero_components[c] && component_mask[c]);
-
-              if (selected)
-                {
+            if (selected)
+              {
 #ifdef DEBUG
-                  // make sure that all selected base elements are indeed
-                  // interpolatory
+                // make sure that all selected base elements are indeed
+                // interpolatory
 
-                  if (const auto fe_system =
-                        dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
-                    {
-                      const auto index =
-                        fe_system->system_to_base_index(i).first.first;
-                      Assert(fe_system->base_element(index)
-                               .has_generalized_support_points(),
-                             ExcMessage("The component mask supplied to "
-                                        "VectorTools::interpolate selects a "
-                                        "non-interpolatory element."));
-                    }
+                if (const auto fe_system =
+                      dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
+                  {
+                    const auto index =
+                      fe_system->system_to_base_index(i).first.first;
+                    Assert(fe_system->base_element(index)
+                             .has_generalized_support_points(),
+                           ExcMessage("The component mask supplied to "
+                                      "VectorTools::interpolate selects a "
+                                      "non-interpolatory element."));
+                  }
 #endif
 
-                  // Add local values to the global vectors
-                  if (needs_expensive_algorithm[fe_index])
-                    ::dealii::internal::ElementAccess<VectorType>::add(
-                      dof_values[i], dofs_on_cell[i], interpolation);
-                  else
-                    {
-                      const auto base_index =
-                        fe[fe_index].system_to_base_index(i);
-                      ::dealii::internal::ElementAccess<VectorType>::add(
-                        function_values[base_index.second]
-                                       [base_index.first.second],
-                        dofs_on_cell[i],
-                        interpolation);
-                    }
+                // Add local values to the global vectors
+                if (needs_expensive_algorithm[fe_index])
                   ::dealii::internal::ElementAccess<VectorType>::add(
-                    typename VectorType::value_type(1.0),
-                    dofs_on_cell[i],
-                    weights);
-                }
-              else
-                {
-                  // If a component is ignored, copy the dof values
-                  // from the vector "vec", but only if they are locally
-                  // available
-                  if (locally_owned_dofs.is_element(dofs_on_cell[i]))
-                    {
-                      const auto value =
-                        ::dealii::internal::ElementAccess<VectorType>::get(
-                          vec, dofs_on_cell[i]);
-                      ::dealii::internal::ElementAccess<VectorType>::add(
-                        value, dofs_on_cell[i], interpolation);
-                      ::dealii::internal::ElementAccess<VectorType>::add(
-                        typename VectorType::value_type(1.0),
-                        dofs_on_cell[i],
-                        weights);
-                    }
-                }
+                    dof_values[i], dofs_on_cell[i], interpolation);
+                else
+                  {
+                    const auto base_index =
+                      fe[fe_index].system_to_base_index(i);
+                    ::dealii::internal::ElementAccess<VectorType>::add(
+                      function_values[base_index.second]
+                                     [base_index.first.second],
+                      dofs_on_cell[i],
+                      interpolation);
+                  }
+                ::dealii::internal::ElementAccess<VectorType>::add(
+                  typename VectorType::value_type(1.0),
+                  dofs_on_cell[i],
+                  weights);
+              }
+            else
+              {
+                // If a component is ignored, copy the dof values
+                // from the vector "vec", but only if they are locally
+                // available
+                if (locally_owned_dofs.is_element(dofs_on_cell[i]))
+                  {
+                    const auto value =
+                      ::dealii::internal::ElementAccess<VectorType>::get(
+                        vec, dofs_on_cell[i]);
+                    ::dealii::internal::ElementAccess<VectorType>::add(
+                      value, dofs_on_cell[i], interpolation);
+                    ::dealii::internal::ElementAccess<VectorType>::add(
+                      typename VectorType::value_type(1.0),
+                      dofs_on_cell[i],
+                      weights);
+                  }
+              }
+          }
+      };
+
+      if (level == numbers::invalid_unsigned_int)
+        {
+          for (const auto &cell : dof_handler.active_cell_iterators())
+            {
+              if (cell->is_locally_owned())
+                runner(cell);
             }
-        } /* loop over dof_handler.active_cell_iterators() */
+        }
+      else
+        {
+          for (const auto &cell : dof_handler.mg_cell_iterators_on_level(level))
+            if (cell->is_locally_owned_on_level())
+              runner(cell);
+        }
 
       interpolation.compress(VectorOperation::add);
       weights.compress(VectorOperation::add);
@@ -527,22 +540,21 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof_handler,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask                                       &component_mask)
+    const ComponentMask                                       &component_mask,
+    const unsigned int                                         level)
   {
     AssertDimension(dof_handler.get_fe_collection().n_components(),
                     function.n_components);
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
-    const auto function_map =
-      [&function](
-        const typename DoFHandler<dim, spacedim>::active_cell_iterator &)
+    const auto function_map = [&function](const auto &)
       -> const Function<spacedim, typename VectorType::value_type> * {
       return &function;
     };
 
     internal::interpolate(
-      mapping, dof_handler, function_map, vec, component_mask);
+      mapping, dof_handler, function_map, vec, component_mask, level);
   }
 
 
@@ -554,13 +566,15 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof_handler,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask                                       &component_mask)
+    const ComponentMask                                       &component_mask,
+    const unsigned int                                         level)
   {
     interpolate(hp::MappingCollection<dim, spacedim>(mapping),
                 dof_handler,
                 function,
                 vec,
-                component_mask);
+                component_mask,
+                level);
   }
 
 
@@ -571,7 +585,8 @@ namespace VectorTools
     const DoFHandler<dim, spacedim>                           &dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType                                                &vec,
-    const ComponentMask                                       &component_mask)
+    const ComponentMask                                       &component_mask,
+    const unsigned int                                         level)
   {
     AssertDimension(dof.get_fe_collection().n_components(),
                     function.n_components);
@@ -579,7 +594,8 @@ namespace VectorTools
                 dof,
                 function,
                 vec,
-                component_mask);
+                component_mask,
+                level);
   }
 
 
