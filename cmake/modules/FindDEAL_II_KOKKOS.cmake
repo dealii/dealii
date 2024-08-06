@@ -65,15 +65,17 @@ if(Kokkos_FOUND)
     #
     # integer conversion resulted in a change of sign:
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=68")
-    # variable "i" was set but never used:
-    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
     # loop is not reachable:
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=128")
-    # warning #186-D: pointless comparison of unsigned integer with zero
-    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=186")
     # warning #177-D: variable "n_max_face_orientations" was declared but never referenced
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=177")
+    # warning #186-D: pointless comparison of unsigned integer with zero
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=186")
+    # warning #191-D: type qualifier is meaningless on cast type
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=191")
     # warning #284-D: NULL reference is not allowed
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=284")
+    # variable "i" was set but never used:
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
   endif()
 endif()
