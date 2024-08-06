@@ -469,7 +469,7 @@ namespace TrilinosWrappers
     if (!status_test)
       {
         if (const ReductionControl *const reduction_control =
-              dynamic_cast<const ReductionControl *const>(&solver_control))
+              dynamic_cast<const ReductionControl *>(&solver_control))
           {
             status_test = std::make_unique<internal::TrilinosReductionControl>(
               reduction_control->max_steps(),
@@ -522,10 +522,10 @@ namespace TrilinosWrappers
     // compute it ourself.
     if (const internal::TrilinosReductionControl
           *const reduction_control_status =
-            dynamic_cast<const internal::TrilinosReductionControl *const>(
+            dynamic_cast<const internal::TrilinosReductionControl *>(
               status_test.get()))
       {
-        Assert(dynamic_cast<const ReductionControl *const>(&solver_control),
+        Assert(dynamic_cast<const ReductionControl *>(&solver_control),
                ExcInternalError());
 
         // Check to see if solver converged in one step
