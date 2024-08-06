@@ -333,11 +333,15 @@ namespace Step55
   template <int dim>
   void StreamPowerErosionProblem<dim>::make_grid()
   {
+    pcout << "Make grid... " << std::flush;
+    
     GridGenerator::subdivided_hyper_rectangle(triangulation,
                                               {7, 4},
                                               Point<2>(-109., 37.),
                                               Point<2>(-102., 41.));
     triangulation.refine_global(4);
+
+    pcout << "done. " << std::endl;
   }
 
 
@@ -345,6 +349,7 @@ namespace Step55
   void StreamPowerErosionProblem<dim>::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "setup");
+    pcout << "Setup system... " << std::flush;
 
     dof_handler.distribute_dofs(fe);
     DoFRenumbering::component_wise(dof_handler);
@@ -391,6 +396,8 @@ namespace Step55
                                          relevant_partitioning,
                                          mpi_communicator);
     system_rhs.reinit(owned_partitioning, mpi_communicator);
+
+    pcout << "done. " << std::endl;
   }
 
 
@@ -399,6 +406,7 @@ namespace Step55
   {
     TimerOutput::Scope t(computing_timer,
                          "initial conditions: interpolate elevation");
+    pcout << "Interpolate elevation... " << std::flush;
 
     const ColoradoTopography colorado_topography(mpi_communicator);
     const VectorFunctionFromScalarFunctionObject<dim> initial_values(
@@ -409,6 +417,8 @@ namespace Step55
     VectorTools::interpolate(dof_handler, initial_values, interpolated);
 
     locally_relevant_solution = interpolated;
+
+    pcout << "done. " << std::endl;
   }
 
 
@@ -416,6 +426,8 @@ namespace Step55
   template <int dim>
   void StreamPowerErosionProblem<dim>::compute_initial_constraints()
   {
+    pcout << "Compute initial constraints... " << std::flush;
+
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
     const IndexSet  locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
@@ -554,6 +566,8 @@ namespace Step55
 
     // For debugging
     locally_relevant_solution.block(1) = distributed_solution.block(1);
+
+    pcout << "done. " << std::endl;
   }
 
 
@@ -563,6 +577,7 @@ namespace Step55
   {
     TimerOutput::Scope t(computing_timer,
                          "initial conditions: assemble waterflow system");
+    pcout << "Assemble initial waterflow system... " << std::flush;
 
     system_matrix = 0;
     system_rhs    = 0;
@@ -665,6 +680,8 @@ namespace Step55
 
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
+
+    pcout << "done. " << std::endl;
   }
 
 
@@ -673,9 +690,10 @@ namespace Step55
   {
     TimerOutput::Scope t(computing_timer,
                          "initial conditions: solve waterflow system");
+    pcout << "Solve initial waterflow system... " << std::endl;
 
-    std::cout << "Initial residual=" << system_rhs.block(1).l2_norm()
-              << std::endl;
+    pcout << "    Initial residual=" << system_rhs.block(1).l2_norm()
+          << std::endl;
     SolverControl solver_control(system_matrix.block(1, 1).m(),
                                  1e-6 * system_rhs.block(1).l2_norm());
 
@@ -698,6 +716,8 @@ namespace Step55
     constraints.distribute(distributed_solution);
 
     locally_relevant_solution.block(1) = distributed_solution.block(1);
+
+    pcout << "    Solve done." << std::endl;
   }
 
 
@@ -1203,9 +1223,11 @@ namespace Step55
     // TODO: Figure out whether the following vectors need to be fully
     // distributed, ghosted, or otherwise. Set to the correct vector as computed
     // above.
+    pcout << "Solve time-dependant system... " << std::flush;
     VectorType solution = locally_relevant_solution;
     VectorType solution_dot;
     time_integrator.solve_dae(solution, solution_dot);
+    pcout << "done." << std::endl;
 
     computing_timer.print_summary();
   }
