@@ -475,10 +475,19 @@ This gives us a way to compute the matrix:
 @f}
 This is easily computable.
 
+The form above involving a matrix is useful in the first step when we need to
+solve for $w$ given the initial elevation. For later time steps, however, all
+we will need is a residual. That is, we will have to compute the vector
+@f[
+  F^w_i =
+    -\left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot \left[I_h(\mathbf d w_h)\right]\right)
+    + (\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,p).
+@f]
+The second term is straightforward. For the first term, recall
+that $w_h(\mathbf x)=$
 
-TODO: Also write out what the residual looks like with this interpolant thingy.
-
-
+TODO: Complete
 
 
 <h3> Solving differential-algebraic equations </h3>
