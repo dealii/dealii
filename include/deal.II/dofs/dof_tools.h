@@ -1382,6 +1382,30 @@ namespace DoFTools
                                const DoFHandler<dim, spacedim> &dof_handler,
                                const ComponentMask             &component_mask,
                                std::vector<std::vector<bool>>  &constant_modes);
+
+  /**
+   * Same as the above but additional to the translational modes also
+   * the rotational modes are added, needed to set up AMG for solving
+   * elasticity problems.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_elasticity_modes(const Mapping<dim, spacedim>     &mapping,
+                           const DoFHandler<dim, spacedim>  &dof_handler,
+                           const ComponentMask              &component_mask,
+                           std::vector<std::vector<double>> &elasticity_modes);
+
+  /**
+   * Same as above but for multigrid levels.
+   */
+  template <int dim, int spacedim>
+  void
+  extract_level_elasticity_modes(
+    const unsigned int                level,
+    const Mapping<dim, spacedim>     &mapping,
+    const DoFHandler<dim, spacedim>  &dof_handler,
+    const ComponentMask              &component_mask,
+    std::vector<std::vector<double>> &elasticity_modes);
   /** @} */
 
   /**

@@ -199,6 +199,19 @@ for (deal_II_dimension : DIMENSIONS)
       const ComponentMask                 &selected_components,
       std::vector<std::vector<bool>>      &constant_modes);
 
+    template void DoFTools::extract_elasticity_modes<deal_II_dimension>(
+      const Mapping<deal_II_dimension>    &mapping,
+      const DoFHandler<deal_II_dimension> &dof_handler,
+      const ComponentMask                 &selected_components,
+      std::vector<std::vector<double>>    &constant_modes);
+
+    template void DoFTools::extract_level_elasticity_modes<deal_II_dimension>(
+      const unsigned int                   level,
+      const Mapping<deal_II_dimension>    &mapping,
+      const DoFHandler<deal_II_dimension> &dof_handler,
+      const ComponentMask                 &selected_components,
+      std::vector<std::vector<double>>    &constant_modes);
+
     template void DoFTools::get_active_fe_indices<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       std::vector<unsigned int>           &active_fe_indices);
