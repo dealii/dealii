@@ -265,8 +265,7 @@ namespace Step55
       const std::vector<NumberType> &local_solution_water_at_q_points,
       const std::vector<Tensor<1, dim, NumberType>>
         &local_gradient_elevation_at_q_points,
-      const std::vector<Tensor<1, dim, NumberType>>
-                                &local_gradient_water_at_q_points,
+      const std::vector<NumberType> &div_Ih_d_wh_at_q_points,
       const std::vector<double> &local_solution_dot_elevation_at_q_points,
       const std::vector<double> &rain_fall_rate_rhs_values,
       const double               cell_diameter,
@@ -746,8 +745,7 @@ namespace Step55
     const std::vector<NumberType> &local_solution_water_at_q_points,
     const std::vector<Tensor<1, dim, NumberType>>
       &local_gradient_elevation_at_q_points,
-    const std::vector<Tensor<1, dim, NumberType>>
-                              &local_gradient_water_at_q_points,
+    const std::vector<NumberType> &div_Ih_d_wh_at_q_points,
     const std::vector<double> &local_solution_dot_elevation_at_q_points,
     const std::vector<double> &rain_fall_rate_rhs_values,
     const double               cell_diameter,
@@ -769,9 +767,9 @@ namespace Step55
         const NumberType &w     = local_solution_water_at_q_points[q];
         const Tensor<1, dim, NumberType> &grad_H =
           local_gradient_elevation_at_q_points[q];
-        const Tensor<1, dim, NumberType> &grad_w =
-          local_gradient_water_at_q_points[q];
+        const NumberType &div_Ih_d_wh = div_Ih_d_wh_at_q_points[q];
         const double p = rain_fall_rate_rhs_values[q];
+        const double &JxW = fe_values.JxW(q);
 
         (void)H;
 
@@ -801,8 +799,7 @@ namespace Step55
 
                 cell_residual[i] -=
                   (Nx_i * (H_dot + k * std::pow(w, m) * std::pow(S, n)) +
-                   grad_Nx_i * (Kd * grad_H)) *
-                  fe_values.JxW(q);
+                   grad_Nx_i * (Kd * grad_H)) * JxW;
               }
             else if (i_group == w_dof)
               {
@@ -814,7 +811,7 @@ namespace Step55
 
                 // TODO: Get this right with the I_h part
                 cell_residual[i] -=
-                  (stabNx_i * (p - d * grad_w)) * fe_values.JxW(q);
+                  (stabNx_i * (p - div_Ih_d_wh)) * JxW;
               }
             else
               {
@@ -843,6 +840,11 @@ namespace Step55
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values_at_node_points(
+      fe,
+      Quadrature<dim>(
+        fe.get_unit_support_points()), // could be made more efficient
+      update_gradients);
 
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -856,17 +858,28 @@ namespace Step55
     std::vector<double> water_at_q_points(fe_values.n_quadrature_points);
     std::vector<Tensor<1, dim>> elevation_grad_at_q_points(
       fe_values.n_quadrature_points);
-    std::vector<Tensor<1, dim>> water_grad_at_q_points(
-      fe_values.n_quadrature_points);
+
+    std::vector<Tensor<1, dim>> elevation_grad_at_node_points(dofs_per_cell);
+    std::vector<double> div_Ih_d_wh_at_q_points(fe_values.n_quadrature_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     const FEValuesExtractors::Scalar     elevation(0);
     const FEValuesExtractors::Scalar     water_flow_rate(1);
 
+    std::vector<double> local_dof_values (dofs_per_cell);
+    std::vector<double> cell_residual(dofs_per_cell);
+
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
+          for(const unsigned int i : fe_values.dof_indices())
+            cell_residual[i] = 0.0;
+
           fe_values.reinit(cell);
+          fe_values_at_node_points.reinit(cell);
+
+          cell->get_dof_indices(local_dof_indices);
+          locally_relevant_solution.extract_subvector_to(local_dof_indices, local_dof_values);
 
           rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
                                         rain_fall_rate_rhs_values);
@@ -879,23 +892,54 @@ namespace Step55
             locally_relevant_solution, elevation_grad_at_q_points);
           fe_values[water_flow_rate].get_function_values(
             locally_relevant_solution, water_at_q_points);
-          fe_values[water_flow_rate].get_function_gradients(
-            locally_relevant_solution, water_grad_at_q_points);
 
-          // TODO: Move this variable out of the loop
-          std::vector<double> cell_residual(dofs_per_cell);
+          fe_values_at_node_points[elevation].get_function_gradients(
+            locally_relevant_solution, elevation_grad_at_node_points);
+          Assert(fe_values_at_node_points.n_quadrature_points ==
+                   elevation_grad_at_node_points.size(),
+                 ExcInternalError());
+          for (const unsigned int j : fe_values.dof_indices())
+            {
+              // TODO: We need some sort of offsets here, because the
+              // support points of W can coincide with support points
+              // for H, but ultimately the solution coefficients are
+              // never both non-zero for the same index j.
+              // As an intermediate step, we've hack something up to
+              // work around this, under the assumption that all H dofs
+              // are enumerated before all w dofs, and that they're
+              // enumerated in a way such that traveral of these two
+              // subblocks in lock-step implies visiting the same support
+              // point.
+              const unsigned int jj = j % dofs_per_cell/2;
+              
+              const double Wj = local_dof_values[jj];
+              const Tensor<1,dim> d_j =
+                -elevation_grad_at_node_points[jj] /
+                std::sqrt(elevation_grad_at_node_points[jj] *
+                            elevation_grad_at_node_points[jj] +
+                          ModelParameters::regularization_epsilon *
+                            ModelParameters::regularization_epsilon);
+              
+              for (const unsigned int q : fe_values.quadrature_point_indices())
+              {
+                const Tensor<1, dim> grad_Nx_j =
+                  fe_values[water_flow_rate].gradient(jj, q);
+
+                div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
+              }
+            }
+
           compute_local_residual(fe_values,
                                  elevation_at_q_points,
                                  water_at_q_points,
                                  elevation_grad_at_q_points,
-                                 water_grad_at_q_points,
+                                 div_Ih_d_wh_at_q_points,
                                  elevation_dot_at_q_points,
                                  rain_fall_rate_rhs_values,
                                  cell->diameter(),
                                  time,
                                  cell_residual);
 
-          cell->get_dof_indices(local_dof_indices);
           constraints.distribute_local_to_global(cell_residual,
                                                  local_dof_indices,
                                                  residual);
@@ -929,6 +973,11 @@ namespace Step55
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values_at_node_points(
+      fe,
+      Quadrature<dim>(
+        fe.get_unit_support_points()), // could be made more efficient
+      update_gradients);
 
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -949,8 +998,9 @@ namespace Step55
     std::vector<ADNumberType> water_at_q_points(fe_values.n_quadrature_points);
     std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_q_points(
       fe_values.n_quadrature_points);
-    std::vector<Tensor<1, dim, ADNumberType>> water_grad_at_q_points(
-      fe_values.n_quadrature_points);
+
+    std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_node_points(dofs_per_cell);
+    std::vector<ADNumberType> div_Ih_d_wh_at_q_points(fe_values.n_quadrature_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     const FEValuesExtractors::Scalar     elevation(0);
@@ -963,11 +1013,11 @@ namespace Step55
           ad_helper.reset();
 
           fe_values.reinit(cell);
+          fe_values_at_node_points.reinit(cell);
 
           cell->get_dof_indices(local_dof_indices);
           ad_helper.register_dof_values(locally_relevant_solution,
                                         local_dof_indices);
-
           const std::vector<ADNumberType> &dof_values_ad =
             ad_helper.get_sensitive_dof_values();
 
@@ -982,9 +1032,42 @@ namespace Step55
             dof_values_ad, elevation_grad_at_q_points);
           fe_values[water_flow_rate].get_function_values_from_local_dof_values(
             dof_values_ad, water_at_q_points);
-          fe_values[water_flow_rate]
-            .get_function_gradients_from_local_dof_values(
-              dof_values_ad, water_grad_at_q_points);
+
+          fe_values_at_node_points[elevation].get_function_gradients_from_local_dof_values(
+            dof_values_ad, elevation_grad_at_node_points);
+          Assert(fe_values_at_node_points.n_quadrature_points ==
+                   elevation_grad_at_node_points.size(),
+                 ExcInternalError());
+          for (const unsigned int j : fe_values.dof_indices())
+            {
+              // TODO: We need some sort of offsets here, because the
+              // support points of W can coincide with support points
+              // for H, but ultimately the solution coefficients are
+              // never both non-zero for the same index j.
+              // As an intermediate step, we've hack something up to
+              // work around this, under the assumption that all H dofs
+              // are enumerated before all w dofs, and that they're
+              // enumerated in a way such that traveral of these two
+              // subblocks in lock-step implies visiting the same support
+              // point.
+              const unsigned int jj = j % dofs_per_cell/2;
+              
+              const ADNumberType Wj = dof_values_ad[jj];
+              const Tensor<1,dim, ADNumberType> d_j =
+                -elevation_grad_at_node_points[jj] /
+                std::sqrt(elevation_grad_at_node_points[jj] *
+                            elevation_grad_at_node_points[jj] +
+                          ModelParameters::regularization_epsilon *
+                            ModelParameters::regularization_epsilon);
+              
+              for (const unsigned int q : fe_values.quadrature_point_indices())
+              {
+                const Tensor<1, dim> grad_Nx_j =
+                  fe_values[water_flow_rate].gradient(jj, q);
+
+                div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
+              }
+            }
 
           std::vector<ADNumberType> residual_ad(n_dependent_variables,
                                                 ADNumberType(0.0));
@@ -992,7 +1075,7 @@ namespace Step55
                                  elevation_at_q_points,
                                  water_at_q_points,
                                  elevation_grad_at_q_points,
-                                 water_grad_at_q_points,
+                                 div_Ih_d_wh_at_q_points,
                                  elevation_dot_at_q_points,
                                  rain_fall_rate_rhs_values,
                                  cell->diameter(),
