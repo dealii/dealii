@@ -103,6 +103,26 @@ namespace Step55
   } // namespace ModelParameters
 
 
+  template <int dim, typename NumberType>
+  NumberType slope_from_elevation_gradient(
+    const Tensor<1, dim, NumberType> &elevation_gradient)
+  {
+    return std::sqrt(elevation_gradient * elevation_gradient +
+                     ModelParameters::regularization_epsilon *
+                       ModelParameters::regularization_epsilon);
+  }
+
+
+  template <int dim, typename NumberType>
+  Tensor<1, dim, NumberType> downhill_direction_from_elevation_gradient(
+    const Tensor<1, dim, NumberType> &elevation_gradient)
+  {
+    return -elevation_gradient /
+           slope_from_elevation_gradient(elevation_gradient);
+  }
+
+
+
   class ColoradoTopography : public Function<2>
   {
   public:
@@ -630,12 +650,8 @@ namespace Step55
           fe_values[elevation].get_function_gradients(
             locally_relevant_solution, elevation_grad_at_q_points);
           for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
-            d_at_q_points[q] =
-              -elevation_grad_at_q_points[q] /
-              std::sqrt(elevation_grad_at_q_points[q] *
-                          elevation_grad_at_q_points[q] +
-                        ModelParameters::regularization_epsilon *
-                          ModelParameters::regularization_epsilon);
+            d_at_q_points[q] = downhill_direction_from_elevation_gradient(
+              elevation_grad_at_q_points[q]);
 
           fe_values_at_node_points[elevation].get_function_gradients(
             locally_relevant_solution, elevation_grad_at_node_points);
@@ -646,11 +662,8 @@ namespace Step55
             {
               Assert(j < d_at_node_points.size(), ExcInternalError());
               d_at_node_points[j] = // TODO: get j for just the w component
-                -elevation_grad_at_node_points[j] /
-                std::sqrt(elevation_grad_at_node_points[j] *
-                            elevation_grad_at_node_points[j] +
-                          ModelParameters::regularization_epsilon *
-                            ModelParameters::regularization_epsilon);
+                downhill_direction_from_elevation_gradient(
+                  elevation_grad_at_node_points[j]);
             }
 
           for (unsigned int q = 0; q < n_q_points; ++q)
@@ -773,11 +786,8 @@ namespace Step55
 
         (void)H;
 
-        const NumberType S =
-          std::sqrt(local_gradient_elevation_at_q_points[q] *
-                      local_gradient_elevation_at_q_points[q] +
-                    ModelParameters::regularization_epsilon *
-                      ModelParameters::regularization_epsilon);
+        const NumberType S = slope_from_elevation_gradient(
+          local_gradient_elevation_at_q_points[q]);
         const Tensor<1, dim, NumberType> d =
           -local_gradient_elevation_at_q_points[q] / S;
 
@@ -810,7 +820,6 @@ namespace Step55
                 const auto stabNx_i =
                   (Nx_i + c * cell_diameter * d * grad_Nx_i);
 
-                // TODO: Get this right with the I_h part
                 cell_residual[i] -= (stabNx_i * (p - div_Ih_d_wh)) * JxW;
               }
             else
@@ -919,11 +928,8 @@ namespace Step55
 
                   const double         Wj = local_dof_values[j];
                   const Tensor<1, dim> d_j =
-                    -elevation_grad_at_node_points[jj] /
-                    std::sqrt(elevation_grad_at_node_points[jj] *
-                                elevation_grad_at_node_points[jj] +
-                              ModelParameters::regularization_epsilon *
-                                ModelParameters::regularization_epsilon);
+                    downhill_direction_from_elevation_gradient(
+                      elevation_grad_at_node_points[jj]);
 
                   for (const unsigned int q :
                        fe_values.quadrature_point_indices())
@@ -1064,11 +1070,8 @@ namespace Step55
 
               const ADNumberType                 Wj = dof_values_ad[jj];
               const Tensor<1, dim, ADNumberType> d_j =
-                -elevation_grad_at_node_points[jj] /
-                std::sqrt(elevation_grad_at_node_points[jj] *
-                            elevation_grad_at_node_points[jj] +
-                          ModelParameters::regularization_epsilon *
-                            ModelParameters::regularization_epsilon);
+                downhill_direction_from_elevation_gradient(
+                  elevation_grad_at_node_points[jj]);
 
               for (const unsigned int q : fe_values.quadrature_point_indices())
                 {
