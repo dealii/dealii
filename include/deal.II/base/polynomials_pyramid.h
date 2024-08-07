@@ -20,6 +20,8 @@
 
 #include <deal.II/base/scalar_polynomials_base.h>
 
+#include <deal.II/lac/full_matrix.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -37,8 +39,6 @@ public:
 
   /*
    * Constructor taking the polynomial @p degree as input.
-   *
-   * @note Currently, only linear polynomials (degree=1) are implemented.
    */
   ScalarLagrangePolynomialPyramid(const unsigned int degree);
 
@@ -114,6 +114,17 @@ public:
 
   virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override;
+
+private:
+  FullMatrix<double> VDM_inv;
+
+  double
+  compute_jacobi_basis_functions(const unsigned int i,
+                                 const Point<dim>  &p) const;
+
+  Tensor<1, dim>
+  compute_jacobi_deriv_basis_functions(const unsigned int i,
+                                       const Point<dim>  &p) const;
 };
 
 

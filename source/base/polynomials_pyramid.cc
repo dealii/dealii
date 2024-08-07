@@ -13,8 +13,12 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/base/point.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/polynomials_pyramid.h>
+
+#include <deal.II/grid/reference_cell.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -39,13 +43,269 @@ namespace
 } // namespace
 
 
+template <int dim>
+double
+ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_basis_functions(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  if (this->degree() == 2)
+    {
+      double       basis;
+      const double x = p[0];
+      const double y = p[1];
+      const double z = p[2];
+
+      double ratio;
+      if (std::fabs(z - 1.0) < 1e-12)
+        {
+          ratio = 0.0;
+        }
+      else
+        {
+          ratio = 1.0 / (z - 1.0);
+        }
+
+      switch (i)
+        {
+          case 0:
+            basis = 1.0;
+            break;
+          case 1:
+            basis = 4.0 * z - 1.0;
+            break;
+          case 2:
+            basis = 15.0 * std::pow(z, 2) - 10.0 * z + 1.0;
+            break;
+          case 3:
+            basis = y;
+            break;
+          case 4:
+            basis = y * (6.0 * z - 1.0);
+            break;
+          case 5:
+            basis = 3 * std::pow(y, 2) * 0.5 - std::pow(z, 2) * 0.5 + z - 0.5;
+            break;
+          case 6:
+            basis = x;
+            break;
+          case 7:
+            basis = x * (6.0 * z - 1.0);
+            break;
+          case 8:
+            basis = -x * y * ratio;
+            break;
+          case 9:
+            basis = x * y * (1.0 - 6.0 * z) * ratio;
+            break;
+          case 10:
+            basis = x * (-3.0 * std::pow(y, 2) + std::pow(z, 2) - 2 * z + 1.0) *
+                    0.5 * ratio;
+            break;
+          case 11:
+            basis = 3.0 / 2.0 * std::pow(x, 2) - std::pow(z, 2) * 0.5 + z - 0.5;
+            break;
+          case 12:
+            basis = y *
+                    (-3.0 * std::pow(x, 2) + std::pow(z, 2) - 2.0 * z + 1.0) *
+                    0.5 * ratio;
+            break;
+          case 13:
+            basis = (3.0 * std::pow(x, 2) - std::pow(z, 2) + 2.0 * z - 1.0) *
+                    (3.0 * std::pow(y, 2) - std::pow(z, 2) + 2.0 * z - 1.0) *
+                    0.25 * std::pow(ratio, 2);
+            break;
+          default:
+
+            DEAL_II_NOT_IMPLEMENTED();
+            break;
+        }
+      if (std::fabs(basis) < 1e-14)
+        basis = 0.0;
+
+      return basis;
+    }
+  DEAL_II_NOT_IMPLEMENTED();
+  return 0;
+}
+
+
+template <int dim>
+Tensor<1, dim>
+ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_deriv_basis_functions(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  if (this->degree() == 2)
+    {
+      Tensor<1, dim> grad;
+      const double   x = p[0];
+      const double   y = p[1];
+      const double   z = p[2];
+
+      double ratio;
+      if (std::fabs(z - 1.0) < 1e-12)
+        {
+          ratio = 0.0;
+        }
+      else
+        {
+          ratio = 1.0 / (z - 1.0);
+        }
+
+      switch (i)
+        {
+          case 0:
+            grad[0] = 0.0;
+            grad[1] = 0.0;
+            grad[2] = 0.0;
+            break;
+          case 1:
+            grad[0] = 0.0;
+            grad[1] = 0.0;
+            grad[2] = 4.0;
+            break;
+          case 2:
+            grad[0] = 0.0;
+            grad[1] = 0.0;
+            grad[2] = 30.0 * z - 10.0;
+            break;
+          case 3:
+            grad[0] = 0.0;
+            grad[1] = 1.0;
+            grad[2] = 0.0;
+            break;
+          case 4:
+            grad[0] = 0.0;
+            grad[1] = 6.0 * z - 1.0;
+            grad[2] = 6.0 * y;
+            break;
+          case 5:
+            grad[0] = 0.0;
+            grad[1] = 3.0 * y;
+            grad[2] = 1.0 - z;
+            break;
+          case 6:
+            grad[0] = 1.0;
+            grad[1] = 0;
+            grad[2] = 0;
+            break;
+          case 7:
+            grad[0] = 6.0 * z - 1.0;
+            grad[1] = 0;
+            grad[2] = 6.0 * x;
+            break;
+          case 8:
+            grad[0] = -y * ratio;
+            grad[1] = -x * ratio;
+            grad[2] = x * y * std::pow(ratio, 2);
+            break;
+          case 9:
+            grad[0] = y * (1.0 - 6.0 * z) * ratio;
+            grad[1] = x * (1.0 - 6.0 * z) * ratio;
+            grad[2] = 5 * x * y * std::pow(ratio, 2);
+            break;
+          case 10:
+            grad[0] = (-3.0 * std::pow(y, 2) + std::pow(z, 2) - 2.0 * z + 1) *
+                      0.5 * ratio;
+            grad[1] = -3.0 * x * y * ratio;
+            grad[2] = x *
+                      (3.0 * std::pow(y, 2) + std::pow(z, 2) - 2.0 * z + 1) *
+                      0.5 * std::pow(ratio, 2);
+            break;
+          case 11:
+            grad[0] = 3.0 * x;
+            grad[1] = 0.0;
+            grad[2] = 1.0 - z;
+            break;
+          case 12:
+            grad[0] = -3.0 * x * y * ratio;
+            grad[1] = (-3.0 * std::pow(x, 2) + std::pow(z, 2) - 2.0 * z + 1) *
+                      0.5 * ratio;
+            grad[2] = y *
+                      (3.0 * std::pow(x, 2) + std::pow(z, 2) - 2.0 * z + 1.0) *
+                      0.5 * std::pow(ratio, 2);
+            break;
+          case 13:
+            {
+              double ratio_13 =
+                (ratio == 0.0) ?
+                  0.0 :
+                  std::pow(z, 3) - 3.0 * std::pow(z, 2) + 3.0 * z - 1.0;
+              grad[0] =
+                3.0 * x *
+                (3.0 * std::pow(y, 2) - std::pow(z, 2) + 2.0 * z - 1.0) * 0.5 *
+                std::pow(ratio, 2);
+              grad[1] =
+                3.0 * y *
+                (3.0 * std::pow(x, 2) - std::pow(z, 2) + 2.0 * z - 1.0) * 0.5 *
+                std::pow(ratio, 2);
+              grad[2] =
+                (-9.0 * std::pow(x, 2) * std::pow(y, 2) + std::pow(z, 4) -
+                 4.0 * std::pow(z, 3) + 6.0 * std::pow(z, 2) - 4.0 * z + 1) *
+                0.5 * ratio_13;
+            }
+            break;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+            break;
+        }
+      for (unsigned int d = 0; d < dim; ++d)
+        if (std::fabs(grad[d]) < 1e-14)
+          grad[d] = 0.0;
+
+      return grad;
+    }
+  DEAL_II_NOT_IMPLEMENTED();
+  return Tensor<1, dim>();
+}
+
 
 template <int dim>
 ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
   const unsigned int degree)
   : ScalarPolynomialsBase<dim>(degree,
                                compute_n_polynomials_pyramid(dim, degree))
-{}
+{
+  if (this->degree() == 2)
+    {
+      // Compute VDM Matrix and its inverse
+      // Get unit support points
+      std::vector<Point<dim>> support_points;
+      const ReferenceCell     reference_cell = ReferenceCells::Pyramid;
+
+      for (const auto i : reference_cell.vertex_indices())
+        support_points.emplace_back(reference_cell.template vertex<dim>(i));
+
+      // lines:
+      for (const unsigned int l : reference_cell.line_indices())
+        {
+          support_points.emplace_back(
+            0.5 * support_points[reference_cell.line_to_cell_vertices(l, 0)] +
+            0.5 * support_points[reference_cell.line_to_cell_vertices(l, 1)]);
+        }
+      // quad:
+      support_points.emplace_back(Point<dim>(0.0, 0.0, 0.0));
+
+      // Now fill VDM Matrix
+      FullMatrix<double> VDM(support_points.size());
+
+      for (unsigned i = 0; i < support_points.size(); ++i)
+        for (unsigned j = 0; j < support_points.size(); ++j)
+          VDM[i][j] =
+            this->compute_jacobi_basis_functions(i, support_points[j]);
+
+      // get inverse
+      VDM.gauss_jordan();
+
+      for (unsigned i = 0; i < support_points.size(); ++i)
+        for (unsigned j = 0; j < support_points.size(); ++j)
+          if (std::fabs(VDM[i][j]) < 1e-14)
+            VDM[i][j] = 0.0;
+
+      VDM_inv = VDM;
+    }
+}
 
 
 template <int dim>
@@ -87,182 +347,15 @@ ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
     }
   else if (this->degree() == 2)
     {
-      const double x = p[0];
-      const double y = p[1];
-      const double z = p[2];
+      AssertIndexRange(i, VDM_inv.m());
 
-      double result;
+      double result = 0;
+      for (unsigned int j = 0; j < VDM_inv.n(); ++j)
+        result += VDM_inv[i][j] * this->compute_jacobi_basis_functions(j, p);
 
-      double ration;
-      double ration_square;
+      if (std::fabs(result) < 1e-14)
+        result = 0.0;
 
-      if (fabs(z - 1.0) > 1.0e-14)
-        {
-          ration        = 1.0 / (z - 1.0);
-          ration_square = std::pow(ration, 2);
-        }
-      else
-        {
-          ration        = 1.0;
-          ration_square = 1.0;
-        }
-
-      switch (i)
-        {
-          case 0:
-            result =
-              (std::pow(z - 1, 2) *
-                 ((1.0 / 12) * std::pow(x, 2) + (1.0 / 18) * x * (6 * z - 1) -
-                  (1.0 / 36) * x + (1.0 / 12) * std::pow(y, 2) +
-                  (1.0 / 18) * y * (6 * z - 1) - (1.0 / 36) * y +
-                  (2.0 / 9) * std::pow(z, 2) - (7.0 / 36) * z - (1.0 / 36)) +
-               (z - 1) * ((1.0 / 12) * x * y * (6 * z - 1) - (1.0 / 6) * x * y +
-                          (1.0 / 12) * x *
-                            (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                          (1.0 / 12) * y *
-                            (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1)) +
-               (1.0 / 36) * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 1:
-            result =
-              (std::pow(z - 1, 2) *
-                 ((1.0 / 12) * std::pow(x, 2) - (1.0 / 18) * x * (6 * z - 1) +
-                  (1.0 / 36) * x + (1.0 / 12) * std::pow(y, 2) +
-                  (1.0 / 18) * y * (6 * z - 1) - (1.0 / 36) * y +
-                  (2.0 / 9) * std::pow(z, 2) - (7.0 / 36) * z - (1.0 / 36)) -
-               (z - 1) * ((1.0 / 12) * x * y * (6 * z - 1) - (1.0 / 6) * x * y +
-                          (1.0 / 12) * x *
-                            (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) -
-                          (1.0 / 12) * y *
-                            (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1)) +
-               (1.0 / 36) * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 2:
-            result =
-              (std::pow(z - 1, 2) *
-                 ((1.0 / 12) * std::pow(x, 2) + (1.0 / 18) * x * (6 * z - 1) -
-                  (1.0 / 36) * x + (1.0 / 12) * std::pow(y, 2) -
-                  (1.0 / 18) * y * (6 * z - 1) + (1.0 / 36) * y +
-                  (2.0 / 9) * std::pow(z, 2) - (7.0 / 36) * z - (1.0 / 36)) -
-               (z - 1) * ((1.0 / 12) * x * y * (6 * z - 1) - (1.0 / 6) * x * y -
-                          (1.0 / 12) * x *
-                            (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                          (1.0 / 12) * y *
-                            (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1)) +
-               (1.0 / 36) * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 3:
-            result =
-              (std::pow(z - 1, 2) *
-                 ((1.0 / 12) * std::pow(x, 2) - (1.0 / 18) * x * (6 * z - 1) +
-                  (1.0 / 36) * x + (1.0 / 12) * std::pow(y, 2) -
-                  (1.0 / 18) * y * (6 * z - 1) + (1.0 / 36) * y +
-                  (2.0 / 9) * std::pow(z, 2) - (7.0 / 36) * z - (1.0 / 36)) -
-               (z - 1) *
-                 (-(1.0 / 12) * x * y * (6 * z - 1) + (1.0 / 6) * x * y +
-                  (1.0 / 12) * x *
-                    (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                  (1.0 / 12) * y *
-                    (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1)) +
-               (1.0 / 36) * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 4:
-            result = z * (2 * z - 1);
-            break;
-          case 5:
-            result =
-              (-x * (z - 1) *
-                 (0.5 * std::pow(y, 2) - 1.0 / 6 * std::pow(z, 2) +
-                  1.0 / 3 * z - 1.0 / 6) +
-               std::pow(z - 1, 2) *
-                 (1.0 / 3 * std::pow(x, 2) + 1.0 / 18 * x * (6 * z - 1) -
-                  5.0 / 18 * x - 1.0 / 6 * std::pow(y, 2) +
-                  1.0 / 18 * std::pow(z, 2) - 1.0 / 9 * z + 1.0 / 18) -
-               1.0 / 18 * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 6:
-            result =
-              (x * (z - 1) *
-                 (0.5 * std::pow(y, 2) - 1.0 / 6 * std::pow(z, 2) +
-                  1.0 / 3 * z - 1.0 / 6) +
-               std::pow(z - 1, 2) *
-                 (1.0 / 3 * std::pow(x, 2) - 1.0 / 18 * x * (6 * z - 1) +
-                  5.0 / 18 * x - 1.0 / 6 * std::pow(y, 2) +
-                  1.0 / 18 * std::pow(z, 2) - 1.0 / 9 * z + 1.0 / 18) -
-               1.0 / 18 * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 7:
-            result =
-              (-1.0 / 6 * y * (z - 1) *
-                 (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-               std::pow(z - 1, 2) *
-                 (-1.0 / 6 * std::pow(x, 2) + 1.0 / 3 * std::pow(y, 2) +
-                  1.0 / 18 * y * (6 * z - 1) - 5.0 / 18 * y +
-                  1.0 / 18 * std::pow(z, 2) - 1.0 / 9 * z + 1.0 / 18) -
-               1.0 / 18 * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 8:
-            result =
-              (1.0 / 6 * y * (z - 1) *
-                 (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-               std::pow(z - 1, 2) *
-                 (-1.0 / 6 * std::pow(x, 2) + 1.0 / 3 * std::pow(y, 2) -
-                  1.0 / 18 * y * (6 * z - 1) + 5.0 / 18 * y +
-                  1.0 / 18 * std::pow(z, 2) - 1.0 / 9 * z + 1.0 / 18) -
-               1.0 / 18 * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          case 9:
-            result =
-              (-x * y * z - x * std::pow(z, 2) + x * z - y * std::pow(z, 2) +
-               y * z - std::pow(z, 3) + 2.0 * std::pow(z, 2) - z - 0) *
-              ration;
-            break;
-          case 10:
-            result =
-              (x * y * z + x * std::pow(z, 2) - x * z - y * std::pow(z, 2) +
-               y * z - std::pow(z, 3) + 2.0 * std::pow(z, 2) - z - 0) *
-              ration;
-            break;
-          case 11:
-            result =
-              (x * y * z - x * std::pow(z, 2) + x * z + y * std::pow(z, 2) -
-               y * z - std::pow(z, 3) + 2.0 * std::pow(z, 2) - z + 0) *
-              ration;
-            break;
-          case 12:
-            result = z *
-                     (-x * y + x * z - x + y * z - y - std::pow(z, 2) +
-                      2.0 * z - 1.0) *
-                     ration;
-            break;
-          case 13:
-            result =
-              (std::pow(z - 1, 2) *
-                 (-2.0 / 3 * std::pow(x, 2) - 2.0 / 3 * std::pow(y, 2) +
-                  8.0 / 9 * std::pow(z, 2) - 16.0 / 9 * z + 8.0 / 9) +
-               1.0 / 9 * (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1)) *
-              ration_square;
-            break;
-          default:
-            DEAL_II_ASSERT_UNREACHABLE();
-        }
       return result;
     }
   DEAL_II_ASSERT_UNREACHABLE();
@@ -344,275 +437,20 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
     }
   else if (this->degree() == 2)
     {
-      const double x = p[0];
-      const double y = p[1];
-      const double z = p[2];
+      AssertIndexRange(i, VDM_inv.m());
 
-      switch (i)
-        {
-          case 0:
-            grad[0] = (1.0 / 6.0 * x *
-                         (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * x + 1.0 / 3.0 * z - 1.0 / 12.0) +
-                       (z - 1) * (0.5 * x * y + 0.25 * std::pow(y, 2) +
-                                  1.0 / 12.0 * y * (6 * z - 1) - 1.0 / 6.0 * y -
-                                  1.0 / 12.0 * std::pow(z, 2) + 1.0 / 6.0 * z -
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[1] = (1.0 / 6.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * y + 1.0 / 3.0 * z - 1.0 / 12.0) +
-                       (z - 1) * (0.25 * std::pow(x, 2) + 0.5 * x * y +
-                                  1.0 / 12.0 * x * (6 * z - 1) - 1.0 / 6.0 * x -
-                                  1.0 / 12.0 * std::pow(z, 2) + 1.0 / 6.0 * z -
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[2] =
-              (-0.5 * std::pow(x, 2) * std::pow(y, 2) -
-               0.25 * std::pow(x, 2) * y * z + 0.25 * std::pow(x, 2) * y -
-               0.25 * x * std::pow(y, 2) * z + 0.25 * x * std::pow(y, 2) -
-               0.25 * x * y * z + 0.25 * x * y + 0.25 * x * std::pow(z, 3) -
-               0.75 * x * std::pow(z, 2) + 0.75 * x * z - 0.25 * x +
-               0.25 * y * std::pow(z, 3) - 0.75 * y * std::pow(z, 2) +
-               0.75 * y * z - 0.25 * y + 0.5 * std::pow(z, 4) -
-               1.75 * std::pow(z, 3) + 2.25 * std::pow(z, 2) - 1.25 * z +
-               0.25) /
-              (std::pow(z, 3) - 3.0 * std::pow(z, 2) + 3.0 * z - 1.0);
-            break;
+      for (unsigned int j = 0; j < VDM_inv.n(); ++j)
+        grad +=
+          VDM_inv[i][j] * this->compute_jacobi_deriv_basis_functions(j, p);
 
-          case 1:
-            grad[0] = (1.0 / 6.0 * x *
-                         (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * x - 1.0 / 3.0 * z + 1.0 / 12.0) +
-                       (z - 1) * (0.5 * x * y - 0.25 * std::pow(y, 2) -
-                                  1.0 / 12.0 * y * (6 * z - 1) + 1.0 / 6.0 * y +
-                                  1.0 / 12.0 * std::pow(z, 2) - 1.0 / 6.0 * z +
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[1] = (1.0 / 6.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * y + 1.0 / 3.0 * z - 1.0 / 12.0) -
-                       (z - 1) * (-0.25 * std::pow(x, 2) + 0.5 * x * y -
-                                  1.0 / 12.0 * x * (6 * z - 1) + 1.0 / 6.0 * x +
-                                  1.0 / 12.0 * std::pow(z, 2) - 1.0 / 6.0 * z +
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[2] =
-              (-0.5 * std::pow(x, 2) * std::pow(y, 2) -
-               0.25 * std::pow(x, 2) * y * z + 0.25 * std::pow(x, 2) * y +
-               0.25 * x * std::pow(y, 2) * z - 0.25 * x * std::pow(y, 2) +
-               0.25 * x * y * z - 0.25 * x * y - 0.25 * x * std::pow(z, 3) +
-               0.75 * x * std::pow(z, 2) - 0.75 * x * z + 0.25 * x +
-               0.25 * y * std::pow(z, 3) - 0.75 * y * std::pow(z, 2) +
-               0.75 * y * z - 0.25 * y + 0.5 * std::pow(z, 4) -
-               1.75 * std::pow(z, 3) + 2.25 * std::pow(z, 2) - 1.25 * z +
-               0.25) /
-              (std::pow(z, 3) - 3.0 * std::pow(z, 2) + 3.0 * z - 1.0);
-            break;
-
-          case 2:
-            grad[0] = (1.0 / 6.0 * x *
-                         (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * x + 1.0 / 3.0 * z - 1.0 / 12.0) -
-                       (z - 1) * (0.5 * x * y - 0.25 * std::pow(y, 2) +
-                                  1.0 / 12.0 * y * (6 * z - 1) - 1.0 / 6.0 * y +
-                                  1.0 / 12.0 * std::pow(z, 2) - 1.0 / 6.0 * z +
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[1] = (1.0 / 6.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * y - 1.0 / 3.0 * z + 1.0 / 12.0) +
-                       (z - 1) * (-0.25 * std::pow(x, 2) + 0.5 * x * y -
-                                  1.0 / 12.0 * x * (6 * z - 1) + 1.0 / 6.0 * x +
-                                  1.0 / 12.0 * std::pow(z, 2) - 1.0 / 6.0 * z +
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[2] =
-              (-0.5 * std::pow(x, 2) * std::pow(y, 2) +
-               0.25 * std::pow(x, 2) * y * z - 0.25 * std::pow(x, 2) * y -
-               0.25 * x * std::pow(y, 2) * z + 0.25 * x * std::pow(y, 2) +
-               0.25 * x * y * z - 0.25 * x * y + 0.25 * x * std::pow(z, 3) -
-               0.75 * x * std::pow(z, 2) + 0.75 * x * z - 0.25 * x -
-               0.25 * y * std::pow(z, 3) + 0.75 * y * std::pow(z, 2) -
-               0.75 * y * z + 0.25 * y + 0.5 * std::pow(z, 4) -
-               1.75 * std::pow(z, 3) + 2.25 * std::pow(z, 2) - 1.25 * z +
-               0.25) /
-              (std::pow(z, 3) - 3 * std::pow(z, 2) + 3 * z - 1.0);
-            break;
-          case 3:
-            grad[0] = (1.0 / 6.0 * x *
-                         (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * x - 1.0 / 3.0 * z + 1.0 / 12.0) -
-                       (z - 1) * (0.5 * x * y + 0.25 * std::pow(y, 2) -
-                                  1.0 / 12.0 * y * (6 * z - 1) + 1.0 / 6.0 * y -
-                                  1.0 / 12.0 * std::pow(z, 2) + 1.0 / 6.0 * z -
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[1] = (1.0 / 6.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (1.0 / 6.0 * y - 1.0 / 3.0 * z + 1.0 / 12.0) -
-                       (z - 1) * (0.25 * std::pow(x, 2) + 0.5 * x * y -
-                                  1.0 / 12.0 * x * (6 * z - 1) + 1.0 / 6.0 * x -
-                                  1.0 / 12.0 * std::pow(z, 2) + 1.0 / 6.0 * z -
-                                  1.0 / 12.0)) /
-                      std::pow((z - 1), 2);
-            grad[2] =
-              (-0.5 * std::pow(x, 2) * std::pow(y, 2) +
-               0.25 * std::pow(x, 2) * y * z - 0.25 * std::pow(x, 2) * y +
-               0.25 * x * std::pow(y, 2) * z - 0.25 * x * std::pow(y, 2) -
-               0.25 * x * y * z + 0.25 * x * y - 0.25 * x * std::pow(z, 3) +
-               0.75 * x * std::pow(z, 2) - 0.75 * x * z + 0.25 * x -
-               0.25 * y * std::pow(z, 3) + 0.75 * y * std::pow(z, 2) -
-               0.75 * y * z + 0.25 * y + 0.5 * std::pow(z, 4) -
-               1.75 * std::pow(z, 3) + 2.25 * std::pow(z, 2) - 1.25 * z +
-               0.25) /
-              (std::pow(z, 3) - 3 * std::pow(z, 2) + 3 * z - 1.0);
-            break;
-          case 4:
-            grad[0] = 0;
-            grad[1] = 0;
-            grad[2] =
-              (4.0 * std::pow(z, 3) - 9.0 * std::pow(z, 2) + 6.0 * z - 1.0) /
-              (std::pow(z, 2) - 2.0 * z + 1.0);
-            break;
-          case 5:
-            grad[0] =
-              (-1.0 / 3.0 * x *
-                 (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-               std::pow((z - 1), 2) *
-                 (2.0 / 3.0 * x + 1.0 / 3.0 * z - 1.0 / 3.0) -
-               (z - 1) * (0.5 * std::pow(y, 2) - 1.0 / 6.0 * std::pow(z, 2) +
-                          1.0 / 3.0 * z - 1.0 / 6.0)) /
-              std::pow((z - 1), 2);
-            grad[1] = (-x * (y * (z - 1)) -
-                       1.0 / 3.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       (-1.0 / 3.0 * y) * (std::pow((z - 1), 2))) /
-                      std::pow((z - 1), 2);
-            grad[2] =
-              (std::pow(x, 2) * std::pow(y, 2) + 0.5 * x * std::pow(y, 2) * z -
-               0.5 * x * std::pow(y, 2) + 0.5 * x * std::pow(z, 3) -
-               1.5 * x * std::pow(z, 2) + 1.5 * x * z - 0.5 * x) /
-              (std::pow(z, 3) - 3 * std::pow(z, 2) + 3 * z - 1.0);
-            break;
-          case 6:
-            grad[0] = (-1.0 / 3.0 * x *
-                         (3 * std::pow(y, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (2.0 / 3.0 * x - 1.0 / 3.0 * z + 1.0 / 3.0) +
-                       (z - 1) * (0.5 * std::pow(y, 2) + 0 -
-                                  1.0 / 6.0 * std::pow(z, 2) + 1.0 / 3.0 * z -
-                                  1.0 / 6.0)) /
-                      std::pow((z - 1), 2);
-            grad[1] = (x * (1.0 * y + 0) * (z - 1) -
-                       1.0 / 3.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) -
-                       (1.0 / 3.0 * y + 0) * std::pow((z - 1), 2)) /
-                      std::pow((z - 1), 2);
-            grad[2] =
-              (1.0 * std::pow(x, 2) * std::pow(y, 2) + 0 - 0 + 0 -
-               0.5 * x * std::pow(y, 2) * z + 0.5 * x * std::pow(y, 2) - 0 + 0 -
-               0.5 * x * std::pow(z, 3) + 1.5 * x * std::pow(z, 2) -
-               1.5 * x * z + 0.5 * x - 0 + 0 - 0 + 0 + 0 - 0 + 0) /
-              (std::pow(z, 3) - 3.0 * std::pow(z, 2) + 3.0 * z - 1.0);
-            break;
-          case 7:
-            grad[0] = x *
-                      (-1.0 * std::pow(y, 2) - 1.0 * y * (z - 1) +
-                       1.0 / 3.0 * std::pow(z, 2) - 2.0 / 3.0 * z -
-                       1.0 / 3.0 * std::pow((z - 1), 2) + 1.0 / 3.0) /
-                      std::pow((z - 1), 2);
-            grad[1] = (-1.0 / 3.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (2.0 / 3.0 * y + 1.0 / 3.0 * z - 1.0 / 3.0) -
-                       1.0 / 6.0 * (z - 1) *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1)) /
-                      std::pow((z - 1), 2);
-            grad[2] =
-              (1.0 * std::pow(x, 2) * std::pow(y, 2) +
-               0.5 * std::pow(x, 2) * y * z - 0.5 * std::pow(x, 2) * y + 0 - 0 +
-               0 + 0.5 * y * std::pow(z, 3) - 1.5 * y * std::pow(z, 2) +
-               1.5 * y * z - 0.5 * y - 0 - 0 + 0) /
-              (std::pow(z, 3) - 3.0 * std::pow(z, 2) + 3.0 * z - 1.0);
-            break;
-          case 8:
-            grad[0] = x *
-                      (-1.0 * std::pow(y, 2) + 1.0 * y * (z - 1) +
-                       1.0 / 3.0 * std::pow(z, 2) - 2.0 / 3.0 * z -
-                       1.0 / 3.0 * std::pow((z - 1), 2) + 1.0 / 3.0) /
-                      std::pow((z - 1), 2);
-            grad[1] = (-1.0 / 3.0 * y *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1) +
-                       std::pow((z - 1), 2) *
-                         (2.0 / 3.0 * y - 1.0 / 3.0 * z + 1.0 / 3.0) +
-                       1.0 / 6.0 * (z - 1) *
-                         (3 * std::pow(x, 2) - std::pow(z, 2) + 2 * z - 1)) /
-                      std::pow((z - 1), 2);
-            grad[2] = (1.0 * std::pow(x, 2) * std::pow(y, 2) -
-                       0.5 * std::pow(x, 2) * y * z + 0.5 * std::pow(x, 2) * y +
-                       0 - 0.5 * y * std::pow(z, 3) + 1.5 * y * std::pow(z, 2) -
-                       1.5 * y * z + 0.5 * y - 0 - 0 + 0) /
-                      (std::pow(z, 3) - 3.0 * std::pow(z, 2) + 3.0 * z - 1.0);
-            break;
-          case 9:
-            grad[0] = z * (-y - z + 1) / (z - 1);
-            grad[1] = z * (-x - z + 1) / (z - 1);
-            grad[2] = (x * y - x * std::pow(z, 2) + 2 * x * z - x -
-                       y * std::pow(z, 2) + 2 * y * z - y - 2 * std::pow(z, 3) +
-                       5 * std::pow(z, 2) - 4 * z + 1) /
-                      (std::pow(z, 2) - 2 * z + 1);
-            break;
-          case 10:
-            grad[0] = z * (y + z - 1) / (z - 1);
-            grad[1] = z * (x - z + 1) / (z - 1);
-            grad[2] = (-x * y + x * std::pow(z, 2) - 2 * x * z + x -
-                       y * std::pow(z, 2) + 2 * y * z - y - 2 * std::pow(z, 3) +
-                       5 * std::pow(z, 2) - 4 * z + 1) /
-                      (std::pow(z, 2) - 2 * z + 1);
-            break;
-          case 11:
-            grad[0] = z * (y - z + 1) / (z - 1);
-            grad[1] = z * (x + z - 1) / (z - 1);
-            grad[2] = (-x * y - x * std::pow(z, 2) + 2 * x * z - x +
-                       y * std::pow(z, 2) - 2 * y * z + y - 2 * std::pow(z, 3) +
-                       5 * std::pow(z, 2) - 4 * z + 1) /
-                      (std::pow(z, 2) - 2 * z + 1);
-            break;
-          case 12:
-            grad[0] = z * (-y + z - 1) / (z - 1);
-            grad[1] = z * (-x + z - 1) / (z - 1);
-            grad[2] = (x * y + x * std::pow(z, 2) - 2 * x * z + x +
-                       y * std::pow(z, 2) - 2 * y * z + y - 2 * std::pow(z, 3) +
-                       5 * std::pow(z, 2) - 4 * z + 1) /
-                      (std::pow(z, 2) - 2 * z + 1);
-            break;
-          case 13:
-            grad[0] = x *
-                      (2 * std::pow(y, 2) - 2 * std::pow(z, 2) + 4 * z - 2) /
-                      (std::pow(z, 2) - 2 * z + 1);
-            grad[1] =
-              y *
-              (2.0 * std::pow(x, 2) - 2.0 * std::pow(z, 2) + 4.0 * z - 2.0) /
-              (std::pow(z, 2) - 2.0 * z + 1.0);
-            grad[2] = (-2.0 * std::pow(x, 2) * std::pow(y, 2) - 0 + 0 - 0 - 0 +
-                       0 + 2.0 * std::pow(z, 4) - 8.0 * std::pow(z, 3) +
-                       12.0 * std::pow(z, 2) - 8.0 * z + 2.0) /
-                      (std::pow(z, 3) - 3.0 * std::pow(z, 2) + 3.0 * z - 1.0);
-            break;
-
-          default:
-            DEAL_II_ASSERT_UNREACHABLE();
-        }
+      for (unsigned int d = 0; d < dim; ++d)
+        if (std::fabs(grad[d]) < 1e-14)
+          grad[d] = 0.0;
     }
+
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+
 
   return grad;
 }

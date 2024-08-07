@@ -1015,63 +1015,9 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
       // Works like the line case, we just have to check it in 2 different
       // spaial dimensions. If p=1, then there are none, if p=2 then there is
       // one points on the quad.
-      const unsigned int p = this->degree;
-
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
-      const std::vector<unsigned int> &index_map_inverse =
-        this->get_poly_space_numbering_inverse();
-      if (false)
-        {
-          for (unsigned int i1 = 0; i1 < p - 1; ++i1)
-            for (unsigned int i2 = 0; i2 < p - 1; ++i2)
-              for (unsigned int j = 0; j < 3 * fe_p_other->n_dofs_per_quad(2);
-                   ++j)
-                {
-                  if ((std::fabs(
-                         this
-                           ->unit_support_points[index_map_inverse[i1 + 1]][0] -
-                         fe_p_other->unit_support_point(
-                           j +
-                           fe_p_other->reference_cell().n_vertices() *
-                             fe_p_other->n_dofs_per_vertex() +
-                           fe_p_other->reference_cell().n_lines() *
-                             fe_p_other->n_dofs_per_line())[0]) < 1e-14) &&
-                      (std::fabs(
-                         this
-                           ->unit_support_points[index_map_inverse[i2 + 1]][0] -
-                         fe_p_other->unit_support_point(
-                           j +
-                           fe_p_other->reference_cell().n_vertices() *
-                             fe_p_other->n_dofs_per_vertex() +
-                           fe_p_other->reference_cell().n_lines() *
-                             fe_p_other->n_dofs_per_line())[1]) < 1e-14))
-                    identities.emplace_back(i1 * (p - 1) + i2, 0);
-                  std::cout << fe_p_other->unit_support_point(
-                                 j +
-                                 fe_p_other->reference_cell().n_vertices() *
-                                   fe_p_other->n_dofs_per_vertex() +
-                                 fe_p_other->reference_cell().n_lines() *
-                                   fe_p_other->n_dofs_per_line())[0]
-                            << " "
-                            << fe_p_other->unit_support_point(
-                                 j +
-                                 fe_p_other->reference_cell().n_vertices() *
-                                   fe_p_other->n_dofs_per_vertex() +
-                                 fe_p_other->reference_cell().n_lines() *
-                                   fe_p_other->n_dofs_per_line())[1]
-                            << " "
-                            << fe_p_other->unit_support_point(
-                                 j +
-                                 fe_p_other->reference_cell().n_vertices() *
-                                   fe_p_other->n_dofs_per_vertex() +
-                                 fe_p_other->reference_cell().n_lines() *
-                                   fe_p_other->n_dofs_per_line())[2]
-                            << std::endl;
-                }
-        }
-
-      else if (p == 2)
+      if (fe_p_other->degree == 2)
         {
           if (face_no > 1) // regards the prism face, needed for
                            // ensure_existence_and_return_dof_identities

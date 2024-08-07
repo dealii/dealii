@@ -1055,7 +1055,7 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
-  const unsigned int                  face_no) const
+  const unsigned int) const
 {
   Assert(fe_other.degree < 4, ExcNotImplemented());
   if (const FE_SimplexP<dim, spacedim> *fe_p_other =
@@ -1069,28 +1069,8 @@ FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
       // after the 3 vertex points in the complete list of unit support points
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
-      if (false)
-        {
-          for (unsigned int i = 0; i < fe_p_other->n_dofs_per_quad(); ++i)
-            for (unsigned int j = 0; j < fe_p_other->n_dofs_per_quad(); ++j)
-              if (std::fabs(
-                    this->unit_support_points[i +
-                                              this->reference_cell()
-                                                  .n_vertices() *
-                                                this->n_dofs_per_vertex() +
-                                              this->reference_cell().n_lines() *
-                                                this->n_dofs_per_line()][0] -
-                    fe_p_other->unit_support_points
-                      [j +
-                       fe_p_other->reference_cell().n_vertices() *
-                         fe_p_other->n_dofs_per_vertex() +
-                       fe_p_other->reference_cell().n_lines() *
-                         fe_p_other->n_dofs_per_line()][0]) < 1e-14)
-                identities.emplace_back(i, j);
-        }
-      else if (fe_p_other->degree == 3 && this->degree == 3)
+      if (fe_p_other->degree == 3 && this->degree == 3)
         identities.emplace_back(0, 0);
-
 
       return identities;
     }
@@ -1102,9 +1082,8 @@ FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
     }
   else if (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr)
     {
-      // Only linear Pyramid Elements are implemented
       // there are no dofs on the faces
-      Assert(fe_other.degree == 1, ExcNotImplemented());
+      Assert(fe_other.degree == 1 || fe_other.degree == 2, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
   else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
