@@ -45,6 +45,13 @@ namespace
         dpo.object_index               = {{}, {5}, {5}, {5}};
         dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {4, 3, 3, 3, 3}};
       }
+    else if (degree == 2)
+      {
+        dpo.dofs_per_object_exclusive  = {{1}, {1}, {1, 0, 0, 0, 0}, {0}};
+        dpo.dofs_per_object_inclusive  = {{1}, {3}, {9, 6, 6, 6, 6}, {14}};
+        dpo.object_index               = {{}, {5}, {13, 14, 14, 14, 14}, {14}};
+        dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {8, 6, 6, 6, 6}};
+      }
     else
       {
         DEAL_II_NOT_IMPLEMENTED();
@@ -63,6 +70,8 @@ namespace
 
     if (degree == 1)
       n_dofs = 5;
+    if (degree == 2)
+      n_dofs = 14;
     else
       DEAL_II_NOT_IMPLEMENTED();
 
@@ -75,6 +84,7 @@ template <int dim, int spacedim>
 FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
   const unsigned int                                degree,
   const internal::GenericDoFsPerObject             &dpos,
+  const bool                                        prolongation_is_additive,
   const typename FiniteElementData<dim>::Conformity conformity)
   : dealii::FE_Poly<dim, spacedim>(
       ScalarLagrangePolynomialPyramid<dim>(degree),
@@ -86,7 +96,7 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
       std::vector<bool>(
         FiniteElementData<dim>(dpos, ReferenceCells::Pyramid, 1, degree)
           .dofs_per_cell,
-        true),
+        prolongation_is_additive),
       std::vector<ComponentMask>(
         FiniteElementData<dim>(dpos, ReferenceCells::Pyramid, 1, degree)
           .dofs_per_cell,
@@ -110,6 +120,57 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
           for (const auto i : face_reference_cell.vertex_indices())
             this->unit_face_support_points[f].emplace_back(
               face_reference_cell.template vertex<dim - 1>(i));
+        }
+    }
+  else if (degree == 2)
+    {
+      for (const auto i : this->reference_cell().vertex_indices())
+        this->unit_support_points.emplace_back(
+          this->reference_cell().template vertex<dim>(i));
+
+      // lines:
+      for (const unsigned int l : this->reference_cell().line_indices())
+        {
+          this->unit_support_points.emplace_back(
+            0.5 * this->unit_support_points[this->reference_cell()
+                                              .line_to_cell_vertices(l, 0)] +
+            0.5 * this->unit_support_points[this->reference_cell()
+                                              .line_to_cell_vertices(l, 1)]);
+        }
+      // quad:
+      this->unit_support_points.emplace_back(Point<dim>(0.0, 0.0, 0.0));
+
+      // face support points
+      this->unit_face_support_points.resize(this->reference_cell().n_faces());
+
+      for (const auto f : this->reference_cell().face_indices())
+        {
+          const auto face_reference_cell =
+            this->reference_cell().face_reference_cell(f);
+
+
+          // vertices
+          for (const auto i : face_reference_cell.vertex_indices())
+            this->unit_face_support_points[f].emplace_back(
+              face_reference_cell.template vertex<dim - 1>(i));
+
+          // lines
+          for (const unsigned int l : face_reference_cell.line_indices())
+            {
+              this->unit_face_support_points[f].emplace_back(
+                0.5 * this->unit_face_support_points
+                        [f][face_reference_cell.line_to_cell_vertices(l, 0)] +
+                0.5 * this->unit_face_support_points
+                        [f][face_reference_cell.line_to_cell_vertices(l, 1)]);
+            }
+          if (face_reference_cell == ReferenceCells::Quadrilateral)
+            {
+              Point<dim - 1> midpoint;
+              for (const auto i : face_reference_cell.vertex_indices())
+                midpoint += face_reference_cell.template vertex<dim - 1>(i);
+              midpoint /= face_reference_cell.n_vertices();
+              this->unit_face_support_points[f].emplace_back(midpoint);
+            }
         }
     }
   else
@@ -144,6 +205,7 @@ template <int dim, int spacedim>
 FE_PyramidP<dim, spacedim>::FE_PyramidP(const unsigned int degree)
   : FE_PyramidPoly<dim, spacedim>(degree,
                                   get_dpo_vector_fe_pyramid_p(degree),
+                                  false,
                                   FiniteElementData<dim>::H1)
 {}
 
@@ -314,6 +376,7 @@ template <int dim, int spacedim>
 FE_PyramidDGP<dim, spacedim>::FE_PyramidDGP(const unsigned int degree)
   : FE_PyramidPoly<dim, spacedim>(degree,
                                   get_dpo_vector_fe_pyramid_dgp(degree),
+                                  true,
                                   FiniteElementData<dim>::L2)
 {}
 
