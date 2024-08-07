@@ -921,10 +921,15 @@ namespace Step55
               // subblocks in lock-step implies visiting the same support
               // point.
 
-              if (j % 2 == 1) // if j is a water DoF    if
-                              // (fe.shape_function_belongs_to(water_flow_rate))
+              const unsigned int j_group =
+                fe.system_to_base_index(j).first.first;
+              const unsigned int w_dof = 1;
+
+              // TODO: if (fe.shape_function_belongs_to(water_flow_rate))
+              if (j_group == w_dof)
                 {
-                  const unsigned int jj = j / 2; // TODO: do this better
+                  // TODO: do this better and check for correctness.
+                  const unsigned int jj = j / 2;
 
                   const double         Wj = local_dof_values[j];
                   const Tensor<1, dim> d_j =
@@ -1066,19 +1071,33 @@ namespace Step55
               // enumerated in a way such that traveral of these two
               // subblocks in lock-step implies visiting the same support
               // point.
-              const unsigned int jj = j % dofs_per_cell / 2;
 
-              const ADNumberType                 Wj = dof_values_ad[jj];
-              const Tensor<1, dim, ADNumberType> d_j =
-                downhill_direction_from_elevation_gradient(
-                  elevation_grad_at_node_points[jj]);
+              const unsigned int j_group =
+                fe.system_to_base_index(j).first.first;
+              const unsigned int w_dof = 1;
 
-              for (const unsigned int q : fe_values.quadrature_point_indices())
+              // TODO: if (fe.shape_function_belongs_to(water_flow_rate))
+              if (j_group == w_dof)
                 {
-                  const Tensor<1, dim> grad_Nx_j =
-                    fe_values[water_flow_rate].gradient(jj, q);
+                  // TODO: do this better and check for correctness.
+                  const unsigned int jj = j / 2;
 
-                  div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
+                  const ADNumberType                 Wj = dof_values_ad[jj];
+                  const Tensor<1, dim, ADNumberType> d_j =
+                    -elevation_grad_at_node_points[jj] /
+                    std::sqrt(elevation_grad_at_node_points[jj] *
+                                elevation_grad_at_node_points[jj] +
+                              ModelParameters::regularization_epsilon *
+                                ModelParameters::regularization_epsilon);
+
+                  for (const unsigned int q :
+                       fe_values.quadrature_point_indices())
+                    {
+                      const Tensor<1, dim> grad_Nx_j =
+                        fe_values[water_flow_rate].gradient(jj, q);
+
+                      div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
+                    }
                 }
             }
 
