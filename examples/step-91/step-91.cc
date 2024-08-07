@@ -23,7 +23,9 @@
 
 #include <deal.II/differentiation/ad.h>
 
+#include <deal.II/lac/block_linear_operator.h>
 #include <deal.II/lac/generic_linear_algebra.h>
+#include <deal.II/lac/linear_operator.h>
 
 /* #define FORCE_USE_OF_TRILINOS */
 
@@ -724,7 +726,7 @@ namespace Step55
                  system_rhs.block(1),
                  preconditioner);
 
-    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+    pcout << "    Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
 
     constraints.distribute(distributed_solution);
@@ -958,6 +960,7 @@ namespace Step55
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
+          ad_helper.reset();
 
           fe_values.reinit(cell);
 
@@ -1033,6 +1036,17 @@ namespace Step55
     SolverControl solver_control(system_matrix.m(), tolerance * rhs.l2_norm());
 
     SolverGMRES<VectorType> solver(solver_control);
+    LA::MPI::PreconditionILU     preconditioner_H;
+    LA::MPI::PreconditionILU     preconditioner_w;
+    preconditioner_H.initialize(system_matrix.block(0, 0));
+    preconditioner_w.initialize(system_matrix.block(1, 1));
+
+    const auto lo_prec_H = linear_operator<typename LA::MPI::BlockVector::BlockType>(system_matrix.block(0, 0), preconditioner_H);
+    const auto lo_prec_w = linear_operator<typename LA::MPI::BlockVector::BlockType>(system_matrix.block(1, 1), preconditioner_w);
+
+    const auto preconditioner = block_diagonal_operator<2, LA::MPI::BlockVector>(
+      std::array<LinearOperator<typename LA::MPI::BlockVector::BlockType>, 2>{
+        {lo_prec_H, lo_prec_w}});
 
     VectorType distributed_solution(owned_partitioning, mpi_communicator);
 
@@ -1041,7 +1055,7 @@ namespace Step55
     solver.solve(system_matrix,
                  distributed_solution,
                  system_rhs,
-                 PreconditionIdentity());
+                 preconditioner);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
@@ -1187,7 +1201,6 @@ namespace Step55
 
     time_integrator.reinit_vector = [this](VectorType &vector) {
       vector.reinit(owned_partitioning,
-                    relevant_partitioning,
                     mpi_communicator);
     };
 
@@ -1237,9 +1250,16 @@ namespace Step55
     // TODO: Figure out whether the following vectors need to be fully
     // distributed, ghosted, or otherwise. Set to the correct vector as computed
     // above.
-    pcout << "Solve time-dependant system... " << std::flush;
-    VectorType solution = locally_relevant_solution;
+    pcout << "Solve time-dependent system... " << std::flush;
+    VectorType solution;
     VectorType solution_dot;
+    solution.reinit(owned_partitioning,
+                    mpi_communicator);
+    solution_dot.reinit(owned_partitioning,
+                    mpi_communicator);
+                    
+    solution = locally_relevant_solution;
+
     time_integrator.solve_dae(solution, solution_dot);
     pcout << "done." << std::endl;
 
