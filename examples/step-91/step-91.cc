@@ -243,28 +243,30 @@ namespace Step55
 
 
 
-  template <int dim>
-  class RainFallRate : public Function<dim>
+  template <int spacedim>
+  class RainFallRate : public Function<spacedim>
   {
   public:
-    virtual double value(const Point<dim>  &p,
-                         const unsigned int component) const override;
+    virtual double value(const Point<spacedim> &p,
+                         const unsigned int     component) const override;
   };
 
 
-  template <int dim>
-  double RainFallRate<dim>::value(const Point<dim> & /*p*/,
-                                  const unsigned int /*component*/) const
+  template <int spacedim>
+  double RainFallRate<spacedim>::value(const Point<spacedim> & /*p*/,
+                                       const unsigned int /*component*/) const
   {
     return ModelParameters::rainfall_rate_p;
   }
 
 
 
-  template <int dim>
   class StreamPowerErosionProblem
   {
   public:
+    static constexpr int dim      = 2;
+    static constexpr int spacedim = 3;
+
     StreamPowerErosionProblem();
 
     void run();
@@ -333,8 +335,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  StreamPowerErosionProblem<dim>::StreamPowerErosionProblem()
+  StreamPowerErosionProblem::StreamPowerErosionProblem()
     : mpi_communicator(MPI_COMM_WORLD)
     , fe(FE_Q<dim>(1), FE_Q<dim>(1))
     , triangulation(mpi_communicator,
@@ -351,8 +352,7 @@ namespace Step55
   {}
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::make_grid()
+  void StreamPowerErosionProblem::make_grid()
   {
     pcout << "Make grid... " << std::flush;
 
@@ -366,8 +366,7 @@ namespace Step55
   }
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::setup_system()
+  void StreamPowerErosionProblem::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "setup");
     pcout << "Setup system... " << std::flush;
@@ -422,8 +421,7 @@ namespace Step55
   }
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::interpolate_initial_elevation()
+  void StreamPowerErosionProblem::interpolate_initial_elevation()
   {
     TimerOutput::Scope t(computing_timer,
                          "initial conditions: interpolate elevation");
@@ -444,8 +442,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::compute_initial_constraints()
+  void StreamPowerErosionProblem::compute_initial_constraints()
   {
     pcout << "Compute initial constraints... " << std::flush;
 
@@ -593,8 +590,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::assemble_initial_waterflow_system()
+  void StreamPowerErosionProblem::assemble_initial_waterflow_system()
   {
     TimerOutput::Scope t(computing_timer,
                          "initial conditions: assemble waterflow system");
@@ -719,8 +715,7 @@ namespace Step55
   }
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::solve_initial_waterflow_system()
+  void StreamPowerErosionProblem::solve_initial_waterflow_system()
   {
     TimerOutput::Scope t(computing_timer,
                          "initial conditions: solve waterflow system");
@@ -756,9 +751,8 @@ namespace Step55
 
 
 
-  template <int dim>
   template <typename NumberType>
-  void StreamPowerErosionProblem<dim>::compute_local_residual(
+  void StreamPowerErosionProblem::compute_local_residual(
     const FEValues<dim>           &fe_values,
     const std::vector<NumberType> &local_solution_elevation_at_q_points,
     const std::vector<NumberType> &local_solution_water_at_q_points,
@@ -838,8 +832,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::assemble_residual(
+  void StreamPowerErosionProblem::assemble_residual(
     const double      time,
     const VectorType &locally_relevant_solution,
     const VectorType &locally_relevant_solution_dot,
@@ -974,8 +967,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::assemble_jacobian(
+  void StreamPowerErosionProblem::assemble_jacobian(
     const double      time,
     const VectorType &locally_relevant_solution,
     const VectorType &locally_relevant_solution_dot,
@@ -1090,11 +1082,8 @@ namespace Step55
 
                   const ADNumberType                 Wj = dof_values_ad[jj];
                   const Tensor<1, dim, ADNumberType> d_j =
-                    -elevation_grad_at_node_points[jj] /
-                    std::sqrt(elevation_grad_at_node_points[jj] *
-                                elevation_grad_at_node_points[jj] +
-                              ModelParameters::regularization_epsilon *
-                                ModelParameters::regularization_epsilon);
+                    downhill_direction_from_elevation_gradient(
+                      elevation_grad_at_node_points[jj]);
 
                   for (const unsigned int q :
                        fe_values.quadrature_point_indices())
@@ -1143,9 +1132,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  void
-  StreamPowerErosionProblem<dim>::solve_with_jacobian(const VectorType &rhs,
+  void StreamPowerErosionProblem::solve_with_jacobian(const VectorType &rhs,
                                                       VectorType       &dst,
                                                       const double tolerance)
   {
@@ -1193,8 +1180,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::refine_grid()
+  void StreamPowerErosionProblem::refine_grid()
   {
     TimerOutput::Scope t(computing_timer, "refine");
 
@@ -1233,8 +1219,7 @@ namespace Step55
   };
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::output_results(
+  void StreamPowerErosionProblem::output_results(
     const double       time,
     const VectorType  &locally_relevant_solution,
     const VectorType  &locally_relevant_solution_dot,
@@ -1281,8 +1266,7 @@ namespace Step55
 
 
 
-  template <int dim>
-  void StreamPowerErosionProblem<dim>::run()
+  void StreamPowerErosionProblem::run()
   {
     make_grid();
     setup_system();
@@ -1401,7 +1385,7 @@ int main(int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      StreamPowerErosionProblem<2> problem;
+      StreamPowerErosionProblem problem;
       problem.run();
     }
   catch (std::exception &exc)
