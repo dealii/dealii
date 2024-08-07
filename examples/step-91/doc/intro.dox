@@ -385,7 +385,7 @@ do not know how to deal with $\nabla \cdot (\mathbf d w_h)$. Traditionally,
 in the finite element method, if you don't know how to deal with a derivative,
 you integrate by parts. This is not an option here because all that would
 happen is that we roll the derivative onto the test function
-$\varphi^w_h+\mathbf d \dot \nabla \varphi^w_h)$ where we would again
+$\varphi^w_h+\mathbf d \cdot \nabla \varphi^w_h)$ where we would again
 end up with a derivative on $\mathbf d$.
 
 Both of these difficulties *could* be avoided by recognizing that while $\mathbf d$
@@ -405,7 +405,7 @@ onto a continuous finite element space, and then taking its derivative,
 but in the end this is perhaps a bit too much.
 
 Rather than chasing these leads, we will use a trick Martin Kronbichler
-showed me: We will replace the SUPG-stabilized weak formulation
+showed us: We will replace the SUPG-stabilized weak formulation
 @f[
   \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
         \nabla \cdot (\mathbf d w_h)\right)
@@ -477,7 +477,9 @@ This is easily computable.
 
 The form above involving a matrix is useful in the first step when we need to
 solve for $w$ given the initial elevation. For later time steps, however, all
-we will need is a residual. That is, we will have to compute the vector
+we will need is a residual. That is, given the coefficients $V,W$ of fields
+$w_h$ and $H_h$, and the known dependence of $\mathbf d$ on $H$,
+we will have to compute the vector
 @f[
   F^w_i =
     -\left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,

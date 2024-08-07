@@ -590,7 +590,8 @@ namespace Step55
                               update_quadrature_points | update_JxW_values);
     FEValues<dim> fe_values_at_node_points(
       fe,
-      Quadrature<dim>(FE_Q<dim>(1).get_unit_support_points()),
+      Quadrature<dim>(
+        fe.get_unit_support_points()), // could be made more efficient
       update_gradients);
 
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
@@ -637,35 +638,48 @@ namespace Step55
 
           fe_values_at_node_points[elevation].get_function_gradients(
             locally_relevant_solution, elevation_grad_at_node_points);
+          Assert(fe_values_at_node_points.n_quadrature_points ==
+                   elevation_grad_at_node_points.size(),
+                 ExcInternalError());
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            d_at_node_points[j] =
-              -elevation_grad_at_node_points[j] /
-              std::sqrt(elevation_grad_at_node_points[j] *
-                          elevation_grad_at_node_points[j] +
-                        ModelParameters::regularization_epsilon *
-                          ModelParameters::regularization_epsilon);
+            {
+              Assert(j < d_at_node_points.size(), ExcInternalError());
+              d_at_node_points[j] = // TODO: get j for just the w component
+                -elevation_grad_at_node_points[j] /
+                std::sqrt(elevation_grad_at_node_points[j] *
+                            elevation_grad_at_node_points[j] +
+                          ModelParameters::regularization_epsilon *
+                            ModelParameters::regularization_epsilon);
+            }
 
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
+                  const double phi_i_w_at_q =
+                    fe_values[water_flow_rate].value(i, q);
+                  const Tensor<1, dim> grad_phi_i_w_at_q =
+                    fe_values[water_flow_rate].gradient(i, q);
+
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
+                      const Tensor<1, dim> grad_phi_j_w_at_q =
+                        fe_values[water_flow_rate].gradient(j, q);
+
                       cell_matrix(i, j) +=
-                        ((fe_values[water_flow_rate].value(i, q) +
+                        ((phi_i_w_at_q +
                           ModelParameters::stabilization_c * cell->diameter() *
-                            d_at_q_points[q] *
-                            fe_values[water_flow_rate].gradient(i, q)) *
+                            (d_at_q_points[q] * grad_phi_i_w_at_q)) *
                          (d_at_node_points[j] *
-                          fe_values[water_flow_rate].gradient(j, q)) *
+                          grad_phi_j_w_at_q) * // TODO: get j for just the w
+                                               // component
                          fe_values.JxW(q));
                     }
 
                   cell_rhs(i) +=
-                    ((fe_values[water_flow_rate].value(i, q) +
-                      ModelParameters::stabilization_c * cell->diameter() *
-                        d_at_q_points[q] *
-                        fe_values[water_flow_rate].gradient(i, q)) *
+                    ((phi_i_w_at_q + ModelParameters::stabilization_c *
+                                       cell->diameter() *
+                                       (d_at_q_points[q] * grad_phi_i_w_at_q)) *
                      rain_fall_rate_rhs_values[q] * fe_values.JxW(q));
                 }
             }
