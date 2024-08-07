@@ -642,7 +642,7 @@ namespace Step55
             locally_relevant_solution, elevation_grad_at_node_points);
           Assert(fe_values_at_node_points.n_quadrature_points ==
                    elevation_grad_at_node_points.size(),
-                 ExcInternalError());
+                 ExcInternalError()); // remove after the PR for this is merged
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             {
               Assert(j < d_at_node_points.size(), ExcInternalError());
