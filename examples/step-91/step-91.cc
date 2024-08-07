@@ -139,8 +139,8 @@ namespace Step55
   };
 
 
-  // TODO: share data among processors
-  // Exact: -109 to -102, 37 to 41
+  // Exact values for Colorado: -109 to -102, 37 to 41
+  // But the data set is slightly larger
   ColoradoTopography::ColoradoTopography(const MPI_Comm mpi_communicator)
   {
     unsigned int n_rows;
@@ -655,47 +655,53 @@ namespace Step55
 
           fe_values_at_node_points[elevation].get_function_gradients(
             locally_relevant_solution, elevation_grad_at_node_points);
-          Assert(fe_values_at_node_points.n_quadrature_points ==
-                   elevation_grad_at_node_points.size(),
-                 ExcInternalError()); // remove after the PR for this is merged
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
-            {
-              Assert(j < d_at_node_points.size(), ExcInternalError());
-              d_at_node_points[j] = // TODO: get j for just the w component
-                downhill_direction_from_elevation_gradient(
-                  elevation_grad_at_node_points[j]);
-            }
+            if (fe.system_to_component_index(j).first == 1) // j is water DoF
+              {
+                d_at_node_points[j] =
+                  downhill_direction_from_elevation_gradient(
+                    elevation_grad_at_node_points[j]);
+              }
+            else
+              d_at_node_points[j] = numbers::signaling_nan<Tensor<1, dim>>();
 
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                {
-                  const double phi_i_w_at_q =
-                    fe_values[water_flow_rate].value(i, q);
-                  const Tensor<1, dim> grad_phi_i_w_at_q =
-                    fe_values[water_flow_rate].gradient(i, q);
+                if (fe.system_to_component_index(i).first ==
+                    1) // i is water DoF
+                  {
+                    const double phi_i_w_at_q =
+                      fe_values[water_flow_rate].value(i, q);
+                    const Tensor<1, dim> grad_phi_i_w_at_q =
+                      fe_values[water_flow_rate].gradient(i, q);
 
-                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    {
-                      const Tensor<1, dim> grad_phi_j_w_at_q =
-                        fe_values[water_flow_rate].gradient(j, q);
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                      if (fe.system_to_component_index(j).first ==
+                          1) // j is water DoF
+                        {
+                          const Tensor<1, dim> grad_phi_j_w_at_q =
+                            fe_values[water_flow_rate].gradient(j, q);
 
-                      cell_matrix(i, j) +=
-                        ((phi_i_w_at_q +
-                          ModelParameters::stabilization_c * cell->diameter() *
-                            (d_at_q_points[q] * grad_phi_i_w_at_q)) *
-                         (d_at_node_points[j] *
-                          grad_phi_j_w_at_q) * // TODO: get j for just the w
-                                               // component
-                         fe_values.JxW(q));
-                    }
+                          cell_matrix(i, j) +=
+                            ((phi_i_w_at_q +
+                              ModelParameters::stabilization_c *
+                                cell->diameter() *
+                                (d_at_q_points[q] * grad_phi_i_w_at_q)) *
+                             (d_at_node_points[j] * grad_phi_j_w_at_q) *
+                             fe_values.JxW(q));
 
-                  cell_rhs(i) +=
-                    ((phi_i_w_at_q + ModelParameters::stabilization_c *
-                                       cell->diameter() *
-                                       (d_at_q_points[q] * grad_phi_i_w_at_q)) *
-                     rain_fall_rate_rhs_values[q] * fe_values.JxW(q));
-                }
+                          Assert(numbers::is_finite(cell_matrix(i, j)),
+                                 ExcInternalError());
+                        }
+
+                    cell_rhs(i) +=
+                      ((phi_i_w_at_q +
+                        ModelParameters::stabilization_c * cell->diameter() *
+                          (d_at_q_points[q] * grad_phi_i_w_at_q)) *
+                       rain_fall_rate_rhs_values[q] * fe_values.JxW(q));
+                    Assert(numbers::is_finite(cell_rhs(i)), ExcInternalError());
+                  }
             }
 
           cell->get_dof_indices(local_dof_indices);
