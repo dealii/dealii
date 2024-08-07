@@ -124,7 +124,7 @@ test()
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
     GridGenerator::hyper_cube(tr);
-    tr.load(filename.c_str(), false);
+    tr.load(filename.c_str());
     FE_Q<dim>       fe(1);
     DoFHandler<dim> dh(tr);
 

@@ -9396,14 +9396,6 @@ XDMFEntry::XDMFEntry()
 
 
 
-XDMFEntry::XDMFEntry(const std::string  &filename,
-                     const double        time,
-                     const std::uint64_t nodes,
-                     const std::uint64_t cells,
-                     const unsigned int  dim)
-  : XDMFEntry(filename, filename, time, nodes, cells, dim, dim, ReferenceCell())
-{}
-
 XDMFEntry::XDMFEntry(const std::string   &filename,
                      const double         time,
                      const std::uint64_t  nodes,
@@ -9411,24 +9403,6 @@ XDMFEntry::XDMFEntry(const std::string   &filename,
                      const unsigned int   dim,
                      const ReferenceCell &cell_type)
   : XDMFEntry(filename, filename, time, nodes, cells, dim, dim, cell_type)
-{}
-
-
-
-XDMFEntry::XDMFEntry(const std::string  &mesh_filename,
-                     const std::string  &solution_filename,
-                     const double        time,
-                     const std::uint64_t nodes,
-                     const std::uint64_t cells,
-                     const unsigned int  dim)
-  : XDMFEntry(mesh_filename,
-              solution_filename,
-              time,
-              nodes,
-              cells,
-              dim,
-              dim,
-              ReferenceCell())
 {}
 
 
@@ -9448,25 +9422,6 @@ XDMFEntry::XDMFEntry(const std::string   &mesh_filename,
               dim,
               dim,
               cell_type)
-{}
-
-
-
-XDMFEntry::XDMFEntry(const std::string  &mesh_filename,
-                     const std::string  &solution_filename,
-                     const double        time,
-                     const std::uint64_t nodes,
-                     const std::uint64_t cells,
-                     const unsigned int  dim,
-                     const unsigned int  spacedim)
-  : XDMFEntry(mesh_filename,
-              solution_filename,
-              time,
-              nodes,
-              cells,
-              dim,
-              spacedim,
-              ReferenceCell())
 {}
 
 
@@ -9548,19 +9503,6 @@ namespace
     return res;
   }
 } // namespace
-
-
-
-std::string
-XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
-                            const ReferenceCell &reference_cell) const
-{
-  // We now store the type of cell in the XDMFEntry:
-  (void)reference_cell;
-  Assert(cell_type == reference_cell,
-         internal::ExcNonMatchingReferenceCellTypes(cell_type, reference_cell));
-  return get_xdmf_content(indent_level);
-}
 
 
 

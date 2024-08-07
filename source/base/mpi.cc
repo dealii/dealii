@@ -160,19 +160,6 @@ namespace Utilities
 
 
 
-    int
-    create_group(const MPI_Comm   comm,
-                 const MPI_Group &group,
-                 const int        tag,
-                 MPI_Comm        *new_comm)
-    {
-      const int ierr = MPI_Comm_create_group(comm, group, tag, new_comm);
-      AssertThrowMPI(ierr);
-      return ierr;
-    }
-
-
-
     std::vector<IndexSet>
     create_ascending_partitioning(
       const MPI_Comm                comm,

@@ -537,45 +537,6 @@ namespace Utilities
       bool get_was_called;
     };
 
-
-
-    /**
-     * If @p comm is an intracommunicator, this function returns a new
-     * communicator @p newcomm with communication group defined by the
-     * @p group argument. The function is only collective over the group of
-     * processes that actually want to create the communicator, i.e., that
-     * are named in the @p group argument. If multiple threads at a given
-     * process perform concurrent create_group() operations, the user must
-     * distinguish these operations by providing different @p tag or @p comm
-     * arguments.
-     *
-     * This function was introduced in the MPI-3.0 standard. If available,
-     * the corresponding function in the provided MPI implementation is used.
-     * Otherwise, the implementation follows the one described in the
-     * following publication:
-     * @code{.bib}
-     * @inproceedings{dinan2011noncollective,
-     *   title        = {Noncollective communicator creation in MPI},
-     *   author       = {Dinan, James and Krishnamoorthy, Sriram and Balaji,
-     *                   Pavan and Hammond, Jeff R and Krishnan, Manojkumar and
-     *                   Tipparaju, Vinod and Vishnu, Abhinav},
-     *   booktitle    = {European MPI Users' Group Meeting},
-     *   pages        = {282--291},
-     *   year         = {2011},
-     *   organization = {Springer}
-     * }
-     * @endcode
-     *
-     * @deprecated Use MPI_Comm_create_group directly
-     */
-#ifdef DEAL_II_WITH_MPI
-    DEAL_II_DEPRECATED int
-    create_group(const MPI_Comm   comm,
-                 const MPI_Group &group,
-                 const int        tag,
-                 MPI_Comm        *new_comm);
-#endif
-
     /**
      * Given the number of locally owned elements @p locally_owned_size,
      * create a 1:1 partitioning of the of elements across the MPI

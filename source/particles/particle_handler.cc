@@ -2183,15 +2183,6 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleHandler<dim, spacedim>::register_store_callback_function()
-  {
-    register_data_attach();
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
   ParticleHandler<dim, spacedim>::register_data_attach()
   {
     const auto callback_function =
@@ -2226,16 +2217,6 @@ namespace Particles
     const bool serialization = true;
     notify_ready_to_unpack(serialization);
   }
-
-
-  template <int dim, int spacedim>
-  void
-  ParticleHandler<dim, spacedim>::register_load_callback_function(
-    const bool serialization)
-  {
-    notify_ready_to_unpack(serialization);
-  }
-
 
 
   template <int dim, int spacedim>

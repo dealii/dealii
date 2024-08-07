@@ -1158,24 +1158,6 @@ namespace DataOutBase
     bool print_date_and_time;
 
     /**
-     * A data type providing the different possible zlib compression
-     * levels. These map directly to constants defined by zlib.
-     *
-     * @deprecated Use DataOutBase::CompressionLevel instead.
-     */
-    using ZlibCompressionLevel DEAL_II_DEPRECATED =
-      DataOutBase::CompressionLevel;
-
-    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
-      no_compression = DataOutBase::CompressionLevel::no_compression;
-    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
-      best_compression = DataOutBase::CompressionLevel::best_compression;
-    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel best_speed =
-      DataOutBase::CompressionLevel::best_speed;
-    DEAL_II_DEPRECATED static const DataOutBase::CompressionLevel
-      default_compression = DataOutBase::CompressionLevel::default_compression;
-
-    /**
      * Flag determining the compression level at which zlib, if available, is
      * run. The default is <tt>best_speed</tt>.
      */
@@ -3403,29 +3385,6 @@ public:
             const ReferenceCell &cell_type);
 
   /**
-   * Deprecated constructor.
-   *
-   * @deprecated Use the constructor that additionally takes a ReferenceCell.
-   */
-  XDMFEntry(const std::string  &filename,
-            const double        time,
-            const std::uint64_t nodes,
-            const std::uint64_t cells,
-            const unsigned int  dim);
-
-  /**
-   * Deprecated constructor.
-   *
-   * @deprecated Use the constructor that additionally takes a ReferenceCell.
-   */
-  XDMFEntry(const std::string  &mesh_filename,
-            const std::string  &solution_filename,
-            const double        time,
-            const std::uint64_t nodes,
-            const std::uint64_t cells,
-            const unsigned int  dim);
-
-  /**
    * Simplified constructor that calls the complete constructor for
    * cases where <code>dim==spacedim</code>.
    */
@@ -3436,20 +3395,6 @@ public:
             const std::uint64_t  cells,
             const unsigned int   dim,
             const ReferenceCell &cell_type);
-
-  /**
-   * Deprecated constructor.
-   *
-   * @deprecated Use the constructor that additionally takes a ReferenceCell.
-   */
-  DEAL_II_DEPRECATED
-  XDMFEntry(const std::string  &mesh_filename,
-            const std::string  &solution_filename,
-            const double        time,
-            const std::uint64_t nodes,
-            const std::uint64_t cells,
-            const unsigned int  dim,
-            const unsigned int  spacedim);
 
   /**
    * Constructor that sets all members to provided parameters.
@@ -3488,17 +3433,6 @@ public:
    */
   std::string
   get_xdmf_content(const unsigned int indent_level) const;
-
-  /**
-   * Get the XDMF content associated with this entry.
-   * If the entry is not valid, this returns an empty string.
-   *
-   * @deprecated Use the other function instead.
-   */
-  DEAL_II_DEPRECATED
-  std::string
-  get_xdmf_content(const unsigned int   indent_level,
-                   const ReferenceCell &reference_cell) const;
 
 private:
   /**

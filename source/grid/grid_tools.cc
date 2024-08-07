@@ -236,21 +236,6 @@ namespace GridTools
   }
 
 
-  template <int dim>
-  void
-  rotate(const double           angle,
-         const unsigned int     axis,
-         Triangulation<dim, 3> &triangulation)
-  {
-    Assert(axis < 3, ExcMessage("Invalid axis given!"));
-
-    Tensor<1, 3, double> vector;
-    vector[axis] = 1.;
-
-    transform(internal::Rotate3d(vector, angle), triangulation);
-  }
-
-
   template <int dim, int spacedim>
   void
   scale(const double                  scaling_factor,

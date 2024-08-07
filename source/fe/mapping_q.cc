@@ -243,13 +243,6 @@ MappingQ<dim, spacedim>::MappingQ(const unsigned int p)
 
 
 template <int dim, int spacedim>
-MappingQ<dim, spacedim>::MappingQ(const unsigned int p, const bool)
-  : MappingQ<dim, spacedim>(p)
-{}
-
-
-
-template <int dim, int spacedim>
 MappingQ<dim, spacedim>::MappingQ(const MappingQ<dim, spacedim> &mapping)
   : polynomial_degree(mapping.polynomial_degree)
   , line_support_points(mapping.line_support_points)

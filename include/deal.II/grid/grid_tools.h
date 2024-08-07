@@ -270,27 +270,6 @@ namespace GridTools
          Triangulation<dim, 3>      &triangulation);
 
   /**
-   * Rotate all vertices of the given @p triangulation in counter-clockwise
-   * direction around the axis with the given index. Otherwise like the
-   * function above; in particular, this function calls the transform() function
-   * and so the discussion about manifolds there also applies here.
-   *
-   * @param[in] angle Angle in radians to rotate the Triangulation by.
-   * @param[in] axis Index of the coordinate axis to rotate around, keeping
-   * that coordinate fixed (0=x axis, 1=y axis, 2=z axis).
-   * @param[in,out] triangulation The Triangulation object to rotate.
-   *
-   * @note Implemented for dim=1, 2, and 3.
-   *
-   * @deprecated Use the alternative with the unit vector instead.
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED void
-  rotate(const double           angle,
-         const unsigned int     axis,
-         Triangulation<dim, 3> &triangulation);
-
-  /**
    * Transform the given triangulation smoothly to a different domain where,
    * typically, each of the vertices at the boundary of the triangulation is
    * mapped to the corresponding points in the @p new_points map.

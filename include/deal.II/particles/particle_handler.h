@@ -791,34 +791,6 @@ namespace Particles
     deserialize();
 
     /**
-     * Callback function that should be called before every refinement
-     * and when writing checkpoints. This function is used to
-     * register pack_callback() with the triangulation. This function
-     * is used in step-70.
-     *
-     * @deprecated Please use prepare_for_coarsening_and_refinement() or
-     * prepare_for_serialization() instead. See there for further information
-     * about the purpose of this function.
-     */
-    DEAL_II_DEPRECATED
-    void
-    register_store_callback_function();
-
-    /**
-     * Callback function that should be called after every refinement
-     * and after resuming from a checkpoint.  This function is used to
-     * register unpack_callback() with the triangulation. This function
-     * is used in step-70.
-     *
-     * @deprecated Please use unpack_after_coarsening_and_refinement() or
-     * deserialize() instead. See there for further information about the
-     * purpose of this function.
-     */
-    DEAL_II_DEPRECATED
-    void
-    register_load_callback_function(const bool serialization);
-
-    /**
      * Serialize the contents of this class using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
      *

@@ -521,33 +521,9 @@ public:
   static const types::fe_index default_fe_index = 0;
 
   /**
-   * Invalid index of the finite element to be used on a given cell.
-   *
-   * @deprecated Use numbers::invalid_fe_index instead.
-   */
-  static const unsigned int invalid_fe_index DEAL_II_DEPRECATED =
-    numbers::invalid_fe_index;
-
-  /**
-   * The type in which we store the active FE index.
-   *
-   * @deprecated Use types::fe_index instead.
-   */
-  using active_fe_index_type DEAL_II_DEPRECATED = types::fe_index;
-
-  /**
    * The type in which we store the offsets in the CRS data structures.
    */
   using offset_type = unsigned int;
-
-  /**
-   * Invalid active FE index which will be used as a default value to determine
-   * whether a future FE index has been set or not.
-   *
-   * @deprecated Use numbers::invalid_fe_index instead.
-   */
-  static const types::fe_index invalid_active_fe_index DEAL_II_DEPRECATED =
-    numbers::invalid_fe_index;
 
   /**
    * Standard constructor, not initializing any data. After constructing an

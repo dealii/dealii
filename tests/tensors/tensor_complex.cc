@@ -56,7 +56,7 @@ main()
 
   // cast result to double to profit from zero
   // threshold and so on
-  t.unroll(unrolled);
+  t.unroll(unrolled.data(), unrolled.data() + 9);
   deallog << "unrolled:";
   for (unsigned i = 0; i < 9; ++i)
     deallog << ' ' << unrolled(i);

@@ -351,21 +351,6 @@ namespace Particles
     get_properties() const;
 
     /**
-     * Tell the particle where to store its properties (even if it does not
-     * own properties). Usually this is only done once per particle, but
-     * since the particle generator does not know about the properties
-     * we want to do it not at construction time. Another use for this
-     * function is after particle transfer to a new process.
-     *
-     * @deprecated This function is only kept for backward compatibility
-     * and has no meaning any more. ParticleAccessors always use the
-     * property pool of the owning particle handler.
-     */
-    DEAL_II_DEPRECATED
-    void
-    set_property_pool(PropertyPool<dim, spacedim> &property_pool);
-
-    /**
      * Return the size in bytes this particle occupies if all of its data is
      * serialized (i.e. the number of bytes that is written by the write_data
      * function of this class).
@@ -392,10 +377,6 @@ namespace Particles
      * Read the data of this object from a stream for the purpose of
      * serialization using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
-     * Note that in order to store the properties correctly, the property pool
-     * of this particle has to be known at the time of reading, i.e.
-     * set_property_pool() has to have been called, before this function is
-     * called.
      */
     template <class Archive>
     void
@@ -826,17 +807,6 @@ namespace Particles
     Assert(state() == IteratorState::valid, ExcInternalError());
 
     return property_pool->get_properties(get_handle());
-  }
-
-
-
-  template <int dim, int spacedim>
-  inline void
-  ParticleAccessor<dim, spacedim>::set_property_pool(
-    PropertyPool<dim, spacedim> &new_property_pool)
-  {
-    Assert(&new_property_pool == property_pool, ExcInternalError());
-    (void)new_property_pool;
   }
 
 

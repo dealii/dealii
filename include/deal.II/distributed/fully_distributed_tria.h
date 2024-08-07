@@ -257,22 +257,13 @@ namespace parallel
        * must be empty before calling this function.
        *
        * You need to load with the same number of MPI processes that
-       * you saved with, hence autopartition is disabled.
+       * you saved with.
        *
        * Cell-based data that was saved with register_data_attach() can be read
        * in with notify_ready_to_unpack() after calling load().
        */
       virtual void
       load(const std::string &filename) override;
-
-      /**
-       * @copydoc load()
-       *
-       * @deprecated The autopartition parameter has been removed.
-       */
-      DEAL_II_DEPRECATED
-      virtual void
-      load(const std::string &filename, const bool autopartition) override;
 
     private:
       virtual unsigned int
