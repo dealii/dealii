@@ -334,7 +334,7 @@ namespace Step55
   void StreamPowerErosionProblem<dim>::make_grid()
   {
     pcout << "Make grid... " << std::flush;
-    
+
     GridGenerator::subdivided_hyper_rectangle(triangulation,
                                               {7, 4},
                                               Point<2>(-109., 37.),
@@ -697,8 +697,8 @@ namespace Step55
     SolverControl solver_control(system_matrix.block(1, 1).m(),
                                  1e-6 * system_rhs.block(1).l2_norm());
 
-    SolverGMRES<LA::MPI::Vector>       solver(solver_control);
-    LA::MPI::PreconditionILU preconditioner;
+    SolverGMRES<LA::MPI::Vector> solver(solver_control);
+    LA::MPI::PreconditionILU     preconditioner;
     preconditioner.initialize(system_matrix.block(1, 1));
 
     VectorType distributed_solution(owned_partitioning, mpi_communicator);

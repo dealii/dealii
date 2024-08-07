@@ -458,7 +458,7 @@ function that, because $\varphi^w_j$ is zero at all node points other than
 the node $\mathbf x_j$, must be proportional to $\varphi^w_j$ itself. In
 other words,
 @f[
-  [I_h(\mathbf d \varphi^w_j)](\mathbf x_j,t) = \mathbf d(\mathbf x_j,t) \varphi^w_j(\mathbf x)
+  [I_h(\mathbf d \varphi^w_j)](\mathbf x,t) = \mathbf d(\mathbf x_j,t) \varphi^w_j(\mathbf x)
 @f]
 and consequently (because $v(\mathbf x_j,t)$ is fixed and no longer
 depends on $\mathbf x$)
@@ -485,9 +485,32 @@ we will need is a residual. That is, we will have to compute the vector
     + (\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,p).
 @f]
 The second term is straightforward. For the first term, recall
-that $w_h(\mathbf x)=$
+that $w_h(\mathbf x,t)=\sum_j W_j(t) \varphi^w_j(\mathbf x)$
+and that (because the operator $I_h$ is linear)
+@f{align*}
+  [I_h(\mathbf d w_h)](\mathbf x,t)
+  &= [I_h(\mathbf d \sum_j W_j(t) \varphi^w_j)](\mathbf x,t) \\
+  &= \sum_j W_j(t) [I_h(\mathbf d \varphi^w_j)](\mathbf x,t) \\
+  &= \sum_j W_j(t) \mathbf d(\mathbf x_j,t) \varphi^w_j(\mathbf x) \\
+  &= \sum_j \underbrace{[W_j(t) \mathbf d(\mathbf x_j,t)]}_{=: \Psi_j(t)} \varphi^w_j(\mathbf x) \\
+  &= \sum_j \Psi_j(t) \varphi^w_j(\mathbf x) \\
+  &= \psi_h(\mathbf x,t).
+@f}
+In other words, $[I_h(\mathbf d w_h)](\mathbf x,t)$ is a (vector-valued)
+finite element field with coefficients $\Psi_j$ that are simply the
+product of $\mathbf d$ evaluated at the node points $j$ times the corresponding
+coefficient $W_j$ at the same node.
 
-TODO: Complete
+You will see in the code how we represent this field $\psi_h$, and then
+compute the integral
+@f[
+  \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot \left[I_h(\mathbf d w_h)\right]\right)
+  =
+  \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot \psi_h \right)
+@f]
+that appears in the computation of the residual.
 
 
 <h3> Solving differential-algebraic equations </h3>
