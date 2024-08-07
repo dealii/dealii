@@ -264,13 +264,13 @@ namespace Step55
       const std::vector<NumberType> &local_solution_elevation_at_q_points,
       const std::vector<NumberType> &local_solution_water_at_q_points,
       const std::vector<Tensor<1, dim, NumberType>>
-        &local_gradient_elevation_at_q_points,
+                                    &local_gradient_elevation_at_q_points,
       const std::vector<NumberType> &div_Ih_d_wh_at_q_points,
-      const std::vector<double> &local_solution_dot_elevation_at_q_points,
-      const std::vector<double> &rain_fall_rate_rhs_values,
-      const double               cell_diameter,
-      const double               time,
-      std::vector<NumberType>   &cell_residual) const;
+      const std::vector<double>     &local_solution_dot_elevation_at_q_points,
+      const std::vector<double>     &rain_fall_rate_rhs_values,
+      const double                   cell_diameter,
+      const double                   time,
+      std::vector<NumberType>       &cell_residual) const;
 
     void assemble_residual(const double      time,
                            const VectorType &locally_relevant_solution,
@@ -744,13 +744,13 @@ namespace Step55
     const std::vector<NumberType> &local_solution_elevation_at_q_points,
     const std::vector<NumberType> &local_solution_water_at_q_points,
     const std::vector<Tensor<1, dim, NumberType>>
-      &local_gradient_elevation_at_q_points,
+                                  &local_gradient_elevation_at_q_points,
     const std::vector<NumberType> &div_Ih_d_wh_at_q_points,
-    const std::vector<double> &local_solution_dot_elevation_at_q_points,
-    const std::vector<double> &rain_fall_rate_rhs_values,
-    const double               cell_diameter,
-    const double               time,
-    std::vector<NumberType>   &cell_residual) const
+    const std::vector<double>     &local_solution_dot_elevation_at_q_points,
+    const std::vector<double>     &rain_fall_rate_rhs_values,
+    const double                   cell_diameter,
+    const double                   time,
+    std::vector<NumberType>       &cell_residual) const
   {
     (void)time; // TODO
 
@@ -768,8 +768,8 @@ namespace Step55
         const Tensor<1, dim, NumberType> &grad_H =
           local_gradient_elevation_at_q_points[q];
         const NumberType &div_Ih_d_wh = div_Ih_d_wh_at_q_points[q];
-        const double p = rain_fall_rate_rhs_values[q];
-        const double &JxW = fe_values.JxW(q);
+        const double      p           = rain_fall_rate_rhs_values[q];
+        const double     &JxW         = fe_values.JxW(q);
 
         (void)H;
 
@@ -799,7 +799,8 @@ namespace Step55
 
                 cell_residual[i] -=
                   (Nx_i * (H_dot + k * std::pow(w, m) * std::pow(S, n)) +
-                   grad_Nx_i * (Kd * grad_H)) * JxW;
+                   grad_Nx_i * (Kd * grad_H)) *
+                  JxW;
               }
             else if (i_group == w_dof)
               {
@@ -810,8 +811,7 @@ namespace Step55
                   (Nx_i + c * cell_diameter * d * grad_Nx_i);
 
                 // TODO: Get this right with the I_h part
-                cell_residual[i] -=
-                  (stabNx_i * (p - div_Ih_d_wh)) * JxW;
+                cell_residual[i] -= (stabNx_i * (p - div_Ih_d_wh)) * JxW;
               }
             else
               {
@@ -866,20 +866,21 @@ namespace Step55
     const FEValuesExtractors::Scalar     elevation(0);
     const FEValuesExtractors::Scalar     water_flow_rate(1);
 
-    std::vector<double> local_dof_values (dofs_per_cell);
+    std::vector<double> local_dof_values(dofs_per_cell);
     std::vector<double> cell_residual(dofs_per_cell);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          for(const unsigned int i : fe_values.dof_indices())
+          for (const unsigned int i : fe_values.dof_indices())
             cell_residual[i] = 0.0;
 
           fe_values.reinit(cell);
           fe_values_at_node_points.reinit(cell);
 
           cell->get_dof_indices(local_dof_indices);
-          locally_relevant_solution.extract_subvector_to(local_dof_indices, local_dof_values);
+          locally_relevant_solution.extract_subvector_to(local_dof_indices,
+                                                         local_dof_values);
 
           rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
                                         rain_fall_rate_rhs_values);
@@ -907,26 +908,32 @@ namespace Step55
               // As an intermediate step, we've hack something up to
               // work around this, under the assumption that all H dofs
               // are enumerated before all w dofs, and that they're
-              // enumerated in a way such that traveral of these two
+              // enumerated in a way such that traversal of these two
               // subblocks in lock-step implies visiting the same support
               // point.
-              const unsigned int jj = j % dofs_per_cell/2;
-              
-              const double Wj = local_dof_values[jj];
-              const Tensor<1,dim> d_j =
-                -elevation_grad_at_node_points[jj] /
-                std::sqrt(elevation_grad_at_node_points[jj] *
-                            elevation_grad_at_node_points[jj] +
-                          ModelParameters::regularization_epsilon *
-                            ModelParameters::regularization_epsilon);
-              
-              for (const unsigned int q : fe_values.quadrature_point_indices())
-              {
-                const Tensor<1, dim> grad_Nx_j =
-                  fe_values[water_flow_rate].gradient(jj, q);
 
-                div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
-              }
+              if (j % 2 == 1) // if j is a water DoF    if
+                              // (fe.shape_function_belongs_to(water_flow_rate))
+                {
+                  const unsigned int jj = j / 2; // TODO: do this better
+
+                  const double         Wj = local_dof_values[j];
+                  const Tensor<1, dim> d_j =
+                    -elevation_grad_at_node_points[jj] /
+                    std::sqrt(elevation_grad_at_node_points[jj] *
+                                elevation_grad_at_node_points[jj] +
+                              ModelParameters::regularization_epsilon *
+                                ModelParameters::regularization_epsilon);
+
+                  for (const unsigned int q :
+                       fe_values.quadrature_point_indices())
+                    {
+                      const Tensor<1, dim> grad_Nx_j =
+                        fe_values[water_flow_rate].gradient(jj, q);
+
+                      div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
+                    }
+                }
             }
 
           compute_local_residual(fe_values,
@@ -999,8 +1006,10 @@ namespace Step55
     std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_q_points(
       fe_values.n_quadrature_points);
 
-    std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_node_points(dofs_per_cell);
-    std::vector<ADNumberType> div_Ih_d_wh_at_q_points(fe_values.n_quadrature_points);
+    std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_node_points(
+      dofs_per_cell);
+    std::vector<ADNumberType> div_Ih_d_wh_at_q_points(
+      fe_values.n_quadrature_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     const FEValuesExtractors::Scalar     elevation(0);
@@ -1033,8 +1042,9 @@ namespace Step55
           fe_values[water_flow_rate].get_function_values_from_local_dof_values(
             dof_values_ad, water_at_q_points);
 
-          fe_values_at_node_points[elevation].get_function_gradients_from_local_dof_values(
-            dof_values_ad, elevation_grad_at_node_points);
+          fe_values_at_node_points[elevation]
+            .get_function_gradients_from_local_dof_values(
+              dof_values_ad, elevation_grad_at_node_points);
           Assert(fe_values_at_node_points.n_quadrature_points ==
                    elevation_grad_at_node_points.size(),
                  ExcInternalError());
@@ -1050,23 +1060,23 @@ namespace Step55
               // enumerated in a way such that traveral of these two
               // subblocks in lock-step implies visiting the same support
               // point.
-              const unsigned int jj = j % dofs_per_cell/2;
-              
-              const ADNumberType Wj = dof_values_ad[jj];
-              const Tensor<1,dim, ADNumberType> d_j =
+              const unsigned int jj = j % dofs_per_cell / 2;
+
+              const ADNumberType                 Wj = dof_values_ad[jj];
+              const Tensor<1, dim, ADNumberType> d_j =
                 -elevation_grad_at_node_points[jj] /
                 std::sqrt(elevation_grad_at_node_points[jj] *
                             elevation_grad_at_node_points[jj] +
                           ModelParameters::regularization_epsilon *
                             ModelParameters::regularization_epsilon);
-              
-              for (const unsigned int q : fe_values.quadrature_point_indices())
-              {
-                const Tensor<1, dim> grad_Nx_j =
-                  fe_values[water_flow_rate].gradient(jj, q);
 
-                div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
-              }
+              for (const unsigned int q : fe_values.quadrature_point_indices())
+                {
+                  const Tensor<1, dim> grad_Nx_j =
+                    fe_values[water_flow_rate].gradient(jj, q);
+
+                  div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
+                }
             }
 
           std::vector<ADNumberType> residual_ad(n_dependent_variables,
@@ -1118,18 +1128,23 @@ namespace Step55
 
     SolverControl solver_control(system_matrix.m(), tolerance * rhs.l2_norm());
 
-    SolverGMRES<VectorType> solver(solver_control);
-    LA::MPI::PreconditionILU     preconditioner_H;
-    LA::MPI::PreconditionILU     preconditioner_w;
+    SolverGMRES<VectorType>  solver(solver_control);
+    LA::MPI::PreconditionILU preconditioner_H;
+    LA::MPI::PreconditionILU preconditioner_w;
     preconditioner_H.initialize(system_matrix.block(0, 0));
     preconditioner_w.initialize(system_matrix.block(1, 1));
 
-    const auto lo_prec_H = linear_operator<typename LA::MPI::BlockVector::BlockType>(system_matrix.block(0, 0), preconditioner_H);
-    const auto lo_prec_w = linear_operator<typename LA::MPI::BlockVector::BlockType>(system_matrix.block(1, 1), preconditioner_w);
+    const auto lo_prec_H =
+      linear_operator<typename LA::MPI::BlockVector::BlockType>(
+        system_matrix.block(0, 0), preconditioner_H);
+    const auto lo_prec_w =
+      linear_operator<typename LA::MPI::BlockVector::BlockType>(
+        system_matrix.block(1, 1), preconditioner_w);
 
-    const auto preconditioner = block_diagonal_operator<2, LA::MPI::BlockVector>(
-      std::array<LinearOperator<typename LA::MPI::BlockVector::BlockType>, 2>{
-        {lo_prec_H, lo_prec_w}});
+    const auto preconditioner =
+      block_diagonal_operator<2, LA::MPI::BlockVector>(
+        std::array<LinearOperator<typename LA::MPI::BlockVector::BlockType>, 2>{
+          {lo_prec_H, lo_prec_w}});
 
     VectorType distributed_solution(owned_partitioning, mpi_communicator);
 
@@ -1283,8 +1298,7 @@ namespace Step55
 
 
     time_integrator.reinit_vector = [this](VectorType &vector) {
-      vector.reinit(owned_partitioning,
-                    mpi_communicator);
+      vector.reinit(owned_partitioning, mpi_communicator);
     };
 
     time_integrator.residual =
@@ -1336,11 +1350,9 @@ namespace Step55
     pcout << "Solve time-dependent system... " << std::flush;
     VectorType solution;
     VectorType solution_dot;
-    solution.reinit(owned_partitioning,
-                    mpi_communicator);
-    solution_dot.reinit(owned_partitioning,
-                    mpi_communicator);
-                    
+    solution.reinit(owned_partitioning, mpi_communicator);
+    solution_dot.reinit(owned_partitioning, mpi_communicator);
+
     solution = locally_relevant_solution;
 
     time_integrator.solve_dae(solution, solution_dot);
