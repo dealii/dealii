@@ -355,7 +355,7 @@ namespace Step55
     void compute_initial_constraints();
     void assemble_initial_waterflow_system();
     void solve_initial_waterflow_system();
-    void check_conservation_for_waterflow_system();
+    void check_conservation_for_waterflow_system(const VectorType &solution);
 
     template <typename NumberType>
     void compute_local_residual(
@@ -863,7 +863,8 @@ namespace Step55
   }
 
 
-  void StreamPowerErosionProblem::check_conservation_for_waterflow_system()
+  void StreamPowerErosionProblem::check_conservation_for_waterflow_system(
+    const VectorType &solution)
   {
     TimerOutput::Scope t(computing_timer,
                          "conservation check: waterflow system");
@@ -920,9 +921,9 @@ namespace Step55
                 fe_face_values.reinit(cell, face);
 
                 fe_face_values[elevation].get_function_gradients(
-                  locally_relevant_solution, elevation_grad_at_fq_points);
+                  solution, elevation_grad_at_fq_points);
                 fe_face_values[water_flow_rate].get_function_values(
-                  locally_relevant_solution, water_at_fq_points);
+                  solution, water_at_fq_points);
 
                 for (const unsigned int f_q_point :
                      fe_face_values.quadrature_point_indices())
@@ -1468,7 +1469,7 @@ namespace Step55
                    /*cycle*/ 0);
     assemble_initial_waterflow_system();
     solve_initial_waterflow_system();
-    check_conservation_for_waterflow_system();
+    check_conservation_for_waterflow_system(locally_relevant_solution);
     output_results(/* time= */ 0,
                    locally_relevant_solution,
                    locally_relevant_solution_dot,
@@ -1537,7 +1538,7 @@ namespace Step55
              const VectorType  &locally_relevant_solution,
              const VectorType  &locally_relevant_solution_dot,
              const unsigned int step_number) {
-        check_conservation_for_waterflow_system();
+        check_conservation_for_waterflow_system(locally_relevant_solution);
         this->output_results(time,
                              locally_relevant_solution,
                              locally_relevant_solution_dot,
