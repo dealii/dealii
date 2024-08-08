@@ -200,7 +200,7 @@ namespace Step55
       // to in meters
       const Point<2> p_long_lat(p[0] / 111000,
                                 p[1] / 111000); // about 111km per arc degree
-      return 4000*(1-(p[0]+109)/7);
+      return 4000*(1-(p_long_lat[0]+109)/7);
 #endif
 
       //      return data->value(p_long_lat);
