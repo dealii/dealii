@@ -351,6 +351,7 @@ namespace Step55
     void compute_initial_constraints();
     void assemble_initial_waterflow_system();
     void solve_initial_waterflow_system();
+    void check_conservation_for_waterflow_system();
 
     template <typename NumberType>
     void compute_local_residual(
@@ -849,6 +850,100 @@ namespace Step55
   }
 
 
+  void StreamPowerErosionProblem::check_conservation_for_waterflow_system()
+  {
+    TimerOutput::Scope t(computing_timer,
+                         "conservation check: waterflow system");
+
+    const QGauss<dim>     quadrature_formula_cell(fe.degree + 1);
+    const QGauss<dim - 1> quadrature_formula_face(fe.degree + 1);
+
+    FEValues<dim, spacedim>     fe_values(fe,
+                                      quadrature_formula_cell,
+                                      update_values | update_quadrature_points |
+                                        update_JxW_values);
+    FEFaceValues<dim, spacedim> fe_face_values(fe,
+                                               quadrature_formula_face,
+                                               update_values |
+                                                 update_gradients |
+                                                 update_quadrature_points |
+                                                 update_normal_vectors |
+                                                 update_JxW_values);
+
+    const unsigned int n_q_points_cell = quadrature_formula_cell.size();
+
+    const RainFallRate<spacedim> rain_fall_rate_rhs;
+    std::vector<double>          rain_fall_rate_rhs_values(n_q_points_cell);
+
+    std::vector<Tensor<1, spacedim>> elevation_grad_at_fq_points(
+      fe_face_values.n_quadrature_points);
+    std::vector<double> water_at_fq_points(fe_face_values.n_quadrature_points);
+
+    const FEValuesExtractors::Scalar elevation(0);
+    const FEValuesExtractors::Scalar water_flow_rate(1);
+
+    double input_from_rain_rate   = 0.0;
+    double output_from_water_rate = 0.0;
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          fe_values.reinit(cell);
+
+          rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
+                                        rain_fall_rate_rhs_values);
+
+          for (const unsigned int q : fe_values.quadrature_point_indices())
+            {
+              const double  p   = rain_fall_rate_rhs_values[q];
+              const double &JxW = fe_values.JxW(q);
+
+              input_from_rain_rate += p * JxW;
+            }
+
+          for (const auto &face : cell->face_iterators())
+            if (face->at_boundary())
+              {
+                fe_face_values.reinit(cell, face);
+
+                fe_face_values[elevation].get_function_gradients(
+                  locally_relevant_solution, elevation_grad_at_fq_points);
+                fe_face_values[water_flow_rate].get_function_values(
+                  locally_relevant_solution, water_at_fq_points);
+
+                for (const unsigned int f_q_point :
+                     fe_face_values.quadrature_point_indices())
+                  {
+                    const double             &w = water_at_fq_points[f_q_point];
+                    const Tensor<1, spacedim> d =
+                      downhill_direction_from_elevation_gradient(
+                        elevation_grad_at_fq_points[f_q_point]);
+                    const Tensor<1, spacedim> &N =
+                      fe_face_values.normal_vector(f_q_point);
+                    const double JxW = fe_face_values.JxW(f_q_point);
+
+                    output_from_water_rate += w * (d * N) * JxW;
+                  }
+              }
+        }
+
+    input_from_rain_rate =
+      Utilities::MPI::sum(input_from_rain_rate, mpi_communicator);
+    output_from_water_rate =
+      Utilities::MPI::sum(output_from_water_rate, mpi_communicator);
+
+    pcout << "Conservation check (water)" << std::endl
+          << "   Input: " << input_from_rain_rate << std::endl
+          << "   Output: " << output_from_water_rate << std::endl
+          << "   Error (abs): "
+          << std::abs(input_from_rain_rate - output_from_water_rate)
+          << std::endl
+          << "   Error (rel): "
+          << std::abs((input_from_rain_rate - output_from_water_rate) /
+                      input_from_rain_rate)
+          << std::endl;
+  }
+
 
   template <typename NumberType>
   void StreamPowerErosionProblem::compute_local_residual(
@@ -1329,6 +1424,7 @@ namespace Step55
                    /*cycle*/ 0);
     assemble_initial_waterflow_system();
     solve_initial_waterflow_system();
+    check_conservation_for_waterflow_system();
     output_results(/* time= */ 0,
                    locally_relevant_solution,
                    locally_relevant_solution_dot,
@@ -1395,8 +1491,7 @@ namespace Step55
              const VectorType  &locally_relevant_solution,
              const VectorType  &locally_relevant_solution_dot,
              const unsigned int step_number) {
-        (void)time;
-        (void)locally_relevant_solution;
+        check_conservation_for_waterflow_system();
         this->output_results(time,
                              locally_relevant_solution,
                              locally_relevant_solution_dot,
