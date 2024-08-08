@@ -326,7 +326,21 @@ namespace Particles
      * @return An ArrayView of the properties of this particle.
      */
     ArrayView<double>
-    get_properties();
+    get_properties()
+    {
+      // The implementation is up here inside the class declaration because
+      // NVCC (at least in 12.5 and 12.6) otherwise produce a compile error:
+      //
+      // error: no declaration matches ‘dealii::ArrayView<__remove_cv(const
+      // double)> dealii::Particles::ParticleAccessor<dim,
+      // spacedim>::get_properties()’
+      //
+      // See https://github.com/dealii/dealii/issues/17148
+      Assert(state() == IteratorState::valid, ExcInternalError());
+
+      return property_pool->get_properties(get_handle());
+    }
+
 
     /**
      * Get read-access to properties of this particle.
@@ -840,14 +854,9 @@ namespace Particles
 
 
 
-  template <int dim, int spacedim>
-  inline ArrayView<double>
-  ParticleAccessor<dim, spacedim>::get_properties()
-  {
-    Assert(state() == IteratorState::valid, ExcInternalError());
-
-    return property_pool->get_properties(get_handle());
-  }
+  // template <int dim, int spacedim>
+  // inline ArrayView<double>
+  //   ParticleAccessor<dim, spacedim>::get_properties()
 
 
 
