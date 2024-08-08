@@ -200,7 +200,7 @@ namespace Step55
       // to in meters
       const Point<2> p_long_lat(p[0] / 111000,
                                 p[1] / 111000); // about 111km per arc degree
-      return 4000*(1-(p_long_lat[0]+109)/7);
+      return 4000 * (1 - (p_long_lat[0] + 109) / 7);
 #endif
 
       //      return data->value(p_long_lat);
@@ -1001,8 +1001,14 @@ namespace Step55
                 const Tensor<1, spacedim> grad_Nx_i =
                   fe_values[elevation].gradient(i, q);
 
-                cell_residual[i] -=
-                  (Nx_i * (H_dot + k * std::pow(w, m) * std::pow(S, n)) +
+                // The sign adopted here needs to be consistent with
+                // the extra operation in the linearisation process
+                // where we add a scaled mass-matrix term (accounting
+                // for the linearisation of the elevation rate).
+                cell_residual[i] +=
+                  (Nx_i *
+                     (H_dot + k * std::pow(std::max(w, NumberType(0.0)), m) *
+                                std::pow(S, n)) +
                    grad_Nx_i * (Kd * grad_H)) *
                   JxW;
               }
@@ -1014,7 +1020,7 @@ namespace Step55
                 const auto stabNx_i =
                   (Nx_i + c * cell_diameter * d * grad_Nx_i);
 
-                cell_residual[i] -= (stabNx_i * (p - div_Ih_d_wh)) * JxW;
+                cell_residual[i] += (stabNx_i * (p - div_Ih_d_wh)) * JxW;
               }
             else
               {
@@ -1250,7 +1256,7 @@ namespace Step55
 
           // Assemble the local contribution to the Jacobian that accounts
           // for the time integration scheme adopted by SUNDIALS:
-          // J = K + alpha K'
+          // J = K + alpha M
           for (const unsigned int q : fe_values.quadrature_point_indices())
             for (const unsigned int i : fe_values.dof_indices())
               for (const unsigned int j : fe_values.dof_indices())
