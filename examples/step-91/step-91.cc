@@ -99,7 +99,7 @@ namespace Step55
     constexpr double diffusion_coefficient_Kd   = 0.01;
     constexpr double rainfall_rate_p            = 0.6;
     constexpr double regularization_epsilon     = 0.0001;
-    constexpr double stabilization_c            = 0.1;
+    constexpr double stabilization_c            = 10;  // TODO: This should be 0.1
   } // namespace ModelParameters
 
 
