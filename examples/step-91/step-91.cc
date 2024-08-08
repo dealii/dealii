@@ -189,17 +189,19 @@ namespace Step55
 
         std::atan2(p[2], std::sqrt(p[0] * p[0] + p[1] * p[1])) * 360 /
           (2 * numbers::PI));
-#else
-      // Convert p to long-lat by scaling to what a degree corresponds
-      // to in meters
-      const Point<2> p_long_lat(p[0] / 111000,
-                                p[1] / 111000); // about 111km per arc degree
-#endif
+
       // TODO: This is of course just a dummy elevation:
       return 4000 *
              (1 -
               std::pow(Point<2>(-105.5, 39).distance(p_long_lat), 2) /
                 std::pow(Point<2>(-105.5, 39).distance(Point<2>(-109, 37)), 2));
+#else
+      // Convert p to long-lat by scaling to what a degree corresponds
+      // to in meters
+      const Point<2> p_long_lat(p[0] / 111000,
+                                p[1] / 111000); // about 111km per arc degree
+      return 4000*(1-(p[0]+109)/7);
+#endif
 
       //      return data->value(p_long_lat);
     }
