@@ -489,7 +489,7 @@ namespace LinearAlgebra
           TpetraTypes::MapType<MemorySpace>>(
           m, 0, Utilities::Trilinos::tpetra_comm_self()),
         column_space_map,
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 0, 0)
         Teuchos::ArrayView<size_t>{entries_per_row_size_type}
 #  else
         Teuchos::ArrayRCP<size_t>(entries_per_row_size_type.data(),
