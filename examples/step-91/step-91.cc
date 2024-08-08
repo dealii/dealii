@@ -156,6 +156,10 @@ namespace Step55
           {
             // TODO: do this better and check for correctness.
             const unsigned int jj = (j % 2 == 0 ? j : j - 1);
+            // We could write this:
+            //   Assert(j % 2 == 1, ExcMessage("Wrong component"));
+            //   const unsigned int jj = j - 1;
+            // assuming that the H, w components are interleaved.
 
             const NumberType                      Wj = local_dof_values[j];
             const Tensor<1, spacedim, NumberType> d_j =
@@ -165,7 +169,7 @@ namespace Step55
             for (const unsigned int q : fe_values.quadrature_point_indices())
               {
                 const Tensor<1, spacedim> grad_Nx_j =
-                  fe_values[water_flow_rate].gradient(jj, q);
+                  fe_values[water_flow_rate].gradient(j, q);
 
                 div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
               }
@@ -407,7 +411,19 @@ namespace Step55
 
   StreamPowerErosionProblem::StreamPowerErosionProblem()
     : mpi_communicator(MPI_COMM_WORLD)
-    , fe(FE_Q<dim, spacedim>(1) ^ 2)
+    // TODO
+    // cf. https://dealii.org/developer/doxygen/deal.II/classFiniteElement.html
+    // Caution! How one sets up the FESystem has a big
+    // effect on how
+    // fe.system_to_component_index(i)
+    // and
+    // fe.system_to_base_index(i) work.
+    //
+    // , fe(FE_Q<dim, spacedim>(1) ^ 2) // All base elements are the same
+    , fe(FE_Q<dim, spacedim>(1),
+         1,
+         FE_Q<dim, spacedim>(1),
+         1) // Two different base elements for two different fields
     , triangulation(mpi_communicator,
                     typename Triangulation<dim, spacedim>::MeshSmoothing(
                       Triangulation<dim, spacedim>::smoothing_on_refinement |
