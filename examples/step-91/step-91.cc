@@ -363,7 +363,8 @@ namespace Step55
       const std::vector<double>     &local_solution_dot_elevation_at_q_points,
       const std::vector<double>     &rain_fall_rate_rhs_values,
       const double                   cell_diameter,
-      std::vector<NumberType>       &cell_residual) const;
+      std::vector<NumberType>       &cell_residual,
+      const bool                     debug = false) const;
 
     void assemble_residual(const VectorType &locally_relevant_solution,
                            const VectorType &locally_relevant_solution_dot,
@@ -951,7 +952,8 @@ namespace Step55
     const std::vector<double>     &local_solution_dot_elevation_at_q_points,
     const std::vector<double>     &rain_fall_rate_rhs_values,
     const double                   cell_diameter,
-    std::vector<NumberType>       &cell_residual) const
+    std::vector<NumberType>       &cell_residual,
+    const bool                     debug) const
   {
     const FEValuesExtractors::Scalar elevation(0);
     const FEValuesExtractors::Scalar water_flow_rate(1);
@@ -1000,6 +1002,16 @@ namespace Step55
                                 std::pow(S, n)) +
                    grad_Nx_i * (Kd * grad_H)) *
                   JxW;
+
+                if (debug)
+                  std::cout << "RES(ELEVATION)"
+                            << "\n  i (H): " << i
+                            << "\n  res H: " << cell_residual[i]
+                            << "\n  H_dot: " << H_dot << "\n  w: " << w
+                            << "\n  S: " << S
+                            << "\n  std::pow(w, m): " << std::pow(w, m)
+                            << "\n  std::pow(S, n): " << std::pow(S, n)
+                            << "\n  grad_H: " << grad_H << std::endl;
               }
             else if (i_group == w_dof)
               {
@@ -1010,6 +1022,13 @@ namespace Step55
                   (Nx_i + c * cell_diameter * d * grad_Nx_i);
 
                 cell_residual[i] += (stabNx_i * (p - div_Ih_d_wh)) * JxW;
+
+                if (debug)
+                  std::cout << "RES(WATER)"
+                            << "\n  i (w): " << i
+                            << "\n  res W: " << cell_residual[i]
+                            << "\n  stabNx_i: " << stabNx_i << "\n  p: " << p
+                            << "\n  div_Ih_d_wh: " << div_Ih_d_wh << std::endl;
               }
             else
               {
@@ -1109,6 +1128,15 @@ namespace Step55
                                  rain_fall_rate_rhs_values,
                                  cell->diameter(),
                                  cell_residual);
+
+          constexpr bool debug_vec = false;
+
+          if (debug_vec)
+            {
+              pcout << "Vector" << std::endl;
+              for (unsigned int i = 0; i < cell_residual.size(); ++i)
+                pcout << cell_residual[i] << std::endl;
+            }
 
           for (const unsigned int i : fe_values.dof_indices())
             AssertIsFinite(cell_residual[i]);
@@ -1216,6 +1244,9 @@ namespace Step55
             elevation_grad_at_node_points,
             div_Ih_d_wh_at_q_points);
 
+          constexpr bool debug_res  = false;
+          constexpr bool debug_mtrx = false;
+
           std::vector<ADNumberType> residual_ad(n_dependent_variables,
                                                 ADNumberType(0.0));
           compute_local_residual(fe_values,
@@ -1225,10 +1256,18 @@ namespace Step55
                                  elevation_dot_at_q_points,
                                  rain_fall_rate_rhs_values,
                                  cell->diameter(),
-                                 residual_ad);
+                                 residual_ad,
+                                 debug_res);
 
           ad_helper.register_residual_vector(residual_ad);
           ad_helper.compute_linearization(cell_matrix);
+
+          if (debug_mtrx)
+            {
+              pcout << std::endl << "Matrix (before)" << std::endl;
+              cell_matrix.print_formatted(
+                std::cout, 3, true, 0, "0.0", 1.0, 1e-12);
+            }
 
           // Assemble the local contribution to the Jacobian that accounts
           // for the time integration scheme adopted by SUNDIALS:
@@ -1239,6 +1278,13 @@ namespace Step55
                 cell_matrix(i, j) += alpha * fe_values[elevation].value(i, q) *
                                      fe_values[elevation].value(j, q) *
                                      fe_values.JxW(q);
+
+          if (debug_mtrx)
+            {
+              pcout << std::endl << "Matrix (after)" << std::endl;
+              cell_matrix.print_formatted(
+                std::cout, 3, true, 0, "0.0", 1.0, 1e-12);
+            }
 
           for (const unsigned int i : fe_values.dof_indices())
             for (const unsigned int j : fe_values.dof_indices())
