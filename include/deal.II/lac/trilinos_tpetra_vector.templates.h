@@ -125,7 +125,8 @@ namespace LinearAlgebra
       , has_ghost(false)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(
-          parallel_partitioner.make_tpetra_map_rcp(communicator, true)))
+          parallel_partitioner.make_tpetra_map_rcp<
+            TpetraTypes::NodeType<MemorySpace>>(communicator, true)))
     {}
 
 
@@ -144,14 +145,18 @@ namespace LinearAlgebra
 
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(
-            parallel_partitioner.make_tpetra_map_rcp(communicator, true));
+            parallel_partitioner
+              .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+                communicator, true));
 
           compressed = true;
         }
       else
         {
           Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> map =
-            locally_owned_entries.make_tpetra_map_rcp(communicator, false);
+            locally_owned_entries
+              .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+                communicator, false);
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(map);
 
@@ -159,7 +164,9 @@ namespace LinearAlgebra
           nonlocal_entries.subtract_set(locally_owned_entries);
           nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(
-            nonlocal_entries.make_tpetra_map_rcp(communicator, true));
+            nonlocal_entries
+              .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+                communicator, true));
 
           compressed = false;
         }
@@ -206,7 +213,9 @@ namespace LinearAlgebra
       has_ghost  = false;
       vector     = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::VectorType<Number, MemorySpace>>(
-        parallel_partitioner.make_tpetra_map_rcp(communicator, true));
+        parallel_partitioner
+          .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+            communicator, true));
     }
 
 
@@ -230,14 +239,18 @@ namespace LinearAlgebra
 
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(
-            parallel_partitioner.make_tpetra_map_rcp(communicator, true));
+            parallel_partitioner
+              .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+                communicator, true));
 
           compressed = true;
         }
       else
         {
           Teuchos::RCP<TpetraTypes::MapType<MemorySpace>> map =
-            locally_owned_entries.make_tpetra_map_rcp(communicator, false);
+            locally_owned_entries
+              .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+                communicator, false);
 
           if (!vector->getMap()->isSameAs(*map))
             {
@@ -253,7 +266,9 @@ namespace LinearAlgebra
 
           nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(
-            nonlocal_entries.make_tpetra_map_rcp(communicator, true));
+            nonlocal_entries
+              .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+                communicator, true));
 
           compressed = false;
         }
@@ -451,7 +466,9 @@ namespace LinearAlgebra
       Teuchos::Array<OtherNumber> vector_data(V.begin(), V.end());
       vector = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::VectorType<Number, MemorySpace>>(
-        V.locally_owned_elements().make_tpetra_map_rcp(), vector_data);
+        V.locally_owned_elements()
+          .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(),
+        vector_data);
 
       has_ghost  = false;
       compressed = true;
@@ -511,7 +528,8 @@ namespace LinearAlgebra
       else
         {
           tpetra_comm_pattern = Teuchos::rcp_dynamic_cast<
-            const TpetraWrappers::CommunicationPattern>(communication_pattern);
+            const TpetraWrappers::CommunicationPattern<MemorySpace>>(
+            communication_pattern);
 
           AssertThrow(
             !tpetra_comm_pattern.is_null(),
@@ -543,9 +561,7 @@ namespace LinearAlgebra
         for (size_t k = 0; k < localLength; ++k)
           x_1d(k) = *values_it++;
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-        source_vector.template sync<
-          typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
-            device_type::memory_space>();
+        source_vector.template sync<typename MemorySpace::kokkos_space>();
 #  endif
       }
       Tpetra::CombineMode tpetra_operation = Tpetra::ZERO;
@@ -630,8 +646,11 @@ namespace LinearAlgebra
 
           // TODO: Tpetra doesn't have a combine mode that also updates local
           // elements, maybe there is a better workaround.
-          Tpetra::Vector<Number, int, types::signed_global_dof_index> dummy(
-            vector->getMap(), false);
+          Tpetra::Vector<Number,
+                         int,
+                         types::signed_global_dof_index,
+                         TpetraTypes::NodeType<MemorySpace>>
+                                               dummy(vector->getMap(), false);
           TpetraTypes::ImportType<MemorySpace> data_exchange(
             V.trilinos_vector().getMap(), dummy.getMap());
           dummy.doImport(V.trilinos_vector(), data_exchange, Tpetra::INSERT);
@@ -738,9 +757,7 @@ namespace LinearAlgebra
           vector_1d(k) += a;
         }
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      vector->template sync<
-        typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
-          device_type::memory_space>();
+      vector->template sync<typename MemorySpace::kokkos_space>();
 #  endif
     }
 

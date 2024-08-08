@@ -18,9 +18,12 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/trilinos_utilities.h>
+
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -136,9 +139,10 @@ public:
   /**
    * Constructor from a Trilinos Teuchos::RCP<Tpetra::Map>.
    */
+  template <typename NodeType>
   explicit IndexSet(
-    const Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>>
-      &map);
+    const Teuchos::RCP<
+      const Tpetra::Map<int, types::signed_global_dof_index, NodeType>> &map);
 #  endif // DEAL_II_TRILINOS_WITH_TPETRA
 
   /**
@@ -608,11 +612,17 @@ public:
                     const bool     overlapping  = false) const;
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  Tpetra::Map<int, types::signed_global_dof_index>
+  template <
+    typename NodeType =
+      LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>
+  Tpetra::Map<int, types::signed_global_dof_index, NodeType>
   make_tpetra_map(const MPI_Comm communicator = MPI_COMM_WORLD,
                   const bool     overlapping  = false) const;
 
-  Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index>>
+  template <
+    typename NodeType =
+      LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Host>>
+  Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index, NodeType>>
   make_tpetra_map_rcp(const MPI_Comm communicator = MPI_COMM_WORLD,
                       const bool     overlapping  = false) const;
 #  endif
