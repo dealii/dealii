@@ -409,10 +409,12 @@ this file that is distributed with the library uses
 @f{align*}{
   f(\mathbf x,t) &= 0, \\
   u_0(\mathbf x) &= 0, \\
-  g(\mathbf x,t) &= \begin{cases}
+  g(\mathbf x,t) &=
+  \begin{cases}
     \cos(4\pi t) & \text{if $x=-1$}, \\
     -\cos(4\pi t) & \text{if $x=1$}, \\
     0 & \text{otherwise}
+  \end{cases}
 @f}
 but this is easily changed.
 
