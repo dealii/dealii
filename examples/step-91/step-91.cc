@@ -1024,6 +1024,9 @@ namespace Step55
                                  time,
                                  cell_residual);
 
+          for (const unsigned int i : fe_values.dof_indices())
+            AssertIsFinite(cell_residual[i]);
+
           constraints.distribute_local_to_global(cell_residual,
                                                  local_dof_indices,
                                                  residual);
@@ -1157,6 +1160,10 @@ namespace Step55
                 cell_matrix(i, j) += alpha * fe_values[elevation].value(i, q) *
                                      fe_values[elevation].value(j, q) *
                                      fe_values.JxW(q);
+
+          for (const unsigned int i : fe_values.dof_indices())
+            for (const unsigned int j : fe_values.dof_indices())
+              AssertIsFinite(cell_matrix(i, j));
 
           constraints.distribute_local_to_global(cell_matrix,
                                                  local_dof_indices,
