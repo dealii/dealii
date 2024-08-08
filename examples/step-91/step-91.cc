@@ -124,6 +124,55 @@ namespace Step55
   }
 
 
+  template <int dim, int spacedim, typename NumberType>
+  void compute_div_Ih_d_wh_at_q_points_from_nodal_points(
+    const FEValues<dim, spacedim> &fe_values,
+    const std::vector<NumberType> &local_dof_values,
+    const std::vector<Tensor<1, spacedim, NumberType>>
+                            &elevation_grad_at_node_points,
+    std::vector<NumberType> &div_Ih_d_wh_at_q_points)
+  {
+    const unsigned int               w_dof = 1;
+    const FEValuesExtractors::Scalar water_flow_rate(1);
+
+    for (const unsigned int j : fe_values.dof_indices())
+      {
+        // TODO: We need some sort of offsets here, because the
+        // support points of W can coincide with support points
+        // for H, but ultimately the solution coefficients are
+        // never both non-zero for the same index j.
+        // As an intermediate step, we've hack something up to
+        // work around this, under the assumption that all H dofs
+        // are enumerated before all w dofs, and that they're
+        // enumerated in a way such that traversal of these two
+        // subblocks in lock-step implies visiting the same support
+        // point.
+
+        const unsigned int j_group =
+          fe_values.get_fe().system_to_base_index(j).first.first;
+
+        // TODO: if (fe.shape_function_belongs_to(water_flow_rate))
+        if (j_group == w_dof)
+          {
+            // TODO: do this better and check for correctness.
+            const unsigned int jj = (j % 2 == 0 ? j : j - 1);
+
+            const NumberType                      Wj = local_dof_values[j];
+            const Tensor<1, spacedim, NumberType> d_j =
+              downhill_direction_from_elevation_gradient(
+                elevation_grad_at_node_points[jj]);
+
+            for (const unsigned int q : fe_values.quadrature_point_indices())
+              {
+                const Tensor<1, spacedim> grad_Nx_j =
+                  fe_values[water_flow_rate].gradient(jj, q);
+
+                div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
+              }
+          }
+      }
+  }
+
 
   class ColoradoTopography : public Function<3>
   {
@@ -957,44 +1006,12 @@ namespace Step55
           Assert(fe_values_at_node_points.n_quadrature_points ==
                    elevation_grad_at_node_points.size(),
                  ExcInternalError());
-          for (const unsigned int j : fe_values.dof_indices())
-            {
-              // TODO: We need some sort of offsets here, because the
-              // support points of W can coincide with support points
-              // for H, but ultimately the solution coefficients are
-              // never both non-zero for the same index j.
-              // As an intermediate step, we've hack something up to
-              // work around this, under the assumption that all H dofs
-              // are enumerated before all w dofs, and that they're
-              // enumerated in a way such that traversal of these two
-              // subblocks in lock-step implies visiting the same support
-              // point.
 
-              const unsigned int j_group =
-                fe.system_to_base_index(j).first.first;
-              const unsigned int w_dof = 1;
-
-              // TODO: if (fe.shape_function_belongs_to(water_flow_rate))
-              if (j_group == w_dof)
-                {
-                  // TODO: do this better and check for correctness.
-                  const unsigned int jj = j / 2;
-
-                  const double              Wj = local_dof_values[j];
-                  const Tensor<1, spacedim> d_j =
-                    downhill_direction_from_elevation_gradient(
-                      elevation_grad_at_node_points[jj]);
-
-                  for (const unsigned int q :
-                       fe_values.quadrature_point_indices())
-                    {
-                      const Tensor<1, spacedim> grad_Nx_j =
-                        fe_values[water_flow_rate].gradient(jj, q);
-
-                      div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
-                    }
-                }
-            }
+          compute_x_at_q_points_from_nodal_points(
+            fe_values,
+            local_dof_values,
+            elevation_grad_at_node_points,
+            div_Ih_d_wh_at_q_points);
 
           compute_local_residual(fe_values,
                                  elevation_at_q_points,
@@ -1108,44 +1125,12 @@ namespace Step55
           Assert(fe_values_at_node_points.n_quadrature_points ==
                    elevation_grad_at_node_points.size(),
                  ExcInternalError());
-          for (const unsigned int j : fe_values.dof_indices())
-            {
-              // TODO: We need some sort of offsets here, because the
-              // support points of W can coincide with support points
-              // for H, but ultimately the solution coefficients are
-              // never both non-zero for the same index j.
-              // As an intermediate step, we've hack something up to
-              // work around this, under the assumption that all H dofs
-              // are enumerated before all w dofs, and that they're
-              // enumerated in a way such that traveral of these two
-              // subblocks in lock-step implies visiting the same support
-              // point.
 
-              const unsigned int j_group =
-                fe.system_to_base_index(j).first.first;
-              const unsigned int w_dof = 1;
-
-              // TODO: if (fe.shape_function_belongs_to(water_flow_rate))
-              if (j_group == w_dof)
-                {
-                  // TODO: do this better and check for correctness.
-                  const unsigned int jj = j / 2;
-
-                  const ADNumberType Wj = dof_values_ad[jj];
-                  const Tensor<1, spacedim, ADNumberType> d_j =
-                    downhill_direction_from_elevation_gradient(
-                      elevation_grad_at_node_points[jj]);
-
-                  for (const unsigned int q :
-                       fe_values.quadrature_point_indices())
-                    {
-                      const Tensor<1, spacedim> grad_Nx_j =
-                        fe_values[water_flow_rate].gradient(jj, q);
-
-                      div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
-                    }
-                }
-            }
+          compute_div_Ih_d_wh_at_q_points_from_nodal_points(
+            fe_values,
+            dof_values_ad,
+            elevation_grad_at_node_points,
+            div_Ih_d_wh_at_q_points);
 
           std::vector<ADNumberType> residual_ad(n_dependent_variables,
                                                 ADNumberType(0.0));
