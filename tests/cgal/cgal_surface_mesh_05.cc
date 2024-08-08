@@ -86,7 +86,7 @@ test()
   GridGenerator::hyper_cube(tria1, 0.5, 1.5);
   tria0.refine_global(3);
   tria1.refine_global(3);
-  GridTools::rotate(numbers::PI_4, 2, tria1);
+  GridTools::rotate(Tensor<1, 3>{{0., 0., 1.}}, numbers::PI_4, tria1);
 
   // Move to CGAL surfaces
   dealii_tria_to_cgal_surface_mesh(tria0, surface_mesh0);
