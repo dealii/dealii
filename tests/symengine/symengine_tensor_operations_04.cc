@@ -136,10 +136,29 @@ test_symmetric_tensor()
   using Tensor_t           = SymmetricTensor<rank, dim, double>;
 
   Tensor_t t_a, t_b;
-  for (auto it = t_a.begin_raw(); it != t_a.end_raw(); ++it)
-    *it = 1.0;
-  for (auto it = t_b.begin_raw(); it != t_b.end_raw(); ++it)
-    *it = 2.0;
+
+  static_assert(rank == 2 || rank == 4);
+
+  if constexpr (rank == 2)
+    {
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          {
+            t_a({i, j}) = 1.0;
+            t_b({i, j}) = 2.0;
+          }
+    }
+  else
+    {
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = 0; l < dim; ++l)
+              {
+                t_a({i, j, k, l}) = 1.0;
+                t_b({i, j, k, l}) = 2.0;
+              }
+    }
 
   const Tensor_SD_number_t symb_t_a =
     SD::make_symmetric_tensor_of_symbols<rank, dim>("a");
