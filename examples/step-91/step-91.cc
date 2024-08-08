@@ -1007,7 +1007,7 @@ namespace Step55
                    elevation_grad_at_node_points.size(),
                  ExcInternalError());
 
-          compute_x_at_q_points_from_nodal_points(
+          compute_div_Ih_d_wh_at_q_points_from_nodal_points(
             fe_values,
             local_dof_values,
             elevation_grad_at_node_points,
