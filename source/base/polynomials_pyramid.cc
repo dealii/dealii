@@ -14,8 +14,12 @@
 
 
 #include <deal.II/base/point.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/polynomials_pyramid.h>
+#include <deal.II/base/quadrature_lib.h>
+
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/reference_cell.h>
 
@@ -28,19 +32,189 @@ namespace
   compute_n_polynomials_pyramid(const unsigned int dim,
                                 const unsigned int degree)
   {
-    if (dim == 3)
-      {
-        if (degree == 1)
-          return 5;
-        else if (degree == 2)
-          return 14;
-      }
+    AssertDimension(dim, 3);
+    AssertIndexRange(degree, 3);
 
-    DEAL_II_NOT_IMPLEMENTED();
-
-    return 0;
+    return (degree + 1) * (degree + 2) * (2 * degree + 3) / 6;
   }
 } // namespace
+
+
+
+template <int dim>
+double
+ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space(
+  const unsigned int i,
+  const unsigned int j,
+  const unsigned int k,
+  const Point<dim>  &p) const
+{
+  const double x = p[0];
+  const double y = p[1];
+  const double z = p[2];
+
+  double ratio;
+  if (std::fabs(z - 1.0) < 1e-12)
+    ratio = 0.0;
+  else
+    ratio = 1.0 / (1.0 - z);
+
+  double             phi    = 0.0;
+  const unsigned int max_ij = std::max(i, j);
+
+  phi =
+    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+    Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
+    std::pow((1.0 - z), max_ij) *
+    Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
+
+  if (std::fabs(phi) < 1e-12)
+    return 0.0;
+
+  return phi;
+}
+
+
+
+template <int dim>
+double
+ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_basis(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  AssertIndexRange(i,
+                   (this->degree() + 1) * (this->degree() + 2) *
+                     (2 * this->degree() + 3) / 6);
+
+  // find corresponding entrance to i
+  for (unsigned int j = 0, counter = 0; j <= this->degree(); ++j)
+    for (unsigned int k = 0; k <= this->degree(); ++k)
+      for (unsigned int l = 0; l <= this->degree() - std::max(j, k);
+           ++l, ++counter)
+        if (counter == i)
+          return compute_polynomial_space(j, k, l, p);
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return 0;
+}
+
+
+
+template <int dim>
+Tensor<1, dim>
+ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_deriv(
+  const unsigned int i,
+  const unsigned int j,
+  const unsigned int k,
+  const Point<dim>  &p) const
+{
+  const double x = p[0];
+  const double y = p[1];
+  const double z = p[2];
+
+  Tensor<1, dim> grad;
+  double         ratio;
+  if (std::fabs(z - 1.0) < 1e-12)
+    ratio = 0.0;
+  else
+    ratio = 1.0 / (1.0 - z);
+
+  const unsigned int max_ij = std::max(i, j);
+
+  grad[0] =
+    Polynomials::jacobi_polynomial_derivative<double>(
+      i, 0, 0, x * ratio, false) *
+    ratio *
+    Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
+    std::pow((1.0 - z), max_ij) *
+    Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
+  grad[1] =
+    Polynomials::jacobi_polynomial_derivative<double>(
+      j, 0, 0, y * ratio, false) *
+    ratio *
+    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+    std::pow((1.0 - z), max_ij) *
+    Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
+  if (max_ij == 0)
+    grad[2] =
+      -x * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) -
+      y * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          k, 2 * max_ij + 2, 0, z, true);
+  else
+    grad[2] =
+      -x * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) -
+      y * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          i, 0, 0, x * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        (-1.0) * max_ij * std::pow((1.0 - z), max_ij - 1) *
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          k, 2 * max_ij + 2, 0, z, true);
+
+
+  for (unsigned int d = 0; d < dim; ++d)
+    if (std::fabs(grad[d]) < 1e-12)
+      grad[d] = 0.0;
+
+  return grad;
+}
+
+
+
+template <int dim>
+Tensor<1, dim>
+ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_deriv(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  AssertIndexRange(i,
+                   (this->degree() + 1) * (this->degree() + 2) *
+                     (2 * this->degree() + 3) / 6);
+
+  // find corresponding entrance to i
+  for (unsigned int j = 0, counter = 0; j <= this->degree(); ++j)
+    for (unsigned int k = 0; k <= this->degree(); ++k)
+      for (unsigned int l = 0; l <= this->degree() - std::max(j, k);
+           ++l, ++counter)
+        if (counter == i)
+          return compute_polynomial_space_deriv(j, k, l, p);
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return Tensor<1, dim>();
+}
+
 
 
 template <int dim>
@@ -267,44 +441,171 @@ ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
   : ScalarPolynomialsBase<dim>(degree,
                                compute_n_polynomials_pyramid(dim, degree))
 {
-  if (this->degree() == 2)
+  std::vector<Point<dim>>   support_points;
+  std::vector<Point<dim>>   support_points_unordered;
+  std::vector<unsigned int> n_dofs_total_per_object(4, 0);
+  std::vector<unsigned int> n_dofs_per_object(4, 0);
+
+  support_points.resize(compute_n_polynomials_pyramid(dim, degree));
+  const double z_equidistance = 1.0 / this->degree();
+
+  for (unsigned int current_degree = this->degree(); current_degree > 0;
+       --current_degree)
     {
-      // Compute VDM Matrix and its inverse
-      // Get unit support points
-      std::vector<Point<dim>> support_points;
-      const ReferenceCell     reference_cell = ReferenceCells::Pyramid;
+      FE_Q<2> fe_q(current_degree);
 
-      for (const auto i : reference_cell.vertex_indices())
-        support_points.emplace_back(reference_cell.template vertex<dim>(i));
-
-      // lines:
-      for (const unsigned int l : reference_cell.line_indices())
+      // save all support points in an unordered fashion
+      for (unsigned int support_point_index = 0;
+           support_point_index < fe_q.get_unit_support_points().size();
+           ++support_point_index)
         {
-          support_points.emplace_back(
-            0.5 * support_points[reference_cell.line_to_cell_vertices(l, 0)] +
-            0.5 * support_points[reference_cell.line_to_cell_vertices(l, 1)]);
+          Point<dim> support_point;
+          for (unsigned int d = 0; d < dim - 1; ++d)
+            support_point[d] =
+              (current_degree * z_equidistance) *
+              (2 * fe_q.get_unit_support_points()[support_point_index][d] - 1);
+          support_point[dim - 1] =
+            (this->degree() - current_degree) * z_equidistance;
+          support_points_unordered.emplace_back(support_point);
         }
-      // quad:
-      support_points.emplace_back(Point<dim>(0.0, 0.0, 0.0));
+      if (current_degree == this->degree())
+        {
+          // the first are the support points at the vertices
+          n_dofs_total_per_object[0] = fe_q.reference_cell().n_vertices() + 1;
+          // lines are on lines
+          n_dofs_total_per_object[1] =
+            fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
+          // faces are on faces
+          n_dofs_total_per_object[2] = fe_q.n_dofs_per_quad();
+          // nothing per hex
+          n_dofs_total_per_object[3] = 0;
 
-      // Now fill VDM Matrix
-      FullMatrix<double> VDM(support_points.size());
+          n_dofs_per_object[0] =
+            fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
+          n_dofs_per_object[2] = fe_q.n_dofs_per_quad(); //dpo.dofs_per_object_exclusive[2][0]
+        }
+      else
+        {
+          // on the vertex here is on the line in the pyramid
+          n_dofs_total_per_object[1] += fe_q.reference_cell().n_vertices();
+          // on the lines here are on faces in the pyramid
+          n_dofs_total_per_object[2] +=
+            fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
+          // on the faces here is on the hex on the pyramid
+          n_dofs_total_per_object[3] += fe_q.n_dofs_per_quad(); //dpo.dofs_per_object_exclusive[3][0]
 
-      for (unsigned i = 0; i < support_points.size(); ++i)
-        for (unsigned j = 0; j < support_points.size(); ++j)
-          VDM[i][j] =
-            this->compute_jacobi_basis_functions(i, support_points[j]);
-
-      // get inverse
-      VDM.gauss_jordan();
-
-      for (unsigned i = 0; i < support_points.size(); ++i)
-        for (unsigned j = 0; j < support_points.size(); ++j)
-          if (std::fabs(VDM[i][j]) < 1e-14)
-            VDM[i][j] = 0.0;
-
-      VDM_inv = VDM;
+          n_dofs_per_object[1] += 1; //dpo.dofs_per_object_exclusive[1][0]
+          n_dofs_per_object[3] += fe_q.n_dofs_per_line(); //dpo.dofs_per_object_exclusive[2][1...4]
+        }
     }
+
+  unsigned int              global_counter = 0;
+  std::vector<unsigned int> start_lines(4);
+  start_lines[0] = n_dofs_total_per_object[0] + n_dofs_per_object[0];
+  start_lines[1] = start_lines[0] + n_dofs_per_object[1];
+  start_lines[2] = start_lines[1] + n_dofs_per_object[1];
+  start_lines[3] = start_lines[2] + n_dofs_per_object[1];
+
+  std::vector<unsigned int> start_faces(4);
+  start_faces[0] = n_dofs_total_per_object[0] + n_dofs_total_per_object[1] +
+                   n_dofs_per_object[2];
+  start_faces[1] = start_faces[0] + n_dofs_per_object[3];
+  start_faces[2] = start_faces[1] + n_dofs_per_object[3];
+  start_faces[3] = start_faces[2] + n_dofs_per_object[3];
+
+  unsigned int start_hex = n_dofs_total_per_object[0] +
+                           n_dofs_total_per_object[1] +
+                           n_dofs_total_per_object[2];
+
+  for (unsigned int current_degree = this->degree(); current_degree > 0;
+       --current_degree)
+    {
+      FE_Q<2> fe_q(current_degree);
+
+      if (current_degree == this->degree())
+        {
+          // this gives all info on the vertices, the first 4 edges and the
+          // first face
+
+          // vertices
+          for (unsigned int counter = 0;
+               counter < fe_q.reference_cell().n_vertices();
+               ++counter)
+            {
+              support_points[counter] =
+                support_points_unordered[global_counter++];
+            }
+          // lines
+          for (unsigned int counter = 0;
+               counter <
+               fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
+               ++counter)
+            {
+              support_points[counter + n_dofs_total_per_object[0]] =
+                support_points_unordered[global_counter++];
+            }
+          // quad
+          for (unsigned int counter = 0; counter < fe_q.n_dofs_per_quad();
+               ++counter)
+            {
+              support_points[counter + n_dofs_total_per_object[0] +
+                             n_dofs_total_per_object[1]] =
+                support_points_unordered[global_counter++];
+            }
+        }
+      else
+        {
+          // vertices are on lines
+          for (unsigned int line = 0; line < fe_q.reference_cell().n_vertices();
+               ++line)
+            {
+              support_points[start_lines[line]++] =
+                support_points_unordered[global_counter++];
+            }
+          // lines are on face
+          for (unsigned int face = 0; face < fe_q.reference_cell().n_lines();
+               ++face)
+            {
+              for (unsigned int n_dof = 0; n_dof < fe_q.n_dofs_per_line();
+                   ++n_dof)
+                support_points[start_faces[face]++] =
+                  support_points_unordered[global_counter++];
+            }
+          // faces are on hex
+          for (unsigned int hex = 0; hex < fe_q.n_dofs_per_quad(); ++hex)
+            {
+              support_points[start_hex++] =
+                support_points_unordered[global_counter++];
+            }
+        }
+    }
+  support_points[4] = Point<dim>(0.0, 0.0, 1.0);
+
+  // Now fill VDM Matrix
+  FullMatrix<double> VDM(support_points.size());
+
+  for (unsigned i = 0; i < VDM.m(); ++i)
+    for (unsigned j = 0; j < VDM.n(); ++j)
+      VDM[i][j] = this->compute_jacobi_basis(i, support_points[j]);
+
+  std::cout << "VDM" << std::endl;
+  for (unsigned i = 0; i < support_points.size(); ++i)
+    {
+      for (unsigned j = 0; j < support_points.size(); ++j)
+        std::cout << VDM[i][j] << " ";
+      std::cout << std::endl;
+    }
+
+
+  // get inverse
+  VDM.gauss_jordan();
+
+  for (unsigned i = 0; i < VDM.m(); ++i)
+    for (unsigned j = 0; j < VDM.n(); ++j)
+      if (std::fabs(VDM[i][j]) < 1e-14)
+        VDM[i][j] = 0.0;
+
+  VDM_inv = VDM;
 }
 
 
@@ -314,52 +615,17 @@ ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
                                                     const Point<dim>  &p) const
 {
   AssertDimension(dim, 3);
-  AssertIndexRange(this->degree(), 3);
+  // AssertIndexRange(this->degree(), 3);
+  AssertIndexRange(i, VDM_inv.m());
 
-  if (this->degree() == 1)
-    {
-      const double Q14 = 0.25;
-      double       ration;
+  double result = 0;
+  for (unsigned int j = 0; j < VDM_inv.n(); ++j)
+    result += VDM_inv[i][j] * this->compute_jacobi_basis(j, p);
 
-      const double r = p[0];
-      const double s = p[1];
-      const double t = p[2];
+  if (std::fabs(result) < 1e-14)
+    result = 0.0;
 
-      if (fabs(t - 1.0) > 1.0e-14)
-        {
-          ration = (r * s * t) / (1.0 - t);
-        }
-      else
-        {
-          ration = 0.0;
-        }
-
-      if (i == 0)
-        return Q14 * ((1.0 - r) * (1.0 - s) - t + ration);
-      if (i == 1)
-        return Q14 * ((1.0 + r) * (1.0 - s) - t - ration);
-      if (i == 2)
-        return Q14 * ((1.0 - r) * (1.0 + s) - t - ration);
-      if (i == 3)
-        return Q14 * ((1.0 + r) * (1.0 + s) - t + ration);
-      else
-        return t;
-    }
-  else if (this->degree() == 2)
-    {
-      AssertIndexRange(i, VDM_inv.m());
-
-      double result = 0;
-      for (unsigned int j = 0; j < VDM_inv.n(); ++j)
-        result += VDM_inv[i][j] * this->compute_jacobi_basis_functions(j, p);
-
-      if (std::fabs(result) < 1e-14)
-        result = 0.0;
-
-      return result;
-    }
-  DEAL_II_ASSERT_UNREACHABLE();
-  return 0.0;
+  return result;
 }
 
 
@@ -370,7 +636,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
                                                    const Point<dim>  &p) const
 {
   AssertDimension(dim, 3);
-  AssertIndexRange(this->degree(), 3);
+  // AssertIndexRange(this->degree(), 3);
 
   Tensor<1, dim> grad;
 
@@ -435,22 +701,26 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
           DEAL_II_NOT_IMPLEMENTED();
         }
     }
-  else if (this->degree() == 2)
-    {
-      AssertIndexRange(i, VDM_inv.m());
+  /*/ else // if (this->degree() == 2)
+  Tensor<1, dim> grad2;
+  {
+    AssertIndexRange(i, VDM_inv.m());
 
-      for (unsigned int j = 0; j < VDM_inv.n(); ++j)
-        grad +=
-          VDM_inv[i][j] * this->compute_jacobi_deriv_basis_functions(j, p);
+    for (unsigned int j = 0; j < VDM_inv.n(); ++j)
+      grad2 += VDM_inv[i][j] * this->compute_jacobi_deriv(j, p);
 
-      for (unsigned int d = 0; d < dim; ++d)
-        if (std::fabs(grad[d]) < 1e-14)
-          grad[d] = 0.0;
-    }
+    for (unsigned int d = 0; d < dim; ++d)
+      if (std::fabs(grad2[d]) < 1e-14)
+        grad2[d] = 0.0;
+  }
 
-  else
-    DEAL_II_NOT_IMPLEMENTED();
+  // else
+  //   DEAL_II_NOT_IMPLEMENTED();
 
+  for (unsigned int d = 0; d < dim; ++d)
+    if (std::fabs(grad2[d] - grad[d]) > 1e-14)
+      std::cout << "Diff in grad" << std::endl;
+*/
 
   return grad;
 }

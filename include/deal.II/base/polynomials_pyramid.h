@@ -125,6 +125,24 @@ private:
   Tensor<1, dim>
   compute_jacobi_deriv_basis_functions(const unsigned int i,
                                        const Point<dim>  &p) const;
+
+  double
+  compute_polynomial_space(const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+                           const Point<dim>  &p) const;
+
+  double
+  compute_jacobi_basis(const unsigned int i, const Point<dim> &p) const;
+
+  Tensor<1, dim>
+  compute_polynomial_space_deriv(const unsigned int i,
+                                 const unsigned int j,
+                                 const unsigned int k,
+                                 const Point<dim>  &p) const;
+
+  Tensor<1, dim>
+  compute_jacobi_deriv(const unsigned int i, const Point<dim> &p) const;
 };
 
 

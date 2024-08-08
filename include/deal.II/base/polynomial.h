@@ -767,7 +767,16 @@ namespace Polynomials
   jacobi_polynomial_value(const unsigned int degree,
                           const int          alpha,
                           const int          beta,
-                          const Number       x);
+                          const Number       x,
+                          const bool         rescale = true);
+
+  template <typename Number>
+  Number
+  jacobi_polynomial_derivative(const unsigned int degree,
+                               const int          alpha,
+                               const int          beta,
+                               const Number       x,
+                               const bool         rescale = true);
 
 
   /**
@@ -1045,7 +1054,8 @@ namespace Polynomials
   jacobi_polynomial_value(const unsigned int degree,
                           const int          alpha,
                           const int          beta,
-                          const Number       x)
+                          const Number       x,
+                          const bool         rescale)
   {
     Assert(alpha >= 0 && beta >= 0,
            ExcNotImplemented("Negative alpha/beta coefficients not supported"));
@@ -1054,7 +1064,7 @@ namespace Polynomials
 
     // The recursion formula is defined for the interval [-1, 1], so rescale
     // to that interval here
-    const Number xeval = Number(-1) + 2. * x;
+    const Number xeval = rescale ? Number(-1) + 2. * x : x;
 
     // initial values P_0(x), P_1(x):
     p0 = 1.0;
@@ -1077,6 +1087,33 @@ namespace Polynomials
         p1              = pn;
       }
     return p1;
+  }
+
+
+  template <typename Number>
+  Number
+  jacobi_polynomial_derivative(const unsigned int degree,
+                               const int          alpha,
+                               const int          beta,
+                               const Number       x,
+                               const bool         rescale)
+  {
+    Assert(alpha >= 0 && beta >= 0,
+           ExcNotImplemented("Negative alpha/beta coefficients not supported"));
+
+    // The derivative of the Jacobi polynomial is evaluated using the recurrence
+    // relations
+    if (degree == 1)
+      return 0.0;
+    if (rescale)
+      return (1 + alpha + beta + degree) * jacobi_polynomial_value(degree - 1,
+                                                                   alpha + 1,
+                                                                   beta + 1,
+                                                                   x,
+                                                                   rescale);
+
+    return 0.5 * (1 + alpha + beta + degree) *
+           jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, rescale);
   }
 
 
