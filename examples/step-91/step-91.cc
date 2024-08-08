@@ -70,6 +70,8 @@
 #include <fstream>
 #include <iostream>
 
+// #define DO_FULL_3D
+
 namespace Step55
 {
   using namespace dealii;
@@ -99,13 +101,13 @@ namespace Step55
     constexpr double diffusion_coefficient_Kd   = 0.01;
     constexpr double rainfall_rate_p            = 0.6;
     constexpr double regularization_epsilon     = 0.0001;
-    constexpr double stabilization_c            = 1;  // TODO: This should be 0.1
+    constexpr double stabilization_c            = 1; // TODO: This should be 0.1
   } // namespace ModelParameters
 
 
-  template <int dim, typename NumberType>
+  template <int spacedim, typename NumberType>
   NumberType slope_from_elevation_gradient(
-    const Tensor<1, dim, NumberType> &elevation_gradient)
+    const Tensor<1, spacedim, NumberType> &elevation_gradient)
   {
     return std::sqrt(elevation_gradient * elevation_gradient +
                      ModelParameters::regularization_epsilon *
@@ -113,9 +115,9 @@ namespace Step55
   }
 
 
-  template <int dim, typename NumberType>
-  Tensor<1, dim, NumberType> downhill_direction_from_elevation_gradient(
-    const Tensor<1, dim, NumberType> &elevation_gradient)
+  template <int spacedim, typename NumberType>
+  Tensor<1, spacedim, NumberType> downhill_direction_from_elevation_gradient(
+    const Tensor<1, spacedim, NumberType> &elevation_gradient)
   {
     return -elevation_gradient /
            slope_from_elevation_gradient(elevation_gradient);
@@ -131,13 +133,19 @@ namespace Step55
     virtual double value(const Point<3> &p,
                          const unsigned int /*component*/ = 0) const override
     {
+#ifdef DO_FULL_3D
       // First pull back p to longitude/latitude, expressed in degrees
       const Point<2> p_long_lat(
         std::atan2(p[1], p[0]) * 360 / (2 * numbers::PI),
 
         std::atan2(p[2], std::sqrt(p[0] * p[0] + p[1] * p[1])) * 360 /
           (2 * numbers::PI));
-
+#else
+      // Convert p to long-lat by scaling to what a degree corresponds
+      // to in meters
+      const Point<2> p_long_lat(p[0] / 111000,
+                                p[1] / 111000); // about 111km per arc degree
+#endif
       // TODO: This is of course just a dummy elevation:
       return 4000 *
              (1 -
@@ -376,6 +384,7 @@ namespace Step55
       Point<2>(-102., 41.));
     triangulation.refine_global(4);
 
+#ifdef DO_FULL_3D
     GridTools::transform(
       [](const Point<spacedim> &p_long_lat_degrees) {
         const Point<2> p_long_lat(p_long_lat_degrees[0] / 360 *
@@ -390,6 +399,10 @@ namespace Step55
                                R * std::sin(p_long_lat[1])); // Z
       },
       triangulation);
+#else
+    // 111km per degree on the earth surface
+    GridTools::scale(111000., triangulation);
+#endif
 
     pcout << "done. " << std::endl;
   }
