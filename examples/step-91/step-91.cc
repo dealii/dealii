@@ -356,7 +356,6 @@ namespace Step55
     template <typename NumberType>
     void compute_local_residual(
       const FEValues<dim, spacedim> &fe_values,
-      const std::vector<NumberType> &local_solution_elevation_at_q_points,
       const std::vector<NumberType> &local_solution_water_at_q_points,
       const std::vector<Tensor<1, spacedim, NumberType>>
                                     &local_gradient_elevation_at_q_points,
@@ -364,15 +363,12 @@ namespace Step55
       const std::vector<double>     &local_solution_dot_elevation_at_q_points,
       const std::vector<double>     &rain_fall_rate_rhs_values,
       const double                   cell_diameter,
-      const double                   time,
       std::vector<NumberType>       &cell_residual) const;
 
-    void assemble_residual(const double      time,
-                           const VectorType &locally_relevant_solution,
+    void assemble_residual(const VectorType &locally_relevant_solution,
                            const VectorType &locally_relevant_solution_dot,
                            VectorType       &residual);
-    void assemble_jacobian(const double      time,
-                           const VectorType &locally_relevant_solution,
+    void assemble_jacobian(const VectorType &locally_relevant_solution,
                            const VectorType &locally_relevant_solution_dot,
                            const double      alpha,
                            MatrixType       &jacobian);
@@ -948,7 +944,6 @@ namespace Step55
   template <typename NumberType>
   void StreamPowerErosionProblem::compute_local_residual(
     const FEValues<dim, spacedim> &fe_values,
-    const std::vector<NumberType> &local_solution_elevation_at_q_points,
     const std::vector<NumberType> &local_solution_water_at_q_points,
     const std::vector<Tensor<1, spacedim, NumberType>>
                                   &local_gradient_elevation_at_q_points,
@@ -956,11 +951,8 @@ namespace Step55
     const std::vector<double>     &local_solution_dot_elevation_at_q_points,
     const std::vector<double>     &rain_fall_rate_rhs_values,
     const double                   cell_diameter,
-    const double                   time,
     std::vector<NumberType>       &cell_residual) const
   {
-    (void)time; // TODO
-
     const FEValuesExtractors::Scalar elevation(0);
     const FEValuesExtractors::Scalar water_flow_rate(1);
 
@@ -969,7 +961,6 @@ namespace Step55
 
     for (const unsigned int q : fe_values.quadrature_point_indices())
       {
-        const NumberType &H     = local_solution_elevation_at_q_points[q];
         const NumberType &H_dot = local_solution_dot_elevation_at_q_points[q];
         const NumberType &w     = local_solution_water_at_q_points[q];
         const Tensor<1, spacedim, NumberType> &grad_H =
@@ -977,8 +968,6 @@ namespace Step55
         const NumberType &div_Ih_d_wh = div_Ih_d_wh_at_q_points[q];
         const double      p           = rain_fall_rate_rhs_values[q];
         const double     &JxW         = fe_values.JxW(q);
-
-        (void)H;
 
         const NumberType S = slope_from_elevation_gradient(
           local_gradient_elevation_at_q_points[q]);
@@ -1033,7 +1022,6 @@ namespace Step55
 
 
   void StreamPowerErosionProblem::assemble_residual(
-    const double      time,
     const VectorType &locally_relevant_solution,
     const VectorType &locally_relevant_solution_dot,
     VectorType       &residual)
@@ -1061,7 +1049,6 @@ namespace Step55
     const RainFallRate<spacedim> rain_fall_rate_rhs;
     std::vector<double>          rain_fall_rate_rhs_values(n_q_points);
 
-    std::vector<double> elevation_at_q_points(fe_values.n_quadrature_points);
     std::vector<double> elevation_dot_at_q_points(
       fe_values.n_quadrature_points);
     std::vector<double> water_at_q_points(fe_values.n_quadrature_points);
@@ -1095,8 +1082,6 @@ namespace Step55
           rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
                                         rain_fall_rate_rhs_values);
 
-          fe_values[elevation].get_function_values(locally_relevant_solution,
-                                                   elevation_at_q_points);
           fe_values[elevation].get_function_values(
             locally_relevant_solution_dot, elevation_dot_at_q_points);
           fe_values[elevation].get_function_gradients(
@@ -1117,14 +1102,12 @@ namespace Step55
             div_Ih_d_wh_at_q_points);
 
           compute_local_residual(fe_values,
-                                 elevation_at_q_points,
                                  water_at_q_points,
                                  elevation_grad_at_q_points,
                                  div_Ih_d_wh_at_q_points,
                                  elevation_dot_at_q_points,
                                  rain_fall_rate_rhs_values,
                                  cell->diameter(),
-                                 time,
                                  cell_residual);
 
           for (const unsigned int i : fe_values.dof_indices())
@@ -1141,7 +1124,6 @@ namespace Step55
 
 
   void StreamPowerErosionProblem::assemble_jacobian(
-    const double      time,
     const VectorType &locally_relevant_solution,
     const VectorType &locally_relevant_solution_dot,
     const double      alpha,
@@ -1181,8 +1163,6 @@ namespace Step55
     const RainFallRate<spacedim> rain_fall_rate_rhs;
     std::vector<double>          rain_fall_rate_rhs_values(n_q_points);
 
-    std::vector<ADNumberType> elevation_at_q_points(
-      fe_values.n_quadrature_points);
     std::vector<double> elevation_dot_at_q_points(
       fe_values.n_quadrature_points);
     std::vector<ADNumberType> water_at_q_points(fe_values.n_quadrature_points);
@@ -1216,8 +1196,6 @@ namespace Step55
           rain_fall_rate_rhs.value_list(fe_values.get_quadrature_points(),
                                         rain_fall_rate_rhs_values);
 
-          fe_values[elevation].get_function_values_from_local_dof_values(
-            dof_values_ad, elevation_at_q_points);
           fe_values[elevation].get_function_values(
             locally_relevant_solution_dot, elevation_dot_at_q_points);
           fe_values[elevation].get_function_gradients_from_local_dof_values(
@@ -1241,14 +1219,12 @@ namespace Step55
           std::vector<ADNumberType> residual_ad(n_dependent_variables,
                                                 ADNumberType(0.0));
           compute_local_residual(fe_values,
-                                 elevation_at_q_points,
                                  water_at_q_points,
                                  elevation_grad_at_q_points,
                                  div_Ih_d_wh_at_q_points,
                                  elevation_dot_at_q_points,
                                  rain_fall_rate_rhs_values,
                                  cell->diameter(),
-                                 time,
                                  residual_ad);
 
           ad_helper.register_residual_vector(residual_ad);
@@ -1469,10 +1445,11 @@ namespace Step55
              const VectorType &locally_relevant_solution,
              const VectorType &locally_relevant_solution_dot,
              VectorType       &residual) {
-        this->assemble_residual(time,
-                                locally_relevant_solution,
+        pcout << "Assemble residual @ " << time << "... " << std::flush;
+        this->assemble_residual(locally_relevant_solution,
                                 locally_relevant_solution_dot,
                                 residual);
+        pcout << "done." << std::endl;
       };
 
     time_integrator.setup_jacobian =
@@ -1480,11 +1457,12 @@ namespace Step55
              const VectorType &locally_relevant_solution,
              const VectorType &locally_relevant_solution_dot,
              const double      alpha) {
-        this->assemble_jacobian(time,
-                                locally_relevant_solution,
+        pcout << "Assemble Jacobian @ " << time << "... " << std::flush;
+        this->assemble_jacobian(locally_relevant_solution,
                                 locally_relevant_solution_dot,
                                 alpha,
                                 system_matrix);
+        pcout << "done." << std::endl;
       };
 
     time_integrator.solve_with_jacobian =
