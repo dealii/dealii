@@ -123,15 +123,28 @@ namespace Step55
 
 
 
-  class ColoradoTopography : public Function<2>
+  class ColoradoTopography : public Function<3>
   {
   public:
     ColoradoTopography(const MPI_Comm mpi_communicator);
 
-    virtual double value(const Point<2> &p,
+    virtual double value(const Point<3> &p,
                          const unsigned int /*component*/ = 0) const override
     {
-      return data->value(p);
+      // First pull back p to longitude/latitude, expressed in degrees
+      const Point<2> p_long_lat(
+        std::atan2(p[1], p[0]) * 360 / (2 * numbers::PI),
+
+        std::atan2(p[2], std::sqrt(p[0] * p[0] + p[1] * p[1])) * 360 /
+          (2 * numbers::PI));
+
+      // TODO: This is of course just a dummy elevation:
+      return 4000 *
+             (1 -
+              std::pow(Point<2>(-105.5, 39).distance(p_long_lat), 2) /
+                std::pow(Point<2>(-105.5, 39).distance(Point<2>(-109, 37)), 2));
+
+      //      return data->value(p_long_lat);
     }
 
   private:
@@ -282,10 +295,10 @@ namespace Step55
 
     template <typename NumberType>
     void compute_local_residual(
-      const FEValues<dim>           &fe_values,
+      const FEValues<dim, spacedim> &fe_values,
       const std::vector<NumberType> &local_solution_elevation_at_q_points,
       const std::vector<NumberType> &local_solution_water_at_q_points,
-      const std::vector<Tensor<1, dim, NumberType>>
+      const std::vector<Tensor<1, spacedim, NumberType>>
                                     &local_gradient_elevation_at_q_points,
       const std::vector<NumberType> &div_Ih_d_wh_at_q_points,
       const std::vector<double>     &local_solution_dot_elevation_at_q_points,
@@ -315,9 +328,9 @@ namespace Step55
 
     MPI_Comm mpi_communicator;
 
-    const FESystem<dim>                       fe;
-    parallel::distributed::Triangulation<dim> triangulation;
-    DoFHandler<dim>                           dof_handler;
+    const FESystem<dim, spacedim>                       fe;
+    parallel::distributed::Triangulation<dim, spacedim> triangulation;
+    DoFHandler<dim, spacedim>                           dof_handler;
 
     std::vector<IndexSet> owned_partitioning;
     std::vector<IndexSet> relevant_partitioning;
@@ -337,11 +350,11 @@ namespace Step55
 
   StreamPowerErosionProblem::StreamPowerErosionProblem()
     : mpi_communicator(MPI_COMM_WORLD)
-    , fe(FE_Q<dim>(1), FE_Q<dim>(1))
+    , fe(FE_Q<dim, spacedim>(1) ^ 2)
     , triangulation(mpi_communicator,
-                    typename Triangulation<dim>::MeshSmoothing(
-                      Triangulation<dim>::smoothing_on_refinement |
-                      Triangulation<dim>::smoothing_on_coarsening))
+                    typename Triangulation<dim, spacedim>::MeshSmoothing(
+                      Triangulation<dim, spacedim>::smoothing_on_refinement |
+                      Triangulation<dim, spacedim>::smoothing_on_coarsening))
     , dof_handler(triangulation)
     , pcout(std::cout,
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
@@ -356,11 +369,27 @@ namespace Step55
   {
     pcout << "Make grid... " << std::flush;
 
-    GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                              {7, 4},
-                                              Point<2>(-109., 37.),
-                                              Point<2>(-102., 41.));
+    GridGenerator::subdivided_hyper_rectangle(
+      triangulation,
+      {7, 4}, // number of subdivisions to make cells square
+      Point<2>(-109., 37.),
+      Point<2>(-102., 41.));
     triangulation.refine_global(4);
+
+    GridTools::transform(
+      [](const Point<spacedim> &p_long_lat_degrees) {
+        const Point<2> p_long_lat(p_long_lat_degrees[0] / 360 *
+                                    (2 * numbers::PI),
+                                  p_long_lat_degrees[1] / 360 *
+                                    (2 * numbers::PI));
+        const double   R = 6371000;
+        return Point<spacedim>(R * std::cos(p_long_lat[1]) *
+                                 std::cos(p_long_lat[0]), // X
+                               R * std::cos(p_long_lat[1]) *
+                                 std::sin(p_long_lat[0]),    // Y
+                               R * std::sin(p_long_lat[1])); // Z
+      },
+      triangulation);
 
     pcout << "done. " << std::endl;
   }
@@ -428,8 +457,10 @@ namespace Step55
     pcout << "Interpolate elevation... " << std::flush;
 
     const ColoradoTopography colorado_topography(mpi_communicator);
-    const VectorFunctionFromScalarFunctionObject<dim> initial_values(
-      [&](const Point<dim> &p) { return colorado_topography.value(p); }, 0, 2);
+    const VectorFunctionFromScalarFunctionObject<spacedim> initial_values(
+      [&](const Point<spacedim> &p) { return colorado_topography.value(p); },
+      0,
+      2);
 
     VectorType interpolated;
     interpolated.reinit(owned_partitioning, MPI_COMM_WORLD);
@@ -504,10 +535,10 @@ namespace Step55
     {
       const Quadrature<dim - 1> face_node_points(
         fe.get_unit_face_support_points());
-      FEFaceValues<dim> fe_face_values(
+      FEFaceValues<dim, spacedim> fe_face_values(
         fe, face_node_points, update_gradients | update_normal_vectors);
 
-      std::vector<Tensor<1, dim>> elevation_gradients_at_face_nodes(
+      std::vector<Tensor<1, spacedim>> elevation_gradients_at_face_nodes(
         face_node_points.size());
       const FEValuesExtractors::Scalar elevation(0);
 
@@ -601,11 +632,12 @@ namespace Step55
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
-    FEValues<dim> fe_values_at_node_points(
+    FEValues<dim, spacedim> fe_values(fe,
+                                      quadrature_formula,
+                                      update_values | update_gradients |
+                                        update_quadrature_points |
+                                        update_JxW_values);
+    FEValues<dim, spacedim> fe_values_at_node_points(
       fe,
       Quadrature<dim>(
         fe.get_unit_support_points()), // could be made more efficient
@@ -617,15 +649,17 @@ namespace Step55
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
 
-    const RainFallRate<dim> rain_fall_rate_rhs;
-    std::vector<double>     rain_fall_rate_rhs_values(n_q_points);
+    const RainFallRate<spacedim> rain_fall_rate_rhs;
+    std::vector<double>          rain_fall_rate_rhs_values(n_q_points);
 
-    std::vector<Tensor<1, dim>> elevation_grad_at_q_points(
+    std::vector<Tensor<1, spacedim>> elevation_grad_at_q_points(
       fe_values.n_quadrature_points);
-    std::vector<Tensor<1, dim>> d_at_q_points(fe_values.n_quadrature_points);
+    std::vector<Tensor<1, spacedim>> d_at_q_points(
+      fe_values.n_quadrature_points);
 
-    std::vector<Tensor<1, dim>> elevation_grad_at_node_points(dofs_per_cell);
-    std::vector<Tensor<1, dim>> d_at_node_points(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>> elevation_grad_at_node_points(
+      dofs_per_cell);
+    std::vector<Tensor<1, spacedim>> d_at_node_points(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     const FEValuesExtractors::Scalar     elevation(0);
@@ -659,7 +693,8 @@ namespace Step55
                     elevation_grad_at_node_points[j]);
               }
             else
-              d_at_node_points[j] = numbers::signaling_nan<Tensor<1, dim>>();
+              d_at_node_points[j] =
+                numbers::signaling_nan<Tensor<1, spacedim>>();
 
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
@@ -669,14 +704,14 @@ namespace Step55
                   {
                     const double phi_i_w_at_q =
                       fe_values[water_flow_rate].value(i, q);
-                    const Tensor<1, dim> grad_phi_i_w_at_q =
+                    const Tensor<1, spacedim> grad_phi_i_w_at_q =
                       fe_values[water_flow_rate].gradient(i, q);
 
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       if (fe.system_to_component_index(j).first ==
                           1) // j is water DoF
                         {
-                          const Tensor<1, dim> grad_phi_j_w_at_q =
+                          const Tensor<1, spacedim> grad_phi_j_w_at_q =
                             fe_values[water_flow_rate].gradient(j, q);
 
                           cell_matrix(i, j) +=
@@ -753,10 +788,10 @@ namespace Step55
 
   template <typename NumberType>
   void StreamPowerErosionProblem::compute_local_residual(
-    const FEValues<dim>           &fe_values,
+    const FEValues<dim, spacedim> &fe_values,
     const std::vector<NumberType> &local_solution_elevation_at_q_points,
     const std::vector<NumberType> &local_solution_water_at_q_points,
-    const std::vector<Tensor<1, dim, NumberType>>
+    const std::vector<Tensor<1, spacedim, NumberType>>
                                   &local_gradient_elevation_at_q_points,
     const std::vector<NumberType> &div_Ih_d_wh_at_q_points,
     const std::vector<double>     &local_solution_dot_elevation_at_q_points,
@@ -778,7 +813,7 @@ namespace Step55
         const NumberType &H     = local_solution_elevation_at_q_points[q];
         const NumberType &H_dot = local_solution_dot_elevation_at_q_points[q];
         const NumberType &w     = local_solution_water_at_q_points[q];
-        const Tensor<1, dim, NumberType> &grad_H =
+        const Tensor<1, spacedim, NumberType> &grad_H =
           local_gradient_elevation_at_q_points[q];
         const NumberType &div_Ih_d_wh = div_Ih_d_wh_at_q_points[q];
         const double      p           = rain_fall_rate_rhs_values[q];
@@ -788,7 +823,7 @@ namespace Step55
 
         const NumberType S = slope_from_elevation_gradient(
           local_gradient_elevation_at_q_points[q]);
-        const Tensor<1, dim, NumberType> d =
+        const Tensor<1, spacedim, NumberType> d =
           -local_gradient_elevation_at_q_points[q] / S;
 
         constexpr double m  = ModelParameters::stream_power_exponent_m;
@@ -803,8 +838,8 @@ namespace Step55
 
             if (i_group == H_dof)
               {
-                const double         Nx_i = fe_values[elevation].value(i, q);
-                const Tensor<1, dim> grad_Nx_i =
+                const double Nx_i = fe_values[elevation].value(i, q);
+                const Tensor<1, spacedim> grad_Nx_i =
                   fe_values[elevation].gradient(i, q);
 
                 cell_residual[i] -=
@@ -815,7 +850,7 @@ namespace Step55
             else if (i_group == w_dof)
               {
                 const double Nx_i = fe_values[water_flow_rate].value(i, q);
-                const Tensor<1, dim> grad_Nx_i =
+                const Tensor<1, spacedim> grad_Nx_i =
                   fe_values[water_flow_rate].gradient(i, q);
                 const auto stabNx_i =
                   (Nx_i + c * cell_diameter * d * grad_Nx_i);
@@ -844,11 +879,12 @@ namespace Step55
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
-    FEValues<dim> fe_values_at_node_points(
+    FEValues<dim, spacedim> fe_values(fe,
+                                      quadrature_formula,
+                                      update_values | update_gradients |
+                                        update_quadrature_points |
+                                        update_JxW_values);
+    FEValues<dim, spacedim> fe_values_at_node_points(
       fe,
       Quadrature<dim>(
         fe.get_unit_support_points()), // could be made more efficient
@@ -857,17 +893,18 @@ namespace Step55
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    const RainFallRate<dim> rain_fall_rate_rhs;
-    std::vector<double>     rain_fall_rate_rhs_values(n_q_points);
+    const RainFallRate<spacedim> rain_fall_rate_rhs;
+    std::vector<double>          rain_fall_rate_rhs_values(n_q_points);
 
     std::vector<double> elevation_at_q_points(fe_values.n_quadrature_points);
     std::vector<double> elevation_dot_at_q_points(
       fe_values.n_quadrature_points);
     std::vector<double> water_at_q_points(fe_values.n_quadrature_points);
-    std::vector<Tensor<1, dim>> elevation_grad_at_q_points(
+    std::vector<Tensor<1, spacedim>> elevation_grad_at_q_points(
       fe_values.n_quadrature_points);
 
-    std::vector<Tensor<1, dim>> elevation_grad_at_node_points(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>> elevation_grad_at_node_points(
+      dofs_per_cell);
     std::vector<double> div_Ih_d_wh_at_q_points(fe_values.n_quadrature_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -930,15 +967,15 @@ namespace Step55
                   // TODO: do this better and check for correctness.
                   const unsigned int jj = j / 2;
 
-                  const double         Wj = local_dof_values[j];
-                  const Tensor<1, dim> d_j =
+                  const double              Wj = local_dof_values[j];
+                  const Tensor<1, spacedim> d_j =
                     downhill_direction_from_elevation_gradient(
                       elevation_grad_at_node_points[jj]);
 
                   for (const unsigned int q :
                        fe_values.quadrature_point_indices())
                     {
-                      const Tensor<1, dim> grad_Nx_j =
+                      const Tensor<1, spacedim> grad_Nx_j =
                         fe_values[water_flow_rate].gradient(jj, q);
 
                       div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
@@ -985,11 +1022,12 @@ namespace Step55
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
-    FEValues<dim> fe_values_at_node_points(
+    FEValues<dim, spacedim> fe_values(fe,
+                                      quadrature_formula,
+                                      update_values | update_gradients |
+                                        update_quadrature_points |
+                                        update_JxW_values);
+    FEValues<dim, spacedim> fe_values_at_node_points(
       fe,
       Quadrature<dim>(
         fe.get_unit_support_points()), // could be made more efficient
@@ -1004,19 +1042,19 @@ namespace Step55
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
 
-    const RainFallRate<dim> rain_fall_rate_rhs;
-    std::vector<double>     rain_fall_rate_rhs_values(n_q_points);
+    const RainFallRate<spacedim> rain_fall_rate_rhs;
+    std::vector<double>          rain_fall_rate_rhs_values(n_q_points);
 
     std::vector<ADNumberType> elevation_at_q_points(
       fe_values.n_quadrature_points);
     std::vector<double> elevation_dot_at_q_points(
       fe_values.n_quadrature_points);
     std::vector<ADNumberType> water_at_q_points(fe_values.n_quadrature_points);
-    std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_q_points(
+    std::vector<Tensor<1, spacedim, ADNumberType>> elevation_grad_at_q_points(
       fe_values.n_quadrature_points);
 
-    std::vector<Tensor<1, dim, ADNumberType>> elevation_grad_at_node_points(
-      dofs_per_cell);
+    std::vector<Tensor<1, spacedim, ADNumberType>>
+                              elevation_grad_at_node_points(dofs_per_cell);
     std::vector<ADNumberType> div_Ih_d_wh_at_q_points(
       fe_values.n_quadrature_points);
 
@@ -1080,15 +1118,15 @@ namespace Step55
                   // TODO: do this better and check for correctness.
                   const unsigned int jj = j / 2;
 
-                  const ADNumberType                 Wj = dof_values_ad[jj];
-                  const Tensor<1, dim, ADNumberType> d_j =
+                  const ADNumberType Wj = dof_values_ad[jj];
+                  const Tensor<1, spacedim, ADNumberType> d_j =
                     downhill_direction_from_elevation_gradient(
                       elevation_grad_at_node_points[jj]);
 
                   for (const unsigned int q :
                        fe_values.quadrature_point_indices())
                     {
-                      const Tensor<1, dim> grad_Nx_j =
+                      const Tensor<1, spacedim> grad_Nx_j =
                         fe_values[water_flow_rate].gradient(jj, q);
 
                       div_Ih_d_wh_at_q_points[q] += Wj * d_j * grad_Nx_j;
@@ -1188,17 +1226,21 @@ namespace Step55
   }
 
 
-  template <int dim>
-  class DownhillFlowPostprocessor : public DataPostprocessorVector<dim>
+  class DownhillFlowPostprocessor
+    : public DataPostprocessorVector<StreamPowerErosionProblem::spacedim>
   {
   public:
+    static constexpr int dim      = StreamPowerErosionProblem::dim;
+    static constexpr int spacedim = StreamPowerErosionProblem::spacedim;
+
+
     DownhillFlowPostprocessor()
-      : DataPostprocessorVector<dim>("downhill_direction",
-                                     update_values | update_gradients)
+      : DataPostprocessorVector<spacedim>("downhill_direction",
+                                          update_values | update_gradients)
     {}
 
     virtual void evaluate_vector_field(
-      const DataPostprocessorInputs::Vector<dim> &input_data,
+      const DataPostprocessorInputs::Vector<spacedim> &input_data,
       std::vector<Vector<double>> &computed_quantities) const override
     {
       AssertDimension(input_data.solution_gradients.size(),
@@ -1206,7 +1248,7 @@ namespace Step55
 
       for (unsigned int p = 0; p < input_data.solution_gradients.size(); ++p)
         {
-          AssertDimension(computed_quantities[p].size(), dim);
+          AssertDimension(computed_quantities[p].size(), spacedim);
 
           const double catchment_area = 1.; // input_data.solution_values[p][1];
           for (unsigned int d = 0; d < dim; ++d)
@@ -1237,17 +1279,17 @@ namespace Step55
         DataComponentInterpretation::component_is_scalar,
         DataComponentInterpretation::component_is_scalar};
 
-    DownhillFlowPostprocessor<dim> downhill_flow_postprocessor;
-    DataOut<dim>                   data_out;
+    DownhillFlowPostprocessor downhill_flow_postprocessor;
+    DataOut<dim, spacedim>    data_out;
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(locally_relevant_solution,
                              solution_names,
-                             DataOut<dim>::type_dof_data,
+                             DataOut<dim, spacedim>::type_dof_data,
                              data_component_interpretation);
     data_out.add_data_vector(
       locally_relevant_solution_dot,
       solution_dot_names,
-      DataOut<dim>::type_dof_data,
+      DataOut<dim, spacedim>::type_dof_data,
       data_component_interpretation); // TODO: Limit this to the elevation
                                       // component only
     data_out.add_data_vector(locally_relevant_solution,
@@ -1274,11 +1316,11 @@ namespace Step55
     compute_initial_constraints();
 
     // Get rid of these three lines eventually (?):
-    assemble_initial_waterflow_system();
     output_results(/* time= */ 0,
                    locally_relevant_solution,
                    locally_relevant_solution_dot,
                    /*cycle*/ 0);
+    assemble_initial_waterflow_system();
     solve_initial_waterflow_system();
     output_results(/* time= */ 0,
                    locally_relevant_solution,

@@ -976,3 +976,35 @@ patience to load and store the data.
 
 <h3> Working on a curved surface </h3>
 
+At the end of the day, the earth is not flat, even when looking at a relatively
+small part of its surface like Colorado. The US Congress defined
+Colorado as deliminited by lines of constant latitude and longitude,
+and so it is tempting to show it as a rectangle as was done in the picture
+at the top of this page. In reality, Colorado is today defined by surveys
+done in the 1860s and 1870s, and the markers laid
+back then make Colorado a polygon with 697 sides. But more importantly
+is that the lines of constant latitude and longitude still lead to a
+part of the Earth surface that is 35 km shorter along its northern side
+than its southern side, simply because it is further north and so closer
+to the north pole where the circles of constant latitude are smaller. As
+a consequence, it is probably useful to just solve our model on a *surface*,
+rather than a flat rectangle.
+
+This is what we will do in this program. In practice, this actually does
+not require many changes. As was first shown in step-34, we just need
+a triangulation of dimension `dim=2` in `spacedim=3` space dimensions,
+i.e., a `Triangulation<dim,spacedim>`. There are many other places in the
+program where we have to add this second template argument, but in
+practice everything else just works as it did before.
+
+We then create the domain by first creating a two-dimensional rectangle
+with the correct longitude and latitude bounds, and then transform it
+from this coordinate system to a Cartesian $x-y-z$ coordinate system
+in which it becomes part of the surface of a sphere of the correct
+radius of the earth. This transformation is facilitated by
+GridTools::transform(). One *could* use a better description than
+just the surface of a sphere, say the
+[WGS 84](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS_84)
+shape, but we're going to leave that for another time.
+
+TODO: Need to attach a manifold.
