@@ -36,11 +36,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class represents an implementation of the
  * H<sup>curl</sup>-conforming N&eacute;d&eacute;lec element described in the
- * PhD thesis of S. Zaglmayr, <b>High Order Finite Element Methods for
- * Electromagnetic Field Computation</b>,
- * Johannes Kepler Universit&auml;t Linz, 2006.
- * It its used in the same context as described at the top of the description
- * for the FE_Nedelec class.
+ * PhD thesis @cite Zaglmayr2006. It its used in the same context as
+ * described at the top of the description for the FE_Nedelec class.
  *
  * This element overcomes the sign conflict issues present in
  * traditional N&eacute;d&eacute;lec elements that arise from the edge
@@ -71,15 +68,9 @@ DEAL_II_NAMESPACE_OPEN
  * originating from the hanging edges and faces must be adapted to account for
  * the orientation of the edges and faces.
  *
- * Further details on this element, including some benchmarking, can be
- * in the paper R. Kynch, P. Ledger: <b>Resolving the sign conflict
- * problem for hp-hexahedral N&eacute;d&eacute;lec elements with application to
- * eddy current problems</b>, Computers & Structures 181, 41-54, 2017 (see
- * https://doi.org/10.1016/j.compstruc.2016.05.021).
- * For details on the implementation of the hanging node constraints, see the
- * paper S. Kinnewig, T. Wick, S. Beuchler: <b>Algorithmic realization of the
- * solution to the sign conflict problem for hanging nodes on hp-hexahedral
- * Nédélec elements</b>, preprint, 2023 (https://arxiv.org/abs/2306.01416).
+ * Further details on this element, including some benchmarking, can be found
+ * in the paper @cite Kynch2017. For details on the implementation of the
+ * hanging node constraints, see the paper @cite Kinnewig2023.
  */
 template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>
