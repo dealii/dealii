@@ -2339,6 +2339,9 @@ FEInterfaceValues<dim, spacedim>::reinit(
     std::is_same_v<DoFCellAccessor<dim, spacedim, false>,
                    typename CellNeighborIteratorType::AccessorType>;
 
+  unsigned int active_fe_index          = 0;
+  unsigned int active_fe_index_neighbor = 0;
+
   if (internal_fe_face_values)
     {
       if (sub_face_no == numbers::invalid_unsigned_int)
@@ -2373,8 +2376,8 @@ FEInterfaceValues<dim, spacedim>::reinit(
     }
   else if (internal_hp_fe_face_values)
     {
-      unsigned int active_fe_index = fe_index_in;
-      unsigned int active_fe_index_neighbor =
+      active_fe_index = fe_index_in;
+      active_fe_index_neighbor =
         (fe_index_neighbor_in != numbers::invalid_unsigned_int) ?
           fe_index_neighbor_in :
           fe_index_in;
@@ -2421,37 +2424,42 @@ FEInterfaceValues<dim, spacedim>::reinit(
 
       // Third check, if the above did not already suffice. We see if we
       // can get somewhere via the dominated's finite element index.
-      const unsigned int dominated_fe_index =
-        ((used_q_index == numbers::invalid_unsigned_int) ||
-             (used_mapping_index == numbers::invalid_unsigned_int) ?
-           internal_hp_fe_face_values->get_fe_collection().find_dominated_fe(
-             {active_fe_index, active_fe_index_neighbor}) :
-           numbers::invalid_unsigned_int);
-
-      if (used_q_index == numbers::invalid_unsigned_int)
+      if ((used_q_index == numbers::invalid_unsigned_int) ||
+          (used_mapping_index == numbers::invalid_unsigned_int))
         {
-          Assert(dominated_fe_index != numbers::invalid_fe_index,
-                 ExcMessage(
-                   "You called this function with 'q_index' left at its "
-                   "default value, but this can only work if one of "
-                   "the two finite elements adjacent to this face "
-                   "dominates the other. See the documentation "
-                   "of this function for more information of how "
-                   "to deal with this situation."));
-          used_q_index = dominated_fe_index;
-        }
+          const unsigned int dominated_fe_index =
+            ((used_q_index == numbers::invalid_unsigned_int) ||
+                 (used_mapping_index == numbers::invalid_unsigned_int) ?
+               internal_hp_fe_face_values->get_fe_collection()
+                 .find_dominated_fe(
+                   {active_fe_index, active_fe_index_neighbor}) :
+               numbers::invalid_unsigned_int);
 
-      if (used_mapping_index == numbers::invalid_unsigned_int)
-        {
-          Assert(dominated_fe_index != numbers::invalid_fe_index,
-                 ExcMessage(
-                   "You called this function with 'mapping_index' left "
-                   "at its default value, but this can only work if one "
-                   "of the two finite elements adjacent to this face "
-                   "dominates the other. See the documentation "
-                   "of this function for more information of how "
-                   "to deal with this situation."));
-          used_mapping_index = dominated_fe_index;
+          if (used_q_index == numbers::invalid_unsigned_int)
+            {
+              Assert(dominated_fe_index != numbers::invalid_fe_index,
+                     ExcMessage(
+                       "You called this function with 'q_index' left at its "
+                       "default value, but this can only work if one of "
+                       "the two finite elements adjacent to this face "
+                       "dominates the other. See the documentation "
+                       "of this function for more information of how "
+                       "to deal with this situation."));
+              used_q_index = dominated_fe_index;
+            }
+
+          if (used_mapping_index == numbers::invalid_unsigned_int)
+            {
+              Assert(dominated_fe_index != numbers::invalid_fe_index,
+                     ExcMessage(
+                       "You called this function with 'mapping_index' left "
+                       "at its default value, but this can only work if one "
+                       "of the two finite elements adjacent to this face "
+                       "dominates the other. See the documentation "
+                       "of this function for more information of how "
+                       "to deal with this situation."));
+              used_mapping_index = dominated_fe_index;
+            }
         }
 
       // Same as if above, but when hp is enabled.
@@ -2550,6 +2558,28 @@ FEInterfaceValues<dim, spacedim>::reinit(
           ++idx;
         }
     }
+  else
+    {
+      const unsigned int n_dofs_per_cell_1 = fe_face_values->dofs_per_cell;
+      const unsigned int n_dofs_per_cell_2 =
+        fe_face_values_neighbor->dofs_per_cell;
+
+      interface_dof_indices.resize(n_dofs_per_cell_1 + n_dofs_per_cell_2);
+      dofmap.resize(n_dofs_per_cell_1 + n_dofs_per_cell_2);
+
+      for (unsigned int i = 0; i < n_dofs_per_cell_1; ++i)
+        {
+          interface_dof_indices[i] = numbers::invalid_dof_index;
+          dofmap[i]                = {i, numbers::invalid_unsigned_int};
+        }
+
+      for (unsigned int i = 0; i < n_dofs_per_cell_2; ++i)
+        {
+          interface_dof_indices[i + n_dofs_per_cell_1] =
+            numbers::invalid_dof_index;
+          dofmap[i + n_dofs_per_cell_1] = {numbers::invalid_unsigned_int, i};
+        }
+    }
 }
 
 
@@ -2589,30 +2619,24 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
       fe_face_values_neighbor = nullptr;
     }
 
+  interface_dof_indices.resize(fe_face_values->get_fe().n_dofs_per_cell());
+
   if constexpr (std::is_same_v<typename CellIteratorType::AccessorType,
                                DoFCellAccessor<dim, spacedim, true>> ||
                 std::is_same_v<typename CellIteratorType::AccessorType,
                                DoFCellAccessor<dim, spacedim, false>>)
     {
-      if (internal_fe_face_values)
-        {
-          interface_dof_indices.resize(
-            fe_face_values->get_fe().n_dofs_per_cell());
-          cell->get_active_or_mg_dof_indices(interface_dof_indices);
-        }
-      else if (internal_hp_fe_face_values)
-        {
-          interface_dof_indices.resize(
-            fe_face_values->get_fe().n_dofs_per_cell());
-          cell->get_active_or_mg_dof_indices(interface_dof_indices);
-        }
-
-      dofmap.resize(interface_dof_indices.size());
-      for (unsigned int i = 0; i < interface_dof_indices.size(); ++i)
-        {
-          dofmap[i] = {{i, numbers::invalid_unsigned_int}};
-        }
+      cell->get_active_or_mg_dof_indices(interface_dof_indices);
     }
+  else
+    {
+      for (auto &i : interface_dof_indices)
+        i = numbers::invalid_dof_index;
+    }
+
+  dofmap.resize(interface_dof_indices.size());
+  for (unsigned int i = 0; i < interface_dof_indices.size(); ++i)
+    dofmap[i] = {{i, numbers::invalid_unsigned_int}};
 }
 
 
