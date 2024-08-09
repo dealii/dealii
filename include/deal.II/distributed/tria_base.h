@@ -394,14 +394,14 @@ namespace parallel
     virtual void
     update_number_cache();
 
-    void
-    update_reference_cells() override;
-
     /**
      * Reset global active cell indices and global level cell indices.
      */
     void
     reset_global_cell_indices();
+
+    void
+    update_reference_cells() override;
   };
 
 

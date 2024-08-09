@@ -398,7 +398,7 @@ namespace Step26
     triangulation.execute_coarsening_and_refinement();
     setup_system();
 
-    solution_trans.interpolate(previous_solution, solution);
+    solution_trans.interpolate(solution);
     constraints.distribute(solution);
   }
 

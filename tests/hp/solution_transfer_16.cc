@@ -67,6 +67,10 @@ main()
   for (const auto &cell : dof_handler.active_cell_iterators())
     cell->set_coarsen_flag();
 
+  // Assign FE_Q(1) to all cells
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    cell->set_future_fe_index(0);
+
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
@@ -76,16 +80,11 @@ main()
 
   triangulation.execute_coarsening_and_refinement();
 
-  // Assign FE_Q(1) to all cells
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    cell->set_active_fe_index(0);
-
   dof_handler.distribute_dofs(fe_collection);
   deallog << "Final number of dofs: " << dof_handler.n_dofs() << std::endl;
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  new_solution = 1.;
-  solution_trans.interpolate(solution, new_solution);
+  solution_trans.interpolate(new_solution);
 
   deallog << "Vector after solution transfer:" << std::endl;
   new_solution.print(deallog.get_file_stream());

@@ -69,7 +69,7 @@ test()
 
   triangulation.execute_coarsening_and_refinement();
 
-  solution_trans.interpolate(previous_solution, solution);
+  solution_trans.interpolate(solution);
 
   deallog << "OK" << std::endl;
 }

@@ -491,11 +491,12 @@ namespace parallel
           std::ofstream f(fname);
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_global_active_cells"
             << std::endl
-            << 4 << " "
-            << Utilities::MPI::n_mpi_processes(this->mpi_communicator) << " "
-            << this->cell_attached_data.pack_callbacks_fixed.size() << " "
-            << this->cell_attached_data.pack_callbacks_variable.size() << " "
-            << this->n_global_active_cells() << std::endl;
+            << ::dealii::internal::CellAttachedDataSerializer<dim, spacedim>::
+                 version_number
+            << " " << Utilities::MPI::n_mpi_processes(this->mpi_communicator)
+            << " " << this->cell_attached_data.pack_callbacks_fixed.size()
+            << " " << this->cell_attached_data.pack_callbacks_variable.size()
+            << " " << this->n_global_active_cells() << std::endl;
         }
 
       // Save cell attached data.
@@ -606,12 +607,15 @@ namespace parallel
         std::ifstream f(fname);
         AssertThrow(f.fail() == false, ExcIO());
         std::string firstline;
-        getline(f, firstline); // skip first line
+        getline(f, firstline);
         f >> version >> numcpus >> attached_count_fixed >>
           attached_count_variable >> n_global_active_cells;
       }
 
-      AssertThrow(version == 4,
+      const auto expected_version = ::dealii::internal::
+        CellAttachedDataSerializer<dim, spacedim>::version_number;
+
+      AssertThrow(version == expected_version,
                   ExcMessage("Incompatible version found in .info file."));
 
       // Load description and construct the triangulation.

@@ -1081,7 +1081,7 @@ namespace Step28
     setup_linear_system();
 
     solution.reinit(dof_handler.n_dofs());
-    soltrans.interpolate(solution_old, solution);
+    soltrans.interpolate(solution);
 
     // enforce constraints to make the interpolated solution conforming on
     // the new mesh:
