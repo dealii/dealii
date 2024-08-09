@@ -946,16 +946,17 @@ namespace Step55
     output_from_water_rate =
       Utilities::MPI::sum(output_from_water_rate, mpi_communicator);
 
+    const double error_abs =
+      std::abs(input_from_rain_rate - output_from_water_rate);
+    const double error_rel = std::abs(error_abs / input_from_rain_rate);
     pcout << "Conservation check (water)" << std::endl
           << "   Input: " << input_from_rain_rate << std::endl
           << "   Output: " << output_from_water_rate << std::endl
-          << "   Error (abs): "
-          << std::abs(input_from_rain_rate - output_from_water_rate)
-          << std::endl
-          << "   Error (rel): "
-          << std::abs((input_from_rain_rate - output_from_water_rate) /
-                      input_from_rain_rate)
-          << std::endl;
+          << "   Error (abs): " << error_abs << std::endl
+          << "   Error (rel): " << error_rel << std::endl;
+
+    AssertThrow(error_rel < 1e-9,
+                ExcMessage("Conservation of water rate not satisfied."));
   }
 
 
