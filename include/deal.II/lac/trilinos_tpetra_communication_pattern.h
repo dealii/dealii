@@ -25,6 +25,7 @@
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/communication_pattern_base.h>
+#  include <deal.II/base/memory_space.h>
 
 #  include <Tpetra_Export.hpp>
 #  include <Tpetra_Import.hpp>
@@ -40,10 +41,13 @@ namespace LinearAlgebra
     /**
      * This class implements a wrapper to Tpetra::Import and Tpetra::Export.
      */
+    template <typename MemorySpace = dealii::MemorySpace::Host>
     class CommunicationPattern : public Utilities::MPI::CommunicationPatternBase
     {
+      static_assert(std::is_same_v<MemorySpace, dealii::MemorySpace::Default> ||
+                    std::is_same_v<MemorySpace, dealii::MemorySpace::Host>);
+
     public:
-      using MemorySpace = dealii::MemorySpace::Host;
       /**
        * Initialize the communication pattern.
        *

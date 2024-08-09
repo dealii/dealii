@@ -200,8 +200,12 @@ Vector<Number>::Vector(
       // that know about the original vector.
       LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
                                                              MemorySpace>
-        localized_vector(complete_index_set(size()).make_tpetra_map_rcp(),
-                         v.get_mpi_communicator());
+        localized_vector(
+          complete_index_set(size())
+            .template make_tpetra_map_rcp<
+              LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<
+                MemorySpace>>(),
+          v.get_mpi_communicator());
 
       Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
         MemorySpace>>
@@ -890,8 +894,12 @@ Vector<Number>::operator=(
       // that know about the original vector.
       LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
                                                              MemorySpace>
-        localized_vector(complete_index_set(size()).make_tpetra_map_rcp(),
-                         v.get_mpi_communicator());
+        localized_vector(
+          complete_index_set(size())
+            .template make_tpetra_map_rcp<
+              LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<
+                MemorySpace>>(),
+          v.get_mpi_communicator());
 
       Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
         MemorySpace>>
