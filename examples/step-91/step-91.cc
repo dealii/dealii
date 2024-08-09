@@ -1265,8 +1265,9 @@ namespace Step55
             elevation_grad_at_node_points,
             div_Ih_d_wh_at_q_points);
 
-          constexpr bool debug_res  = false;
-          constexpr bool debug_mtrx = false;
+          constexpr bool debug_res    = false;
+          constexpr bool debug_res_ad = false;
+          constexpr bool debug_mtrx   = false;
 
           std::vector<ADNumberType> residual_ad(n_dependent_variables,
                                                 ADNumberType(0.0));
@@ -1279,6 +1280,17 @@ namespace Step55
                                  cell->diameter(),
                                  residual_ad,
                                  debug_res);
+
+          if (debug_res_ad)
+            {
+              pcout << std::endl << "Vector (AD)" << std::endl;
+              for (unsigned int i = 0; i < residual_ad.size(); ++i)
+                {
+                  pcout << "i: " << i
+                        << " ; diff size: " << residual_ad[i].availableSize()
+                        << " ; res: " << residual_ad[i] << std::endl;
+                }
+            }
 
           ad_helper.register_residual_vector(residual_ad);
           ad_helper.compute_linearization(cell_matrix);
