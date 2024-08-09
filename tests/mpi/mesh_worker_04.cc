@@ -193,9 +193,9 @@ test()
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(
-    argc, argv, testing_max_num_threads());
-  MPILogInitAll log;
+  // Disable multithreading so that text output order is consistent
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   test<2>();
 }
