@@ -1036,7 +1036,7 @@ namespace Step55
                 const double Nx_i = fe_values[water_flow_rate].value(i, q);
                 const Tensor<1, spacedim> grad_Nx_i =
                   fe_values[water_flow_rate].gradient(i, q);
-                const auto stabNx_i =
+                const NumberType stabNx_i =
                   (Nx_i + c * cell_diameter * d * grad_Nx_i);
 
                 cell_residual[i] += (stabNx_i * (p - div_Ih_d_wh)) * JxW;
