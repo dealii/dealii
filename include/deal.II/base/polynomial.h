@@ -1103,7 +1103,7 @@ namespace Polynomials
 
     // The derivative of the Jacobi polynomial is evaluated using the recurrence
     // relations
-    if (degree == 1)
+    if (degree == 0)
       return 0.0;
     if (rescale)
       return (1 + alpha + beta + degree) * jacobi_polynomial_value(degree - 1,

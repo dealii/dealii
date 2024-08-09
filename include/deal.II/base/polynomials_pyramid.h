@@ -40,7 +40,9 @@ public:
   /*
    * Constructor taking the polynomial @p degree as input.
    */
-  ScalarLagrangePolynomialPyramid(const unsigned int degree);
+  ScalarLagrangePolynomialPyramid(const unsigned int            degree,
+                                  const unsigned int            n_dofs,
+                                  const std::vector<Point<dim>> support_points);
 
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()

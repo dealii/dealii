@@ -26,20 +26,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
-{
-  unsigned int
-  compute_n_polynomials_pyramid(const unsigned int dim,
-                                const unsigned int degree)
-  {
-    AssertDimension(dim, 3);
-    AssertIndexRange(degree, 3);
-
-    return (degree + 1) * (degree + 2) * (2 * degree + 3) / 6;
-  }
-} // namespace
-
-
 
 template <int dim>
 double
@@ -437,151 +423,12 @@ ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_deriv_basis_functions(
 
 template <int dim>
 ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
-  const unsigned int degree)
-  : ScalarPolynomialsBase<dim>(degree,
-                               compute_n_polynomials_pyramid(dim, degree))
+  const unsigned int            degree,
+  const unsigned int            n_dofs,
+  const std::vector<Point<dim>> support_points)
+  : ScalarPolynomialsBase<dim>(degree, n_dofs)
 {
-  std::vector<Point<dim>>   support_points;
-  std::vector<Point<dim>>   support_points_unordered;
-  std::vector<unsigned int> n_dofs_total_per_object(4, 0);
-  std::vector<unsigned int> n_dofs_per_object(4, 0);
-
-  support_points.resize(compute_n_polynomials_pyramid(dim, degree));
-  const double z_equidistance = 1.0 / this->degree();
-
-  for (unsigned int current_degree = this->degree(); current_degree > 0;
-       --current_degree)
-    {
-      FE_Q<2> fe_q(current_degree);
-
-      // save all support points in an unordered fashion
-      for (unsigned int support_point_index = 0;
-           support_point_index < fe_q.get_unit_support_points().size();
-           ++support_point_index)
-        {
-          Point<dim> support_point;
-          for (unsigned int d = 0; d < dim - 1; ++d)
-            support_point[d] =
-              (current_degree * z_equidistance) *
-              (2 * fe_q.get_unit_support_points()[support_point_index][d] - 1);
-          support_point[dim - 1] =
-            (this->degree() - current_degree) * z_equidistance;
-          support_points_unordered.emplace_back(support_point);
-        }
-      if (current_degree == this->degree())
-        {
-          // the first are the support points at the vertices
-          n_dofs_total_per_object[0] = fe_q.reference_cell().n_vertices() + 1;
-          // lines are on lines
-          n_dofs_total_per_object[1] =
-            fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
-          // faces are on faces
-          n_dofs_total_per_object[2] = fe_q.n_dofs_per_quad();
-          // nothing per hex
-          n_dofs_total_per_object[3] = 0;
-
-          n_dofs_per_object[0] =
-            fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
-          n_dofs_per_object[2] = fe_q.n_dofs_per_quad(); //dpo.dofs_per_object_exclusive[2][0]
-        }
-      else
-        {
-          // on the vertex here is on the line in the pyramid
-          n_dofs_total_per_object[1] += fe_q.reference_cell().n_vertices();
-          // on the lines here are on faces in the pyramid
-          n_dofs_total_per_object[2] +=
-            fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
-          // on the faces here is on the hex on the pyramid
-          n_dofs_total_per_object[3] += fe_q.n_dofs_per_quad(); //dpo.dofs_per_object_exclusive[3][0]
-
-          n_dofs_per_object[1] += 1; //dpo.dofs_per_object_exclusive[1][0]
-          n_dofs_per_object[3] += fe_q.n_dofs_per_line(); //dpo.dofs_per_object_exclusive[2][1...4]
-        }
-    }
-
-  unsigned int              global_counter = 0;
-  std::vector<unsigned int> start_lines(4);
-  start_lines[0] = n_dofs_total_per_object[0] + n_dofs_per_object[0];
-  start_lines[1] = start_lines[0] + n_dofs_per_object[1];
-  start_lines[2] = start_lines[1] + n_dofs_per_object[1];
-  start_lines[3] = start_lines[2] + n_dofs_per_object[1];
-
-  std::vector<unsigned int> start_faces(4);
-  start_faces[0] = n_dofs_total_per_object[0] + n_dofs_total_per_object[1] +
-                   n_dofs_per_object[2];
-  start_faces[1] = start_faces[0] + n_dofs_per_object[3];
-  start_faces[2] = start_faces[1] + n_dofs_per_object[3];
-  start_faces[3] = start_faces[2] + n_dofs_per_object[3];
-
-  unsigned int start_hex = n_dofs_total_per_object[0] +
-                           n_dofs_total_per_object[1] +
-                           n_dofs_total_per_object[2];
-
-  for (unsigned int current_degree = this->degree(); current_degree > 0;
-       --current_degree)
-    {
-      FE_Q<2> fe_q(current_degree);
-
-      if (current_degree == this->degree())
-        {
-          // this gives all info on the vertices, the first 4 edges and the
-          // first face
-
-          // vertices
-          for (unsigned int counter = 0;
-               counter < fe_q.reference_cell().n_vertices();
-               ++counter)
-            {
-              support_points[counter] =
-                support_points_unordered[global_counter++];
-            }
-          // lines
-          for (unsigned int counter = 0;
-               counter <
-               fe_q.reference_cell().n_lines() * fe_q.n_dofs_per_line();
-               ++counter)
-            {
-              support_points[counter + n_dofs_total_per_object[0]] =
-                support_points_unordered[global_counter++];
-            }
-          // quad
-          for (unsigned int counter = 0; counter < fe_q.n_dofs_per_quad();
-               ++counter)
-            {
-              support_points[counter + n_dofs_total_per_object[0] +
-                             n_dofs_total_per_object[1]] =
-                support_points_unordered[global_counter++];
-            }
-        }
-      else
-        {
-          // vertices are on lines
-          for (unsigned int line = 0; line < fe_q.reference_cell().n_vertices();
-               ++line)
-            {
-              support_points[start_lines[line]++] =
-                support_points_unordered[global_counter++];
-            }
-          // lines are on face
-          for (unsigned int face = 0; face < fe_q.reference_cell().n_lines();
-               ++face)
-            {
-              for (unsigned int n_dof = 0; n_dof < fe_q.n_dofs_per_line();
-                   ++n_dof)
-                support_points[start_faces[face]++] =
-                  support_points_unordered[global_counter++];
-            }
-          // faces are on hex
-          for (unsigned int hex = 0; hex < fe_q.n_dofs_per_quad(); ++hex)
-            {
-              support_points[start_hex++] =
-                support_points_unordered[global_counter++];
-            }
-        }
-    }
-  support_points[4] = Point<dim>(0.0, 0.0, 1.0);
-
-  // Now fill VDM Matrix
+  // fill VDM Matrix
   FullMatrix<double> VDM(support_points.size());
 
   for (unsigned i = 0; i < VDM.m(); ++i)
@@ -640,7 +487,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
 
   Tensor<1, dim> grad;
 
-  if (this->degree() == 1)
+  if (false) //(this->degree() == 1)
     {
       const double Q14 = 0.25;
 
@@ -701,26 +548,23 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
           DEAL_II_NOT_IMPLEMENTED();
         }
     }
-  /*/ else // if (this->degree() == 2)
-  Tensor<1, dim> grad2;
+  // else // if (this->degree() == 2)
+
   {
     AssertIndexRange(i, VDM_inv.m());
 
     for (unsigned int j = 0; j < VDM_inv.n(); ++j)
-      grad2 += VDM_inv[i][j] * this->compute_jacobi_deriv(j, p);
+      grad += VDM_inv[i][j] * this->compute_jacobi_deriv(j, p);
 
     for (unsigned int d = 0; d < dim; ++d)
-      if (std::fabs(grad2[d]) < 1e-14)
-        grad2[d] = 0.0;
+      if (std::fabs(grad[d]) < 1e-14)
+        grad[d] = 0.0;
   }
 
   // else
   //   DEAL_II_NOT_IMPLEMENTED();
 
-  for (unsigned int d = 0; d < dim; ++d)
-    if (std::fabs(grad2[d] - grad[d]) > 1e-14)
-      std::cout << "Diff in grad" << std::endl;
-*/
+
 
   return grad;
 }
