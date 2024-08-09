@@ -3459,6 +3459,121 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
   return result;
 }
 
+/**
+ * An enumeration to describe the desired symmetry of the
+ * symmetric fourth order tensor
+ */
+enum class SymmetryType
+{
+  /**
+   * Only minor symmetry of the form:
+   * $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$.
+   */
+  minor,
+  /** 
+   * Both minor and major symmetry of the form:
+   * Minor - $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$
+   * Major - $A_{ijkl}=A_{klij}$.
+   */
+  minor_major,
+};
+
+/**
+ * Return the symmetrized version of a full rank-4 tensor, i.e.
+ * as a symmetric rank-4 tensor.
+ * @param symmetry_type decides the type of symmetry.
+ * This is the version for general dimensions.
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number>
+DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<4, dim, Number>
+  symmetrize(const Tensor<4, dim, Number> &t,
+             const SymmetryType &symmetry_type = SymmetryType::minor)
+{
+  SymmetricTensor<4, dim, Number> result;
+  for (unsigned int i = 0; i < dim; ++i)
+    result[i][i][i][i] = t[i][i][i][i];
+
+  const Number half = internal::NumberType<Number>::value(0.5);
+
+  if (symmetry_type == SymmetryType::minor)
+    {
+      // minor symmetry - A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}
+
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = 0; l < dim; ++l)
+              {
+                if (i != j && k == l)
+                  {
+                    // A_{ijkk}=A_{jikk}
+                    result[i][j][k][k] = (t[i][j][k][k] + t[j][i][k][k]) * half;
+                  }
+                else if (i == j && k != l)
+                  {
+                    // A_{iikl}=A_{iilk}
+                    result[i][i][k][l] = (t[i][i][k][l] + t[i][i][l][k]) * half;
+                  }
+                else if (i != j && k != l)
+                  {
+                    // A_{ijkl}=A_{jilk}
+                    result[i][j][k][l] = (t[i][j][k][l] + t[j][i][k][l] +
+                                          t[i][j][l][k] + t[j][i][l][k]) *
+                                         half * half;
+                  }
+                else
+                  {
+                    // A_{iijj} unchanged
+                    result[i][j][k][l] = t[i][j][k][l];
+                  }
+              }
+    }
+  else if (symmetry_type == SymmetryType::minor_major)
+    {
+
+      // minor symmetry - A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = 0; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = 0; l < dim; ++l)
+              {
+                if (i != j && k == l)
+                  {
+                    // A_{ijkk}=A_{jikk}
+                    result[i][j][k][k] = (t[i][j][k][k] + t[j][i][k][k]) * half;
+                  }
+                else if (i == j && k != l)
+                  {
+                    // A_{iikl}=A_{iilk}
+                    result[i][i][k][l] = (t[i][i][k][l] + t[i][i][l][k]) * half;
+                  }
+                else if (i != j && k != l)
+                  {
+                    // A_{ijkl}=A_{jilk}
+                    result[i][j][k][l] = (t[i][j][k][l] + t[j][i][k][l] +
+                                          t[i][j][l][k] + t[j][i][l][k]) *
+                                         half * half;
+                  }
+                else
+                  {
+                    // A_{iijj} unchanged
+                    result[i][j][k][l] = t[i][j][k][l];
+                  }
+              }
+
+      // major symmetry - A_{ijkl}=A_{klij}
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = i; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = k; l < dim; ++l)
+              result[i][j][k][l] = (t[i][j][k][l] + t[k][l][i][j]) * half;
+    }
+  return result;
+}
+
 
 
 /**
