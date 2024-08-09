@@ -436,7 +436,14 @@ namespace internal
         Assert(fe_index_local_ptr !=
                  dof_handler.hp_object_fe_indices[structdim].begin() +
                    dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
-               ExcMessage("Call distribute_dofs() first."));
+               ExcMessage(
+                 "You tried to call a function accessing DoF indices, but "
+                 "they appear not be available (yet) or inconsistent. "
+                 "Did you call distribute_dofs() first? Alternatively, if "
+                 "you are using different elements on different cells (i.e., "
+                 "you are using the hp capabilities of deal.II), did you "
+                 "change the active_fe_index of a cell since you last "
+                 "called distribute_dofs()?"));
 
         const types::fe_index fe_index_local =
           std::distance(dof_handler.hp_object_fe_indices[structdim].begin() +
