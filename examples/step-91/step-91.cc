@@ -1156,10 +1156,10 @@ namespace Step55
             }
 
           for (const unsigned int i : fe_values.dof_indices())
-          {
-            (void)i;
-            AssertIsFinite(cell_residual[i]);
-          }
+            {
+              (void)i;
+              AssertIsFinite(cell_residual[i]);
+            }
 
           constraints.distribute_local_to_global(cell_residual,
                                                  local_dof_indices,
@@ -1308,11 +1308,11 @@ namespace Step55
 
           for (const unsigned int i : fe_values.dof_indices())
             for (const unsigned int j : fe_values.dof_indices())
-          {
-            (void)i;
-            (void)j;
-              AssertIsFinite(cell_matrix(i, j));
-          }
+              {
+                (void)i;
+                (void)j;
+                AssertIsFinite(cell_matrix(i, j));
+              }
 
           constraints.distribute_local_to_global(cell_matrix,
                                                  local_dof_indices,

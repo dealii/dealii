@@ -1008,3 +1008,94 @@ just the surface of a sphere, say the
 shape, but we're going to leave that for another time.
 
 TODO: Need to attach a manifold.
+
+
+<h3> A test case to check correctness of the program </h3>
+
+As with all other tutorial programs, we spent a substantial amount of time
+verifying that it actually works correctly. To this end, here is a test case
+that is relatively simple to implement and for which one can compute the
+exact solution as well.
+
+The test case is posed on a two-dimensional (flat) domain that is a rectangle,
+but everything only depends on the $x$ coordinate and so it is, in essence,
+a one-dimensional (but time-dependent) problem. We choose the rectangle
+so that $0 < x < L$ (the extent of the $y$ coordinate does not matter).
+We start with a linear initial elevation profile:
+@f[
+  H(x,0) = ax+b,
+@f]
+where we will choose $a<0$ so that the initial elevation slopes down from
+left to right. For this initial profile, the slope equals $S(x,0)=a$
+and the downhill direction field is $\mathbd d(x,0) = (1,0)^T$. (Here
+and in the following, we will use $\epsilon=0$ in the regularization of
+functions that are not differentiable.)
+Because $\mathbf d$ is spatially constant, we then recognize that
+in the equation for the water flow rate, we have
+@f[
+  \nabla\cdot (\mathbf d(x,0) w(x,0)) = \frac{\partial w(x,0)}{\partial x} = p.
+@f]
+That is, at the initial time, we have that $w(x,0)=px$, recognizing that
+at the left end of the domain, $w(x=0,0)=0$ because that is an inflow
+boundary (the domain sloping to the right). Now recall that the evolution
+of the elevation is governed by
+@f[
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  =
+  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  + K_d \Delta H(\mathbf x, t).
+@f]
+In other words, at the initial time, the rate of change of the elevation field is
+@f[
+  \frac{\partial H(\mathbf x,0)}{\partial t}
+  =
+  - k w(\mathbf x,0)^m S(\mathbf x,0)^n
+  + K_d \Delta H(\mathbf x, 0)
+  =
+  - k (px)^m |a|^n
+  + 0,
+@f]
+where in the last step we have used that the Laplacian of a linear function
+is zero.
+
+We end up with two special cases for which we can compute the exact solution:
+- If $m=0$ (which implies that the amount of water does not actually
+  matter for the amount of erosion), then we get
+  @f[
+  \frac{\partial H(\mathbf x,0)}{\partial t}
+  =
+  - k |a|^n,
+  @f]
+  which means that the elevation field recedes downward at a spatially constant rate
+  at the initial time. In other words, it remains linear, with the same slope,
+  and we can easily verify that
+  @f{align*}{
+    H(x,t) &= ax + b - k |a|^n t, \\
+    w(x,t) &= px
+  @f}
+  is the solution. Correctly, this model reflects that if the erosion rate is $k=0$
+  (no erosion at all), then the elevation field does not change.
+
+- If $m=1, n=1$, the situation is only marginally more complex. In that case, because
+  we have a linear growth of the amount of water flowing from left to right,
+  and because for $m=1$ the erosion rate grows linearly with the amount of
+  water (i.e., here also linearly from left to right), we end up with a slope
+  that keeps steepening. Trying the ansatz
+  @f{align*}{
+    H(x,t) &= \alpha(t) x + \beta(t), \\
+    w(x,t) &= px
+  @f}
+  with $\alpha(0)=a, \beta(0)$, we quickly find by plugging everything into
+  the equations that we need $\beta(t)=b$, and that $\alpha'(t)=kp\alpha(t)$,
+  which solves to $\alpha(t)=ae^{kpt}$ and so
+  @f{align*}{
+    H(x,t) &= ae^{kpt} x + b, \\
+    w(x,t) &= px
+  @f}
+  as the exact solution. As before, if $k=0$ (no erosion), then the elevation
+  field stays the same. Similarly, if there is no water ($p=0$), then no
+  erosion happens and correctly our solution predicts that the elevation
+  remains constant with time.
+
+TODO: Discuss how we can check this in the program. Perhaps make it a run-time
+parameter?
