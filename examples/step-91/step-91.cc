@@ -766,9 +766,11 @@ namespace Step55
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             if (fe.system_to_component_index(j).first == 1) // j is water DoF
               {
+                // TODO: do this better and check for correctness.
+                const unsigned int jj = (j % 2 == 0 ? j : j - 1);
                 d_at_node_points[j] =
                   downhill_direction_from_elevation_gradient(
-                    elevation_grad_at_node_points[j]);
+                    elevation_grad_at_node_points[jj]);
               }
             else
               d_at_node_points[j] =
