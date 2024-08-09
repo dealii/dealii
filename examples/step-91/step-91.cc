@@ -149,7 +149,7 @@ namespace Step55
         // point.
 
         const unsigned int j_group =
-          fe_values.get_fe().system_to_base_index(j).first.first;
+          fe_values.get_fe().system_to_component_index(j).first;
 
         // TODO: if (fe.shape_function_belongs_to(water_flow_rate))
         if (j_group == w_dof)
@@ -419,11 +419,11 @@ namespace Step55
     // and
     // fe.system_to_base_index(i) work.
     //
-    // , fe(FE_Q<dim, spacedim>(1) ^ 2) // All base elements are the same
-    , fe(FE_Q<dim, spacedim>(1),
-         1,
-         FE_Q<dim, spacedim>(1),
-         1) // Two different base elements for two different fields
+    , fe(FE_Q<dim, spacedim>(1) ^ 2) // All base elements are the same
+    // , fe(FE_Q<dim, spacedim>(1),
+    //      1,
+    //      FE_Q<dim, spacedim>(1),
+    //      1) // Two different base elements for two different fields
     , triangulation(mpi_communicator,
                     typename Triangulation<dim, spacedim>::MeshSmoothing(
                       Triangulation<dim, spacedim>::smoothing_on_refinement |
@@ -1001,7 +1001,7 @@ namespace Step55
 
         for (const unsigned int i : fe_values.dof_indices())
           {
-            const unsigned int i_group = fe.system_to_base_index(i).first.first;
+            const unsigned int i_group = fe.system_to_component_index(i).first;
 
             if (i_group == H_dof)
               {
