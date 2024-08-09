@@ -1497,9 +1497,9 @@ namespace Step55
       /* relative_tolerance               */ 1e-5,
       /* ignore_algebraic_terms_for_errors*/ true,
       // Initial conditions parameters
-      /* const InitialConditionCorrection */
+      /* const InitialConditionCorrection ic_type */
       SUNDIALS::IDA<VectorType>::AdditionalData::use_y_diff, // ???
-      /* const InitialConditionCorrection */
+      /* const InitialConditionCorrection reset_type */
       SUNDIALS::IDA<VectorType>::AdditionalData::use_y_diff, // ???
       /* maximum_non_linear_iterations_ic*/ 5);
     SUNDIALS::IDA<VectorType> time_integrator(time_integrator_parameters);
@@ -1551,7 +1551,24 @@ namespace Step55
                              step_number);
       };
 
-    //    time_integrator.differential_components;
+    time_integrator.differential_components = [this]() {
+      IndexSet indices(dof_handler.n_dofs());
+
+      // We will solve for the initial conditions for the water flow, so
+      // we mark these DoFs as having the correct initial value.
+      // We delegate to IDA the responsibility solve for consistent initial
+      // conditions for the elevation, as well as the rates for both fields.
+      const FEValuesExtractors::Scalar water_flow_rate(1);
+      const BlockMask water_mask = fe.block_mask(water_flow_rate);
+      indices.add_indices(DoFTools::extract_dofs(dof_handler, water_mask));
+
+      // const FEValuesExtractors::Scalar elevation(0);
+      // const BlockMask elevation_mask = fe.block_mask(water_flow_rate);
+      // indices.add_indices(DoFTools::extract_dofs(dof_handler,
+      // elevation_mask));
+
+      return indices;
+    };
 
     // TODO: Figure out whether the following vectors need to be fully
     // distributed, ghosted, or otherwise. Set to the correct vector as computed
