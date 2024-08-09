@@ -782,7 +782,7 @@ namespace Step39
   void InteriorPenaltyProblem<dim>::solve()
   {
     // The solver of choice is conjugate gradient.
-    SolverControl            control(1000, 1.e-12);
+    SolverControl            control(1000, 1.e-12, false, true);
     SolverCG<Vector<double>> solver(control);
 
     // Now we are setting up the components of the multilevel
