@@ -626,6 +626,17 @@ namespace TrilinosWrappers
           const dealii::LinearAlgebra::distributed::Vector<double> &b);
 
     /**
+     * Solve the linear system <tt>Ax=b</tt> where A is an operator,
+     * and the vectors x and b are native Trilinos vector types.
+     * This function can be used when A is a LinearOperators derived
+     * from a TrilinosPayload.
+     */
+    void
+    solve(const Epetra_Operator    &A,
+          Epetra_MultiVector       &x,
+          const Epetra_MultiVector &b);
+
+    /**
      * Access to object that controls convergence.
      */
     SolverControl &
