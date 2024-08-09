@@ -1470,17 +1470,21 @@ namespace Step55
     compute_initial_constraints();
 
     // Get rid of these three lines eventually (?):
+    constexpr bool compute_water_initial_values = true;
     output_results(/* time= */ 0,
                    locally_relevant_solution,
                    locally_relevant_solution_dot,
                    /*cycle*/ 0);
-    assemble_initial_waterflow_system();
-    solve_initial_waterflow_system();
-    check_conservation_for_waterflow_system(locally_relevant_solution);
-    output_results(/* time= */ 0,
-                   locally_relevant_solution,
-                   locally_relevant_solution_dot,
-                   /*cycle*/ 1);
+    if (compute_water_initial_values)
+      {
+        assemble_initial_waterflow_system();
+        solve_initial_waterflow_system();
+        check_conservation_for_waterflow_system(locally_relevant_solution);
+        output_results(/* time= */ 0,
+                       locally_relevant_solution,
+                       locally_relevant_solution_dot,
+                       /*cycle*/ 1);
+      }
 
     const SUNDIALS::IDA<VectorType>::AdditionalData time_integrator_parameters(
       /* initial_time     */ 0.0, // Initial time is today
@@ -1552,21 +1556,27 @@ namespace Step55
                              step_number);
       };
 
-    time_integrator.differential_components = [this]() {
+    time_integrator.differential_components = [this,
+                                               compute_water_initial_values]() {
       IndexSet indices(dof_handler.n_dofs());
 
-      // We will solve for the initial conditions for the water flow, so
-      // we mark these DoFs as having the correct initial value.
-      // We delegate to IDA the responsibility solve for consistent initial
-      // conditions for the elevation, as well as the rates for both fields.
-      const FEValuesExtractors::Scalar water_flow_rate(1);
-      const BlockMask water_mask = fe.block_mask(water_flow_rate);
-      indices.add_indices(DoFTools::extract_dofs(dof_handler, water_mask));
+      // The initial values for the elevation are known (as given by the
+      // input topology) so we mark these as being algebraic, and IDA will
+      // not perturb the initial solution values.
+      const FEValuesExtractors::Scalar elevation(0);
+      const BlockMask elevation_mask = fe.block_mask(elevation);
+      indices.add_indices(DoFTools::extract_dofs(dof_handler, elevation_mask));
 
-      // const FEValuesExtractors::Scalar elevation(0);
-      // const BlockMask elevation_mask = fe.block_mask(water_flow_rate);
-      // indices.add_indices(DoFTools::extract_dofs(dof_handler,
-      // elevation_mask));
+      if (compute_water_initial_values)
+        {
+          // We will solve for the initial conditions for the water flow, so
+          // we mark these DoFs as having the correct initial value.
+          // We delegate to IDA the responsibility solve for consistent initial
+          // conditions for the elevation, as well as the rates for both fields.
+          const FEValuesExtractors::Scalar water_flow_rate(1);
+          const BlockMask water_mask = fe.block_mask(water_flow_rate);
+          indices.add_indices(DoFTools::extract_dofs(dof_handler, water_mask));
+        }
 
       return indices;
     };
