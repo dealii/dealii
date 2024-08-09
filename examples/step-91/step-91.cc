@@ -1156,7 +1156,10 @@ namespace Step55
             }
 
           for (const unsigned int i : fe_values.dof_indices())
+          {
+            (void)i;
             AssertIsFinite(cell_residual[i]);
+          }
 
           constraints.distribute_local_to_global(cell_residual,
                                                  local_dof_indices,
@@ -1305,7 +1308,11 @@ namespace Step55
 
           for (const unsigned int i : fe_values.dof_indices())
             for (const unsigned int j : fe_values.dof_indices())
+          {
+            (void)i;
+            (void)j;
               AssertIsFinite(cell_matrix(i, j));
+          }
 
           constraints.distribute_local_to_global(cell_matrix,
                                                  local_dof_indices,
@@ -1321,14 +1328,16 @@ namespace Step55
                                                       VectorType       &dst,
                                                       const double tolerance)
   {
+    (void)tolerance; // TODO. What tolerance is this? We set two in the IDA
+                     // solver settings, and neither of them seem to be related
+                     // in any obvious manner to the value that this takes!
     TimerOutput::Scope t(computing_timer, "solve");
 
-    // SolverControl solver_control(system_matrix.m(),
-    //                              1e-6 * system_rhs.l2_norm());
+    ReductionControl        solver_control(system_matrix.m(),
+                                    1.e-12 * rhs.l2_norm(),
+                                    1.e-6);
+    SolverGMRES<VectorType> solver(solver_control);
 
-    SolverControl solver_control(system_matrix.m(), tolerance * rhs.l2_norm());
-
-    SolverGMRES<VectorType>  solver(solver_control);
     LA::MPI::PreconditionILU preconditioner_H;
     LA::MPI::PreconditionILU preconditioner_w;
     preconditioner_H.initialize(system_matrix.block(0, 0));
@@ -1350,10 +1359,7 @@ namespace Step55
 
     constraints.set_zero(distributed_solution);
 
-    solver.solve(system_matrix,
-                 distributed_solution,
-                 system_rhs,
-                 preconditioner);
+    solver.solve(system_matrix, distributed_solution, rhs, preconditioner);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
