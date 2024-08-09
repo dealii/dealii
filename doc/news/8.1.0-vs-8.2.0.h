@@ -163,7 +163,7 @@ inconvenience this causes.
   (Luca Heltai, 2014/09/13)
   </li>
 
-  <li> New: The new tutorial program step-52 explains how to use the
+  <li> New: The new tutorial program step 52 explains how to use the
   new time stepping methods.
   <br>
   (Bruno Turcksin, Damien Lebrun-Grandie, 2014/09/12)
