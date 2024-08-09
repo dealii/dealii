@@ -112,6 +112,11 @@ public:
   SmartPointer(const SmartPointer<T, P> &tt);
 
   /**
+   * Move constructor for SmartPointer.
+   */
+  SmartPointer(SmartPointer<T, P> &&tt) noexcept;
+
+  /**
    * Constructor taking a normal pointer. If possible, i.e. if the pointer is
    * not a null pointer, the constructor subscribes to the given object to
    * lock it, i.e. to prevent its destruction before the end of its use.
@@ -157,6 +162,12 @@ public:
    */
   SmartPointer<T, P> &
   operator=(const SmartPointer<T, P> &tt);
+
+  /**
+   * Move assignment operator for SmartPointer.
+   */
+  SmartPointer<T, P> &
+  operator=(SmartPointer<T, P> &&tt) noexcept;
 
   /**
    * Delete the object pointed to and set the pointer to nullptr. Note
@@ -313,6 +324,39 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &tt)
 
 
 template <typename T, typename P>
+inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&tt) noexcept
+  : t(tt.t)
+  , id(tt.id)
+  , pointed_to_object_is_alive(false)
+{
+  if (tt != nullptr)
+    {
+      Assert(tt.pointed_to_object_is_alive,
+             ExcMessage("You can't move a smart pointer object that "
+                        "is pointing to an object that is no longer alive."));
+
+      try
+        {
+          t->subscribe(&pointed_to_object_is_alive, id);
+        }
+      catch (...)
+        {
+          Assert(false,
+                 ExcMessage(
+                   "Calling subscribe() failed with an exception, but we "
+                   "are in a function that cannot throw exceptions. "
+                   "Aborting the program here."));
+        }
+
+      // Release the rhs object as if we had moved all members away from
+      // it directly:
+      tt = nullptr;
+    }
+}
+
+
+
+template <typename T, typename P>
 inline SmartPointer<T, P>::~SmartPointer()
 {
   if (pointed_to_object_is_alive && t != nullptr)
@@ -401,6 +445,48 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, P> &tt)
   if (tt.pointed_to_object_is_alive && tt != nullptr)
     t->subscribe(&pointed_to_object_is_alive, id);
 
+  return *this;
+}
+
+
+
+template <typename T, typename P>
+inline SmartPointer<T, P> &
+SmartPointer<T, P>::operator=(SmartPointer<T, P> &&tt) noexcept
+{
+  if (tt == nullptr)
+    {
+      *this = nullptr;
+    }
+  // if objects on the left and right hand side of the operator= are
+  // the same, then this is a no-op
+  else if (&tt != this)
+    {
+      // Let us unsubscribe from the current object
+      if (pointed_to_object_is_alive)
+        t->unsubscribe(&pointed_to_object_is_alive, id);
+
+      // Then reset to the new object, and subscribe to it:
+      Assert(tt.pointed_to_object_is_alive,
+             ExcMessage("You can't move a smart pointer object that "
+                        "is pointing to an object that is no longer alive."));
+      t = tt.get();
+      try
+        {
+          t->subscribe(&pointed_to_object_is_alive, id);
+        }
+      catch (...)
+        {
+          Assert(false,
+                 ExcMessage(
+                   "Calling subscribe() failed with an exception, but we "
+                   "are in a function that cannot throw exceptions. "
+                   "Aborting the program here."));
+        }
+
+      // Finally release the rhs object since we moved its contents
+      tt = nullptr;
+    }
   return *this;
 }
 
