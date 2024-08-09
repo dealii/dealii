@@ -44,12 +44,12 @@ test()
     }
   parallel_partitioner_1.compress();
   parallel_partitioner_2.compress();
-  LinearAlgebra::TpetraWrappers::Vector<Number> a(parallel_partitioner_1,
-                                                  MPI_COMM_WORLD);
-  LinearAlgebra::TpetraWrappers::Vector<Number> b(parallel_partitioner_1,
-                                                  MPI_COMM_WORLD);
-  LinearAlgebra::TpetraWrappers::Vector<Number> c(parallel_partitioner_2,
-                                                  MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> a(
+    parallel_partitioner_1, MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> b(
+    parallel_partitioner_1, MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> c(
+    parallel_partitioner_2, MPI_COMM_WORLD);
 
   IndexSet read_write_index_set(10);
   if (rank == 0)
@@ -117,7 +117,7 @@ test()
     }
 
 
-  LinearAlgebra::TpetraWrappers::Vector<Number> d(a);
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> d(a);
   a.add(2., b, 3., d);
   read_write_3.import_elements(a, VectorOperation::insert);
   if (rank == 0)

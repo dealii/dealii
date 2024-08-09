@@ -2819,13 +2819,13 @@ namespace internal
 
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  template <typename Number>
+  template <typename Number, typename MemorySpace>
   inline void
   import_vector_with_ghost_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<Number> &vec,
-    const IndexSet                                      &locally_owned_elements,
-    const IndexSet                                      &needed_elements,
-    LinearAlgebra::TpetraWrappers::Vector<Number>       &output,
+    const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &vec,
+    const IndexSet &locally_owned_elements,
+    const IndexSet &needed_elements,
+    LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &output,
     const std::bool_constant<false> /*is_block_vector*/)
   {
     Assert(!vec.has_ghost_elements(), ExcGhostsPresent());

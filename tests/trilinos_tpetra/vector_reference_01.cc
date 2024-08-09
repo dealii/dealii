@@ -31,7 +31,7 @@
 void
 test()
 {
-  LinearAlgebra::TpetraWrappers::Vector<double> v;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v;
   v.reinit(complete_index_set(3), MPI_COMM_WORLD);
   v(0) = 0;
   v(1) = 1;

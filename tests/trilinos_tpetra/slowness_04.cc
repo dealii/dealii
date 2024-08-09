@@ -67,9 +67,8 @@ test()
 
   // build the sparse matrix
   IndexSet indices = complete_index_set(N * N);
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> matrix(indices,
-                                                             MPI_COMM_WORLD,
-                                                             5);
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>
+    matrix(indices, MPI_COMM_WORLD, 5);
   for (unsigned int i_ = 0; i_ < N; ++i_)
     for (unsigned int j_ = 0; j_ < N; ++j_)
       {
@@ -104,8 +103,10 @@ test()
   // then do a single matrix-vector
   // multiplication with subsequent formation
   // of the matrix norm
-  LinearAlgebra::TpetraWrappers::Vector<double> v1(indices, MPI_COMM_WORLD);
-  LinearAlgebra::TpetraWrappers::Vector<double> v2(indices, MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v1(
+    indices, MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v2(
+    indices, MPI_COMM_WORLD);
   for (unsigned int i = 0; i < N * N; ++i)
     v1(i) = i;
   matrix.vmult(v2, v1);

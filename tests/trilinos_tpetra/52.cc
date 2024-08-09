@@ -28,7 +28,8 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::SparseMatrix<double> &m)
+test(
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> &m)
 {
   // first set a few entries
   for (unsigned int i = 0; i < m.m(); ++i)
@@ -70,10 +71,11 @@ main(int argc, char **argv)
       {
         std::vector<unsigned int> row_lengths(5, 3U);
         row_lengths.back() = 2;
-        LinearAlgebra::TpetraWrappers::SparseMatrix<double> m(
-          static_cast<types::global_dof_index>(5U),
-          static_cast<types::global_dof_index>(5U),
-          row_lengths);
+        LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                    MemorySpace::Default>
+          m(static_cast<types::global_dof_index>(5U),
+            static_cast<types::global_dof_index>(5U),
+            row_lengths);
         test(m);
       }
     }

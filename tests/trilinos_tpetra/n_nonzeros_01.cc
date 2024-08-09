@@ -26,11 +26,13 @@ void
 test()
 {
   // create an empty sparsity pattern
-  LinearAlgebra::TpetraWrappers::SparsityPattern sparsity(4, 5, 1);
+  LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Default> sparsity(
+    4, 5, 1);
   sparsity.compress();
 
   // attach a sparse matrix to it
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> A(sparsity);
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> A(
+    sparsity);
 
   // see how many nonzero elements it reports
   deallog << A.n_nonzero_elements() << std::endl;

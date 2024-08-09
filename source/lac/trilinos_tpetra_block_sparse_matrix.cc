@@ -26,31 +26,31 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-    template class BlockSparseMatrix<double>;
+    template class BlockSparseMatrix<double, MemorySpace::Host>;
 
     template void
-    BlockSparseMatrix<double>::reinit(
+    BlockSparseMatrix<double, MemorySpace::Host>::reinit(
       const ::dealii::BlockDynamicSparsityPattern &);
 
     template void
-    BlockSparseMatrix<double>::vmult(
-      TpetraWrappers::Vector<double> &,
-      const TpetraWrappers::Vector<double> &) const;
+    BlockSparseMatrix<double, MemorySpace::Host>::vmult(
+      TpetraWrappers::Vector<double, MemorySpace::Host> &,
+      const TpetraWrappers::Vector<double, MemorySpace::Host> &) const;
 
     template void
-    BlockSparseMatrix<double>::Tvmult(
-      TpetraWrappers::Vector<double> &,
-      const TpetraWrappers::Vector<double> &) const;
+    BlockSparseMatrix<double, MemorySpace::Host>::Tvmult(
+      TpetraWrappers::Vector<double, MemorySpace::Host> &,
+      const TpetraWrappers::Vector<double, MemorySpace::Host> &) const;
 
     template void
-    BlockSparseMatrix<double>::vmult(
-      TpetraWrappers::BlockVector<double> &,
-      const TpetraWrappers::BlockVector<double> &) const;
+    BlockSparseMatrix<double, MemorySpace::Host>::vmult(
+      TpetraWrappers::BlockVector<double, MemorySpace::Host> &,
+      const TpetraWrappers::BlockVector<double, MemorySpace::Host> &) const;
 
     template void
-    BlockSparseMatrix<double>::Tvmult(
-      TpetraWrappers::BlockVector<double> &,
-      const TpetraWrappers::BlockVector<double> &) const;
+    BlockSparseMatrix<double, MemorySpace::Host>::Tvmult(
+      TpetraWrappers::BlockVector<double, MemorySpace::Host> &,
+      const TpetraWrappers::BlockVector<double, MemorySpace::Host> &) const;
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 #  endif // DOXYGEN
