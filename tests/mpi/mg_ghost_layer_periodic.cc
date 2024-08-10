@@ -49,11 +49,8 @@ test()
     GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
     periodic_faces;
   for (unsigned int d = 0; d < dim; ++d)
-    GridTools::collect_periodic_faces(static_cast<Triangulation<dim> &>(tria),
-                                      2 * d,
-                                      2 * d + 1,
-                                      d,
-                                      periodic_faces);
+    GridTools::collect_periodic_faces(
+      tria, 2 * d, 2 * d + 1, d, periodic_faces);
 
   tria.add_periodicity(periodic_faces);
 
