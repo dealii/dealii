@@ -2160,12 +2160,10 @@ namespace Step32
 
     assemble_stokes_preconditioner();
 
-    std::vector<std::vector<bool>>   constant_modes;
-    const FEValuesExtractors::Vector velocity_components(0);
-    DoFTools::extract_constant_modes(stokes_dof_handler,
-                                     stokes_fe.component_mask(
-                                       velocity_components),
-                                     constant_modes);
+    const FEValuesExtractors::Vector     velocity_components(0);
+    const std::vector<std::vector<bool>> constant_modes =
+      DoFTools::extract_constant_modes(
+        stokes_dof_handler, stokes_fe.component_mask(velocity_components));
 
     Mp_preconditioner =
       std::make_shared<TrilinosWrappers::PreconditionJacobi>();

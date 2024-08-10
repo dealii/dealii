@@ -73,8 +73,8 @@ test()
         ComponentMask mask(fe.n_components(), false);
         mask.set(c, true);
 
-        std::vector<std::vector<bool>> constant_modes;
-        DoFTools::extract_level_constant_modes(0, dofh, mask, constant_modes);
+        const auto constant_modes =
+          DoFTools::extract_level_constant_modes(0, dofh, mask);
 
         for (unsigned int i = 0; i < constant_modes.size(); ++i)
           {
@@ -92,8 +92,8 @@ test()
         ComponentMask mask(fe.n_components(), false);
         mask.set(c, true);
 
-        std::vector<std::vector<bool>> constant_modes;
-        DoFTools::extract_level_constant_modes(0, dofh, mask, constant_modes);
+        const auto constant_modes =
+          DoFTools::extract_level_constant_modes(0, dofh, mask);
 
         for (unsigned int i = 0; i < constant_modes.size(); ++i)
           {
