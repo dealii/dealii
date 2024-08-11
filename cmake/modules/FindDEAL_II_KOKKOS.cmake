@@ -77,5 +77,7 @@ if(Kokkos_FOUND)
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=284")
     # variable "i" was set but never used:
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
+    # warning #940-D: missing return statement at end of non-void function
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
   endif()
 endif()
