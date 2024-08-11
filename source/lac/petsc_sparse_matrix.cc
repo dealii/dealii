@@ -151,17 +151,11 @@ namespace PETScWrappers
                           const std::vector<size_type> &row_lengths,
                           const bool                    is_symmetric)
   {
-    Assert(row_lengths.size() == m,
-           ExcDimensionMismatch(row_lengths.size(), m));
+    AssertDimension(row_lengths.size(), m);
 
-    // use the call sequence indicating a
-    // maximal number of elements for each
-    // row individually. annoyingly, we
-    // always use unsigned ints for cases
-    // like this, while PETSc wants to see
-    // signed integers. so we have to
-    // convert, unless we want to play dirty
-    // tricks with conversions of pointers
+    for (const auto &row_length : row_lengths)
+      AssertThrowIntegerConversion(static_cast<PetscInt>(row_length),
+                                   row_length);
     const std::vector<PetscInt> int_row_lengths(row_lengths.begin(),
                                                 row_lengths.end());
 
@@ -183,6 +177,13 @@ namespace PETScWrappers
   SparseMatrix::do_reinit(const SparsityPatternType &sparsity_pattern,
                           const bool                 preset_nonzero_locations)
   {
+    // If the sparsity pattern's dimensions can be converted to PetscInts then
+    // the rest of the conversions will succeed
+    AssertIntegerConversion(static_cast<PetscInt>(sparsity_pattern.n_rows()),
+                            sparsity_pattern.n_rows());
+    AssertIntegerConversion(static_cast<PetscInt>(sparsity_pattern.n_cols()),
+                            sparsity_pattern.n_cols());
+
     std::vector<size_type> row_lengths(sparsity_pattern.n_rows());
     for (size_type i = 0; i < sparsity_pattern.n_rows(); ++i)
       row_lengths[i] = sparsity_pattern.row_length(i);
@@ -212,14 +213,18 @@ namespace PETScWrappers
         for (size_type i = 0; i < sparsity_pattern.n_rows(); ++i)
           {
             row_entries.resize(row_lengths[i]);
-            row_values.resize(row_lengths[i], 0.0);
+            row_values.resize(row_lengths[i]);
             for (size_type j = 0; j < row_lengths[i]; ++j)
-              row_entries[j] = sparsity_pattern.column_number(i, j);
+              {
+                const auto petsc_j =
+                  static_cast<PetscInt>(sparsity_pattern.column_number(i, j));
+                row_entries[j] = petsc_j;
+              }
 
-            const PetscInt       int_row = i;
+            const auto           petsc_i = static_cast<PetscInt>(i);
             const PetscErrorCode ierr    = MatSetValues(matrix,
                                                      1,
-                                                     &int_row,
+                                                     &petsc_i,
                                                      row_lengths[i],
                                                      row_entries.data(),
                                                      row_values.data(),
