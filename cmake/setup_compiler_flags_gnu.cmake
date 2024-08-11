@@ -162,7 +162,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
 
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-funroll-all-loops")
-  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-fstrict-aliasing")
 
   #
   # Disable assert() in deal.II and user projects in release mode
