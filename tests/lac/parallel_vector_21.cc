@@ -16,7 +16,6 @@
 // when doing reinit() from another vector and manually setting the local
 // range
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

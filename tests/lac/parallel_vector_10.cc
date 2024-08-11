@@ -15,7 +15,6 @@
 
 // check operator= when we do some operations with ghosts
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

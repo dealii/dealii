@@ -26,7 +26,6 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/cuda_vector.h>
 
 #include <deal.II/matrix_free/portable_matrix_free.h>
 
@@ -48,16 +47,6 @@ check(const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
            reference_partitioner.ghost_indices(),
          ExcInternalError());
 }
-
-#ifdef DEAL_II_WITH_CUDA
-template <typename Number>
-void
-check(const LinearAlgebra::CUDAWrappers::Vector<Number> &vector,
-      const Utilities::MPI::Partitioner                 &reference_partitioner)
-{
-  AssertDimension(vector.size(), reference_partitioner.size());
-}
-#endif
 
 template <int dim, int fe_degree, typename VectorType>
 void
@@ -118,9 +107,5 @@ main(int argc, char **argv)
        1,
        LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>();
 
-#ifdef DEAL_II_WITH_CUDA
-  if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1)
-    test<2, 1, LinearAlgebra::CUDAWrappers::Vector<double>>();
-#endif
   return 0;
 }

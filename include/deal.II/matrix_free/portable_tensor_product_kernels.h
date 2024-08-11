@@ -20,8 +20,6 @@
 
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -32,8 +30,6 @@ namespace Portable
     /**
      * In this namespace, the evaluator routines that evaluate the tensor
      * products are implemented.
-     *
-     * @ingroup CUDAWrappers
      */
     // TODO: for now only the general variant is implemented
     enum EvaluatorVariant
@@ -335,8 +331,6 @@ namespace Portable
 
     /**
      * Generic evaluator framework.
-     *
-     * @ingroup CUDAWrappers
      */
     template <EvaluatorVariant variant,
               int              dim,
@@ -351,8 +345,6 @@ namespace Portable
     /**
      * Internal evaluator for 1d-3d shape function using the tensor product form
      * of the basis functions.
-     *
-     * @ingroup CUDAWrappers
      */
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     struct EvaluatorTensorProduct<evaluate_general,

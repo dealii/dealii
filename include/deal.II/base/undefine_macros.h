@@ -25,14 +25,6 @@
 #  undef AssertARKode
 #endif // #ifdef AssertARKode
 
-#ifdef AssertCuda
-#  undef AssertCuda
-#endif // #ifdef AssertCuda
-
-#ifdef AssertCudaKernel
-#  undef AssertCudaKernel
-#endif // #ifdef AssertCudaKernel
-
 #ifdef AssertCusolver
 #  undef AssertCusolver
 #endif // #ifdef AssertCusolver
@@ -64,10 +56,6 @@
 #ifdef AssertNothrow
 #  undef AssertNothrow
 #endif // #ifdef AssertNothrow
-
-#ifdef AssertNothrowCuda
-#  undef AssertNothrowCuda
-#endif // #ifdef AssertNothrowCuda
 
 #ifdef AssertNothrowCusparse
 #  undef AssertNothrowCusparse

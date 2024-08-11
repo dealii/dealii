@@ -12,7 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
-// Test that Point operations on a CUDA device can be used.
+// Test that Point operations with the default Kokkos backend can be used.
 
 #include <deal.II/base/point.h>
 

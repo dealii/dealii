@@ -37,10 +37,6 @@
 #  include <Epetra_Import.h>
 #endif
 
-#ifdef DEAL_II_WITH_CUDA
-#  include <deal.II/lac/cuda_vector.h>
-#endif
-
 #include <boost/io/ios_state.hpp>
 
 DEAL_II_NAMESPACE_OPEN
@@ -848,96 +844,6 @@ namespace LinearAlgebra
                     operation,
                     trilinos_vec.get_mpi_communicator(),
                     communication_pattern);
-  }
-#endif
-
-
-
-#ifdef DEAL_II_WITH_CUDA
-  template <typename Number>
-  void
-  ReadWriteVector<Number>::import_elements(
-    const LinearAlgebra::CUDAWrappers::Vector<Number> &cuda_vec,
-    VectorOperation::values                            operation,
-    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)
-  {
-    const unsigned int n_elements = stored_elements.n_elements();
-    if (operation == VectorOperation::insert)
-      {
-        cudaError_t error_code = cudaMemcpy(values.data(),
-                                            cuda_vec.get_values(),
-                                            n_elements * sizeof(Number),
-                                            cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-      }
-    else if (operation == VectorOperation::add)
-      {
-        // Copy the vector from the device to a temporary vector on the host
-        std::vector<Number> tmp(n_elements);
-        cudaError_t         error_code = cudaMemcpy(tmp.data(),
-                                            cuda_vec.get_values(),
-                                            n_elements * sizeof(Number),
-                                            cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-
-        // Add the two vectors
-        for (unsigned int i = 0; i < n_elements; ++i)
-          values[i] += tmp[i];
-      }
-    else if (operation == VectorOperation::min)
-      {
-        // Copy the vector from the device to a temporary vector on the host
-        std::vector<Number> tmp(n_elements);
-        cudaError_t         error_code = cudaMemcpy(tmp.data(),
-                                            cuda_vec.get_values(),
-                                            n_elements * sizeof(Number),
-                                            cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-
-        // To ensure that this code also compiles with complex
-        // numbers, we only compare the real part of the
-        // variable. Note that min/max do not make sense with complex
-        // numbers.
-        for (unsigned int i = 0; i < n_elements; ++i)
-          {
-            Assert(
-              std::imag(tmp[i]) == 0.,
-              ExcMessage(
-                "VectorOperation::min is not defined if there is an imaginary part!)"));
-            Assert(
-              std::imag(values[i]) == 0.,
-              ExcMessage(
-                "VectorOperation::min is not defined if there is an imaginary part!)"));
-            if (std::real(tmp[i]) - std::real(values[i]) < 0.0)
-              values[i] = tmp[i];
-          }
-      }
-    else if (operation == VectorOperation::max)
-      {
-        // Copy the vector from the device to a temporary vector on the host
-        std::vector<Number> tmp(n_elements);
-        cudaError_t         error_code = cudaMemcpy(tmp.data(),
-                                            cuda_vec.get_values(),
-                                            n_elements * sizeof(Number),
-                                            cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
-
-        for (unsigned int i = 0; i < n_elements; ++i)
-          {
-            Assert(
-              std::imag(tmp[i]) == 0.,
-              ExcMessage(
-                "VectorOperation::max is not defined if there is an imaginary part!)"));
-            Assert(
-              std::imag(values[i]) == 0.,
-              ExcMessage(
-                "VectorOperation::max is not defined if there is an imaginary part!)"));
-            if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
-              values[i] = tmp[i];
-          }
-      }
-    else
-      AssertThrow(false, ExcNotImplemented());
   }
 #endif
 

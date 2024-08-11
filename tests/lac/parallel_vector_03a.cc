@@ -16,7 +16,6 @@
 // similar to parallel_sparse_vector_03.cc, but make sure
 // compress(insert) zeroes out ghosts in Release mode
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

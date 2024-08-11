@@ -204,7 +204,6 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_CGAL_VERSION_GTE=1 \
                          DEAL_II_WITH_TASKFLOW=1 \
                          DEAL_II_WITH_COMPLEX_VALUES=1 \
-                         DEAL_II_WITH_CUDA=1 \
                          DEAL_II_WITH_GINKGO=1 \
                          DEAL_II_WITH_GMSH=1 \
                          DEAL_II_GMSH_WITH_API=1 \

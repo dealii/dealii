@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/cuda.h>
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/kokkos.h>
 
@@ -35,9 +35,8 @@ namespace MemorySpace
 {
   /**
    * Structure which stores data on the host or the @ref GlossDevice "device" depending on the
-   * template parameter @p MemorySpace. Valid choices are MemorySpace::Host,
-   * MemorySpace::Default, and MemorySpace::CUDA (if CUDA was enabled in
-   * deal.II). The data is copied into the structure which then owns the data
+   * template parameter @p MemorySpace. Valid choices are MemorySpace::Host and MemorySpace::Default.
+   * The data is copied into the structure which then owns the data
    * and will release the memory when the destructor is called.
    */
   template <typename T, typename MemorySpace>

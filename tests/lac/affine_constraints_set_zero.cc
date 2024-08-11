@@ -17,8 +17,6 @@
 // check AffineConstraints<double>::set_zero(Vector) for parallel distributed
 // vectors
 
-#include <deal.II/base/cuda_size.h>
-
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/grid/grid_generator.h>

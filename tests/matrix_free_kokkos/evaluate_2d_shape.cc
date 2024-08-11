@@ -15,14 +15,14 @@
 
 
 // this function tests the correctness of the 2d evaluation functions used in
-// CUDAWrappers::FEEvaluation. These functions are marked 'internal' but it is
+// Portable::FEEvaluation. These functions are marked 'internal' but it is
 // much easier to check their correctness directly rather than from the results
 // in dependent functions
 
-#include <deal.II/lac/cuda_vector.h>
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/read_write_vector.h>
 
-#include <deal.II/matrix_free/cuda_fe_evaluation.h>
+#include <deal.II/matrix_free/portable_tensor_product_kernels.h>
 
 #include <fstream>
 #include <iostream>
@@ -43,8 +43,8 @@ evaluate_tensor_product(
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> src)
 {
-  CUDAWrappers::internal::EvaluatorTensorProduct<
-    CUDAWrappers::internal::evaluate_general,
+  Portable::internal::EvaluatorTensorProduct<
+    Portable::internal::evaluate_general,
     2,
     M - 1,
     N,

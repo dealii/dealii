@@ -18,8 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/cuda.h>
-#include <deal.II/base/cuda_size.h>
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/base/memory_space.h>
 
@@ -29,8 +27,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 
-#include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
-#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/portable_hanging_nodes_internal.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <Kokkos_Core.hpp>
@@ -126,7 +124,7 @@ namespace Portable
     void
     ReinitHelper<dim, Number>::resize(const unsigned int n_colors)
     {
-      // We need at least three colors when we are using CUDA-aware MPI and
+      // We need at least three colors when we are using device-aware MPI and
       // overlapping the communication
       data->n_cells.resize(std::max(n_colors, 3U), 0);
       data->local_to_global.resize(n_colors);
@@ -324,28 +322,6 @@ namespace Portable
         return vec.locally_owned_size();
       }
     };
-
-#ifdef DEAL_II_WITH_CUDA
-    template <>
-    struct VectorLocalSize<LinearAlgebra::CUDAWrappers::Vector<double>>
-    {
-      static unsigned int
-      get(const LinearAlgebra::CUDAWrappers::Vector<double> &vec)
-      {
-        return vec.size();
-      }
-    };
-
-    template <>
-    struct VectorLocalSize<LinearAlgebra::CUDAWrappers::Vector<float>>
-    {
-      static unsigned int
-      get(const LinearAlgebra::CUDAWrappers::Vector<float> &vec)
-      {
-        return vec.size();
-      }
-    };
-#endif
 
 
 
@@ -573,17 +549,6 @@ namespace Portable
           dst_ptr[constr_dofs[dof]] = val;
       });
   }
-
-
-#ifdef DEAL_II_WITH_CUDA
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::initialize_dof_vector(
-    LinearAlgebra::CUDAWrappers::Vector<Number> &vec) const
-  {
-    vec.reinit(n_dofs);
-  }
-#endif
 
 
 
@@ -1023,7 +988,7 @@ namespace Portable
                   apply_kernel);
 
                 // We need a synchronization point because we don't want
-                // CUDA-aware MPI to start the MPI communication until the
+                // device-aware MPI to start the MPI communication until the
                 // kernel is done.
                 Kokkos::fence();
               }
@@ -1131,18 +1096,6 @@ namespace Portable
       }
   }
 
-#ifdef DEAL_II_WITH_CUDA
-  template <int dim, typename Number>
-  template <typename Functor>
-  void
-  MatrixFree<dim, Number>::distributed_cell_loop(
-    const Functor &,
-    const LinearAlgebra::CUDAWrappers::Vector<Number> &,
-    LinearAlgebra::CUDAWrappers::Vector<Number> &) const
-  {
-    DEAL_II_ASSERT_UNREACHABLE();
-  }
-#endif
 } // namespace Portable
 
 DEAL_II_NAMESPACE_CLOSE

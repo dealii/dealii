@@ -363,8 +363,7 @@ namespace Step64
     // Since all the operations in the `solve()` function are executed on the
     // graphics card, it is necessary for the vectors used to store their values
     // on the GPU as well. LinearAlgebra::distributed::Vector can be told which
-    // memory space to use. There is also LinearAlgebra::CUDAWrappers::Vector
-    // that always uses GPU memory storage but doesn't work with MPI. It might
+    // memory space to use. It might
     // be worth noticing that the communication between different MPI processes
     // can be improved if the MPI implementation is GPU-aware and the configure
     // flag `DEAL_II_MPI_WITH_DEVICE_SUPPORT` is enabled. (The value of this

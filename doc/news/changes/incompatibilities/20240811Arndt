@@ -1,0 +1,4 @@
+Removed: All support for CUDAWrappers and CUDA-related macros have been removed.
+GPU support is provided through Kokkos.
+<br>
+(Daniel Arndt, 2024/08/11)

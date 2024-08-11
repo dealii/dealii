@@ -41,7 +41,6 @@
 #cmakedefine DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED
 #cmakedefine DEAL_II_WITH_CGAL
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
-#cmakedefine DEAL_II_WITH_CUDA
 #cmakedefine DEAL_II_WITH_GINKGO
 #cmakedefine DEAL_II_WITH_GMSH
 #cmakedefine DEAL_II_WITH_GSL
@@ -491,9 +490,6 @@
 #endif
 
 #cmakedefine DEAL_II_MPI_WITH_DEVICE_SUPPORT
-#ifdef DEAL_II_MPI_WITH_DEVICE_SUPPORT
-#cmakedefine DEAL_II_MPI_WITH_CUDA_SUPPORT
-#endif
 
 /***********************************************************************
  * Two macro names that we put at the top and bottom of all deal.II files

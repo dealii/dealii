@@ -15,20 +15,6 @@
     <p>
       To compile and run CUDA code, you need to use an external Kokkos
       installation that has been configured with CUDA support.
-
-      To enable deal.II's own CUDA backend, you will need your GPU to have compute
-      capability 6.0 or higher. Independently from the GPU itself, you also need a
-      version of CUDA between 10.2 and 11.8.
-    </p>
-
-    <p>
-      To configure deal.II's own CUDA backend use the following option:
-      <pre>
-
-        -DDEAL_II_WITH_CUDA=ON
-      </pre>
-      CUDA versions prior to 11.0 don't support C++17 or higher. You will have
-      to make sure that C++17 is disabled when using earlier versions.
     </p>
 
     <p>

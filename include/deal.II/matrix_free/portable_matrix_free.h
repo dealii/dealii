@@ -18,7 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/cuda_size.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/partitioner.h>
@@ -34,7 +33,6 @@
 #include <deal.II/grid/filtered_iterator.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <Kokkos_Core.hpp>
@@ -86,8 +84,6 @@ namespace Portable
    * Triangulation class in deal.II.
    *
    * @note Only float and double are supported.
-   *
-   * @ingroup CUDAWrappers
    */
   template <int dim, typename Number = double>
   class MatrixFree : public Subscriptor
@@ -119,7 +115,7 @@ namespace Portable
         AssertThrow(
           overlap_communication_computation == false,
           ExcMessage(
-            "Overlapping communication and computation requires CUDA-aware MPI."));
+            "Overlapping communication and computation requires device-aware MPI."));
 #endif
         if (overlap_communication_computation == true)
           AssertThrow(
@@ -146,7 +142,7 @@ namespace Portable
       bool use_coloring;
 
       /**
-       * Overlap MPI communications with computation. This requires CUDA-aware
+       * Overlap MPI communications with computation. This requires device-aware
        * MPI and use_coloring must be false.
        */
       bool overlap_communication_computation;
@@ -374,16 +370,6 @@ namespace Portable
     void
     set_constrained_values(const Number val, VectorType &dst) const;
 
-#ifdef DEAL_II_WITH_CUDA
-    /**
-     * Initialize a serial vector. The size corresponds to the number of degrees
-     * of freedom in the DoFHandler object.
-     */
-    void
-    initialize_dof_vector(
-      LinearAlgebra::CUDAWrappers::Vector<Number> &vec) const;
-#endif
-
     /**
      * Initialize a distributed vector. The local elements correspond to the
      * locally owned degrees of freedom and the ghost elements correspond to the
@@ -462,20 +448,6 @@ namespace Portable
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
       const;
 
-#ifdef DEAL_II_WITH_CUDA
-    /**
-     * This function should never be called. Calling it results in an internal
-     * error. This function exists only because cell_loop needs
-     * distributed_cell_loop() to exist for LinearAlgebra::CUDAWrappers::Vector.
-     */
-    template <typename Functor>
-    void
-    distributed_cell_loop(
-      const Functor                                     &func,
-      const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
-      LinearAlgebra::CUDAWrappers::Vector<Number>       &dst) const;
-#endif
-
     /**
      * Unique ID associated with the object.
      */
@@ -489,7 +461,7 @@ namespace Portable
     bool use_coloring;
 
     /**
-     *  Overlap MPI communications with computation. This requires CUDA-aware
+     *  Overlap MPI communications with computation. This requires device-aware
      *  MPI and use_coloring must be false.
      */
     bool overlap_communication_computation;

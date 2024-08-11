@@ -41,11 +41,6 @@ namespace internal
 {
   namespace GrowingVectorMemoryImplementation
   {
-#ifdef DEAL_II_WITH_CUDA
-    void
-    release_all_unused_cuda_memory();
-#endif
-
     void
     release_all_unused_memory()
     {
@@ -56,9 +51,6 @@ namespace internal
       dealii::GrowingVectorMemory<dealii::LinearAlgebra::distributed::Vector<
         double,
         MemorySpace::Default>>::release_unused_memory();
-#ifdef DEAL_II_WITH_CUDA
-      release_all_unused_cuda_memory();
-#endif
     }
   } // namespace GrowingVectorMemoryImplementation
 } // namespace internal

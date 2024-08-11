@@ -42,7 +42,7 @@ digraph G
             color="gray", fontcolor="gray", fillcolor="white", style="filled"];
   fevalues [label="FEEvaluation", fillcolor="deepskyblue"];
   mf       [label="MatrixFree loops", fillcolor="deepskyblue"];
-  cuda     [label="CUDA",     URL="\ref CUDAWrappers", fontname="FreeSans",fontsize=12,
+  portable     [label="Portable",     URL="\ref Portable", fontname="FreeSans",fontsize=12,
             height=0.2,width=0.4,
             color="gray", fontcolor="gray", fillcolor="white", style="filled"];
   tbb      [label="TBB", fontname="FreeSans",fontsize=12,
@@ -51,8 +51,8 @@ digraph G
 {rank=same
   simd -> fevalues        [dir="none", color="transparent"];
   fevalues -> mf          [dir="none", color="transparent"];
-  mf -> cuda              [dir="none", color="transparent"];
-  cuda -> tbb             [dir="none", color="transparent"];
+  mf -> portable              [dir="none", color="transparent"];
+  portable -> tbb             [dir="none", color="transparent"];
 }
   subgraph sol {
     rank="same";

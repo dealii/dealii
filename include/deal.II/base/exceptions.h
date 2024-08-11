@@ -31,11 +31,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #include <string>
 #include <type_traits>
 
-#ifdef DEAL_II_WITH_CUDA
-#  include <cusolverSp.h>
-#  include <cusparse.h>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -1198,21 +1193,6 @@ namespace StandardExceptions
     "if deal.II was configured to use Assimp, but cmake did not "
     "find a valid Assimp library.");
 
-#ifdef DEAL_II_WITH_CUDA
-  /**
-   * This exception is raised if an error happened in a CUDA kernel.
-   *
-   * The constructor takes a single <tt>char*</tt>, the output of
-   * cudaGetErrorString.
-   */
-  DeclException1(ExcCudaError, const char *, << arg1);
-  /**
-   * This exception is raised if an error happened in a cuSPARSE function.
-   */
-  DeclException1(ExcCusparseError,
-                 std::string,
-                 << "There was an error in a cuSPARSE function: " << arg1);
-#endif
   /** @} */
 
   /**
@@ -1518,23 +1498,6 @@ namespace deal_II_exceptions
       // another function:
       do_issue_error_nothrow(e);
     }
-#ifdef DEAL_II_WITH_CUDA
-    /**
-     * Return a string given an error code. This is similar to the
-     * cudaGetErrorString function but there is no equivalent function for
-     * cuSPARSE.
-     */
-    std::string
-    get_cusparse_error_string(const cusparseStatus_t error_code);
-
-    /**
-     * Return a string given an error code. This is similar to the
-     * cudaGetErrorString function but there is no equivalent function for
-     * cuSOLVER.
-     */
-    std::string
-    get_cusolver_error_string(const cusolverStatus_t error_code);
-#endif
   } /*namespace internals*/
 
 } /*namespace deal_II_exceptions*/
@@ -2173,201 +2136,6 @@ namespace internal
       }                              \
     while (false)
 #endif // DEAL_II_WITH_MPI
-
-#ifdef DEAL_II_WITH_CUDA
-/**
- * An assertion that checks that the error code produced by calling a CUDA
- * routine is equal to cudaSuccess.
- *
- * @note This and similar macro names are examples of preprocessor definitions
- * in the deal.II library that are not prefixed by a string that likely makes
- * them unique to deal.II. As a consequence, it is possible that other
- * libraries your code interfaces with define the same name, and the result
- * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
- * this macro, as well as all other macros defined by deal.II that are not
- * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
- * the header <code>deal.II/base/undefine_macros.h</code> after all other
- * deal.II headers have been included.
- *
- * @ingroup Exceptions
- */
-#  ifdef DEBUG
-#    define AssertCuda(error_code)      \
-      Assert(error_code == cudaSuccess, \
-             dealii::ExcCudaError(cudaGetErrorString(error_code)))
-#  else
-#    define AssertCuda(error_code) \
-      do                           \
-        {                          \
-          (void)(error_code);      \
-        }                          \
-      while (false)
-#  endif
-
-/**
- * The non-throwing equivalent of AssertCuda.
- *
- * @note This and similar macro names are examples of preprocessor definitions
- * in the deal.II library that are not prefixed by a string that likely makes
- * them unique to deal.II. As a consequence, it is possible that other
- * libraries your code interfaces with define the same name, and the result
- * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
- * this macro, as well as all other macros defined by deal.II that are not
- * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
- * the header <code>deal.II/base/undefine_macros.h</code> after all other
- * deal.II headers have been included.
- *
- * @ingroup Exceptions
- */
-#  ifdef DEBUG
-#    define AssertNothrowCuda(error_code)      \
-      AssertNothrow(error_code == cudaSuccess, \
-                    dealii::ExcCudaError(cudaGetErrorString(error_code)))
-#  else
-#    define AssertNothrowCuda(error_code) \
-      do                                  \
-        {                                 \
-          (void)(error_code);             \
-        }                                 \
-      while (false)
-#  endif
-
-/**
- * An assertion that checks that the kernel was launched and executed
- * successfully.
- *
- * @note This and similar macro names are examples of preprocessor definitions
- * in the deal.II library that are not prefixed by a string that likely makes
- * them unique to deal.II. As a consequence, it is possible that other
- * libraries your code interfaces with define the same name, and the result
- * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
- * this macro, as well as all other macros defined by deal.II that are not
- * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
- * the header <code>deal.II/base/undefine_macros.h</code> after all other
- * deal.II headers have been included.
- *
- * @ingroup Exceptions
- */
-#  ifdef DEBUG
-#    define AssertCudaKernel()                                  \
-      do                                                        \
-        {                                                       \
-          cudaError_t local_error_code = cudaPeekAtLastError(); \
-          AssertCuda(local_error_code);                         \
-          local_error_code = cudaDeviceSynchronize();           \
-          AssertCuda(local_error_code);                         \
-        }                                                       \
-      while (false)
-#  else
-#    define AssertCudaKernel() \
-      do                       \
-        {                      \
-        }                      \
-      while (false)
-#  endif
-
-/**
- * An assertion that checks that the error code produced by calling a cuSPARSE
- * routine is equal to CUSPARSE_STATUS_SUCCESS.
- *
- * @note This and similar macro names are examples of preprocessor definitions
- * in the deal.II library that are not prefixed by a string that likely makes
- * them unique to deal.II. As a consequence, it is possible that other
- * libraries your code interfaces with define the same name, and the result
- * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
- * this macro, as well as all other macros defined by deal.II that are not
- * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
- * the header <code>deal.II/base/undefine_macros.h</code> after all other
- * deal.II headers have been included.
- *
- * @ingroup Exceptions
- */
-#  ifdef DEBUG
-#    define AssertCusparse(error_code)                                      \
-      Assert(                                                               \
-        error_code == CUSPARSE_STATUS_SUCCESS,                              \
-        dealii::ExcCusparseError(                                           \
-          dealii::deal_II_exceptions::internals::get_cusparse_error_string( \
-            error_code)))
-#  else
-#    define AssertCusparse(error_code) \
-      do                               \
-        {                              \
-          (void)(error_code);          \
-        }                              \
-      while (false)
-#  endif
-
-/**
- * The non-throwing equivalent of AssertCusparse.
- *
- * @note This and similar macro names are examples of preprocessor definitions
- * in the deal.II library that are not prefixed by a string that likely makes
- * them unique to deal.II. As a consequence, it is possible that other
- * libraries your code interfaces with define the same name, and the result
- * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
- * this macro, as well as all other macros defined by deal.II that are not
- * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
- * the header <code>deal.II/base/undefine_macros.h</code> after all other
- * deal.II headers have been included.
- *
- * @ingroup Exceptions
- */
-#  ifdef DEBUG
-#    define AssertNothrowCusparse(error_code)                               \
-      AssertNothrow(                                                        \
-        error_code == CUSPARSE_STATUS_SUCCESS,                              \
-        dealii::ExcCusparseError(                                           \
-          dealii::deal_II_exceptions::internals::get_cusparse_error_string( \
-            error_code)))
-#  else
-#    define AssertNothrowCusparse(error_code) \
-      do                                      \
-        {                                     \
-          (void)(error_code);                 \
-        }                                     \
-      while (false)
-#  endif
-
-/**
- * An assertion that checks that the error code produced by calling a cuSOLVER
- * routine is equal to CUSOLVER_STATUS_SUCCESS.
- *
- * @note This and similar macro names are examples of preprocessor definitions
- * in the deal.II library that are not prefixed by a string that likely makes
- * them unique to deal.II. As a consequence, it is possible that other
- * libraries your code interfaces with define the same name, and the result
- * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
- * this macro, as well as all other macros defined by deal.II that are not
- * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
- * the header <code>deal.II/base/undefine_macros.h</code> after all other
- * deal.II headers have been included.
- *
- * @ingroup Exceptions
- */
-#  ifdef DEBUG
-#    define AssertCusolver(error_code)                                      \
-      Assert(                                                               \
-        error_code == CUSOLVER_STATUS_SUCCESS,                              \
-        dealii::ExcCusparseError(                                           \
-          dealii::deal_II_exceptions::internals::get_cusolver_error_string( \
-            error_code)))
-#  else
-#    define AssertCusolver(error_code) \
-      do                               \
-        {                              \
-          (void)(error_code);          \
-        }                              \
-      while (false)
-#  endif
-
-#endif
 
 #ifdef DEAL_II_TRILINOS_WITH_SEACAS
 /**

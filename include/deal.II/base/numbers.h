@@ -20,10 +20,6 @@
 
 #include <deal.II/base/types.h>
 
-#ifdef DEAL_II_WITH_CUDA
-#  include <cuComplex.h>
-#endif
-
 #include <Kokkos_Macros.hpp>
 
 #include <cmath>
@@ -32,7 +28,6 @@
 #include <type_traits>
 
 #define DEAL_II_HOST_DEVICE KOKKOS_FUNCTION
-#define DEAL_II_CUDA_HOST_DEV DEAL_II_HOST_DEVICE
 #define DEAL_II_HOST_DEVICE_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
 
 // clang++ assumes that all constexpr functions are __host__ __device__ when
@@ -775,27 +770,6 @@ namespace internal
     }
   };
 
-#ifdef DEAL_II_WITH_CUDA
-  template <>
-  struct NumberType<cuComplex>
-  {
-    static cuComplex
-    value(const float t)
-    {
-      return make_cuComplex(t, 0.f);
-    }
-  };
-
-  template <>
-  struct NumberType<cuDoubleComplex>
-  {
-    static cuDoubleComplex
-    value(const double t)
-    {
-      return make_cuDoubleComplex(t, 0.);
-    }
-  };
-#endif
 } // namespace internal
 
 namespace numbers

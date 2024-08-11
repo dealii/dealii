@@ -257,7 +257,7 @@ namespace internal
 
     /**
      * This class creates the mask used in the treatment of hanging nodes in
-     * CUDAWrappers::MatrixFree.
+     * Portable::MatrixFree.
      * The implementation of this class is explained in detail in
      * @cite munch2022hn.
      */

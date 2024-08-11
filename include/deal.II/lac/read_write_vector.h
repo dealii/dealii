@@ -81,16 +81,6 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 #  endif
 
-#  ifdef DEAL_II_WITH_CUDA
-namespace LinearAlgebra
-{
-  namespace CUDAWrappers
-  {
-    template <typename>
-    class Vector;
-  }
-} // namespace LinearAlgebra
-#  endif
 #endif
 
 namespace LinearAlgebra
@@ -463,35 +453,6 @@ namespace LinearAlgebra
     void
     import(const EpetraWrappers::Vector &V,
            VectorOperation::values       operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-#endif
-
-#ifdef DEAL_II_WITH_CUDA
-    /**
-     * Import all the elements present in the vector's IndexSet from the input
-     * vector @p cuda_vec. VectorOperation::values @p operation is used to
-     * decide if the elements in @p V should be added to the current vector or
-     * replace the current elements. The last parameter is not used.
-     */
-    void
-    import_elements(
-      const CUDAWrappers::Vector<Number> &cuda_vec,
-      VectorOperation::values             operation,
-      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-        &communication_pattern = {});
-
-
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const CUDAWrappers::Vector<Number> &V,
-           VectorOperation::values             operation,
            const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
              &communication_pattern = {})
     {

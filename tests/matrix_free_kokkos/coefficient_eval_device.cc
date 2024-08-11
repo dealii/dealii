@@ -20,7 +20,6 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/portable_matrix_free.templates.h>
