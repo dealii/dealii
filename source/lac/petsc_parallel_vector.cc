@@ -293,21 +293,25 @@ namespace PETScWrappers
     {
       (void)n;
       AssertIndexRange(locally_owned_size, n + 1);
+      // If the size of the index set can be converted to a PetscInt then every
+      // index can also be converted
+      AssertThrowIntegerConversion(static_cast<PetscInt>(n), n);
       ghosted       = true;
       ghost_indices = ghostnodes;
 
-      const std::vector<size_type> ghostindices = ghostnodes.get_index_vector();
-
-      const PetscInt *ptr =
-        (ghostindices.size() > 0 ?
-           reinterpret_cast<const PetscInt *>(ghostindices.data()) :
-           nullptr);
+      std::size_t           i = 0;
+      std::vector<PetscInt> petsc_ghost_indices(ghostnodes.n_elements());
+      for (const auto &index : ghostnodes)
+        {
+          petsc_ghost_indices[i] = static_cast<PetscInt>(index);
+          ++i;
+        }
 
       PetscErrorCode ierr = VecCreateGhost(communicator,
                                            locally_owned_size,
                                            PETSC_DETERMINE,
-                                           ghostindices.size(),
-                                           ptr,
+                                           petsc_ghost_indices.size(),
+                                           petsc_ghost_indices.data(),
                                            &vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
 
