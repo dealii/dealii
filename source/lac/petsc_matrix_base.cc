@@ -166,11 +166,8 @@ namespace PETScWrappers
 
     // now set all the entries of these rows to zero
 #  ifdef DEBUG
-    for (size_type i = 0; i < rows.size(); ++i)
-      {
-        const auto row = static_cast<PetscInt>(rows[i]);
-        AssertIntegerConversion(row, rows[i]);
-      }
+    for (const auto &row : rows)
+      AssertIntegerConversion(static_cast<PetscInt>(row), row);
 #  endif
     const std::vector<PetscInt> petsc_rows(rows.begin(), rows.end());
 
@@ -201,11 +198,8 @@ namespace PETScWrappers
 
     // now set all the entries of these rows to zero
 #  ifdef DEBUG
-    for (size_type i = 0; i < rows.size(); ++i)
-      {
-        const auto row = static_cast<PetscInt>(rows[i]);
-        AssertIntegerConversion(row, rows[i]);
-      }
+    for (const auto &row : rows)
+      AssertIntegerConversion(static_cast<PetscInt>(row), row);
 #  endif
     const std::vector<PetscInt> petsc_rows(rows.begin(), rows.end());
 
@@ -410,7 +404,7 @@ namespace PETScWrappers
     // something that is unreasonable. there should simply be a way in PETSc to
     // query the number of entries in a row bypassing the call to compress(),
     // but I can't find one
-    Assert(row < m(), ExcInternalError());
+    AssertIndexRange(row, m());
 
     // get a representation of the present
     // row
