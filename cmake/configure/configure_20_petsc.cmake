@@ -63,40 +63,14 @@ macro(feature_petsc_find_external var)
       set(${var} FALSE)
     endif()
 
-    #
-    # PETSc has to be configured with the same number of bits for indices as
-    # deal.II.
-    #
-    # petscconf.h should export PETSC_WITH_64BIT_INDICES 1 in case 64bits
-    # indices support is enabled.
-    # So we check for this:
-    #
-    if( (NOT PETSC_WITH_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
-         OR
-         (PETSC_WITH_64BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES))
-      message(STATUS "Could not find a sufficient PETSc installation: "
-        "PETSc has to be configured to use the same number of bits for the "
-        "global indices as deal.II."
-        )
-      set(PETSC_ADDITIONAL_ERROR_STRING
-        ${PETSC_ADDITIONAL_ERROR_STRING}
-        "Could not find a sufficient PETSc installation:\n"
-        "PETSc has to be configured to use the same number of bits for the "
-        "global indices as deal.II, but found:\n"
-        "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
-        "  PETSC_WITH_64BIT_INDICES = (${PETSC_WITH_64BIT_INDICES})\n"
-        )
-      set(${var} FALSE)
-    endif()
-
     # If PETSc is compiled with complex scalar type we need to have support
     # for complex values within deal.II as well.
     #
-    if( PETSC_WITH_COMPLEX AND NOT DEAL_II_WITH_COMPLEX_VALUES )
+    if(PETSC_WITH_COMPLEX AND NOT DEAL_II_WITH_COMPLEX_VALUES)
         message(STATUS "The PETSc configuration is incompatible with the deal.II configuration: "
-        "PETSc is compiled with complex scalar type. "
-        "This requires support for complex values in deal.II as well."
-        )
+          "PETSc is compiled with complex scalar type. "
+          "This requires support for complex values in deal.II as well."
+          )
       set(PETSC_ADDITIONAL_ERROR_STRING
         ${PETSC_ADDITIONAL_ERROR_STRING}
         "The PETSc configuration is incompatible with the deal.II configuration:\n"
