@@ -1078,25 +1078,20 @@ namespace PETScWrappers
     Assert((last_action == action) || (last_action == VectorOperation::unknown),
            internal::VectorReference::ExcWrongMode(action, last_action));
     Assert(!has_ghost_elements(), ExcGhostsPresent());
-    // VecSetValues complains if we
-    // come with an empty
-    // vector. however, it is not a
-    // collective operation, so we
-    // can skip the call if necessary
-    // (unlike the above calls)
-    if (n_elements != 0)
-      {
-        const PetscInt *petsc_indices =
-          reinterpret_cast<const PetscInt *>(indices);
 
-        const InsertMode     mode = (add_values ? ADD_VALUES : INSERT_VALUES);
-        const PetscErrorCode ierr =
-          VecSetValues(vector, n_elements, petsc_indices, values, mode);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+    std::vector<PetscInt> petsc_indices(n_elements);
+    for (size_type i = 0; i < n_elements; ++i)
+      {
+        const auto petsc_index = static_cast<PetscInt>(indices[i]);
+        AssertIntegerConversion(petsc_index, indices[i]);
+        petsc_indices[i] = petsc_index;
       }
 
-    // set the mode here, independent of whether we have actually
-    // written elements or whether the list was empty
+    const InsertMode     mode = (add_values ? ADD_VALUES : INSERT_VALUES);
+    const PetscErrorCode ierr = VecSetValues(
+      vector, petsc_indices.size(), petsc_indices.data(), values, mode);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
     last_action = action;
   }
 
