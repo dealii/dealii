@@ -1480,7 +1480,7 @@ namespace PETScWrappers
 
     prepare_action(VectorOperation::add);
 
-    const auto petsc_row = row;
+    const auto petsc_row = static_cast<PetscInt>(row);
     AssertIntegerConversion(petsc_row, row);
 
     PetscInt n_columns = 0;
