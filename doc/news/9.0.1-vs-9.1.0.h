@@ -428,7 +428,7 @@ inconvenience this causes.
   for quadrilateral and hexahedral meshes. The BR1-P0 pair is LBB stable for Stokes problems. Due
   to the edge-based bubble functions, features such as hanging nodes are not supported.
   <br>
-  (Graham Harper, 07/09/2018)
+  (Graham Harper, 2018/07/09)
  </li>
 
  <li>

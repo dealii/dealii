@@ -321,7 +321,7 @@ inconvenience this causes.
   Changed: Adjusted ranges for GridRefinement::refine_and_coarsen_fixed_fraction():
   Now criteria of every cell will be considered.
   <br>
-  (Marc Fehling, 12/05/2019)
+  (Marc Fehling, 2019/12/05)
  </li>
 
  <li>
@@ -330,7 +330,7 @@ inconvenience this causes.
   This affects both GridRefinement::fixed_number_refinement() and
   parallel::distributed::GridRefinement::fixed_number_refinement().
   <br>
-  (Marc Fehling, 12/05/2019)
+  (Marc Fehling, 2019/12/05)
  </li>
 
  <li>
@@ -1394,7 +1394,7 @@ inconvenience this causes.
   Improved: mu_parser functions now use random number generation facilities
   provided by the standard library.
   <br>
-  (Reza Rastak, 2019/20/30)
+  (Reza Rastak, 2019/12/30)
  </li>
 
  <li>
@@ -1454,7 +1454,9 @@ inconvenience this causes.
  <li>
   New: IndexSet::tensor_product() creates a new IndexSet with global size equal to
   this->size()*other.size(), containing for every element n of this IndexSet, the indices
-  of the other IndexSet, contained in the interval [n*other.size(), (n+1)*other.size()).;<br>;(Luca Heltai, 2019/12/12)
+  of the other IndexSet, contained in the interval [n*other.size(), (n+1)*other.size()).
+  <br>
+  (Luca Heltai, 2019/12/12)
  </li>
 
  <li>
