@@ -313,8 +313,10 @@ namespace
                      vertex_touch_count.end(),
                      &connectivity->ctt_offset[1]);
 
-    [[maybe_unused]] const typename internal::p4est::types<dim>::locidx num_vtt =
-      std::accumulate(vertex_touch_count.begin(), vertex_touch_count.end(), 0u);
+    [[maybe_unused]] const typename internal::p4est::types<dim>::locidx
+      num_vtt = std::accumulate(vertex_touch_count.begin(),
+                                vertex_touch_count.end(),
+                                0u);
     Assert(connectivity->ctt_offset[triangulation.n_vertices()] == num_vtt,
            ExcInternalError());
 
@@ -1847,7 +1849,8 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::create_triangulation(
-      [[maybe_unused]] const TriangulationDescription::Description<dim, spacedim>
+      [[maybe_unused]] const TriangulationDescription::Description<dim,
+                                                                   spacedim>
         &construction_data)
     {
       DEAL_II_ASSERT_UNREACHABLE();
