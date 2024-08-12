@@ -2649,13 +2649,13 @@ namespace parallel
         // There must not be any chains!
         for (unsigned int i = 0; i < topological_vertex_numbering.size(); ++i)
           {
-            const unsigned int j = topological_vertex_numbering[i];
+            [[maybe_unused]] const unsigned int j =
+              topological_vertex_numbering[i];
             Assert(j == i || topological_vertex_numbering[j] == j,
                    ExcMessage("Got inconclusive constraints with chain: " +
                               std::to_string(i) + " vs " + std::to_string(j) +
                               " which should be equal to " +
                               std::to_string(topological_vertex_numbering[j])));
-            (void)j;
           }
 
 
@@ -3142,8 +3142,9 @@ namespace parallel
       // stores locally (in the future we should check that we have exactly as
       // many non-artificial cells as parallel_forest->local_num_quadrants)
       {
-        const unsigned int total_local_cells = this->n_active_cells();
-        (void)total_local_cells;
+        [[maybe_unused]] const unsigned int total_local_cells =
+          this->n_active_cells();
+
 
         if (Utilities::MPI::n_mpi_processes(this->mpi_communicator) == 1)
           {
@@ -3201,10 +3202,10 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     std::vector<types::subdomain_id> Triangulation<dim, spacedim>::
-      find_point_owner_rank(const std::vector<Point<dim>> &points)
+      find_point_owner_rank(
+        [[maybe_unused]] const std::vector<Point<dim>> &points)
     {
 #  ifndef P4EST_SEARCH_LOCAL
-      (void)points;
       AssertThrow(
         false,
         ExcMessage(
@@ -4285,10 +4286,10 @@ namespace parallel
     template <int dim, int spacedim>
     TemporarilyMatchRefineFlags<dim, spacedim>::TemporarilyMatchRefineFlags(
       dealii::Triangulation<dim, spacedim> &tria)
-      : distributed_tria(
-          dynamic_cast<
-            dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
-            &tria))
+      :
+      [[maybe_unused]] distributed_tria(
+        dynamic_cast<
+          dealii::parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
     {
 #ifdef DEAL_II_WITH_P4EST
       if (distributed_tria != nullptr)
@@ -4351,9 +4352,6 @@ namespace parallel
           distributed_tria->load_coarsen_flags(saved_coarsen_flags);
           distributed_tria->load_refine_flags(saved_refine_flags);
         }
-#else
-      // pretend that this destructor does something to silence clang-tidy
-      (void)distributed_tria;
 #endif
     }
   } // namespace distributed
