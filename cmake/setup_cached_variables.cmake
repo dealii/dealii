@@ -338,7 +338,7 @@ list(APPEND DEAL_II_FEATURES 64BIT_INDICES)
 
 option(DEAL_II_WITH_COMPLEX_VALUES
   "If set to OFF, the classes that take a number type are not explicitly instantiated for std::complex<float> and std::complex<double>. This effectively disables the support for computing with complex values. If PETSc is built with complex scalar type, this option must be ON."
-  ON
+  OFF
   )
 list(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
 
