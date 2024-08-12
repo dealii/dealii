@@ -37,7 +37,7 @@ endif()
 #
 # Are all dependencies fulfilled?
 #
-if(NOT DEAL_II_WITH_OPENCASCADE) # keep in one line
+if(NOT DEAL_II_WITH_OPENCASCADE)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_OPENCASCADE = ON
