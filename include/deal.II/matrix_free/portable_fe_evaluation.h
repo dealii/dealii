@@ -135,9 +135,9 @@ namespace Portable
     /**
      * Evaluate the function values and the gradients of the FE function given
      * at the DoF values in the input vector at the quadrature points on the
-     * unit cell. The function arguments specify which parts shall actually be
-     * computed. This function needs to be called before the functions
-     * @p get_value() or @p get_gradient() give useful information.
+     * unit cell. The function argument @p evaluate_flag specifies which parts
+     * shall actually be computed. This function needs to be called before the
+     * functions @p get_value() or @p get_gradient() give useful information.
      */
     DEAL_II_HOST_DEVICE void
     evaluate(const EvaluationFlags::EvaluationFlags evaluate_flag);
@@ -157,9 +157,8 @@ namespace Portable
     /**
      * This function takes the values and/or gradients that are stored on
      * quadrature points, tests them by all the basis functions/gradients on
-     * the cell and performs the cell integration. The two function arguments
-     * @p integrate_val and @p integrate_grad are used to enable/disable some
-     * of the values or the gradients.
+     * the cell and performs the cell integration as specified by the
+     * @p integration_flag argument.
      */
     DEAL_II_HOST_DEVICE void
     integrate(const EvaluationFlags::EvaluationFlags integration_flag);
