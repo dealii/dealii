@@ -1092,6 +1092,18 @@ namespace PETScWrappers
     // To allow calling protected prepare_add() and prepare_set().
     template <class>
     friend class dealii::BlockMatrixBase;
+
+
+    /**
+     * Internal function wrapping MatSetValues().
+     */
+    void
+    add_or_set(const VectorOperation::values &operation,
+               const size_type                row,
+               const size_type                n_cols,
+               const size_type               *col_indices,
+               const PetscScalar             *values,
+               const bool                     elide_zero_values);
   };
 
 
@@ -1311,56 +1323,12 @@ namespace PETScWrappers
                   const PetscScalar *values,
                   const bool         elide_zero_values)
   {
-    prepare_action(VectorOperation::insert);
-
-    const auto petsc_row = static_cast<PetscInt>(row);
-    AssertIntegerConversion(petsc_row, row);
-
-    std::vector<PetscInt>    column_indices;
-    column_indices.reserve(n_cols);
-    std::vector<PetscScalar> column_values;
-    column_values.reserve(n_cols);
-    if (elide_zero_values == false)
-      {
-        column_indices.resize(n_cols);
-        column_values.resize(n_cols);
-
-        for (size_type j = 0; j < n_cols; ++j)
-          {
-            AssertIsFinite(values[j]);
-            column_indices[j] = static_cast<PetscInt>(col_indices[j]);
-            AssertIntegerConversion(column_indices[j], col_indices[j]);
-            column_values[j] = values[j];
-          }
-      }
-    else
-      {
-        // Otherwise, extract nonzero values in each row and get the
-        // respective index.
-        for (size_type j = 0; j < n_cols; ++j)
-          {
-            const PetscScalar value = values[j];
-            AssertIsFinite(value);
-            if (value != PetscScalar())
-              {
-                column_indices.push_back(static_cast<PetscInt>(col_indices[j]));
-                AssertIntegerConversion(column_indices.back(), col_indices[j]);
-                column_values.push_back(value);
-              }
-          }
-      }
-
-    const auto petsc_n_columns = static_cast<PetscInt>(column_indices.size());
-    AssertIntegerConversion(petsc_n_columns, column_indices.size());
-
-    const PetscErrorCode ierr = MatSetValues(matrix,
-                                             1,
-                                             &petsc_row,
-                                             petsc_n_columns,
-                                             column_indices.data(),
-                                             column_values.data(),
-                                             INSERT_VALUES);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    add_or_set(VectorOperation::insert,
+               row,
+               n_cols,
+               col_indices,
+               values,
+               elide_zero_values);
   }
 
 
@@ -1452,12 +1420,30 @@ namespace PETScWrappers
                   const bool         elide_zero_values,
                   const bool /*col_indices_are_sorted*/)
   {
-    prepare_action(VectorOperation::add);
+    add_or_set(VectorOperation::add,
+               row,
+               n_cols,
+               col_indices,
+               values,
+               elide_zero_values);
+  }
+
+
+
+  inline void
+  MatrixBase::add_or_set(const VectorOperation::values &operation,
+                         const size_type                row,
+                         const size_type                n_cols,
+                         const size_type               *col_indices,
+                         const PetscScalar             *values,
+                         const bool                     elide_zero_values)
+  {
+    prepare_action(operation);
 
     const auto petsc_row = static_cast<PetscInt>(row);
     AssertIntegerConversion(petsc_row, row);
 
-    std::vector<PetscInt>    column_indices;
+    std::vector<PetscInt> column_indices;
     column_indices.reserve(n_cols);
     std::vector<PetscScalar> column_values;
     column_values.reserve(n_cols);
@@ -1494,13 +1480,18 @@ namespace PETScWrappers
     const auto petsc_n_columns = static_cast<PetscInt>(column_indices.size());
     AssertIntegerConversion(petsc_n_columns, column_indices.size());
 
-    const PetscErrorCode ierr = MatSetValues(matrix,
-                                             1,
-                                             &petsc_row,
-                                             petsc_n_columns,
-                                             column_indices.data(),
-                                             column_values.data(),
-                                             ADD_VALUES);
+    Assert(operation == VectorOperation::insert ||
+             operation == VectorOperation::add,
+           ExcInternalError());
+    const PetscErrorCode ierr =
+      MatSetValues(matrix,
+                   1,
+                   &petsc_row,
+                   petsc_n_columns,
+                   column_indices.data(),
+                   column_values.data(),
+                   operation == VectorOperation::insert ? INSERT_VALUES :
+                                                          ADD_VALUES);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
