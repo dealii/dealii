@@ -951,6 +951,20 @@ namespace StandardExceptions
                  << "but aren't. They are " << arg1 << " and " << arg2 << '.');
 
   /**
+   * This exception is raised whenever deal.II cannot convert between integer
+   * types.
+   */
+  DeclException2(
+    ExcInvalidIntegerConversion,
+    long long,
+    long long,
+    << "Two integers should be equal to each other after a type conversion but "
+    << "aren't. A typical cause of this problem is that the integral types "
+    << "used by deal.II and an external library are different (e.g., one uses "
+    << "32-bit integers and the other uses 64-bit integers). The integers are "
+    << arg1 << " and " << arg2 << '.');
+
+  /**
    * The first dimension should be either equal to the second or the third,
    * but it is neither.
    */
@@ -1987,6 +2001,27 @@ namespace deal_II_exceptions
                                                                        dim2), \
          dealii::ExcDimensionMismatch((dim1), (dim2)))
 
+/**
+ * Special assertion for integer conversions.
+ *
+ * deal.II does not always use the same integer types as its dependencies. For
+ * example, PETSc uses signed integers whereas deal.II uses unsigned integers.
+ * This assertion checks that we can successfully convert between two index
+ * types.
+ */
+#define AssertIntegerConversion(index1, index2)                         \
+  Assert(::dealii::deal_II_exceptions::internals::compare_for_equality( \
+           index1, index2),                                             \
+         dealii::ExcInvalidIntegerConversion((index1), (index2)))
+
+/**
+ * Special assertion for integer conversions which will throw exceptions.
+ * Otherwise this is the same as AssertIntegerConversion.
+ */
+#define AssertThrowIntegerConversion(index1, index2)                         \
+  AssertThrow(::dealii::deal_II_exceptions::internals::compare_for_equality( \
+                index1, index2),                                             \
+              dealii::ExcInvalidIntegerConversion((index1), (index2)))
 
 /**
  * An assertion that tests whether <tt>vec</tt> has size <tt>dim1</tt>, and

@@ -185,6 +185,15 @@ namespace PETScWrappers
                             const IndexSet            &local_columns,
                             const SparsityPatternType &sparsity_pattern)
     {
+      // If the sparsity pattern's dimensions can be converted to PetscInts then
+      // the rest of the conversions will succeed
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_rows()),
+                                   sparsity_pattern.n_rows());
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_cols()),
+                                   sparsity_pattern.n_cols());
+
       Assert(sparsity_pattern.n_rows() == local_rows.size(),
              ExcMessage(
                "SparsityPattern and IndexSet have different number of rows"));
@@ -272,9 +281,9 @@ namespace PETScWrappers
           // dummy entry at the end to make
           // sure petsc doesn't read past the
           // end
-          std::vector<PetscInt>
-
-            rowstart_in_window(local_row_end - local_row_start + 1, 0),
+          std::vector<PetscInt> rowstart_in_window(local_row_end -
+                                                     local_row_start + 1,
+                                                   0),
             colnums_in_window;
           {
             unsigned int n_cols = 0;
@@ -351,6 +360,14 @@ namespace PETScWrappers
                                   local_columns_per_process.size()));
       Assert(this_process < local_rows_per_process.size(), ExcInternalError());
       assert_is_compressed();
+      // If the sparsity pattern's dimensions can be converted to PetscInts then
+      // the rest of the conversions will succeed
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_rows()),
+                                   sparsity_pattern.n_rows());
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_cols()),
+                                   sparsity_pattern.n_cols());
 
       // for each row that we own locally, we
       // have to count how many of the
@@ -410,17 +427,20 @@ namespace PETScWrappers
           // dummy entry at the end to make
           // sure petsc doesn't read past the
           // end
-          std::vector<PetscInt>
-
-            rowstart_in_window(local_row_end - local_row_start + 1, 0),
+          std::vector<PetscInt> rowstart_in_window(local_row_end -
+                                                     local_row_start + 1,
+                                                   0),
             colnums_in_window;
           {
             size_type n_cols = 0;
             for (size_type i = local_row_start; i < local_row_end; ++i)
               {
                 const size_type row_length = sparsity_pattern.row_length(i);
-                rowstart_in_window[i + 1 - local_row_start] =
+                const auto      row_start =
                   rowstart_in_window[i - local_row_start] + row_length;
+                const auto petsc_row_start = static_cast<PetscInt>(row_start);
+                AssertIntegerConversion(petsc_row_start, row_start);
+                rowstart_in_window[i + 1 - local_row_start] = petsc_row_start;
                 n_cols += row_length;
               }
             colnums_in_window.resize(n_cols + 1, -1);
@@ -435,7 +455,11 @@ namespace PETScWrappers
                      sparsity_pattern.begin(i);
                    p != sparsity_pattern.end(i);
                    ++p, ++ptr)
-                *ptr = p->column();
+                {
+                  const auto petsc_column = static_cast<PetscInt>(p->column());
+                  AssertIntegerConversion(petsc_column, p->column());
+                  *ptr = petsc_column;
+                }
           }
 
 
@@ -471,6 +495,15 @@ namespace PETScWrappers
                             const IndexSet            &local_active_columns,
                             const SparsityPatternType &sparsity_pattern)
     {
+      // If the sparsity pattern's dimensions can be converted to PetscInts then
+      // the rest of the conversions will succeed
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_rows()),
+                                   sparsity_pattern.n_rows());
+      AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                     sparsity_pattern.n_cols()),
+                                   sparsity_pattern.n_cols());
+
 #  if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
       Assert(sparsity_pattern.n_rows() == local_rows.size(),
              ExcMessage(

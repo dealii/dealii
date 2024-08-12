@@ -1250,7 +1250,7 @@ namespace PETScWrappers
         while (input != indices_end)
           {
             const auto index = static_cast<PetscInt>(*input);
-            AssertDimension(index, *input);
+            AssertIntegerConversion(index, *input);
             if (index >= begin && index < end)
               {
                 // local entry
@@ -1293,7 +1293,7 @@ namespace PETScWrappers
         while (input != indices_end)
           {
             const auto index = static_cast<PetscInt>(*input);
-            AssertDimension(index, *input);
+            AssertIntegerConversion(index, *input);
 
             Assert(index >= begin && index < end,
                    ExcMessage("You are accessing elements of a vector without "

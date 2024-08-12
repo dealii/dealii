@@ -1340,30 +1340,29 @@ namespace PETScWrappers
   {
     prepare_action(VectorOperation::insert);
 
-    const PetscInt  petsc_i = row;
-    const PetscInt *col_index_ptr;
+    const auto petsc_row = static_cast<PetscInt>(row);
+    AssertIntegerConversion(petsc_row, row);
 
-    const PetscScalar *col_value_ptr;
-    int                n_columns;
-
-    // If we don't elide zeros, the pointers are already available...
+    PetscInt n_columns = 0;
+    column_indices.resize(n_cols);
+    column_values.resize(n_cols);
     if (elide_zero_values == false)
       {
-        col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
-        col_value_ptr = values;
-        n_columns     = n_cols;
+        n_columns = static_cast<PetscInt>(n_cols);
+        AssertIntegerConversion(n_columns, n_cols);
+
+        for (size_type j = 0; j < n_cols; ++j)
+          {
+            AssertIsFinite(values[j]);
+            column_indices[j] = static_cast<PetscInt>(col_indices[j]);
+            AssertIntegerConversion(column_indices[j], col_indices[j]);
+            column_values[j] = values[j];
+          }
       }
     else
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective index.
-        if (column_indices.size() < n_cols)
-          {
-            column_indices.resize(n_cols);
-            column_values.resize(n_cols);
-          }
-
-        n_columns = 0;
         for (size_type j = 0; j < n_cols; ++j)
           {
             const PetscScalar value = values[j];
@@ -1376,17 +1375,14 @@ namespace PETScWrappers
               }
           }
         AssertIndexRange(n_columns, n_cols + 1);
-
-        col_index_ptr = column_indices.data();
-        col_value_ptr = column_values.data();
       }
 
     const PetscErrorCode ierr = MatSetValues(matrix,
                                              1,
-                                             &petsc_i,
+                                             &petsc_row,
                                              n_columns,
-                                             col_index_ptr,
-                                             col_value_ptr,
+                                             column_indices.data(),
+                                             column_values.data(),
                                              INSERT_VALUES);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
@@ -1484,30 +1480,29 @@ namespace PETScWrappers
 
     prepare_action(VectorOperation::add);
 
-    const PetscInt  petsc_i = row;
-    const PetscInt *col_index_ptr;
+    const auto petsc_row = static_cast<PetscInt>(row);
+    AssertIntegerConversion(petsc_row, row);
 
-    const PetscScalar *col_value_ptr;
-    int                n_columns;
-
-    // If we don't elide zeros, the pointers are already available...
+    PetscInt n_columns = 0;
+    column_indices.resize(n_cols);
+    column_values.resize(n_cols);
     if (elide_zero_values == false)
       {
-        col_index_ptr = reinterpret_cast<const PetscInt *>(col_indices);
-        col_value_ptr = values;
-        n_columns     = n_cols;
+        n_columns = static_cast<PetscInt>(n_cols);
+        AssertIntegerConversion(n_columns, n_cols);
+
+        for (size_type j = 0; j < n_cols; ++j)
+          {
+            AssertIsFinite(values[j]);
+            column_indices[j] = static_cast<PetscInt>(col_indices[j]);
+            AssertIntegerConversion(column_indices[j], col_indices[j]);
+            column_values[j] = values[j];
+          }
       }
     else
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective index.
-        if (column_indices.size() < n_cols)
-          {
-            column_indices.resize(n_cols);
-            column_values.resize(n_cols);
-          }
-
-        n_columns = 0;
         for (size_type j = 0; j < n_cols; ++j)
           {
             const PetscScalar value = values[j];
@@ -1520,13 +1515,15 @@ namespace PETScWrappers
               }
           }
         AssertIndexRange(n_columns, n_cols + 1);
-
-        col_index_ptr = column_indices.data();
-        col_value_ptr = column_values.data();
       }
 
-    const PetscErrorCode ierr = MatSetValues(
-      matrix, 1, &petsc_i, n_columns, col_index_ptr, col_value_ptr, ADD_VALUES);
+    const PetscErrorCode ierr = MatSetValues(matrix,
+                                             1,
+                                             &petsc_row,
+                                             n_columns,
+                                             column_indices.data(),
+                                             column_values.data(),
+                                             ADD_VALUES);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
@@ -1615,14 +1612,20 @@ namespace PETScWrappers
   inline bool
   MatrixBase::in_local_range(const size_type index) const
   {
-    PetscInt begin, end;
+    PetscInt petsc_begin, petsc_end;
 
     const PetscErrorCode ierr =
-      MatGetOwnershipRange(static_cast<const Mat &>(matrix), &begin, &end);
+      MatGetOwnershipRange(static_cast<const Mat &>(matrix),
+                           &petsc_begin,
+                           &petsc_end);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return ((index >= static_cast<size_type>(begin)) &&
-            (index < static_cast<size_type>(end)));
+    const auto begin = static_cast<size_type>(petsc_begin);
+    AssertIntegerConversion(begin, petsc_begin);
+    const auto end = static_cast<size_type>(petsc_end);
+    AssertIntegerConversion(end, petsc_end);
+
+    return ((index >= begin) && (index < end));
   }
 
 

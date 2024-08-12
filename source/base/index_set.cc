@@ -1112,12 +1112,20 @@ IndexSet::make_petsc_is(const MPI_Comm communicator) const
   std::vector<size_type> indices;
   fill_index_vector(indices);
 
-  PetscInt              n = indices.size();
-  std::vector<PetscInt> pindices(indices.begin(), indices.end());
+  // If the size of the index set can be converted to a PetscInt then every
+  // value can also be converted
+  AssertThrowIntegerConversion(static_cast<PetscInt>(size()), size());
+  const auto local_size = static_cast<PetscInt>(n_elements());
+  AssertIntegerConversion(local_size, n_elements());
+
+  size_type             i = 0;
+  std::vector<PetscInt> petsc_indices(n_elements());
+  for (const auto &index : *this)
+    petsc_indices[i] = static_cast<PetscInt>(index);
 
   IS             is;
-  PetscErrorCode ierr =
-    ISCreateGeneral(communicator, n, pindices.data(), PETSC_COPY_VALUES, &is);
+  PetscErrorCode ierr = ISCreateGeneral(
+    communicator, local_size, petsc_indices.data(), PETSC_COPY_VALUES, &is);
   AssertThrow(ierr == 0, ExcPETScError(ierr));
 
   return is;

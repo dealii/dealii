@@ -51,10 +51,17 @@ namespace PETScWrappers
                                const MPI_Comm                communicator)
   {
     clear();
+    AssertIndexRange(local_size, ghost_indices.size() + 1);
+    // If the size of the index set can be converted to a PetscInt then every
+    // index can also be converted
+    AssertThrowIntegerConversion(ghost_indices.size(),
+                                 static_cast<PetscInt>(ghost_indices.size()));
 
     PetscLayout layout;
     AssertPETSc(PetscLayoutCreate(communicator, &layout));
-    AssertPETSc(PetscLayoutSetLocalSize(layout, local_size));
+    const auto petsc_local_size = static_cast<PetscInt>(local_size);
+    AssertThrowIntegerConversion(local_size, petsc_local_size);
+    AssertPETSc(PetscLayoutSetLocalSize(layout, petsc_local_size));
     AssertPETSc(PetscLayoutSetUp(layout));
 
     PetscInt start, end;
@@ -88,6 +95,14 @@ namespace PETScWrappers
                                const IndexSet &ghost_indices,
                                const MPI_Comm  communicator)
   {
+    // If the sizes of the index sets can be converted to PetscInts then every
+    // index can also be converted
+    AssertThrowIntegerConversion(static_cast<PetscInt>(
+                                   locally_owned_indices.size()),
+                                 locally_owned_indices.size());
+    AssertThrowIntegerConversion(static_cast<PetscInt>(ghost_indices.size()),
+                                 ghost_indices.size());
+
     const auto            in_deal = locally_owned_indices.get_index_vector();
     std::vector<PetscInt> in_petsc(in_deal.begin(), in_deal.end());
 
@@ -121,7 +136,9 @@ namespace PETScWrappers
       {
         if (i != numbers::invalid_dof_index)
           {
-            indices_has_clean.push_back(static_cast<PetscInt>(i));
+            const auto petsc_i = static_cast<PetscInt>(i);
+            AssertThrowIntegerConversion(i, petsc_i);
+            indices_has_clean.push_back(petsc_i);
             indices_has_loc.push_back(loc);
           }
         else
@@ -137,7 +154,9 @@ namespace PETScWrappers
       {
         if (i != numbers::invalid_dof_index)
           {
-            indices_want_clean.push_back(static_cast<PetscInt>(i));
+            const auto petsc_i = static_cast<PetscInt>(i);
+            AssertThrowIntegerConversion(i, petsc_i);
+            indices_want_clean.push_back(petsc_i);
             indices_want_loc.push_back(loc);
           }
         else

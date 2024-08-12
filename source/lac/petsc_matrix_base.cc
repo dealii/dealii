@@ -59,6 +59,13 @@ namespace PETScWrappers
       // iterator for an empty line (what
       // would it point to?)
       Assert(ncols != 0, ExcInternalError());
+#    ifdef DEBUG
+      for (PetscInt j = 0; j < ncols; ++j)
+        {
+          const auto column = static_cast<PetscInt>(colnums[j]);
+          AssertIntegerConversion(column, colnums[j]);
+        }
+#    endif
       colnum_cache =
         std::make_shared<std::vector<size_type>>(colnums, colnums + ncols);
       value_cache =
@@ -157,8 +164,11 @@ namespace PETScWrappers
   {
     assert_is_compressed();
 
-    // now set all the entries of these rows
-    // to zero
+    // now set all the entries of these rows to zero
+#  ifdef DEBUG
+    for (const auto &row : rows)
+      AssertIntegerConversion(static_cast<PetscInt>(row), row);
+#  endif
     const std::vector<PetscInt> petsc_rows(rows.begin(), rows.end());
 
     // call the functions. note that we have
@@ -186,8 +196,11 @@ namespace PETScWrappers
   {
     assert_is_compressed();
 
-    // now set all the entries of these rows
-    // to zero
+    // now set all the entries of these rows to zero
+#  ifdef DEBUG
+    for (const auto &row : rows)
+      AssertIntegerConversion(static_cast<PetscInt>(row), row);
+#  endif
     const std::vector<PetscInt> petsc_rows(rows.begin(), rows.end());
 
     // call the functions. note that we have
@@ -215,7 +228,10 @@ namespace PETScWrappers
   PetscScalar
   MatrixBase::el(const size_type i, const size_type j) const
   {
-    PetscInt petsc_i = i, petsc_j = j;
+    const auto petsc_i = static_cast<PetscInt>(i);
+    AssertIntegerConversion(petsc_i, i);
+    const auto petsc_j = static_cast<PetscInt>(j);
+    AssertIntegerConversion(petsc_j, j);
 
     PetscScalar value;
 
@@ -388,7 +404,7 @@ namespace PETScWrappers
     // something that is unreasonable. there should simply be a way in PETSc to
     // query the number of entries in a row bypassing the call to compress(),
     // but I can't find one
-    Assert(row < m(), ExcInternalError());
+    AssertIndexRange(row, m());
 
     // get a representation of the present
     // row
