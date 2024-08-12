@@ -51,7 +51,6 @@
 #
 #     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_WITH_COMPLEX_VALUES
-#     DEAL_II_COMPILE_EXAMPLES
 #     DEAL_II_DOXYGEN_USE_MATHJAX
 #     DEAL_II_DOXYGEN_USE_ONLINE_MATHJAX
 #     DEAL_II_CPACK_EXTERNAL_LIBS
@@ -341,12 +340,6 @@ option(DEAL_II_WITH_COMPLEX_VALUES
   ON
   )
 list(APPEND DEAL_II_FEATURES COMPLEX_VALUES)
-
-option(DEAL_II_COMPILE_EXAMPLES
-  "If set to ON, all configurable example executables will be built and installed as well. If set to OFF, the examples component only installs the source code of example steps."
-  ON
-  )
-mark_as_advanced(DEAL_II_COMPILE_EXAMPLES)
 
 option(DEAL_II_DOXYGEN_USE_MATHJAX
   "If set to ON, doxygen documentation is generated using mathjax"
