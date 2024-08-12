@@ -1454,7 +1454,9 @@ inconvenience this causes.
  <li>
   New: IndexSet::tensor_product() creates a new IndexSet with global size equal to
   this->size()*other.size(), containing for every element n of this IndexSet, the indices
-  of the other IndexSet, contained in the interval [n*other.size(), (n+1)*other.size()).;<br>;(Luca Heltai, 2019/12/12)
+  of the other IndexSet, contained in the interval [n*other.size(), (n+1)*other.size()).
+  <br>
+  (Luca Heltai, 2019/12/12)
  </li>
 
  <li>
