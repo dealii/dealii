@@ -1061,8 +1061,6 @@ namespace internal
     else // if (mpisize > 1)
 #endif
       {
-        // (void)global_first_cell;
-        // (void)global_num_cells;
         (void)mpi_communicator;
 
         //
