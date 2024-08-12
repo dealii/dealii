@@ -2603,10 +2603,9 @@ namespace Functions
   template <int dim>
   double
   InterpolatedTensorProductGridData<dim>::value(
-    const Point<dim>  &p,
-    const unsigned int component) const
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2634,10 +2633,9 @@ namespace Functions
   template <int dim>
   Tensor<1, dim>
   InterpolatedTensorProductGridData<dim>::gradient(
-    const Point<dim>  &p,
-    const unsigned int component) const
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2712,10 +2710,10 @@ namespace Functions
 
   template <int dim>
   double
-  InterpolatedUniformGridData<dim>::value(const Point<dim>  &p,
-                                          const unsigned int component) const
+  InterpolatedUniformGridData<dim>::value(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2761,10 +2759,10 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  InterpolatedUniformGridData<dim>::gradient(const Point<dim>  &p,
-                                             const unsigned int component) const
+  InterpolatedUniformGridData<dim>::gradient(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2850,10 +2848,9 @@ namespace Functions
 
   template <int dim>
   double
-  Polynomial<dim>::value(const Point<dim>  &p,
-                         const unsigned int component) const
+  Polynomial<dim>::value(const Point<dim>                   &p,
+                         [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     double sum = 0;
@@ -2892,10 +2889,9 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  Polynomial<dim>::gradient(const Point<dim>  &p,
-                            const unsigned int component) const
+  Polynomial<dim>::gradient(const Point<dim>                   &p,
+                            [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
