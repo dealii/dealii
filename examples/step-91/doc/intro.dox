@@ -2,7 +2,8 @@
 <h1>Introduction</h1>
 
 <i>
-This program was contributed by Wolfgang Bangerth, Colorado State University.
+This program was contributed by Wolfgang Bangerth (Colorado State University)
+and Jean-Paul Pelteret.
 
 This material is based upon work partially supported by National Science
 Foundation grants OAC-1835673 and EAR-1925595.
@@ -14,7 +15,8 @@ simpler models of erosion of the Earth surface, namely the "stream-power erosion
 equations". Specifically, the aims for this program are the following:
 <ol>
   <li> We want to solve the stream-power erosion model, using a realistic
-       data set of the topography of Colorado.
+       data set of the topography of Colorado, using massively parallel
+       computations.
   <li> The stream-power equations form a system of differential equations that
        contain the time derivative of one variable, but not the time derivative
        of the other variable. Such equations are called
@@ -31,6 +33,17 @@ equations". Specifically, the aims for this program are the following:
        ($x$-$y$ or latitude-longitude)
        but on the curved surface of the earth.
 </ol>
+
+None of these points are idle occupations: At the time of writing this
+program, typical erosion simulations use algorithms for flow routing
+(i.e., the task of determining how much water is available where) that
+are not parallel; do not scale to large computations; and the whole
+simulation is run on flat geometries rather than the curved earth
+surface. Moreover, the standard algorithms alternate between solving
+the erosion equation and solving the equation for the water flow rate;
+this alternating algorithm is only first order accurate. We will
+improve on all of these aspects of the current state of the art in
+this program.
 
 
 <h3> The stream-power erosion model </h3>
@@ -227,7 +240,7 @@ are obvious, some not so much:
   Kansas, Oklahoma, New Mexico, or Utah into Colorado (ignoring for a moment
   the issue of whether water from Arizona could reach Colorado at the
   [Four Corners point](https://en.wikipedia.org/wiki/Four_Corners)). How
-  much water that would flow into Colorado at these points is, of course,
+  much water would flow into Colorado at these points is, of course,
   something we cannot really know without also solving for the "outside
   world"; that is, whatever we impose is an "artificial boundary condition"
   in that it makes assumptions about the world outside the domain on which
@@ -820,15 +833,15 @@ is easy enough, and we will do this part by hand.
 
 <h4> Providing IDA with initial conditions </h4>
 
-TODO
+TODO. Two options: (i) given initial elevation, compute corresponding water flow rate at the initial time; (ii) let IDA do it.
 
 
 
 <h3> The initial elevation data set and loading large data in general </h3>
 
 The program, at its start, needs to load a file that describes the
-initial elevation $H(\mathbf x,t=0)$. This information is the
-interpolated to obtain the initial values for the elements of the
+initial elevation $H(\mathbf x,t=0)$. This information is then
+interpolated onto the finite element mesh to obtain the initial values for the elements of the
 expansion vector $V(t=0)$ used for the elevation.
 
 The data we will use can be obtained from a United States Geological
