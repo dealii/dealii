@@ -1089,33 +1089,6 @@ namespace PETScWrappers
     Tmmult(MatrixBase &C, const MatrixBase &B, const VectorBase &V) const;
 
   private:
-    /**
-     * An internal array of integer values that is used to store the column
-     * indices when adding/inserting local data into the (large) sparse
-     * matrix.
-     *
-     * This variable does not store any "state" of the matrix
-     * object. Rather, it is only used as a temporary buffer by some
-     * of the member functions of this class. As with all @p mutable
-     * member variables, the use of this variable is not thread-safe
-     * unless guarded by a mutex. However, since PETSc matrix
-     * operations are not thread-safe anyway, there is no need to
-     * attempt to make things thread-safe, and so there is no mutex
-     * associated with this variable.
-     */
-    mutable std::vector<PetscInt> column_indices;
-
-    /**
-     * An internal array of double values that is used to store the column
-     * indices when adding/inserting local data into the (large) sparse
-     * matrix.
-     *
-     * The same comment as for the @p column_indices variable above
-     * applies.
-     */
-    mutable std::vector<PetscScalar> column_values;
-
-
     // To allow calling protected prepare_add() and prepare_set().
     template <class>
     friend class dealii::BlockMatrixBase;
@@ -1343,13 +1316,14 @@ namespace PETScWrappers
     const auto petsc_row = static_cast<PetscInt>(row);
     AssertIntegerConversion(petsc_row, row);
 
-    PetscInt n_columns = 0;
-    column_indices.resize(n_cols);
-    column_values.resize(n_cols);
+    std::vector<PetscInt>    column_indices;
+    column_indices.reserve(n_cols);
+    std::vector<PetscScalar> column_values;
+    column_values.reserve(n_cols);
     if (elide_zero_values == false)
       {
-        n_columns = static_cast<PetscInt>(n_cols);
-        AssertIntegerConversion(n_columns, n_cols);
+        column_indices.resize(n_cols);
+        column_values.resize(n_cols);
 
         for (size_type j = 0; j < n_cols; ++j)
           {
@@ -1369,18 +1343,20 @@ namespace PETScWrappers
             AssertIsFinite(value);
             if (value != PetscScalar())
               {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns]  = value;
-                ++n_columns;
+                column_indices.push_back(static_cast<PetscInt>(col_indices[j]));
+                AssertIntegerConversion(column_indices.back(), col_indices[j]);
+                column_values.push_back(value);
               }
           }
-        AssertIndexRange(n_columns, n_cols + 1);
       }
+
+    const auto petsc_n_columns = static_cast<PetscInt>(column_indices.size());
+    AssertIntegerConversion(petsc_n_columns, column_indices.size());
 
     const PetscErrorCode ierr = MatSetValues(matrix,
                                              1,
                                              &petsc_row,
-                                             n_columns,
+                                             petsc_n_columns,
                                              column_indices.data(),
                                              column_values.data(),
                                              INSERT_VALUES);
@@ -1476,20 +1452,19 @@ namespace PETScWrappers
                   const bool         elide_zero_values,
                   const bool /*col_indices_are_sorted*/)
   {
-    (void)elide_zero_values;
-
     prepare_action(VectorOperation::add);
 
     const auto petsc_row = static_cast<PetscInt>(row);
     AssertIntegerConversion(petsc_row, row);
 
-    PetscInt n_columns = 0;
-    column_indices.resize(n_cols);
-    column_values.resize(n_cols);
+    std::vector<PetscInt>    column_indices;
+    column_indices.reserve(n_cols);
+    std::vector<PetscScalar> column_values;
+    column_values.reserve(n_cols);
     if (elide_zero_values == false)
       {
-        n_columns = static_cast<PetscInt>(n_cols);
-        AssertIntegerConversion(n_columns, n_cols);
+        column_indices.resize(n_cols);
+        column_values.resize(n_cols);
 
         for (size_type j = 0; j < n_cols; ++j)
           {
@@ -1509,18 +1484,20 @@ namespace PETScWrappers
             AssertIsFinite(value);
             if (value != PetscScalar())
               {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns]  = value;
-                ++n_columns;
+                column_indices.push_back(static_cast<PetscInt>(col_indices[j]));
+                AssertIntegerConversion(column_indices.back(), col_indices[j]);
+                column_values.push_back(value);
               }
           }
-        AssertIndexRange(n_columns, n_cols + 1);
       }
+
+    const auto petsc_n_columns = static_cast<PetscInt>(column_indices.size());
+    AssertIntegerConversion(petsc_n_columns, column_indices.size());
 
     const PetscErrorCode ierr = MatSetValues(matrix,
                                              1,
                                              &petsc_row,
-                                             n_columns,
+                                             petsc_n_columns,
                                              column_indices.data(),
                                              column_values.data(),
                                              ADD_VALUES);
