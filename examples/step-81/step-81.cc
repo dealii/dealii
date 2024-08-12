@@ -850,8 +850,10 @@ namespace Step81
     data_out.add_data_vector(solution,
                              {"real_Ex", "real_Ey", "imag_Ex", "imag_Ey"});
     data_out.build_patches();
-    std::ofstream output("solution.vtk");
+    const std::string filename = "solution.vtk";
+    std::ofstream     output(filename);
     data_out.write_vtk(output);
+    std::cout << "Output written to " << filename << std::endl;
   }
 
 
