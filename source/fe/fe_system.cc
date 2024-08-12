@@ -187,18 +187,16 @@ namespace internal
   template <int dim, int spacedim = dim>
   void
   copy_nonprimitive_base_element_values(
-    const FESystem<dim, spacedim> &fe,
-    const unsigned int             base_no,
-    const unsigned int             n_q_points,
-    const UpdateFlags              base_flags,
+    [[maybe_unused]] const FESystem<dim, spacedim> &fe,
+    [[maybe_unused]] const unsigned int             base_no,
+    const unsigned int                              n_q_points,
+    const UpdateFlags                               base_flags,
     const std::vector<typename FESystem<dim, spacedim>::BaseOffsets> &offsets,
     const FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
       &base_data,
     FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
       &output_data)
   {
-    (void)fe;
-    (void)base_no;
     Assert(!fe.base_element(base_no).is_primitive(), ExcInternalError());
 
     for (const auto &offset : offsets)
@@ -1702,8 +1700,9 @@ FESystem<dim, spacedim>::initialize(
   Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
-  const ReferenceCell reference_cell = fes.front()->reference_cell();
-  (void)reference_cell;
+  [[maybe_unused]] const ReferenceCell reference_cell =
+    fes.front()->reference_cell();
+
   Assert(std::all_of(fes.begin(),
                      fes.end(),
                      [reference_cell](const FiniteElement<dim, spacedim> *fe) {
