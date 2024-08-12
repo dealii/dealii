@@ -1205,8 +1205,7 @@ namespace PETScWrappers
                                    const ForwardIterator indices_end,
                                    OutputIterator        values_begin) const
   {
-    const PetscInt n_idx = static_cast<PetscInt>(indices_end - indices_begin);
-    if (n_idx == 0)
+    if (indices_begin == indices_end)
       return;
 
     // if we are dealing
@@ -1246,24 +1245,28 @@ namespace PETScWrappers
         ierr = VecGetArrayRead(locally_stored_elements, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        for (PetscInt i = 0; i < n_idx; ++i)
+        auto input  = indices_begin;
+        auto output = values_begin;
+        while (input != indices_end)
           {
-            const unsigned int index = *(indices_begin + i);
-            if (index >= static_cast<unsigned int>(begin) &&
-                index < static_cast<unsigned int>(end))
+            const auto index = static_cast<PetscInt>(*input);
+            AssertDimension(index, *input);
+            if (index >= begin && index < end)
               {
                 // local entry
-                *(values_begin + i) = *(ptr + index - begin);
+                *output = *(ptr + index - begin);
               }
             else
               {
                 // ghost entry
-                const unsigned int ghostidx =
-                  ghost_indices.index_within_set(index);
+                const auto ghost_index = ghost_indices.index_within_set(*input);
 
-                AssertIndexRange(ghostidx + end - begin, lsize);
-                *(values_begin + i) = *(ptr + ghostidx + end - begin);
+                AssertIndexRange(ghost_index + end - begin, lsize);
+                *output = *(ptr + ghost_index + end - begin);
               }
+
+            ++input;
+            ++output;
           }
 
         ierr = VecRestoreArrayRead(locally_stored_elements, &ptr);
@@ -1285,12 +1288,14 @@ namespace PETScWrappers
         ierr = VecGetArrayRead(vector, &ptr);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        for (PetscInt i = 0; i < n_idx; ++i)
+        auto input  = indices_begin;
+        auto output = values_begin;
+        while (input != indices_end)
           {
-            const unsigned int index = *(indices_begin + i);
+            const auto index = static_cast<PetscInt>(*input);
+            AssertDimension(index, *input);
 
-            Assert(index >= static_cast<unsigned int>(begin) &&
-                     index < static_cast<unsigned int>(end),
+            Assert(index >= begin && index < end,
                    ExcMessage("You are accessing elements of a vector without "
                               "ghost elements that are not actually owned by "
                               "this vector. A typical case where this may "
@@ -1300,7 +1305,10 @@ namespace PETScWrappers
                               "elements for all locally relevant or locally "
                               "active vector entries."));
 
-            *(values_begin + i) = *(ptr + index - begin);
+            *output = *(ptr + index - begin);
+
+            ++input;
+            ++output;
           }
 
         ierr = VecRestoreArrayRead(vector, &ptr);
