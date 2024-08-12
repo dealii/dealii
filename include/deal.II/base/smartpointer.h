@@ -305,8 +305,13 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &tt)
   , id(tt.id)
   , pointed_to_object_is_alive(false)
 {
-  if (tt.pointed_to_object_is_alive && t != nullptr)
-    t->subscribe(&pointed_to_object_is_alive, id);
+  if (tt != nullptr)
+    {
+      Assert(tt.pointed_to_object_is_alive,
+             ExcMessage("You can't copy a smart pointer object that "
+                        "is pointing to an object that is no longer alive."));
+      t->subscribe(&pointed_to_object_is_alive, id);
+    }
 }
 
 
@@ -317,8 +322,13 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &tt)
   , id(tt.id)
   , pointed_to_object_is_alive(false)
 {
-  if (tt.pointed_to_object_is_alive && t != nullptr)
-    t->subscribe(&pointed_to_object_is_alive, id);
+  if (tt != nullptr)
+    {
+      Assert(tt.pointed_to_object_is_alive,
+             ExcMessage("You can't copy a smart pointer object that "
+                        "is pointing to an object that is no longer alive."));
+      t->subscribe(&pointed_to_object_is_alive, id);
+    }
 }
 
 
@@ -419,8 +429,13 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, Q> &tt)
 
   // Then reset to the new object, and subscribe to it
   t = (tt != nullptr ? tt.get() : nullptr);
-  if (tt.pointed_to_object_is_alive && tt != nullptr)
-    t->subscribe(&pointed_to_object_is_alive, id);
+  if (tt != nullptr)
+    {
+      Assert(tt.pointed_to_object_is_alive,
+             ExcMessage("You can't copy a smart pointer object that "
+                        "is pointing to an object that is no longer alive."));
+      t->subscribe(&pointed_to_object_is_alive, id);
+    }
   return *this;
 }
 
@@ -442,9 +457,13 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, P> &tt)
 
   // Then reset to the new object, and subscribe to it
   t = (tt != nullptr ? tt.get() : nullptr);
-  if (tt.pointed_to_object_is_alive && tt != nullptr)
-    t->subscribe(&pointed_to_object_is_alive, id);
-
+  if (tt != nullptr)
+    {
+      Assert(tt.pointed_to_object_is_alive,
+             ExcMessage("You can't copy a smart pointer object that "
+                        "is pointing to an object that is no longer alive."));
+      t->subscribe(&pointed_to_object_is_alive, id);
+    }
   return *this;
 }
 
