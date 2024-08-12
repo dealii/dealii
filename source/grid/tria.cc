@@ -3519,7 +3519,7 @@ namespace internal
             if (subcell_object->boundary_id !=
                 numbers::internal_face_boundary_id)
               {
-                (void)vertex_locations;
+                [[mabe_unused]]vertex_locations;
                 AssertThrow(
                   boundary_id != numbers::internal_face_boundary_id,
                   ExcMessage(
@@ -3549,7 +3549,7 @@ namespace internal
         // make sure that all subcelldata entries have been processed
         // TODO: this is not guaranteed, why?
         // AssertDimension(counter, boundary_objects_in.size());
-        (void)counter;
+        [[mabe_unused]]counter;
       }
 
 
@@ -5038,7 +5038,7 @@ namespace internal
                 triangulation.vertices[next_unused_vertex] = line->center(true);
 
                 bool pair_found = false;
-                (void)pair_found;
+                [[mabe_unused]]pair_found;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -5808,7 +5808,7 @@ namespace internal
                 // two child lines.  To this end, find a pair of
                 // unused lines
                 bool pair_found = false;
-                (void)pair_found;
+                [[mabe_unused]]pair_found;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -6232,7 +6232,7 @@ namespace internal
               for (const unsigned int line : quad->line_indices())
                 {
                   AssertIsNotUsed(new_lines[line]);
-                  (void)line;
+                  [[mabe_unused]]line;
                 }
 
               // 2) create new quads (properties are set below). Both triangles
@@ -6254,7 +6254,7 @@ namespace internal
               for (const auto &quad : new_quads)
                 {
                   AssertIsNotUsed(quad);
-                  (void)quad;
+                  [[mabe_unused]]quad;
                 }
 
               // 3) set vertex indices and set new vertex
@@ -11934,10 +11934,10 @@ namespace internal
         std::vector<unsigned int>                            &quad_cell_count)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)triangulation;
-        (void)cell;
-        (void)line_cell_count;
-        (void)quad_cell_count;
+        [[mabe_unused]]triangulation;
+        [[mabe_unused]]cell;
+        [[mabe_unused]]line_cell_count;
+        [[mabe_unused]]quad_cell_count;
       }
 
       template <int dim, int spacedim>
@@ -11955,7 +11955,7 @@ namespace internal
         Triangulation<dim, spacedim> &triangulation)
       {
         // nothing to do since anisotropy is not supported
-        (void)triangulation;
+        [[mabe_unused]]triangulation;
       }
 
       template <int dim, int spacedim>
@@ -12293,7 +12293,7 @@ void Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
             }
     }
 
-  (void)boundary_found;
+  [[mabe_unused]]boundary_found;
   Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
 }
 
@@ -16304,7 +16304,7 @@ void Triangulation<dim, spacedim>::load_attached_data(
       // CellStatus::cell_will_persist.
       for (const auto &cell_rel : this->local_cell_relations)
         {
-          (void)cell_rel;
+          [[mabe_unused]]cell_rel;
           Assert((cell_rel.second == // cell_status
                   ::dealii::CellStatus::cell_will_persist),
                  ExcInternalError());

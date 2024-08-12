@@ -2405,7 +2405,7 @@ namespace Functions
                          const Point<1>         &p_unit,
                          const Point<1>         &dx)
     {
-      (void)p_unit;
+      [[mabe_unused]]p_unit;
       Tensor<1, 1> grad;
       grad[0] = (data_values[ix[0] + 1] - data_values[ix[0]]) / dx[0];
       return grad;

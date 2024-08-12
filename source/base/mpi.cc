@@ -794,7 +794,7 @@ namespace Utilities
     void
     CollectiveMutex::lock(const MPI_Comm comm)
     {
-      (void)comm;
+      [[mabe_unused]]comm;
 
       Assert(
         !locked,
@@ -831,7 +831,7 @@ namespace Utilities
     void
     CollectiveMutex::unlock(const MPI_Comm comm)
     {
-      (void)comm;
+      [[mabe_unused]]comm;
 
       // First check if this function is called during exception handling
       // if so, abort. This can happen if a ScopedLock is destroyed.
