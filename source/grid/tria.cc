@@ -849,9 +849,6 @@ namespace internal
     else
 #endif
       {
-        // (void)global_first_cell;
-        // (void)global_num_cells;
-        // (void)mpi_communicator;
 
         //
         // ---------- Fixed size data ----------
