@@ -14,8 +14,7 @@
 
 
 
-// simply check what happens when condensing BlockDyanmicSparsityPattern. This
-// test was written when I changed a few things in the algorithm.
+// simply check what happens when condensing BlockDynamicSparsityPattern.
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>

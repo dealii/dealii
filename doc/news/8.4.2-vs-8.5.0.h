@@ -1017,7 +1017,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: ContraintMatrix::distribute_local_to_global now does a bulk write of
+  Improved: ConstraintMatrix::distribute_local_to_global now does a bulk write of
   all vector values at once. This improves performance with
   PETScWrappers::MPI::Vector by about 10%.
   <br>

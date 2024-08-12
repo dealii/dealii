@@ -18,7 +18,7 @@
 #include "../tests.h"
 
 // These tests were used while building extensions for
-// PetscSclar=complex. They check that std::complex<double> and
+// PetscScalar=complex. They check that std::complex<double> and
 // PetscScalar complex are compatible without explicitly casting.
 //
 // These tests look archaic - they are the original tests used to

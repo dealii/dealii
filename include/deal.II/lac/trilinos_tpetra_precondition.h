@@ -73,7 +73,7 @@ namespace LinearAlgebra
       PreconditionBase() = default;
 
       /**
-       * @brief Desctructor.
+       * @brief Destructor.
        * Destroys the preconditioner, leaving an object like just after having
        * called the constructor.
        */
@@ -853,7 +853,7 @@ namespace LinearAlgebra
          */
         double min_eigenvalue;
         /**
-         * @brief Estimated ratio between maximum and mimimum eigenvalue.
+         * @brief Estimated ratio between maximum and minimum eigenvalue.
          *
          */
         double eigenvalue_ratio;
@@ -930,7 +930,7 @@ namespace LinearAlgebra
          * @brief Constructor.
          *
          * Before factorization each diagonal entry will be modified by the
-         * following fomula \f[a_{ii}^{new} = \alpha\sign(a_{ii})+\beta a_{ii}
+         * following formula \f[a_{ii}^{new} = \alpha\sign(a_{ii})+\beta a_{ii}
          * \f] with \f[\alpha\f] given by ilu_atol and \f[\beta\f] given by
          * ilu_rtol.
          *
@@ -1014,7 +1014,7 @@ namespace LinearAlgebra
          * @brief Constructor.
          *
          * Before factorization each diagonal entry will be modified by the
-         * following fomula \f[a_{ii}^{new} = \alpha\sign(a_{ii})+\beta a_{ii}
+         * following formula \f[a_{ii}^{new} = \alpha\sign(a_{ii})+\beta a_{ii}
          * \f] with \f[\alpha\f] given by ilut_atol and \f[\beta\f] given by
          * ilut_rtol.
          *

@@ -47,7 +47,7 @@ std::tuple<unsigned int, unsigned int>
 create_triangulation(const std::vector<Point<3>>    &vertices_,
                      const std::vector<CellData<3>> &cell_data_,
                      const unsigned int              face_n,
-                     const unsigned int              n_permuations,
+                     const unsigned int              n_permutations,
                      Triangulation<3>               &tria)
 {
   const ReferenceCell ref_cell  = ReferenceCells::Tetrahedron;
@@ -79,7 +79,7 @@ create_triangulation(const std::vector<Point<3>>    &vertices_,
       tria.create_triangulation(vertices, cell_data, SubCellData());
       ++permutation_n;
     }
-  while ((permutation_n < n_permuations) &&
+  while ((permutation_n < n_permutations) &&
          std::next_permutation(cell_data.back().vertices.begin(),
                                cell_data.back().vertices.end()));
 

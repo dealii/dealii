@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 // test GridTools::torus() the manifolds attached to the torus (TorusManifold,
-// ToriodalManifold, TransfiniteInterpolationManifold), output visually
+// ToroidalManifold, TransfiniteInterpolationManifold), output visually
 // checked
 
 #include <deal.II/grid/grid_generator.h>

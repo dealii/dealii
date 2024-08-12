@@ -14,7 +14,7 @@
 
 
 
-// check assignment from IdenityMatrix. like the full_matrix_* tests, but use
+// check assignment from IdentityMatrix. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors, even though we only store real values
 // in them
 

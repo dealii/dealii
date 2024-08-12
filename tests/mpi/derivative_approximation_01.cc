@@ -14,7 +14,7 @@
 
 
 
-// document bug in the DerivateApproximation in parallel
+// document bug in the DerivativeApproximation in parallel
 /*
  --------------------------------------------------------
  An error occurred in line <3349> of file

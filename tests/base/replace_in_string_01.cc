@@ -37,11 +37,11 @@ check(const std::string in,
 void
 test()
 {
-  check("wie geht es dir?", "dir", "euch", "wie geht es euch?");
+  check("how are you?", "you", "you all", "how are you all?");
   check("empty from", "", "abc", "empty from");
-  check("eins zwei drei", "ei", "", "ns zw dr");
-  check("eins zwei drei", "zwei", "zweiundvierzig", "eins zweiundvierzig drei");
-  check("wer das liest ist doof", "das liest ", "", "wer ist doof");
+  check("one two three", "e", "", "on two thr");
+  check("one two three", "two", "fortytwo", "one fortytwo three");
+  check("how are you?", "how are ", "", "you?");
   check("string string", "string", "", " ");
   check(" same is same", " same", " same", " same is same");
   check("  ", " ", "", "");

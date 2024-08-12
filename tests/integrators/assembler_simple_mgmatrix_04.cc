@@ -176,15 +176,15 @@ test(FiniteElement<dim> &fe)
   deallog << fe.get_name() << std::endl;
 
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
-  std::vector<unsigned int> repititions(dim, 1);
-  repititions[0] = 2;
+  std::vector<unsigned int> repetitions(dim, 1);
+  repetitions[0] = 2;
   const Point<dim> p1 =
     (dim == 1 ? Point<dim>(-1.) :
                 (dim == 2 ? Point<dim>(-1., -1.) : Point<dim>(-1., -1., -1.)));
   const Point<dim> p2 =
     (dim == 1 ? Point<dim>(1.) :
                 (dim == 2 ? Point<dim>(1., 1.) : Point<dim>(1., 1., 1.)));
-  GridGenerator::subdivided_hyper_rectangle(tr, repititions, p1, p2);
+  GridGenerator::subdivided_hyper_rectangle(tr, repetitions, p1, p2);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 

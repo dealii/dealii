@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-// Checks if vertices on face are given in correct oder
+// Checks if vertices on face are given in correct order
 
 #include <deal.II/fe/mapping_q.h>
 

@@ -323,7 +323,7 @@ namespace Step77
 
   // The following function is similar to that in step-77,
   // except that it supports parallel assembly.
-  // The Jacobian is assembled using homogenous boundary conditions
+  // The Jacobian is assembled using homogeneous boundary conditions
   // since we always solve for the update step.
   // Here we don't need to reevaluate the `locally_relevant_solution`
   // vector since SNES guaranties that the Jacobian callback is called
@@ -463,7 +463,7 @@ namespace Step77
 
   // Again, this is basically a verbatim copy of the function in step-77.
   // The only differences are in how we setup the nonlinear solver and in
-  // the way we handle non-homogenous boundary conditions.
+  // the way we handle non-homogeneous boundary conditions.
   template <int dim>
   void
   MinimalSurfaceProblem<dim>::run()
@@ -586,7 +586,7 @@ namespace Step77
           // We are now set up to solve the nonlinear system
           nonlinear_solver.solve(current_solution);
 
-          // Differently from step-77, we apply non-homogenous boundary
+          // Differently from step-77, we apply non-homogeneous boundary
           // conditions only once, after the algebraic solve is done.
           // Note that this call is only needed since this example uses hanging
           // nodes constraints.

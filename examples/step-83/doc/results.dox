@@ -112,7 +112,7 @@ lines:
 [...]
 @endcode
 What each of these numbers represents is hard to tell in practice, and also
-entirely unimporant for our current purposes -- it's
+entirely unimportant for our current purposes -- it's
 a representation of the many objects that make up this program's state, and
 from which one can restore its state. The point simply being that this is what
 serialization produces: A long list (a sequence) of bits that we can put

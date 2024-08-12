@@ -14,7 +14,7 @@
 
 // This function tests the correctness of the matrix-free implementation
 // of the FE_RaviartThomasNodal element by evaluating values + gradients
-// as well as the divergence and comparing the result with FEVaules which
+// as well as the divergence and comparing the result with FEValues which
 // is considered the reference. The mesh is a hypercube mesh with no
 // hanging nodes and no other constraints.
 

@@ -48,17 +48,17 @@ test()
   AdditionalData<3> data;
   data.cell_size = .1;
   cgal_surface_mesh_to_cgal_triangulation(sm, tria, data);
-  const unsigned int n_intial_facets = tria.number_of_facets_in_complex();
+  const unsigned int n_initial_facets = tria.number_of_facets_in_complex();
   tria.clear();
   data.cell_size = .5;
   cgal_surface_mesh_to_cgal_triangulation(sm, tria, data);
 
   Assert(
-    n_intial_facets > tria.number_of_facets_in_complex(),
+    n_initial_facets > tria.number_of_facets_in_complex(),
     ExcMessage(
       "The number of facets in the finer mesh must be greater than the number of facets in the coarse mesh."));
   deallog << std::boolalpha
-          << (n_intial_facets > tria.number_of_facets_in_complex())
+          << (n_initial_facets > tria.number_of_facets_in_complex())
           << std::endl;
 }
 

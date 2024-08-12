@@ -37,7 +37,7 @@ test()
     std::vector<typename Particles::PropertyPool<dim, spacedim>::Handle>
       particle_handles;
 
-    // Allocate some space in non-contigous locations
+    // Allocate some space in non-contiguous locations
     particle_handles.push_back(pool.register_particle());
     particle_handles.insert(particle_handles.begin(), pool.register_particle());
     particle_handles.push_back(pool.register_particle());

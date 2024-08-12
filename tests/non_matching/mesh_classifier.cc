@@ -289,9 +289,9 @@ setup_intersected_Q2_positive_coefficients<3>(Vector<double> &level_set)
 // functions are negative between the support points.
 template <int dim>
 void
-test_lagrange_coefficents_positive()
+test_lagrange_coefficients_positive()
 {
-  deallog << "test_lagrange_coefficents_positive" << std::endl;
+  deallog << "test_lagrange_coefficients_positive" << std::endl;
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation);
 
@@ -367,7 +367,7 @@ run_test()
   test_intersection_x_eq_0_plane<dim>();
   // This test doesn't make sense in 1D.
   if (dim != 1)
-    test_lagrange_coefficents_positive<dim>();
+    test_lagrange_coefficients_positive<dim>();
 
   test_reclassify_called_multiple_times<dim>();
 }

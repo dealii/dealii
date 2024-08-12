@@ -48,13 +48,13 @@ test(const FiniteElement<dim> &fe, const Quadrature<dim> &quad)
       Triangulation<dim> tria;
       GridGenerator::reference_cell(tria, fe.reference_cell());
 
-      FE_SimplexP<dim> fe_continous(fe.degree);
+      FE_SimplexP<dim> fe_continuous(fe.degree);
 
       DoFHandler<dim> dof_handler(tria);
-      dof_handler.distribute_dofs(fe_continous);
+      dof_handler.distribute_dofs(fe_continuous);
 
       std::vector<types::global_dof_index> dof_indices(
-        fe_continous.n_dofs_per_face());
+        fe_continuous.n_dofs_per_face());
       for (const auto &cell : dof_handler.active_cell_iterators())
         {
           unsigned int face_counter = 0;
