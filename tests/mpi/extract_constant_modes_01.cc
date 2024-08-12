@@ -49,8 +49,10 @@ test()
   std::vector<unsigned int> sub(2);
   sub[0] = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   sub[1] = 1;
-  GridGenerator::subdivided_hyper_rectangle(
-    static_cast<Triangulation<dim> &>(tr), sub, Point<2>(0, 0), Point<2>(1, 1));
+  GridGenerator::subdivided_hyper_rectangle(tr,
+                                            sub,
+                                            Point<2>(0, 0),
+                                            Point<2>(1, 1));
 
   FESystem<dim>   fe(FE_Q<dim>(1), 2, FE_DGQ<dim>(0), 1);
   DoFHandler<dim> dofh(tr);
