@@ -234,7 +234,7 @@ namespace Utilities
         if (p != nullptr)
           {
             const int ierr = MPI_Type_free(p);
-            (void)ierr;
+            [[mabe_unused]]ierr;
             AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
 
             delete p;
@@ -254,12 +254,12 @@ namespace Utilities
     {
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
-      (void)myid;
-      (void)n_procs;
+      [[mabe_unused]]myid;
+      [[mabe_unused]]n_procs;
 
       for (const unsigned int destination : destinations)
         {
-          (void)destination;
+          [[mabe_unused]]destination;
           AssertIndexRange(destination, n_procs);
         }
 
@@ -396,7 +396,7 @@ namespace Utilities
 
           for (const unsigned int destination : destinations)
             {
-              (void)destination;
+              [[mabe_unused]]destination;
               AssertIndexRange(destination, n_procs);
               Assert(destination != Utilities::MPI::this_mpi_process(mpi_comm),
                      ExcMessage(
@@ -802,7 +802,7 @@ namespace Utilities
     void
     CollectiveMutex::lock(const MPI_Comm comm)
     {
-      (void)comm;
+      [[mabe_unused]]comm;
 
       Assert(
         !locked,
@@ -839,7 +839,7 @@ namespace Utilities
     void
     CollectiveMutex::unlock(const MPI_Comm comm)
     {
-      (void)comm;
+      [[mabe_unused]]comm;
 
       // First check if this function is called during exception handling
       // if so, abort. This can happen if a ScopedLock is destroyed.
