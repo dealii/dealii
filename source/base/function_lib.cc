@@ -1941,7 +1941,7 @@ namespace Functions
   FourierCosineFunction<dim>::value(const Point<dim>  &p,
                                     const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
     return std::cos(fourier_coefficients * p);
   }
@@ -1953,7 +1953,7 @@ namespace Functions
   FourierCosineFunction<dim>::gradient(const Point<dim>  &p,
                                        const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
   }
@@ -1965,7 +1965,7 @@ namespace Functions
   FourierCosineFunction<dim>::laplacian(const Point<dim>  &p,
                                         const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::cos(fourier_coefficients * p));
@@ -1991,7 +1991,7 @@ namespace Functions
   FourierSineFunction<dim>::value(const Point<dim>  &p,
                                   const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
     return std::sin(fourier_coefficients * p);
   }
@@ -2003,7 +2003,7 @@ namespace Functions
   FourierSineFunction<dim>::gradient(const Point<dim>  &p,
                                      const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
     return fourier_coefficients * std::cos(fourier_coefficients * p);
   }
@@ -2015,7 +2015,7 @@ namespace Functions
   FourierSineFunction<dim>::laplacian(const Point<dim>  &p,
                                       const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::sin(fourier_coefficients * p));
@@ -2047,7 +2047,7 @@ namespace Functions
   FourierSineSum<dim>::value(const Point<dim>  &p,
                              const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2065,7 +2065,7 @@ namespace Functions
   FourierSineSum<dim>::gradient(const Point<dim>  &p,
                                 const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
@@ -2083,7 +2083,7 @@ namespace Functions
   FourierSineSum<dim>::laplacian(const Point<dim>  &p,
                                  const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2121,7 +2121,7 @@ namespace Functions
   FourierCosineSum<dim>::value(const Point<dim>  &p,
                                const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2139,7 +2139,7 @@ namespace Functions
   FourierCosineSum<dim>::gradient(const Point<dim>  &p,
                                   const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
@@ -2157,7 +2157,7 @@ namespace Functions
   FourierCosineSum<dim>::laplacian(const Point<dim>  &p,
                                    const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2189,7 +2189,7 @@ namespace Functions
   Monomial<dim, Number>::value(const Point<dim>  &p,
                                const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, this->n_components);
 
     Number prod = 1;
@@ -2225,7 +2225,7 @@ namespace Functions
   Monomial<dim, Number>::gradient(const Point<dim>  &p,
                                   const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
@@ -2419,7 +2419,7 @@ namespace Functions
                          const Point<1>         &p_unit,
                          const Point<1>         &dx)
     {
-      (void)p_unit;
+      [[mabe_unused]]p_unit;
       Tensor<1, 1> grad;
       grad[0] = (data_values[ix[0] + 1] - data_values[ix[0]]) / dx[0];
       return grad;
@@ -2606,7 +2606,7 @@ namespace Functions
     const Point<dim>  &p,
     const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2637,7 +2637,7 @@ namespace Functions
     const Point<dim>  &p,
     const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2715,7 +2715,7 @@ namespace Functions
   InterpolatedUniformGridData<dim>::value(const Point<dim>  &p,
                                           const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2764,7 +2764,7 @@ namespace Functions
   InterpolatedUniformGridData<dim>::gradient(const Point<dim>  &p,
                                              const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     Assert(
       component == 0,
       ExcMessage(
@@ -2853,7 +2853,7 @@ namespace Functions
   Polynomial<dim>::value(const Point<dim>  &p,
                          const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     double sum = 0;
@@ -2895,7 +2895,7 @@ namespace Functions
   Polynomial<dim>::gradient(const Point<dim>  &p,
                             const unsigned int component) const
   {
-    (void)component;
+    [[mabe_unused]]component;
     AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
