@@ -907,7 +907,7 @@ namespace internal
     const std::string &file_basename,
     const unsigned int n_attached_deserialize_fixed,
     const unsigned int n_attached_deserialize_variable,
-    const MPI_Comm    &mpi_communicator)
+    [[maybe_unused]] const MPI_Comm    &mpi_communicator)
   {
     Assert(dest_data_fixed.empty(),
            ExcMessage("Previously loaded data has not been released yet!"));
@@ -1066,7 +1066,6 @@ namespace internal
       {
         (void)global_first_cell;
         (void)global_num_cells;
-        (void)mpi_communicator;
 
         //
         // ---------- Fixed size data ----------
@@ -2009,7 +2008,7 @@ namespace internal
 
       // count the number of objects, of unused single objects and of
       // unused pairs of objects
-      unsigned int n_quads          = 0;
+      [[maybe_unused]] unsigned int n_quads          = 0;
       unsigned int n_unused_pairs   = 0;
       unsigned int n_unused_singles = 0;
       for (unsigned int i = 0; i < tria_faces.quads.used.size(); ++i)
@@ -2038,7 +2037,6 @@ namespace internal
       Assert(n_quads + 2 * n_unused_pairs + n_unused_singles ==
                tria_faces.quads.used.size(),
              ExcInternalError());
-      (void)n_quads;
 
       // how many single quads are needed in addition to n_unused_quads?
       const int additional_single_quads = new_quads_single - n_unused_singles;
@@ -2199,11 +2197,9 @@ namespace internal
      * should be called from the functions of the higher TriaLevel classes.
      */
     void
-    monitor_memory(const TriaLevel   &tria_level,
-                   const unsigned int true_dimension)
+    monitor_memory([[maybe_unused]] const TriaLevel   &tria_level,
+                   [[maybe_unused]] const unsigned int true_dimension)
     {
-      (void)tria_level;
-      (void)true_dimension;
       Assert(2 * true_dimension * tria_level.refine_flags.size() ==
                tria_level.neighbors.size(),
              ExcMemoryInexact(tria_level.refine_flags.size(),
@@ -2243,7 +2239,7 @@ namespace internal
 
           // count the number of objects, of unused single objects and of
           // unused pairs of objects
-          unsigned int n_objects        = 0;
+          [[maybe_unused]] unsigned int n_objects        = 0;
           unsigned int n_unused_pairs   = 0;
           unsigned int n_unused_singles = 0;
           for (unsigned int i = 0; i < tria_objects.used.size(); ++i)
@@ -2272,7 +2268,6 @@ namespace internal
           Assert(n_objects + 2 * n_unused_pairs + n_unused_singles ==
                    tria_objects.used.size(),
                  ExcInternalError());
-          (void)n_objects;
 
           // how many single objects are needed in addition to
           // n_unused_objects?
