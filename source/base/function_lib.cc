@@ -1941,7 +1941,7 @@ namespace Functions
   FourierCosineFunction<dim>::value(const Point<dim>  &p,
                                     const unsigned int component) const
   {
-    (void)component;
+    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return std::cos(fourier_coefficients * p);
   }
@@ -1953,7 +1953,7 @@ namespace Functions
   FourierCosineFunction<dim>::gradient(const Point<dim>  &p,
                                        const unsigned int component) const
   {
-    (void)component;
+    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
   }
@@ -1965,7 +1965,7 @@ namespace Functions
   FourierCosineFunction<dim>::laplacian(const Point<dim>  &p,
                                         const unsigned int component) const
   {
-    (void)component;
+    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::cos(fourier_coefficients * p));
@@ -1991,7 +1991,7 @@ namespace Functions
   FourierSineFunction<dim>::value(const Point<dim>  &p,
                                   const unsigned int component) const
   {
-    (void)component;
+    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return std::sin(fourier_coefficients * p);
   }
@@ -2003,7 +2003,7 @@ namespace Functions
   FourierSineFunction<dim>::gradient(const Point<dim>  &p,
                                      const unsigned int component) const
   {
-    (void)component;
+    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return fourier_coefficients * std::cos(fourier_coefficients * p);
   }
