@@ -606,7 +606,9 @@ namespace Step22
         displacements[i] = displacements[i - 1] + n_elements[i - 1];
 
       global_quad_points_first.resize(displacements[n_processes]);
-      MPI_Allgatherv(&local_quad_points_first[0],
+      MPI_Allgatherv((local_quad_points_first.size() > 0) ?
+                       (&local_quad_points_first[0]) :
+                       nullptr,
                      n_my_elements,
                      MPI_DOUBLE,
                      &global_quad_points_first[0],
@@ -635,7 +637,9 @@ namespace Step22
         displacements[i] = displacements[i - 1] + n_elements[i - 1];
 
       global_quad_points_second.resize(displacements[n_processes]);
-      MPI_Allgatherv(&local_quad_points_second[0],
+      MPI_Allgatherv((local_quad_points_second.size() > 0) ?
+                       (&local_quad_points_second[0]) :
+                       nullptr,
                      n_my_elements,
                      MPI_DOUBLE,
                      &global_quad_points_second[0],
