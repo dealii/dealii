@@ -60,20 +60,19 @@ DEAL_II_NAMESPACE_OPEN
 InitFinalize::Signals InitFinalize::signals = InitFinalize::Signals();
 
 
-InitFinalize::InitFinalize(int                     &argc,
-                           char                  **&argv,
+InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
+                           [[maybe_unused]] char **&argv,
                            const InitializeLibrary &libraries,
                            const unsigned int       max_num_threads)
   : libraries(libraries)
 {
-  static bool constructor_has_already_run = false;
-  (void)constructor_has_already_run;
+  [[maybe_unused]] static bool constructor_has_already_run = false;
   Assert(constructor_has_already_run == false,
          ExcMessage("You can only create a single object of this class "
                     "in a program since it initializes the MPI system."));
 
 
-  int ierr = 0;
+  [[maybe_unused]] int ierr = 0;
 #ifdef DEAL_II_WITH_MPI
   if (static_cast<bool>(libraries & InitializeLibrary::MPI))
     {
@@ -100,11 +99,6 @@ InitFinalize::InitFinalize(int                     &argc,
       //    ExcMessage("MPI reports that we are not allowed to use multiple
       //    threads."));
     }
-#else
-  // make sure the compiler doesn't warn about these variables
-  (void)argc;
-  (void)argv;
-  (void)ierr;
 #endif
 
     // we are allowed to call MPI_Init ourselves and PETScInitialize will
@@ -434,8 +428,8 @@ InitFinalize::finalize()
             }
           else
             {
-              const int ierr = MPI_Finalize();
-              (void)ierr;
+              [[maybe_unused]] const int ierr = MPI_Finalize();
+
               AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
             }
         }
