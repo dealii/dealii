@@ -313,9 +313,10 @@ namespace
                      vertex_touch_count.end(),
                      &connectivity->ctt_offset[1]);
 
-    const typename internal::p4est::types<dim>::locidx num_vtt =
-      std::accumulate(vertex_touch_count.begin(), vertex_touch_count.end(), 0u);
-    (void)num_vtt;
+    [[maybe_unused]] const typename internal::p4est::types<dim>::locidx
+      num_vtt = std::accumulate(vertex_touch_count.begin(),
+                                vertex_touch_count.end(),
+                                0u);
     Assert(connectivity->ctt_offset[triangulation.n_vertices()] == num_vtt,
            ExcInternalError());
 
@@ -727,10 +728,9 @@ namespace
     typename internal::p4est::types<dim>::quadrant *quadrant,
     int /* rank_begin */,
     int /* rank_end */,
-    void * /* this is always nullptr */ point)
+    [[maybe_unused]] void * /* this is always nullptr */ point)
   {
     // point must be nullptr here
-    (void)point;
     Assert(point == nullptr, dealii::ExcInternalError());
 
     // we need the user pointer
@@ -1849,11 +1849,10 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::create_triangulation(
-      const TriangulationDescription::Description<dim, spacedim>
+      [[maybe_unused]] const TriangulationDescription::Description<dim,
+                                                                   spacedim>
         &construction_data)
     {
-      (void)construction_data;
-
       DEAL_II_ASSERT_UNREACHABLE();
     }
 
@@ -2081,9 +2080,8 @@ namespace parallel
         }
 
       // each cell should have been flagged `CellStatus::cell_will_persist`
-      for (const auto &cell_rel : this->local_cell_relations)
+      for ([[maybe_unused]] const auto &cell_rel : this->local_cell_relations)
         {
-          (void)cell_rel;
           Assert((cell_rel.second == // cell_status
                   CellStatus::cell_will_persist),
                  ExcInternalError());
