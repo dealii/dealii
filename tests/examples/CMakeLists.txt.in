@@ -6,11 +6,18 @@
 # and ${DEAL_II_SOURCE_DIR} points to the deal.II main repository root.
 #
 
-file(GLOB _diff_files "${_base_directory}/*.diff")
-foreach(_diff_file ${_diff_files})
-  get_filename_component(_step "${_diff_file}" NAME_WLE)
+file(GLOB _steps RELATIVE "${DEAL_II_SOURCE_DIR}/examples/" "${DEAL_II_SOURCE_DIR}/examples/step-*")
+foreach(_step ${_steps})
   set(_source_file "${DEAL_II_SOURCE_DIR}/examples/${_step}/${_step}.cc")
+  set(_diff_file   "${_base_directory}/${_step}.diff")
   set(_output_file "${CMAKE_CURRENT_SOURCE_DIR}/${_step}.cc")
+
+  # check if diff file exists
+  if(NOT EXISTS ${_diff_file})
+    message(FATAL_ERROR
+      "\nMissing ${_step}.diff file for example ${_step}.\n"
+      )
+  endif()
 
   # ... and create a rule that updates all diff files if necessary during
   # testsuite invocation:
