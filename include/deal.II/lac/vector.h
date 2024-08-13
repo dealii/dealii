@@ -287,6 +287,13 @@ public:
    */
   virtual ~Vector() override = default;
 
+
+  /**
+   * This function is equivalent to writing <code>size() == 0</code>.
+   */
+  bool
+  empty() const;
+
   /**
    * This function does nothing but exists for compatibility with the parallel
    * vector classes.
@@ -1392,6 +1399,12 @@ Vector<Number>::operator!=(const Vector<Number2> &v) const
 }
 
 
+template <typename Number>
+inline bool
+Vector<Number>::empty() const
+{
+  return this->size() == 0;
+}
 
 template <typename Number>
 inline void

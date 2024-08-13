@@ -60,11 +60,11 @@ DataOutStack<dim, spacedim>::new_parameter_value(const double p,
   for (typename std::vector<DataVector>::const_iterator i = dof_data.begin();
        i != dof_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    Assert(i->data.empty(), ExcDataNotCleared());
   for (typename std::vector<DataVector>::const_iterator i = cell_data.begin();
        i != cell_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    Assert(i->data.empty(), ExcDataNotCleared());
 }
 
 

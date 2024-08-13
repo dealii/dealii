@@ -591,7 +591,7 @@ namespace Step28
 
     system_rhs.reinit(n_dofs);
 
-    if (solution.size() == 0)
+    if (solution.empty())
       {
         solution.reinit(n_dofs);
         solution_old.reinit(n_dofs);

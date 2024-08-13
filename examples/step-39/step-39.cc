@@ -1010,7 +1010,7 @@ namespace Step39
     for (unsigned int s = 0; s < n_steps; ++s)
       {
         deallog << "Step " << s << std::endl;
-        if (estimates.block(0).size() == 0)
+        if (estimates.block(0).empty())
           triangulation.refine_global(1);
         else
           {
