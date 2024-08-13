@@ -116,7 +116,7 @@ test()
       for (unsigned int i = 1; i < nprocs; ++i)
         {
           if (myid == i)
-            MPI_Send(&renumbering[0],
+            MPI_Send((renumbering.size() > 0) ? (&renumbering[0]) : nullptr,
                      renumbering.size(),
                      Utilities::MPI::mpi_type_id_for_type<
                        decltype(complete_renumbering[0])>,
@@ -124,7 +124,9 @@ test()
                      i,
                      MPI_COMM_WORLD);
           else if (myid == 0)
-            MPI_Recv(&complete_renumbering[offset],
+            MPI_Recv((dofs_per_proc[i].n_elements() > 0) ?
+                       (&complete_renumbering[offset]) :
+                       nullptr,
                      dofs_per_proc[i].n_elements(),
                      Utilities::MPI::mpi_type_id_for_type<
                        decltype(complete_renumbering[0])>,

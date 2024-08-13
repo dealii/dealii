@@ -187,6 +187,13 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
 
+  # Enable invalid element access and other checks in the c++ standard libray:
+  list(APPEND DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    list(APPEND DEAL_II_DEFINITIONS_DEBUG "_LIBCPP_ENABLE_ASSERTIONS")
+    list(APPEND DEAL_II_DEFINITIONS_DEBUG "_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_EXTENSIVE")
+  endif()
+
   #
   # We have to ensure that we emit floating-point instructions in debug
   # mode that preserve the occurrence of floating-point exceptions and don't

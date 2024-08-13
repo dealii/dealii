@@ -1454,7 +1454,8 @@ MGTransferMF<dim, Number>::initialize_transfer_references(
 
   this->transfer.resize(min_level, max_level);
 
-  for (unsigned int l = min_level; l <= max_level; ++l)
+  // Note that transfer[min_level] is empty and never used:
+  for (unsigned int l = min_level + 1; l <= max_level; ++l)
     this->transfer[l] = &const_cast<MGTwoLevelTransferBase<VectorType> &>(
       static_cast<const MGTwoLevelTransferBase<VectorType> &>(
         Utilities::get_underlying_value(transfer[l])));
