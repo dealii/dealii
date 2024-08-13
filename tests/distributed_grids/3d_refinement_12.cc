@@ -123,8 +123,8 @@ main(int argc, char *argv[])
   std::vector<unsigned int> n_cell_smooth;
   std::vector<unsigned int> n_cell_no_smooth;
 
-  std::set<Location<dim>> final_cell_center_loactions_smooth;
-  std::set<Location<dim>> final_cell_center_loactions_no_smooth;
+  std::set<Location<dim>> final_cell_center_locations_smooth;
+  std::set<Location<dim>> final_cell_center_locations_no_smooth;
   if (I_am_host)
     {
       deallog << "Flag limit_level_difference_at_vertices set:" << std::endl;
@@ -132,7 +132,7 @@ main(int argc, char *argv[])
   {
     TriaTest<dim> tria_test(
       dealii::Triangulation<dim>::limit_level_difference_at_vertices);
-    tria_test.run(n_cell_smooth, final_cell_center_loactions_smooth);
+    tria_test.run(n_cell_smooth, final_cell_center_locations_smooth);
   }
   if (I_am_host)
     {
@@ -140,7 +140,7 @@ main(int argc, char *argv[])
     }
   {
     TriaTest<dim> tria_test(dealii::Triangulation<dim>::none);
-    tria_test.run(n_cell_no_smooth, final_cell_center_loactions_no_smooth);
+    tria_test.run(n_cell_no_smooth, final_cell_center_locations_no_smooth);
   }
   if (I_am_host)
     {
@@ -161,26 +161,26 @@ main(int argc, char *argv[])
       }
   }
   {
-    bool cell_center_loactions_are_same =
-      (final_cell_center_loactions_smooth.size() ==
-       final_cell_center_loactions_no_smooth.size());
+    bool cell_center_locations_are_same =
+      (final_cell_center_locations_smooth.size() ==
+       final_cell_center_locations_no_smooth.size());
 
     std::set<Location<dim>>::const_iterator it1 =
-      final_cell_center_loactions_smooth.begin();
+      final_cell_center_locations_smooth.begin();
     std::set<Location<dim>>::const_iterator it2 =
-      final_cell_center_loactions_no_smooth.begin();
+      final_cell_center_locations_no_smooth.begin();
 
-    for (; cell_center_loactions_are_same &&
-           (it1 != final_cell_center_loactions_smooth.end());
+    for (; cell_center_locations_are_same &&
+           (it1 != final_cell_center_locations_smooth.end());
          ++it1, ++it2)
       {
-        cell_center_loactions_are_same =
-          cell_center_loactions_are_same && (*it1 == *it2);
+        cell_center_locations_are_same =
+          cell_center_locations_are_same && (*it1 == *it2);
       }
     if (I_am_host)
       {
-        deallog << "cell_center_loactions_are_same = "
-                << cell_center_loactions_are_same << std::endl;
+        deallog << "cell_center_locations_are_same = "
+                << cell_center_locations_are_same << std::endl;
       }
   }
 

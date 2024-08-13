@@ -87,11 +87,11 @@ private:
   void
   setup_system();
 
-  const unsigned int n_blocks;         // total number of blocks
-  const unsigned int n_components;     // total number of components
-  const unsigned int first_u_comp;     // where displacements starts
-  const unsigned int first_lamda_comp; // where lagrage multipliers start
-  const unsigned int degree;           // of shape functions
+  const unsigned int n_blocks;          // total number of blocks
+  const unsigned int n_components;      // total number of components
+  const unsigned int first_u_comp;      // where displacements starts
+  const unsigned int first_lambda_comp; // where lagrage multipliers start
+  const unsigned int degree;            // of shape functions
 
   std::vector<types::global_dof_index> dofs_per_block;
 
@@ -118,7 +118,7 @@ private:
                                            // used for integral evaluation
 
   const FEValuesExtractors::Vector u_fe;
-  const FEValuesExtractors::Vector lamda_fe;
+  const FEValuesExtractors::Vector lambda_fe;
 
   unsigned int id_of_lagrange_mult;
   double       beta1;
@@ -156,7 +156,7 @@ public:
   virtual void
   vector_value(const Point<dim> &p, Vector<double> &values) const;
   virtual double
-  value(const Point<dim> &p, unsigned int compoment) const;
+  value(const Point<dim> &p, unsigned int component) const;
 };
 
 template <int dim>
@@ -169,7 +169,7 @@ BoundaryValues<dim>::vector_value(const Point<dim> &p,
 
 template <int dim>
 inline double
-BoundaryValues<dim>::value(const Point<dim> &p, unsigned int compoment) const
+BoundaryValues<dim>::value(const Point<dim> &p, unsigned int component) const
 {
   return -0.001;
 }
@@ -237,7 +237,7 @@ ElasticProblem<dim>::ElasticProblem()
   : n_blocks(2)
   , n_components(dim * n_blocks)
   , first_u_comp(0)
-  , first_lamda_comp(dim)
+  , first_lambda_comp(dim)
   , degree(1)
   , dofs_per_block(n_blocks)
   , dof_handler(triangulation)
@@ -254,7 +254,7 @@ ElasticProblem<dim>::ElasticProblem()
                              dim // same for lagrange multipliers
                              )
   , u_fe(first_u_comp)
-  , lamda_fe(first_lamda_comp)
+  , lambda_fe(first_lambda_comp)
   , id_of_lagrange_mult(1)
   , beta1(1.0)
 {
@@ -343,7 +343,7 @@ ElasticProblem<dim>::setup_system()
           << n_elasticity_cells << std::endl;
   Assert(n_lagrange_cells > 0,
          ExcInternalError()); // there should be at least 1 cell! Otherwise
-                              // DoFHanlder crashes with 0 dofs for block 2!
+                              // DoFHandler crashes with 0 dofs for block 2!
   //
   //(2) distribute DoFs
   dof_handler.distribute_dofs(

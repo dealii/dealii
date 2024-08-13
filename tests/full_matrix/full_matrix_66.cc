@@ -14,7 +14,7 @@
 
 
 
-// check assignment from IdenityMatrix
+// check assignment from IdentityMatrix
 
 
 #include "../tests.h"

@@ -99,7 +99,7 @@ test(std::array<unsigned int, 4> fe_degrees)
 
   deallog << "Total constraints:          " << constraints.n_constraints()
           << std::endl
-          << "  Inhomogenous constraints: " << constraints.n_inhomogeneities()
+          << "  Inhomogeneous constraints: " << constraints.n_inhomogeneities()
           << std::endl
           << "  Identity constraints:     " << constraints.n_identities()
           << std::endl;

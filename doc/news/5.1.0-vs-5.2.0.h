@@ -397,7 +397,7 @@ inconvenience this causes.
   <li> <p>
        Improved: The class <code>Quadrature</code> has a new
        constructor generating the <tt>dim</tt>-dimensional tensor product of a
-       one-dimensonal formula directly.
+       one-dimensional formula directly.
        <br>
        (GK, 2005/06/10)
        </p>

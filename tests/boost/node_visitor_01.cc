@@ -63,7 +63,7 @@ main()
       if (level == 2)
         {
           Assert(boxes_in_boxes.size() == 0,
-                 ExcMessage("Leafs have no children."));
+                 ExcMessage("Leaves have no children."));
         }
       else
         {

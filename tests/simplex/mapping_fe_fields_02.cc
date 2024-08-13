@@ -47,9 +47,9 @@ public:
   {}
 
   double
-  value(const Point<dim> &point, const unsigned int compontent) const
+  value(const Point<dim> &point, const unsigned int component) const
   {
-    return std::sin(point[compontent] * 0.5 * numbers::PI);
+    return std::sin(point[component] * 0.5 * numbers::PI);
   }
 };
 

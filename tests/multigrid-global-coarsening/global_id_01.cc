@@ -42,7 +42,7 @@ test(const MPI_Comm comm)
   GridGenerator::subdivided_hyper_cube(basetria, 4);
   basetria.refine_global(4);
 
-  const auto deterimine_n_coarse_cells = [&comm](auto &tria) {
+  const auto determine_n_coarse_cells = [&comm](auto &tria) {
     types::coarse_cell_id n_coarse_cells = 0;
 
     for (auto cell : tria.active_cell_iterators())
@@ -55,7 +55,7 @@ test(const MPI_Comm comm)
 
   // create translator: CellID <-> unique ID
   internal::CellIDTranslator<dim> cell_id_translator(
-    deterimine_n_coarse_cells(basetria), basetria.n_global_levels());
+    determine_n_coarse_cells(basetria), basetria.n_global_levels());
 
 
   for (auto cell : basetria.cell_iterators())

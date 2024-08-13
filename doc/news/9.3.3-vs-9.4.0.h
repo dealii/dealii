@@ -1645,7 +1645,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: You can now perform range-based iterations on hp::FECollecion, hp::QCollection,
+  New: You can now perform range-based iterations on hp::FECollection, hp::QCollection,
   and hp::MappingCollection objects.
   <br>
   (Peter Munch, 2021/10/27)

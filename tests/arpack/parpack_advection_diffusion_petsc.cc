@@ -13,7 +13,7 @@
  * ------------------------------------------------------------------------
 
  * This file tests the non-symmetric interface to PARPACK for an
- advection-diffussion
+ advection-diffusion
  * operator with PETSc mpi vectors.
  *
  * We test that the computed vectors are eigenvectors and mass-normal, i.e.

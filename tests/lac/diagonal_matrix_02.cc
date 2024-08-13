@@ -14,7 +14,7 @@
 
 
 
-// this tests the correctness of distribute_local_to_globa() for DiagonalMatrix
+// this tests the correctness of distribute_local_to_global() for DiagonalMatrix
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>

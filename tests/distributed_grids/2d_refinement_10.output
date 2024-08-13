@@ -103,4 +103,4 @@ DEAL:2d::0.875000 0.625000
 DEAL:2d::0.875000 0.875000
 DEAL:2d::Compare result:
 DEAL:2d::n_cells_are_same = 1
-DEAL:2d::cell_center_loactions_are_same = 1
+DEAL:2d::cell_center_locations_are_same = 1

@@ -508,7 +508,7 @@ namespace TimeStepping
       const double                                                       t,
       const double      factor_solution,
       const double      factor_ai,
-      const VectorType &corrent_ri,
+      const VectorType &current_ri,
       VectorType       &vec_ki,
       VectorType       &solution,
       VectorType       &next_ri) const;

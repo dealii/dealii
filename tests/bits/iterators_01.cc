@@ -51,7 +51,7 @@ main()
     internal::BlockVectorIterators::Iterator<BlockVector<double>,
                                              false>>::iterator_category;
 
-  using intervall_iterator_category =
+  using interval_iterator_category =
     std::iterator_traits<IndexSet::IntervalIterator>::iterator_category;
   using element_iterator_category =
     std::iterator_traits<IndexSet::ElementIterator>::iterator_category;

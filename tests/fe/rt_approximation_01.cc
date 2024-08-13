@@ -467,15 +467,16 @@ main()
     MappingQ1Eulerian<2> mapping_euler(*dof_handler_def, deformation);
 
     // Try rotating the elements
-    for (double rotat = 0; rotat < 2 * numbers::PI; rotat += 0.25 * numbers::PI)
+    for (double rotate = 0; rotate < 2 * numbers::PI;
+         rotate += 0.25 * numbers::PI)
       {
         // Rotate element
         VectorTools::project(*dof_handler_def,
                              hn_constraints_def,
                              QGauss<2>(6),
-                             TestDef1<2>(2, rotat),
+                             TestDef1<2>(2, rotate),
                              deformation);
-        deallog << "phi = " << rotat << std::endl;
+        deallog << "phi = " << rotate << std::endl;
         TestProjection(mapping_euler, dof_handler);
       }
 

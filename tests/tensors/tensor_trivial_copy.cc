@@ -16,7 +16,7 @@
 // Verify that Tensor is trivially copyable.
 
 // TODO not all compilers that support enough of a subset of C++11 to compile
-// the library (notably GCC 4.8) implement std::is_trivally_copyable. At some
+// the library (notably GCC 4.8) implement std::is_trivially_copyable. At some
 // point in the future we should use that instead of the boost equivalent.
 
 #include <deal.II/base/tensor.h>

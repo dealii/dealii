@@ -18,7 +18,7 @@
  * infrastructure on the CPU. Considered are the initialization
  * costs and the costs for an operator evaluation.
  * CUDAWrapper::MatrixFree was written with CUDA and now uses
- * Kokkos as backend and, as consequnce, favors GPU hardware. This
+ * Kokkos as backend and, as consequence, favors GPU hardware. This
  * performance test is meant to track the improvement of
  * the performance of CUDAWrapper::MatrixFree on the CPU.
  *

@@ -1,0 +1,4 @@
+New: deal.II contributions are now automatically checked
+for typos using the 'typos' software.
+<br>
+(Rene Gassmoeller, 2024/08/12)

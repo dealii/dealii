@@ -1081,7 +1081,7 @@ namespace PETScWrappers
 
         // If we have the decide_and_prepare_for_remeshing callback
         // set, then we also need to have the callback for actually
-        // transfering the solution:
+        // transferring the solution:
         AssertThrow(interpolate || transfer_solution_vectors_to_new_mesh,
                     StandardExceptions::ExcFunctionNotProvided(
                       "transfer_solution_vectors_to_new_mesh"));

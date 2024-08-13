@@ -68,7 +68,7 @@ namespace internal
 /**
  * Enum of different choices for istropic refinement.
  * There are 3 different ways to refine a tetrahedral, here we save the
- * different possibilities. It is different to RefinementPossibilites are these
+ * different possibilities. It is different to RefinementPossibilities are these
  * are options in the case that an isotropic refinement is conducted.
  */
 enum class IsotropicRefinementChoice : std::uint8_t

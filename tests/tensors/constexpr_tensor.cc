@@ -182,7 +182,7 @@ main()
     constexpr Tensor<1, 3> dummy_1;
     constexpr Tensor<0, 3> dummy_0;
     DEAL_II_CONSTEXPR auto product_result = dummy_1 * dummy_1;
-    DEAL_II_CONSTEXPR auto constraction_result =
+    DEAL_II_CONSTEXPR auto contraction_result =
       contract<0, 0>(dummy_1, dummy_1);
     DEAL_II_CONSTEXPR auto outer_product_result =
       outer_product(dummy_0, dummy_0);

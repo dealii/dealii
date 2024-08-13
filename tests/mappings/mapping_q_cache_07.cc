@@ -65,10 +65,10 @@ test(const bool         vector_describes_relative_displacement,
 
   if (vector_describes_relative_displacement)
     {
-      Vector<double> absolut_vector(dof_handler_dim.n_dofs());
-      VectorTools::get_position_vector(dof_handler_dim, absolut_vector);
+      Vector<double> absolute_vector(dof_handler_dim.n_dofs());
+      VectorTools::get_position_vector(dof_handler_dim, absolute_vector);
 
-      euler_vector -= absolut_vector;
+      euler_vector -= absolute_vector;
     }
 
   // output mesh with with MappingFEField based on a vector constructed

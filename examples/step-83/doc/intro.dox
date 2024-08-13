@@ -606,7 +606,7 @@ in the program below, a "checkpoint" actually consists of a number
 of files -- one file into which we write the program's member
 variables, and several into which the triangulation puts its
 information. We then would have to rename several files,
-preferrably as a single, "atomic" operation that cannot be
+preferably as a single, "atomic" operation that cannot be
 interrupted. Implementing this is tricky and non-trivial (though
 possible), and so we will not show this part and instead just
 assume that nothing will happen between renaming the first

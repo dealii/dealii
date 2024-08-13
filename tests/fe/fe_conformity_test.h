@@ -91,7 +91,7 @@ namespace FEConforimityTest
     DoFHandler<dim>                        dof_handler;
     AffineConstraints<double>              constraints;
 
-    Vector<double> random_fe_funtion;
+    Vector<double> random_fe_function;
 
     const unsigned int config_switch;
 
@@ -266,10 +266,10 @@ namespace FEConforimityTest
       constraints.close();
     }
 
-    random_fe_funtion.reinit(dof_handler.n_dofs());
+    random_fe_function.reinit(dof_handler.n_dofs());
 
     // Fill vector with pseudo-random values
-    fill_vector_randomly(random_fe_funtion, /* min */ -5.0, /* max */ 5.0);
+    fill_vector_randomly(random_fe_function, /* min */ -5.0, /* max */ 5.0);
   } // make_dofs()
 
 
@@ -453,7 +453,7 @@ namespace FEConforimityTest
                 case FiniteElementData<dim>::Conformity::H1:
                   {
                     get_function_jump(fe_interface_values,
-                                      random_fe_funtion,
+                                      random_fe_function,
                                       interface_jumps);
 
                     deallog << "Function jumps (at quad points) in cell   "
@@ -466,7 +466,7 @@ namespace FEConforimityTest
                 case FiniteElementData<dim>::Conformity::Hdiv:
                   {
                     get_normal_jump(fe_interface_values,
-                                    random_fe_funtion,
+                                    random_fe_function,
                                     interface_jumps);
 
                     deallog << "Normal jumps (at quad points) in cell   "
@@ -479,7 +479,7 @@ namespace FEConforimityTest
                 case FiniteElementData<dim>::Conformity::Hcurl:
                   {
                     get_tangential_jump(fe_interface_values,
-                                        random_fe_funtion,
+                                        random_fe_function,
                                         interface_jumps);
 
                     deallog << "Tangential jumps (at quad points) in cell   "

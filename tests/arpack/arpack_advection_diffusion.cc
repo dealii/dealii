@@ -18,7 +18,7 @@
  *          Joscha Gedicke, U Heidelberg
  *
  * This file tests the non-symmetric interface to ARPACK for an
- advection-diffussion
+ advection-diffusion
  * operator. The advection is chosen in such a way that we compute complex
  eigenvalues.
  * The most critical case when we cut a complex conjugate pair is tested, i.e.

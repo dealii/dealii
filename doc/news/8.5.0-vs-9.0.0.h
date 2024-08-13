@@ -1037,7 +1037,7 @@ inconvenience this causes.
 
  <li>
   New: FECollection gained an equality comparison operator. Both FiniteElement
-  and FECollcetion have a non-equality comparison operator now.
+  and FECollection have a non-equality comparison operator now.
   <br>
   (Daniel Arndt, 2018/04/25)
  </li>

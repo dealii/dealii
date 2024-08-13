@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-// this is the root cause for solution_tranfer_01: the prolongation
+// this is the root cause for solution_transfer_01: the prolongation
 // matrices for FE_DGQ<dim-1,dim> were not computed at all
 
 #include <deal.II/fe/fe_dgq.h>
