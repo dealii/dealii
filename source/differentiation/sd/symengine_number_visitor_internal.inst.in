@@ -24,23 +24,10 @@ for (number : REAL_SCALARS)
 
           template class CSEDictionaryVisitor<number, SD::Expression>;
           template class DictionarySubstitutionVisitor<number, SD::Expression>;
-
-        \}
-      \}
-    \}
-  }
-
-for (number : COMPLEX_SCALARS)
-  {
-    namespace Differentiation
-    \{
-      namespace SD
-      \{
-        namespace internal
-        \{
-
-          template class CSEDictionaryVisitor<number, SD::Expression>;
-          template class DictionarySubstitutionVisitor<number, SD::Expression>;
+          template class CSEDictionaryVisitor<std::complex<number>,
+                                              SD::Expression>;
+          template class DictionarySubstitutionVisitor<std::complex<number>,
+                                                       SD::Expression>;
 
         \}
       \}

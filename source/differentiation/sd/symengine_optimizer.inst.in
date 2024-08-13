@@ -21,19 +21,7 @@ for (number : REAL_SCALARS)
       \{
 
         template class BatchOptimizer<number>;
-
-      \}
-    \}
-  }
-
-for (number : COMPLEX_SCALARS)
-  {
-    namespace Differentiation
-    \{
-      namespace SD
-      \{
-
-        template class BatchOptimizer<number>;
+        template class BatchOptimizer<std::complex<number>>;
 
       \}
     \}

@@ -32,19 +32,10 @@ for (Number : REAL_SCALARS)
       \{
         template struct NumberTraits<Number, NumberTypes::adolc_taped>;
         template struct NumberTraits<Number, NumberTypes::adolc_tapeless>;
-      \}
-    \}
-  }
-
-
-for (Number : COMPLEX_SCALARS)
-  {
-    namespace Differentiation
-    \{
-      namespace AD
-      \{
-        template struct NumberTraits<Number, NumberTypes::adolc_taped>;
-        template struct NumberTraits<Number, NumberTypes::adolc_tapeless>;
+        template struct NumberTraits<std::complex<Number>,
+                                     NumberTypes::adolc_taped>;
+        template struct NumberTraits<std::complex<Number>,
+                                     NumberTypes::adolc_tapeless>;
       \}
     \}
   }
