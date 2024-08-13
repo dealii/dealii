@@ -320,7 +320,11 @@ namespace VectorTools
       hp::QCollection<dim> support_quadrature;
       for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
         {
-          const auto &fe_i   = fe[fe_index];
+          const auto &fe_i = fe[fe_index];
+          Assert(fe_i.has_generalized_support_points(),
+                 ExcMessage(
+                   "The finite element does not have generalized support "
+                   "points. This is required for interpolation."));
           const auto &points = fe_i.get_generalized_support_points();
           support_quadrature.push_back(Quadrature<dim>(points));
           if (fe_i.n_base_elements() == 1 &&
