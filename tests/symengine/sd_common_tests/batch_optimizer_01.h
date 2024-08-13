@@ -22,6 +22,7 @@
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector.templates.h>
 
 #include <iostream>
 
