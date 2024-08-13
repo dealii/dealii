@@ -1668,10 +1668,10 @@ namespace deal_II_exceptions
 #  define Assert(cond, exc)                                                    \
     do                                                                         \
       {                                                                        \
-        typename std::remove_reference<decltype(cond)>::type *deal_ii_asser_a; \
-        typename std::remove_reference<decltype(exc)>::type  *deal_ii_asser_b; \
-        (void)deal_ii_asser_a;                                                 \
-        (void)deal_ii_asser_b;                                                 \
+        typename std::remove_reference<decltype(cond)>::type *dealii_assert_a; \
+        typename std::remove_reference<decltype(exc)>::type  *dealii_assert_b; \
+        (void)dealii_assert_a;                                                 \
+        (void)dealii_assert_b;                                                 \
       }                                                                        \
     while (false)
 
