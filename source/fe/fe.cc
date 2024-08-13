@@ -845,12 +845,13 @@ FiniteElement<dim, spacedim>::hp_constraints_are_implemented() const
 template <int dim, int spacedim>
 const FullMatrix<double> &
 FiniteElement<dim, spacedim>::constraints(
-  [[maybe_unused]] const internal::SubfaceCase<dim> &subface_case) const
+  const internal::SubfaceCase<dim> &subface_case) const
 {
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
   AssertDimension(this->n_unique_faces(), 1);
   [[maybe_unused]] const unsigned int face_no = 0;
+  (void)subface_case;
 
   Assert(subface_case == internal::SubfaceCase<dim>::case_isotropic,
          ExcMessage("Constraints for this element are only implemented "
@@ -1174,9 +1175,11 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
 template <int dim, int spacedim>
 const FiniteElement<dim, spacedim> &
 FiniteElement<dim, spacedim>::get_sub_fe(
-  [[maybe_unused]] const unsigned int first_component,
-  [[maybe_unused]] const unsigned int n_selected_components) const
+  const unsigned int first_component,
+  const unsigned int n_selected_components) const
 {
+  (void)first_component;
+  (void)n_selected_components;
   // No complicated logic is needed here, because it is overridden in
   // FESystem<dim,spacedim>. Just make sure that what the user chose is valid:
   Assert(first_component == 0 && n_selected_components == this->n_components(),
@@ -1325,12 +1328,11 @@ FiniteElement<dim, spacedim>::fill_fe_face_values(
 template <int dim, int spacedim>
 inline void
 FiniteElement<dim, spacedim>::fill_fe_face_values(
-  [[maybe_unused]] const typename Triangulation<dim, spacedim>::cell_iterator
-                                                          &cell,
-  [[maybe_unused]] const unsigned int                      face_no,
-  const Quadrature<dim - 1>                               &quadrature,
-  const Mapping<dim, spacedim>                            &mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const unsigned int                                          face_no,
+  const Quadrature<dim - 1>                                  &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
                                                                 &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
@@ -1341,6 +1343,8 @@ FiniteElement<dim, spacedim>::fill_fe_face_values(
   Assert(false,
          ExcMessage("Use of a deprecated interface, please implement "
                     "fill_fe_face_values taking a hp::QCollection argument"));
+  (void)face_no;
+  (void)cell;
   (void)quadrature;
   (void)mapping;
   (void)mapping_internal;
