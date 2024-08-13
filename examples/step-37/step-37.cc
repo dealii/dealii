@@ -236,10 +236,7 @@ namespace Step37
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     void local_compute_diagonal(
-      const MatrixFree<dim, number>               &data,
-      LinearAlgebra::distributed::Vector<number>  &dst,
-      const unsigned int                          &dummy,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
+      FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> &integrator) const;
 
     Table<2, VectorizedArray<number>> coefficient;
   };
@@ -515,12 +512,10 @@ namespace Step37
   // inverse_diagonal_entries of type DiagonalMatrix in the base class
   // MatrixFreeOperators::Base. This member is a shared pointer that we first
   // need to initialize and then get the vector representing the diagonal
-  // entries in the matrix. As to the actual diagonal computation, we again
-  // use the cell_loop infrastructure of MatrixFree to invoke a local worker
-  // routine called local_compute_diagonal(). Since we will only write into a
-  // vector but not have any source vector, we put a dummy argument of type
-  // <tt>unsigned int</tt> in place of the source vector to confirm with the
-  // cell_loop interface. After the loop, we need to set the vector entries
+  // entries in the matrix. As to the actual diagonal computation, we could
+  // manually write a cell_loop and invoke a local worker that applies all unit
+  // vectors on each cell. Instead, we use MatrixFreeTools::compute_diagonal()
+  // to do this for us. Afterwards, we need to set the vector entries
   // subject to Dirichlet boundary conditions to one (either those on the
   // boundary described by the AffineConstraints object inside MatrixFree or
   // the indices at the interface between different grid levels in adaptive
@@ -531,8 +526,7 @@ namespace Step37
   // form required by the Chebyshev smoother based on the Jacobi iteration. In
   // the loop, we assert that all entries are non-zero, because they should
   // either have obtained a positive contribution from integrals or be
-  // constrained and treated by @p set_constrained_entries_to_one() following
-  // cell_loop.
+  // constrained and treated by @p set_constrained_entries_to_one().
   template <int dim, int fe_degree, typename number>
   void LaplaceOperator<dim, fe_degree, number>::compute_diagonal()
   {
@@ -541,11 +535,11 @@ namespace Step37
     LinearAlgebra::distributed::Vector<number> &inverse_diagonal =
       this->inverse_diagonal_entries->get_vector();
     this->data->initialize_dof_vector(inverse_diagonal);
-    unsigned int dummy = 0;
-    this->data->cell_loop(&LaplaceOperator::local_compute_diagonal,
-                          this,
-                          inverse_diagonal,
-                          dummy);
+
+    MatrixFreeTools::compute_diagonal(*this->data,
+                                      inverse_diagonal,
+                                      &LaplaceOperator::local_compute_diagonal,
+                                      this);
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
@@ -609,38 +603,17 @@ namespace Step37
   // level matrices where no hanging node constraints appear.
   template <int dim, int fe_degree, typename number>
   void LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
-    const MatrixFree<dim, number>              &data,
-    LinearAlgebra::distributed::Vector<number> &dst,
-    const unsigned int &,
-    const std::pair<unsigned int, unsigned int> &cell_range) const
+    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> &phi) const
   {
-    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
+    const unsigned int cell = phi.get_current_cell_index();
 
-    AlignedVector<VectorizedArray<number>> diagonal(phi.dofs_per_cell);
+    phi.evaluate(EvaluationFlags::gradients);
 
-    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
+    for (const unsigned int q : phi.quadrature_point_indices())
       {
-        AssertDimension(coefficient.size(0), data.n_cell_batches());
-        AssertDimension(coefficient.size(1), phi.n_q_points);
-
-        phi.reinit(cell);
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
-              phi.submit_dof_value(VectorizedArray<number>(), j);
-            phi.submit_dof_value(make_vectorized_array<number>(1.), i);
-
-            phi.evaluate(EvaluationFlags::gradients);
-            for (const unsigned int q : phi.quadrature_point_indices())
-              phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q),
-                                  q);
-            phi.integrate(EvaluationFlags::gradients);
-            diagonal[i] = phi.get_dof_value(i);
-          }
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          phi.submit_dof_value(diagonal[i], i);
-        phi.distribute_local_to_global(dst);
+        phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q), q);
       }
+    phi.integrate(EvaluationFlags::gradients);
   }
 
 
