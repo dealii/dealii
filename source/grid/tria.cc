@@ -901,13 +901,13 @@ namespace internal
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   void CellAttachedDataSerializer<dim, spacedim>::load(
-    const unsigned int global_first_cell,
-    const unsigned int global_num_cells,
-    const unsigned int local_num_cells,
-    const std::string &file_basename,
-    const unsigned int n_attached_deserialize_fixed,
-    const unsigned int n_attached_deserialize_variable,
-    [[maybe_unused]] const MPI_Comm    &mpi_communicator)
+    const unsigned int               global_first_cell,
+    const unsigned int               global_num_cells,
+    const unsigned int               local_num_cells,
+    const std::string               &file_basename,
+    const unsigned int               n_attached_deserialize_fixed,
+    const unsigned int               n_attached_deserialize_variable,
+    [[maybe_unused]] const MPI_Comm &mpi_communicator)
   {
     Assert(dest_data_fixed.empty(),
            ExcMessage("Previously loaded data has not been released yet!"));
@@ -2009,8 +2009,8 @@ namespace internal
       // count the number of objects, of unused single objects and of
       // unused pairs of objects
       [[maybe_unused]] unsigned int n_quads          = 0;
-      unsigned int n_unused_pairs   = 0;
-      unsigned int n_unused_singles = 0;
+      unsigned int                  n_unused_pairs   = 0;
+      unsigned int                  n_unused_singles = 0;
       for (unsigned int i = 0; i < tria_faces.quads.used.size(); ++i)
         {
           if (tria_faces.quads.used[i])
@@ -2240,8 +2240,8 @@ namespace internal
           // count the number of objects, of unused single objects and of
           // unused pairs of objects
           [[maybe_unused]] unsigned int n_objects        = 0;
-          unsigned int n_unused_pairs   = 0;
-          unsigned int n_unused_singles = 0;
+          unsigned int                  n_unused_pairs   = 0;
+          unsigned int                  n_unused_singles = 0;
           for (unsigned int i = 0; i < tria_objects.used.size(); ++i)
             {
               if (tria_objects.used[i])
