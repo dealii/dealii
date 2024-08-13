@@ -1,0 +1,4 @@
+Improved: Portable::MatrixFree now supports FESystem(FE_Q, n_components)
+with arbitrary number of components.
+<br>
+(Peter Munch, Daniel Arndt, 2024/08/14)

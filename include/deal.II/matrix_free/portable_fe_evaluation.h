@@ -72,12 +72,19 @@ namespace Portable
     /**
      * An alias for scalar quantities.
      */
-    using value_type = Number;
+    using value_type = std::conditional_t<(n_components_ == 1),
+                                          Number,
+                                          Tensor<1, n_components_, Number>>;
 
     /**
      * An alias for vectorial quantities.
      */
-    using gradient_type = Tensor<1, dim, Number>;
+    using gradient_type = std::conditional_t<
+      n_components_ == 1,
+      Tensor<1, dim, Number>,
+      std::conditional_t<n_components_ == dim,
+                         Tensor<2, dim, Number>,
+                         Tensor<1, n_components_, Tensor<1, dim, Number>>>>;
 
     /**
      * An alias to kernel specific information.
@@ -265,22 +272,24 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     read_dof_values(const Number *src)
   {
-    static_assert(n_components_ == 1, "This function only supports FE with one \
-                  components");
     // Populate the scratch memory
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
-                                                 n_q_points),
-                         [&](const int &i) {
-                           shared_data->values(i) =
-                             src[data->local_to_global(cell_id, i)];
-                         });
+    Kokkos::parallel_for(
+      Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+      [&](const int &i) {
+        for (unsigned int c = 0; c < n_components_; ++c)
+          shared_data->values(i, c) =
+            src[data->local_to_global(cell_id, i + tensor_dofs_per_cell * c)];
+      });
     shared_data->team_member.team_barrier();
 
-    internal::resolve_hanging_nodes<dim, fe_degree, false>(
-      shared_data->team_member,
-      data->constraint_weights,
-      data->constraint_mask(cell_id),
-      shared_data->values);
+    for (unsigned int c = 0; c < n_components_; ++c)
+      {
+        internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
+          shared_data->team_member,
+          data->constraint_weights,
+          data->constraint_mask(cell_id),
+          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+      }
   }
 
 
@@ -294,31 +303,35 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     distribute_local_to_global(Number *dst) const
   {
-    static_assert(n_components_ == 1, "This function only supports FE with one \
-                  components");
-
-    internal::resolve_hanging_nodes<dim, fe_degree, true>(
-      shared_data->team_member,
-      data->constraint_weights,
-      data->constraint_mask(cell_id),
-      shared_data->values);
+    for (unsigned int c = 0; c < n_components_; ++c)
+      {
+        internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
+          shared_data->team_member,
+          data->constraint_weights,
+          data->constraint_mask(cell_id),
+          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+      }
 
     if (data->use_coloring)
       {
-        Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
-                                                     n_q_points),
-                             [&](const int &i) {
-                               dst[data->local_to_global(cell_id, i)] +=
-                                 shared_data->values(i);
-                             });
+        Kokkos::parallel_for(
+          Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+          [&](const int &i) {
+            for (unsigned int c = 0; c < n_components_; ++c)
+              dst[data->local_to_global(cell_id,
+                                        i + tensor_dofs_per_cell * c)] +=
+                shared_data->values(i, c);
+          });
       }
     else
       {
         Kokkos::parallel_for(
           Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
           [&](const int &i) {
-            Kokkos::atomic_add(&dst[data->local_to_global(cell_id, i)],
-                               shared_data->values(i));
+            for (unsigned int c = 0; c < n_components_; ++c)
+              Kokkos::atomic_add(&dst[data->local_to_global(
+                                   cell_id, i + tensor_dofs_per_cell * c)],
+                                 shared_data->values(i, c));
           });
       }
   }
@@ -347,23 +360,31 @@ namespace Portable
                                data->shape_gradients,
                                data->co_shape_gradients);
 
-    if ((evaluate_flag & EvaluationFlags::values) &&
-        (evaluate_flag & EvaluationFlags::gradients))
+    for (unsigned int c = 0; c < n_components_; ++c)
       {
-        evaluator_tensor_product.evaluate_values_and_gradients(
-          shared_data->values, shared_data->gradients);
-        shared_data->team_member.team_barrier();
-      }
-    else if (evaluate_flag & EvaluationFlags::gradients)
-      {
-        evaluator_tensor_product.evaluate_gradients(shared_data->values,
-                                                    shared_data->gradients);
-        shared_data->team_member.team_barrier();
-      }
-    else if (evaluate_flag & EvaluationFlags::values)
-      {
-        evaluator_tensor_product.evaluate_values(shared_data->values);
-        shared_data->team_member.team_barrier();
+        if ((evaluate_flag & EvaluationFlags::values) &&
+            (evaluate_flag & EvaluationFlags::gradients))
+          {
+            evaluator_tensor_product.evaluate_values_and_gradients(
+              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
+              Kokkos::subview(
+                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
+            shared_data->team_member.team_barrier();
+          }
+        else if (evaluate_flag & EvaluationFlags::gradients)
+          {
+            evaluator_tensor_product.evaluate_gradients(
+              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
+              Kokkos::subview(
+                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
+            shared_data->team_member.team_barrier();
+          }
+        else if (evaluate_flag & EvaluationFlags::values)
+          {
+            evaluator_tensor_product.evaluate_values(
+              Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+            shared_data->team_member.team_barrier();
+          }
       }
   }
 
@@ -406,22 +427,31 @@ namespace Portable
                                data->shape_gradients,
                                data->co_shape_gradients);
 
-    if ((integration_flag & EvaluationFlags::values) &&
-        (integration_flag & EvaluationFlags::gradients))
+
+    for (unsigned int c = 0; c < n_components_; ++c)
       {
-        evaluator_tensor_product.integrate_values_and_gradients(
-          shared_data->values, shared_data->gradients);
-      }
-    else if (integration_flag & EvaluationFlags::values)
-      {
-        evaluator_tensor_product.integrate_values(shared_data->values);
-        shared_data->team_member.team_barrier();
-      }
-    else if (integration_flag & EvaluationFlags::gradients)
-      {
-        evaluator_tensor_product.template integrate_gradients<false>(
-          shared_data->values, shared_data->gradients);
-        shared_data->team_member.team_barrier();
+        if ((integration_flag & EvaluationFlags::values) &&
+            (integration_flag & EvaluationFlags::gradients))
+          {
+            evaluator_tensor_product.integrate_values_and_gradients(
+              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
+              Kokkos::subview(
+                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
+          }
+        else if (integration_flag & EvaluationFlags::values)
+          {
+            evaluator_tensor_product.integrate_values(
+              Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+            shared_data->team_member.team_barrier();
+          }
+        else if (integration_flag & EvaluationFlags::gradients)
+          {
+            evaluator_tensor_product.template integrate_gradients<false>(
+              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
+              Kokkos::subview(
+                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
+            shared_data->team_member.team_barrier();
+          }
       }
   }
 
@@ -457,7 +487,17 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::get_value(
     int q_point) const
   {
-    return shared_data->values(q_point);
+    if constexpr (n_components_ == 1)
+      {
+        return shared_data->values(q_point, 0);
+      }
+    else
+      {
+        value_type result;
+        for (unsigned int c = 0; c < n_components; ++c)
+          result[c] = shared_data->values(q_point, c);
+        return result;
+      }
   }
 
 
@@ -475,7 +515,17 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_dof_value(int q_point) const
   {
-    return shared_data->values(q_point);
+    if constexpr (n_components_ == 1)
+      {
+        return shared_data->values(q_point, 0);
+      }
+    else
+      {
+        value_type result;
+        for (unsigned int c = 0; c < n_components; ++c)
+          result[c] = shared_data->values(q_point, c);
+        return result;
+      }
   }
 
 
@@ -489,7 +539,16 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     submit_value(const value_type &val_in, int q_point)
   {
-    shared_data->values(q_point) = val_in * data->JxW(cell_id, q_point);
+    if constexpr (n_components_ == 1)
+      {
+        shared_data->values(q_point, 0) = val_in * data->JxW(cell_id, q_point);
+      }
+    else
+      {
+        for (unsigned int c = 0; c < n_components; ++c)
+          shared_data->values(q_point, c) =
+            val_in[c] * data->JxW(cell_id, q_point);
+      }
   }
 
 
@@ -503,7 +562,15 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     submit_dof_value(const value_type &val_in, int q_point)
   {
-    shared_data->values(q_point) = val_in;
+    if constexpr (n_components_ == 1)
+      {
+        shared_data->values(q_point, 0) = val_in;
+      }
+    else
+      {
+        for (unsigned int c = 0; c < n_components; ++c)
+          shared_data->values(q_point, c) = val_in[c];
+      }
   }
 
 
@@ -521,17 +588,30 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_gradient(int q_point) const
   {
-    static_assert(n_components_ == 1, "This function only supports FE with one \
-                  components");
-
     gradient_type grad;
-    for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+
+    if constexpr (n_components_ == 1)
       {
-        Number tmp = 0.;
-        for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
-                 shared_data->gradients(q_point, d_2);
-        grad[d_1] = tmp;
+        for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+          {
+            Number tmp = 0.;
+            for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
+              tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                     shared_data->gradients(q_point, d_2, 0);
+            grad[d_1] = tmp;
+          }
+      }
+    else
+      {
+        for (unsigned int c = 0; c < n_components; ++c)
+          for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+            {
+              Number tmp = 0.;
+              for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
+                tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                       shared_data->gradients(q_point, d_2, c);
+              grad[c][d_1] = tmp;
+            }
       }
 
     return grad;
@@ -548,13 +628,30 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     submit_gradient(const gradient_type &grad_in, int q_point)
   {
-    for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+    if constexpr (n_components_ == 1)
       {
-        Number tmp = 0.;
-        for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += data->inv_jacobian(cell_id, q_point, d_1, d_2) * grad_in[d_2];
-        shared_data->gradients(q_point, d_1) =
-          tmp * data->JxW(cell_id, q_point);
+        for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+          {
+            Number tmp = 0.;
+            for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
+              tmp +=
+                data->inv_jacobian(cell_id, q_point, d_1, d_2) * grad_in[d_2];
+            shared_data->gradients(q_point, d_1, 0) =
+              tmp * data->JxW(cell_id, q_point);
+          }
+      }
+    else
+      {
+        for (unsigned int c = 0; c < n_components; ++c)
+          for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+            {
+              Number tmp = 0.;
+              for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
+                tmp += data->inv_jacobian(cell_id, q_point, d_1, d_2) *
+                       grad_in[c][d_2];
+              shared_data->gradients(q_point, d_1, c) =
+                tmp * data->JxW(cell_id, q_point);
+            }
       }
   }
 
