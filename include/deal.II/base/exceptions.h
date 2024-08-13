@@ -1659,11 +1659,22 @@ namespace deal_II_exceptions
 #    endif /*ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #  endif   /*KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #else      /*ifdef DEBUG*/
-#  define Assert(cond, exc) \
-    do                      \
-      {                     \
-      }                     \
+/*
+ * In order to avoid unused parameters (etc.) warnings we need to use cond
+ * and exc without actually evaluating the expression and generating code.
+ * We accomplish this by using decltype(...) and create a dummy pointer
+ * with these signatures.
+ */
+#  define Assert(cond, exc)                                                    \
+    do                                                                         \
+      {                                                                        \
+        typename std::remove_reference<decltype(cond)>::type *deal_ii_asser_a; \
+        typename std::remove_reference<decltype(exc)>::type  *deal_ii_asser_b; \
+        (void)deal_ii_asser_a;                                                 \
+        (void)deal_ii_asser_b;                                                 \
+      }                                                                        \
     while (false)
+
 #endif /*ifdef DEBUG*/
 
 
