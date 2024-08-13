@@ -2121,14 +2121,13 @@ namespace GridTools
       void
       get_subdomain_association(
         const parallel::distributed::Triangulation<dim, spacedim>
-                                         &triangulation,
-        const std::vector<CellId>        &cell_ids,
-        std::vector<types::subdomain_id> &subdomain_ids)
+                                                          &triangulation,
+        const std::vector<CellId>                         &cell_ids,
+        [[maybe_unused]] std::vector<types::subdomain_id> &subdomain_ids)
       {
 #ifndef DEAL_II_WITH_P4EST
         (void)triangulation;
         (void)cell_ids;
-        (void)subdomain_ids;
         Assert(
           false,
           ExcMessage(
@@ -4201,14 +4200,13 @@ namespace GridTools
     std::map<unsigned int, std::vector<unsigned int>>
     DistributedComputeIntersectionLocationsInternal<structdim, spacedim>::
       communicate_indices(
-        const std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>
-                      &point_recv_components,
-        const MPI_Comm comm) const
+        [[maybe_unused]] const std::vector<
+          std::tuple<unsigned int, unsigned int, unsigned int>>
+                                       &point_recv_components,
+        [[maybe_unused]] const MPI_Comm comm) const
     {
 #ifndef DEAL_II_WITH_MPI
       Assert(false, ExcNeedsMPI());
-      (void)point_recv_components;
-      (void)comm;
       return {};
 #else
       // since we are converting to DistributedComputePointLocationsInternal
@@ -4436,8 +4434,8 @@ namespace GridTools
         marked_cell_tree;
 
       const auto answer_request =
-        [&](const unsigned int &other_rank,
-            const RequestType  &request) -> AnswerType {
+        [&]([[maybe_unused]] const unsigned int &other_rank,
+            const RequestType                   &request) -> AnswerType {
         AnswerType answer;
 
         if (has_relevant_vertices)
@@ -4456,7 +4454,7 @@ namespace GridTools
                 const auto bb = BoundingBox<spacedim>(request[i].second)
                                   .create_extended(tolerance);
 
-                for (const auto &box_cell :
+                for ([[maybe_unused]] const auto &box_cell :
                      marked_cell_tree |
                        boost::geometry::index::adaptors::queried(
                          boost::geometry::index::intersects(bb)))
@@ -4492,8 +4490,6 @@ namespace GridTools
                           }
                       }
 #else
-                    (void)other_rank;
-                    (void)box_cell;
                     Assert(false, ExcNeedsCGAL());
 #endif
                   }
@@ -4606,12 +4602,10 @@ namespace GridTools
   template <int spacedim>
   std::vector<std::vector<BoundingBox<spacedim>>>
   exchange_local_bounding_boxes(
-    const std::vector<BoundingBox<spacedim>> &local_bboxes,
-    const MPI_Comm                            mpi_communicator)
+    [[maybe_unused]] const std::vector<BoundingBox<spacedim>> &local_bboxes,
+    [[maybe_unused]] const MPI_Comm                            mpi_communicator)
   {
 #ifndef DEAL_II_WITH_MPI
-    (void)local_bboxes;
-    (void)mpi_communicator;
     Assert(false,
            ExcMessage(
              "GridTools::exchange_local_bounding_boxes() requires MPI."));
@@ -4704,10 +4698,9 @@ namespace GridTools
   RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
   build_global_description_tree(
     const std::vector<BoundingBox<spacedim>> &local_description,
-    const MPI_Comm                            mpi_communicator)
+    [[maybe_unused]] const MPI_Comm           mpi_communicator)
   {
 #ifndef DEAL_II_WITH_MPI
-    (void)mpi_communicator;
     // Building a tree with the only boxes available without MPI
     std::vector<std::pair<BoundingBox<spacedim>, unsigned int>> boxes_index(
       local_description.size());
