@@ -28,6 +28,13 @@
 #include <memory>
 #include <tuple>
 
+#ifdef DEAL_II_WITH_TASKFLOW
+#  include <deal.II/base/multithread_info.h>
+
+#  include <taskflow/algorithm/for_each.hpp>
+#  include <taskflow/taskflow.hpp>
+#endif
+
 #ifdef DEAL_II_WITH_TBB
 #  include <tbb/blocked_range.h>
 #  include <tbb/parallel_for.h>
@@ -73,6 +80,37 @@ namespace parallel
     };
 #endif
 
+#ifdef DEAL_II_WITH_TASKFLOW
+    /**
+     * Internal function to do a parallel_for using taskflow
+     */
+    template <typename Iterator, typename Functor>
+    void
+    taskflow_parallel_for(Iterator           x_begin,
+                          Iterator           x_end,
+                          const Functor     &functor,
+                          const unsigned int grainsize)
+    {
+      tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+      tf::Taskflow  taskflow;
+
+      // TODO: We have several choices for the Partitioner and we should spend
+      // some time benchmarking them:
+      // 1. StaticPartitioner(grainsize): all work items have grainsize number
+      // of items
+      // 2. GuidedPartitioner(grainsize):
+      // "The size of a partition is proportional to the number of unassigned
+      // iterations divided by the number of workers, and the size will
+      // gradually decrease to the given chunk size."
+      // 3. GuidedPartitioner(0): The default.
+      taskflow.for_each(
+        x_begin,
+        x_end,
+        [&](const auto &item) { functor(item); },
+        tf::StaticPartitioner(grainsize));
+      executor.run(taskflow).wait();
+    }
+#endif
 
 #ifdef DEAL_II_WITH_TBB
     /**
@@ -168,14 +206,21 @@ namespace parallel
                                           const Function      &function,
                                           const unsigned int   grainsize)
   {
-#ifndef DEAL_II_WITH_TBB
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)grainsize;
+#ifdef DEAL_II_WITH_TASKFLOW
+    using Iterators     = std::tuple<InputIterator, OutputIterator>;
+    using SyncIterators = SynchronousIterators<Iterators>;
+    Iterators x_begin(begin_in, out);
+    Iterators x_end(end_in, OutputIterator());
 
-    for (InputIterator in = begin_in; in != end_in;)
-      *out++ = function(*in++);
-#else
+    internal::taskflow_parallel_for(
+      SyncIterators(x_begin),
+      SyncIterators(x_end),
+      [function](const auto &it) {
+        *std::get<1>(it) = function(*std::get<0>(it));
+      },
+      grainsize);
+
+#elif defined(DEAL_II_WITH_TBB)
     using Iterators     = std::tuple<InputIterator, OutputIterator>;
     using SyncIterators = SynchronousIterators<Iterators>;
     Iterators x_begin(begin_in, out);
@@ -188,6 +233,13 @@ namespace parallel
           *std::get<1>(p) = function(*std::get<0>(p));
       },
       grainsize);
+#else
+    // make sure we don't get compiler
+    // warnings about unused arguments
+    (void)grainsize;
+
+    for (InputIterator in = begin_in; in != end_in;)
+      *out++ = function(*in++);
 #endif
   }
 
@@ -244,14 +296,22 @@ namespace parallel
                                           const Function       &function,
                                           const unsigned int    grainsize)
   {
-#ifndef DEAL_II_WITH_TBB
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)grainsize;
+#ifdef DEAL_II_WITH_TASKFLOW
+    using Iterators =
+      std::tuple<InputIterator1, InputIterator2, OutputIterator>;
+    using SyncIterators = SynchronousIterators<Iterators>;
+    Iterators x_begin(begin_in1, in2, out);
+    Iterators x_end(end_in1, InputIterator2(), OutputIterator());
 
-    for (InputIterator1 in1 = begin_in1; in1 != end_in1;)
-      *out++ = function(*in1++, *in2++);
-#else
+    internal::taskflow_parallel_for(
+      SyncIterators(x_begin),
+      SyncIterators(x_end),
+      [function](const auto &it) {
+        *std::get<2>(it) = function(*std::get<0>(it), *std::get<1>(it));
+      },
+      grainsize);
+
+#elif defined(DEAL_II_WITH_TBB)
     using Iterators =
       std::tuple<InputIterator1, InputIterator2, OutputIterator>;
     using SyncIterators = SynchronousIterators<Iterators>;
@@ -265,6 +325,14 @@ namespace parallel
           *std::get<2>(p) = function(*std::get<0>(p), *std::get<1>(p));
       },
       grainsize);
+
+#else
+    // make sure we don't get compiler
+    // warnings about unused arguments
+    (void)grainsize;
+
+    for (InputIterator1 in1 = begin_in1; in1 != end_in1;)
+      *out++ = function(*in1++, *in2++);
 #endif
   }
 
@@ -327,14 +395,26 @@ namespace parallel
                                           const Function       &function,
                                           const unsigned int    grainsize)
   {
-#ifndef DEAL_II_WITH_TBB
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)grainsize;
+#ifdef DEAL_II_WITH_TASKFLOW
+    using Iterators = std::
+      tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>;
+    using SyncIterators = SynchronousIterators<Iterators>;
+    Iterators x_begin(begin_in1, in2, in3, out);
+    Iterators x_end(end_in1,
+                    InputIterator2(),
+                    InputIterator3(),
+                    OutputIterator());
 
-    for (InputIterator1 in1 = begin_in1; in1 != end_in1;)
-      *out++ = function(*in1++, *in2++, *in3++);
-#else
+    internal::taskflow_parallel_for(
+      SyncIterators(x_begin),
+      SyncIterators(x_end),
+      [function](const auto &it) {
+        *std::get<3>(it) =
+          function(*std::get<0>(it), *std::get<1>(it), *std::get<2>(it));
+      },
+      grainsize);
+
+#elif defined(DEAL_II_WITH_TBB)
     using Iterators = std::
       tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>;
     using SyncIterators = SynchronousIterators<Iterators>;
@@ -352,6 +432,13 @@ namespace parallel
             function(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
       },
       grainsize);
+#else
+    // make sure we don't get compiler
+    // warnings about unused arguments
+    (void)grainsize;
+
+    for (OutputIterator1 in1 = begin_in1; in1 != end_in1;)
+      *out++ = function(*in1++, *in2++, *in3++);
 #endif
   }
 
