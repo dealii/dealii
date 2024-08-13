@@ -38,7 +38,7 @@ namespace HDF5
       check_exception(const std::string &type, const std::string &name)
       {
 #  ifdef DEAL_II_WITH_MPI
-        if (std::uncaught_exceptions() != 0)
+        if (std::uncaught_exceptions() > 0)
           {
             std::cerr
               << "---------------------------------------------------------\n"

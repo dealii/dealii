@@ -746,7 +746,7 @@ namespace Utilities
         check_exception()
         {
 #ifdef DEAL_II_WITH_MPI
-          if (std::uncaught_exceptions() != 0)
+          if (std::uncaught_exceptions() > 0)
             {
               std::cerr
                 << "---------------------------------------------------------\n"
