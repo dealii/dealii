@@ -533,11 +533,15 @@ namespace internal
           object_dof_indices.data() + range.first;
 
         // process dofs
-        for (unsigned int i = 0; i < range.second; ++i, ++dof_indices_ptr)
-          process(
-            stored_indices[(structdim == 0 || structdim == dim) ? i :
-                                                                  mapping(i)],
-            dof_indices_ptr);
+        for (unsigned int i = 0; i < range.second; ++i)
+          {
+            process(
+              stored_indices[(structdim == 0 || structdim == dim) ? i :
+                                                                    mapping(i)],
+              dof_indices_ptr);
+            if (dof_indices_ptr != nullptr)
+              ++dof_indices_ptr;
+          }
       }
 
 
@@ -1143,8 +1147,11 @@ namespace internal
             dof_indices_ptr,
             dof_processor);
 
-        AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
-                        dof_indices_ptr - get_array_ptr(const_dof_indices));
+        if (dof_indices_ptr != nullptr)
+          {
+            AssertDimension(n_dof_indices(accessor, fe_index, count_level_dofs),
+                            dof_indices_ptr - get_array_ptr(const_dof_indices));
+          }
 
         // PM: This is a part that should not be reached since it indicates that
         // an object (and/or its subobjects) is not active. However,
