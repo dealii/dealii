@@ -28,10 +28,13 @@
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/vector_operation.h>
 
+#  include <boost/container/small_vector.hpp>
+
 #  include <petscmat.h>
 
 #  include <cmath>
 #  include <memory>
+#  include <optional>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1089,36 +1092,21 @@ namespace PETScWrappers
     Tmmult(MatrixBase &C, const MatrixBase &B, const VectorBase &V) const;
 
   private:
-    /**
-     * An internal array of integer values that is used to store the column
-     * indices when adding/inserting local data into the (large) sparse
-     * matrix.
-     *
-     * This variable does not store any "state" of the matrix
-     * object. Rather, it is only used as a temporary buffer by some
-     * of the member functions of this class. As with all @p mutable
-     * member variables, the use of this variable is not thread-safe
-     * unless guarded by a mutex. However, since PETSc matrix
-     * operations are not thread-safe anyway, there is no need to
-     * attempt to make things thread-safe, and so there is no mutex
-     * associated with this variable.
-     */
-    mutable std::vector<PetscInt> column_indices;
-
-    /**
-     * An internal array of double values that is used to store the column
-     * indices when adding/inserting local data into the (large) sparse
-     * matrix.
-     *
-     * The same comment as for the @p column_indices variable above
-     * applies.
-     */
-    mutable std::vector<PetscScalar> column_values;
-
-
     // To allow calling protected prepare_add() and prepare_set().
     template <class>
     friend class dealii::BlockMatrixBase;
+
+
+    /**
+     * Internal function wrapping MatSetValues().
+     */
+    void
+    add_or_set(const VectorOperation::values &operation,
+               const size_type                row,
+               const size_type                n_cols,
+               const size_type               *col_indices,
+               const PetscScalar             *values,
+               const bool                     elide_zero_values);
   };
 
 
@@ -1338,53 +1326,12 @@ namespace PETScWrappers
                   const PetscScalar *values,
                   const bool         elide_zero_values)
   {
-    prepare_action(VectorOperation::insert);
-
-    const auto petsc_row = static_cast<PetscInt>(row);
-    AssertIntegerConversion(petsc_row, row);
-
-    PetscInt n_columns = 0;
-    column_indices.resize(n_cols);
-    column_values.resize(n_cols);
-    if (elide_zero_values == false)
-      {
-        n_columns = static_cast<PetscInt>(n_cols);
-        AssertIntegerConversion(n_columns, n_cols);
-
-        for (size_type j = 0; j < n_cols; ++j)
-          {
-            AssertIsFinite(values[j]);
-            column_indices[j] = static_cast<PetscInt>(col_indices[j]);
-            AssertIntegerConversion(column_indices[j], col_indices[j]);
-            column_values[j] = values[j];
-          }
-      }
-    else
-      {
-        // Otherwise, extract nonzero values in each row and get the
-        // respective index.
-        for (size_type j = 0; j < n_cols; ++j)
-          {
-            const PetscScalar value = values[j];
-            AssertIsFinite(value);
-            if (value != PetscScalar())
-              {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns]  = value;
-                ++n_columns;
-              }
-          }
-        AssertIndexRange(n_columns, n_cols + 1);
-      }
-
-    const PetscErrorCode ierr = MatSetValues(matrix,
-                                             1,
-                                             &petsc_row,
-                                             n_columns,
-                                             column_indices.data(),
-                                             column_values.data(),
-                                             INSERT_VALUES);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    add_or_set(VectorOperation::insert,
+               row,
+               n_cols,
+               col_indices,
+               values,
+               elide_zero_values);
   }
 
 
@@ -1476,54 +1423,88 @@ namespace PETScWrappers
                   const bool         elide_zero_values,
                   const bool /*col_indices_are_sorted*/)
   {
-    (void)elide_zero_values;
+    add_or_set(VectorOperation::add,
+               row,
+               n_cols,
+               col_indices,
+               values,
+               elide_zero_values);
+  }
 
-    prepare_action(VectorOperation::add);
+
+
+  inline void
+  MatrixBase::add_or_set(const VectorOperation::values &operation,
+                         const size_type                row,
+                         const size_type                n_cols,
+                         const size_type               *col_indices,
+                         const PetscScalar             *values,
+                         const bool                     elide_zero_values)
+  {
+    prepare_action(operation);
 
     const auto petsc_row = static_cast<PetscInt>(row);
     AssertIntegerConversion(petsc_row, row);
 
-    PetscInt n_columns = 0;
-    column_indices.resize(n_cols);
-    column_values.resize(n_cols);
+    // Use 100 entries so that we can store a row of a matrix constructed with
+    // FESystem<3>(FE_Q<3>(2), 3, FE_Q<3>(1), 1) (i.e., a common Stokes FE,
+    // which has 89 DoFs) with room to spare without allocating memory in the
+    // free store.
+    //
+    // Setting up small_vectors isn't free so only set up column_values if we
+    // actually use it.
+    boost::container::small_vector<PetscInt, 100> column_indices;
+    std::optional<boost::container::small_vector<PetscScalar, 100>>
+      column_values;
+
+    const PetscScalar *values_ptr = nullptr;
     if (elide_zero_values == false)
       {
-        n_columns = static_cast<PetscInt>(n_cols);
-        AssertIntegerConversion(n_columns, n_cols);
+        column_indices.resize(n_cols);
 
         for (size_type j = 0; j < n_cols; ++j)
           {
             AssertIsFinite(values[j]);
             column_indices[j] = static_cast<PetscInt>(col_indices[j]);
             AssertIntegerConversion(column_indices[j], col_indices[j]);
-            column_values[j] = values[j];
           }
+
+        values_ptr = values;
       }
     else
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective index.
+        column_values.emplace();
         for (size_type j = 0; j < n_cols; ++j)
           {
             const PetscScalar value = values[j];
             AssertIsFinite(value);
             if (value != PetscScalar())
               {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns]  = value;
-                ++n_columns;
+                column_indices.push_back(static_cast<PetscInt>(col_indices[j]));
+                AssertIntegerConversion(column_indices.back(), col_indices[j]);
+                column_values->push_back(value);
               }
           }
-        AssertIndexRange(n_columns, n_cols + 1);
+        values_ptr = column_values->data();
       }
 
-    const PetscErrorCode ierr = MatSetValues(matrix,
-                                             1,
-                                             &petsc_row,
-                                             n_columns,
-                                             column_indices.data(),
-                                             column_values.data(),
-                                             ADD_VALUES);
+    const auto petsc_n_columns = static_cast<PetscInt>(column_indices.size());
+    AssertIntegerConversion(petsc_n_columns, column_indices.size());
+
+    Assert(operation == VectorOperation::insert ||
+             operation == VectorOperation::add,
+           ExcInternalError());
+    const PetscErrorCode ierr =
+      MatSetValues(matrix,
+                   1,
+                   &petsc_row,
+                   petsc_n_columns,
+                   column_indices.data(),
+                   values_ptr,
+                   operation == VectorOperation::insert ? INSERT_VALUES :
+                                                          ADD_VALUES);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
