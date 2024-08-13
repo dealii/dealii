@@ -624,12 +624,12 @@ namespace internal
 
       template <>
       Point<3>
-      do_get_new_point(const ArrayView<const Tensor<1, 3>> &directions,
-                       [[maybe_unused]] const ArrayView<const double>       &distances,
-                       const ArrayView<const double>       &weights,
-                       const Point<3>                      &candidate_point)
+      do_get_new_point(
+        const ArrayView<const Tensor<1, 3>>            &directions,
+        [[maybe_unused]] const ArrayView<const double> &distances,
+        const ArrayView<const double>                  &weights,
+        const Point<3>                                 &candidate_point)
       {
-
         AssertDimension(directions.size(), distances.size());
         AssertDimension(directions.size(), weights.size());
 
