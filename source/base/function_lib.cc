@@ -1938,10 +1938,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineFunction<dim>::value(const Point<dim>  &p,
-                                    const unsigned int component) const
+  FourierCosineFunction<dim>::value(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return std::cos(fourier_coefficients * p);
   }
@@ -1950,10 +1950,10 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierCosineFunction<dim>::gradient(const Point<dim>  &p,
-                                       const unsigned int component) const
+  FourierCosineFunction<dim>::gradient(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
   }
@@ -1962,10 +1962,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineFunction<dim>::laplacian(const Point<dim>  &p,
-                                        const unsigned int component) const
+  FourierCosineFunction<dim>::laplacian(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::cos(fourier_coefficients * p));
@@ -1988,10 +1988,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineFunction<dim>::value(const Point<dim>  &p,
-                                  const unsigned int component) const
+  FourierSineFunction<dim>::value(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return std::sin(fourier_coefficients * p);
   }
@@ -2000,10 +2000,10 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierSineFunction<dim>::gradient(const Point<dim>  &p,
-                                     const unsigned int component) const
+  FourierSineFunction<dim>::gradient(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    [[maybe_unused]]component;
     AssertIndexRange(component, 1);
     return fourier_coefficients * std::cos(fourier_coefficients * p);
   }
