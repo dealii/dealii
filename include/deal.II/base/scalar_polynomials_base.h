@@ -258,29 +258,27 @@ inline Tensor<order, dim>
 ScalarPolynomialsBase<dim>::compute_derivative(const unsigned int i,
                                                const Point<dim>  &p) const
 {
-  if (order == 1)
+  if constexpr (order == 1)
     {
-      auto derivative = compute_1st_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_1st_derivative(i, p);
     }
-  if (order == 2)
+  else if constexpr (order == 2)
     {
-      auto derivative = compute_2nd_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_2nd_derivative(i, p);
     }
-  if (order == 3)
+  else if constexpr (order == 3)
     {
-      auto derivative = compute_3rd_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_3rd_derivative(i, p);
     }
-  if (order == 4)
+  else if constexpr (order == 4)
     {
-      auto derivative = compute_4th_derivative(i, p);
-      return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
+      return compute_4th_derivative(i, p);
     }
-  DEAL_II_NOT_IMPLEMENTED();
-  Tensor<order, dim> empty;
-  return empty;
+  else
+    {
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
+    }
 }
 
 DEAL_II_NAMESPACE_CLOSE
