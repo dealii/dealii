@@ -42,7 +42,7 @@ clen = "clen"
 # Don't check the following files
 [files]
 extend-exclude = [
-    # "*.output",
+    "*.output",
     "tests/parameter_handler/parameter_handler_25.cc", # this file contains a typo on purpose
     "*.svg",
     "*.pvsm",
