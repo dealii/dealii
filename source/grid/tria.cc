@@ -672,7 +672,7 @@ namespace internal
   void CellAttachedDataSerializer<dim, spacedim>::save(
     [[maybe_unused]] const unsigned int global_first_cell,
     [[maybe_unused]] const unsigned int global_num_cells,
-    const std::string &file_basename,
+    const std::string                  &file_basename,
     [[maybe_unused]] const MPI_Comm    &mpi_communicator) const
   {
     Assert(sizes_fixed_cumulative.size() > 0,
@@ -849,7 +849,6 @@ namespace internal
     else
 #endif
       {
-
         //
         // ---------- Fixed size data ----------
         //
@@ -900,11 +899,11 @@ namespace internal
   void CellAttachedDataSerializer<dim, spacedim>::load(
     [[maybe_unused]] const unsigned int global_first_cell,
     [[maybe_unused]] const unsigned int global_num_cells,
-    const unsigned int local_num_cells,
-    const std::string &file_basename,
-    const unsigned int n_attached_deserialize_fixed,
-    const unsigned int n_attached_deserialize_variable,
-    const MPI_Comm    &mpi_communicator)
+    const unsigned int                  local_num_cells,
+    const std::string                  &file_basename,
+    const unsigned int                  n_attached_deserialize_fixed,
+    const unsigned int                  n_attached_deserialize_variable,
+    const MPI_Comm                     &mpi_communicator)
   {
     Assert(dest_data_fixed.empty(),
            ExcMessage("Previously loaded data has not been released yet!"));
