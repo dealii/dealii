@@ -18,10 +18,6 @@
 < 
 ---
 > #include <iostream>
-134c133
-<     std::ifstream f("example.msh");
----
->     std::ifstream f("../../../source/step-49/example.msh");
 246a246
 > 
 297a298
