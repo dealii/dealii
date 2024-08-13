@@ -28,10 +28,13 @@
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/vector_operation.h>
 
+#  include <boost/container/small_vector.hpp>
+
 #  include <petscmat.h>
 
 #  include <cmath>
 #  include <memory>
+#  include <optional>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1443,27 +1446,36 @@ namespace PETScWrappers
     const auto petsc_row = static_cast<PetscInt>(row);
     AssertIntegerConversion(petsc_row, row);
 
-    std::vector<PetscInt> column_indices;
-    column_indices.reserve(n_cols);
-    std::vector<PetscScalar> column_values;
-    column_values.reserve(n_cols);
+    // Use 100 entries so that we can store a row of a matrix constructed with
+    // FESystem<3>(FE_Q<3>(2), 3, FE_Q<3>(1), 1) (i.e., a common Stokes FE,
+    // which has 89 DoFs) with room to spare without allocating memory in the
+    // free store.
+    //
+    // Setting up small_vectors isn't free so only set up column_values if we
+    // actually use it.
+    boost::container::small_vector<PetscInt, 100> column_indices;
+    std::optional<boost::container::small_vector<PetscScalar, 100>>
+      column_values;
+
+    const PetscScalar *values_ptr = nullptr;
     if (elide_zero_values == false)
       {
         column_indices.resize(n_cols);
-        column_values.resize(n_cols);
 
         for (size_type j = 0; j < n_cols; ++j)
           {
             AssertIsFinite(values[j]);
             column_indices[j] = static_cast<PetscInt>(col_indices[j]);
             AssertIntegerConversion(column_indices[j], col_indices[j]);
-            column_values[j] = values[j];
           }
+
+        values_ptr = values;
       }
     else
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective index.
+        column_values.emplace();
         for (size_type j = 0; j < n_cols; ++j)
           {
             const PetscScalar value = values[j];
@@ -1472,9 +1484,10 @@ namespace PETScWrappers
               {
                 column_indices.push_back(static_cast<PetscInt>(col_indices[j]));
                 AssertIntegerConversion(column_indices.back(), col_indices[j]);
-                column_values.push_back(value);
+                column_values->push_back(value);
               }
           }
+        values_ptr = column_values->data();
       }
 
     const auto petsc_n_columns = static_cast<PetscInt>(column_indices.size());
@@ -1489,7 +1502,7 @@ namespace PETScWrappers
                    &petsc_row,
                    petsc_n_columns,
                    column_indices.data(),
-                   column_values.data(),
+                   values_ptr,
                    operation == VectorOperation::insert ? INSERT_VALUES :
                                                           ADD_VALUES);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
