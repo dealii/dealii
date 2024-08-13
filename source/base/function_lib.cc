@@ -2012,10 +2012,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineFunction<dim>::laplacian(const Point<dim>  &p,
-                                      const unsigned int component) const
+  FourierSineFunction<dim>::laplacian(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
            (-std::sin(fourier_coefficients * p));
@@ -2044,10 +2044,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineSum<dim>::value(const Point<dim>  &p,
-                             const unsigned int component) const
+  FourierSineSum<dim>::value(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2062,10 +2062,10 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierSineSum<dim>::gradient(const Point<dim>  &p,
-                                const unsigned int component) const
+  FourierSineSum<dim>::gradient(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
@@ -2080,10 +2080,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineSum<dim>::laplacian(const Point<dim>  &p,
-                                 const unsigned int component) const
+  FourierSineSum<dim>::laplacian(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2118,10 +2118,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineSum<dim>::value(const Point<dim>  &p,
-                               const unsigned int component) const
+  FourierCosineSum<dim>::value(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2136,10 +2136,10 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierCosineSum<dim>::gradient(const Point<dim>  &p,
-                                  const unsigned int component) const
+  FourierCosineSum<dim>::gradient(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     const unsigned int n = weights.size();
@@ -2154,10 +2154,10 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineSum<dim>::laplacian(const Point<dim>  &p,
-                                   const unsigned int component) const
+  FourierCosineSum<dim>::laplacian(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     const unsigned int n   = weights.size();
@@ -2186,10 +2186,10 @@ namespace Functions
 
   template <int dim, typename Number>
   Number
-  Monomial<dim, Number>::value(const Point<dim>  &p,
-                               const unsigned int component) const
+  Monomial<dim, Number>::value(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, this->n_components);
 
     Number prod = 1;
@@ -2222,10 +2222,10 @@ namespace Functions
 
   template <int dim, typename Number>
   Tensor<1, dim, Number>
-  Monomial<dim, Number>::gradient(const Point<dim>  &p,
-                                  const unsigned int component) const
+  Monomial<dim, Number>::gradient(
+    const Point<dim>                   &p,
+    [[maybe_unused]] const unsigned int component) const
   {
-    (void)component;
     AssertIndexRange(component, 1);
 
     Tensor<1, dim> r;
