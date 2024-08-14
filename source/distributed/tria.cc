@@ -2647,13 +2647,13 @@ namespace parallel
         // There must not be any chains!
         for (unsigned int i = 0; i < topological_vertex_numbering.size(); ++i)
           {
-            const unsigned int j = topological_vertex_numbering[i];
+            [[maybe_unused]] const unsigned int j =
+              topological_vertex_numbering[i];
             Assert(j == i || topological_vertex_numbering[j] == j,
                    ExcMessage("Got inconclusive constraints with chain: " +
                               std::to_string(i) + " vs " + std::to_string(j) +
                               " which should be equal to " +
                               std::to_string(topological_vertex_numbering[j])));
-            (void)j;
           }
 
 
@@ -3140,8 +3140,9 @@ namespace parallel
       // stores locally (in the future we should check that we have exactly as
       // many non-artificial cells as parallel_forest->local_num_quadrants)
       {
-        const unsigned int total_local_cells = this->n_active_cells();
-        (void)total_local_cells;
+        [[maybe_unused]] const unsigned int total_local_cells =
+          this->n_active_cells();
+
 
         if (Utilities::MPI::n_mpi_processes(this->mpi_communicator) == 1)
           {
@@ -3199,10 +3200,10 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     std::vector<types::subdomain_id> Triangulation<dim, spacedim>::
-      find_point_owner_rank(const std::vector<Point<dim>> &points)
+      find_point_owner_rank(
+        [[maybe_unused]] const std::vector<Point<dim>> &points)
     {
 #  ifndef P4EST_SEARCH_LOCAL
-      (void)points;
       AssertThrow(
         false,
         ExcMessage(
