@@ -425,7 +425,7 @@ namespace Portable
                      scratch_memory_space,
                    Kokkos::MemoryTraits<Kokkos::Unmanaged>> values)
     {
-      if (dim == 2)
+      if constexpr (dim == 2)
         {
           interpolate_boundary_2d<fe_degree, 0, transpose>(team_member,
                                                            constraint_weights,
@@ -437,7 +437,7 @@ namespace Portable
                                                            constraint_mask,
                                                            values);
         }
-      else if (dim == 3)
+      else if constexpr (dim == 3)
         {
           // Interpolate y and z faces (x-direction)
           interpolate_boundary_3d<fe_degree, 0, transpose>(team_member,
