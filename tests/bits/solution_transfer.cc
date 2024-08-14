@@ -115,22 +115,17 @@ transfer(std::ostream &out)
     cell->set_refine_flag();
 
   tria.prepare_coarsening_and_refinement();
-  q_soltrans.prepare_for_pure_refinement();
-  dgq_soltrans.prepare_for_pure_refinement();
+  q_soltrans.prepare_for_coarsening_and_refinement(q_solution);
+  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_solution);
   tria.execute_coarsening_and_refinement();
   q_dof_handler.distribute_dofs(fe_q);
   dgq_dof_handler.distribute_dofs(fe_dgq);
 
-  Vector<double> tmp_q(q_dof_handler.n_dofs());
-  q_soltrans.refine_interpolate(q_solution, tmp_q);
   q_solution.reinit(q_dof_handler.n_dofs());
-  q_solution = tmp_q;
+  q_soltrans.interpolate(q_solution);
 
-  Vector<double> tmp_dgq(dgq_dof_handler.n_dofs());
-  dgq_soltrans.refine_interpolate(dgq_solution, tmp_dgq);
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
-  dgq_solution = tmp_dgq;
-
+  dgq_soltrans.interpolate(dgq_solution);
 
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector(q_solution, "solution");
@@ -167,8 +162,8 @@ transfer(std::ostream &out)
   dgq_dof_handler.distribute_dofs(fe_dgq);
   q_solution.reinit(q_dof_handler.n_dofs());
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
-  q_soltrans.interpolate(q_old_solution, q_solution);
-  dgq_soltrans.interpolate(dgq_old_solution, dgq_solution);
+  q_soltrans.interpolate(q_solution);
+  dgq_soltrans.interpolate(dgq_solution);
 
   q_data_out.clear_data_vectors();
   q_data_out.add_data_vector(q_solution, "solution");

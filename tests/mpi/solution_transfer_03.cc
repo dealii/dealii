@@ -144,7 +144,7 @@ transfer(const MPI_Comm mpi_communicator)
   old_solution = solution;
 
   tria.prepare_coarsening_and_refinement();
-  soltrans.prepare_for_pure_refinement();
+  soltrans.prepare_for_coarsening_and_refinement(old_solution);
   tria.execute_coarsening_and_refinement();
 
   dof_handler.distribute_dofs(fe);
@@ -159,7 +159,7 @@ transfer(const MPI_Comm mpi_communicator)
                        this_mpi_process);
 
   solution.reinit(locally_owned_partitioning, mpi_communicator);
-  soltrans.refine_interpolate(old_solution, solution);
+  soltrans.interpolate(solution);
 }
 
 
