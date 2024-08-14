@@ -851,7 +851,6 @@ FiniteElement<dim, spacedim>::constraints(
   // same number of dofs
   AssertDimension(this->n_unique_faces(), 1);
   [[maybe_unused]] const unsigned int face_no = 0;
-  (void)subface_case;
 
   Assert(subface_case == internal::SubfaceCase<dim>::case_isotropic,
          ExcMessage("Constraints for this element are only implemented "
@@ -1178,8 +1177,6 @@ FiniteElement<dim, spacedim>::get_sub_fe(
   const unsigned int first_component,
   const unsigned int n_selected_components) const
 {
-  (void)first_component;
-  (void)n_selected_components;
   // No complicated logic is needed here, because it is overridden in
   // FESystem<dim,spacedim>. Just make sure that what the user chose is valid:
   Assert(first_component == 0 && n_selected_components == this->n_components(),
@@ -1328,29 +1325,23 @@ FiniteElement<dim, spacedim>::fill_fe_face_values(
 template <int dim, int spacedim>
 inline void
 FiniteElement<dim, spacedim>::fill_fe_face_values(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const unsigned int                                          face_no,
-  const Quadrature<dim - 1>                                  &quadrature,
-  const Mapping<dim, spacedim>                               &mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
+  const typename Triangulation<dim, spacedim>::cell_iterator & /* cell */,
+  const unsigned int /* face_no */,
+  const Quadrature<dim - 1> & /* quadrature */,
+  const Mapping<dim, spacedim> & /* mapping */,
+  const typename Mapping<dim, spacedim>::InternalDataBase
+    & /* mapping_internal */,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-                                                                &mapping_data,
-  const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
+    & /* mapping_data */,
+  const typename FiniteElement<dim, spacedim>::InternalDataBase
+    & /* fe_internal */,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
-    &output_data) const
+    & /* output_data */) const
 {
   Assert(false,
          ExcMessage("Use of a deprecated interface, please implement "
                     "fill_fe_face_values taking a hp::QCollection argument"));
-  (void)face_no;
-  (void)cell;
-  (void)quadrature;
-  (void)mapping;
-  (void)mapping_internal;
-  (void)mapping_data;
-  (void)fe_internal;
-  (void)output_data;
 }
 #  endif
 
@@ -1379,7 +1370,6 @@ template <int dim, int spacedim>
 const FiniteElement<dim, spacedim> &
 FiniteElement<dim, spacedim>::base_element(const unsigned int index) const
 {
-  (void)index;
   AssertIndexRange(index, 1);
   // This function should not be
   // called for a system element
