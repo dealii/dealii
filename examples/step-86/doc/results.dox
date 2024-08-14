@@ -234,7 +234,14 @@ ourselves to blame for that by setting
 @code
       set match final time        = false
 @endcode
-in the input file.
+in the input file. If hitting the end time exactly is important to us,
+setting the flag to `true` resolves this issue.
+
+We can even reason why PETSc eventually chooses a time step of around
+0.025: The boundary values undergo a complete cosine cycle within 0.5
+time units; we should expect that it takes around ten or twenty time
+steps to resolve each period of a cycle to reasonable accuracy, and
+this leads to the time step choice PETSc finds.
 
 Not all combinations of methods, time step adaptation algorithms, and
 other parameters are valid, but the main messages from the experiment
