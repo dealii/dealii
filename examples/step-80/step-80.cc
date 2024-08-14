@@ -329,6 +329,8 @@ namespace Step80
 
     void assemble_stokes_system();
     void assemble_nitsche_restriction();
+    void assemble_coupling_sparsity();
+    void assemble_coupling();
 
     void solve();
 
@@ -365,11 +367,10 @@ namespace Step80
     std::vector<IndexSet> fluid_relevant_dofs;
     std::vector<IndexSet> solid_relevant_dofs;
 
-    AffineConstraints<double> constraints;
+    AffineConstraints<double> fluid_constraints;
     AffineConstraints<double> solid_constraints;
 
-
-      LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
+    LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
     LA::MPI::BlockSparseMatrix fluid_preconditioner;
 
     LA::MPI::BlockSparseMatrix
@@ -387,12 +388,12 @@ namespace Step80
     IndexSet locally_owned_tracer_particle_coordinates;
     IndexSet locally_relevant_tracer_particle_coordinates;
 
-    LA::MPI::Vector tracer_particle_velocities;
+    LA::MPI::Vector tracer_particle_velocity;
     LA::MPI::Vector relevant_tracer_particle_displacements;
 
     std::vector<std::vector<BoundingBox<spacedim>>> global_fluid_bounding_boxes;
 
-    FEValuesExtractors::Vector velocities;
+    FEValuesExtractors::Vector velocity;
     FEValuesExtractors::Scalar pressure;
 
     FEValuesExtractors::Vector displacement;
@@ -422,6 +423,10 @@ namespace Step80
                    Triangulation<dim, spacedim>::smoothing_on_coarsening))
     , fluid_dh(fluid_tria)
     , solid_dh(solid_tria)
+    , velocity(0)
+    , pressure(spacedim)
+    , displacement(0)
+    , lagrange_multiplier(spacedim)
   {}
 
 
@@ -462,12 +467,11 @@ namespace Step80
           tria.set_manifold(
             manifold_id,
             OpenCASCADE::ArclengthProjectionLineManifold<dim, spacedim>(shape));
-        else if (spacedim == 3)
+        else if constexpr (spacedim == 3)
           {
-            const auto t = reinterpret_cast<Triangulation<dim, 3> *>(&tria);
-            t->set_manifold(manifold_id,
-                            OpenCASCADE::NormalToMeshProjectionManifold<dim, 3>(
-                              shape));
+            tria.set_manifold(
+              manifold_id,
+              OpenCASCADE::NormalToMeshProjectionManifold<dim, 3>(shape));
           }
         else
           tria.set_manifold(manifold_id,
@@ -536,27 +540,28 @@ namespace Step80
     global_fluid_bounding_boxes =
       Utilities::MPI::all_gather(mpi_communicator, local_boxes);
 
-      Assert(!global_fluid_bounding_boxes.empty(),
-             ExcInternalError(
-                     "I was expecting the "
-                     "global_fluid_bounding_boxes to be filled at this stage. "
-                     "Make sure you fill this vector before trying to use it "
-                     "here. Bailing out."));
+    Assert(!global_fluid_bounding_boxes.empty(),
+           ExcInternalError(
+             "I was expecting the "
+             "global_fluid_bounding_boxes to be filled at this stage. "
+             "Make sure you fill this vector before trying to use it "
+             "here. Bailing out."));
 
     solid_particle_handler.initialize(fluid_tria,
-                                       StaticMappingQ1<spacedim>::mapping);
-      std::vector<bool> components(2*dim);
-      for (unsigned int d=0 ; d < dim; ++d)
+                                      StaticMappingQ1<spacedim>::mapping);
+    std::vector<bool> components(2 * dim);
+    for (unsigned int d = 0; d < dim; ++d)
       {
-          components[d] = true;
-          components[dim+d]=false;
+        components[d]       = true;
+        components[dim + d] = false;
       }
 
-    Particles::Generators::dof_support_points(solid_dh,
-                                              global_fluid_bounding_boxes,
-                                              solid_particle_handler,
-                                              StaticMappingQ1<spacedim>::mapping,
-                                              components);
+    Particles::Generators::dof_support_points(
+      solid_dh,
+      global_fluid_bounding_boxes,
+      solid_particle_handler,
+      StaticMappingQ1<spacedim>::mapping,
+      components);
 
     pcout << "Solid particles: " << solid_particle_handler.n_global_particles()
           << std::endl;
@@ -578,171 +583,176 @@ namespace Step80
 
 
     solid_fe = std::make_unique<FE_Q<dim, spacedim>>(1);
-// solid_dh.distribute_dofs(*solid_fe); this has been moved to the setup_dofs since we are setting up a matrix also
+    // solid_dh.distribute_dofs(*solid_fe); this has been moved to the
+    // setup_dofs since we are setting up a matrix also
   }
 
 
   template <int dim, int spacedim>
-  void StokesImmersedProblem<dim, spacedim>::setup_dofs() {
-      TimerOutput::Scope t(computing_timer, "Setup dofs");
+  void StokesImmersedProblem<dim, spacedim>::setup_dofs()
+  {
+    TimerOutput::Scope t(computing_timer, "Setup dofs");
 
-      fluid_dh.distribute_dofs(*fluid_fe);
+    fluid_dh.distribute_dofs(*fluid_fe);
 
-      std::vector<unsigned int> stokes_sub_blocks(spacedim + 1, 0);
-      stokes_sub_blocks[spacedim] = 1;
-      DoFRenumbering::component_wise(fluid_dh, stokes_sub_blocks);
+    std::vector<unsigned int> stokes_sub_blocks(spacedim + 1, 0);
+    stokes_sub_blocks[spacedim] = 1;
+    DoFRenumbering::component_wise(fluid_dh, stokes_sub_blocks);
 
-      auto dofs_per_block =
-              DoFTools::count_dofs_per_fe_block(fluid_dh, stokes_sub_blocks);
+    auto dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(fluid_dh, stokes_sub_blocks);
 
-      const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
-      pcout << "   Number of degrees of freedom for Stokes equation: " << fluid_dh.n_dofs() << " ("
-            << n_u << '+' << n_p << ')' << std::endl;
+    pcout << "   Number of degrees of freedom for Stokes equation: "
+          << fluid_dh.n_dofs() << " (" << n_u << '+' << n_p << ')' << std::endl;
 
-      fluid_owned_dofs.resize(2);
-      fluid_owned_dofs[0] = fluid_dh.locally_owned_dofs().get_view(0, n_u);
-      fluid_owned_dofs[1] =
-              fluid_dh.locally_owned_dofs().get_view(n_u, n_u + n_p);
+    fluid_owned_dofs.resize(2);
+    fluid_owned_dofs[0] = fluid_dh.locally_owned_dofs().get_view(0, n_u);
+    fluid_owned_dofs[1] =
+      fluid_dh.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
-      const IndexSet locally_relevant_dofs =
-              DoFTools::extract_locally_relevant_dofs(fluid_dh);
-      fluid_relevant_dofs.resize(2);
-      fluid_relevant_dofs[0] = locally_relevant_dofs.get_view(0, n_u);
-      fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
+    const IndexSet locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(fluid_dh);
+    fluid_relevant_dofs.resize(2);
+    fluid_relevant_dofs[0] = locally_relevant_dofs.get_view(0, n_u);
+    fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
-      {
-          constraints.reinit(locally_relevant_dofs);
+    {
+      fluid_constraints.reinit(locally_relevant_dofs);
 
-          DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
-          VectorTools::interpolate_boundary_values(
-                  fluid_dh,
-                  0,
-                  Functions::ZeroFunction<spacedim>(spacedim + 1),
-                  constraints,
-                  fluid_fe->component_mask(velocities));
-          constraints.close();
-      }
+      DoFTools::make_hanging_node_constraints(fluid_dh, fluid_constraints);
+      VectorTools::interpolate_boundary_values(
+        fluid_dh,
+        0,
+        Functions::ZeroFunction<spacedim>(spacedim + 1),
+        fluid_constraints,
+        fluid_fe->component_mask(velocity));
+      fluid_constraints.close();
+    }
 
-      auto locally_owned_dofs_per_processor =
-              Utilities::MPI::all_gather(mpi_communicator,
-                                         fluid_dh.locally_owned_dofs());
-      {
-          fluid_matrix.clear();
+    auto locally_owned_dofs_per_processor =
+      Utilities::MPI::all_gather(mpi_communicator,
+                                 fluid_dh.locally_owned_dofs());
+    {
+      fluid_matrix.clear();
 
-          Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
-          for (unsigned int c = 0; c < spacedim + 1; ++c)
-              for (unsigned int d = 0; d < spacedim + 1; ++d)
-                  if (c == spacedim && d == spacedim)
-                      coupling[c][d] = DoFTools::none;
-                  else if (c == spacedim || d == spacedim || c == d)
-                      coupling[c][d] = DoFTools::always;
-                  else
-                      coupling[c][d] = DoFTools::none;
+      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+      for (unsigned int c = 0; c < spacedim + 1; ++c)
+        for (unsigned int d = 0; d < spacedim + 1; ++d)
+          if (c == spacedim && d == spacedim)
+            coupling[c][d] = DoFTools::none;
+          else if (c == spacedim || d == spacedim || c == d)
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
 
-          BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
-          DoFTools::make_sparsity_pattern(
-                  fluid_dh, coupling, dsp, constraints, false);
+      DoFTools::make_sparsity_pattern(
+        fluid_dh, coupling, dsp, fluid_constraints, false);
 
-          SparsityTools::distribute_sparsity_pattern(
-                  dsp,
-                  locally_owned_dofs_per_processor,
-                  mpi_communicator,
-                  locally_relevant_dofs);
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
+        locally_owned_dofs_per_processor,
+        mpi_communicator,
+        locally_relevant_dofs);
 
-          fluid_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
-      }
+      fluid_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+    }
 
-      {
-          fluid_preconditioner.clear();
+    {
+      fluid_preconditioner.clear();
 
-          Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
-          for (unsigned int c = 0; c < spacedim + 1; ++c)
-              for (unsigned int d = 0; d < spacedim + 1; ++d)
-                  if (c == spacedim && d == spacedim)
-                      coupling[c][d] = DoFTools::always;
-                  else
-                      coupling[c][d] = DoFTools::none;
+      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+      for (unsigned int c = 0; c < spacedim + 1; ++c)
+        for (unsigned int d = 0; d < spacedim + 1; ++d)
+          if (c == spacedim && d == spacedim)
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
 
-          BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
-          DoFTools::make_sparsity_pattern(
-                  fluid_dh, coupling, dsp, constraints, false);
-          SparsityTools::distribute_sparsity_pattern(
-                  dsp,
-                  locally_owned_dofs_per_processor,
-                  mpi_communicator,
-                  locally_relevant_dofs);
-          fluid_preconditioner.reinit(fluid_owned_dofs, dsp, mpi_communicator);
-      }
+      DoFTools::make_sparsity_pattern(
+        fluid_dh, coupling, dsp, fluid_constraints, false);
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
+        locally_owned_dofs_per_processor,
+        mpi_communicator,
+        locally_relevant_dofs);
+      fluid_preconditioner.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+    }
 
-      locally_relevant_solution.reinit(fluid_owned_dofs,
-                                       fluid_relevant_dofs,
-                                       mpi_communicator);
-      system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
-      solution.reinit(fluid_owned_dofs, mpi_communicator);
+    locally_relevant_solution.reinit(fluid_owned_dofs,
+                                     fluid_relevant_dofs,
+                                     mpi_communicator);
+    system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
+    solution.reinit(fluid_owned_dofs, mpi_communicator);
 
-// Setup system for the solid mechanics component
-      {
+    // Setup system for the solid mechanics component
+    {
       solid_dh.distribute_dofs(*solid_fe);
 
       std::vector<unsigned int> solid_sub_blocks(2 * spacedim, 0);
       for (unsigned int d = dim; d < 2 * dim; ++d)
-          stokes_sub_blocks[d] = 1;
+        stokes_sub_blocks[d] = 1;
       DoFRenumbering::component_wise(solid_dh, solid_sub_blocks);
       auto solid_dofs_per_block =
-              DoFTools::count_dofs_per_fe_block(solid_dh, solid_sub_blocks);
+        DoFTools::count_dofs_per_fe_block(solid_dh, solid_sub_blocks);
 
-      const unsigned int n_disp = solid_dofs_per_block[0], n_lag = solid_dofs_per_block[1];
+      const unsigned int n_disp = solid_dofs_per_block[0],
+                         n_lag  = solid_dofs_per_block[1];
 
-      pcout << "   Number of degrees of freedom for solid mechanics: " << solid_dh.n_dofs() << " ("
-            << n_disp << '+' << n_lag << ')' << std::endl;
+      pcout << "   Number of degrees of freedom for solid mechanics: "
+            << solid_dh.n_dofs() << " (" << n_disp << '+' << n_lag << ')'
+            << std::endl;
 
       solid_owned_dofs.resize(2);
       solid_owned_dofs[0] = solid_dh.locally_owned_dofs().get_view(0, n_disp);
       solid_owned_dofs[1] =
-              solid_dh.locally_owned_dofs().get_view(n_disp, n_disp + n_lag);
+        solid_dh.locally_owned_dofs().get_view(n_disp, n_disp + n_lag);
 
       const IndexSet solid_locally_relevant_dofs =
-              DoFTools::extract_locally_relevant_dofs(fluid_dh);
+        DoFTools::extract_locally_relevant_dofs(fluid_dh);
       solid_relevant_dofs.resize(2);
       solid_relevant_dofs[0] = solid_locally_relevant_dofs.get_view(0, n_disp);
-      solid_relevant_dofs[1] = solid_locally_relevant_dofs.get_view(n_disp, n_disp + n_lag);
+      solid_relevant_dofs[1] =
+        solid_locally_relevant_dofs.get_view(n_disp, n_disp + n_lag);
 
 
-      BlockDynamicSparsityPattern dsp(solid_dofs_per_block, solid_dofs_per_block);
+      BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
+                                      solid_dofs_per_block);
 
-      DoFTools::make_sparsity_pattern(
-              solid_dh, dsp, constraints, false);
+      DoFTools::make_sparsity_pattern(solid_dh, dsp, solid_constraints, false);
 
       auto solid_locally_owned_dofs_per_processor =
-              Utilities::MPI::all_gather(mpi_communicator,
-                                         solid_dh.locally_owned_dofs());
+        Utilities::MPI::all_gather(mpi_communicator,
+                                   solid_dh.locally_owned_dofs());
 
       SparsityTools::distribute_sparsity_pattern(
-              dsp,
-              solid_locally_owned_dofs_per_processor,
-              mpi_communicator,
-              locally_relevant_dofs);
+        dsp,
+        solid_locally_owned_dofs_per_processor,
+        mpi_communicator,
+        locally_relevant_dofs);
 
       solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
-  }
+    }
 
     {
-//      coupling_matrix.clear();
-//      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
-//      DoFTools::make_sparsity_pattern(
-//        fluid_dh, solid_dh, dsp, constraints, false);
-//      SparsityTools::distribute_sparsity_pattern(
-//        dsp,
-//        locally_owned_dofs_per_processor,
-//        mpi_communicator,
-//        locally_relevant_dofs);
-//      coupling_matrix.reinit(fluid_owned_dofs,
-//                             solid_dh.locally_owned_dofs(),
-//                             dsp,
-//                             mpi_communicator);
+      //      coupling_matrix.clear();
+      //      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      //      DoFTools::make_sparsity_pattern(
+      //        fluid_dh, solid_dh, dsp, constraints, false);
+      //      SparsityTools::distribute_sparsity_pattern(
+      //        dsp,
+      //        locally_owned_dofs_per_processor,
+      //        mpi_communicator,
+      //        locally_relevant_dofs);
+      //      coupling_matrix.reinit(fluid_owned_dofs,
+      //                             solid_dh.locally_owned_dofs(),
+      //                             dsp,
+      //                             mpi_communicator);
     }
   }
 
@@ -778,8 +788,6 @@ namespace Step80
     std::vector<double>              phi_p(dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    const FEValuesExtractors::Vector     velocities(0);
-    const FEValuesExtractors::Scalar     pressure(spacedim);
 
     for (const auto &cell : fluid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
@@ -795,8 +803,8 @@ namespace Step80
             {
               for (unsigned int k = 0; k < dofs_per_cell; ++k)
                 {
-                  grad_phi_u[k] = fe_values[velocities].gradient(k, q);
-                  div_phi_u[k]  = fe_values[velocities].divergence(k, q);
+                  grad_phi_u[k] = fe_values[velocity].gradient(k, q);
+                  div_phi_u[k]  = fe_values[velocity].divergence(k, q);
                   phi_p[k]      = fe_values[pressure].value(k, q);
                 }
 
@@ -823,12 +831,12 @@ namespace Step80
 
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(
+          fluid_constraints.distribute_local_to_global(
             cell_matrix, cell_rhs, local_dof_indices, fluid_matrix, system_rhs);
 
-          constraints.distribute_local_to_global(cell_matrix2,
-                                                 local_dof_indices,
-                                                 fluid_preconditioner);
+          fluid_constraints.distribute_local_to_global(cell_matrix2,
+                                                       local_dof_indices,
+                                                       fluid_preconditioner);
         }
 
     fluid_matrix.compress(VectorOperation::add);
@@ -841,9 +849,6 @@ namespace Step80
   void StokesImmersedProblem<dim, spacedim>::assemble_nitsche_restriction()
   {
     TimerOutput::Scope t(computing_timer, "Assemble Nitsche terms");
-
-    const FEValuesExtractors::Vector velocities(0);
-    const FEValuesExtractors::Scalar pressure(spacedim);
 
     // SolidVelocity<spacedim> solid_velocity(par.angular_velocity);
 
@@ -900,13 +905,147 @@ namespace Step80
               }
           }
 
-        constraints.distribute_local_to_global(
+        fluid_constraints.distribute_local_to_global(
           local_matrix, local_rhs, fluid_dof_indices, fluid_matrix, system_rhs);
         particle = pic.end();
       }
 
     fluid_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void StokesImmersedProblem<dim, spacedim>::assemble_coupling_sparsity()
+  {
+    TimerOutput::Scope t(computing_timer, "Assemble Coupling sparsity");
+
+    std::vector<types::global_dof_index> fluid_dof_indices(
+      fluid_fe->n_dofs_per_cell());
+    std::vector<types::global_dof_index> solid_dof_indices;
+
+    FullMatrix<double> local_matrix;
+
+    auto particle = solid_particle_handler.begin();
+    while (particle != solid_particle_handler.end())
+      {
+        const auto &cell = particle->get_surrounding_cell();
+        const auto &dh_cell =
+          typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
+        dh_cell->get_dof_indices(fluid_dof_indices);
+
+
+        const auto pic = solid_particle_handler.particles_in_cell(cell);
+
+        const auto n_particles_in_cell = pic.end() - pic.begin();
+
+        local_matrix.reinit(fluid_fe->n_dofs_per_cell(),
+                            n_particles_in_cell * spacedim);
+
+        solid_dof_indices.resize(n_particles_in_cell * spacedim);
+
+        unsigned int local_solid_dof_index = 0;
+        unsigned int local_pic_index       = 0;
+        Assert(pic.begin() == particle, ExcInternalError());
+        for (const auto &p : pic)
+          {
+            const auto &ref_q              = p.get_reference_location();
+            const auto  global_particle_id = p.get_id();
+            const auto &JxW                = p.get_properties()[0];
+
+            for (unsigned int d = 0; d < spacedim; ++d)
+              solid_dof_indices[local_solid_dof_index++] =
+                global_particle_id * spacedim + d;
+
+            for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
+              {
+                const auto comp_i =
+                  fluid_fe->system_to_component_index(i).first;
+
+                if (comp_i < spacedim)
+                  local_matrix(i, local_pic_index * spacedim + comp_i) =
+                    fluid_fe->shape_value(i, ref_q);
+              }
+            local_pic_index++;
+          }
+
+        fluid_constraints.distribute_local_to_global(local_matrix,
+                                                     fluid_dof_indices,
+                                                     solid_constraints,
+                                                     solid_dof_indices,
+                                                     coupling_matrix);
+        particle = pic.end();
+      }
+
+    coupling_matrix.compress(VectorOperation::add);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void StokesImmersedProblem<dim, spacedim>::assemble_coupling()
+  {
+    TimerOutput::Scope t(computing_timer, "Assemble Coupling terms");
+
+    std::vector<types::global_dof_index> fluid_dof_indices(
+      fluid_fe->n_dofs_per_cell());
+    std::vector<types::global_dof_index> solid_dof_indices;
+
+    FullMatrix<double> local_matrix;
+
+    auto particle = solid_particle_handler.begin();
+    while (particle != solid_particle_handler.end())
+      {
+        const auto &cell = particle->get_surrounding_cell();
+        const auto &dh_cell =
+          typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
+        dh_cell->get_dof_indices(fluid_dof_indices);
+
+
+        const auto pic = solid_particle_handler.particles_in_cell(cell);
+
+        const auto n_particles_in_cell =
+          solid_particle_handler.n_particles_in_cell(cell);
+
+        local_matrix.reinit(fluid_fe->n_dofs_per_cell(),
+                            n_particles_in_cell * spacedim);
+
+        solid_dof_indices.resize(n_particles_in_cell * spacedim);
+
+        unsigned int local_solid_dof_index = 0;
+        unsigned int local_pic_index       = 0;
+        Assert(pic.begin() == particle, ExcInternalError());
+        for (const auto &p : pic)
+          {
+            const auto &ref_q              = p.get_reference_location();
+            const auto  global_particle_id = p.get_id();
+
+            for (unsigned int d = 0; d < spacedim; ++d)
+              solid_dof_indices[local_solid_dof_index++] =
+                global_particle_id * spacedim + d;
+
+            for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
+              {
+                const auto comp_i =
+                  fluid_fe->system_to_component_index(i).first;
+
+                if (comp_i < spacedim)
+                  local_matrix(i, local_pic_index * spacedim + comp_i) =
+                    fluid_fe->shape_value(i, ref_q);
+              }
+            local_pic_index++;
+          }
+
+        fluid_constraints.distribute_local_to_global(local_matrix,
+                                                     fluid_dof_indices,
+                                                     solid_constraints,
+                                                     solid_dof_indices,
+                                                     coupling_matrix);
+        particle = pic.end();
+      }
+
+    coupling_matrix.compress(VectorOperation::add);
   }
 
 
@@ -960,7 +1099,7 @@ namespace Step80
 
     SolverFGMRES<LA::MPI::BlockVector> solver(solver_control);
 
-    constraints.set_zero(solution);
+    fluid_constraints.set_zero(solution);
 
     solver.solve(fluid_matrix, solution, system_rhs, P);
 
@@ -968,7 +1107,7 @@ namespace Step80
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
 
-    constraints.distribute(solution);
+    fluid_constraints.distribute(solution);
 
     locally_relevant_solution = solution;
     const double mean_pressure =
@@ -985,8 +1124,7 @@ namespace Step80
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::refine_and_transfer()
   {
-    TimerOutput::Scope               t(computing_timer, "Refine");
-    const FEValuesExtractors::Vector velocity(0);
+    TimerOutput::Scope t(computing_timer, "Refine");
 
     Vector<float> error_per_cell(fluid_tria.n_active_cells());
     KellyErrorEstimator<spacedim>::estimate(fluid_dh,
@@ -1041,7 +1179,7 @@ namespace Step80
     tracer_particle_handler.unpack_after_coarsening_and_refinement();
     solid_particle_handler.unpack_after_coarsening_and_refinement();
 
-    constraints.distribute(solution);
+    fluid_constraints.distribute(solution);
     locally_relevant_solution = solution;
   }
 
@@ -1150,7 +1288,7 @@ namespace Step80
             initial_setup(); // FE_Nothing -> FE_Q for solid
             setup_dofs();
             setup_solid_particles();
-            tracer_particle_velocities.reinit(
+            tracer_particle_velocity.reinit(
               locally_owned_tracer_particle_coordinates, mpi_communicator);
             output_results(output_cycle, time);
             {
@@ -1186,10 +1324,10 @@ namespace Step80
             fluid_dh,
             tracer_particle_handler,
             locally_relevant_solution,
-            tracer_particle_velocities,
-            fluid_fe->component_mask(FEValuesExtractors::Vector(0)));
+            tracer_particle_velocity,
+            fluid_fe->component_mask(velocity));
 
-          tracer_particle_velocities *= time_step;
+          tracer_particle_velocity *= time_step;
 
           locally_relevant_tracer_particle_coordinates =
             tracer_particle_handler.locally_owned_particle_ids().tensor_product(
@@ -1200,7 +1338,7 @@ namespace Step80
             locally_relevant_tracer_particle_coordinates,
             mpi_communicator);
 
-          relevant_tracer_particle_displacements = tracer_particle_velocities;
+          relevant_tracer_particle_displacements = tracer_particle_velocity;
 
           tracer_particle_handler.set_particle_positions(
             relevant_tracer_particle_displacements);
@@ -1208,7 +1346,7 @@ namespace Step80
 
         assemble_stokes_system();
         // assemble_elasticity_system();
-        // assemble_coupling_system();
+        assemble_coupling();
         // assemble_nitsche_restriction();
         solve();
 
