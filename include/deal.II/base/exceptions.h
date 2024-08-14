@@ -1665,14 +1665,16 @@ namespace deal_II_exceptions
  * We accomplish this by using decltype(...) and create a dummy pointer
  * with these signatures.
  */
-#  define Assert(cond, exc)                                                    \
-    do                                                                         \
-      {                                                                        \
-        typename std::remove_reference<decltype(cond)>::type *dealii_assert_a; \
-        typename std::remove_reference<decltype(exc)>::type  *dealii_assert_b; \
-        (void)dealii_assert_a;                                                 \
-        (void)dealii_assert_b;                                                 \
-      }                                                                        \
+#  define Assert(cond, exc)                                  \
+    do                                                       \
+      {                                                      \
+        typename std::remove_reference<decltype(cond)>::type \
+          *dealii_assert_variable_a = nullptr;               \
+        typename std::remove_reference<decltype(exc)>::type  \
+          *dealii_assert_variable_b = nullptr;               \
+        (void)dealii_assert_variable_a;                      \
+        (void)dealii_assert_variable_b;                      \
+      }                                                      \
     while (false)
 
 #endif /*ifdef DEBUG*/
