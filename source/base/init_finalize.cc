@@ -417,12 +417,7 @@ InitFinalize::finalize()
       if (static_cast<bool>(libraries & InitializeLibrary::MPI) &&
           (MPI_has_been_started))
         {
-#  if __cpp_lib_uncaught_exceptions >= 201411
-          // std::uncaught_exception() is deprecated in c++17
           if (std::uncaught_exceptions() > 0)
-#  else
-          if (std::uncaught_exception() == true)
-#  endif
             {
               // do not try to call MPI_Finalize to avoid a deadlock.
             }

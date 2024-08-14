@@ -38,12 +38,7 @@ namespace HDF5
       check_exception(const std::string &type, const std::string &name)
       {
 #  ifdef DEAL_II_WITH_MPI
-#    if __cpp_lib_uncaught_exceptions >= 201411
-        // std::uncaught_exception() is deprecated in c++17
-        if (std::uncaught_exceptions() != 0)
-#    else
-        if (std::uncaught_exception() == true)
-#    endif
+        if (std::uncaught_exceptions() > 0)
           {
             std::cerr
               << "---------------------------------------------------------\n"
