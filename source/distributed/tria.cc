@@ -728,7 +728,7 @@ namespace
     typename internal::p4est::types<dim>::quadrant *quadrant,
     int /* rank_begin */,
     int /* rank_end */,
-    [[maybe_unused]] void * /* this is always nullptr */ point)
+    void * /* this is always nullptr */ point)
   {
     // point must be nullptr here
     Assert(point == nullptr, dealii::ExcInternalError());
@@ -1849,9 +1849,8 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::create_triangulation(
-      [[maybe_unused]] const TriangulationDescription::Description<dim,
-                                                                   spacedim>
-        &construction_data)
+      const TriangulationDescription::Description<dim, spacedim>
+        & /*construction_data*/)
     {
       DEAL_II_ASSERT_UNREACHABLE();
     }
@@ -2647,8 +2646,7 @@ namespace parallel
         // There must not be any chains!
         for (unsigned int i = 0; i < topological_vertex_numbering.size(); ++i)
           {
-            [[maybe_unused]] const unsigned int j =
-              topological_vertex_numbering[i];
+            const unsigned int j = topological_vertex_numbering[i];
             Assert(j == i || topological_vertex_numbering[j] == j,
                    ExcMessage("Got inconclusive constraints with chain: " +
                               std::to_string(i) + " vs " + std::to_string(j) +
@@ -3140,8 +3138,7 @@ namespace parallel
       // stores locally (in the future we should check that we have exactly as
       // many non-artificial cells as parallel_forest->local_num_quadrants)
       {
-        [[maybe_unused]] const unsigned int total_local_cells =
-          this->n_active_cells();
+        const unsigned int total_local_cells = this->n_active_cells();
 
 
         if (Utilities::MPI::n_mpi_processes(this->mpi_communicator) == 1)
