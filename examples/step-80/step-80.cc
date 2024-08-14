@@ -522,7 +522,7 @@ namespace Step80
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::setup_solid_particles()
   {
-    const unsigned int n_properties = 1;
+    const unsigned int n_properties = 0;
     solid_particle_handler.initialize(fluid_tria,
                                       StaticMappingQ1<spacedim>::mapping,
                                       n_properties);
@@ -549,12 +549,8 @@ namespace Step80
 
     solid_particle_handler.initialize(fluid_tria,
                                       StaticMappingQ1<spacedim>::mapping);
-    std::vector<bool> components(2 * dim);
-    for (unsigned int d = 0; d < dim; ++d)
-      {
-        components[d]       = true;
-        components[dim + d] = false;
-      }
+    std::vector<bool> components(2 * dim,false);
+    components[0]=true;
 
     Particles::Generators::dof_support_points(
       solid_dh,
@@ -696,7 +692,7 @@ namespace Step80
 
       std::vector<unsigned int> solid_sub_blocks(2 * spacedim, 0);
       for (unsigned int d = dim; d < 2 * dim; ++d)
-        stokes_sub_blocks[d] = 1;
+        solid_sub_blocks[d] = 1;
       DoFRenumbering::component_wise(solid_dh, solid_sub_blocks);
       auto solid_dofs_per_block =
         DoFTools::count_dofs_per_fe_block(solid_dh, solid_sub_blocks);
