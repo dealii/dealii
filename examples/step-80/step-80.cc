@@ -361,6 +361,9 @@ namespace Step80
 
     std::unique_ptr<MappingFEField<dim, spacedim>> solid_mapping;
 
+    std::vector<types::global_dof_index> fluid_dofs_per_block;
+    std::vector<types::global_dof_index> solid_dofs_per_block;
+
     std::vector<IndexSet> fluid_owned_dofs;
     std::vector<IndexSet> solid_owned_dofs;
 
@@ -549,8 +552,8 @@ namespace Step80
 
     solid_particle_handler.initialize(fluid_tria,
                                       StaticMappingQ1<spacedim>::mapping);
-    std::vector<bool> components(2 * dim,false);
-    components[0]=true;
+    std::vector<bool> components(2 * dim, false);
+    components[0] = true;
 
     Particles::Generators::dof_support_points(
       solid_dh,
@@ -595,10 +598,11 @@ namespace Step80
     stokes_sub_blocks[spacedim] = 1;
     DoFRenumbering::component_wise(fluid_dh, stokes_sub_blocks);
 
-    auto dofs_per_block =
+    fluid_dofs_per_block =
       DoFTools::count_dofs_per_fe_block(fluid_dh, stokes_sub_blocks);
 
-    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+    const unsigned int n_u = fluid_dofs_per_block[0],
+                       n_p = fluid_dofs_per_block[1];
 
     pcout << "   Number of degrees of freedom for Stokes equation: "
           << fluid_dh.n_dofs() << " (" << n_u << '+' << n_p << ')' << std::endl;
@@ -608,14 +612,15 @@ namespace Step80
     fluid_owned_dofs[1] =
       fluid_dh.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
-    const IndexSet locally_relevant_dofs =
+    const IndexSet locally_relevant_fluid_dofs =
       DoFTools::extract_locally_relevant_dofs(fluid_dh);
     fluid_relevant_dofs.resize(2);
-    fluid_relevant_dofs[0] = locally_relevant_dofs.get_view(0, n_u);
-    fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
+    fluid_relevant_dofs[0] = locally_relevant_fluid_dofs.get_view(0, n_u);
+    fluid_relevant_dofs[1] =
+      locally_relevant_fluid_dofs.get_view(n_u, n_u + n_p);
 
     {
-      fluid_constraints.reinit(locally_relevant_dofs);
+      fluid_constraints.reinit(locally_relevant_fluid_dofs);
 
       DoFTools::make_hanging_node_constraints(fluid_dh, fluid_constraints);
       VectorTools::interpolate_boundary_values(
@@ -627,7 +632,7 @@ namespace Step80
       fluid_constraints.close();
     }
 
-    auto locally_owned_dofs_per_processor =
+    auto locally_owned_fluid_dofs_per_processor =
       Utilities::MPI::all_gather(mpi_communicator,
                                  fluid_dh.locally_owned_dofs());
     {
@@ -643,16 +648,17 @@ namespace Step80
           else
             coupling[c][d] = DoFTools::none;
 
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(fluid_dofs_per_block,
+                                      fluid_dofs_per_block);
 
       DoFTools::make_sparsity_pattern(
         fluid_dh, coupling, dsp, fluid_constraints, false);
 
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        locally_owned_dofs_per_processor,
+        locally_owned_fluid_dofs_per_processor,
         mpi_communicator,
-        locally_relevant_dofs);
+        locally_relevant_fluid_dofs);
 
       fluid_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
     }
@@ -668,15 +674,16 @@ namespace Step80
           else
             coupling[c][d] = DoFTools::none;
 
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      BlockDynamicSparsityPattern dsp(fluid_dofs_per_block,
+                                      fluid_dofs_per_block);
 
       DoFTools::make_sparsity_pattern(
         fluid_dh, coupling, dsp, fluid_constraints, false);
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        locally_owned_dofs_per_processor,
+        locally_owned_fluid_dofs_per_processor,
         mpi_communicator,
-        locally_relevant_dofs);
+        locally_relevant_fluid_dofs);
       fluid_preconditioner.reinit(fluid_owned_dofs, dsp, mpi_communicator);
     }
 
@@ -694,7 +701,7 @@ namespace Step80
       for (unsigned int d = dim; d < 2 * dim; ++d)
         solid_sub_blocks[d] = 1;
       DoFRenumbering::component_wise(solid_dh, solid_sub_blocks);
-      auto solid_dofs_per_block =
+      solid_dofs_per_block =
         DoFTools::count_dofs_per_fe_block(solid_dh, solid_sub_blocks);
 
       const unsigned int n_disp = solid_dofs_per_block[0],
@@ -709,12 +716,12 @@ namespace Step80
       solid_owned_dofs[1] =
         solid_dh.locally_owned_dofs().get_view(n_disp, n_disp + n_lag);
 
-      const IndexSet solid_locally_relevant_dofs =
+      const IndexSet locally_relevant_solid_dofs =
         DoFTools::extract_locally_relevant_dofs(fluid_dh);
       solid_relevant_dofs.resize(2);
-      solid_relevant_dofs[0] = solid_locally_relevant_dofs.get_view(0, n_disp);
+      solid_relevant_dofs[0] = locally_relevant_solid_dofs.get_view(0, n_disp);
       solid_relevant_dofs[1] =
-        solid_locally_relevant_dofs.get_view(n_disp, n_disp + n_lag);
+        locally_relevant_solid_dofs.get_view(n_disp, n_disp + n_lag);
 
 
       BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
@@ -722,33 +729,35 @@ namespace Step80
 
       DoFTools::make_sparsity_pattern(solid_dh, dsp, solid_constraints, false);
 
-      auto solid_locally_owned_dofs_per_processor =
+      auto locally_owned_solid_dofs_per_processor =
         Utilities::MPI::all_gather(mpi_communicator,
                                    solid_dh.locally_owned_dofs());
 
       SparsityTools::distribute_sparsity_pattern(
         dsp,
-        solid_locally_owned_dofs_per_processor,
+        locally_owned_solid_dofs_per_processor,
         mpi_communicator,
-        locally_relevant_dofs);
+        locally_relevant_fluid_dofs);
 
       solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
     }
 
     {
-      //      coupling_matrix.clear();
-      //      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
-      //      DoFTools::make_sparsity_pattern(
-      //        fluid_dh, solid_dh, dsp, constraints, false);
-      //      SparsityTools::distribute_sparsity_pattern(
-      //        dsp,
-      //        locally_owned_dofs_per_processor,
-      //        mpi_communicator,
-      //        locally_relevant_dofs);
-      //      coupling_matrix.reinit(fluid_owned_dofs,
-      //                             solid_dh.locally_owned_dofs(),
-      //                             dsp,
-      //                             mpi_communicator);
+      BlockDynamicSparsityPattern dsp(fluid_dofs_per_block,
+                                      solid_dofs_per_block);
+      assemble_coupling_sparsity(dsp);
+
+      coupling_matrix.clear();
+      coupling_matrix.reinit(fluid_dofs_per_block.size(),
+                             solid_dofs_per_block.size());
+      for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
+        for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
+          coupling_matrix.block(i, j).reinit(fluid_owned_dofs[i],
+                                             solid_owned_dofs[j],
+                                             dsp.block(i, j),
+                                             mpi_communicator,
+                                             true);
+      coupling_matrix.collect_sizes();
     }
   }
 
@@ -935,12 +944,6 @@ namespace Step80
 
         const auto pic = solid_particle_handler.particles_in_cell(cell);
 
-        const auto n_particles_in_cell = pic.end() - pic.begin();
-
-        solid_dof_indices.resize(n_particles_in_cell * spacedim);
-
-        unsigned int local_solid_dof_index = 0;
-        unsigned int local_pic_index       = 0;
         Assert(pic.begin() == particle, ExcInternalError());
         for (const auto &p : pic)
           {
@@ -955,7 +958,6 @@ namespace Step80
                   dsp.add(fluid_dof_indices[i],
                           global_particle_id * spacedim + comp_i);
               }
-            local_pic_index++;
           }
         particle = pic.end();
       }
