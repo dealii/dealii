@@ -322,7 +322,6 @@ namespace Step80
 
     double compute_time_step() const;
 
-    void setup_tracer_particles();
     void setup_solid_particles();
 
     void initial_setup();
@@ -367,8 +366,10 @@ namespace Step80
     std::vector<IndexSet> solid_relevant_dofs;
 
     AffineConstraints<double> constraints;
+    AffineConstraints<double> solid_constraints;
 
-    LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
+
+      LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
     LA::MPI::BlockSparseMatrix fluid_preconditioner;
 
     LA::MPI::BlockSparseMatrix
@@ -514,21 +515,13 @@ namespace Step80
     solid_tria.refine_global(par.initial_solid_refinement);
   }
 
-
   template <int dim, int spacedim>
-  void StokesImmersedProblem<dim, spacedim>::setup_tracer_particles()
+  void StokesImmersedProblem<dim, spacedim>::setup_solid_particles()
   {
-    parallel::distributed::Triangulation<spacedim> particle_insert_tria(
-      mpi_communicator);
-    GridGenerator::generate_from_name_and_arguments(
-      particle_insert_tria,
-      par.name_of_particle_grid,
-      par.arguments_for_particle_grid);
-    particle_insert_tria.refine_global(par.particle_insertion_refinement);
-
-    FE_Q<spacedim>       particles_fe(1);
-    DoFHandler<spacedim> particles_dof_handler(particle_insert_tria);
-    particles_dof_handler.distribute_dofs(particles_fe);
+    const unsigned int n_properties = 1;
+    solid_particle_handler.initialize(fluid_tria,
+                                      StaticMappingQ1<spacedim>::mapping,
+                                      n_properties);
 
     std::vector<BoundingBox<spacedim>> all_boxes;
     all_boxes.reserve(fluid_tria.n_locally_owned_active_cells());
@@ -543,71 +536,27 @@ namespace Step80
     global_fluid_bounding_boxes =
       Utilities::MPI::all_gather(mpi_communicator, local_boxes);
 
-    tracer_particle_handler.initialize(fluid_tria,
-                                       StaticMappingQ1<spacedim>::mapping);
+      Assert(!global_fluid_bounding_boxes.empty(),
+             ExcInternalError(
+                     "I was expecting the "
+                     "global_fluid_bounding_boxes to be filled at this stage. "
+                     "Make sure you fill this vector before trying to use it "
+                     "here. Bailing out."));
 
-    Particles::Generators::dof_support_points(particles_dof_handler,
-                                              global_fluid_bounding_boxes,
-                                              tracer_particle_handler);
-
-    pcout << "Tracer particles: "
-          << tracer_particle_handler.n_global_particles() << std::endl;
-
-    locally_owned_tracer_particle_coordinates =
-      tracer_particle_handler.locally_owned_particle_ids().tensor_product(
-        complete_index_set(spacedim));
-
-    locally_relevant_tracer_particle_coordinates =
-      locally_owned_tracer_particle_coordinates;
-  }
-
-
-  template <int dim, int spacedim>
-  void StokesImmersedProblem<dim, spacedim>::setup_solid_particles()
-  {
-    QGauss<dim> quadrature(fluid_fe->degree + 1);
-
-    const unsigned int n_properties = 1;
     solid_particle_handler.initialize(fluid_tria,
-                                      StaticMappingQ1<spacedim>::mapping,
-                                      n_properties);
+                                       StaticMappingQ1<spacedim>::mapping);
+      std::vector<bool> components(2*dim);
+      for (unsigned int d=0 ; d < dim; ++d)
+      {
+          components[d] = true;
+          components[dim+d]=false;
+      }
 
-    std::vector<Point<spacedim>> quadrature_points_vec;
-    quadrature_points_vec.reserve(quadrature.size() *
-                                  solid_tria.n_locally_owned_active_cells());
-
-    std::vector<std::vector<double>> properties;
-    properties.reserve(quadrature.size() *
-                       solid_tria.n_locally_owned_active_cells());
-
-    FEValues<dim, spacedim> fe_v(*solid_fe,
-                                 quadrature,
-                                 update_JxW_values | update_quadrature_points);
-    for (const auto &cell : solid_dh.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          fe_v.reinit(cell);
-          const auto &points = fe_v.get_quadrature_points();
-          const auto &JxW    = fe_v.get_JxW_values();
-
-          for (unsigned int q = 0; q < points.size(); ++q)
-            {
-              quadrature_points_vec.emplace_back(points[q]);
-              properties.emplace_back(
-                std::vector<double>(n_properties, JxW[q]));
-            }
-        }
-
-    Assert(!global_fluid_bounding_boxes.empty(),
-           ExcInternalError(
-             "I was expecting the "
-             "global_fluid_bounding_boxes to be filled at this stage. "
-             "Make sure you fill this vector before trying to use it "
-             "here. Bailing out."));
-
-    solid_particle_handler.insert_global_particles(quadrature_points_vec,
-                                                   global_fluid_bounding_boxes,
-                                                   properties);
+    Particles::Generators::dof_support_points(solid_dh,
+                                              global_fluid_bounding_boxes,
+                                              solid_particle_handler,
+                                              StaticMappingQ1<spacedim>::mapping,
+                                              components);
 
     pcout << "Solid particles: " << solid_particle_handler.n_global_particles()
           << std::endl;
@@ -628,140 +577,172 @@ namespace Step80
                                            1);
 
 
-    solid_fe = std::make_unique<FE_Nothing<dim, spacedim>>();
-    solid_dh.distribute_dofs(*solid_fe);
+    solid_fe = std::make_unique<FE_Q<dim, spacedim>>(1);
+// solid_dh.distribute_dofs(*solid_fe); this has been moved to the setup_dofs since we are setting up a matrix also
   }
 
 
   template <int dim, int spacedim>
-  void StokesImmersedProblem<dim, spacedim>::setup_dofs()
-  {
-    TimerOutput::Scope t(computing_timer, "Setup dofs");
+  void StokesImmersedProblem<dim, spacedim>::setup_dofs() {
+      TimerOutput::Scope t(computing_timer, "Setup dofs");
 
-    fluid_dh.distribute_dofs(*fluid_fe);
+      fluid_dh.distribute_dofs(*fluid_fe);
 
-    std::vector<unsigned int> stokes_sub_blocks(spacedim + 1, 0);
-    stokes_sub_blocks[spacedim] = 1;
-    DoFRenumbering::component_wise(fluid_dh, stokes_sub_blocks);
+      std::vector<unsigned int> stokes_sub_blocks(spacedim + 1, 0);
+      stokes_sub_blocks[spacedim] = 1;
+      DoFRenumbering::component_wise(fluid_dh, stokes_sub_blocks);
 
-    auto dofs_per_block =
-      DoFTools::count_dofs_per_fe_block(fluid_dh, stokes_sub_blocks);
+      auto dofs_per_block =
+              DoFTools::count_dofs_per_fe_block(fluid_dh, stokes_sub_blocks);
 
-    const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
+      const unsigned int n_u = dofs_per_block[0], n_p = dofs_per_block[1];
 
-    pcout << "   Number of degrees of freedom: " << fluid_dh.n_dofs() << " ("
-          << n_u << '+' << n_p << " -- "
-          << solid_particle_handler.n_global_particles() << '+'
-          << tracer_particle_handler.n_global_particles() << ')' << std::endl;
+      pcout << "   Number of degrees of freedom for Stokes equation: " << fluid_dh.n_dofs() << " ("
+            << n_u << '+' << n_p << ')' << std::endl;
 
-    fluid_owned_dofs.resize(2);
-    fluid_owned_dofs[0] = fluid_dh.locally_owned_dofs().get_view(0, n_u);
-    fluid_owned_dofs[1] =
-      fluid_dh.locally_owned_dofs().get_view(n_u, n_u + n_p);
+      fluid_owned_dofs.resize(2);
+      fluid_owned_dofs[0] = fluid_dh.locally_owned_dofs().get_view(0, n_u);
+      fluid_owned_dofs[1] =
+              fluid_dh.locally_owned_dofs().get_view(n_u, n_u + n_p);
 
-    const IndexSet locally_relevant_dofs =
-      DoFTools::extract_locally_relevant_dofs(fluid_dh);
-    fluid_relevant_dofs.resize(2);
-    fluid_relevant_dofs[0] = locally_relevant_dofs.get_view(0, n_u);
-    fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
+      const IndexSet locally_relevant_dofs =
+              DoFTools::extract_locally_relevant_dofs(fluid_dh);
+      fluid_relevant_dofs.resize(2);
+      fluid_relevant_dofs[0] = locally_relevant_dofs.get_view(0, n_u);
+      fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
-    {
-      constraints.reinit(locally_relevant_dofs);
+      {
+          constraints.reinit(locally_relevant_dofs);
 
-      DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
-      VectorTools::interpolate_boundary_values(
-        fluid_dh,
-        0,
-        Functions::ZeroFunction<spacedim>(spacedim + 1),
-        constraints,
-        fluid_fe->component_mask(velocities));
-      constraints.close();
-    }
+          DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
+          VectorTools::interpolate_boundary_values(
+                  fluid_dh,
+                  0,
+                  Functions::ZeroFunction<spacedim>(spacedim + 1),
+                  constraints,
+                  fluid_fe->component_mask(velocities));
+          constraints.close();
+      }
 
-    auto locally_owned_dofs_per_processor =
-      Utilities::MPI::all_gather(mpi_communicator,
-                                 fluid_dh.locally_owned_dofs());
-    {
-      fluid_matrix.clear();
+      auto locally_owned_dofs_per_processor =
+              Utilities::MPI::all_gather(mpi_communicator,
+                                         fluid_dh.locally_owned_dofs());
+      {
+          fluid_matrix.clear();
 
-      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
-      for (unsigned int c = 0; c < spacedim + 1; ++c)
-        for (unsigned int d = 0; d < spacedim + 1; ++d)
-          if (c == spacedim && d == spacedim)
-            coupling[c][d] = DoFTools::none;
-          else if (c == spacedim || d == spacedim || c == d)
-            coupling[c][d] = DoFTools::always;
-          else
-            coupling[c][d] = DoFTools::none;
+          Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+          for (unsigned int c = 0; c < spacedim + 1; ++c)
+              for (unsigned int d = 0; d < spacedim + 1; ++d)
+                  if (c == spacedim && d == spacedim)
+                      coupling[c][d] = DoFTools::none;
+                  else if (c == spacedim || d == spacedim || c == d)
+                      coupling[c][d] = DoFTools::always;
+                  else
+                      coupling[c][d] = DoFTools::none;
 
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+          BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+
+          DoFTools::make_sparsity_pattern(
+                  fluid_dh, coupling, dsp, constraints, false);
+
+          SparsityTools::distribute_sparsity_pattern(
+                  dsp,
+                  locally_owned_dofs_per_processor,
+                  mpi_communicator,
+                  locally_relevant_dofs);
+
+          fluid_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+      }
+
+      {
+          fluid_preconditioner.clear();
+
+          Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+          for (unsigned int c = 0; c < spacedim + 1; ++c)
+              for (unsigned int d = 0; d < spacedim + 1; ++d)
+                  if (c == spacedim && d == spacedim)
+                      coupling[c][d] = DoFTools::always;
+                  else
+                      coupling[c][d] = DoFTools::none;
+
+          BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+
+          DoFTools::make_sparsity_pattern(
+                  fluid_dh, coupling, dsp, constraints, false);
+          SparsityTools::distribute_sparsity_pattern(
+                  dsp,
+                  locally_owned_dofs_per_processor,
+                  mpi_communicator,
+                  locally_relevant_dofs);
+          fluid_preconditioner.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+      }
+
+      locally_relevant_solution.reinit(fluid_owned_dofs,
+                                       fluid_relevant_dofs,
+                                       mpi_communicator);
+      system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
+      solution.reinit(fluid_owned_dofs, mpi_communicator);
+
+// Setup system for the solid mechanics component
+      {
+      solid_dh.distribute_dofs(*solid_fe);
+
+      std::vector<unsigned int> solid_sub_blocks(2 * spacedim, 0);
+      for (unsigned int d = dim; d < 2 * dim; ++d)
+          stokes_sub_blocks[d] = 1;
+      DoFRenumbering::component_wise(solid_dh, solid_sub_blocks);
+      auto solid_dofs_per_block =
+              DoFTools::count_dofs_per_fe_block(solid_dh, solid_sub_blocks);
+
+      const unsigned int n_disp = solid_dofs_per_block[0], n_lag = solid_dofs_per_block[1];
+
+      pcout << "   Number of degrees of freedom for solid mechanics: " << solid_dh.n_dofs() << " ("
+            << n_disp << '+' << n_lag << ')' << std::endl;
+
+      solid_owned_dofs.resize(2);
+      solid_owned_dofs[0] = solid_dh.locally_owned_dofs().get_view(0, n_disp);
+      solid_owned_dofs[1] =
+              solid_dh.locally_owned_dofs().get_view(n_disp, n_disp + n_lag);
+
+      const IndexSet solid_locally_relevant_dofs =
+              DoFTools::extract_locally_relevant_dofs(fluid_dh);
+      solid_relevant_dofs.resize(2);
+      solid_relevant_dofs[0] = solid_locally_relevant_dofs.get_view(0, n_disp);
+      solid_relevant_dofs[1] = solid_locally_relevant_dofs.get_view(n_disp, n_disp + n_lag);
+
+
+      BlockDynamicSparsityPattern dsp(solid_dofs_per_block, solid_dofs_per_block);
 
       DoFTools::make_sparsity_pattern(
-        fluid_dh, coupling, dsp, constraints, false);
+              solid_dh, dsp, constraints, false);
+
+      auto solid_locally_owned_dofs_per_processor =
+              Utilities::MPI::all_gather(mpi_communicator,
+                                         solid_dh.locally_owned_dofs());
 
       SparsityTools::distribute_sparsity_pattern(
-        dsp,
-        locally_owned_dofs_per_processor,
-        mpi_communicator,
-        locally_relevant_dofs);
+              dsp,
+              solid_locally_owned_dofs_per_processor,
+              mpi_communicator,
+              locally_relevant_dofs);
 
-      fluid_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
-    }
-
-    {
-      fluid_preconditioner.clear();
-
-      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
-      for (unsigned int c = 0; c < spacedim + 1; ++c)
-        for (unsigned int d = 0; d < spacedim + 1; ++d)
-          if (c == spacedim && d == spacedim)
-            coupling[c][d] = DoFTools::always;
-          else
-            coupling[c][d] = DoFTools::none;
-
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
-
-      DoFTools::make_sparsity_pattern(
-        fluid_dh, coupling, dsp, constraints, false);
-      SparsityTools::distribute_sparsity_pattern(
-        dsp,
-        locally_owned_dofs_per_processor,
-        mpi_communicator,
-        locally_relevant_dofs);
-      fluid_preconditioner.reinit(fluid_owned_dofs, dsp, mpi_communicator);
-    }
-
-    locally_relevant_solution.reinit(fluid_owned_dofs,
-                                     fluid_relevant_dofs,
-                                     mpi_communicator);
-    system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
-    solution.reinit(fluid_owned_dofs, mpi_communicator);
-
-    // Same thing for solid
-    {
-      solid_matrix.clear();
-      DynamicSparsityPattern dsp(solid_dh.n_dofs());
-      DoFTools::make_sparsity_pattern(solid_dh, dsp);
-      solid_matrix.reinit(solid_dh.locally_owned_dofs(),
-                          solid_dh.locally_owned_dofs(),
-                          dsp,
-                          mpi_communicator);
-    }
+      solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
+  }
 
     {
-      coupling_matrix.clear();
-      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
-      DoFTools::make_sparsity_pattern(
-        fluid_dh, solid_dh, dsp, constraints, false);
-      SparsityTools::distribute_sparsity_pattern(
-        dsp,
-        locally_owned_dofs_per_processor,
-        mpi_communicator,
-        locally_relevant_dofs);
-      coupling_matrix.reinit(fluid_owned_dofs,
-                             solid_dh.locally_owned_dofs(),
-                             dsp,
-                             mpi_communicator);
+//      coupling_matrix.clear();
+//      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+//      DoFTools::make_sparsity_pattern(
+//        fluid_dh, solid_dh, dsp, constraints, false);
+//      SparsityTools::distribute_sparsity_pattern(
+//        dsp,
+//        locally_owned_dofs_per_processor,
+//        mpi_communicator,
+//        locally_relevant_dofs);
+//      coupling_matrix.reinit(fluid_owned_dofs,
+//                             solid_dh.locally_owned_dofs(),
+//                             dsp,
+//                             mpi_communicator);
     }
   }
 
@@ -1168,7 +1149,6 @@ namespace Step80
             make_grid();
             initial_setup(); // FE_Nothing -> FE_Q for solid
             setup_dofs();
-            setup_tracer_particles();
             setup_solid_particles();
             tracer_particle_velocities.reinit(
               locally_owned_tracer_particle_coordinates, mpi_communicator);
@@ -1284,14 +1264,6 @@ int main(int argc, char *argv[])
           ParameterAcceptor::initialize(prm_file);
 
           StokesImmersedProblem<2> problem(par);
-          problem.run();
-        }
-      else if (dim == 2 && spacedim == 3)
-        {
-          StokesImmersedProblemParameters<2, 3> par;
-          ParameterAcceptor::initialize(prm_file);
-
-          StokesImmersedProblem<2, 3> problem(par);
           problem.run();
         }
       else if (dim == 3 && spacedim == 3)
