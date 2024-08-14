@@ -126,7 +126,7 @@ namespace Step80
     ParameterAcceptor::prm.declare_entry("space dimension",
                                          "2",
                                          Patterns::Integer(2, 3));
-    // If reading of the input file fails, run by default in 1D-2D
+    // If reading of the input file fails, run by default in 2D-2D
     try
       {
         ParameterAcceptor::prm.parse_input(prm_file, "", true);
@@ -329,7 +329,7 @@ namespace Step80
 
     void assemble_stokes_system();
     void assemble_nitsche_restriction();
-    void assemble_coupling_sparsity();
+    void assemble_coupling_sparsity(BlockDynamicSparsityPattern &dsp);
     void assemble_coupling();
 
     void solve();
@@ -913,7 +913,8 @@ namespace Step80
 
 
   template <int dim, int spacedim>
-  void StokesImmersedProblem<dim, spacedim>::assemble_coupling_sparsity()
+  void StokesImmersedProblem<dim, spacedim>::assemble_coupling_sparsity(
+    BlockDynamicSparsityPattern &dsp)
   {
     TimerOutput::Scope t(computing_timer, "Assemble Coupling sparsity");
 
@@ -936,9 +937,6 @@ namespace Step80
 
         const auto n_particles_in_cell = pic.end() - pic.begin();
 
-        local_matrix.reinit(fluid_fe->n_dofs_per_cell(),
-                            n_particles_in_cell * spacedim);
-
         solid_dof_indices.resize(n_particles_in_cell * spacedim);
 
         unsigned int local_solid_dof_index = 0;
@@ -946,13 +944,7 @@ namespace Step80
         Assert(pic.begin() == particle, ExcInternalError());
         for (const auto &p : pic)
           {
-            const auto &ref_q              = p.get_reference_location();
-            const auto  global_particle_id = p.get_id();
-            const auto &JxW                = p.get_properties()[0];
-
-            for (unsigned int d = 0; d < spacedim; ++d)
-              solid_dof_indices[local_solid_dof_index++] =
-                global_particle_id * spacedim + d;
+            const auto global_particle_id = p.get_id();
 
             for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
@@ -960,21 +952,13 @@ namespace Step80
                   fluid_fe->system_to_component_index(i).first;
 
                 if (comp_i < spacedim)
-                  local_matrix(i, local_pic_index * spacedim + comp_i) =
-                    fluid_fe->shape_value(i, ref_q);
+                  dsp.add(fluid_dof_indices[i],
+                          global_particle_id * spacedim + comp_i);
               }
             local_pic_index++;
           }
-
-        fluid_constraints.distribute_local_to_global(local_matrix,
-                                                     fluid_dof_indices,
-                                                     solid_constraints,
-                                                     solid_dof_indices,
-                                                     coupling_matrix);
         particle = pic.end();
       }
-
-    coupling_matrix.compress(VectorOperation::add);
   }
 
 
