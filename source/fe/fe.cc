@@ -1331,27 +1331,22 @@ inline void
 FiniteElement<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1>                                  &quadrature,
-  const Mapping<dim, spacedim>                               &mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
-  const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-                                                                &mapping_data,
-  const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
-  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
-                                                                     spacedim>
-    &output_data) const
+  [[maybe_unused]] const Quadrature<dim - 1>                 &quadrature,
+  [[maybe_unused]] const Mapping<dim, spacedim>              &mapping,
+  [[maybe_unused]] const typename Mapping<dim, spacedim>::InternalDataBase
+    &mapping_internal,
+  [[maybe_unused]] const internal::FEValuesImplementation::
+    MappingRelatedData<dim, spacedim> &mapping_data,
+  [[maybe_unused]] const typename FiniteElement<dim, spacedim>::InternalDataBase
+    &fe_internal,
+  [[maybe_unused]] dealii::internal::FEValuesImplementation::
+    FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   Assert(false,
          ExcMessage("Use of a deprecated interface, please implement "
                     "fill_fe_face_values taking a hp::QCollection argument"));
   (void)cell;
   (void)face_no;
-  (void)quadrature;
-  (void)mapping;
-  (void)mapping_internal;
-  (void)mapping_data;
-  (void)fe_internal;
-  (void)output_data;
 }
 #  endif
 
@@ -1378,9 +1373,9 @@ FiniteElement<dim, spacedim>::get_subface_data(
 
 template <int dim, int spacedim>
 const FiniteElement<dim, spacedim> &
-FiniteElement<dim, spacedim>::base_element(const unsigned int index) const
+FiniteElement<dim, spacedim>::base_element(
+  [[maybe_unused]] const unsigned int index) const
 {
-  (void)index;
   AssertIndexRange(index, 1);
   // This function should not be
   // called for a system element
