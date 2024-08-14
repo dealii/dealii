@@ -13,14 +13,14 @@
 // ------------------------------------------------------------------------
 
 
-for (Number : COMPLEX_SCALARS)
+for (Number : REAL_SCALARS)
 {
     namespace Differentiation
     \{
     namespace AD
     \{
-    template struct NumberTraits<Number,NumberTypes::sacado_rad>;
-    template struct NumberTraits<Number,NumberTypes::sacado_rad_dfad>;
+    template struct NumberTraits<std::complex<Number>,NumberTypes::sacado_rad>;
+    template struct NumberTraits<std::complex<Number>,NumberTypes::sacado_rad_dfad>;
     \}
     \}
 }
