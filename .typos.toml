@@ -43,9 +43,12 @@ clen = "clen"
 [files]
 extend-exclude = [
     "*.output",
-    "tests/parameter_handler/parameter_handler_25.cc", # this file contains a typo on purpose
     "*.svg",
     "*.pvsm",
     "*.vtu",
     "*.bib", # bib entries contain many arbitrary abbreviations
+    # the following files contain typos on purpose
+    "tests/parameter_handler/parameter_handler_25.cc",
+    "tests/parameter_handler/prm/parameter_handler_26_fail.json",
+    "tests/parameter_handler/prm/parameter_handler_26_fail.prm",
     ] 
