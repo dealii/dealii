@@ -907,6 +907,11 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
+        identities.emplace_back(i, i);
+      return identities;
+
+
+      for (unsigned int i = 0; i < this->degree - 1; ++i)
         for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
           if (std::fabs(
                 this->unit_support_points[index_map_inverse_q[i + 1]][0] -
@@ -946,7 +951,7 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
-  const unsigned int                  face_no) const
+  const unsigned int /*face_no*/) const
 {
   // we can presently only compute these identities if both FEs are FE_Qs or
   // if the other one is an FE_Nothing
@@ -997,17 +1002,12 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
       // Only linear Pyramid Elements are implemented
       // there are no dofs on the faces
       // Assert(fe_other.degree == 1, ExcNotImplemented());
-      if (fe_other.degree == 1)
-        return std::vector<std::pair<unsigned int, unsigned int>>();
-      else if (fe_other.degree == 2)
-        {
-          std::vector<std::pair<unsigned int, unsigned int>> identities;
-          if (face_no == 0)
-            identities.emplace_back(0, 0);
-          return identities;
-        }
-      else
-        DEAL_II_NOT_IMPLEMENTED();
+
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+      // if (face_no == 0)
+      for (unsigned int i = 0; i < fe_other.n_dofs_per_quad(0); ++i)
+        identities.emplace_back(i, i);
+      return identities;
     }
   else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
              dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
@@ -1016,14 +1016,9 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
       // spaial dimensions. If p=1, then there are none, if p=2 then there is
       // one points on the quad.
       std::vector<std::pair<unsigned int, unsigned int>> identities;
-
-      if (fe_p_other->degree == 2)
-        {
-          if (face_no > 1) // regards the prism face, needed for
-                           // ensure_existence_and_return_dof_identities
-            identities.emplace_back(0, 0);
-        }
-
+      // if (face_no == 0)
+      for (unsigned int i = 0; i < fe_other.n_dofs_per_quad(0); ++i)
+        identities.emplace_back(i, i);
       return identities;
     }
   else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)

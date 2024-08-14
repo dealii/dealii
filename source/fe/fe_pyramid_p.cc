@@ -40,7 +40,38 @@ namespace
     return (degree + 1) * (degree + 2) * (2 * degree + 3) / 6;
   }
 
+  /**
+   * Helper function to set up the dpo vector of FE_PyramidP for a given @p degree.
+   */
+  internal::GenericDoFsPerObject
+  get_dpo_vector_fe_pyramid_p(const unsigned int degree)
+  {
+    internal::GenericDoFsPerObject dpo;
 
+    if (degree == 1)
+      {
+        dpo.dofs_per_object_exclusive  = {{1}, {0}, {0, 0, 0, 0, 0}, {0}};
+        dpo.dofs_per_object_inclusive  = {{1}, {2}, {4, 3, 3, 3, 3}, {5}};
+        dpo.object_index               = {{}, {5}, {5}, {5}};
+        dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {4, 3, 3, 3, 3}};
+      }
+    else if (degree == 2)
+      {
+        dpo.dofs_per_object_exclusive  = {{1}, {1}, {1, 0, 0, 0, 0}, {0}};
+        dpo.dofs_per_object_inclusive  = {{1}, {3}, {9, 6, 6, 6, 6}, {14}};
+        dpo.object_index               = {{},
+                                          {5, 6, 7, 8, 9, 10, 11, 12},
+                                          {13, 14, 14, 14, 14},
+                                          {14}};
+        dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {8, 6, 6, 6, 6}};
+      }
+    else
+      {
+        DEAL_II_NOT_IMPLEMENTED();
+      }
+
+    return dpo;
+  }
 
   /**
    * Helper function to set up the dpo vector of FE_PyramidP for a given @p degree.
@@ -54,12 +85,12 @@ namespace
     internal::GenericDoFsPerObject dpo;
 
     // set dpo for linear case and then add for higher orders
-    dpo.dofs_per_object_exclusive  = {{1}, {degree - 1}, {0, 0, 0, 0, 0}, {0}};
-    dpo.dofs_per_object_inclusive  = {{1},
-                                      {degree + 1},
-                                      {4, 3, 3, 3, 3},
-                                      {compute_n_dofs(dim, degree)}};
-    dpo.object_index               = {{}, {5}, {5, 5, 5, 5, 5}, {5}};
+    dpo.dofs_per_object_exclusive = {{1}, {degree - 1}, {0, 0, 0, 0, 0}, {0}};
+    dpo.dofs_per_object_inclusive = {{1},
+                                     {degree + 1},
+                                     {4, 3, 3, 3, 3},
+                                     {compute_n_dofs(dim, degree)}};
+    dpo.object_index = {{}, {5, 5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5}, {5}};
     dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {4, 3, 3, 3, 3}};
 
     std::vector<Point<dim>> support_points;
@@ -120,6 +151,11 @@ namespace
             dpo.first_object_index_on_face[2][2] += fe_q.n_dofs_per_line();
             dpo.first_object_index_on_face[2][3] += fe_q.n_dofs_per_line();
             dpo.first_object_index_on_face[2][4] += fe_q.n_dofs_per_line();
+
+
+            dpo.object_index[1][1] += fe_q.n_dofs_per_line();
+            dpo.object_index[1][2] += 2 * fe_q.n_dofs_per_line();
+            dpo.object_index[1][3] += 3 * fe_q.n_dofs_per_line();
           }
         else
           {
@@ -162,6 +198,11 @@ namespace
     start_lines[1] = start_lines[0] + n_dofs_per_object[1];
     start_lines[2] = start_lines[1] + n_dofs_per_object[1];
     start_lines[3] = start_lines[2] + n_dofs_per_object[1];
+
+    dpo.object_index[1][4] = start_lines[0];
+    dpo.object_index[1][5] = start_lines[1];
+    dpo.object_index[1][6] = start_lines[2];
+    dpo.object_index[1][7] = start_lines[3];
 
     std::vector<unsigned int> start_faces(4);
     start_faces[0] = n_dofs_total_per_object[0] + n_dofs_total_per_object[1] +
@@ -290,35 +331,6 @@ namespace
   }
 
 
-  /**
-   * Helper function to set up the dpo vector of FE_PyramidP for a given @p degree.
-   */
-  internal::GenericDoFsPerObject
-  get_dpo_vector_fe_pyramid_p(const unsigned int degree)
-  {
-    internal::GenericDoFsPerObject dpo;
-
-    if (degree == 1)
-      {
-        dpo.dofs_per_object_exclusive  = {{1}, {0}, {0, 0, 0, 0, 0}, {0}};
-        dpo.dofs_per_object_inclusive  = {{1}, {2}, {4, 3, 3, 3, 3}, {5}};
-        dpo.object_index               = {{}, {5}, {5}, {5}};
-        dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {4, 3, 3, 3, 3}};
-      }
-    else if (degree == 2)
-      {
-        dpo.dofs_per_object_exclusive  = {{1}, {1}, {1, 0, 0, 0, 0}, {0}};
-        dpo.dofs_per_object_inclusive  = {{1}, {3}, {9, 6, 6, 6, 6}, {14}};
-        dpo.object_index               = {{}, {5}, {13, 14, 14, 14, 14}, {14}};
-        dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {8, 6, 6, 6, 6}};
-      }
-    else
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-      }
-
-    return dpo;
-  }
 
   /**
    * Helper function to set up the dpo vector of FE_PyramidDGP for a given @p degree.
@@ -673,7 +685,6 @@ FE_PyramidP<dim, spacedim>::hp_quad_dof_identities(
     }
 
   std::vector<std::pair<unsigned int, unsigned int>> result;
-
   for (unsigned int i = 0; i < this->n_dofs_per_quad(face_no); ++i)
     result.emplace_back(i, i);
 
