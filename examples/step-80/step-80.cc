@@ -368,11 +368,13 @@ namespace Step80
 
     AffineConstraints<double> constraints;
 
-    LA::MPI::BlockSparseMatrix fluid_matrix;
+    LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
     LA::MPI::BlockSparseMatrix fluid_preconditioner;
 
-    LA::MPI::BlockSparseMatrix solid_matrix;
-    LA::MPI::BlockSparseMatrix coupling_matrix;
+    LA::MPI::BlockSparseMatrix
+      solid_matrix; // displacement and Lagrange multiplier
+    LA::MPI::BlockSparseMatrix
+      coupling_matrix; // between displacement and velocity
 
     LA::MPI::BlockVector solution;
     LA::MPI::BlockVector locally_relevant_solution;
@@ -388,6 +390,12 @@ namespace Step80
     LA::MPI::Vector relevant_tracer_particle_displacements;
 
     std::vector<std::vector<BoundingBox<spacedim>>> global_fluid_bounding_boxes;
+
+    FEValuesExtractors::Vector velocities;
+    FEValuesExtractors::Scalar pressure;
+
+    FEValuesExtractors::Vector displacement;
+    FEValuesExtractors::Vector lagrange_multiplier;
   };
 
 
@@ -660,7 +668,6 @@ namespace Step80
     {
       constraints.reinit(locally_relevant_dofs);
 
-      const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
       VectorTools::interpolate_boundary_values(
         fluid_dh,
@@ -729,6 +736,33 @@ namespace Step80
                                      mpi_communicator);
     system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
     solution.reinit(fluid_owned_dofs, mpi_communicator);
+
+    // Same thing for solid
+    {
+      solid_matrix.clear();
+      DynamicSparsityPattern dsp(solid_dh.n_dofs());
+      DoFTools::make_sparsity_pattern(solid_dh, dsp);
+      solid_matrix.reinit(solid_dh.locally_owned_dofs(),
+                          solid_dh.locally_owned_dofs(),
+                          dsp,
+                          mpi_communicator);
+    }
+
+    {
+      coupling_matrix.clear();
+      BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
+      DoFTools::make_sparsity_pattern(
+        fluid_dh, solid_dh, dsp, constraints, false);
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
+        locally_owned_dofs_per_processor,
+        mpi_communicator,
+        locally_relevant_dofs);
+      coupling_matrix.reinit(fluid_owned_dofs,
+                             solid_dh.locally_owned_dofs(),
+                             dsp,
+                             mpi_communicator);
+    }
   }
 
 
@@ -1132,7 +1166,7 @@ namespace Step80
         if (cycle == 0)
           {
             make_grid();
-            initial_setup();
+            initial_setup(); // FE_Nothing -> FE_Q for solid
             setup_dofs();
             setup_tracer_particles();
             setup_solid_particles();
@@ -1193,7 +1227,9 @@ namespace Step80
         }
 
         assemble_stokes_system();
-        assemble_nitsche_restriction();
+        // assemble_elasticity_system();
+        // assemble_coupling_system();
+        // assemble_nitsche_restriction();
         solve();
 
         if (cycle % par.output_frequency == 0)
