@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2021 by the deal.II authors
+ * Copyright (C) 2024 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Authors: Luca Heltai, Bruno Blais, Rene Gassmoeller, 2020
+ * Authors: Luca Heltai, Bruno Blais, 2024
  */
 
 
@@ -26,6 +25,8 @@
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/linear_operator_tools.h>
+
+#include <boost/algorithm/string.hpp>
 
 #define FORCE_USE_OF_TRILINOS
 
@@ -101,9 +102,42 @@ namespace LA
 #include <iostream>
 #include <memory>
 
-namespace Step70
+namespace Step80
 {
   using namespace dealii;
+
+
+  std::pair<unsigned int, unsigned int>
+  get_dimension_and_spacedimension(const ParameterHandler &prm)
+  {
+    auto dim      = prm.get_integer("dimension");
+    auto spacedim = prm.get_integer("space dimension");
+    return {dim, spacedim};
+  }
+
+  // A free function to read the dimension and spacedimension from a parameter
+  // file
+  std::pair<unsigned int, unsigned int>
+  get_dimension_and_spacedimension(const std::string &prm_file)
+  {
+    ParameterAcceptor::prm.declare_entry("dimension",
+                                         "2",
+                                         Patterns::Integer(2, 3));
+    ParameterAcceptor::prm.declare_entry("space dimension",
+                                         "2",
+                                         Patterns::Integer(2, 3));
+    // If reading of the input file fails, run by default in 1D-2D
+    try
+      {
+        ParameterAcceptor::prm.parse_input(prm_file, "", true);
+      }
+    catch (std::exception &exc)
+      {
+        return {2, 2};
+        throw;
+      }
+    return get_dimension_and_spacedimension(ParameterAcceptor::prm);
+  }
 
 
   template <int dim, int spacedim = dim>
@@ -247,6 +281,29 @@ namespace Step70
       this->prm.set("Function expression",
                     "t < .500001 ? 6.283185 : -6.283185");
     });
+
+    // Make sure that dim and spacedim are actually declared also in the
+    // application
+    declare_parameters_call_back.connect([&]() {
+      this->leave_my_subsection(this->prm);
+      this->prm.declare_entry("dimension", "2", Patterns::Integer(2, 3));
+      this->prm.declare_entry("space dimension", "2", Patterns::Integer(2, 3));
+      this->enter_my_subsection(this->prm);
+    });
+
+    // And make sure we check that the dimension and space dimension in the file
+    // match the ones of the application
+    parse_parameters_call_back.connect([&]() {
+      this->leave_my_subsection(this->prm);
+      const auto [dim_, spacedim_] =
+        get_dimension_and_spacedimension(this->prm);
+      AssertThrow(dim_ == dim && spacedim_ == spacedim,
+                  ExcMessage(
+                    "The dimension and space dimension in the parameter "
+                    "file do not match the ones of the running application."
+                    " This should not happen: aborting."));
+      this->enter_my_subsection(this->prm);
+    });
   }
 
 
@@ -311,8 +368,11 @@ namespace Step70
 
     AffineConstraints<double> constraints;
 
-    LA::MPI::BlockSparseMatrix system_matrix;
-    LA::MPI::BlockSparseMatrix preconditioner_matrix;
+    LA::MPI::BlockSparseMatrix fluid_matrix;
+    LA::MPI::BlockSparseMatrix fluid_preconditioner;
+
+    LA::MPI::BlockSparseMatrix solid_matrix;
+    LA::MPI::BlockSparseMatrix coupling_matrix;
 
     LA::MPI::BlockVector solution;
     LA::MPI::BlockVector locally_relevant_solution;
@@ -615,7 +675,7 @@ namespace Step70
       Utilities::MPI::all_gather(mpi_communicator,
                                  fluid_dh.locally_owned_dofs());
     {
-      system_matrix.clear();
+      fluid_matrix.clear();
 
       Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
       for (unsigned int c = 0; c < spacedim + 1; ++c)
@@ -638,11 +698,11 @@ namespace Step70
         mpi_communicator,
         locally_relevant_dofs);
 
-      system_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+      fluid_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
     }
 
     {
-      preconditioner_matrix.clear();
+      fluid_preconditioner.clear();
 
       Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
       for (unsigned int c = 0; c < spacedim + 1; ++c)
@@ -661,7 +721,7 @@ namespace Step70
         locally_owned_dofs_per_processor,
         mpi_communicator,
         locally_relevant_dofs);
-      preconditioner_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+      fluid_preconditioner.reinit(fluid_owned_dofs, dsp, mpi_communicator);
     }
 
     locally_relevant_solution.reinit(fluid_owned_dofs,
@@ -676,9 +736,8 @@ namespace Step70
   template <int dim, int spacedim>
   void StokesImmersedProblem<dim, spacedim>::assemble_stokes_system()
   {
-    system_matrix         = 0;
-    preconditioner_matrix = 0;
-    system_rhs            = 0;
+    fluid_matrix = 0;
+    system_rhs   = 0;
 
     TimerOutput::Scope t(computing_timer, "Assemble Stokes terms");
 
@@ -749,19 +808,16 @@ namespace Step70
 
 
           cell->get_dof_indices(local_dof_indices);
-          constraints.distribute_local_to_global(cell_matrix,
-                                                 cell_rhs,
-                                                 local_dof_indices,
-                                                 system_matrix,
-                                                 system_rhs);
+          constraints.distribute_local_to_global(
+            cell_matrix, cell_rhs, local_dof_indices, fluid_matrix, system_rhs);
 
           constraints.distribute_local_to_global(cell_matrix2,
                                                  local_dof_indices,
-                                                 preconditioner_matrix);
+                                                 fluid_preconditioner);
         }
 
-    system_matrix.compress(VectorOperation::add);
-    preconditioner_matrix.compress(VectorOperation::add);
+    fluid_matrix.compress(VectorOperation::add);
+    fluid_preconditioner.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
   }
 
@@ -774,7 +830,7 @@ namespace Step70
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(spacedim);
 
-    SolidVelocity<spacedim> solid_velocity(par.angular_velocity);
+    // SolidVelocity<spacedim> solid_velocity(par.angular_velocity);
 
     std::vector<types::global_dof_index> fluid_dof_indices(
       fluid_fe->n_dofs_per_cell());
@@ -801,9 +857,9 @@ namespace Step70
         Assert(pic.begin() == particle, ExcInternalError());
         for (const auto &p : pic)
           {
-            const auto &ref_q  = p.get_reference_location();
-            const auto &real_q = p.get_location();
-            const auto &JxW    = p.get_properties()[0];
+            const auto &ref_q = p.get_reference_location();
+            // const auto &real_q = p.get_location();
+            const auto &JxW = p.get_properties()[0];
 
             for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
@@ -823,21 +879,18 @@ namespace Step70
                             fluid_fe->shape_value(j, ref_q) * JxW;
                       }
                     local_rhs(i) += penalty_parameter * par.penalty_term *
-                                    solid_velocity.value(real_q, comp_i) *
+                                    1 * // [TODO]
                                     fluid_fe->shape_value(i, ref_q) * JxW;
                   }
               }
           }
 
-        constraints.distribute_local_to_global(local_matrix,
-                                               local_rhs,
-                                               fluid_dof_indices,
-                                               system_matrix,
-                                               system_rhs);
+        constraints.distribute_local_to_global(
+          local_matrix, local_rhs, fluid_dof_indices, fluid_matrix, system_rhs);
         particle = pic.end();
       }
 
-    system_matrix.compress(VectorOperation::add);
+    fluid_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
   }
 
@@ -855,7 +908,7 @@ namespace Step70
 #ifdef USE_PETSC_LA
       data.symmetric_operator = true;
 #endif
-      prec_A.initialize(system_matrix.block(0, 0), data);
+      prec_A.initialize(fluid_matrix.block(0, 0), data);
     }
 
     LA::MPI::PreconditionAMG prec_S;
@@ -865,14 +918,14 @@ namespace Step70
 #ifdef USE_PETSC_LA
       data.symmetric_operator = true;
 #endif
-      prec_S.initialize(preconditioner_matrix.block(1, 1), data);
+      prec_S.initialize(fluid_preconditioner.block(1, 1), data);
     }
 
-    const auto A = linear_operator<LA::MPI::Vector>(system_matrix.block(0, 0));
+    const auto A = linear_operator<LA::MPI::Vector>(fluid_matrix.block(0, 0));
     const auto amgA = linear_operator(A, prec_A);
 
     const auto S =
-      linear_operator<LA::MPI::Vector>(preconditioner_matrix.block(1, 1));
+      linear_operator<LA::MPI::Vector>(fluid_preconditioner.block(1, 1));
     const auto amgS = linear_operator(S, prec_S);
 
     ReductionControl          inner_solver_control(100,
@@ -887,14 +940,14 @@ namespace Step70
         dealii::LinearOperator<typename LA::MPI::BlockVector::BlockType>,
         2>{{amgA, amgS}});
 
-    SolverControl solver_control(system_matrix.m(),
+    SolverControl solver_control(fluid_matrix.m(),
                                  1e-10 * system_rhs.l2_norm());
 
     SolverFGMRES<LA::MPI::BlockVector> solver(solver_control);
 
     constraints.set_zero(solution);
 
-    solver.solve(system_matrix, solution, system_rhs, P);
+    solver.solve(fluid_matrix, solution, system_rhs, P);
 
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
@@ -1106,10 +1159,11 @@ namespace Step70
             TimerOutput::Scope t(computing_timer,
                                  "Set solid particle position");
 
-            SolidPosition<spacedim> solid_position(par.angular_velocity,
-                                                   time_step);
-            solid_particle_handler.set_particle_positions(solid_position,
-                                                          false);
+            // SolidPosition<spacedim> solid_position(par.angular_velocity,
+            //                                        time_step);
+            // solid_particle_handler.set_particle_positions(solid_position,
+            //                                               false);
+            // [TODO]
           }
 
         {
@@ -1166,14 +1220,13 @@ namespace Step70
           refine_and_transfer();
       }
   }
-
-} // namespace Step70
+} // namespace Step80
 
 
 
 int main(int argc, char *argv[])
 {
-  using namespace Step70;
+  using namespace Step80;
   using namespace dealii;
   deallog.depth_console(1);
   try
@@ -1186,7 +1239,18 @@ int main(int argc, char *argv[])
       else
         prm_file = "parameters.prm";
 
-      if (prm_file.find("23") != std::string::npos)
+      // Extract the dimension from the parameter file.
+      auto [dim, spacedim] = get_dimension_and_spacedimension(prm_file);
+
+      if (dim == 2 && spacedim == 2)
+        {
+          StokesImmersedProblemParameters<2> par;
+          ParameterAcceptor::initialize(prm_file);
+
+          StokesImmersedProblem<2> problem(par);
+          problem.run();
+        }
+      else if (dim == 2 && spacedim == 3)
         {
           StokesImmersedProblemParameters<2, 3> par;
           ParameterAcceptor::initialize(prm_file);
@@ -1194,7 +1258,7 @@ int main(int argc, char *argv[])
           StokesImmersedProblem<2, 3> problem(par);
           problem.run();
         }
-      else if (prm_file.find("3") != std::string::npos)
+      else if (dim == 3 && spacedim == 3)
         {
           StokesImmersedProblemParameters<3> par;
           ParameterAcceptor::initialize(prm_file);
@@ -1204,11 +1268,11 @@ int main(int argc, char *argv[])
         }
       else
         {
-          StokesImmersedProblemParameters<2> par;
-          ParameterAcceptor::initialize(prm_file);
-
-          StokesImmersedProblem<2> problem(par);
-          problem.run();
+          AssertThrow(false,
+                      ExcNotImplemented(
+                        "The combination of dimension " + std::to_string(dim) +
+                        " and spacedimension " + std::to_string(spacedim) +
+                        " is not implemented."));
         }
     }
   catch (std::exception &exc)
