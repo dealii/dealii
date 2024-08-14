@@ -229,6 +229,17 @@ are worthwhile browsing through before you start any large-scale programming:
   to continuously transform existing code to make it fit for future
   extension @cite Refactoring .
 
+- deal.II is written in C++, a language that is perhaps not the very
+  easiest one to learn. There are may good books that provide an
+  introduction to the language, as well as web resources such as
+  [this C++ quickstart tutorial](https://cplusplus.com/doc/tutorial/) and
+  [this more in-depth reference](https://www.learncpp.com/).
+  If all you want is to look up a
+  fact (say, the name of a member function of `std::vector`, or the
+  order of function arguments of `std::snprintf`, then
+  [cppreference.org](https://en.cppreference.com/) is the place many
+  of us go to.
+
 - The <a href="http://software-carpentry.org/">Software Carpentry project</a>
   that provides introductions to many topics that are important to dealing
   with software, such as version control, make files, testing, etc. It is
