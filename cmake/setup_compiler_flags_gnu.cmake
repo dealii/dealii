@@ -169,11 +169,13 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
   list(APPEND DEAL_II_DEFINITIONS_RELEASE "NDEBUG")
 
   #
-  # There are many places in the library where we create a new typedef and then
-  # immediately use it in an Assert. Hence, only ignore unused typedefs in Release
-  # mode.
+  # There are many places in the library where we
+  #  - create a new typedef and then only use it in an Assert.
+  #  - use a function parameter only in an Assert.
+  # Thus disable these two warnings in release mode.
   #
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused-local-typedefs")
+  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused-parameter")
 endif()
 
 
