@@ -1659,24 +1659,31 @@ namespace deal_II_exceptions
 #    endif /*ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #  endif   /*KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #else      /*ifdef DEBUG*/
+#  ifdef DEAL_II_HAVE_CXX20
 /*
  * In order to avoid unused parameters (etc.) warnings we need to use cond
  * and exc without actually evaluating the expression and generating code.
  * We accomplish this by using decltype(...) and create a dummy pointer
- * with these signatures.
+ * with these signatures. Notably, this approach works with C++20 onwards.
  */
-#  define Assert(cond, exc)                                  \
-    do                                                       \
-      {                                                      \
-        typename std::remove_reference<decltype(cond)>::type \
-          *dealii_assert_variable_a = nullptr;               \
-        typename std::remove_reference<decltype(exc)>::type  \
-          *dealii_assert_variable_b = nullptr;               \
-        (void)dealii_assert_variable_a;                      \
-        (void)dealii_assert_variable_b;                      \
-      }                                                      \
-    while (false)
-
+#    define Assert(cond, exc)                                  \
+      do                                                       \
+        {                                                      \
+          typename std::remove_reference<decltype(cond)>::type \
+            *dealii_assert_variable_a = nullptr;               \
+          typename std::remove_reference<decltype(exc)>::type  \
+            *dealii_assert_variable_b = nullptr;               \
+          (void)dealii_assert_variable_a;                      \
+          (void)dealii_assert_variable_b;                      \
+        }                                                      \
+      while (false)
+#  else
+#    define Assert(cond, exc) \
+      do                      \
+        {                     \
+        }                     \
+      while (false)
+#  endif
 #endif /*ifdef DEBUG*/
 
 
