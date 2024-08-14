@@ -2422,7 +2422,14 @@ FESystem<dim, spacedim>::compare_for_domination(
         dynamic_cast<const FESystem<dim, spacedim> *>(&fe_other))
     {
       Assert(this->n_components() == fe_sys_other->n_components(),
-             ExcNotImplemented());
+             ExcMessage("You can only compare two elements for domination "
+                        "that have the same number of vector components. The "
+                        "current element has " +
+                        std::to_string(this->n_components()) +
+                        " vector components, and you are comparing it "
+                        "against an element with " +
+                        std::to_string(fe_sys_other->n_components()) +
+                        " vector components."));
       Assert(this->n_base_elements() == fe_sys_other->n_base_elements(),
              ExcNotImplemented());
 
