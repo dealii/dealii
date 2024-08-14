@@ -1938,9 +1938,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineFunction<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierCosineFunction<dim>::value(const Point<dim>  &p,
+                                    const unsigned int component) const
   {
     AssertIndexRange(component, 1);
     return std::cos(fourier_coefficients * p);
@@ -1950,9 +1949,8 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierCosineFunction<dim>::gradient(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierCosineFunction<dim>::gradient(const Point<dim>  &p,
+                                       const unsigned int component) const
   {
     AssertIndexRange(component, 1);
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
@@ -1962,9 +1960,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineFunction<dim>::laplacian(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierCosineFunction<dim>::laplacian(const Point<dim>  &p,
+                                        const unsigned int component) const
   {
     AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
@@ -1988,9 +1985,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineFunction<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierSineFunction<dim>::value(const Point<dim>  &p,
+                                  const unsigned int component) const
   {
     AssertIndexRange(component, 1);
     return std::sin(fourier_coefficients * p);
@@ -2000,9 +1996,8 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierSineFunction<dim>::gradient(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierSineFunction<dim>::gradient(const Point<dim>  &p,
+                                     const unsigned int component) const
   {
     AssertIndexRange(component, 1);
     return fourier_coefficients * std::cos(fourier_coefficients * p);
@@ -2012,9 +2007,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineFunction<dim>::laplacian(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierSineFunction<dim>::laplacian(const Point<dim>  &p,
+                                      const unsigned int component) const
   {
     AssertIndexRange(component, 1);
     return (fourier_coefficients * fourier_coefficients) *
@@ -2044,9 +2038,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineSum<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierSineSum<dim>::value(const Point<dim>  &p,
+                             const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2062,9 +2055,8 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierSineSum<dim>::gradient(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierSineSum<dim>::gradient(const Point<dim>  &p,
+                                const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2080,9 +2072,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierSineSum<dim>::laplacian(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierSineSum<dim>::laplacian(const Point<dim>  &p,
+                                 const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2118,9 +2109,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineSum<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierCosineSum<dim>::value(const Point<dim>  &p,
+                               const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2136,9 +2126,8 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  FourierCosineSum<dim>::gradient(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierCosineSum<dim>::gradient(const Point<dim>  &p,
+                                  const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2154,9 +2143,8 @@ namespace Functions
 
   template <int dim>
   double
-  FourierCosineSum<dim>::laplacian(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  FourierCosineSum<dim>::laplacian(const Point<dim>  &p,
+                                   const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2186,9 +2174,8 @@ namespace Functions
 
   template <int dim, typename Number>
   Number
-  Monomial<dim, Number>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  Monomial<dim, Number>::value(const Point<dim>  &p,
+                               const unsigned int component) const
   {
     AssertIndexRange(component, this->n_components);
 
@@ -2222,9 +2209,8 @@ namespace Functions
 
   template <int dim, typename Number>
   Tensor<1, dim, Number>
-  Monomial<dim, Number>::gradient(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  Monomial<dim, Number>::gradient(const Point<dim>  &p,
+                                  const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2603,8 +2589,8 @@ namespace Functions
   template <int dim>
   double
   InterpolatedTensorProductGridData<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+    const Point<dim>  &p,
+    const unsigned int component) const
   {
     Assert(
       component == 0,
@@ -2633,8 +2619,8 @@ namespace Functions
   template <int dim>
   Tensor<1, dim>
   InterpolatedTensorProductGridData<dim>::gradient(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+    const Point<dim>  &p,
+    const unsigned int component) const
   {
     Assert(
       component == 0,
@@ -2710,9 +2696,8 @@ namespace Functions
 
   template <int dim>
   double
-  InterpolatedUniformGridData<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  InterpolatedUniformGridData<dim>::value(const Point<dim>  &p,
+                                          const unsigned int component) const
   {
     Assert(
       component == 0,
@@ -2759,9 +2744,8 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  InterpolatedUniformGridData<dim>::gradient(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  InterpolatedUniformGridData<dim>::gradient(const Point<dim>  &p,
+                                             const unsigned int component) const
   {
     Assert(
       component == 0,
@@ -2848,8 +2832,8 @@ namespace Functions
 
   template <int dim>
   double
-  Polynomial<dim>::value(const Point<dim>                   &p,
-                         [[maybe_unused]] const unsigned int component) const
+  Polynomial<dim>::value(const Point<dim>  &p,
+                         const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
@@ -2889,8 +2873,8 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  Polynomial<dim>::gradient(const Point<dim>                   &p,
-                            [[maybe_unused]] const unsigned int component) const
+  Polynomial<dim>::gradient(const Point<dim>  &p,
+                            const unsigned int component) const
   {
     AssertIndexRange(component, 1);
 
