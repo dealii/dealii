@@ -8862,33 +8862,29 @@ template <typename FlagType>
 void
 DataOutInterface<dim, spacedim>::set_flags(const FlagType &flags)
 {
-  // The price for not writing ten duplicates of this function is some loss in
-  // type safety.
-  if (typeid(flags) == typeid(dx_flags))
-    dx_flags = *reinterpret_cast<const DataOutBase::DXFlags *>(&flags);
-  else if (typeid(flags) == typeid(ucd_flags))
-    ucd_flags = *reinterpret_cast<const DataOutBase::UcdFlags *>(&flags);
-  else if (typeid(flags) == typeid(povray_flags))
-    povray_flags = *reinterpret_cast<const DataOutBase::PovrayFlags *>(&flags);
-  else if (typeid(flags) == typeid(eps_flags))
-    eps_flags = *reinterpret_cast<const DataOutBase::EpsFlags *>(&flags);
-  else if (typeid(flags) == typeid(gmv_flags))
-    gmv_flags = *reinterpret_cast<const DataOutBase::GmvFlags *>(&flags);
-  else if (typeid(flags) == typeid(hdf5_flags))
-    hdf5_flags = *reinterpret_cast<const DataOutBase::Hdf5Flags *>(&flags);
-  else if (typeid(flags) == typeid(tecplot_flags))
-    tecplot_flags =
-      *reinterpret_cast<const DataOutBase::TecplotFlags *>(&flags);
-  else if (typeid(flags) == typeid(vtk_flags))
-    vtk_flags = *reinterpret_cast<const DataOutBase::VtkFlags *>(&flags);
-  else if (typeid(flags) == typeid(svg_flags))
-    svg_flags = *reinterpret_cast<const DataOutBase::SvgFlags *>(&flags);
-  else if (typeid(flags) == typeid(gnuplot_flags))
-    gnuplot_flags =
-      *reinterpret_cast<const DataOutBase::GnuplotFlags *>(&flags);
-  else if (typeid(flags) == typeid(deal_II_intermediate_flags))
-    deal_II_intermediate_flags =
-      *reinterpret_cast<const DataOutBase::Deal_II_IntermediateFlags *>(&flags);
+  if constexpr (std::is_same_v<FlagType, DataOutBase::DXFlags>)
+    dx_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::UcdFlags>)
+    ucd_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::PovrayFlags>)
+    povray_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::EpsFlags>)
+    eps_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::GmvFlags>)
+    gmv_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::Hdf5Flags>)
+    hdf5_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::TecplotFlags>)
+    tecplot_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::VtkFlags>)
+    vtk_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::SvgFlags>)
+    svg_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::GnuplotFlags>)
+    gnuplot_flags = flags;
+  else if constexpr (std::is_same_v<FlagType,
+                                    DataOutBase::Deal_II_IntermediateFlags>)
+    deal_II_intermediate_flags = flags;
   else
     DEAL_II_NOT_IMPLEMENTED();
 }
