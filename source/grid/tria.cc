@@ -900,13 +900,13 @@ namespace internal
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   void CellAttachedDataSerializer<dim, spacedim>::load(
-    const unsigned int               global_first_cell,
-    const unsigned int               global_num_cells,
-    const unsigned int               local_num_cells,
-    const std::string               &file_basename,
-    const unsigned int               n_attached_deserialize_fixed,
-    const unsigned int               n_attached_deserialize_variable,
-    [[maybe_unused]] const MPI_Comm &mpi_communicator)
+    const unsigned int global_first_cell,
+    const unsigned int global_num_cells,
+    const unsigned int local_num_cells,
+    const std::string &file_basename,
+    const unsigned int n_attached_deserialize_fixed,
+    const unsigned int n_attached_deserialize_variable,
+    const MPI_Comm    &mpi_communicator)
   {
     Assert(dest_data_fixed.empty(),
            ExcMessage("Previously loaded data has not been released yet!"));
@@ -1063,6 +1063,7 @@ namespace internal
     else // if (mpisize > 1)
 #endif
       {
+        (void)mpi_communicator;
         (void)global_first_cell;
         (void)global_num_cells;
 
