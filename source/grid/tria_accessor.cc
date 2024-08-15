@@ -1578,7 +1578,6 @@ template <>
 double
 TriaAccessor<1, 1, 1>::extent_in_direction(const unsigned int axis) const
 {
-  (void)axis;
   AssertIndexRange(axis, 1);
 
   return this->diameter();
@@ -1589,7 +1588,6 @@ template <>
 double
 TriaAccessor<1, 1, 2>::extent_in_direction(const unsigned int axis) const
 {
-  (void)axis;
   AssertIndexRange(axis, 1);
 
   return this->diameter();
@@ -2248,7 +2246,6 @@ CellAccessor<dim, spacedim>::set_direction_flag(
   // Some older compilers (GCC 9) print an unused variable warning about
   // new_direction_flag when it is only used in a subset of 'if constexpr'
   // statements
-  (void)new_direction_flag;
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if constexpr (dim == spacedim)
     Assert(new_direction_flag == true,
