@@ -102,6 +102,19 @@
       another way, installing PETSc with the flag <code>--download-mpich</code>
       often causes problems (such as linking errors or poor performance)
       that may be avoided by using whatever your system provides instead.
+
+      If you want to solve problems which have more than two billion unknowns
+      with PETSc then you should also pass the
+      <code>--with-64-bit-indices=on</code> flag to <code>configure.py</code>.
+      You will also want to configure deal.II with 64-bit indices by
+      providing <code>-DDEAL_II_WITH_64BIT_INDICES=ON</code> to deal.II's cmake
+      configuration run. deal.II will throw an exception if it cannot
+      successfully convert indices between the two libraries, but, as long
+      as the supported index ranges overlap (e.g., when solving problems with
+      less than 2 billion degrees of freedom where either PETSc or deal.II uses
+      32-bit indices and the other uses 64-bit indices) all solvers will work
+      correctly.
+
       <br>
       Now let PETSc check his own sanity:
       <pre>
