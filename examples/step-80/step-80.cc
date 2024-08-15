@@ -21,10 +21,10 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/timer.h>
 
-#include <deal.II/lac/block_linear_operator.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/linear_operator_tools.h>
+#include <deal.II/lac/block_linear_operator.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -81,6 +81,7 @@ namespace LA
 #include <deal.II/lac/solver_minres.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_linear_operator.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
@@ -1158,45 +1159,57 @@ namespace Step80
       prec_S.initialize(fluid_preconditioner.block(1, 1), data);
     }
 
-
-    const auto A  = linear_operator<LA::MPI::Vector>(fluid_matrix.block(0, 0));
-    const auto B  = linear_operator<LA::MPI::Vector>(fluid_matrix.block(1, 0));
-    const auto Bt = linear_operator<LA::MPI::Vector>(fluid_matrix.block(0, 1));
+    using Vec   = LA::MPI::Vector;
+    using LinOp = LinearOperator<Vec>;
 
 
-    const auto K  = linear_operator<LA::MPI::Vector>(solid_matrix.block(0, 0));
-    const auto D  = linear_operator<LA::MPI::Vector>(solid_matrix.block(1, 0));
-    const auto Dt = linear_operator<LA::MPI::Vector>(solid_matrix.block(0, 1));
-    const auto M  = linear_operator<LA::MPI::Vector>(solid_matrix.block(1, 1));
+    const auto A  = linear_operator<Vec>(fluid_matrix.block(0, 0));
+    const auto B  = linear_operator<Vec>(fluid_matrix.block(1, 0));
+    const auto Bt = linear_operator<Vec>(fluid_matrix.block(0, 1));
+    const auto Z6 = 0.0 * linear_operator<Vec>(fluid_matrix.block(1, 1));
+
+    const auto K  = linear_operator<Vec>(solid_matrix.block(0, 0));
+    const auto D  = linear_operator<Vec>(solid_matrix.block(1, 0));
+    const auto Dt = linear_operator<Vec>(solid_matrix.block(0, 1));
+    const auto M  = linear_operator<Vec>(solid_matrix.block(1, 1));
 
     const auto amgA = linear_operator(A, prec_A);
     const auto amgK = linear_operator(K, prec_K);
 
-    const auto Ct =
-      linear_operator<LA::MPI::Vector>(coupling_matrix.block(0, 1));
-    const auto C = transpose_operator(Ct);
+    const auto Z1t = 0.0 * linear_operator<Vec>(coupling_matrix.block(0, 0));
+    const auto Ct  = linear_operator<Vec>(coupling_matrix.block(0, 1));
+    const auto Z2t = 0.0 * linear_operator<Vec>(coupling_matrix.block(1, 0));
+    const auto Z3t = 0.0 * linear_operator<Vec>(coupling_matrix.block(1, 1));
 
-    const auto Z1 =
-      0.0 * linear_operator<LA::MPI::Vector>(coupling_matrix.block(0, 0));
-
-    const auto Z2 =
-      0.0 * linear_operator<LA::MPI::Vector>(coupling_matrix.block(1, 0));
-    const auto Z3t =
-      0.0 * linear_operator<LA::MPI::Vector>(coupling_matrix.block(1, 1));
-
-    const auto Z2t = transpose_operator(Z2);
-    const auto Z3  = transpose_operator(Z3t);
-
-    const auto Z1t = transpose_operator(Z1);
+    const auto Z1 = transpose_operator(Z1t);
+    const auto Z2 = transpose_operator(Z2t);
+    const auto C  = transpose_operator(Ct);
+    const auto Z3 = transpose_operator(Z3t);
 
     const auto Z4 = 0.0 * M;
 
-    std::array<std::array<decltype(A), 4>, 4> AA = {
+    std::array<std::array<LinOp, 4>, 4> system_array = {
       {{{A, Z1t, Bt, Ct * M}}, // vel
        {{Z1, K, Z2t, Dt}},     // disp
-       {{B, Z2, D, Z3t}},      // pres
-       {{M * C, M, Z3, Z4}}}}; // lagr
+       {{B, Z2, Z6, Z3t}},     // pres
+       {{M * C, D, Z3, Z4}}}}; // lagr
 
+    std::array<std::array<LinOp, 2>, 2> BB_array = {{{{B, Z2}},      // pres
+                                                     {{M * C, D}}}}; // lagr
+
+    std::array<std::array<LinOp, 2>, 2> AA_array = {{{{A, Z1t}},  // pres
+                                                     {{Z1, K}}}}; // lagr
+
+    using BVec = typename LA::MPI::BlockVector;
+
+    const auto system = block_operator<4, 4, BVec>(system_array);
+
+    const auto AA  = block_operator<2, 2, BVec>(AA_array);
+    const auto BB  = block_operator<2, 2, BVec>(BB_array);
+    const auto BBt = transpose_operator(BB);
+
+    std::array<LinOp, 2> diag_ops = {{amgA, amgK}};
+    auto diagprecAA               = block_diagonal_operator<2, BVec>(diag_ops);
 
     const auto S =
       linear_operator<LA::MPI::Vector>(fluid_preconditioner.block(1, 1));
