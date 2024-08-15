@@ -4511,11 +4511,9 @@ AffineConstraints<number>::distribute_local_to_global(
   // add must be equal if we have a Trilinos or PETSc vector but do not have to
   // be if we have a deal.II native vector: one could further optimize this for
   // Vector, LinearAlgebra::distributed::vector, etc.
-  if (std::is_same_v<typename VectorType::value_type, number>)
+  if constexpr (std::is_same_v<typename VectorType::value_type, number>)
     {
-      global_vector.add(vector_indices,
-                        *reinterpret_cast<std::vector<number> *>(
-                          &vector_values));
+      global_vector.add(vector_indices, vector_values);
     }
   else
     {
