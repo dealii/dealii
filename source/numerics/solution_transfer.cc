@@ -261,9 +261,11 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(
     ExcMessage(
       "You can only call interpolate() once per SolutionTransfer object."));
 
+  using Number = typename VectorType::value_type;
+
   if (average_values)
     for (auto *const vec : all_out)
-      *vec = 0.0;
+      *vec = Number();
 
   VectorType valence;
 
@@ -284,7 +286,6 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(
   if (average_values)
     {
       // finalize valence: compress and invert
-      using Number = typename VectorType::value_type;
       valence.compress(VectorOperation::add);
       for (const auto i : valence.locally_owned_elements())
         valence[i] = (static_cast<Number>(valence[i]) == Number() ?
