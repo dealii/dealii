@@ -170,6 +170,9 @@ namespace Step80
     double viscosity    = 1.0;
     double penalty_term = 100;
 
+    double lame_mu     = 1.0;
+    double lame_lambda = 1.0;
+
     std::list<types::boundary_id> homogeneous_dirichlet_ids{0};
 
     std::string name_of_fluid_grid       = "hyper_cube";
@@ -215,6 +218,10 @@ namespace Step80
     add_parameter("Final time", final_time);
 
     add_parameter("Viscosity", viscosity);
+
+    add_parameter("Lame mu", lame_mu);
+
+    add_parameter("Lame lambda", lame_lambda);
 
     add_parameter("Nitsche penalty term", penalty_term);
 
@@ -326,8 +333,10 @@ namespace Step80
 
     void initial_setup();
     void setup_dofs();
+    void setup_coupling();
 
     void assemble_stokes_system();
+    void assemble_elasticity_system();
     void assemble_nitsche_restriction();
     void assemble_coupling_sparsity(BlockDynamicSparsityPattern &dsp);
     void assemble_coupling();
@@ -552,8 +561,8 @@ namespace Step80
 
     solid_particle_handler.initialize(fluid_tria,
                                       StaticMappingQ1<spacedim>::mapping);
-    std::vector<bool> components(2 * dim, false);
-    components[0] = true;
+    std::vector<bool> components(2 * spacedim, false);
+    components[spacedim] = true;
 
     Particles::Generators::dof_support_points(
       solid_dh,
@@ -741,24 +750,27 @@ namespace Step80
 
       solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
     }
+  }
 
-    {
-      BlockDynamicSparsityPattern dsp(fluid_dofs_per_block,
-                                      solid_dofs_per_block);
-      assemble_coupling_sparsity(dsp);
 
-      coupling_matrix.clear();
-      coupling_matrix.reinit(fluid_dofs_per_block.size(),
-                             solid_dofs_per_block.size());
-      for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
-        for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
-          coupling_matrix.block(i, j).reinit(fluid_owned_dofs[i],
-                                             solid_owned_dofs[j],
-                                             dsp.block(i, j),
-                                             mpi_communicator,
-                                             true);
-      coupling_matrix.collect_sizes();
-    }
+
+  template <int dim, int spacedim>
+  void StokesImmersedProblem<dim, spacedim>::setup_coupling()
+  {
+    BlockDynamicSparsityPattern dsp(fluid_dofs_per_block, solid_dofs_per_block);
+    assemble_coupling_sparsity(dsp);
+
+    coupling_matrix.clear();
+    coupling_matrix.reinit(fluid_dofs_per_block.size(),
+                           solid_dofs_per_block.size());
+    for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
+      for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
+        coupling_matrix.block(i, j).reinit(fluid_owned_dofs[i],
+                                           solid_owned_dofs[j],
+                                           dsp.block(i, j),
+                                           mpi_communicator,
+                                           true);
+    coupling_matrix.collect_sizes();
   }
 
 
@@ -848,6 +860,84 @@ namespace Step80
     fluid_preconditioner.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
   }
+
+
+
+  template <int dim, int spacedim>
+  void StokesImmersedProblem<dim, spacedim>::assemble_elasticity_system()
+  {
+    solid_matrix = 0;
+
+    TimerOutput::Scope t(computing_timer, "Assemble Elasticity terms");
+
+    QGauss<spacedim>   quadrature_formula(solid_fe->degree + 1);
+    FEValues<spacedim> fe_values(*solid_fe,
+                                 quadrature_formula,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+
+    const unsigned int dofs_per_cell = solid_fe->n_dofs_per_cell();
+    const unsigned int n_q_points    = quadrature_formula.size();
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_matrix2(dofs_per_cell, dofs_per_cell);
+    // Vector<double>     cell_rhs(dofs_per_cell);
+
+    std::vector<Vector<double>> rhs_values(n_q_points,
+                                           Vector<double>(spacedim + 1));
+
+    std::vector<SymmetricTensor<2, spacedim>> grad_eps_phi_u(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          phi_u(dofs_per_cell);
+    std::vector<double>                       div_phi_u(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          phi_lagrange(dofs_per_cell);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    for (const auto &cell : solid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell_matrix = 0;
+
+          fe_values.reinit(cell);
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
+                {
+                  grad_eps_phi_u[k] =
+                    fe_values[displacement].symmetric_gradient(k, q);
+                  div_phi_u[k]    = fe_values[displacement].divergence(k, q);
+                  phi_u[k]        = fe_values[displacement].value(k, q);
+                  phi_lagrange[k] = fe_values[lagrange_multiplier].value(k, q);
+                }
+
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                {
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    {
+                      cell_matrix(i, j) +=
+                        (2 * par.lame_mu *
+                           scalar_product(grad_eps_phi_u[i],
+                                          grad_eps_phi_u[j]) +
+                         par.lame_lambda * div_phi_u[i] * div_phi_u[j] +
+                         phi_lagrange[i] * phi_u[j] +
+                         phi_u[i] * phi_lagrange[j] +
+                         phi_lagrange[i] * phi_lagrange[j]) *
+                        fe_values.JxW(q);
+                    }
+                }
+            }
+
+          cell->get_dof_indices(local_dof_indices);
+          solid_constraints.distribute_local_to_global(cell_matrix,
+                                                       local_dof_indices,
+                                                       solid_matrix);
+        }
+
+    solid_matrix.compress(VectorOperation::add);
+  }
+
 
 
   template <int dim, int spacedim>
@@ -956,7 +1046,8 @@ namespace Step80
 
                 if (comp_i < spacedim)
                   dsp.add(fluid_dof_indices[i],
-                          global_particle_id * spacedim + comp_i);
+                          solid_dofs_per_block[0] +
+                            global_particle_id * spacedim + comp_i);
               }
           }
         particle = pic.end();
@@ -1005,7 +1096,7 @@ namespace Step80
 
             for (unsigned int d = 0; d < spacedim; ++d)
               solid_dof_indices[local_solid_dof_index++] =
-                global_particle_id * spacedim + d;
+                solid_dofs_per_block[0] + global_particle_id * spacedim + d;
 
             for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
@@ -1046,6 +1137,16 @@ namespace Step80
 #endif
       prec_A.initialize(fluid_matrix.block(0, 0), data);
     }
+    // For the solid part
+    LA::MPI::PreconditionAMG prec_K;
+    {
+      LA::MPI::PreconditionAMG::AdditionalData data;
+
+#ifdef USE_PETSC_LA
+      data.symmetric_operator = true;
+#endif
+      prec_K.initialize(solid_matrix.block(0, 0), data);
+    }
 
     LA::MPI::PreconditionAMG prec_S;
     {
@@ -1057,8 +1158,45 @@ namespace Step80
       prec_S.initialize(fluid_preconditioner.block(1, 1), data);
     }
 
-    const auto A = linear_operator<LA::MPI::Vector>(fluid_matrix.block(0, 0));
+
+    const auto A  = linear_operator<LA::MPI::Vector>(fluid_matrix.block(0, 0));
+    const auto B  = linear_operator<LA::MPI::Vector>(fluid_matrix.block(1, 0));
+    const auto Bt = linear_operator<LA::MPI::Vector>(fluid_matrix.block(0, 1));
+
+
+    const auto K  = linear_operator<LA::MPI::Vector>(solid_matrix.block(0, 0));
+    const auto D  = linear_operator<LA::MPI::Vector>(solid_matrix.block(1, 0));
+    const auto Dt = linear_operator<LA::MPI::Vector>(solid_matrix.block(0, 1));
+    const auto M  = linear_operator<LA::MPI::Vector>(solid_matrix.block(1, 1));
+
     const auto amgA = linear_operator(A, prec_A);
+    const auto amgK = linear_operator(K, prec_K);
+
+    const auto Ct =
+      linear_operator<LA::MPI::Vector>(coupling_matrix.block(0, 1));
+    const auto C = transpose_operator(Ct);
+
+    const auto Z1 =
+      0.0 * linear_operator<LA::MPI::Vector>(coupling_matrix.block(0, 0));
+
+    const auto Z2 =
+      0.0 * linear_operator<LA::MPI::Vector>(coupling_matrix.block(1, 0));
+    const auto Z3t =
+      0.0 * linear_operator<LA::MPI::Vector>(coupling_matrix.block(1, 1));
+
+    const auto Z2t = transpose_operator(Z2);
+    const auto Z3  = transpose_operator(Z3t);
+
+    const auto Z1t = transpose_operator(Z1);
+
+    const auto Z4 = 0.0 * M;
+
+    std::array<std::array<decltype(A), 4>, 4> AA = {
+      {{{A, Z1t, Bt, Ct * M}}, // vel
+       {{Z1, K, Z2t, Dt}},     // disp
+       {{B, Z2, D, Z3t}},      // pres
+       {{M * C, M, Z3, Z4}}}}; // lagr
+
 
     const auto S =
       linear_operator<LA::MPI::Vector>(fluid_preconditioner.block(1, 1));
@@ -1270,16 +1408,7 @@ namespace Step80
             initial_setup(); // FE_Nothing -> FE_Q for solid
             setup_dofs();
             setup_solid_particles();
-            tracer_particle_velocity.reinit(
-              locally_owned_tracer_particle_coordinates, mpi_communicator);
             output_results(output_cycle, time);
-            {
-              TimerOutput::Scope t(computing_timer, "Output tracer particles");
-              output_particles(tracer_particle_handler,
-                               "tracer",
-                               output_cycle,
-                               time);
-            }
             {
               TimerOutput::Scope t(computing_timer, "Output solid particles");
               output_particles(solid_particle_handler,
@@ -1287,61 +1416,17 @@ namespace Step80
                                output_cycle,
                                time);
             }
-          }
-        else
-          {
-            TimerOutput::Scope t(computing_timer,
-                                 "Set solid particle position");
-
-            // SolidPosition<spacedim> solid_position(par.angular_velocity,
-            //                                        time_step);
-            // solid_particle_handler.set_particle_positions(solid_position,
-            //                                               false);
-            // [TODO]
+            assemble_stokes_system();
+            assemble_elasticity_system();
           }
 
-        {
-          TimerOutput::Scope t(computing_timer, "Set tracer particle motion");
-          Particles::Utilities::interpolate_field_on_particles(
-            fluid_dh,
-            tracer_particle_handler,
-            locally_relevant_solution,
-            tracer_particle_velocity,
-            fluid_fe->component_mask(velocity));
-
-          tracer_particle_velocity *= time_step;
-
-          locally_relevant_tracer_particle_coordinates =
-            tracer_particle_handler.locally_owned_particle_ids().tensor_product(
-              complete_index_set(spacedim));
-
-          relevant_tracer_particle_displacements.reinit(
-            locally_owned_tracer_particle_coordinates,
-            locally_relevant_tracer_particle_coordinates,
-            mpi_communicator);
-
-          relevant_tracer_particle_displacements = tracer_particle_velocity;
-
-          tracer_particle_handler.set_particle_positions(
-            relevant_tracer_particle_displacements);
-        }
-
-        assemble_stokes_system();
-        // assemble_elasticity_system();
+        setup_coupling();
         assemble_coupling();
-        // assemble_nitsche_restriction();
         solve();
 
         if (cycle % par.output_frequency == 0)
           {
             output_results(output_cycle, time);
-            {
-              TimerOutput::Scope t(computing_timer, "Output tracer particles");
-              output_particles(tracer_particle_handler,
-                               "tracer",
-                               output_cycle,
-                               time);
-            }
             {
               TimerOutput::Scope t(computing_timer, "Output solid particles");
               output_particles(solid_particle_handler,
@@ -1351,9 +1436,9 @@ namespace Step80
             }
             ++output_cycle;
           }
-        if (cycle % par.refinement_frequency == 0 &&
-            cycle != par.number_of_time_steps - 1)
-          refine_and_transfer();
+        // if (cycle % par.refinement_frequency == 0 &&
+        //     cycle != par.number_of_time_steps - 1)
+        //   refine_and_transfer();
       }
   }
 } // namespace Step80
