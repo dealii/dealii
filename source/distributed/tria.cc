@@ -3200,10 +3200,10 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     std::vector<types::subdomain_id> Triangulation<dim, spacedim>::
-      find_point_owner_rank(
-        [[maybe_unused]] const std::vector<Point<dim>> &points)
+      find_point_owner_rank(const std::vector<Point<dim>> &points)
     {
 #  ifndef P4EST_SEARCH_LOCAL
+      (void)points;
       AssertThrow(
         false,
         ExcMessage(
