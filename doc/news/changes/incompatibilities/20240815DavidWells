@@ -1,0 +1,4 @@
+Changed: The minimum version of p4est compatible with deal.II has been
+increased to 2.2.
+<br>
+(David Wells, 2024/08/15)
