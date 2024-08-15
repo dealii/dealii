@@ -618,7 +618,6 @@ namespace
       }
   }
 
-#  ifdef P4EST_SEARCH_LOCAL
   template <int dim>
   class PartitionSearch
   {
@@ -1193,7 +1192,7 @@ namespace
 
     are_vertices_initialized = true;
   }
-#  endif //  P4EST_SEARCH_LOCAL defined
+
 
 
   /**
@@ -1976,19 +1975,6 @@ namespace parallel
             std::accumulate(this->data_serializer.dest_sizes_variable.begin(),
                             this->data_serializer.dest_sizes_variable.end(),
                             std::vector<int>::size_type(0)));
-
-#  if DEAL_II_P4EST_VERSION_GTE(2, 0, 65, 0)
-#  else
-          // ----- WORKAROUND -----
-          // An assertion in p4est prevents us from sending/receiving no data
-          // at all, which is mandatory if one of our processes does not own
-          // any quadrant. This bypasses the assertion from being triggered.
-          //   - see: https://github.com/cburstedde/p4est/issues/48
-          if (this->data_serializer.src_sizes_variable.empty())
-            this->data_serializer.src_sizes_variable.resize(1);
-          if (this->data_serializer.dest_sizes_variable.empty())
-            this->data_serializer.dest_sizes_variable.resize(1);
-#  endif
 
           // Execute variable size transfer.
           dealii::internal::p4est::functions<dim>::transfer_custom(
@@ -3202,16 +3188,6 @@ namespace parallel
     std::vector<types::subdomain_id> Triangulation<dim, spacedim>::
       find_point_owner_rank(const std::vector<Point<dim>> &points)
     {
-#  ifndef P4EST_SEARCH_LOCAL
-      (void)points;
-      AssertThrow(
-        false,
-        ExcMessage(
-          "This function is only available if p4est is version 2.2 and higher."));
-      // Just return to satisfy compiler
-      return std::vector<unsigned int>(1,
-                                       dealii::numbers::invalid_subdomain_id);
-#  else
       // We can only use this function if vertices are communicated to p4est
       AssertThrow(this->are_vertices_communicated_to_p4est(),
                   ExcMessage(
@@ -3298,7 +3274,6 @@ namespace parallel
       sc_array_destroy_null(&point_sc_array);
 
       return owner_rank;
-#  endif // P4EST_SEARCH_LOCAL defined
     }
 
 
