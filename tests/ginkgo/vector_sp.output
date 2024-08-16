@@ -1,0 +1,8 @@
+
+DEAL:can_compute_scalar_product:OK
+DEAL:can_compute_l1_norm:OK
+DEAL:can_compute_l2_norm:OK
+DEAL:throws_on_linfty_norm:OK
+DEAL:can_compute_add_and_dot:OK
+DEAL:can_compute_all_zero:OK
+DEAL:throws_on_mean_value:OK
