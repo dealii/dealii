@@ -517,9 +517,11 @@ namespace deal_II_exceptions
         }
 #endif
 
-      // Let's abort the program here. On the host, we need to call std::abort,
-      // on devices we need to do something different. Kokkos::abort() does
-      // the right thing in all circumstances.
+        // Let's abort the program here. On the host, we need to call
+        // std::abort, on devices we need to do something different.
+        // Kokkos::abort() does the right thing in all circumstances.
+
+#if KOKKOS_VERSION < 30200
       if constexpr (std::is_same_v<Kokkos::DefaultExecutionSpace,
                                    Kokkos::DefaultHostExecutionSpace>)
         {
@@ -529,6 +531,7 @@ namespace deal_II_exceptions
           std::abort();
         }
       else
+#endif
         {
           Kokkos::abort(
             "Abort() was called during dealing with an assertion or exception.");
