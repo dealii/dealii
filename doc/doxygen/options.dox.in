@@ -2,7 +2,7 @@
 # deal.II documentation.
 
 PROJECT_NAME           = "The deal.II Library"
-PROJECT_NUMBER         = "Reference documentation for deal.II version @DEAL_II_PACKAGE_VERSION@"
+PROJECT_NUMBER         = "deal.II version @DEAL_II_PACKAGE_VERSION@"
 PROJECT_LOGO           = @CMAKE_CURRENT_SOURCE_DIR@/images/logo200.png
 OUTPUT_DIRECTORY       = .
 
@@ -125,7 +125,9 @@ MATHJAX_RELPATH        = @_mathjax_relpath@
 MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 200
-HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/stylesheet.css
+HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/doxygen-awesome.css \
+                         @CMAKE_CURRENT_SOURCE_DIR@/custom.css
+
 LAYOUT_FILE            = @CMAKE_CURRENT_BINARY_DIR@/DoxygenLayout.xml
 
 
