@@ -323,7 +323,7 @@ namespace VectorTools
         {
           const auto &fe_i = fe[fe_index];
           // If the finite element has no dofs, we can skip it
-          if (fe_i->dofs_per_cell == 0)
+          if (fe_i.dofs_per_cell == 0)
             continue;
           Assert(fe_i.has_generalized_support_points(),
                  ExcMessage(
