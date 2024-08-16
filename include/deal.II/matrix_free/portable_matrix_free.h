@@ -218,6 +218,11 @@ namespace Portable
       unsigned int n_cells;
 
       /**
+       * Number of components.
+       */
+      unsigned int n_components;
+
+      /**
        * Length of the padding.
        */
       unsigned int padding_length;
@@ -505,6 +510,16 @@ namespace Portable
     unsigned int fe_degree;
 
     /**
+     * Number of components.
+     */
+    unsigned int n_components;
+
+    /**
+     * Number of scalar degrees of freedom per cell.
+     */
+    unsigned int scalar_dofs_per_cell;
+
+    /**
      * Number of degrees of freedom per cell.
      */
     unsigned int dofs_per_cell;
@@ -634,19 +649,19 @@ namespace Portable
     using TeamHandle = Kokkos::TeamPolicy<
       MemorySpace::Default::kokkos_space::execution_space>::member_type;
 
-    using SharedView1D = Kokkos::View<
-      Number *,
+    using SharedViewValues = Kokkos::View<
+      Number **,
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
-    using SharedView2D = Kokkos::View<
-      Number *[dim],
+    using SharedViewGradients = Kokkos::View<
+      Number ***,
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
     DEAL_II_HOST_DEVICE
-    SharedData(const TeamHandle   &team_member,
-               const SharedView1D &values,
-               const SharedView2D &gradients)
+    SharedData(const TeamHandle          &team_member,
+               const SharedViewValues    &values,
+               const SharedViewGradients &gradients)
       : team_member(team_member)
       , values(values)
       , gradients(gradients)
@@ -660,12 +675,12 @@ namespace Portable
     /**
      * Memory for dof and quad values.
      */
-    SharedView1D values;
+    SharedViewValues values;
 
     /**
      * Memory for computed gradients in reference coordinate system.
      */
-    SharedView2D gradients;
+    SharedViewGradients gradients;
   };
 
 
