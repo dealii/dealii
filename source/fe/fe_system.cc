@@ -2416,8 +2416,6 @@ FESystem<dim, spacedim>::compare_for_domination(
 
   // vertex/line/face/cell domination
   // --------------------------------
-  // at present all we can do is to compare with other FESystems that have the
-  // same number of components and bases
   if (const FESystem<dim, spacedim> *fe_sys_other =
         dynamic_cast<const FESystem<dim, spacedim> *>(&fe_other))
     {
@@ -2430,27 +2428,27 @@ FESystem<dim, spacedim>::compare_for_domination(
                         "against an element with " +
                         std::to_string(fe_sys_other->n_components()) +
                         " vector components."));
-      Assert(this->n_base_elements() == fe_sys_other->n_base_elements(),
-             ExcNotImplemented());
 
-      FiniteElementDomination::Domination domination =
-        FiniteElementDomination::no_requirements;
-
-      // loop over all base elements and do some sanity checks
-      for (unsigned int b = 0; b < this->n_base_elements(); ++b)
+      const unsigned int n_components = this->n_components();
+      
+      FiniteElementDomination::Domination domination = FiniteElementDomination::no_requirements;
+      
+      for (unsigned int c = 0; c < n_components; ++c)
         {
-          Assert(this->base_element(b).n_components() ==
-                   fe_sys_other->base_element(b).n_components(),
-                 ExcNotImplemented());
-          Assert(this->element_multiplicity(b) ==
-                   fe_sys_other->element_multiplicity(b),
-                 ExcNotImplemented());
+          const unsigned int base_element_index_in_fe_sys_this = this->component_to_base_index(c).first;
+          const unsigned int base_element_index_in_fe_sys_other = fe_sys_other->component_to_base_index(c).first;
 
+          Assert(this->base_element(base_element_index_in_fe_sys_this).n_components() ==
+                   fe_sys_other->base_element(base_element_index_in_fe_sys_other).n_components(),
+                 ExcNotImplemented());
+          Assert(this->element_multiplicity(base_element_index_in_fe_sys_this) ==
+                   fe_sys_other->element_multiplicity(base_element_index_in_fe_sys_other),
+                 ExcNotImplemented());
           // for this pair of base elements, check who dominates and combine
           // with previous result
           const FiniteElementDomination::Domination base_domination =
-            (this->base_element(b).compare_for_domination(
-              fe_sys_other->base_element(b), codim));
+            (this->base_element(base_element_index_in_fe_sys_this).compare_for_domination(
+              fe_sys_other->base_element(base_element_index_in_fe_sys_other), codim));
           domination = domination & base_domination;
         }
 
