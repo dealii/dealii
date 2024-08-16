@@ -59,8 +59,8 @@ namespace LinearAlgebra
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
 #    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
 #      ifdef DEAL_II_HAVE_CXX20
-    static_assert(concepts::is_vector_space_vector <
-                  Vector<std::complex<float>>);
+    static_assert(
+      concepts::is_vector_space_vector<Vector<std::complex<float>>>);
 #      endif
     template class Vector<std::complex<float>>;
     template Vector<std::complex<float>> &
@@ -74,8 +74,8 @@ namespace LinearAlgebra
 
 #    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
 #      ifdef DEAL_II_HAVE_CXX20
-    static_assert(concepts::is_vector_space_vector <
-                  Vector<std::complex<double>>);
+    static_assert(
+      concepts::is_vector_space_vector<Vector<std::complex<double>>>);
 #      endif
     template class Vector<std::complex<double>>;
     template Vector<std::complex<double>> &
