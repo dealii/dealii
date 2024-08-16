@@ -20,23 +20,37 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 100
-    - uses: ssciwr/doxygen-install@v1
-      with:
-        version: "1.9.6"
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
-        sudo apt update && sudo apt install graphviz perl texlive-bibtex-extra
-        doxygen --version
     - name: indent
       run: |
         ./contrib/utilities/check_indentation.sh
-    - name: documentation
+
+  doxygen:
+    # build the documentation
+
+    name: doxygen
+    runs-on: [ubuntu-22.04]
+
+    steps:
+    - name: setup
+      run: |
+        sudo apt update
+        sudo apt install graphviz perl texlive-bibtex-extra
+    - uses: ssciwr/doxygen-install@v1
+      with:
+        version: "1.9.6"
+    - uses: actions/checkout@v4
+    - name: build documentation
       run: |
         mkdir build
         cd build
         cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DDEAL_II_DOXYGEN_USE_MATHJAX=ON ..
         make -j 2 documentation
+    - name: check for doxygen errors and warnings
+      run: |
+        cd build
         cat doxygen.log
         # Suppress:
         # warning: Inheritance graph for 'SmartPointer' not generated, too many nodes (138), threshold is 50. Consider increasing DOT_GRAPH_MAX_NODES.
@@ -47,10 +61,13 @@ jobs:
         sed -i '/explicit link request to/d' doxygen.log
         # Remove empty lines
         sed -i '/^$/d' doxygen.log
+        # Check if remaining log is zero size
         ! [ -s doxygen.log ] || exit 1
-        tar -czf doxygen_documentation.tar.gz doc/doxygen
+    - name: compress
+      run: |
+        tar -czf doxygen_documentation.tar.gz build/doc/doxygen
     - name: archive documentation
       uses: actions/upload-artifact@v4
       with:
         name: doxygen_documentation.tar.gz
-        path: build/doxygen_documentation.tar.gz
+        path: doxygen_documentation.tar.gz
