@@ -2007,9 +2007,9 @@ namespace internal
 
       // count the number of objects, of unused single objects and of
       // unused pairs of objects
-      [[maybe_unused]] unsigned int n_quads          = 0;
-      unsigned int                  n_unused_pairs   = 0;
-      unsigned int                  n_unused_singles = 0;
+      unsigned int n_quads          = 0;
+      unsigned int n_unused_pairs   = 0;
+      unsigned int n_unused_singles = 0;
       for (unsigned int i = 0; i < tria_faces.quads.used.size(); ++i)
         {
           if (tria_faces.quads.used[i])
@@ -2196,8 +2196,8 @@ namespace internal
      * should be called from the functions of the higher TriaLevel classes.
      */
     void
-    monitor_memory([[maybe_unused]] const TriaLevel   &tria_level,
-                   [[maybe_unused]] const unsigned int true_dimension)
+    monitor_memory(const TriaLevel   &tria_level,
+                   const unsigned int true_dimension)
     {
       Assert(2 * true_dimension * tria_level.refine_flags.size() ==
                tria_level.neighbors.size(),
@@ -2238,9 +2238,9 @@ namespace internal
 
           // count the number of objects, of unused single objects and of
           // unused pairs of objects
-          [[maybe_unused]] unsigned int n_objects        = 0;
-          unsigned int                  n_unused_pairs   = 0;
-          unsigned int                  n_unused_singles = 0;
+          unsigned int n_objects        = 0;
+          unsigned int n_unused_pairs   = 0;
+          unsigned int n_unused_singles = 0;
           for (unsigned int i = 0; i < tria_objects.used.size(); ++i)
             {
               if (tria_objects.used[i])
