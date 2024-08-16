@@ -234,7 +234,7 @@ namespace Utilities
         if (p != nullptr)
           {
             const int ierr = MPI_Type_free(p);
-            (void)ierr;
+
             AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
 
             delete p;
@@ -254,12 +254,11 @@ namespace Utilities
     {
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
-      (void)myid;
-      (void)n_procs;
+
+
 
       for (const unsigned int destination : destinations)
         {
-          (void)destination;
           AssertIndexRange(destination, n_procs);
         }
 
@@ -396,7 +395,6 @@ namespace Utilities
 
           for (const unsigned int destination : destinations)
             {
-              (void)destination;
               AssertIndexRange(destination, n_procs);
               Assert(destination != Utilities::MPI::this_mpi_process(mpi_comm),
                      ExcMessage(
