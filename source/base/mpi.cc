@@ -233,7 +233,7 @@ namespace Utilities
       auto deleter = [](MPI_Datatype *p) {
         if (p != nullptr)
           {
-            const int ierr = MPI_Type_free(p);
+            [[maybe_unused]] const int ierr = MPI_Type_free(p);
 
             AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
 
@@ -255,13 +255,10 @@ namespace Utilities
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
-
-
+#  ifdef DEBUG
       for (const unsigned int destination : destinations)
-        {
-          AssertIndexRange(destination, n_procs);
-        }
-
+        AssertIndexRange(destination, n_procs);
+#  endif
 
       // Have a little function that checks if destinations provided
       // to the current process are unique. The way it does this is
@@ -393,6 +390,7 @@ namespace Utilities
           const unsigned int n_procs =
             Utilities::MPI::n_mpi_processes(mpi_comm);
 
+#  ifdef DEBUG
           for (const unsigned int destination : destinations)
             {
               AssertIndexRange(destination, n_procs);
@@ -400,6 +398,7 @@ namespace Utilities
                      ExcMessage(
                        "There is no point in communicating with ourselves."));
             }
+#  endif
 
           // Calculate the number of messages to send to each process
           std::vector<unsigned int> dest_vector(n_procs);
