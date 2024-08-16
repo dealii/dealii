@@ -2430,25 +2430,35 @@ FESystem<dim, spacedim>::compare_for_domination(
                         " vector components."));
 
       const unsigned int n_components = this->n_components();
-      
-      FiniteElementDomination::Domination domination = FiniteElementDomination::no_requirements;
-      
+
+      FiniteElementDomination::Domination domination =
+        FiniteElementDomination::no_requirements;
+
       for (unsigned int c = 0; c < n_components; ++c)
         {
-          const unsigned int base_element_index_in_fe_sys_this = this->component_to_base_index(c).first;
-          const unsigned int base_element_index_in_fe_sys_other = fe_sys_other->component_to_base_index(c).first;
+          const unsigned int base_element_index_in_fe_sys_this =
+            this->component_to_base_index(c).first;
+          const unsigned int base_element_index_in_fe_sys_other =
+            fe_sys_other->component_to_base_index(c).first;
 
-          Assert(this->base_element(base_element_index_in_fe_sys_this).n_components() ==
-                   fe_sys_other->base_element(base_element_index_in_fe_sys_other).n_components(),
+          Assert(this->base_element(base_element_index_in_fe_sys_this)
+                     .n_components() ==
+                   fe_sys_other
+                     ->base_element(base_element_index_in_fe_sys_other)
+                     .n_components(),
                  ExcNotImplemented());
-          Assert(this->element_multiplicity(base_element_index_in_fe_sys_this) ==
-                   fe_sys_other->element_multiplicity(base_element_index_in_fe_sys_other),
+          Assert(this->element_multiplicity(
+                   base_element_index_in_fe_sys_this) ==
+                   fe_sys_other->element_multiplicity(
+                     base_element_index_in_fe_sys_other),
                  ExcNotImplemented());
           // for this pair of base elements, check who dominates and combine
           // with previous result
           const FiniteElementDomination::Domination base_domination =
-            (this->base_element(base_element_index_in_fe_sys_this).compare_for_domination(
-              fe_sys_other->base_element(base_element_index_in_fe_sys_other), codim));
+            (this->base_element(base_element_index_in_fe_sys_this)
+               .compare_for_domination(fe_sys_other->base_element(
+                                         base_element_index_in_fe_sys_other),
+                                       codim));
           domination = domination & base_domination;
         }
 
