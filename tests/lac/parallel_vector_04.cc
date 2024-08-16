@@ -16,7 +16,6 @@
 // check that operator= resets ghosts, both if they have been set and if they
 // have not been set
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

@@ -17,8 +17,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/cuda_size.h>
-
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
 
 #include <Kokkos_Macros.hpp>

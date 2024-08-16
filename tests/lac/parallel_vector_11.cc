@@ -16,7 +16,6 @@
 // check that add, sadd, equ, scale work correctly on a vector where some
 // processor do not own any degrees of freedom
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

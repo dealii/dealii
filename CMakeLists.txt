@@ -94,7 +94,6 @@ verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
 # Now, set the project and set up the rest:
 #
 project(deal.II CXX C)
-enable_language_optional(Fortran)
 
 verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_deal_ii.cmake)
 

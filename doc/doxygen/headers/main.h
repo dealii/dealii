@@ -74,7 +74,6 @@
     rank="same";
     petsc       [label="PETSc",    URL="\ref PETScWrappers"];
     trilinos    [label="Trilinos", URL="\ref TrilinosWrappers"];
-    cuda        [label="CUDA",     URL="\ref CUDAWrappers"];
   }
   umfpack     [label="UMFPACK"];
 

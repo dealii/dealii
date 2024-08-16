@@ -17,7 +17,6 @@
 // appropriately when creating a vector from a non-ghosted source vector using
 // the assignment operator
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

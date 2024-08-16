@@ -17,7 +17,6 @@
 // (zero and first derivatives) on different kinds of meshes (Cartesian,
 // general, with and without hanging nodes).
 
-#include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/portable_fe_evaluation.h>

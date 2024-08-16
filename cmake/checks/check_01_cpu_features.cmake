@@ -328,16 +328,6 @@ if(DEAL_II_HAVE_ARM_NEON)
 endif()
 
 #
-# We need to disable SIMD vectorization for CUDA device code.
-# Otherwise, nvcc compilers from version 9 on will emit an error message like:
-# "[...] contains a vector, which is not supported in device code"
-#
-
-if(DEAL_II_WITH_CUDA)
-  set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
-endif()
-
-#
 # If we have OpenMP SIMD support (i.e. DEAL_II_HAVE_OPENMP_SIMD is true)
 # populate DEAL_II_OPENMP_SIMD_PRAGMA.
 #

@@ -29,7 +29,6 @@
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>

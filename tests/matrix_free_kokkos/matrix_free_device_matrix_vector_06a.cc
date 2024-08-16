@@ -14,7 +14,7 @@
 
 
 // Same as matrix_free_matrix_vector_06a but uses LA::distributed::Vector
-// instead of CUDAWrappers::Vector
+// instead of Portable::Vector
 
 #include <deal.II/base/function.h>
 

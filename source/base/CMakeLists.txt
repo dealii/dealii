@@ -110,14 +110,6 @@ set(_separate_src
   symmetric_tensor.cc
   )
 
-# Add CUDA wrapper files
-if(DEAL_II_WITH_CUDA)
-  set(_separate_src
-    ${_separate_src}
-    cuda.cc
-  )
-endif()
-
 # determined by profiling
 set(_n_includes_per_unity_file 29)
 

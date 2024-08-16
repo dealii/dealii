@@ -16,7 +16,6 @@
 // check that handling of ghost elements in parallel distributed vectors works
 // appropriately when assigning from ghosted to non-ghosted vectors
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

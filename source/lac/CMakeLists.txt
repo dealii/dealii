@@ -57,14 +57,6 @@ set(_separate_src
   utilities.cc
   )
 
-# Add CUDA wrapper files
-if(DEAL_II_WITH_CUDA)
-  set(_separate_src
-    ${_separate_src}
-    vector_memory_cuda.cc
-    )
-endif()
-
 set(_inst
   affine_constraints.inst.in
   block_sparse_matrix.inst.in
@@ -162,19 +154,6 @@ if(DEAL_II_WITH_TRILINOS)
     ${_inst}
     trilinos_sparse_matrix.inst.in
     trilinos_vector.inst.in
-  )
-endif()
-
-# Add CUDA wrapper files
-if(DEAL_II_WITH_CUDA)
-  set(_separate_src
-    ${_separate_src}
-    cuda_kernels.cc
-    cuda_precondition.cc
-    cuda_solver_direct.cc
-    cuda_sparse_matrix.cc
-    cuda_vector.cc
-    read_write_vector_cuda.cc
   )
 endif()
 

@@ -15,7 +15,6 @@
 
 // check import from LA::d::Vector to another LA::d::Vector
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

@@ -17,7 +17,6 @@
 // setting where one ghost is zero and should not have an effect on vector
 // entries
 
-#include <deal.II/base/cuda.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 

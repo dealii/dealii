@@ -67,8 +67,8 @@ The data movement in deal.II is done using LinearAlgebra::ReadWriteVector. These
 vectors can be seen as buffers on the host that are used to either store data
 received from the device or to send data to the device. There are two types of vectors
 that can be used on the device:
-- LinearAlgebra::CUDAWrappers::Vector, which is similar to the more common
-Vector<Number>, and
+- LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>, that has a host
+and device copy of the data, and
 - LinearAlgebra::distributed::Vector<Number,
 MemorySpace::Default>, which is a regular
 LinearAlgebra::distributed::Vector where we have specified which memory

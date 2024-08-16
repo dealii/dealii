@@ -58,8 +58,6 @@ namespace Portable
    *
    * @tparam Number Number format, @p double or @p float. Defaults to @p
    * double.
-   *
-   * @ingroup CUDAWrappers
    */
   template <int dim,
             int fe_degree,
