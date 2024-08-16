@@ -3579,7 +3579,7 @@ namespace internal
           temp_vector1.reinit(rhs, true);
           temp_vector2.reinit(rhs, true);
 
-          // 1) compute rediduum (including operator application)
+          // 1) compute residual (including operator application)
           matrix.vmult(
             temp_vector1,
             solution,
