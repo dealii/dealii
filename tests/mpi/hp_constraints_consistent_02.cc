@@ -120,7 +120,8 @@ test(const unsigned int degree_center,
 
   // ------ verify -----
   std::vector<IndexSet> locally_owned_dofs_per_processor =
-    Utilities::MPI::all_gather(dh.get_communicator(), dh.locally_owned_dofs());
+    Utilities::MPI::all_gather(dh.get_mpi_communicator(),
+                               dh.locally_owned_dofs());
 
   const IndexSet locally_active_dofs =
     DoFTools::extract_locally_active_dofs(dh);

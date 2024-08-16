@@ -1218,6 +1218,16 @@ public:
    * Return MPI communicator used by the underlying triangulation.
    */
   MPI_Comm
+  get_mpi_communicator() const;
+
+  /**
+   * Return MPI communicator used by the underlying triangulation.
+   *
+   * @deprecated Use get_mpi_communicator() instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Access the MPI communicator with get_mpi_communicator() instead.")
+  MPI_Comm
   get_communicator() const;
 
   /**
@@ -1909,12 +1919,21 @@ inline const Triangulation<dim, spacedim>
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline MPI_Comm DoFHandler<dim, spacedim>::get_communicator() const
+inline MPI_Comm DoFHandler<dim, spacedim>::get_mpi_communicator() const
 {
   Assert(tria != nullptr,
          ExcMessage("This DoFHandler object has not been associated "
                     "with a triangulation."));
-  return tria->get_communicator();
+  return tria->get_mpi_communicator();
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+inline MPI_Comm DoFHandler<dim, spacedim>::get_communicator() const
+{
+  return get_mpi_communicator();
 }
 
 

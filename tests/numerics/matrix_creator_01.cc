@@ -50,7 +50,7 @@ test()
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  const auto      mpi_comm   = dof_handler.get_communicator();
+  const auto      mpi_comm   = dof_handler.get_mpi_communicator();
   const IndexSet &owned_dofs = dof_handler.locally_owned_dofs();
 
   const IndexSet relevant_dofs =

@@ -442,7 +442,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       task_info.allow_ghosted_vectors_in_loops =
         additional_data.allow_ghosted_vectors_in_loops;
 
-      task_info.communicator    = dof_handler[0]->get_communicator();
+      task_info.communicator    = dof_handler[0]->get_mpi_communicator();
       task_info.communicator_sm = additional_data.communicator_sm;
       task_info.my_pid =
         Utilities::MPI::this_mpi_process(task_info.communicator);

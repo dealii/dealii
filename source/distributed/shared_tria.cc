@@ -90,7 +90,8 @@ namespace parallel
       // Check that all meshes are the same (or at least have the same
       // total number of active cells):
       const unsigned int max_active_cells =
-        Utilities::MPI::max(this->n_active_cells(), this->get_communicator());
+        Utilities::MPI::max(this->n_active_cells(),
+                            this->get_mpi_communicator());
       Assert(
         max_active_cells == this->n_active_cells(),
         ExcMessage(
@@ -293,7 +294,7 @@ namespace parallel
           [](const auto &i) { return (i.is_locally_owned()); });
 
         const unsigned int total_cells =
-          Utilities::MPI::sum(n_my_cells, this->get_communicator());
+          Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
         Assert(total_cells == this->n_active_cells(),
                ExcMessage("Not all cells are assigned to a processor."));
       }
@@ -309,7 +310,7 @@ namespace parallel
 
 
           const unsigned int total_cells =
-            Utilities::MPI::sum(n_my_cells, this->get_communicator());
+            Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
           Assert(total_cells == this->n_cells(),
                  ExcMessage("Not all cells are assigned to a processor."));
         }
@@ -387,7 +388,7 @@ namespace parallel
             }
 
         Utilities::MPI::max(refinement_configurations,
-                            this->get_communicator(),
+                            this->get_mpi_communicator(),
                             refinement_configurations);
 
         for (const auto &cell : this->active_cell_iterators())

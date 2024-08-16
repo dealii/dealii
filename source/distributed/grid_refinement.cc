@@ -220,7 +220,7 @@ namespace
     Vector<Number> locally_owned_indicators(n_locally_owned_active_cells(tria));
     get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
-    MPI_Comm mpi_communicator = tria.get_communicator();
+    MPI_Comm mpi_communicator = tria.get_mpi_communicator();
 
     // figure out the global max and min of the indicators. we don't need it
     // here, but it's a collective communication call
@@ -532,7 +532,7 @@ namespace parallel
           n_locally_owned_active_cells(tria));
         get_locally_owned_indicators(tria, criteria, locally_owned_indicators);
 
-        MPI_Comm mpi_communicator = tria.get_communicator();
+        MPI_Comm mpi_communicator = tria.get_mpi_communicator();
 
         // figure out the global max and min of the indicators. we don't need it
         // here, but it's a collective communication call

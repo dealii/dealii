@@ -431,7 +431,7 @@ const IndexSet locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(d
 LinearAlgebra::distributed::Vector<double> copy_vec(solution);
 solution.reinit(dof_handler.locally_owned_dofs(),
                 locally_relevant_dofs,
-                triangulation.get_communicator());
+                triangulation.get_mpi_communicator());
 solution.copy_locally_owned_data_from(copy_vec);
 constraints.distribute(solution);
 solution.update_ghost_values();

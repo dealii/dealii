@@ -47,7 +47,7 @@ test()
     Point<spacedim> position;
     Point<dim>      reference_position;
 
-    if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+    if (Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) == 0)
       for (unsigned int i = 0; i < dim; ++i)
         position[i] = 0.475;
     else
@@ -57,7 +57,7 @@ test()
     Particles::Particle<dim, spacedim> particle(
       position,
       reference_position,
-      Utilities::MPI::this_mpi_process(tr.get_communicator()));
+      Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()));
     typename Triangulation<dim, spacedim>::active_cell_iterator cell =
       tr.begin_active();
     while (!cell->is_locally_owned())
@@ -73,9 +73,9 @@ test()
          ++particle)
       {
         particle->get_properties()[0] =
-          10 + Utilities::MPI::this_mpi_process(tr.get_communicator());
+          10 + Utilities::MPI::this_mpi_process(tr.get_mpi_communicator());
         particle->get_properties()[1] =
-          100 + Utilities::MPI::this_mpi_process(tr.get_communicator());
+          100 + Utilities::MPI::this_mpi_process(tr.get_mpi_communicator());
       }
 
 
@@ -88,7 +88,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is local on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
 
     for (auto particle = particle_handler.begin_ghost();
@@ -98,7 +98,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is ghost on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
 
     deallog << "Modifying particles positions and properties" << std::endl;
@@ -127,7 +127,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is local on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
 
     for (auto particle = particle_handler.begin_ghost();
@@ -137,7 +137,7 @@ test()
               << " location : " << particle->get_location()
               << " property : " << particle->get_properties()[0] << " and "
               << particle->get_properties()[1] << " is ghost on process : "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
   }
 

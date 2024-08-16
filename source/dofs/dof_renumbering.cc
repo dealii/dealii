@@ -680,7 +680,7 @@ namespace DoFRenumbering
     // If we don't have a renumbering (i.e., when there is 1 component) then
     // return
     if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_communicator()) == 0)
+                            dof_handler.get_mpi_communicator()) == 0)
       return;
 
     // verify that the last numbered
@@ -726,7 +726,7 @@ namespace DoFRenumbering
     // If we don't have a renumbering (i.e., when there is 1 component) then
     // return
     if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_communicator()) == 0)
+                            dof_handler.get_mpi_communicator()) == 0)
       return;
 
     // verify that the last numbered
@@ -936,12 +936,12 @@ namespace DoFRenumbering
                                     n_buckets,
                                     DEAL_II_DOF_INDEX_MPI_TYPE,
                                     MPI_SUM,
-                                    tria->get_communicator());
+                                    tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
 
         std::vector<types::global_dof_index> global_dof_count(n_buckets);
         Utilities::MPI::sum(local_dof_count,
-                            tria->get_communicator(),
+                            tria->get_mpi_communicator(),
                             global_dof_count);
 
         // calculate shifts
@@ -1055,7 +1055,7 @@ namespace DoFRenumbering
            ExcInternalError());
 
     if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_communicator()) > 0)
+                            dof_handler.get_mpi_communicator()) > 0)
       dof_handler.renumber_dofs(level, renumbering);
   }
 
@@ -1197,12 +1197,12 @@ namespace DoFRenumbering
                                     n_buckets,
                                     DEAL_II_DOF_INDEX_MPI_TYPE,
                                     MPI_SUM,
-                                    tria->get_communicator());
+                                    tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
 
         std::vector<types::global_dof_index> global_dof_count(n_buckets);
         Utilities::MPI::sum(local_dof_count,
-                            tria->get_communicator(),
+                            tria->get_mpi_communicator(),
                             global_dof_count);
 
         // calculate shifts
@@ -1389,7 +1389,7 @@ namespace DoFRenumbering
                                     1,
                                     DEAL_II_DOF_INDEX_MPI_TYPE,
                                     MPI_SUM,
-                                    tria->get_communicator());
+                                    tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
 #endif
       }
@@ -2262,7 +2262,7 @@ namespace DoFRenumbering
     // If there is only one component then there is nothing to do, so check
     // first:
     if (Utilities::MPI::max(renumbering.size(),
-                            dof_handler.get_communicator()) > 0)
+                            dof_handler.get_mpi_communicator()) > 0)
       dof_handler.renumber_dofs(renumbering);
   }
 

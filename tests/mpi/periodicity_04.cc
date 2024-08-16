@@ -272,7 +272,7 @@ check(const unsigned int orientation, bool reverse)
                 1,
                 MPI_INT,
                 MPI_SUM,
-                triangulation.get_communicator());
+                triangulation.get_mpi_communicator());
   Assert(sum_of_pairs_global > 0, ExcInternalError());
   for (it = face_map.begin(); it != face_map.end(); ++it)
     {

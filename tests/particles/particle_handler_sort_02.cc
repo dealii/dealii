@@ -50,7 +50,7 @@ test()
 
   std::vector<Point<spacedim>> position(1);
 
-  if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+  if (Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) == 0)
     for (unsigned int i = 0; i < dim; ++i)
       position[0][i] = 2;
 

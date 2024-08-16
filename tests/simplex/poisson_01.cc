@@ -87,7 +87,7 @@ get_communicator(const Triangulation<dim, spacedim> &tria)
 {
   if (auto tria_ =
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(&tria))
-    return tria_->get_communicator();
+    return tria_->get_mpi_communicator();
 
   return MPI_COMM_SELF;
 }

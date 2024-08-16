@@ -58,7 +58,7 @@ get_mpi_comm(const MeshType &mesh)
                                       MeshType::space_dimension> *>(
     &(mesh.get_triangulation()));
 
-  return tria_parallel != nullptr ? tria_parallel->get_communicator() :
+  return tria_parallel != nullptr ? tria_parallel->get_mpi_communicator() :
                                     MPI_COMM_SELF;
 }
 

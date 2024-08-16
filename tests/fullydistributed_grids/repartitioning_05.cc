@@ -64,7 +64,7 @@ LinearAlgebra::distributed::Vector<double>
 partition_distributed_triangulation(const Triangulation<dim, spacedim> &tria_in,
                                     const MPI_Comm                      comm)
 {
-  const auto comm_tria = tria_in.get_communicator();
+  const auto comm_tria = tria_in.get_mpi_communicator();
 
   const auto n_global_active_cells = Utilities::MPI::max(
     comm_tria == MPI_COMM_SELF ? 0 : tria_in.n_global_active_cells(), comm);

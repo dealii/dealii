@@ -150,7 +150,7 @@ namespace GridTools
         }
 
     const double global_volume =
-      Utilities::MPI::sum(local_volume, triangulation.get_communicator());
+      Utilities::MPI::sum(local_volume, triangulation.get_mpi_communicator());
 
     return global_volume;
   }
@@ -413,7 +413,7 @@ namespace GridTools
         min_diameter = std::min(min_diameter, cell->diameter(mapping));
 
     const double global_min_diameter =
-      Utilities::MPI::min(min_diameter, triangulation.get_communicator());
+      Utilities::MPI::min(min_diameter, triangulation.get_mpi_communicator());
     return global_min_diameter;
   }
 
@@ -430,7 +430,7 @@ namespace GridTools
         max_diameter = std::max(max_diameter, cell->diameter(mapping));
 
     const double global_max_diameter =
-      Utilities::MPI::max(max_diameter, triangulation.get_communicator());
+      Utilities::MPI::max(max_diameter, triangulation.get_mpi_communicator());
     return global_max_diameter;
   }
 } /* namespace GridTools */

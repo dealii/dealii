@@ -915,7 +915,7 @@ PreconditionMG<dim, VectorType, TransferType>::get_mpi_communicator() const
   const parallel::TriangulationBase<dim> *ptria =
     dynamic_cast<const parallel::TriangulationBase<dim> *>(&tria);
   Assert(ptria != nullptr, ExcInternalError());
-  return ptria->get_communicator();
+  return ptria->get_mpi_communicator();
 }
 
 

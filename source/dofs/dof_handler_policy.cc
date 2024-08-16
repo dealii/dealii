@@ -2889,7 +2889,7 @@ namespace internal
         Assert(tr != nullptr, ExcInternalError());
 
         const unsigned int n_procs =
-          Utilities::MPI::n_mpi_processes(tr->get_communicator());
+          Utilities::MPI::n_mpi_processes(tr->get_mpi_communicator());
 
         // If an underlying shared::Tria allows artificial cells, we need to
         // restore the true cell owners temporarily.
@@ -3040,7 +3040,7 @@ namespace internal
                       "is set in the constructor."));
 
         const unsigned int n_procs =
-          Utilities::MPI::n_mpi_processes(tr->get_communicator());
+          Utilities::MPI::n_mpi_processes(tr->get_mpi_communicator());
         const unsigned int n_levels = tr->n_global_levels();
 
         std::vector<NumberCache> number_caches;
@@ -3252,7 +3252,7 @@ namespace internal
         Utilities::MPI::internal::all_reduce<bool>(
           MPI_LAND,
           ArrayView<const bool>(&uses_sequential_numbering, 1),
-          tr->get_communicator(),
+          tr->get_mpi_communicator(),
           ArrayView<bool>(&all_use_sequential_numbering, 1));
         if (all_use_sequential_numbering)
           {
@@ -3264,10 +3264,11 @@ namespace internal
                      this->dof_handler->locally_owned_dofs().n_elements(),
                    ExcInternalError());
             const unsigned int n_cpu =
-              Utilities::MPI::n_mpi_processes(tr->get_communicator());
+              Utilities::MPI::n_mpi_processes(tr->get_mpi_communicator());
             std::vector<types::global_dof_index> gathered_new_numbers(
               this->dof_handler->n_dofs(), 0);
-            Assert(Utilities::MPI::this_mpi_process(tr->get_communicator()) ==
+            Assert(Utilities::MPI::this_mpi_process(
+                     tr->get_mpi_communicator()) ==
                      this->dof_handler->get_triangulation()
                        .locally_owned_subdomain(),
                    ExcInternalError());
@@ -3290,7 +3291,7 @@ namespace internal
                                        rcounts.data(),
                                        1,
                                        MPI_INT,
-                                       tr->get_communicator());
+                                       tr->get_mpi_communicator());
               AssertThrowMPI(ierr);
 
               // compute the displacements (relative to recvbuf)
@@ -3304,7 +3305,7 @@ namespace internal
               Assert(new_numbers_copy.size() ==
                        static_cast<unsigned int>(
                          rcounts[Utilities::MPI::this_mpi_process(
-                           tr->get_communicator())]),
+                           tr->get_mpi_communicator())]),
                      ExcInternalError());
               ierr = MPI_Allgatherv(new_numbers_copy.data(),
                                     new_numbers_copy.size(),
@@ -3313,7 +3314,7 @@ namespace internal
                                     rcounts.data(),
                                     displacements.data(),
                                     DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    tr->get_communicator());
+                                    tr->get_mpi_communicator());
               AssertThrowMPI(ierr);
             }
 
@@ -3327,7 +3328,7 @@ namespace internal
             std::vector<unsigned int> flag_2(this->dof_handler->n_dofs(), 0);
             std::vector<IndexSet>     locally_owned_dofs_per_processor =
               Utilities::MPI::all_gather(
-                tr->get_communicator(),
+                tr->get_mpi_communicator(),
                 this->dof_handler->locally_owned_dofs());
             for (unsigned int i = 0; i < n_cpu; ++i)
               {
@@ -3695,7 +3696,7 @@ namespace internal
         //                    range of indices
         const auto [my_shift, n_global_dofs] =
           Utilities::MPI::partial_and_total_sum(
-            n_locally_owned_dofs, triangulation->get_communicator());
+            n_locally_owned_dofs, triangulation->get_mpi_communicator());
 
 
         // make dof indices globally consecutive
@@ -3892,7 +3893,7 @@ namespace internal
             const auto [my_shift, n_global_dofs] =
               Utilities::MPI::partial_and_total_sum(
                 level_number_cache.n_locally_owned_dofs,
-                triangulation->get_communicator());
+                triangulation->get_mpi_communicator());
             level_number_cache.n_global_dofs = n_global_dofs;
 
             // assign appropriate indices

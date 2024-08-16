@@ -1525,8 +1525,8 @@ namespace GridTools
       }
 
     // Get the size of the largest CellID string
-    max_cellid_size =
-      Utilities::MPI::max(max_cellid_size, triangulation.get_communicator());
+    max_cellid_size = Utilities::MPI::max(max_cellid_size,
+                                          triangulation.get_mpi_communicator());
 
     // Make indices global by getting the number of vertices owned by each
     // processors and shifting the indices accordingly
@@ -1536,7 +1536,7 @@ namespace GridTools
                           1,
                           DEAL_II_VERTEX_INDEX_MPI_TYPE,
                           MPI_SUM,
-                          triangulation.get_communicator());
+                          triangulation.get_mpi_communicator());
     AssertThrowMPI(ierr);
 
     for (auto &global_index_it : local_to_global_vertex_index)
@@ -1587,7 +1587,7 @@ namespace GridTools
                          DEAL_II_VERTEX_INDEX_MPI_TYPE,
                          destination,
                          mpi_tag,
-                         triangulation.get_communicator(),
+                         triangulation.get_mpi_communicator(),
                          &first_requests[i]);
         AssertThrowMPI(ierr);
       }
@@ -1612,7 +1612,7 @@ namespace GridTools
                         DEAL_II_VERTEX_INDEX_MPI_TYPE,
                         source,
                         mpi_tag,
-                        triangulation.get_communicator(),
+                        triangulation.get_mpi_communicator(),
                         MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
@@ -1658,7 +1658,7 @@ namespace GridTools
                          MPI_CHAR,
                          destination,
                          mpi_tag2,
-                         triangulation.get_communicator(),
+                         triangulation.get_mpi_communicator(),
                          &second_requests[i]);
         AssertThrowMPI(ierr);
       }
@@ -1681,7 +1681,7 @@ namespace GridTools
                         MPI_CHAR,
                         source,
                         mpi_tag2,
-                        triangulation.get_communicator(),
+                        triangulation.get_mpi_communicator(),
                         MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
@@ -1780,7 +1780,7 @@ namespace GridTools
               dynamic_cast<parallel::shared::Triangulation<dim, spacedim> *>(
                 &triangulation))
           Utilities::MPI::sum(cell_weights,
-                              shared_tria->get_communicator(),
+                              shared_tria->get_mpi_communicator(),
                               cell_weights);
 
         // verify that the global sum of weights is larger than 0
@@ -1880,7 +1880,7 @@ namespace GridTools
               dynamic_cast<parallel::shared::Triangulation<dim, spacedim> *>(
                 &triangulation))
           Utilities::MPI::sum(cell_weights,
-                              shared_tria->get_communicator(),
+                              shared_tria->get_mpi_communicator(),
                               cell_weights);
 
         // verify that the global sum of weights is larger than 0
@@ -2161,7 +2161,7 @@ namespace GridTools
                 cell_id.get_coarse_cell_id(),
                 &p4est_cell,
                 Utilities::MPI::this_mpi_process(
-                  triangulation.get_communicator()));
+                  triangulation.get_mpi_communicator()));
 
             Assert(owner >= 0, ExcMessage("p4est should know the owner."));
 
@@ -3745,7 +3745,7 @@ namespace GridTools
         &cache.get_locally_owned_cell_bounding_boxes_rtree());
 
       const unsigned int my_rank = Utilities::MPI::this_mpi_process(
-        cache.get_triangulation().get_communicator());
+        cache.get_triangulation().get_mpi_communicator());
 
       cell_hint = first_cell.first;
       if (cell_hint.state() == IteratorState::valid)
@@ -3934,7 +3934,7 @@ namespace GridTools
       auto &send_components = result.send_components;
       auto &recv_components = result.recv_components;
 
-      const auto comm = cache.get_triangulation().get_communicator();
+      const auto comm = cache.get_triangulation().get_mpi_communicator();
 
       const auto potential_owners = internal::guess_owners_of_entities(
         comm, global_bboxes, points, tolerance);
@@ -4155,7 +4155,7 @@ namespace GridTools
 
           // indices assigned at recv side needed to fill send_components
           indices_of_rank = communicate_indices(result.recv_components,
-                                                tria.get_communicator());
+                                                tria.get_mpi_communicator());
         }
 
       for (const auto &send_component : send_components)
@@ -4324,7 +4324,7 @@ namespace GridTools
           structdim,
           spacedim>::IntersectionType;
 
-      const auto comm = cache.get_triangulation().get_communicator();
+      const auto comm = cache.get_triangulation().get_mpi_communicator();
 
       DistributedComputeIntersectionLocationsInternal<structdim, spacedim>
         result;

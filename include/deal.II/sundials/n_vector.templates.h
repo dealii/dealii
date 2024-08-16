@@ -401,7 +401,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       const MPI_Comm &
-      get_communicator(N_Vector v);
+      get_mpi_communicator(N_Vector v);
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
       /**
@@ -409,7 +409,7 @@ namespace SUNDIALS
        */
       template <typename VectorType>
       inline SUNComm
-      get_communicator_by_value(N_Vector v);
+      get_mpi_communicator_by_value(N_Vector v);
 #  else
       /**
        * Sundials likes a void* but we want to use the above functions
@@ -417,7 +417,7 @@ namespace SUNDIALS
        */
       template <typename VectorType>
       inline void *
-      get_communicator_as_void_ptr(N_Vector v);
+      get_mpi_communicator_as_void_ptr(N_Vector v);
 #  endif
     } // namespace NVectorOperations
   }   // namespace internal
@@ -726,7 +726,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       const MPI_Comm &
-      get_communicator(N_Vector v)
+      get_mpi_communicator(N_Vector v)
       {
         Assert(v != nullptr, ExcInternalError());
         Assert(v->content != nullptr, ExcInternalError());
@@ -740,7 +740,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
       template <typename VectorType>
       SUNComm
-      get_communicator_by_value(N_Vector v)
+      get_mpi_communicator_by_value(N_Vector v)
       {
 #    ifndef DEAL_II_WITH_MPI
         (void)v;
@@ -753,7 +753,7 @@ namespace SUNDIALS
           //
           // Further, we need to cast away const here, as SUNDIALS demands the
           // communicator by value.
-          return const_cast<SUNComm>(get_communicator<VectorType>(v));
+          return const_cast<SUNComm>(get_mpi_communicator<VectorType>(v));
         else
           return SUN_COMM_NULL;
 #    endif
@@ -761,7 +761,7 @@ namespace SUNDIALS
 #  else
       template <typename VectorType>
       void *
-      get_communicator_as_void_ptr(N_Vector v)
+      get_mpi_communicator_as_void_ptr(N_Vector v)
       {
 #    ifndef DEAL_II_WITH_MPI
         (void)v;
@@ -770,7 +770,7 @@ namespace SUNDIALS
         if (is_serial_vector<VectorType>::value == false)
           // We need to cast away const here, as SUNDIALS demands a pure
           // `void*`.
-          return &(const_cast<MPI_Comm &>(get_communicator<VectorType>(v)));
+          return &(const_cast<MPI_Comm &>(get_mpi_communicator<VectorType>(v)));
         else
           return nullptr;
 #    endif
@@ -899,7 +899,7 @@ namespace SUNDIALS
       {
         ArrayView<realtype> products(d, nv);
         Utilities::MPI::sum(products,
-                            get_communicator<VectorType>(x),
+                            get_mpi_communicator<VectorType>(x),
                             products);
         return 0;
       }
@@ -1047,7 +1047,7 @@ namespace SUNDIALS
                                                  local_elements.end(),
                                                  indexed_less_than);
         return Utilities::MPI::min((*vector)[local_min],
-                                   get_communicator<VectorType>(x));
+                                   get_mpi_communicator<VectorType>(x));
       }
 
 
@@ -1087,7 +1087,7 @@ namespace SUNDIALS
           }
 
         return Utilities::MPI::min(proc_local_min,
-                                   get_communicator<VectorType>(x));
+                                   get_mpi_communicator<VectorType>(x));
       }
 
 
@@ -1272,10 +1272,10 @@ namespace SUNDIALS
       //  v->ops->nvspace           = undef;
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
       v->ops->nvgetcommunicator =
-        &NVectorOperations::get_communicator_by_value<VectorType>;
+        &NVectorOperations::get_mpi_communicator_by_value<VectorType>;
 #  else
       v->ops->nvgetcommunicator =
-        &NVectorOperations::get_communicator_as_void_ptr<VectorType>;
+        &NVectorOperations::get_mpi_communicator_as_void_ptr<VectorType>;
 #  endif
       v->ops->nvgetlength = &NVectorOperations::get_global_length<VectorType>;
 

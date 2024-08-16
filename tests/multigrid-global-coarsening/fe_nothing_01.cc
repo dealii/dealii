@@ -141,7 +141,7 @@ do_test(const hp::FECollection<dim> &fe_fine,
 
 #if 0
   data_out.write_vtu_with_pvtu_record(
-    "./", "result", counter++, tria.get_communicator(), 3, 1);
+    "./", "result", counter++, tria.get_mpi_communicator(), 3, 1);
 #else
   deallog << std::endl;
   data_out.write_vtk(deallog.get_file_stream());

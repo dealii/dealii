@@ -317,7 +317,7 @@ MappingQCache<dim, spacedim>::initialize(
     DoFTools::extract_locally_relevant_dofs(dof_handler);
   vector_ghosted.reinit(dof_handler.locally_owned_dofs(),
                         locally_relevant_dofs,
-                        dof_handler.get_communicator());
+                        dof_handler.get_mpi_communicator());
   copy_locally_owned_data_from(vector, vector_ghosted);
   vector_ghosted.update_ghost_values();
 
@@ -521,7 +521,7 @@ MappingQCache<dim, spacedim>::initialize(
         DoFTools::extract_locally_relevant_level_dofs(dof_handler, l);
       vectors_ghosted[l].reinit(dof_handler.locally_owned_mg_dofs(l),
                                 locally_relevant_dofs,
-                                dof_handler.get_communicator());
+                                dof_handler.get_mpi_communicator());
       copy_locally_owned_data_from(vectors[l], vectors_ghosted[l]);
       vectors_ghosted[l].update_ghost_values();
     }

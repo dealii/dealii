@@ -52,7 +52,7 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
   return std::make_shared<const Utilities::MPI::Partitioner>(
     dof_handler.locally_owned_dofs(),
     locally_relevant_dofs,
-    dof_handler.get_communicator());
+    dof_handler.get_mpi_communicator());
 }
 
 void

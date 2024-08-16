@@ -208,16 +208,16 @@ namespace hp
         {
           max_criterion_refine =
             Utilities::MPI::max(max_criterion_refine,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
           min_criterion_refine =
             Utilities::MPI::min(min_criterion_refine,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
           max_criterion_coarsen =
             Utilities::MPI::max(max_criterion_coarsen,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
           min_criterion_coarsen =
             Utilities::MPI::min(min_criterion_coarsen,
-                                parallel_tria->get_communicator());
+                                parallel_tria->get_mpi_communicator());
         }
 
       // Absent any better strategies, we will set the threshold by linear
@@ -332,7 +332,7 @@ namespace hp
           // parallel implementation with distributed memory
           //
 
-          MPI_Comm mpi_communicator = parallel_tria->get_communicator();
+          MPI_Comm mpi_communicator = parallel_tria->get_mpi_communicator();
 
           // 2.) Communicate the number of cells scheduled for p-adaptation
           //     globally.
@@ -1038,7 +1038,7 @@ namespace hp
 
           levels_changed_in_cycle =
             Utilities::MPI::logical_or(levels_changed_in_cycle,
-                                       dof_handler.get_communicator());
+                                       dof_handler.get_mpi_communicator());
           levels_changed |= levels_changed_in_cycle;
         }
       while (levels_changed_in_cycle);

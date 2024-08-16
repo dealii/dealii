@@ -286,7 +286,7 @@ namespace GridTools
                 &(*tria)))
           {
             covering_rtree[level] = GridTools::build_global_description_tree(
-              boxes, tria_mpi->get_communicator());
+              boxes, tria_mpi->get_mpi_communicator());
           }
         else
           {

@@ -1557,7 +1557,7 @@ namespace DoFTools
          Utilities::MPI::n_mpi_processes(
            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
              &dof_handler.get_triangulation())
-             ->get_communicator()));
+             ->get_mpi_communicator()));
     Assert(n_subdomains > *std::max_element(subdomain_association.begin(),
                                             subdomain_association.end()),
            ExcInternalError());
@@ -2089,7 +2089,7 @@ namespace DoFTools
                                        n_target_components,
                                        DEAL_II_DOF_INDEX_MPI_TYPE,
                                        MPI_SUM,
-                                       tria->get_communicator());
+                                       tria->get_mpi_communicator());
         AssertThrowMPI(ierr);
       }
 #endif
@@ -2177,7 +2177,7 @@ namespace DoFTools
                                            n_target_blocks,
                                            DEAL_II_DOF_INDEX_MPI_TYPE,
                                            MPI_SUM,
-                                           tria->get_communicator());
+                                           tria->get_mpi_communicator());
             AssertThrowMPI(ierr);
           }
 #endif

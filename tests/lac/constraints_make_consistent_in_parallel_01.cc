@@ -83,7 +83,7 @@ test(const DoFHandler<dim, spacedim> &dof_handler,
 
   constraints.make_consistent_in_parallel(dof_handler.locally_owned_dofs(),
                                           locally_relevant_dofs,
-                                          dof_handler.get_communicator());
+                                          dof_handler.get_mpi_communicator());
 
   const auto b = collect_lines(constraints, dof_handler.n_dofs());
   b.print(deallog.get_file_stream());

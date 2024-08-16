@@ -71,7 +71,7 @@ namespace RepartitioningPolicyTools
     return {};
 #else
 
-    const auto comm = tria->get_communicator();
+    const auto comm = tria->get_mpi_communicator();
 
     const unsigned int process_has_active_locally_owned_cells =
       tria->n_locally_owned_active_cells() > 0;
@@ -134,7 +134,7 @@ namespace RepartitioningPolicyTools
   FirstChildPolicy<dim, spacedim>::partition(
     const Triangulation<dim, spacedim> &tria_coarse_in) const
   {
-    const auto communicator = tria_coarse_in.get_communicator();
+    const auto communicator = tria_coarse_in.get_mpi_communicator();
 
     const internal::CellIDTranslator<dim> cell_id_translator(n_coarse_cells,
                                                              n_global_levels);
@@ -212,7 +212,7 @@ namespace RepartitioningPolicyTools
                       tria_in.end()),
                     [](const auto &cell) { return cell.is_locally_owned(); });
 
-    const auto comm = tria_in.get_communicator();
+    const auto comm = tria_in.get_mpi_communicator();
 
     if (Utilities::MPI::min(n_locally_owned_active_cells, comm) >= n_min_cells)
       return {}; // all processes have enough cells
@@ -289,7 +289,7 @@ namespace RepartitioningPolicyTools
 
     std::vector<unsigned int> weights(partitioner->locally_owned_size());
 
-    const auto mpi_communicator = tria_in.get_communicator();
+    const auto mpi_communicator = tria_in.get_mpi_communicator();
     const auto n_subdomains = Utilities::MPI::n_mpi_processes(mpi_communicator);
 
     // determine weight of each cell
@@ -307,7 +307,7 @@ namespace RepartitioningPolicyTools
     // weight
     const auto [process_local_weight_offset, total_weight] =
       Utilities::MPI::partial_and_total_sum(process_local_weight,
-                                            tria->get_communicator());
+                                            tria->get_mpi_communicator());
 
     // set up partition
     LinearAlgebra::distributed::Vector<double> partition(partitioner);

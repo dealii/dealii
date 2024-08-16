@@ -449,7 +449,7 @@ namespace Portable
                       quad,
                       iterator_filter,
                       std::make_shared<const MPI_Comm>(
-                        parallel_triangulation->get_communicator()),
+                        parallel_triangulation->get_mpi_communicator()),
                       additional_data);
     else
       internal_reinit(mapping,

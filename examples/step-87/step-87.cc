@@ -1106,7 +1106,7 @@ namespace Step87
   {
     support_points.reinit(dof_handler.locally_owned_dofs(),
                           DoFTools::extract_locally_active_dofs(dof_handler),
-                          dof_handler.get_communicator());
+                          dof_handler.get_mpi_communicator());
 
     const auto &fe = dof_handler.get_fe();
 

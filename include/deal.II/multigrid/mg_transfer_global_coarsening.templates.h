@@ -806,7 +806,8 @@ namespace internal
       , dof_handler_coarse(dof_handler_coarse)
       , mg_level_fine(mg_level_fine)
       , communicator(
-          dof_handler_fine.get_communicator() /*TODO: fix for different comms*/)
+          dof_handler_fine
+            .get_mpi_communicator() /*TODO: fix for different comms*/)
       , cell_id_translator(
           dof_handler_fine.get_triangulation().n_global_coarse_cells(),
           dof_handler_fine.get_triangulation().n_global_levels())
@@ -1457,7 +1458,8 @@ namespace internal
           });
 
         return Utilities::MPI::min(static_cast<unsigned int>(flag),
-                                   dof_handler_fine.get_communicator()) == 1;
+                                   dof_handler_fine.get_mpi_communicator()) ==
+               1;
       }
     else
       {
@@ -1620,7 +1622,7 @@ namespace internal
           dof_handler_coarse.locally_owned_dofs() :
           dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
         locally_relevant_dofs,
-        dof_handler_coarse.get_communicator());
+        dof_handler_coarse.get_mpi_communicator());
     }
 
 
@@ -1691,9 +1693,9 @@ namespace internal
                                    cell->active_fe_index());
         });
 
-      const auto comm = dof_handler_fine.get_communicator();
+      const auto comm = dof_handler_fine.get_mpi_communicator();
 
-      Assert(comm == dof_handler_coarse.get_communicator(),
+      Assert(comm == dof_handler_coarse.get_mpi_communicator(),
              ExcNotImplemented());
 
       ArrayView<unsigned int> temp_min(min_active_fe_indices);
@@ -2022,11 +2024,11 @@ namespace internal
 
       {
         transfer.partitioner_coarse = transfer.constraint_info_coarse.finalize(
-          dof_handler_coarse.get_communicator());
+          dof_handler_coarse.get_mpi_communicator());
         transfer.vec_coarse.reinit(transfer.partitioner_coarse);
 
         transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
-          dof_handler_fine.get_communicator());
+          dof_handler_fine.get_mpi_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
@@ -2583,11 +2585,11 @@ namespace internal
 
       {
         transfer.partitioner_coarse = transfer.constraint_info_coarse.finalize(
-          dof_handler_coarse.get_communicator());
+          dof_handler_coarse.get_mpi_communicator());
         transfer.vec_coarse.reinit(transfer.partitioner_coarse);
 
         transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
-          dof_handler_fine.get_communicator());
+          dof_handler_fine.get_mpi_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
@@ -2795,7 +2797,7 @@ namespace MGTransferGlobalCoarseningTools
             &fine_triangulation_in))
         return std::make_shared<
           parallel::distributed::Triangulation<dim, spacedim>>(
-          fine_triangulation->get_communicator());
+          fine_triangulation->get_mpi_communicator());
       else
 #endif
 #ifdef DEAL_II_WITH_MPI
@@ -2803,7 +2805,7 @@ namespace MGTransferGlobalCoarseningTools
               const parallel::shared::Triangulation<dim, spacedim> *>(
               &fine_triangulation_in))
         return std::make_shared<parallel::shared::Triangulation<dim, spacedim>>(
-          fine_triangulation->get_communicator(),
+          fine_triangulation->get_mpi_communicator(),
           Triangulation<dim, spacedim>::none,
           fine_triangulation->with_artificial_cells());
       else
@@ -2865,7 +2867,7 @@ namespace MGTransferGlobalCoarseningTools
 
     Assert(fine_triangulation, ExcNotImplemented());
 
-    const auto comm = fine_triangulation->get_communicator();
+    const auto comm = fine_triangulation->get_mpi_communicator();
 
     if (keep_fine_triangulation == true &&
         repartition_fine_triangulation == false)
@@ -3957,7 +3959,7 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
                                 IteratorFilters::LocallyOwnedCell())
         is_locally_owned_coarse.add_index(cell_id_translator.translate(cell));
 
-      const MPI_Comm communicator = dof_handler_fine.get_communicator();
+      const MPI_Comm communicator = dof_handler_fine.get_mpi_communicator();
 
       std::vector<unsigned int> owning_ranks(
         is_locally_owned_coarse.n_elements());
@@ -4452,7 +4454,7 @@ MGTransferMF<dim, Number>::fill_and_communicate_copy_indices_global_coarsening(
 
   this->perform_plain_copy =
     Utilities::MPI::max(this->perform_plain_copy ? 1 : 0,
-                        dof_handler_out.get_communicator()) != 0;
+                        dof_handler_out.get_mpi_communicator()) != 0;
 
   if (this->perform_plain_copy)
     {
@@ -5009,12 +5011,12 @@ namespace internal
 
         const Utilities::MPI::Partitioner partitioner_support_points(
           dof_handler_support_points.locally_owned_dofs(),
-          dof_handler_support_points.get_communicator());
+          dof_handler_support_points.get_mpi_communicator());
 
         const Utilities::MPI::Partitioner partitioner_dof(
           dof_handler.locally_owned_dofs(),
           DoFTools::extract_locally_relevant_dofs(dof_handler),
-          dof_handler.get_communicator());
+          dof_handler.get_mpi_communicator());
 
         std::vector<bool> dof_processed(partitioner_dof.locally_owned_size() +
                                           partitioner_dof.n_ghost_indices(),
@@ -5324,7 +5326,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::reinit(
     this->partitioner_fine.reset(
       new Utilities::MPI::Partitioner(dof_handler_fine.locally_owned_dofs(),
                                       locally_relevant_dofs,
-                                      dof_handler_fine.get_communicator()));
+                                      dof_handler_fine.get_mpi_communicator()));
 
     this->vec_fine.reinit(this->partitioner_fine);
   }

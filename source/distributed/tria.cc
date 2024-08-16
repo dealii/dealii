@@ -3447,7 +3447,7 @@ namespace parallel
             this->local_cell_relations,
             this->cell_attached_data.pack_callbacks_fixed,
             this->cell_attached_data.pack_callbacks_variable,
-            this->get_communicator());
+            this->get_mpi_communicator());
         }
 
       // finally copy back from local part of tree to deal.II
@@ -3621,7 +3621,7 @@ namespace parallel
             this->local_cell_relations,
             this->cell_attached_data.pack_callbacks_fixed,
             this->cell_attached_data.pack_callbacks_variable,
-            this->get_communicator());
+            this->get_mpi_communicator());
         }
 
       try

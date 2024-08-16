@@ -3366,7 +3366,7 @@ namespace GridTools
       // a mutex:
       static Utilities::MPI::CollectiveMutex      mutex;
       Utilities::MPI::CollectiveMutex::ScopedLock lock(
-        mutex, tria->get_communicator());
+        mutex, tria->get_mpi_communicator());
 
       const int mpi_tag =
         Utilities::MPI::internal::Tags::exchange_cell_data_request;
@@ -3385,7 +3385,7 @@ namespace GridTools
                                        MPI_BYTE,
                                        it.first,
                                        mpi_tag,
-                                       tria->get_communicator(),
+                                       tria->get_mpi_communicator(),
                                        &requests[idx]);
             AssertThrowMPI(ierr);
             ++idx;
@@ -3401,7 +3401,7 @@ namespace GridTools
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
                                mpi_tag,
-                               tria->get_communicator(),
+                               tria->get_mpi_communicator(),
                                &status);
           AssertThrowMPI(ierr);
 
@@ -3424,7 +3424,7 @@ namespace GridTools
                           MPI_BYTE,
                           status.MPI_SOURCE,
                           status.MPI_TAG,
-                          tria->get_communicator(),
+                          tria->get_mpi_communicator(),
                           &status);
           AssertThrowMPI(ierr);
 
@@ -3477,7 +3477,7 @@ namespace GridTools
                            MPI_BYTE,
                            status.MPI_SOURCE,
                            mpi_tag_reply,
-                           tria->get_communicator(),
+                           tria->get_mpi_communicator(),
                            &reply_requests[idx]);
           AssertThrowMPI(ierr);
         }
@@ -3489,7 +3489,7 @@ namespace GridTools
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
                                mpi_tag_reply,
-                               tria->get_communicator(),
+                               tria->get_mpi_communicator(),
                                &status);
           AssertThrowMPI(ierr);
 
@@ -3504,7 +3504,7 @@ namespace GridTools
                           MPI_BYTE,
                           status.MPI_SOURCE,
                           status.MPI_TAG,
-                          tria->get_communicator(),
+                          tria->get_mpi_communicator(),
                           &status);
           AssertThrowMPI(ierr);
 

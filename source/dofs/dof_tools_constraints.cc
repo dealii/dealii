@@ -4135,7 +4135,7 @@ namespace DoFTools
                                          TriangulationBase<dim, spacedim> &>(
                     coarse_to_fine_grid_map.get_destination_grid()
                       .get_triangulation());
-                communicator          = tria.get_communicator();
+                communicator          = tria.get_mpi_communicator();
                 is_called_in_parallel = true;
               }
             catch (std::bad_cast &)

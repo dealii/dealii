@@ -1075,7 +1075,7 @@ namespace VectorTools
 
       u.reinit(locally_owned_dofs,
                locally_relevant_dofs,
-               dof_handler.get_communicator());
+               dof_handler.get_mpi_communicator());
     }
 
 

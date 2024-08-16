@@ -920,7 +920,7 @@ namespace internal
 
             dst.block(b).reinit(locally_owned_dofs_b[b],
                                 locally_relevant_dofs_b[b],
-                                dof_handler.get_communicator());
+                                dof_handler.get_mpi_communicator());
             copy_locally_owned_data_from(src.block(b), dst.block(b));
           }
 
@@ -966,7 +966,7 @@ namespace internal
 
         dst.block(0).reinit(locally_owned_dofs,
                             locally_relevant_dofs,
-                            dof_handler.get_communicator());
+                            dof_handler.get_mpi_communicator());
         copy_locally_owned_data_from(src, dst.block(0));
 
         dst.collect_sizes();
