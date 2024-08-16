@@ -61,7 +61,7 @@ test(const unsigned int mapping_degree)
     Vector<double> solution(dof_handler.n_dofs());
     data_out.add_data_vector(solution, "solution");
 
-    data_out.build_patches(mapping, 2);
+    data_out.build_patches(mapping, 3);
 
 #if false
     std::ofstream output("test." + std::to_string(mapping_degree) +  ".vtk");
@@ -79,4 +79,5 @@ main()
 
   test(1);
   test(2);
+  test(3);
 }
