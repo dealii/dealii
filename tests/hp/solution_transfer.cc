@@ -151,12 +151,6 @@ transfer(std::ostream &out)
         cell->set_coarsen_flag();
     }
 
-  Vector<double> q_old_solution = q_solution, dgq_old_solution = dgq_solution;
-  tria.prepare_coarsening_and_refinement();
-  q_soltrans.prepare_for_coarsening_and_refinement(q_old_solution);
-  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_old_solution);
-  tria.execute_coarsening_and_refinement();
-
   counter = 0;
   {
     typename DoFHandler<dim>::active_cell_iterator
@@ -165,22 +159,28 @@ transfer(std::ostream &out)
     for (; cell != endc; ++cell, ++celldg, ++counter)
       {
         if (counter > 20 && counter < 90)
-          cell->set_active_fe_index(0);
+          cell->set_future_fe_index(0);
         else
-          cell->set_active_fe_index(Testing::rand() % max_degree);
+          cell->set_future_fe_index(Testing::rand() % max_degree);
         if (counter > 20 && counter < 90)
-          celldg->set_active_fe_index(0);
+          celldg->set_future_fe_index(0);
         else
-          celldg->set_active_fe_index(Testing::rand() % max_degree);
+          celldg->set_future_fe_index(Testing::rand() % max_degree);
       }
   }
+
+  Vector<double> q_old_solution = q_solution, dgq_old_solution = dgq_solution;
+  tria.prepare_coarsening_and_refinement();
+  q_soltrans.prepare_for_coarsening_and_refinement(q_old_solution);
+  dgq_soltrans.prepare_for_coarsening_and_refinement(dgq_old_solution);
+  tria.execute_coarsening_and_refinement();
 
   q_dof_handler.distribute_dofs(fe_q);
   dgq_dof_handler.distribute_dofs(fe_dgq);
   q_solution.reinit(q_dof_handler.n_dofs());
   dgq_solution.reinit(dgq_dof_handler.n_dofs());
-  q_soltrans.interpolate(q_old_solution, q_solution);
-  dgq_soltrans.interpolate(dgq_old_solution, dgq_solution);
+  q_soltrans.interpolate(q_solution);
+  dgq_soltrans.interpolate(dgq_solution);
 
   // check correctness by comparing the values
   // on points of QGauss of order 2.

@@ -61,7 +61,7 @@ refine_and_transfer(const Function<dim> &function, Triangulation<dim> &tria)
   dh.distribute_dofs(fe);
 
   Vector<double> sol_new(dh.n_dofs());
-  soltrans.interpolate(sol_old, sol_new);
+  soltrans.interpolate(sol_new);
 
   return sol_new;
 }

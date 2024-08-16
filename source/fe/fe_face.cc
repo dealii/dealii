@@ -449,7 +449,6 @@ FE_FaceQ<dim, spacedim>::compare_for_domination(
   const unsigned int                  codim) const
 {
   Assert(codim <= dim, ExcImpossibleInDim(dim));
-  (void)codim;
 
   // vertex/line/face/cell domination
   // --------------------------------
@@ -579,9 +578,6 @@ FE_FaceQ<1, spacedim>::get_subface_interpolation_matrix(
   FullMatrix<double> &interpolation_matrix,
   const unsigned int  face_no) const
 {
-  (void)x_source_fe;
-  (void)face_no;
-
   Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
          ExcDimensionMismatch(interpolation_matrix.n(),
                               this->n_dofs_per_face(face_no)));
@@ -834,7 +830,6 @@ FE_FaceP<dim, spacedim>::compare_for_domination(
   const unsigned int                  codim) const
 {
   Assert(codim <= dim, ExcImpossibleInDim(dim));
-  (void)codim;
 
   // vertex/line/face/cell domination
   // --------------------------------
@@ -956,7 +951,6 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
               v_in(k) = this->poly_space.compute_value(i, p);
             }
           const double result = H.least_squares(v_out, v_in);
-          (void)result;
           Assert(result < 1e-12, FETools::ExcLeastSquaresError(result));
 
           for (unsigned int j = 0; j < source_fe->n_dofs_per_face(face_no); ++j)

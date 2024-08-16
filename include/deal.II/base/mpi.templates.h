@@ -142,12 +142,17 @@ namespace Utilities
     T
     sum(const T &t, const MPI_Comm mpi_communicator)
     {
-      T return_value{};
-      internal::all_reduce(MPI_SUM,
-                           ArrayView<const T>(&t, 1),
-                           mpi_communicator,
-                           ArrayView<T>(&return_value, 1));
-      return return_value;
+      if (mpi_communicator == MPI_COMM_SELF)
+        return t;
+      else
+        {
+          T return_value{};
+          internal::all_reduce(MPI_SUM,
+                               ArrayView<const T>(&t, 1),
+                               mpi_communicator,
+                               ArrayView<T>(&return_value, 1));
+          return return_value;
+        }
     }
 
 
@@ -174,7 +179,11 @@ namespace Utilities
         const MPI_Comm            mpi_communicator,
         const ArrayView<T>       &sums)
     {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+      if (mpi_communicator == MPI_COMM_SELF)
+        for (unsigned int i = 0; i < values.size(); ++i)
+          sums[i] = values[i];
+      else
+        internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
 
 

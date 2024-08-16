@@ -811,7 +811,7 @@ namespace Step72
 
     setup_system();
 
-    solution_transfer.interpolate(coarse_solution, current_solution);
+    solution_transfer.interpolate(current_solution);
     nonzero_constraints.distribute(current_solution);
   }
 

@@ -3905,6 +3905,22 @@ protected:
   update_cell_relations();
 
   /**
+   * Function to pack data for
+   * SolutionTransfer::prepare_for_coarsening_and_refinement() in the case of a
+   * serial triangulation.
+   */
+  void
+  pack_data_serial();
+
+
+  /**
+   * Function to unpack data for SolutionTransfer::interpolate() in the case of
+   * a serial triangulation.
+   */
+  void
+  unpack_data_serial();
+
+  /**
    * Vector of pairs, each containing a deal.II cell iterator and its
    * respective CellStatus. To update its contents, use the
    * update_cell_relations() member function.

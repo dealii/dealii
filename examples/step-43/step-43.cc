@@ -1688,7 +1688,7 @@ namespace Step43
       tmp_saturation[0].reinit(saturation_solution);
       tmp_saturation[1].reinit(saturation_solution);
       tmp_saturation[2].reinit(saturation_solution);
-      saturation_soltrans.interpolate(x_saturation, tmp_saturation);
+      saturation_soltrans.interpolate(tmp_saturation);
 
       saturation_solution                              = tmp_saturation[0];
       old_saturation_solution                          = tmp_saturation[1];
@@ -1702,7 +1702,7 @@ namespace Step43
       std::vector<TrilinosWrappers::MPI::BlockVector> tmp_darcy(2);
       tmp_darcy[0].reinit(darcy_solution);
       tmp_darcy[1].reinit(darcy_solution);
-      darcy_soltrans.interpolate(x_darcy, tmp_darcy);
+      darcy_soltrans.interpolate(tmp_darcy);
 
       last_computed_darcy_solution        = tmp_darcy[0];
       second_last_computed_darcy_solution = tmp_darcy[1];

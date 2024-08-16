@@ -92,19 +92,21 @@ main()
 
   // Interpolate solution
   SolutionTransfer<2, Vector<double>> solultion_trans(dof_handler);
-  solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
-  triangulation.execute_coarsening_and_refinement();
   // Assign FE_Q_ to all cells
   cell = dof_handler.begin_active();
   for (; cell != endc; ++cell)
     {
-      cell->set_active_fe_index(0);
+      cell->set_future_fe_index(0);
     }
+
+  solultion_trans.prepare_for_coarsening_and_refinement(solution);
+
+  triangulation.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  solultion_trans.interpolate(solution, new_solution);
+  solultion_trans.interpolate(new_solution);
 
 
   // Save output

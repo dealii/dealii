@@ -121,7 +121,8 @@ namespace Portable
     template <unsigned int fe_degree,
               unsigned int direction,
               bool         transpose,
-              typename Number>
+              typename Number,
+              typename ViewType>
     DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_2d(
       const Kokkos::TeamPolicy<
@@ -130,11 +131,8 @@ namespace Portable
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-                                                           &constraint_mask,
-      Kokkos::View<Number *,
-                   MemorySpace::Default::kokkos_space::execution_space::
-                     scratch_memory_space,
-                   Kokkos::MemoryTraits<Kokkos::Unmanaged>> values)
+              &constraint_mask,
+      ViewType values)
     {
       constexpr unsigned int n_q_points_1d = fe_degree + 1;
       constexpr unsigned int n_q_points    = Utilities::pow(n_q_points_1d, 2);
@@ -242,7 +240,8 @@ namespace Portable
     template <unsigned int fe_degree,
               unsigned int direction,
               bool         transpose,
-              typename Number>
+              typename Number,
+              typename ViewType>
     DEAL_II_HOST_DEVICE inline void
     interpolate_boundary_3d(
       const Kokkos::TeamPolicy<
@@ -251,11 +250,8 @@ namespace Portable
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-                                                            constraint_mask,
-      Kokkos::View<Number *,
-                   MemorySpace::Default::kokkos_space::execution_space::
-                     scratch_memory_space,
-                   Kokkos::MemoryTraits<Kokkos::Unmanaged>> values)
+               constraint_mask,
+      ViewType values)
     {
       constexpr unsigned int n_q_points_1d = fe_degree + 1;
       constexpr unsigned int n_q_points    = Utilities::pow(n_q_points_1d, 3);
@@ -410,7 +406,11 @@ namespace Portable
      * @cite ljungkvist2017matrix and in Section 3.4 of
      * @cite kronbichler2019multigrid.
      */
-    template <int dim, int fe_degree, bool transpose, typename Number>
+    template <int  dim,
+              int  fe_degree,
+              bool transpose,
+              typename Number,
+              typename ViewType>
     DEAL_II_HOST_DEVICE void
     resolve_hanging_nodes(
       const Kokkos::TeamPolicy<
@@ -419,13 +419,10 @@ namespace Portable
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-                                                            constraint_mask,
-      Kokkos::View<Number *,
-                   MemorySpace::Default::kokkos_space::execution_space::
-                     scratch_memory_space,
-                   Kokkos::MemoryTraits<Kokkos::Unmanaged>> values)
+               constraint_mask,
+      ViewType values)
     {
-      if (dim == 2)
+      if constexpr (dim == 2)
         {
           interpolate_boundary_2d<fe_degree, 0, transpose>(team_member,
                                                            constraint_weights,
@@ -437,7 +434,7 @@ namespace Portable
                                                            constraint_mask,
                                                            values);
         }
-      else if (dim == 3)
+      else if constexpr (dim == 3)
         {
           // Interpolate y and z faces (x-direction)
           interpolate_boundary_3d<fe_degree, 0, transpose>(team_member,

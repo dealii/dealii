@@ -26,9 +26,9 @@ macro(feature_p4est_find_external var)
     set(${var} TRUE)
 
     #
-    # We require at least version 2.0
+    # We require at least version 2.2
     #
-    set(_version_required 2.0)
+    set(_version_required 2.2)
     if(P4EST_VERSION VERSION_LESS ${_version_required})
       message(STATUS "Insufficient p4est installation found: "
         "At least version ${_version_required} is required."
