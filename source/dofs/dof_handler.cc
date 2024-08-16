@@ -49,31 +49,6 @@ const types::fe_index DoFHandler<dim, spacedim>::default_fe_index;
 
 namespace internal
 {
-  template <int dim, int spacedim>
-  std::string
-  policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::
-                     PolicyBase<dim, spacedim> &policy)
-  {
-    std::string policy_name;
-    if (dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::
-                       Policy::Sequential<dim, spacedim> *>(&policy))
-      policy_name = "Policy::Sequential<";
-    else if (dynamic_cast<
-               const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelDistributed<dim, spacedim> *>(&policy))
-      policy_name = "Policy::ParallelDistributed<";
-    else if (dynamic_cast<
-               const typename dealii::internal::DoFHandlerImplementation::
-                 Policy::ParallelShared<dim, spacedim> *>(&policy))
-      policy_name = "Policy::ParallelShared<";
-    else
-      AssertThrow(false, ExcNotImplemented());
-    policy_name += Utilities::int_to_string(dim) + "," +
-                   Utilities::int_to_string(spacedim) + ">";
-    return policy_name;
-  }
-
-
   namespace DoFHandlerImplementation
   {
     /**

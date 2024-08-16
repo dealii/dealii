@@ -20,11 +20,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 
     namespace internal
     \{
-      template std::string
-      policy_to_string(const DoFHandlerImplementation::Policy::PolicyBase<
-                       deal_II_dimension,
-                       deal_II_space_dimension> &);
-
       namespace hp
       \{
         namespace DoFHandlerImplementation
