@@ -8,6 +8,7 @@ DEAL:2D::0
 DEAL:2D::numbers::invalid_fe_index
 DEAL:2D::3
 DEAL:2D::2
+DEAL:2D::3
 DEAL:3D::3
 DEAL:3D::1
 DEAL:3D::0
@@ -17,4 +18,5 @@ DEAL:3D::0
 DEAL:3D::numbers::invalid_fe_index
 DEAL:3D::3
 DEAL:3D::2
+DEAL:3D::3
 DEAL::OK

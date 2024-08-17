@@ -167,6 +167,19 @@ test()
     deallog << fe_collection.find_dominated_fe_extended(fes, /*codim=*/1)
             << std::endl;
   }
+
+  // Test compare_for_domination().
+  // The test returns
+  // FiniteElementDomination::Domination::either_element_can_dominate or 3.
+  {
+    hp::FECollection<dim> fe_collection;
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 3));
+    fe_collection.push_back(
+      FESystem<dim>(FE_Q<dim>(1), 2, FE_Nothing<dim>(), 1));
+    deallog << "hello: "
+            << fe_collection[0].compare_for_domination(fe_collection[1])
+            << std::endl;
+  }
 }
 
 int

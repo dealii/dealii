@@ -2447,11 +2447,7 @@ FESystem<dim, spacedim>::compare_for_domination(
                      ->base_element(base_element_index_in_fe_sys_other)
                      .n_components(),
                  ExcNotImplemented());
-          Assert(this->element_multiplicity(
-                   base_element_index_in_fe_sys_this) ==
-                   fe_sys_other->element_multiplicity(
-                     base_element_index_in_fe_sys_other),
-                 ExcNotImplemented());
+
           // for this pair of base elements, check who dominates and combine
           // with previous result
           const FiniteElementDomination::Domination base_domination =
@@ -2459,6 +2455,7 @@ FESystem<dim, spacedim>::compare_for_domination(
                .compare_for_domination(fe_sys_other->base_element(
                                          base_element_index_in_fe_sys_other),
                                        codim));
+
           domination = domination & base_domination;
         }
 
