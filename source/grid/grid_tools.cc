@@ -197,11 +197,9 @@ namespace GridTools
 
   template <int dim, int spacedim>
   void
-  rotate(const double angle, Triangulation<dim, spacedim> &triangulation)
+  rotate(const double /*angle*/,
+         Triangulation<dim, spacedim> & /*triangulation*/)
   {
-    (void)angle;
-    (void)triangulation;
-
     AssertThrow(false,
                 ExcMessage(
                   "GridTools::rotate() is only available for spacedim = 2."));
