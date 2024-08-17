@@ -18,6 +18,7 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
@@ -320,7 +321,14 @@ namespace VectorTools
       hp::QCollection<dim> support_quadrature;
       for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
         {
-          const auto &fe_i   = fe[fe_index];
+          const auto &fe_i = fe[fe_index];
+          // If the finite element has no dofs, we can skip it
+          if (fe_i.dofs_per_cell == 0)
+            continue;
+          Assert(fe_i.has_generalized_support_points(),
+                 ExcMessage(
+                   "The finite element does not have generalized support "
+                   "points. This is required for interpolation."));
           const auto &points = fe_i.get_generalized_support_points();
           support_quadrature.push_back(Quadrature<dim>(points));
           if (fe_i.n_base_elements() == 1 &&
