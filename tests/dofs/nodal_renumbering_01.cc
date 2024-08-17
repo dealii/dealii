@@ -73,7 +73,7 @@ void
 test(DoFHandler<2> &dof_handler, const hp::MappingCollection<2> &mappings)
 {
   DoFRenumbering::support_point_wise(dof_handler);
-  const MPI_Comm comm = dof_handler.get_communicator();
+  const MPI_Comm comm = dof_handler.get_mpi_communicator();
 
   const IndexSet &local_dofs = dof_handler.locally_owned_dofs();
   deallog << "new case with locally owned dofs = ";

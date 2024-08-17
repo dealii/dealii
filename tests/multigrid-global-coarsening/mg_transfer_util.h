@@ -47,7 +47,7 @@ initialize_dof_vector(LinearAlgebra::distributed::Vector<Number> &vec,
       &(dof_handler.get_triangulation()));
 
   MPI_Comm comm =
-    dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+    dist_tria != nullptr ? dist_tria->get_mpi_communicator() : MPI_COMM_SELF;
 
   vec.reinit(level == numbers::invalid_unsigned_int ?
                dof_handler.locally_owned_dofs() :

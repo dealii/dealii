@@ -353,7 +353,7 @@ namespace VectorTools
                                        3,
                                        MPI_DOUBLE,
                                        MPI_SUM,
-                                       p_triangulation->get_communicator());
+                                       p_triangulation->get_mpi_communicator());
         AssertThrowMPI(ierr);
 
         internal::set_possibly_complex_number(global_values[0],

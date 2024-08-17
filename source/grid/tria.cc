@@ -12135,9 +12135,18 @@ void Triangulation<dim, spacedim>::clear()
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-MPI_Comm Triangulation<dim, spacedim>::get_communicator() const
+MPI_Comm Triangulation<dim, spacedim>::get_mpi_communicator() const
 {
   return MPI_COMM_SELF;
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+MPI_Comm Triangulation<dim, spacedim>::get_communicator() const
+{
+  return get_mpi_communicator();
 }
 
 
@@ -15760,7 +15769,7 @@ void Triangulation<dim, spacedim>::pack_data_serial()
         this->local_cell_relations,
         this->cell_attached_data.pack_callbacks_fixed,
         this->cell_attached_data.pack_callbacks_variable,
-        this->get_communicator());
+        this->get_mpi_communicator());
 
       // dummy copy of data
       this->data_serializer.dest_data_fixed =
@@ -16252,13 +16261,13 @@ void Triangulation<dim, spacedim>::save_attached_data(
         tria->local_cell_relations,
         tria->cell_attached_data.pack_callbacks_fixed,
         tria->cell_attached_data.pack_callbacks_variable,
-        this->get_communicator());
+        this->get_mpi_communicator());
 
       // then store buffers in file
       tria->data_serializer.save(global_first_cell,
                                  global_num_cells,
                                  file_basename,
-                                 this->get_communicator());
+                                 this->get_mpi_communicator());
 
       // and release the memory afterwards
       tria->data_serializer.clear();
@@ -16293,7 +16302,7 @@ void Triangulation<dim, spacedim>::load_attached_data(
                                  file_basename,
                                  n_attached_deserialize_fixed,
                                  n_attached_deserialize_variable,
-                                 this->get_communicator());
+                                 this->get_mpi_communicator());
 
       this->data_serializer.unpack_cell_status(this->local_cell_relations);
 

@@ -346,7 +346,7 @@ test_destroy()
 template <typename VectorType,
           std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
 void
-test_get_communicator()
+test_get_mpi_communicator()
 {
   auto vector   = create_test_vector<VectorType>();
   auto n_vector = make_nvector_view(vector
@@ -368,7 +368,7 @@ test_get_communicator()
 template <typename VectorType,
           std::enable_if_t<!is_serial_vector<VectorType>::value, int> = 0>
 void
-test_get_communicator()
+test_get_mpi_communicator()
 {
   auto vector   = create_test_vector<VectorType>();
   auto n_vector = make_nvector_view(vector
@@ -1081,7 +1081,7 @@ run_all_tests(const std::string &prefix)
   // test vector operations
   test_clone<VectorType>();
   test_destroy<VectorType>();
-  test_get_communicator<VectorType>();
+  test_get_mpi_communicator<VectorType>();
   test_length<VectorType>();
   test_linear_sum<VectorType>();
   test_linear_combination<VectorType>();

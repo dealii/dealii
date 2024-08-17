@@ -111,7 +111,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  const MPI_Comm mpi_communicator   = triangulation.get_communicator();
+  const MPI_Comm mpi_communicator   = triangulation.get_mpi_communicator();
   const IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
   const IndexSet locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof_handler);

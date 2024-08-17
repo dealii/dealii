@@ -83,7 +83,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -109,7 +109,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -137,7 +137,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -164,7 +164,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
                     dh.locally_owned_mg_dofs(level),
@@ -220,7 +220,7 @@ namespace internal
            const SparsityPatternType       &sp,
            const DoFHandler<dim, spacedim> &dh)
     {
-      const MPI_Comm communicator = dh.get_communicator();
+      const MPI_Comm communicator = dh.get_mpi_communicator();
 
       // Reinit PETSc matrix
       matrix.reinit(dh.locally_owned_mg_dofs(level + 1),

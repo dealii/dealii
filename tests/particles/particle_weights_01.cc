@@ -53,7 +53,7 @@ test()
       GridTools::compute_mesh_predicate_bounding_box(
         triangulation, IteratorFilters::LocallyOwnedCell());
     const auto global_bounding_boxes =
-      Utilities::MPI::all_gather(triangulation.get_communicator(),
+      Utilities::MPI::all_gather(triangulation.get_mpi_communicator(),
                                  local_bounding_box);
 
     Particles::Generators::quadrature_points(triangulation,

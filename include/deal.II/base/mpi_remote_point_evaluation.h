@@ -721,10 +721,10 @@ namespace Utilities
       (void)sort_data;
 #else
       static CollectiveMutex      mutex;
-      CollectiveMutex::ScopedLock lock(mutex, tria->get_communicator());
+      CollectiveMutex::ScopedLock lock(mutex, tria->get_mpi_communicator());
 
       const unsigned int my_rank =
-        Utilities::MPI::this_mpi_process(tria->get_communicator());
+        Utilities::MPI::this_mpi_process(tria->get_mpi_communicator());
 
       // allocate memory for output and buffer
       output.resize(point_ptrs.back() * n_components);
@@ -809,7 +809,7 @@ namespace Utilities
               (send_ptrs[i + 1] - send_ptrs[i]) * n_components),
             send_ranks[i],
             internal::Tags::remote_point_evaluation,
-            tria->get_communicator(),
+            tria->get_mpi_communicator(),
             send_buffers_packed,
             send_requests);
         }
@@ -848,7 +848,7 @@ namespace Utilities
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
                                internal::Tags::remote_point_evaluation,
-                               tria->get_communicator(),
+                               tria->get_mpi_communicator(),
                                &status);
           AssertThrowMPI(ierr);
 
@@ -867,7 +867,7 @@ namespace Utilities
             (recv_ptrs[j + 1] - recv_ptrs[j]) * n_components);
 
           internal::recv_and_unpack(recv_buffer,
-                                    tria->get_communicator(),
+                                    tria->get_mpi_communicator(),
                                     status,
                                     recv_buffer_packed);
 
@@ -933,10 +933,10 @@ namespace Utilities
       (void)sort_data;
 #else
       static CollectiveMutex      mutex;
-      CollectiveMutex::ScopedLock lock(mutex, tria->get_communicator());
+      CollectiveMutex::ScopedLock lock(mutex, tria->get_mpi_communicator());
 
       const unsigned int my_rank =
-        Utilities::MPI::this_mpi_process(tria->get_communicator());
+        Utilities::MPI::this_mpi_process(tria->get_mpi_communicator());
 
       // allocate memory for buffer
       const auto &point_ptrs = this->get_point_ptrs();
@@ -1031,7 +1031,7 @@ namespace Utilities
               (recv_ptrs[i + 1] - recv_ptrs[i]) * n_components),
             recv_ranks[i],
             internal::Tags::remote_point_evaluation,
-            tria->get_communicator(),
+            tria->get_mpi_communicator(),
             send_buffers_packed,
             send_requests);
         }
@@ -1069,7 +1069,7 @@ namespace Utilities
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
                                internal::Tags::remote_point_evaluation,
-                               tria->get_communicator(),
+                               tria->get_mpi_communicator(),
                                &status);
           AssertThrowMPI(ierr);
 
@@ -1089,7 +1089,7 @@ namespace Utilities
             (send_ptrs[j + 1] - send_ptrs[j]) * n_components);
 
           internal::recv_and_unpack(recv_buffer,
-                                    tria->get_communicator(),
+                                    tria->get_mpi_communicator(),
                                     status,
                                     recv_buffer_packed);
 

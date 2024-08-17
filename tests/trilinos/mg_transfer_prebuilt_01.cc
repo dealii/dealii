@@ -56,7 +56,7 @@ reinit_vector(const dealii::DoFHandler<dim, spacedim>      &mg_dof,
   for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
     {
       v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
-                      tria->get_communicator());
+                      tria->get_mpi_communicator());
     }
 }
 

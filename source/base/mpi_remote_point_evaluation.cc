@@ -186,7 +186,7 @@ namespace Utilities
       const auto n_owning_processes_global =
         Utilities::MPI::all_reduce<std::tuple<unsigned int, unsigned int>>(
           n_owning_processes_local,
-          tria.get_communicator(),
+          tria.get_mpi_communicator(),
           [&](const auto &a,
               const auto &b) -> std::tuple<unsigned int, unsigned int> {
             if (a == n_owning_processes_default)

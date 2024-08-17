@@ -1292,7 +1292,7 @@ namespace internal
                     cell->active_fe_index();
 
               Utilities::MPI::sum(active_fe_indices,
-                                  tr->get_communicator(),
+                                  tr->get_mpi_communicator(),
                                   active_fe_indices);
 
               // now go back and fill the active FE index on all other
@@ -1393,7 +1393,7 @@ namespace internal
                     .hp_cell_future_fe_indices[cell->level()][cell->index()];
 
               Utilities::MPI::sum(future_fe_indices,
-                                  tr->get_communicator(),
+                                  tr->get_mpi_communicator(),
                                   future_fe_indices);
 
               for (const auto &cell : dof_handler.active_cell_iterators())

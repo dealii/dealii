@@ -80,7 +80,7 @@ do_test(const unsigned int degree,
   LinearAlgebra::distributed::Vector<double> vector(
     dof_handler.locally_owned_dofs(),
     locally_relevant_dofs,
-    dof_handler.get_communicator());
+    dof_handler.get_mpi_communicator());
 
   VectorTools::interpolate(dof_handler, fu, vector);
 

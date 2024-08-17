@@ -1548,7 +1548,7 @@ namespace MGTools
     if (const parallel::TriangulationBase<dim, spacedim> *tr =
           dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &tria))
-      global_min = Utilities::MPI::min(min_level, tr->get_communicator());
+      global_min = Utilities::MPI::min(min_level, tr->get_mpi_communicator());
 
     AssertIndexRange(global_min, tria.n_global_levels());
 
@@ -1674,7 +1674,7 @@ namespace MGTools
   workload_imbalance(const Triangulation<dim, spacedim> &tria)
   {
     return internal::workload_imbalance(local_workload(tria),
-                                        tria.get_communicator());
+                                        tria.get_mpi_communicator());
   }
 
 
@@ -1686,7 +1686,7 @@ namespace MGTools
       &trias)
   {
     return internal::workload_imbalance(local_workload(trias),
-                                        trias.back()->get_communicator());
+                                        trias.back()->get_mpi_communicator());
   }
 
 
@@ -1700,7 +1700,7 @@ namespace MGTools
     std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
       cells(n_global_levels);
 
-    const MPI_Comm communicator = tria.get_communicator();
+    const MPI_Comm communicator = tria.get_mpi_communicator();
 
     const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
 
@@ -1736,7 +1736,7 @@ namespace MGTools
     std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
       cells(n_global_levels);
 
-    const MPI_Comm communicator = trias.back()->get_communicator();
+    const MPI_Comm communicator = trias.back()->get_mpi_communicator();
 
     const unsigned int my_rank = Utilities::MPI::this_mpi_process(communicator);
 
@@ -1805,7 +1805,7 @@ namespace MGTools
   vertical_communication_efficiency(const Triangulation<dim, spacedim> &tria)
   {
     return internal::vertical_communication_efficiency(
-      local_vertical_communication_cost(tria), tria.get_communicator());
+      local_vertical_communication_cost(tria), tria.get_mpi_communicator());
   }
 
 
@@ -1818,7 +1818,7 @@ namespace MGTools
   {
     return internal::vertical_communication_efficiency(
       local_vertical_communication_cost(trias),
-      trias.back()->get_communicator());
+      trias.back()->get_mpi_communicator());
   }
 
 } // namespace MGTools

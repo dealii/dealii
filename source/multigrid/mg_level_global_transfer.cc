@@ -85,8 +85,9 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices(
   if (const parallel::TriangulationBase<dim, spacedim> *ptria =
         dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
           &mg_dof.get_triangulation()))
-    perform_plain_copy = (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
-                                              ptria->get_communicator()) == 1);
+    perform_plain_copy =
+      (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
+                           ptria->get_mpi_communicator()) == 1);
   else
     perform_plain_copy = my_perform_plain_copy;
 }
@@ -280,7 +281,7 @@ void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   fill_and_communicate_copy_indices(const DoFHandler<dim, spacedim> &mg_dof)
 {
-  const MPI_Comm mpi_communicator = mg_dof.get_communicator();
+  const MPI_Comm mpi_communicator = mg_dof.get_mpi_communicator();
 
   fill_internal(mg_dof,
                 mg_constrained_dofs,

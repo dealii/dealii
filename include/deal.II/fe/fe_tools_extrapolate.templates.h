@@ -1335,7 +1335,7 @@ namespace FETools
         ExcMessage(
           "Extrapolate in parallel only works for parallel distributed triangulations!"));
 
-      communicator = tr->get_communicator();
+      communicator = tr->get_mpi_communicator();
 
       compute_all_non_local_data(dof2, u2_relevant);
 
@@ -1492,7 +1492,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 #endif // DEAL_II_WITH_PETSC
 
@@ -1509,7 +1509,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 
 
@@ -1528,7 +1528,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 #    endif
 
@@ -1544,7 +1544,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 #  endif
 #endif // DEAL_II_WITH_TRILINOS
@@ -1561,7 +1561,7 @@ namespace FETools
       Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+      vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
 
 
@@ -1589,7 +1589,7 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
-                    parallel_tria->get_communicator());
+                    parallel_tria->get_mpi_communicator());
     }
 #endif // DEAL_II_WITH_PETSC
 
@@ -1609,7 +1609,7 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
-                    parallel_tria->get_communicator());
+                    parallel_tria->get_mpi_communicator());
     }
 #endif // DEAL_II_WITH_TRILINOS
 
@@ -1628,7 +1628,7 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
-                    parallel_tria->get_communicator());
+                    parallel_tria->get_mpi_communicator());
     }
 
 

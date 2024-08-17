@@ -65,7 +65,7 @@ test()
 
   // gather bounding boxes of other processes
   const auto global_bboxes =
-    Utilities::MPI::all_gather(tria.get_communicator(), local_reduced_box);
+    Utilities::MPI::all_gather(tria.get_mpi_communicator(), local_reduced_box);
 
   const GridTools::Cache<dim> cache(tria, mapping);
 

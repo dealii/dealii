@@ -1810,10 +1810,21 @@ public:
   clear();
 
   /**
-   * Return MPI communicator used by this triangulation. In the case of
-   * a serial Triangulation object, MPI_COMM_SELF is returned.
+   * Return the MPI communicator used by this triangulation. In the case of a
+   * serial Triangulation object, MPI_COMM_SELF is returned.
    */
   virtual MPI_Comm
+  get_mpi_communicator() const;
+
+  /**
+   * Return the MPI communicator used by this triangulation. In the case of
+   * a serial Triangulation object, MPI_COMM_SELF is returned.
+   *
+   * @deprecated Use get_mpi_communicator() instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Access the MPI communicator with get_mpi_communicator() instead.")
+  MPI_Comm
   get_communicator() const;
 
   /**

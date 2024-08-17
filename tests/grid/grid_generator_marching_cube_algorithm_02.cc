@@ -120,7 +120,7 @@ create_mca_tria(const unsigned int   n_subdivisions,
                                           "data_background_" +
                                             std::to_string(n_subdivisions),
                                           0,
-                                          triangulation.get_communicator());
+                                          triangulation.get_mpi_communicator());
     }
 }
 

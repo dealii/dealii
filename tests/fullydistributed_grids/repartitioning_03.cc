@@ -71,7 +71,7 @@ output_grid(
   const std::string                                                      &label)
 {
   deallog.push(label);
-  const auto comm    = trias.front()->get_communicator();
+  const auto comm    = trias.front()->get_mpi_communicator();
   const auto my_rank = Utilities::MPI::this_mpi_process(comm);
 
   for (unsigned int i = 0; i < trias.size(); ++i)

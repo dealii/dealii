@@ -58,7 +58,7 @@ test()
   tr.refine_global(1);
 
   const auto n_locally_owned_active_cells_per_processor =
-    Utilities::MPI::all_gather(tr.get_communicator(),
+    Utilities::MPI::all_gather(tr.get_mpi_communicator(),
                                tr.n_locally_owned_active_cells());
   if (myid == 0)
     for (unsigned int p = 0; p < numproc; ++p)

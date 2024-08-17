@@ -94,10 +94,11 @@ test()
   }
 
   const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
-  TrilinosWrappers::MPI::Vector x_rel(relevant_set, dofh.get_communicator());
+  TrilinosWrappers::MPI::Vector x_rel(relevant_set,
+                                      dofh.get_mpi_communicator());
   {
     TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-                                               dofh.get_communicator());
+                                               dofh.get_mpi_communicator());
     VectorTools::interpolate(dofh, LinearFunction<dim>(), interpolated);
     x_rel = interpolated;
   }

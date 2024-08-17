@@ -724,7 +724,7 @@ namespace TriangulationDescription
             dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &tria))
         {
-          Assert(comm == ptria->get_communicator(),
+          Assert(comm == ptria->get_mpi_communicator(),
                  ExcMessage("MPI communicators do not match."));
           Assert(my_rank_in == numbers::invalid_unsigned_int ||
                    my_rank_in == dealii::Utilities::MPI::this_mpi_process(comm),
@@ -1013,16 +1013,15 @@ namespace TriangulationDescription
       const TriangulationDescription::Settings settings_in)
     {
 #ifdef DEAL_II_WITH_MPI
-      if (tria.get_communicator() == MPI_COMM_NULL)
+      if (tria.get_mpi_communicator() == MPI_COMM_NULL)
         AssertDimension(partition.locally_owned_size(), 0);
 #endif
 
       if (partition.size() == 0)
         {
           AssertDimension(partitions_mg.size(), 0);
-          return create_description_from_triangulation(tria,
-                                                       tria.get_communicator(),
-                                                       settings_in);
+          return create_description_from_triangulation(
+            tria, tria.get_mpi_communicator(), settings_in);
         }
 
       // Update partitioner ghost elements because we will later want
@@ -1141,7 +1140,7 @@ namespace TriangulationDescription
             mg_cell_to_future_owner,
             coinciding_vertex_groups,
             vertex_to_coinciding_vertex_group,
-            tria.get_communicator(),
+            tria.get_mpi_communicator(),
             rank,
             settings));
 

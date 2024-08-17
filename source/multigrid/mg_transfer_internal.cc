@@ -207,7 +207,7 @@ namespace internal
 
 #ifdef DEAL_II_WITH_MPI
       if (tria && Utilities::MPI::sum(send_data_temp.size(),
-                                      tria->get_communicator()) > 0)
+                                      tria->get_mpi_communicator()) > 0)
         {
           const std::set<types::subdomain_id> &neighbors =
             tria->level_ghost_owners();
@@ -262,10 +262,8 @@ namespace internal
               AssertThrow(level_dof_indices.size() == is_ghost.n_elements(),
                           ExcMessage("Size does not match!"));
 
-              const auto index_owner =
-                Utilities::MPI::compute_index_owner(owned_level_dofs,
-                                                    is_ghost,
-                                                    tria->get_communicator());
+              const auto index_owner = Utilities::MPI::compute_index_owner(
+                owned_level_dofs, is_ghost, tria->get_mpi_communicator());
 
               AssertThrow(level_dof_indices.size() == index_owner.size(),
                           ExcMessage("Size does not match!"));
@@ -280,7 +278,7 @@ namespace internal
           // Protect the send/recv logic with a mutex:
           static Utilities::MPI::CollectiveMutex      mutex;
           Utilities::MPI::CollectiveMutex::ScopedLock lock(
-            mutex, tria->get_communicator());
+            mutex, tria->get_mpi_communicator());
 
           const int mpi_tag =
             Utilities::MPI::internal::Tags::mg_transfer_fill_copy_indices;
@@ -299,7 +297,7 @@ namespace internal
                             MPI_BYTE,
                             dest,
                             mpi_tag,
-                            tria->get_communicator(),
+                            tria->get_mpi_communicator(),
                             &*requests.rbegin());
                 AssertThrowMPI(ierr);
               }
@@ -315,7 +313,7 @@ namespace internal
                 MPI_Status status;
                 int        ierr = MPI_Probe(MPI_ANY_SOURCE,
                                      mpi_tag,
-                                     tria->get_communicator(),
+                                     tria->get_mpi_communicator(),
                                      &status);
                 AssertThrowMPI(ierr);
                 int len;
@@ -329,7 +327,7 @@ namespace internal
                                     MPI_BYTE,
                                     status.MPI_SOURCE,
                                     status.MPI_TAG,
-                                    tria->get_communicator(),
+                                    tria->get_mpi_communicator(),
                                     &status);
                     AssertThrowMPI(ierr);
                     continue;
@@ -346,7 +344,7 @@ namespace internal
                                 MPI_BYTE,
                                 status.MPI_SOURCE,
                                 status.MPI_TAG,
-                                tria->get_communicator(),
+                                tria->get_mpi_communicator(),
                                 &status);
                 AssertThrowMPI(ierr);
 
@@ -371,7 +369,7 @@ namespace internal
           // Make sure in debug mode, that everybody sent/received all packages
           // on this level. If a deadlock occurs here, the list of expected
           // senders is not computed correctly.
-          const int ierr = MPI_Barrier(tria->get_communicator());
+          const int ierr = MPI_Barrier(tria->get_mpi_communicator());
           AssertThrowMPI(ierr);
 #  endif
         }
@@ -923,7 +921,7 @@ namespace internal
                                    external_partitioners.empty() ?
                                      nullptr :
                                      external_partitioners[level],
-                                   tria.get_communicator(),
+                                   tria.get_mpi_communicator(),
                                    target_partitioners[level],
                                    copy_indices_global_mine[level]);
 
@@ -942,7 +940,7 @@ namespace internal
                                        external_partitioners.empty() ?
                                          nullptr :
                                          external_partitioners[0],
-                                       tria.get_communicator(),
+                                       tria.get_mpi_communicator(),
                                        target_partitioners[0],
                                        copy_indices_global_mine[0]);
 

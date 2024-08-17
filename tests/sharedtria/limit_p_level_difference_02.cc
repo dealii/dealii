@@ -98,7 +98,7 @@ test(const unsigned int fes_size,
       for (const auto &cell :
            dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
         count[cell->active_fe_index()]++;
-      Utilities::MPI::sum(count, tria.get_communicator(), count);
+      Utilities::MPI::sum(count, tria.get_mpi_communicator(), count);
       deallog << "cycle:" << i << ", fe count:" << count << std::endl;
     }
 

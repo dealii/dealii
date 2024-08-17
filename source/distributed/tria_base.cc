@@ -157,7 +157,7 @@ namespace parallel
 
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  MPI_Comm TriangulationBase<dim, spacedim>::get_communicator() const
+  MPI_Comm TriangulationBase<dim, spacedim>::get_mpi_communicator() const
   {
     return mpi_communicator;
   }

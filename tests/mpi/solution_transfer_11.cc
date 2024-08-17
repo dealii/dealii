@@ -60,7 +60,7 @@ test()
   LinearAlgebra::distributed::Vector<double> solution;
   solution.reinit(locally_owned_dofs,
                   locally_relevant_dofs,
-                  dofh.get_communicator());
+                  dofh.get_mpi_communicator());
 
   for (unsigned int i = 0; i < solution.size(); ++i)
     if (locally_owned_dofs.is_element(i))
@@ -68,7 +68,7 @@ test()
   solution.update_ghost_values();
 
   double l1_norm = solution.l1_norm();
-  if (Utilities::MPI::this_mpi_process(dofh.get_communicator()) == 0)
+  if (Utilities::MPI::this_mpi_process(dofh.get_mpi_communicator()) == 0)
     deallog << "pre  refinement l1=" << l1_norm << std::endl;
 
   // set refine/coarsen flags manually
@@ -121,11 +121,11 @@ test()
 
   solution.reinit(locally_owned_dofs,
                   locally_relevant_dofs,
-                  dofh.get_communicator());
+                  dofh.get_mpi_communicator());
   soltrans.interpolate(solution);
 
   l1_norm = solution.l1_norm();
-  if (Utilities::MPI::this_mpi_process(dofh.get_communicator()) == 0)
+  if (Utilities::MPI::this_mpi_process(dofh.get_mpi_communicator()) == 0)
     deallog << "post refinement l1=" << l1_norm << std::endl;
 
   // make sure no processor is hanging

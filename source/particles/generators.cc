@@ -204,7 +204,7 @@ namespace Particles
                                       1,
                                       DEAL_II_PARTICLE_INDEX_MPI_TYPE,
                                       MPI_SUM,
-                                      tria->get_communicator());
+                                      tria->get_mpi_communicator());
           AssertThrowMPI(ierr);
         }
 #endif
@@ -287,7 +287,7 @@ namespace Particles
               &triangulation))
         {
           const unsigned int my_rank =
-            Utilities::MPI::this_mpi_process(tria->get_communicator());
+            Utilities::MPI::this_mpi_process(tria->get_mpi_communicator());
           combined_seed += my_rank;
         }
       std::mt19937 random_number_generator(combined_seed);
@@ -320,8 +320,8 @@ namespace Particles
                 &triangulation))
           {
             std::tie(local_start_weight, global_weight_integral) =
-              Utilities::MPI::partial_and_total_sum(local_weight_integral,
-                                                    tria->get_communicator());
+              Utilities::MPI::partial_and_total_sum(
+                local_weight_integral, tria->get_mpi_communicator());
           }
         else
           {

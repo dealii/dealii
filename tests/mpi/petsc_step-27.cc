@@ -225,7 +225,7 @@ namespace Step27
     // We have not dealt with chains of constraints on ghost cells yet.
     // Thus, we are content with verifying their consistency for now.
     std::vector<IndexSet> locally_owned_dofs_per_processor =
-      Utilities::MPI::all_gather(dof_handler.get_communicator(),
+      Utilities::MPI::all_gather(dof_handler.get_mpi_communicator(),
                                  dof_handler.locally_owned_dofs());
 
     const IndexSet locally_active_dofs =

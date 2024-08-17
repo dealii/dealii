@@ -386,7 +386,7 @@ namespace Particles
 
     global_number_of_particles =
       dealii::Utilities::MPI::sum(number_of_locally_owned_particles,
-                                  triangulation->get_communicator());
+                                  triangulation->get_mpi_communicator());
 
     if (global_number_of_particles == 0)
       {
@@ -395,7 +395,9 @@ namespace Particles
       }
     else
       {
-        Utilities::MPI::max(result, triangulation->get_communicator(), result);
+        Utilities::MPI::max(result,
+                            triangulation->get_mpi_communicator(),
+                            result);
 
         next_free_particle_index      = result[1] + 1;
         global_max_particles_per_cell = result[0];
@@ -718,12 +720,13 @@ namespace Particles
             &*triangulation))
       {
         types::particle_index particles_to_add_locally = positions.size();
-        const int             ierr = MPI_Scan(&particles_to_add_locally,
-                                  &local_start_index,
-                                  1,
-                                  DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                                  MPI_SUM,
-                                  parallel_triangulation->get_communicator());
+        const int             ierr =
+          MPI_Scan(&particles_to_add_locally,
+                   &local_start_index,
+                   1,
+                   DEAL_II_PARTICLE_INDEX_MPI_TYPE,
+                   MPI_SUM,
+                   parallel_triangulation->get_mpi_communicator());
         AssertThrowMPI(ierr);
         local_start_index -= particles_to_add_locally;
       }
@@ -779,7 +782,7 @@ namespace Particles
     if (!ids.empty())
       AssertDimension(ids.size(), positions.size());
 
-    const auto comm = triangulation->get_communicator();
+    const auto comm = triangulation->get_mpi_communicator();
 
     const auto n_mpi_processes = Utilities::MPI::n_mpi_processes(comm);
 
@@ -1502,7 +1505,7 @@ namespace Particles
             &*triangulation))
       {
         if (dealii::Utilities::MPI::n_mpi_processes(
-              parallel_triangulation->get_communicator()) > 1)
+              parallel_triangulation->get_mpi_communicator()) > 1)
           send_recv_particles(moved_particles, moved_cells);
       }
 #endif
@@ -1540,7 +1543,7 @@ namespace Particles
     if (parallel_triangulation != nullptr)
       {
         if (dealii::Utilities::MPI::n_mpi_processes(
-              parallel_triangulation->get_communicator()) == 1)
+              parallel_triangulation->get_mpi_communicator()) == 1)
           return;
       }
     else
@@ -1647,7 +1650,7 @@ namespace Particles
         &*triangulation);
     if (parallel_triangulation == nullptr ||
         dealii::Utilities::MPI::n_mpi_processes(
-          parallel_triangulation->get_communicator()) == 1)
+          parallel_triangulation->get_mpi_communicator()) == 1)
       {
         return;
       }
@@ -1808,24 +1811,26 @@ namespace Particles
       std::vector<MPI_Request> n_requests(2 * n_neighbors);
       for (unsigned int i = 0; i < n_neighbors; ++i)
         {
-          const int ierr = MPI_Irecv(&(n_recv_data[i]),
-                                     1,
-                                     MPI_UNSIGNED,
-                                     neighbors[i],
-                                     mpi_tag,
-                                     parallel_triangulation->get_communicator(),
-                                     &(n_requests[2 * i]));
+          const int ierr =
+            MPI_Irecv(&(n_recv_data[i]),
+                      1,
+                      MPI_UNSIGNED,
+                      neighbors[i],
+                      mpi_tag,
+                      parallel_triangulation->get_mpi_communicator(),
+                      &(n_requests[2 * i]));
           AssertThrowMPI(ierr);
         }
       for (unsigned int i = 0; i < n_neighbors; ++i)
         {
-          const int ierr = MPI_Isend(&(n_send_data[i]),
-                                     1,
-                                     MPI_UNSIGNED,
-                                     neighbors[i],
-                                     mpi_tag,
-                                     parallel_triangulation->get_communicator(),
-                                     &(n_requests[2 * i + 1]));
+          const int ierr =
+            MPI_Isend(&(n_send_data[i]),
+                      1,
+                      MPI_UNSIGNED,
+                      neighbors[i],
+                      mpi_tag,
+                      parallel_triangulation->get_mpi_communicator(),
+                      &(n_requests[2 * i + 1]));
           AssertThrowMPI(ierr);
         }
       const int ierr =
@@ -1863,7 +1868,7 @@ namespace Particles
                         MPI_CHAR,
                         neighbors[i],
                         mpi_tag,
-                        parallel_triangulation->get_communicator(),
+                        parallel_triangulation->get_mpi_communicator(),
                         &(requests[send_ops]));
             AssertThrowMPI(ierr);
             ++send_ops;
@@ -1878,7 +1883,7 @@ namespace Particles
                         MPI_CHAR,
                         neighbors[i],
                         mpi_tag,
-                        parallel_triangulation->get_communicator(),
+                        parallel_triangulation->get_mpi_communicator(),
                         &(requests[send_ops + recv_ops]));
             AssertThrowMPI(ierr);
             ++recv_ops;
@@ -2021,7 +2026,7 @@ namespace Particles
                         MPI_CHAR,
                         neighbors[i],
                         mpi_tag,
-                        parallel_triangulation->get_communicator(),
+                        parallel_triangulation->get_mpi_communicator(),
                         &(requests[send_ops]));
             AssertThrowMPI(ierr);
             ++send_ops;
@@ -2036,7 +2041,7 @@ namespace Particles
                         MPI_CHAR,
                         neighbors[i],
                         mpi_tag,
-                        parallel_triangulation->get_communicator(),
+                        parallel_triangulation->get_mpi_communicator(),
                         &(requests[send_ops + recv_ops]));
             AssertThrowMPI(ierr);
             ++recv_ops;

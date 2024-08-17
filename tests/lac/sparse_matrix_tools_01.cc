@@ -63,7 +63,7 @@ reinit_sparsity_pattern(const DoFHandler<dim, spacedim>   &dof_handler,
                         TrilinosWrappers::SparsityPattern &sparsity_pattern)
 {
   sparsity_pattern.reinit(dof_handler.locally_owned_dofs(),
-                          dof_handler.get_communicator());
+                          dof_handler.get_mpi_communicator());
 }
 
 template <int dim,

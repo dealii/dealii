@@ -268,7 +268,7 @@ MGTransferPrebuilt<VectorType>::build(
           ::dealii::SparsityTools::distribute_sparsity_pattern(
             dsp,
             dof_handler.locally_owned_mg_dofs(level + 1),
-            dof_handler.get_communicator(),
+            dof_handler.get_mpi_communicator(),
             dsp.row_index_set());
         }
 #endif

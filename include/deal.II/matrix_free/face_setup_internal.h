@@ -296,7 +296,7 @@ namespace internal
               if (const dealii::parallel::TriangulationBase<dim> *ptria =
                     dynamic_cast<const dealii::parallel::TriangulationBase<dim>
                                    *>(&triangulation))
-                comm = ptria->get_communicator();
+                comm = ptria->get_mpi_communicator();
 
               MPI_Status   status;
               unsigned int mysize    = inner_face.second.shared_faces.size();

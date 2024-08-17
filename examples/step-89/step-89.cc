@@ -208,7 +208,7 @@ namespace Step89
 
       data_out.build_patches(mapping, degree, DataOut<dim>::curved_inner_cells);
       data_out.write_vtu_in_parallel(name_prefix + ".vtu",
-                                     dof_handler.get_communicator());
+                                     dof_handler.get_mpi_communicator());
     }
   } // namespace HelperFunctions
 
@@ -1180,7 +1180,7 @@ namespace Step89
                    (cell->vertex(1) - cell->vertex(0)).norm_square());
       h_local_min = std::sqrt(h_local_min);
       const double h_min =
-        Utilities::MPI::min(h_local_min, dof_handler.get_communicator());
+        Utilities::MPI::min(h_local_min, dof_handler.get_mpi_communicator());
 
       const double dt =
         cr * HelperFunctions::compute_dt_cfl(h_min, degree, speed_of_sound);

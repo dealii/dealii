@@ -55,7 +55,8 @@ test()
     Particles::ParticleHandler<dim, spacedim> particle_handler(tria_shared,
                                                                mapping);
 
-    if (Utilities::MPI::this_mpi_process(tria_shared.get_communicator()) == 0)
+    if (Utilities::MPI::this_mpi_process(tria_shared.get_mpi_communicator()) ==
+        0)
       {
         std::vector<Point<spacedim>> position(2);
         std::vector<Point<dim>>      reference_position(2);
@@ -86,7 +87,7 @@ test()
                   << " is in cell " << particle.get_surrounding_cell()
                   << " on process "
                   << Utilities::MPI::this_mpi_process(
-                       tria_shared.get_communicator())
+                       tria_shared.get_mpi_communicator())
                   << std::flush << std::endl;
       }
 
@@ -99,7 +100,7 @@ test()
               << " is in cell " << particle.get_surrounding_cell()
               << " on process "
               << Utilities::MPI::this_mpi_process(
-                   tria_shared.get_communicator())
+                   tria_shared.get_mpi_communicator())
               << std::flush << std::endl;
 
     // Move all points up by 0.5. This will change cell for particle 1 and will
@@ -116,7 +117,7 @@ test()
               << " is in cell " << particle.get_surrounding_cell()
               << " on process "
               << Utilities::MPI::this_mpi_process(
-                   tria_shared.get_communicator())
+                   tria_shared.get_mpi_communicator())
               << std::flush << std::endl;
   }
 

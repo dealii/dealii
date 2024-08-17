@@ -3683,7 +3683,7 @@ GridOut::write_mesh_per_processor_as_vtu(
           else
             pos += 1;
           const unsigned int n_procs =
-            Utilities::MPI::n_mpi_processes(tr->get_communicator());
+            Utilities::MPI::n_mpi_processes(tr->get_mpi_communicator());
           for (unsigned int i = 0; i < n_procs; ++i)
             filenames.push_back(filename_without_extension.substr(pos) +
                                 ".proc" + Utilities::int_to_string(i, 4) +

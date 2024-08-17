@@ -43,7 +43,7 @@ test()
     // particles
     Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
-    if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+    if (Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) == 0)
       {
         std::vector<Point<spacedim>> position(2);
         std::vector<Point<dim>>      reference_position(2);
@@ -75,7 +75,7 @@ test()
           deallog << "Before sort particle id " << particle.get_id()
                   << " is in cell " << particle.get_surrounding_cell()
                   << " on process "
-                  << Utilities::MPI::this_mpi_process(tr.get_communicator())
+                  << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
                   << std::flush << std::endl;
       }
 
@@ -87,7 +87,7 @@ test()
       deallog << "After sort particle id " << particle.get_id()
               << " is in cell " << particle.get_surrounding_cell()
               << " on process "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::flush << std::endl;
 
     // Move all points up by 0.5. This will change cell for particle 1, and will
@@ -103,7 +103,7 @@ test()
       deallog << "After shift particle id " << particle.get_id()
               << " is in cell " << particle.get_surrounding_cell()
               << " on process "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::flush << std::endl;
   }
 

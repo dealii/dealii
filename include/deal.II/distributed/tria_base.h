@@ -97,7 +97,7 @@ namespace parallel
      * Return MPI communicator used by this triangulation.
      */
     virtual MPI_Comm
-    get_communicator() const override;
+    get_mpi_communicator() const override;
 
     /**
      * Return if multilevel hierarchy is supported and has been constructed.

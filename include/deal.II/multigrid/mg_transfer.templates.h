@@ -129,7 +129,7 @@ namespace internal
       for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
         {
           v[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                          tria->get_communicator());
+                          tria->get_mpi_communicator());
         }
     }
 #endif
@@ -157,7 +157,7 @@ namespace internal
       for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
         {
           v[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                          tria->get_communicator());
+                          tria->get_mpi_communicator());
         }
     }
 #endif
@@ -216,7 +216,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
   internal::MGTransfer::reinit_vector(dof_handler, component_to_block_map, dst);
 #ifdef DEBUG_OUTPUT
   std::cout << "copy_to_mg src " << src.l2_norm() << std::endl;
-  int ierr = MPI_Barrier(dof_handler.get_communicator());
+  int ierr = MPI_Barrier(dof_handler.get_mpi_communicator());
   AssertThrowMPI(ierr);
 #endif
 
@@ -236,7 +236,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
     {
       --level;
 #ifdef DEBUG_OUTPUT
-      ierr = MPI_Barrier(dof_handler.get_communicator());
+      ierr = MPI_Barrier(dof_handler.get_mpi_communicator());
       AssertThrowMPI(ierr);
 #endif
 
@@ -257,7 +257,7 @@ MGLevelGlobalTransfer<VectorType>::copy_to_mg(
       dst_level.compress(VectorOperation::insert);
 
 #ifdef DEBUG_OUTPUT
-      ierr = MPI_Barrier(dof_handler.get_communicator());
+      ierr = MPI_Barrier(dof_handler.get_mpi_communicator());
       AssertThrowMPI(ierr);
       std::cout << "copy_to_mg dst " << level << ' ' << dst_level.l2_norm()
                 << std::endl;
@@ -295,11 +295,11 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
   for (unsigned int level = src.min_level(); level <= src.max_level(); ++level)
     {
 #ifdef DEBUG_OUTPUT
-      int ierr = MPI_Barrier(dof_handler.get_communicator());
+      int ierr = MPI_Barrier(dof_handler.get_mpi_communicator());
       AssertThrowMPI(ierr);
       std::cout << "copy_from_mg src " << level << ' ' << src[level].l2_norm()
                 << std::endl;
-      ierr = MPI_Barrier(dof_handler.get_communicator());
+      ierr = MPI_Barrier(dof_handler.get_mpi_communicator());
       AssertThrowMPI(ierr);
 #endif
 
@@ -320,7 +320,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
 #ifdef DEBUG_OUTPUT
       {
         dst.compress(VectorOperation::insert);
-        ierr = MPI_Barrier(dof_handler.get_communicator());
+        ierr = MPI_Barrier(dof_handler.get_mpi_communicator());
         AssertThrowMPI(ierr);
         std::cout << "copy_from_mg level=" << level << ' ' << dst.l2_norm()
                   << std::endl;
@@ -329,7 +329,7 @@ MGLevelGlobalTransfer<VectorType>::copy_from_mg(
     }
   dst.compress(VectorOperation::insert);
 #ifdef DEBUG_OUTPUT
-  const int ierr = MPI_Barrier(dof_handler.get_communicator());
+  const int ierr = MPI_Barrier(dof_handler.get_mpi_communicator());
   AssertThrowMPI(ierr);
   std::cout << "copy_from_mg " << dst.l2_norm() << std::endl;
 #endif
@@ -445,7 +445,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
           dst[level].reinit(ghosted_level_vector[level], false);
         else
           dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
-                            dof_handler.get_communicator());
+                            dof_handler.get_mpi_communicator());
       }
     else if ((perform_plain_copy == false &&
               perform_renumbered_plain_copy == false) ||

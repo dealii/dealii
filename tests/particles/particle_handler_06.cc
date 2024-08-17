@@ -45,7 +45,7 @@ test()
     Point<spacedim> position;
     Point<dim>      reference_position;
 
-    if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
+    if (Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()) == 0)
       for (unsigned int i = 0; i < dim; ++i)
         position[i] = 0.475;
     else
@@ -55,7 +55,7 @@ test()
     Particles::Particle<dim, spacedim> particle(
       position,
       reference_position,
-      Utilities::MPI::this_mpi_process(tr.get_communicator()));
+      Utilities::MPI::this_mpi_process(tr.get_mpi_communicator()));
 
     // We give a local random cell hint to check that sorting and
     // transferring ghost particles works.
@@ -74,7 +74,7 @@ test()
          ++particle)
       deallog << "Particle id " << particle->get_id()
               << " is local particle on process "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
 
     for (auto particle = particle_handler.begin_ghost();
@@ -82,7 +82,7 @@ test()
          ++particle)
       deallog << "Particle id " << particle->get_id()
               << " is ghost particle on process "
-              << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << Utilities::MPI::this_mpi_process(tr.get_mpi_communicator())
               << std::endl;
   }
 

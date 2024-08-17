@@ -457,7 +457,7 @@ namespace Step75
 
         TrilinosWrappers::SparsityPattern dsp(
           dof_handler.locally_owned_dofs(),
-          dof_handler.get_triangulation().get_communicator());
+          dof_handler.get_triangulation().get_mpi_communicator());
 
         DoFTools::make_sparsity_pattern(dof_handler, dsp, this->constraints);
 

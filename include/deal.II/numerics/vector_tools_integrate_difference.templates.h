@@ -669,7 +669,7 @@ namespace VectorTools
     }
 #endif
 
-    const MPI_Comm comm = tria.get_communicator();
+    const MPI_Comm comm = tria.get_mpi_communicator();
 
     switch (norm)
       {
