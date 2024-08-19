@@ -1,0 +1,3 @@
+Fixed: Objects of type FEFaceEvaluation can now be collected in an std::vector.
+<br>
+(Martin Kronbichler, John Coughlin, 2024/08/19)
