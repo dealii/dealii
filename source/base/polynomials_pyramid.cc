@@ -266,7 +266,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
 {
   AssertDimension(dim, 3);
   AssertIndexRange(i, VDM_inv.m());
-  
+
   Tensor<1, dim> grad;
 
   for (unsigned int j = 0; j < VDM_inv.n(); ++j)

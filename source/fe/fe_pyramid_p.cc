@@ -330,15 +330,14 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
         ComponentMask(std::vector<bool>(1, true))))
 {
   AssertDimension(dim, 3);
-    
+
   for (auto &support_point : dpos_support_points.second)
     this->unit_support_points.emplace_back(support_point);
-  
+
   if (conformity == FiniteElementData<dim>::H1)
     {
       // face support points
-      this->unit_face_support_points.resize(
-        this->reference_cell().n_faces());
+      this->unit_face_support_points.resize(this->reference_cell().n_faces());
 
       for (const auto f : this->reference_cell().face_indices())
         {
@@ -348,8 +347,7 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
           if (face_reference_cell == ReferenceCells::Quadrilateral)
             {
               FE_Q<2> fe_face(degree);
-              for (auto &face_support_point :
-                    fe_face.get_unit_support_points())
+              for (auto &face_support_point : fe_face.get_unit_support_points())
                 {
                   Point<dim - 1> p;
                   for (unsigned int d = 0; d < dim - 1; ++d)
@@ -360,8 +358,7 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
           else if (face_reference_cell == ReferenceCells::Triangle)
             {
               FE_SimplexP<2> fe_face(degree);
-              for (auto &face_support_point :
-                    fe_face.get_unit_support_points())
+              for (auto &face_support_point : fe_face.get_unit_support_points())
                 {
                   Point<dim - 1> p;
                   for (unsigned int d = 0; d < dim - 1; ++d)
@@ -452,18 +449,8 @@ FE_PyramidP<dim, spacedim>::compare_for_domination(
   // (if fe_other is not derived from FE_SimplexDGP)
   // & cell domination
   // ----------------------------------------
-  if (const FE_PyramidP<dim, spacedim> *fe_pp_other =
-        dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
-    {
-      if (this->degree < fe_pp_other->degree)
-        return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_pp_other->degree)
-        return FiniteElementDomination::either_element_can_dominate;
-      else
-        return FiniteElementDomination::other_element_dominates;
-    }
-  else if (const FE_SimplexP<dim, spacedim> *fe_p_other =
-             dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
+  if (const FE_SimplexP<dim, spacedim> *fe_p_other =
+        dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
     {
       if (this->degree < fe_p_other->degree)
         return FiniteElementDomination::this_element_dominates;
@@ -478,6 +465,26 @@ FE_PyramidP<dim, spacedim>::compare_for_domination(
       if (this->degree < fe_q_other->degree)
         return FiniteElementDomination::this_element_dominates;
       else if (this->degree == fe_q_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const FE_PyramidP<dim, spacedim> *fe_pp_other =
+             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_pp_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_pp_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const FE_WedgeP<dim, spacedim> *fe_pp_other =
+             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_pp_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_pp_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;

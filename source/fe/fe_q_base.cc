@@ -860,23 +860,12 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
 
       return identities;
     }
-  else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
-             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+  else if ((dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr))
     {
-      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
+      Assert(fe_other.degree == this->degree, ExcNotImplemented());
+
       std::vector<std::pair<unsigned int, unsigned int>> identities;
-
-      for (unsigned int i = 0; i < this->degree - 1; ++i)
-        identities.emplace_back(i, i);
-
-      return identities;
-    }
-  else if (const FE_PyramidP<dim, spacedim> *fe_p_other =
-             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
-    {
-      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
-      std::vector<std::pair<unsigned int, unsigned int>> identities;
-
       for (unsigned int i = 0; i < this->degree - 1; ++i)
         identities.emplace_back(i, i);
       return identities;
@@ -911,7 +900,7 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
-  const unsigned int /*face_no*/) const
+  const unsigned int) const
 {
   // we can presently only compute these identities if both FEs are FE_Qs or
   // if the other one is an FE_Nothing
@@ -957,18 +946,10 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr)
+  else if ((dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr))
     {
-      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
-      std::vector<std::pair<unsigned int, unsigned int>> identities;
-      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
-        identities.emplace_back(i, i);
-      return identities;
-    }
-  else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
-             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
-    {
-      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
+      Assert(fe_other.degree == this->degree, ExcNotImplemented());
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
       for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)

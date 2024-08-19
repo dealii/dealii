@@ -951,25 +951,14 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
 
       return identities;
     }
-  else if (const auto *fe_p_other =
-             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+  else if ((dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr))
     {
-      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
-      std::vector<std::pair<unsigned int, unsigned int>> identities;
+      Assert(fe_other.degree == this->degree, ExcNotImplemented());
 
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
       for (unsigned int i = 0; i < this->degree - 1; ++i)
         identities.emplace_back(i, i);
-      return identities;
-    }
-  else if (const auto *fe_p_other =
-             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
-    {
-      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
-      std::vector<std::pair<unsigned int, unsigned int>> identities;
-
-      for (unsigned int i = 0; i < this->degree - 1; ++i)
-        identities.emplace_back(i, i);
-
       return identities;
     }
 
@@ -1070,17 +1059,11 @@ FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (const FE_PyramidP<dim, spacedim> *fe_p_other =
-             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+  else if ((dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr))
     {
-      std::vector<std::pair<unsigned int, unsigned int>> identities;
-      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
-        identities.emplace_back(i, i);
-      return identities;
-    }
-  else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
-             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
-    {
+      Assert(fe_other.degree == this->degree, ExcNotImplemented());
+
       std::vector<std::pair<unsigned int, unsigned int>> identities;
       for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
         identities.emplace_back(i, i);

@@ -51,15 +51,6 @@ public:
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double>               &nodal_values) const override;
-
-
-
-  std::pair<const internal::GenericDoFsPerObject, const std::vector<Point<dim>>>
-  get_support_points_dpo_vector_fe_pyramid_dgp(const unsigned int dim_,
-                                               const unsigned int degree);
-  std::pair<const internal::GenericDoFsPerObject, const std::vector<Point<dim>>>
-  get_support_points_dpo_vector_fe_pyramid_p(const unsigned int dim_,
-                                             const unsigned int degree);
 };
 
 /**
