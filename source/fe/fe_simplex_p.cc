@@ -954,31 +954,21 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
   else if (const auto *fe_p_other =
              dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
     {
+      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
-        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
-          if (std::fabs(this->unit_support_points[i + this->reference_cell()
-                                                        .n_vertices()][0] -
-                        fe_p_other->get_unit_support_points()
-                          [i + fe_p_other->reference_cell().n_vertices()][0]) <
-              1e-14)
-            identities.emplace_back(i, j);
+        identities.emplace_back(i, i);
       return identities;
     }
   else if (const auto *fe_p_other =
              dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
     {
+      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
-        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
-          if (std::fabs(this->unit_support_points[i + this->reference_cell()
-                                                        .n_vertices()][0] -
-                        fe_p_other->get_unit_support_points()
-                          [i + fe_p_other->reference_cell().n_vertices()][0]) <
-              1e-14)
-            identities.emplace_back(i, j);
+        identities.emplace_back(i, i);
 
       return identities;
     }
@@ -1080,18 +1070,21 @@ FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
-  else if (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr)
+  else if (const FE_PyramidP<dim, spacedim> *fe_p_other =
+             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
     {
-      // there are no dofs on the faces
-      Assert(fe_other.degree == 1 || fe_other.degree == 2, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
+        identities.emplace_back(i, i);
+      return identities;
     }
   else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
              dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
     {
-      // there are no DoFs on the faces on triangles
-      Assert(fe_other.degree == 1 || fe_other.degree == 2, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int>>();
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
+        identities.emplace_back(i, i);
+      return identities;
     }
   else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {

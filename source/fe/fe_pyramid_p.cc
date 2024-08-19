@@ -43,39 +43,6 @@ namespace
   /**
    * Helper function to set up the dpo vector of FE_PyramidP for a given @p degree.
    */
-  internal::GenericDoFsPerObject
-  get_dpo_vector_fe_pyramid_p(const unsigned int degree)
-  {
-    internal::GenericDoFsPerObject dpo;
-
-    if (degree == 1)
-      {
-        dpo.dofs_per_object_exclusive  = {{1}, {0}, {0, 0, 0, 0, 0}, {0}};
-        dpo.dofs_per_object_inclusive  = {{1}, {2}, {4, 3, 3, 3, 3}, {5}};
-        dpo.object_index               = {{}, {5}, {5}, {5}};
-        dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {4, 3, 3, 3, 3}};
-      }
-    else if (degree == 2)
-      {
-        dpo.dofs_per_object_exclusive  = {{1}, {1}, {1, 0, 0, 0, 0}, {0}};
-        dpo.dofs_per_object_inclusive  = {{1}, {3}, {9, 6, 6, 6, 6}, {14}};
-        dpo.object_index               = {{},
-                                          {5, 6, 7, 8, 9, 10, 11, 12},
-                                          {13, 14, 14, 14, 14},
-                                          {14}};
-        dpo.first_object_index_on_face = {{}, {4, 3, 3, 3, 3}, {8, 6, 6, 6, 6}};
-      }
-    else
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-      }
-
-    return dpo;
-  }
-
-  /**
-   * Helper function to set up the dpo vector of FE_PyramidP for a given @p degree.
-   */
   template <int dim>
   std::pair<const internal::GenericDoFsPerObject, const std::vector<Point<dim>>>
   get_support_points_dpo_vector_fe_pyramid_p(const unsigned int degree)
@@ -329,26 +296,6 @@ namespace
 
     return dpos_support_points;
   }
-
-
-
-  /**
-   * Helper function to set up the dpo vector of FE_PyramidDGP for a given @p degree.
-   */
-  internal::GenericDoFsPerObject
-  get_dpo_vector_fe_pyramid_dgp(const unsigned int degree)
-  {
-    unsigned int n_dofs = 0;
-
-    if (degree == 1)
-      n_dofs = 5;
-    if (degree == 2)
-      n_dofs = 14;
-    else
-      DEAL_II_NOT_IMPLEMENTED();
-
-    return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCells::Pyramid);
-  }
 } // namespace
 
 
@@ -383,118 +330,46 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
         ComponentMask(std::vector<bool>(1, true))))
 {
   AssertDimension(dim, 3);
-
-  if (false) //(degree == 1)
+    
+  for (auto &support_point : dpos_support_points.second)
+    this->unit_support_points.emplace_back(support_point);
+  
+  if (conformity == FiniteElementData<dim>::H1)
     {
-      for (const auto i : this->reference_cell().vertex_indices())
-        this->unit_support_points.emplace_back(
-          this->reference_cell().template vertex<dim>(i));
-
-      this->unit_face_support_points.resize(this->reference_cell().n_faces());
-
-      for (const auto f : this->reference_cell().face_indices())
-        {
-          const auto face_reference_cell =
-            this->reference_cell().face_reference_cell(f);
-
-          for (const auto i : face_reference_cell.vertex_indices())
-            this->unit_face_support_points[f].emplace_back(
-              face_reference_cell.template vertex<dim - 1>(i));
-        }
-    }
-  else if (false) //(degree == 2)
-    {
-      for (const auto i : this->reference_cell().vertex_indices())
-        this->unit_support_points.emplace_back(
-          this->reference_cell().template vertex<dim>(i));
-
-      // lines:
-      for (const unsigned int l : this->reference_cell().line_indices())
-        {
-          this->unit_support_points.emplace_back(
-            0.5 * this->unit_support_points[this->reference_cell()
-                                              .line_to_cell_vertices(l, 0)] +
-            0.5 * this->unit_support_points[this->reference_cell()
-                                              .line_to_cell_vertices(l, 1)]);
-        }
-      // quad:
-      this->unit_support_points.emplace_back(Point<dim>(0.0, 0.0, 0.0));
-
       // face support points
-      this->unit_face_support_points.resize(this->reference_cell().n_faces());
+      this->unit_face_support_points.resize(
+        this->reference_cell().n_faces());
 
       for (const auto f : this->reference_cell().face_indices())
         {
           const auto face_reference_cell =
             this->reference_cell().face_reference_cell(f);
 
-
-          // vertices
-          for (const auto i : face_reference_cell.vertex_indices())
-            this->unit_face_support_points[f].emplace_back(
-              face_reference_cell.template vertex<dim - 1>(i));
-
-          // lines
-          for (const unsigned int l : face_reference_cell.line_indices())
-            {
-              this->unit_face_support_points[f].emplace_back(
-                0.5 * this->unit_face_support_points
-                        [f][face_reference_cell.line_to_cell_vertices(l, 0)] +
-                0.5 * this->unit_face_support_points
-                        [f][face_reference_cell.line_to_cell_vertices(l, 1)]);
-            }
           if (face_reference_cell == ReferenceCells::Quadrilateral)
             {
-              Point<dim - 1> midpoint;
-              for (const auto i : face_reference_cell.vertex_indices())
-                midpoint += face_reference_cell.template vertex<dim - 1>(i);
-              midpoint /= face_reference_cell.n_vertices();
-              this->unit_face_support_points[f].emplace_back(midpoint);
+              FE_Q<2> fe_face(degree);
+              for (auto &face_support_point :
+                    fe_face.get_unit_support_points())
+                {
+                  Point<dim - 1> p;
+                  for (unsigned int d = 0; d < dim - 1; ++d)
+                    p[d] = face_support_point[d];
+                  this->unit_face_support_points[f].emplace_back(p);
+                }
+            }
+          else if (face_reference_cell == ReferenceCells::Triangle)
+            {
+              FE_SimplexP<2> fe_face(degree);
+              for (auto &face_support_point :
+                    fe_face.get_unit_support_points())
+                {
+                  Point<dim - 1> p;
+                  for (unsigned int d = 0; d < dim - 1; ++d)
+                    p[d] = face_support_point[d];
+                  this->unit_face_support_points[f].emplace_back(p);
+                }
             }
         }
-    }
-  else
-    {
-      for (auto &support_point : dpos_support_points.second)
-        this->unit_support_points.emplace_back(support_point);
-      /*
-            if (conformity == FiniteElementData<dim>::H1)
-              {
-                // face support points
-                this->unit_face_support_points.resize(
-                  this->reference_cell().n_faces());
-
-                for (const auto f : this->reference_cell().face_indices())
-                  {
-                    const auto face_reference_cell =
-                      this->reference_cell().face_reference_cell(f);
-
-                    if (face_reference_cell == ReferenceCells::Quadrilateral)
-                      {
-                        FE_Q<2> fe_face(degree);
-                        for (auto &face_support_point :
-                             fe_face.get_unit_support_points())
-                          {
-                            Point<dim - 1> p;
-                            for (unsigned int d = 0; d < dim - 1; ++d)
-                              p[d] = face_support_point[d];
-                            this->unit_face_support_points[f].emplace_back(p);
-                          }
-                      }
-                    else if (face_reference_cell == ReferenceCells::Triangle)
-                      {
-                        FE_SimplexP<2> fe_face(degree);
-                        for (auto &face_support_point :
-                             fe_face.get_unit_support_points())
-                          {
-                            Point<dim - 1> p;
-                            for (unsigned int d = 0; d < dim - 1; ++d)
-                              p[d] = face_support_point[d];
-                            this->unit_face_support_points[f].emplace_back(p);
-                          }
-                      }
-                  }
-              }*/
     }
 }
 

@@ -863,62 +863,22 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
   else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
              dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
     {
-      // DoFs are located along lines, so two dofs are identical if they are
-      // located at identical positions. If the points are at the same location,
-      // the lines have to ahve identical support points, if not then there are
-      // no shared support points. For FE_Q, we take the lexicographic ordering
-      // of the line support points in the first direction (i.e., x-direction),
-      // which we access between index 1 and p-1 (index 0 and p are vertex
-      // dofs). For FE_WedgeP, they are currently hard-coded and we iterate over
-      // points on the first line which begin after the 6 vertex points in the
-      // complete list of unit support points
-
-      const std::vector<unsigned int> &index_map_inverse_q =
-        this->get_poly_space_numbering_inverse();
-
+      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
-        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
-          if (std::fabs(
-                this->unit_support_points[index_map_inverse_q[i + 1]][0] -
-                fe_p_other->get_unit_support_points()
-                  [j + fe_p_other->reference_cell().n_vertices()][0]) < 1e-14)
-            identities.emplace_back(i, j);
+        identities.emplace_back(i, i);
 
       return identities;
     }
   else if (const FE_PyramidP<dim, spacedim> *fe_p_other =
              dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
     {
-      // DoFs are located along lines, so two dofs are identical if they are
-      // located at identical positions. If the points are at the same location,
-      // the lines have to ahve identical support points, if not then there are
-      // no shared support points. For FE_Q, we take the lexicographic ordering
-      // of the line support points in the first direction (i.e., x-direction),
-      // which we access between index 1 and p-1 (index 0 and p are vertex
-      // dofs). For FE_PyramidP, they are currently hard-coded and we iterate
-      // over points on the first line which begin after the 6 vertex points in
-      // the complete list of unit support points
-
-      const std::vector<unsigned int> &index_map_inverse_q =
-        this->get_poly_space_numbering_inverse();
-
+      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
         identities.emplace_back(i, i);
-      return identities;
-
-
-      for (unsigned int i = 0; i < this->degree - 1; ++i)
-        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
-          if (std::fabs(
-                this->unit_support_points[index_map_inverse_q[i + 1]][0] -
-                fe_p_other->get_unit_support_points()
-                  [j + fe_p_other->reference_cell().n_vertices()][0]) < 1e-14)
-            identities.emplace_back(i, j);
-
       return identities;
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
@@ -999,25 +959,19 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
     }
   else if (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr)
     {
-      // Only linear Pyramid Elements are implemented
-      // there are no dofs on the faces
-      // Assert(fe_other.degree == 1, ExcNotImplemented());
-
+      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
       std::vector<std::pair<unsigned int, unsigned int>> identities;
-      // if (face_no == 0)
-      for (unsigned int i = 0; i < fe_other.n_dofs_per_quad(0); ++i)
+      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
         identities.emplace_back(i, i);
       return identities;
     }
   else if (const FE_WedgeP<dim, spacedim> *fe_p_other =
              dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
     {
-      // Works like the line case, we just have to check it in 2 different
-      // spaial dimensions. If p=1, then there are none, if p=2 then there is
-      // one points on the quad.
+      Assert(fe_p_other->degree == this->this->degree, ExcNotImplemented());
+
       std::vector<std::pair<unsigned int, unsigned int>> identities;
-      // if (face_no == 0)
-      for (unsigned int i = 0; i < fe_other.n_dofs_per_quad(0); ++i)
+      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
         identities.emplace_back(i, i);
       return identities;
     }
