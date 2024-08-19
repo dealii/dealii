@@ -2324,15 +2324,16 @@ namespace internal
 
                       bool       is_mixed_mesh = false;
                       const auto reference_cell =
-                        dof_handler.get_fe(0).reference_cell();
+                        dof_handler.get_fe(quad->nth_active_fe_index(0))
+                          .reference_cell();
                       for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                         if (!(reference_cell ==
                               dof_handler.get_fe(quad->nth_active_fe_index(f))
                                 .reference_cell()))
                           is_mixed_mesh = true;
 
-                      unsigned int hypercube_or_simplex_fe_index =
-                        numbers::invalid_unsigned_int;
+                      unsigned short hypercube_or_simplex_fe_index =
+                        numbers::invalid_fe_index;
                       if (is_mixed_mesh)
                         // try finding an index which is not pyramid or wedge
                         for (unsigned int f = 0; f < n_active_fe_indices; ++f)

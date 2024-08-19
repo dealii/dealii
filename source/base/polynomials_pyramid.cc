@@ -217,15 +217,6 @@ ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
     for (unsigned j = 0; j < VDM.n(); ++j)
       VDM[i][j] = this->compute_jacobi_basis(i, support_points[j]);
 
-  std::cout << "VDM" << std::endl;
-  for (unsigned i = 0; i < support_points.size(); ++i)
-    {
-      for (unsigned j = 0; j < support_points.size(); ++j)
-        std::cout << VDM[i][j] << " ";
-      std::cout << std::endl;
-    }
-
-
   // get inverse
   VDM.gauss_jordan();
 
