@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/complex_overloads.h>
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/std_cxx20/type_traits.h>
 
 #include <complex>
@@ -1051,6 +1052,10 @@ namespace concepts
     {
       U.all_zero()
     } -> std::same_as<bool>;
+
+    {
+      U.get_mpi_communicator()
+    } -> std::same_as<MPI_Comm>;
   };
 
 
