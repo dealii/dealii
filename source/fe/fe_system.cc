@@ -2429,12 +2429,10 @@ FESystem<dim, spacedim>::compare_for_domination(
                         std::to_string(fe_sys_other->n_components()) +
                         " vector components."));
 
-      const unsigned int n_components = this->n_components();
-
       FiniteElementDomination::Domination domination =
         FiniteElementDomination::no_requirements;
 
-      for (unsigned int c = 0; c < n_components; ++c)
+      for (unsigned int c = 0; c < this->n_components(); ++c)
         {
           const unsigned int base_element_index_in_fe_sys_this =
             this->component_to_base_index(c).first;
