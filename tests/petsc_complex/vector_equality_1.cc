@@ -56,7 +56,7 @@ main(int argc, char **argv)
         PETScWrappers::MPI::Vector w(MPI_COMM_WORLD, 20, 20);
         test(v, w);
 
-        // SOme output
+        // Some output
         deallog << "Complex vectors: " << std::endl;
         v.print(deallog.get_file_stream(), 0, false, true);
         w.print(deallog.get_file_stream(), 0, false, true);

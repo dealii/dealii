@@ -39,7 +39,7 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
   const double left  = 0;
   const double right = 1;
 
-  auto add_periodicy = [&](dealii::Triangulation<dim> &tria) {
+  auto add_periodicity = [&](dealii::Triangulation<dim> &tria) {
     std::vector<
       GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
          periodic_faces;
@@ -78,8 +78,8 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
   // create serial triangulation
   Triangulation<dim> basetria;
   GridGenerator::subdivided_hyper_cube(basetria, n_subdivisions);
-  // new: add periodicy on serial mesh
-  add_periodicy(basetria);
+  // new: add periodicity on serial mesh
+  add_periodicity(basetria);
   basetria.refine_global(n_refinements);
 
   GridTools::partition_triangulation_zorder(
@@ -96,8 +96,8 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
   // actually create triangulation
   tria_pft.create_triangulation(construction_data);
 
-  // new: add periodicy on fullydistributed mesh (!!!)
-  add_periodicy(tria_pft);
+  // new: add periodicity on fullydistributed mesh (!!!)
+  add_periodicity(tria_pft);
 
   // test triangulation
   FE_Q<dim>       fe(2);

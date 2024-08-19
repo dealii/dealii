@@ -978,7 +978,7 @@ namespace Threads
               // the current executor from scheduling more tasks, but it is
               // unrelated to the tasks of the scheduler for which we are
               // waiting for something, and so that other executor will
-              // eventually get arond to scheduling the task we are waiting
+              // eventually get around to scheduling the task we are waiting
               // for, at which point the current task will also complete.
               future.wait();
 
