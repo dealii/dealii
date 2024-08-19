@@ -950,6 +950,14 @@ public:
   update_ghost_values() const;
 
   /**
+   * This function returns the MPI communicator of the vector in the
+   * underlying blocks or, if the vector has not been initialized, the empty
+   * MPI_COMM_SELF.
+   */
+  MPI_Comm
+  get_mpi_communicator() const;
+
+  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
@@ -1990,6 +1998,18 @@ BlockVectorBase<VectorType>::update_ghost_values() const
 {
   for (size_type i = 0; i < n_blocks(); ++i)
     block(i).update_ghost_values();
+}
+
+
+
+template <typename VectorType>
+MPI_Comm
+BlockVectorBase<VectorType>::get_mpi_communicator() const
+{
+  if (n_blocks() > 0)
+    return block(0).get_mpi_communicator();
+  else
+    return MPI_COMM_SELF;
 }
 
 

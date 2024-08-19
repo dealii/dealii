@@ -1072,6 +1072,16 @@ public:
    */
   void
   zero_out_ghost_values() const;
+
+  /**
+   * This function returns the empty object MPI_COMM_SELF that does not signal
+   * any parallel communication model, as this vector is in fact serial with
+   * respect to the message passing interface (MPI). The function exists for
+   * compatibility with the @p parallel vector classes (e.g.,
+   * LinearAlgebra::distributed::Vector class).
+   */
+  MPI_Comm
+  get_mpi_communicator() const;
   /** @} */
 
 private:
@@ -1411,6 +1421,14 @@ inline void
 Vector<Number>::update_ghost_values() const
 {}
 
+
+
+template <typename Number>
+inline MPI_Comm
+Vector<Number>::get_mpi_communicator() const
+{
+  return MPI_COMM_SELF;
+}
 
 
 template <typename Number>
