@@ -2517,8 +2517,16 @@ inline FEEvaluationBase<dim,
           other.mapped_geometry->get_fe_values().get_mapping(),
           other.mapped_geometry->get_quadrature(),
           other.mapped_geometry->get_fe_values().get_update_flags());
-      this->mapping_data = &this->mapped_geometry->get_data_storage();
-      this->cell         = 0;
+
+      if constexpr (is_face == false)
+        this->mapping_data = &this->mapped_geometry->get_data_storage();
+      else
+        Assert(false,
+               ExcNotImplemented("On-the-fly geometry evaluation with "
+                                 "face evaluators is not currently "
+                                 "implemented!"));
+
+      this->cell = 0;
 
       this->jacobian =
         this->mapped_geometry->get_data_storage().jacobians[0].begin();
@@ -2585,8 +2593,16 @@ operator=(const FEEvaluationBase<dim,
           other.mapped_geometry->get_fe_values().get_mapping(),
           other.mapped_geometry->get_quadrature(),
           other.mapped_geometry->get_fe_values().get_update_flags());
-      this->cell         = 0;
-      this->mapping_data = &this->mapped_geometry->get_data_storage();
+
+      if constexpr (is_face == false)
+        this->mapping_data = &this->mapped_geometry->get_data_storage();
+      else
+        Assert(false,
+               ExcNotImplemented("On-the-fly geometry evaluation with "
+                                 "face evaluators is not currently "
+                                 "implemented!"));
+      this->cell = 0;
+
       this->jacobian =
         this->mapped_geometry->get_data_storage().jacobians[0].begin();
       this->J_value =
