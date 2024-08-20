@@ -770,6 +770,16 @@ namespace Polynomials
                           const Number       x,
                           const bool         rescale = true);
 
+  /*
+   * Evaluate the derivative of the Jacobi polynomial $ d P_n^{\alpha, \beta}(x)
+   * / dx $ specified by the
+   * parameters @p alpha, @p beta, @p n, where @p n is the degree of the
+   * Jacobi polynomial.
+   *
+   * @note The Jacobi polynomials are not orthonormal and are defined on the
+   * unit interval $[0, 1]$ as usual for deal.II, rather than $[-1, +1]$ often
+   * used in literature. @p x is the point of evaluation.
+   */
   template <typename Number>
   Number
   jacobi_polynomial_derivative(const unsigned int degree,
@@ -777,7 +787,6 @@ namespace Polynomials
                                const int          beta,
                                const Number       x,
                                const bool         rescale = true);
-
 
   /**
    * Compute the roots of the Jacobi polynomials on the unit interval $[0, 1]$
@@ -1106,14 +1115,11 @@ namespace Polynomials
     if (degree == 0)
       return 0.0;
     if (rescale)
-      return (1 + alpha + beta + degree) * jacobi_polynomial_value(degree - 1,
-                                                                   alpha + 1,
-                                                                   beta + 1,
-                                                                   x,
-                                                                   rescale);
+      return (1 + alpha + beta + degree) *
+             jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, true);
 
     return 0.5 * (1 + alpha + beta + degree) *
-           jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, rescale);
+           jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, false);
   }
 
 

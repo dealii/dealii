@@ -276,7 +276,7 @@ namespace
 
 
   /**
-   * Helper function to set up the dpo vector of FE_PyramidP for a given @p degree.
+   * Helper function to set up the dpo vector of FE_PyramidDGP for a given @p degree.
    */
   template <int dim>
   std::pair<const internal::GenericDoFsPerObject, const std::vector<Point<dim>>>

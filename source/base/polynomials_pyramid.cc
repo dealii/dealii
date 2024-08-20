@@ -19,12 +19,36 @@
 #include <deal.II/base/polynomials_pyramid.h>
 #include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/fe/fe_q.h>
-
-#include <deal.II/grid/reference_cell.h>
-
 
 DEAL_II_NAMESPACE_OPEN
+
+
+
+template <int dim>
+ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
+  const unsigned int            degree,
+  const unsigned int            n_dofs,
+  const std::vector<Point<dim>> support_points)
+  : ScalarPolynomialsBase<dim>(degree, n_dofs)
+{
+  // fill VDM Matrix
+  FullMatrix<double> VDM(support_points.size());
+
+  for (unsigned i = 0; i < VDM.m(); ++i)
+    for (unsigned j = 0; j < VDM.n(); ++j)
+      VDM[i][j] = this->compute_jacobi_basis(i, support_points[j]);
+
+  // get inverse
+  VDM.gauss_jordan();
+
+  for (unsigned i = 0; i < VDM.m(); ++i)
+    for (unsigned j = 0; j < VDM.n(); ++j)
+      if (std::fabs(VDM[i][j]) < 1e-14)
+        VDM[i][j] = 0.0;
+
+  VDM_inv = VDM;
+}
+
 
 
 template <int dim>
@@ -68,9 +92,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_basis(
   const unsigned int i,
   const Point<dim>  &p) const
 {
-  AssertIndexRange(i,
-                   (this->degree() + 1) * (this->degree() + 2) *
-                     (2 * this->degree() + 3) / 6);
+  AssertIndexRange(i, this->n());
 
   // find corresponding entrance to i
   for (unsigned int j = 0, counter = 0; j <= this->degree(); ++j)
@@ -88,7 +110,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_basis(
 
 template <int dim>
 Tensor<1, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_deriv(
+ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
   const unsigned int i,
   const unsigned int j,
   const unsigned int k,
@@ -181,13 +203,11 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_deriv(
 
 template <int dim>
 Tensor<1, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_deriv(
+ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_derivative(
   const unsigned int i,
   const Point<dim>  &p) const
 {
-  AssertIndexRange(i,
-                   (this->degree() + 1) * (this->degree() + 2) *
-                     (2 * this->degree() + 3) / 6);
+  AssertIndexRange(i, this->n());
 
   // find corresponding entrance to i
   for (unsigned int j = 0, counter = 0; j <= this->degree(); ++j)
@@ -195,37 +215,10 @@ ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_deriv(
       for (unsigned int l = 0; l <= this->degree() - std::max(j, k);
            ++l, ++counter)
         if (counter == i)
-          return compute_polynomial_space_deriv(j, k, l, p);
+          return compute_polynomial_space_derivative(j, k, l, p);
 
   DEAL_II_ASSERT_UNREACHABLE();
   return Tensor<1, dim>();
-}
-
-
-
-template <int dim>
-ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
-  const unsigned int            degree,
-  const unsigned int            n_dofs,
-  const std::vector<Point<dim>> support_points)
-  : ScalarPolynomialsBase<dim>(degree, n_dofs)
-{
-  // fill VDM Matrix
-  FullMatrix<double> VDM(support_points.size());
-
-  for (unsigned i = 0; i < VDM.m(); ++i)
-    for (unsigned j = 0; j < VDM.n(); ++j)
-      VDM[i][j] = this->compute_jacobi_basis(i, support_points[j]);
-
-  // get inverse
-  VDM.gauss_jordan();
-
-  for (unsigned i = 0; i < VDM.m(); ++i)
-    for (unsigned j = 0; j < VDM.n(); ++j)
-      if (std::fabs(VDM[i][j]) < 1e-14)
-        VDM[i][j] = 0.0;
-
-  VDM_inv = VDM;
 }
 
 
@@ -261,7 +254,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
   Tensor<1, dim> grad;
 
   for (unsigned int j = 0; j < VDM_inv.n(); ++j)
-    grad += VDM_inv[i][j] * this->compute_jacobi_deriv(j, p);
+    grad += VDM_inv[i][j] * this->compute_jacobi_derivative(j, p);
 
   for (unsigned int d = 0; d < dim; ++d)
     if (std::fabs(grad[d]) < 1e-14)

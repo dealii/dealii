@@ -2332,7 +2332,7 @@ namespace internal
                                 .reference_cell()))
                           is_mixed_mesh = true;
 
-                      unsigned short hypercube_or_simplex_fe_index =
+                      auto hypercube_or_simplex_fe_index =
                         numbers::invalid_fe_index;
                       if (is_mixed_mesh)
                         // try finding an index which is not pyramid or wedge
