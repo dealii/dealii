@@ -34,7 +34,7 @@ if(NOT ${deal.II_FOUND})
     )
 endif()
 
-if(NOT DEAL_II_WITH_LAPACK OR NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST) # keep in one line
+if(NOT DEAL_II_WITH_LAPACK OR NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_LAPACK = ON

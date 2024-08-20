@@ -34,7 +34,7 @@ if(NOT ${deal.II_FOUND})
     )
 endif()
 
-if(NOT DEAL_II_WITH_SUNDIALS) # keep in one line
+if(NOT DEAL_II_WITH_SUNDIALS)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_SUNDIALS = ON

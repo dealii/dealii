@@ -37,7 +37,7 @@ endif()
 #
 # Are all dependencies fulfilled?
 #
-if(NOT (DEAL_II_WITH_PETSC AND DEAL_II_PETSC_WITH_COMPLEX AND DEAL_II_WITH_P4EST AND DEAL_II_WITH_HDF5)) # keep in one line
+if(NOT (DEAL_II_WITH_PETSC AND DEAL_II_PETSC_WITH_COMPLEX AND DEAL_II_WITH_P4EST AND DEAL_II_WITH_HDF5))
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_PETSC = ON
