@@ -1159,7 +1159,10 @@ namespace DoFTools
    *   are to be filtered by this function.
    * @param[in] component_mask A mask that states which components you want
    *   to select. The size of this mask must be compatible with the number of
-   *   components in the FiniteElement used by the @p dof_handler. See
+   *   components in the FiniteElement used by the @p dof_handler. A common
+   *   way to create this kind of mask is using extractors for whatever
+   *   vector component you want to extract, and using it with
+   *   FiniteElement::component_mask(). See
    *   @ref GlossComponentMask "the glossary entry on component masks"
    *   for more information.
    * @return An IndexSet object that will contain exactly those entries that
