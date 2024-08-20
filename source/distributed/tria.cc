@@ -2629,6 +2629,7 @@ namespace parallel
               }
           }
 
+#  ifdef DEBUG
         // There must not be any chains!
         for (unsigned int i = 0; i < topological_vertex_numbering.size(); ++i)
           {
@@ -2639,6 +2640,7 @@ namespace parallel
                               " which should be equal to " +
                               std::to_string(topological_vertex_numbering[j])));
           }
+#  endif
 
 
         // this code is replicated from grid/tria.cc but using an indirection
@@ -3118,6 +3120,7 @@ namespace parallel
 
 
 
+#  ifdef DEBUG
       // check that our local copy has exactly as many cells as the p4est
       // original (at least if we are on only one processor); for parallel
       // computations, we want to check that we have at least as many as p4est
@@ -3140,7 +3143,6 @@ namespace parallel
                    ExcInternalError());
           }
 
-#  ifdef DEBUG
         // count the number of owned, active cells and compare with p4est.
         unsigned int n_owned = 0;
         for (const auto &cell : this->active_cell_iterators())
@@ -3152,8 +3154,8 @@ namespace parallel
         Assert(static_cast<unsigned int>(
                  parallel_forest->local_num_quadrants) == n_owned,
                ExcInternalError());
-#  endif
       }
+#  endif
 
       this->smooth_grid = save_smooth;
 
