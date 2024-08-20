@@ -74,11 +74,12 @@ DEAL_II_NAMESPACE_OPEN
  * // redistribute dofs,
  * dof_handler.distribute_dofs(fe);
  *
- * // and interpolate the solution
- * VectorType interpolated_solution;
+ * // adjust the vector size so that it can hold all dofs
+ * // (for distributed grids, see instructions below),
+ * solution.reinit(...);
  *
- * //create VectorType in the right size here
- * soltrans.interpolate(interpolated_solution);
+ * // and interpolate the solution
+ * soltrans.interpolate(solution);
  * @endcode
  *
  * <h3>Usage on distributed grids</h3>
