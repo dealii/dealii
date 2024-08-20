@@ -32,7 +32,7 @@ jobs:
     # simple serial release build using g++
 
     name: linux release serial
-    runs-on: [ubuntu-22.04]
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -87,7 +87,7 @@ jobs:
     # simple parallel debug build using g++
 
     name: linux debug parallel
-    runs-on: [ubuntu-22.04]
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -150,7 +150,7 @@ jobs:
     # simple parallel debug build using g++ and trilinos+tpetra
 
     name: linux debug parallel tpetra
-    runs-on: [ubuntu-22.04]
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -210,7 +210,7 @@ jobs:
     # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
 
     name: linux debug intel oneapi
-    runs-on: [ubuntu-22.04]
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
