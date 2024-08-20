@@ -71,3 +71,16 @@ jobs:
       with:
         name: doxygen_documentation.tar.gz
         path: doxygen_documentation.tar.gz
+
+  typos:
+    # check for typos
+
+    name: typos
+    runs-on: [ubuntu-22.04]
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: crate-ci/typos@v1.19.0
+      with:
+        files: doc examples include source tests
+        config: ./.typos.toml
