@@ -566,9 +566,10 @@ namespace Portable
 
 
   template <int dim, typename Number>
+  template <typename MemorySpace>
   void
   MatrixFree<dim, Number>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &vec) const
+    LinearAlgebra::distributed::Vector<Number, MemorySpace> &vec) const
   {
     if (partitioner)
       vec.reinit(partitioner);

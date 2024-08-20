@@ -34,10 +34,9 @@
 #include "../tests.h"
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 void
-check(const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-                                        &vector,
+check(const LinearAlgebra::distributed::Vector<Number, MemorySpace> &vector,
       const Utilities::MPI::Partitioner &reference_partitioner)
 {
   Assert(vector.get_partitioner()->locally_owned_range() ==
@@ -102,6 +101,8 @@ main(int argc, char **argv)
   deallog.push(Utilities::int_to_string(myid));
 
   MPILogInitAll mpi_inilog;
+
+  test<2, 1, LinearAlgebra::distributed::Vector<double, MemorySpace::Host>>();
 
   test<2,
        1,
