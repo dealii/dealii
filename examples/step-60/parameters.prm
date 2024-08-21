@@ -18,12 +18,12 @@ subsection Distributed Lagrange<1,2>
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = R=.3, Cx=.4, Cy=.4                 # default: 
+    set Function constants  = R=.3, Cx=.4, Cy=.4                 # default:
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -34,7 +34,7 @@ subsection Distributed Lagrange<1,2>
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -59,12 +59,12 @@ subsection Distributed Lagrange<1,2>
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = 
+    set Function constants  =
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -75,7 +75,7 @@ subsection Distributed Lagrange<1,2>
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -100,12 +100,12 @@ subsection Distributed Lagrange<1,2>
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = 
+    set Function constants  =
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -116,7 +116,7 @@ subsection Distributed Lagrange<1,2>
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -141,12 +141,12 @@ subsection Distributed Lagrange<1,2>
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = 
+    set Function constants  =
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -157,7 +157,7 @@ subsection Distributed Lagrange<1,2>
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.

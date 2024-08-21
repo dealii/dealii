@@ -9,7 +9,7 @@ set Run 3d simulation               = true
 
 subsection Exact solution 2d
   # Any constant used inside the function which is not a variable name.
-  set Function constants = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -22,7 +22,7 @@ end
 
 subsection Exact solution 3d
   # Any constant used inside the function which is not a variable name.
-  set Function constants = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -49,7 +49,7 @@ end
 
 subsection Wind function 2d
   # Any constant used inside the function which is not a variable name.
-  set Function constants = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
@@ -62,7 +62,7 @@ end
 
 subsection Wind function 3d
   # Any constant used inside the function which is not a variable name.
-  set Function constants = 
+  set Function constants =
 
   # Separate vector valued expressions by ';' as ',' is used internally by the
   # function parser.
