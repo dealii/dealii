@@ -380,10 +380,10 @@ namespace Portable
      * locally owned degrees of freedom and the ghost elements correspond to the
      * (additional) locally relevant dofs.
      */
+    template <typename MemorySpaceType>
     void
     initialize_dof_vector(
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &vec)
-      const;
+      LinearAlgebra::distributed::Vector<Number, MemorySpaceType> &vec) const;
 
     /**
      * Return the colored graph of locally owned active cells.
