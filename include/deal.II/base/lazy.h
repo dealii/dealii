@@ -299,9 +299,7 @@ inline Lazy<T>::Lazy(const Lazy &other)
   if (other.has_value())
     {
       object_is_initialized.store(true);
-      task_result =
-        Threads::new_task([&other]() -> T { return other.value(); });
-      task_result.join();
+      task_result.emplace_object(other.value());
     }
   else
     object_is_initialized.store(false);
@@ -333,8 +331,7 @@ inline Lazy<T> &Lazy<T>::operator=(const Lazy &other)
   if (other.has_value())
     {
       object_is_initialized.store(true);
-      task_result =
-        Threads::new_task([&other]() -> T { return other.value(); });
+      task_result.emplace_object(other.value());
     }
   else
     {
