@@ -637,7 +637,8 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
   Assert(source_fe.n_components() == this->n_components(),
          ExcDimensionMismatch(source_fe.n_components(), this->n_components()));
 
-  if (source_fe.has_face_support_points(face_no))
+  if ((source_fe.has_face_support_points(face_no)) &&
+      (source_fe.n_dofs_per_face(face_no) > 0))
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0

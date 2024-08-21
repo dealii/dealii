@@ -2088,7 +2088,10 @@ public:
   /**
    * Return whether a finite element has defined support points on faces. If
    * the result is true, then a call to the get_unit_face_support_points()
-   * yields a non-empty vector.
+   * yields an array with `dofs_per_face` entries. Note that the function's name
+   * is poorly chosen: The function does not return *whether* an element has
+   * support points, but whether its implementation is able to *provide*
+   * a list of support points via get_unit_face_support_points().
    *
    * For more information, see the documentation for the has_support_points()
    * function.
@@ -2137,11 +2140,16 @@ public:
   /**
    * Return whether a finite element has defined generalized support
    * points. If the result is true, then a call to the
-   * get_generalized_support_points() yields a non-empty vector.
+   * get_generalized_support_points() yields an
+   * array with minimal set of *unique* support points. Note that the function's
+   * name is poorly chosen: The function does not return *whether* an element
+   * has support points, but whether its implementation is able to *provide*
+   * a list of support points via get_unit_support_points().
    *
    * See the
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-   * for more information.
+   * or the documentation for the has_support_points() function for more
+   * information.
    */
   bool
   has_generalized_support_points() const;
