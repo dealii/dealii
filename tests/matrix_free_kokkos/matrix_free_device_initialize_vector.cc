@@ -34,9 +34,9 @@
 #include "../tests.h"
 
 
-template <typename Number, typename MemorySpace>
+template <typename Number, typename MemorySpaceType>
 void
-check(const LinearAlgebra::distributed::Vector<Number, MemorySpace> &vector,
+check(const LinearAlgebra::distributed::Vector<Number, MemorySpaceType> &vector,
       const Utilities::MPI::Partitioner &reference_partitioner)
 {
   Assert(vector.get_partitioner()->locally_owned_range() ==
