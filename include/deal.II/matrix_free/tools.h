@@ -25,6 +25,7 @@
 #include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/vector_access_internal.h>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -1375,7 +1376,7 @@ namespace MatrixFreeTools
     {}
 
     KOKKOS_FUNCTION void
-    operator()(const unsigned int /*cell*/,
+    operator()(const unsigned int                                      cell,
                const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
                Portable::SharedData<dim, Number> *shared_data,
                const Number *,
@@ -1384,15 +1385,31 @@ namespace MatrixFreeTools
       Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(
         gpu_data, shared_data);
       constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
-      double        diagonal[dofs_per_cell] = {};
+      Number        diagonal[dofs_per_cell] = {};
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
           Kokkos::parallel_for(
             Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
             [&](int j) { fe_eval.submit_dof_value(i == j ? 1 : 0, j); });
+
+          Portable::internal::
+            resolve_hanging_nodes<dim, fe_degree, false, Number>(
+              shared_data->team_member,
+              gpu_data->constraint_weights,
+              gpu_data->constraint_mask(cell),
+              Kokkos::subview(shared_data->values, Kokkos::ALL, 0));
+
           fe_eval.evaluate(m_evaluation_flags);
           fe_eval.apply_for_each_quad_point(m_quad_operation);
           fe_eval.integrate(m_integration_flags);
+
+          Portable::internal::
+            resolve_hanging_nodes<dim, fe_degree, true, Number>(
+              shared_data->team_member,
+              gpu_data->constraint_weights,
+              gpu_data->constraint_mask(cell),
+              Kokkos::subview(shared_data->values, Kokkos::ALL, 0));
+
           Kokkos::single(Kokkos::PerTeam(shared_data->team_member),
                          [&] { diagonal[i] = fe_eval.get_dof_value(i); });
         }
@@ -1401,7 +1418,27 @@ namespace MatrixFreeTools
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           fe_eval.submit_dof_value(diagonal[i], i);
       });
-      fe_eval.distribute_local_to_global(dst);
+
+      // We need to do the same as distribute_local_to_global but without
+      // constraints since we have already taken care of them earlier
+      if (gpu_data->use_coloring)
+        {
+          Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                       dofs_per_cell),
+                               [&](const int &i) {
+                                 dst[gpu_data->local_to_global(cell, i)] +=
+                                   shared_data->values(i, 0);
+                               });
+        }
+      else
+        {
+          Kokkos::parallel_for(
+            Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
+            [&](const int &i) {
+              Kokkos::atomic_add(&dst[gpu_data->local_to_global(cell, i)],
+                                 shared_data->values(i, 0));
+            });
+        }
     };
 
     static constexpr unsigned int n_local_dofs = QuadOperation::n_local_dofs;

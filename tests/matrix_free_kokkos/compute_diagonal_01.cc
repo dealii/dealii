@@ -30,12 +30,10 @@ test()
   GridGenerator::hyper_cube(tria, -numbers::PI / 2, numbers::PI / 2);
 
   tria.refine_global(2);
-  // FIXME
-  // for (auto &cell : tria.active_cell_iterators())
-  //  if (cell->is_active() && cell->is_locally_owned() &&
-  //      cell->center()[0] < 0.0)
-  // tria.begin_active()->set_refine_flag();
-  // tria.execute_coarsening_and_refinement();
+  for (auto &cell : tria.active_cell_iterators())
+    if (cell->is_active() && cell->is_locally_owned() &&
+        cell->center()[0] < 0.0)
+      tria.execute_coarsening_and_refinement();
 
   const FE_Q<dim>     fe_q(fe_degree);
   const FESystem<dim> fe(fe_q, n_components);
@@ -53,8 +51,6 @@ test()
                                              n_components),
                                            constraint);
   constraint.close();
-
-  // constraint.print(std::cout);
 
   typename Portable::MatrixFree<dim, Number>::AdditionalData additional_data;
   additional_data.mapping_update_flags = update_values | update_gradients;

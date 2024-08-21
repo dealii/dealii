@@ -120,7 +120,6 @@ public:
               Assert(diagonal_global_host[i] > 0,
                      ExcMessage("Diagonal non-positive at position " +
                                 std::to_string(i)));
-              // std::cout << i << ": " << diagonal_global_host[i] << '\n';
             }
         }
 
@@ -151,12 +150,9 @@ public:
           {
             if (!constraints.is_constrained(i))
               {
-                if (std::abs(A_ref(i, i) - diagonal_global_host(i)) > 1e-6)
-                  // std::cout << i << ": " << A_ref(i,i) << " should be " <<
-                  // diagonal_global_host(i) << '\n';
-                  Assert(std::abs(A_ref(i, i) - diagonal_global_host(i)) < 1e-6,
-                         ExcMessage("Wrong diagonal entry at position " +
-                                    std::to_string(i)));
+                Assert(std::abs(A_ref(i, i) - diagonal_global_host(i)) < 1e-6,
+                       ExcMessage("Wrong diagonal entry at position " +
+                                  std::to_string(i)));
               }
           }
       }
