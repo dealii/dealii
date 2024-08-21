@@ -1,8 +1,50 @@
+/*
+ * Set primary color equal to the main webpage.
+ */
+html {
+    --primary-color: #546d78;
+}
 
-#titlearea
-{
-    background-color: #0000ff;
-    color: #80ff00;
+/*
+ * Mobile mode: fix '+' and '-' symbols for opening/closing sub-menus in the top navigation bar.
+ */
+@media screen and (max-width: 767px) {
+    /*
+     * Background color when mouse hover.
+     */
+    .sm-dox a:hover span.sub-arrow {
+        background: var(--primary-dark-color);
+        color: var(--primary-lighter-color);
+    }
+
+    /*
+     * Background color on mouse click.
+     */
+    .sm-dox a span.sub-arrow {
+        background: var(--primary-lighter-color);
+        color: var(--page-foreground-color);
+    }
+
+    .sm-dox a span.sub-arrow:before {
+        display: block;
+        content: '+';
+    }
+
+    .sm-dox a.highlighted span.sub-arrow:before {
+        display: block;
+        content: '-';
+    }
+}
+
+/*
+ * Remove padding around titlebar.
+ */
+#titlearea {
+    width: auto;
+    padding: 0px;
+    background: none;
+    color: var(--header-foreground);
+    border-bottom: none;
 }
 
 @media (prefers-color-scheme: light) {
