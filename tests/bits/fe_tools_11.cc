@@ -52,7 +52,7 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   // check that the name of the FE
   // and the name of the FE that we
   // re-create from this name are
-  // identitical. this is also a
+  // identical. this is also a
   // pretty good indication that the
   // two FEs are actually the same
   deallog << modify_name<dim>(fe1.get_name());

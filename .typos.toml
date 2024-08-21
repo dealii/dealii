@@ -14,6 +14,16 @@ use_degress = "use_degress"
 MPI_MODE_WRONLY = "MPI_MODE_WRONLY"
 Equil = "Equil"
 multline = "multline"
+Tro = "Tro"
+arange = "arange"
+iy = "iy"
+Strang = "Strang"
+SuperMUC = "SuperMUC"
+pn = "pn"
+thr = "thr"
+yhat = "yhat"
+noy2tics = "noy2tics"
+bck = "bck"
 
 [default.extend-words]
 # Don't correct these word (parts)

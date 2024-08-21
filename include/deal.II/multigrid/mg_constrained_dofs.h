@@ -231,7 +231,7 @@ public:
    * @param add_boundary_indices Add boundary indices.
    * @param add_refinement_edge_indices Add refinement-edge indices.
    * @param add_level_constraints Add level constraints including the one passed
-   *   during initialize() and periodicy constraints.
+   *   during initialize() and periodicity constraints.
    * @param add_user_constraints Add user constraints.
    */
   template <typename Number>

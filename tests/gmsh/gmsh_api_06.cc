@@ -58,9 +58,9 @@ test()
   // Read the file back and change the physical group description to be
   // unrecognizable.
   std::ifstream     input(mesh_filename, std::ifstream::in);
-  std::stringstream buffert;
-  buffert << input.rdbuf();
-  std::string filecontent = buffert.str();
+  std::stringstream buffer;
+  buffer << input.rdbuf();
+  std::string filecontent = buffer.str();
   input.close();
 
   boost::replace_all(filecontent, "MaterialID", "Unrecognizable");

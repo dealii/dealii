@@ -2460,7 +2460,7 @@ namespace TrilinosWrappers
         /**
          * Return a flag that describes whether this operator can return the
          * computation of the infinity norm. Since in general this is not the
-         * case, this always returns a negetive result.
+         * case, this always returns a negative result.
          *
          * This overloads the same function from the Trilinos class
          * Epetra_Operator.

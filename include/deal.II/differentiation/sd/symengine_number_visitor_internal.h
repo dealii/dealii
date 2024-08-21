@@ -385,7 +385,7 @@ namespace Differentiation
 
         /**
          * Evaluate the dependent functions that were registered at
-         * initializtion time.
+         * initialization time.
          *
          * The @p output_values are the numerical result of substituting
          * each of the @p substitution_values for their corresponding entry
@@ -420,7 +420,7 @@ namespace Differentiation
 
         /**
          * Evaluate the dependent function that were registered at
-         * initializtion time.
+         * initialization time.
          *
          * The purpose of this function is the same as the other call()
          * functions, but

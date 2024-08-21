@@ -548,7 +548,7 @@ public:
     "sync. The class requires that the number of dataset keys is the same as "
     "the number of independent values sets and mesh linked value sets. The "
     "number of each of these is allowed to differ by one to allow new values "
-    "to be added with out restricting the order the user choses to do so. "
+    "to be added without restricting the order the user chooses to do so. "
     "Special cases of no FHandler and no independent values should not "
     "trigger this error.");
 

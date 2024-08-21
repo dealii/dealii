@@ -80,7 +80,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: crate-ci/typos@v1.19.0
+    - uses: crate-ci/typos@v1.23.6
       with:
         files: doc examples include source tests
         config: ./.typos.toml
