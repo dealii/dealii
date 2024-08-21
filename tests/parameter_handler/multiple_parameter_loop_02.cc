@@ -60,7 +60,7 @@ HelperClass::run(ParameterHandler &prm)
 {
   deallog << "Number of run: " << run_no << std::endl;
 
-  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::PRM);
 }
 
 

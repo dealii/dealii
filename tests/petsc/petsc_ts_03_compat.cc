@@ -237,13 +237,13 @@ main(int argc, char **argv)
 
   data.add_parameters(prm);
   deallog << "# Default Parameters" << std::endl;
-  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortText);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortPRM);
 
   std::ifstream ifile(SOURCE_DIR "/petsc_ts_03_in.prm");
   prm.parse_input(ifile);
 
   deallog << "# Testing Parameters" << std::endl;
-  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortText);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::ShortPRM);
 
   for (int setjaci = 0; setjaci < 2; setjaci++)
     {

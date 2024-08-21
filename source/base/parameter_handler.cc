@@ -1379,11 +1379,11 @@ ParameterHandler::print_parameters(std::ostream     &out,
     }
 
   // for all of the other formats, print a preamble:
-  if (((style & Short) != 0) && ((style & Text) != 0))
+  if (((style & Short) != 0) && ((style & PRM) != 0))
     {
       // nothing to do
     }
-  else if ((style & Text) != 0)
+  else if ((style & PRM) != 0)
     {
       out << "# Listing of Parameters" << std::endl
           << "# ---------------------" << std::endl;
@@ -1461,7 +1461,7 @@ ParameterHandler::recursively_print_parameters(
 
   const bool is_short = (style & Short) != 0;
 
-  if ((style & Text) != 0)
+  if ((style & PRM) != 0)
     {
       // first find out the longest entry name to be able to align the
       // equal signs to do this loop over all nodes of the current
@@ -1727,9 +1727,8 @@ ParameterHandler::recursively_print_parameters(
       else if (is_alias_node(p.second) == false)
         ++n_sections;
 
-    if (((style & Description) == 0) &&
-        (!(((style & Text) != 0) && is_short)) && (n_parameters != 0) &&
-        (n_sections != 0))
+    if (((style & Description) == 0) && (!(((style & PRM) != 0) && is_short)) &&
+        (n_parameters != 0) && (n_sections != 0))
       out << "\n\n";
   }
 
@@ -1739,7 +1738,7 @@ ParameterHandler::recursively_print_parameters(
         (is_alias_node(p.second) == false))
       {
         // first print the subsection header
-        if (((style & Text) != 0) || ((style & Description) != 0))
+        if (((style & PRM) != 0) || ((style & Description) != 0))
           {
             out << std::setw(overall_indent_level * 2) << ""
                 << "subsection " << demangle(p.first) << '\n';
@@ -1781,13 +1780,13 @@ ParameterHandler::recursively_print_parameters(
         recursively_print_parameters(
           tree, directory_path, style, overall_indent_level + 1, out);
 
-        if (is_short && ((style & Text) != 0))
+        if (is_short && ((style & PRM) != 0))
           {
             // write end of subsection.
             out << std::setw(overall_indent_level * 2) << ""
                 << "end" << '\n';
           }
-        else if ((style & Text) != 0)
+        else if ((style & PRM) != 0)
           {
             // write end of subsection. one blank line after each
             // subsection

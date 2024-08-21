@@ -56,7 +56,7 @@ main()
   prm.leave_subsection();
 
   prm.print_parameters(deallog.get_file_stream(),
-                       ParameterHandler::Text |
+                       ParameterHandler::PRM |
                          ParameterHandler::KeepDeclarationOrder);
 
   deallog << std::boolalpha;

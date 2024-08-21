@@ -44,7 +44,7 @@ main()
   if (false)
     {
       std::ofstream ofile(SOURCE_DIR "/arkode_10_in.prm");
-      prm.print_parameters(ofile, ParameterHandler::ShortText);
+      prm.print_parameters(ofile, ParameterHandler::ShortPRM);
       ofile.close();
     }
 

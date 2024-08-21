@@ -44,7 +44,7 @@ main()
 
       // read and then write parameters
       prm.parse_input(SOURCE_DIR "/prm/parameter_handler_3.prm");
-      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::PRM);
     }
   catch (const std::exception &exc)
     {
