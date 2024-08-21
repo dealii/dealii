@@ -961,6 +961,11 @@ public:
      * values as a LaTeX file.
      */
     ShortLaTeX = LaTeX | Short,
+
+    /**
+     * Write out only parameters with changed values.
+     */
+    KeepOnlyChanged = 0x0200,
   };
 
 
