@@ -14,7 +14,7 @@
 
 
 
-// test DoFTools::extract_level_elasticity_modes
+// test DoFTools::rigid_body_modes
 
 #include <deal.II/base/tensor.h>
 
@@ -45,10 +45,7 @@ void
 test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  parallel::distributed::Triangulation<dim> tr(
-    MPI_COMM_WORLD,
-    Triangulation<dim>::none,
-    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_cube(tr, 2);
 
   MappingQ1<dim> mapping;
@@ -56,16 +53,14 @@ test()
   FESystem<dim>   fe(FE_Q<dim>(1), dim);
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
-  dofh.distribute_mg_dofs();
 
   deallog << "Total dofs=" << dofh.n_dofs() << std::endl;
 
   // extract constant modes and print
   ComponentMask mask(fe.n_components(), true);
 
-  std::vector<std::vector<double>> constant_modes;
-  DoFTools::extract_level_elasticity_modes(
-    0, mapping, dofh, mask, constant_modes);
+  std::vector<std::vector<double>> constant_modes =
+    DoFTools::extract_rigid_body_modes(mapping, dofh, mask);
 
   for (unsigned int i = 0; i < constant_modes.size(); ++i)
     {

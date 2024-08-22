@@ -43,7 +43,7 @@
 #include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_interpolate.h>
 
 #include <algorithm>
 #include <numeric>
@@ -1495,21 +1495,20 @@ namespace DoFTools
 
 
     template <int dim, int spacedim>
-    void
-    extract_elasticity_modes(const Mapping<dim, spacedim>     &mapping,
-                             const DoFHandler<dim, spacedim>  &dof_handler,
-                             const ComponentMask              &component_mask,
-                             const unsigned int                mg_level,
-                             std::vector<std::vector<double>> &elasticity_modes)
+    std::vector<std::vector<double>>
+    extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask             &component_mask,
+                             const unsigned int               mg_level)
     {
       AssertDimension(dim, spacedim);
       AssertDimension(component_mask.n_selected_components(), dim);
 
-      const unsigned int n_modes = RigidBodyMotion<dim>::n_modes;
+      constexpr unsigned int n_modes = RigidBodyMotion<dim>::n_modes;
 
-      elasticity_modes.resize(n_modes);
+      std::vector<std::vector<double>> rigid_body_modes(n_modes);
 
-      LinearAlgebra::distributed::Vector<double> elasticity_modes_dealii(
+      LinearAlgebra::distributed::Vector<double> rigid_body_modes_dealii(
         mg_level == numbers::invalid_unsigned_int ?
           dof_handler.locally_owned_dofs() :
           dof_handler.locally_owned_mg_dofs(mg_level),
@@ -1523,14 +1522,16 @@ namespace DoFTools
           VectorTools::interpolate(mapping,
                                    dof_handler,
                                    RigidBodyMotion<dim>(i),
-                                   elasticity_modes_dealii,
+                                   rigid_body_modes_dealii,
                                    component_mask,
                                    mg_level);
 
           // copy to right format
-          elasticity_modes[i].assign(elasticity_modes_dealii.begin(),
-                                     elasticity_modes_dealii.end());
+          rigid_body_modes[i].assign(rigid_body_modes_dealii.begin(),
+                                     rigid_body_modes_dealii.end());
         }
+
+      return rigid_body_modes;
     }
 
   } // namespace internal
@@ -1567,32 +1568,30 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
-  void
-  extract_elasticity_modes(const Mapping<dim, spacedim>     &mapping,
-                           const DoFHandler<dim, spacedim>  &dof_handler,
-                           const ComponentMask              &component_mask,
-                           std::vector<std::vector<double>> &constant_modes)
+  std::vector<std::vector<double>>
+  extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
+                           const DoFHandler<dim, spacedim> &dof_handler,
+                           const ComponentMask             &component_mask)
   {
-    internal::extract_elasticity_modes(mapping,
-                                       dof_handler,
-                                       component_mask,
-                                       numbers::invalid_unsigned_int,
-                                       constant_modes);
+    return internal::extract_rigid_body_modes(mapping,
+                                              dof_handler,
+                                              component_mask,
+                                              numbers::invalid_unsigned_int);
   }
 
 
 
   template <int dim, int spacedim>
-  void
-  extract_level_elasticity_modes(
-    const unsigned int                level,
-    const Mapping<dim, spacedim>     &mapping,
-    const DoFHandler<dim, spacedim>  &dof_handler,
-    const ComponentMask              &component_mask,
-    std::vector<std::vector<double>> &constant_modes)
+  std::vector<std::vector<double>>
+  extract_level_rigid_body_modes(const unsigned int               level,
+                                 const Mapping<dim, spacedim>    &mapping,
+                                 const DoFHandler<dim, spacedim> &dof_handler,
+                                 const ComponentMask &component_mask)
   {
-    internal::extract_elasticity_modes(
-      mapping, dof_handler, component_mask, level, constant_modes);
+    return internal::extract_rigid_body_modes(mapping,
+                                              dof_handler,
+                                              component_mask,
+                                              level);
   }
 
 

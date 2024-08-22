@@ -1501,10 +1501,10 @@ namespace TrilinosWrappers
 
       /**
        * Same as above, but with values instead of Booleans. This
-       * is usfule if you want to specifiy rotational modes
+       * is useful if you want to specify rotational modes
        * in addition to the translational modes. See also:
-       * DoFTools::extract_elasticity_modes
-       * and DoFTools::extract_level_elasticity_modes.
+       * DoFTools::extract_rigid_body_modes
+       * and DoFTools::extract_level_rigid_body_modes.
        */
       std::vector<std::vector<double>> constant_modes_values;
 
