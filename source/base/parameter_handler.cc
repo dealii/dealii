@@ -737,6 +737,38 @@ namespace
           }
       }
   }
+
+  void
+  recursively_keep_non_default(const boost::property_tree::ptree &tree_in,
+                               boost::property_tree::ptree       &tree_out)
+  {
+    for (const auto &p : tree_in)
+      {
+        if (is_parameter_node(p.second))
+          {
+            const std::string value = p.second.get<std::string>("value");
+
+            if (value != p.second.get<std::string>("default_value"))
+              tree_out.put_child(p.first, p.second);
+          }
+        else if (is_alias_node(p.second))
+          {
+            // nothing to do
+          }
+        else
+          {
+            boost::property_tree::ptree temp;
+
+            if (const auto val = p.second.get_value_optional<std::string>())
+              temp.put_value<std::string>(*val);
+
+            recursively_keep_non_default(p.second, temp);
+
+            if (temp.size() > 0)
+              tree_out.put_child(p.first, temp);
+          }
+      }
+  }
 } // namespace
 
 
@@ -1329,6 +1361,14 @@ ParameterHandler::print_parameters(std::ostream     &out,
       recursively_sort_parameters(path_separator,
                                   std::vector<std::string>(),
                                   current_entries);
+    }
+
+  if ((style & KeepOnlyChanged) != 0)
+    {
+      boost::property_tree::ptree current_entries_without_default;
+      recursively_keep_non_default(current_entries,
+                                   current_entries_without_default);
+      current_entries = current_entries_without_default;
     }
 
   // we'll have to print some text that is padded with spaces;
