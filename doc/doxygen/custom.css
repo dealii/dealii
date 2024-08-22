@@ -5,26 +5,14 @@ html {
     --primary-color: #546d78;
 }
 
+a:link, a:visited, a:hover, a:focus, a:active {
+    color: #1779c4 !important;
+}
+
 /*
  * Mobile mode: fix '+' and '-' symbols for opening/closing sub-menus in the top navigation bar.
  */
 @media screen and (max-width: 767px) {
-    /*
-     * Background color when mouse hover.
-     */
-    .sm-dox a:hover span.sub-arrow {
-        background: var(--primary-dark-color);
-        color: var(--primary-lighter-color);
-    }
-
-    /*
-     * Background color on mouse click.
-     */
-    .sm-dox a span.sub-arrow {
-        background: var(--primary-lighter-color);
-        color: var(--page-foreground-color);
-    }
-
     .sm-dox a span.sub-arrow:before {
         display: block;
         content: '+';
