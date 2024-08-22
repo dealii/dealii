@@ -33,7 +33,8 @@ test()
   for (auto &cell : tria.active_cell_iterators())
     if (cell->is_active() && cell->is_locally_owned() &&
         cell->center()[0] < 0.0)
-      tria.execute_coarsening_and_refinement();
+      cell->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
 
   const FE_Q<dim>     fe_q(fe_degree);
   const FESystem<dim> fe(fe_q, n_components);
