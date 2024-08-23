@@ -1384,6 +1384,8 @@ namespace MatrixFreeTools
     {
       Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(
         gpu_data, shared_data);
+      m_quad_operation.set_matrix_free_data(*gpu_data);
+      m_quad_operation.set_cell(cell);
       constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
       Number        diagonal[dofs_per_cell] = {};
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -1444,7 +1446,7 @@ namespace MatrixFreeTools
     static constexpr unsigned int n_local_dofs = QuadOperation::n_local_dofs;
 
   private:
-    const QuadOperation                   &m_quad_operation;
+    mutable QuadOperation                  m_quad_operation;
     const EvaluationFlags::EvaluationFlags m_evaluation_flags;
     const EvaluationFlags::EvaluationFlags m_integration_flags;
   };
@@ -1483,7 +1485,6 @@ namespace MatrixFreeTools
 
     CellAction<dim, fe_degree, Number, QuadOperation> cell_action(
       quad_operation, evaluation_flags, integration_flags);
-    // diagonal_global.zero_out_ghost_values();
     LinearAlgebra::distributed::Vector<Number, MemorySpace> dummy;
     matrix_free.cell_loop(cell_action, dummy, diagonal_global);
 

@@ -58,6 +58,15 @@ public:
     fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
   }
 
+  DEAL_II_HOST_DEVICE
+  void
+  set_cell(int)
+  {}
+
+  DEAL_II_HOST_DEVICE void
+  set_matrix_free_data(const Portable::MatrixFree<dim, Number>::Data &)
+  {}
+
   static const unsigned int n_q_points =
     dealii::Utilities::pow(fe_degree + 1, dim);
 
