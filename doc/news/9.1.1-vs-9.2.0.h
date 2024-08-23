@@ -989,7 +989,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: step-26 and step-52 now also output the simulation time
+  Fixed: step-26 and step 52 now also output the simulation time
   in the VTK/VTU output files.
   <br>
   (Wolfgang Bangerth, 2020/03/27)
