@@ -56,6 +56,14 @@ DEAL::  0.0441942
 DEAL::  54.8271
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
+DEAL::   Number of active cells:       3072
+DEAL::   Number of degrees of freedom: 43008
+DEAL::  0.0441942
+DEAL::  92.3281
+DEAL::  0.0441942
+DEAL::  92.3281
+DEAL::solution1 and solution2 coincide.
+DEAL::Cycle 0:
 DEAL::   Number of active cells:       1024
 DEAL::   Number of degrees of freedom: 6144
 DEAL::  0.0441942

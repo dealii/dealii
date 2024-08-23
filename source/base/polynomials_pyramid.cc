@@ -26,9 +26,31 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
-  const unsigned int            degree,
-  const unsigned int            n_dofs,
-  const std::vector<Point<dim>> support_points)
+  const unsigned int degree)
+  : ScalarPolynomialsBase<dim>(1, 5)
+{
+  AssertThrow(degree == 1,
+              ExcNotImplemented(
+                "This constructor only works for linear elements."));
+  std::vector<double> VDM_inverse_vector = {
+    {0.1875, -0.0625, -0.25,   -0.25, 0.25,  0.1875, -0.0625, -0.25,   0.25,
+     -0.25,  0.1875,  -0.0625, 0.25,  -0.25, -0.25,  0.1875,  -0.0625, 0.25,
+     0.25,   0.25,    0.25,    0.25,  0,     0,      0}};
+  FullMatrix<double> VDM(5, 5);
+  for (unsigned i = 0; i < VDM_inverse.m(); ++i)
+    for (unsigned j = 0; j < VDM_inverse.n(); ++j)
+      VDM[i][j] = VDM_inverse_vector[i * VDM_inverse.m() + j];
+
+  VDM_inverse = VDM;
+}
+
+
+
+template <int dim>
+ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
+  const unsigned int             degree,
+  const unsigned int             n_dofs,
+  const std::vector<Point<dim>> &support_points)
   : ScalarPolynomialsBase<dim>(degree, n_dofs)
 {
   // fill VDM Matrix
@@ -46,7 +68,7 @@ ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
       if (std::fabs(VDM[i][j]) < 1e-14)
         VDM[i][j] = 0.0;
 
-  VDM_inv = VDM;
+  VDM_inverse = VDM;
 }
 
 
@@ -64,7 +86,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space(
   const double z = p[2];
 
   double ratio;
-  if (std::fabs(z - 1.0) < 1e-12)
+  if (std::fabs(z - 1.0) < 1e-14)
     ratio = 0.0;
   else
     ratio = 1.0 / (1.0 - z);
@@ -78,7 +100,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space(
     std::pow((1.0 - z), max_ij) *
     Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
 
-  if (std::fabs(phi) < 1e-12)
+  if (std::fabs(phi) < 1e-14)
     return 0.0;
 
   return phi;
@@ -122,7 +144,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
 
   Tensor<1, dim> grad;
   double         ratio;
-  if (std::fabs(z - 1.0) < 1e-12)
+  if (std::fabs(z - 1.0) < 1e-14)
     ratio = 0.0;
   else
     ratio = 1.0 / (1.0 - z);
@@ -145,39 +167,44 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
     Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
   if (max_ij == 0)
     grad[2] =
-      -x * std::pow(ratio, 2) *
+      x * std::pow(ratio, 2) *
         Polynomials::jacobi_polynomial_derivative<double>(
           i, 0, 0, x * ratio, false) *
         Polynomials::jacobi_polynomial_value<double>(
           j, 0, 0, y * ratio, false) *
-        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) -
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
       y * std::pow(ratio, 2) *
         Polynomials::jacobi_polynomial_derivative<double>(
           j, 0, 0, y * ratio, false) *
         Polynomials::jacobi_polynomial_value<double>(
           i, 0, 0, x * ratio, false) *
-        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) +
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
       Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
         Polynomials::jacobi_polynomial_value<double>(
           j, 0, 0, y * ratio, false) *
         Polynomials::jacobi_polynomial_derivative<double>(
-          k, 2 * max_ij + 2, 0, z, true);
+          k, 2 * max_ij + 2, 0, 2.0 * z - 1, false) *
+        2.0;
   else
     grad[2] =
-      -x * std::pow(ratio, 2) *
+      x * std::pow(ratio, 2) *
         Polynomials::jacobi_polynomial_derivative<double>(
           i, 0, 0, x * ratio, false) *
         Polynomials::jacobi_polynomial_value<double>(
           j, 0, 0, y * ratio, false) *
         std::pow((1.0 - z), max_ij) *
-        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) -
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
       y * std::pow(ratio, 2) *
         Polynomials::jacobi_polynomial_derivative<double>(
           j, 0, 0, y * ratio, false) *
         Polynomials::jacobi_polynomial_value<double>(
           i, 0, 0, x * ratio, false) *
         std::pow((1.0 - z), max_ij) *
-        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) +
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
       Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
         Polynomials::jacobi_polynomial_value<double>(
           j, 0, 0, y * ratio, false) *
@@ -189,14 +216,19 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
           j, 0, 0, y * ratio, false) *
         std::pow((1.0 - z), max_ij) *
         Polynomials::jacobi_polynomial_derivative<double>(
-          k, 2 * max_ij + 2, 0, z, true);
+          k, 2 * max_ij + 2, 0, 2.0 * z - 1, false) *
+        2.0;
 
-
+  Tensor<1, dim> gradient;
   for (unsigned int d = 0; d < dim; ++d)
-    if (std::fabs(grad[d]) < 1e-12)
-      grad[d] = 0.0;
+    {
+      if (std::fabs(grad[d]) < 1e-14)
+        gradient[d] = 0.0;
+      else
+        gradient[d] = grad[d];
+    }
 
-  return grad;
+  return gradient;
 }
 
 
@@ -229,11 +261,11 @@ ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
                                                     const Point<dim>  &p) const
 {
   AssertDimension(dim, 3);
-  AssertIndexRange(i, VDM_inv.m());
+  AssertIndexRange(i, VDM_inverse.m());
 
   double result = 0;
-  for (unsigned int j = 0; j < VDM_inv.n(); ++j)
-    result += VDM_inv[i][j] * this->compute_jacobi_basis(j, p);
+  for (unsigned int j = 0; j < VDM_inverse.n(); ++j)
+    result += VDM_inverse[i][j] * this->compute_jacobi_basis(j, p);
 
   if (std::fabs(result) < 1e-14)
     result = 0.0;
@@ -249,12 +281,12 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
                                                    const Point<dim>  &p) const
 {
   AssertDimension(dim, 3);
-  AssertIndexRange(i, VDM_inv.m());
+  AssertIndexRange(i, VDM_inverse.m());
 
   Tensor<1, dim> grad;
 
-  for (unsigned int j = 0; j < VDM_inv.n(); ++j)
-    grad += VDM_inv[i][j] * this->compute_jacobi_derivative(j, p);
+  for (unsigned int j = 0; j < VDM_inverse.n(); ++j)
+    grad += VDM_inverse[i][j] * this->compute_jacobi_derivative(j, p);
 
   for (unsigned int d = 0; d < dim; ++d)
     if (std::fabs(grad[d]) < 1e-14)

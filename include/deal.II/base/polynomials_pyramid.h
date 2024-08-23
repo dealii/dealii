@@ -27,6 +27,11 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Polynomials defined on pyramid entities. This class is basis of
  * FE_PyramidP.
+ * The polynomials are based on @cite Bergot2010. We first use the
+ * Jacobi-Polynomials to construct a modal basis (Proposition 1.10). With the
+ * modal basis the Vandermonde is calculated which leads to a nodal basis. For
+ * computing the values of the nodal basis the Vandermonde matrix is multiplied
+ * with the modal basis vector evaluated at the evaluation point.
  */
 template <int dim>
 class ScalarLagrangePolynomialPyramid : public ScalarPolynomialsBase<dim>
@@ -39,10 +44,17 @@ public:
 
   /*
    * Constructor taking the polynomial @p degree as input.
+   * This constructor only works for linear elements.
    */
-  ScalarLagrangePolynomialPyramid(const unsigned int            degree,
-                                  const unsigned int            n_dofs,
-                                  const std::vector<Point<dim>> support_points);
+  ScalarLagrangePolynomialPyramid(const unsigned int degree);
+
+  /*
+   * Constructor taking the polynomial @p degree, the number of polynomials @p n_dofs and the support points as input.
+   */
+  ScalarLagrangePolynomialPyramid(
+    const unsigned int             degree,
+    const unsigned int             n_dofs,
+    const std::vector<Point<dim>> &support_points);
 
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()
@@ -124,7 +136,7 @@ private:
   /**
    * Inverse of the Vandermonde matrix
    */
-  FullMatrix<double> VDM_inv;
+  FullMatrix<double> VDM_inverse;
 
   /**
    * Evaluate orthogonal base at point @p p

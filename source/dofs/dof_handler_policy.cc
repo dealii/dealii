@@ -168,77 +168,48 @@ namespace internal
 #ifdef DEBUG
               // double check whether the newly created entries make
               // any sense at all
+              auto assert_identity =
+                [fes, fe_index_1, fe_index_2](
+                  const std::pair<unsigned int, unsigned int> &identity,
+                  const unsigned int                           face_no_1,
+                  const unsigned int                           face_no_2) {
+                  Assert(identity.first <
+                           fes[fe_index_1]
+                             .template n_dofs_per_object<structdim>(face_no_1),
+                         ExcInternalError());
+                  Assert(identity.second <
+                           fes[fe_index_2]
+                             .template n_dofs_per_object<structdim>(face_no_2),
+                         ExcInternalError());
+                };
               for (const auto &identity : reduced_identities)
                 {
+                  // If the second element is a pyramid we have to see if we are
+                  // on a triangular face or on a quad face. On a
+                  // hypercube element we can be on any face with
+                  // face number face_no while on the pyramid only face_no = 0
+                  // gives the correct result for the hyercube relation. Same
+                  // applies for the triangular face.
                   if (fes[fe_index_2].reference_cell() ==
                       ReferenceCells::Pyramid)
                     {
                       if (fes[fe_index_1].reference_cell().is_simplex())
-                        {
-                          Assert(identity.first <
-                                   fes[fe_index_1]
-                                     .template n_dofs_per_object<structdim>(
-                                       face_no),
-                                 ExcInternalError());
-                          Assert(identity.second <
-                                   fes[fe_index_2]
-                                     .template n_dofs_per_object<structdim>(1),
-                                 ExcInternalError());
-                        }
+                        assert_identity(identity, face_no, 1);
                       else
-                        {
-                          Assert(identity.first <
-                                   fes[fe_index_1]
-                                     .template n_dofs_per_object<structdim>(
-                                       face_no),
-                                 ExcInternalError());
-                          Assert(identity.second <
-                                   fes[fe_index_2]
-                                     .template n_dofs_per_object<structdim>(0),
-                                 ExcInternalError());
-                        }
+                        assert_identity(identity, face_no, 0);
                     }
+                  // same concept applies to wedges only the first 2 faces are
+                  // triangles while the rest is quads
                   else if (fes[fe_index_2].reference_cell() ==
                            ReferenceCells::Wedge)
                     {
                       if (fes[fe_index_1].reference_cell().is_simplex())
-                        {
-                          Assert(identity.first <
-                                   fes[fe_index_1]
-                                     .template n_dofs_per_object<structdim>(
-                                       face_no),
-                                 ExcInternalError());
-                          Assert(identity.second <
-                                   fes[fe_index_2]
-                                     .template n_dofs_per_object<structdim>(0),
-                                 ExcInternalError());
-                        }
+                        assert_identity(identity, face_no, 0);
                       else
-                        {
-                          Assert(identity.first <
-                                   fes[fe_index_1]
-                                     .template n_dofs_per_object<structdim>(
-                                       face_no),
-                                 ExcInternalError());
-                          Assert(identity.second <
-                                   fes[fe_index_2]
-                                     .template n_dofs_per_object<structdim>(2),
-                                 ExcInternalError());
-                        }
+                        assert_identity(identity, face_no, 2);
                     }
                   else
-                    {
-                      Assert(
-                        identity.first <
-                          fes[fe_index_1].template n_dofs_per_object<structdim>(
-                            face_no),
-                        ExcInternalError());
-                      Assert(
-                        identity.second <
-                          fes[fe_index_2].template n_dofs_per_object<structdim>(
-                            face_no),
-                        ExcInternalError());
-                    }
+                    assert_identity(identity, face_no, face_no);
                 }
 #endif
 
@@ -2321,7 +2292,9 @@ namespace internal
                       const unsigned int n_active_fe_indices =
                         quad->n_active_fe_indices();
 
-
+                      // check if we are on a mixed mesh
+                      // if yes we have to find the fe_index of the hyercube or
+                      // simplex element
                       bool       is_mixed_mesh = false;
                       const auto reference_cell =
                         dof_handler.get_fe(quad->nth_active_fe_index(0))
@@ -2351,6 +2324,14 @@ namespace internal
                           const types::fe_index fe_index =
                             quad->nth_active_fe_index(f);
 
+                          // On a pyramid or a wedge there are different number
+                          // of DoFs on different quads. If we are on a
+                          // hypercube or simplex element we can be on any face
+                          // index q while on pyramids or wedges the face index
+                          // q changes how many DoFs there are on the face, so
+                          // taking the wrong face wont merge the corresponding
+                          // DoFs. To avoid errors on the faces take the number
+                          // of DoFs from the hypercue/simplex element
                           const unsigned int n_dofs_per_quad =
                             is_mixed_mesh ?
                               dof_handler.get_fe(hypercube_or_simplex_fe_index)

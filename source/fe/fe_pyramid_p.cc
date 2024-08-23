@@ -75,16 +75,12 @@ namespace
         FE_Q<2> fe_q(current_degree);
 
         // save all support points in an unordered fashion
-        for (unsigned int support_point_index = 0;
-             support_point_index < fe_q.get_unit_support_points().size();
-             ++support_point_index)
+        for (const auto &support_point_fe_q : fe_q.get_unit_support_points())
           {
             Point<dim> support_point;
             for (unsigned int d = 0; d < dim - 1; ++d)
-              support_point[d] =
-                (current_degree * z_equidistance) *
-                (2 * fe_q.get_unit_support_points()[support_point_index][d] -
-                 1);
+              support_point[d] = (current_degree * z_equidistance) *
+                                 (2 * support_point_fe_q[d] - 1);
             support_point[dim - 1] = (degree - current_degree) * z_equidistance;
             support_points_unordered.emplace_back(support_point);
           }
@@ -347,7 +343,8 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
           if (face_reference_cell == ReferenceCells::Quadrilateral)
             {
               FE_Q<2> fe_face(degree);
-              for (auto &face_support_point : fe_face.get_unit_support_points())
+              for (const auto &face_support_point :
+                   fe_face.get_unit_support_points())
                 {
                   Point<dim - 1> p;
                   for (unsigned int d = 0; d < dim - 1; ++d)
