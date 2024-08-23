@@ -606,8 +606,20 @@ namespace Step31
                                      stokes_fe.component_mask(
                                        velocity_components),
                                      constant_modes);
+
+    std::vector<std::vector<double>> constant_modes_values(
+      constant_modes.size());
+
+    for (unsigned int i = 0; i < constant_modes.size(); ++i)
+      {
+        constant_modes_values[i].resize(constant_modes[i].size());
+
+        for (unsigned int j = 0; j < constant_modes[i].size(); ++j)
+          constant_modes_values[i][j] = constant_modes[i][j];
+      }
+
     TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
-    amg_data.constant_modes        = constant_modes;
+    amg_data.constant_modes_values = constant_modes_values;
     amg_data.elliptic              = true;
     amg_data.higher_order_elements = true;
     amg_data.smoother_sweeps       = 2;

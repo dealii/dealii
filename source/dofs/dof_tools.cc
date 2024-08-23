@@ -43,6 +43,8 @@
 #include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/numerics/vector_tools_interpolate.h>
+
 #include <algorithm>
 #include <numeric>
 
@@ -1407,6 +1409,131 @@ namespace DoFTools
             }
       });
     }
+
+
+
+    /**
+     * Definition of the rigid body motions for linear elasticity.
+     */
+    template <int dim>
+    class RigidBodyMotion : public Function<dim>
+    {
+    public:
+      static constexpr unsigned int n_modes = dim * (dim + 1) / 2;
+
+      RigidBodyMotion(const unsigned int type);
+
+      virtual double
+      value(const Point<dim> &p, const unsigned int component) const override;
+
+    private:
+      const unsigned int type;
+    };
+
+
+
+    template <int dim>
+    RigidBodyMotion<dim>::RigidBodyMotion(const unsigned int type)
+      : Function<dim>(dim)
+      , type(type)
+    {
+      Assert(type < n_modes, ExcNotImplemented());
+    }
+
+
+
+    Tensor<1, 2>
+    cross_product(const Tensor<1, 2> &tensor1, const Tensor<1, 1> &tensor2)
+    {
+      // |a|   |0|   |+bc|
+      // |b| x |0| = |-ac|
+      // |0|   |c|   | 0 |
+
+      Tensor<1, 2> cproduct;
+      cproduct[0] = +tensor1[1] * tensor2[0];
+      cproduct[1] = -tensor1[0] * tensor2[0];
+      return cproduct;
+    }
+
+
+
+    Tensor<1, 3>
+    cross_product(const Tensor<1, 3> &tensor1, const Tensor<1, 3> &tensor2)
+    {
+      Tensor<1, 3> cproduct;
+      cproduct[0] = +tensor1[1] * tensor2[2] - tensor1[2] * tensor2[1];
+      cproduct[1] = +tensor1[2] * tensor2[0] - tensor1[0] * tensor2[2];
+      cproduct[2] = +tensor1[0] * tensor2[1] - tensor1[1] * tensor2[0];
+      return cproduct;
+    }
+
+
+
+    template <int dim>
+    double
+    RigidBodyMotion<dim>::value(const Point<dim>  &p,
+                                const unsigned int component) const
+    {
+      if (type < dim) // translation modes
+        return static_cast<double>(component == type);
+
+      if constexpr (dim >= 2) // rotation modes
+        {
+          Tensor<1, n_modes - dim> dir;
+          dir[type - dim] = 1.0;
+
+          return cross_product(p, dir)[component];
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+
+          return 0.0;
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    std::vector<std::vector<double>>
+    extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask             &component_mask,
+                             const unsigned int               mg_level)
+    {
+      AssertDimension(dim, spacedim);
+      AssertDimension(component_mask.n_selected_components(), dim);
+
+      constexpr unsigned int n_modes = RigidBodyMotion<dim>::n_modes;
+
+      std::vector<std::vector<double>> rigid_body_modes(n_modes);
+
+      LinearAlgebra::distributed::Vector<double> rigid_body_modes_dealii(
+        mg_level == numbers::invalid_unsigned_int ?
+          dof_handler.locally_owned_dofs() :
+          dof_handler.locally_owned_mg_dofs(mg_level),
+        mg_level == numbers::invalid_unsigned_int ?
+          DoFTools::extract_locally_active_dofs(dof_handler) :
+          DoFTools::extract_locally_active_level_dofs(dof_handler, mg_level),
+        dof_handler.get_communicator());
+
+      for (unsigned int i = 0; i < n_modes; ++i)
+        {
+          VectorTools::interpolate(mapping,
+                                   dof_handler,
+                                   RigidBodyMotion<dim>(i),
+                                   rigid_body_modes_dealii,
+                                   component_mask,
+                                   mg_level);
+
+          // copy to right format
+          rigid_body_modes[i].assign(rigid_body_modes_dealii.begin(),
+                                     rigid_body_modes_dealii.end());
+        }
+
+      return rigid_body_modes;
+    }
+
   } // namespace internal
 
 
@@ -1436,6 +1563,35 @@ namespace DoFTools
                                      component_mask,
                                      level,
                                      constant_modes);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::vector<double>>
+  extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
+                           const DoFHandler<dim, spacedim> &dof_handler,
+                           const ComponentMask             &component_mask)
+  {
+    return internal::extract_rigid_body_modes(mapping,
+                                              dof_handler,
+                                              component_mask,
+                                              numbers::invalid_unsigned_int);
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::vector<double>>
+  extract_level_rigid_body_modes(const unsigned int               level,
+                                 const Mapping<dim, spacedim>    &mapping,
+                                 const DoFHandler<dim, spacedim> &dof_handler,
+                                 const ComponentMask &component_mask)
+  {
+    return internal::extract_rigid_body_modes(mapping,
+                                              dof_handler,
+                                              component_mask,
+                                              level);
   }
 
 

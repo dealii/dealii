@@ -1500,6 +1500,15 @@ namespace TrilinosWrappers
       std::vector<std::vector<bool>> constant_modes;
 
       /**
+       * Same as above, but with values instead of Booleans. This
+       * is useful if you want to specify rotational modes
+       * in addition to the translational modes. See also:
+       * DoFTools::extract_rigid_body_modes
+       * and DoFTools::extract_level_rigid_body_modes.
+       */
+      std::vector<std::vector<double>> constant_modes_values;
+
+      /**
        * Determines how many sweeps of the smoother should be performed. When
        * the flag <tt>elliptic</tt> is set to <tt>true</tt>, i.e., for
        * elliptic or almost elliptic problems, the polynomial degree of the
