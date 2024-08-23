@@ -188,7 +188,7 @@ namespace internal
                   // on a triangular face or on a quad face. On a
                   // hypercube element we can be on any face with
                   // face number face_no while on the pyramid only face_no = 0
-                  // gives the correct result for the hyercube relation. Same
+                  // gives the correct result for the hypercube relation. Same
                   // applies for the triangular face.
                   if (fes[fe_index_2].reference_cell() ==
                       ReferenceCells::Pyramid)
@@ -2293,7 +2293,7 @@ namespace internal
                         quad->n_active_fe_indices();
 
                       // check if we are on a mixed mesh
-                      // if yes we have to find the fe_index of the hyercube or
+                      // if yes we have to find the fe_index of the hypercube or
                       // simplex element
                       bool       is_mixed_mesh = false;
                       const auto reference_cell =
@@ -2331,7 +2331,7 @@ namespace internal
                           // q changes how many DoFs there are on the face, so
                           // taking the wrong face wont merge the corresponding
                           // DoFs. To avoid errors on the faces take the number
-                          // of DoFs from the hypercue/simplex element
+                          // of DoFs from the hypercube/simplex element
                           const unsigned int n_dofs_per_quad =
                             is_mixed_mesh ?
                               dof_handler.get_fe(hypercube_or_simplex_fe_index)
