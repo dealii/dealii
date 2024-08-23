@@ -13,37 +13,214 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/base/point.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/polynomials_pyramid.h>
+#include <deal.II/base/quadrature_lib.h>
+
 
 DEAL_II_NAMESPACE_OPEN
-
-namespace
-{
-  unsigned int
-  compute_n_polynomials_pyramid(const unsigned int dim,
-                                const unsigned int degree)
-  {
-    if (dim == 3)
-      {
-        if (degree == 1)
-          return 5;
-      }
-
-    DEAL_II_NOT_IMPLEMENTED();
-
-    return 0;
-  }
-} // namespace
 
 
 
 template <int dim>
 ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
-  const unsigned int degree)
-  : ScalarPolynomialsBase<dim>(degree,
-                               compute_n_polynomials_pyramid(dim, degree))
-{}
+  const unsigned int            degree,
+  const unsigned int            n_dofs,
+  const std::vector<Point<dim>> support_points)
+  : ScalarPolynomialsBase<dim>(degree, n_dofs)
+{
+  // fill VDM Matrix
+  FullMatrix<double> VDM(support_points.size());
+
+  for (unsigned i = 0; i < VDM.m(); ++i)
+    for (unsigned j = 0; j < VDM.n(); ++j)
+      VDM[i][j] = this->compute_jacobi_basis(i, support_points[j]);
+
+  // get inverse
+  VDM.gauss_jordan();
+
+  for (unsigned i = 0; i < VDM.m(); ++i)
+    for (unsigned j = 0; j < VDM.n(); ++j)
+      if (std::fabs(VDM[i][j]) < 1e-14)
+        VDM[i][j] = 0.0;
+
+  VDM_inv = VDM;
+}
+
+
+
+template <int dim>
+double
+ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space(
+  const unsigned int i,
+  const unsigned int j,
+  const unsigned int k,
+  const Point<dim>  &p) const
+{
+  const double x = p[0];
+  const double y = p[1];
+  const double z = p[2];
+
+  double ratio;
+  if (std::fabs(z - 1.0) < 1e-12)
+    ratio = 0.0;
+  else
+    ratio = 1.0 / (1.0 - z);
+
+  double             phi    = 0.0;
+  const unsigned int max_ij = std::max(i, j);
+
+  phi =
+    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+    Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
+    std::pow((1.0 - z), max_ij) *
+    Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
+
+  if (std::fabs(phi) < 1e-12)
+    return 0.0;
+
+  return phi;
+}
+
+
+
+template <int dim>
+double
+ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_basis(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  AssertIndexRange(i, this->n());
+
+  // find corresponding entrance to i
+  for (unsigned int j = 0, counter = 0; j <= this->degree(); ++j)
+    for (unsigned int k = 0; k <= this->degree(); ++k)
+      for (unsigned int l = 0; l <= this->degree() - std::max(j, k);
+           ++l, ++counter)
+        if (counter == i)
+          return compute_polynomial_space(j, k, l, p);
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return 0;
+}
+
+
+
+template <int dim>
+Tensor<1, dim>
+ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
+  const unsigned int i,
+  const unsigned int j,
+  const unsigned int k,
+  const Point<dim>  &p) const
+{
+  const double x = p[0];
+  const double y = p[1];
+  const double z = p[2];
+
+  Tensor<1, dim> grad;
+  double         ratio;
+  if (std::fabs(z - 1.0) < 1e-12)
+    ratio = 0.0;
+  else
+    ratio = 1.0 / (1.0 - z);
+
+  const unsigned int max_ij = std::max(i, j);
+
+  grad[0] =
+    Polynomials::jacobi_polynomial_derivative<double>(
+      i, 0, 0, x * ratio, false) *
+    ratio *
+    Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
+    std::pow((1.0 - z), max_ij) *
+    Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
+  grad[1] =
+    Polynomials::jacobi_polynomial_derivative<double>(
+      j, 0, 0, y * ratio, false) *
+    ratio *
+    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+    std::pow((1.0 - z), max_ij) *
+    Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
+  if (max_ij == 0)
+    grad[2] =
+      -x * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) -
+      y * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          k, 2 * max_ij + 2, 0, z, true);
+  else
+    grad[2] =
+      -x * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) -
+      y * std::pow(ratio, 2) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          j, 0, 0, y * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          i, 0, 0, x * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_value<double>(k, 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        (-1.0) * max_ij * std::pow((1.0 - z), max_ij - 1) *
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          k, 2 * max_ij + 2, 0, z, true);
+
+
+  for (unsigned int d = 0; d < dim; ++d)
+    if (std::fabs(grad[d]) < 1e-12)
+      grad[d] = 0.0;
+
+  return grad;
+}
+
+
+
+template <int dim>
+Tensor<1, dim>
+ScalarLagrangePolynomialPyramid<dim>::compute_jacobi_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  AssertIndexRange(i, this->n());
+
+  // find corresponding entrance to i
+  for (unsigned int j = 0, counter = 0; j <= this->degree(); ++j)
+    for (unsigned int k = 0; k <= this->degree(); ++k)
+      for (unsigned int l = 0; l <= this->degree() - std::max(j, k);
+           ++l, ++counter)
+        if (counter == i)
+          return compute_polynomial_space_derivative(j, k, l, p);
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return Tensor<1, dim>();
+}
+
 
 
 template <int dim>
@@ -52,34 +229,16 @@ ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
                                                     const Point<dim>  &p) const
 {
   AssertDimension(dim, 3);
-  AssertIndexRange(this->degree(), 2);
+  AssertIndexRange(i, VDM_inv.m());
 
-  const double Q14 = 0.25;
-  double       ration;
+  double result = 0;
+  for (unsigned int j = 0; j < VDM_inv.n(); ++j)
+    result += VDM_inv[i][j] * this->compute_jacobi_basis(j, p);
 
-  const double r = p[0];
-  const double s = p[1];
-  const double t = p[2];
+  if (std::fabs(result) < 1e-14)
+    result = 0.0;
 
-  if (fabs(t - 1.0) > 1.0e-14)
-    {
-      ration = (r * s * t) / (1.0 - t);
-    }
-  else
-    {
-      ration = 0.0;
-    }
-
-  if (i == 0)
-    return Q14 * ((1.0 - r) * (1.0 - s) - t + ration);
-  if (i == 1)
-    return Q14 * ((1.0 + r) * (1.0 - s) - t - ration);
-  if (i == 2)
-    return Q14 * ((1.0 - r) * (1.0 + s) - t - ration);
-  if (i == 3)
-    return Q14 * ((1.0 + r) * (1.0 + s) - t + ration);
-  else
-    return t;
+  return result;
 }
 
 
@@ -90,71 +249,16 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
                                                    const Point<dim>  &p) const
 {
   AssertDimension(dim, 3);
-  AssertIndexRange(this->degree(), 4);
+  AssertIndexRange(i, VDM_inv.m());
 
   Tensor<1, dim> grad;
 
-  if (this->degree() == 1)
-    {
-      const double Q14 = 0.25;
+  for (unsigned int j = 0; j < VDM_inv.n(); ++j)
+    grad += VDM_inv[i][j] * this->compute_jacobi_derivative(j, p);
 
-      const double r = p[0];
-      const double s = p[1];
-      const double t = p[2];
-
-      double rationdr;
-      double rationds;
-      double rationdt;
-
-      if (fabs(t - 1.0) > 1.0e-14)
-        {
-          rationdr = s * t / (1.0 - t);
-          rationds = r * t / (1.0 - t);
-          rationdt = r * s / ((1.0 - t) * (1.0 - t));
-        }
-      else
-        {
-          rationdr = 1.0;
-          rationds = 1.0;
-          rationdt = 1.0;
-        }
-
-
-      if (i == 0)
-        {
-          grad[0] = Q14 * (-1.0 * (1.0 - s) + rationdr);
-          grad[1] = Q14 * (-1.0 * (1.0 - r) + rationds);
-          grad[2] = Q14 * (rationdt - 1.0);
-        }
-      else if (i == 1)
-        {
-          grad[0] = Q14 * (1.0 * (1.0 - s) - rationdr);
-          grad[1] = Q14 * (-1.0 * (1.0 + r) - rationds);
-          grad[2] = Q14 * (-1.0 * rationdt - 1.0);
-        }
-      else if (i == 2)
-        {
-          grad[0] = Q14 * (-1.0 * (1.0 + s) - rationdr);
-          grad[1] = Q14 * (1.0 * (1.0 - r) - rationds);
-          grad[2] = Q14 * (-1.0 * rationdt - 1.0);
-        }
-      else if (i == 3)
-        {
-          grad[0] = Q14 * (1.0 * (1.0 + s) + rationdr);
-          grad[1] = Q14 * (1.0 * (1.0 + r) + rationds);
-          grad[2] = Q14 * (rationdt - 1.0);
-        }
-      else if (i == 4)
-        {
-          grad[0] = 0.0;
-          grad[1] = 0.0;
-          grad[2] = 1.0;
-        }
-      else
-        {
-          DEAL_II_NOT_IMPLEMENTED();
-        }
-    }
+  for (unsigned int d = 0; d < dim; ++d)
+    if (std::fabs(grad[d]) < 1e-14)
+      grad[d] = 0.0;
 
   return grad;
 }

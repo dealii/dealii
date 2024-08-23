@@ -747,7 +747,10 @@ FE_Q_Base<dim, spacedim>::hp_vertex_dof_identities(
       return {{0U, 0U}};
     }
   else if (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other) !=
-           nullptr)
+             nullptr ||
+           dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other) !=
+             nullptr ||
+           dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other) != nullptr)
     {
       // there should be exactly one single DoF of each FE at a vertex, and they
       // should have identical value
@@ -857,6 +860,16 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
 
       return identities;
     }
+  else if ((dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr))
+    {
+      Assert(fe_other.degree == this->degree, ExcNotImplemented());
+
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+      for (unsigned int i = 0; i < this->degree - 1; ++i)
+        identities.emplace_back(i, i);
+      return identities;
+    }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
     {
       // the FE_Nothing has no degrees of freedom, so there are no
@@ -932,6 +945,16 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
       // the FE_Nothing has no degrees of freedom, so there are no
       // equivalencies to be recorded
       return std::vector<std::pair<unsigned int, unsigned int>>();
+    }
+  else if ((dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr))
+    {
+      Assert(fe_other.degree == this->degree, ExcNotImplemented());
+
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
+        identities.emplace_back(i, i);
+      return identities;
     }
   else if (fe_other.n_unique_faces() == 1 && fe_other.n_dofs_per_face(0) == 0)
     {

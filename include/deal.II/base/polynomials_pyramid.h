@@ -20,6 +20,8 @@
 
 #include <deal.II/base/scalar_polynomials_base.h>
 
+#include <deal.II/lac/full_matrix.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -37,10 +39,10 @@ public:
 
   /*
    * Constructor taking the polynomial @p degree as input.
-   *
-   * @note Currently, only linear polynomials (degree=1) are implemented.
    */
-  ScalarLagrangePolynomialPyramid(const unsigned int degree);
+  ScalarLagrangePolynomialPyramid(const unsigned int            degree,
+                                  const unsigned int            n_dofs,
+                                  const std::vector<Point<dim>> support_points);
 
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()
@@ -55,6 +57,9 @@ public:
            std::vector<Tensor<3, dim>> &third_derivatives,
            std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_value()
+   */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
 
@@ -114,6 +119,42 @@ public:
 
   virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override;
+
+private:
+  /**
+   * Inverse of the Vandermonde matrix
+   */
+  FullMatrix<double> VDM_inv;
+
+  /**
+   * Evaluate orthogonal base at point @p p
+   */
+  double
+  compute_polynomial_space(const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+                           const Point<dim>  &p) const;
+
+  /**
+   * Evaluate orthogonal basis function @p i at point @p p
+   */
+  double
+  compute_jacobi_basis(const unsigned int i, const Point<dim> &p) const;
+
+  /**
+   * Evaluate the derivative of the orthogonal base at point @p p
+   */
+  Tensor<1, dim>
+  compute_polynomial_space_derivative(const unsigned int i,
+                                      const unsigned int j,
+                                      const unsigned int k,
+                                      const Point<dim>  &p) const;
+
+  /**
+   * Evaluate the derivative of the orthogonal basis @p i at point @p p
+   */
+  Tensor<1, dim>
+  compute_jacobi_derivative(const unsigned int i, const Point<dim> &p) const;
 };
 
 

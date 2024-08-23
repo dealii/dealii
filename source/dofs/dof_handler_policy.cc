@@ -170,14 +170,75 @@ namespace internal
               // any sense at all
               for (const auto &identity : reduced_identities)
                 {
-                  Assert(identity.first <
-                           fes[fe_index_1]
-                             .template n_dofs_per_object<structdim>(face_no),
-                         ExcInternalError());
-                  Assert(identity.second <
-                           fes[fe_index_2]
-                             .template n_dofs_per_object<structdim>(face_no),
-                         ExcInternalError());
+                  if (fes[fe_index_2].reference_cell() ==
+                      ReferenceCells::Pyramid)
+                    {
+                      if (fes[fe_index_1].reference_cell().is_simplex())
+                        {
+                          Assert(identity.first <
+                                   fes[fe_index_1]
+                                     .template n_dofs_per_object<structdim>(
+                                       face_no),
+                                 ExcInternalError());
+                          Assert(identity.second <
+                                   fes[fe_index_2]
+                                     .template n_dofs_per_object<structdim>(1),
+                                 ExcInternalError());
+                        }
+                      else
+                        {
+                          Assert(identity.first <
+                                   fes[fe_index_1]
+                                     .template n_dofs_per_object<structdim>(
+                                       face_no),
+                                 ExcInternalError());
+                          Assert(identity.second <
+                                   fes[fe_index_2]
+                                     .template n_dofs_per_object<structdim>(0),
+                                 ExcInternalError());
+                        }
+                    }
+                  else if (fes[fe_index_2].reference_cell() ==
+                           ReferenceCells::Wedge)
+                    {
+                      if (fes[fe_index_1].reference_cell().is_simplex())
+                        {
+                          Assert(identity.first <
+                                   fes[fe_index_1]
+                                     .template n_dofs_per_object<structdim>(
+                                       face_no),
+                                 ExcInternalError());
+                          Assert(identity.second <
+                                   fes[fe_index_2]
+                                     .template n_dofs_per_object<structdim>(0),
+                                 ExcInternalError());
+                        }
+                      else
+                        {
+                          Assert(identity.first <
+                                   fes[fe_index_1]
+                                     .template n_dofs_per_object<structdim>(
+                                       face_no),
+                                 ExcInternalError());
+                          Assert(identity.second <
+                                   fes[fe_index_2]
+                                     .template n_dofs_per_object<structdim>(2),
+                                 ExcInternalError());
+                        }
+                    }
+                  else
+                    {
+                      Assert(
+                        identity.first <
+                          fes[fe_index_1].template n_dofs_per_object<structdim>(
+                            face_no),
+                        ExcInternalError());
+                      Assert(
+                        identity.second <
+                          fes[fe_index_2].template n_dofs_per_object<structdim>(
+                            face_no),
+                        ExcInternalError());
+                    }
                 }
 #endif
 
@@ -2260,15 +2321,43 @@ namespace internal
                       const unsigned int n_active_fe_indices =
                         quad->n_active_fe_indices();
 
+
+                      bool       is_mixed_mesh = false;
+                      const auto reference_cell =
+                        dof_handler.get_fe(quad->nth_active_fe_index(0))
+                          .reference_cell();
+                      for (unsigned int f = 0; f < n_active_fe_indices; ++f)
+                        if (!(reference_cell ==
+                              dof_handler.get_fe(quad->nth_active_fe_index(f))
+                                .reference_cell()))
+                          is_mixed_mesh = true;
+
+                      auto hypercube_or_simplex_fe_index =
+                        numbers::invalid_fe_index;
+                      if (is_mixed_mesh)
+                        // try finding an index which is not pyramid or wedge
+                        for (unsigned int f = 0; f < n_active_fe_indices; ++f)
+                          if (dof_handler.get_fe(quad->nth_active_fe_index(f))
+                                .reference_cell()
+                                .is_simplex() ||
+                              dof_handler.get_fe(quad->nth_active_fe_index(f))
+                                .reference_cell()
+                                .is_hyper_cube())
+                            hypercube_or_simplex_fe_index =
+                              quad->nth_active_fe_index(f);
+
                       for (unsigned int f = 0; f < n_active_fe_indices; ++f)
                         {
                           const types::fe_index fe_index =
                             quad->nth_active_fe_index(f);
 
-                          for (unsigned int d = 0;
-                               d <
-                               dof_handler.get_fe(fe_index).n_dofs_per_quad(q);
-                               ++d)
+                          const unsigned int n_dofs_per_quad =
+                            is_mixed_mesh ?
+                              dof_handler.get_fe(hypercube_or_simplex_fe_index)
+                                .n_dofs_per_quad(q) :
+                              dof_handler.get_fe(fe_index).n_dofs_per_quad(q);
+
+                          for (unsigned int d = 0; d < n_dofs_per_quad; ++d)
                             {
                               const types::global_dof_index old_dof_index =
                                 quad->dof_index(d, fe_index);

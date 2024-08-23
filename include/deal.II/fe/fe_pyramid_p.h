@@ -38,8 +38,10 @@ public:
   /**
    * Constructor.
    */
-  FE_PyramidPoly(const unsigned int                                degree,
-                 const internal::GenericDoFsPerObject             &dpos,
+  FE_PyramidPoly(const unsigned int                       degree,
+                 std::pair<const internal::GenericDoFsPerObject,
+                           const std::vector<Point<dim>>> dpos_support_points,
+                 const bool prolongation_is_additive,
                  const typename FiniteElementData<dim>::Conformity conformity);
 
   /**
