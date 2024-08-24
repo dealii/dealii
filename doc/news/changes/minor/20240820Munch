@@ -1,0 +1,3 @@
+Improved: DataOut now also supports cubic output of simplices.
+<br>
+(Peter Munch, 2024/08/14)

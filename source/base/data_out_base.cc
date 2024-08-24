@@ -754,6 +754,11 @@ namespace
         vtk_cell_id[0] = patch.reference_cell.vtk_linear_type();
         vtk_cell_id[1] = Utilities::pow(patch.n_subdivisions, dim);
       }
+    else if (patch.reference_cell.is_simplex())
+      {
+        vtk_cell_id[0] = patch.reference_cell.vtk_lagrange_type();
+        vtk_cell_id[2] = patch.data.n_cols();
+      }
     else
       {
         DEAL_II_NOT_IMPLEMENTED();
