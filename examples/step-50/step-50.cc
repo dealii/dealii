@@ -335,7 +335,7 @@ namespace Step50
           << "****  directory, or use the following default values\n"
           << "****  to create an input file:\n";
         if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-          prm.print_parameters(std::cout, ParameterHandler::Text);
+          prm.print_parameters(std::cout, ParameterHandler::PRM);
         return false;
       }
 

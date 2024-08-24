@@ -142,7 +142,7 @@ main()
   data.add_parameters(prm);
 
   // std::ofstream ofile(SOURCE_DIR "/ida_01.prm");
-  // prm.print_parameters(ofile, ParameterHandler::ShortText);
+  // prm.print_parameters(ofile, ParameterHandler::ShortPRM);
   // ofile.close();
 
   std::ifstream ifile(SOURCE_DIR "/ida_01_in.prm");

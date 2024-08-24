@@ -194,7 +194,7 @@ namespace Step63
     /* ...and then try to read their values from the input file: */
     if (prm_filename.empty())
       {
-        prm.print_parameters(std::cout, ParameterHandler::Text);
+        prm.print_parameters(std::cout, ParameterHandler::PRM);
         AssertThrow(
           false, ExcMessage("Please pass a .prm file as the first argument!"));
       }

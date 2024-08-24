@@ -14,7 +14,7 @@
 
 
 
-// test ParameterHandler::set(Text)
+// test ParameterHandler::set(PRM)
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -50,7 +50,7 @@ main()
       prm.leave_subsection();
 
       // then write
-      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::PRM);
     }
   catch (const std::exception &exc)
     {

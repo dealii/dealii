@@ -43,7 +43,7 @@ main()
       prm.leave_subsection();
 
       // then write
-      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::PRM);
 
       // and do it again with the opposite
       // value
@@ -52,7 +52,7 @@ main()
       prm.leave_subsection();
 
       // then write
-      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::Text);
+      prm.print_parameters(deallog.get_file_stream(), ParameterHandler::PRM);
     }
   catch (const std::exception &exc)
     {

@@ -14,7 +14,7 @@
 
 
 
-// test ParameterHandler::log_parameters(Text)
+// test ParameterHandler::log_parameters(PRM)
 
 #include <deal.II/base/parameter_handler.h>
 

@@ -221,13 +221,13 @@ main(int argc, char **argv)
 
   data.add_parameters(prm);
   out << "# Default Parameters" << std::endl;
-  prm.print_parameters(out, ParameterHandler::ShortText);
+  prm.print_parameters(out, ParameterHandler::ShortPRM);
 
   std::ifstream ifile(SOURCE_DIR "/petsc_ts_00_in.prm");
   prm.parse_input(ifile);
 
   out << "# Testing Parameters" << std::endl;
-  prm.print_parameters(out, ParameterHandler::ShortText);
+  prm.print_parameters(out, ParameterHandler::ShortPRM);
 
   for (int setjaci = 0; setjaci < 2; setjaci++)
     {

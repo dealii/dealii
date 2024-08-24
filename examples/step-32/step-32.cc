@@ -1000,7 +1000,7 @@ namespace Step32
         parameter_file.close();
 
         std::ofstream parameter_out(parameter_filename);
-        prm.print_parameters(parameter_out, ParameterHandler::Text);
+        prm.print_parameters(parameter_out, ParameterHandler::PRM);
 
         AssertThrow(
           false,

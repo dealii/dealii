@@ -895,14 +895,6 @@ public:
     PRM = 0x0010,
 
     /**
-     * Write human readable output suitable to be read by
-     * ParameterHandler::parse_input() again.
-     *
-     * @deprecated Use `PRM` instead of `Text`.
-     */
-    Text = PRM,
-
-    /**
      * Write parameters as a LaTeX table.
      */
     LaTeX = 0x0020,
@@ -935,14 +927,6 @@ public:
      * values.
      */
     ShortPRM = PRM | Short,
-
-    /**
-     * Write the content of ParameterHandler without comments or changed default
-     * values.
-     *
-     * @deprecated Use `ShortPRM` instead of `ShortText`.
-     */
-    ShortText = ShortPRM,
 
     /**
      * Write the content of ParameterHandler without comments or changed default
