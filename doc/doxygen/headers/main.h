@@ -50,6 +50,7 @@
   output     [label="Graphical output", URL="\ref output"];
   manifold   [label="Manifold",         URL="\ref manifold"];
 
+
   tria -> dh              [style="solid"];
   fe -> dh                [style="solid"];
   fe -> fevalues          [style="solid"];
@@ -62,14 +63,13 @@
   manifold -> tria        [style="solid"];
   manifold -> mapping     [style="solid"];
 
-
-
   node [fontname="FreeSans",fontsize=12,
         shape=record,height=0.2,width=0.4,
         color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
   edge [color="gray55", weight=1];
 
-  opencascade [label="OpenCASCADE"];
+  opencascade [label="OpenCASCADE", URL="\ref OpenCASCADE"];
+
   subgraph linalglibs {
     rank="same";
     petsc       [label="PETSc",    URL="\ref PETScWrappers"];
@@ -81,8 +81,6 @@
   petsc -> solvers        [dir="none"];
   trilinos -> systems     [dir="none"];
   trilinos -> solvers     [dir="none"];
-  cuda -> systems         [dir="none"];
-  cuda -> solvers         [dir="none"];
   umfpack -> solvers      [dir="none"];
   opencascade -> manifold [dir="none"];
 
@@ -92,10 +90,12 @@
         color="gray55", fontcolor="gray55", fillcolor="white", style="filled"];
   edge [color="gray55", weight=1];
 
+  kokkos      [label="Kokkos"];
   gmsh        [label="gmsh", URL="\ref Gmsh"];
   visit       [label="VisIt"]
   paraview    [label="ParaView"]
 
+  kokkos -> systems  [dir="none"];
   gmsh -> tria       [dir="none"];
   output -> visit    [dir="none"];
   output -> paraview [dir="none"];
