@@ -64,7 +64,7 @@ public:
   {}
 
   DEAL_II_HOST_DEVICE void
-  set_matrix_free_data(const Portable::MatrixFree<dim, Number>::Data &)
+  set_matrix_free_data(const typename Portable::MatrixFree<dim, Number>::Data &)
   {}
 
   static const unsigned int n_q_points =
