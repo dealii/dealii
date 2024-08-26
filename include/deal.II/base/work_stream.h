@@ -782,7 +782,7 @@ namespace WorkStream
                 })
                 .name("worker");
 
-            // Create a copier task. This task is a seperate object from the
+            // Create a copier task. This task is a separate object from the
             // worker task.
             tf::Task copier_task = taskflow
                                      .emplace([idx, &copy_datas, &copier]() {
