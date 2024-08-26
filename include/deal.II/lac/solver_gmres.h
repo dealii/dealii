@@ -22,7 +22,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
-#include <deal.II/base/vectorization.h>
 
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/full_matrix.h>
@@ -132,6 +131,7 @@ namespace internal
      * triangular matrix by Givens rotations, and eventually solves the
      * minimization problem in the projected Krylov space.
      */
+    template <typename Number>
     class ArnoldiProcess
     {
     public:
@@ -192,6 +192,11 @@ namespace internal
        */
       const FullMatrix<double> &
       get_hessenberg_matrix() const;
+
+      /**
+       * Temporary vector to implement work for deal.II vector types
+       */
+      std::vector<const Number *> vector_ptrs;
 
     private:
       /**
@@ -617,7 +622,9 @@ protected:
    * Class that performs the actual orthogonalization process and solves the
    * projected linear system.
    */
-  internal::SolverGMRESImplementation::ArnoldiProcess arnoldi_process;
+  internal::SolverGMRESImplementation::ArnoldiProcess<
+    typename VectorType::value_type>
+    arnoldi_process;
 };
 
 
@@ -711,7 +718,9 @@ private:
    * Class that performs the actual orthogonalization process and solves the
    * projected linear system.
    */
-  internal::SolverGMRESImplementation::ArnoldiProcess arnoldi_process;
+  internal::SolverGMRESImplementation::ArnoldiProcess<
+    typename VectorType::value_type>
+    arnoldi_process;
 };
 
 /** @} */
@@ -818,30 +827,34 @@ namespace internal
 
 
     template <typename VectorType, typename Enable = void>
-    struct is_dealii_compatible_distributed_vector;
+    struct is_dealii_compatible_vector;
 
     template <typename VectorType>
-    struct is_dealii_compatible_distributed_vector<
+    struct is_dealii_compatible_vector<
       VectorType,
       std::enable_if_t<!internal::is_block_vector<VectorType>>>
     {
-      static constexpr bool value = std::is_same_v<
-        VectorType,
-        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                           MemorySpace::Host>>;
+      static constexpr bool value =
+        std::is_same_v<
+          VectorType,
+          LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                             MemorySpace::Host>> ||
+        std::is_same_v<VectorType, Vector<typename VectorType::value_type>>;
     };
 
 
 
     template <typename VectorType>
-    struct is_dealii_compatible_distributed_vector<
+    struct is_dealii_compatible_vector<
       VectorType,
       std::enable_if_t<internal::is_block_vector<VectorType>>>
     {
-      static constexpr bool value = std::is_same_v<
-        typename VectorType::BlockType,
-        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                           MemorySpace::Host>>;
+      static constexpr bool value =
+        std::is_same_v<
+          typename VectorType::BlockType,
+          LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                             MemorySpace::Host>> ||
+        std::is_same_v<VectorType, Vector<typename VectorType::value_type>>;
     };
 
 
@@ -918,14 +931,14 @@ namespace internal
 
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<
-                !is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
+              std::enable_if_t<!is_dealii_compatible_vector<VectorType>::value,
+                               VectorType> * = nullptr>
     void
     Tvmult_add(const unsigned int            n,
                const VectorType             &vv,
                const TmpVectors<VectorType> &orthogonal_vectors,
-               Vector<double>               &h)
+               Vector<double>               &h,
+               std::vector<const typename VectorType::value_type *> &)
     {
       for (unsigned int i = 0; i < n; ++i)
         {
@@ -939,159 +952,41 @@ namespace internal
 
 
 
+    // worker method for deal.II's vector types implemented in .cc file
+    template <bool delayed_reorthogonalization, typename Number>
+    void
+    do_Tvmult_add(const unsigned int                 n_vectors,
+                  const std::size_t                  locally_owned_size,
+                  const Number                      *current_vector,
+                  const std::vector<const Number *> &orthogonal_vectors,
+                  Vector<double>                    &b);
+
+
+
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<
-                is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
+              std::enable_if_t<is_dealii_compatible_vector<VectorType>::value,
+                               VectorType> * = nullptr>
     void
-    Tvmult_add(const unsigned int            n,
-               const VectorType             &vv,
-               const TmpVectors<VectorType> &orthogonal_vectors,
-               Vector<double>               &h)
+    Tvmult_add(
+      const unsigned int                                    n,
+      const VectorType                                     &vv,
+      const TmpVectors<VectorType>                         &orthogonal_vectors,
+      Vector<double>                                       &h,
+      std::vector<const typename VectorType::value_type *> &vector_ptrs)
     {
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          unsigned int j = 0;
+          vector_ptrs.resize(n);
+          for (unsigned int i = 0; i < n; ++i)
+            vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
 
-          if (n <= 128)
-            {
-              // optimized path
-              static constexpr unsigned int n_lanes =
-                VectorizedArray<double>::size();
-
-              VectorizedArray<double> hs[128];
-              for (unsigned int i = 0; i < n; ++i)
-                hs[i] = 0.0;
-              VectorizedArray<double>
-                correct[delayed_reorthogonalization ? 129 : 1];
-              if (delayed_reorthogonalization)
-                for (unsigned int i = 0; i < n + 1; ++i)
-                  correct[i] = 0.0;
-
-              unsigned int c = 0;
-
-              constexpr unsigned int inner_batch_size =
-                delayed_reorthogonalization ? 6 : 12;
-
-              for (; c < block(vv, b).locally_owned_size() / n_lanes /
-                           inner_batch_size;
-                   ++c, j += n_lanes * inner_batch_size)
-                {
-                  VectorizedArray<double> vvec[inner_batch_size];
-                  for (unsigned int k = 0; k < inner_batch_size; ++k)
-                    vvec[k].load(block(vv, b).begin() + j + k * n_lanes);
-                  VectorizedArray<double> last_vector[inner_batch_size];
-                  for (unsigned int k = 0; k < inner_batch_size; ++k)
-                    last_vector[k].load(
-                      block(orthogonal_vectors[n - 1], b).begin() + j +
-                      k * n_lanes);
-
-                  {
-                    VectorizedArray<double> local_sum_0 =
-                      last_vector[0] * vvec[0];
-                    VectorizedArray<double> local_sum_1 =
-                      last_vector[0] * last_vector[0];
-                    VectorizedArray<double> local_sum_2 = vvec[0] * vvec[0];
-                    for (unsigned int k = 1; k < inner_batch_size; ++k)
-                      {
-                        local_sum_0 += last_vector[k] * vvec[k];
-                        if (delayed_reorthogonalization)
-                          {
-                            local_sum_1 += last_vector[k] * last_vector[k];
-                            local_sum_2 += vvec[k] * vvec[k];
-                          }
-                      }
-                    hs[n - 1] += local_sum_0;
-                    if (delayed_reorthogonalization)
-                      {
-                        correct[n - 1] += local_sum_1;
-                        correct[n] += local_sum_2;
-                      }
-                  }
-
-                  for (unsigned int i = 0; i < n - 1; ++i)
-                    {
-                      // break the dependency chain into the field hs[i] for
-                      // small sizes i by first accumulating 4 or 8 results
-                      // into a local variable
-                      VectorizedArray<double> temp;
-                      temp.load(block(orthogonal_vectors[i], b).begin() + j);
-                      VectorizedArray<double> local_sum_0 = temp * vvec[0];
-                      VectorizedArray<double> local_sum_1 =
-                        delayed_reorthogonalization ? temp * last_vector[0] :
-                                                      0.;
-                      for (unsigned int k = 1; k < inner_batch_size; ++k)
-                        {
-                          temp.load(block(orthogonal_vectors[i], b).begin() +
-                                    j + k * n_lanes);
-                          local_sum_0 += temp * vvec[k];
-                          if (delayed_reorthogonalization)
-                            local_sum_1 += temp * last_vector[k];
-                        }
-                      hs[i] += local_sum_0;
-                      if (delayed_reorthogonalization)
-                        correct[i] += local_sum_1;
-                    }
-                }
-
-              c *= inner_batch_size;
-              for (; c < block(vv, b).locally_owned_size() / n_lanes;
-                   ++c, j += n_lanes)
-                {
-                  VectorizedArray<double> vvec, last_vector;
-                  vvec.load(block(vv, b).begin() + j);
-                  last_vector.load(block(orthogonal_vectors[n - 1], b).begin() +
-                                   j);
-                  hs[n - 1] += last_vector * vvec;
-                  if (delayed_reorthogonalization)
-                    {
-                      correct[n - 1] += last_vector * last_vector;
-                      correct[n] += vvec * vvec;
-                    }
-
-                  for (unsigned int i = 0; i < n - 1; ++i)
-                    {
-                      VectorizedArray<double> temp;
-                      temp.load(block(orthogonal_vectors[i], b).begin() + j);
-                      hs[i] += temp * vvec;
-                      if (delayed_reorthogonalization)
-                        correct[i] += temp * last_vector;
-                    }
-                }
-
-              for (unsigned int i = 0; i < n; ++i)
-                {
-                  h(i) += hs[i].sum();
-                  if (delayed_reorthogonalization)
-                    h(i + n) += correct[i].sum();
-                }
-              if (delayed_reorthogonalization)
-                h(n + n) += correct[n].sum();
-            }
-
-          // remainder loop of optimized path or non-optimized path (if
-          // n>128)
-          for (; j < block(vv, b).locally_owned_size(); ++j)
-            {
-              const double vvec = block(vv, b).local_element(j);
-              const double last_vector =
-                block(orthogonal_vectors[n - 1], b).local_element(j);
-              h(n - 1) += last_vector * vvec;
-              if (delayed_reorthogonalization)
-                {
-                  h(n + n - 1) += last_vector * last_vector;
-                  h(n + n) += vvec * vvec;
-                }
-              for (unsigned int i = 0; i < n - 1; ++i)
-                {
-                  const double temp =
-                    block(orthogonal_vectors[i], b).local_element(j);
-                  h(i) += temp * vvec;
-                  if (delayed_reorthogonalization)
-                    h(n + i) += temp * last_vector;
-                }
-            }
+          do_Tvmult_add<delayed_reorthogonalization>(n,
+                                                     block(vv, b).end() -
+                                                       block(vv, b).begin(),
+                                                     block(vv, b).begin(),
+                                                     vector_ptrs,
+                                                     h);
         }
 
       Utilities::MPI::sum(h, block(vv, 0).get_mpi_communicator(), h);
@@ -1101,14 +996,14 @@ namespace internal
 
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<
-                !is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
+              std::enable_if_t<!is_dealii_compatible_vector<VectorType>::value,
+                               VectorType> * = nullptr>
     double
     subtract_and_norm(const unsigned int            n,
                       const TmpVectors<VectorType> &orthogonal_vectors,
                       const Vector<double>         &h,
-                      VectorType                   &vv)
+                      VectorType                   &vv,
+                      std::vector<const typename VectorType::value_type *> &)
     {
       Assert(n > 0, ExcInternalError());
 
@@ -1147,155 +1042,43 @@ namespace internal
 
 
 
+    // worker method for deal.II's vector types implemented in .cc file
+    template <bool delayed_reorthogonalization, typename Number>
+    double
+    do_subtract_and_norm(const unsigned int                 n_vectors,
+                         const std::size_t                  locally_owned_size,
+                         const std::vector<const Number *> &orthogonal_vectors,
+                         const Vector<double>              &h,
+                         Number                            *current_vector);
+
+
+
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<
-                is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
+              std::enable_if_t<is_dealii_compatible_vector<VectorType>::value,
+                               VectorType> * = nullptr>
     double
-    subtract_and_norm(const unsigned int            n,
-                      const TmpVectors<VectorType> &orthogonal_vectors,
-                      const Vector<double>         &h,
-                      VectorType                   &vv)
+    subtract_and_norm(
+      const unsigned int                                    n,
+      const TmpVectors<VectorType>                         &orthogonal_vectors,
+      const Vector<double>                                 &h,
+      VectorType                                           &vv,
+      std::vector<const typename VectorType::value_type *> &vector_ptrs)
     {
-      static constexpr unsigned int n_lanes = VectorizedArray<double>::size();
-
-      double      norm_vv_temp = 0.0;
-      VectorType &last_vector =
-        const_cast<VectorType &>(orthogonal_vectors[n - 1]);
-      const double inverse_norm_previous =
-        delayed_reorthogonalization ? 1. / h(n + n - 1) : 0.;
-      const double scaling_factor_vv =
-        delayed_reorthogonalization ?
-          (h(n + n) > 0.0 ? inverse_norm_previous / h(n + n) :
-                            inverse_norm_previous / h(n + n - 1)) :
-          0.;
+      double norm_vv_temp = 0.0;
 
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          VectorizedArray<double> norm_vv_temp_vectorized = 0.0;
+          vector_ptrs.resize(n);
+          for (unsigned int i = 0; i < n; ++i)
+            vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
 
-          constexpr unsigned int inner_batch_size =
-            delayed_reorthogonalization ? 6 : 12;
-
-          unsigned int j = 0;
-          unsigned int c = 0;
-          for (; c <
-                 block(vv, b).locally_owned_size() / n_lanes / inner_batch_size;
-               ++c, j += n_lanes * inner_batch_size)
-            {
-              VectorizedArray<double> temp[inner_batch_size];
-              VectorizedArray<double> last_vec[inner_batch_size];
-
-              const double last_factor = h(n - 1);
-              for (unsigned int k = 0; k < inner_batch_size; ++k)
-                {
-                  temp[k].load(block(vv, b).begin() + j + k * n_lanes);
-                  last_vec[k].load(block(last_vector, b).begin() + j +
-                                   k * n_lanes);
-                  if (!delayed_reorthogonalization)
-                    temp[k] -= last_factor * last_vec[k];
-                }
-
-              for (unsigned int i = 0; i < n - 1; ++i)
-                {
-                  const double factor = h(i);
-                  const double correction_factor =
-                    (delayed_reorthogonalization ? h(n + i) : 0.0);
-                  for (unsigned int k = 0; k < inner_batch_size; ++k)
-                    {
-                      VectorizedArray<double> vec;
-                      vec.load(block(orthogonal_vectors[i], b).begin() + j +
-                               k * n_lanes);
-                      temp[k] -= factor * vec;
-                      if (delayed_reorthogonalization)
-                        last_vec[k] -= correction_factor * vec;
-                    }
-                }
-
-              if (delayed_reorthogonalization)
-                for (unsigned int k = 0; k < inner_batch_size; ++k)
-                  {
-                    last_vec[k] = last_vec[k] * inverse_norm_previous;
-                    last_vec[k].store(block(last_vector, b).begin() + j +
-                                      k * n_lanes);
-                    temp[k] -= last_factor * last_vec[k];
-                    temp[k] = temp[k] * scaling_factor_vv;
-                    temp[k].store(block(vv, b).begin() + j + k * n_lanes);
-                  }
-              else
-                for (unsigned int k = 0; k < inner_batch_size; ++k)
-                  {
-                    temp[k].store(block(vv, b).begin() + j + k * n_lanes);
-                    norm_vv_temp_vectorized += temp[k] * temp[k];
-                  }
-            }
-
-          c *= inner_batch_size;
-          for (; c < block(vv, b).locally_owned_size() / n_lanes;
-               ++c, j += n_lanes)
-            {
-              VectorizedArray<double> temp, last_vec;
-              temp.load(block(vv, b).begin() + j);
-              last_vec.load(block(last_vector, b).begin() + j);
-              if (!delayed_reorthogonalization)
-                temp -= h(n - 1) * last_vec;
-
-              for (unsigned int i = 0; i < n - 1; ++i)
-                {
-                  VectorizedArray<double> vec;
-                  vec.load(block(orthogonal_vectors[i], b).begin() + j);
-                  temp -= h(i) * vec;
-                  if (delayed_reorthogonalization)
-                    last_vec -= h(n + i) * vec;
-                }
-
-              if (delayed_reorthogonalization)
-                {
-                  last_vec = last_vec * inverse_norm_previous;
-                  last_vec.store(block(last_vector, b).begin() + j);
-                  temp -= h(n - 1) * last_vec;
-                  temp = temp * scaling_factor_vv;
-                  temp.store(block(vv, b).begin() + j);
-                }
-              else
-                {
-                  temp.store(block(vv, b).begin() + j);
-                  norm_vv_temp_vectorized += temp * temp;
-                }
-            }
-
-          if (!delayed_reorthogonalization)
-            norm_vv_temp += norm_vv_temp_vectorized.sum();
-
-          for (; j < block(vv, b).locally_owned_size(); ++j)
-            {
-              double temp     = block(vv, b).local_element(j);
-              double last_vec = block(last_vector, b).local_element(j);
-              if (delayed_reorthogonalization)
-                {
-                  for (unsigned int i = 0; i < n - 1; ++i)
-                    {
-                      const double vec =
-                        block(orthogonal_vectors[i], b).local_element(j);
-                      temp -= h(i) * vec;
-                      last_vec -= h(n + i) * vec;
-                    }
-                  last_vec *= inverse_norm_previous;
-                  block(last_vector, b).local_element(j) = last_vec;
-                  temp -= h(n - 1) * last_vec;
-                  temp *= scaling_factor_vv;
-                }
-              else
-                {
-                  temp -= h(n - 1) * last_vec;
-                  for (unsigned int i = 0; i < n - 1; ++i)
-                    temp -=
-                      h(i) * block(orthogonal_vectors[i], b).local_element(j);
-                  norm_vv_temp += temp * temp;
-                }
-              block(vv, b).local_element(j) = temp;
-            }
+          norm_vv_temp += do_subtract_and_norm<delayed_reorthogonalization>(
+            n,
+            block(vv, b).end() - block(vv, b).begin(),
+            vector_ptrs,
+            h,
+            block(vv, b).begin());
         }
 
       return std::sqrt(
@@ -1305,15 +1088,15 @@ namespace internal
 
 
     template <typename VectorType,
-              std::enable_if_t<
-                !is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
+              std::enable_if_t<!is_dealii_compatible_vector<VectorType>::value,
+                               VectorType> * = nullptr>
     void
     add(VectorType                   &p,
         const unsigned int            n,
         const Vector<double>         &h,
         const TmpVectors<VectorType> &tmp_vectors,
-        const bool                    zero_out)
+        const bool                    zero_out,
+        std::vector<const typename VectorType::value_type *> &)
     {
       if (zero_out)
         p.equ(h(0), tmp_vectors[0]);
@@ -1326,31 +1109,48 @@ namespace internal
 
 
 
-    template <typename VectorType,
-              std::enable_if_t<
-                is_dealii_compatible_distributed_vector<VectorType>::value,
-                VectorType> * = nullptr>
+    // worker method for deal.II's vector types implemented in .cc file
+    template <typename Number>
     void
-    add(VectorType                   &p,
-        const unsigned int            n,
-        const Vector<double>         &h,
-        const TmpVectors<VectorType> &tmp_vectors,
-        const bool                    zero_out)
+    do_add(const unsigned int                 n_vectors,
+           const std::size_t                  locally_owned_size,
+           const std::vector<const Number *> &tmp_vectors,
+           const Vector<double>              &h,
+           const bool                         zero_out,
+           Number                            *output);
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<is_dealii_compatible_vector<VectorType>::value,
+                               VectorType> * = nullptr>
+    void
+    add(VectorType                                           &p,
+        const unsigned int                                    n,
+        const Vector<double>                                 &h,
+        const TmpVectors<VectorType>                         &tmp_vectors,
+        const bool                                            zero_out,
+        std::vector<const typename VectorType::value_type *> &vector_ptrs)
     {
       for (unsigned int b = 0; b < n_blocks(p); ++b)
-        for (unsigned int j = 0; j < block(p, b).locally_owned_size(); ++j)
-          {
-            double temp = zero_out ? 0 : block(p, b).local_element(j);
-            for (unsigned int i = 0; i < n; ++i)
-              temp += block(tmp_vectors[i], b).local_element(j) * h(i);
-            block(p, b).local_element(j) = temp;
-          }
+        {
+          vector_ptrs.resize(n);
+          for (unsigned int i = 0; i < n; ++i)
+            vector_ptrs[i] = block(tmp_vectors[i], b).begin();
+          do_add(n,
+                 block(p, b).end() - block(p, b).begin(),
+                 vector_ptrs,
+                 h,
+                 zero_out,
+                 block(p, b).begin());
+        }
     }
 
 
 
+    template <typename Number>
     inline void
-    ArnoldiProcess::initialize(
+    ArnoldiProcess<Number>::initialize(
       const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy,
       const unsigned int                             basis_size,
       const bool                                     force_reorthogonalization)
@@ -1375,9 +1175,10 @@ namespace internal
 
 
 
+    template <typename Number>
     template <typename VectorType>
     inline double
-    ArnoldiProcess::orthonormalize_nth_vector(
+    ArnoldiProcess<Number>::orthonormalize_nth_vector(
       const unsigned int                        n,
       TmpVectors<VectorType>                   &orthogonal_vectors,
       const unsigned int                        accumulated_iterations,
@@ -1405,7 +1206,7 @@ namespace internal
           // 4 of Bielich et al. (2022).
 
           // To avoid un-scaled numbers as appearing with the original
-          // algorithm of Bielich et al., we use a preliminary scaling of the
+          // algorithm by Bielich et al., we use a preliminary scaling of the
           // last vector. This will be corrected in the delayed step.
           const double previous_scaling = n > 0 ? h(n + n - 2) : 1.;
 
@@ -1413,7 +1214,7 @@ namespace internal
           h.reinit(n + n + 1);
 
           // global reduction
-          Tvmult_add<true>(n, vv, orthogonal_vectors, h);
+          Tvmult_add<true>(n, vv, orthogonal_vectors, h, vector_ptrs);
 
           // delayed correction terms
           double tmp = 0;
@@ -1444,8 +1245,8 @@ namespace internal
               hessenberg_matrix(i, n - 1) = (h(i) - sum) / alpha_j;
             }
 
-          // Compute estimate norm for approximate convergence criterion (to
-          // be corrected in next iteration)
+          // compute norm estimate for approximate convergence criterion
+          // (value of norm to be corrected in next iteration)
           double sum = 0;
           for (unsigned int i = 0; i < n - 1; ++i)
             sum += h(i) * h(i);
@@ -1455,10 +1256,10 @@ namespace internal
 
           // projection and delayed reorthogonalization. We scale the vector
           // vv here by the preliminary norm to avoid working with too large
-          // values and correct to the actual norm in high precision in the
-          // next iteration.
+          // values and correct the actual norm in the Hessenberg matrix in
+          // high precision in the next iteration.
           h(n + n) = hessenberg_matrix(n, n - 1);
-          subtract_and_norm<true>(n, orthogonal_vectors, h, vv);
+          subtract_and_norm<true>(n, orthogonal_vectors, h, vv, vector_ptrs);
 
           // transform new column of upper Hessenberg matrix into upper
           // triangular form by computing the respective factor
@@ -1503,9 +1304,9 @@ namespace internal
                        LinearAlgebra::OrthogonalizationStrategy::
                          classical_gram_schmidt)
                 {
-                  Tvmult_add<false>(n, vv, orthogonal_vectors, h);
-                  norm_vv =
-                    subtract_and_norm<false>(n, orthogonal_vectors, h, vv);
+                  Tvmult_add<false>(n, vv, orthogonal_vectors, h, vector_ptrs);
+                  norm_vv = subtract_and_norm<false>(
+                    n, orthogonal_vectors, h, vv, vector_ptrs);
                 }
               else
                 {
@@ -1561,8 +1362,9 @@ namespace internal
 
 
 
+    template <typename Number>
     inline double
-    ArnoldiProcess::do_givens_rotation(
+    ArnoldiProcess<Number>::do_givens_rotation(
       const bool                              delayed_reorthogonalization,
       const int                               col,
       FullMatrix<double>                     &matrix,
@@ -1570,7 +1372,7 @@ namespace internal
       Vector<double>                         &rhs)
     {
       // for the delayed orthogonalization, we can only compute the column of
-      // the previous column (as there will be correction terms added to the
+      // the previous iteration (as there will be correction terms added to the
       // present column for stability reasons), but we still want to compute
       // the residual estimate from the accumulated work; we therefore perform
       // givens rotations on two columns simultaneously
@@ -1645,8 +1447,9 @@ namespace internal
 
 
 
+    template <typename Number>
     inline const Vector<double> &
-    ArnoldiProcess::solve_projected_system(
+    ArnoldiProcess<Number>::solve_projected_system(
       const bool orthogonalization_finished)
     {
       FullMatrix<double>  tmp_triangular_matrix;
@@ -1656,11 +1459,12 @@ namespace internal
       unsigned int        n      = givens_rotations.size();
 
       // If we solve with the delayed orthogonalization, we still need to
-      // perform the elimination of the last column. We distinguish two cases,
-      // one where the orthogonalization has finished (i.e., end of inner
-      // iteration in GMRES) and we can safely overwrite the content of the
-      // tridiagonal matrix and right hand side, and the case during the inner
-      // iterations where we need to create copies of the matrices in the QR
+      // perform the elimination of the last column before we can solve the
+      // projected system. We distinguish two cases, one where the
+      // orthogonalization has finished (i.e., end of inner iteration in
+      // GMRES) and we can safely overwrite the content of the tridiagonal
+      // matrix and right hand side, and the case during the inner iterations,
+      // where we need to create copies of the matrices in the QR
       // decomposition as well as the right hand side.
       if (orthogonalization_strategy ==
           LinearAlgebra::OrthogonalizationStrategy::
@@ -1705,8 +1509,9 @@ namespace internal
 
 
 
+    template <typename Number>
     inline const FullMatrix<double> &
-    ArnoldiProcess::get_hessenberg_matrix() const
+    ArnoldiProcess<Number>::get_hessenberg_matrix() const
     {
       return hessenberg_matrix;
     }
@@ -1883,10 +1688,8 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
             }
         }
 
-      const double norm_v =
-        arnoldi_process.orthonormalize_nth_vector(0,
-                                                  basis_vectors,
-                                                  accumulated_iterations);
+      const double norm_v = arnoldi_process.orthonormalize_nth_vector(
+        0, basis_vectors, accumulated_iterations, re_orthogonalize_signal);
 
       // check the residual here as well since it may be that we got the exact
       // (or an almost exact) solution vector at the outset. if we wouldn't
@@ -2022,11 +1825,21 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
 
       if (left_precondition)
         dealii::internal::SolverGMRESImplementation::add(
-          x, inner_iteration, projected_solution, basis_vectors, false);
+          x,
+          inner_iteration,
+          projected_solution,
+          basis_vectors,
+          false,
+          arnoldi_process.vector_ptrs);
       else
         {
           dealii::internal::SolverGMRESImplementation::add(
-            p, inner_iteration, projected_solution, basis_vectors, true);
+            p,
+            inner_iteration,
+            projected_solution,
+            basis_vectors,
+            true,
+            arnoldi_process.vector_ptrs);
           preconditioner.vmult(v, p);
           x.add(1., v);
         }
@@ -2145,6 +1958,7 @@ double SolverGMRES<VectorType>::criterion()
 }
 
 
+
 //----------------------------------------------------------------------//
 
 template <typename VectorType>
@@ -2248,7 +2062,12 @@ void SolverFGMRES<VectorType>::solve(const MatrixType         &A,
       const Vector<double> &projected_solution =
         arnoldi_process.solve_projected_system(true);
       dealii::internal::SolverGMRESImplementation::add(
-        x, inner_iteration, projected_solution, z, false);
+        x,
+        inner_iteration,
+        projected_solution,
+        z,
+        false,
+        arnoldi_process.vector_ptrs);
     }
   while (iteration_state == SolverControl::iterate);
 

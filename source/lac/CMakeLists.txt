@@ -32,6 +32,7 @@ set(_unity_include_src
   read_write_vector.cc
   solver.cc
   solver_control.cc
+  solver_gmres.cc
   sparse_decomposition.cc
   sparse_direct.cc
   sparse_ilu.cc
@@ -72,6 +73,7 @@ set(_inst
   read_write_vector.inst.in
   scalapack.inst.in
   solver.inst.in
+  solver_gmres.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
   tensor_product_matrix.inst.in
