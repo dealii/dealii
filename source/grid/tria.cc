@@ -16504,14 +16504,12 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags()
           for (const auto &cell : this->active_cell_iterators())
             {
               if (cell->refine_flag_set())
-                for (const unsigned int vertex :
-                     GeometryInfo<dim>::vertex_indices())
+                for (const unsigned int vertex : cell->vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level() + 1);
               else if (!cell->coarsen_flag_set())
-                for (const unsigned int vertex :
-                     GeometryInfo<dim>::vertex_indices())
+                for (const unsigned int vertex : cell->vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level());
@@ -16524,8 +16522,7 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags()
                   // to correct this by iterating over the entire
                   // process until we are converged
                   Assert(cell->coarsen_flag_set(), ExcInternalError());
-                  for (const unsigned int vertex :
-                       GeometryInfo<dim>::vertex_indices())
+                  for (const unsigned int vertex : cell->vertex_indices())
                     vertex_level[cell->vertex_index(vertex)] =
                       std::max(vertex_level[cell->vertex_index(vertex)],
                                cell->level() - 1);
@@ -16546,8 +16543,7 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags()
           for (active_cell_iterator cell = last_active(); cell != endc; --cell)
             if (cell->refine_flag_set() == false)
               {
-                for (const unsigned int vertex :
-                     GeometryInfo<dim>::vertex_indices())
+                for (const unsigned int vertex : cell->vertex_indices())
                   if (vertex_level[cell->vertex_index(vertex)] >=
                       cell->level() + 1)
                     {
@@ -16562,8 +16558,7 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags()
                         {
                           cell->set_refine_flag();
 
-                          for (const unsigned int v :
-                               GeometryInfo<dim>::vertex_indices())
+                          for (const unsigned int v : cell->vertex_indices())
                             vertex_level[cell->vertex_index(v)] =
                               std::max(vertex_level[cell->vertex_index(v)],
                                        cell->level() + 1);
@@ -17090,8 +17085,7 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                     // smoothing operation below.
                     bool at_periodic_boundary = false;
 
-                    for (const unsigned int n :
-                         GeometryInfo<dim>::face_indices())
+                    for (const unsigned int n : cell->face_indices())
                       {
                         const cell_iterator neighbor = cell->neighbor(n);
                         if (neighbor.state() == IteratorState::valid)
@@ -17162,14 +17156,12 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           for (const auto &cell : active_cell_iterators())
             {
               if (cell->refine_flag_set())
-                for (const unsigned int vertex :
-                     GeometryInfo<dim>::vertex_indices())
+                for (const unsigned int vertex : cell->vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level() + 1);
               else if (!cell->coarsen_flag_set())
-                for (const unsigned int vertex :
-                     GeometryInfo<dim>::vertex_indices())
+                for (const unsigned int vertex : cell->vertex_indices())
                   vertex_level[cell->vertex_index(vertex)] =
                     std::max(vertex_level[cell->vertex_index(vertex)],
                              cell->level());
@@ -17180,8 +17172,7 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                   // always true (the coarsen flag could be removed
                   // again) and so we may make an error here
                   Assert(cell->coarsen_flag_set(), ExcInternalError());
-                  for (const unsigned int vertex :
-                       GeometryInfo<dim>::vertex_indices())
+                  for (const unsigned int vertex : cell->vertex_indices())
                     vertex_level[cell->vertex_index(vertex)] =
                       std::max(vertex_level[cell->vertex_index(vertex)],
                                cell->level() - 1);
@@ -17201,8 +17192,7 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           for (active_cell_iterator cell = last_active(); cell != end(); --cell)
             if (cell->refine_flag_set() == false)
               {
-                for (const unsigned int vertex :
-                     GeometryInfo<dim>::vertex_indices())
+                for (const unsigned int vertex : cell->vertex_indices())
                   if (vertex_level[cell->vertex_index(vertex)] >=
                       cell->level() + 1)
                     {
@@ -17217,8 +17207,7 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                         {
                           cell->set_refine_flag();
 
-                          for (const unsigned int v :
-                               GeometryInfo<dim>::vertex_indices())
+                          for (const unsigned int v : cell->vertex_indices())
                             vertex_level[cell->vertex_index(v)] =
                               std::max(vertex_level[cell->vertex_index(v)],
                                        cell->level() + 1);
