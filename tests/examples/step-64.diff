@@ -11,6 +11,6 @@
 >     //cg.solve(*system_matrix_dev, solution_dev, system_rhs_dev, preconditioner);
 >     check_solver_within_range(pcout,cg.solve(*system_matrix_dev, solution_dev, system_rhs_dev, preconditioner),
 >                            solver_control.last_step(),
->                              26, 228);
+>                              8, 60);
 > //    pcout << "  Solved in " << solver_control.last_step() << " iterations."
 > //          << std::endl;
