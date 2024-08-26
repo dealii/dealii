@@ -305,9 +305,9 @@ namespace internal
     const MPI_Comm                           mpi_communicator)
   {
     // The result vector filled step by step.
-    using ConstraintType =
+    using ConstraintLine =
       typename dealii::AffineConstraints<number>::ConstraintLine;
-    std::vector<ConstraintType> locally_relevant_constraints;
+    std::vector<ConstraintLine> locally_relevant_constraints;
 
 #ifndef DEAL_II_WITH_MPI
     AssertThrow(false, ExcNotImplemented()); // one should not come here
@@ -322,13 +322,13 @@ namespace internal
 
     // helper function
     const auto sort_and_make_unique = [&constraints_in, &locally_owned_dofs](
-                                        std::vector<ConstraintType>
+                                        std::vector<ConstraintLine>
                                           &locally_relevant_constraints) {
       (void)constraints_in;
       if (locally_relevant_constraints.empty())
         return;
 
-      for (ConstraintType &entry : locally_relevant_constraints)
+      for (ConstraintLine &entry : locally_relevant_constraints)
         std::sort(entry.entries.begin(),
                   entry.entries.end(),
                   [](const auto &l1, const auto &l2) {
@@ -337,7 +337,7 @@ namespace internal
 
       std::sort(locally_relevant_constraints.begin(),
                 locally_relevant_constraints.end(),
-                [](const ConstraintType &l1, const ConstraintType &l2) {
+                [](const ConstraintLine &l1, const ConstraintLine &l2) {
                   return l1.index < l2.index;
                 });
 
@@ -351,9 +351,9 @@ namespace internal
           return false;
       };
 
-      typename std::vector<ConstraintType>::iterator read_ptr =
+      typename std::vector<ConstraintLine>::iterator read_ptr =
         locally_relevant_constraints.begin();
-      typename std::vector<ConstraintType>::iterator write_ptr =
+      typename std::vector<ConstraintLine>::iterator write_ptr =
         locally_relevant_constraints.begin();
       // go through sorted locally relevant constraints and look out for
       // duplicates (same constrained index, same entries) or cases that need
@@ -368,8 +368,8 @@ namespace internal
             }
           else // equal global dof index
             {
-              ConstraintType       &a = *write_ptr;
-              const ConstraintType &b = *read_ptr;
+              ConstraintLine       &a = *write_ptr;
+              const ConstraintLine &b = *read_ptr;
               Assert(a.index == b.index, ExcInternalError());
               if (!equal_with_tol(a.inhomogeneity, b.inhomogeneity) &&
                   locally_owned_dofs.is_element(b.index))
@@ -381,8 +381,8 @@ namespace internal
                   a.inhomogeneity = b.inhomogeneity;
                 }
 
-              typename ConstraintType::Entries       &av = a.entries;
-              const typename ConstraintType::Entries &bv = b.entries;
+              typename ConstraintLine::Entries       &av = a.entries;
+              const typename ConstraintLine::Entries &bv = b.entries;
               // check if entries vectors are equal
               bool vectors_are_equal = (av.size() == bv.size());
               for (unsigned int i = 0; vectors_are_equal && i < av.size(); ++i)
@@ -398,7 +398,7 @@ namespace internal
               // second entry
               if (!vectors_are_equal)
                 {
-                  typename ConstraintType::Entries cv;
+                  typename ConstraintLine::Entries cv;
                   cv.reserve(av.size() + bv.size());
 
                   unsigned int i = 0;
@@ -477,11 +477,11 @@ namespace internal
         affine_constraints_make_consistent_in_parallel_0;
 
       // ... collect data and sort according to owner
-      std::map<unsigned int, std::vector<ConstraintType>> send_data_temp;
+      std::map<unsigned int, std::vector<ConstraintLine>> send_data_temp;
 
       for (unsigned int i = 0; i < constrained_indices_owners.size(); ++i)
         {
-          ConstraintType entry;
+          ConstraintLine entry;
 
           const types::global_dof_index index =
             constrained_indices.nth_index_in_set(i);
@@ -504,7 +504,7 @@ namespace internal
       std::map<unsigned int, std::vector<char>> send_data;
 
       for (const typename std::map<unsigned int,
-                                   std::vector<ConstraintType>>::value_type &i :
+                                   std::vector<ConstraintLine>>::value_type &i :
            send_data_temp)
         send_data[i.first] = Utilities::pack(i.second, false);
 
@@ -560,7 +560,7 @@ namespace internal
           AssertThrowMPI(ierr);
 
           const auto data =
-            Utilities::unpack<std::vector<ConstraintType>>(buffer, false);
+            Utilities::unpack<std::vector<ConstraintLine>>(buffer, false);
 
           for (const auto &i : data)
             locally_relevant_constraints.push_back(i);
@@ -613,13 +613,13 @@ namespace internal
         {
           Assert(rank_and_indices.first != my_rank, ExcInternalError());
 
-          std::vector<ConstraintType> data;
+          std::vector<ConstraintLine> data;
 
           for (const types::global_dof_index index : rank_and_indices.second)
             {
               // note: at this stage locally_relevant_constraints still
               // contains only locally owned constraints
-              const typename std::vector<ConstraintType>::iterator ptr =
+              const typename std::vector<ConstraintLine>::iterator ptr =
                 std::find_if(locally_relevant_constraints.begin(),
                              locally_relevant_constraints.end(),
                              [index](const auto &a) {
@@ -679,9 +679,9 @@ namespace internal
                           MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
 
-          const std::vector<ConstraintType>
+          const std::vector<ConstraintLine>
             received_locally_relevant_constrain =
-              Utilities::unpack<std::vector<ConstraintType>>(buffer, false);
+              Utilities::unpack<std::vector<ConstraintLine>>(buffer, false);
 
           for (const auto &locally_relevant_constrain :
                received_locally_relevant_constrain)
