@@ -1130,21 +1130,22 @@ public:
   /**
    * Mark a previously declared parameter as deprecated. This will cause an
    * exception of type ExcEncounteredDeprecatedEntries to be thrown if
-   * the parameter is used in the input file.
+   * the parameter is used in an input file that is parsed by the
+   * parse_input() function.
    *
-   * The exception message will list the name of the parameter.
+   * The exception message will list the name of the parameter(s) that
+   * were encountered in the input file.
    *
-   * @param entry The name of the parameter to mark as deprecated.
-   * @param deprecation_status An optional parameter that can be used to
-   *  toggle the deprecation status of the parameter. If set to true, the
+   * @param entry The name of the parameter to be marked as deprecated.
+   * @param is_deprecated An optional parameter that can be used to
+   *  set the deprecation status of the parameter. If set to true, the
    *  parameter will be marked as deprecated. This is the default behavior.
    *  If set to false, the parameter will be marked as not deprecated.
    *  This is useful if a parameter is marked as deprecated by
    *  one function, but another function wants to keep using it.
    */
   void
-  mark_as_deprecated(const std::string &entry,
-                     const bool         deprecation_status = true);
+  mark_as_deprecated(const std::string &entry, const bool is_deprecated = true);
 
   /**
    * Attach an action to the parameter with name @p entry in the current

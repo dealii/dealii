@@ -1006,7 +1006,7 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
 
 void
 ParameterHandler::mark_as_deprecated(const std::string &existing_entry_name,
-                                     const bool         deprecation_status)
+                                     const bool         is_deprecated)
 {
   // assert that the entry exists
   Assert(entries->get_optional<std::string>(
@@ -1027,7 +1027,7 @@ ParameterHandler::mark_as_deprecated(const std::string &existing_entry_name,
 
   entries->put(get_current_full_path(existing_entry_name) + path_separator +
                  "deprecation_status",
-               deprecation_status ? "true" : "false");
+               is_deprecated ? "true" : "false");
 }
 
 
