@@ -143,8 +143,14 @@ INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
 // FIXME: This mixed variant is needed for multigrid and matrix free.
 template void
 dealii::AffineConstraints<double>::distribute<
-  dealii::LinearAlgebra::TpetraWrappers::Vector<float>>(
-  dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host>>(
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &)
+  const;
+template void
+dealii::AffineConstraints<double>::distribute<
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default>>(
+  dealii::LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &)
+  const;
 #    endif
 #  endif
 #endif

@@ -1279,7 +1279,7 @@ namespace LinearAlgebra
       source_stored_elements = source_index_set;
 
       tpetra_comm_pattern =
-        Teuchos::rcp(new TpetraWrappers::CommunicationPattern(
+        Teuchos::rcp(new TpetraWrappers::CommunicationPattern<MemorySpace>(
           locally_owned_elements(), source_index_set, mpi_comm));
     }
   } // namespace TpetraWrappers

@@ -27,16 +27,19 @@
 void
 test()
 {
-  LinearAlgebra::TpetraWrappers::SparsityPattern sp(5, 5, 3);
+  LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Default> sp(5,
+                                                                          5,
+                                                                          3);
   for (unsigned int i = 0; i < 5; ++i)
     for (unsigned int j = 0; j < 5; ++j)
       if ((i + 2 * j + 1) % 3 == 0)
         sp.add(i, j);
   sp.compress();
 
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double>                 m(sp);
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double>::const_iterator i =
-    m.begin();
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> m(
+    sp);
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>::
+    const_iterator i = m.begin();
   deallog << i->value() << std::endl;
   ++i;
   deallog << i->value() << std::endl;

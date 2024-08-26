@@ -27,7 +27,7 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::Vector<double> &v)
+test(LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &v)
 {
   // set some entries of the vector
   for (unsigned int i = 0; i < v.size(); ++i)
@@ -36,7 +36,7 @@ test(LinearAlgebra::TpetraWrappers::Vector<double> &v)
   v.compress(VectorOperation::insert);
 
   // then copy it
-  LinearAlgebra::TpetraWrappers::Vector<double> w;
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> w;
   w.reinit(complete_index_set(v.size()), MPI_COMM_WORLD);
   w = v;
 
@@ -64,7 +64,7 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::Vector<double> v;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v;
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test(v);
       }

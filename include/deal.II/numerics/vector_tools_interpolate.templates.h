@@ -1147,11 +1147,11 @@ namespace VectorTools
 #endif
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <typename Number>
+    template <typename Number, typename MemorySpace>
     void
     copy_locally_owned_data_from(
-      const LinearAlgebra::TpetraWrappers::Vector<Number> &src,
-      LinearAlgebra::distributed::Vector<Number>          &dst)
+      const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &src,
+      LinearAlgebra::distributed::Vector<Number>                       &dst)
     {
       // ReadWriteVector does not work for ghosted
       // TrilinosWrappers::MPI::Vector objects. Fall back to copy the

@@ -27,9 +27,9 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::Vector<double> &v,
-     LinearAlgebra::TpetraWrappers::Vector<double> &w,
-     LinearAlgebra::TpetraWrappers::Vector<double> &x)
+test(LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &v,
+     LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &w,
+     LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &x)
 {
   for (unsigned int i = 0; i < v.size(); ++i)
     {
@@ -69,11 +69,11 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::Vector<double> v;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> v;
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        LinearAlgebra::TpetraWrappers::Vector<double> w;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> w;
         w.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        LinearAlgebra::TpetraWrappers::Vector<double> x;
+        LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> x;
         x.reinit(complete_index_set(100), MPI_COMM_WORLD);
         test(v, w, x);
       }

@@ -49,7 +49,9 @@ test()
       my_set.add_range(400, 529);
     }
   my_set.compress();
-  my_set.make_tpetra_map(MPI_COMM_WORLD, false);
+  my_set.template make_tpetra_map<
+    LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace::Default>>(
+    MPI_COMM_WORLD, false);
 }
 
 

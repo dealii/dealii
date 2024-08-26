@@ -28,13 +28,14 @@
 void
 test()
 {
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> m(5U, 5U, 5U);
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> m(
+    5U, 5U, 5U);
   m.set(0, 0, 1);
   m.set(1, 1, 2);
   m.set(1, 2, 3);
   m.compress(VectorOperation::insert);
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double>::const_iterator i =
-    m.begin();
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>::
+    const_iterator i = m.begin();
   deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;
   ++i;
   deallog << i->row() << ' ' << i->column() << ' ' << i->value() << std::endl;

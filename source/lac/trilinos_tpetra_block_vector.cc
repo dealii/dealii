@@ -32,30 +32,44 @@ namespace LinearAlgebra
 
 #  ifdef HAVE_TPETRA_INST_FLOAT
 #    ifdef DEAL_II_HAVE_CXX20
-    static_assert(concepts::is_vector_space_vector<BlockVector<float>>);
+    static_assert(
+      concepts::is_vector_space_vector<BlockVector<float, MemorySpace::Host>>);
+    static_assert(concepts::is_vector_space_vector<
+                  BlockVector<float, MemorySpace::Default>>);
 #    endif
-    template class BlockVector<float>;
+    template class BlockVector<float, MemorySpace::Host>;
+    template class BlockVector<float, MemorySpace::Default>;
 #  endif
 #  ifdef HAVE_TPETRA_INST_DOUBLE
 #    ifdef DEAL_II_HAVE_CXX20
-    static_assert(concepts::is_vector_space_vector<BlockVector<double>>);
+    static_assert(
+      concepts::is_vector_space_vector<BlockVector<double, MemorySpace::Host>>);
+    static_assert(concepts::is_vector_space_vector<
+                  BlockVector<double, MemorySpace::Default>>);
 #    endif
-    template class BlockVector<double>;
+    template class BlockVector<double, MemorySpace::Host>;
+    template class BlockVector<double, MemorySpace::Default>;
 #  endif
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
 #    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
 #      ifdef DEAL_II_HAVE_CXX20
-    static_assert(
-      concepts::is_vector_space_vector<BlockVector<std::complex<float>>>);
+    static_assert(concepts::is_vector_space_vector<
+                  BlockVector<std::complex<float>, MemorySpace::Host>>);
+    static_assert(concepts::is_vector_space_vector<
+                  BlockVector<std::complex<float>, MemorySpace::Default>>);
 #      endif
-    template class BlockVector<std::complex<float>>;
+    template class BlockVector<std::complex<float>, MemorySpace::Host>;
+    template class BlockVector<std::complex<float>, MemorySpace::Default>;
 #    endif
 #    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
 #      ifdef DEAL_II_HAVE_CXX20
-    static_assert(
-      concepts::is_vector_space_vector<BlockVector<std::complex<double>>>);
+    static_assert(concepts::is_vector_space_vector<
+                  BlockVector<std::complex<double>, MemorySpace::Host>>);
+    static_assert(concepts::is_vector_space_vector<
+                  BlockVector<std::complex<double>, MemorySpace::Default>>);
 #      endif
-    template class BlockVector<std::complex<double>>;
+    template class BlockVector<std::complex<double>, MemorySpace::Host>;
+    template class BlockVector<std::complex<double>, MemorySpace::Default>;
 #    endif
 #  endif
   } // namespace TpetraWrappers

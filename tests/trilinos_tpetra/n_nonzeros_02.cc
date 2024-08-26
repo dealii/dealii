@@ -44,7 +44,7 @@ test()
   coupling.fill(DoFTools::none);
 
   // create an empty sparsity pattern
-  LinearAlgebra::TpetraWrappers::SparsityPattern sparsity;
+  LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Default> sparsity;
   sparsity.reinit(dof_handler.n_dofs(), dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler,
                                   coupling,
@@ -56,7 +56,7 @@ test()
   sparsity.compress();
 
   // attach a sparse matrix to it
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> A;
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> A;
   A.reinit(sparsity);
 
   // see how many nonzero elements it reports

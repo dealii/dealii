@@ -492,17 +492,17 @@ namespace FETools
     }
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <int dim, int spacedim, typename Number>
+    template <int dim, int spacedim, typename Number, typename MemorySpace>
     void
     back_interpolate(
       const DoFHandler<dim, spacedim> &,
-      const AffineConstraints<
-        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
-      const LinearAlgebra::TpetraWrappers::Vector<Number> &,
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                Vector<Number, MemorySpace>::value_type> &,
+      const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &,
       const DoFHandler<dim, spacedim> &,
-      const AffineConstraints<
-        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
-      LinearAlgebra::TpetraWrappers::Vector<Number> &)
+      const AffineConstraints<typename LinearAlgebra::TpetraWrappers::
+                                Vector<Number, MemorySpace>::value_type> &,
+      LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace> &)
     {
       AssertThrow(false, ExcNotImplemented());
     }

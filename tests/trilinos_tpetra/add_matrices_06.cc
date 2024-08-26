@@ -30,9 +30,11 @@
 
 
 void
-test(LinearAlgebra::TpetraWrappers::SparseMatrix<double> &m)
+test(
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> &m)
 {
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> m2(m.m(), m.n(), 3U),
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> m2(
+    m.m(), m.n(), 3U),
     m3(m.m(), m.n(), 3U);
 
   // first set a few entries one-by-one
@@ -59,7 +61,9 @@ test(LinearAlgebra::TpetraWrappers::SparseMatrix<double> &m)
   Vector<double> src(m.m()), dst(m.m());
   src = 1.;
 
-  LinearAlgebra::TpetraWrappers::PreconditionJacobi<double> prec;
+  LinearAlgebra::TpetraWrappers::PreconditionJacobi<double,
+                                                    MemorySpace::Default>
+    prec;
   prec.initialize(m);
 
   m.vmult(dst, src);
@@ -93,7 +97,9 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::SparseMatrix<double> m(5U, 5U, 3U);
+        LinearAlgebra::TpetraWrappers::SparseMatrix<double,
+                                                    MemorySpace::Default>
+          m(5U, 5U, 3U);
 
         test(m);
       }

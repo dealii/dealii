@@ -31,17 +31,20 @@ test()
   // create a sparsity pattern with totally
   // empty lines (not even diagonals, since
   // not quadratic)
-  LinearAlgebra::TpetraWrappers::SparsityPattern sparsity(4, 5, 1);
+  LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Default> sparsity(
+    4, 5, 1);
   sparsity.add(1, 1);
   sparsity.add(3, 1);
   sparsity.compress();
 
   // attach a sparse matrix to it
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double> A(sparsity);
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> A(
+    sparsity);
 
   // and loop over the elements of it
-  for (LinearAlgebra::TpetraWrappers::SparseMatrix<double>::const_iterator k =
-         A.begin();
+  for (LinearAlgebra::TpetraWrappers::
+         SparseMatrix<double, MemorySpace::Default>::const_iterator k =
+           A.begin();
        k != A.end();
        ++k)
     deallog << k->row() << ' ' << k->column() << ' ' << k->value() << std::endl;

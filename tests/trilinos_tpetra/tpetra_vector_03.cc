@@ -38,8 +38,8 @@ test()
   locally_owned.add_range(my_id * 2, my_id * 2 + 2);
   locally_owned.compress();
 
-  LinearAlgebra::TpetraWrappers::Vector<Number> v(locally_owned,
-                                                  MPI_COMM_WORLD);
+  LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace::Default> v(
+    locally_owned, MPI_COMM_WORLD);
 
   IndexSet     workaround_set(n_procs * 2);
   unsigned int my_first_index  = (my_id * 2 + 2) % (n_procs * 2);
