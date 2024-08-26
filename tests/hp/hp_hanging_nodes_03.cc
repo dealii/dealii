@@ -84,10 +84,10 @@ test(const int skip_cell)
   AffineConstraints<double> constraints;
   {
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    constraints.print(deallog.get_file_stream());
+    constraints.close();
   }
 
-#if true
+#if false
   // output vtu
   DataOut<dim> data_out;
   {
@@ -104,6 +104,7 @@ test(const int skip_cell)
   }
 #endif
 
+  constraints.print(deallog.get_file_stream());
   deallog << "OK" << std::endl;
 }
 
