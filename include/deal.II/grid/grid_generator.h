@@ -2613,12 +2613,14 @@ namespace GridGenerator
 
   /**
    * Create a coordinate-parallel brick from the two diagonally opposite
-   * corner points @p p1 and @p p2. The number of vertices in coordinate
+   * corner points @p p1 and @p p2 and subdivide each cell into simplices.
+   *
+   * The number of vertices in coordinate
    * direction @p i is given by <tt>repetitions[i]+1</tt>.
    *
-   * @note This function connects internally 4/8 vertices to
-   *   quadrilateral/hexahedral cells and subdivides these into 2/5
-   * triangular/tetrahedral cells.
+   * @note This function takes the mesh produced by subdivided_hyper_rectangle()
+   * and further subdivides each cell into 2 triangles (for @p dim 2) or
+   * 5 tetrahedra (for @p dim 3), respectively.
    *
    * @note Currently, this function only works for `dim==spacedim`.
    *
@@ -2636,15 +2638,17 @@ namespace GridGenerator
 
   /**
    * Initialize the given triangulation with a hypercube (square in 2d and
-   * cube in 3d) consisting of @p repetitions cells in each direction.
+   * cube in 3d) consisting of @p repetitions cells in each direction with
+   * each cell divided into simplices.
+   *
    * The hypercube volume is the tensor product interval
    * $[left,right]^{\text{dim}}$ in the present number of dimensions, where
    * the limits are given as arguments. They default to zero and unity, then
    * producing the unit hypercube.
    *
-   * @note This function connects internally 4/8 vertices to
-   * quadrilateral/hexahedral cells and subdivides these into 2/5
-   * triangular/tetrahedral cells.
+   * @note This function takes the mesh produced by subdivided_hyper_cube()
+   * and further subdivides each cell into 2 triangles (for @p dim 2) or
+   * 5 tetrahedra (for @p dim 3), respectively.
    *
    * Also see
    * @ref simplex "Simplex support".
