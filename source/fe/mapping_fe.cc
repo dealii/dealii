@@ -26,6 +26,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe.h>
 
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -2270,22 +2271,105 @@ std::vector<Point<spacedim>>
 MappingFE<dim, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  Assert(
-    check_all_manifold_ids_identical(cell),
-    ExcMessage(
-      "All entities of a cell need to have the same manifold id as the cell has."));
-
-  std::vector<Point<spacedim>> vertices(cell->n_vertices());
-
-  for (const unsigned int i : cell->vertex_indices())
-    vertices[i] = cell->vertex(i);
-
   std::vector<Point<spacedim>> mapping_support_points(
     fe->get_unit_support_points().size());
 
-  cell->get_manifold().get_new_points(vertices,
-                                      mapping_support_point_weights,
-                                      mapping_support_points);
+  std::vector<Point<spacedim>> vertices(cell->n_vertices());
+  for (const unsigned int i : cell->vertex_indices())
+    vertices[i] = cell->vertex(i);
+
+  if (check_all_manifold_ids_identical(cell))
+    {
+      // version 1) all geometric entities have the same manifold:
+
+      cell->get_manifold().get_new_points(vertices,
+                                          mapping_support_point_weights,
+                                          mapping_support_points);
+    }
+  else
+    {
+      // version 1) geometric entities have different manifold
+
+      // helper function to compute mapped points on subentities
+      // note[PM]: this function currently only uses the vertices
+      // of cells to create new points on subentities; however,
+      // one should use all bounding points to create new points
+      // as in the case of MappingQ.
+      const auto process = [&](const auto    &manifold,
+                               const auto    &indices,
+                               const unsigned n_points) {
+        if ((indices.size() == 0) || (n_points == 0))
+          return;
+
+        const unsigned int n_shape_functions =
+          this->fe->reference_cell().n_vertices();
+
+        Table<2, double> mapping_support_point_weights_local(n_points,
+                                                             n_shape_functions);
+        std::vector<Point<spacedim>> mapping_support_points_local(n_points);
+
+        for (unsigned int p = 0; p < n_points; ++p)
+          for (unsigned int i = 0; i < n_shape_functions; ++i)
+            mapping_support_point_weights_local(p, i) =
+              mapping_support_point_weights(
+                indices[p + (indices.size() - n_points)], i);
+
+        manifold.get_new_points(vertices,
+                                mapping_support_point_weights_local,
+                                mapping_support_points_local);
+
+        for (unsigned int p = 0; p < n_points; ++p)
+          mapping_support_points[indices[p + (indices.size() - n_points)]] =
+            mapping_support_points_local[p];
+      };
+
+      // create dummy DoFHandler to extract indices on subobjects
+      const auto                  &fe = *this->fe;
+      Triangulation<dim, spacedim> tria;
+      GridGenerator::reference_cell(tria, fe.reference_cell());
+      DoFHandler<dim, spacedim> dof_handler(tria);
+      dof_handler.distribute_dofs(fe);
+      const auto &cell_ref = dof_handler.begin_active();
+
+      std::vector<types::global_dof_index> indices;
+
+      // add vertices
+      for (const unsigned int i : cell->vertex_indices())
+        mapping_support_points[i] = cell->vertex(i);
+
+      // process and add line support points
+      for (unsigned int l = 0; l < cell_ref->n_lines(); ++l)
+        {
+          const auto accessor = cell_ref->line(l);
+          indices.resize(fe.n_dofs_per_line() + 2 * fe.n_dofs_per_vertex());
+          accessor->get_dof_indices(indices);
+          process(cell->line(l)->get_manifold(), indices, fe.n_dofs_per_line());
+        }
+
+      // process and add face support points
+      if constexpr (dim >= 3)
+        {
+          for (unsigned int f = 0; f < cell_ref->n_faces(); ++f)
+            {
+              const auto accessor = cell_ref->face(f);
+              indices.resize(fe.n_dofs_per_face());
+              accessor->get_dof_indices(indices);
+              process(cell->face(f)->get_manifold(),
+                      indices,
+                      fe.n_dofs_per_quad());
+            }
+        }
+
+      // process and add volume support points
+      if constexpr (dim >= 2)
+        {
+          indices.resize(fe.n_dofs_per_cell());
+          cell_ref->get_dof_indices(indices);
+          process(cell->get_manifold(),
+                  indices,
+                  (dim == 2) ? fe.n_dofs_per_quad() : fe.n_dofs_per_hex());
+        }
+    }
 
   return mapping_support_points;
 }
