@@ -1591,15 +1591,23 @@ ParameterHandler::recursively_print_parameters(
                     78 - overall_indent_level * 2 - 2);
 
                 for (const auto &doc_line : doc_lines)
-                  out << std::setw(overall_indent_level * 2) << ""
-                      << "# " << doc_line << '\n';
+                  {
+                    out << std::setw(overall_indent_level * 2) << '#';
+
+                    if (!doc_line.empty())
+                      out << ' ' << doc_line;
+
+                    out << '\n';
+                  }
               }
 
-            // print name and value of this entry
-            out << std::setw(overall_indent_level * 2) << ""
-                << "set " << demangle(p.first)
-                << std::setw(longest_name - demangle(p.first).size() + 1) << " "
-                << "= " << value;
+            // print the name and (if set) value of this entry
+            out << std::setw(overall_indent_level * 2) << "set "
+                << demangle(p.first)
+                << std::setw(longest_name - demangle(p.first).size() + 1) << ' '
+                << '=';
+            if (!value.empty())
+              out << ' ' << value;
 
             // finally print the default value, but only if it differs
             // from the actual value
