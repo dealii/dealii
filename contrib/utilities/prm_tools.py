@@ -21,6 +21,7 @@ import sys
 import os
 import re
 import argparse
+from argparse import RawTextHelpFormatter
 
 __author__ = 'The authors of deal.II'
 __copyright__ = 'Copyright 2024, deal.II'
@@ -104,6 +105,9 @@ def read_value_or_subsection(input_file, parameters):
 
     for line in input_file:
         line = line.strip()
+
+        # Replace tabs with 2 spaces
+        line.sub("\t", "  ")
 
         # If line ends with \, read next line and append including \n
         if line != "":
@@ -283,21 +287,7 @@ def write_parameter_file(parameters, file):
 
 def main(input_file, output_file):
     """ This function reformats the given input .prm files to follow our
-    general formatting guidelines. These are:
-
-    - indent by two spaces for each subsection level, and indent comments as well
-    as content
-    - ensure an empty line before a subsection or a comment, unless it is a
-    subsection/comment following directly another subsection, or it is at the
-    start of the file
-    - combine content of subsections that are duplicated
-    - if values are duplicated, merge them and use the last one in the file (like
-    deal.II ParameterHandler when it reads the file)
-    - retain as much user formatting in comments and parameter values as possible,
-    e.g. spaces for padding values to align between adjacent lines. This is not
-    always perfectly possible.
-    - retain broken lines (`\\`) in values of parameters and comments, remove them
-    from subsection or parameter names.
+    general formatting guidelines.
     """
     parameters = read_parameter_file(input_file)
     write_parameter_file(parameters, output_file)
@@ -307,7 +297,28 @@ def main(input_file, output_file):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
                     prog='deal.II .prm file reformatter',
-                    description='Reformats deal.II .prm files to follow our general formatting guidelines. See the documentation of this script for details.')
+                    description=
+"""Reformats deal.II .prm files to follow our general formatting guidelines.
+The script expects two arguments, a path to the file to be formatted, and a
+path to which the formatted output should be written. If the two paths are
+identical the given file is overwritten with the formatted output.
+
+Our formatting guidelines are:
+    - indent by two spaces for each subsection level, and indent comments as
+      well as content
+    - ensure an empty line before a subsection or a comment, unless it is a
+      subsection/comment following directly another subsection, or it is at the
+      start of the file
+    - combine content of subsections that are duplicated
+    - if values are duplicated, merge them and use the last one in the file
+      (like deal.II ParameterHandler when it reads the file)
+    - retain as much user formatting in comments and parameter values as
+      possible, e.g. spaces for padding values to align between adjacent lines.
+      This is not always perfectly possible.
+    - retain broken lines (`\\`) in values of parameters and comments, remove
+      them from subsection or parameter names.  """,
+                    formatter_class=RawTextHelpFormatter)
+
     parser.add_argument('input_file', type=str, help='The .prm file to reformat.')
     parser.add_argument('output_file', type=str, help='The .prm file to write the reformatted file to.')
     args = parser.parse_args()
