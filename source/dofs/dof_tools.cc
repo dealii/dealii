@@ -1269,12 +1269,13 @@ namespace DoFTools
   namespace internal
   {
     template <int dim, int spacedim>
-    void
+    std::vector<std::vector<bool>>
     extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                            const ComponentMask             &component_mask,
-                           const unsigned int               mg_level,
-                           std::vector<std::vector<bool>>  &constant_modes)
+                           const unsigned int               mg_level)
     {
+      std::vector<std::vector<bool>> constant_modes;
+
       const auto &locally_owned_dofs =
         (mg_level == numbers::invalid_unsigned_int) ?
           dof_handler.locally_owned_dofs() :
@@ -1284,8 +1285,7 @@ namespace DoFTools
       // constant_modes object:
       if (locally_owned_dofs.n_elements() == 0)
         {
-          constant_modes = std::vector<std::vector<bool>>(0);
-          return;
+          return std::vector<std::vector<bool>>(0);
         }
 
       const unsigned int n_components = dof_handler.get_fe(0).n_components();
@@ -1408,6 +1408,8 @@ namespace DoFTools
                       indices.second, i);
             }
       });
+
+      return constant_modes;
     }
 
 
@@ -1539,15 +1541,39 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
+  std::vector<std::vector<bool>>
+  extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
+                         const ComponentMask             &component_mask)
+  {
+    return internal::extract_constant_modes(dof_handler,
+                                            component_mask,
+                                            numbers::invalid_unsigned_int);
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
                          const ComponentMask             &component_mask,
                          std::vector<std::vector<bool>>  &constant_modes)
   {
-    internal::extract_constant_modes(dof_handler,
-                                     component_mask,
-                                     numbers::invalid_unsigned_int,
-                                     constant_modes);
+    const auto temp =
+      internal::extract_constant_modes(dof_handler,
+                                       component_mask,
+                                       numbers::invalid_unsigned_int);
+    constant_modes = temp;
+  }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::vector<bool>>
+  extract_level_constant_modes(const unsigned int               level,
+                               const DoFHandler<dim, spacedim> &dof_handler,
+                               const ComponentMask             &component_mask)
+  {
+    return internal::extract_constant_modes(dof_handler, component_mask, level);
   }
 
 
@@ -1559,10 +1585,9 @@ namespace DoFTools
                                const ComponentMask             &component_mask,
                                std::vector<std::vector<bool>>  &constant_modes)
   {
-    internal::extract_constant_modes(dof_handler,
-                                     component_mask,
-                                     level,
-                                     constant_modes);
+    const auto temp =
+      internal::extract_constant_modes(dof_handler, component_mask, level);
+    constant_modes = temp;
   }
 
 

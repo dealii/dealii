@@ -197,9 +197,8 @@ Step4<dim>::solve()
   deallog.push(Utilities::int_to_string(dof_handler.n_dofs(), 5));
   TrilinosWrappers::PreconditionAMG                 preconditioner;
   TrilinosWrappers::PreconditionAMG::AdditionalData data;
-  DoFTools::extract_constant_modes(dof_handler,
-                                   ComponentMask(1, true),
-                                   data.constant_modes);
+  data.constant_modes =
+    DoFTools::extract_constant_modes(dof_handler, ComponentMask(1, true));
   data.smoother_sweeps = 2;
   {
     solution = 0;

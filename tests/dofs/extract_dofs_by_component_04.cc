@@ -67,8 +67,8 @@ check()
       for (unsigned int c = 0; c < element.n_components(); ++c)
         component_mask.set(c, (int_mask & (1 << c)));
 
-      std::vector<std::vector<bool>> constant_modes;
-      DoFTools::extract_constant_modes(dof, component_mask, constant_modes);
+      const auto constant_modes =
+        DoFTools::extract_constant_modes(dof, component_mask);
 
       for (unsigned int d = 0; d < constant_modes.size(); ++d)
         {

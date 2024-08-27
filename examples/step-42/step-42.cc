@@ -1622,10 +1622,8 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Solve: setup preconditioner");
 
-      std::vector<std::vector<bool>> constant_modes;
-      DoFTools::extract_constant_modes(dof_handler,
-                                       ComponentMask(),
-                                       constant_modes);
+      const std::vector<std::vector<bool>> constant_modes =
+        DoFTools::extract_constant_modes(dof_handler, ComponentMask());
 
       TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
       additional_data.constant_modes        = constant_modes;
