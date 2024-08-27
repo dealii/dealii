@@ -1117,6 +1117,26 @@ public:
                 const bool                   has_to_be_set = false);
 
   /**
+   * Mark a previously declared parameter as deprecated. This will cause an
+   * exception of type ExcEncounteredDeprecatedEntries to be thrown if
+   * the parameter is used in an input file that is parsed by the
+   * parse_input() function.
+   *
+   * The exception message will list the name of the parameter(s) that
+   * were encountered in the input file.
+   *
+   * @param entry The name of the parameter to be marked as deprecated.
+   * @param is_deprecated An optional parameter that can be used to
+   *  set the deprecation status of the parameter. If set to true, the
+   *  parameter will be marked as deprecated. This is the default behavior.
+   *  If set to false, the parameter will be marked as not deprecated.
+   *  This is useful if a parameter is marked as deprecated by
+   *  one function, but another function wants to keep using it.
+   */
+  void
+  mark_as_deprecated(const std::string &entry, const bool is_deprecated = true);
+
+  /**
    * Attach an action to the parameter with name @p entry in the current
    * section. The action needs to be a function-like object that takes the
    * value of the parameter as a (string) argument. See the general
@@ -1648,6 +1668,25 @@ public:
   DeclException1(ExcEntryAlreadyExists,
                  std::string,
                  << "The following entry already exists: " << arg1 << '.');
+
+  /**
+   * Exception
+   */
+  DeclException3(ExcEntryIsDeprecated,
+                 int,
+                 std::string,
+                 std::string,
+                 << "Line <" << arg1 << "> of file <" << arg2 << ">: "
+                 << "Entry <" << arg3 << "> is deprecated.");
+
+  /**
+   * Exception
+   */
+  DeclException1(ExcEncounteredDeprecatedEntries,
+                 std::string,
+                 << "The following deprecated entries were encountered:\n\n"
+                 << arg1);
+
   /**
    * Exception
    */
@@ -1663,6 +1702,7 @@ public:
     ExcAlreadyAtTopLevel,
     "You can't leave a subsection if you are already at the top level "
     "of the subsection hierarchy.");
+
   /**
    * Exception
    */

@@ -449,6 +449,9 @@ ParameterHandler::parse_input(std::istream      &input,
   unsigned int current_line_n         = 0;
   unsigned int current_logical_line_n = 0;
 
+  // Keep a list of deprecation messages if we encounter deprecated entries.
+  std::string deprecation_messages;
+
   // define an action that tries to scan a line.
   //
   // if that fails, i.e., if scan_line throws
@@ -461,23 +464,30 @@ ParameterHandler::parse_input(std::istream      &input,
   // unknown state.
   //
   // after unwinding the subsection stack, just re-throw the exception
-  auto scan_line_or_cleanup = [this,
-                               &skip_undefined,
-                               &saved_path](const std::string &line,
-                                            const std::string &filename,
-                                            const unsigned int line_number) {
-    try
-      {
-        scan_line(line, filename, line_number, skip_undefined);
-      }
-    catch (...)
-      {
-        while ((saved_path != subsection_path) && (subsection_path.size() > 0))
-          leave_subsection();
+  auto scan_line_or_cleanup =
+    [this,
+     &skip_undefined,
+     &saved_path,
+     &deprecation_messages](const std::string &line,
+                            const std::string &filename,
+                            const unsigned int line_number) {
+      try
+        {
+          scan_line(line, filename, line_number, skip_undefined);
+        }
+      catch (ExcEntryIsDeprecated &e)
+        {
+          deprecation_messages += e.what();
+        }
+      catch (...)
+        {
+          while ((saved_path != subsection_path) &&
+                 (subsection_path.size() > 0))
+            leave_subsection();
 
-        throw;
-      }
-  };
+          throw;
+        }
+    };
 
 
   while (std::getline(input, input_line))
@@ -558,6 +568,11 @@ ParameterHandler::parse_input(std::istream      &input,
       AssertThrow(false,
                   ExcUnbalancedSubsections(filename, paths_message.str()));
     }
+
+  // if we encountered deprecated entries, throw an exception
+  // that contains all the deprecation messages
+  AssertThrow(deprecation_messages.empty(),
+              ExcEncounteredDeprecatedEntries(deprecation_messages));
 }
 
 
@@ -1012,9 +1027,39 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
 
   entries->put(get_current_full_path(alias_name) + path_separator + "alias",
                existing_entry_name);
-  entries->put(get_current_full_path(alias_name) + path_separator +
+
+  if (alias_is_deprecated)
+    mark_as_deprecated(alias_name);
+  else
+    mark_as_deprecated(alias_name, false);
+}
+
+
+
+void
+ParameterHandler::mark_as_deprecated(const std::string &existing_entry_name,
+                                     const bool         is_deprecated)
+{
+  // assert that the entry exists
+  Assert(entries->get_optional<std::string>(
+           get_current_full_path(existing_entry_name)),
+         ExcMessage("You are trying to mark the entry <" + existing_entry_name +
+                    "> as deprecated, but the entry does not exist."));
+
+  // then also make sure that what is being referred to is in
+  // fact a parameter or alias (not a subsection)
+  Assert(
+    entries->get_optional<std::string>(
+      get_current_full_path(existing_entry_name) + path_separator + "value") ||
+      entries->get_optional<std::string>(
+        get_current_full_path(existing_entry_name) + path_separator + "alias"),
+    ExcMessage("You are trying to mark the entry <" + existing_entry_name +
+               "> as deprecated, but the entry does not seem to be a "
+               "parameter declaration or a parameter alias."));
+
+  entries->put(get_current_full_path(existing_entry_name) + path_separator +
                  "deprecation_status",
-               (alias_is_deprecated ? "true" : "false"));
+               is_deprecated ? "true" : "false");
 }
 
 
@@ -1639,7 +1684,13 @@ ParameterHandler::recursively_print_parameters(
                 if (!is_short &&
                     !p.second.get<std::string>("documentation").empty())
                   out << "{\\it Description:} "
-                      << p.second.get<std::string>("documentation") << "\n\n"
+                      << p.second.get<std::string>("documentation")
+                      << ((p.second.get_optional<std::string>(
+                             "deprecation_status") &&
+                           p.second.get<std::string>("deprecation_status") ==
+                             "true") ?
+                            " This parameter is deprecated.\n\n" :
+                            "\n\n")
                       << '\n';
                 if (!is_short)
                   {
@@ -2055,6 +2106,7 @@ ParameterHandler::scan_line(std::string        line,
           // finally write the new value into the database
           entries->put(path + path_separator + "value", entry_value);
 
+          // record that the entry has been set manually
           auto map_iter = entries_set_status.find(path);
           if (map_iter != entries_set_status.end())
             map_iter->second =
@@ -2063,6 +2115,19 @@ ParameterHandler::scan_line(std::string        line,
             AssertThrow(false,
                         ExcMessage("Could not find parameter " + path +
                                    " in map entries_set_status."));
+
+          // Check if the entry (or the resolved alias) is deprecated,
+          // throw an exception if it is
+          if (entries->get_optional<std::string>(path + path_separator +
+                                                 "deprecation_status") &&
+              entries->get<std::string>(path + path_separator +
+                                        "deprecation_status") == "true")
+            {
+              AssertThrow(false,
+                          ExcEntryIsDeprecated(current_line_n,
+                                               input_filename,
+                                               entry_name));
+            }
         }
       else
         {
