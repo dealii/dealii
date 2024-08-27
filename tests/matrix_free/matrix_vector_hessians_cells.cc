@@ -68,15 +68,14 @@ test_hessians(const dealii::FE_Poly<dim>                    &fe,
   additional_data.mapping_update_flags_inner_faces =
     update_values | update_gradients | update_hessians;
 
-  [[maybe_unused]]MatrixFree<dim, double, VectorizedArrayType> matrix_free;
+  MatrixFree<dim, double, VectorizedArrayType> matrix_free;
   matrix_free.reinit(mapping, dof_handler, constraints, quad, additional_data);
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "Working with " << fe.get_name() << " and "
             << dof_handler.n_dofs() << " dofs" << std::endl;
 
-  LinearAlgebra::distributed::Vector<double> dst2;
-  [[maybe_unused]]LinearAlgebra::distributed::Vector<double> src, dst;
+  LinearAlgebra::distributed::Vector<double> src, dst, dst2;
   matrix_free.initialize_dof_vector(src);
   for (auto &v : src)
     v = random_value<double>();
@@ -102,7 +101,7 @@ test_hessians(const dealii::FE_Poly<dim>                    &fe,
   matrix_free.template loop<LinearAlgebra::distributed::Vector<double>,
                             LinearAlgebra::distributed::Vector<double>>(
     [&](
-      const auto &matrix_free, auto &dst, const auto &src, [[maybe_unused]]const auto &range) {
+      const auto &matrix_free, auto &dst, const auto &src, const auto &range) {
       FEEvaluation<dim, -1, 0, 1, double, VectorizedArrayType> fe_eval(
         matrix_free);
       for (unsigned int cell = range.first; cell < range.second; ++cell)
@@ -184,12 +183,14 @@ test_hessians(const dealii::FE_Poly<dim>                    &fe,
             }
         }
     },
-    [&](
-      const auto &matrix_free, auto &dst, const auto &src, const auto &range) {
-    },
-    [&](
-      const auto &matrix_free, auto &dst, const auto &src, const auto &range) {
-    },
+    [&](const auto & /*matrix_free*/,
+        auto & /*dst*/,
+        const auto & /*src*/,
+        const auto & /*range*/) {},
+    [&](const auto & /*matrix_free*/,
+        auto & /*dst*/,
+        const auto & /*src*/,
+        const auto & /*range*/) {},
     dst,
     src,
     true);

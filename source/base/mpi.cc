@@ -794,8 +794,6 @@ namespace Utilities
     void
     CollectiveMutex::lock(const MPI_Comm comm)
     {
-      [[mabe_unused]]comm;
-
       Assert(
         !locked,
         ExcMessage(
@@ -821,6 +819,8 @@ namespace Utilities
           // nothing to do as blocking barrier already completed
 #  endif
         }
+#else
+      (void)comm;
 #endif
 
       locked = true;
@@ -831,8 +831,6 @@ namespace Utilities
     void
     CollectiveMutex::unlock(const MPI_Comm comm)
     {
-      [[mabe_unused]]comm;
-
       // First check if this function is called during exception handling
       // if so, abort. This can happen if a ScopedLock is destroyed.
       internal::CollectiveMutexImplementation::check_exception();
@@ -857,6 +855,8 @@ namespace Utilities
           AssertThrowMPI(ierr);
 #  endif
         }
+#else
+      (void)comm;
 #endif
 
       locked = false;

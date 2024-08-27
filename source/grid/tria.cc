@@ -669,10 +669,10 @@ namespace internal
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   void CellAttachedDataSerializer<dim, spacedim>::save(
-    [[maybe_unused]] const unsigned int global_first_cell,
-    [[maybe_unused]] const unsigned int global_num_cells,
-    const std::string                  &file_basename,
-    [[maybe_unused]] const MPI_Comm    &mpi_communicator) const
+    const unsigned int global_first_cell,
+    const unsigned int global_num_cells,
+    const std::string &file_basename,
+    const MPI_Comm    &mpi_communicator) const
   {
     Assert(sizes_fixed_cumulative.size() > 0,
            ExcMessage("No data has been packed!"));
@@ -848,6 +848,10 @@ namespace internal
     else
 #endif
       {
+        (void)global_first_cell;
+        (void)global_num_cells;
+        (void)mpi_communicator;
+
         //
         // ---------- Fixed size data ----------
         //
@@ -896,13 +900,13 @@ namespace internal
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   void CellAttachedDataSerializer<dim, spacedim>::load(
-    [[maybe_unused]] const unsigned int global_first_cell,
-    [[maybe_unused]] const unsigned int global_num_cells,
-    const unsigned int                  local_num_cells,
-    const std::string                  &file_basename,
-    const unsigned int                  n_attached_deserialize_fixed,
-    const unsigned int                  n_attached_deserialize_variable,
-    const MPI_Comm                     &mpi_communicator)
+    const unsigned int global_first_cell,
+    const unsigned int global_num_cells,
+    const unsigned int local_num_cells,
+    const std::string &file_basename,
+    const unsigned int n_attached_deserialize_fixed,
+    const unsigned int n_attached_deserialize_variable,
+    const MPI_Comm    &mpi_communicator)
   {
     Assert(dest_data_fixed.empty(),
            ExcMessage("Previously loaded data has not been released yet!"));
@@ -1060,6 +1064,8 @@ namespace internal
 #endif
       {
         (void)mpi_communicator;
+        (void)global_first_cell;
+        (void)global_num_cells;
 
         //
         // ---------- Fixed size data ----------
@@ -3473,7 +3479,7 @@ namespace internal
                     return a.vertices < b.vertices;
                   });
 
-        unsigned int counter = 0;
+        [[maybe_unused]] unsigned int counter = 0;
 
         std::vector<unsigned int> key;
         key.reserve(GeometryInfo<structdim>::vertices_per_cell);
@@ -3519,7 +3525,6 @@ namespace internal
             if (subcell_object->boundary_id !=
                 numbers::internal_face_boundary_id)
               {
-                [[mabe_unused]]vertex_locations;
                 AssertThrow(
                   boundary_id != numbers::internal_face_boundary_id,
                   ExcMessage(
@@ -3549,7 +3554,6 @@ namespace internal
         // make sure that all subcelldata entries have been processed
         // TODO: this is not guaranteed, why?
         // AssertDimension(counter, boundary_objects_in.size());
-        [[mabe_unused]]counter;
       }
 
 
@@ -5038,7 +5042,6 @@ namespace internal
                 triangulation.vertices[next_unused_vertex] = line->center(true);
 
                 bool pair_found = false;
-                [[mabe_unused]]pair_found;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -5808,7 +5811,6 @@ namespace internal
                 // two child lines.  To this end, find a pair of
                 // unused lines
                 bool pair_found = false;
-                [[mabe_unused]]pair_found;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -6230,10 +6232,7 @@ namespace internal
                 }
 
               for (const unsigned int line : quad->line_indices())
-                {
-                  AssertIsNotUsed(new_lines[line]);
-                  [[mabe_unused]]line;
-                }
+                AssertIsNotUsed(new_lines[line]);
 
               // 2) create new quads (properties are set below). Both triangles
               // and quads are divided in four.
@@ -6252,10 +6251,7 @@ namespace internal
               quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
               for (const auto &quad : new_quads)
-                {
-                  AssertIsNotUsed(quad);
-                  [[mabe_unused]]quad;
-                }
+                AssertIsNotUsed(quad);
 
               // 3) set vertex indices and set new vertex
 
@@ -11928,16 +11924,12 @@ namespace internal
       template <int dim, int spacedim>
       static void
       delete_children(
-        Triangulation<dim, spacedim>                         &triangulation,
-        typename Triangulation<dim, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int>                            &line_cell_count,
-        std::vector<unsigned int>                            &quad_cell_count)
+        Triangulation<dim, spacedim> & /*triangulation*/,
+        typename Triangulation<dim, spacedim>::cell_iterator & /*cell*/,
+        std::vector<unsigned int> & /*line_cell_count*/,
+        std::vector<unsigned int> & /*quad_cell_count*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        [[mabe_unused]]triangulation;
-        [[mabe_unused]]cell;
-        [[mabe_unused]]line_cell_count;
-        [[mabe_unused]]quad_cell_count;
       }
 
       template <int dim, int spacedim>
@@ -11952,10 +11944,9 @@ namespace internal
       template <int dim, int spacedim>
       static void
       prevent_distorted_boundary_cells(
-        Triangulation<dim, spacedim> &triangulation)
+        Triangulation<dim, spacedim> & /*triangulation*/)
       {
         // nothing to do since anisotropy is not supported
-        [[mabe_unused]]triangulation;
       }
 
       template <int dim, int spacedim>
@@ -12293,7 +12284,6 @@ void Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
             }
     }
 
-  [[mabe_unused]]boundary_found;
   Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
 }
 
@@ -16304,7 +16294,6 @@ void Triangulation<dim, spacedim>::load_attached_data(
       // CellStatus::cell_will_persist.
       for (const auto &cell_rel : this->local_cell_relations)
         {
-          [[mabe_unused]]cell_rel;
           Assert((cell_rel.second == // cell_status
                   ::dealii::CellStatus::cell_will_persist),
                  ExcInternalError());

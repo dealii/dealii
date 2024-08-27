@@ -2402,10 +2402,9 @@ namespace Functions
     Tensor<1, 1>
     gradient_interpolate(const Table<1, double> &data_values,
                          const TableIndices<1>  &ix,
-                         const Point<1>         &p_unit,
-                         const Point<1>         &dx)
+                         const Point<1> & /*p_unit*/,
+                         const Point<1> &dx)
     {
-      [[mabe_unused]]p_unit;
       Tensor<1, 1> grad;
       grad[0] = (data_values[ix[0] + 1] - data_values[ix[0]]) / dx[0];
       return grad;
