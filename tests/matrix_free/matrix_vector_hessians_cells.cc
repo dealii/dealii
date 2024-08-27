@@ -183,20 +183,14 @@ test_hessians(const dealii::FE_Poly<dim>                    &fe,
             }
         }
     },
-    [&](
-      const auto &matrix_free, auto &dst, const auto &src, const auto &range) {
-      (void)matrix_free;
-      (void)dst;
-      (void)src;
-      (void)range;
-    },
-    [&](
-      const auto &matrix_free, auto &dst, const auto &src, const auto &range) {
-      (void)matrix_free;
-      (void)dst;
-      (void)src;
-      (void)range;
-    },
+    [&](const auto & /*matrix_free*/,
+        auto & /*dst*/,
+        const auto & /*src*/,
+        const auto & /*range*/) {},
+    [&](const auto & /*matrix_free*/,
+        auto & /*dst*/,
+        const auto & /*src*/,
+        const auto & /*range*/) {},
     dst,
     src,
     true);

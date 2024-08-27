@@ -3479,7 +3479,7 @@ namespace internal
                     return a.vertices < b.vertices;
                   });
 
-        unsigned int counter = 0;
+        [[maybe_unused]] unsigned int counter = 0;
 
         std::vector<unsigned int> key;
         key.reserve(GeometryInfo<structdim>::vertices_per_cell);
@@ -3525,7 +3525,6 @@ namespace internal
             if (subcell_object->boundary_id !=
                 numbers::internal_face_boundary_id)
               {
-                (void)vertex_locations;
                 AssertThrow(
                   boundary_id != numbers::internal_face_boundary_id,
                   ExcMessage(
@@ -3555,7 +3554,6 @@ namespace internal
         // make sure that all subcelldata entries have been processed
         // TODO: this is not guaranteed, why?
         // AssertDimension(counter, boundary_objects_in.size());
-        (void)counter;
       }
 
 
@@ -5044,7 +5042,6 @@ namespace internal
                 triangulation.vertices[next_unused_vertex] = line->center(true);
 
                 bool pair_found = false;
-                (void)pair_found;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -5814,7 +5811,6 @@ namespace internal
                 // two child lines.  To this end, find a pair of
                 // unused lines
                 bool pair_found = false;
-                (void)pair_found;
                 for (; next_unused_line != endl; ++next_unused_line)
                   if (!next_unused_line->used() &&
                       !(++next_unused_line)->used())
@@ -6236,10 +6232,7 @@ namespace internal
                 }
 
               for (const unsigned int line : quad->line_indices())
-                {
-                  AssertIsNotUsed(new_lines[line]);
-                  (void)line;
-                }
+                AssertIsNotUsed(new_lines[line]);
 
               // 2) create new quads (properties are set below). Both triangles
               // and quads are divided in four.
@@ -6258,10 +6251,7 @@ namespace internal
               quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
               for (const auto &quad : new_quads)
-                {
-                  AssertIsNotUsed(quad);
-                  (void)quad;
-                }
+                AssertIsNotUsed(quad);
 
               // 3) set vertex indices and set new vertex
 
@@ -11934,16 +11924,12 @@ namespace internal
       template <int dim, int spacedim>
       static void
       delete_children(
-        Triangulation<dim, spacedim>                         &triangulation,
-        typename Triangulation<dim, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int>                            &line_cell_count,
-        std::vector<unsigned int>                            &quad_cell_count)
+        Triangulation<dim, spacedim> & /*triangulation*/,
+        typename Triangulation<dim, spacedim>::cell_iterator & /*cell*/,
+        std::vector<unsigned int> & /*line_cell_count*/,
+        std::vector<unsigned int> & /*quad_cell_count*/)
       {
         AssertThrow(false, ExcNotImplemented());
-        (void)triangulation;
-        (void)cell;
-        (void)line_cell_count;
-        (void)quad_cell_count;
       }
 
       template <int dim, int spacedim>
@@ -11958,10 +11944,9 @@ namespace internal
       template <int dim, int spacedim>
       static void
       prevent_distorted_boundary_cells(
-        Triangulation<dim, spacedim> &triangulation)
+        Triangulation<dim, spacedim> & /*triangulation*/)
       {
         // nothing to do since anisotropy is not supported
-        (void)triangulation;
       }
 
       template <int dim, int spacedim>
@@ -12299,7 +12284,6 @@ void Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
             }
     }
 
-  (void)boundary_found;
   Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
 }
 
@@ -16310,7 +16294,6 @@ void Triangulation<dim, spacedim>::load_attached_data(
       // CellStatus::cell_will_persist.
       for (const auto &cell_rel : this->local_cell_relations)
         {
-          (void)cell_rel;
           Assert((cell_rel.second == // cell_status
                   ::dealii::CellStatus::cell_will_persist),
                  ExcInternalError());
