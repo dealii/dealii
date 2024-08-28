@@ -448,7 +448,7 @@ namespace internal
     std::vector<types::global_dof_index> constrained_indices_temp;
     for (const auto &line : constraints_in.get_lines())
       constrained_indices_temp.push_back(line.index);
-
+    std::sort(constrained_indices_temp.begin(), constrained_indices_temp.end());
     constrained_indices.add_indices(constrained_indices_temp.begin(),
                                     constrained_indices_temp.end());
 
