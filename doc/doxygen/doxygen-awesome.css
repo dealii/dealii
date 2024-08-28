@@ -2005,6 +2005,16 @@ hr {
     overflow: auto;
 }
 
+/**
+ We are not allowed to change the size of graphs made with dot, because
+ imagemaps (which we use for tutorial dependencies for example) can not
+ be scaled. So, if you remove the following rule, you can no longer click
+ on tutorials.
+*/
+.contents .dotgraph img {
+    max-width: none;
+}
+
 @media screen and (max-width: 767px) {
     .contents .dyncontent > .center, .contents > center {
         margin-left: calc(0px - var(--spacing-large));
