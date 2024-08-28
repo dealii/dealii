@@ -136,8 +136,8 @@ namespace Step64
       Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
       const int q_point) const;
 
-    DEAL_II_HOST_DEVICE void
-    set_matrix_free_data(const Portable::MatrixFree<dim, double>::Data &data)
+    DEAL_II_HOST_DEVICE void set_matrix_free_data(
+      const typename Portable::MatrixFree<dim, double>::Data &data)
     {
       gpu_data = &data;
     }
