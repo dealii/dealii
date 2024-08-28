@@ -661,11 +661,11 @@ AffineConstraints<number>::make_consistent_in_parallel(
         this->add_constraint(line.index, line.entries, line.inhomogeneity);
 
       // 4) Stop loop if converged.
-      const auto constraints_converged =
-        Utilities::MPI::min(static_cast<unsigned int>(
-                              constraints_to_make_consistent ==
-                              constraints_made_consistent),
-                            mpi_communicator);
+      const bool constraints_converged =
+        (Utilities::MPI::min(
+           (constraints_to_make_consistent == constraints_made_consistent ? 1 :
+                                                                            0),
+           mpi_communicator) == 1);
       if (constraints_converged)
         break;
     }
