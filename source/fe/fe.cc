@@ -1044,7 +1044,18 @@ template <int dim, int spacedim>
 bool
 FiniteElement<dim, spacedim>::has_support_points() const
 {
-  return (unit_support_points.size() != 0);
+  if (this->dofs_per_cell > 0)
+    return (unit_support_points.size() != 0);
+  else
+    {
+      // If the FE has no DoFs, we shouldn't expect the array
+      // size to be anything other than zero:
+      AssertDimension(unit_support_points.size(), 0);
+
+      // A finite element without DoFs *has* support points
+      // (which is then an empty array)
+      return true;
+    }
 }
 
 

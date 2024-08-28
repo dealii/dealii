@@ -2023,20 +2023,29 @@ public:
 
   /**
    * Return whether a finite element has defined support points. If the result
-   * is true, then a call to the get_unit_support_points() yields a non-empty
-   * array.
+   * is true, then a call to the get_unit_support_points() yields an
+   * array with `dofs_per_cell` entries. Note that the function's name is
+   * poorly chosen: The function does not return *whether* an element has
+   * support points, but whether its implementation is able to *provide*
+   * a list of support points via get_unit_support_points().
    *
-   * The result may be false if an element is not defined by interpolating
-   * shape functions, for example by P-elements on quadrilaterals. It will
-   * usually only be true if the element constructs its shape functions by the
-   * requirement that they be one at a certain point and zero at all the
-   * points associated with the other shape functions.
+   * The result may be false if a finite element defines itself not by
+   * interpolating shape functions, but by other means. A typical example are
+   * discontinuous $P$-type elements on quadrilaterals (rather than the common
+   * $Q$-type elements on quadrilaterals). Elements will generally only
+   * `true` if they construct their shape functions by the
+   * requirement that they be nonzero at a certain point and zero at all the
+   * points associated with the other shape functions. In other words,
+   * if the "node functionals" that form the dual space of the finite
+   * element space and are used to define the shape functions are point
+   * evaluations.
    *
    * In composed elements (i.e. for the FESystem class), the result will be
    * true if all the base elements have defined support points. FE_Nothing
-   * is a special case in FESystems, because it has 0 support points and
-   * has_support_points() is false, but an FESystem containing an FE_Nothing
-   * among other elements will return true.
+   * is a special case since it does not have support point (it has no
+   * shape functions, after all), and so returns an empty array from its
+   * get_unit_support_points() function. Nonetheless, because that array has
+   * the right size, it reports `true` in the current function.
    */
   bool
   has_support_points() const;
