@@ -1994,17 +1994,44 @@ public:
    * consistent on all MPI processes in a distributed computation.
    *
    * The IndexSet @p locally_owned_dofs conforms to all DoFs that are locally
-   * owned on the current process, i.e., DoFHandler::locally_owned_dofs().
+   * owned on the current process, that is typically what you get from
+   * DoFHandler::locally_owned_dofs().
    *
    * The IndexSet @p constraints_to_make_consistent shall contain all DoF
    * indices for which we want to store the complete constraints for. Which DoFs
-   * these might be depends on your actual use case: For most applications in
+   * these might be depends on your actual use case; in general, these are
+   * the degrees of freedoms for which you compute contributions to the matrix
+   * and right hand side of a linear system. For most applications in
    * which you are using continuous Galerkin methods, you would want to use
    * locally active DoFs here, obtained via
-   * DoFTools::extract_locally_active_dofs(). However in discontinuous Galerkin
-   * methods, you might need consistent information on all locally relevant
-   * DoFs due to the need to compute face integrals against ghosted cells,
-   * for which you need DoFTools::extract_locally_relevant_dofs().
+   * DoFTools::extract_locally_active_dofs(). This is because you compute
+   * contributions for the linear system only on the locally owned cells,
+   * and the degrees of freedom located there -- i.e., exactly the locally
+   * active degrees of freedom (see
+   * @ref GlossLocallyActiveDof "this glossary entry"). On the other hand,
+   * for discontinuous Galerkin methods, you might need consistent information
+   * on all locally relevant DoFs due to the need to compute face integrals
+   * between locally owned and ghost cells, with contributions computed also
+   * for matrix and right hand side entries that correspond to degrees of
+   * freedom on ghost cells, i.e., DoFs that are owned by other processes.
+   * In that case, you need to know about constraints also for degrees of
+   * freedom on locally relevant DoFs, and in that case you want to pass
+   * as second argument to this function what you get from
+   * DoFTools::extract_locally_relevant_dofs(). It is worth noting that the
+   * same happens if you use a continuous Galerkin method but if your
+   * bilinear form contains terms computed on faces -- for example to
+   * penalize certain terms when solving the biharmonic equation (see,
+   * for example, step-47).
+   *
+   * At the end of this function, the current object
+   * only stores constraints for degrees of freedom whose indices are
+   * listed in the second argument. In other words, while
+   * DoFTools::make_hanging_node_constraints() may compute constraints
+   * also for degrees of freedom at the interface between two ghost cells
+   * (these DoFs are locally *relevant*), if you pass as second argument only
+   * the set of locally *active* DoFs, this function will at the end have
+   * forgotten constraints about all DoFs that are locally relevant but
+   * not locally active.
    *
    * This function updates the locally stored constraints (or local_lines) of
    * this object, whenever a DoF is constrained against another that we have not
@@ -2017,7 +2044,9 @@ public:
    *   locally_owned_dofs, constraints.get_local_lines(), mpi_communicator);
    * @endcode
    *
-   * @note One should call this function before calling close().
+   * @note This function internally calls close(). As a consequence, whether
+   *   or not you have called close() before, the current object will be
+   *   closed after this function.
    */
   void
   make_consistent_in_parallel(const IndexSet &locally_owned_dofs,

@@ -320,149 +320,68 @@ namespace internal
     const unsigned int my_rank =
       Utilities::MPI::this_mpi_process(mpi_communicator);
 
-    // helper function
-    const auto sort_and_make_unique = [&constraints_in, &locally_owned_dofs](
-                                        std::vector<ConstraintLine>
-                                          &locally_relevant_constraints) {
-      (void)constraints_in;
-      if (locally_relevant_constraints.empty())
-        return;
+    // First define a helper function that sorts and normalizes the constraints
+    // provided through the function's argument:
+    const auto sort_and_make_unique =
+      [](std::vector<ConstraintLine> &locally_relevant_constraints) {
+        if (locally_relevant_constraints.empty())
+          return;
 
-      for (ConstraintLine &entry : locally_relevant_constraints)
-        std::sort(entry.entries.begin(),
-                  entry.entries.end(),
-                  [](const auto &l1, const auto &l2) {
-                    return l1.first < l2.first;
+        // First sort the array of constraints by their index:
+        std::sort(locally_relevant_constraints.begin(),
+                  locally_relevant_constraints.end(),
+                  [](const ConstraintLine &l1, const ConstraintLine &l2) {
+                    return l1.index < l2.index;
                   });
 
-      std::sort(locally_relevant_constraints.begin(),
-                locally_relevant_constraints.end(),
-                [](const ConstraintLine &l1, const ConstraintLine &l2) {
-                  return l1.index < l2.index;
-                });
+        // It is possible that two processes have computed constraints
+        // for the same DoF differently (for example, in parallel because
+        // they have visited different faces of the same cell because
+        // on different processes, different neighbor cells are artificial.
+        //
+        // This is ok, as long as after resolution of all chains of
+        // constraints we end up with the same constraint. But at this
+        // point, we just don't know yet. We deal with this by simply
+        // dropping constraints for DoFs for which there is a previous
+        // constraint in the list:
+        locally_relevant_constraints.erase(
+          std::unique(locally_relevant_constraints.begin(),
+                      locally_relevant_constraints.end(),
+                      [](const ConstraintLine &a, const ConstraintLine &b) {
+                        return (a.index == b.index);
+                      }),
+          locally_relevant_constraints.end());
 
-      const auto equal_with_tol = [](const number d, const number e) {
-        if (std::abs(std::real(d - e)) <
-            std::sqrt(
-              std::numeric_limits<
-                typename numbers::NumberTraits<number>::real_type>::epsilon()))
-          return true;
-        else
-          return false;
+        // For those constraints that survive, sort the right hand side arrays:
+        for (ConstraintLine &entry : locally_relevant_constraints)
+          std::sort(entry.entries.begin(),
+                    entry.entries.end(),
+                    [](const auto &l1, const auto &l2) {
+                      return l1.first < l2.first;
+                    });
       };
 
-      typename std::vector<ConstraintLine>::iterator read_ptr =
-        locally_relevant_constraints.begin();
-      typename std::vector<ConstraintLine>::iterator write_ptr =
-        locally_relevant_constraints.begin();
-      // go through sorted locally relevant constraints and look out for
-      // duplicates (same constrained index, same entries) or cases that need
-      // to be augmented (same index, different entries)
-      while (++read_ptr != locally_relevant_constraints.end())
-        {
-          if (read_ptr->index != write_ptr->index)
-            {
-              // if we have a different index, use it here
-              if (++write_ptr != read_ptr)
-                *write_ptr = std::move(*read_ptr);
-            }
-          else // equal global dof index
-            {
-              ConstraintLine       &a = *write_ptr;
-              const ConstraintLine &b = *read_ptr;
-              Assert(a.index == b.index, ExcInternalError());
-              if (!equal_with_tol(a.inhomogeneity, b.inhomogeneity) &&
-                  locally_owned_dofs.is_element(b.index))
-                {
-                  Assert(equal_with_tol(b.inhomogeneity,
-                                        constraints_in.get_inhomogeneity(
-                                          b.index)),
-                         ExcInternalError());
-                  a.inhomogeneity = b.inhomogeneity;
-                }
-
-              typename ConstraintLine::Entries       &av = a.entries;
-              const typename ConstraintLine::Entries &bv = b.entries;
-              // check if entries vectors are equal
-              bool vectors_are_equal = (av.size() == bv.size());
-              for (unsigned int i = 0; vectors_are_equal && i < av.size(); ++i)
-                {
-                  if (av[i].first != bv[i].first)
-                    vectors_are_equal = false;
-                  else
-                    Assert(equal_with_tol(av[i].second, bv[i].second),
-                           ExcInternalError());
-                }
-
-              // merge entries vectors if different, otherwise ignore the
-              // second entry
-              if (!vectors_are_equal)
-                {
-                  typename ConstraintLine::Entries cv;
-                  cv.reserve(av.size() + bv.size());
-
-                  unsigned int i = 0;
-                  unsigned int j = 0;
-
-                  for (; (i < av.size()) && (j < bv.size());)
-                    {
-                      if (av[i].first == bv[j].first)
-                        {
-                          Assert(equal_with_tol(av[i].second, bv[j].second),
-                                 ExcInternalError());
-
-                          cv.push_back(av[i]);
-                          ++i;
-                          ++j;
-                        }
-                      else if (av[i].first < bv[j].first)
-                        {
-                          cv.push_back(av[i]);
-                          ++i;
-                        }
-                      else
-                        {
-                          cv.push_back(bv[j]);
-                          ++j;
-                        }
-                    }
-
-                  for (; i < av.size(); ++i)
-                    cv.push_back(av[i]);
-
-                  for (; j < bv.size(); ++j)
-                    cv.push_back(bv[j]);
-
-                  std::swap(av, cv);
-                }
-            }
-        }
-      ++write_ptr;
-      locally_relevant_constraints.erase(write_ptr,
-                                         locally_relevant_constraints.end());
-    };
-
     // step 0: Collect the indices of constrained DoFs we know of:
-    IndexSet constrained_indices(locally_owned_dofs.size());
-
-    std::vector<types::global_dof_index> constrained_indices_temp;
-    constrained_indices_temp.reserve(constraints_in.n_constraints());
-    for (const auto &line : constraints_in.get_lines())
-      constrained_indices_temp.push_back(line.index);
-    std::sort(constrained_indices_temp.begin(), constrained_indices_temp.end());
-    constrained_indices.add_indices(constrained_indices_temp.begin(),
-                                    constrained_indices_temp.end());
+    IndexSet my_constraint_indices(locally_owned_dofs.size());
+    {
+      std::vector<types::global_dof_index> indices;
+      indices.reserve(constraints_in.n_constraints());
+      for (const auto &line : constraints_in.get_lines())
+        indices.push_back(line.index);
+      std::sort(indices.begin(), indices.end());
+      my_constraint_indices.add_indices(indices.begin(), indices.end());
+    }
 
     // step 1: Identify the owners of DoFs we know to be constrained.
     //         Of course, we are likely to own a good share of the DoFs
     //         we know to be constrained -- and that is ok.
-    std::vector<unsigned int> constrained_indices_owners(
-      constrained_indices.n_elements());
+    std::vector<unsigned int> owners_of_my_constraints(
+      my_constraint_indices.n_elements());
     Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
       constrained_indices_process(locally_owned_dofs,
-                                  constrained_indices,
+                                  my_constraint_indices,
                                   mpi_communicator,
-                                  constrained_indices_owners,
+                                  owners_of_my_constraints,
                                   true);
 
     Utilities::MPI::ConsensusAlgorithms::Selector<
@@ -471,20 +390,20 @@ namespace internal
       consensus_algorithm;
     consensus_algorithm.run(constrained_indices_process, mpi_communicator);
 
-    // step 2: collect all locally owned constraints
+    // step 2: Collect all locally owned constraints into a data structure
+    //         that we can send to other processes that want to know
+    //         about them.
     const std::map<unsigned int, IndexSet> constrained_indices_by_ranks =
       constrained_indices_process.get_requesters();
-
     {
-      // ... collect data and sort according to owner
       std::map<unsigned int, std::vector<ConstraintLine>> send_data;
 
-      for (unsigned int i = 0; i < constrained_indices_owners.size(); ++i)
+      for (unsigned int i = 0; i < owners_of_my_constraints.size(); ++i)
         {
           ConstraintLine entry;
 
           const types::global_dof_index index =
-            constrained_indices.nth_index_in_set(i);
+            my_constraint_indices.nth_index_in_set(i);
 
           entry.index = index;
 
@@ -495,10 +414,10 @@ namespace internal
                 *constraints = constraints_in.get_constraint_entries(index))
             entry.entries = *constraints;
 
-          if (constrained_indices_owners[i] == my_rank)
+          if (owners_of_my_constraints[i] == my_rank)
             locally_relevant_constraints.push_back(entry);
           else
-            send_data[constrained_indices_owners[i]].push_back(entry);
+            send_data[owners_of_my_constraints[i]].push_back(entry);
         }
 
       // Now exchange this data between processes:
@@ -515,7 +434,7 @@ namespace internal
     }
 
     // step 3: communicate constraints so that each process knows how the
-    // locally locally relevant dofs are constrained
+    // locally relevant dofs are constrained
     {
       // ... determine owners of locally relevant dofs
       IndexSet locally_relevant_dofs_non_local = locally_relevant_dofs;
@@ -593,10 +512,17 @@ AffineConstraints<number>::make_consistent_in_parallel(
   const IndexSet &constraints_to_make_consistent_,
   const MPI_Comm  mpi_communicator)
 {
+  // We need to resolve chains of constraints in this function, and that
+  // is exactly what close() does. So call this function at the beginning
+  // to make sure we start working with constraints that are already
+  // resolved to the degree possible before exchanging information.
+  // We do this here so that it is also done if we choose the early
+  // exit in the following statement.
+  if (sorted == false)
+    close();
+
   if (Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
     return; // Nothing to do, since serial.
-
-  Assert(sorted == false, ExcMatrixIsClosed());
 
   Assert(this->local_lines.size() > 0,
          ExcMessage(
