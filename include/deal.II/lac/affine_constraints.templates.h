@@ -446,6 +446,7 @@ namespace internal
     IndexSet constrained_indices(locally_owned_dofs.size());
 
     std::vector<types::global_dof_index> constrained_indices_temp;
+    constrained_indices_temp.reserve(constraints_in.n_constraints());
     for (const auto &line : constraints_in.get_lines())
       constrained_indices_temp.push_back(line.index);
     std::sort(constrained_indices_temp.begin(), constrained_indices_temp.end());
