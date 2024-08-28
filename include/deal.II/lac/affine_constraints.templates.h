@@ -442,7 +442,7 @@ namespace internal
                                          locally_relevant_constraints.end());
     };
 
-    // 0) collect constrained indices of the current object
+    // step 0: Collect the indices of constrained DoFs we know of:
     IndexSet constrained_indices(locally_owned_dofs.size());
 
     std::vector<types::global_dof_index> constrained_indices_temp;
@@ -452,7 +452,9 @@ namespace internal
     constrained_indices.add_indices(constrained_indices_temp.begin(),
                                     constrained_indices_temp.end());
 
-    // step 1: identify owners of constraints
+    // step 1: Identify the owners of DoFs we know to be constrained.
+    //         Of course, we are likely to own a good share of the DoFs
+    //         we know to be constrained -- and that is ok.
     std::vector<unsigned int> constrained_indices_owners(
       constrained_indices.n_elements());
     Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
@@ -627,8 +629,8 @@ AffineConstraints<number>::make_consistent_in_parallel(
   unsigned int       iteration_count = 0;
   for (; iteration_count < max_iterations; ++iteration_count)
     {
-      // 1) Get all locally relevant constraints ("temporal constraint matrix").
-      const auto temporal_constraint_matrix =
+      // 1) Get all locally relevant constraints we need to know about:
+      const std::vector<ConstraintLine> imported_constraints =
         internal::compute_locally_relevant_constraints(
           *this,
           locally_owned_dofs,
@@ -637,7 +639,7 @@ AffineConstraints<number>::make_consistent_in_parallel(
 
       // 2) Add untracked DoFs to the index sets.
       constrained_indices.clear();
-      for (const auto &line : temporal_constraint_matrix)
+      for (const auto &line : imported_constraints)
         {
           constrained_indices.push_back(line.index);
           for (const auto &entry : line.entries)
@@ -653,9 +655,9 @@ AffineConstraints<number>::make_consistent_in_parallel(
       constraints_to_make_consistent.add_indices(constrained_indices.begin(),
                                                  constrained_indices.end());
 
-      // 3) Clear and refill this constraint matrix.
+      // 3) Clear and refill this constraint matrix. Also resolve chains:
       this->reinit(locally_owned_dofs, locally_stored_constraints);
-      for (const auto &line : temporal_constraint_matrix)
+      for (const auto &line : imported_constraints)
         this->add_constraint(line.index, line.entries, line.inhomogeneity);
 
       // 4) Stop loop if converged.
