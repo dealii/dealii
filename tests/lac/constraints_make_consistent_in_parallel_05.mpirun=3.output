@@ -1,0 +1,16 @@
+
+DEAL:0::Constraints as created:
+DEAL:0::Constraints as made consistent:
+
+DEAL:1::Constraints as created:
+    1 0:  0.500000
+DEAL:1::Constraints as made consistent:
+    1 0:  0.500000
+
+
+DEAL:2::Constraints as created:
+    2 1:  0.500000
+DEAL:2::Constraints as made consistent:
+    1 0:  0.500000
+    2 0:  0.250000
+
