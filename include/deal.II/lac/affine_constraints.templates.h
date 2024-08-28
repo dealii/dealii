@@ -660,6 +660,7 @@ AffineConstraints<number>::make_consistent_in_parallel(
       this->reinit(locally_owned_dofs, locally_stored_constraints);
       for (const auto &line : imported_constraints)
         this->add_constraint(line.index, line.entries, line.inhomogeneity);
+      this->close();
 
       // 4) Stop loop if converged.
       const bool constraints_converged =
