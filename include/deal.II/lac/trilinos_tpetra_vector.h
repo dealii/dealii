@@ -1167,6 +1167,12 @@ namespace LinearAlgebra
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
               vector_1d_local(local_row) += values[i];
+
+              // Set the compressed state to false only if there is nonlocal
+              // part in this distributed vector, otherwise it's always
+              // compressed.
+              if (nonlocal_vector.get() != nullptr)
+                compressed = false;
             }
           else
             {
@@ -1285,6 +1291,12 @@ namespace LinearAlgebra
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
               vector_1d_local(local_row) = values[i];
+
+              // Set the compressed state to false only if there is nonlocal
+              // part in this distributed vector, otherwise it's always
+              // compressed.
+              if (nonlocal_vector.get() != nullptr)
+                compressed = false;
             }
           else
             {
