@@ -74,6 +74,39 @@ test()
   }
 }
 
+void
+test_anisotropic_3d()
+{
+  Triangulation<3> tria;
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(1);
+  tria.execute_coarsening_and_refinement();
+
+
+  typename Triangulation<3, 3>::active_cell_iterator cell = tria.begin_active();
+  for (unsigned int i = 0; i < 3; i++)
+    {
+      cell->set_refine_flag(RefinementCase<3>::cut_axis(i));
+      cell++;
+    }
+  tria.execute_coarsening_and_refinement();
+
+  deallog << "Unchanged grid:" << std::endl;
+  GridOut().write_gnuplot(tria, deallog.get_file_stream());
+  {
+    std::ofstream f("grid1");
+    GridOut().write_gnuplot(tria, f);
+  }
+
+  GridTools::transform(trans_func<3>, tria);
+  deallog << "transformed grid:" << std::endl;
+  GridOut().write_gnuplot(tria, deallog.get_file_stream());
+  {
+    std::ofstream f("grid2");
+    GridOut().write_gnuplot(tria, f);
+  }
+}
+
 
 int
 main()
@@ -82,6 +115,7 @@ main()
 
   test<2>();
   test<3>();
+  test_anisotropic_3d();
 
   return 0;
 }
