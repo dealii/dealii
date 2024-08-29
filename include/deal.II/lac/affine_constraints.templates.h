@@ -598,7 +598,7 @@ AffineConstraints<number>::make_consistent_in_parallel(
 
   Assert(sorted == false, ExcMatrixIsClosed());
 
-  Assert(this->local_lines.is_empty() == false,
+  Assert(this->local_lines.size() > 0,
          ExcMessage(
            "This functionality requires that the AffineConstraints object "
            "knows for which degrees of freedom it can store constraints. "
