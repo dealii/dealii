@@ -62,3 +62,5 @@ while (<>) {
 for (; $level>=3; --$level) {
     print "      </ul>\n";
 }
+
+print "<br>\n";
