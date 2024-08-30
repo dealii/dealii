@@ -57,10 +57,9 @@ test()
   deallog << "Total dofs=" << dofh.n_dofs() << std::endl;
 
   // extract constant modes and print
-  ComponentMask mask(fe.n_components(), true);
 
   std::vector<std::vector<double>> constant_modes =
-    DoFTools::extract_rigid_body_modes(mapping, dofh, mask);
+    DoFTools::extract_rigid_body_modes(mapping, dofh);
 
   for (unsigned int i = 0; i < constant_modes.size(); ++i)
     {

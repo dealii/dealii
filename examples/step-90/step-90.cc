@@ -947,7 +947,7 @@ namespace Step90
         const unsigned int max_iterations = 500;
         SolverControl      solver_control(max_iterations, relative_error);
         const std::vector<std::vector<bool>> constant_modes =
-          DoFTools::extract_constant_modes(dof_handler, ComponentMask());
+          DoFTools::extract_constant_modes(dof_handler);
         TrilinosWrappers::PreconditionAMG preconditioner_stiffness;
         TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
         Amg_data.constant_modes        = constant_modes;

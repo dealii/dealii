@@ -1504,7 +1504,6 @@ namespace DoFTools
                              const unsigned int               mg_level)
     {
       AssertDimension(dim, spacedim);
-      AssertDimension(component_mask.n_selected_components(), dim);
 
       constexpr unsigned int n_modes = RigidBodyMotion<dim>::n_modes;
 
