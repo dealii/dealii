@@ -2424,6 +2424,25 @@ namespace GridGenerator
                                     Triangulation<1, spacedim>       &out_tria);
 #endif
 
+
+  /**
+   * Perform an Alfeld split (also called barycentric refinement) of a simplex
+   * mesh.
+   *
+   * This function takes a simplex mesh (@p in_tria) and subdivides each
+   * triangle into three triangles with a single new vertex (the barycenter). In
+   * the process, the simplex mesh is flattened (no hierarchy is kept).
+   *
+   * @note Currently only implemented for @p dim = 2.
+   *
+   * Also see
+   * @ref simplex "Simplex support".
+   */
+  template <int dim, int spacedim>
+  void
+  alfeld_split_of_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
+                               Triangulation<dim, spacedim>       &out_tria);
+
   /**
    * Namespace Airfoil contains classes and functions in order to create a
    * C-type mesh for the (flow) field around Joukowski or NACA airfoils.

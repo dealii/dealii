@@ -8403,6 +8403,209 @@ namespace GridGenerator
 
 
 
+  template <int dim, int spacedim>
+  void
+  alfeld_split_of_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
+                               Triangulation<dim, spacedim>       &out_tria)
+  {
+    Assert(dim == 2, ExcNotImplemented());
+
+    Triangulation<dim, spacedim> temp_tria;
+    if (in_tria.n_global_levels() > 1)
+      {
+        AssertThrow(!in_tria.has_hanging_nodes(), ExcNotImplemented());
+        GridGenerator::flatten_triangulation(in_tria, temp_tria);
+      }
+    const Triangulation<dim, spacedim> &ref_tria =
+      in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
+
+    // Three triangles connecting to barycenter with vertex index 3:
+    static const ndarray<unsigned int, 3, 3> table_2D_cell = {
+      {{{0, 1, 3}}, {{1, 2, 3}}, {{2, 0, 3}}}};
+
+    /* Boundary-faces 2d:
+     * After converting, each of the 4 quadrilateral faces is defined by faces
+     * of 2 different triangles, i.e., lines. Note that lines are defined by 2
+     * vertices.
+     */
+    static const ndarray<unsigned int, 4, 2, 2>
+      vertex_ids_for_boundary_faces_2d = {
+        {{{{{0, 1}}}}, {{{{1, 2}}}}, {{{{2, 0}}}}}};
+
+
+    std::vector<Point<spacedim>> vertices;
+    std::vector<CellData<dim>>   cells;
+    SubCellData                  subcell_data;
+
+    // for each vertex we store the assigned index so that we only
+    // assign them a value once
+    std::vector<unsigned int> old_to_new_vertex_indices(
+      ref_tria.n_vertices(), numbers::invalid_unsigned_int);
+
+    // We first have to create all of the new vertices. To do this, we loop over
+    // all cells and on each cell
+    // (i) copy the existing vertex locations (and record their new indices in
+    // the 'old_to_new_vertex_indices' vector),
+    // (ii) create new barycenter vertex location
+    for (const auto &cell : ref_tria.cell_iterators())
+      {
+        // temporary array storing the global indices of each cell entity in the
+        // sequence: vertices, edges/faces, cell
+        std::array<unsigned int, dim == 2 ? 4 : 5> local_vertex_indices;
+
+        // (i) copy the existing vertex locations
+        Tensor<1, spacedim> barycenter;
+        for (const auto v : cell->vertex_indices())
+          {
+            const auto v_global = cell->vertex_index(v);
+
+            if (old_to_new_vertex_indices[v_global] ==
+                numbers::invalid_unsigned_int)
+              {
+                old_to_new_vertex_indices[v_global] = vertices.size();
+                vertices.push_back(cell->vertex(v));
+              }
+
+            AssertIndexRange(v, local_vertex_indices.size());
+            local_vertex_indices[v] = old_to_new_vertex_indices[v_global];
+
+            barycenter += vertices[local_vertex_indices[v]] - Point<spacedim>();
+          }
+
+        // (ii) barycenter:
+        local_vertex_indices[3] = vertices.size();
+        vertices.push_back(Point<spacedim>() + barycenter / 3.);
+
+        // helper function for creating cells and subcells
+        const auto add_cell = [&](const unsigned int struct_dim,
+                                  const auto        &index_vertices,
+                                  const unsigned int material_or_boundary_id,
+                                  const unsigned int manifold_id = 0) {
+          // sub-cell data only has to be stored if the information differs
+          // from the default
+          if (struct_dim < dim &&
+              (material_or_boundary_id == numbers::internal_face_boundary_id &&
+               manifold_id == numbers::flat_manifold_id))
+            return;
+
+          if (struct_dim == dim) // cells
+            {
+              if (dim == 2)
+                {
+                  AssertDimension(index_vertices.size(), 3);
+                }
+              else if (dim == 3)
+                {
+                  AssertDimension(index_vertices.size(), 4);
+                }
+
+              CellData<dim> cell_data(index_vertices.size());
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  cell_data.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                  cell_data.material_id =
+                    material_or_boundary_id; // inherit material id
+                  cell_data.manifold_id =
+                    manifold_id; // inherit cell-manifold id
+                }
+              cells.push_back(cell_data);
+            }
+          else if (dim == 2 && struct_dim == 1) // an edge of a simplex
+            {
+              Assert(index_vertices.size() == 2, ExcInternalError());
+              CellData<1> boundary_line(2);
+              boundary_line.boundary_id = material_or_boundary_id;
+              boundary_line.manifold_id = manifold_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  boundary_line.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_lines.push_back(boundary_line);
+            }
+          else if (dim == 3 && struct_dim == 2) // a face of a tetrahedron
+            {
+              Assert(index_vertices.size() == 3, ExcInternalError());
+              CellData<2> boundary_quad(3);
+              boundary_quad.material_id = material_or_boundary_id;
+              boundary_quad.manifold_id = manifold_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  boundary_quad.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_quads.push_back(boundary_quad);
+            }
+          else if (dim == 3 && struct_dim == 1) // an edge of a tetrahedron
+            {
+              Assert(index_vertices.size() == 2, ExcInternalError());
+              CellData<1> boundary_line(2);
+              boundary_line.boundary_id = material_or_boundary_id;
+              boundary_line.manifold_id = manifold_id;
+              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                {
+                  AssertIndexRange(index_vertices[i],
+                                   local_vertex_indices.size());
+                  boundary_line.vertices[i] =
+                    local_vertex_indices[index_vertices[i]];
+                }
+              subcell_data.boundary_lines.push_back(boundary_line);
+            }
+          else
+            {
+              DEAL_II_NOT_IMPLEMENTED();
+            }
+        };
+
+        const auto material_id_cell = cell->material_id();
+
+        // create cells one by one
+        if (dim == 2)
+          {
+            // get cell-manifold id from current quad cell
+            const auto manifold_id_cell = cell->manifold_id();
+
+            for (const auto &cell_vertices : table_2D_cell)
+              add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
+          }
+        else
+          DEAL_II_NOT_IMPLEMENTED();
+
+        // Set up sub-cell data.
+        for (const auto f : cell->face_indices())
+          {
+            const auto bid = cell->face(f)->boundary_id();
+            const auto mid = cell->face(f)->manifold_id();
+
+            // process boundary-faces: set boundary and manifold ids
+            if (dim == 2) // 2d boundary-faces
+              {
+                for (const auto &face_vertices :
+                     vertex_ids_for_boundary_faces_2d[f])
+                  add_cell(1, face_vertices, bid, mid);
+              }
+            else
+              DEAL_II_NOT_IMPLEMENTED();
+          }
+      }
+
+    out_tria.clear();
+    out_tria.create_triangulation(vertices, cells, subcell_data);
+
+    for (const auto i : out_tria.get_manifold_ids())
+      if (i != numbers::flat_manifold_id)
+        out_tria.set_manifold(i, FlatManifold<dim, spacedim>());
+  }
+
+
+
   template <template <int, int> class MeshType, int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES(
     (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
