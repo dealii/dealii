@@ -1,0 +1,23 @@
+
+DEAL::ExcEncounteredDeprecatedEntries(deprecation_messages)
+    The following deprecated entries were encountered:
+
+
+--------------------------------------------------------
+An error occurred in file <parameter_handler.cc> in function
+    void dealii::ParameterHandler::scan_line(std::string, const std::string &, const unsigned int, const bool)
+Additional information: 
+    Line <2> of file <prm/parameter_handler_3.prm>: Entry <string list> is
+    deprecated.
+--------------------------------------------------------
+
+--------------------------------------------------------
+An error occurred in file <parameter_handler.cc> in function
+    void dealii::ParameterHandler::scan_line(std::string, const std::string &, const unsigned int, const bool)
+Additional information: 
+    Line <3> of file <prm/parameter_handler_3.prm>: Entry <int> is
+    deprecated.
+--------------------------------------------------------
+
+DEAL::a, b, c
+DEAL::3
