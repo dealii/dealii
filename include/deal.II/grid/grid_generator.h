@@ -2429,11 +2429,13 @@ namespace GridGenerator
    * Perform an Alfeld split (also called barycentric refinement) of a simplex
    * mesh.
    *
+   * @note Currently only implemented for @p dim = 2.
+
    * This function takes a simplex mesh (@p in_tria) and subdivides each
    * triangle into three triangles with a single new vertex (the barycenter). In
    * the process, the simplex mesh is flattened (no hierarchy is kept).
    *
-   * @note Currently only implemented for @p dim = 2.
+   * @image html alfeld-split.svg
    *
    * Also see
    * @ref simplex "Simplex support".
