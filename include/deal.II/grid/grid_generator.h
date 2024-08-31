@@ -2437,6 +2437,13 @@ namespace GridGenerator
    *
    * @image html alfeld-split.svg
    *
+   * The meshes produced by this function can be used for Scott-Vogelius
+   elements
+   * for the Stokes equation: The $P_k - DGP_{k-1}$ element is point-wise
+   divergence
+   * free on barycentric refined meshes for $k\geq 2$ for @p dim = 2 and $k\geq 3$
+   * for @p dim = 3, see @cite Farrell2021.
+   *
    * Also see
    * @ref simplex "Simplex support".
    */
