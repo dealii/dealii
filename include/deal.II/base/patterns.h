@@ -2415,11 +2415,10 @@ namespace Patterns
       to_string(const T                     &value,
                 const Patterns::PatternBase &p = *Convert<T>::to_pattern())
       {
-        namespace B                     = magic_enum::bitwise_operators;
         const auto               values = magic_enum::enum_values<T>();
         std::vector<std::string> names;
         for (const auto &v : values)
-          if (B::operator&(value, v) == v)
+          if (magic_enum::bitwise_operators::operator&(value, v) == v)
             names.push_back(std::string(magic_enum::enum_name(v)));
         return Patterns::Tools::Convert<decltype(names)>::to_string(names, p);
       }
@@ -2428,7 +2427,6 @@ namespace Patterns
       to_value(const std::string                   &s,
                const dealii::Patterns::PatternBase &p = *to_pattern())
       {
-        namespace B = magic_enum::bitwise_operators;
         // Make sure we have a valid enum value, or empty value
         AssertThrow(p.match(s), ExcNoMatch(s, p.description()));
         T                        value = T();
@@ -2439,7 +2437,8 @@ namespace Patterns
           {
             auto v = magic_enum::enum_cast<T>(name);
             if (v.has_value())
-              value = B::operator|(value, v.value());
+              value =
+                magic_enum::bitwise_operators::operator|(value, v.value());
           }
         return value;
       }
