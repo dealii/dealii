@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 // Check Patterns::Tools::Convert for enum types
+// Test the conversion of UpdateFlags to string and back
 
 #include <deal.II/fe/fe_values.h>
 

@@ -13,6 +13,8 @@
 // ------------------------------------------------------------------------
 
 // Check Patterns::Tools::Convert for custom enum types
+// Test the conversion of a standard enum to string and back, and of an enum
+// class to string and back
 
 #include <deal.II/fe/fe_values.h>
 
