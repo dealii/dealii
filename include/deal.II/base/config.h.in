@@ -50,6 +50,7 @@
 #cmakedefine DEAL_II_WITH_LAPACK
 #cmakedefine LAPACK_WITH_64BIT_BLAS_INDICES
 #cmakedefine DEAL_II_LAPACK_WITH_MKL
+#cmakedefine DEAL_II_WITH_MAGIC_ENUM
 #cmakedefine DEAL_II_WITH_METIS
 #cmakedefine DEAL_II_WITH_MPI
 #cmakedefine DEAL_II_WITH_MUPARSER
