@@ -1373,7 +1373,7 @@ namespace DoFTools
   template <int dim, int spacedim>
   std::vector<std::vector<bool>>
   extract_constant_modes(const DoFHandler<dim, spacedim> &dof_handler,
-                         const ComponentMask             &component_mask);
+                         const ComponentMask             &component_mask = {});
 
   /**
    * Same as above.
@@ -1394,7 +1394,7 @@ namespace DoFTools
   std::vector<std::vector<bool>>
   extract_level_constant_modes(const unsigned int               level,
                                const DoFHandler<dim, spacedim> &dof_handler,
-                               const ComponentMask             &component_mask);
+                               const ComponentMask &component_mask = {});
 
   /**
    * Same as above.
@@ -1419,7 +1419,7 @@ namespace DoFTools
   std::vector<std::vector<double>>
   extract_rigid_body_modes(const Mapping<dim, spacedim>    &mapping,
                            const DoFHandler<dim, spacedim> &dof_handler,
-                           const ComponentMask             &component_mask);
+                           const ComponentMask &component_mask = {});
 
   /**
    * Same as above but for multigrid levels.
@@ -1429,7 +1429,7 @@ namespace DoFTools
   extract_level_rigid_body_modes(const unsigned int               level,
                                  const Mapping<dim, spacedim>    &mapping,
                                  const DoFHandler<dim, spacedim> &dof_handler,
-                                 const ComponentMask &component_mask);
+                                 const ComponentMask &component_mask = {});
   /** @} */
 
   /**
