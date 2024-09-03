@@ -82,7 +82,22 @@ main()
   catch (const ParameterHandler::ExcEncounteredDeprecatedEntries &exc)
     {
       deallog << exc.get_exc_name() << std::endl;
-      exc.print_info(deallog.get_file_stream());
+
+      // Filter out compiler-dependent information
+      std::stringstream tmp;
+      exc.print_info(tmp);
+      std::string filtered_error = tmp.str();
+      size_t      function_begin = filtered_error.find("in function");
+
+      while (function_begin != filtered_error.npos)
+        {
+          size_t additional_begin =
+            filtered_error.find("Additional", function_begin);
+          filtered_error = filtered_error.substr(0, function_begin) + '\n' +
+                           filtered_error.substr(additional_begin);
+          function_begin = filtered_error.find("in function");
+        }
+      deallog << filtered_error;
 
       // Check that the deprecated entries are still accessible.
       prm.enter_subsection("Testing");
