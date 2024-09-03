@@ -19,6 +19,8 @@
 
 #include <boost/serialization/utility.hpp>
 
+#include <algorithm>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
@@ -437,14 +439,13 @@ namespace Utilities
 
           Assert(size > 0, ExcNotImplemented());
 
-          dofs_per_process = (size + n_procs - 1) / n_procs;
-          if (dofs_per_process < range_minimum_grain_size)
-            {
-              dofs_per_process  = range_minimum_grain_size;
-              stride_small_size = dofs_per_process * n_procs / size;
-            }
-          else
-            stride_small_size = 1;
+          dofs_per_process =
+            std::max<types::global_dof_index>((size + n_procs - 1) / n_procs,
+                                              range_minimum_grain_size);
+
+          stride_small_size =
+            std::max<unsigned int>(dofs_per_process * n_procs / size, 1);
+
           local_range.first  = get_index_offset(my_rank);
           local_range.second = get_index_offset(my_rank + 1);
 
