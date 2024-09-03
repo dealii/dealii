@@ -1138,6 +1138,11 @@ namespace Step75
   // which will then output all information. Output of local quantities is
   // limited to the first 8 processes to avoid cluttering the terminal.
   //
+  // On all other processes, the containers for the collected data remain empty.
+  // To ensure that we do not access invalid memory with the insertion operator
+  // (`<<`) on these processes, we need to check that the containers are not
+  // empty.
+  //
   // Furthermore, we would like to print the frequencies of the polynomial
   // degrees in the numerical discretization. Since this information is only
   // stored locally, we will count the finite elements on locally owned cells
@@ -1160,7 +1165,8 @@ namespace Step75
         Utilities::MPI::gather(mpi_communicator,
                                triangulation.n_locally_owned_active_cells());
       for (unsigned int i = 0; i < first_n_processes; ++i)
-        pcout << ' ' << n_active_cells_per_subdomain[i];
+        if (n_active_cells_per_subdomain.size() > 0)
+          pcout << ' ' << n_active_cells_per_subdomain[i];
       if (output_cropped)
         pcout << " ...";
       pcout << std::endl;
@@ -1175,7 +1181,8 @@ namespace Step75
         Utilities::MPI::gather(mpi_communicator,
                                dof_handler.n_locally_owned_dofs());
       for (unsigned int i = 0; i < first_n_processes; ++i)
-        pcout << ' ' << n_dofs_per_subdomain[i];
+        if (n_dofs_per_subdomain.size() > 0)
+          pcout << ' ' << n_dofs_per_subdomain[i];
       if (output_cropped)
         pcout << " ...";
       pcout << std::endl;
@@ -1192,7 +1199,8 @@ namespace Step75
             << std::endl
             << "     by partition:              ";
       for (unsigned int i = 0; i < first_n_processes; ++i)
-        pcout << ' ' << n_constraints_per_subdomain[i];
+        if (n_constraints_per_subdomain.size() > 0)
+          pcout << ' ' << n_constraints_per_subdomain[i];
       if (output_cropped)
         pcout << " ...";
       pcout << std::endl;
