@@ -323,13 +323,13 @@ namespace internal
     // First define a helper function that sorts and normalizes the constraints
     // provided through the function's argument:
     const auto sort_and_make_unique =
-      [](std::vector<ConstraintLine> &locally_relevant_constraints) {
-        if (locally_relevant_constraints.empty())
+      [](std::vector<ConstraintLine> &constraints) {
+        if (constraints.empty())
           return;
 
         // First sort the array of constraints by their index:
-        std::sort(locally_relevant_constraints.begin(),
-                  locally_relevant_constraints.end(),
+        std::sort(constraints.begin(),
+                  constraints.end(),
                   [](const ConstraintLine &l1, const ConstraintLine &l2) {
                     return l1.index < l2.index;
                   });
@@ -344,16 +344,16 @@ namespace internal
         // point, we just don't know yet. We deal with this by simply
         // dropping constraints for DoFs for which there is a previous
         // constraint in the list:
-        locally_relevant_constraints.erase(
-          std::unique(locally_relevant_constraints.begin(),
-                      locally_relevant_constraints.end(),
-                      [](const ConstraintLine &a, const ConstraintLine &b) {
-                        return (a.index == b.index);
-                      }),
-          locally_relevant_constraints.end());
+        constraints.erase(std::unique(constraints.begin(),
+                                      constraints.end(),
+                                      [](const ConstraintLine &a,
+                                         const ConstraintLine &b) {
+                                        return (a.index == b.index);
+                                      }),
+                          constraints.end());
 
         // For those constraints that survive, sort the right hand side arrays:
-        for (ConstraintLine &entry : locally_relevant_constraints)
+        for (ConstraintLine &entry : constraints)
           std::sort(entry.entries.begin(),
                     entry.entries.end(),
                     [](const auto &l1, const auto &l2) {
