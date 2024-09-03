@@ -14,8 +14,10 @@
 
 
 
-// test AffineConstraints<double>::make_consistent_in_parallel for case
-// where constraints need to be combined between different ranks
+// test AffineConstraints<double>::make_consistent_in_parallel for a
+// case where each process owns one DoF and on each process p>0 we
+// know about one constraint that constrains X_p=0.5*X_{p-1}. After making
+// things consistent in parallel, this needs to all reduce to X_p=factor*X1.
 
 #include <deal.II/base/mpi.h>
 
@@ -32,38 +34,26 @@ main(int argc, char **argv)
   const unsigned int my_proc = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  AssertThrow(n_procs == 3, ExcMessage("Only working on 3 ranks"));
+  const unsigned int n_indices = n_procs;
+  IndexSet           owned_elements(n_indices);
+  owned_elements.add_index(my_proc);
+  IndexSet relevant_elements(n_indices);
+  relevant_elements.add_index(my_proc);
+  if (my_proc > 0)
+    relevant_elements.add_index(my_proc - 1);
+  AffineConstraints<double> constraints(owned_elements, relevant_elements);
 
-  const unsigned int        n_indices = 5;
-  IndexSet                  owned_elements(n_indices);
-  IndexSet                  relevant_elements(n_indices);
-  AffineConstraints<double> constraints;
-  if (my_proc == 0)
-    {
-      owned_elements.add_index(0);
-      relevant_elements.add_range(0, 3);
-      constraints.reinit(owned_elements, relevant_elements);
-    }
-  else if (my_proc == 1)
-    {
-      owned_elements.add_range(1, 3);
-      relevant_elements.add_range(0, n_indices);
-      constraints.reinit(owned_elements, relevant_elements);
-      constraints.add_constraint(0, {{1, 0.5}, {2, 0.5}});
-      constraints.add_constraint(2, {{3, 1.5}});
-    }
-  else if (my_proc == 2)
-    {
-      owned_elements.add_range(3, n_indices);
-      relevant_elements.add_range(0, n_indices);
-      constraints.reinit(owned_elements, relevant_elements);
-      constraints.add_constraint(0, {{1, 0.5}, {3, 0.75}});
-    }
+  if (my_proc > 0)
+    constraints.add_constraint(my_proc, {{my_proc - 1, 0.5}});
+
+  deallog << "Constraints as created:" << std::endl;
+  constraints.print(deallog.get_file_stream());
 
   constraints.make_consistent_in_parallel(owned_elements,
                                           relevant_elements,
                                           MPI_COMM_WORLD);
-  constraints.close();
+
+  deallog << "Constraints as made consistent:" << std::endl;
   constraints.print(deallog.get_file_stream());
 
   return 0;
