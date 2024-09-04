@@ -1076,7 +1076,17 @@ template <int dim, int spacedim>
 bool
 FiniteElement<dim, spacedim>::has_generalized_support_points() const
 {
-  return (get_generalized_support_points().size() != 0);
+  if (this->dofs_per_cell > 0)
+    return (get_generalized_support_points().size() != 0);
+  else
+    {
+      // If the FE has no DoFs, the array size should be zero:
+      AssertDimension(get_generalized_support_points().size(), 0);
+
+      // A finite element without DoFs *has* generalized support points
+      // (which is then an empty array)
+      return true;
+    }
 }
 
 
@@ -1117,8 +1127,18 @@ bool
 FiniteElement<dim, spacedim>::has_face_support_points(
   const unsigned int face_no) const
 {
-  return (unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-            .size() != 0);
+  const unsigned int face_index = this->n_unique_faces() == 1 ? 0 : face_no;
+  if (this->n_dofs_per_face(face_index) > 0)
+    return (unit_face_support_points[face_index].size() != 0);
+  else
+    {
+      // If the FE has no DoFs on face, the array size should be zero
+      AssertDimension(unit_face_support_points[face_index].size(), 0);
+
+      // A finite element without DoFs *has* face support points
+      // (which is then an empty array)
+      return true;
+    }
 }
 
 
