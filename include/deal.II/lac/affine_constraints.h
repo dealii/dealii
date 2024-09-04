@@ -2025,7 +2025,7 @@ public:
    *
    * At the end of this function, the current object
    * only stores constraints for degrees of freedom whose indices are
-   * listed in the second argument. In other words, while
+   * listed in @p constraints_to_make_consistent. In other words, while
    * DoFTools::make_hanging_node_constraints() may compute constraints
    * also for degrees of freedom at the interface between two ghost cells
    * (these DoFs are locally *relevant*), if you pass as second argument only
