@@ -24,28 +24,35 @@
 set(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
 set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 
+# silence a warning when including FindKOKKOS.cmake
+set(CMAKE_CXX_EXTENSIONS OFF)
+find_package(Kokkos 3.7.0 QUIET
+  HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
+  )
 
-if(DEAL_II_TRILINOS_WITH_KOKKOS OR DEAL_II_PETSC_WITH_KOKKOS)
-  # Let ArborX know that we have found Kokkos
-  set(Kokkos_FOUND ON)
-  # Let deal.II know that we have found Kokkos
-  set(KOKKOS_FOUND ON)
-else()
-  # silence a warning when including FindKOKKOS.cmake
-  set(CMAKE_CXX_EXTENSIONS OFF)
-  find_package(Kokkos 3.7.0 QUIET
-    HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
-    )
+set(KOKKOS_FOUND ${Kokkos_FOUND})
 
-  set(KOKKOS_FOUND ${Kokkos_FOUND})
+set(_target Kokkos::kokkos)
+process_feature(KOKKOS
+  TARGETS REQUIRED _target
+  )
 
-  set(_target Kokkos::kokkos)
-  process_feature(KOKKOS
-    TARGETS REQUIRED _target
-    )
+if(DEAL_II_TRILINOS_WITH_KOKKOS AND NOT Kokkos_FOUND)
+  message(FATAL_ERROR "\n"
+    "Trilinos is configured with Kokkos, but we could not find the "
+    "Kokkos installation. Please provide the location via KOKKOS_DIR.")
 endif()
 
+if(DEAL_II_PETSC_WITH_KOKKOS AND NOT Kokkos_FOUND)
+  message(FATAL_ERROR "\n"
+    "PETSc is configured with Kokkos, but we could not find the "
+    "Kokkos installation. Please provide the location via KOKKOS_DIR.")
+endif()
 
+# TODO: We should verify that the installation used by PETSc/Trilinos is
+# the same one we found.
+
+# GPU support
 if(Kokkos_FOUND)
   if(Kokkos_ENABLE_CUDA)
     # We need to disable SIMD vectorization for CUDA device code.
