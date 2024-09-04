@@ -321,6 +321,34 @@ namespace Threads
       DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>));
 
     /**
+     * Instead of letting a task compute the object stored by this
+     * instance of Lazy, just copy the object passed as an argument
+     * and use it instead.
+     *
+     * As for several other member functions, this function can only be called
+     * if there is not currently a running task whose result is supposed to
+     * be used.
+     */
+    void
+    emplace_object(const T &t)
+      DEAL_II_CXX20_REQUIRES((std::is_copy_constructible_v<T> ||
+                              std::is_copy_assignable_v<T>));
+
+    /**
+     * Instead of letting a task compute the object stored by this
+     * instance of Lazy, just move the object passed as an argument
+     * and use it instead.
+     *
+     * As for several other member functions, this function can only be called
+     * if there is not currently a running task whose result is supposed to
+     * be used.
+     */
+    void
+    emplace_object(T &&t)
+      DEAL_II_CXX20_REQUIRES((std::is_copy_constructible_v<T> ||
+                              std::is_copy_assignable_v<T>));
+
+    /**
      * Reset the current object to a state as if it had been
      * default-constructed. For the same reasons as outlined
      * in the documentation of the destructor and of the
@@ -497,6 +525,30 @@ namespace Threads
     }
   }
 
+
+
+  template <typename T>
+  inline void
+  TaskResult<T>::emplace_object(const T &t)
+    DEAL_II_CXX20_REQUIRES((std::is_copy_constructible_v<T> ||
+                            std::is_copy_assignable_v<T>))
+  {
+    clear();
+    task_result         = t;
+    result_is_available = true;
+  }
+
+
+  template <typename T>
+  inline void
+  TaskResult<T>::emplace_object(T &&t)
+    DEAL_II_CXX20_REQUIRES((std::is_copy_constructible_v<T> ||
+                            std::is_copy_assignable_v<T>))
+  {
+    clear();
+    task_result         = std::move(t);
+    result_is_available = true;
+  }
 
 
   template <typename T>
