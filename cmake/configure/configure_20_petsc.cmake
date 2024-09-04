@@ -82,7 +82,7 @@ macro(feature_petsc_find_external var)
       set(${var} FALSE)
     endif()
 
-    if(DEAL_II_PETSC_WITH_KOKKOS)
+    if(PETSC_WITH_KOKKOS)
       if(DEAL_II_FORCE_BUNDLED_KOKKOS)
         set(PETSC_ADDITIONAL_ERROR_STRING
           ${PETSC_ADDITIONAL_ERROR_STRING}
