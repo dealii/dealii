@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2018 - 2023 by the deal.II authors
+// Copyright (C) 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,9 +13,44 @@
 // ------------------------------------------------------------------------
 
 
+// Test AffineConstraints::make_consistent_in_parallel() for the case where
+// constraints need to be combined between different ranks. We consider the
+// following tricky hp-scenario on two MPI processes:
+//
+//   subd 0 | subd 1
+//          |
+//  +---+---+---+---+
+//  |   |   |   |   |
+//  | 2 | 3 | 3 | 2 |
+//  |   |   |   |   |
+//  +---X-+-+-+-+---+
+//  |   |2|2|2|2|   |
+//  | 2 +-+-+-+-+ 2 |
+//  |   |2|2|2|2|   |
+//  +---+-+-+-+-+---+
+//          |
+//   subd 0 | subd 1
+//
+// Consider the edge marked with 'X'; in particular, DoFs 63 and 64 which solely
+// belong to the Q3 element and are hanging nodes on that edge.
+//
+// The DoFs of the Q3 element are constrained against the coarse Q2 elements.
+// The DoFs of the fine Q2 elements are also constrained against the coarse Q2
+// elements. DoFTools::make_hanging_node_constraints() resolves these
+// constraints correctly, and they are correct for process 0 on subdomain 0.
+//
+// From the point of view of process 1, the coarse Q2 elements on subdomain 0
+// are artificial and their DoFs are thus not part of its locally relevant DoFs.
+// Hence for the given context, DoFTools::make_hanging_node_constraints()
+// constrains the DoFs of the Q3 element against the fine Q2 elements.
+// As process 1 does not know about the coarse Q2 elements, i.e., for the given
+// LOCAL context on process 1, these are indeed the correct constraints.
+//
+// However in the GLOBAL context, the constraints are wrong on process 1.
+// They are only assembled correctly on process 0. Thus, we need
+// AffineConstraints::make_consistent_in_parallel() to distribute these
+// constraints correctly.
 
-// test AffineConstraints<double>::make_consistent_in_parallel for case
-// where constraints need to be combined between different ranks
 
 #include <deal.II/distributed/tria.h>
 
@@ -31,94 +66,141 @@
 
 #include <deal.II/lac/affine_constraints.h>
 
+#include <deal.II/numerics/data_out.h>
+
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test()
 {
-  static const int dim      = 3;
-  static const int spacedim = 3;
+  constexpr int dim      = 3;
+  constexpr int spacedim = 3;
 
+  // set up grid
   parallel::distributed::Triangulation<dim, spacedim> triangulation(
     MPI_COMM_WORLD);
+  {
+    std::vector<unsigned int> repetitions({4, 2, 1});
+    Point<dim>                bottom_left(-2, -1, 0);
+    Point<dim>                top_right(2, 1, 1);
+
+    GridGenerator::subdivided_hyper_rectangle(triangulation,
+                                              repetitions,
+                                              bottom_left,
+                                              top_right);
+  }
+
+  // set up hp-refinement in center part
   DoFHandler<dim, spacedim> dof_handler(triangulation);
+  {
+    for (const auto &cell : dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      {
+        const auto &center = cell->center();
+        if (std::abs(center[0]) < 1.)
+          {
+            if (center[1] > 0.)
+              cell->set_active_fe_index(1);
+            else
+              cell->set_refine_flag();
+          }
+      }
+    triangulation.execute_coarsening_and_refinement();
+  }
 
+  // enumerate dofs
   hp::FECollection<dim, spacedim> fe_collection;
+  {
+    fe_collection.push_back(FE_Q<dim, spacedim>(2));
+    fe_collection.push_back(FE_Q<dim, spacedim>(3));
+    dof_handler.distribute_dofs(fe_collection);
+  }
 
-  IndexSet locally_active_dofs;
-  IndexSet locally_relevant_dofs;
+#if false
+  // output vtu
+  DataOut<dim, spacedim> data_out;
+  {
+    Vector<float> fe_degrees(triangulation.n_active_cells());
+    for (const auto &cell : dof_handler.active_cell_iterators() |
+                              IteratorFilters::LocallyOwnedCell())
+      fe_degrees(cell->active_cell_index()) = cell->get_fe().degree;
 
-  std::vector<unsigned int> repetitions({4, 2, 1});
-  Point<dim>                bottom_left(-2, -1, 0);
-  Point<dim>                top_right(2, 1, 1);
+    Vector<float> subdomain(triangulation.n_active_cells());
+    for (auto &subd : subdomain)
+      subd = triangulation.locally_owned_subdomain();
 
-  GridGenerator::subdivided_hyper_rectangle(triangulation,
-                                            repetitions,
-                                            bottom_left,
-                                            top_right);
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(fe_degrees, "fe_degrees");
+    data_out.add_data_vector(subdomain, "subdomain");
+    data_out.build_patches();
 
-  // hp-refine center part
-  for (const auto &cell : dof_handler.active_cell_iterators() |
-                            IteratorFilters::LocallyOwnedCell())
-    {
-      cell->set_active_fe_index(1);
+    data_out.write_vtu_in_parallel("output.vtu",
+                                   dof_handler.get_mpi_communicator());
+  }
+#endif
 
-      const auto &center = cell->center();
-      if (std::abs(center[0]) < 1.)
+  // miscellaneous
+  const auto show_constraints_63_64 =
+    [&](const AffineConstraints<double> &constraints) {
+      const unsigned int my_id =
+        Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+      for (const unsigned int dof : {63, 64})
         {
-          if (center[1] > 0.)
-            cell->set_active_fe_index(2);
-          else
-            cell->set_refine_flag();
+          deallog << "What process " << my_id << " believes about DoF " << dof
+                  << ":" << std::endl;
+          for (const auto &c : constraints.get_lines())
+            if (c.index == dof)
+              for (const auto &entry : c.entries)
+                deallog << "    constrained against " << entry.first
+                        << " with weight " << entry.second << std::endl;
         }
-    }
-
-  triangulation.execute_coarsening_and_refinement();
-
-  // set dofs
-  for (unsigned int degree = 1; degree <= 10; ++degree)
-    fe_collection.push_back(FE_Q<dim>(degree));
-  dof_handler.distribute_dofs(fe_collection);
+    };
 
   const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-  locally_active_dofs   = DoFTools::extract_locally_active_dofs(dof_handler);
-  locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_handler);
-  AffineConstraints<double> constraints(locally_owned_dofs,
-                                        locally_relevant_dofs);
+  const IndexSet  locally_active_dofs =
+    DoFTools::extract_locally_active_dofs(dof_handler);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-  const auto show_constraints_63_64 = [&]() {
-    deallog << "What process "
-            << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-            << " believes about DoF 63:" << std::endl;
-    for (const auto &c : constraints.get_lines())
-      if (c.index == 63)
-        for (const auto &entry : c.entries)
-          deallog << "    constrained against " << entry.first
-                  << " with weight " << entry.second << std::endl;
-    deallog << "What process "
-            << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-            << " believes about DoF 64:" << std::endl;
-    for (const auto &c : constraints.get_lines())
-      if (c.index == 64)
-        for (const auto &entry : c.entries)
-          deallog << "    constrained against " << entry.first
-                  << " with weight " << entry.second << std::endl;
-  };
+  // make hanging node constraints
+  AffineConstraints<double> constraints;
+  {
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
+    deallog << "------------- make_hanging_node_constraints():" << std::endl;
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    show_constraints_63_64(constraints);
+  }
 
-  deallog << "------------- make_hanging_node_constraints():" << std::endl;
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-  show_constraints_63_64();
+  // make consistent in parallel on locally active dofs
+  AffineConstraints<double> constraints_active;
+  {
+    constraints_active.copy_from(constraints);
 
-  deallog << "------------- make_consistent_in_parallel():" << std::endl;
-  constraints.make_consistent_in_parallel(locally_owned_dofs,
-                                          locally_relevant_dofs,
-                                          dof_handler.get_communicator());
-  show_constraints_63_64();
+    deallog << "------------- make_consistent_in_parallel() "
+            << "on locally active dofs:" << std::endl;
+    constraints_active.make_consistent_in_parallel(
+      locally_owned_dofs,
+      locally_active_dofs,
+      dof_handler.get_mpi_communicator());
+    show_constraints_63_64(constraints_active);
+  }
+
+  // make consistent in parallel on locally relevant dofs
+  AffineConstraints<double> constraints_relevant;
+  {
+    constraints_relevant.copy_from(constraints);
+
+    deallog << "------------- make_consistent_in_parallel() "
+            << "on locally relevant dofs:" << std::endl;
+    constraints_relevant.make_consistent_in_parallel(
+      locally_owned_dofs,
+      locally_relevant_dofs,
+      dof_handler.get_mpi_communicator());
+    show_constraints_63_64(constraints_relevant);
+  }
 }
-
 
 
 int
