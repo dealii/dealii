@@ -4,19 +4,19 @@ subsection Heat Equation
   set Mesh adaptation frequency      = 10
 
   subsection Right hand side
-    set Function constants  = 
+    set Function constants  =
     set Function expression = 0
     set Variable names      = x,y,t
   end
-  
+
   subsection Initial value
-    set Function constants  = 
+    set Function constants  =
     set Function expression = 0
     set Variable names      = x,y,t
   end
-  
+
   subsection Boundary values
-    set Function constants  = 
+    set Function constants  =
     set Function expression = (if(x<-0.999, 1, 0) + if(x>0.999, -1, 0)) * cos(4*pi*t)
     set Variable names      = x,y,t
   end
@@ -28,7 +28,7 @@ subsection Heat Equation
       set initial time            = 0
       set match final time        = false
       set maximum number of steps = -1
-      set options prefix          = 
+      set options prefix          =
       set solver type             = beuler
     end
 
@@ -39,6 +39,6 @@ subsection Heat Equation
       set ignore algebraic lte     = true
       set maximum step size        = -1
       set minimum step size        = -1
-    end    
+    end
   end
 end
