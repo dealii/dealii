@@ -3145,7 +3145,7 @@ namespace GridTools
                 // this line has children
                 cell->face(face)->child(0)->vertex(1) =
                   (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)) /
-                  2;
+                  2.0;
               }
       }
     else if (dim == 3)
@@ -3158,29 +3158,51 @@ namespace GridTools
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
-                Assert(cell->reference_cell() ==
-                         ReferenceCells::get_hypercube<dim>(),
-                       ExcNotImplemented());
+                if (static_cast<uint8_t>(cell->face(face)->refinement_case()) ==
+                    RefinementCase<dim - 1>::isotropic_refinement)
+                  {
+                    Assert(cell->reference_cell() ==
+                             ReferenceCells::get_hypercube<dim>(),
+                           ExcNotImplemented());
 
-                // this face has hanging nodes
-                cell->face(face)->child(0)->vertex(1) =
-                  (cell->face(face)->vertex(0) + cell->face(face)->vertex(1)) /
-                  2.0;
-                cell->face(face)->child(0)->vertex(2) =
-                  (cell->face(face)->vertex(0) + cell->face(face)->vertex(2)) /
-                  2.0;
-                cell->face(face)->child(1)->vertex(3) =
-                  (cell->face(face)->vertex(1) + cell->face(face)->vertex(3)) /
-                  2.0;
-                cell->face(face)->child(2)->vertex(3) =
-                  (cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) /
-                  2.0;
+                    // this face has hanging nodes
+                    cell->face(face)->child(0)->vertex(1) =
+                      (cell->face(face)->vertex(0) +
+                       cell->face(face)->vertex(1)) /
+                      2.0;
+                    cell->face(face)->child(0)->vertex(2) =
+                      (cell->face(face)->vertex(0) +
+                       cell->face(face)->vertex(2)) /
+                      2.0;
+                    cell->face(face)->child(1)->vertex(3) =
+                      (cell->face(face)->vertex(1) +
+                       cell->face(face)->vertex(3)) /
+                      2.0;
+                    cell->face(face)->child(2)->vertex(3) =
+                      (cell->face(face)->vertex(2) +
+                       cell->face(face)->vertex(3)) /
+                      2.0;
 
-                // center of the face
-                cell->face(face)->child(0)->vertex(3) =
-                  (cell->face(face)->vertex(0) + cell->face(face)->vertex(1) +
-                   cell->face(face)->vertex(2) + cell->face(face)->vertex(3)) /
-                  4.0;
+                    // center of the face
+                    cell->face(face)->child(0)->vertex(3) =
+                      (cell->face(face)->vertex(0) +
+                       cell->face(face)->vertex(1) +
+                       cell->face(face)->vertex(2) +
+                       cell->face(face)->vertex(3)) /
+                      4.0;
+                  }
+                else
+                  {
+                    // Special case for anisotropic refinement
+                    for (unsigned int line = 0;
+                         line < GeometryInfo<dim - 1>::faces_per_cell;
+                         line++)
+                      if (cell->face(face)->line(line)->has_children())
+                        cell->face(face)->line(line)->child(0)->vertex(1) =
+                          (cell->face(face)->line(line)->vertex(0) +
+                           cell->face(face)->line(line)->vertex(1)) /
+                          2.0;
+                  }
               }
       }
 
