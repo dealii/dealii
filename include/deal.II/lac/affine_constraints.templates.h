@@ -317,7 +317,7 @@ namespace internal
     (void)mpi_communicator;
 #else
 
-    const unsigned int my_rank =
+    [[maybe_unused]] const unsigned int my_rank =
       Utilities::MPI::this_mpi_process(mpi_communicator);
 
     // First define a helper function that sorts and normalizes the constraints
