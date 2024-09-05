@@ -366,15 +366,15 @@ namespace internal
     {
       std::vector<types::global_dof_index> indices;
       indices.reserve(constraints_in.n_constraints());
-      for (const auto &line : constraints_in.get_lines())
-        indices.push_back(line.index);
+      for (const ConstraintLine &line : constraints_in.get_lines())
+        if (locally_owned_dofs.is_element(line.index) == false)
+          indices.push_back(line.index);
       std::sort(indices.begin(), indices.end());
       my_constraint_indices.add_indices(indices.begin(), indices.end());
     }
 
-    // step 1: Identify the owners of DoFs we know to be constrained.
-    //         Of course, we are likely to own a good share of the DoFs
-    //         we know to be constrained -- and that is ok.
+    // step 1: Identify the owners of DoFs we know to be constrained but do
+    //         not own.
     std::vector<unsigned int> owners_of_my_constraints(
       my_constraint_indices.n_elements());
     Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
@@ -398,33 +398,41 @@ namespace internal
     {
       std::map<unsigned int, std::vector<ConstraintLine>> send_data;
 
-      for (unsigned int i = 0; i < owners_of_my_constraints.size(); ++i)
+      // For each constraint we know of but owned by another process, create a
+      // copy of the constraint and add it to the list of things to send to
+      // other processes:
+      for (unsigned int constraint_index = 0;
+           constraint_index < owners_of_my_constraints.size();
+           ++constraint_index)
         {
           ConstraintLine entry;
 
           const types::global_dof_index index =
-            my_constraint_indices.nth_index_in_set(i);
+            my_constraint_indices.nth_index_in_set(constraint_index);
 
           entry.index = index;
-
-          if (constraints_in.is_inhomogeneously_constrained(index))
-            entry.inhomogeneity = constraints_in.get_inhomogeneity(index);
-
           if (const std::vector<std::pair<types::global_dof_index, number>>
                 *constraints = constraints_in.get_constraint_entries(index))
             entry.entries = *constraints;
+          entry.inhomogeneity = constraints_in.get_inhomogeneity(index);
 
-          if (owners_of_my_constraints[i] == my_rank)
-            locally_relevant_constraints.push_back(entry);
-          else
-            send_data[owners_of_my_constraints[i]].push_back(entry);
+
+          Assert(owners_of_my_constraints[constraint_index] != my_rank,
+                 ExcInternalError());
+          send_data[owners_of_my_constraints[constraint_index]].push_back(
+            entry);
         }
 
       // Now exchange this data between processes:
       const std::map<unsigned int, std::vector<ConstraintLine>> received_data =
         Utilities::MPI::some_to_some(mpi_communicator, send_data);
 
-      // Finally collate everything into one array, sort, and make it unique:
+      // Finally join things with the constraints we know about and own
+      // ourselves, collate everything we received into one array, sort,
+      // and make it unique:
+      for (const ConstraintLine &line : constraints_in.get_lines())
+        if (locally_owned_dofs.is_element(line.index))
+          locally_relevant_constraints.push_back(line);
       for (const auto &[rank, constraints] : received_data)
         locally_relevant_constraints.insert(locally_relevant_constraints.end(),
                                             constraints.begin(),
