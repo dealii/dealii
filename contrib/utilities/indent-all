@@ -74,12 +74,12 @@ process "source" ".*\.inst.in" format_inst
 process "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|inst.in|output.*|cmake)" fix_permissions
 
-process "doc/news/*/*" "[A-Za-z0-9]*" fix_permissions
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" fix_permissions
 
 process "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|inst.in|cmake)" dos_to_unix
 
-process "doc/news/*/*" "[A-Za-z0-9]*" dos_to_unix
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" dos_to_unix
 
 #
 # Removing trailing whitespace
@@ -88,7 +88,7 @@ process "doc/news/*/*" "[A-Za-z0-9]*" dos_to_unix
 process "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|html|dox|txt)" remove_trailing_whitespace
 
-process "doc/news/*/*" "[A-Za-z0-9]*" remove_trailing_whitespace
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" remove_trailing_whitespace
 
 #
 # Ensure only a single newline at end of files
@@ -97,4 +97,4 @@ process "doc/news/*/*" "[A-Za-z0-9]*" remove_trailing_whitespace
 process "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|html|dox|txt)" ensure_single_trailing_newline
 
-process "doc/news/*/*" "[A-Za-z0-9]*" ensure_single_trailing_newline
+process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" ensure_single_trailing_newline
