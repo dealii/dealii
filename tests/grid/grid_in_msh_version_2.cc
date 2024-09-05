@@ -51,6 +51,8 @@ filename_resolution()
                 GridIn<2>::msh);
   check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_2/hole8170.msh"),
                 GridIn<2>::msh);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_2/hole81_commented.msh"),
+                GridIn<2>::msh);
 }
 
 
