@@ -296,6 +296,54 @@ AffineConstraints<number>::is_consistent_in_parallel(
 
 namespace internal
 {
+  // A helper function that sorts and normalizes the constraints
+  // provided through the function's argument:
+  template <typename number>
+  void
+  sort_and_make_unique(
+    std::vector<typename dealii::AffineConstraints<number>::ConstraintLine>
+      &constraints)
+  {
+    using ConstraintLine =
+      typename dealii::AffineConstraints<number>::ConstraintLine;
+
+    if (constraints.empty())
+      return;
+
+    // First sort the array of constraints by their index:
+    std::sort(constraints.begin(),
+              constraints.end(),
+              [](const ConstraintLine &l1, const ConstraintLine &l2) {
+                return l1.index < l2.index;
+              });
+
+    // It is possible that two processes have computed constraints
+    // for the same DoF differently (for example, in parallel because
+    // they have visited different faces of the same cell because
+    // on different processes, different neighbor cells are artificial.
+    //
+    // This is ok, as long as after resolution of all chains of
+    // constraints we end up with the same constraint. But at this
+    // point, we just don't know yet. We deal with this by simply
+    // dropping constraints for DoFs for which there is a previous
+    // constraint in the list:
+    constraints.erase(std::unique(constraints.begin(),
+                                  constraints.end(),
+                                  [](const ConstraintLine &a,
+                                     const ConstraintLine &b) {
+                                    return (a.index == b.index);
+                                  }),
+                      constraints.end());
+
+    // For those constraints that survive, sort the right hand side arrays:
+    for (ConstraintLine &entry : constraints)
+      std::sort(entry.entries.begin(),
+                entry.entries.end(),
+                [](const auto &l1, const auto &l2) {
+                  return l1.first < l2.first;
+                });
+  }
+
   template <typename number>
   std::vector<typename dealii::AffineConstraints<number>::ConstraintLine>
   compute_locally_relevant_constraints(
@@ -319,47 +367,6 @@ namespace internal
 
     [[maybe_unused]] const unsigned int my_rank =
       Utilities::MPI::this_mpi_process(mpi_communicator);
-
-    // First define a helper function that sorts and normalizes the constraints
-    // provided through the function's argument:
-    const auto sort_and_make_unique =
-      [](std::vector<ConstraintLine> &constraints) {
-        if (constraints.empty())
-          return;
-
-        // First sort the array of constraints by their index:
-        std::sort(constraints.begin(),
-                  constraints.end(),
-                  [](const ConstraintLine &l1, const ConstraintLine &l2) {
-                    return l1.index < l2.index;
-                  });
-
-        // It is possible that two processes have computed constraints
-        // for the same DoF differently (for example, in parallel because
-        // they have visited different faces of the same cell because
-        // on different processes, different neighbor cells are artificial.
-        //
-        // This is ok, as long as after resolution of all chains of
-        // constraints we end up with the same constraint. But at this
-        // point, we just don't know yet. We deal with this by simply
-        // dropping constraints for DoFs for which there is a previous
-        // constraint in the list:
-        constraints.erase(std::unique(constraints.begin(),
-                                      constraints.end(),
-                                      [](const ConstraintLine &a,
-                                         const ConstraintLine &b) {
-                                        return (a.index == b.index);
-                                      }),
-                          constraints.end());
-
-        // For those constraints that survive, sort the right hand side arrays:
-        for (ConstraintLine &entry : constraints)
-          std::sort(entry.entries.begin(),
-                    entry.entries.end(),
-                    [](const auto &l1, const auto &l2) {
-                      return l1.first < l2.first;
-                    });
-      };
 
     // step 0: Collect the indices of constrained DoFs we know of:
     IndexSet my_constraint_indices(locally_owned_dofs.size());
@@ -438,7 +445,7 @@ namespace internal
                                             constraints.begin(),
                                             constraints.end());
 
-      sort_and_make_unique(locally_relevant_constraints);
+      sort_and_make_unique<number>(locally_relevant_constraints);
     }
 
     // step 3: communicate constraints so that each process knows how the
@@ -502,7 +509,7 @@ namespace internal
                                             constraints.begin(),
                                             constraints.end());
 
-      sort_and_make_unique(locally_relevant_constraints);
+      sort_and_make_unique<number>(locally_relevant_constraints);
     }
 
 #endif
