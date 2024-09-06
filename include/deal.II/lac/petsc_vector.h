@@ -446,7 +446,7 @@ namespace PETScWrappers
      * @relatesalso PETScWrappers::MPI::Vector
      */
     inline void
-    swap(Vector &u, Vector &v)
+    swap(Vector &u, Vector &v) noexcept
     {
       u.swap(v);
     }

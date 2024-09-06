@@ -185,7 +185,7 @@ namespace Differentiation
       template <typename Number>
       struct SacadoNumberInfo<
         Number,
-        std::enable_if_t<std::is_arithmetic<std::decay_t<Number>>::value>>
+        std::enable_if_t<std::is_arithmetic_v<std::decay_t<Number>>>>
       {
         static const unsigned int n_supported_derivative_levels = 0;
       };
