@@ -2429,20 +2429,20 @@ namespace GridGenerator
    * Perform an Alfeld split (also called barycentric refinement) of a simplex
    * mesh.
    *
-   * @note Currently only implemented for @p dim = 2.
-
-   * This function takes a simplex mesh (@p in_tria) and subdivides each
-   * triangle into three triangles with a single new vertex (the barycenter). In
-   * the process, the simplex mesh is flattened (no hierarchy is kept).
+   * Each simplex cell in the input mesh (given in @p in_tria) is refined into
+   * three (for @p dim = 2) or four (for @p dim = 3) simplices connecting to the
+   * barycenter, which is the only new vertex added for each input cell. In the
+   * process, the simplex mesh is flattened (no hierarchy is kept).
+   *
+   * @note Currently only implemented for @p dim = 2 and hanging nodes are not
+   * supported.
    *
    * @image html alfeld-split.svg
    *
    * The meshes produced by this function can be used for Scott-Vogelius
-   elements
-   * for the Stokes equation: The $P_k - DGP_{k-1}$ element is point-wise
-   divergence
-   * free on barycentric refined meshes for $k\geq 2$ for @p dim = 2 and $k\geq 3$
-   * for @p dim = 3, see @cite Farrell2021.
+   * elements for the Stokes equation: The $P_k - DGP_{k-1}$ element is
+   * point-wise divergence free on barycentric refined meshes for $k\geq 2$
+   * for @p dim = 2 and $k\geq 3$ for @p dim = 3, see @cite Farrell2021.
    *
    * Also see
    * @ref simplex "Simplex support".

@@ -8423,15 +8423,11 @@ namespace GridGenerator
     static const ndarray<unsigned int, 3, 3> table_2D_cell = {
       {{{0, 1, 3}}, {{1, 2, 3}}, {{2, 0, 3}}}};
 
-    /* Boundary-faces 2d:
-     * After converting, each of the 4 quadrilateral faces is defined by faces
-     * of 2 different triangles, i.e., lines. Note that lines are defined by 2
-     * vertices.
-     */
+    // Boundary-faces 2d:
+    // Each face of the original simplex is defined by the following vertices:
     static const ndarray<unsigned int, 4, 2, 2>
       vertex_ids_for_boundary_faces_2d = {
         {{{{{0, 1}}}}, {{{{1, 2}}}}, {{{{2, 0}}}}}};
-
 
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
@@ -8449,12 +8445,18 @@ namespace GridGenerator
     // (ii) create new barycenter vertex location
     for (const auto &cell : ref_tria.cell_iterators())
       {
+        AssertThrow(
+          cell->reference_cell().is_simplex(),
+          ExcMessage(
+            "Cell with invalid ReferenceCell encountered. GridGenerator::alfeld_split_of_simplex_mesh() "
+            "only supports simplex meshes as input."));
+
         // temporary array storing the global indices of each cell entity in the
         // sequence: vertices, edges/faces, cell
-        std::array<unsigned int, dim == 2 ? 4 : 5> local_vertex_indices;
+        std::array<unsigned int, 4> local_vertex_indices;
 
         // (i) copy the existing vertex locations
-        Tensor<1, spacedim> barycenter;
+        Point<spacedim> barycenter;
         for (const auto v : cell->vertex_indices())
           {
             const auto v_global = cell->vertex_index(v);
@@ -8474,7 +8476,7 @@ namespace GridGenerator
 
         // (ii) barycenter:
         local_vertex_indices[3] = vertices.size();
-        vertices.push_back(Point<spacedim>() + barycenter / 3.);
+        vertices.push_back(barycenter / 3.);
 
         // helper function for creating cells and subcells
         const auto add_cell = [&](const unsigned int struct_dim,
@@ -8490,14 +8492,7 @@ namespace GridGenerator
 
           if (struct_dim == dim) // cells
             {
-              if (dim == 2)
-                {
-                  AssertDimension(index_vertices.size(), 3);
-                }
-              else if (dim == 3)
-                {
-                  AssertDimension(index_vertices.size(), 4);
-                }
+              AssertDimension(index_vertices.size(), dim + 1);
 
               CellData<dim> cell_data(index_vertices.size());
               for (unsigned int i = 0; i < index_vertices.size(); ++i)
@@ -8506,11 +8501,10 @@ namespace GridGenerator
                                    local_vertex_indices.size());
                   cell_data.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
-                  cell_data.material_id =
-                    material_or_boundary_id; // inherit material id
-                  cell_data.manifold_id =
-                    manifold_id; // inherit cell-manifold id
                 }
+              cell_data.material_id =
+                material_or_boundary_id;           // inherit material id
+              cell_data.manifold_id = manifold_id; // inherit cell-manifold id
               cells.push_back(cell_data);
             }
           else if (dim == 2 && struct_dim == 1) // an edge of a simplex
