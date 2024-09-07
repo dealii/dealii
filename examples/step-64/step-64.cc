@@ -136,8 +136,21 @@ namespace Step64
       Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
       const int q_point) const;
 
+    DEAL_II_HOST_DEVICE void set_matrix_free_data(
+      const typename Portable::MatrixFree<dim, double>::Data &data)
+    {
+      gpu_data = &data;
+    }
+
+    DEAL_II_HOST_DEVICE void set_cell(int new_cell)
+    {
+      cell = new_cell;
+    }
+
     static const unsigned int n_q_points =
       dealii::Utilities::pow(fe_degree + 1, dim);
+
+    static const unsigned int n_local_dofs = n_q_points;
 
   private:
     const typename Portable::MatrixFree<dim, double>::Data *gpu_data;
@@ -233,7 +246,7 @@ namespace Step64
   // needs to have a `vmult()` function that performs the action of
   // the linear operator on a source vector.
   template <int dim, int fe_degree>
-  class HelmholtzOperator
+  class HelmholtzOperator : public Subscriptor
   {
   public:
     HelmholtzOperator(const DoFHandler<dim>           &dof_handler,
@@ -248,9 +261,25 @@ namespace Step64
       LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &vec)
       const;
 
+    void compute_diagonal();
+
+    std::shared_ptr<DiagonalMatrix<
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+    get_matrix_diagonal_inverse() const;
+
+    types::global_dof_index m() const;
+
+    types::global_dof_index n() const;
+
+    double el(const types::global_dof_index row,
+              const types::global_dof_index col) const;
+
   private:
     Portable::MatrixFree<dim, double>                                mf_data;
     LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef;
+    std::shared_ptr<DiagonalMatrix<
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+      inverse_diagonal_entries;
   };
 
 
@@ -322,6 +351,81 @@ namespace Step64
   {
     mf_data.initialize_dof_vector(vec);
   }
+
+
+
+  template <int dim, int fe_degree>
+  void HelmholtzOperator<dim, fe_degree>::compute_diagonal()
+  {
+    this->inverse_diagonal_entries.reset(
+      new DiagonalMatrix<
+        LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>());
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>
+      &inverse_diagonal = inverse_diagonal_entries->get_vector();
+    initialize_dof_vector(inverse_diagonal);
+
+    HelmholtzOperatorQuad<dim, fe_degree> helmholtz_operator_quad(
+      nullptr, coef.get_values(), -1);
+
+    MatrixFreeTools::compute_diagonal<dim, fe_degree, fe_degree + 1, 0, double>(
+      mf_data,
+      inverse_diagonal,
+      helmholtz_operator_quad,
+      EvaluationFlags::values | EvaluationFlags::gradients,
+      EvaluationFlags::values | EvaluationFlags::gradients);
+
+    double *raw_diagonal = inverse_diagonal.get_values();
+
+    Kokkos::parallel_for(
+      inverse_diagonal.locally_owned_size(), KOKKOS_LAMBDA(int i) {
+        Assert(raw_diagonal[i] > 0.,
+               ExcMessage("No diagonal entry in a positive definite operator "
+                          "should be zero"));
+        raw_diagonal[i] = 1. / raw_diagonal[i];
+      });
+  }
+
+
+
+  template <int dim, int fe_degree>
+  std::shared_ptr<DiagonalMatrix<
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+  HelmholtzOperator<dim, fe_degree>::get_matrix_diagonal_inverse() const
+  {
+    return inverse_diagonal_entries;
+  }
+
+
+
+  template <int dim, int fe_degree>
+  types::global_dof_index HelmholtzOperator<dim, fe_degree>::m() const
+  {
+    return mf_data.get_vector_partitioner()->size();
+  }
+
+
+
+  template <int dim, int fe_degree>
+  types::global_dof_index HelmholtzOperator<dim, fe_degree>::n() const
+  {
+    return mf_data.get_vector_partitioner()->size();
+  }
+
+
+
+  template <int dim, int fe_degree>
+  double
+  HelmholtzOperator<dim, fe_degree>::el(const types::global_dof_index row,
+                                        const types::global_dof_index col) const
+  {
+    (void)col;
+    Assert(row == col, ExcNotImplemented());
+    Assert(inverse_diagonal_entries.get() != nullptr &&
+             inverse_diagonal_entries->m() > 0,
+           ExcNotInitialized());
+    return 1.0 / (*inverse_diagonal_entries)(row, row);
+  }
+
 
 
   // @sect3{Class <code>HelmholtzProblem</code>}
@@ -509,7 +613,20 @@ namespace Step64
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::solve()
   {
-    PreconditionIdentity preconditioner;
+    system_matrix_dev->compute_diagonal();
+
+    using PreconditionerType = PreconditionChebyshev<
+      HelmholtzOperator<dim, fe_degree>,
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>;
+    typename PreconditionerType::AdditionalData additional_data;
+    additional_data.smoothing_range     = 15.;
+    additional_data.degree              = 5;
+    additional_data.eig_cg_n_iterations = 10;
+    additional_data.preconditioner =
+      system_matrix_dev->get_matrix_diagonal_inverse();
+
+    PreconditionerType preconditioner;
+    preconditioner.initialize(*system_matrix_dev, additional_data);
 
     SolverControl solver_control(system_rhs_dev.size(),
                                  1e-12 * system_rhs_dev.l2_norm());
