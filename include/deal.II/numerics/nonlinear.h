@@ -689,15 +689,15 @@ NonlinearSolverSelector<VectorType>::solve(
     }
   else
     {
-      const std::string solvers =
+      const std::string solvers = ""
 #ifdef DEAL_II_WITH_SUNDIALS
-        "kinsol\n"
+                                  "kinsol\n"
 #endif
 #ifdef DEAL_II_TRILINOS_WITH_NOX
-        "NOX\n"
+                                  "NOX\n"
 #endif
 #ifdef DEAL_II_WITH_PETSC
-        "SNES\n"
+                                  "SNES\n"
 #endif
         ;
 
