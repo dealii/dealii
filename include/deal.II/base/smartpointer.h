@@ -243,11 +243,9 @@ public:
 
 private:
   /**
-   * Pointer to the object we want to subscribe to. Since it is often
-   * necessary to follow this pointer when debugging, we have deliberately
-   * chosen a short name.
+   * Pointer to the object we want to subscribe to.
    */
-  T *t;
+  T *pointer;
 
   /**
    * The identification for the subscriptor.
@@ -267,7 +265,7 @@ private:
 
 template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer()
-  : t(nullptr)
+  : pointer(nullptr)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {}
@@ -276,7 +274,7 @@ inline SmartPointer<T, P>::SmartPointer()
 
 template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer(T *t)
-  : t(t)
+  : pointer(t)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {
@@ -288,12 +286,12 @@ inline SmartPointer<T, P>::SmartPointer(T *t)
 
 template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer(T *t, const std::string &id)
-  : t(t)
+  : pointer(t)
   , id(id)
   , pointed_to_object_is_alive(false)
 {
-  if (t != nullptr)
-    t->subscribe(&pointed_to_object_is_alive, id);
+  if (pointer != nullptr)
+    pointer->subscribe(&pointed_to_object_is_alive, id);
 }
 
 
@@ -301,7 +299,7 @@ inline SmartPointer<T, P>::SmartPointer(T *t, const std::string &id)
 template <typename T, typename P>
 template <class Q>
 inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &other)
-  : t(other.t)
+  : pointer(other.pointer)
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
@@ -310,7 +308,7 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &other)
       Assert(other.pointed_to_object_is_alive,
              ExcMessage("You can't copy a smart pointer object that "
                         "is pointing to an object that is no longer alive."));
-      t->subscribe(&pointed_to_object_is_alive, id);
+      pointer->subscribe(&pointed_to_object_is_alive, id);
     }
 }
 
@@ -318,7 +316,7 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &other)
 
 template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &other)
-  : t(other.t)
+  : pointer(other.pointer)
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
@@ -327,7 +325,7 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &other)
       Assert(other.pointed_to_object_is_alive,
              ExcMessage("You can't copy a smart pointer object that "
                         "is pointing to an object that is no longer alive."));
-      t->subscribe(&pointed_to_object_is_alive, id);
+      pointer->subscribe(&pointed_to_object_is_alive, id);
     }
 }
 
@@ -335,7 +333,7 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &other)
 
 template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&other) noexcept
-  : t(other.t)
+  : pointer(other.pointer)
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
@@ -347,7 +345,7 @@ inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&other) noexcept
 
       try
         {
-          t->subscribe(&pointed_to_object_is_alive, id);
+          pointer->subscribe(&pointed_to_object_is_alive, id);
         }
       catch (...)
         {
@@ -369,8 +367,8 @@ inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&other) noexcept
 template <typename T, typename P>
 inline SmartPointer<T, P>::~SmartPointer()
 {
-  if (pointed_to_object_is_alive && t != nullptr)
-    t->unsubscribe(&pointed_to_object_is_alive, id);
+  if (pointed_to_object_is_alive && pointer != nullptr)
+    pointer->unsubscribe(&pointed_to_object_is_alive, id);
 }
 
 
@@ -379,13 +377,13 @@ template <typename T, typename P>
 inline void
 SmartPointer<T, P>::clear()
 {
-  if (pointed_to_object_is_alive && t != nullptr)
+  if (pointed_to_object_is_alive && pointer != nullptr)
     {
-      t->unsubscribe(&pointed_to_object_is_alive, id);
-      delete t;
+      pointer->unsubscribe(&pointed_to_object_is_alive, id);
+      delete pointer;
       Assert(pointed_to_object_is_alive == false, ExcInternalError());
     }
-  t = nullptr;
+  pointer = nullptr;
 }
 
 
@@ -395,17 +393,17 @@ inline SmartPointer<T, P> &
 SmartPointer<T, P>::operator=(T *tt)
 {
   // optimize if no real action is requested
-  if (t == tt)
+  if (pointer == tt)
     return *this;
 
   // Let us unsubscribe from the current object
-  if (pointed_to_object_is_alive && t != nullptr)
-    t->unsubscribe(&pointed_to_object_is_alive, id);
+  if (pointed_to_object_is_alive && pointer != nullptr)
+    pointer->unsubscribe(&pointed_to_object_is_alive, id);
 
   // Then reset to the new object, and subscribe to it
-  t = tt;
+  pointer = tt;
   if (tt != nullptr)
-    t->subscribe(&pointed_to_object_is_alive, id);
+    pointer->subscribe(&pointed_to_object_is_alive, id);
 
   return *this;
 }
@@ -424,17 +422,17 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, Q> &other)
     return *this;
 
   // Let us unsubscribe from the current object
-  if (pointed_to_object_is_alive && t != nullptr)
-    t->unsubscribe(&pointed_to_object_is_alive, id);
+  if (pointed_to_object_is_alive && pointer != nullptr)
+    pointer->unsubscribe(&pointed_to_object_is_alive, id);
 
   // Then reset to the new object, and subscribe to it
-  t = (other != nullptr ? other.get() : nullptr);
+  pointer = (other != nullptr ? other.get() : nullptr);
   if (other != nullptr)
     {
       Assert(other.pointed_to_object_is_alive,
              ExcMessage("You can't copy a smart pointer object that "
                         "is pointing to an object that is no longer alive."));
-      t->subscribe(&pointed_to_object_is_alive, id);
+      pointer->subscribe(&pointed_to_object_is_alive, id);
     }
   return *this;
 }
@@ -452,17 +450,17 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, P> &other)
     return *this;
 
   // Let us unsubscribe from the current object
-  if (pointed_to_object_is_alive && t != nullptr)
-    t->unsubscribe(&pointed_to_object_is_alive, id);
+  if (pointed_to_object_is_alive && pointer != nullptr)
+    pointer->unsubscribe(&pointed_to_object_is_alive, id);
 
   // Then reset to the new object, and subscribe to it
-  t = (other != nullptr ? other.get() : nullptr);
+  pointer = (other != nullptr ? other.get() : nullptr);
   if (other != nullptr)
     {
       Assert(other.pointed_to_object_is_alive,
              ExcMessage("You can't copy a smart pointer object that "
                         "is pointing to an object that is no longer alive."));
-      t->subscribe(&pointed_to_object_is_alive, id);
+      pointer->subscribe(&pointed_to_object_is_alive, id);
     }
   return *this;
 }
@@ -482,17 +480,17 @@ SmartPointer<T, P>::operator=(SmartPointer<T, P> &&other) noexcept
   else if (&other != this)
     {
       // Let us unsubscribe from the current object
-      if (t != nullptr && pointed_to_object_is_alive)
-        t->unsubscribe(&pointed_to_object_is_alive, id);
+      if (pointer != nullptr && pointed_to_object_is_alive)
+        pointer->unsubscribe(&pointed_to_object_is_alive, id);
 
       // Then reset to the new object, and subscribe to it:
       Assert(other.pointed_to_object_is_alive,
              ExcMessage("You can't move a smart pointer object that "
                         "is pointing to an object that is no longer alive."));
-      t = other.get();
+      pointer = other.get();
       try
         {
-          t->subscribe(&pointed_to_object_is_alive, id);
+          pointer->subscribe(&pointed_to_object_is_alive, id);
         }
       catch (...)
         {
@@ -514,7 +512,7 @@ SmartPointer<T, P>::operator=(SmartPointer<T, P> &&other) noexcept
 template <typename T, typename P>
 inline SmartPointer<T, P>::operator T *() const
 {
-  return t;
+  return pointer;
 }
 
 
@@ -523,10 +521,10 @@ template <typename T, typename P>
 inline T &
 SmartPointer<T, P>::operator*() const
 {
-  Assert(t != nullptr, ExcNotInitialized());
+  Assert(pointer != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,
          ExcMessage("The object pointed to is not valid anymore."));
-  return *t;
+  return *pointer;
 }
 
 
@@ -535,10 +533,10 @@ template <typename T, typename P>
 inline T *
 SmartPointer<T, P>::get() const
 {
-  Assert(t != nullptr, ExcNotInitialized());
+  Assert(pointer != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,
          ExcMessage("The object pointed to is not valid anymore."));
-  return t;
+  return pointer;
 }
 
 
@@ -558,11 +556,11 @@ inline void
 SmartPointer<T, P>::swap(SmartPointer<T, Q> &other)
 {
 #ifdef DEBUG
-  SmartPointer<T, P> aux(t, id);
+  SmartPointer<T, P> aux(pointer, id);
   *this = other;
   other = aux;
 #else
-  std::swap(t, other.t);
+  std::swap(pointer, other.pointer);
 #endif
 }
 
@@ -572,13 +570,13 @@ template <typename T, typename P>
 inline void
 SmartPointer<T, P>::swap(T *&ptr)
 {
-  if (pointed_to_object_is_alive && t != nullptr)
-    t->unsubscribe(pointed_to_object_is_alive, id);
+  if (pointed_to_object_is_alive && pointer != nullptr)
+    pointer->unsubscribe(pointed_to_object_is_alive, id);
 
-  std::swap(t, ptr);
+  std::swap(pointer, ptr);
 
-  if (t != nullptr)
-    t->subscribe(pointed_to_object_is_alive, id);
+  if (pointer != nullptr)
+    pointer->subscribe(pointed_to_object_is_alive, id);
 }
 
 
