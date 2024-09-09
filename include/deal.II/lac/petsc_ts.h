@@ -716,8 +716,8 @@ namespace PETScWrappers
     /**
      * Pointers to the internal PETSc matrix objects.
      */
-    SmartPointer<AMatrixType, TimeStepper> A;
-    SmartPointer<PMatrixType, TimeStepper> P;
+    ObserverPointer<AMatrixType, TimeStepper> A;
+    ObserverPointer<PMatrixType, TimeStepper> P;
 
     /**
      * Object to apply solve_with_jacobian.

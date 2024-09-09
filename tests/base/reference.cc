@@ -14,8 +14,8 @@
 
 
 
-// check that SmartPointers preserve constness etc of the objects they
-// point to, through assignment of SmartPointers to each other and
+// check that ObserverPointers preserve constness etc of the objects they
+// point to, through assignment of ObserverPointers to each other and
 // other tests.
 
 
@@ -70,11 +70,11 @@ main()
   Test        a("A");
   const Test &b("B");
 
-  SmartPointer<Test, Test>       r(&a, "Test R");
-  SmartPointer<const Test, Test> s(&a, "const Test S");
-  //  SmartPointer<Test,Test>       t=&b;    // this one should not work
-  SmartPointer<Test, Test>       t(const_cast<Test *>(&b), "Test T");
-  SmartPointer<const Test, Test> u(&b, "const Test");
+  ObserverPointer<Test, Test>       r(&a, "Test R");
+  ObserverPointer<const Test, Test> s(&a, "const Test S");
+  //  ObserverPointer<Test,Test>       t=&b;    // this one should not work
+  ObserverPointer<Test, Test>       t(const_cast<Test *>(&b), "Test T");
+  ObserverPointer<const Test, Test> u(&b, "const Test");
 
 
   deallog << "a ";

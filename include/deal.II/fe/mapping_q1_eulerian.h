@@ -176,14 +176,15 @@ protected:
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VectorType, MappingQ1Eulerian<dim, VectorType, spacedim>>
+  ObserverPointer<const VectorType,
+                  MappingQ1Eulerian<dim, VectorType, spacedim>>
     euler_transform_vectors;
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>,
-               MappingQ1Eulerian<dim, VectorType, spacedim>>
+  ObserverPointer<const DoFHandler<dim, spacedim>,
+                  MappingQ1Eulerian<dim, VectorType, spacedim>>
     shiftmap_dof_handler;
 };
 

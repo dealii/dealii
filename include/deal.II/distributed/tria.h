@@ -1139,7 +1139,7 @@ namespace parallel
       /**
        * The modified parallel::distributed::Triangulation.
        */
-      const SmartPointer<
+      const ObserverPointer<
         dealii::parallel::distributed::Triangulation<dim, spacedim>>
         distributed_tria;
 

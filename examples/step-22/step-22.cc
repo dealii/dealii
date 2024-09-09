@@ -288,8 +288,8 @@ namespace Step22
     void vmult(Vector<double> &dst, const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const MatrixType>         matrix;
-    const SmartPointer<const PreconditionerType> preconditioner;
+    const ObserverPointer<const MatrixType>         matrix;
+    const ObserverPointer<const PreconditionerType> preconditioner;
   };
 
 
@@ -335,7 +335,7 @@ namespace Step22
   // consequence of the definition above, the declaration
   // <code>InverseMatrix</code> now contains the second template parameter for
   // a preconditioner class as above, which affects the
-  // <code>SmartPointer</code> object <code>m_inverse</code> as well.
+  // <code>ObserverPointer</code> object <code>m_inverse</code> as well.
   template <class PreconditionerType>
   class SchurComplement : public Subscriptor
   {
@@ -347,8 +347,8 @@ namespace Step22
     void vmult(Vector<double> &dst, const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
-    const SmartPointer<
+    const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
+    const ObserverPointer<
       const InverseMatrix<SparseMatrix<double>, PreconditionerType>>
       A_inverse;
 

@@ -168,7 +168,7 @@ namespace MeshWorker
 
 
     /// The block structure of the system
-    SmartPointer<const BlockInfo, DoFInfo<dim, spacedim>> block_info;
+    ObserverPointer<const BlockInfo, DoFInfo<dim, spacedim>> block_info;
 
     /**
      * The structure refers to a cell with level data instead of active data.

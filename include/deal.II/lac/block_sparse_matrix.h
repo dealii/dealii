@@ -364,9 +364,9 @@ private:
   /**
    * Pointer to the block sparsity pattern used for this matrix. In order to
    * guarantee that it is not deleted while still in use, we subscribe to it
-   * using the SmartPointer class.
+   * using the ObserverPointer class.
    */
-  SmartPointer<const BlockSparsityPattern, BlockSparseMatrix<number>>
+  ObserverPointer<const BlockSparsityPattern, BlockSparseMatrix<number>>
     sparsity_pattern;
 };
 

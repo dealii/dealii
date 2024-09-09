@@ -39,7 +39,7 @@ main()
   DoFHandler<dim, spacedim> dh(tria);
   dh.distribute_dofs(fe);
 
-  SmartPointer<const FiniteElement<dim, spacedim>> fe_p(&dh.get_fe());
+  ObserverPointer<const FiniteElement<dim, spacedim>> fe_p(&dh.get_fe());
 
   dh.distribute_dofs(*fe_p);
 

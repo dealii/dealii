@@ -250,8 +250,8 @@ private:
   /**
    * This grid shall be used as coarse grid.
    */
-  SmartPointer<const Triangulation<dim, spacedim>,
-               PersistentTriangulation<dim, spacedim>>
+  ObserverPointer<const Triangulation<dim, spacedim>,
+                  PersistentTriangulation<dim, spacedim>>
     coarse_grid;
 
   /**

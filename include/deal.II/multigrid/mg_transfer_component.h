@@ -369,7 +369,7 @@ private:
    * The constraints of the global system.
    */
 public:
-  SmartPointer<const AffineConstraints<double>> constraints;
+  ObserverPointer<const AffineConstraints<double>> constraints;
 };
 
 /** @} */

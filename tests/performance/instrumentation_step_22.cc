@@ -213,8 +213,8 @@ public:
   vmult(Vector<double> &dst, const Vector<double> &src) const;
 
 private:
-  const SmartPointer<const MatrixType>         matrix;
-  const SmartPointer<const PreconditionerType> preconditioner;
+  const ObserverPointer<const MatrixType>         matrix;
+  const ObserverPointer<const PreconditionerType> preconditioner;
 };
 
 
@@ -254,8 +254,8 @@ public:
   vmult(Vector<double> &dst, const Vector<double> &src) const;
 
 private:
-  const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
-  const SmartPointer<
+  const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
+  const ObserverPointer<
     const InverseMatrix<SparseMatrix<double>, PreconditionerType>>
     A_inverse;
 

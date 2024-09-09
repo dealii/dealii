@@ -246,15 +246,15 @@ protected:
    * inverse matrices should not be stored) until the last call of the
    * preconditioning @p vmult function of the derived classes.
    */
-  SmartPointer<const MatrixType,
-               RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
+  ObserverPointer<const MatrixType,
+                  RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
     A;
 
   /**
    * Control information.
    */
-  SmartPointer<const AdditionalData,
-               RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
+  ObserverPointer<const AdditionalData,
+                  RelaxationBlock<MatrixType, InverseNumberType, VectorType>>
     additional_data;
 
 private:

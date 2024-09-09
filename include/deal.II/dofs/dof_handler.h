@@ -1491,7 +1491,7 @@ private:
   /**
    * Address of the triangulation to work on.
    */
-  SmartPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
+  ObserverPointer<const Triangulation<dim, spacedim>, DoFHandler<dim, spacedim>>
     tria;
 
   /**

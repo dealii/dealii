@@ -48,9 +48,9 @@ DEAL_II_NAMESPACE_OPEN
  * object (which for this purpose needs to be derived from the Subscriptor
  * class), and ensuring that the pointed-to object's destructor triggers an
  * error if that use-count is larger than zero -- i.e., if there are still
- * observing SmartPointer objects pointing to it.
+ * observing ObserverPointer objects pointing to it.
  *
- * Conceptually, SmartPointer fills a gap between `std::unique_ptr` and
+ * Conceptually, ObserverPointer fills a gap between `std::unique_ptr` and
  * `std::shared_ptr`. While the former makes it clear that there is a unique
  * owner of an object (namely the scope in which the `std::unique_ptr` resides),
  * it does not allow other places in a code base to point to the object. In
@@ -58,74 +58,75 @@ DEAL_II_NAMESPACE_OPEN
  * but none of them is the "owner" of the object: They all are, and the last
  * one to stop pointing to the object is responsible for deleting it.
  *
- * SmartPointer utilizes semantics in which one place owns an object and others
- * can point to it. The owning place is responsible for destroying the object
- * when it is no longer needed, and as mentioned above, this will trigger an
- * error if other places are still pointing to it via SmartPointer pointers.
+ * ObserverPointer utilizes semantics in which one place owns an object and
+ * others can point to it. The owning place is responsible for destroying the
+ * object when it is no longer needed, and as mentioned above, this will trigger
+ * an error if other places are still pointing to it via ObserverPointer
+ * pointers.
  *
  * In practice, using this scheme, if you try to destroy an object to which
- * observers still point via SmartPointer objects, you will get an error that
+ * observers still point via ObserverPointer objects, you will get an error that
  * says that there are still observers of the object and that the object can
  * consequently not be destroyed without creating "dangling" pointers. This
  * is often not very helpful in *finding* where these pointers are. As a
  * consequence, this class also provides two ways to annotate the observer
  * count with information about what other places still observe an object.
- * First, when initializing a SmartPointer object with the address of the
+ * First, when initializing a ObserverPointer object with the address of the
  * object pointed to, you can also attach a string that describes the
  * observing location, and this string will then be shown in error messages
  * listing all remaining observers. Second, if no such string is provided,
  * the name second template argument `P` is used as the debug string. This
- * allows to encode the observer information in the type of the SmartPointer.
+ * allows to encode the observer information in the type of the ObserverPointer.
  *
- * @note Unlike `std::unique_ptr` and `std::shared_ptr`, SmartPointer does
+ * @note Unlike `std::unique_ptr` and `std::shared_ptr`, ObserverPointer does
  *   NOT implement any memory handling. In particular, deleting a
- *   SmartPointer does not delete the object because the semantics
+ *   ObserverPointer does not delete the object because the semantics
  *   of this class are that it only *observes* an object, but does not
  *   take over ownership. As a consequence, this is a sure way of creating
  *   a memory leak:
  *   @code
- *     SmartPointer<T> dont_do_this = new T;
+ *     ObserverPointer<T> dont_do_this = new T;
  *   @endcode
  *   This is because here, no variable "owns" the object pointed to, and
  *   the destruction of the `dont_do_this` pointer does not trigger the
  *   release of the memory pointed to.
  *
  * @note This class correctly handles `const`-ness of an object, i.e.,
- *   a `SmartPointer<const T>` really behaves as if it were a pointer
+ *   a `ObserverPointer<const T>` really behaves as if it were a pointer
  *   to a constant object (disallowing write access when dereferenced), while
- *   `SmartPointer<T>` is a mutable pointer.
+ *   `ObserverPointer<T>` is a mutable pointer.
  *
  * @dealiiConceptRequires{std::is_base_of_v<Subscriptor, T>}
  *
  * @ingroup memory
  */
 template <typename T, typename P = void>
-class SmartPointer
+class ObserverPointer
 {
 public:
   /**
    * Standard constructor for null pointer. The id of this pointer is set to
    * the name of the class P.
    */
-  SmartPointer();
+  ObserverPointer();
 
   /**
-   * Copy constructor for SmartPointer. We do not copy the object subscribed
+   * Copy constructor for ObserverPointer. We do not copy the object subscribed
    * to from <tt>tt</tt>, but subscribe ourselves to it again.
    */
   template <class Q>
-  SmartPointer(const SmartPointer<T, Q> &other);
+  ObserverPointer(const ObserverPointer<T, Q> &other);
 
   /**
-   * Copy constructor for SmartPointer. We do not copy the object subscribed
+   * Copy constructor for ObserverPointer. We do not copy the object subscribed
    * to from <tt>tt</tt>, but subscribe ourselves to it again.
    */
-  SmartPointer(const SmartPointer<T, P> &other);
+  ObserverPointer(const ObserverPointer<T, P> &other);
 
   /**
-   * Move constructor for SmartPointer.
+   * Move constructor for ObserverPointer.
    */
-  SmartPointer(SmartPointer<T, P> &&other) noexcept;
+  ObserverPointer(ObserverPointer<T, P> &&other) noexcept;
 
   /**
    * Constructor taking a normal pointer. If possible, i.e. if the pointer is
@@ -133,9 +134,9 @@ public:
    * lock it, i.e. to prevent its destruction before the end of its use.
    *
    * The <tt>id</tt> is used in the call to Subscriptor::subscribe(id) and by
-   * ~SmartPointer() in the call to Subscriptor::unsubscribe().
+   * ~ObserverPointer() in the call to Subscriptor::unsubscribe().
    */
-  SmartPointer(T *t, const std::string &id);
+  ObserverPointer(T *t, const std::string &id);
 
   /**
    * Constructor taking a normal pointer. If possible, i.e. if the pointer is
@@ -143,12 +144,12 @@ public:
    * lock it, i.e. to prevent its destruction before the end of its use. The
    * id of this pointer is set to the name of the class P.
    */
-  SmartPointer(T *t);
+  ObserverPointer(T *t);
 
   /**
    * Destructor, removing the subscription.
    */
-  ~SmartPointer();
+  ~ObserverPointer();
 
   /**
    * Assignment operator for normal pointers. The pointer subscribes to the
@@ -156,35 +157,35 @@ public:
    * will not try to subscribe to a null-pointer, but still delete the old
    * subscription.
    */
-  SmartPointer<T, P> &
+  ObserverPointer<T, P> &
   operator=(T *tt);
 
   /**
-   * Assignment operator for SmartPointer. The pointer subscribes to the new
+   * Assignment operator for ObserverPointer. The pointer subscribes to the new
    * object automatically and unsubscribes to an old one if it exists.
    */
   template <class Q>
-  SmartPointer<T, P> &
-  operator=(const SmartPointer<T, Q> &other);
+  ObserverPointer<T, P> &
+  operator=(const ObserverPointer<T, Q> &other);
 
   /**
-   * Assignment operator for SmartPointer. The pointer subscribes to the new
+   * Assignment operator for ObserverPointer. The pointer subscribes to the new
    * object automatically and unsubscribes to an old one if it exists.
    */
-  SmartPointer<T, P> &
-  operator=(const SmartPointer<T, P> &other);
+  ObserverPointer<T, P> &
+  operator=(const ObserverPointer<T, P> &other);
 
   /**
-   * Move assignment operator for SmartPointer.
+   * Move assignment operator for ObserverPointer.
    */
-  SmartPointer<T, P> &
-  operator=(SmartPointer<T, P> &&other) noexcept;
+  ObserverPointer<T, P> &
+  operator=(ObserverPointer<T, P> &&other) noexcept;
 
   /**
    * Delete the object pointed to and set the pointer to nullptr. Note
    * that unlike what the documentation of the class describes, *this
    * function actually deletes the object pointed to*. That is, this
-   * function assumes a SmartPointer's ownership of the object pointed to.
+   * function assumes a ObserverPointer's ownership of the object pointed to.
    *
    * @deprecated This function is deprecated. It does not use the
    * semantics we usually use for this class, and its use is surely
@@ -231,7 +232,7 @@ public:
    */
   template <class Q>
   void
-  swap(SmartPointer<T, Q> &tt);
+  swap(ObserverPointer<T, Q> &tt);
 
   /**
    * Swap pointers between this object and the pointer given. As this releases
@@ -275,7 +276,7 @@ private:
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer()
+inline ObserverPointer<T, P>::ObserverPointer()
   : pointer(nullptr)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
@@ -288,7 +289,7 @@ inline SmartPointer<T, P>::SmartPointer()
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer(T *t)
+inline ObserverPointer<T, P>::ObserverPointer(T *t)
   : pointer(t)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
@@ -304,7 +305,7 @@ inline SmartPointer<T, P>::SmartPointer(T *t)
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer(T *t, const std::string &id)
+inline ObserverPointer<T, P>::ObserverPointer(T *t, const std::string &id)
   : pointer(t)
   , id(id)
   , pointed_to_object_is_alive(false)
@@ -321,7 +322,8 @@ inline SmartPointer<T, P>::SmartPointer(T *t, const std::string &id)
 
 template <typename T, typename P>
 template <class Q>
-inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &other)
+inline ObserverPointer<T, P>::ObserverPointer(
+  const ObserverPointer<T, Q> &other)
   : pointer(other.pointer)
   , id(other.id)
   , pointed_to_object_is_alive(false)
@@ -342,7 +344,8 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &other)
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &other)
+inline ObserverPointer<T, P>::ObserverPointer(
+  const ObserverPointer<T, P> &other)
   : pointer(other.pointer)
   , id(other.id)
   , pointed_to_object_is_alive(false)
@@ -363,7 +366,8 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &other)
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&other) noexcept
+inline ObserverPointer<T, P>::ObserverPointer(
+  ObserverPointer<T, P> &&other) noexcept
   : pointer(other.pointer)
   , id(other.id)
   , pointed_to_object_is_alive(false)
@@ -400,7 +404,7 @@ inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&other) noexcept
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::~SmartPointer()
+inline ObserverPointer<T, P>::~ObserverPointer()
 {
   static_assert(std::is_base_of_v<Subscriptor, T>,
                 "This class can only be used if the first template argument "
@@ -414,7 +418,7 @@ inline SmartPointer<T, P>::~SmartPointer()
 
 template <typename T, typename P>
 inline void
-SmartPointer<T, P>::clear()
+ObserverPointer<T, P>::clear()
 {
   if (pointed_to_object_is_alive && pointer != nullptr)
     {
@@ -428,8 +432,8 @@ SmartPointer<T, P>::clear()
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P> &
-SmartPointer<T, P>::operator=(T *tt)
+inline ObserverPointer<T, P> &
+ObserverPointer<T, P>::operator=(T *tt)
 {
   // optimize if no real action is requested
   if (pointer == tt)
@@ -451,8 +455,8 @@ SmartPointer<T, P>::operator=(T *tt)
 
 template <typename T, typename P>
 template <class Q>
-inline SmartPointer<T, P> &
-SmartPointer<T, P>::operator=(const SmartPointer<T, Q> &other)
+inline ObserverPointer<T, P> &
+ObserverPointer<T, P>::operator=(const ObserverPointer<T, Q> &other)
 {
   // if objects on the left and right
   // hand side of the operator= are
@@ -479,8 +483,8 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, Q> &other)
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P> &
-SmartPointer<T, P>::operator=(const SmartPointer<T, P> &other)
+inline ObserverPointer<T, P> &
+ObserverPointer<T, P>::operator=(const ObserverPointer<T, P> &other)
 {
   // if objects on the left and right
   // hand side of the operator= are
@@ -507,8 +511,8 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, P> &other)
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P> &
-SmartPointer<T, P>::operator=(SmartPointer<T, P> &&other) noexcept
+inline ObserverPointer<T, P> &
+ObserverPointer<T, P>::operator=(ObserverPointer<T, P> &&other) noexcept
 {
   if (other == nullptr)
     {
@@ -549,7 +553,7 @@ SmartPointer<T, P>::operator=(SmartPointer<T, P> &&other) noexcept
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::operator T *() const
+inline ObserverPointer<T, P>::operator T *() const
 {
   return pointer;
 }
@@ -558,7 +562,7 @@ inline SmartPointer<T, P>::operator T *() const
 
 template <typename T, typename P>
 inline T &
-SmartPointer<T, P>::operator*() const
+ObserverPointer<T, P>::operator*() const
 {
   Assert(pointer != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,
@@ -570,7 +574,7 @@ SmartPointer<T, P>::operator*() const
 
 template <typename T, typename P>
 inline T *
-SmartPointer<T, P>::get() const
+ObserverPointer<T, P>::get() const
 {
   Assert(pointer != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,
@@ -582,7 +586,7 @@ SmartPointer<T, P>::get() const
 
 template <typename T, typename P>
 inline T *
-SmartPointer<T, P>::operator->() const
+ObserverPointer<T, P>::operator->() const
 {
   return this->get();
 }
@@ -592,10 +596,10 @@ SmartPointer<T, P>::operator->() const
 template <typename T, typename P>
 template <class Q>
 inline void
-SmartPointer<T, P>::swap(SmartPointer<T, Q> &other)
+ObserverPointer<T, P>::swap(ObserverPointer<T, Q> &other)
 {
 #ifdef DEBUG
-  SmartPointer<T, P> aux(pointer, id);
+  ObserverPointer<T, P> aux(pointer, id);
   *this = other;
   other = aux;
 #else
@@ -607,7 +611,7 @@ SmartPointer<T, P>::swap(SmartPointer<T, Q> &other)
 
 template <typename T, typename P>
 inline void
-SmartPointer<T, P>::swap(T *&ptr)
+ObserverPointer<T, P>::swap(T *&ptr)
 {
   if (pointed_to_object_is_alive && pointer != nullptr)
     pointer->unsubscribe(pointed_to_object_is_alive, id);
@@ -622,18 +626,18 @@ SmartPointer<T, P>::swap(T *&ptr)
 
 template <typename T, typename P>
 inline std::size_t
-SmartPointer<T, P>::memory_consumption() const
+ObserverPointer<T, P>::memory_consumption() const
 {
-  return sizeof(SmartPointer<T, P>);
+  return sizeof(ObserverPointer<T, P>);
 }
 
 
 
 // The following function is not strictly necessary but is an optimization
-// for places where you call swap(p1,p2) with SmartPointer objects p1, p2.
+// for places where you call swap(p1,p2) with ObserverPointer objects p1, p2.
 // Unfortunately, MS Visual Studio (at least up to the 2013 edition) trips
 // over it when calling std::swap(v1,v2) where v1,v2 are std::vectors of
-// SmartPointer objects: it can't determine whether it should call std::swap
+// ObserverPointer objects: it can't determine whether it should call std::swap
 // or dealii::swap on the individual elements (see bug #184 on our Google Code
 // site. Consequently, just take this function out of the competition for this
 // compiler.
@@ -645,7 +649,7 @@ SmartPointer<T, P>::memory_consumption() const
  */
 template <typename T, typename P, class Q>
 inline void
-swap(SmartPointer<T, P> &t1, SmartPointer<T, Q> &t2)
+swap(ObserverPointer<T, P> &t1, ObserverPointer<T, Q> &t2)
 {
   t1.swap(t2);
 }
@@ -661,7 +665,7 @@ swap(SmartPointer<T, P> &t1, SmartPointer<T, Q> &t2)
  */
 template <typename T, typename P>
 inline void
-swap(SmartPointer<T, P> &t1, T *&t2)
+swap(ObserverPointer<T, P> &t1, T *&t2)
 {
   t1.swap(t2);
 }
@@ -677,7 +681,7 @@ swap(SmartPointer<T, P> &t1, T *&t2)
  */
 template <typename T, typename P>
 inline void
-swap(T *&t1, SmartPointer<T, P> &t2)
+swap(T *&t1, ObserverPointer<T, P> &t2)
 {
   t2.swap(t1);
 }

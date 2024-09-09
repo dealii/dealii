@@ -86,10 +86,10 @@ namespace FEConforimityTest
                         const Vector<double>         &dof_vector,
                         std::vector<double>          &jumps);
 
-    SmartPointer<const FiniteElement<dim>> fe_ptr;
-    Triangulation<dim>                     triangulation;
-    DoFHandler<dim>                        dof_handler;
-    AffineConstraints<double>              constraints;
+    ObserverPointer<const FiniteElement<dim>> fe_ptr;
+    Triangulation<dim>                        triangulation;
+    DoFHandler<dim>                           dof_handler;
+    AffineConstraints<double>                 constraints;
 
     Vector<double> random_fe_function;
 

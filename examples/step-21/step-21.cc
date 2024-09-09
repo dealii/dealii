@@ -428,7 +428,7 @@ namespace Step21
     }
 
   private:
-    const SmartPointer<const MatrixType> matrix;
+    const ObserverPointer<const MatrixType> matrix;
   };
 
 
@@ -452,8 +452,8 @@ namespace Step21
     }
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double>>           system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>>> m_inverse;
+    const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
+    const ObserverPointer<const InverseMatrix<SparseMatrix<double>>> m_inverse;
 
     mutable Vector<double> tmp1, tmp2;
   };
@@ -477,7 +477,7 @@ namespace Step21
     }
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
+    const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
 
     mutable Vector<double> tmp1, tmp2;
   };

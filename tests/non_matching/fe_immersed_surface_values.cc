@@ -93,7 +93,7 @@ private:
   const FE_Q<dim>                             element;
   Triangulation<dim>                          triangulation;
   DoFHandler<dim>                             dof_handler;
-  const SmartPointer<const Mapping<dim>>      mapping;
+  const ObserverPointer<const Mapping<dim>>   mapping;
   NonMatching::ImmersedSurfaceQuadrature<dim> quadrature;
 };
 

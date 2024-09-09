@@ -39,8 +39,9 @@ DEAL_II_NAMESPACE_OPEN
  * moved from or destroyed.
  * The mechanism works as follows: The member function subscribe() accepts a
  * pointer to a boolean that is modified on invalidation. The object that owns
- * this pointer (usually an object of class type SmartPointer) is then expected
- * to check the state of the boolean before trying to access this class.
+ * this pointer (usually an object of class type ObserverPointer) is then
+ * expected to check the state of the boolean before trying to access this
+ * class.
  *
  * The utility of this class is even enhanced by providing identifying strings
  * to the functions subscribe() and unsubscribe(). These strings are represented
@@ -50,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  * <code>x</code> is some object. Therefore, the pointers provided to
  * subscribe() and to unsubscribe() must be the same. Strings with equal
  * contents will not be recognized to be the same. The handling in
- * SmartPointer will take care of this.
+ * ObserverPointer will take care of this.
  * The current subscribers to this class can be obtained by calling
  * list_subscribers().
  *
@@ -104,7 +105,7 @@ public:
    * @name Subscriptor functionality
    *
    * Classes derived from Subscriptor provide a facility to subscribe to this
-   * object. This is mostly used by the SmartPointer class.
+   * object. This is mostly used by the ObserverPointer class.
    * @{
    */
 
@@ -234,8 +235,8 @@ private:
   using map_iterator = decltype(counter_map)::iterator;
 
   /**
-   * In this vector, we store pointers to the validity bool in the SmartPointer
-   * objects that subscribe to this class.
+   * In this vector, we store pointers to the validity bool in the
+   * ObserverPointer objects that subscribe to this class.
    */
   mutable std::vector<std::atomic<bool> *> validity_pointers;
 

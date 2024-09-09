@@ -323,7 +323,7 @@ private:
    * DoF handler to be used for the data corresponding to the present
    * parameter value.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>, DataOutStack<dim, spacedim>>
+  ObserverPointer<const DoFHandler<dim, spacedim>, DataOutStack<dim, spacedim>>
     dof_handler;
 
   /**

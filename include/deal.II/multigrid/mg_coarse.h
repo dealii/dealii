@@ -73,8 +73,8 @@ private:
   /**
    * Reference to the smoother.
    */
-  SmartPointer<const MGSmootherBase<VectorType>,
-               MGCoarseGridApplySmoother<VectorType>>
+  ObserverPointer<const MGSmootherBase<VectorType>,
+                  MGCoarseGridApplySmoother<VectorType>>
     coarse_smooth;
 };
 
@@ -134,31 +134,31 @@ private:
   /**
    * Reference to the solver.
    */
-  SmartPointer<SolverType,
-               MGCoarseGridIterativeSolver<VectorType,
-                                           SolverType,
-                                           MatrixType,
-                                           PreconditionerType>>
+  ObserverPointer<SolverType,
+                  MGCoarseGridIterativeSolver<VectorType,
+                                              SolverType,
+                                              MatrixType,
+                                              PreconditionerType>>
     solver;
 
   /**
    * Reference to the matrix.
    */
-  SmartPointer<const MatrixType,
-               MGCoarseGridIterativeSolver<VectorType,
-                                           SolverType,
-                                           MatrixType,
-                                           PreconditionerType>>
+  ObserverPointer<const MatrixType,
+                  MGCoarseGridIterativeSolver<VectorType,
+                                              SolverType,
+                                              MatrixType,
+                                              PreconditionerType>>
     matrix;
 
   /**
    * Reference to the preconditioner.
    */
-  SmartPointer<const PreconditionerType,
-               MGCoarseGridIterativeSolver<VectorType,
-                                           SolverType,
-                                           MatrixType,
-                                           PreconditionerType>>
+  ObserverPointer<const PreconditionerType,
+                  MGCoarseGridIterativeSolver<VectorType,
+                                              SolverType,
+                                              MatrixType,
+                                              PreconditionerType>>
     preconditioner;
 };
 
@@ -261,10 +261,9 @@ void
 MGCoarseGridApplySmoother<VectorType>::initialize(
   const MGSmootherBase<VectorType> &coarse_smooth_)
 {
-  coarse_smooth =
-    SmartPointer<const MGSmootherBase<VectorType>,
-                 MGCoarseGridApplySmoother<VectorType>>(&coarse_smooth_,
-                                                        typeid(*this).name());
+  coarse_smooth = ObserverPointer<const MGSmootherBase<VectorType>,
+                                  MGCoarseGridApplySmoother<VectorType>>(
+    &coarse_smooth_, typeid(*this).name());
 }
 
 

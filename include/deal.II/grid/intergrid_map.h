@@ -122,7 +122,8 @@ public:
   using cell_iterator = typename MeshType::cell_iterator;
 
   /**
-   * Constructor setting the class name arguments in the SmartPointer members.
+   * Constructor setting the class name arguments in the ObserverPointer
+   * members.
    */
   InterGridMap();
 
@@ -187,12 +188,12 @@ private:
   /**
    * Store a pointer to the source grid.
    */
-  SmartPointer<const MeshType, InterGridMap<MeshType>> source_grid;
+  ObserverPointer<const MeshType, InterGridMap<MeshType>> source_grid;
 
   /**
    * Likewise for the destination grid.
    */
-  SmartPointer<const MeshType, InterGridMap<MeshType>> destination_grid;
+  ObserverPointer<const MeshType, InterGridMap<MeshType>> destination_grid;
 
   /**
    * Set the mapping for the pair of cells given. These shall match in level

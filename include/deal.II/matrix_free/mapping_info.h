@@ -192,7 +192,7 @@ namespace internal
       /**
        * The pointer to the first entry of mapping_collection.
        */
-      SmartPointer<const Mapping<dim>> mapping;
+      ObserverPointer<const Mapping<dim>> mapping;
 
       /**
        * Reference-cell type related to each quadrature and active quadrature

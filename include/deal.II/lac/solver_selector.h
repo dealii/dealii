@@ -206,7 +206,7 @@ protected:
    * Stores the @p SolverControl that is needed in the constructor of each @p
    * Solver class. This can be changed with @p set_control().
    */
-  SmartPointer<SolverControl, SolverSelector<VectorType>> control;
+  ObserverPointer<SolverControl, SolverSelector<VectorType>> control;
 
   /**
    * Stores the name of the solver.

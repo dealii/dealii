@@ -891,12 +891,12 @@ protected:
   /**
    * Pointer to the Mapping object passed to the constructor.
    */
-  SmartPointer<const Mapping<dim, spacedim>> mapping;
+  ObserverPointer<const Mapping<dim, spacedim>> mapping;
 
   /**
    * Pointer to the FiniteElement object passed to the constructor.
    */
-  SmartPointer<const FiniteElement<dim, spacedim>> fe;
+  ObserverPointer<const FiniteElement<dim, spacedim>> fe;
 
   /**
    * Description of the 1d polynomial basis for tensor product elements used
@@ -1045,7 +1045,7 @@ protected:
    * Pointer to currently used mapping info (either on the fly or external
    * precomputed).
    */
-  SmartPointer<NonMatching::MappingInfo<dim, spacedim, Number>> mapping_info;
+  ObserverPointer<NonMatching::MappingInfo<dim, spacedim, Number>> mapping_info;
 
   /**
    * The current cell index to access mapping data from mapping info.

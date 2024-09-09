@@ -120,6 +120,6 @@
  *
  * These are the classes, where no reasonable predetermined set of instances
  * exists. Therefore, all member definitions are included in the header file
- * and are instantiated wherever needed.  An example would be the SmartPointer
+ * and are instantiated wherever needed.  An example would be the ObserverPointer
  * class template that can be used with virtually any template argument.
  */

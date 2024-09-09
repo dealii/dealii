@@ -241,12 +241,13 @@ namespace GridTools
     /**
      * A pointer to the Triangulation.
      */
-    SmartPointer<const Triangulation<dim, spacedim>, Cache<dim, spacedim>> tria;
+    ObserverPointer<const Triangulation<dim, spacedim>, Cache<dim, spacedim>>
+      tria;
 
     /**
      * Mapping to use when computing on the Triangulation.
      */
-    SmartPointer<const Mapping<dim, spacedim>, Cache<dim, spacedim>> mapping;
+    ObserverPointer<const Mapping<dim, spacedim>, Cache<dim, spacedim>> mapping;
 
 
     /**

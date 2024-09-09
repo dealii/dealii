@@ -145,7 +145,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<DoFHandler<dim, spacedim>> dof_handler;
+        ObserverPointer<DoFHandler<dim, spacedim>> dof_handler;
       };
 
 
@@ -205,7 +205,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<DoFHandler<dim, spacedim>> dof_handler;
+        ObserverPointer<DoFHandler<dim, spacedim>> dof_handler;
       };
 
 
@@ -247,7 +247,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<DoFHandler<dim, spacedim>> dof_handler;
+        ObserverPointer<DoFHandler<dim, spacedim>> dof_handler;
       };
     } // namespace Policy
   }   // namespace DoFHandlerImplementation

@@ -149,7 +149,7 @@ namespace Step59
   // general-purpose class MatrixFreeOperators::Base. We derive the class from
   // the Subscriptor class to be able to use the operator within the Chebyshev
   // preconditioner because that preconditioner stores the underlying matrix
-  // via a SmartPointer.
+  // via a ObserverPointer.
   //
   // Given that we implement a complete matrix interface by hand, we need to
   // add an `initialize()` function, an `m()` function, a `vmult()` function,

@@ -98,7 +98,7 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
   else
     {
       // inner time step
-      const std::vector<SmartPointer<TimeStepBase, TimeDependent>>::iterator
+      const std::vector<ObserverPointer<TimeStepBase, TimeDependent>>::iterator
         insert_position =
           std::find(timesteps.begin(), timesteps.end(), position);
       // check iterators again to satisfy coverity: both insert_position and
@@ -136,7 +136,7 @@ TimeDependent::delete_timestep(const unsigned int position)
 
   // Remember time step object for
   // later deletion and unlock
-  // SmartPointer
+  // ObserverPointer
   TimeStepBase *t     = timesteps[position];
   timesteps[position] = nullptr;
   // Now delete unsubscribed object
@@ -153,14 +153,15 @@ TimeDependent::delete_timestep(const unsigned int position)
     timesteps[position - 1]->set_next_timestep(
       (position < timesteps.size()) ?
         timesteps[position] :
-        /*null*/ SmartPointer<TimeStepBase, TimeDependent>());
+        /*null*/ ObserverPointer<TimeStepBase, TimeDependent>());
 
   // same for "previous" pointer of next
   // time step
   if (position < timesteps.size())
     timesteps[position]->set_previous_timestep(
-      (position != 0) ? timesteps[position - 1] :
-                        /*null*/ SmartPointer<TimeStepBase, TimeDependent>());
+      (position != 0) ?
+        timesteps[position - 1] :
+        /*null*/ ObserverPointer<TimeStepBase, TimeDependent>());
 }
 
 

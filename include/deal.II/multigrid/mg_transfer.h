@@ -386,7 +386,7 @@ protected:
   /**
    * The mg_constrained_dofs of the level systems.
    */
-  SmartPointer<const MGConstrainedDoFs> mg_constrained_dofs;
+  ObserverPointer<const MGConstrainedDoFs> mg_constrained_dofs;
 
 private:
   /**
@@ -574,7 +574,7 @@ protected:
   /**
    * The mg_constrained_dofs of the level systems.
    */
-  SmartPointer<const MGConstrainedDoFs> mg_constrained_dofs;
+  ObserverPointer<const MGConstrainedDoFs> mg_constrained_dofs;
 
   /**
    * In the function copy_to_mg, we need to access ghosted entries of the

@@ -609,17 +609,17 @@ private:
   /**
    * Underlying communicator which handles update of the ghost values.
    */
-  SmartPointer<const FERemoteEvaluationCommunicator<dim>> comm;
+  ObserverPointer<const FERemoteEvaluationCommunicator<dim>> comm;
 
   /**
    * Pointer to MeshType if used with Triangulation.
    */
-  SmartPointer<const Triangulation<dim>> tria;
+  ObserverPointer<const Triangulation<dim>> tria;
 
   /**
    * Pointer to MeshType if used with DoFHandler.
    */
-  SmartPointer<const DoFHandler<dim>> dof_handler;
+  ObserverPointer<const DoFHandler<dim>> dof_handler;
 
   /**
    * First selected component.

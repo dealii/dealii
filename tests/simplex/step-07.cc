@@ -209,7 +209,7 @@ namespace Step7
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    SmartPointer<const FiniteElement<dim>> fe;
+    ObserverPointer<const FiniteElement<dim>> fe;
 
     AffineConstraints<double> hanging_node_constraints;
 

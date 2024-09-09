@@ -366,7 +366,8 @@ namespace internal
   void
   store_affine_constraints(
     const dealii::AffineConstraints<Number2> *,
-    SmartPointer<const dealii::AffineConstraints<Number>> &stored_constraints)
+    ObserverPointer<const dealii::AffineConstraints<Number>>
+      &stored_constraints)
   {
     stored_constraints = nullptr;
   }
@@ -374,8 +375,9 @@ namespace internal
   template <typename Number>
   void
   store_affine_constraints(
-    const dealii::AffineConstraints<Number>               *affine_constraints,
-    SmartPointer<const dealii::AffineConstraints<Number>> &stored_constraints)
+    const dealii::AffineConstraints<Number> *affine_constraints,
+    ObserverPointer<const dealii::AffineConstraints<Number>>
+      &stored_constraints)
   {
     stored_constraints = affine_constraints;
   }
@@ -1118,9 +1120,9 @@ namespace internal
   std::vector<bool>
   compute_dof_info(
     const std::vector<const dealii::AffineConstraints<number> *> &constraint,
-    const std::vector<IndexSet>                            &locally_owned_dofs,
-    const std::vector<SmartPointer<const DoFHandler<dim>>> &dof_handlers,
-    const Table<2, MatrixFreeFunctions::ShapeInfo<double>> &shape_infos,
+    const std::vector<IndexSet> &locally_owned_dofs,
+    const std::vector<ObserverPointer<const DoFHandler<dim>>> &dof_handlers,
+    const Table<2, MatrixFreeFunctions::ShapeInfo<double>>    &shape_infos,
     const unsigned int               cell_level_index_end_local,
     const unsigned int               mg_level,
     const bool                       hold_all_faces_to_owned_cells,

@@ -415,8 +415,8 @@ private:
   /**
    * Pointer to the degree of freedom handler to work with.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>,
-               SolutionTransfer<dim, VectorType, spacedim>>
+  ObserverPointer<const DoFHandler<dim, spacedim>,
+                  SolutionTransfer<dim, VectorType, spacedim>>
     dof_handler;
 
   /**
@@ -915,8 +915,8 @@ namespace Legacy
     /**
      * Pointer to the degree of freedom handler to work with.
      */
-    SmartPointer<const DoFHandler<dim, spacedim>,
-                 SolutionTransfer<dim, VectorType, spacedim>>
+    ObserverPointer<const DoFHandler<dim, spacedim>,
+                    SolutionTransfer<dim, VectorType, spacedim>>
       dof_handler;
 
     /**

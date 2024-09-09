@@ -571,7 +571,7 @@ namespace internal
         /**
          * The modified parallel::shared::Triangulation.
          */
-        const SmartPointer<
+        const ObserverPointer<
           const dealii::parallel::shared::Triangulation<dim, spacedim>>
           shared_tria;
 

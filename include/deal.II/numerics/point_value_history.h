@@ -634,7 +634,7 @@ private:
    * A smart pointer to the dof_handler supplied to the constructor. This can
    * be released by calling @p clear().
    */
-  SmartPointer<const DoFHandler<dim>, PointValueHistory<dim>> dof_handler;
+  ObserverPointer<const DoFHandler<dim>, PointValueHistory<dim>> dof_handler;
 
 
   /**

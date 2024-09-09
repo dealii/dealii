@@ -123,18 +123,18 @@ namespace Algorithms
     /**
      * The operator computing the residual.
      */
-    SmartPointer<OperatorBase, Newton<VectorType>> residual;
+    ObserverPointer<OperatorBase, Newton<VectorType>> residual;
 
     /**
      * The operator applying the inverse derivative to the residual.
      */
-    SmartPointer<OperatorBase, Newton<VectorType>> inverse_derivative;
+    ObserverPointer<OperatorBase, Newton<VectorType>> inverse_derivative;
 
     /**
      * The operator handling the output in case the debug_vectors is true.
      * Call the initialize function first.
      */
-    SmartPointer<OutputOperator<VectorType>, Newton<VectorType>> data_out;
+    ObserverPointer<OutputOperator<VectorType>, Newton<VectorType>> data_out;
 
     /**
      * This flag is set by the function assemble(), indicating that the matrix

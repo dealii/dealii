@@ -438,12 +438,12 @@ namespace Utilities
       /**
        * Reference to the Triangulation object used during reinit().
        */
-      SmartPointer<const Triangulation<dim, spacedim>> tria;
+      ObserverPointer<const Triangulation<dim, spacedim>> tria;
 
       /**
        * Reference to the Mapping object used during reinit().
        */
-      SmartPointer<const Mapping<dim, spacedim>> mapping;
+      ObserverPointer<const Mapping<dim, spacedim>> mapping;
 
       /**
        * (One-to-one) relation of points and cells.

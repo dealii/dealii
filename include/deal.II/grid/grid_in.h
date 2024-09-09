@@ -882,7 +882,7 @@ protected:
   /**
    * Store address of the triangulation to be fed with the data read in.
    */
-  SmartPointer<Triangulation<dim, spacedim>, GridIn<dim, spacedim>> tria;
+  ObserverPointer<Triangulation<dim, spacedim>, GridIn<dim, spacedim>> tria;
 
   /**
    * This function can write the raw cell data objects created by the

@@ -436,7 +436,7 @@ public:
   }
 
 private:
-  SmartPointer<const LAPLACEOPERATOR> laplace;
+  ObserverPointer<const LAPLACEOPERATOR> laplace;
 };
 
 

@@ -204,7 +204,7 @@ private:
   Triangulation<dim> triangulation;
   DoFHandler<dim>    dof_handler;
 
-  SmartPointer<const hp::FECollection<dim>> fe;
+  ObserverPointer<const hp::FECollection<dim>> fe;
 
   AffineConstraints<double> hanging_node_constraints;
 

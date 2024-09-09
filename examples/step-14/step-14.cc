@@ -355,7 +355,7 @@ namespace Step14
       virtual void output_solution() const = 0;
 
     protected:
-      const SmartPointer<Triangulation<dim>> triangulation;
+      const ObserverPointer<Triangulation<dim>> triangulation;
 
       unsigned int refinement_cycle;
     };
@@ -399,12 +399,12 @@ namespace Step14
       virtual unsigned int n_dofs() const override;
 
     protected:
-      const SmartPointer<const FiniteElement<dim>>  fe;
-      const SmartPointer<const Quadrature<dim>>     quadrature;
-      const SmartPointer<const Quadrature<dim - 1>> face_quadrature;
-      DoFHandler<dim>                               dof_handler;
-      Vector<double>                                solution;
-      const SmartPointer<const Function<dim>>       boundary_values;
+      const ObserverPointer<const FiniteElement<dim>>  fe;
+      const ObserverPointer<const Quadrature<dim>>     quadrature;
+      const ObserverPointer<const Quadrature<dim - 1>> face_quadrature;
+      DoFHandler<dim>                                  dof_handler;
+      Vector<double>                                   solution;
+      const ObserverPointer<const Function<dim>>       boundary_values;
 
       virtual void assemble_rhs(Vector<double> &rhs) const = 0;
 
@@ -709,7 +709,7 @@ namespace Step14
       virtual void output_solution() const override;
 
     protected:
-      const SmartPointer<const Function<dim>> rhs_function;
+      const ObserverPointer<const Function<dim>> rhs_function;
       virtual void assemble_rhs(Vector<double> &rhs) const override;
     };
 
@@ -913,7 +913,7 @@ namespace Step14
       virtual void refine_grid() override;
 
     private:
-      const SmartPointer<const Function<dim>> weighting_function;
+      const ObserverPointer<const Function<dim>> weighting_function;
     };
 
 
@@ -1051,7 +1051,7 @@ namespace Step14
     // @sect4{The SetUpBase and SetUp classes}
 
     // Based on the above description, the <code>SetUpBase</code> class then
-    // looks as follows. To allow using the <code>SmartPointer</code> class
+    // looks as follows. To allow using the <code>ObserverPointer</code> class
     // with this class, we derived from the <code>Subscriptor</code> class.
     template <int dim>
     struct SetUpBase : public Subscriptor
@@ -1624,7 +1624,7 @@ namespace Step14
         const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
     protected:
-      const SmartPointer<const DualFunctional::DualFunctionalBase<dim>>
+      const ObserverPointer<const DualFunctional::DualFunctionalBase<dim>>
                    dual_functional;
       virtual void assemble_rhs(Vector<double> &rhs) const override;
 
@@ -1757,8 +1757,8 @@ namespace Step14
       // that will serve as the "scratch data" class of the WorkStream concept:
       struct CellData
       {
-        FEValues<dim>                           fe_values;
-        const SmartPointer<const Function<dim>> right_hand_side;
+        FEValues<dim>                              fe_values;
+        const ObserverPointer<const Function<dim>> right_hand_side;
 
         std::vector<double> cell_residual;
         std::vector<double> rhs_values;

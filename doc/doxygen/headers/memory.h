@@ -17,8 +17,8 @@
  * @defgroup memory Memory handling
  *
  * This group has some basic classes and namespaces for memory
- * handling. The Subscriptor and SmartPointer classes are used for
- * counted memory handling, i.e. whenever a SmartPointer is set to
+ * handling. The Subscriptor and ObserverPointer classes are used for
+ * counted memory handling, i.e. whenever a ObserverPointer is set to
  * point to an object, it increases a counter in that object; when the
  * pointer is set to point elsewhere, it decreases it again. This way,
  * one always knows how many users of an object there still are. While

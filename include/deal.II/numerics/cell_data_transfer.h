@@ -159,8 +159,8 @@ private:
   /**
    * Pointer to the triangulation to work with.
    */
-  SmartPointer<const Triangulation<dim, spacedim>,
-               CellDataTransfer<dim, spacedim, VectorType>>
+  ObserverPointer<const Triangulation<dim, spacedim>,
+                  CellDataTransfer<dim, spacedim, VectorType>>
     triangulation;
 
   /**

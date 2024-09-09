@@ -650,7 +650,7 @@ private:
     /**
      * Matrix-free object on the fine side.
      */
-    SmartPointer<const MatrixFree<dim, Number>> matrix_free_fine;
+    ObserverPointer<const MatrixFree<dim, Number>> matrix_free_fine;
 
     /**
      * Index within the list of DoFHandler objects in the matrix_free_fine
@@ -661,7 +661,7 @@ private:
     /**
      * Matrix-free object on the coarse side.
      */
-    SmartPointer<const MatrixFree<dim, Number>> matrix_free_coarse;
+    ObserverPointer<const MatrixFree<dim, Number>> matrix_free_coarse;
 
     /**
      * Index within the list of DoFHandler objects in the matrix_free_coarse
@@ -711,7 +711,7 @@ private:
   /**
    * Pointer to the DoFHandler object used during initialization.
    */
-  SmartPointer<const DoFHandler<dim>> dof_handler_fine;
+  ObserverPointer<const DoFHandler<dim>> dof_handler_fine;
 
   /**
    * Multigrid level used during initialization.
@@ -897,7 +897,7 @@ private:
   /**
    * Pointer to the DoFHandler object used during initialization.
    */
-  SmartPointer<const DoFHandler<dim>> dof_handler_fine;
+  ObserverPointer<const DoFHandler<dim>> dof_handler_fine;
 
   /**
    * Multigrid level used during initialization.
@@ -1248,8 +1248,8 @@ private:
    */
   void
   initialize_internal_transfer(
-    const DoFHandler<dim>                       &dof_handler,
-    const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
+    const DoFHandler<dim>                          &dof_handler,
+    const ObserverPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
    * Retrieve finest DoFHandler from two-level transfer objects.
@@ -1302,7 +1302,7 @@ private:
   /**
    * Collection of the two-level transfer operators.
    */
-  MGLevelObject<SmartPointer<MGTwoLevelTransferBase<VectorType>>> transfer;
+  MGLevelObject<ObserverPointer<MGTwoLevelTransferBase<VectorType>>> transfer;
 
   /**
    * External partitioners used during initialize_dof_vector().
@@ -1395,7 +1395,8 @@ private:
   /**
    * Non-block version of transfer operation.
    */
-  std::vector<SmartPointer<const MGTransferMF<dim, Number>>> transfer_operators;
+  std::vector<ObserverPointer<const MGTransferMF<dim, Number>>>
+    transfer_operators;
 };
 
 

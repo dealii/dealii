@@ -367,7 +367,7 @@ public:
     /**
      * A pointer to the underlying finite element.
      */
-    SmartPointer<const FiniteElement<dim, spacedim>> fe;
+    ObserverPointer<const FiniteElement<dim, spacedim>> fe;
 
     /**
      * Values of shape functions. Access by function @p shape.
@@ -570,15 +570,15 @@ protected:
   /**
    * Reference to the vector of shifts.
    */
-  std::vector<
-    SmartPointer<const VectorType, MappingFEField<dim, spacedim, VectorType>>>
+  std::vector<ObserverPointer<const VectorType,
+                              MappingFEField<dim, spacedim, VectorType>>>
     euler_vector;
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>,
-               MappingFEField<dim, spacedim, VectorType>>
+  ObserverPointer<const DoFHandler<dim, spacedim>,
+                  MappingFEField<dim, spacedim, VectorType>>
     euler_dof_handler;
 
 private:

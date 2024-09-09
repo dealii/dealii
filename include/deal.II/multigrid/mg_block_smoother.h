@@ -123,8 +123,8 @@ private:
   /**
    * Memory for auxiliary vectors.
    */
-  SmartPointer<VectorMemory<BlockVector<number>>,
-               MGSmootherBlock<MatrixType, RelaxationType, number>>
+  ObserverPointer<VectorMemory<BlockVector<number>>,
+                  MGSmootherBlock<MatrixType, RelaxationType, number>>
     mem;
 };
 

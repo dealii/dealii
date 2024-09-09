@@ -877,14 +877,15 @@ namespace Particles
     /**
      * Address of the triangulation to work on.
      */
-    SmartPointer<const Triangulation<dim, spacedim>,
-                 ParticleHandler<dim, spacedim>>
+    ObserverPointer<const Triangulation<dim, spacedim>,
+                    ParticleHandler<dim, spacedim>>
       triangulation;
 
     /**
      * Address of the mapping to work on.
      */
-    SmartPointer<const Mapping<dim, spacedim>, ParticleHandler<dim, spacedim>>
+    ObserverPointer<const Mapping<dim, spacedim>,
+                    ParticleHandler<dim, spacedim>>
       mapping;
 
     /**

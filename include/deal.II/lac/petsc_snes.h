@@ -472,8 +472,8 @@ namespace PETScWrappers
     /**
      * Pointers to the internal PETSc matrix objects.
      */
-    SmartPointer<AMatrixType, NonlinearSolver> A;
-    SmartPointer<PMatrixType, NonlinearSolver> P;
+    ObserverPointer<AMatrixType, NonlinearSolver> A;
+    ObserverPointer<PMatrixType, NonlinearSolver> P;
 
     /**
      * This flag is used to support versions of PETSc older than 3.13.

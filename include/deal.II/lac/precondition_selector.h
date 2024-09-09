@@ -188,7 +188,8 @@ private:
    * Matrix that is used for the matrix-builtin preconditioning function. cf.
    * also @p PreconditionUseMatrix.
    */
-  SmartPointer<const MatrixType, PreconditionSelector<MatrixType, VectorType>>
+  ObserverPointer<const MatrixType,
+                  PreconditionSelector<MatrixType, VectorType>>
     A;
 
   /**

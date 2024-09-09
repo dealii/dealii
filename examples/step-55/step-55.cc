@@ -106,8 +106,8 @@ namespace Step55
       void vmult(VectorType &dst, const VectorType &src) const;
 
     private:
-      const SmartPointer<const Matrix> matrix;
-      const Preconditioner            &preconditioner;
+      const ObserverPointer<const Matrix> matrix;
+      const Preconditioner               &preconditioner;
     };
 
 

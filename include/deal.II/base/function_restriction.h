@@ -74,7 +74,7 @@ namespace Functions
 
   private:
     // The higher-dimensional function that has been restricted.
-    const SmartPointer<const Function<dim + 1>> function;
+    const ObserverPointer<const Function<dim + 1>> function;
 
     // The (`dim + 1`)-coordinate direction that has been restricted.
     const unsigned int restricted_direction;
@@ -133,7 +133,7 @@ namespace Functions
 
   private:
     // The higher-dimensional function that has been restricted.
-    const SmartPointer<const Function<dim + 1>> function;
+    const ObserverPointer<const Function<dim + 1>> function;
 
     // The (`dim + 1`)-coordinate direction that is kept "open"
     const unsigned int open_direction;

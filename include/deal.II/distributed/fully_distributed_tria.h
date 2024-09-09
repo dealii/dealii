@@ -306,7 +306,7 @@ namespace parallel
       /**
        * Partitioner used during repartition().
        */
-      SmartPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
+      ObserverPointer<const RepartitioningPolicyTools::Base<dim, spacedim>>
         partitioner_distributed;
 
       /**

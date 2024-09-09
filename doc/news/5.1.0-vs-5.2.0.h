@@ -494,7 +494,7 @@ inconvenience this causes.
        New: Class <code>Subscriptor</code> receives a
        text argument allowing to identify the violating pointer more
        easily. The additional feature is being incorporated into <code
-       class="class">SmartPointer</code> constructors throughout the
+       class="class">ObserverPointer</code> constructors throughout the
        library.
        <br>
        (GK, 2005/03/16)

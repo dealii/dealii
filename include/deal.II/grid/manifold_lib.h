@@ -790,15 +790,15 @@ private:
   /**
    * Pointer to the push_forward function.
    */
-  SmartPointer<const Function<chartdim>,
-               FunctionManifold<dim, spacedim, chartdim>>
+  ObserverPointer<const Function<chartdim>,
+                  FunctionManifold<dim, spacedim, chartdim>>
     push_forward_function;
 
   /**
    * Pointer to the pull_back function.
    */
-  SmartPointer<const Function<spacedim>,
-               FunctionManifold<dim, spacedim, chartdim>>
+  ObserverPointer<const Function<spacedim>,
+                  FunctionManifold<dim, spacedim, chartdim>>
     pull_back_function;
 
   /**

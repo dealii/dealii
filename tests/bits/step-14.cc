@@ -287,7 +287,7 @@ namespace LaplaceSolver
     output_solution() const = 0;
 
   protected:
-    const SmartPointer<Triangulation<dim>> triangulation;
+    const ObserverPointer<Triangulation<dim>> triangulation;
 
     unsigned int refinement_cycle;
   };
@@ -335,12 +335,12 @@ namespace LaplaceSolver
     n_dofs() const;
 
   protected:
-    const SmartPointer<const FiniteElement<dim>>  fe;
-    const SmartPointer<const Quadrature<dim>>     quadrature;
-    const SmartPointer<const Quadrature<dim - 1>> face_quadrature;
-    DoFHandler<dim>                               dof_handler;
-    Vector<double>                                solution;
-    const SmartPointer<const Function<dim>>       boundary_values;
+    const ObserverPointer<const FiniteElement<dim>>  fe;
+    const ObserverPointer<const Quadrature<dim>>     quadrature;
+    const ObserverPointer<const Quadrature<dim - 1>> face_quadrature;
+    DoFHandler<dim>                                  dof_handler;
+    Vector<double>                                   solution;
+    const ObserverPointer<const Function<dim>>       boundary_values;
 
     virtual void
     assemble_rhs(Vector<double> &rhs) const = 0;
@@ -581,7 +581,7 @@ namespace LaplaceSolver
     output_solution() const;
 
   protected:
-    const SmartPointer<const Function<dim>> rhs_function;
+    const ObserverPointer<const Function<dim>> rhs_function;
     virtual void
     assemble_rhs(Vector<double> &rhs) const;
 
@@ -808,7 +808,7 @@ namespace LaplaceSolver
     refine_grid();
 
   private:
-    const SmartPointer<const Function<dim>> weighting_function;
+    const ObserverPointer<const Function<dim>> weighting_function;
   };
 
 
@@ -1254,7 +1254,7 @@ namespace LaplaceSolver
     postprocess(const Evaluation::EvaluationBase<dim> &postprocessor) const;
 
   protected:
-    const SmartPointer<const DualFunctional::DualFunctionalBase<dim>>
+    const ObserverPointer<const DualFunctional::DualFunctionalBase<dim>>
       dual_functional;
     virtual void
     assemble_rhs(Vector<double> &rhs) const;
@@ -1362,8 +1362,8 @@ namespace LaplaceSolver
 
     struct CellData
     {
-      FEValues<dim>                           fe_values;
-      const SmartPointer<const Function<dim>> right_hand_side;
+      FEValues<dim>                              fe_values;
+      const ObserverPointer<const Function<dim>> right_hand_side;
 
       std::vector<double>                  cell_residual;
       std::vector<double>                  rhs_values;
@@ -1911,7 +1911,7 @@ public:
     unsigned int primal_fe_degree;
     unsigned int dual_fe_degree;
 
-    SmartPointer<const Data::SetUpBase<dim>> data;
+    ObserverPointer<const Data::SetUpBase<dim>> data;
 
     enum RefinementCriterion
     {
@@ -1923,11 +1923,12 @@ public:
 
     RefinementCriterion refinement_criterion;
 
-    SmartPointer<const DualFunctional::DualFunctionalBase<dim>> dual_functional;
+    ObserverPointer<const DualFunctional::DualFunctionalBase<dim>>
+      dual_functional;
 
     EvaluatorList evaluator_list;
 
-    SmartPointer<const Function<dim>> kelly_weight;
+    ObserverPointer<const Function<dim>> kelly_weight;
 
     unsigned int max_degrees_of_freedom;
 

@@ -86,7 +86,7 @@ private:
   double
   term_D(const Tensor<1, 3> &r, const Tensor<1, 3> &a1, const Tensor<1, 3> &a2);
 
-  SmartPointer<FEValues<dim, dim + 1>> fe_values;
+  ObserverPointer<FEValues<dim, dim + 1>> fe_values;
 };
 
 template <>

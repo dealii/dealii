@@ -321,8 +321,8 @@ namespace Step22
     vmult(Vector<double> &dst, const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const Matrix>         matrix;
-    const SmartPointer<const Preconditioner> preconditioner;
+    const ObserverPointer<const Matrix>         matrix;
+    const ObserverPointer<const Preconditioner> preconditioner;
   };
 
 
@@ -364,8 +364,8 @@ namespace Step22
     vmult(Vector<double> &dst, const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
-    const SmartPointer<
+    const ObserverPointer<const BlockSparseMatrix<double>> system_matrix;
+    const ObserverPointer<
       const InverseMatrix<SparseMatrix<double>, Preconditioner>>
       A_inverse;
 

@@ -1742,9 +1742,9 @@ private:
   /**
    * Pointer to the sparsity pattern used for this matrix. In order to
    * guarantee that it is not deleted while still in use, we subscribe to it
-   * using the SmartPointer class.
+   * using the ObserverPointer class.
    */
-  SmartPointer<const SparsityPattern, SparseMatrix<number>> cols;
+  ObserverPointer<const SparsityPattern, SparseMatrix<number>> cols;
 
   /**
    * Array of values for all the nonzero entries. The position of an

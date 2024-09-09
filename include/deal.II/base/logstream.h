@@ -122,7 +122,7 @@ public:
      * A pointer to the LogStream object to which the prefix is
      * applied.
      */
-    SmartPointer<LogStream, LogStream::Prefix> stream;
+    ObserverPointer<LogStream, LogStream::Prefix> stream;
   };
 
 

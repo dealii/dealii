@@ -616,7 +616,7 @@ protected:
    * this object operates on. Note that this object takes possession of the
    * objects pointed to by the pointers in this collection.
    */
-  std::vector<SmartPointer<TimeStepBase, TimeDependent>> timesteps;
+  std::vector<ObserverPointer<TimeStepBase, TimeDependent>> timesteps;
 
   /**
    * Number of the present sweep. This is reset by the @p start_sweep function
@@ -1466,14 +1466,14 @@ protected:
    * the functions @p sleep and @p wake_up to save memory, if such a behavior
    * is specified in the @p flags structure.
    */
-  SmartPointer<Triangulation<dim, dim>, TimeStepBase_Tria<dim>> tria;
+  ObserverPointer<Triangulation<dim, dim>, TimeStepBase_Tria<dim>> tria;
 
   /**
    * Pointer to a grid which is to be used as the coarse grid for this time
    * level.  This pointer is set through the constructor; ownership remains
    * with the owner of this management object.
    */
-  SmartPointer<const Triangulation<dim, dim>, TimeStepBase_Tria<dim>>
+  ObserverPointer<const Triangulation<dim, dim>, TimeStepBase_Tria<dim>>
     coarse_grid;
 
   /**

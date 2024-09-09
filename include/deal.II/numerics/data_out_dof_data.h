@@ -342,7 +342,7 @@ namespace internal
       /**
        * Pointer to the DoFHandler object that the vector is based on.
        */
-      SmartPointer<const DoFHandler<dim, spacedim>> dof_handler;
+      ObserverPointer<const DoFHandler<dim, spacedim>> dof_handler;
 
       /**
        * Names of the components of this data vector.
@@ -362,7 +362,7 @@ namespace internal
        * Pointer to a DataPostprocessing object which shall be applied to this
        * data vector.
        */
-      SmartPointer<const dealii::DataPostprocessor<spacedim>> postprocessor;
+      ObserverPointer<const dealii::DataPostprocessor<spacedim>> postprocessor;
 
       /**
        * Number of output variables this dataset provides (either number of
@@ -952,12 +952,12 @@ protected:
   /**
    * Pointer to the triangulation object.
    */
-  SmartPointer<const Triangulation<dim, spacedim>> triangulation;
+  ObserverPointer<const Triangulation<dim, spacedim>> triangulation;
 
   /**
    * Pointer to the optional handler object.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>> dofs;
+  ObserverPointer<const DoFHandler<dim, spacedim>> dofs;
 
   /**
    * List of data elements with vectors of values for each degree of freedom.

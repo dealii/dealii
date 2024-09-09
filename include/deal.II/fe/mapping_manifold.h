@@ -313,7 +313,7 @@ public:
      *
      * Updated each.
      */
-    mutable SmartPointer<const Manifold<dim, spacedim>> manifold;
+    mutable ObserverPointer<const Manifold<dim, spacedim>> manifold;
   };
 
 private:

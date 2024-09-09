@@ -422,30 +422,30 @@ private:
   /**
    * The matrix for each level.
    */
-  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> matrix;
+  ObserverPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> matrix;
 
   /**
    * The matrix for each level.
    */
-  SmartPointer<const MGCoarseGridBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGCoarseGridBase<VectorType>, Multigrid<VectorType>>
     coarse;
 
   /**
    * Object for grid transfer.
    */
-  SmartPointer<const MGTransferBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGTransferBase<VectorType>, Multigrid<VectorType>>
     transfer;
 
   /**
    * The pre-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
     pre_smooth;
 
   /**
    * The post-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
+  ObserverPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
     post_smooth;
 
   /**
@@ -453,7 +453,7 @@ private:
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>> edge_out;
+  ObserverPointer<const MGMatrixBase<VectorType>> edge_out;
 
   /**
    * Transpose edge matrix from the refinement edge to the interior of the
@@ -461,21 +461,23 @@ private:
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>> edge_in;
+  ObserverPointer<const MGMatrixBase<VectorType>> edge_in;
 
   /**
    * Edge matrix from fine to coarse.
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_down;
+  ObserverPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>>
+    edge_down;
 
   /**
    * Transpose edge matrix from coarse to fine.
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
+  ObserverPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>>
+    edge_up;
 
   template <int dim, typename OtherVectorType, typename TransferType>
   friend class PreconditionMG;
@@ -610,28 +612,28 @@ private:
   /**
    * Associated @p DoFHandler.
    */
-  std::vector<SmartPointer<const DoFHandler<dim>,
-                           PreconditionMG<dim, VectorType, TransferType>>>
+  std::vector<ObserverPointer<const DoFHandler<dim>,
+                              PreconditionMG<dim, VectorType, TransferType>>>
     dof_handler_vector;
 
   /**
    * Storage for the pointers to the DoFHandler objects
-   * without SmartPointer wrapper.
+   * without ObserverPointer wrapper.
    */
   std::vector<const DoFHandler<dim> *> dof_handler_vector_raw;
 
   /**
    * The multigrid object.
    */
-  SmartPointer<Multigrid<VectorType>,
-               PreconditionMG<dim, VectorType, TransferType>>
+  ObserverPointer<Multigrid<VectorType>,
+                  PreconditionMG<dim, VectorType, TransferType>>
     multigrid;
 
   /**
    * Object for grid transfer.
    */
-  SmartPointer<const TransferType,
-               PreconditionMG<dim, VectorType, TransferType>>
+  ObserverPointer<const TransferType,
+                  PreconditionMG<dim, VectorType, TransferType>>
     transfer;
 
   /**

@@ -283,7 +283,7 @@ private:
   /**
    * Pointer to the matrix.
    */
-  SmartPointer<const SparseMatrix<number>, SparseVanka<number>> matrix;
+  ObserverPointer<const SparseMatrix<number>, SparseVanka<number>> matrix;
 
   /**
    * Indices of those degrees of freedom that we shall work on.
@@ -294,7 +294,7 @@ private:
    * Array of inverse matrices, one for each degree of freedom. Only those
    * elements will be used that are tagged in @p selected.
    */
-  mutable std::vector<SmartPointer<FullMatrix<float>, SparseVanka<number>>>
+  mutable std::vector<ObserverPointer<FullMatrix<float>, SparseVanka<number>>>
     inverses;
 
   /**

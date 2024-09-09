@@ -14,7 +14,7 @@
 
 
 
-// Check that it is possible to put SmartPointer objects into a
+// Check that it is possible to put ObserverPointer objects into a
 // std::any object.
 
 
@@ -36,7 +36,7 @@ main()
 {
   initlog();
 
-  Test               t;
-  SmartPointer<Test> r(&t);
-  std::any           a = r;
+  Test                  t;
+  ObserverPointer<Test> r(&t);
+  std::any              a = r;
 }

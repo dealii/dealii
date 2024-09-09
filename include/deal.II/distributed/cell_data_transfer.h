@@ -235,8 +235,8 @@ namespace parallel
       /**
        * Pointer to the triangulation to work with.
        */
-      SmartPointer<const parallel::distributed::Triangulation<dim, spacedim>,
-                   CellDataTransfer<dim, spacedim, VectorType>>
+      ObserverPointer<const parallel::distributed::Triangulation<dim, spacedim>,
+                      CellDataTransfer<dim, spacedim, VectorType>>
         triangulation;
 
       /**
