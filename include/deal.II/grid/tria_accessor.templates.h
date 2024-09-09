@@ -3342,49 +3342,6 @@ inline CellAccessor<dim, spacedim>::CellAccessor(
 
 
 
-namespace internal
-{
-  namespace CellAccessorImplementation
-  {
-    template <int spacedim>
-    inline dealii::TriaIterator<dealii::TriaAccessor<0, 1, spacedim>>
-    get_face(const dealii::CellAccessor<1, spacedim> &cell,
-             const unsigned int                       i)
-    {
-      dealii::TriaAccessor<0, 1, spacedim> a(
-        &cell.get_triangulation(),
-        ((i == 0) && cell.at_boundary(0) ?
-           dealii::TriaAccessor<0, 1, spacedim>::left_vertex :
-           ((i == 1) && cell.at_boundary(1) ?
-              dealii::TriaAccessor<0, 1, spacedim>::right_vertex :
-              dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
-        dealii::internal::TriaAccessorImplementation::Implementation::
-          vertex_index(cell, i));
-      return dealii::TriaIterator<dealii::TriaAccessor<0, 1, spacedim>>(a);
-    }
-
-
-    template <int spacedim>
-    inline dealii::TriaIterator<dealii::TriaAccessor<1, 2, spacedim>>
-    get_face(const dealii::CellAccessor<2, spacedim> &cell,
-             const unsigned int                       i)
-    {
-      return cell.line(i);
-    }
-
-
-    template <int spacedim>
-    inline dealii::TriaIterator<dealii::TriaAccessor<2, 3, spacedim>>
-    get_face(const dealii::CellAccessor<3, spacedim> &cell,
-             const unsigned int                       i)
-    {
-      return cell.quad(i);
-    }
-  } // namespace CellAccessorImplementation
-} // namespace internal
-
-
-
 template <int dim, int spacedim>
 inline TriaIterator<CellAccessor<dim, spacedim>>
 CellAccessor<dim, spacedim>::child(const unsigned int i) const
@@ -3423,7 +3380,28 @@ inline TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
 CellAccessor<dim, spacedim>::face(const unsigned int i) const
 {
   AssertIndexRange(i, this->n_faces());
-  return dealii::internal::CellAccessorImplementation::get_face(*this, i);
+  if constexpr (dim == 1)
+    {
+      TriaAccessor<0, 1, spacedim> a(
+        &this->get_triangulation(),
+        ((i == 0) && at_boundary(0) ?
+           TriaAccessor<0, 1, spacedim>::left_vertex :
+           ((i == 1) && at_boundary(1) ?
+              TriaAccessor<0, 1, spacedim>::right_vertex :
+              TriaAccessor<0, 1, spacedim>::interior_vertex)),
+        internal::TriaAccessorImplementation::Implementation::vertex_index(
+          *this, i));
+      return TriaIterator<TriaAccessor<0, 1, spacedim>>(a);
+    }
+  else if constexpr (dim == 2)
+    return this->line(i);
+  else if constexpr (dim == 3)
+    return this->quad(i);
+  else
+    {
+      Assert(false, ExcNotImplemented());
+      return {};
+    }
 }
 
 
@@ -3456,8 +3434,7 @@ CellAccessor<dim, spacedim>::face_iterators() const
     face_iterators(this->n_faces());
 
   for (const unsigned int i : this->face_indices())
-    face_iterators[i] =
-      dealii::internal::CellAccessorImplementation::get_face(*this, i);
+    face_iterators[i] = this->face(i);
 
   return face_iterators;
 }
