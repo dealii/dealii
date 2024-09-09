@@ -7983,6 +7983,10 @@ namespace GridGenerator
                                     Triangulation<dim, spacedim> &out_tria)
   {
     Assert(dim > 1, ExcNotImplemented());
+    AssertThrow(
+      in_tria.all_reference_cells_are_hyper_cube(),
+      ExcMessage(
+        "GridGenerator::convert_hypercube_to_simplex_mesh() expects a mesh that consists only of quads/hexes."));
 
     Triangulation<dim, spacedim> temp_tria;
     if (in_tria.n_global_levels() > 1)
@@ -7993,16 +7997,14 @@ namespace GridGenerator
     const Triangulation<dim, spacedim> &ref_tria =
       in_tria.n_global_levels() > 1 ? temp_tria : in_tria;
 
-    /* static tables with the definitions of cells, faces and edges by its
-     * vertices for 2d and 3d. For the inheritance of the manifold_id,
-     * definitions of inner-faces and boundary-faces are required. In case of
-     * 3d, also inner-edges and boundary-edges need to be defined.
-     */
+    // static tables with the definitions of cells, faces and edges by its
+    // vertices for 2d and 3d. For the inheritance of the manifold_id,
+    // definitions of inner-faces and boundary-faces are required. In case of
+    // 3d, also inner-edges and boundary-edges need to be defined.
 
-    /* Cell definition 2d:
-     * A quadrilateral element is converted to 8 simplices elements. Each
-     * triangle is defined by 3 vertices.
-     */
+    // Cell definition 2d:
+    // A quadrilateral element is converted to 8 simplices elements. Each
+    // triangle is defined by 3 vertices.
     static const ndarray<unsigned int, 8, 3> table_2D_cell = {{{{0, 6, 4}},
                                                                {{8, 4, 6}},
                                                                {{8, 6, 5}},
@@ -8012,10 +8014,9 @@ namespace GridGenerator
                                                                {{8, 5, 7}},
                                                                {{3, 7, 5}}}};
 
-    /* Cell definition 3d:
-     * A hexahedron element is converted to 24 tetrahedron elements. Each
-     * tetrahedron is defined by 4 vertices.
-     */
+    // Cell definition 3d:
+    // A hexahedron element is converted to 24 tetrahedron elements. Each
+    // tetrahedron is defined by 4 vertices.
     static const ndarray<unsigned int, 24, 4> vertex_ids_for_cells_3d = {
       {{{0, 1, 12, 10}},  {{2, 3, 11, 12}},  {{7, 6, 11, 13}},
        {{5, 4, 13, 10}},  {{0, 2, 8, 12}},   {{4, 6, 13, 8}},
@@ -8026,22 +8027,20 @@ namespace GridGenerator
        {{13, 9, 11, 7}},  {{13, 11, 8, 6}},  {{10, 12, 9, 1}},
        {{9, 12, 11, 3}},  {{11, 12, 8, 2}},  {{8, 12, 10, 0}}}};
 
-    /* Boundary-faces 2d:
-     * After converting, each of the 4 quadrilateral faces is defined by faces
-     * of 2 different triangles, i.e., lines. Note that lines are defined by 2
-     * vertices.
-     */
+    // Boundary-faces 2d:
+    // After converting, each of the 4 quadrilateral faces is defined by faces
+    // of 2 different triangles, i.e., lines. Note that lines are defined by 2
+    // vertices.
     static const ndarray<unsigned int, 4, 2, 2>
       vertex_ids_for_boundary_faces_2d = {{{{{{0, 4}}, {{4, 2}}}},
                                            {{{{1, 5}}, {{5, 3}}}},
                                            {{{{0, 6}}, {{6, 1}}}},
                                            {{{{2, 7}}, {{7, 3}}}}}};
 
-    /* Boundary-faces 3d:
-     * After converting, each of the 6 hexahedron faces corresponds to faces of
-     * 4 different tetrahedron faces, i.e., triangles. Note that a triangle is
-     * defined by 3 vertices.
-     */
+    // Boundary-faces 3d:
+    // After converting, each of the 6 hexahedron faces corresponds to faces of
+    // 4 different tetrahedron faces, i.e., triangles. Note that a triangle is
+    // defined by 3 vertices.
     static const ndarray<unsigned int, 6, 4, 3>
       vertex_ids_for_boundary_faces_3d = {
         {{{{{0, 4, 8}}, {{4, 8, 6}}, {{8, 6, 2}}, {{0, 2, 8}}}},
@@ -8051,10 +8050,9 @@ namespace GridGenerator
          {{{{0, 1, 12}}, {{1, 12, 3}}, {{12, 3, 2}}, {{0, 12, 2}}}},
          {{{{4, 5, 13}}, {{5, 13, 7}}, {{13, 7, 6}}, {{4, 13, 6}}}}}};
 
-    /* Inner-faces 2d:
-     * The converted triangulation based on simplices has 8 faces that do not
-     * form the boundary, i.e. inner-faces, each defined by 2 vertices.
-     */
+    // Inner-faces 2d:
+    // The converted triangulation based on simplices has 8 faces that do not
+    // form the boundary, i.e. inner-faces, each defined by 2 vertices.
     static const ndarray<unsigned int, 8, 2> vertex_ids_for_inner_faces_2d = {
       {{{6, 4}},
        {{6, 8}},
@@ -8065,10 +8063,9 @@ namespace GridGenerator
        {{7, 8}},
        {{7, 5}}}};
 
-    /* Inner-faces 3d:
-     * The converted triangulation based on simplices has 72 faces that do not
-     * form the boundary, i.e. inner-faces, each defined by 3 vertices.
-     */
+    // Inner-faces 3d:
+    // The converted triangulation based on simplices has 72 faces that do not
+    // form the boundary, i.e. inner-faces, each defined by 3 vertices.
     static const ndarray<unsigned int, 72, 3> vertex_ids_for_inner_faces_3d = {
       {{{0, 12, 10}},  {{12, 1, 10}},  {{12, 1, 9}},  {{12, 3, 9}},
        {{12, 2, 11}},  {{12, 3, 11}},  {{12, 0, 8}},  {{12, 2, 8}},
@@ -8089,10 +8086,9 @@ namespace GridGenerator
        {{12, 13, 9}},  {{12, 13, 11}}, {{9, 11, 13}}, {{9, 11, 12}},
        {{12, 13, 11}}, {{12, 13, 8}},  {{8, 11, 13}}, {{8, 11, 12}}}};
 
-    /* Inner-edges 3d:
-     * The converted triangulation based on simplices has 60 edges that do not
-     * coincide with the boundary, i.e. inner-edges, each defined by 2 vertices.
-     */
+    // Inner-edges 3d:
+    // The converted triangulation based on simplices has 60 edges that do not
+    // coincide with the boundary, i.e. inner-edges, each defined by 2 vertices.
     static const ndarray<unsigned int, 60, 2> vertex_ids_for_inner_edges_3d = {
       {{{12, 10}}, {{12, 9}},  {{12, 11}}, {{12, 8}},  {{9, 13}},  {{11, 13}},
        {{8, 13}},  {{10, 13}}, {{10, 9}},  {{9, 11}},  {{11, 8}},  {{8, 10}},
@@ -8105,16 +8101,15 @@ namespace GridGenerator
        {{12, 13}}, {{9, 11}},  {{9, 13}},  {{11, 13}}, {{9, 12}},  {{11, 12}},
        {{12, 13}}, {{11, 8}},  {{11, 13}}, {{8, 13}},  {{11, 12}}, {{8, 12}}}};
 
-    /* Boundary-edges 3d:
-     * For each of the 6 boundary-faces of the hexahedron, there are 8 edges (of
-     * different tetrahedrons) that coincide with the boundary, i.e.
-     * boundary-edges. Each boundary-edge is defined by 2 vertices. 4 of these
-     * edges are new (they are placed in the middle of a presently existing
-     * face); the other 4 coincide with edges present in the hexahedral
-     * triangulation. The new 4 edges inherit the manifold id of the relevant
-     * face, but the other 4 need to be copied from the input and thus do not
-     * require a lookup table.
-     */
+    // Boundary-edges 3d:
+    // For each of the 6 boundary-faces of the hexahedron, there are 8 edges (of
+    // different tetrahedrons) that coincide with the boundary, i.e.
+    // boundary-edges. Each boundary-edge is defined by 2 vertices. 4 of these
+    // edges are new (they are placed in the middle of a presently existing
+    // face); the other 4 coincide with edges present in the hexahedral
+    // triangulation. The new 4 edges inherit the manifold id of the relevant
+    // face, but the other 4 need to be copied from the input and thus do not
+    // require a lookup table.
     static const ndarray<unsigned int, 6, 4, 2>
       vertex_ids_for_new_boundary_edges_3d = {
         {{{{{4, 8}}, {{6, 8}}, {{0, 8}}, {{2, 8}}}},
@@ -8207,26 +8202,18 @@ namespace GridGenerator
 
           if (struct_dim == dim) // cells
             {
-              if (dim == 2)
-                {
-                  AssertDimension(index_vertices.size(), 3);
-                }
-              else if (dim == 3)
-                {
-                  AssertDimension(index_vertices.size(), 4);
-                }
+              AssertDimension(index_vertices.size(), dim + 1);
 
               CellData<dim> cell_data(index_vertices.size());
+              cell_data.material_id =
+                material_or_boundary_id;           // inherit material id
+              cell_data.manifold_id = manifold_id; // inherit cell-manifold id
               for (unsigned int i = 0; i < index_vertices.size(); ++i)
                 {
                   AssertIndexRange(index_vertices[i],
                                    local_vertex_indices.size());
                   cell_data.vertices[i] =
                     local_vertex_indices[index_vertices[i]];
-                  cell_data.material_id =
-                    material_or_boundary_id; // inherit material id
-                  cell_data.manifold_id =
-                    manifold_id; // inherit cell-manifold id
                 }
               cells.push_back(cell_data);
             }
