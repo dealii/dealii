@@ -26,11 +26,28 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * The SmartPointer class avoids using dangling pointers. They can be used just
- * like a pointer (i.e., using the <tt>*</tt> and <tt>-></tt> operators and
- * through casting) but make sure that the object pointed to is not deleted or
- * moved from in the course of use of the pointer by signaling the pointee its
- * use.
+ * This class represents an "observer pointer", i.e., it is a pointer class
+ * like `std::unique_ptr` or `std::shared_ptr`, but it does not participate in
+ * managing the lifetime of the object pointed to -- we are simply observing
+ * an object passively that is owned by some other entity of the program, but
+ * we are not in charge of creating and destroying this object. In particular,
+ * the pointer may be pointing to a member variable of another object whose
+ * lifetime is not actively managed but is instead tied to the lifetime of
+ * the surrounding object of which it is a member.
+ *
+ * The class does, however, have mechanisms to ensure that the object pointed
+ * to remains alive at least as long as the pointer points to -- in other words,
+ * unlike a simple C-style `T*` variable, it can avoid the problem of
+ * [dangling pointers](https://en.wikipedia.org/wiki/Dangling_pointer). In other
+ * works, objects of the current type can be used like a regular
+ * pointer (i.e., using the `*p` and `p->` operators and
+ * through casting), but they make sure that the object pointed to is not
+ * deleted or moved from in the course of use of the pointer by signaling the
+ * pointee its use. This is achieved by keeping a use count for the pointed-to
+ * object (which for this purpose needs to be derived from the Subscriptor
+ * class), and ensuring that the pointed-to object's destructor triggers an
+ * error if that use-count is larger than zero -- i.e., if there are still
+ * observing SmartPointer objects pointing to it.
  *
  * Conceptually, SmartPointer fills a gap between `std::unique_ptr` and
  * `std::shared_ptr`. While the former makes it clear that there is a unique
@@ -42,23 +59,14 @@ DEAL_II_NAMESPACE_OPEN
  *
  * SmartPointer utilizes semantics in which one place owns an object and others
  * can point to it. The owning place is responsible for destroying the object
- * when it is no longer needed, and this will trigger an error if other places
- * are still pointing to it via SmartPointer pointers. In other words, one
- * should consider those places that hold a SmartPointer to an object as
- * "observers", and an object may only be destroyed without an error if there
- * are no observers left. With hindsight, perhaps a better name for the class
- * would have been "ObserverPointer".
- *
- * To make this scheme work, SmartPointers need to increment the "observer
- * count" when they point to an observed object. This is facilitated by
- * requiring that the objects pointed to, i.e., the template type `T`, must
- * inherit from the Subscriptor class.
+ * when it is no longer needed, and as mentioned above, this will trigger an
+ * error if other places are still pointing to it via SmartPointer pointers.
  *
  * In practice, using this scheme, if you try to destroy an object to which
  * observers still point via SmartPointer objects, you will get an error that
  * says that there are still observers of the object and that the object can
  * consequently not be destroyed without creating "dangling" pointers. This
- * is often not very helpful in finding where these pointers are. As a
+ * is often not very helpful in *finding* where these pointers are. As a
  * consequence, this class also provides two ways to annotate the observer
  * count with information about what other places still observe an object.
  * First, when initializing a SmartPointer object with the address of the
