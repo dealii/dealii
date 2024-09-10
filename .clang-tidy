@@ -8,6 +8,10 @@
 # - selected modernize-* warnings:
 #   Some of these produce a lot of noise for limited utility.
 #
+# - performance-enum-size:
+#   We don't care if an enum could use a smaller base type than
+#   unsigned int.
+#
 # - performance-inefficient-string-concatenation:
 #   We don't care about "a"+to_string(5)+...
 #
@@ -33,9 +37,10 @@ Checks: >
   -modernize-use-transparent-functors,
   mpi-*,
   performance-*,
+  -performance-avoid-endl,
+  -performance-enum-size,
   -performance-inefficient-string-concatenation,
   -performance-no-automatic-move,
-  -performance-avoid-endl,
   readability-qualified-auto
 
 WarningsAsErrors: '*'

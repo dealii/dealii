@@ -25,8 +25,7 @@
 #   make sure to run this script in an empty build directory
 #
 # Requirements:
-# Clang 5.0.1+ and have clang, clang++, and run-clang-tidy.py in
-# your path.
+# Clang 5.0.1+ and have clang, clang++, and run-clang-tidy in your path.
 
 # grab first argument and make relative path an absolute one:
 SRC=$1
@@ -41,14 +40,14 @@ fi
 echo "SRC-DIR=$SRC"
 
 # enable MPI (to get MPI warnings)
-# export compile commands (so that run-clang-tidy.py works)
+# export compile commands (so that run-clang-tidy works)
 ARGS=("-D" "DEAL_II_WITH_MPI=ON" "-D" "CMAKE_EXPORT_COMPILE_COMMANDS=ON" "-D" "CMAKE_BUILD_TYPE=Debug" "$@")
 
 # for a list of checks, see /.clang-tidy
 cat "$SRC/.clang-tidy"
 
-if ! [ -x "$(command -v run-clang-tidy.py)" ] || ! [ -x "$(command -v clang++)" ]; then
-    echo "make sure clang, clang++, and run-clang-tidy.py (part of clang) are in the path"
+if ! [ -x "$(command -v run-clang-tidy)" ] || ! [ -x "$(command -v clang++)" ]; then
+    echo "make sure clang, clang++, and run-clang-tidy (part of clang) are in the path"
     exit 2
 fi
 
@@ -63,7 +62,7 @@ cmake --build . --target expand_all_instantiations || (echo "make expand_all_ins
 #
 # pipe away stderr (just contains nonsensical "x warnings generated")
 # pipe output to output.txt
-run-clang-tidy.py -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
+run-clang-tidy -p . -quiet -header-filter "$SRC/include/*" -extra-arg='-DCLANG_TIDY' 2>error.txt >output.txt
 
 # grep interesting errors and make sure we remove duplicates:
 grep -E '(warning|error): ' output.txt | sort | uniq >clang-tidy.log

@@ -16,7 +16,7 @@ concurrency:
 jobs:
   tidy:
     name: tidy
-    runs-on: [ubuntu-22.04]
+    runs-on: [ubuntu-24.04]
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -30,23 +30,20 @@ jobs:
     - uses: actions/checkout@v4
     - name: modules
       run: |
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository -y ppa:ginggs/deal.ii-9.4.0-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
-            clang-12 \
-            clang-tidy-12 \
-            numdiff \
+            clang-18 \
+            clang-tidy-18 \
             libboost-all-dev \
             libcgal-dev \
-            libp4est-dev \
-            trilinos-all-dev \
-            petsc-dev \
+            libhdf5-mpi-dev \
             libmetis-dev \
-            libhdf5-mpi-dev
+            libp4est-dev \
+            numdiff \
+            petsc-dev \
+            trilinos-all-dev
     - name: tidy
       run: |
         mkdir build
         cd build
-        export PATH=/usr/lib/llvm-12/share/clang/:$PATH
         ../contrib/utilities/run_clang_tidy.sh ..
