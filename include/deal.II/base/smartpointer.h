@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
 
 #include <atomic>
 #include <typeinfo>
@@ -93,6 +94,8 @@ DEAL_II_NAMESPACE_OPEN
  *   a `SmartPointer<const T>` really behaves as if it were a pointer
  *   to a constant object (disallowing write access when dereferenced), while
  *   `SmartPointer<T>` is a mutable pointer.
+ *
+ * @dealiiConceptRequires{std::is_base_of_v<Subscriptor, T>}
  *
  * @ingroup memory
  */
@@ -276,7 +279,11 @@ inline SmartPointer<T, P>::SmartPointer()
   : pointer(nullptr)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
-{}
+{
+  static_assert(std::is_base_of_v<Subscriptor, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'Subscriptor'.");
+}
 
 
 
@@ -286,6 +293,10 @@ inline SmartPointer<T, P>::SmartPointer(T *t)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {
+  static_assert(std::is_base_of_v<Subscriptor, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'Subscriptor'.");
+
   if (t != nullptr)
     t->subscribe(&pointed_to_object_is_alive, id);
 }
@@ -298,6 +309,10 @@ inline SmartPointer<T, P>::SmartPointer(T *t, const std::string &id)
   , id(id)
   , pointed_to_object_is_alive(false)
 {
+  static_assert(std::is_base_of_v<Subscriptor, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'Subscriptor'.");
+
   if (pointer != nullptr)
     pointer->subscribe(&pointed_to_object_is_alive, id);
 }
@@ -311,6 +326,10 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &other)
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
+  static_assert(std::is_base_of_v<Subscriptor, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'Subscriptor'.");
+
   if (other != nullptr)
     {
       Assert(other.pointed_to_object_is_alive,
@@ -328,6 +347,10 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &other)
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
+  static_assert(std::is_base_of_v<Subscriptor, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'Subscriptor'.");
+
   if (other != nullptr)
     {
       Assert(other.pointed_to_object_is_alive,
@@ -345,6 +368,10 @@ inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&other) noexcept
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
+  static_assert(std::is_base_of_v<Subscriptor, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'Subscriptor'.");
+
   if (other != nullptr)
     {
       Assert(other.pointed_to_object_is_alive,
@@ -375,6 +402,10 @@ inline SmartPointer<T, P>::SmartPointer(SmartPointer<T, P> &&other) noexcept
 template <typename T, typename P>
 inline SmartPointer<T, P>::~SmartPointer()
 {
+  static_assert(std::is_base_of_v<Subscriptor, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'Subscriptor'.");
+
   if (pointed_to_object_is_alive && pointer != nullptr)
     pointer->unsubscribe(&pointed_to_object_is_alive, id);
 }
