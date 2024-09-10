@@ -58,6 +58,9 @@ main()
         }
     }
 
+  for (const auto &boundary_id : triangulation1.get_boundary_ids())
+    deallog << "  boundary_id = " << boundary_id << std::endl;
+
   deallog << "Triangulation 2:\n";
   for (const auto &cell : triangulation2.active_cell_iterators())
     {
@@ -68,6 +71,9 @@ main()
           deallog << "    vertex: " << v << std::endl;
         }
     }
+
+  for (const auto &boundary_id : triangulation1.get_boundary_ids())
+    deallog << "  boundary_id = " << boundary_id << std::endl;
 
   GridGenerator::merge_triangulations(triangulation2,
                                       triangulation1,

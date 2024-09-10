@@ -12331,30 +12331,14 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 std::vector<types::boundary_id> Triangulation<dim, spacedim>::get_boundary_ids()
   const
 {
-  // in 1d, we store a map of all used boundary indicators. use it for
-  // our purposes
-  if (dim == 1)
-    {
-      std::vector<types::boundary_id> boundary_ids;
-      for (std::map<unsigned int, types::boundary_id>::const_iterator p =
-             vertex_to_boundary_id_map_1d->begin();
-           p != vertex_to_boundary_id_map_1d->end();
-           ++p)
-        boundary_ids.push_back(p->second);
+  std::set<types::boundary_id> boundary_ids;
+  for (const auto &cell : active_cell_iterators())
+    if (cell->is_locally_owned())
+      for (const auto &face : cell->face_indices())
+        if (cell->at_boundary(face))
+          boundary_ids.insert(cell->face(face)->boundary_id());
 
-      return boundary_ids;
-    }
-  else
-    {
-      std::set<types::boundary_id> b_ids;
-      for (auto cell : active_cell_iterators())
-        if (cell->is_locally_owned())
-          for (const unsigned int face : cell->face_indices())
-            if (cell->at_boundary(face))
-              b_ids.insert(cell->face(face)->boundary_id());
-      std::vector<types::boundary_id> boundary_ids(b_ids.begin(), b_ids.end());
-      return boundary_ids;
-    }
+  return {boundary_ids.begin(), boundary_ids.end()};
 }
 
 
