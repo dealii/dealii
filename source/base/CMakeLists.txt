@@ -23,6 +23,7 @@ set(_unity_include_src
   conditional_ostream.cc
   convergence_table.cc
   discrete_time.cc
+  enable_ref_counting_by_observer.cc
   event.cc
   exceptions.cc
   flow_function.cc
@@ -88,7 +89,6 @@ set(_unity_include_src
   quadrature_lib.cc
   quadrature_selector.cc
   scalar_polynomials_base.cc
-  subscriptor.cc
   symbolic_function.cc
   table_handler.cc
   tensor.cc
