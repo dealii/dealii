@@ -18,13 +18,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/communication_pattern_base.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/memory_space_data.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/partitioner.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>

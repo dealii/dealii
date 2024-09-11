@@ -19,11 +19,11 @@
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/communication_pattern_base.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
 

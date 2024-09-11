@@ -22,9 +22,9 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/grid/tria.h>
 

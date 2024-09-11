@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/affine_constraints.h>
 

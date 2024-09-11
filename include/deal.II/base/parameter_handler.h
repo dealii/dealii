@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/patterns.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <boost/archive/basic_archive.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>

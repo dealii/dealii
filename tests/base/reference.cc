@@ -19,8 +19,8 @@
 // other tests.
 
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <iostream>
 #include <vector>
