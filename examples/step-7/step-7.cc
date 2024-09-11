@@ -45,7 +45,7 @@
 // Then we will show a little trick how we can make sure that objects are not
 // deleted while they are still in use. For this purpose, deal.II has the
 // ObserverPointer helper class, which is declared in this file:
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 // Next, we will want to use the function VectorTools::integrate_difference()
 // mentioned in the introduction, and we are going to use a ConvergenceTable
 // that collects all important data during a run and prints it at the end as a

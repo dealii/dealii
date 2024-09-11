@@ -20,9 +20,9 @@
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/iterator_range.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/grid/cell_id.h>

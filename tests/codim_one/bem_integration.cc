@@ -30,7 +30,7 @@
 
 #include <deal.II/fe/fe_dgp.h>
 // #include <deal.II/fe/fe_q.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>

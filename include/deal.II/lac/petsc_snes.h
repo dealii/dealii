@@ -19,8 +19,8 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/base/mpi.h>
+#  include <deal.II/base/observer_pointer.h>
 #  include <deal.II/base/parameter_handler.h>
-#  include <deal.II/base/smartpointer.h>
 
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_precondition.h>

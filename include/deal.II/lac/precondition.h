@@ -19,8 +19,8 @@
 
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/affine_constraints.h>

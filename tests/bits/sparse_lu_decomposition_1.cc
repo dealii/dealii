@@ -21,7 +21,7 @@
 // it was fixed around 2003-05-22
 
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/sparse_ilu.h>
 

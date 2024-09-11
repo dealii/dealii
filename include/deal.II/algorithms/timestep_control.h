@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/vector_memory.h>

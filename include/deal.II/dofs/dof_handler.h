@@ -23,7 +23,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/types.h>
 
 #include <deal.II/dofs/block_info.h>

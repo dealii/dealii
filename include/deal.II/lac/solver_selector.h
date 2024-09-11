@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/precondition.h>

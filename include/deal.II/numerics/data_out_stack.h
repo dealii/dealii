@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/vector.h>
 

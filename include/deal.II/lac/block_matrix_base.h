@@ -20,7 +20,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/utilities.h>
 

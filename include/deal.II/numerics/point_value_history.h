@@ -19,9 +19,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/smartpointer.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>

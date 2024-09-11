@@ -19,7 +19,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/lazy.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 

@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 
 #include <deal.II/lac/lapack_support.h>

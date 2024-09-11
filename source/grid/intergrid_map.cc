@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/shared_tria.h>

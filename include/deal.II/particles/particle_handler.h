@@ -20,7 +20,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/distributed/tria.h>

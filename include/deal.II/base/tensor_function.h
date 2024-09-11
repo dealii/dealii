@@ -21,8 +21,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_time.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <vector>

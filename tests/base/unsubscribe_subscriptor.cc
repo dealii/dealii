@@ -17,7 +17,7 @@
 // check that unsubscribing with a wrong id is handled correctly
 
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <iostream>

@@ -16,8 +16,8 @@
 #define dealii_function_restriction_h
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/tensor.h>
 
 DEAL_II_NAMESPACE_OPEN

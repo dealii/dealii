@@ -16,7 +16,7 @@
 #define dealii_non_matching_fe_values
 
 #include <deal.II/base/bounding_box.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

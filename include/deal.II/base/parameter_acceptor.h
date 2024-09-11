@@ -18,8 +18,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/smartpointer.h>
 
 #include <boost/signals2/signal.hpp>
 

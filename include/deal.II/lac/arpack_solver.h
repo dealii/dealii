@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/solver_control.h>
 

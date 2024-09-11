@@ -21,7 +21,7 @@
 #include <deal.II/algorithms/operator.h>
 #include <deal.II/algorithms/timestep_control.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 DEAL_II_NAMESPACE_OPEN
 

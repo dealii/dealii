@@ -12,8 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#ifndef dealii_smartpointer_h
-#define dealii_smartpointer_h
+#ifndef dealii_observer_pointer_h
+#define dealii_observer_pointer_h
 
 
 #include <deal.II/base/config.h>

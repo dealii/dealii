@@ -20,10 +20,10 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/ndarray.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/scalar_polynomials_base.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/tensor.h>
 
 #include <vector>

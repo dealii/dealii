@@ -21,7 +21,7 @@
 
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
