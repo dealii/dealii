@@ -503,7 +503,7 @@ namespace internal
  * @ingroup constraints
  */
 template <typename number = double>
-class AffineConstraints : public Subscriptor
+class AffineConstraints : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -2370,7 +2370,7 @@ inline AffineConstraints<number>::AffineConstraints(
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
   const AffineConstraints &affine_constraints)
-  : Subscriptor()
+  : EnableRefCountingByObserverPointer()
   , lines(affine_constraints.lines)
   , lines_cache(affine_constraints.lines_cache)
   , locally_owned_dofs(affine_constraints.locally_owned_dofs)

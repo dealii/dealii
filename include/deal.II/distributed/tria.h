@@ -1113,7 +1113,8 @@ namespace parallel
      * The use of this class is demonstrated in step-75.
      */
     template <int dim, int spacedim = dim>
-    class TemporarilyMatchRefineFlags : public Subscriptor
+    class TemporarilyMatchRefineFlags
+      : public EnableRefCountingByObserverPointer
     {
     public:
       /**

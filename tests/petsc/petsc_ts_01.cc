@@ -22,7 +22,7 @@
  * and exceptions handling for PETSCWrappers::TimeStepper.
  */
 
-class VectorType : public Subscriptor
+class VectorType : public EnableRefCountingByObserverPointer
 {
 public:
   explicit VectorType(Vec v)
@@ -39,7 +39,7 @@ private:
   Vec v;
 };
 
-class MatrixType : public Subscriptor
+class MatrixType : public EnableRefCountingByObserverPointer
 {
 public:
   explicit MatrixType(Mat A)

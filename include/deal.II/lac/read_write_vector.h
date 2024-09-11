@@ -123,7 +123,8 @@ namespace LinearAlgebra
    * get the first index of the largest range.
    */
   template <typename Number>
-  class ReadWriteVector : public Subscriptor, public ReadVector<Number>
+  class ReadWriteVector : public EnableRefCountingByObserverPointer,
+                          public ReadVector<Number>
   {
   public:
     /**
@@ -846,7 +847,7 @@ namespace LinearAlgebra
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(
     const ReadWriteVector<Number> &v)
-    : Subscriptor()
+    : EnableRefCountingByObserverPointer()
   {
     this->operator=(v);
   }

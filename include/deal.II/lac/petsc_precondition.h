@@ -56,7 +56,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBase : public Subscriptor
+  class PreconditionBase : public EnableRefCountingByObserverPointer
   {
   public:
     /**

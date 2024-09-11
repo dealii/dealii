@@ -26,10 +26,11 @@ DEAL_II_NAMESPACE_OPEN
 static const char *unknown_subscriber = "unknown subscriber";
 
 
-std::mutex Subscriptor::mutex;
+std::mutex EnableRefCountingByObserverPointer::mutex;
 
 
-Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
+EnableRefCountingByObserverPointer::EnableRefCountingByObserverPointer(
+  EnableRefCountingByObserverPointer &&subscriptor) noexcept
   : counter(0)
   , object_info(subscriptor.object_info)
 {
@@ -40,7 +41,7 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
 
 
 
-Subscriptor::~Subscriptor()
+EnableRefCountingByObserverPointer::~EnableRefCountingByObserverPointer()
 {
   for (auto *const validity_ptr : validity_pointers)
     *validity_ptr = false;
@@ -49,7 +50,7 @@ Subscriptor::~Subscriptor()
 
 
 void
-Subscriptor::check_no_subscribers() const noexcept
+EnableRefCountingByObserverPointer::check_no_subscribers() const noexcept
 {
   // Check whether there are still subscriptions to this object. If so, output
   // the actual name of the class to which this object belongs, i.e. the most
@@ -114,8 +115,9 @@ Subscriptor::check_no_subscribers() const noexcept
 
 
 
-Subscriptor &
-Subscriptor::operator=(Subscriptor &&s) noexcept
+EnableRefCountingByObserverPointer &
+EnableRefCountingByObserverPointer::operator=(
+  EnableRefCountingByObserverPointer &&s) noexcept
 {
   for (auto *const validity_ptr : s.validity_pointers)
     *validity_ptr = false;
@@ -127,8 +129,8 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 
 
 void
-Subscriptor::subscribe(std::atomic<bool> *const validity,
-                       const std::string       &id) const
+EnableRefCountingByObserverPointer::subscribe(std::atomic<bool> *const validity,
+                                              const std::string       &id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -147,8 +149,9 @@ Subscriptor::subscribe(std::atomic<bool> *const validity,
 
 
 void
-Subscriptor::unsubscribe(std::atomic<bool> *const validity,
-                         const std::string       &id) const
+EnableRefCountingByObserverPointer::unsubscribe(
+  std::atomic<bool> *const validity,
+  const std::string       &id) const
 {
   const std::string &name = id.empty() ? unknown_subscriber : id;
 
@@ -183,7 +186,7 @@ Subscriptor::unsubscribe(std::atomic<bool> *const validity,
       AssertNothrow(
         validity_ptr_it != validity_pointers.end(),
         ExcMessage(
-          "This Subscriptor object does not know anything about the supplied pointer!"));
+          "This EnableRefCountingByObserverPointer object does not know anything about the supplied pointer!"));
       return;
     }
 
@@ -195,7 +198,7 @@ Subscriptor::unsubscribe(std::atomic<bool> *const validity,
 
 
 void
-Subscriptor::list_subscribers() const
+EnableRefCountingByObserverPointer::list_subscribers() const
 {
   list_subscribers(deallog);
 }

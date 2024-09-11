@@ -1516,7 +1516,9 @@ inline void
 SparsityPattern::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar &boost::serialization::base_object<const Subscriptor>(*this);
+  ar &
+    boost::serialization::base_object<const EnableRefCountingByObserverPointer>(
+      *this);
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
@@ -1539,7 +1541,8 @@ inline void
 SparsityPattern::load(Archive &ar, const unsigned int)
 {
   // forward to serialization function in the base class.
-  ar &boost::serialization::base_object<Subscriptor>(*this);
+  ar &boost::serialization::base_object<EnableRefCountingByObserverPointer>(
+    *this);
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 

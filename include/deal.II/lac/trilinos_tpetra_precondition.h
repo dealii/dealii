@@ -53,7 +53,7 @@ namespace LinearAlgebra
      * @ingroup Preconditioners
      */
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
-    class PreconditionBase : public Subscriptor
+    class PreconditionBase : public EnableRefCountingByObserverPointer
     {
     public:
       /**

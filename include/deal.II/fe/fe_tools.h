@@ -85,7 +85,7 @@ namespace FETools
    * FETools::add_fe_name() functions.
    */
   template <int dim, int spacedim = dim>
-  class FEFactoryBase : public Subscriptor
+  class FEFactoryBase : public EnableRefCountingByObserverPointer
   {
   public:
     /**

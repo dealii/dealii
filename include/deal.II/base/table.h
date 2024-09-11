@@ -437,7 +437,7 @@ namespace internal
  * @ingroup data
  */
 template <int N, typename T>
-class TableBase : public Subscriptor
+class TableBase : public EnableRefCountingByObserverPointer
 {
 public:
   using value_type = T;
@@ -2165,7 +2165,7 @@ TableBase<N, T>::TableBase(const TableIndices<N> &sizes,
 
 template <int N, typename T>
 TableBase<N, T>::TableBase(const TableBase<N, T> &src)
-  : Subscriptor()
+  : EnableRefCountingByObserverPointer()
   , values(src.values)
   , table_size(src.table_size)
 {}
@@ -2185,7 +2185,7 @@ TableBase<N, T>::TableBase(const TableBase<N, T2> &src)
 
 template <int N, typename T>
 TableBase<N, T>::TableBase(TableBase<N, T> &&src) noexcept
-  : Subscriptor(std::move(src))
+  : EnableRefCountingByObserverPointer(std::move(src))
   , values(std::move(src.values))
   , table_size(src.table_size)
 {
@@ -2199,7 +2199,7 @@ template <class Archive>
 inline void
 TableBase<N, T>::serialize(Archive &ar, const unsigned int)
 {
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableRefCountingByObserverPointer &>(*this);
 
   ar &values &table_size;
 }
@@ -2342,10 +2342,11 @@ template <int N, typename T>
 inline TableBase<N, T> &
 TableBase<N, T>::operator=(TableBase<N, T> &&m) noexcept
 {
-  static_cast<Subscriptor &>(*this) = std::move(static_cast<Subscriptor &>(m));
-  values                            = std::move(m.values);
-  table_size                        = m.table_size;
-  m.table_size                      = TableIndices<N>();
+  static_cast<EnableRefCountingByObserverPointer &>(*this) =
+    std::move(static_cast<EnableRefCountingByObserverPointer &>(m));
+  values       = std::move(m.values);
+  table_size   = m.table_size;
+  m.table_size = TableIndices<N>();
 
   return *this;
 }

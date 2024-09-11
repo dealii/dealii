@@ -32,7 +32,7 @@
 std::vector<char> memory(10000);
 int               next = 0;
 
-class Test : public Subscriptor
+class Test : public EnableRefCountingByObserverPointer
 {
   const char *name;
 

@@ -77,7 +77,7 @@ namespace TrilinosWrappers
   namespace MPI
   {
     Vector::Vector()
-      : Subscriptor()
+      : EnableRefCountingByObserverPointer()
       , last_action(Zero)
       , compressed(true)
       , has_ghosts(false)
@@ -110,7 +110,8 @@ namespace TrilinosWrappers
       : Vector()
     {
       // initialize a minimal, valid object and swap
-      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      static_cast<EnableRefCountingByObserverPointer &>(*this) =
+        static_cast<EnableRefCountingByObserverPointer &&>(v);
       swap(v);
     }
 
@@ -522,7 +523,8 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator=(Vector &&v) noexcept
     {
-      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      static_cast<EnableRefCountingByObserverPointer &>(*this) =
+        static_cast<EnableRefCountingByObserverPointer &&>(v);
       swap(v);
       return *this;
     }

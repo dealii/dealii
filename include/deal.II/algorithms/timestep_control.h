@@ -57,7 +57,7 @@ namespace Algorithms
    * with a more modern interface and better programming guarantees. Consider
    * using DiscreteTime instead of TimestepControl.
    */
-  class TimestepControl : public Subscriptor
+  class TimestepControl : public EnableRefCountingByObserverPointer
   {
   public:
     /**

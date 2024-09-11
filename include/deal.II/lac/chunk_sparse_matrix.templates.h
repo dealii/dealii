@@ -279,7 +279,7 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix()
 
 template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparseMatrix &m)
-  : Subscriptor(m)
+  : EnableRefCountingByObserverPointer(m)
   , cols(nullptr, "ChunkSparseMatrix")
   , val(nullptr)
   , max_len(0)

@@ -249,7 +249,8 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class VectorBase : public ReadVector<PetscScalar>, public Subscriptor
+  class VectorBase : public ReadVector<PetscScalar>,
+                     public EnableRefCountingByObserverPointer
   {
   public:
     /**
@@ -1321,7 +1322,7 @@ namespace PETScWrappers
   VectorBase::save(Archive &ar, const unsigned int) const
   {
     // forward to serialization function in the base class.
-    ar &static_cast<const Subscriptor &>(*this);
+    ar &static_cast<const EnableRefCountingByObserverPointer &>(*this);
     ar &size();
     ar &local_range();
 
@@ -1343,7 +1344,7 @@ namespace PETScWrappers
   inline void
   VectorBase::load(Archive &ar, const unsigned int)
   {
-    ar &static_cast<Subscriptor &>(*this);
+    ar &static_cast<EnableRefCountingByObserverPointer &>(*this);
 
     size_type                       size = 0;
     std::pair<size_type, size_type> local_range;

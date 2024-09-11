@@ -56,7 +56,8 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim, typename number = double>
-  class DEAL_II_DEPRECATED LocalIntegrator : public Subscriptor
+  class DEAL_II_DEPRECATED LocalIntegrator
+    : public EnableRefCountingByObserverPointer
   {
   public:
     /**

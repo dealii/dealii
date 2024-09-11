@@ -445,7 +445,7 @@ DEAL_II_NAMESPACE_OPEN
  * in the manual).
  */
 template <typename number>
-class ChunkSparseMatrix : public virtual Subscriptor
+class ChunkSparseMatrix : public virtual EnableRefCountingByObserverPointer
 {
 public:
   /**

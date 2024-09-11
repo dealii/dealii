@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * of matrices, will be sufficient for applications.
  */
 template <typename VectorType>
-class MGMatrixBase : public Subscriptor
+class MGMatrixBase : public EnableRefCountingByObserverPointer
 {
 public:
   /*
@@ -104,7 +104,7 @@ public:
  * will be done by derived classes.
  */
 template <typename VectorType>
-class MGCoarseGridBase : public Subscriptor
+class MGCoarseGridBase : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -168,7 +168,7 @@ public:
  * needed.
  */
 template <typename VectorType>
-class MGTransferBase : public Subscriptor
+class MGTransferBase : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -248,7 +248,7 @@ public:
  * in the vector @p u given the right hand side, which is done by smooth().
  */
 template <typename VectorType>
-class MGSmootherBase : public Subscriptor
+class MGSmootherBase : public EnableRefCountingByObserverPointer
 {
 public:
   /**

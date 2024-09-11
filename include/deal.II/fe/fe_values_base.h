@@ -151,7 +151,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup feaccess
  */
 template <int dim, int spacedim>
-class FEValuesBase : public Subscriptor
+class FEValuesBase : public EnableRefCountingByObserverPointer
 {
 public:
   /**

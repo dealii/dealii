@@ -159,7 +159,7 @@ namespace mg
  * MGTransferBase.
  */
 template <typename VectorType>
-class Multigrid : public Subscriptor
+class Multigrid : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -499,7 +499,7 @@ private:
  * to be initialized with a separate DoFHandler for each block.
  */
 template <int dim, typename VectorType, typename TransferType>
-class PreconditionMG : public Subscriptor
+class PreconditionMG : public EnableRefCountingByObserverPointer
 {
 public:
   /**

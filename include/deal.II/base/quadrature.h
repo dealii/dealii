@@ -119,7 +119,7 @@ DEAL_II_NAMESPACE_OPEN
  * as "list of evaluation points".
  */
 template <int dim>
-class Quadrature : public Subscriptor
+class Quadrature : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -545,7 +545,7 @@ Quadrature<dim>::serialize(Archive &ar, const unsigned int)
 {
   // forward to serialization
   // function in the base class.
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableRefCountingByObserverPointer &>(*this);
 
   ar &quadrature_points &weights;
 }

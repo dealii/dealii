@@ -246,7 +246,7 @@ namespace Step64
   // needs to have a `vmult()` function that performs the action of
   // the linear operator on a source vector.
   template <int dim, int fe_degree>
-  class HelmholtzOperator : public Subscriptor
+  class HelmholtzOperator : public EnableRefCountingByObserverPointer
   {
   public:
     HelmholtzOperator(const DoFHandler<dim>           &dof_handler,

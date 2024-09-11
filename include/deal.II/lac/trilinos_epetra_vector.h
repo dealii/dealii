@@ -223,7 +223,7 @@ namespace LinearAlgebra
      * @ingroup Vectors
      */
     class Vector : public ReadVector<VectorTraits::value_type>,
-                   public Subscriptor
+                   public EnableRefCountingByObserverPointer
     {
     public:
       using value_type      = VectorTraits::value_type;

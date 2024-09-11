@@ -63,7 +63,7 @@ namespace GridTools
    * method mark_for_update() manually.
    */
   template <int dim, int spacedim = dim>
-  class Cache : public Subscriptor
+  class Cache : public EnableRefCountingByObserverPointer
   {
   public:
     /**

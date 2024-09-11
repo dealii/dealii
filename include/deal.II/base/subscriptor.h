@@ -34,14 +34,13 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This class, as a base class, allows to keep track of other objects using a
  * specific object. It is used to avoid that pointers that point to an object of
- * a class derived from Subscriptor are referenced after that object has been
- * invalidated. Here, invalidation is assumed to happen when the object is
- * moved from or destroyed.
- * The mechanism works as follows: The member function subscribe() accepts a
- * pointer to a boolean that is modified on invalidation. The object that owns
- * this pointer (usually an object of class type ObserverPointer) is then
- * expected to check the state of the boolean before trying to access this
- * class.
+ * a class derived from EnableRefCountingByObserverPointer are referenced after
+ * that object has been invalidated. Here, invalidation is assumed to happen
+ * when the object is moved from or destroyed. The mechanism works as follows:
+ * The member function subscribe() accepts a pointer to a boolean that is
+ * modified on invalidation. The object that owns this pointer (usually an
+ * object of class type ObserverPointer) is then expected to check the state of
+ * the boolean before trying to access this class.
  *
  * The utility of this class is even enhanced by providing identifying strings
  * to the functions subscribe() and unsubscribe(). These strings are represented
@@ -57,13 +56,13 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup memory
  */
-class Subscriptor
+class EnableRefCountingByObserverPointer
 {
 public:
   /**
    * Constructor setting the counter to zero.
    */
-  Subscriptor();
+  EnableRefCountingByObserverPointer();
 
   /**
    * Copy-constructor.
@@ -71,20 +70,22 @@ public:
    * The counter of the copy is zero, since references point to the original
    * object.
    */
-  Subscriptor(const Subscriptor &);
+  EnableRefCountingByObserverPointer(
+    const EnableRefCountingByObserverPointer &);
 
   /**
    * Move constructor.
    *
-   * An object inheriting from Subscriptor can only be moved if no other
-   * objects are subscribing to it.
+   * An object inheriting from EnableRefCountingByObserverPointer can only be
+   * moved if no other objects are subscribing to it.
    */
-  Subscriptor(Subscriptor &&) noexcept;
+  EnableRefCountingByObserverPointer(
+    EnableRefCountingByObserverPointer &&) noexcept;
 
   /**
    * Destructor, asserting that the counter is zero.
    */
-  virtual ~Subscriptor();
+  virtual ~EnableRefCountingByObserverPointer();
 
   /**
    * Assignment operator.
@@ -92,20 +93,21 @@ public:
    * This has to be handled with care, too, because the counter has to remain
    * the same. It therefore does nothing more than returning <tt>*this</tt>.
    */
-  Subscriptor &
-  operator=(const Subscriptor &);
+  EnableRefCountingByObserverPointer &
+  operator=(const EnableRefCountingByObserverPointer &);
 
   /**
    * Move assignment operator. Only invalidates the object moved from.
    */
-  Subscriptor &
-  operator=(Subscriptor &&) noexcept;
+  EnableRefCountingByObserverPointer &
+  operator=(EnableRefCountingByObserverPointer &&) noexcept;
 
   /**
-   * @name Subscriptor functionality
+   * @name EnableRefCountingByObserverPointer functionality
    *
-   * Classes derived from Subscriptor provide a facility to subscribe to this
-   * object. This is mostly used by the ObserverPointer class.
+   * Classes derived from EnableRefCountingByObserverPointer provide a facility
+   * to subscribe to this object. This is mostly used by the ObserverPointer
+   * class.
    * @{
    */
 
@@ -173,7 +175,8 @@ public:
 
   /**
    * A subscriber with the identification string given to
-   * Subscriptor::unsubscribe() did not subscribe to the object.
+   * EnableRefCountingByObserverPointer::unsubscribe() did not subscribe to the
+   * object.
    */
   DeclException2(ExcNoSubscriber,
                  std::string,
@@ -274,22 +277,24 @@ private:
 
 //---------------------------------------------------------------------------
 
-inline Subscriptor::Subscriptor()
+inline EnableRefCountingByObserverPointer::EnableRefCountingByObserverPointer()
   : counter(0)
   , object_info(nullptr)
 {}
 
 
 
-inline Subscriptor::Subscriptor(const Subscriptor &)
+inline EnableRefCountingByObserverPointer::EnableRefCountingByObserverPointer(
+  const EnableRefCountingByObserverPointer &)
   : counter(0)
   , object_info(nullptr)
 {}
 
 
 
-inline Subscriptor &
-Subscriptor::operator=(const Subscriptor &s)
+inline EnableRefCountingByObserverPointer &
+EnableRefCountingByObserverPointer::operator=(
+  const EnableRefCountingByObserverPointer &s)
 {
   object_info = s.object_info;
   return *this;
@@ -298,7 +303,7 @@ Subscriptor::operator=(const Subscriptor &s)
 
 
 inline unsigned int
-Subscriptor::n_subscriptions() const
+EnableRefCountingByObserverPointer::n_subscriptions() const
 {
   return counter;
 }
@@ -307,7 +312,7 @@ Subscriptor::n_subscriptions() const
 
 template <class Archive>
 inline void
-Subscriptor::serialize(Archive &, const unsigned int)
+EnableRefCountingByObserverPointer::serialize(Archive &, const unsigned int)
 {
   // do nothing, as explained in the
   // documentation of this function
@@ -315,7 +320,7 @@ Subscriptor::serialize(Archive &, const unsigned int)
 
 template <typename StreamType>
 inline void
-Subscriptor::list_subscribers(StreamType &stream) const
+EnableRefCountingByObserverPointer::list_subscribers(StreamType &stream) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 

@@ -104,7 +104,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename number>
 class SparseLUDecomposition : protected SparseMatrix<number>,
-                              public virtual Subscriptor
+                              public virtual EnableRefCountingByObserverPointer
 {
 protected:
   /**

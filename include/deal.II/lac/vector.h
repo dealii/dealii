@@ -116,7 +116,8 @@ namespace parallel
  * in the manual).
  */
 template <typename Number>
-class Vector : public Subscriptor, public ReadVector<Number>
+class Vector : public EnableRefCountingByObserverPointer,
+               public ReadVector<Number>
 {
 public:
   /**
@@ -1480,7 +1481,7 @@ inline void
 Vector<Number>::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const EnableRefCountingByObserverPointer &>(*this);
   ar &values;
 }
 
@@ -1492,7 +1493,7 @@ inline void
 Vector<Number>::load(Archive &ar, const unsigned int)
 {
   // the load stuff again from the archive
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableRefCountingByObserverPointer &>(*this);
   ar &values;
   maybe_reset_thread_partitioner();
 }

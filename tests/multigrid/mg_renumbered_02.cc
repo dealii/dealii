@@ -142,7 +142,7 @@ diff(Vector<double>        &diff,
 
 
 template <int dim>
-class OutputCreator : public Subscriptor
+class OutputCreator : public EnableRefCountingByObserverPointer
 {
 public:
   void

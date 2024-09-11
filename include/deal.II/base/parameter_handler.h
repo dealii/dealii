@@ -851,7 +851,7 @@ class MultipleParameterLoop;
  *
  * @ingroup input
  */
-class ParameterHandler : public Subscriptor
+class ParameterHandler : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -2330,7 +2330,7 @@ ParameterHandler::save(Archive &ar, const unsigned int) const
 {
   // Forward to serialization
   // function in the base class.
-  ar &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const EnableRefCountingByObserverPointer &>(*this);
 
   ar &*entries.get();
 
@@ -2350,7 +2350,7 @@ ParameterHandler::load(Archive &ar, const unsigned int)
 {
   // Forward to serialization
   // function in the base class.
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableRefCountingByObserverPointer &>(*this);
 
   ar &*entries.get();
 

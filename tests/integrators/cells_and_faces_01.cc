@@ -45,7 +45,7 @@
 const unsigned int n_functionals = 3;
 
 template <int dim>
-class Local : public Subscriptor
+class Local : public EnableRefCountingByObserverPointer
 {
 public:
   using CellInfo = EmptyInfo;

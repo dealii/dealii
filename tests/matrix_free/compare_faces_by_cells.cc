@@ -47,7 +47,7 @@ template <int dim,
           int fe_degree,
           int n_q_points_1d = fe_degree + 1,
           typename number   = double>
-class LaplaceOperator : public Subscriptor
+class LaplaceOperator : public EnableRefCountingByObserverPointer
 {
 public:
   using value_type = number;

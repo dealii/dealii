@@ -27,7 +27,7 @@
 #include "../tests.h"
 
 
-class Test : public Subscriptor
+class Test : public EnableRefCountingByObserverPointer
 {};
 
 

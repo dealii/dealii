@@ -63,7 +63,7 @@ class ParameterHandler;
  * number of iterations.
  * </ul>
  */
-class SolverControl : public Subscriptor
+class SolverControl : public EnableRefCountingByObserverPointer
 {
 public:
   /**

@@ -579,7 +579,7 @@ namespace DataPostprocessorInputs
  * @ingroup output
  */
 template <int dim>
-class DataPostprocessor : public Subscriptor
+class DataPostprocessor : public EnableRefCountingByObserverPointer
 {
 public:
   /**

@@ -60,7 +60,7 @@ namespace Polynomials
    * @ingroup Polynomials
    */
   template <typename number>
-  class PiecewisePolynomial : public Subscriptor
+  class PiecewisePolynomial : public EnableRefCountingByObserverPointer
   {
   public:
     /**
@@ -301,7 +301,7 @@ namespace Polynomials
   PiecewisePolynomial<number>::serialize(Archive &ar, const unsigned int)
   {
     // forward to serialization function in the base class.
-    ar &static_cast<Subscriptor &>(*this);
+    ar &static_cast<EnableRefCountingByObserverPointer &>(*this);
     ar &polynomial;
     ar &n_intervals;
     ar &interval;

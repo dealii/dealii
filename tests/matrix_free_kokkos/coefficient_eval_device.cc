@@ -75,7 +75,7 @@ DummyOperator<dim, fe_degree>::operator()(
 
 
 template <int dim, int fe_degree>
-class DummyMatrixFree : public Subscriptor
+class DummyMatrixFree : public EnableRefCountingByObserverPointer
 {
 public:
   DummyMatrixFree(const Portable::MatrixFree<dim, double> &data_in,

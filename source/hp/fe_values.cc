@@ -134,7 +134,7 @@ namespace hp
   template <int dim, int q_dim, typename FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const FEValuesBase<dim, q_dim, FEValuesType> &other)
-    : Subscriptor(other)
+    : EnableRefCountingByObserverPointer(other)
     , fe_collection(other.fe_collection)
     , mapping_collection(other.mapping_collection)
     , q_collection(other.q_collection)

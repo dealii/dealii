@@ -148,7 +148,7 @@ class TensorFunction;
 template <int dim, typename RangeNumberType = double>
 class Function : public FunctionTime<
                    typename numbers::NumberTraits<RangeNumberType>::real_type>,
-                 public Subscriptor
+                 public EnableRefCountingByObserverPointer
 {
 public:
   /**

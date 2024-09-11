@@ -866,7 +866,7 @@ namespace LaplaceSolver
 namespace Data
 {
   template <int dim>
-  struct SetUpBase : public Subscriptor
+  struct SetUpBase : public EnableRefCountingByObserverPointer
   {
     virtual const Function<dim> &
     get_boundary_values() const = 0;
@@ -1095,7 +1095,7 @@ namespace Data
 namespace DualFunctional
 {
   template <int dim>
-  class DualFunctionalBase : public Subscriptor
+  class DualFunctionalBase : public EnableRefCountingByObserverPointer
   {
   public:
     virtual void

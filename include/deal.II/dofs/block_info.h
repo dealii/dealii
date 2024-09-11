@@ -91,7 +91,7 @@ class DoFHandler;
  *
  * @ingroup dofs
  */
-class BlockInfo : public Subscriptor
+class BlockInfo : public EnableRefCountingByObserverPointer
 {
 public:
   /**

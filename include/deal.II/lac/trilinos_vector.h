@@ -401,7 +401,8 @@ namespace TrilinosWrappers
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public Subscriptor, public ReadVector<TrilinosScalar>
+    class Vector : public EnableRefCountingByObserverPointer,
+                   public ReadVector<TrilinosScalar>
     {
     public:
       /**

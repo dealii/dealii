@@ -45,10 +45,10 @@ DEAL_II_NAMESPACE_OPEN
  * through casting), but they make sure that the object pointed to is not
  * deleted or moved from in the course of use of the pointer by signaling the
  * pointee its use. This is achieved by keeping a use count for the pointed-to
- * object (which for this purpose needs to be derived from the Subscriptor
- * class), and ensuring that the pointed-to object's destructor triggers an
- * error if that use-count is larger than zero -- i.e., if there are still
- * observing ObserverPointer objects pointing to it.
+ * object (which for this purpose needs to be derived from the
+ * EnableRefCountingByObserverPointer class), and ensuring that the pointed-to
+ * object's destructor triggers an error if that use-count is larger than zero
+ * -- i.e., if there are still observing ObserverPointer objects pointing to it.
  *
  * Conceptually, ObserverPointer fills a gap between `std::unique_ptr` and
  * `std::shared_ptr`. While the former makes it clear that there is a unique
@@ -96,7 +96,8 @@ DEAL_II_NAMESPACE_OPEN
  *   to a constant object (disallowing write access when dereferenced), while
  *   `ObserverPointer<T>` is a mutable pointer.
  *
- * @dealiiConceptRequires{std::is_base_of_v<Subscriptor, T>}
+ * @dealiiConceptRequires{std::is_base_of_v<EnableRefCountingByObserverPointer,
+ * T>}
  *
  * @ingroup memory
  */
@@ -133,8 +134,9 @@ public:
    * not a null pointer, the constructor subscribes to the given object to
    * lock it, i.e. to prevent its destruction before the end of its use.
    *
-   * The <tt>id</tt> is used in the call to Subscriptor::subscribe(id) and by
-   * ~ObserverPointer() in the call to Subscriptor::unsubscribe().
+   * The <tt>id</tt> is used in the call to
+   * EnableRefCountingByObserverPointer::subscribe(id) and by ~ObserverPointer()
+   * in the call to EnableRefCountingByObserverPointer::unsubscribe().
    */
   ObserverPointer(T *t, const std::string &id);
 
@@ -281,9 +283,10 @@ inline ObserverPointer<T, P>::ObserverPointer()
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {
-  static_assert(std::is_base_of_v<Subscriptor, T>,
-                "This class can only be used if the first template argument "
-                "is a class derived from 'Subscriptor'.");
+  static_assert(
+    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
+    "This class can only be used if the first template argument "
+    "is a class derived from 'EnableRefCountingByObserverPointer'.");
 }
 
 
@@ -294,9 +297,10 @@ inline ObserverPointer<T, P>::ObserverPointer(T *t)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {
-  static_assert(std::is_base_of_v<Subscriptor, T>,
-                "This class can only be used if the first template argument "
-                "is a class derived from 'Subscriptor'.");
+  static_assert(
+    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
+    "This class can only be used if the first template argument "
+    "is a class derived from 'EnableRefCountingByObserverPointer'.");
 
   if (t != nullptr)
     t->subscribe(&pointed_to_object_is_alive, id);
@@ -310,9 +314,10 @@ inline ObserverPointer<T, P>::ObserverPointer(T *t, const std::string &id)
   , id(id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(std::is_base_of_v<Subscriptor, T>,
-                "This class can only be used if the first template argument "
-                "is a class derived from 'Subscriptor'.");
+  static_assert(
+    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
+    "This class can only be used if the first template argument "
+    "is a class derived from 'EnableRefCountingByObserverPointer'.");
 
   if (pointer != nullptr)
     pointer->subscribe(&pointed_to_object_is_alive, id);
@@ -328,9 +333,10 @@ inline ObserverPointer<T, P>::ObserverPointer(
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(std::is_base_of_v<Subscriptor, T>,
-                "This class can only be used if the first template argument "
-                "is a class derived from 'Subscriptor'.");
+  static_assert(
+    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
+    "This class can only be used if the first template argument "
+    "is a class derived from 'EnableRefCountingByObserverPointer'.");
 
   if (other != nullptr)
     {
@@ -350,9 +356,10 @@ inline ObserverPointer<T, P>::ObserverPointer(
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(std::is_base_of_v<Subscriptor, T>,
-                "This class can only be used if the first template argument "
-                "is a class derived from 'Subscriptor'.");
+  static_assert(
+    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
+    "This class can only be used if the first template argument "
+    "is a class derived from 'EnableRefCountingByObserverPointer'.");
 
   if (other != nullptr)
     {
@@ -372,9 +379,10 @@ inline ObserverPointer<T, P>::ObserverPointer(
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(std::is_base_of_v<Subscriptor, T>,
-                "This class can only be used if the first template argument "
-                "is a class derived from 'Subscriptor'.");
+  static_assert(
+    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
+    "This class can only be used if the first template argument "
+    "is a class derived from 'EnableRefCountingByObserverPointer'.");
 
   if (other != nullptr)
     {
@@ -406,9 +414,10 @@ inline ObserverPointer<T, P>::ObserverPointer(
 template <typename T, typename P>
 inline ObserverPointer<T, P>::~ObserverPointer()
 {
-  static_assert(std::is_base_of_v<Subscriptor, T>,
-                "This class can only be used if the first template argument "
-                "is a class derived from 'Subscriptor'.");
+  static_assert(
+    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
+    "This class can only be used if the first template argument "
+    "is a class derived from 'EnableRefCountingByObserverPointer'.");
 
   if (pointed_to_object_is_alive && pointer != nullptr)
     pointer->unsubscribe(&pointed_to_object_is_alive, id);
