@@ -1,0 +1,31 @@
+
+DEAL::Refinement cycle 0
+DEAL::   Set-up...
+DEAL::	Number of active cells: 6
+DEAL::	Number of degrees of freedom: 52 (34+18)
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::   Velocity L2 Error: 0.314683
+DEAL::   Pressure L2 Error: 3.40767
+DEAL::   Velocity H1 Error: 2.13131
+DEAL::   Velocity Hdiv Err: 3.33043e-09
+DEAL::Refinement cycle 1
+DEAL::   Set-up...
+DEAL::	Number of active cells: 96
+DEAL::	Number of degrees of freedom: 706 (418+288)
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::   Velocity L2 Error: 0.00815750
+DEAL::   Pressure L2 Error: 0.782868
+DEAL::   Velocity H1 Error: 0.275850
+DEAL::   Velocity Hdiv Err: 1.64529e-08
+DEAL::Refinement cycle 2
+DEAL::   Set-up...
+DEAL::	Number of active cells: 486
+DEAL::	Number of degrees of freedom: 3476 (2018+1458)
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::   Velocity L2 Error: 0.000739254
+DEAL::   Pressure L2 Error: 0.190631
+DEAL::   Velocity H1 Error: 0.0599330
+DEAL::   Velocity Hdiv Err: 6.61221e-09
