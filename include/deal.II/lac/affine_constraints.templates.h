@@ -258,29 +258,29 @@ AffineConstraints<number>::is_consistent_in_parallel(
   unsigned int inconsistent = 0;
 
   // from each processor:
-  for (const auto &kv : received)
+  for (const auto &[sender, constraints] : received)
     {
       // for each incoming line:
-      for (const auto &lineit : kv.second)
+      for (const ConstraintLine &constraint : constraints)
         {
-          const ConstraintLine reference = get_line(lineit.index);
+          const ConstraintLine reference = get_line(constraint.index);
 
-          if (lineit.inhomogeneity != reference.inhomogeneity)
+          if (constraint.inhomogeneity != reference.inhomogeneity)
             {
               ++inconsistent;
 
               if (verbose)
-                std::cout << "Proc " << myid << " got line " << lineit.index
-                          << " from " << kv.first << " inhomogeneity "
-                          << lineit.inhomogeneity
+                std::cout << "Proc " << myid << " got line " << constraint.index
+                          << " from " << sender << " inhomogeneity "
+                          << constraint.inhomogeneity
                           << " != " << reference.inhomogeneity << std::endl;
             }
-          else if (lineit.entries != reference.entries)
+          else if (constraint.entries != reference.entries)
             {
               ++inconsistent;
               if (verbose)
-                std::cout << "Proc " << myid << " got line " << lineit.index
-                          << " from " << kv.first << " with wrong values!"
+                std::cout << "Proc " << myid << " got line " << constraint.index
+                          << " from " << sender << " with wrong values!"
                           << std::endl;
             }
         }
@@ -476,14 +476,13 @@ namespace internal
 
       std::map<unsigned int, std::vector<ConstraintLine>> send_data;
 
-      for (const std::map<unsigned int, IndexSet>::value_type
-             &rank_and_indices : locally_relevant_dofs_by_ranks)
+      for (const auto &[destination, indices] : locally_relevant_dofs_by_ranks)
         {
-          Assert(rank_and_indices.first != my_rank, ExcInternalError());
+          Assert(destination != my_rank, ExcInternalError());
 
           std::vector<ConstraintLine> data;
 
-          for (const types::global_dof_index index : rank_and_indices.second)
+          for (const types::global_dof_index index : indices)
             {
               // note: at this stage locally_relevant_constraints still
               // contains only locally owned constraints
@@ -497,14 +496,14 @@ namespace internal
                 data.push_back(*ptr);
             }
 
-          send_data[rank_and_indices.first] = std::move(data);
+          send_data[destination] = std::move(data);
         }
 
       const std::map<unsigned int, std::vector<ConstraintLine>> received_data =
         Utilities::MPI::some_to_some(mpi_communicator, send_data);
 
       // Finally collate everything into one array, sort, and make it unique:
-      for (const auto &[rank, constraints] : received_data)
+      for (const auto &[sender, constraints] : received_data)
         locally_relevant_constraints.insert(locally_relevant_constraints.end(),
                                             constraints.begin(),
                                             constraints.end());
