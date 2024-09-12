@@ -684,7 +684,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: ObserverPointer and Subscriptor use a `std::string`
+  Changed: SmartPointer and Subscriptor use a `std::string`
   instead of a `const char *` for subscriber identification. As a result,
   subscriber strings are no longer compared by their memory address but instead
   by their content.
@@ -1287,10 +1287,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The class Subscriptor and ObserverPointer check for dangling pointers and
+  Changed: The class Subscriptor and SmartPointer check for dangling pointers and
   use-after-move. The destructor of Subscriptor doesn't signal an error when there
   is still an object subscribed to it. Instead, validity is checked when
-  dereferencing the ObserverPointer object.
+  dereferencing the SmartPointer object.
   <br>
   (Daniel Arndt, 2018/11/02)
  </li>

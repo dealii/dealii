@@ -552,7 +552,7 @@ inconvenience this causes.
        (WB 2006/08/02)
        </p>
 
-  <li> <p> Changed: When there is still a <code>ObserverPointer</code> object
+  <li> <p> Changed: When there is still a <code>SmartPointer</code> object
        pointing to another object at the time it is destroyed, this would cause
        the program to be aborted. However, there are cases where this is not
        desirable, for example here:

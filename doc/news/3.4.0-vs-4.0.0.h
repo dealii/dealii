@@ -385,7 +385,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
   <li> <p>
        Fixed: The <code>Subscriptor</code> uses a counter to
-       count how many <code>ObserverPointer</code> objects subscribe
+       count how many <code>SmartPointer</code> objects subscribe
        to the pointed-to object. This counter needs to be a volatile variable
        in multithreaded mode, to avoid false compiler optimizations based on
        the assumption that the variable cannot change between two subsequent
