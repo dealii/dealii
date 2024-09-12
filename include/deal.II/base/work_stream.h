@@ -1228,72 +1228,74 @@ namespace WorkStream
 
               // For each cell queue up a combined worker and copier task. These
               // are not yet run.
-              for (auto &it : colored_iterators[color])
+              for (const Iterator &it : colored_iterators[color])
                 {
                   auto worker_task =
                     taskflow
-                      .emplace([it,
-                                have_worker,
-                                have_copier,
-                                &thread_safe_scratch_and_copy_data_list,
-                                &sample_scratch_data,
-                                &sample_copy_data,
-                                &worker,
-                                &copier]() {
-                        ScratchData *scratch_data = nullptr;
-                        CopyData    *copy_data    = nullptr;
+                      .emplace(
+                        [it =
+                           it, // make a copy of the reference to the iterator
+                         have_worker,
+                         have_copier,
+                         &thread_safe_scratch_and_copy_data_list,
+                         &sample_scratch_data,
+                         &sample_copy_data,
+                         &worker,
+                         &copier]() {
+                          ScratchData *scratch_data = nullptr;
+                          CopyData    *copy_data    = nullptr;
 
-                        ScratchAndCopyDataList &scratch_and_copy_data_list =
-                          thread_safe_scratch_and_copy_data_list.get();
-                        // See if there is an unused object. if so, grab it and
-                        // mark it as used.
-                        for (typename ScratchAndCopyDataList::iterator p =
-                               scratch_and_copy_data_list.begin();
-                             p != scratch_and_copy_data_list.end();
-                             ++p)
-                          {
-                            if (p->currently_in_use == false)
-                              {
-                                scratch_data        = p->scratch_data.get();
-                                copy_data           = p->copy_data.get();
-                                p->currently_in_use = true;
-                                break;
-                              }
-                          }
-                        // If no element in the list was found, create one and
-                        // mark it as used.
-                        if (scratch_data == nullptr)
-                          {
-                            Assert(copy_data == nullptr, ExcInternalError());
-                            scratch_and_copy_data_list.emplace_back(
-                              std::make_unique<ScratchData>(
-                                sample_scratch_data),
-                              std::make_unique<CopyData>(sample_copy_data),
-                              true);
-                            scratch_data = scratch_and_copy_data_list.back()
-                                             .scratch_data.get();
-                            copy_data =
-                              scratch_and_copy_data_list.back().copy_data.get();
-                          }
-                        if (have_worker)
-                          worker(it, *scratch_data, *copy_data);
-                        if (have_copier)
-                          copier(*copy_data);
+                          ScratchAndCopyDataList &scratch_and_copy_data_list =
+                            thread_safe_scratch_and_copy_data_list.get();
+                          // See if there is an unused object. if so, grab it
+                          // and mark it as used.
+                          for (typename ScratchAndCopyDataList::iterator p =
+                                 scratch_and_copy_data_list.begin();
+                               p != scratch_and_copy_data_list.end();
+                               ++p)
+                            {
+                              if (p->currently_in_use == false)
+                                {
+                                  scratch_data        = p->scratch_data.get();
+                                  copy_data           = p->copy_data.get();
+                                  p->currently_in_use = true;
+                                  break;
+                                }
+                            }
+                          // If no element in the list was found, create one and
+                          // mark it as used.
+                          if (scratch_data == nullptr)
+                            {
+                              Assert(copy_data == nullptr, ExcInternalError());
+                              scratch_and_copy_data_list.emplace_back(
+                                std::make_unique<ScratchData>(
+                                  sample_scratch_data),
+                                std::make_unique<CopyData>(sample_copy_data),
+                                true);
+                              scratch_data = scratch_and_copy_data_list.back()
+                                               .scratch_data.get();
+                              copy_data = scratch_and_copy_data_list.back()
+                                            .copy_data.get();
+                            }
+                          if (have_worker)
+                            worker(it, *scratch_data, *copy_data);
+                          if (have_copier)
+                            copier(*copy_data);
 
-                        // Mark objects as free to be used again.
-                        for (typename ScratchAndCopyDataList::iterator p =
-                               scratch_and_copy_data_list.begin();
-                             p != scratch_and_copy_data_list.end();
-                             ++p)
-                          {
-                            if (p->scratch_data.get() == scratch_data)
-                              {
-                                Assert(p->currently_in_use == true,
-                                       ExcInternalError());
-                                p->currently_in_use = false;
-                              }
-                          }
-                      })
+                          // Mark objects as free to be used again.
+                          for (typename ScratchAndCopyDataList::iterator p =
+                                 scratch_and_copy_data_list.begin();
+                               p != scratch_and_copy_data_list.end();
+                               ++p)
+                            {
+                              if (p->scratch_data.get() == scratch_data)
+                                {
+                                  Assert(p->currently_in_use == true,
+                                         ExcInternalError());
+                                  p->currently_in_use = false;
+                                }
+                            }
+                        })
                       .name("worker_and_copier");
                   // If we are on the last color we do not need to add a barrier
                   // at the end of the graph. Otherwise we force the next color
