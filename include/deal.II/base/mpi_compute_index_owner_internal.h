@@ -346,8 +346,14 @@ namespace Utilities
            * the consensus algorithm back to the owner in the original
            * IndexSet. This requires some point-to-point communication.
            *
-           * @return Map of processors and associated ranges of indices that
-           *         are requested from the current rank
+           * @return Map of processors and associated sets of indices
+           *         that are requested from the current rank. In
+           *         other words, this function returns for each rank
+           *         that has requested information about indices
+           *         owned by the current which indices it has
+           *         requested about; the values of the map are
+           *         therefore all subsets of the owned set of
+           *         indices.
            */
           std::map<unsigned int, IndexSet>
           get_requesters();
