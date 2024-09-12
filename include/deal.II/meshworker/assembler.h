@@ -53,7 +53,7 @@ namespace MeshWorker
    * This is the structure set up by the FESystem class. Globally, this means,
    * data is assembled into one residual vector and into one matrix. These
    * objects may be block vectors and block matrices, but the process of
-   * assembling ignores this fact.
+   * assembling does not care about this.
    *
    * Similarly, there is only a single cell vector and cell matrix,
    * respectively, which is indexed by all degrees of freedom of the FESystem.
@@ -65,8 +65,9 @@ namespace MeshWorker
    *
    * Here, all the blocks are treated separately (in spite of using FESystem
    * for its convenience in other places). For instance, no block matrix is
-   * assembled, but a list of blocks, which can be combined later by
-   * BlockMatrixArray. Locally, this means, that each matrix block of a system
+   * assembled, but a list of blocks, which can be blocks inside a larger block
+   * matrix but, again, the assembly process is unaware of this and does
+   * not care. Locally, this means, that each matrix block of a system
    * is generated separately and assembled into the corresponding global
    * block.
    *

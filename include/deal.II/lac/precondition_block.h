@@ -40,9 +40,8 @@ DEAL_II_NAMESPACE_OPEN
  * diagonal and provides the inversion of the diagonal blocks of the matrix.
  * It is not necessary for this class that the matrix be block diagonal;
  * rather, it applies to matrices of arbitrary structure with the minimal
- * property of having invertible blocks on the diagonal. Still the matrix must
- * have access to single matrix entries. Therefore, BlockMatrixArray and
- * similar classes are not a possible matrix class template arguments.
+ * property of having invertible blocks on the diagonal. The matrix must
+ * have access to individual matrix entries.
  *
  * The block matrix structure used by this class is given, e.g., for the DG
  * method for the transport equation. For a downstream numbering the matrices
@@ -703,10 +702,7 @@ public:
   /**
    * Execute block SOR preconditioning.
    *
-   * Warning: this function performs normal @p vmult without adding. The
-   * reason for its existence is that BlockMatrixArray requires the adding
-   * version by default. On the other hand, adding requires an additional
-   * auxiliary vector, which is not desirable.
+   * Warning: this function performs normal @p vmult without adding.
    *
    * @see vmult
    */
@@ -729,10 +725,7 @@ public:
   /**
    * Execute backward block SOR preconditioning.
    *
-   * Warning: this function performs normal @p vmult without adding. The
-   * reason for its existence is that BlockMatrixArray requires the adding
-   * version by default. On the other hand, adding requires an additional
-   * auxiliary vector, which is not desirable.
+   * Warning: this function performs normal @p vmult without adding.
    *
    * @see vmult
    */
