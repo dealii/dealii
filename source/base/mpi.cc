@@ -713,7 +713,11 @@ namespace Utilities
       // processes again and extended with information with the actual owner
       // of that the index.
       internal::ComputeIndexOwner::ConsensusAlgorithmsPayload process(
-        owned_indices, indices_to_look_up, comm, owning_ranks);
+        owned_indices,
+        indices_to_look_up,
+        comm,
+        owning_ranks,
+        /* keep track of requesters = */ false);
 
       // Step 2: read dictionary
       // Communicate with the process who owns the index in the static
