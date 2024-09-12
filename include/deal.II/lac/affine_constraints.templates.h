@@ -482,18 +482,32 @@ namespace internal
 
           std::vector<ConstraintLine> data;
 
-          for (const types::global_dof_index index : indices)
+          auto i = indices.begin();
+
+          auto j = std::lower_bound(locally_relevant_constraints.begin(),
+                                    locally_relevant_constraints.end(),
+                                    *i,
+                                    [&](const auto &a, const auto &b) {
+                                      return a.index < b;
+                                    });
+
+          for (; (i != indices.end()) &&
+                 (j != locally_relevant_constraints.end());)
             {
-              // note: at this stage locally_relevant_constraints still
-              // contains only locally owned constraints
-              const typename std::vector<ConstraintLine>::iterator ptr =
-                std::find_if(locally_relevant_constraints.begin(),
-                             locally_relevant_constraints.end(),
-                             [index](const auto &a) {
-                               return a.index == index;
-                             });
-              if (ptr != locally_relevant_constraints.end())
-                data.push_back(*ptr);
+              if (*i == j->index)
+                {
+                  data.push_back(*j);
+                  ++i;
+                  ++j;
+                }
+              else if (*i < j->index)
+                {
+                  ++i;
+                }
+              else
+                {
+                  ++j;
+                }
             }
 
           send_data[destination] = std::move(data);
