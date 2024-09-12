@@ -160,7 +160,7 @@ class FESystem;
  * done based on vector components, but based on the use of
  * @ref GlossBlock "blocks",
  * and the result is then used to substructure objects of type BlockVector,
- * BlockSparseMatrix, BlockMatrixArray, and so on. If you use non-primitive
+ * BlockSparseMatrix, and so on. If you use non-primitive
  * elements, you cannot determine the block number by
  * FiniteElement::system_to_component_index(). Instead, you can use
  * FiniteElement::system_to_block_index(). The number of blocks of a finite

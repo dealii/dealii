@@ -75,24 +75,6 @@ namespace internal
  * This behavior allows us to store MatrixBlock objects in vectors, for
  * instance in MGLevelObject without extracting the #matrix first.
  *
- * MatrixBlock comes handy when using BlockMatrixArray. Once the MatrixBlock
- * has been properly initialized and filled, it can be used in the simplest
- * case as:
- * @code
- * MatrixBlockVector<SparseMatrix<double> > > blocks;
- *
- * ...
- *
- * BlockMatrixArray matrix (n_blocks, n_blocks);
- *
- * for (size_type i=0;i<blocks.size;++i)
- *   matrix.enter(blocks.block(i).row, blocks.block(i).column,
- * blocks.matrix(i));
- * @endcode
- *
- * Here, we have not gained very much, except that we do not need to set up
- * empty blocks in the block system.
- *
  * @note This class expects, that the row and column BlockIndices objects for
  * the system are equal. If they are not, some functions will throw
  * ExcNotImplemented.
