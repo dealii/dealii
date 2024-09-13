@@ -13,8 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
-#include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/mpi.h>
 
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
@@ -145,28 +144,14 @@ namespace RepartitioningPolicyTools
       if (cell->is_locally_owned())
         is_coarse.add_index(cell_id_translator.translate(cell));
 
-    std::vector<unsigned int> owning_ranks_of_coarse_cells(
-      is_coarse.n_elements());
-    {
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        process(is_level_partitions,
-                is_coarse,
-                communicator,
-                owning_ranks_of_coarse_cells,
-                false);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_cell_index, types::global_cell_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, communicator);
-    }
+    const std::vector<unsigned int> owning_ranks_of_coarse_cells =
+      Utilities::MPI::compute_index_owner(is_level_partitions,
+                                          is_coarse,
+                                          communicator);
 
     const auto tria =
       dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
         &tria_coarse_in);
-
     Assert(tria, ExcNotImplemented());
 
     LinearAlgebra::distributed::Vector<double> partition(
