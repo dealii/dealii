@@ -451,7 +451,8 @@ namespace internal
     // step 3: communicate constraints so that each process knows how the
     // locally relevant dofs are constrained
     {
-      // ... determine owners of locally relevant dofs
+      // First determine the owners of those locally relevant dofs we
+      // don't own ourselves.
       IndexSet locally_relevant_dofs_non_local = locally_relevant_dofs;
       locally_relevant_dofs_non_local.subtract_set(locally_owned_dofs);
 
@@ -462,7 +463,7 @@ namespace internal
                                       locally_relevant_dofs_non_local,
                                       mpi_communicator,
                                       locally_relevant_dofs_owners,
-                                      true);
+                                      /* keep track of requesters = */ true);
 
       Utilities::MPI::ConsensusAlgorithms::Selector<
         std::vector<
@@ -471,28 +472,38 @@ namespace internal
         consensus_algorithm;
       consensus_algorithm.run(locally_relevant_dofs_process, mpi_communicator);
 
-      const auto locally_relevant_dofs_by_ranks =
-        locally_relevant_dofs_process.get_requesters();
+      // We are, however, not actually interested in who owns a specific
+      // DoF we have among our locally-stored-but-not-locally-owned constraints.
+      // Rather, we want to know who requested information about our own
+      // locally-owned DoFs. That's because we will want to send our own
+      // locally-owned constraints to those processes for which these are
+      // in their own locally-relevant index sets.
+      const std::map<unsigned int, IndexSet>
+        requesters_and_requested_constraints =
+          locally_relevant_dofs_process.get_requesters();
 
       std::map<unsigned int, std::vector<ConstraintLine>> send_data;
-
-      for (const auto &[destination, indices] : locally_relevant_dofs_by_ranks)
+      for (const auto &[destination, requested_indices] :
+           requesters_and_requested_constraints)
         {
           Assert(destination != my_rank, ExcInternalError());
+          Assert(requested_indices.is_subset_of(locally_owned_dofs),
+                 ExcInternalError());
 
           std::vector<ConstraintLine> data;
 
-          auto i = indices.begin();
+          IndexSet::ElementIterator i = requested_indices.begin();
 
-          auto j = std::lower_bound(locally_relevant_constraints.begin(),
-                                    locally_relevant_constraints.end(),
-                                    *i,
-                                    [&](const auto &a, const auto &b) {
-                                      return a.index < b;
-                                    });
+          typename std::vector<ConstraintLine>::const_iterator j =
+            std::lower_bound(locally_relevant_constraints.begin(),
+                             locally_relevant_constraints.end(),
+                             *i,
+                             [&](const auto &a, const auto &b) {
+                               return a.index < b;
+                             });
 
-          for (; (i != indices.end()) &&
-                 (j != locally_relevant_constraints.end());)
+          while ((i != requested_indices.end()) &&
+                 (j != locally_relevant_constraints.end()))
             {
               if (*i == j->index)
                 {
@@ -501,13 +512,9 @@ namespace internal
                   ++j;
                 }
               else if (*i < j->index)
-                {
-                  ++i;
-                }
+                ++i;
               else
-                {
-                  ++j;
-                }
+                ++j;
             }
 
           send_data[destination] = std::move(data);
