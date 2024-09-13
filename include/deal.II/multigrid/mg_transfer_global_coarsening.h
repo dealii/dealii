@@ -978,9 +978,9 @@ private:
  * refined meshes.
  *
  * This class currently only works for the tensor-product finite elements
- * FE_Q and FE_DGQ and simplex elements FE_SimplexP and FE_SimplexDGP as well as
- * for systems involving multiple components of one of these elements. Other
- * elements are currently not implemented.
+ * FE_Q, FE_DGQ, and FE_DGP and simplex elements FE_SimplexP and FE_SimplexDGP
+ * as well as for systems involving multiple components of one of these
+ * elements. Other elements are currently not implemented.
  *
  * The implementation of this class is explained in detail in @cite munch2022gc.
  */

@@ -65,6 +65,19 @@ print(const LinearAlgebra::distributed::Vector<Number> &vec)
   deallog << std::endl;
 }
 
+template <typename Number>
+void
+print_if_non_zero(const LinearAlgebra::distributed::Vector<Number> &vec,
+                  const Number                                      tolerance)
+{
+  for (const auto &v : vec)
+    if (std::abs(v) > tolerance)
+      deallog << v << " ";
+    else
+      deallog << 0.0 << " ";
+  deallog << std::endl;
+}
+
 
 template <int dim, typename Number, typename MeshType>
 void
