@@ -604,7 +604,7 @@ sometimes not thinking of all cases, for example by checking
 for <code>p[0]</code> to be less than and greater than zero,
 rather than greater-or-equal to zero, and thereby forgetting
 some cases that would otherwise lead to bugs that are awkward
-to find.
+to find.)
 
 By playing with such cases where four or more sectors come
 together and on which the coefficient has different values, one can
