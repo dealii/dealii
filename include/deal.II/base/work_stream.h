@@ -1181,7 +1181,6 @@ namespace WorkStream
 
       {
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
-        tf::Taskflow  taskflow;
         using ScratchAndCopyDataObjects = typename internal::
           ScratchAndCopyDataObjects<Iterator, ScratchData, CopyData>;
 
@@ -1190,12 +1189,11 @@ namespace WorkStream
         Threads::ThreadLocalStorage<ScratchAndCopyDataList>
           thread_safe_scratch_and_copy_data_list;
 
-        // These are used to establish task dependencies. These are barrier
-        // tasks which are dependent on all tasks in the same "color" to be
-        // completed before allowing any tasks in the next "color" to be worked
-        // on.
-        tf::Task last_color;
-        tf::Task next_color;
+        tf::Taskflow taskflow;
+
+        // Create a "future" object which eventually contains the execution
+        // result of a taskflow graph and can be used to yield execution
+        tf::Future<void> execution_future;
 
         const bool have_worker =
           (static_cast<const std::function<
@@ -1214,108 +1212,84 @@ namespace WorkStream
           // Ignore color blocks which are empty.
           if (colored_iterators[color].size() > 0)
             {
-              // Keep a handle to the last color. Tasks in taskflow are
-              // basically handles to internally stored data, so this does not
-              // perform a copy:
-              if (!next_color.empty())
-                last_color = next_color;
-              // A placeholder task is a task object which respects dependencies
-              // but is empty (contains no work). The name is useful when
-              // examining a visualization of the graph through Taskflow's
-              // supported visualization tools.
-              if (color < colored_iterators.size() - 1)
-                next_color = taskflow.placeholder().name("color border");
-
               // For each cell queue up a combined worker and copier task. These
               // are not yet run.
               for (const Iterator &it : colored_iterators[color])
                 {
-                  auto worker_task =
-                    taskflow
-                      .emplace(
-                        [it =
-                           it, // make a copy of the reference to the iterator
-                         have_worker,
-                         have_copier,
-                         &thread_safe_scratch_and_copy_data_list,
-                         &sample_scratch_data,
-                         &sample_copy_data,
-                         &worker,
-                         &copier]() {
-                          ScratchData *scratch_data = nullptr;
-                          CopyData    *copy_data    = nullptr;
+                  taskflow
+                    .emplace(
+                      [it = it, // make a copy of the reference to the iterator
+                       have_worker,
+                       have_copier,
+                       &thread_safe_scratch_and_copy_data_list,
+                       &sample_scratch_data,
+                       &sample_copy_data,
+                       &worker,
+                       &copier]() {
+                        ScratchData *scratch_data = nullptr;
+                        CopyData    *copy_data    = nullptr;
 
-                          ScratchAndCopyDataList &scratch_and_copy_data_list =
-                            thread_safe_scratch_and_copy_data_list.get();
-                          // See if there is an unused object. if so, grab it
-                          // and mark it as used.
-                          for (typename ScratchAndCopyDataList::iterator p =
-                                 scratch_and_copy_data_list.begin();
-                               p != scratch_and_copy_data_list.end();
-                               ++p)
-                            {
-                              if (p->currently_in_use == false)
-                                {
-                                  scratch_data        = p->scratch_data.get();
-                                  copy_data           = p->copy_data.get();
-                                  p->currently_in_use = true;
-                                  break;
-                                }
-                            }
-                          // If no element in the list was found, create one and
-                          // mark it as used.
-                          if (scratch_data == nullptr)
-                            {
-                              Assert(copy_data == nullptr, ExcInternalError());
-                              scratch_and_copy_data_list.emplace_back(
-                                std::make_unique<ScratchData>(
-                                  sample_scratch_data),
-                                std::make_unique<CopyData>(sample_copy_data),
-                                true);
-                              scratch_data = scratch_and_copy_data_list.back()
-                                               .scratch_data.get();
-                              copy_data = scratch_and_copy_data_list.back()
-                                            .copy_data.get();
-                            }
-                          if (have_worker)
-                            worker(it, *scratch_data, *copy_data);
-                          if (have_copier)
-                            copier(*copy_data);
+                        ScratchAndCopyDataList &scratch_and_copy_data_list =
+                          thread_safe_scratch_and_copy_data_list.get();
+                        // See if there is an unused object. if so, grab it
+                        // and mark it as used.
+                        for (typename ScratchAndCopyDataList::iterator p =
+                               scratch_and_copy_data_list.begin();
+                             p != scratch_and_copy_data_list.end();
+                             ++p)
+                          {
+                            if (p->currently_in_use == false)
+                              {
+                                scratch_data        = p->scratch_data.get();
+                                copy_data           = p->copy_data.get();
+                                p->currently_in_use = true;
+                                break;
+                              }
+                          }
+                        // If no element in the list was found, create one and
+                        // mark it as used.
+                        if (scratch_data == nullptr)
+                          {
+                            Assert(copy_data == nullptr, ExcInternalError());
+                            scratch_and_copy_data_list.emplace_back(
+                              std::make_unique<ScratchData>(
+                                sample_scratch_data),
+                              std::make_unique<CopyData>(sample_copy_data),
+                              true);
+                            scratch_data = scratch_and_copy_data_list.back()
+                                             .scratch_data.get();
+                            copy_data =
+                              scratch_and_copy_data_list.back().copy_data.get();
+                          }
+                        if (have_worker)
+                          worker(it, *scratch_data, *copy_data);
+                        if (have_copier)
+                          copier(*copy_data);
 
-                          // Mark objects as free to be used again.
-                          for (typename ScratchAndCopyDataList::iterator p =
-                                 scratch_and_copy_data_list.begin();
-                               p != scratch_and_copy_data_list.end();
-                               ++p)
-                            {
-                              if (p->scratch_data.get() == scratch_data)
-                                {
-                                  Assert(p->currently_in_use == true,
-                                         ExcInternalError());
-                                  p->currently_in_use = false;
-                                }
-                            }
-                        })
-                      .name("worker_and_copier");
-                  // If we are on the last color we do not need to add a barrier
-                  // at the end of the graph. Otherwise we force the next color
-                  // barrier to wait until the current task (and thus all tasks
-                  // in this color group) are finished.
-                  if (color < colored_iterators.size() - 1)
-                    worker_task.precede(next_color);
-
-                  // The first group of tasks does not depend on a previous
-                  // barrier being reached. Otherwise, we ensure the previous
-                  // barrier must resolve before any new tasks in the next color
-                  // can start.
-                  if (!last_color.empty())
-                    last_color.precede(worker_task);
+                        // Mark objects as free to be used again.
+                        for (typename ScratchAndCopyDataList::iterator p =
+                               scratch_and_copy_data_list.begin();
+                             p != scratch_and_copy_data_list.end();
+                             ++p)
+                          {
+                            if (p->scratch_data.get() == scratch_data)
+                              {
+                                Assert(p->currently_in_use == true,
+                                       ExcInternalError());
+                                p->currently_in_use = false;
+                              }
+                          }
+                      })
+                    .name("worker_and_copier");
                 }
+              if (color > 0)
+                // Wait for the previous color to finish executing
+                execution_future.wait();
+              execution_future = executor.run(std::move(taskflow));
             }
-        // Now we run all the tasks in the task graph. They will be run in
-        // parallel and are eligible to run when their dependencies established
-        // above are met.
-        executor.run(taskflow).wait();
+        // Wait for our final execution to finish
+        if (colored_iterators.size() > 0)
+          execution_future.wait();
       }
     }    // namespace taskflow_colored
 #  endif // DEAL_II_WITH_TASKFLOW
