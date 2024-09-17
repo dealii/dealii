@@ -3462,6 +3462,71 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
 
 
 /**
+ * Return the symmetrized version of a full rank-4 tensor, i.e.
+ * as a symmetric rank-4 tensor. The symmetry could be of the following types:
+ * Only minor: $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$.
+ * Both minor and major: $A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}$ and
+ * $A_{ijkl}=A_{klij}$. This is the version for general dimensions.
+ * @param t The tensor to be symmetrized.
+ * @param major_symmetry  This argument decides the presence of major symmetry.
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number>
+DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
+  SymmetricTensor<4, dim, Number>
+  symmetrize(const Tensor<4, dim, Number> &t, const bool major_symmetry)
+{
+  SymmetricTensor<4, dim, Number> result;
+
+  const Number half = internal::NumberType<Number>::value(0.5);
+
+  // minor symmetry - A_{ijkl}=A_{jikl}=A_{ijlk}=A_{jilk}
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = 0; j < dim; ++j)
+      for (unsigned int k = 0; k < dim; ++k)
+        for (unsigned int l = 0; l < dim; ++l)
+          {
+            if (i != j && k == l)
+              {
+                // A_{ijkk}=A_{jikk}
+                result[i][j][k][k] = (t[i][j][k][k] + t[j][i][k][k]) * half;
+              }
+            else if (i == j && k != l)
+              {
+                // A_{iikl}=A_{iilk}
+                result[i][i][k][l] = (t[i][i][k][l] + t[i][i][l][k]) * half;
+              }
+            else if (i != j && k != l)
+              {
+                // A_{ijkl}=A_{jilk}
+                result[i][j][k][l] = (t[i][j][k][l] + t[j][i][k][l] +
+                                      t[i][j][l][k] + t[j][i][l][k]) *
+                                     half * half;
+              }
+            else
+              {
+                // A_{iijj} and A_{iiii} unchanged
+                result[i][j][k][l] = t[i][j][k][l];
+              }
+          }
+
+  // in case major symmetry is also required
+  if (major_symmetry)
+    {
+      // major symmetry - A_{ijkl}=A_{klij}
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int j = i; j < dim; ++j)
+          for (unsigned int k = 0; k < dim; ++k)
+            for (unsigned int l = k; l < dim; ++l)
+              result[i][j][k][l] = (t[i][j][k][l] + t[k][l][i][j]) * half;
+    }
+  return result;
+}
+
+
+
+/**
  * Multiplication of a symmetric tensor of general rank with a scalar from the
  * right. This version of the operator is used if the scalar has the same data
  * type as is used to store the elements of the symmetric tensor.
