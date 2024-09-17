@@ -4888,18 +4888,23 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 DEAL_II_NOT_IMPLEMENTED();
             }
         }
-
-      if constexpr (n_components == 1)
-        return hessian_out[0];
-      else
-        return hessian_out;
     }
   // cell with general Jacobian
   else
     {
-      const auto normal = this->normal_vector(q_point);
-      return get_hessian(q_point) * normal * normal;
+      const auto normal  = this->normal_vector(q_point);
+      const auto hessian = get_hessian(q_point);
+
+      if constexpr (n_components == 1)
+        hessian_out[0] = hessian * normal * normal;
+      else
+        for (unsigned int comp = 0; comp < n_components; ++comp)
+          hessian_out[comp] = hessian[comp] * normal * normal;
     }
+  if constexpr (n_components == 1)
+    return hessian_out[0];
+  else
+    return hessian_out;
 }
 
 
@@ -5626,8 +5631,12 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       if constexpr (n_components == 1)
         submit_hessian(normal_hessian_in * normal_projector, q_point);
       else
-        submit_hessian(outer_product(normal_hessian_in, normal_projector),
-                       q_point);
+        {
+          hessian_type tmp;
+          for (unsigned int comp = 0; comp < n_components; ++comp)
+            tmp[comp] = normal_hessian_in[comp] * normal_projector;
+          submit_hessian(tmp, q_point);
+        }
     }
 }
 
