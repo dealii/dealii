@@ -14,7 +14,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/thread_management.h>
 
 #include <deal.II/distributed/tria_base.h>
@@ -1771,22 +1771,10 @@ namespace MGTools
                   cell_id_translator.translate(cell, i));
             }
 
-        std::vector<unsigned int> is_fine_required_ranks(
-          is_fine_required.n_elements());
-
-        Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-          process(is_fine_owned,
-                  is_fine_required,
-                  communicator,
-                  is_fine_required_ranks,
-                  false);
-
-        Utilities::MPI::ConsensusAlgorithms::Selector<
-          std::vector<
-            std::pair<types::global_cell_index, types::global_cell_index>>,
-          std::vector<unsigned int>>
-          consensus_algorithm;
-        consensus_algorithm.run(process, communicator);
+        const std::vector<unsigned int> is_fine_required_ranks =
+          Utilities::MPI::compute_index_owner(is_fine_owned,
+                                              is_fine_required,
+                                              communicator);
 
         for (unsigned i = 0; i < is_fine_required.n_elements(); ++i)
           if (is_fine_required_ranks[i] == my_rank)
