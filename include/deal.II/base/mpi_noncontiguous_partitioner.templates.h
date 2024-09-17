@@ -31,67 +31,88 @@ namespace Utilities
 {
   namespace MPI
   {
-    template <typename Number>
+    template <typename Number, unsigned int n_components_templated>
     void
     NoncontiguousPartitioner::export_to_ghosted_array(
       const ArrayView<const Number> &src,
-      const ArrayView<Number>       &dst) const
+      const ArrayView<Number>       &dst,
+      const unsigned int             n_components) const
     {
+      Assert((n_components_templated != 0) != (n_components != 0),
+             ExcNotImplemented());
+
+      const unsigned int n_components_to_be_used =
+        (n_components_templated != 0) ? n_components_templated : n_components;
+
       // allocate internal memory since needed
       if (requests.size() != send_ranks.size() + recv_ranks.size())
         requests.resize(send_ranks.size() + recv_ranks.size());
 
-      if (this->buffers.size() != send_ptr.back() * sizeof(Number))
-        this->buffers.resize(this->temporary_storage_size() * sizeof(Number));
+      if (this->buffers.size() !=
+          send_ptr.back() * sizeof(Number) * n_components_to_be_used)
+        this->buffers.resize(this->temporary_storage_size() * sizeof(Number) *
+                             n_components_to_be_used);
 
       // perform actual exchange
-      this->template export_to_ghosted_array<Number>(
+      this->template export_to_ghosted_array<Number, n_components_templated>(
         0,
         src,
         ArrayView<Number>(reinterpret_cast<Number *>(this->buffers.data()),
-                          send_ptr.back()),
+                          send_ptr.back() * n_components_to_be_used),
         dst,
-        this->requests);
+        this->requests,
+        n_components);
     }
 
 
-    template <typename Number>
+    template <typename Number, unsigned int n_components_templated>
     void
     NoncontiguousPartitioner::export_to_ghosted_array(
       const unsigned int             communication_channel,
       const ArrayView<const Number> &locally_owned_array,
       const ArrayView<Number>       &temporary_storage,
       const ArrayView<Number>       &ghost_array,
-      std::vector<MPI_Request>      &requests) const
+      std::vector<MPI_Request>      &requests,
+      const unsigned int             n_components) const
     {
-      this->template export_to_ghosted_array_start<Number>(
+      this->template export_to_ghosted_array_start<Number,
+                                                   n_components_templated>(
         communication_channel,
         locally_owned_array,
         temporary_storage,
-        requests);
-      this->template export_to_ghosted_array_finish<Number>(temporary_storage,
-                                                            ghost_array,
-                                                            requests);
+        requests,
+        n_components);
+      this->template export_to_ghosted_array_finish<Number,
+                                                    n_components_templated>(
+        temporary_storage, ghost_array, requests, n_components);
     }
 
 
 
-    template <typename Number>
+    template <typename Number, unsigned int n_components_templated>
     void
     NoncontiguousPartitioner::export_to_ghosted_array_start(
       const unsigned int             communication_channel,
       const ArrayView<const Number> &src,
       const ArrayView<Number>       &buffers,
-      std::vector<MPI_Request>      &requests) const
+      std::vector<MPI_Request>      &requests,
+      const unsigned int             n_components) const
     {
 #ifndef DEAL_II_WITH_MPI
       (void)communication_channel;
       (void)src;
       (void)buffers;
       (void)requests;
+      (void)n_components;
       Assert(false, ExcNeedsMPI());
 #else
       AssertDimension(requests.size(), recv_ranks.size() + send_ranks.size());
+
+      Assert((n_components_templated != 0) != (n_components != 0),
+             ExcNotImplemented());
+
+      const unsigned int n_components_to_be_used =
+        (n_components_templated != 0) ? n_components_templated : n_components;
 
       const auto tag =
         communication_channel +
@@ -106,8 +127,8 @@ namespace Utilities
       for (types::global_dof_index i = 0; i < recv_ranks.size(); ++i)
         {
           const int ierr =
-            MPI_Irecv(buffers.data() + recv_ptr[i],
-                      recv_ptr[i + 1] - recv_ptr[i],
+            MPI_Irecv(buffers.data() + recv_ptr[i] * n_components_to_be_used,
+                      (recv_ptr[i + 1] - recv_ptr[i]) * n_components_to_be_used,
                       Utilities::MPI::mpi_type_id_for_type<Number>,
                       recv_ranks[i],
                       tag,
@@ -122,21 +143,24 @@ namespace Utilities
         {
           // collect data to be send
           for (types::global_dof_index j = send_ptr[i]; j < send_ptr[i + 1];
-               j++)
+               ++j, ++k)
             {
               AssertIndexRange(k, send_indices.size());
-              buffers[j] = src[send_indices[k]];
-              ++k;
+              for (unsigned int comp = 0; comp < n_components_to_be_used;
+                   ++comp)
+                buffers[j * n_components_to_be_used + comp] =
+                  src[send_indices[k] * n_components_to_be_used + comp];
             }
 
           // send data
-          Assert((send_ptr[i] < buffers.size()) ||
-                   (send_ptr[i] == buffers.size() &&
-                    send_ptr[i + 1] == send_ptr[i]),
+          Assert((send_ptr[i] * n_components_to_be_used < buffers.size()) ||
+                   (send_ptr[i] * n_components_to_be_used == buffers.size() &&
+                    send_ptr[i + 1] * n_components_to_be_used ==
+                      send_ptr[i] * n_components_to_be_used),
                  ExcMessage("The input buffer doesn't contain enough entries"));
           const int ierr =
-            MPI_Isend(buffers.data() + send_ptr[i],
-                      send_ptr[i + 1] - send_ptr[i],
+            MPI_Isend(buffers.data() + send_ptr[i] * n_components_to_be_used,
+                      (send_ptr[i + 1] - send_ptr[i]) * n_components_to_be_used,
                       Utilities::MPI::mpi_type_id_for_type<Number>,
                       send_ranks[i],
                       tag,
@@ -149,19 +173,28 @@ namespace Utilities
 
 
 
-    template <typename Number>
+    template <typename Number, unsigned int n_components_templated>
     void
     NoncontiguousPartitioner::export_to_ghosted_array_finish(
       const ArrayView<const Number> &buffers,
       const ArrayView<Number>       &dst,
-      std::vector<MPI_Request>      &requests) const
+      std::vector<MPI_Request>      &requests,
+      const unsigned int             n_components) const
     {
 #ifndef DEAL_II_WITH_MPI
       (void)buffers;
       (void)dst;
       (void)requests;
+      (void)n_components;
       Assert(false, ExcNeedsMPI());
 #else
+
+      Assert((n_components_templated != 0) != (n_components != 0),
+             ExcNotImplemented());
+
+      const unsigned int n_components_to_be_used =
+        (n_components_templated != 0) ? n_components_templated : n_components;
+
       // receive all data packages and copy data from buffers
       for (types::global_dof_index proc = 0; proc < recv_ranks.size(); ++proc)
         {
@@ -176,8 +209,10 @@ namespace Utilities
           AssertIndexRange(i + 1, recv_ptr.size());
           for (types::global_dof_index j = recv_ptr[i], c = 0;
                j < recv_ptr[i + 1];
-               j++)
-            dst[recv_indices[j]] = buffers[recv_ptr[i] + c++];
+               ++j, ++c)
+            for (unsigned int comp = 0; comp < n_components_to_be_used; ++comp)
+              dst[recv_indices[j] * n_components_to_be_used + comp] =
+                buffers[(recv_ptr[i] + c) * n_components_to_be_used + comp];
         }
 
       // wait that all data packages have been sent
