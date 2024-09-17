@@ -136,7 +136,7 @@ private:
   /**
    * Mapping used in connection with patch_tria.
    */
-  const SmartPointer<const Mapping<patch_dim, spacedim>> patch_mapping;
+  const ObserverPointer<const Mapping<patch_dim, spacedim>> patch_mapping;
 
   /**
    * DataOut object that does the actual building of the patches.
@@ -161,7 +161,7 @@ private:
   /**
    * Mapping of the original triangulation provided in update_mapping().
    */
-  SmartPointer<const Mapping<dim, spacedim>> mapping;
+  ObserverPointer<const Mapping<dim, spacedim>> mapping;
 };
 
 DEAL_II_NAMESPACE_CLOSE

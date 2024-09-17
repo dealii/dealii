@@ -22,7 +22,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -415,8 +415,8 @@ private:
   /**
    * Pointer to the degree of freedom handler to work with.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>,
-               SolutionTransfer<dim, VectorType, spacedim>>
+  ObserverPointer<const DoFHandler<dim, spacedim>,
+                  SolutionTransfer<dim, VectorType, spacedim>>
     dof_handler;
 
   /**
@@ -915,8 +915,8 @@ namespace Legacy
     /**
      * Pointer to the degree of freedom handler to work with.
      */
-    SmartPointer<const DoFHandler<dim, spacedim>,
-                 SolutionTransfer<dim, VectorType, spacedim>>
+    ObserverPointer<const DoFHandler<dim, spacedim>,
+                    SolutionTransfer<dim, VectorType, spacedim>>
       dof_handler;
 
     /**

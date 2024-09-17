@@ -91,7 +91,7 @@ public:
    * may reflect, for example, different constitutive models of continuum
    * mechanics in different parts of the domain.
    *
-   * @note The first time this method is called, it stores a SmartPointer to the
+   * @note The first time this method is called, it stores a ObserverPointer to the
    * Triangulation object that owns the cell. The future invocations of this
    * method expects the cell to be from the same stored triangulation.
    *
@@ -227,8 +227,8 @@ private:
    * Triangulation, we need to store a reference to that Triangulation within
    * the class.
    */
-  SmartPointer<const Triangulation<dimension, space_dimension>,
-               CellDataStorage<CellIteratorType, DataType>>
+  ObserverPointer<const Triangulation<dimension, space_dimension>,
+                  CellDataStorage<CellIteratorType, DataType>>
     tria;
 
   /**

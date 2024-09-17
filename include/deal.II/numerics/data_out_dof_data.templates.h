@@ -1756,10 +1756,10 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_dof_handler(
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
-    SmartPointer<const Triangulation<dim, spacedim>>(&d.get_triangulation(),
-                                                     typeid(*this).name());
+    ObserverPointer<const Triangulation<dim, spacedim>>(&d.get_triangulation(),
+                                                        typeid(*this).name());
   dofs =
-    SmartPointer<const DoFHandler<dim, spacedim>>(&d, typeid(*this).name());
+    ObserverPointer<const DoFHandler<dim, spacedim>>(&d, typeid(*this).name());
 }
 
 
@@ -1775,8 +1775,8 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_triangulation(
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
-    SmartPointer<const Triangulation<dim, spacedim>>(&tria,
-                                                     typeid(*this).name());
+    ObserverPointer<const Triangulation<dim, spacedim>>(&tria,
+                                                        typeid(*this).name());
 }
 
 
@@ -1801,7 +1801,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
     }
   else
     {
-      triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+      triangulation = ObserverPointer<const Triangulation<dim, spacedim>>(
         &dof_handler.get_triangulation(), typeid(*this).name());
     }
 
@@ -1841,7 +1841,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
   if (triangulation == nullptr)
     {
       Assert(dof_handler != nullptr, ExcInternalError());
-      triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+      triangulation = ObserverPointer<const Triangulation<dim, spacedim>>(
         &dof_handler->get_triangulation(), typeid(*this).name());
     }
 
@@ -1981,7 +1981,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
     &data_component_interpretation_)
 {
   if (triangulation == nullptr)
-    triangulation = SmartPointer<const Triangulation<dim, spacedim>>(
+    triangulation = ObserverPointer<const Triangulation<dim, spacedim>>(
       &dof_handler.get_triangulation(), typeid(*this).name());
 
   Assert(&dof_handler.get_triangulation() == triangulation,

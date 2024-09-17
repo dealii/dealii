@@ -946,7 +946,7 @@ namespace NonMatching
          * One dimensional quadrature rules used to create the immersed
          * quadratures.
          */
-        const SmartPointer<const hp::QCollection<1>> q_collection1D;
+        const ObserverPointer<const hp::QCollection<1>> q_collection1D;
 
         /**
          * Stores options/settings for the algorithm.
@@ -1057,7 +1057,7 @@ namespace NonMatching
          * Index of the quadrature in q_collection1d that should use to
          * generate the immersed quadrature rules.
          */
-        const SmartPointer<const hp::QCollection<1>> q_collection1D;
+        const ObserverPointer<const hp::QCollection<1>> q_collection1D;
 
         /**
          * Quadratures that the derived classes create.

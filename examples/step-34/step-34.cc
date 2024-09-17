@@ -21,7 +21,7 @@
 // The program starts with including a bunch of include files that we will use
 // in the various parts of the program. Most of them have been discussed in
 // previous tutorials already:
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/quadrature_selector.h>

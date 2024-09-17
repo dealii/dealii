@@ -19,8 +19,8 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/base/mpi.h>
+#  include <deal.II/base/observer_pointer.h>
 #  include <deal.II/base/parameter_handler.h>
-#  include <deal.II/base/smartpointer.h>
 
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_precondition.h>
@@ -716,8 +716,8 @@ namespace PETScWrappers
     /**
      * Pointers to the internal PETSc matrix objects.
      */
-    SmartPointer<AMatrixType, TimeStepper> A;
-    SmartPointer<PMatrixType, TimeStepper> P;
+    ObserverPointer<AMatrixType, TimeStepper> A;
+    ObserverPointer<PMatrixType, TimeStepper> P;
 
     /**
      * Object to apply solve_with_jacobian.

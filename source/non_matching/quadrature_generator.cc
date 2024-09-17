@@ -1414,19 +1414,19 @@ namespace NonMatching
         /**
          * Pointer to the DoFHandler passed to the constructor.
          */
-        const SmartPointer<const DoFHandler<dim>> dof_handler;
+        const ObserverPointer<const DoFHandler<dim>> dof_handler;
 
         /**
          * Pointer to the vector of solution coefficients passed to the
          * constructor.
          */
-        const SmartPointer<const VectorType> global_dof_values;
+        const ObserverPointer<const VectorType> global_dof_values;
 
         /**
          * Pointer to the element associated with the cell in the last call to
          * set_active_cell().
          */
-        SmartPointer<const FiniteElement<dim>> element;
+        ObserverPointer<const FiniteElement<dim>> element;
 
         /**
          * DOF-indices of the cell in the last call to set_active_cell().

@@ -1034,12 +1034,12 @@ private:
   /**
    * Pointer to first FEValuesBase object.
    */
-  SmartPointer<const FEValuesBase<dim1, spacedim>> first_fe_values;
+  ObserverPointer<const FEValuesBase<dim1, spacedim>> first_fe_values;
 
   /**
    * Pointer to second FEValuesBase object.
    */
-  SmartPointer<const FEValuesBase<dim2, spacedim>> second_fe_values;
+  ObserverPointer<const FEValuesBase<dim2, spacedim>> second_fe_values;
 
   /**
    * Renumbering data for the first FEValuesBase object.

@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/precondition_block_base.h>
@@ -342,7 +342,8 @@ protected:
    * inverse matrices should not be stored) until the last call of the
    * preconditoining @p vmult function of the derived classes.
    */
-  SmartPointer<const MatrixType, PreconditionBlock<MatrixType, inverse_type>> A;
+  ObserverPointer<const MatrixType, PreconditionBlock<MatrixType, inverse_type>>
+    A;
   /**
    * Relaxation parameter to be used by derived classes.
    */

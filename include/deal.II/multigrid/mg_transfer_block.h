@@ -159,7 +159,7 @@ protected:
    * The mg_constrained_dofs of the level systems.
    */
 
-  SmartPointer<const MGConstrainedDoFs, MGTransferBlockBase>
+  ObserverPointer<const MGConstrainedDoFs, MGTransferBlockBase>
     mg_constrained_dofs;
 };
 
@@ -277,7 +277,7 @@ private:
    * Memory pool required if additional multiplication using #factors is
    * desired.
    */
-  SmartPointer<VectorMemory<Vector<number>>, MGTransferBlock<number>> memory;
+  ObserverPointer<VectorMemory<Vector<number>>, MGTransferBlock<number>> memory;
 };
 
 

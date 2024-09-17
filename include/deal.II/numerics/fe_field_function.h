@@ -469,8 +469,8 @@ namespace Functions
     /**
      * Pointer to the dof handler.
      */
-    SmartPointer<const DoFHandler<dim, spacedim>,
-                 FEFieldFunction<dim, VectorType, spacedim>>
+    ObserverPointer<const DoFHandler<dim, spacedim>,
+                    FEFieldFunction<dim, VectorType, spacedim>>
       dh;
 
     /**

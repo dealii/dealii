@@ -21,7 +21,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_sparsity_pattern.h>

@@ -21,7 +21,7 @@
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/operator.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/solver_control.h>
 
@@ -123,18 +123,18 @@ namespace Algorithms
     /**
      * The operator computing the residual.
      */
-    SmartPointer<OperatorBase, Newton<VectorType>> residual;
+    ObserverPointer<OperatorBase, Newton<VectorType>> residual;
 
     /**
      * The operator applying the inverse derivative to the residual.
      */
-    SmartPointer<OperatorBase, Newton<VectorType>> inverse_derivative;
+    ObserverPointer<OperatorBase, Newton<VectorType>> inverse_derivative;
 
     /**
      * The operator handling the output in case the debug_vectors is true.
      * Call the initialize function first.
      */
-    SmartPointer<OutputOperator<VectorType>, Newton<VectorType>> data_out;
+    ObserverPointer<OutputOperator<VectorType>, Newton<VectorType>> data_out;
 
     /**
      * This flag is set by the function assemble(), indicating that the matrix

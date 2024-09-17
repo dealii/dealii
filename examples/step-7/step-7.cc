@@ -44,8 +44,8 @@
 #include <deal.II/dofs/dof_renumbering.h>
 // Then we will show a little trick how we can make sure that objects are not
 // deleted while they are still in use. For this purpose, deal.II has the
-// SmartPointer helper class, which is declared in this file:
-#include <deal.II/base/smartpointer.h>
+// ObserverPointer helper class, which is declared in this file:
+#include <deal.II/base/observer_pointer.h>
 // Next, we will want to use the function VectorTools::integrate_difference()
 // mentioned in the introduction, and we are going to use a ConvergenceTable
 // that collects all important data during a run and prints it at the end as a
@@ -379,9 +379,9 @@ namespace Step7
     // subscribing class is expected to check the value stored in its
     // corresponding pointer before trying to access the object subscribed to.
     //
-    // This is exactly what the SmartPointer class is doing. It basically acts
-    // just like a pointer, i.e. it can be dereferenced, can be assigned to and
-    // from other pointers, and so on. On top of that it uses the mechanism
+    // This is exactly what the ObserverPointer class is doing. It basically
+    // acts just like a pointer, i.e. it can be dereferenced, can be assigned to
+    // and from other pointers, and so on. On top of that it uses the mechanism
     // described above to find out if the pointer this class is representing is
     // dangling when we try to dereference it. In that case an exception is
     // thrown.
@@ -389,9 +389,9 @@ namespace Step7
     // In the present example program, we want to protect the finite element
     // object from the situation that for some reason the finite element
     // pointed to is destroyed while still in use. We therefore use a
-    // SmartPointer to the finite element object; since the finite element
+    // ObserverPointer to the finite element object; since the finite element
     // object is actually never changed in our computations, we pass a const
-    // FiniteElement&lt;dim&gt; as template argument to the SmartPointer
+    // FiniteElement&lt;dim&gt; as template argument to the ObserverPointer
     // class. Note that the pointer so declared is assigned at construction
     // time of the solve object, and destroyed upon destruction, so the lock
     // on the destruction of the finite element object extends throughout the
@@ -399,7 +399,7 @@ namespace Step7
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    SmartPointer<const FiniteElement<dim>> fe;
+    ObserverPointer<const FiniteElement<dim>> fe;
 
     AffineConstraints<double> hanging_node_constraints;
 

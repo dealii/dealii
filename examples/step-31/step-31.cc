@@ -253,8 +253,8 @@ namespace Step31
       void vmult(VectorType &dst, const VectorType &src) const;
 
     private:
-      const SmartPointer<const MatrixType> matrix;
-      const PreconditionerType            &preconditioner;
+      const ObserverPointer<const MatrixType> matrix;
+      const PreconditionerType               &preconditioner;
     };
 
 
@@ -355,10 +355,10 @@ namespace Step31
                  const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
-      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix>
+      const ObserverPointer<const TrilinosWrappers::BlockSparseMatrix>
         stokes_matrix;
-      const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                             PreconditionerTypeMp>>
+      const ObserverPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
+                                                PreconditionerTypeMp>>
                                  m_inverse;
       const PreconditionerTypeA &a_preconditioner;
 

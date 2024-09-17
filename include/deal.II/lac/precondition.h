@@ -19,8 +19,8 @@
 
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -682,7 +682,7 @@ protected:
   /**
    * Pointer to the matrix object.
    */
-  SmartPointer<const MatrixType, PreconditionRelaxation<MatrixType>> A;
+  ObserverPointer<const MatrixType, PreconditionRelaxation<MatrixType>> A;
 
   /**
    * Stores the additional data passed to the initialize function, obtained
@@ -867,8 +867,8 @@ namespace internal
       }
 
     private:
-      const SmartPointer<const MatrixType> A;
-      const double                         relaxation;
+      const ObserverPointer<const MatrixType> A;
+      const double                            relaxation;
     };
 
     template <typename MatrixType>
@@ -935,8 +935,8 @@ namespace internal
       }
 
     private:
-      const SmartPointer<const MatrixType> A;
-      const double                         relaxation;
+      const ObserverPointer<const MatrixType> A;
+      const double                            relaxation;
     };
 
     template <typename MatrixType>
@@ -1026,8 +1026,8 @@ namespace internal
       }
 
     private:
-      const SmartPointer<const MatrixType> A;
-      const double                         relaxation;
+      const ObserverPointer<const MatrixType> A;
+      const double                            relaxation;
 
       /**
        * An array that stores for each matrix row where the first position after
@@ -1069,8 +1069,8 @@ namespace internal
       }
 
     private:
-      const SmartPointer<const MatrixType> A;
-      const double                         relaxation;
+      const ObserverPointer<const MatrixType> A;
+      const double                            relaxation;
 
       const std::vector<size_type> &permutation;
       const std::vector<size_type> &inverse_permutation;
@@ -2026,8 +2026,8 @@ public:
  * <h4>Requirements on the templated classes</h4>
  *
  * The class `MatrixType` must be derived from Subscriptor because a
- * SmartPointer to `MatrixType` is held in the class. In particular, this means
- * that the matrix object needs to persist during the lifetime of
+ * ObserverPointer to `MatrixType` is held in the class. In particular, this
+ * means that the matrix object needs to persist during the lifetime of
  * PreconditionChebyshev. The preconditioner is held in a shared_ptr that is
  * copied into the AdditionalData member variable of the class, so the
  * variable used for initialization can safely be discarded after calling
@@ -2254,7 +2254,7 @@ private:
   /**
    * A pointer to the underlying matrix.
    */
-  SmartPointer<
+  ObserverPointer<
     const MatrixType,
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>>
     matrix_ptr;

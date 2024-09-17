@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/grid/tria.h>
 
@@ -159,8 +159,8 @@ private:
   /**
    * Pointer to the triangulation to work with.
    */
-  SmartPointer<const Triangulation<dim, spacedim>,
-               CellDataTransfer<dim, spacedim, VectorType>>
+  ObserverPointer<const Triangulation<dim, spacedim>,
+                  CellDataTransfer<dim, spacedim, VectorType>>
     triangulation;
 
   /**

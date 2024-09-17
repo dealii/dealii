@@ -58,7 +58,8 @@ public:
   }
 
 private:
-  SmartPointer<const DoFHandler<dim>, TestOutputOperator<VectorType, dim>> dof;
+  ObserverPointer<const DoFHandler<dim>, TestOutputOperator<VectorType, dim>>
+    dof;
 };
 
 class ZeroResidual : public Algorithms::OperatorBase

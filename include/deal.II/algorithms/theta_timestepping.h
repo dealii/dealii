@@ -21,7 +21,7 @@
 #include <deal.II/algorithms/operator.h>
 #include <deal.II/algorithms/timestep_control.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -129,7 +129,7 @@ namespace Algorithms
    * them <code>Implicit</code> and <code>Explicit</code>. They both share the
    * public interface of Operator, and additionally provide storage for the
    * matrices to be used and a pointer to TimestepData. Note that we do not
-   * use a SmartPointer here, since the TimestepData will be destroyed before
+   * use a ObserverPointer here, since the TimestepData will be destroyed before
    * the operator.
    *
    * @code
@@ -140,7 +140,7 @@ namespace Algorithms
    *   void operator()(AnyData &out, const AnyData &in);
    *
    * private:
-   *   SmartPointer<const FullMatrix<double>, Explicit> matrix;
+   *   ObserverPointer<const FullMatrix<double>, Explicit> matrix;
    *   FullMatrix<double>                               m;
    * };
    *
@@ -151,7 +151,7 @@ namespace Algorithms
    *   void operator()(AnyData &out, const AnyData &in);
    *
    * private:
-   *   SmartPointer<const FullMatrix<double>, Implicit> matrix;
+   *   ObserverPointer<const FullMatrix<double>, Implicit> matrix;
    *   FullMatrix<double>                               m;
    * };
    * @endcode
@@ -412,7 +412,7 @@ namespace Algorithms
      * vector, $M$ the @ref GlossMassMatrix "mass matrix", $F$ the operator in space and $c$ is the
      * adjusted time step size $(1-\theta) \Delta t$.
      */
-    SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_explicit;
+    ObserverPointer<OperatorBase, ThetaTimestepping<VectorType>> op_explicit;
 
     /**
      * The operator solving the implicit part of the scheme. It will receive
@@ -424,12 +424,12 @@ namespace Algorithms
      * the input data, <i>M</i> the @ref GlossMassMatrix "mass matrix", <i>F</i> the operator in
      * space and <i>c</i> is the adjusted time step size $ \theta \Delta t$
      */
-    SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_implicit;
+    ObserverPointer<OperatorBase, ThetaTimestepping<VectorType>> op_implicit;
 
     /**
      * The operator writing the output in each time step
      */
-    SmartPointer<OutputOperator<VectorType>, ThetaTimestepping<VectorType>>
+    ObserverPointer<OutputOperator<VectorType>, ThetaTimestepping<VectorType>>
       output;
   };
 

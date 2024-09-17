@@ -1698,7 +1698,8 @@ protected:
   /**
    * A pointer to the mapping object associated with this FEValues object.
    */
-  const SmartPointer<const Mapping<dim, spacedim>, FEValuesBase<dim, spacedim>>
+  const ObserverPointer<const Mapping<dim, spacedim>,
+                        FEValuesBase<dim, spacedim>>
     mapping;
 
   /**
@@ -1720,8 +1721,8 @@ protected:
    * A pointer to the finite element object associated with this FEValues
    * object.
    */
-  const SmartPointer<const FiniteElement<dim, spacedim>,
-                     FEValuesBase<dim, spacedim>>
+  const ObserverPointer<const FiniteElement<dim, spacedim>,
+                        FEValuesBase<dim, spacedim>>
     fe;
 
   /**

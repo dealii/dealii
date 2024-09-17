@@ -19,7 +19,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/lazy.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
@@ -548,7 +548,7 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    ObserverPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The single scalar component this view represents of the FEValuesBase
@@ -1271,7 +1271,7 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    ObserverPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The first component of the vector this view represents of the
@@ -1584,7 +1584,7 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    ObserverPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The first component of the vector this view represents of the
@@ -1958,7 +1958,7 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    ObserverPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The first component of the vector this view represents of the

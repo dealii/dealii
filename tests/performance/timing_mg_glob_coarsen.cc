@@ -303,8 +303,8 @@ public:
   }
 
 private:
-  SmartPointer<const MGSmootherBase<VectorType>> coarse_smooth;
-  const std::vector<unsigned int>               *constrained_dofs;
+  ObserverPointer<const MGSmootherBase<VectorType>> coarse_smooth;
+  const std::vector<unsigned int>                  *constrained_dofs;
 
   mutable VectorType src_copy;
 };

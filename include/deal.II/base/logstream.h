@@ -18,7 +18,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/thread_local_storage.h>
 
@@ -122,7 +122,7 @@ public:
      * A pointer to the LogStream object to which the prefix is
      * applied.
      */
-    SmartPointer<LogStream, LogStream::Prefix> stream;
+    ObserverPointer<LogStream, LogStream::Prefix> stream;
   };
 
 

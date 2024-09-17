@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <string>
@@ -188,7 +188,8 @@ private:
    * Matrix that is used for the matrix-builtin preconditioning function. cf.
    * also @p PreconditionUseMatrix.
    */
-  SmartPointer<const MatrixType, PreconditionSelector<MatrixType, VectorType>>
+  ObserverPointer<const MatrixType,
+                  PreconditionSelector<MatrixType, VectorType>>
     A;
 
   /**

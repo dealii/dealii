@@ -37,7 +37,7 @@ public:
 
 class SquareRootResidual : public Algorithms::OperatorBase
 {
-  SmartPointer<SquareRoot, SquareRootResidual> discretization;
+  ObserverPointer<SquareRoot, SquareRootResidual> discretization;
 
 public:
   SquareRootResidual(SquareRoot &problem)
@@ -53,7 +53,7 @@ public:
 
 class SquareRootSolver : public Algorithms::OperatorBase
 {
-  SmartPointer<SquareRoot, SquareRootSolver> solver;
+  ObserverPointer<SquareRoot, SquareRootSolver> solver;
 
 public:
   SquareRootSolver(SquareRoot &problem)

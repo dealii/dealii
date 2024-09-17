@@ -112,7 +112,7 @@ private:
   /**
    * The first ChartManifold.
    */
-  SmartPointer<
+  ObserverPointer<
     const ChartManifold<dim1, intermediate_dim, chartdim>,
     CompositionManifold<dim, spacedim, chartdim, dim1, dim2, intermediate_dim>>
     F;
@@ -121,7 +121,7 @@ private:
   /**
    * The second ChartManifold.
    */
-  SmartPointer<
+  ObserverPointer<
     const ChartManifold<dim2, spacedim, intermediate_dim>,
     CompositionManifold<dim, spacedim, chartdim, dim1, dim2, intermediate_dim>>
     G;

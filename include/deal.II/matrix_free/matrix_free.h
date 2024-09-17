@@ -2252,7 +2252,7 @@ private:
   /**
    * Pointers to the DoFHandlers underlying the current problem.
    */
-  std::vector<SmartPointer<const DoFHandler<dim>>> dof_handlers;
+  std::vector<ObserverPointer<const DoFHandler<dim>>> dof_handlers;
 
   /**
    * Pointers to the AffineConstraints underlying the current problem. Only
@@ -2260,7 +2260,8 @@ private:
    * template parameter as the `Number` template of MatrixFree is passed to
    * reinit(). Filled with nullptr otherwise.
    */
-  std::vector<SmartPointer<const AffineConstraints<Number>>> affine_constraints;
+  std::vector<ObserverPointer<const AffineConstraints<Number>>>
+    affine_constraints;
 
   /**
    * Contains the information about degrees of freedom on the individual cells

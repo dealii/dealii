@@ -220,7 +220,7 @@ namespace LaplaceSolver
     n_dofs() const = 0;
 
   protected:
-    const SmartPointer<Triangulation<dim>> triangulation;
+    const ObserverPointer<Triangulation<dim>> triangulation;
   };
 
 
@@ -256,11 +256,11 @@ namespace LaplaceSolver
     n_dofs() const;
 
   protected:
-    const SmartPointer<const FiniteElement<dim>> fe;
-    const SmartPointer<const Quadrature<dim>>    quadrature;
-    DoFHandler<dim>                              dof_handler;
-    Vector<double>                               solution;
-    const SmartPointer<const Function<dim>>      boundary_values;
+    const ObserverPointer<const FiniteElement<dim>> fe;
+    const ObserverPointer<const Quadrature<dim>>    quadrature;
+    DoFHandler<dim>                                 dof_handler;
+    Vector<double>                                  solution;
+    const ObserverPointer<const Function<dim>>      boundary_values;
 
     virtual void
     assemble_rhs(Vector<double> &rhs) const = 0;
@@ -490,7 +490,7 @@ namespace LaplaceSolver
                  const Function<dim>      &boundary_values);
 
   protected:
-    const SmartPointer<const Function<dim>> rhs_function;
+    const ObserverPointer<const Function<dim>> rhs_function;
     virtual void
     assemble_rhs(Vector<double> &rhs) const;
   };

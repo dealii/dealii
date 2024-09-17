@@ -590,7 +590,7 @@ namespace MatrixFreeOperators
     /**
      * Const pointer to the operator class.
      */
-    SmartPointer<const OperatorType> mf_base_operator;
+    ObserverPointer<const OperatorType> mf_base_operator;
   };
 
 

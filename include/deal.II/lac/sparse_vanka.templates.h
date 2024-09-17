@@ -61,7 +61,7 @@ template <typename number>
 SparseVanka<number>::~SparseVanka()
 {
   typename std::vector<
-    SmartPointer<FullMatrix<float>, SparseVanka<number>>>::iterator i;
+    ObserverPointer<FullMatrix<float>, SparseVanka<number>>>::iterator i;
   for (i = inverses.begin(); i != inverses.end(); ++i)
     {
       FullMatrix<float> *p = *i;

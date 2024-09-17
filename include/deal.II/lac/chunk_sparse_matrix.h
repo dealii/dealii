@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/chunk_sparsity_pattern.h>
@@ -1405,9 +1405,9 @@ private:
   /**
    * Pointer to the sparsity pattern used for this matrix. In order to
    * guarantee that it is not deleted while still in use, we subscribe to it
-   * using the SmartPointer class.
+   * using the ObserverPointer class.
    */
-  SmartPointer<const ChunkSparsityPattern, ChunkSparseMatrix<number>> cols;
+  ObserverPointer<const ChunkSparsityPattern, ChunkSparseMatrix<number>> cols;
 
   /**
    * Array of values for all the nonzero entries. The position of an

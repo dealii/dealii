@@ -96,7 +96,7 @@ Subscriptor::check_no_subscribers() const noexcept
           std::cerr
             << "---------------------------------------------------------"
             << std::endl
-            << "An object pointed to by a SmartPointer is being destroyed."
+            << "An object pointed to by a ObserverPointer is being destroyed."
             << std::endl
             << "Under normal circumstances, this would abort the program."
             << std::endl

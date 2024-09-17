@@ -182,7 +182,7 @@ namespace FESeries
     /**
      * hp::FECollection for which transformation matrices will be calculated.
      */
-    SmartPointer<const hp::FECollection<dim, spacedim>> fe_collection;
+    ObserverPointer<const hp::FECollection<dim, spacedim>> fe_collection;
 
     /**
      * hp::QCollection used in calculation of transformation matrices.
@@ -352,7 +352,7 @@ namespace FESeries
     /**
      * hp::FECollection for which transformation matrices will be calculated.
      */
-    SmartPointer<const hp::FECollection<dim, spacedim>> fe_collection;
+    ObserverPointer<const hp::FECollection<dim, spacedim>> fe_collection;
 
     /**
      * hp::QCollection used in calculation of transformation matrices.

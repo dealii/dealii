@@ -21,7 +21,7 @@
 #include <deal.II/algorithms/any_data.h>
 
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/block_vector.h>
 
@@ -111,8 +111,8 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const AffineConstraints<typename VectorType::value_type>,
-                   ResidualSimple<VectorType>>
+      ObserverPointer<const AffineConstraints<typename VectorType::value_type>,
+                      ResidualSimple<VectorType>>
         constraints;
     };
 
@@ -211,7 +211,7 @@ namespace MeshWorker
       /**
        * The vector of global matrices being assembled.
        */
-      std::vector<SmartPointer<MatrixType, MatrixSimple<MatrixType>>> matrix;
+      std::vector<ObserverPointer<MatrixType, MatrixSimple<MatrixType>>> matrix;
 
       /**
        * The smallest positive number that will be entered into the global
@@ -234,8 +234,8 @@ namespace MeshWorker
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const AffineConstraints<typename MatrixType::value_type>,
-                   MatrixSimple<MatrixType>>
+      ObserverPointer<const AffineConstraints<typename MatrixType::value_type>,
+                      MatrixSimple<MatrixType>>
         constraints;
     };
 
@@ -378,40 +378,40 @@ namespace MeshWorker
       /**
        * The global matrix being assembled.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         matrix;
 
       /**
        * The matrix used for face flux terms across the refinement edge,
        * coupling coarse to fine.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         flux_up;
 
       /**
        * The matrix used for face flux terms across the refinement edge,
        * coupling fine to coarse.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         flux_down;
 
       /**
        * The matrix used for face contributions for continuous elements across
        * the refinement edge, coupling coarse to fine.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         interface_in;
 
       /**
        * The matrix used for face contributions for continuous elements across
        * the refinement edge, coupling fine to coarse.
        */
-      SmartPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
+      ObserverPointer<MGLevelObject<MatrixType>, MGMatrixSimple<MatrixType>>
         interface_out;
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const MGConstrainedDoFs, MGMatrixSimple<MatrixType>>
+      ObserverPointer<const MGConstrainedDoFs, MGMatrixSimple<MatrixType>>
         mg_constrained_dofs;
 
       /**

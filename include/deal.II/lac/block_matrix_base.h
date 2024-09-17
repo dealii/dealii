@@ -20,7 +20,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/utilities.h>
 
@@ -849,7 +849,7 @@ protected:
   /**
    * Array of sub-matrices.
    */
-  Table<2, SmartPointer<BlockType, BlockMatrixBase<MatrixType>>> sub_objects;
+  Table<2, ObserverPointer<BlockType, BlockMatrixBase<MatrixType>>> sub_objects;
 
   /**
    * This function collects the sizes of the sub-objects and stores them in

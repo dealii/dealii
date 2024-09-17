@@ -19,8 +19,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/table.h>
 
 #include <array>

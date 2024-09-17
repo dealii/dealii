@@ -120,13 +120,13 @@ namespace NonMatching
         /**
          * Pointer to the DoFHandler associated with the level set function.
          */
-        const SmartPointer<const DoFHandler<dim>> dof_handler;
+        const ObserverPointer<const DoFHandler<dim>> dof_handler;
 
         /**
          * Pointer to the vector containing the level set function's global dof
          * values.
          */
-        const SmartPointer<const VectorType> level_set;
+        const ObserverPointer<const VectorType> level_set;
       };
 
 
@@ -229,7 +229,7 @@ namespace NonMatching
         /**
          * Pointer to the level set function.
          */
-        const SmartPointer<const Function<dim>> level_set;
+        const ObserverPointer<const Function<dim>> level_set;
 
         /**
          * Collection containing the single element which we locally interpolate

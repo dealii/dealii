@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 1998 - 2023 by the deal.II authors
+// Copyright (C) 2024 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,24 +12,30 @@
 //
 // ------------------------------------------------------------------------
 
-#ifndef dealii_smartpointer_h
-#define dealii_smartpointer_h
+
+
+// Ensure that the old SmartPointer class name continues to be
+// available after the renaming to ObserverPointer.
 
 
 #include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 
-DEAL_II_NAMESPACE_OPEN
+#include <any>
+#include <iostream>
 
-/**
- * A type alias for the ObserverPointer class that makes sure the previous
- * name of the class, SmartPointer, continues to be available.
- *
- * @deprecated Use the new name of the class, ObserverPointer, instead.
- */
-template <typename T, typename P = void>
-using SmartPointer DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-  "Use the new name of the class, ObserverPointer.") = ObserverPointer<T, P>;
+#include "../tests.h"
 
-DEAL_II_NAMESPACE_CLOSE
 
-#endif
+class Test : public Subscriptor
+{};
+
+
+int
+main()
+{
+  static_assert(std::is_same_v<ObserverPointer<Test>, SmartPointer<Test>>);
+  static_assert(
+    std::is_same_v<ObserverPointer<Test, int>, SmartPointer<Test, int>>);
+}

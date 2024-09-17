@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -323,7 +323,7 @@ private:
    * DoF handler to be used for the data corresponding to the present
    * parameter value.
    */
-  SmartPointer<const DoFHandler<dim, spacedim>, DataOutStack<dim, spacedim>>
+  ObserverPointer<const DoFHandler<dim, spacedim>, DataOutStack<dim, spacedim>>
     dof_handler;
 
   /**

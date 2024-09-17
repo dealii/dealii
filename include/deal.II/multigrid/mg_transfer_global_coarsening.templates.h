@@ -4283,8 +4283,8 @@ MGTransferMF<dim, Number>::initialize_constraints(
 template <int dim, typename Number>
 void
 MGTransferMF<dim, Number>::initialize_internal_transfer(
-  const DoFHandler<dim>                       &dof_handler,
-  const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs)
+  const DoFHandler<dim>                          &dof_handler,
+  const ObserverPointer<const MGConstrainedDoFs> &mg_constrained_dofs)
 {
   const unsigned int min_level = 0;
   const unsigned int max_level =

@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/mutex.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 
 #include <deal.II/lac/lapack_support.h>
@@ -1024,8 +1024,9 @@ public:
   Tvmult(BlockVector<number> &, const BlockVector<number> &) const;
 
 private:
-  SmartPointer<const LAPACKFullMatrix<number>, PreconditionLU<number>> matrix;
-  SmartPointer<VectorMemory<Vector<number>>, PreconditionLU<number>>   mem;
+  ObserverPointer<const LAPACKFullMatrix<number>, PreconditionLU<number>>
+                                                                        matrix;
+  ObserverPointer<VectorMemory<Vector<number>>, PreconditionLU<number>> mem;
 };
 
 /*---------------------- Inline functions -----------------------------------*/

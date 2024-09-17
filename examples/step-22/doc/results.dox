@@ -418,8 +418,8 @@ class BlockSchurPreconditioner : public Subscriptor
               const BlockVector<double> &src) const;
 
   private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>,
+    const ObserverPointer<const BlockSparseMatrix<double> > system_matrix;
+    const ObserverPointer<const InverseMatrix<SparseMatrix<double>,
                        PreconditionerMp > > m_inverse;
     const PreconditionerA &a_preconditioner;
 

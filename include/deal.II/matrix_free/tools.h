@@ -622,7 +622,7 @@ namespace MatrixFreeTools
     /**
      * Reference to the underlying MatrixFree object.
      */
-    SmartPointer<const MatrixFree<dim, Number, VectorizedArrayType>>
+    ObserverPointer<const MatrixFree<dim, Number, VectorizedArrayType>>
       matrix_free;
 
     /**

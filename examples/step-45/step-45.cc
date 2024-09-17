@@ -197,8 +197,8 @@ namespace Step45
                const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const MatrixType>         matrix;
-    const SmartPointer<const PreconditionerType> preconditioner;
+    const ObserverPointer<const MatrixType>         matrix;
+    const ObserverPointer<const PreconditionerType> preconditioner;
 
     mutable TrilinosWrappers::MPI::Vector tmp;
   };
@@ -248,8 +248,9 @@ namespace Step45
                const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
-    const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> system_matrix;
-    const SmartPointer<
+    const ObserverPointer<const TrilinosWrappers::BlockSparseMatrix>
+      system_matrix;
+    const ObserverPointer<
       const InverseMatrix<TrilinosWrappers::SparseMatrix, PreconditionerType>>
                                           A_inverse;
     mutable TrilinosWrappers::MPI::Vector tmp1, tmp2;

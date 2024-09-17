@@ -21,7 +21,7 @@
 #include <deal.II/algorithms/any_data.h>
 
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/block_vector.h>
 
@@ -167,15 +167,15 @@ namespace MeshWorker
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo,
-                   ResidualLocalBlocksToGlobalBlocks<VectorType>>
+      ObserverPointer<const BlockInfo,
+                      ResidualLocalBlocksToGlobalBlocks<VectorType>>
         block_info;
 
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const AffineConstraints<typename VectorType::value_type>,
-                   ResidualLocalBlocksToGlobalBlocks<VectorType>>
+      ObserverPointer<const AffineConstraints<typename VectorType::value_type>,
+                      ResidualLocalBlocksToGlobalBlocks<VectorType>>
         constraints;
     };
 
@@ -272,22 +272,22 @@ namespace MeshWorker
       /**
        * The global matrices, stored as a vector of pointers.
        */
-      SmartPointer<MatrixBlockVector<MatrixType>,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<MatrixBlockVector<MatrixType>,
+                      MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         matrices;
 
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const BlockInfo,
+                      MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         block_info;
       /**
        * A pointer to the object containing constraints.
        */
 
-      SmartPointer<const AffineConstraints<typename MatrixType::value_type>,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const AffineConstraints<typename MatrixType::value_type>,
+                      MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         constraints;
 
       /**
@@ -327,8 +327,8 @@ namespace MeshWorker
     public:
       using MatrixPtrVector = MGMatrixBlockVector<MatrixType>;
       using MatrixPtrVectorPtr =
-        SmartPointer<MatrixPtrVector,
-                     MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>;
+        ObserverPointer<MatrixPtrVector,
+                        MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>;
 
       /**
        * Constructor, initializing the #threshold, which limits how small
@@ -503,15 +503,15 @@ namespace MeshWorker
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo,
-                   MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const BlockInfo,
+                      MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         block_info;
 
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const MGConstrainedDoFs,
-                   MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+      ObserverPointer<const MGConstrainedDoFs,
+                      MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
         mg_constrained_dofs;
 
 

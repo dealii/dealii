@@ -469,7 +469,7 @@ namespace Step13
     // a triangulation in the constructor and storing it henceforth. Since
     // this triangulation will be used throughout all computations, we have to
     // make sure that the triangulation is valid until it is last used. We
-    // do this by keeping a <code>SmartPointer</code> to this triangulation,
+    // do this by keeping a <code>ObserverPointer</code> to this triangulation,
     // as explained in step-7.
     //
     // Note that while the pointer itself is declared constant
@@ -496,7 +496,7 @@ namespace Step13
       virtual unsigned int n_dofs() const                           = 0;
 
     protected:
-      const SmartPointer<Triangulation<dim>> triangulation;
+      const ObserverPointer<Triangulation<dim>> triangulation;
     };
 
 
@@ -568,11 +568,11 @@ namespace Step13
       // member variables, of which the use should be clear from the previous
       // examples:
     protected:
-      const SmartPointer<const FiniteElement<dim>> fe;
-      const SmartPointer<const Quadrature<dim>>    quadrature;
-      DoFHandler<dim>                              dof_handler;
-      Vector<double>                               solution;
-      const SmartPointer<const Function<dim>>      boundary_values;
+      const ObserverPointer<const FiniteElement<dim>> fe;
+      const ObserverPointer<const Quadrature<dim>>    quadrature;
+      DoFHandler<dim>                                 dof_handler;
+      Vector<double>                                  solution;
+      const ObserverPointer<const Function<dim>>      boundary_values;
 
       // Then we declare an abstract function that will be used to assemble
       // the right hand side. As explained above, there are various cases for
@@ -996,7 +996,7 @@ namespace Step13
     // constructor takes the same data as does that of the underlying class
     // (to which it passes all information) except for one function object
     // that denotes the right hand side of the problem. A pointer to this
-    // object is stored (again as a <code>SmartPointer</code>, in order to
+    // object is stored (again as a <code>ObserverPointer</code>, in order to
     // make sure that the function object is not deleted as long as it is
     // still used by this class).
     //
@@ -1013,7 +1013,7 @@ namespace Step13
                    const Function<dim>      &boundary_values);
 
     protected:
-      const SmartPointer<const Function<dim>> rhs_function;
+      const ObserverPointer<const Function<dim>> rhs_function;
       virtual void assemble_rhs(Vector<double> &rhs) const override;
     };
 

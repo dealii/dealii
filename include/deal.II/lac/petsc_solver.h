@@ -20,7 +20,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/base/smartpointer.h>
+#  include <deal.II/base/observer_pointer.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/solver_control.h>
@@ -172,7 +172,7 @@ namespace PETScWrappers
      * copy the data from this object before starting the solution process,
      * and copy the data back into it afterwards.
      */
-    SmartPointer<SolverControl, SolverBase> solver_control;
+    ObserverPointer<SolverControl, SolverBase> solver_control;
 
     /**
      * Utility to create the KSP object and attach convergence test.

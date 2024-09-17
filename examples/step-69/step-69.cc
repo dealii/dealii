@@ -239,7 +239,7 @@ namespace Step69
     const MPI_Comm mpi_communicator;
     TimerOutput   &computing_timer;
 
-    SmartPointer<const Discretization<dim>> discretization;
+    ObserverPointer<const Discretization<dim>> discretization;
   };
 
   // @sect4{The <code>ProblemDescription</code> class}
@@ -401,8 +401,8 @@ namespace Step69
     const MPI_Comm mpi_communicator;
     TimerOutput   &computing_timer;
 
-    SmartPointer<const OfflineData<dim>>   offline_data;
-    SmartPointer<const InitialValues<dim>> initial_values;
+    ObserverPointer<const OfflineData<dim>>   offline_data;
+    ObserverPointer<const InitialValues<dim>> initial_values;
 
     SparseMatrix<double> dij_matrix;
 
@@ -454,7 +454,7 @@ namespace Step69
     const MPI_Comm mpi_communicator;
     TimerOutput   &computing_timer;
 
-    SmartPointer<const OfflineData<dim>> offline_data;
+    ObserverPointer<const OfflineData<dim>> offline_data;
 
     Vector<double> r;
 

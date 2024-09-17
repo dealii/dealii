@@ -210,7 +210,7 @@ namespace MeshWorker
   {
   public:
     /**
-     * Create an empty ScratchData object. A SmartPointer pointing to
+     * Create an empty ScratchData object. A ObserverPointer pointing to
      * @p mapping and @p fe is stored internally. Make sure they live longer
      * than this class instance.
      *
@@ -305,7 +305,7 @@ namespace MeshWorker
       const UpdateFlags         &neighbor_face_update_flags = update_default);
 
     /**
-     * Create an empty ScratchData object. A SmartPointer pointing to
+     * Create an empty ScratchData object. A ObserverPointer pointing to
      * @p mapping_collection and @p fe_collection is stored internally. Make sure they live longer
      * than this class instance.
      *
@@ -1360,13 +1360,13 @@ namespace MeshWorker
      * The mapping used by the internal FEValues. Make sure it lives
      * longer than this class.
      */
-    SmartPointer<const Mapping<dim, spacedim>> mapping;
+    ObserverPointer<const Mapping<dim, spacedim>> mapping;
 
     /**
      * The finite element used by the internal FEValues. Make sure it lives
      * longer than this class.
      */
-    SmartPointer<const FiniteElement<dim, spacedim>> fe;
+    ObserverPointer<const FiniteElement<dim, spacedim>> fe;
 
     /**
      * Quadrature formula used to integrate on the current cell, and on its
@@ -1428,13 +1428,14 @@ namespace MeshWorker
      * The mapping collection used by the internal hp::FEValues. Make sure it
      * lives longer than this class.
      */
-    SmartPointer<const hp::MappingCollection<dim, spacedim>> mapping_collection;
+    ObserverPointer<const hp::MappingCollection<dim, spacedim>>
+      mapping_collection;
 
     /**
      * The finite element used by the internal FEValues. Make sure it lives
      * longer than this class.
      */
-    SmartPointer<const hp::FECollection<dim, spacedim>> fe_collection;
+    ObserverPointer<const hp::FECollection<dim, spacedim>> fe_collection;
 
     /**
      * Quadrature formula used to integrate on the current cell, and on its
@@ -1553,13 +1554,14 @@ namespace MeshWorker
      * A pointer to the last used FEValues/FEFaceValues, or FESubfaceValues
      * object on this cell.
      */
-    SmartPointer<const FEValuesBase<dim, spacedim>> current_fe_values;
+    ObserverPointer<const FEValuesBase<dim, spacedim>> current_fe_values;
 
     /**
      * A pointer to the last used FEValues/FEFaceValues, or FESubfaceValues
      * object on the neighbor cell.
      */
-    SmartPointer<const FEValuesBase<dim, spacedim>> current_neighbor_fe_values;
+    ObserverPointer<const FEValuesBase<dim, spacedim>>
+      current_neighbor_fe_values;
   };
 
 #ifndef DOXYGEN

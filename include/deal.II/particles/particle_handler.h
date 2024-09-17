@@ -20,7 +20,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <deal.II/distributed/tria.h>
@@ -877,14 +877,15 @@ namespace Particles
     /**
      * Address of the triangulation to work on.
      */
-    SmartPointer<const Triangulation<dim, spacedim>,
-                 ParticleHandler<dim, spacedim>>
+    ObserverPointer<const Triangulation<dim, spacedim>,
+                    ParticleHandler<dim, spacedim>>
       triangulation;
 
     /**
      * Address of the mapping to work on.
      */
-    SmartPointer<const Mapping<dim, spacedim>, ParticleHandler<dim, spacedim>>
+    ObserverPointer<const Mapping<dim, spacedim>,
+                    ParticleHandler<dim, spacedim>>
       mapping;
 
     /**

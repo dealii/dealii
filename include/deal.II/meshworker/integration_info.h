@@ -219,8 +219,8 @@ namespace MeshWorker
     /**
      * The pointer to the (system) element used for initialization.
      */
-    SmartPointer<const FiniteElement<dim, spacedim>,
-                 IntegrationInfo<dim, spacedim>>
+    ObserverPointer<const FiniteElement<dim, spacedim>,
+                    IntegrationInfo<dim, spacedim>>
       fe_pointer;
 
     /**

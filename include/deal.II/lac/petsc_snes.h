@@ -19,8 +19,8 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/base/mpi.h>
+#  include <deal.II/base/observer_pointer.h>
 #  include <deal.II/base/parameter_handler.h>
-#  include <deal.II/base/smartpointer.h>
 
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_precondition.h>
@@ -472,8 +472,8 @@ namespace PETScWrappers
     /**
      * Pointers to the internal PETSc matrix objects.
      */
-    SmartPointer<AMatrixType, NonlinearSolver> A;
-    SmartPointer<PMatrixType, NonlinearSolver> P;
+    ObserverPointer<AMatrixType, NonlinearSolver> A;
+    ObserverPointer<PMatrixType, NonlinearSolver> P;
 
     /**
      * This flag is used to support versions of PETSc older than 3.13.

@@ -1,0 +1,6 @@
+Changed: The SmartPointer class has been renamed to ObserverPointer,
+since this name is a much better reflection of the purpose of this
+class. The documentation of the class has also been updated
+significantly to better explain what the class does.
+<br>
+(Wolfgang Bangerth, 2024/09/09)

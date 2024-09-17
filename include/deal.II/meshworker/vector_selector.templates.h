@@ -99,7 +99,8 @@ namespace MeshWorker
   VectorData<VectorType, dim, spacedim>::initialize(const VectorType  *v,
                                                     const std::string &name)
   {
-    SmartPointer<const VectorType, VectorData<VectorType, dim, spacedim>> p = v;
+    ObserverPointer<const VectorType, VectorData<VectorType, dim, spacedim>> p =
+      v;
     this->data.add(p, name);
     VectorSelector::initialize(this->data);
   }
@@ -195,8 +196,8 @@ namespace MeshWorker
     const MGLevelObject<VectorType> *v,
     const std::string               &name)
   {
-    SmartPointer<const MGLevelObject<VectorType>,
-                 MGVectorData<VectorType, dim, spacedim>>
+    ObserverPointer<const MGLevelObject<VectorType>,
+                    MGVectorData<VectorType, dim, spacedim>>
       p = v;
     this->data.add(p, name);
     VectorSelector::initialize(this->data);

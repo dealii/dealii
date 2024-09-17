@@ -19,7 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/mpi_stub.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 
@@ -1139,7 +1139,7 @@ namespace parallel
       /**
        * The modified parallel::distributed::Triangulation.
        */
-      const SmartPointer<
+      const ObserverPointer<
         dealii::parallel::distributed::Triangulation<dim, spacedim>>
         distributed_tria;
 

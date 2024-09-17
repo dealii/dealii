@@ -65,8 +65,8 @@ namespace Algorithms
     operator<<(const AnyData &vectors) override;
 
   private:
-    SmartPointer<const DoFHandler<dim, spacedim>,
-                 DoFOutputOperator<VectorType, dim, spacedim>>
+    ObserverPointer<const DoFHandler<dim, spacedim>,
+                    DoFOutputOperator<VectorType, dim, spacedim>>
       dof;
 
     const std::string  filename_base;

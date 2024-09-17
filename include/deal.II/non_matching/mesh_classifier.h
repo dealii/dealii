@@ -172,7 +172,7 @@ namespace NonMatching
     /**
      * Pointer to the triangulation that should be classified.
      */
-    const SmartPointer<const Triangulation<dim>> triangulation;
+    const ObserverPointer<const Triangulation<dim>> triangulation;
 
     /**
      * Pointer to an object that describes what we need to know about the

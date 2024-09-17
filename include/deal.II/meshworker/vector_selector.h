@@ -21,7 +21,7 @@
 #include <deal.II/algorithms/named_selection.h>
 
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/tensor.h>
 
 DEAL_II_NAMESPACE_OPEN

@@ -14,11 +14,11 @@
 
 
 
-// Check that it is possible to put SmartPointer objects into a
+// Check that it is possible to put ObserverPointer objects into a
 // std::any object.
 
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/subscriptor.h>
 
 #include <any>
@@ -36,7 +36,7 @@ main()
 {
   initlog();
 
-  Test               t;
-  SmartPointer<Test> r(&t);
-  std::any           a = r;
+  Test                  t;
+  ObserverPointer<Test> r(&t);
+  std::any              a = r;
 }

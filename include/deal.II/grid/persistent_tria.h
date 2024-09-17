@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/grid/tria.h>
 
@@ -250,8 +250,8 @@ private:
   /**
    * This grid shall be used as coarse grid.
    */
-  SmartPointer<const Triangulation<dim, spacedim>,
-               PersistentTriangulation<dim, spacedim>>
+  ObserverPointer<const Triangulation<dim, spacedim>,
+                  PersistentTriangulation<dim, spacedim>>
     coarse_grid;
 
   /**
