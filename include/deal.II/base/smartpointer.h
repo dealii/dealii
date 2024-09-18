@@ -18,18 +18,10 @@
 
 #include <deal.II/base/observer_pointer.h>
 
-DEAL_II_NAMESPACE_OPEN
-
-/**
- * A type alias for the ObserverPointer class that makes sure the previous
- * name of the class, SmartPointer, continues to be available.
- *
- * @deprecated Use the new name of the class, ObserverPointer, instead.
- */
-template <typename T, typename P = void>
-using SmartPointer DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-  "Use the new name of the class, ObserverPointer.") = ObserverPointer<T, P>;
-
-DEAL_II_NAMESPACE_CLOSE
+// This file is simply an alias for the base/observer_pointer.h file.
+// The class was renamed and deprecated right after the 9.6 release.
+// We should deprecate the file in the following release (9.7 or
+// whatever release number it gets) and remove the release after
+// (9.8 or as appropriate).
 
 #endif
