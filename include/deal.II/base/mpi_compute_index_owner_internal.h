@@ -227,7 +227,7 @@ namespace Utilities
                                      const IndexSet &indices_to_look_up,
                                      const MPI_Comm  comm,
                                      std::vector<unsigned int> &owning_ranks,
-                                     const bool track_index_requests = false);
+                                     const bool track_index_requesters = false);
 
           /**
            * The index space which describes the locally owned space.
@@ -262,7 +262,7 @@ namespace Utilities
            * indices, and what those indices were. If true, it will be added
            * into `requesters` and can be queried by `get_requesters()`.
            */
-          const bool track_index_requests;
+          const bool track_index_requesters;
 
           /**
            * The result of the index owner computation: To each index

@@ -458,13 +458,13 @@ namespace Utilities
           const IndexSet            &indices_to_look_up,
           const MPI_Comm             comm,
           std::vector<unsigned int> &owning_ranks,
-          const bool                 track_index_requests)
+          const bool                 track_index_requesters)
           : owned_indices(owned_indices)
           , indices_to_look_up(indices_to_look_up)
           , comm(comm)
           , my_rank(this_mpi_process(comm))
           , n_procs(n_mpi_processes(comm))
-          , track_index_requests(track_index_requests)
+          , track_index_requesters(track_index_requesters)
           , owning_ranks(owning_ranks)
         {
           dict.reinit(owned_indices, comm);
@@ -488,7 +488,7 @@ namespace Utilities
                   dict.actually_owning_ranks[i - dict.local_range.first];
                 request_buffer.push_back(actual_owner);
 
-                if (track_index_requests)
+                if (track_index_requesters)
                   append_index_origin(i - dict.local_range.first,
                                       other_rank,
                                       actual_owner,
@@ -513,7 +513,7 @@ namespace Utilities
                 {
                   owning_ranks[index] =
                     dict.actually_owning_ranks[i - dict.local_range.first];
-                  if (track_index_requests)
+                  if (track_index_requesters)
                     append_index_origin(i - dict.local_range.first,
                                         my_rank,
                                         owning_ranks[index],
@@ -575,7 +575,7 @@ namespace Utilities
         std::map<unsigned int, IndexSet>
         ConsensusAlgorithmsPayload::get_requesters()
         {
-          Assert(track_index_requests,
+          Assert(track_index_requesters,
                  ExcMessage("Must enable index range tracking in "
                             "constructor of ConsensusAlgorithmProcess"));
 
