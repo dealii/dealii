@@ -76,7 +76,12 @@ test_hessians(const unsigned int                             degree,
   AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(
-    mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    mapping,
+    dof_handler,
+    0,
+    Functions::ZeroFunction<dim>(
+      dof_handler.get_fe_collection().n_components()),
+    constraints);
   constraints.close();
 
   // FEFaceEvaluation
