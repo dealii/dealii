@@ -27,6 +27,7 @@
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
@@ -46,7 +47,8 @@ template <int dim>
 void
 test_hessians(const unsigned int                             degree,
               const dealii::FE_Poly<dim>                    &fe,
-              const dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
+              const dealii::EvaluationFlags::EvaluationFlags evaluation_flags,
+              const bool                                     check_system)
 {
   using VectorizedArrayType = VectorizedArray<double>;
 
@@ -61,13 +63,25 @@ test_hessians(const unsigned int                             degree,
   tria.execute_coarsening_and_refinement();
 
   DoFHandler<dim> dof_handler(tria);
-  dof_handler.distribute_dofs(fe);
+  if (check_system)
+    {
+      FESystem<dim> fe_system(fe, dim + 1);
+      dof_handler.distribute_dofs(fe_system);
+    }
+  else
+    dof_handler.distribute_dofs(fe);
+
   MappingQGeneric<dim> mapping(1);
 
   AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(
-    mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    mapping,
+    dof_handler,
+    0,
+    Functions::ZeroFunction<dim>(
+      dof_handler.get_fe_collection().n_components()),
+    constraints);
   constraints.close();
 
   // FEFaceEvaluation
@@ -168,12 +182,13 @@ main(int argc, char **argv)
     deallog << "test_hessians_only" << std::endl;
     for (unsigned int i = 1; i < 3; ++i)
       {
-        test_hessians<1>(i, dealii::FE_Q<1>(i), evaluation_flags);
-        test_hessians<2>(i, dealii::FE_Q<2>(i), evaluation_flags);
-        test_hessians<3>(i, dealii::FE_Q<3>(i), evaluation_flags);
-        test_hessians<1>(i, dealii::FE_DGQ<1>(i), evaluation_flags);
-        test_hessians<2>(i, dealii::FE_DGQ<2>(i), evaluation_flags);
-        test_hessians<3>(i, dealii::FE_DGQ<3>(i), evaluation_flags);
+        test_hessians<1>(i, dealii::FE_Q<1>(i), evaluation_flags, false);
+        test_hessians<2>(i, dealii::FE_Q<2>(i), evaluation_flags, false);
+        test_hessians<3>(i, dealii::FE_Q<3>(i), evaluation_flags, false);
+        test_hessians<1>(i, dealii::FE_DGQ<1>(i), evaluation_flags, false);
+        test_hessians<2>(i, dealii::FE_DGQ<2>(i), evaluation_flags, false);
+        test_hessians<3>(i, dealii::FE_DGQ<3>(i), evaluation_flags, false);
       }
+    test_hessians<2>(3, dealii::FE_DGQ<2>(3), evaluation_flags, true);
   }
 }
