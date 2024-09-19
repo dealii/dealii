@@ -272,6 +272,17 @@ private:
 };
 
 
+/**
+ * A type alias for the ObserverPointer class that makes sure the previous
+ * name of the class, SmartPointer, continues to be available.
+ *
+ * @deprecated Use the new name of the class, ObserverPointer, instead.
+ */
+template <typename T, typename P = void>
+using SmartPointer DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  "Use the new name of the class, ObserverPointer.") = ObserverPointer<T, P>;
+
+
 /* --------------------- inline Template functions ------------------------- */
 
 
