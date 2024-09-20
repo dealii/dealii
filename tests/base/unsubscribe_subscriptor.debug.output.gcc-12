@@ -8,7 +8,8 @@ The violated condition was:
     it != counter_map.end()
 Additional information: 
     No subscriber with identifier <b> subscribes to this object of class
-    N6dealii34EnableRefCountingByObserverPointerE. Consequently, it cannot be unsubscribed.
+    N6dealii34EnableRefCountingByObserverPointerE. Consequently, it cannot
+    be unsubscribed.
 --------------------------------------------------------
 
 DEAL::Exception: ExcMessage( "This EnableRefCountingByObserverPointer object does not know anything about the supplied pointer!")
@@ -19,7 +20,7 @@ An error occurred in file <enable_ref_counting_by_observer.cc> in function
 The violated condition was: 
     validity_ptr_it != validity_pointers.end()
 Additional information: 
-    This EnableRefCountingByObserverPointer object does not know anything about the supplied
-    pointer!
+    This EnableRefCountingByObserverPointer object does not know anything
+    about the supplied pointer!
 --------------------------------------------------------
 
