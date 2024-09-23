@@ -3302,25 +3302,48 @@ public:
    * Return an iterator to the neighboring cell on the other side of the face
    * with number @p face_no. If the neighbor does not exist,
    * i.e., if the face with number @p face_no of the current object is at the boundary, then
-   * an invalid iterator is returned.
+   * an invalid iterator is returned. In detail, the smallest cell `neighbor`
+   * for which `cell->face(face_no)` is a subset of
+   * `neighbor->face(opposite_face_no)`, where `opposite_face_no` is the face
+   * number opposite to `face_no`.
    *
    * Consequently, the index @p face_no must be less than n_faces().
    *
-   * The neighbor of a cell has at most the same level as this cell. For
-   * example, consider the following situation:
-   * @image html limit_level_difference_at_vertices.png ""
-   * Here, if you are on the top right cell and you ask for its left neighbor
-   * (which is, according to the conventions spelled out in the GeometryInfo
-   * class, its <i>zeroth</i> neighbor), then you will get the mother cell of
-   * the four small cells at the top left. In other words, the cell you get as
-   * neighbor has the same refinement level as the one you're on right now
-   * (the top right one) and it may have children.
+   * For example, consider the following situation:
+   * @image html limit_level_difference_at_vertices_anisotropic.png ""
    *
-   * On the other hand, if you were at the top right cell of the four small
-   * cells at the top left, and you asked for the right neighbor (which is
-   * associated with index <code>face_no=1</code>), then you would get the large
-   * cell at the top right which in this case has a lower refinement level and
-   * no children of its own.
+   * Here, if you are on cell `1.3` and ask for its left neighbor (which is,
+   * according to the conventions spelled out in the GeometryInfo class, its
+   * <i>zeroth</i> neighbor), then you will get the mother cell of `3.5`, since
+   * this is the smallest cell for which we have `(1.3)->face(0) ==
+   * (3.5)->parent()->face(1)`. Note, that you will not obtain the mother cell
+   * of `2.8`.
+   *
+   * Further, if you ask for the right (i.e. the <i>first</i>) neighbor of cell
+   * `4.1`, then you will get cell `1.3`. Consequently, there are two
+   * neighboring cells that differ by three in their levels. In fact, using
+   * anisotropic refinement it is possible to generate arbitrary large
+   * differences in the level of neighboring cells. Perform e.g. arbitrarily
+   * many `y`-refinements of cell `4.1` and its children. While the second and
+   * third neighbors are being refined as well, due to the avoidance of multiple
+   * hanging nodes, cell `1.3` always remains as neighbor of the resulting
+   * right-most child.
+   *
+   * On the other hand, if you were at cell `3.3` and ask for its third
+   * neighbor, cell `4.1` will be returned, since it is the smallest cell that
+   * fulfills the described property. This shows, that the neighbor <i>can</i>
+   * have a higher level than the cell itself.
+   *
+   * However, using only isotropic refinement, the neighbor will have <i>at
+   * most</i> the level as the cell itself. This can be verified in the bottom
+   * half of the image, where only isotropic refinement was done: The first
+   * neighbor of `3.3` is given by `2.6`. Further refinement of `2.6` will
+   * generate a new first neighbor with level 3, but any further refinements of
+   * that child will not affect the neighbor of cell `3.3`. Due to the avoidance
+   * of multiple hanging nodes on a mesh, it is also impossible to obtain a
+   * coarser cell than `2.6` as the first neighbor of `3.3`. Consequently, the
+   * neighbor of a fully isotropic refined mesh has either the same level as the
+   * cell itself, or is exactly one level coarser.
    */
   TriaIterator<CellAccessor<dim, spacedim>>
   neighbor(const unsigned int face_no) const;
