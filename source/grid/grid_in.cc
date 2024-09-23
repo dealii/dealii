@@ -2019,7 +2019,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
   // contain the the file stripped of the comments
   std::string stripped_file;
 
-  // Comments can be included by mesh generating softwares and must be deleted,
+  // Comments can be included by mesh generating software and must be deleted,
   // a string is filed with the content of the file stripped of the comments
   while (std::getline(input_stream, line))
     {
