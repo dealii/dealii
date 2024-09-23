@@ -284,14 +284,14 @@ public:
   /**
    * Initialize the object by setting the actual parsed functions.
    *
-   * @param[in] vars a string with the variables that will be used by the
-   * expressions to be evaluated. Note that the variables can have any name
-   * (of course different from the function names defined above!), but the
-   * order IS important. The first variable will correspond to the first
+   * @param[in] vars a string with the variables, separated by commas, that will
+   * be used by the expressions to be evaluated. Note that the variables can
+   * have any name (of course different from the function names defined above!),
+   * but the order IS important. The first variable will correspond to the first
    * component of the point in which the function is evaluated, the second
    * variable to the second component and so forth. If this function is also
    * time dependent, then it is necessary to specify it by setting the
-   * <code>time_dependent</code> parameter to true.  An exception is thrown if
+   * <code>time_dependent</code> parameter to true. An exception is thrown if
    * the number of variables specified here is different from dim (if this
    * function is not time-dependent) or from dim+1 (if it is time-dependent).
    *
