@@ -3,7 +3,7 @@
 <h3>Resonance frequency and bandgap</h3>
 
 The results are analyzed in the
-[jupyter notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
+[Jupyter Notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
 with the following code
 @code{.py}
 h5_file = h5py.File('results.h5', 'r')
@@ -79,7 +79,7 @@ has a gaussian shape
 a^2 = a_\textrm{max}^2\frac{\omega^2\Gamma^2}{(\omega_r^2-\omega^2)^2+\Gamma^2\omega^2}
 @f]
 where $f_r = \frac{\omega_r}{2\pi}$ is the resonance frequency and $\Gamma=\frac{\omega_r}{Q}$ is the dissipation rate.
-We used the previous equation in the jupyter notebook to fit the mechanical resonance.
+We used the previous equation in the Jupyter Notebook to fit the mechanical resonance.
 
 Given the values we have chosen for the parameters, one could estimate the resonance frequency
 analytically. Indeed, this is then confirmed by what we get in this program:
@@ -137,7 +137,7 @@ macroscopic quantum harmonic oscillator.
 <h3>Possibilities for extensions</h3>
 
 Instead of setting the parameters in the C++ file we could set the parameters
-using a python script and save them in the HDF5 file that we will use for
+using a Python script and save them in the HDF5 file that we will use for
 the simulations. Then the deal.II program will read the parameters from the
 HDF5 file.
 

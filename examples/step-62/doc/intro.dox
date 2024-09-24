@@ -58,7 +58,7 @@ There are two regimes that depend on the waveguide width:
   This case can be solved using FEM
   or with a [scattering matrix formalism](https://doi.org/10.1103/PhysRevA.94.033813).
   Although we do not study this case in this tutorial, it is very easy to reach the multimode
-  regime by increasing the parameter waveguide width (`dimension_y` in the jupyter notebook).
+  regime by increasing the parameter waveguide width (`dimension_y` in the Jupyter Notebook).
 
 The simulations of this tutorial are performed in the frequency domain.
 To calculate the transmission spectrum, we use a
@@ -165,8 +165,8 @@ F_i &=& \int_\Omega\varphi_m^i f_m
 @f}
 
 <h3>Simulation parameters</h3>
-In this tutorial we use a python
-[jupyter notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
+In this tutorial we use a Python
+[Jupyter Notebook](https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb)
 to set up the parameters and run the simulation.
 First we create a HDF5 file where we store the parameters and the results of
 the simulation.

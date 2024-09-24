@@ -359,7 +359,7 @@ data_file.write_dataset("mean_value",mean_value);
 
 
 <h3> Using R and ggplot2 to generate plots</h3>
-@note Alternatively, one could use the python code in the next subsection.
+@note Alternatively, one could use the Python code in the next subsection.
 
 The data put into %HDF5 files above can then be used from scripting
 languages for further postprocessing. In the following, let us show
@@ -548,7 +548,7 @@ to zero:
   </tr>
 </table>
 
-<h3> Using python to generate plots</h3>
+<h3> Using Python to generate plots</h3>
 
 In this section we discuss the postprocessing of the data stored in %HDF5 files using the "python" programming language.
 The necessary packages to import are
@@ -704,7 +704,7 @@ plt.ylabel("point value error")
 plt.show()
 @endcode
 
-A python package which mimics the `R` ggplot2 (which is based on specifying the grammar of the graphics) is
+A Python package which mimics the `R` ggplot2 (which is based on specifying the grammar of the graphics) is
 <a href="https://plotnine.org/">plotnine</a>.
 @code{.py}
 We need to import the following from the <code>plotnine</code> package
