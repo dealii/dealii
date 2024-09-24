@@ -462,12 +462,13 @@
  *   <tr valign="top">
  *       <td>step-49</td>
  *       <td> Advanced mesh creation and manipulation techniques.
+ *         <br/> (Also available as a Python <a href="https://github.com/dealii/dealii/blob/master/examples/step-49/step-49.ipynb">Jupyter notebook</a>)
  *       </td></tr>
  *
  *   <tr valign="top">
  *       <td>step-50</td>
  *       <td> Geometric multigrid on adaptive meshes distributed in parallel.
- *       <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, MatrixFree, FEInterfaceValues, MeshWorker::mesh_loop()
+ *         <br/> Keywords: Multigrid, MGLevelObject, MGConstrainedDoFs, IndexSet, MGTools, PreconditionMG, MatrixFree, FEInterfaceValues, MeshWorker::mesh_loop()
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -479,6 +480,8 @@
  *   <tr valign="top">
  *       <td>step-53</td>
  *       <td> Describing the geometry of complex domains and curved boundaries.
+ *         <br/> Keywords: Functions::InterpolatedUniformGridData, ChartManifold
+ *         <br/> (Also available as a Python <a href="https://github.com/dealii/dealii/blob/master/examples/step-53/step-53.ipynb">Jupyter notebook</a>)
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -534,6 +537,7 @@
  *       <td> Resonance frequency and bandgap of a phononic crystal. Elastic
  *       wave equation in the frequency domain with Perfectly Matched Layer
  *       boundary conditions. Parallelization via MUMPS and MPI.
+ *       <br/> (Also available as a Python <a href="https://github.com/dealii/dealii/blob/master/examples/step-62/step-62.ipynb">Jupyter notebook</a>)
  *       </td></tr>
  *
  *   <tr valign="top">
