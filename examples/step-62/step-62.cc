@@ -96,7 +96,7 @@ namespace step62
     HDF5::Group data;
 
     // The simulation parameters are stored in `data` as HDF5 attributes. The
-    // following attributes are defined in the jupyter notebook, stored in
+    // following attributes are defined in the Jupyter Notebook, stored in
     // `data` as HDF5 attributes and then read by the constructor.
     const double     max_force_amplitude;
     const double     force_sigma_x;
@@ -127,8 +127,8 @@ namespace step62
     // HDF5::Group in which all the simulation results will be stored.
     HDF5::Group data;
 
-    // The same as before, the following attributes are defined in the jupyter
-    // notebook, stored in `data` as HDF5 attributes and then read by the
+    // The same as before, the following attributes are defined in the Jupyter
+    // Notebook, stored in `data` as HDF5 attributes and then read by the
     // constructor.
     const double pml_coeff;
     const int    pml_coeff_degree;
@@ -159,8 +159,8 @@ namespace step62
     // HDF5::Group in which all the simulation results will be stored.
     HDF5::Group data;
 
-    // The same as before, the following attributes are defined in the jupyter
-    // notebook, stored in `data` as HDF5 attributes and then read by the
+    // The same as before, the following attributes are defined in the Jupyter
+    // Notebook, stored in `data` as HDF5 attributes and then read by the
     // constructor.
     const double       lambda;
     const double       mu;
@@ -186,8 +186,8 @@ namespace step62
     // HDF5::Group in which all the simulation results will be stored.
     HDF5::Group data;
 
-    // The same as before, the following attributes are defined in the jupyter
-    // notebook, stored in `data` as HDF5 attributes and then read by the
+    // The same as before, the following attributes are defined in the Jupyter
+    // Notebook, stored in `data` as HDF5 attributes and then read by the
     // constructor.
     const std::string        simulation_name;
     const bool               save_vtu_files;
@@ -424,8 +424,8 @@ namespace step62
 
   // As before, the constructor reads all the parameters from the HDF5::Group
   // `data` using the HDF5::Group::get_attribute() function. As we have
-  // discussed, a quadratic turn-on of the PML has been defined in the jupyter
-  // notebook. It is possible to use a linear, cubic or another power degree by
+  // discussed, a quadratic turn-on of the PML has been defined in the Jupyter
+  // Notebook. It is possible to use a linear, cubic or another power degree by
   // changing the parameter `pml_coeff_degree`. The parameters `pml_x` and
   // `pml_y` can be used to turn on and off the `x` and `y` PMLs.
   template <int dim>
@@ -809,7 +809,7 @@ namespace step62
       n_q_points, Vector<std::complex<double>>(dim));
 
     // We calculate the stiffness tensor for the $\lambda$ and $\mu$ that have
-    // been defined in the jupyter notebook. Note that contrary to $\rho$ the
+    // been defined in the Jupyter Notebook. Note that contrary to $\rho$ the
     // stiffness is constant among for the whole domain.
     const SymmetricTensor<4, dim> stiffness_tensor =
       get_stiffness_tensor<dim>(parameters.lambda, parameters.mu);
