@@ -32,31 +32,10 @@
 
 #include "../test_grids.h"
 
-
-template <int dim>
+template <int dim, typename IteratorType>
 void
-test(unsigned int fe_degree)
+test(const IteratorType &cell, FEInterfaceValues<dim> &fiv)
 {
-  Triangulation<dim> tria;
-  TestGrids::hyper_line(tria, 2);
-
-  DoFHandler<dim> dofh(tria);
-  FE_DGQ<dim>     fe(fe_degree);
-  deallog << fe.get_name() << std::endl;
-  dofh.distribute_dofs(fe);
-
-  MappingQ<dim> mapping(1);
-  UpdateFlags   update_flags = update_values | update_gradients |
-                             update_quadrature_points | update_JxW_values;
-
-  FEInterfaceValues<dim> fiv(mapping,
-                             fe,
-                             QGauss<dim - 1>(fe.degree + 1),
-                             update_flags);
-
-
-  auto cell = dofh.begin();
-
   for (const unsigned int f : GeometryInfo<dim>::face_indices())
     if (!cell->at_boundary(f))
       {
@@ -100,6 +79,32 @@ test(unsigned int fe_degree)
                               fiv.get_JxW_values()[qpoint];
         deallog << "average_of_shape_values(): " << cell_vector << std::endl;
       }
+}
+
+
+template <int dim>
+void
+test(unsigned int fe_degree)
+{
+  Triangulation<dim> tria;
+  TestGrids::hyper_line(tria, 2);
+
+  DoFHandler<dim> dofh(tria);
+  FE_DGQ<dim>     fe(fe_degree);
+  deallog << fe.get_name() << std::endl;
+  dofh.distribute_dofs(fe);
+
+  MappingQ<dim> mapping(1);
+  UpdateFlags   update_flags = update_values | update_gradients |
+                             update_quadrature_points | update_JxW_values;
+
+  FEInterfaceValues<dim> fiv(mapping,
+                             fe,
+                             QGauss<dim - 1>(fe.degree + 1),
+                             update_flags);
+
+  test(tria.begin(), fiv);
+  test(dofh.begin(), fiv);
 }
 
 
