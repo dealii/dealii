@@ -691,7 +691,21 @@ ComponentSelectFunction<dim, RangeNumberType>::memory_consumption() const
 template <int dim, typename RangeNumberType>
 ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
   ScalarFunctionFromFunctionObject(
-    const std::function<RangeNumberType(const Point<dim> &)> &function_object)
+    const std::function<RangeNumberType(const Point<dim> &)> &fu)
+  : ScalarFunctionFromFunctionObject<dim, RangeNumberType>(
+      [fu](const double t, const Point<dim> &x) {
+        (void)t; // we got a function object that only takes 'x', so ignore 't'
+        return fu(x);
+      })
+{}
+
+
+
+template <int dim, typename RangeNumberType>
+ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
+  ScalarFunctionFromFunctionObject(
+    const std::function<RangeNumberType(const double, const Point<dim> &)>
+      &function_object)
   : Function<dim, RangeNumberType>(1)
   , function_object(function_object)
 {}
@@ -707,7 +721,8 @@ ScalarFunctionFromFunctionObject<dim, RangeNumberType>::value(
   (void)component;
   Assert(component == 0,
          ExcMessage("This object represents only scalar functions"));
-  return function_object(p);
+
+  return function_object(this->get_time(), p);
 }
 
 

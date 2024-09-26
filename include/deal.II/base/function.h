@@ -811,6 +811,15 @@ public:
     const std::function<RangeNumberType(const Point<dim> &)> &function_object);
 
   /**
+   * Given a function object that takes  a time and a Point and returns a
+   * RangeNumberType value, convert this into an object that matches the
+   * Function<dim, RangeNumberType> interface.
+   */
+  explicit ScalarFunctionFromFunctionObject(
+    const std::function<RangeNumberType(const double, const Point<dim> &)>
+      &function_object_t);
+
+  /**
    * Return the value of the function at the given point. Returns the value
    * the function given to the constructor produces for this point.
    */
@@ -822,7 +831,8 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std::function<RangeNumberType(const Point<dim> &)> function_object;
+  const std::function<RangeNumberType(const double, const Point<dim> &)>
+    function_object;
 };
 
 
