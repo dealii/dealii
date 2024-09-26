@@ -2016,7 +2016,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
   // assign boundary ids.
   std::array<std::map<int, int>, 4> tag_maps;
 
-  // contain the the file stripped of the comments
+  // contain the content of the file stripped of the comments
   std::string stripped_file;
 
   // Comments can be included by mesh generating software and must be deleted,
@@ -2037,7 +2037,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
       stripped_file += line + '\n';
     }
 
-  // Restart file reading
+  // Restart reading the file normally since it has been stripped of comments
   std::istringstream in(stripped_file);
 
   in >> line;
