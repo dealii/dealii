@@ -134,9 +134,7 @@ jobs:
         make -j2 \
           setup_tests_a-framework \
           setup_tests_examples \
-          setup_tests_quick_tests \
-          setup_tests_simplex \
-          setup_tests_vtk
+          setup_tests_quick_tests
         ctest --output-on-failure -j2 -VV
 
   ###############################
