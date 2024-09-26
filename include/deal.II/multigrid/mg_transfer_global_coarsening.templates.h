@@ -1466,6 +1466,20 @@ namespace internal
 
 
 
+  template <int dim>
+  bool
+  fe_has_tp_structure(const FiniteElement<dim> &fe)
+  {
+    return fe.n_base_elements() == 1 &&
+           ((dynamic_cast<const FE_Q<dim> *>(&fe.base_element(0)) != nullptr) ||
+            (dynamic_cast<const FE_DGQ<dim> *>(&fe.base_element(0)) !=
+             nullptr) ||
+            (dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe.base_element(0)) !=
+             nullptr));
+  }
+
+
+
   class MGTwoLevelTransferImplementation
   {
     /**
@@ -1767,6 +1781,8 @@ namespace internal
                           ((dynamic_cast<const FE_Q<dim> *>(
                               &fe_fine.base_element(0)) != nullptr));
 
+      const bool has_tp_structure = fe_has_tp_structure(fe_fine);
+
       for (auto &scheme : transfer.schemes)
         {
           // number of dofs on coarse and fine cells
@@ -1836,7 +1852,7 @@ namespace internal
 
 
       const auto cell_local_children_indices =
-        (reference_cell == ReferenceCells::get_hypercube<dim>()) ?
+        (has_tp_structure) ?
           get_child_offsets<dim>(transfer.schemes[0].n_dofs_per_cell_coarse,
                                  is_feq ? fe_fine.degree : (fe_fine.degree + 1),
                                  fe_fine.degree) :
@@ -1870,7 +1886,7 @@ namespace internal
         // ---------------------- lexicographic_numbering ----------------------
         std::vector<unsigned int> lexicographic_numbering_fine;
         std::vector<unsigned int> lexicographic_numbering_coarse;
-        if (reference_cell == ReferenceCells::get_hypercube<dim>())
+        if (has_tp_structure)
           {
             const Quadrature<1> dummy_quadrature(
               std::vector<Point<1>>(1, Point<1>()));
@@ -2031,7 +2047,7 @@ namespace internal
              transfer_scheme_index < transfer.schemes.size();
              ++transfer_scheme_index)
           {
-            if (reference_cell == ReferenceCells::get_hypercube<dim>())
+            if (has_tp_structure)
               {
                 const auto fe = create_1D_fe(fe_fine.base_element(0));
 
@@ -2173,15 +2189,15 @@ namespace internal
       AssertDimension(fe_fine.n_base_elements(), 1);
       AssertDimension(fe_coarse.n_base_elements(), 1);
 
+      const bool has_tp_structure = fe_has_tp_structure(fe_fine);
+
       const FiniteElement<dim> &fe_fine_scalar   = fe_fine.base_element(0);
       const FiniteElement<dim> &fe_coarse_scalar = fe_coarse.base_element(0);
 
-      const auto reference_cell = fe_fine.reference_cell();
+      Assert(fe_fine.reference_cell() == fe_coarse.reference_cell(),
+             ExcNotImplemented());
 
-      Assert(reference_cell == fe_coarse.reference_cell(), ExcNotImplemented());
-
-      if (reference_cell == ReferenceCells::get_hypercube<dim>() &&
-          (fe_coarse != fe_fine) &&
+      if (has_tp_structure && (fe_coarse != fe_fine) &&
           (fe_coarse.n_dofs_per_cell() != 0 && fe_fine.n_dofs_per_cell() != 0))
         {
           const auto fe_fine_1d = create_1D_fe(fe_fine_scalar);
@@ -2242,8 +2258,7 @@ namespace internal
               scheme.restriction_matrix[k] =
                 matrix(renumbering_coarse[i], renumbering_fine[j]);
         }
-      else if (reference_cell != ReferenceCells::get_hypercube<dim>() &&
-               (fe_fine != fe_coarse) &&
+      else if ((!has_tp_structure) && (fe_fine != fe_coarse) &&
                (fe_fine.n_dofs_per_cell() != 0 &&
                 fe_coarse.n_dofs_per_cell() != 0))
         {
@@ -2363,6 +2378,10 @@ namespace internal
                                 &fe.base_element(0)) != nullptr);
                     });
 
+      const bool has_tp_structure =
+        std::all_of(dof_handler_fine.get_fe_collection().begin(),
+                    dof_handler_fine.get_fe_collection().end(),
+                    [](const auto &fe) { return fe_has_tp_structure(fe); });
 
       const auto process_cells = [&](const auto &fu) {
         loop_over_active_or_level_cells(
@@ -2464,7 +2483,7 @@ namespace internal
                    ExcNotImplemented());
 
             // ------------------- lexicographic_numbering  --------------------
-            if (reference_cell == ReferenceCells::get_hypercube<dim>())
+            if (has_tp_structure)
               {
                 const Quadrature<1> dummy_quadrature(
                   std::vector<Point<1>>(1, Point<1>()));
