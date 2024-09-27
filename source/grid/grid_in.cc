@@ -2002,10 +2002,10 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
 
 template <int dim, int spacedim>
 void
-GridIn<dim, spacedim>::read_msh(std::istream &in)
+GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in.fail() == false, ExcIO());
+  AssertThrow(input_stream.fail() == false, ExcIO());
 
   unsigned int n_vertices;
   unsigned int n_cells;
@@ -2015,6 +2015,30 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   // points, curves, surfaces and volumes. We use this information later to
   // assign boundary ids.
   std::array<std::map<int, int>, 4> tag_maps;
+
+  // contain the content of the file stripped of the comments
+  std::string stripped_file;
+
+  // Comments can be included by mesh generating software and must be deleted,
+  // a string is filed with the content of the file stripped of the comments
+  while (std::getline(input_stream, line))
+    {
+      if (line == "$Comments")
+        {
+          while (std::getline(input_stream, line))
+            {
+              if (line == "$EndComments")
+                {
+                  break;
+                }
+            }
+          continue;
+        }
+      stripped_file += line + '\n';
+    }
+
+  // Restart reading the file normally since it has been stripped of comments
+  std::istringstream in(stripped_file);
 
   in >> line;
 
