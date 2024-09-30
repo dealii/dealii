@@ -1003,7 +1003,7 @@ vectorized_transpose_and_store(const bool                            add_into,
 
 #ifndef DOXYGEN
 
-#  if defined(DEAL_II_HAVE_ARM_NEON) && defined(__ARM_NEON)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ARM_NEON)
 
 /**
  * Specialization for double and ARM Neon.
@@ -6313,7 +6313,7 @@ compare_and_apply_mask(const VectorizedArray<double, 2> &left,
 
 #  endif
 
-#  if defined(DEAL_II_HAVE_ARM_NEON) && defined(__ARM_NEON)
+#  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ARM_NEON)
 
 template <SIMDComparison predicate>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 4>
