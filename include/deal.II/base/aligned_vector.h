@@ -79,6 +79,21 @@ public:
   AlignedVector();
 
   /**
+   * Range constructor.
+   *
+   * @note Unlike std::vector, this constructor uses random-access iterators so
+   * that the copy may be parallelized.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  template <
+    typename RandomAccessIterator,
+    typename = std::enable_if_t<std::is_convertible_v<
+      typename std::iterator_traits<RandomAccessIterator>::iterator_category,
+      std::random_access_iterator_tag>>>
+  AlignedVector(RandomAccessIterator begin, RandomAccessIterator end);
+
+  /**
    * Set the vector size to the given size and initializes all elements with
    * T().
    *
@@ -239,6 +254,24 @@ public:
   template <typename ForwardIterator>
   void
   insert_back(ForwardIterator begin, ForwardIterator end);
+
+  /**
+   * Insert the range specified by @p begin and @p end after the element @p position.
+   *
+   * @note Unlike std::vector, this function uses random-access iterators so
+   * that the copy may be parallelized.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  template <
+    typename RandomAccessIterator,
+    typename = std::enable_if_t<std::is_convertible_v<
+      typename std::iterator_traits<RandomAccessIterator>::iterator_category,
+      std::random_access_iterator_tag>>>
+  iterator
+  insert(const_iterator       position,
+         RandomAccessIterator begin,
+         RandomAccessIterator end);
 
   /**
    * Fills the vector with size() copies of a default constructed object.
@@ -743,7 +776,7 @@ namespace internal
    *
    * @relatesalso AlignedVector
    */
-  template <typename T>
+  template <typename RandomAccessIterator, typename T>
   class AlignedVectorCopyConstruct
     : private dealii::parallel::ParallelForInteger
   {
@@ -760,9 +793,9 @@ namespace internal
      * The elements from the source array are simply copied via the placement
      * new copy constructor.
      */
-    AlignedVectorCopyConstruct(const T *const source_begin,
-                               const T *const source_end,
-                               T *const       destination)
+    AlignedVectorCopyConstruct(RandomAccessIterator source_begin,
+                               RandomAccessIterator source_end,
+                               T *const             destination)
       : source_(source_begin)
       , destination_(destination)
     {
@@ -787,22 +820,21 @@ namespace internal
       if (end == begin)
         return;
 
-      // for classes trivial assignment can use memcpy. cast element to
-      // (void*) to silence compiler warning for virtual classes (they will
-      // never arrive here because they are non-trivial).
-
-      if (std::is_trivial_v<T> == true)
-        std::memcpy(static_cast<void *>(destination_ + begin),
-                    static_cast<const void *>(source_ + begin),
+      // for classes trivial assignment can use memcpy.
+      if constexpr (std::is_trivial_v<T> == true &&
+                    (std::is_same_v<T *, RandomAccessIterator> ||
+                     std::is_same_v<const T *, RandomAccessIterator>) == true)
+        std::memcpy(destination_ + begin,
+                    source_ + begin,
                     (end - begin) * sizeof(T));
       else
         for (std::size_t i = begin; i < end; ++i)
-          new (&destination_[i]) T(source_[i]);
+          new (&destination_[i]) T(*(source_ + i));
     }
 
   private:
-    const T *const source_;
-    T *const       destination_;
+    RandomAccessIterator source_;
+    T *const             destination_;
   };
 
 
@@ -812,7 +844,7 @@ namespace internal
    *
    * @relatesalso AlignedVector
    */
-  template <typename T>
+  template <typename RandomAccessIterator, typename T>
   class AlignedVectorMoveConstruct
     : private dealii::parallel::ParallelForInteger
   {
@@ -829,9 +861,9 @@ namespace internal
      * The data is moved between the two arrays by invoking the destructor on
      * the source range (preparing for a subsequent call to free).
      */
-    AlignedVectorMoveConstruct(T *const source_begin,
-                               T *const source_end,
-                               T *const destination)
+    AlignedVectorMoveConstruct(RandomAccessIterator source_begin,
+                               RandomAccessIterator source_end,
+                               T *const             destination)
       : source_(source_begin)
       , destination_(destination)
     {
@@ -856,23 +888,23 @@ namespace internal
       if (end == begin)
         return;
 
-      // Classes with trivial assignment can use memcpy. cast element to
-      // (void*) to silence compiler warning for virtual classes (they will
-      // never arrive here because they are non-trivial).
-      if (std::is_trivial_v<T> == true)
-        std::memcpy(static_cast<void *>(destination_ + begin),
-                    static_cast<void *>(source_ + begin),
+      // Classes with trivial assignment can use memcpy.
+      if constexpr (std::is_trivial_v<T> == true &&
+                    (std::is_same_v<T *, RandomAccessIterator> ||
+                     std::is_same_v<const T *, RandomAccessIterator>) == true)
+        std::memcpy(destination_ + begin,
+                    source_ + begin,
                     (end - begin) * sizeof(T));
       else
         // For everything else just use the move constructor. The original
         // object remains alive and will be destroyed elsewhere.
         for (std::size_t i = begin; i < end; ++i)
-          new (&destination_[i]) T(std::move(source_[i]));
+          new (&destination_[i]) T(std::move(*(source_ + i)));
     }
 
   private:
-    T *const source_;
-    T *const destination_;
+    RandomAccessIterator source_;
+    T *const             destination_;
   };
 
 
@@ -918,16 +950,11 @@ namespace internal
       // do not use memcmp for long double because on some systems it does not
       // completely fill its memory and may lead to false positives in
       // e.g. valgrind
-      if (std::is_trivial_v<T> == true &&
-          std::is_same_v<T, long double> == false)
+      if constexpr (std::is_trivial_v<T> == true &&
+                    std::is_same_v<T, long double> == false)
         {
           const unsigned char zero[sizeof(T)] = {};
-          // cast element to (void*) to silence compiler warning for virtual
-          // classes (they will never arrive here because they are
-          // non-trivial).
-          if (std::memcmp(zero,
-                          static_cast<const void *>(&element),
-                          sizeof(T)) == 0)
+          if (std::memcmp(zero, &element, sizeof(T)) == 0)
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
@@ -943,18 +970,17 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // for classes with trivial assignment of zero can use memset. cast
-      // element to (void*) to silence compiler warning for virtual
-      // classes (they will never arrive here because they are
-      // non-trivial).
-      if (std::is_trivial_v<T> == true && trivial_element)
-        std::memset(static_cast<void *>(destination_ + begin),
-                    0,
-                    (end - begin) * sizeof(T));
-      else
-        copy_construct_or_assign(begin,
-                                 end,
-                                 std::bool_constant<initialize_memory>());
+      // Classes with trivial assignment of zero can use memset.
+      if constexpr (std::is_trivial_v<T> == true)
+        if (trivial_element)
+          {
+            std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
+            return;
+          }
+
+      copy_construct_or_assign(begin,
+                               end,
+                               std::bool_constant<initialize_memory>());
     }
 
   private:
@@ -1029,14 +1055,9 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // for classes with trivial assignment of zero can use memset. cast
-      // element to (void*) to silence compiler warning for virtual
-      // classes (they will never arrive here because they are
-      // non-trivial).
-      if (std::is_trivial_v<T> == true)
-        std::memset(static_cast<void *>(destination_ + begin),
-                    0,
-                    (end - begin) * sizeof(T));
+      // Classes with trivial assignment of zero can use memset.
+      if constexpr (std::is_trivial_v<T> == true)
+        std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
       else
         default_construct_or_assign(begin,
                                     end,
@@ -1196,6 +1217,23 @@ inline AlignedVector<T>::AlignedVector()
 
 
 template <class T>
+template <typename RandomAccessIterator, typename>
+inline AlignedVector<T>::AlignedVector(RandomAccessIterator begin,
+                                       RandomAccessIterator end)
+  : elements(nullptr, Deleter(this))
+  , used_elements_end(nullptr)
+  , allocated_elements_end(nullptr)
+  , replicated_across_communicator(false)
+{
+  allocate_and_move(0u, end - begin, end - begin);
+  used_elements_end = allocated_elements_end;
+  dealii::internal::AlignedVectorCopyConstruct<RandomAccessIterator, T>(begin,
+                                                                        end,
+                                                                        data());
+}
+
+
+template <class T>
 inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
@@ -1222,9 +1260,9 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
   // copy the data from vec
   reserve(vec.size());
   used_elements_end = allocated_elements_end;
-  internal::AlignedVectorCopyConstruct<T>(vec.elements.get(),
-                                          vec.used_elements_end,
-                                          elements.get());
+  internal::AlignedVectorCopyConstruct<T *, T>(vec.elements.get(),
+                                               vec.used_elements_end,
+                                               elements.get());
 }
 
 
@@ -1252,9 +1290,9 @@ AlignedVector<T>::operator=(const AlignedVector<T> &vec)
 
   // Then copy the elements over by using the copy constructor on these
   // elements:
-  internal::AlignedVectorCopyConstruct<T>(vec.elements.get(),
-                                          vec.used_elements_end,
-                                          elements.get());
+  internal::AlignedVectorCopyConstruct<T *, T>(vec.elements.get(),
+                                               vec.used_elements_end,
+                                               elements.get());
 
   // Finally adjust the pointer to the end of the elements that are used:
   used_elements_end = elements.get() + new_size;
@@ -1420,9 +1458,8 @@ AlignedVector<T>::allocate_and_move(const size_t old_size,
 
   // copy whatever elements we need to retain
   if (new_allocated_size > 0)
-    dealii::internal::AlignedVectorMoveConstruct<T>(elements.get(),
-                                                    elements.get() + old_size,
-                                                    new_data_ptr);
+    dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+      elements.get(), elements.get() + old_size, new_data_ptr);
 
   // Now reset all the member variables of the current object
   // based on the allocation above. Assigning to a std::unique_ptr
@@ -1549,6 +1586,53 @@ AlignedVector<T>::insert_back(ForwardIterator begin, ForwardIterator end)
         new (used_elements_end) T;
       *used_elements_end = *begin;
     }
+}
+
+
+
+template <class T>
+template <typename RandomAccessIterator, typename>
+inline typename AlignedVector<T>::iterator
+AlignedVector<T>::insert(const_iterator       position,
+                         RandomAccessIterator begin,
+                         RandomAccessIterator end)
+{
+  Assert(replicated_across_communicator == false,
+         ExcAlignedVectorChangeAfterReplication());
+  Assert(this->begin() <= position && position <= this->end(),
+         ExcMessage("The position iterator is not valid."));
+  const auto offset = position - this->begin();
+
+  const size_type old_size   = size();
+  const size_type range_size = end - begin;
+  const size_type new_size   = old_size + range_size;
+  if (range_size != 0)
+    {
+      // This is similar to allocate_and_move(), except that we need to move
+      // whatever was before position and whatever is after it into two
+      // different places
+      T *new_data_ptr = nullptr;
+      Utilities::System::posix_memalign(
+        reinterpret_cast<void **>(&new_data_ptr), 64, new_size * sizeof(T));
+
+      // Correctly handle the case where the range is inside the present array
+      // by creating a temporary.
+      AlignedVector<T> temporary(begin, end);
+      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+        elements.get(), elements.get() + offset, new_data_ptr);
+      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+        temporary.begin(), temporary.end(), new_data_ptr + offset);
+      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
+        elements.get() + offset,
+        elements.get() + old_size,
+        new_data_ptr + offset + range_size);
+
+      Deleter deleter(this);
+      elements          = decltype(elements)(new_data_ptr, std::move(deleter));
+      used_elements_end = elements.get() + new_size;
+      allocated_elements_end = elements.get() + new_size;
+    }
+  return this->begin() + offset;
 }
 
 

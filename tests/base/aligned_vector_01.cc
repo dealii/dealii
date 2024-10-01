@@ -18,8 +18,9 @@
 
 #include <deal.II/base/aligned_vector.h>
 
-#include "../tests.h"
+#include <deque>
 
+#include "../tests.h"
 
 void
 test()
@@ -39,7 +40,64 @@ test()
   b.push_back(27);
   a.insert_back(b.begin(), b.end());
 
-  deallog << "Insertion: ";
+  // Check the range constructor with and without conversion.
+  {
+    VEC c(b.begin(), b.end());
+    AssertThrow(c == b, ExcInternalError());
+
+    std::vector<int> temp(b.begin(), b.end());
+    VEC              d(temp.begin(), temp.end());
+    AssertThrow(c == d, ExcInternalError());
+  }
+
+  // Check the range constructor with a random-access iterator which is not
+  // contiguous
+  {
+    // Use a large enough deque to guarantee that we have multiple blocks
+    std::deque<unsigned int> temp(8192);
+    std::iota(temp.begin(), temp.end(), 0u);
+
+    VEC e(temp.begin(), temp.end());
+    AssertThrow(std::equal(e.begin(), e.end(), temp.begin()),
+                ExcInternalError());
+  }
+
+  // Also check large insertions for equality and iterator position
+  {
+    std::deque<unsigned int> temp(8192);
+    std::iota(temp.begin(), temp.end(), 0u);
+
+    VEC        f(temp.begin(), temp.begin() + temp.size() / 4);
+    const auto it0 =
+      f.insert(f.end(), temp.begin() + temp.size() / 2, temp.end());
+    AssertThrow(static_cast<std::size_t>(it0 - f.begin()) == temp.size() / 4,
+                ExcInternalError());
+    AssertThrow(*it0 == temp[temp.size() / 2], ExcInternalError());
+    AssertThrow(*(it0 - 1) == temp[temp.size() / 4 - 1], ExcInternalError());
+    AssertThrow(f.back() == temp.back(), ExcInternalError());
+
+    const auto it1 = f.insert(f.begin() + temp.size() / 4,
+                              temp.begin() + temp.size() / 4,
+                              temp.begin() + temp.size() / 2);
+    AssertThrow(static_cast<std::size_t>(it1 - f.begin()) == temp.size() / 4,
+                ExcInternalError());
+    AssertThrow(*it1 == temp[temp.size() / 4], ExcInternalError());
+    AssertThrow(std::equal(f.begin(), f.end(), temp.begin()),
+                ExcInternalError());
+  }
+
+  deallog << "back Insertion: ";
+  for (unsigned int i = 0; i < a.size(); ++i)
+    deallog << a[i] << ' ';
+  deallog << std::endl;
+
+  {
+    AlignedVector<unsigned short> temp(4);
+    std::fill(temp.begin(), temp.end(), 42u);
+    a.insert(a.begin() + 4, temp.begin(), temp.end());
+  }
+  deallog << "Insertion at position 4: ";
+
   for (unsigned int i = 0; i < a.size(); ++i)
     deallog << a[i] << ' ';
   deallog << std::endl;
