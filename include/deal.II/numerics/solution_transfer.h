@@ -363,12 +363,12 @@ public:
 
   /**
    * Same as the previous function. It interpolates only one function. It
-   * assumes the vectors having the right sizes (i.e.
-   * <tt>in.size()==n_dofs_old</tt>, <tt>out.size()==n_dofs_refined</tt>)
+   * assumes the vector has the right size (i.e.
+   * <tt>out.size()==n_dofs_refined</tt>)
    *
    * Multiple calling of this function is NOT allowed. Interpolating
    * several functions can be performed in one step by using
-   * <tt>interpolate (all_in, all_out)</tt>
+   * <tt>interpolate (all_out)</tt>
    */
   void
   interpolate(VectorType &out);
