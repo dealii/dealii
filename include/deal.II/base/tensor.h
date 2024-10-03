@@ -24,21 +24,12 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor_accessors.h>
 
+#include <Kokkos_Core.hpp>
+
 #ifdef DEAL_II_WITH_ADOLC
 #  include <adolc/adouble.h> // Taped double
 #endif
 
-// boost::serialization::make_array used to be in array.hpp, but was
-// moved to a different file in BOOST 1.64
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 106400
-#  include <boost/serialization/array_wrapper.hpp>
-#else
-#  include <boost/serialization/array.hpp>
-#endif
-
-
-#include <array>
 #include <cmath>
 #include <ostream>
 #include <type_traits>
@@ -849,8 +840,8 @@ private:
    * Otherwise, it is an array of tensors one rank lower.
    */
   std::conditional_t<rank_ == 1,
-                     std::array<Number, dim>,
-                     std::array<Tensor<rank_ - 1, dim, Number>, dim>>
+                     Kokkos::Array<Number, dim>,
+                     Kokkos::Array<Tensor<rank_ - 1, dim, Number>, dim>>
     values;
 
   /**
@@ -1262,17 +1253,17 @@ template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor()
   : values(
-      // In order to initialize the std::array<Number,dim>, we would need a
+      // In order to initialize the Kokkos::Array<Number,dim>, we would need a
       // brace-enclosed list of length 'dim'. There is no way in C++ to create
       // such a list in-place, but we can come up with a lambda function that
       // expands such a list via template-pack expansion, and then uses this
-      // list to initialize a std::array which it then returns.
+      // list to initialize a Kokkos:Array which it then returns.
       //
       // The trick to come up with such a lambda function is to have a function
       // that takes an argument that depends on a template-pack of integers.
       // We will call the function with an integer list of length 'dim', and
       // in the function itself expand that pack in a way that it serves as
-      // a brace-enclosed list of initializers for a std::array.
+      // a brace-enclosed list of initializers for a Kokkos::Array.
       //
       // Of course, we do not want to initialize the array with the integers,
       // but with  zeros. (Or, more correctly, a zero of the element type.)
@@ -1328,7 +1319,7 @@ namespace internal
   namespace TensorInitialization
   {
     template <int rank, int dim, typename Number, std::size_t... I>
-    constexpr std::array<typename Tensor<rank, dim, Number>::value_type, dim>
+    constexpr Kokkos::Array<typename Tensor<rank, dim, Number>::value_type, dim>
     make_zero_array(const std::index_sequence<I...> &)
     {
       static_assert(sizeof...(I) == dim, "This is bad.");
@@ -1819,7 +1810,7 @@ Tensor<rank_, dim, Number>::unroll(const Iterator begin,
              ExcMessage(
                "The provided iterator range must contain at least 'dim' "
                "elements."));
-      std::copy(std::begin(values), std::end(values), begin);
+      std::copy(values.data(), values.data() + values.size(), begin);
     }
 }
 
@@ -1895,10 +1886,10 @@ template <class Archive>
 inline void
 Tensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 {
-  if constexpr (rank_ > 1)
-    ar &values;
-  else
-    ar &boost::serialization::make_array(&values[0], dim);
+  for (int i = 0; i < dim; ++i)
+    {
+      ar &values[i];
+    }
 }
 
 
