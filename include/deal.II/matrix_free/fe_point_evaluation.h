@@ -2467,16 +2467,16 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
 {
-  if (this->must_reinitialize_pointers)
-    internal_reinit_single_cell_state_mapping_info();
-
-  if (this->n_q_points == 0)
-    return;
-
   Assert(!(evaluation_flags & EvaluationFlags::hessians), ExcNotImplemented());
 
   if (!((evaluation_flags & EvaluationFlags::values) ||
         (evaluation_flags & EvaluationFlags::gradients))) // no evaluation flags
+    return;
+
+  if (this->must_reinitialize_pointers)
+    internal_reinit_single_cell_state_mapping_info();
+
+  if (this->n_q_points == 0)
     return;
 
   AssertDimension(solution_values.size(), this->fe->dofs_per_cell);
