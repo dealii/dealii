@@ -105,12 +105,12 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    Scalar();
+    constexpr Scalar();
 
     /**
      * Constructor. Take the selected vector component as argument.
      */
-    Scalar(const unsigned int component);
+    constexpr Scalar(const unsigned int component);
 
     /**
      * Return a string that uniquely identifies this finite element extractor.
@@ -160,13 +160,13 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    Vector();
+    constexpr Vector();
 
     /**
      * Constructor. Take the first component of the selected vector inside the
      * FEValues object as argument.
      */
-    Vector(const unsigned int first_vector_component);
+    constexpr Vector(const unsigned int first_vector_component);
 
     /**
      * Return a string that uniquely identifies this finite element extractor.
@@ -207,13 +207,13 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    SymmetricTensor();
+    constexpr SymmetricTensor();
 
     /**
      * Constructor. Take the first component of the selected tensor inside the
      * FEValues object as argument.
      */
-    SymmetricTensor(const unsigned int first_tensor_component);
+    constexpr SymmetricTensor(const unsigned int first_tensor_component);
 
     /**
      * Return a string that uniquely identifies this finite element extractor.
@@ -254,13 +254,13 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    Tensor();
+    constexpr Tensor();
 
     /**
      * Constructor. Take the first component of the selected tensor inside the
      * FEValues object as argument.
      */
-    Tensor(const unsigned int first_tensor_component);
+    constexpr Tensor(const unsigned int first_tensor_component);
 
     /**
      * Return a string that uniquely identifies this finite element extractor.
@@ -279,7 +279,7 @@ namespace FEValuesExtractors
     /**
      * Construct a new FirstCoupling object with the given extractor.
      */
-    FirstCoupling(const Extractor &extractor);
+    constexpr FirstCoupling(const Extractor &extractor);
 
     /**
      * The actual extractor object.
@@ -297,7 +297,7 @@ namespace FEValuesExtractors
     /**
      * Construct a new SecondCoupling object with the given extractor.
      */
-    SecondCoupling(const Extractor &extractor);
+    constexpr SecondCoupling(const Extractor &extractor);
 
     /**
      * The actual extractor object.
@@ -311,61 +311,64 @@ namespace FEValuesExtractors
 
 namespace FEValuesExtractors
 {
-  inline Scalar::Scalar()
+  constexpr inline Scalar::Scalar()
     : component(numbers::invalid_unsigned_int)
   {}
 
 
 
-  inline Scalar::Scalar(const unsigned int component)
+  constexpr inline Scalar::Scalar(const unsigned int component)
     : component(component)
   {}
 
 
 
-  inline Vector::Vector()
+  constexpr inline Vector::Vector()
     : first_vector_component(numbers::invalid_unsigned_int)
   {}
 
 
-  inline Vector::Vector(const unsigned int first_vector_component)
+  constexpr inline Vector::Vector(const unsigned int first_vector_component)
     : first_vector_component(first_vector_component)
   {}
 
 
   template <int rank>
-  inline SymmetricTensor<rank>::SymmetricTensor()
+  constexpr inline SymmetricTensor<rank>::SymmetricTensor()
     : first_tensor_component(numbers::invalid_unsigned_int)
   {}
 
 
   template <int rank>
-  inline SymmetricTensor<rank>::SymmetricTensor(
+  constexpr inline SymmetricTensor<rank>::SymmetricTensor(
     const unsigned int first_tensor_component)
     : first_tensor_component(first_tensor_component)
   {}
 
 
   template <int rank>
-  inline Tensor<rank>::Tensor()
+  constexpr inline Tensor<rank>::Tensor()
     : first_tensor_component(numbers::invalid_unsigned_int)
   {}
 
 
   template <int rank>
-  inline Tensor<rank>::Tensor(const unsigned int first_tensor_component)
+  constexpr inline Tensor<rank>::Tensor(
+    const unsigned int first_tensor_component)
     : first_tensor_component(first_tensor_component)
   {}
 
 
   template <typename Extractor>
-  inline FirstCoupling<Extractor>::FirstCoupling(const Extractor &extractor)
+  constexpr inline FirstCoupling<Extractor>::FirstCoupling(
+    const Extractor &extractor)
     : extractor(extractor)
   {}
 
 
   template <typename Extractor>
-  inline SecondCoupling<Extractor>::SecondCoupling(const Extractor &extractor)
+  constexpr inline SecondCoupling<Extractor>::SecondCoupling(
+    const Extractor &extractor)
     : extractor(extractor)
   {}
 } // namespace FEValuesExtractors
