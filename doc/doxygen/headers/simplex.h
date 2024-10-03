@@ -14,12 +14,12 @@
 
 
 /**
- * @defgroup simplex Simplex support (experimental)
+ * @defgroup simplex Simplex support
  *
- * This group describes the experimental simplex support in deal.II.
+ * This group describes the simplex support in deal.II.
  *
- * Simplex and mixed meshes in deal.II are still experimental, i.e., work
- * in progress. Large parts of the library have been ported to be able to
+ * Simplex and mixed meshes in deal.II are work in progress.
+ * Large parts of the library have been ported to be able to
  * operate on such kind of meshes. However, there are still many functions
  * that need to be generalized.
  *
