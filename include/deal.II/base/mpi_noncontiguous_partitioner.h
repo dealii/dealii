@@ -79,6 +79,14 @@ namespace Utilities
        * Fill the vector @p ghost_array according to the precomputed communication
        * pattern with values from @p locally_owned_array.
        *
+       * In the default case, only one object is communicated per entry
+       * (`n_components_templated == 1'). If you want to communicate more
+       * entries, you can increase the value of @p n_components_templated in the
+       * case that you know the size at compile time. If you want to set the
+       * size during runtime, you can set @p n_components. However,
+       * @p n_components_templated has to be set to `0` in this case. Either
+       * @p n_components_templated or @p n_components can be set.
+       *
        * @pre The vectors only have to provide a method begin(), which allows
        *   to access their raw data.
        *
@@ -91,11 +99,12 @@ namespace Utilities
        *   functions separately and hereby overlap communication and
        *   computation.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array(
         const ArrayView<const Number> &locally_owned_array,
-        const ArrayView<Number>       &ghost_array) const;
+        const ArrayView<Number>       &ghost_array,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Same as above but with an interface similar to
@@ -111,14 +120,15 @@ namespace Utilities
        * @note Any value less than 10 is a valid value of
        *   @p communication_channel.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array(
         const unsigned int             communication_channel,
         const ArrayView<const Number> &locally_owned_array,
         const ArrayView<Number>       &temporary_storage,
         const ArrayView<Number>       &ghost_array,
-        std::vector<MPI_Request>      &requests) const;
+        std::vector<MPI_Request>      &requests,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Start update: Data is packed, non-blocking send and receives
@@ -136,13 +146,14 @@ namespace Utilities
        * @note Any value less than 10 is a valid value of
        *   @p communication_channel.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array_start(
         const unsigned int             communication_channel,
         const ArrayView<const Number> &locally_owned_array,
         const ArrayView<Number>       &temporary_storage,
-        std::vector<MPI_Request>      &requests) const;
+        std::vector<MPI_Request>      &requests,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Finish update. The method waits until all data has been sent and
@@ -158,12 +169,13 @@ namespace Utilities
        * @pre The required size of the vectors are the same as in the functions
        *   above.
        */
-      template <typename Number>
+      template <typename Number, unsigned int n_components_templated = 1>
       void
       export_to_ghosted_array_finish(
         const ArrayView<const Number> &temporary_storage,
         const ArrayView<Number>       &ghost_array,
-        std::vector<MPI_Request>      &requests) const;
+        std::vector<MPI_Request>      &requests,
+        const unsigned int             n_components = 0) const;
 
       /**
        * Similar to the above functions but for importing vector entries
