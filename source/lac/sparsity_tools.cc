@@ -878,6 +878,7 @@ namespace SparsityTools
                       n_remaining_neighbors[it->column()]--;
                     }
                 }
+              std::sort(current_neighbors.begin(), current_neighbors.end());
             }
         }
 
