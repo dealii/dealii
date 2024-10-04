@@ -824,7 +824,9 @@ namespace SparsityTools
                       ++write_index;
                       if (n_remaining_neighbors[node] < candidate_valence ||
                           (n_remaining_neighbors[node] == candidate_valence &&
-                           row_lengths[node] > candidate_row_length))
+                           (row_lengths[node] > candidate_row_length ||
+                            (row_lengths[node] == candidate_row_length &&
+                             node < candidate_index))))
                         {
                           candidate_index      = node;
                           candidate_valence    = n_remaining_neighbors[node];
@@ -878,7 +880,6 @@ namespace SparsityTools
                       n_remaining_neighbors[it->column()]--;
                     }
                 }
-              std::sort(current_neighbors.begin(), current_neighbors.end());
             }
         }
 
