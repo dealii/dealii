@@ -14,7 +14,7 @@ jobs:
     # run the indent checks
 
     name: indent
-    runs-on: [ubuntu-22.04]
+    runs-on: [ubuntu-24.04]
 
     steps:
     - uses: actions/checkout@v4
@@ -31,16 +31,14 @@ jobs:
     # build the documentation
 
     name: doxygen
-    runs-on: [ubuntu-22.04]
+    runs-on: [ubuntu-24.04]
 
     steps:
     - name: setup
       run: |
         sudo apt update
-        sudo apt install graphviz perl texlive-bibtex-extra
-    - uses: ssciwr/doxygen-install@v1
-      with:
-        version: "1.9.6"
+        sudo apt install doxygen graphviz perl texlive-bibtex-extra
+        doxygen --version
     - uses: actions/checkout@v4
     - name: build documentation
       run: |
@@ -76,11 +74,11 @@ jobs:
     # check for typos
 
     name: typos
-    runs-on: [ubuntu-22.04]
+    runs-on: [ubuntu-24.04]
 
     steps:
     - uses: actions/checkout@v4
-    - uses: crate-ci/typos@v1.24.6
+    - uses: crate-ci/typos@v1.25.0
       with:
         files: doc examples include source tests
         config: ./.typos.toml
