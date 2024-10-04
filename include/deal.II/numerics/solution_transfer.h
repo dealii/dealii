@@ -952,9 +952,9 @@ namespace Legacy
 
 
     /**
-     * Is used for @p prepare_for_refining (of course also for @p
-     * repare_for_refining_and_coarsening) and stores all dof indices of the
-     * cells that'll be refined
+     * Is used for @p prepare_for_pure_refinement (of course also for
+     * @p prepare_for_coarsening_and_refinement) and stores all dof indices of
+     * the cells that'll be refined.
      */
     std::vector<std::vector<types::global_dof_index>> indices_on_cell;
 
@@ -1006,8 +1006,9 @@ namespace Legacy
     std::map<std::pair<unsigned int, unsigned int>, Pointerstruct> cell_map;
 
     /**
-     * Is used for @p prepare_for_refining_and_coarsening The interpolated dof
-     * values of all cells that'll be coarsened will be stored in this vector.
+     * Is used for @p prepare_for_coarsening_and_refinement. The interpolated
+     * dof values of all cells that'll be coarsened will be stored in this
+     * vector.
      */
     std::vector<std::vector<Vector<typename VectorType::value_type>>>
       dof_values_on_cell;
