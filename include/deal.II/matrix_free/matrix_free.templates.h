@@ -2026,7 +2026,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
            task_info.refinement_edge_face_partition_data[0]));
 
       for (auto &di : dof_info)
-        di.compute_face_index_compression(face_info.faces);
+        di.compute_face_index_compression(
+          face_info.faces, additional_data.hold_all_faces_to_owned_cells);
 
       // build the inverse map back from the faces array to
       // cell_and_face_to_plain_faces
