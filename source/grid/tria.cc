@@ -7788,8 +7788,8 @@ namespace internal
 
                         if (old_child[0]->index() + 1 != old_child[1]->index())
                           {
-                            // this is exactly the ugly case we taked
-                            // about. so, no coimplaining, lets get
+                            // this is exactly the ugly case we talked
+                            // about. so, no complaining, lets get
                             // two new lines and copy all info
                             typename Triangulation<dim,
                                                    spacedim>::raw_line_iterator
