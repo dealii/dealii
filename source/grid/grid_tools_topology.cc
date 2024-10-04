@@ -1855,8 +1855,9 @@ namespace GridTools
     const Triangulation<dim, spacedim> &triangulation,
     DynamicSparsityPattern             &cell_connectivity)
   {
-    std::vector<std::vector<unsigned int>> vertex_to_cell(
-      triangulation.n_vertices());
+    // Assume at most 16 neighbors per cell (a structured hex mesh has 8)
+    std::vector<boost::container::small_vector<unsigned int, 16>>
+      vertex_to_cell(triangulation.n_vertices());
     for (const auto &cell : triangulation.active_cell_iterators())
       {
         for (const unsigned int v : cell->vertex_indices())
@@ -1866,14 +1867,20 @@ namespace GridTools
 
     cell_connectivity.reinit(triangulation.n_active_cells(),
                              triangulation.n_active_cells());
+    std::vector<types::global_dof_index> neighbors;
     for (const auto &cell : triangulation.active_cell_iterators())
       {
+        neighbors.clear();
         for (const unsigned int v : cell->vertex_indices())
-          for (unsigned int n = 0;
-               n < vertex_to_cell[cell->vertex_index(v)].size();
-               ++n)
-            cell_connectivity.add(cell->active_cell_index(),
-                                  vertex_to_cell[cell->vertex_index(v)][n]);
+          neighbors.insert(neighbors.end(),
+                           vertex_to_cell[cell->vertex_index(v)].begin(),
+                           vertex_to_cell[cell->vertex_index(v)].end());
+        std::sort(neighbors.begin(), neighbors.end());
+        cell_connectivity.add_entries(cell->active_cell_index(),
+                                      neighbors.begin(),
+                                      std::unique(neighbors.begin(),
+                                                  neighbors.end()),
+                                      true);
       }
   }
 
@@ -1885,8 +1892,8 @@ namespace GridTools
     const unsigned int                  level,
     DynamicSparsityPattern             &cell_connectivity)
   {
-    std::vector<std::vector<unsigned int>> vertex_to_cell(
-      triangulation.n_vertices());
+    std::vector<boost::container::small_vector<unsigned int, 16>>
+      vertex_to_cell(triangulation.n_vertices());
     for (typename Triangulation<dim, spacedim>::cell_iterator cell =
            triangulation.begin(level);
          cell != triangulation.end(level);
@@ -1898,17 +1905,20 @@ namespace GridTools
 
     cell_connectivity.reinit(triangulation.n_cells(level),
                              triangulation.n_cells(level));
-    for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-           triangulation.begin(level);
-         cell != triangulation.end(level);
-         ++cell)
+    std::vector<types::global_dof_index> neighbors;
+    for (const auto &cell : triangulation.cell_iterators_on_level(level))
       {
+        neighbors.clear();
         for (const unsigned int v : cell->vertex_indices())
-          for (unsigned int n = 0;
-               n < vertex_to_cell[cell->vertex_index(v)].size();
-               ++n)
-            cell_connectivity.add(cell->index(),
-                                  vertex_to_cell[cell->vertex_index(v)][n]);
+          neighbors.insert(neighbors.end(),
+                           vertex_to_cell[cell->vertex_index(v)].begin(),
+                           vertex_to_cell[cell->vertex_index(v)].end());
+        std::sort(neighbors.begin(), neighbors.end());
+        cell_connectivity.add_entries(cell->index(),
+                                      neighbors.begin(),
+                                      std::unique(neighbors.begin(),
+                                                  neighbors.end()),
+                                      true);
       }
   }
 } /* namespace GridTools */
