@@ -68,6 +68,7 @@
 #
 
 foreach(build ${DEAL_II_BUILD_TYPES})
+  set(CMAKE_TRY_COMPILE_CONFIGURATION ${build})
   check_compiler_setup(
     "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS_${build}_SAVED}"
     "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS_${build}_SAVED}"
