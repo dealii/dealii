@@ -93,6 +93,8 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     _check_linker_flags()
   endif()
 
+  unset(CMAKE_TRY_COMPILE_CONFIGURATION)
+
   if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build})
     message(FATAL_ERROR "
   Configuration error: Cannot compile a test program with the final set of

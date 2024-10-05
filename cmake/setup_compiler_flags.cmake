@@ -75,6 +75,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     DEAL_II_HAVE_USABLE_USER_FLAGS_${build}
     ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
     )
+  unset(CMAKE_TRY_COMPILE_CONFIGURATION)
 
   if(NOT DEAL_II_HAVE_USABLE_USER_FLAGS_${build})
     message(FATAL_ERROR "
