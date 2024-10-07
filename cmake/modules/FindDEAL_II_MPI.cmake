@@ -102,40 +102,42 @@ endif()
 # lld / ld.gold and missing libopen-pal.so on the link line:
 #
 
-check_compiler_setup(
-  "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}"
-  "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS}"
-  MPI_UNDERLINKAGE_OK
-  ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES} ${MPI_C_LIBRARIES}
-  )
-
-if(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
-  # This check only works if MPI_CXX_LIBRARIES is non-empty, otherwise we will just give up
-  # and hope for the best...
-  message(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
-
-  list(GET MPI_CXX_LIBRARIES 0 _lib)
-  get_filename_component(_hint ${_lib} DIRECTORY)
-  deal_ii_find_library(_mpi_libopen_pal_library
-    NAMES open-pal
-    HINTS ${_hint}
-    NO_DEFAULT_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    NO_CMAKE_FIND_ROOT_PATH
+if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  check_compiler_setup(
+    "${DEAL_II_CXX_FLAGS_SAVED} ${DEAL_II_CXX_FLAGS}"
+    "${DEAL_II_LINKER_FLAGS_SAVED} ${DEAL_II_LINKER_FLAGS}"
+    MPI_UNDERLINKAGE_OK
+    ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES} ${MPI_C_LIBRARIES}
     )
 
-  #
-  # Note: We don't need to check whether the find library call is
-  # successful: If libopen-pal cannot be found then the
-  # process_feature will drop the library automatically.
-  #
-  # In this case the sanity check in cmake/setup_finalize.cmake will fail
-  # and we start dropping -fuse-ld=lld and -fuse-ld=ld.gold from the
-  # command line.
-  #
+  if(NOT MPI_UNDERLINKAGE_OK AND NOT "${MPI_CXX_LIBRARIES}" STREQUAL "")
+    # This check only works if MPI_CXX_LIBRARIES is non-empty, otherwise we will just give up
+    # and hope for the best...
+    message(STATUS "Trying to avoid underlinkage by expliclitly adding libopen-pal to link line")
+
+    list(GET MPI_CXX_LIBRARIES 0 _lib)
+    get_filename_component(_hint ${_lib} DIRECTORY)
+    deal_ii_find_library(_mpi_libopen_pal_library
+      NAMES open-pal
+      HINTS ${_hint}
+      NO_DEFAULT_PATH
+      NO_CMAKE_ENVIRONMENT_PATH
+      NO_CMAKE_PATH
+      NO_SYSTEM_ENVIRONMENT_PATH
+      NO_CMAKE_SYSTEM_PATH
+      NO_CMAKE_FIND_ROOT_PATH
+      )
+
+    #
+    # Note: We don't need to check whether the find library call is
+    # successful: If libopen-pal cannot be found then the
+    # process_feature will drop the library automatically.
+    #
+    # In this case the sanity check in cmake/setup_finalize.cmake will fail
+    # and we start dropping -fuse-ld=lld and -fuse-ld=ld.gold from the
+    # command line.
+    #
+  endif()
 endif()
 
 process_feature(MPI
