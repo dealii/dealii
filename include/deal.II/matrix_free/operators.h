@@ -1261,10 +1261,10 @@ namespace MatrixFreeOperators
 
   template <int dim, typename VectorType, typename VectorizedArrayType>
   typename Base<dim, VectorType, VectorizedArrayType>::value_type
-  Base<dim, VectorType, VectorizedArrayType>::el(const unsigned int row,
-                                                 const unsigned int col) const
+  Base<dim, VectorType, VectorizedArrayType>::el(
+    const unsigned int                  row,
+    [[maybe_unused]] const unsigned int col) const
   {
-    (void)col;
     Assert(row == col, ExcNotImplemented());
     Assert(inverse_diagonal_entries.get() != nullptr &&
              inverse_diagonal_entries->m() > 0,
