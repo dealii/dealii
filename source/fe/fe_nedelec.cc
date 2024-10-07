@@ -215,14 +215,108 @@ template <int dim>
 void
 FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // for 1d and 2d, do nothing
-  if (dim < 3)
+  // This function changes some entries of two tables,
+  // adjust_quad_dof_index_for_face_orientation_table
+  // and
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  // These tables specify the permutations and sign adjustments of the quad
+  // dofs. The tables are already filled with zeros meaning no permutations
+  // or sign change are required. This function changes some entries of the
+  // tables such that the shape functions that correspond to the quad dofs
+  // and are shared between neighbouring cells have consistent orientations.
+
+  // Only three-dimensional Nedelec finite elements are treated. The
+  // two-dimensional Nedelec finite elements only need sign adjustments of the
+  // line dofs. These adjustments are done by
+  // internal::FE_PolyTensor::get_dof_sign_change_nedelec(...)
+  // in fe_poly_tensor.cc. The notions of curl and curl-conforming finite
+  // elements in higher-dimensional spaces, dim >3, are somewhat unclear as
+  // curl, strictly peaking, exists only in the three-dimensional space.
+  if (dim != 3)
     return;
 
-  // TODO: Implement this for this class
-  return;
-}
+  const unsigned int k = this->tensor_degree() - 1;
 
+  // The Nedelec finite elements of the lowermost order have no quad dofs.
+  if (k == 0)
+    return;
+
+  // The finite element orders > 4 are not implemented.
+  if (k > 4)
+    return;
+
+  const std::vector<std::vector<std::vector<int>>> swap_table =
+    swap_tables_vector.at(k);
+
+  // TODO: the implementation makes the assumption that all quads have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
+  Assert(
+    this->adjust_quad_dof_index_for_face_orientation_table[0].n_elements() ==
+      this->reference_cell().n_face_orientations(face_no) *
+        this->n_dofs_per_quad(face_no),
+    ExcInternalError());
+
+  Assert(
+    this->adjust_quad_dof_sign_for_face_orientation_table[0].n_elements() ==
+      this->reference_cell().n_face_orientations(face_no) *
+        this->n_dofs_per_quad(face_no),
+    ExcInternalError());
+
+// The 3D Nedelec finite elements have 2*k*(k+1) dofs per each quad.
+  Assert(2*k*(k+1) == this->n_dofs_per_quad(face_no), ExcInternalError());
+
+  const unsigned int half_dofs = k*(k+1); // see below;
+
+  for (const bool face_orientation : {false, true})
+   for (const bool face_rotation : {false, true})
+    for (const bool face_flip : {false, true})
+    {
+      const auto case_no =
+        internal::combined_face_orientation(face_orientation,
+                                            face_rotation,
+                                            face_flip);
+
+      // The dofs on a quad are indexed as the following:
+      //
+      // | x0, x1, x2, x3, ..., xk  | y0, y1, y2, y3 ..., yk  |
+      // |                          |                         |
+      // |-- half_ dofs = k*(k+1) --|-- half_dofs = k*(k+1) --|
+      // |                                                    |
+      // |-------------------- 2*k*(k+1) ---------------------|
+
+      for (unsigned int indx_x = 0; indx_x < half_dofs; indx_x++)
+      {
+        if (swap_table.at(case_no).at(0).at(indx_x) != -1)
+        {
+          const unsigned int indx_y = half_dofs +
+            static_cast<unsigned int>(swap_table.at(case_no).at(0).at(indx_x));
+
+          // dofs swap
+          this
+            ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+              indx_x, case_no) = indx_y - indx_x;
+
+           this
+             ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+              indx_y, case_no) = indx_x - indx_y;
+          }
+
+          // dof sign change
+          this
+           ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+              indx_x, case_no) =
+               static_cast<bool>(swap_table.at(case_no).at(1).at(indx_x));
+
+          this
+           ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+              indx_x + half_dofs, case_no) =
+               static_cast<bool>(swap_table.at(case_no).at(2).at(indx_x));
+        }
+      }
+}
 
 template <int dim>
 std::string
