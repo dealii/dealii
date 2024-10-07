@@ -645,10 +645,7 @@ private:
    * Initialize the permutation pattern and the pattern of sign change. 
    *
    * @note Currently this function is implemented for the finite elements of 
-   * the order k < 4. The Nedelec finite elements in the two-dimensional space
-   * as well as the Nedelec finite elements of the lowermost order, k=0, in the 
-   * three-dimensional space have only line (edge) dofs. The line dofs are
-   * handled by the 
+   * the order k < 4.
    */
   void
   initialize_quad_dof_index_permutation_and_sign_change();
