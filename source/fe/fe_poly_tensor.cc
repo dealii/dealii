@@ -138,7 +138,7 @@ namespace internal
       void
       get_dof_sign_change_nedelec(
         const typename dealii::Triangulation<2, spacedim>::cell_iterator &cell,
-        const FiniteElement<2, spacedim> & fe,
+        const FiniteElement<2, spacedim>                                 &fe,
         const std::vector<MappingKind> &mapping_kind,
         std::vector<double>            &line_dof_sign)
       {
@@ -168,44 +168,48 @@ namespace internal
         for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell; ++l)
           if (!(cell->line_orientation(l)) &&
               mapping_kind[0] == mapping_nedelec)
-          {
-            if (k == 0)
             {
-             // This is exactly how the sign adjustment has been done before.
-             // The behaviour of the adjustment stays exactly the same for the
-             // 2D Nedelec finite elements of the lowermost order, k = 0.
-             // This adjustment is straightforward as the edge dofs are the only
-             // dofs and there is only one dof per edge if k = 0.
-              line_dof_sign[l] = -1.0;
+              if (k == 0)
+                {
+                  // This is exactly how the sign adjustment has been done
+                  // before. The behaviour of the adjustment stays exactly the
+                  // same for the 2D Nedelec finite elements of the lowermost
+                  // order, k = 0. This adjustment is straightforward as the
+                  // edge dofs are the only dofs and there is only one dof per
+                  // edge if k = 0.
+                  line_dof_sign[l] = -1.0;
+                }
+              else
+                {
+                  // The case k > 0 is a bit more complicated. As we adjust
+                  // only edge dofs in this function, we need to concern
+                  // ourselves with the first 4*(k+1) entries in line_dof_sign
+                  // vector ignoring the rest. There are (k+1) dofs per edge.
+                  // Let us consider the local dof indices on one edge,
+                  // local_line_dof = 0...k. The shape functions with even
+                  // indices are asymmetric. The corresponding dofs need sign
+                  // adjustment if the edge points in the opposite direction.
+                  // The shape functions with odd indices are symmetric. The
+                  // corresponding dofs need no sign adjustment even if the edge
+                  // points in the opposite direction. In the current context
+                  // the notion of symmetry of a shape function means that a
+                  // shape function looks exactly the same if it is looked upon
+                  // from the centers of the two neighbouring cells that share
+                  // it.
+                  for (unsigned int local_line_dof = 0;
+                       local_line_dof < (k + 1);
+                       local_line_dof++)
+                    if (local_line_dof % 2 == 0)
+                      line_dof_sign[local_line_dof + l * (k + 1)] = -1.0;
+                }
             }
-            else
-            {
-             // The case k > 0 is a bit more complicated. As we adjust
-             // only edge dofs in this function, we need to concern
-             // ourselves with the first 4*(k+1) entries in line_dof_sign
-             // vector ignoring the rest. There are (k+1) dofs per edge.
-             // Let us consider the local dof indices on one edge,
-             // local_line_dof = 0...k. The shape functions with even indices
-             // are asymmetric. The corresponding dofs need sign adjustment
-             // if the edge points in the opposite direction. The shape
-             // functions with odd indices are symmetric. The corresponding
-             // dofs need no sign adjustment even if the edge points in
-             // the opposite direction. In the current context the notion of
-             // symmetry of a shape function means that a shape function looks
-             // exactly the same if it is looked upon from the centers of the
-             // two neighbouring cells that share it.
-              for (unsigned int local_line_dof = 0; local_line_dof<(k+1); local_line_dof++)
-                if (local_line_dof % 2 == 0)
-                  line_dof_sign[local_line_dof + l*(k+1)] = -1.0;
-            }
-         }
       }
 
       template <int spacedim>
       void
       get_dof_sign_change_nedelec(
         const typename dealii::Triangulation<3, spacedim>::cell_iterator &cell,
-        const FiniteElement<3, spacedim> & fe,
+        const FiniteElement<3, spacedim>                                 &fe,
         const std::vector<MappingKind> &mapping_kind,
         std::vector<double>            &line_dof_sign)
       {
@@ -238,40 +242,44 @@ namespace internal
         for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
           if (!(cell->line_orientation(l)) &&
               mapping_kind[0] == mapping_nedelec)
-          {
-            if (k == 0)
             {
-             // This is exactly how the sign adjustment has been done before.
-             // The behaviour of the adjustment stays exactly the same for the
-             // 3D Nedelec finite elements of the lowermost order, k = 0.
-             // This adjustment is straightforward as the edge dofs are the only
-             // dofs and there is only one dof per edge if k = 0.
-             line_dof_sign[l] = -1.0;
+              if (k == 0)
+                {
+                  // This is exactly how the sign adjustment has been done
+                  // before. The behaviour of the adjustment stays exactly the
+                  // same for the 3D Nedelec finite elements of the lowermost
+                  // order, k = 0. This adjustment is straightforward as the
+                  // edge dofs are the only dofs and there is only one dof per
+                  // edge if k = 0.
+                  line_dof_sign[l] = -1.0;
+                }
+              else
+                {
+                  // The case k > 0 is a bit more complicated. As we adjust
+                  // only edge dofs in this function, we need to concern
+                  // ourselves with the first 12*(k+1) entries in line_dof_sign
+                  // vector ignoring the rest. There are (k+1) dofs per edge.
+                  // Let us consider the local dof indices on one edge,
+                  // local_line_dof = 0...k. The shape functions with even
+                  // indices are asymmetric. The corresponding dofs need sign
+                  // adjustment if the edge points in the opposite direction.
+                  // The shape functions with odd indices are symmetric. The
+                  // corresponding dofs need no sign adjustment even if the edge
+                  // points in the opposite direction. In the current context
+                  // the notion of symmetry of a shape function means that a
+                  // shape function looks exactly the same if it is looked upon
+                  // from the centers of the two neighbouring cells that share
+                  // it.
+                  for (unsigned int local_line_dof = 0;
+                       local_line_dof < (k + 1);
+                       local_line_dof++)
+                    if (local_line_dof % 2 == 0)
+                      line_dof_sign[local_line_dof + l * (k + 1)] = -1.0;
+                }
             }
-            else
-            {
-             // The case k > 0 is a bit more complicated. As we adjust
-             // only edge dofs in this function, we need to concern
-             // ourselves with the first 12*(k+1) entries in line_dof_sign
-             // vector ignoring the rest. There are (k+1) dofs per edge.
-             // Let us consider the local dof indices on one edge,
-             // local_line_dof = 0...k. The shape functions with even indices
-             // are asymmetric. The corresponding dofs need sign adjustment
-             // if the edge points in the opposite direction. The shape
-             // functions with odd indices are symmetric. The corresponding
-             // dofs need no sign adjustment even if the edge points in
-             // the opposite direction. In the current context the notion of
-             // symmetry of a shape function means that a shape function looks
-             // exactly the same if it is looked upon from the centers of the
-             // two neighbouring cells that share it.
-              for (unsigned int local_line_dof = 0; local_line_dof<(k+1); local_line_dof++)
-                if (local_line_dof % 2 == 0)
-                  line_dof_sign[local_line_dof + l*(k+1)] = -1.0;
-            }
-          }
-        }
+      }
     } // namespace
-  } // namespace FE_PolyTensor
+  }   // namespace FE_PolyTensor
 } // namespace internal
 
 #ifndef DOXYGEN

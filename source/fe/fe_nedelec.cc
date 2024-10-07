@@ -265,57 +265,56 @@ FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
         this->n_dofs_per_quad(face_no),
     ExcInternalError());
 
-// The 3D Nedelec finite elements have 2*k*(k+1) dofs per each quad.
-  Assert(2*k*(k+1) == this->n_dofs_per_quad(face_no), ExcInternalError());
+  // The 3D Nedelec finite elements have 2*k*(k+1) dofs per each quad.
+  Assert(2 * k * (k + 1) == this->n_dofs_per_quad(face_no), ExcInternalError());
 
-  const unsigned int half_dofs = k*(k+1); // see below;
+  const unsigned int half_dofs = k * (k + 1); // see below;
 
   for (const bool face_orientation : {false, true})
-   for (const bool face_rotation : {false, true})
-    for (const bool face_flip : {false, true})
-    {
-      const auto case_no =
-        internal::combined_face_orientation(face_orientation,
-                                            face_rotation,
-                                            face_flip);
-
-      // The dofs on a quad are indexed as the following:
-      //
-      // | x0, x1, x2, x3, ..., xk  | y0, y1, y2, y3 ..., yk  |
-      // |                          |                         |
-      // |-- half_ dofs = k*(k+1) --|-- half_dofs = k*(k+1) --|
-      // |                                                    |
-      // |-------------------- 2*k*(k+1) ---------------------|
-
-      for (unsigned int indx_x = 0; indx_x < half_dofs; indx_x++)
-      {
-        if (swap_table.at(case_no).at(0).at(indx_x) != -1)
+    for (const bool face_rotation : {false, true})
+      for (const bool face_flip : {false, true})
         {
-          const unsigned int indx_y = half_dofs +
-            static_cast<unsigned int>(swap_table.at(case_no).at(0).at(indx_x));
+          const auto case_no =
+            internal::combined_face_orientation(face_orientation,
+                                                face_rotation,
+                                                face_flip);
 
-          // dofs swap
-          this
-            ->adjust_quad_dof_index_for_face_orientation_table[face_no](
-              indx_x, case_no) = indx_y - indx_x;
+          // The dofs on a quad are indexed as the following:
+          //
+          // | x0, x1, x2, x3, ..., xk  | y0, y1, y2, y3 ..., yk  |
+          // |                          |                         |
+          // |-- half_ dofs = k*(k+1) --|-- half_dofs = k*(k+1) --|
+          // |                                                    |
+          // |-------------------- 2*k*(k+1) ---------------------|
 
-           this
-             ->adjust_quad_dof_index_for_face_orientation_table[face_no](
-              indx_y, case_no) = indx_x - indx_y;
-          }
+          for (unsigned int indx_x = 0; indx_x < half_dofs; indx_x++)
+            {
+              if (swap_table.at(case_no).at(0).at(indx_x) != -1)
+                {
+                  const unsigned int indx_y =
+                    half_dofs + static_cast<unsigned int>(
+                                  swap_table.at(case_no).at(0).at(indx_x));
 
-          // dof sign change
-          this
-           ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-              indx_x, case_no) =
-               static_cast<bool>(swap_table.at(case_no).at(1).at(indx_x));
+                  // dofs swap
+                  this
+                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                      indx_x, case_no) = indx_y - indx_x;
 
-          this
-           ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-              indx_x + half_dofs, case_no) =
-               static_cast<bool>(swap_table.at(case_no).at(2).at(indx_x));
+                  this
+                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                      indx_y, case_no) = indx_x - indx_y;
+                }
+
+              // dof sign change
+              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                indx_x, case_no) =
+                static_cast<bool>(swap_table.at(case_no).at(1).at(indx_x));
+
+              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                indx_x + half_dofs, case_no) =
+                static_cast<bool>(swap_table.at(case_no).at(2).at(indx_x));
+            }
         }
-      }
 }
 
 template <int dim>

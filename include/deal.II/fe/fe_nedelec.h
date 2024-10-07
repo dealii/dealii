@@ -642,9 +642,9 @@ private:
   mutable Threads::Mutex prolongation_matrix_mutex;
 
   /**
-   * Initialize the permutation pattern and the pattern of sign change. 
+   * Initialize the permutation pattern and the pattern of sign change.
    *
-   * @note Currently this function is implemented for the finite elements of 
+   * @note Currently this function is implemented for the finite elements of
    * the order k < 4.
    */
   void
@@ -656,9 +656,9 @@ private:
 
   // Information related to face orientation ----------------------------------
   //
-  // The order of the Nedelec elements equals the tensor degree minus one, 
+  // The order of the Nedelec elements equals the tensor degree minus one,
   // k = n - 1. In the three-dimensional space the Nedelec elements of the
-  // lowermost order, k = 0, have only 12 line (edge) dofs. The Nedelec elements 
+  // lowermost order, k = 0, have only 12 line (edge) dofs. The Nedelec elements
   // of the higher orders, k > 0, have 3*(k+1)*(k+2)^2 dofs in total if dim=3.
   // The dofs in a cell are distributed between lines (edges), quads (faces),
   // and the hex (the interior of the cell) as the following:
@@ -678,12 +678,12 @@ private:
   // The hex dofs need no adjustments: they are not shared between
   // neighbouring mesh cells.
   //
-  // The two-dimensional Nedelec finite elements share no quad dofs between 
-  // neighbouring mesh cells. The zero-order three-dimensional Nedelec finite 
-  // elements have no quad dofs. Consequently, here we treat only quad dofs of 
+  // The two-dimensional Nedelec finite elements share no quad dofs between
+  // neighbouring mesh cells. The zero-order three-dimensional Nedelec finite
+  // elements have no quad dofs. Consequently, here we treat only quad dofs of
   // the three-dimensional Nedelec finite elements of the higher orders, k>0.
-  // The questions how the curl looks like in the higher-dimensional spaces and 
-  // what does it mean to be curl-conforming if dim>3 we leave unanswered.  
+  // The questions how the curl looks like in the higher-dimensional spaces and
+  // what does it mean to be curl-conforming if dim>3 we leave unanswered.
   //
   // In FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
   // we need to change some entries in the following two vectors of tables:
@@ -768,132 +768,137 @@ private:
   // Recall, the swap_table_0 is empty as the Nedelec finite elements of the
   // lowermost order have no quad dofs.
 
-  const std::vector<std::vector<std::vector<int>>> swap_table_1 =
-    {// 0   1
-     {{ 0,  1},  // 0
-      { 0,  0},
-      { 0,  0}},
-     {{-1, -1},  // 1
-      { 0,  0},
-      { 0,  0}},
-     {{-1, -1},  // 2
-      { 0,  0},
-      { 1,  0}},
-     {{ 0,  1},  // 3
-      { 1,  0},
-      { 0,  0}},
-     {{ 0,  1},  // 4
-      { 1,  0},
-      { 1,  0}},
-     {{-1, -1},  // 5
-      { 1,  0},
-      { 1,  0}},
-     {{-1, -1},  // 6
-      { 1,  0},
-      { 0,  0}},
-     {{ 0,  1},  // 7
-      { 0,  0},
-      { 1,  0}}
-    };
+  const std::vector<std::vector<std::vector<int>>> swap_table_1 = {
+    // 0   1
+    {{0, 1}, // 0
+     {0, 0},
+     {0, 0}},
+    {{-1, -1}, // 1
+     {0, 0},
+     {0, 0}},
+    {{-1, -1}, // 2
+     {0, 0},
+     {1, 0}},
+    {{0, 1}, // 3
+     {1, 0},
+     {0, 0}},
+    {{0, 1}, // 4
+     {1, 0},
+     {1, 0}},
+    {{-1, -1}, // 5
+     {1, 0},
+     {1, 0}},
+    {{-1, -1}, // 6
+     {1, 0},
+     {0, 0}},
+    {{0, 1}, // 7
+     {0, 0},
+     {1, 0}}};
 
-  const std::vector<std::vector<std::vector<int>>> swap_table_2 =
-    {// 0   1   2   3   4   5
-     {{ 0,  3,  1,  4,  2,  5}, // 0
-      { 0,  0,  0,  0,  0,  0},
-      { 0,  0,  0,  0,  0,  0}},
-     {{-1, -1, -1, -1, -1, -1}, // 1
-      { 0,  0,  0,  0,  0,  0},
-      { 0,  0,  0,  0,  0,  0}},
-     {{-1, -1, -1, -1, -1, -1}, // 2
-      { 0,  1,  0,  1,  0,  1},
-      { 1,  0,  1,  1,  0,  1}},
-     {{ 0,  3,  1,  4,  2,  5}, // 3
-      { 1,  1,  0,  0,  1,  1},
-      { 0,  0,  0,  1,  1,  1}},
-     {{ 0,  3,  1,  4,  2,  5}, // 4
-      { 1,  0,  0,  1,  1,  0},
-      { 1,  0,  1,  0,  1,  0}},
-     {{-1, -1, -1, -1, -1, -1}, // 5
-      { 1,  0,  0,  1,  1,  0},
-      { 1,  0,  1,  0,  1,  0}},
-     {{-1, -1, -1, -1, -1, -1}, // 6
-      { 1,  1,  0,  0,  1,  1},
-      { 0,  0,  0,  1,  1,  1}},
-     {{ 0,  3,  1,  4,  2,  5}, // 7
-      { 0,  1,  0,  1,  0,  1},
-      { 1,  0,  1,  1,  0,  1}}
-    };
+  const std::vector<std::vector<std::vector<int>>> swap_table_2 = {
+    // 0   1   2   3   4   5
+    {{0, 3, 1, 4, 2, 5}, // 0
+     {0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1}, // 1
+     {0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1}, // 2
+     {0, 1, 0, 1, 0, 1},
+     {1, 0, 1, 1, 0, 1}},
+    {{0, 3, 1, 4, 2, 5}, // 3
+     {1, 1, 0, 0, 1, 1},
+     {0, 0, 0, 1, 1, 1}},
+    {{0, 3, 1, 4, 2, 5}, // 4
+     {1, 0, 0, 1, 1, 0},
+     {1, 0, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1}, // 5
+     {1, 0, 0, 1, 1, 0},
+     {1, 0, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1}, // 6
+     {1, 1, 0, 0, 1, 1},
+     {0, 0, 0, 1, 1, 1}},
+    {{0, 3, 1, 4, 2, 5}, // 7
+     {0, 1, 0, 1, 0, 1},
+     {1, 0, 1, 1, 0, 1}}};
 
-  const std::vector<std::vector<std::vector<int>>> swap_table_3 =
-    {// 0   1   2   3   4   5   6   7   8   9  10  11
-     {{ 0,  4,  8,  1,  5,  9,  2,  6, 10,  3,  7, 11}, // 0
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 1
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 2
-      { 0,  1,  0,  0,  1,  0,  0,  1,  0,  0,  1,  0},
-      { 1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0}},
-     {{ 0,  4,  8,  1,  5,  9,  2,  6, 10,  3,  7, 11}, // 3
-      { 1,  1,  1,  0,  0,  0,  1,  1,  1,  0,  0,  0},
-      { 0,  0,  0,  0,  1,  1,  1,  1,  0,  0,  0,  0}},
-     {{ 0,  4,  8,  1,  5,  9,  2,  6, 10,  3,  7, 11}, // 4
-      { 1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0},
-      { 1,  0,  1,  0,  0,  1,  0,  1,  1,  0,  1,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 5
-      { 1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0},
-      { 1,  0,  1,  0,  0,  1,  0,  1,  1,  0,  1,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 6
-      { 1,  1,  1,  0,  0,  0,  1,  1,  1,  0,  0,  0},
-      { 0,  0,  0,  0,  1,  1,  1,  1,  0,  0,  0,  0}},
-     {{ 0,  4,  8,  1,  5,  9,  2,  6, 10,  3,  7, 11}, // 7
-      { 0,  1,  0,  0,  1,  0,  0,  1,  0,  0,  1,  0},
-      { 1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0}}
-    };
+  const std::vector<std::vector<std::vector<int>>> swap_table_3 = {
+    // 0   1   2   3   4   5   6   7   8   9  10  11
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 0
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 1
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 2
+     {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0},
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}},
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 3
+     {1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0},
+     {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0}},
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 4
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 5
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 6
+     {1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0},
+     {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0}},
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 7
+     {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0},
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}}};
 
-  const std::vector<std::vector<std::vector<int>>> swap_table_4 =
-    { // Swap sign_X and sign_Y rows if k=4. Why?...
-     // 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19
-     {{ 0,  5, 10, 15,  1,  6, 11, 16,  2,  7, 12, 17,  3,  8, 13, 18,  4,  9, 14, 19}, // 0
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 1
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-      { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 2
-      { 1,  0,  1,  0,  1,  1,  0,  1,  0,  1,  1,  0,  1,  0,  1,  1,  0,  1,  0,  1},
-      { 0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1}},
-     {{ 0,  5, 10, 15,  1,  6, 11, 16,  2,  7, 12, 17,  3,  8, 13, 18,  4,  9, 14, 19}, // 3
-      { 0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1},
-      { 1,  1,  1,  1,  0,  0,  0,  0,  1,  1,  1,  1,  0,  0,  0,  0,  1,  1,  1,  1}},
-     {{ 0,  5, 10, 15,  1,  6, 11, 16,  2,  7, 12, 17,  3,  8, 13, 18,  4,  9, 14, 19}, // 4
-      { 1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0},
-      { 1,  0,  1,  0,  0,  1,  0,  1,  1,  0,  1,  0,  0,  1,  0,  1,  1,  0,  1,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 5
-      { 1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0},
-      { 1,  0,  1,  0,  0,  1,  0,  1,  1,  0,  1,  0,  0,  1,  0,  1,  1,  0,  1,  0}},
-     {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 6
-      { 0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1},
-      { 1,  1,  1,  1,  0,  0,  0,  0,  1,  1,  1,  1,  0,  0,  0,  0,  1,  1,  1,  1}},
-     {{ 0,  5, 10, 15,  1,  6, 11, 16,  2,  7, 12, 17,  3,  8, 13, 18,  4,  9, 14, 19}, // 7
-      { 1,  0,  1,  0,  1,  1,  0,  1,  0,  1,  1,  0,  1,  0,  1,  1,  0,  1,  0,  1},
-      { 0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1}}
-    };
+  const std::vector<std::vector<std::vector<int>>> swap_table_4 = {
+    // Swap sign_X and sign_Y rows if k=4. Why?...
+    // 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+    // 19
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 0
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 1
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 2
+     {1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+     {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1}},
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 3
+     {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
+     {1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1}},
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 4
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 5
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 6
+     {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
+     {1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1}},
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 7
+     {1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+     {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1}}};
 
   // Finally, the swap tables are organized into a vector.
 
-   const std::vector<std::vector<std::vector<std::vector<int>>>> swap_tables_vector =
-    {
-     {{}}, // There are no quad dofs in FE_Nedelec of the lowermost order.
-     {swap_table_1},
-     {swap_table_2},
-     {swap_table_3},
-     {swap_table_4}
-    };
+  const std::vector<std::vector<std::vector<std::vector<int>>>>
+    swap_tables_vector = {
+      {{}}, // There are no quad dofs in FE_Nedelec of the lowermost order.
+      {swap_table_1},
+      {swap_table_2},
+      {swap_table_3},
+      {swap_table_4}};
 
-  // TODO: understand why the lines sign_X and sign_Y must be swapped in the case k=4.
-  // After that, formulate the tendencies in the swap tables as closed-form expressions.
+  // TODO: understand why the lines sign_X and sign_Y must be swapped in the
+  // case k=4. After that, formulate the tendencies in the swap tables as
+  // closed-form expressions.
 };
 
 /* -------------- declaration of explicit specializations ------------- */
