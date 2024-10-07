@@ -356,56 +356,6 @@ MGCoarseGridIterativeSolver<VectorType,
 
 
 
-namespace internal
-{
-  namespace MGCoarseGridIterativeSolver
-  {
-    template <typename VectorType,
-              typename SolverType,
-              typename MatrixType,
-              typename PreconditionerType,
-              std::enable_if_t<
-                std::is_same_v<VectorType, typename SolverType::vector_type>,
-                VectorType> * = nullptr>
-    void
-    solve(SolverType               &solver,
-          const MatrixType         &matrix,
-          const PreconditionerType &preconditioner,
-          VectorType               &dst,
-          const VectorType         &src)
-    {
-      solver.solve(matrix, dst, src, preconditioner);
-    }
-
-    template <typename VectorType,
-              typename SolverType,
-              typename MatrixType,
-              typename PreconditionerType,
-              std::enable_if_t<
-                !std::is_same_v<VectorType, typename SolverType::vector_type>,
-                VectorType> * = nullptr>
-    void
-    solve(SolverType               &solver,
-          const MatrixType         &matrix,
-          const PreconditionerType &preconditioner,
-          VectorType               &dst,
-          const VectorType         &src)
-    {
-      typename SolverType::vector_type src_;
-      typename SolverType::vector_type dst_;
-
-      src_ = src;
-      dst_ = dst;
-
-      solver.solve(matrix, dst_, src_, preconditioner);
-
-      dst = dst_;
-    }
-  } // namespace MGCoarseGridIterativeSolver
-} // namespace internal
-
-
-
 template <typename VectorType,
           typename SolverType,
           typename MatrixType,
@@ -424,8 +374,23 @@ MGCoarseGridIterativeSolver<
   Assert(preconditioner != nullptr, ExcNotInitialized());
 
   dst = 0;
-  internal::MGCoarseGridIterativeSolver::solve(
-    *solver, *matrix, *preconditioner, dst, src);
+
+  if constexpr (std::is_same_v<VectorType, typename SolverType::vector_type>)
+    {
+      solver->solve(*matrix, dst, src, *preconditioner);
+    }
+  else
+    {
+      typename SolverType::vector_type src_;
+      typename SolverType::vector_type dst_;
+
+      src_ = src;
+      dst_ = dst;
+
+      solver->solve(*matrix, dst_, src_, *preconditioner);
+
+      dst = dst_;
+    }
 }
 
 
