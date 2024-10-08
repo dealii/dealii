@@ -417,7 +417,7 @@ namespace GridTools
    * </p>
    *
    * The four cells that were originally the corners of a square will give you
-   * some troubles during computations, as the jacobian of the transformation
+   * some troubles during computations, as the Jacobian of the transformation
    * from the reference cell to those cells will go to zero, affecting the error
    * constants of the finite element estimates.
    *
@@ -434,7 +434,7 @@ namespace GridTools
    * GridTools::regularize_corner_cells(tria);
    * tria.refine_global(2);
    * @endcode
-   * generates a mesh that has a much better behavior w.r.t. the jacobian of
+   * generates a mesh that has a much better behavior w.r.t. the Jacobian of
    * the Mapping:
    *
    * <p ALIGN="center">
