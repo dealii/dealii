@@ -817,7 +817,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         }
 
       // Will the piola transform be used? If so we need to update
-      // the jacobian gradients in case of update_gradients on general cells.
+      // the Jacobian gradients in case of update_gradients on general cells.
       bool piola_transform = false;
       for (unsigned int no = 0, c = 0; no < dof_handler.size(); ++no)
         for (unsigned int b = 0;
