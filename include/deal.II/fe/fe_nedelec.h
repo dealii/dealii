@@ -726,7 +726,7 @@ private:
   // illustrated by the following example:
   //
   //                *
-  //        y0, y9, y1, y0, ..., yk
+  //        y0, y9, y1, y2, ..., yk
   //      ---------------------------                     (swap)
   //        x0, x1, x2, x3, ..., xk
   //        *
@@ -739,9 +739,9 @@ private:
   // information: indices of the y-dofs, the sign change of the x-dofs, and
   // sign change of the y-dofs. The swap above is encoded as the following:
   //
-  // swap = { 0, 9, 1, 0, ...., yk,  // indices of the y-dofs
+  // swap = { 0, 9, 1, 2, ...., yk,  // indices of the y-dofs
   //          1, 0, 0, 0, ...., 0,   // sign change of the x-dofs,
-  //          0, 0, 1, 0, ...., 0};  // sign change of the y-dofs.
+  //          0, 1, 0, 0, ...., 0};  // sign change of the y-dofs.
   //
   // If no swap is needed, -1 is placed instead of the y-dof index.
   //
