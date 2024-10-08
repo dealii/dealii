@@ -1466,10 +1466,10 @@ namespace MatrixFreeTools
     const QuadOperation                                     &quad_operation,
     EvaluationFlags::EvaluationFlags                         evaluation_flags,
     EvaluationFlags::EvaluationFlags                         integration_flags,
-    [[maybe_unused]] const unsigned int                      dof_no,
-    [[maybe_unused]] const unsigned int                      quad_no,
-    [[maybe_unused]] const unsigned int first_selected_component,
-    [[maybe_unused]] const unsigned int first_vector_component)
+    const unsigned int                                       dof_no,
+    const unsigned int                                       quad_no,
+    const unsigned int first_selected_component,
+    const unsigned int first_vector_component)
   {
     Assert(dof_no == 0, ExcNotImplemented());
     Assert(quad_no == 0, ExcNotImplemented());
