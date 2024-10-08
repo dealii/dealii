@@ -1471,10 +1471,6 @@ namespace MatrixFreeTools
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
-    (void)dof_no;
-    (void)quad_no;
-    (void)first_selected_component;
-    (void)first_vector_component;
     Assert(dof_no == 0, ExcNotImplemented());
     Assert(quad_no == 0, ExcNotImplemented());
     Assert(first_selected_component == 0, ExcNotImplemented());

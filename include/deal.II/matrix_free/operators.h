@@ -1264,7 +1264,6 @@ namespace MatrixFreeOperators
   Base<dim, VectorType, VectorizedArrayType>::el(const unsigned int row,
                                                  const unsigned int col) const
   {
-    (void)col;
     Assert(row == col, ExcNotImplemented());
     Assert(inverse_diagonal_entries.get() != nullptr &&
              inverse_diagonal_entries->m() > 0,
