@@ -1572,6 +1572,10 @@ FESystem<dim, spacedim>::build_interface_constraints()
 
             case 3:
               {
+                Assert(this->reference_cell() ==
+                         ReferenceCells::get_hypercube<dim>(),
+                       ExcNotImplemented());
+
                 // same way as above, although a little more complicated...
 
                 // the indices m=0..5*d_v-1 are from the center and the four
