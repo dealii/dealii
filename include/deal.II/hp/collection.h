@@ -253,7 +253,8 @@ namespace hp
     size() const;
 
     /**
-     * The return value of this function is equivalent to <code>size() == 0</code>
+     * The return value of this function is equivalent to
+     * <code>size() == 0</code>
      */
     bool
     empty() const;
