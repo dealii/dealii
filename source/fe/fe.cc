@@ -888,9 +888,17 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
       case 1:
         return {0U, 0U};
       case 2:
+        // We have to interpolate from the DoFs in the interior of the
+        // the two child faces (=lines) and the one central vertex
+        // to the DoFs of the parent face:
         return {this->n_dofs_per_vertex() + 2 * this->n_dofs_per_line(),
                 this->n_dofs_per_face(face_no)};
       case 3:
+        // We have to interpolate from the DoFs in the interior of the
+        // the child faces (=quads or tris) and the vertices that are
+        // not part of the parent face, to the DoFs of the parent face:
+        Assert(this->reference_cell() == ReferenceCells::get_hypercube<dim>(),
+               ExcNotImplemented());
         return {5 * this->n_dofs_per_vertex() + 12 * this->n_dofs_per_line() +
                   4 * this->n_dofs_per_quad(face_no),
                 this->n_dofs_per_face(face_no)};
