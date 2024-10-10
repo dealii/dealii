@@ -48,7 +48,7 @@ namespace hp
     void
     full_p_adaptivity(const DoFHandler<dim, spacedim> &dof_handler)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -68,7 +68,7 @@ namespace hp
     p_adaptivity_from_flags(const DoFHandler<dim, spacedim> &dof_handler,
                             const std::vector<bool>         &p_flags)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -117,7 +117,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -156,7 +156,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -253,7 +253,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -447,7 +447,7 @@ namespace hp
     p_adaptivity_from_regularity(const DoFHandler<dim, spacedim> &dof_handler,
                                  const Vector<Number> &sobolev_indices)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -509,7 +509,7 @@ namespace hp
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_coarsen)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -550,7 +550,7 @@ namespace hp
                   const double                     gamma_h,
                   const double                     gamma_n)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -677,7 +677,7 @@ namespace hp
     void
     force_p_over_h(const DoFHandler<dim, spacedim> &dof_handler)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -698,7 +698,7 @@ namespace hp
     void
     choose_p_over_h(const DoFHandler<dim, spacedim> &dof_handler)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return;
 
@@ -811,7 +811,7 @@ namespace hp
                              const unsigned int               max_difference,
                              const unsigned int               contains_fe_index)
     {
-      if (dof_handler.get_fe_collection().size() == 0)
+      if (dof_handler.get_fe_collection().empty())
         // nothing to do
         return false;
 

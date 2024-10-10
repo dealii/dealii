@@ -253,6 +253,13 @@ namespace hp
     size() const;
 
     /**
+     * The return value of this function is equivalent to
+     * <code>size() == 0</code>
+     */
+    bool
+    empty() const;
+
+    /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
@@ -308,6 +315,15 @@ namespace hp
   Collection<T>::size() const
   {
     return entries.size();
+  }
+
+
+
+  template <typename T>
+  inline bool
+  Collection<T>::empty() const
+  {
+    return this->size() == 0;
   }
 
 
