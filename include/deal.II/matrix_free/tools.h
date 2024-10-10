@@ -324,6 +324,77 @@ namespace MatrixFreeTools
 
   namespace internal
   {
+    template <int dim,
+              typename VectorizedArrayType,
+              bool is_face,
+              typename... EvalTypes,
+              typename Function,
+              size_t... Is>
+    void
+    generic_apply(Function &&operation,
+                  std::vector<std::unique_ptr<
+                    FEEvaluationData<dim, VectorizedArrayType, is_face>>> &phi,
+                  std::index_sequence<Is...>);
+
+    template <int dim,
+              typename VectorizedArrayType,
+              typename... FaceEvalTypes,
+              typename Function,
+              size_t... Is>
+    void
+    face_apply(
+      Function &&face_operation,
+      std::vector<
+        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>> &phi,
+      std::index_sequence<Is...>);
+
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename... FaceEvalTypes,
+              size_t... Is>
+    auto
+    create_face_phi_vector(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const std::pair<unsigned int, unsigned int>        &range,
+      const std::vector<unsigned int> &first_selected_component,
+      const std::index_sequence<Is...>);
+
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename... FaceEvalTypes,
+              size_t... Is>
+    auto
+    create_boundary_phi_vector(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const std::pair<unsigned int, unsigned int>        &range,
+      const std::vector<unsigned int> &first_selected_component,
+      const std::index_sequence<Is...>);
+
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename... CellEvalTypes,
+              size_t... Is>
+    auto
+    create_cell_phi_vector(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const std::pair<unsigned int, unsigned int>        &range,
+      const MatrixFreeTools::internal::
+        ComputeMatrixScratchData<dim, VectorizedArrayType, false> &data,
+      const std::index_sequence<Is...>);
+
+    template <int dim,
+              typename VectorizedArrayType,
+              bool is_face,
+              typename... EvalTypes,
+              size_t... Is>
+    void
+    reinit_phi(std::vector<std::unique_ptr<
+                 FEEvaluationData<dim, VectorizedArrayType, is_face>>> &phi,
+               const unsigned int                                       batch,
+               std::index_sequence<Is...>);
     /**
      * Compute the diagonal of a linear operator (@p diagonal_global), given
      * @p matrix_free and the local cell, face and boundary integral operation.
@@ -470,6 +541,83 @@ namespace MatrixFreeTools
     const unsigned int first_selected_component = 0);
 
 
+  /**
+   * Compute the block matrix representation of a blocked linear operator
+   * (@p block matrix), given @p matrix_free and the local cell integral
+   * operation @p cell_operation, interior face integral operation
+   * @p face_operation, and boundary face integal operation @p boundary_operation.
+   *
+   * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
+   * passed to the constructor of the FEEvaluation that is internally set up.
+   */
+  template <int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename BlockMatrixType,
+            typename... CellEvalTypes,
+            typename... FaceEvalTypes>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType>           &matrix_free,
+    const std::vector<const dealii::AffineConstraints<Number> *> &constraints,
+    BlockMatrixType                                              &matrix,
+    const std::function<void(CellEvalTypes &...)>              &cell_operation,
+    const std::function<void(
+      const std::pair<FaceEvalTypes &, FaceEvalTypes &> &...)> &face_operation,
+    const std::function<void(FaceEvalTypes &...)> &boundary_operation,
+    const std::vector<unsigned int>               &dof_no     = {},
+    const std::vector<unsigned int>               &quad_no    = {},
+    const std::vector<unsigned int> &first_selected_component = {});
+
+  /**
+   * Compute the block matrix representation of a blocked linear operator
+   * (@p block matrix), given @p matrix_free and the local cell integral
+   * operation @p cell_operation. Constrained entries on the diagonal are set to
+   * one.
+   *
+   * The parameters @p dof_no, @p quad_no, and @p first_selected_component are
+   * passed to the constructor of the FEEvaluation that is internally set up.
+   */
+  template <typename CLASS,
+            int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename BlockMatrixType,
+            typename... CellEvalTypes>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType>           &matrix_free,
+    const std::vector<const dealii::AffineConstraints<Number> *> &constraints,
+    BlockMatrixType                                              &matrix,
+    void (CLASS::*cell_operation)(CellEvalTypes &...) const,
+    const CLASS                     *owning_class,
+    const std::vector<unsigned int> &dof_no                   = {},
+    const std::vector<unsigned int> &quad_no                  = {},
+    const std::vector<unsigned int> &first_selected_component = {});
+
+  /**
+   * Same as above but with a class and a function pointer.
+   */
+  template <typename CLASS,
+            int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename BlockMatrixType,
+            typename... CellEvalTypes,
+            typename... FaceEvalTypes>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType>           &matrix_free,
+    const std::vector<const dealii::AffineConstraints<Number> *> &constraints,
+    BlockMatrixType                                              &matrix,
+    void (CLASS::*cell_operation)(CellEvalTypes &...) const,
+    void (CLASS::*face_operation)(
+      const std::pair<FaceEvalTypes &, FaceEvalTypes &> &...) const,
+    void (CLASS::*boundary_operation)(FaceEvalTypes &...) const,
+    const CLASS                     *owning_class,
+    const std::vector<unsigned int> &dof_no                   = {},
+    const std::vector<unsigned int> &quad_no                  = {},
+    const std::vector<unsigned int> &first_selected_component = {});
 
   /**
    * A wrapper around MatrixFree to help users to deal with DoFHandler
@@ -2328,6 +2476,267 @@ namespace MatrixFreeTools
 
   namespace internal
   {
+    using dealii::internal::AffineConstraints::IsBlockMatrix;
+    template <size_t N, size_t... Is>
+    struct even_sequence_helper
+      : even_sequence_helper<N - 1, 2 * (N - 1), Is...>
+    {};
+
+    template <size_t... Is>
+    struct even_sequence_helper<0, Is...>
+    {
+      using type = std::index_sequence<Is...>;
+    };
+
+    template <size_t N>
+    using even_sequence = typename even_sequence_helper<(N + 1) / 2>::type;
+
+    template <size_t N, size_t... Is>
+    struct odd_sequence_helper
+      : odd_sequence_helper<N - 1, 2 * (N - 1) + 1, Is...>
+    {};
+
+    template <size_t... Is>
+    struct odd_sequence_helper<0, Is...>
+    {
+      using type = std::index_sequence<Is...>;
+    };
+    template <size_t N>
+    using odd_sequence = typename odd_sequence_helper<N / 2>::type;
+
+    inline std::vector<unsigned int>
+    zip(const std::vector<unsigned int> &a, const std::vector<unsigned int> &b);
+
+    template <size_t... Is>
+    std::vector<unsigned int> make_index_vector(std::index_sequence<Is...>);
+
+    template <typename T1, typename T2>
+    std::pair<T1 &&, T2 &&>
+    forward_as_pair(T1 &&first, T2 &&second);
+
+    std::vector<unsigned int>
+    zip(const std::vector<unsigned int> &a, const std::vector<unsigned int> &b)
+    {
+      AssertDimension(a.size(), b.size());
+      std::vector<unsigned int> zipped;
+      zipped.reserve(a.size() + b.size());
+      for (size_t i = 0; i < a.size(); ++i)
+        {
+          zipped.push_back(a[i]);
+          zipped.push_back(b[i]);
+        }
+      return zipped;
+    }
+
+    template <size_t... Is>
+    std::vector<unsigned int>
+    make_index_vector(std::index_sequence<Is...>)
+    {
+      return {Is...};
+    }
+    template <typename T1, typename T2>
+    std::pair<T1 &&, T2 &&>
+    forward_as_pair(T1 &&first, T2 &&second)
+    {
+      return std::pair<T1 &&, T2 &&>(std::forward<T1>(first),
+                                     std::forward<T2>(second));
+    }
+    template <int dim,
+              typename VectorizedArrayType,
+              bool is_face,
+              typename... EvalTypes,
+              typename Function,
+              size_t... Is>
+    void
+    generic_apply(Function &&operation,
+                  std::vector<std::unique_ptr<
+                    FEEvaluationData<dim, VectorizedArrayType, is_face>>> &phi,
+                  std::index_sequence<Is...>)
+    {
+      static_assert(sizeof...(Is) == sizeof...(EvalTypes),
+                    "Index sequence size must match number of EvalTypes");
+      Assert(phi.size() >= sizeof...(Is),
+             ExcLowerRange(phi.size(), sizeof...(Is)));
+      std::apply(operation,
+                 std::forward_as_tuple(static_cast<EvalTypes &>(*phi[Is])...));
+    }
+
+    template <int dim,
+              typename VectorizedArrayType,
+              typename... FaceEvalTypes,
+              typename Function,
+              size_t... Is>
+    void
+    face_apply(
+      Function &&face_operation,
+      std::vector<
+        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>> &phi,
+      std::index_sequence<Is...>)
+    {
+      static_assert(sizeof...(Is) == sizeof...(FaceEvalTypes),
+                    "Index sequence size must match number of FaceEvalTypes");
+      Assert(phi.size() >= 2 * sizeof...(Is),
+             ExcLowerRange(phi.size(), 2 * sizeof...(Is)));
+      std::apply(face_operation,
+                 std::forward_as_tuple(forward_as_pair(
+                   static_cast<FaceEvalTypes &>(*phi[Is * 2]),
+                   static_cast<FaceEvalTypes &>(*phi[Is * 2 + 1]))...));
+    }
+
+
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename... FaceEvalTypes,
+              size_t... Is>
+    auto
+    create_face_phi_vector(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const std::pair<unsigned int, unsigned int>        &range,
+      const std::vector<unsigned int> &first_selected_component,
+      const std::index_sequence<Is...>)
+    {
+      std::vector<
+        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
+        phi;
+      phi.reserve(2 * sizeof...(FaceEvalTypes));
+      (
+        [&]() {
+          if (!MatrixFreeTools::internal::is_fe_nothing<true>(
+                matrix_free,
+                range,
+                Is,
+                Is,
+                first_selected_component[Is],
+                FaceEvalTypes::static_fe_degree,
+                FaceEvalTypes::static_n_q_points_1d,
+                true) &&
+              !MatrixFreeTools::internal::is_fe_nothing<true>(
+                matrix_free,
+                range,
+                Is,
+                Is,
+                first_selected_component[Is],
+                FaceEvalTypes::static_fe_degree,
+                FaceEvalTypes::static_n_q_points_1d,
+                false))
+            {
+              phi.emplace_back(std::make_unique<FaceEvalTypes>(
+                matrix_free,
+                range,
+                true,
+                Is,
+                Is,
+                first_selected_component[Is * 2]));
+              phi.emplace_back(std::make_unique<FaceEvalTypes>(
+                matrix_free,
+                range,
+                false,
+                Is,
+                Is,
+                first_selected_component[Is * 2 + 1]));
+            }
+        }(),
+        ...);
+      return phi;
+    }
+
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename... FaceEvalTypes,
+              size_t... Is>
+    auto
+    create_boundary_phi_vector(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const std::pair<unsigned int, unsigned int>        &range,
+      const std::vector<unsigned int> &first_selected_component,
+      const std::index_sequence<Is...>)
+    {
+      std::vector<
+        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, true>>>
+        phi;
+      phi.reserve(sizeof...(FaceEvalTypes));
+
+      (
+        [&]() {
+          if (!MatrixFreeTools::internal::is_fe_nothing<true>(
+                matrix_free,
+                range,
+                Is,
+                Is,
+                first_selected_component[Is],
+                FaceEvalTypes::static_fe_degree,
+                FaceEvalTypes::static_n_q_points_1d,
+                true))
+            phi.emplace_back(std::make_unique<FaceEvalTypes>(
+              matrix_free, range, true, Is, Is, first_selected_component[Is]));
+        }(),
+        ...);
+      return phi;
+    }
+
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename... CellEvalTypes,
+              size_t... Is>
+    auto
+    create_cell_phi_vector(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const std::pair<unsigned int, unsigned int>        &range,
+      const MatrixFreeTools::internal::
+        ComputeMatrixScratchData<dim, VectorizedArrayType, false> &data,
+      const std::index_sequence<Is...>)
+    {
+      static_assert(sizeof...(Is) == sizeof...(CellEvalTypes),
+                    "Index sequence size must match number of CellEvalTypes");
+      std::vector<
+        std::unique_ptr<FEEvaluationData<dim, VectorizedArrayType, false>>>
+        phi;
+      phi.reserve(sizeof...(CellEvalTypes));
+
+      (
+        [&]() {
+          if (!MatrixFreeTools::internal::is_fe_nothing<false>(
+                matrix_free,
+                range,
+                data.dof_numbers[Is],
+                data.quad_numbers[Is],
+                data.first_selected_components[Is],
+                CellEvalTypes::static_fe_degree,
+                CellEvalTypes::static_n_q_points_1d))
+            phi.emplace_back(std::make_unique<CellEvalTypes>(
+              matrix_free,
+              range,
+              data.dof_numbers[Is],
+              data.quad_numbers[Is],
+              data.first_selected_components[Is]));
+        }(),
+        ...);
+      return phi;
+    }
+
+
+    template <int dim,
+              typename VectorizedArrayType,
+              bool is_face,
+              typename... EvalTypes,
+              size_t... Is>
+    void
+    reinit_phi(std::vector<std::unique_ptr<
+                 FEEvaluationData<dim, VectorizedArrayType, is_face>>> &phi,
+               const unsigned int                                       batch,
+               std::index_sequence<Is...>)
+    {
+      static_assert(sizeof...(Is) == sizeof...(EvalTypes),
+                    "Index sequence size must match number of EvalTypes");
+      Assert(phi.size() >= sizeof...(Is),
+             ExcLowerRange(phi.size(), sizeof...(Is)));
+      (static_cast<EvalTypes &>(*phi[Is]).reinit(batch), ...);
+      (void)batch;
+    }
+
     template <int dim,
               typename Number,
               typename VectorizedArrayType,
@@ -2344,11 +2753,41 @@ namespace MatrixFreeTools
                  &data_boundary,
       MatrixType &matrix)
     {
-      std::unique_ptr<AffineConstraints<typename MatrixType::value_type>>
-        constraints_for_matrix;
-      const AffineConstraints<typename MatrixType::value_type> &constraints =
-        internal::create_new_affine_constraints_if_needed(
-          matrix, constraints_in, constraints_for_matrix);
+      std::vector<const dealii::AffineConstraints<Number> *> constraints{
+        &constraints_in};
+      compute_matrix<dim, Number>(
+        matrix_free, constraints, data_cell, data_face, data_boundary, matrix);
+    }
+
+    template <int dim,
+              typename Number,
+              typename VectorizedArrayType,
+              typename MatrixType>
+    void
+    compute_matrix(
+      const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
+      const std::vector<const dealii::AffineConstraints<Number> *>
+        &constraints_in,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, false>
+        &data_cell,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+        &data_face,
+      const internal::ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+                 &data_boundary,
+      MatrixType &matrix)
+    {
+      std::vector<
+        std::unique_ptr<AffineConstraints<typename MatrixType::value_type>>>
+        constraints_for_matrix(constraints_in.size());
+      std::vector<std::reference_wrapper<
+        const AffineConstraints<typename MatrixType::value_type>>>
+        constraints;
+      for (unsigned int i = 0; i < constraints_in.size(); ++i)
+        {
+          constraints.emplace_back(
+            internal::create_new_affine_constraints_if_needed(
+              matrix, *constraints_in[i], constraints_for_matrix[i]));
+        }
 
       const auto batch_operation =
         [&matrix_free, &constraints, &matrix](
@@ -2470,23 +2909,42 @@ namespace MatrixFreeTools
                             matrices[bi][bj][v](i, j) =
                               phi[bi]->begin_dof_values()[i][v];
                     }
-
-                  for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                    for (unsigned int bi = 0; bi < n_blocks; ++bi)
-                      if (bi == bj)
-                        // specialization for blocks on the diagonal
-                        // to writing into diagonal elements of the
-                        // matrix if the corresponding degree of freedom
-                        // is constrained, see also the documentation
-                        // of AffineConstraints::distribute_local_to_global()
-                        constraints.distribute_local_to_global(
-                          matrices[bi][bi][v], dof_indices_mf[bi][v], matrix);
-                      else
-                        constraints.distribute_local_to_global(
-                          matrices[bi][bj][v],
-                          dof_indices_mf[bi][v],
-                          dof_indices_mf[bj][v],
-                          matrix);
+                  if constexpr (!IsBlockMatrix<MatrixType>::value)
+                    for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                      for (unsigned int bi = 0; bi < n_blocks; ++bi)
+                        if (bi == bj)
+                          // specialization for blocks on the diagonal
+                          // to writing into diagonal elements of the
+                          // matrix if the corresponding degree of freedom
+                          // is constrained, see also the documentation
+                          // of AffineConstraints::distribute_local_to_global()
+                          constraints[bi].get().distribute_local_to_global(
+                            matrices[bi][bi][v], dof_indices_mf[bi][v], matrix);
+                        else
+                          constraints[bi].get().distribute_local_to_global(
+                            matrices[bi][bj][v],
+                            dof_indices_mf[bi][v],
+                            constraints[bj].get(),
+                            dof_indices_mf[bj][v],
+                            matrix);
+                  else
+                    for (unsigned int v = 0; v < n_filled_lanes; ++v)
+                      for (unsigned int bi = 0; bi < n_blocks; ++bi)
+                        if (matrix.block(bi, bj).n_nonzero_elements() != 0)
+                          {
+                            if (bi == bj)
+                              constraints[bi].get().distribute_local_to_global(
+                                matrices[bi][bi][v],
+                                dof_indices_mf[bi][v],
+                                matrix.block(bi, bj));
+                            else
+                              constraints[bi].get().distribute_local_to_global(
+                                matrices[bi][bj][v],
+                                dof_indices_mf[bi][v],
+                                constraints[bj].get(),
+                                dof_indices_mf[bj][v],
+                                matrix.block(bi, bj));
+                          }
                 }
             }
         };
@@ -2585,6 +3043,270 @@ namespace MatrixFreeTools
       dof_no,
       quad_no,
       first_selected_component);
+  }
+
+  template <int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename BlockMatrixType,
+            typename... CellEvalTypes,
+            typename... FaceEvalTypes>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType>         &matrix_free,
+    const dealii::AffineConstraints<Number>                    &constraints,
+    BlockMatrixType                                            &matrix,
+    const std::function<void(CellEvalTypes &...)>              &cell_operation,
+    const std::function<void(
+      const std::pair<FaceEvalTypes &, FaceEvalTypes &> &...)> &face_operation,
+    const std::function<void(FaceEvalTypes &...)> &boundary_operation)
+  {
+    std::vector<const dealii::AffineConstraints<Number> *> constraints_{
+      &constraints};
+    compute_matrix(matrix_free,
+                   constraints_,
+                   matrix,
+                   cell_operation,
+                   face_operation,
+                   boundary_operation);
+  }
+
+  template <int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename BlockMatrixType,
+            typename... CellEvalTypes,
+            typename... FaceEvalTypes>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType>           &matrix_free,
+    const std::vector<const dealii::AffineConstraints<Number> *> &constraints,
+    BlockMatrixType                                              &matrix,
+    const std::function<void(CellEvalTypes &...)>              &cell_operation,
+    const std::function<void(
+      const std::pair<FaceEvalTypes &, FaceEvalTypes &> &...)> &face_operation,
+    const std::function<void(FaceEvalTypes &...)> &boundary_operation,
+    const std::vector<unsigned int>               &dof_no,
+    const std::vector<unsigned int>               &quad_no,
+    const std::vector<unsigned int>               &first_selected_component)
+  {
+    using namespace internal;
+    auto cell_eval_index    = std::index_sequence_for<CellEvalTypes...>{};
+    auto face_eval_index    = std::index_sequence_for<FaceEvalTypes...>{};
+    auto in_face_eval_index = even_sequence<2 * sizeof...(FaceEvalTypes)>{};
+    auto ex_face_eval_index = odd_sequence<2 * sizeof...(FaceEvalTypes)>{};
+    MatrixFreeTools::internal::
+      ComputeMatrixScratchData<dim, VectorizedArrayType, false>
+        data_cell;
+
+    const auto index_vector = make_index_vector(cell_eval_index);
+    data_cell.dof_numbers   = dof_no.empty() ? index_vector : dof_no;
+    data_cell.quad_numbers  = quad_no.empty() ? index_vector : quad_no;
+    data_cell.n_components.resize(index_vector.size());
+    for (size_t i = 0; i < index_vector.size(); ++i)
+      data_cell.n_components[i] =
+        matrix_free.get_dof_handler(index_vector[i]).get_fe().n_components();
+
+    data_cell.first_selected_components =
+      first_selected_component.empty() ?
+        std::vector<unsigned int>(index_vector.size(), 0) :
+        first_selected_component;
+    data_cell.batch_type = std::vector<unsigned int>(index_vector.size(), 0);
+
+    data_cell.op_create =
+      [&](const std::pair<unsigned int, unsigned int> &range) {
+        return create_cell_phi_vector<dim,
+                                      Number,
+                                      VectorizedArrayType,
+                                      CellEvalTypes...>(matrix_free,
+                                                        range,
+                                                        data_cell,
+                                                        cell_eval_index);
+      };
+
+    data_cell.op_reinit = [&cell_eval_index](auto &phi, const unsigned batch) {
+      reinit_phi<dim, VectorizedArrayType, false, CellEvalTypes...>(
+        phi, batch, cell_eval_index);
+    };
+
+    if (cell_operation)
+      data_cell.op_compute = [&](auto &phi) {
+        generic_apply<dim, VectorizedArrayType, false, CellEvalTypes...>(
+          cell_operation, phi, cell_eval_index);
+      };
+
+
+    MatrixFreeTools::internal::
+      ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+        data_face;
+
+    data_face.dof_numbers  = zip(index_vector, index_vector);
+    data_face.quad_numbers = zip(index_vector, index_vector);
+    data_face.n_components.resize(index_vector.size());
+    for (size_t i = 0; i < index_vector.size(); ++i)
+      data_face.n_components[i] =
+        matrix_free.get_dof_handler(index_vector[i]).get_fe().n_components();
+
+    std::vector<unsigned int> first_selected_components(index_vector.size(), 0);
+    data_face.first_selected_components =
+      zip(first_selected_components, first_selected_components);
+    data_face.batch_type =
+      zip(std::vector<unsigned int>(index_vector.size(), 1),
+          std::vector<unsigned int>(index_vector.size(), 2));
+
+    data_face.op_create =
+      [&](const std::pair<unsigned int, unsigned int> &range) {
+        return create_face_phi_vector<dim,
+                                      Number,
+                                      VectorizedArrayType,
+                                      FaceEvalTypes...>(
+          matrix_free,
+          range,
+          data_face.first_selected_components,
+          face_eval_index);
+      };
+
+    data_face.op_reinit = [&in_face_eval_index,
+                           &ex_face_eval_index](auto          &phi,
+                                                const unsigned batch) {
+      reinit_phi<dim, VectorizedArrayType, true, FaceEvalTypes...>(
+        phi, batch, in_face_eval_index);
+      reinit_phi<dim, VectorizedArrayType, true, FaceEvalTypes...>(
+        phi, batch, ex_face_eval_index);
+    };
+
+    if (face_operation)
+      data_face.op_compute = [&](auto &phi) {
+        face_apply<dim, VectorizedArrayType, FaceEvalTypes...>(face_operation,
+                                                               phi,
+                                                               face_eval_index);
+      };
+
+    MatrixFreeTools::internal::
+      ComputeMatrixScratchData<dim, VectorizedArrayType, true>
+        data_boundary;
+
+    data_boundary.dof_numbers  = index_vector;
+    data_boundary.quad_numbers = index_vector;
+    data_boundary.n_components.resize(index_vector.size());
+    for (size_t i = 0; i < index_vector.size(); ++i)
+      data_boundary.n_components[i] =
+        matrix_free.get_dof_handler(index_vector[i]).get_fe().n_components();
+
+    data_boundary.first_selected_components =
+      std::vector<unsigned int>(index_vector.size(), 0);
+    data_boundary.batch_type =
+      std::vector<unsigned int>(index_vector.size(), 1);
+
+    data_boundary.op_create =
+      [&](const std::pair<unsigned int, unsigned int> &range) {
+        return create_boundary_phi_vector<dim,
+                                          Number,
+                                          VectorizedArrayType,
+                                          FaceEvalTypes...>(
+          matrix_free,
+          range,
+          data_boundary.first_selected_components,
+          face_eval_index);
+      };
+
+    data_boundary.op_reinit = [&face_eval_index](auto          &phi,
+                                                 const unsigned batch) {
+      reinit_phi<dim, VectorizedArrayType, true, FaceEvalTypes...>(
+        phi, batch, face_eval_index);
+    };
+
+    if (boundary_operation)
+      data_boundary.op_compute = [&](auto &phi) {
+        generic_apply<dim, VectorizedArrayType, true, FaceEvalTypes...>(
+          boundary_operation, phi, face_eval_index);
+      };
+    MatrixFreeTools::internal::compute_matrix(
+      matrix_free, constraints, data_cell, data_face, data_boundary, matrix);
+  }
+
+  template <typename CLASS,
+            int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename BlockMatrixType,
+            typename... CellEvalTypes>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType>           &matrix_free,
+    const std::vector<const dealii::AffineConstraints<Number> *> &constraints,
+    BlockMatrixType                                              &matrix,
+    void (CLASS::*cell_operation)(CellEvalTypes &...) const,
+    const CLASS                     *owning_class,
+    const std::vector<unsigned int> &dof_no,
+    const std::vector<unsigned int> &quad_no,
+    const std::vector<unsigned int> &first_selected_component)
+  {
+    std::function<void(CellEvalTypes & ...)> cell_op_func =
+      [&owning_class, &cell_operation](CellEvalTypes &...evals) {
+        (owning_class->*cell_operation)(evals...);
+      };
+
+    std::function<void()> face_op_func{};
+    std::function<void()> boundary_op_func{};
+
+    compute_matrix(matrix_free,
+                   constraints,
+                   matrix,
+                   cell_op_func,
+                   face_op_func,
+                   boundary_op_func,
+                   dof_no,
+                   quad_no,
+                   first_selected_component);
+  }
+
+  template <typename CLASS,
+            int dim,
+            typename Number,
+            typename VectorizedArrayType,
+            typename BlockMatrixType,
+            typename... CellEvalTypes,
+            typename... FaceEvalTypes>
+  void
+  compute_matrix(
+    const MatrixFree<dim, Number, VectorizedArrayType>           &matrix_free,
+    const std::vector<const dealii::AffineConstraints<Number> *> &constraints,
+    BlockMatrixType                                              &matrix,
+    void (CLASS::*cell_operation)(CellEvalTypes &...) const,
+    void (CLASS::*face_operation)(
+      const std::pair<FaceEvalTypes &, FaceEvalTypes &> &...) const,
+    void (CLASS::*boundary_operation)(FaceEvalTypes &...) const,
+    const CLASS                     *owning_class,
+    const std::vector<unsigned int> &dof_no,
+    const std::vector<unsigned int> &quad_no,
+    const std::vector<unsigned int> &first_selected_component)
+  {
+    std::function<void(CellEvalTypes & ...)> cell_op_func =
+      [&owning_class, &cell_operation](CellEvalTypes &...evals) {
+        (owning_class->*cell_operation)(evals...);
+      };
+
+    std::function<void(const std::pair<FaceEvalTypes &, FaceEvalTypes &> &...)>
+      face_op_func =
+        [&owning_class, &face_operation](
+          const std::pair<FaceEvalTypes &, FaceEvalTypes &> &...face_evals) {
+          (owning_class->*face_operation)(face_evals...);
+        };
+    std::function<void(FaceEvalTypes & ...)> boundary_op_func =
+      [&owning_class, &boundary_operation](FaceEvalTypes &...boundary_evals) {
+        (owning_class->*boundary_operation)(boundary_evals...);
+      };
+
+    compute_matrix(matrix_free,
+                   constraints,
+                   matrix,
+                   cell_op_func,
+                   face_op_func,
+                   boundary_op_func,
+                   dof_no,
+                   quad_no,
+                   first_selected_component);
   }
 
 #endif // DOXYGEN
