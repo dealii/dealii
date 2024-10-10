@@ -1589,19 +1589,24 @@ namespace internal
 
     template void
     DoFInfo::compute_face_index_compression<1>(
-      const std::vector<FaceToCellTopology<1>> &);
+      const std::vector<FaceToCellTopology<1>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<2>(
-      const std::vector<FaceToCellTopology<2>> &);
+      const std::vector<FaceToCellTopology<2>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<4>(
-      const std::vector<FaceToCellTopology<4>> &);
+      const std::vector<FaceToCellTopology<4>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<8>(
-      const std::vector<FaceToCellTopology<8>> &);
+      const std::vector<FaceToCellTopology<8>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<16>(
-      const std::vector<FaceToCellTopology<16>> &);
+      const std::vector<FaceToCellTopology<16>> &,
+      bool);
 
     template void
     DoFInfo::compute_vector_zero_access_pattern<1>(

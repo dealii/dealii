@@ -103,4 +103,8 @@ test()
   mf.vmult(out, in);
 
   deallog << "Norm of result:          " << out.l2_norm() << std::endl;
+
+  mf.manual_loop_vmult(out, in);
+
+  deallog << "Norm of result:          " << out.l2_norm() << std::endl;
 }
