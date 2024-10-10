@@ -283,7 +283,7 @@ struct FERemoteCommunicationObjectTwoLevel
  * A class to fill the fields in PrecomputedEvaluationData.
  */
 template <int dim>
-class FERemoteEvaluationCommunicator : public Subscriptor
+class FERemoteEvaluationCommunicator : public EnableRefCountingByObserverPointer
 {
 public:
   /**

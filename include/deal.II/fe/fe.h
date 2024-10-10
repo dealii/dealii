@@ -651,7 +651,8 @@ class FESystem;
  * @ingroup febase fe
  */
 template <int dim, int spacedim = dim>
-class FiniteElement : public Subscriptor, public FiniteElementData<dim>
+class FiniteElement : public EnableRefCountingByObserverPointer,
+                      public FiniteElementData<dim>
 {
 public:
   /**

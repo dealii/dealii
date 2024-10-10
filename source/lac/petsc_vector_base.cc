@@ -128,7 +128,7 @@ namespace PETScWrappers
 
 
   VectorBase::VectorBase(const VectorBase &v)
-    : Subscriptor()
+    : EnableRefCountingByObserverPointer()
     , ghosted(v.ghosted)
     , ghost_indices(v.ghost_indices)
     , last_action(VectorOperation::unknown)
@@ -143,7 +143,7 @@ namespace PETScWrappers
 
 
   VectorBase::VectorBase(const Vec &v)
-    : Subscriptor()
+    : EnableRefCountingByObserverPointer()
     , vector(v)
     , ghosted(false)
     , last_action(VectorOperation::unknown)

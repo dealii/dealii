@@ -190,7 +190,7 @@ writes into the `values` member variable. If the class had more member
 variables, one would list them one after the other. The same is true
 if a class has base classes. For example, here is the corresponding
 function for the Quadrature class that stores quadrature points and
-weights, and is derived from the Subscriptor base class:
+weights, and is derived from the EnableRefCountingByObserverPointer base class:
 @code
 template <int dim>
 template <class Archive>
@@ -198,7 +198,7 @@ inline void
 Quadrature<dim>::serialize(Archive &ar, const unsigned int)
 {
   // Forward to the (de)serialization function in the base class:
-  ar & static_cast<Subscriptor &>(*this);
+  ar & static_cast<EnableRefCountingByObserverPointer &>(*this);
 
   // Then (de)serialize the member variables:
   ar & quadrature_points & weights;

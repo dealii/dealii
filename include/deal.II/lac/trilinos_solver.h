@@ -482,7 +482,7 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    */
-  class SolverDirect : public Subscriptor
+  class SolverDirect : public EnableRefCountingByObserverPointer
   {
   public:
     /**

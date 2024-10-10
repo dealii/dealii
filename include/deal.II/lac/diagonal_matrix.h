@@ -58,7 +58,7 @@ namespace LinearAlgebra
  * @endcode
  */
 template <typename VectorType = Vector<double>>
-class DiagonalMatrix : public Subscriptor
+class DiagonalMatrix : public EnableRefCountingByObserverPointer
 {
 public:
   using value_type = typename VectorType::value_type;

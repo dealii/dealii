@@ -68,14 +68,14 @@ template <int dim,
           int n_q_points_1d,
           typename BlockVectorType =
             LinearAlgebra::distributed::BlockVector<double>>
-class BlockLaplace : public Subscriptor
+class BlockLaplace : public EnableRefCountingByObserverPointer
 {
 public:
   using value_type = typename BlockVectorType::value_type;
   using size_type  = typename BlockVectorType::size_type;
 
   BlockLaplace()
-    : Subscriptor()
+    : EnableRefCountingByObserverPointer()
   {}
 
   void

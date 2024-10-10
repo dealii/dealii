@@ -170,7 +170,7 @@ namespace PETScWrappers
    * methods:
    *
    * @code
-   * class VectorType : public Subscriptor
+   * class VectorType : public EnableRefCountingByObserverPointer
    *    ...
    *    explicit VectorType(Vec);
    *    ...
@@ -179,7 +179,7 @@ namespace PETScWrappers
    * @endcode
    *
    * @code
-   * class MatrixType : public Subscriptor
+   * class MatrixType : public EnableRefCountingByObserverPointer
    *    ...
    *    explicit MatrixType(Mat);
    *    ...

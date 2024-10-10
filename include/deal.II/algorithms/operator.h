@@ -62,7 +62,7 @@ namespace Algorithms
    * providing additional information and forwarded to the inner Operator
    * objects of the nested iteration.
    */
-  class OperatorBase : public Subscriptor
+  class OperatorBase : public EnableRefCountingByObserverPointer
   {
   public:
     /**
@@ -101,7 +101,7 @@ namespace Algorithms
    * in each step of an iteration.
    */
   template <typename VectorType>
-  class OutputOperator : public Subscriptor
+  class OutputOperator : public EnableRefCountingByObserverPointer
   {
   public:
     /**

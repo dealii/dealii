@@ -97,7 +97,7 @@ private:
 };
 
 template <typename SparseMatrixType>
-class MySparseMatrix : public Subscriptor
+class MySparseMatrix : public EnableRefCountingByObserverPointer
 {
 public:
   MySparseMatrix(const SparseMatrixType &sparse_matrix)

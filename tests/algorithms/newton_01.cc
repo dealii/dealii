@@ -24,7 +24,7 @@
 // test computing square root of 2 with newton's method
 
 
-class SquareRoot : public Subscriptor
+class SquareRoot : public EnableRefCountingByObserverPointer
 {
 public:
   void

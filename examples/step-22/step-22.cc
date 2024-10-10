@@ -279,7 +279,7 @@ namespace Step22
   // <code>InverseMatrix</code> object is created. The member function
   // <code>vmult</code> is obtained by solving a linear system:
   template <class MatrixType, class PreconditionerType>
-  class InverseMatrix : public Subscriptor
+  class InverseMatrix : public EnableRefCountingByObserverPointer
   {
   public:
     InverseMatrix(const MatrixType         &m,
@@ -337,7 +337,7 @@ namespace Step22
   // a preconditioner class as above, which affects the
   // <code>ObserverPointer</code> object <code>m_inverse</code> as well.
   template <class PreconditionerType>
-  class SchurComplement : public Subscriptor
+  class SchurComplement : public EnableRefCountingByObserverPointer
   {
   public:
     SchurComplement(

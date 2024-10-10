@@ -288,7 +288,7 @@ LaplaceProblem<dim>::LaplaceProblem()
 // finite element object which counts
 // how many objects use that finite
 // element (this is what the
-// <code>Subscriptor</code>/<code>ObserverPointer</code>
+// <code>EnableRefCountingByObserverPointer</code>/<code>ObserverPointer</code>
 // class pair is used for, in case
 // you want something like this for
 // your own programs; see step-7 for

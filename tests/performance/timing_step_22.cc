@@ -202,7 +202,7 @@ RightHandSide<dim>::value_list(const std::vector<Point<dim>> &vp,
 
 
 template <class MatrixType, class PreconditionerType>
-class InverseMatrix : public Subscriptor
+class InverseMatrix : public EnableRefCountingByObserverPointer
 {
 public:
   InverseMatrix(const MatrixType &m, const PreconditionerType &preconditioner);
@@ -241,7 +241,7 @@ InverseMatrix<MatrixType, PreconditionerType>::vmult(
 
 
 template <class PreconditionerType>
-class SchurComplement : public Subscriptor
+class SchurComplement : public EnableRefCountingByObserverPointer
 {
 public:
   SchurComplement(

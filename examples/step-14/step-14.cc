@@ -1052,9 +1052,10 @@ namespace Step14
 
     // Based on the above description, the <code>SetUpBase</code> class then
     // looks as follows. To allow using the <code>ObserverPointer</code> class
-    // with this class, we derived from the <code>Subscriptor</code> class.
+    // with this class, we derived from the
+    // <code>EnableRefCountingByObserverPointer</code> class.
     template <int dim>
-    struct SetUpBase : public Subscriptor
+    struct SetUpBase : public EnableRefCountingByObserverPointer
     {
       virtual const Function<dim> &get_boundary_values() const = 0;
 
@@ -1383,7 +1384,7 @@ namespace Step14
     // the right hand side, we only need to provide for a function that
     // assembles the right hand side for a given discretization:
     template <int dim>
-    class DualFunctionalBase : public Subscriptor
+    class DualFunctionalBase : public EnableRefCountingByObserverPointer
     {
     public:
       virtual void assemble_rhs(const DoFHandler<dim> &dof_handler,

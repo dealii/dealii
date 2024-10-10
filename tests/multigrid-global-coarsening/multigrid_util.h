@@ -58,7 +58,7 @@
 #include "../tests.h"
 
 template <int dim_, int n_components = dim_, typename Number = double>
-class Operator : public Subscriptor
+class Operator : public EnableRefCountingByObserverPointer
 {
 public:
   using value_type = Number;

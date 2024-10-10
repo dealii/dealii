@@ -87,7 +87,7 @@ namespace StokesClass
               class MassMatrixType,
               class PreconditionerA,
               class PreconditionerMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableRefCountingByObserverPointer
     {
     public:
       /**

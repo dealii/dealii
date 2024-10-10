@@ -259,7 +259,7 @@ namespace Step56
   }
 
   template <class PreconditionerAType, class PreconditionerSType>
-  class BlockSchurPreconditioner : public Subscriptor
+  class BlockSchurPreconditioner : public EnableRefCountingByObserverPointer
   {
   public:
     BlockSchurPreconditioner(

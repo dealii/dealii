@@ -77,7 +77,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, typename Number, typename VectorizedArrayType>
 MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree()
-  : Subscriptor()
+  : EnableRefCountingByObserverPointer()
   , indices_are_initialized(false)
   , mapping_is_initialized(false)
   , mg_level(numbers::invalid_unsigned_int)
@@ -88,7 +88,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree()
 template <int dim, typename Number, typename VectorizedArrayType>
 MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree(
   const MatrixFree<dim, Number, VectorizedArrayType> &other)
-  : Subscriptor()
+  : EnableRefCountingByObserverPointer()
 {
   copy_from(other);
 }

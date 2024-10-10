@@ -86,7 +86,7 @@ namespace Portable
    * @note Only float and double are supported.
    */
   template <int dim, typename Number = double>
-  class MatrixFree : public Subscriptor
+  class MatrixFree : public EnableRefCountingByObserverPointer
   {
   public:
     using jacobian_type = Tensor<2, dim, Tensor<1, dim, Number>>;

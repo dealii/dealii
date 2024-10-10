@@ -215,7 +215,7 @@ namespace internal
  * Alternatively, the IdentityMatrix class can be used to precondition in this
  * way.
  */
-class PreconditionIdentity : public Subscriptor
+class PreconditionIdentity : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -330,7 +330,7 @@ private:
  * multiplied. Still, this class is useful in multigrid smoother objects
  * (MGSmootherRelaxation).
  */
-class PreconditionRichardson : public Subscriptor
+class PreconditionRichardson : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -494,7 +494,7 @@ private:
  */
 template <typename MatrixType = SparseMatrix<double>,
           typename VectorType = Vector<double>>
-class PreconditionUseMatrix : public Subscriptor
+class PreconditionUseMatrix : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -562,7 +562,7 @@ private:
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename PreconditionerType = IdentityMatrix>
-class PreconditionRelaxation : public Subscriptor
+class PreconditionRelaxation : public EnableRefCountingByObserverPointer
 {
 public:
   /**
@@ -2025,13 +2025,14 @@ public:
  *
  * <h4>Requirements on the templated classes</h4>
  *
- * The class `MatrixType` must be derived from Subscriptor because a
- * ObserverPointer to `MatrixType` is held in the class. In particular, this
- * means that the matrix object needs to persist during the lifetime of
- * PreconditionChebyshev. The preconditioner is held in a shared_ptr that is
- * copied into the AdditionalData member variable of the class, so the
- * variable used for initialization can safely be discarded after calling
- * initialize(). Both the matrix and the preconditioner need to provide
+ * The class `MatrixType` must be derived from
+ * EnableRefCountingByObserverPointer because a ObserverPointer to `MatrixType`
+ * is held in the class. In particular, this means that the matrix object needs
+ * to persist during the lifetime of PreconditionChebyshev. The preconditioner
+ * is held in a shared_ptr that is copied into the AdditionalData member
+ * variable of the class, so the variable used for initialization can safely be
+ * discarded after calling initialize(). Both the matrix and the preconditioner
+ * need to provide
  * @p vmult() functions for the matrix-vector product and @p m() functions for
  * accessing the number of rows in the (square) matrix. Furthermore, the
  * matrix must provide <tt>el(i,i)</tt> methods for accessing the matrix
@@ -2100,7 +2101,7 @@ public:
 template <typename MatrixType         = SparseMatrix<double>,
           typename VectorType         = Vector<double>,
           typename PreconditionerType = DiagonalMatrix<VectorType>>
-class PreconditionChebyshev : public Subscriptor
+class PreconditionChebyshev : public EnableRefCountingByObserverPointer
 {
 public:
   /**

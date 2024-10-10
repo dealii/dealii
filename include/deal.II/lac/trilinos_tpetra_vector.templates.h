@@ -78,7 +78,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector()
-      : Subscriptor()
+      : EnableRefCountingByObserverPointer()
       , compressed(true)
       , has_ghost(false)
       , vector(Utilities::Trilinos::internal::make_rcp<
@@ -91,7 +91,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector(const Vector<Number, MemorySpace> &V)
-      : Subscriptor()
+      : EnableRefCountingByObserverPointer()
       , compressed(V.compressed)
       , has_ghost(V.has_ghost)
       , vector(Utilities::Trilinos::internal::make_rcp<
@@ -109,7 +109,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector(
       const Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>> V)
-      : Subscriptor()
+      : EnableRefCountingByObserverPointer()
       , compressed(true)
       , has_ghost(V->getMap()->isOneToOne() == false)
       , vector(V)
@@ -120,7 +120,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector(const IndexSet &parallel_partitioner,
                                         const MPI_Comm  communicator)
-      : Subscriptor()
+      : EnableRefCountingByObserverPointer()
       , compressed(true)
       , has_ghost(false)
       , vector(Utilities::Trilinos::internal::make_rcp<
@@ -136,7 +136,7 @@ namespace LinearAlgebra
                                         const IndexSet &ghost_entries,
                                         const MPI_Comm  communicator,
                                         const bool      vector_writable)
-      : Subscriptor()
+      : EnableRefCountingByObserverPointer()
     {
       if (!vector_writable)
         {

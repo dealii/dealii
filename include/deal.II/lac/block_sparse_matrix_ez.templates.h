@@ -82,7 +82,7 @@ BlockSparseMatrixEZ<number>::operator=(const double d)
 template <typename number>
 BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ(
   const BlockSparseMatrixEZ<number> &m)
-  : Subscriptor(m)
+  : EnableRefCountingByObserverPointer(m)
   , row_indices(m.row_indices)
   , column_indices(m.column_indices)
   , blocks(m.blocks)
