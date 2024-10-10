@@ -12,6 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/work_stream.h>
+
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
@@ -1236,43 +1238,79 @@ namespace Particles
     real_locations.reserve(global_max_particles_per_cell);
     reference_locations.reserve(global_max_particles_per_cell);
 
-    for (const auto &cell : triangulation->active_cell_iterators())
+
+    // We calculate what particles have left their cell in parallel in the
+    // worker. If they have left their cell, we must add them in serial to the
+    // list of missing particles.
+    struct StageOne_CopyData
+    {
+      std::vector<particle_iterator> local_particles_out_of_cell;
+    };
+
+    struct StageOne_ScratchData
+    {
+      std::vector<Point<spacedim>> real_locations;
+      std::vector<Point<dim>>      reference_locations;
+      StageOne_ScratchData(const unsigned int size)
       {
+        real_locations.reserve(size);
+        reference_locations.reserve(size);
+      }
+    };
+
+    const auto stage_one_worker =
+      [&](
+        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+        StageOne_ScratchData &scratch,
+        StageOne_CopyData    &copy) {
         // Particles can be inserted into arbitrary cells, e.g. if their cell is
         // not known. However, for artificial cells we can not evaluate
         // the reference position of particles. Do not sort particles that are
         // not locally owned, because they will be sorted by the process that
         // owns them.
+        scratch.real_locations.clear();
+        copy.local_particles_out_of_cell.clear();
+
         if (cell->is_locally_owned() == false)
           {
-            continue;
+            return;
           }
 
         const unsigned int n_pic = n_particles_in_cell(cell);
         auto               pic   = particles_in_cell(cell);
 
-        real_locations.clear();
         for (const auto &particle : pic)
-          real_locations.push_back(particle.get_location());
+          scratch.real_locations.push_back(particle.get_location());
 
-        reference_locations.resize(n_pic);
-        mapping->transform_points_real_to_unit_cell(cell,
-                                                    real_locations,
-                                                    reference_locations);
+        scratch.reference_locations.resize(n_pic);
+        mapping->transform_points_real_to_unit_cell(
+          cell, scratch.real_locations, scratch.reference_locations);
 
         auto particle = pic.begin();
-        for (const auto &p_unit : reference_locations)
+        for (const auto &p_unit : scratch.reference_locations)
           {
             if (numbers::is_finite(p_unit[0]) &&
                 GeometryInfo<dim>::is_inside_unit_cell(p_unit,
                                                        tolerance_inside_cell))
               particle->set_reference_location(p_unit);
             else
-              particles_out_of_cell.push_back(particle);
+              copy.local_particles_out_of_cell.push_back(particle);
 
             ++particle;
           }
-      }
+      };
+
+    const auto stage_one_copier = [&](const StageOne_CopyData &copy) {
+      particles_out_of_cell.insert(particles_out_of_cell.end(),
+                                   copy.local_particles_out_of_cell.begin(),
+                                   copy.local_particles_out_of_cell.end());
+    };
+    WorkStream::run(triangulation->begin_active(),
+                    triangulation->end(),
+                    stage_one_worker,
+                    stage_one_copier,
+                    StageOne_ScratchData(global_max_particles_per_cell),
+                    StageOne_CopyData());
 
     // There are three reasons why a particle is not in its old cell:
     // It moved to another cell, to another subdomain or it left the mesh.
@@ -1320,26 +1358,56 @@ namespace Particles
         &vertex_to_cell_centers =
           triangulation_cache->get_vertex_to_cell_centers_directions();
 
-      std::vector<unsigned int> search_order;
+      // Now in the next step we find where the particles that have left their
+      // cell have gone to. They may be lost entirely or located in a new cell.
+      // We can try to find the new cells of multiple particles in parallel,
+      // however we cannot reinsert the particles until we have finished looking
+      // at all of them or we risk invalidating the data the worker is looking
+      // at.
 
-      // Reuse these vectors below, but only with a single element.
-      // Avoid resizing for every particle.
-      Point<dim>      invalid_reference_point;
-      Point<spacedim> invalid_point;
-      invalid_reference_point[0] = std::numeric_limits<double>::infinity();
-      invalid_point[0]           = std::numeric_limits<double>::infinity();
-      reference_locations.resize(1, invalid_reference_point);
-      real_locations.resize(1, invalid_point);
+      struct StageTwo_CopyData
+      {
+        typename Triangulation<dim, spacedim>::cell_iterator current_cell;
+        particle_iterator                                    out_particle;
+        Point<dim>                                           reference_location;
+        bool                                                 found_cell;
+      };
 
-      // Find the cells that the particles moved to.
-      for (auto &out_particle : particles_out_of_cell)
+      struct StageTwo_ScratchData
+      {
+        std::vector<Point<spacedim>> real_locations;
+        std::vector<Point<dim>>      reference_locations;
+
+        StageTwo_ScratchData()
         {
+          Point<dim>      invalid_reference_point;
+          Point<spacedim> invalid_point;
+          invalid_reference_point[0] = std::numeric_limits<double>::infinity();
+          invalid_point[0]           = std::numeric_limits<double>::infinity();
+          reference_locations.resize(1, invalid_reference_point);
+          real_locations.resize(1, invalid_point);
+        }
+      };
+
+      struct StageTwo_QueuedData
+      {
+        typename Triangulation<dim, spacedim>::cell_iterator current_cell;
+        particle_iterator                                    out_particle;
+      };
+
+      std::vector<StageTwo_QueuedData> data_queue;
+      // Find the cells that the particles moved to.
+      const auto stage_two_worker =
+        [&](
+          const typename std::vector<particle_iterator>::iterator out_particle,
+          StageTwo_ScratchData                                   &scratch,
+          StageTwo_CopyData                                      &copy) {
           // make a copy of the current cell, since we will modify the
           // variable current_cell below, but we need the original in
           // the case the particle is not found
-          auto current_cell = out_particle->get_surrounding_cell();
+          auto current_cell = (*out_particle)->get_surrounding_cell();
 
-          real_locations[0] = out_particle->get_location();
+          scratch.real_locations[0] = (*out_particle)->get_location();
 
           // Record if the new cell was found
           bool found_cell = false;
@@ -1348,7 +1416,7 @@ namespace Particles
           // that are adjacent to the closest vertex
           const unsigned int closest_vertex =
             GridTools::find_closest_vertex_of_cell<dim, spacedim>(
-              current_cell, out_particle->get_location(), *mapping);
+              current_cell, (*out_particle)->get_location(), *mapping);
           const unsigned int closest_vertex_index =
             current_cell->vertex_index(closest_vertex);
 
@@ -1357,6 +1425,8 @@ namespace Particles
 
           // The order of searching through the candidate cells matters for
           // performance reasons. Start with a simple order.
+          std::vector<unsigned int> search_order;
+
           search_order.resize(n_candidate_cells);
           for (unsigned int i = 0; i < n_candidate_cells; ++i)
             search_order[i] = i;
@@ -1365,7 +1435,8 @@ namespace Particles
           // sorting the candidate cells by alignment with
           // the vertex_to_particle direction.
           Tensor<1, spacedim> vertex_to_particle =
-            out_particle->get_location() - current_cell->vertex(closest_vertex);
+            (*out_particle)->get_location() -
+            current_cell->vertex(closest_vertex);
 
           // Only do this if the particle is not on a vertex, otherwise we
           // cannot normalize
@@ -1375,16 +1446,16 @@ namespace Particles
                 vertex_to_cell_centers[closest_vertex_index][0].norm_square())
             {
               vertex_to_particle /= vertex_to_particle.norm();
-              const auto &vertex_to_cells =
+              const auto &vertex_to_cells_two =
                 vertex_to_cell_centers[closest_vertex_index];
 
               std::sort(search_order.begin(),
                         search_order.end(),
                         [&vertex_to_particle,
-                         &vertex_to_cells](const unsigned int a,
-                                           const unsigned int b) {
-                          return compare_particle_association(
-                            a, b, vertex_to_particle, vertex_to_cells);
+                         &vertex_to_cells_two](const unsigned int a,
+                                               const unsigned int b) {
+                          return compare_particle_association<spacedim>(
+                            a, b, vertex_to_particle, vertex_to_cells_two);
                         });
             }
 
@@ -1397,12 +1468,13 @@ namespace Particles
                 const_iterator candidate_cell = candidate_cells.begin();
 
               std::advance(candidate_cell, search_order[i]);
-              mapping->transform_points_real_to_unit_cell(*candidate_cell,
-                                                          real_locations,
-                                                          reference_locations);
+              mapping->transform_points_real_to_unit_cell(
+                *candidate_cell,
+                scratch.real_locations,
+                scratch.reference_locations);
 
-              if (GeometryInfo<dim>::is_inside_unit_cell(reference_locations[0],
-                                                         tolerance_inside_cell))
+              if (GeometryInfo<dim>::is_inside_unit_cell(
+                    scratch.reference_locations[0], tolerance_inside_cell))
                 {
                   current_cell = *candidate_cell;
                   found_cell   = true;
@@ -1415,19 +1487,18 @@ namespace Particles
           // This case should be rare.
           if (!found_cell)
             {
-              // For some clang-based compilers and boost versions the call to
-              // RTree::query doesn't compile. We use a slower implementation as
-              // workaround.
-              // This is fixed in boost in
-              // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
+            // For some clang-based compilers and boost versions the call to
+            // RTree::query doesn't compile. We use a slower implementation as
+            // workaround.
+            // This is fixed in boost in
+            // https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a
 #if defined(DEAL_II_WITH_BOOST_BUNDLED) ||                \
   !(defined(__clang_major__) && __clang_major__ >= 16) || \
   BOOST_VERSION >= 108100
-
               std::vector<std::pair<Point<spacedim>, unsigned int>>
                 closest_vertex_in_domain;
               triangulation_cache->get_used_vertices_rtree().query(
-                boost::geometry::index::nearest(out_particle->get_location(),
+                boost::geometry::index::nearest((*out_particle)->get_location(),
                                                 1),
                 std::back_inserter(closest_vertex_in_domain));
 
@@ -1439,7 +1510,7 @@ namespace Particles
               const unsigned int closest_vertex_index_in_domain =
                 GridTools::find_closest_vertex(*mapping,
                                                *triangulation,
-                                               out_particle->get_location());
+                                               (*out_particle)->get_location());
 #endif
 
               // Search all of the cells adjacent to the closest vertex of the
@@ -1448,10 +1519,10 @@ namespace Particles
                    vertex_to_cells[closest_vertex_index_in_domain])
                 {
                   mapping->transform_points_real_to_unit_cell(
-                    cell, real_locations, reference_locations);
+                    cell, scratch.real_locations, scratch.reference_locations);
 
                   if (GeometryInfo<dim>::is_inside_unit_cell(
-                        reference_locations[0], tolerance_inside_cell))
+                        scratch.reference_locations[0], tolerance_inside_cell))
                     {
                       current_cell = cell;
                       found_cell   = true;
@@ -1459,41 +1530,67 @@ namespace Particles
                     }
                 }
             }
+          copy.found_cell         = found_cell;
+          copy.current_cell       = current_cell;
+          copy.out_particle       = (*out_particle);
+          copy.reference_location = scratch.reference_locations[0];
+        };
 
-          if (!found_cell)
-            {
-              // We can find no cell for this particle. It has left the
-              // domain due to an integration error or an open boundary.
-              // Signal the loss and move on.
-              signals.particle_lost(out_particle,
-                                    out_particle->get_surrounding_cell());
-              continue;
-            }
+      const auto stage_two_copier = [&](const StageTwo_CopyData &copy) {
+        auto local_out_particle = copy.out_particle;
 
-          // If we are here, we found a cell and reference position for this
-          // particle
-          out_particle->set_reference_location(reference_locations[0]);
+        if (!copy.found_cell)
+          {
+            // We can find no cell for this particle. It has left the
+            // domain due to an integration error or an open boundary.
+            // Signal the loss and move on.
+            signals.particle_lost(copy.out_particle,
+                                  copy.out_particle->get_surrounding_cell());
+            return;
+          }
+        // If we are here, we found a cell and reference position for this
+        // particle
+        local_out_particle->set_reference_location(copy.reference_location);
 
+        // Re-insertion into the domain while workers are running may cause
+        // problems, we queue this for later.
+        StageTwo_QueuedData data_entry;
+        data_entry.current_cell = copy.current_cell;
+        data_entry.out_particle = copy.out_particle;
+        data_queue.push_back(data_entry);
+      };
+
+      WorkStream::run(particles_out_of_cell.begin(),
+                      particles_out_of_cell.end(),
+                      stage_two_worker,
+                      stage_two_copier,
+                      StageTwo_ScratchData(),
+                      StageTwo_CopyData());
+
+      // Now we reinsert all queued particles.
+      for (const auto &data_entry : data_queue)
+        {
           // Reinsert the particle into our domain if we own its cell.
           // Mark it for MPI transfer otherwise
-          if (current_cell->is_locally_owned())
+          if (data_entry.current_cell->is_locally_owned())
             {
               typename PropertyPool<dim, spacedim>::Handle &old =
-                out_particle->particles_in_cell
-                  ->particles[out_particle->particle_index_within_cell];
+                data_entry.out_particle->particles_in_cell->particles
+                  [data_entry.out_particle->particle_index_within_cell];
 
               // Avoid deallocating the memory of this particle
               const auto old_value = old;
               old = PropertyPool<dim, spacedim>::invalid_handle;
 
               // Allocate particle with the old handle
-              insert_particle(old_value, current_cell);
+              insert_particle(old_value, data_entry.current_cell);
             }
           else
             {
-              moved_particles[current_cell->subdomain_id()].push_back(
-                out_particle);
-              moved_cells[current_cell->subdomain_id()].push_back(current_cell);
+              moved_particles[data_entry.current_cell->subdomain_id()]
+                .push_back(data_entry.out_particle);
+              moved_cells[data_entry.current_cell->subdomain_id()].push_back(
+                data_entry.current_cell);
             }
         }
     }
