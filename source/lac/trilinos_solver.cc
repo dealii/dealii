@@ -845,6 +845,23 @@ namespace TrilinosWrappers
 
 
   void
+  SolverDirect::solve(const Epetra_Operator    &A,
+                      Epetra_MultiVector       &x,
+                      const Epetra_MultiVector &b)
+  {
+    // We need an Epetra_LinearProblem object to let the Amesos solver know
+    // about the matrix and vectors.
+    linear_problem =
+      std::make_unique<Epetra_LinearProblem>(const_cast<Epetra_Operator *>(&A),
+                                             &x,
+                                             const_cast<Epetra_MultiVector *>(
+                                               &b));
+
+    do_solve();
+  }
+
+
+  void
   SolverDirect::solve(const SparseMatrix &A,
                       MPI::Vector        &x,
                       const MPI::Vector  &b)
