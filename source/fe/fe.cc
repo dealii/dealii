@@ -899,7 +899,8 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
         // We have to interpolate from the DoFs in the interior of the
         // the child faces (=quads or tris) and the vertices that are
         // not part of the parent face, to the DoFs of the parent face:
-        if (this->reference_cell() == ReferenceCells::Hexahedron)
+        if (this->reference_cell().face_reference_cell(face_no) ==
+            ReferenceCells::Quadrilateral)
           return {
             5 * this->n_dofs_per_vertex() +  // 4 vertices at mid-edge points
                                              // + 1 at cell center
@@ -907,7 +908,8 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
                                              // + 2*2 edges in the cell interior
               4 * this->n_dofs_per_quad(face_no), // 4 child faces
             this->n_dofs_per_face(face_no)};
-        else if (this->reference_cell() == ReferenceCells::Tetrahedron)
+        else if (this->reference_cell().face_reference_cell(face_no) ==
+                 ReferenceCells::Triangle)
           return {
             3 * this->n_dofs_per_vertex() + // 3 vertices at mid-edge points
               9 * this->n_dofs_per_line() + // 3*2 children of the old edges
@@ -915,10 +917,7 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
               4 * this->n_dofs_per_quad(face_no), // 4 child faces
             this->n_dofs_per_face(face_no)};
         else
-          {
-            Assert(this->n_dofs_per_face(face_no) == 0, ExcNotImplemented());
-            return {0U, 0U};
-          }
+          DEAL_II_ASSERT_UNREACHABLE();
 
       default:
         DEAL_II_NOT_IMPLEMENTED();
