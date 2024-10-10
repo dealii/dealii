@@ -81,6 +81,55 @@ private:
 
 
 /**
+ * Coarse grid solver using an operator, e.g., preconditioner, only.
+ * This is a little wrapper, transforming an operator into a coarse grid solver.
+ */
+template <class VectorType, class MatrixType>
+class MGCoarseGridApplyOperator : public MGCoarseGridBase<VectorType>
+{
+public:
+  /**
+   * Default constructor.
+   */
+  MGCoarseGridApplyOperator();
+
+  /**
+   * Constructor. Store a pointer to the operator for later use.
+   */
+  MGCoarseGridApplyOperator(const MatrixType &matrix);
+
+  /**
+   * Clear the pointer.
+   */
+  void
+  clear();
+
+  /**
+   * Initialize new data.
+   */
+  void
+  initialize(const MatrixType &matrix);
+
+  /**
+   * Implementation of the abstract function.
+   */
+  virtual void
+  operator()(const unsigned int level,
+             VectorType        &dst,
+             const VectorType  &src) const override;
+
+private:
+  /**
+   * Reference to the operator.
+   */
+  ObserverPointer<const MatrixType,
+                  MGCoarseGridApplyOperator<VectorType, MatrixType>>
+    matrix;
+};
+
+
+
+/**
  * Coarse grid multigrid operator for an iterative solver.
  *
  * This class provides a wrapper for a deal.II iterative solver with a given
@@ -282,6 +331,54 @@ MGCoarseGridApplySmoother<VectorType>::operator()(const unsigned int level,
                                                   const VectorType  &src) const
 {
   coarse_smooth->apply(level, dst, src);
+}
+
+/* ------------------ Functions for MGCoarseGridApplyOperator ----------*/
+
+template <class VectorType, class PreconditionerType>
+MGCoarseGridApplyOperator<VectorType,
+                          PreconditionerType>::MGCoarseGridApplyOperator()
+  : matrix(0, typeid(*this).name())
+{}
+
+
+
+template <class VectorType, class PreconditionerType>
+MGCoarseGridApplyOperator<VectorType, PreconditionerType>::
+  MGCoarseGridApplyOperator(const PreconditionerType &matrix)
+  : matrix(&matrix, typeid(*this).name())
+{}
+
+
+
+template <class VectorType, class PreconditionerType>
+void
+MGCoarseGridApplyOperator<VectorType, PreconditionerType>::initialize(
+  const PreconditionerType &matrix_)
+{
+  matrix = &matrix_;
+}
+
+
+
+template <class VectorType, class PreconditionerType>
+void
+MGCoarseGridApplyOperator<VectorType, PreconditionerType>::clear()
+{
+  matrix = 0;
+}
+
+
+template <class VectorType, class PreconditionerType>
+void
+MGCoarseGridApplyOperator<VectorType, PreconditionerType>::operator()(
+  const unsigned int /*level*/,
+  VectorType       &dst,
+  const VectorType &src) const
+{
+  Assert(matrix != nullptr, ExcNotInitialized());
+
+  matrix->vmult(dst, src);
 }
 
 /* ------------------ Functions for MGCoarseGridIterativeSolver ------------ */
