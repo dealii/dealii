@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * Base class for all sparsity patterns, defining a common interface by which
  * new values can be added.
  */
-class SparsityPatternBase : public EnableRefCountingByObserverPointer
+class SparsityPatternBase : public EnableObserverPointer
 {
 public:
   /**

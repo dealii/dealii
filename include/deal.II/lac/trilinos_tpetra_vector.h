@@ -285,8 +285,7 @@ namespace LinearAlgebra
      * @ingroup Vectors
      */
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
-    class Vector : public ReadVector<Number>,
-                   public EnableRefCountingByObserverPointer
+    class Vector : public ReadVector<Number>, public EnableObserverPointer
     {
     public:
       /**

@@ -38,7 +38,7 @@
 
 // Use local matrices for Laplacian / interior penalty DG
 template <int dim>
-class MatrixIntegrator : public EnableRefCountingByObserverPointer
+class MatrixIntegrator : public EnableObserverPointer
 {
 public:
   static void

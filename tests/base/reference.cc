@@ -32,7 +32,7 @@
 std::vector<char> memory(10000);
 int               next = 0;
 
-class Test : public EnableRefCountingByObserverPointer
+class Test : public EnableObserverPointer
 {
   const char *name;
 

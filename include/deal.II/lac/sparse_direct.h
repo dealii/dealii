@@ -88,7 +88,7 @@ namespace types
  *
  * @ingroup Solvers Preconditioners
  */
-class SparseDirectUMFPACK : public EnableRefCountingByObserverPointer
+class SparseDirectUMFPACK : public EnableObserverPointer
 {
 public:
   /**

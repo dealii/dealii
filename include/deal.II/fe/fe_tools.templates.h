@@ -1073,8 +1073,7 @@ namespace FETools
       template <int dim>
       void
       fill_no_codim_fe_names(
-        std::map<std::string,
-                 std::unique_ptr<const EnableRefCountingByObserverPointer>>
+        std::map<std::string, std::unique_ptr<const EnableObserverPointer>>
           &result)
       {
         result["FE_Q_Hierarchical"] =
@@ -1155,8 +1154,7 @@ namespace FETools
       template <int dim, int spacedim>
       void
       fill_codim_fe_names(
-        std::map<std::string,
-                 std::unique_ptr<const EnableRefCountingByObserverPointer>>
+        std::map<std::string, std::unique_ptr<const EnableObserverPointer>>
           &result)
       {
         result["FE_Bernstein"] =
@@ -1197,15 +1195,13 @@ namespace FETools
       // by the functions above.
       std::array<
         std::array<
-          std::map<std::string,
-                   std::unique_ptr<const EnableRefCountingByObserverPointer>>,
+          std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
           4>,
         4> inline fill_default_map()
       {
         std::array<
           std::array<
-            std::map<std::string,
-                     std::unique_ptr<const EnableRefCountingByObserverPointer>>,
+            std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
             4>,
           4>
           result;
@@ -1251,16 +1247,14 @@ namespace FETools
       // each dimension and then separate between them further down
       inline std::array<
         std::array<
-          std::map<std::string,
-                   std::unique_ptr<const EnableRefCountingByObserverPointer>>,
+          std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
           4>,
         4> &
       get_fe_name_map()
       {
         static std::array<
           std::array<
-            std::map<std::string,
-                     std::unique_ptr<const EnableRefCountingByObserverPointer>>,
+            std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
             4>,
           4>
           fe_name_map = fill_default_map();
@@ -2260,7 +2254,7 @@ namespace FETools
     std::unique_lock<std::shared_mutex> lock(
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
     internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].emplace(
-      name, std::unique_ptr<const EnableRefCountingByObserverPointer>(factory));
+      name, std::unique_ptr<const EnableObserverPointer>(factory));
   }
 
 
@@ -2277,9 +2271,8 @@ namespace FETools
       std::unique_ptr<FiniteElement<dim, spacedim>>
       get_fe_by_name_ext(
         std::string &name,
-        const std::map<
-          std::string,
-          std::unique_ptr<const EnableRefCountingByObserverPointer>>
+        const std::map<std::string,
+                       std::unique_ptr<const EnableObserverPointer>>
           &fe_name_map)
       {
         // Extract the name of the
@@ -2399,7 +2392,7 @@ namespace FETools
             // argument, which defaults to 1,
             // so this properly returns
             // FE_Nothing()
-            const EnableRefCountingByObserverPointer *ptr =
+            const EnableObserverPointer *ptr =
               fe_name_map.find(name_part)->second.get();
             const FETools::FEFactoryBase<dim, spacedim> *fef =
               dynamic_cast<const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
@@ -2425,7 +2418,7 @@ namespace FETools
                 const std::pair<int, unsigned int> tmp =
                   Utilities::get_integer_at_position(name, 0);
                 name.erase(0, tmp.second + 1);
-                const EnableRefCountingByObserverPointer *ptr =
+                const EnableObserverPointer *ptr =
                   fe_name_map.find(name_part)->second.get();
                 const FETools::FEFactoryBase<dim, spacedim> *fef =
                   dynamic_cast<const FETools::FEFactoryBase<dim, spacedim> *>(
@@ -2443,7 +2436,7 @@ namespace FETools
                       Utilities::get_integer_at_position(name, 0);
                     // delete "))"
                     name.erase(0, tmp.second + 2);
-                    const EnableRefCountingByObserverPointer *ptr =
+                    const EnableObserverPointer *ptr =
                       fe_name_map.find(name_part)->second.get();
                     const FETools::FEFactoryBase<dim, spacedim> *fef =
                       dynamic_cast<
@@ -2456,7 +2449,7 @@ namespace FETools
                       Utilities::get_integer_at_position(name, 0);
                     // delete "))"
                     name.erase(0, tmp.second + 2);
-                    const EnableRefCountingByObserverPointer *ptr =
+                    const EnableObserverPointer *ptr =
                       fe_name_map.find(name_part)->second.get();
                     const FETools::FEFactoryBase<dim, spacedim> *fef =
                       dynamic_cast<
@@ -2478,7 +2471,7 @@ namespace FETools
                       Utilities::get_integer_at_position(name, 0);
                     // delete "))"
                     name.erase(0, tmp.second + 2);
-                    const EnableRefCountingByObserverPointer *ptr =
+                    const EnableObserverPointer *ptr =
                       fe_name_map.find(name_part)->second.get();
                     const FETools::FEFactoryBase<dim, spacedim> *fef =
                       dynamic_cast<

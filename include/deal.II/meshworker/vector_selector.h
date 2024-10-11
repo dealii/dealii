@@ -44,7 +44,7 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  class VectorSelector : public EnableRefCountingByObserverPointer
+  class VectorSelector : public EnableObserverPointer
   {
   public:
     /**

@@ -241,7 +241,7 @@ namespace ChunkSparsityPatternIterators
  *
  * The use of this class is demonstrated in step-51.
  */
-class ChunkSparsityPattern : public EnableRefCountingByObserverPointer
+class ChunkSparsityPattern : public EnableObserverPointer
 {
 public:
   /**

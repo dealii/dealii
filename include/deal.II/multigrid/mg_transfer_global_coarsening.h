@@ -216,7 +216,7 @@ namespace MGTransferGlobalCoarseningTools
  * accordingly.
  */
 template <typename VectorType>
-class MGTwoLevelTransferBase : public EnableRefCountingByObserverPointer
+class MGTwoLevelTransferBase : public EnableObserverPointer
 {
 public:
   static_assert(

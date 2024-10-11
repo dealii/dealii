@@ -546,7 +546,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @ingroup Matrix1
    */
-  class SparseMatrix : public EnableRefCountingByObserverPointer
+  class SparseMatrix : public EnableObserverPointer
   {
   public:
     /**

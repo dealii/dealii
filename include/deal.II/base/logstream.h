@@ -77,7 +77,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup textoutput
  */
-class LogStream : public EnableRefCountingByObserverPointer
+class LogStream : public EnableObserverPointer
 {
 public:
   /**

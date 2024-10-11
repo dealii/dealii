@@ -55,7 +55,7 @@
 
 
 template <int dim, typename number = double>
-class LaplaceOperator : public EnableRefCountingByObserverPointer
+class LaplaceOperator : public EnableObserverPointer
 {
 public:
   using value_type = number;

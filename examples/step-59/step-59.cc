@@ -147,7 +147,7 @@ namespace Step59
   // MatrixFreeOperators::Base because we want to present some additional
   // features of MatrixFree::loop() that are not available in the
   // general-purpose class MatrixFreeOperators::Base. We derive the class from
-  // the EnableRefCountingByObserverPointer class to be able to use the operator
+  // the EnableObserverPointer class to be able to use the operator
   // within the Chebyshev preconditioner because that preconditioner stores the
   // underlying matrix via a ObserverPointer.
   //
@@ -160,7 +160,7 @@ namespace Step59
   // step-39.
 
   template <int dim, int fe_degree, typename number>
-  class LaplaceOperator : public EnableRefCountingByObserverPointer
+  class LaplaceOperator : public EnableObserverPointer
   {
   public:
     using value_type = number;

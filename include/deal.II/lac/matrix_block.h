@@ -89,7 +89,7 @@ namespace internal
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename MatrixType>
-class MatrixBlock : public EnableRefCountingByObserverPointer
+class MatrixBlock : public EnableObserverPointer
 {
 public:
   /**
@@ -419,7 +419,7 @@ public:
  * @ingroup vector_valued
  */
 template <typename MatrixType>
-class MGMatrixBlockVector : public EnableRefCountingByObserverPointer
+class MGMatrixBlockVector : public EnableObserverPointer
 {
 public:
   /**

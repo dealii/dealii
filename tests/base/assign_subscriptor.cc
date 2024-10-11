@@ -14,7 +14,7 @@
 
 
 
-// Check the behavior of the ObserverPointer-EnableRefCountingByObserverPointer
+// Check the behavior of the ObserverPointer-EnableObserverPointer
 // pair for copy and move semantics.
 
 
@@ -26,7 +26,7 @@
 
 #include "../tests.h"
 
-class Test : public EnableRefCountingByObserverPointer
+class Test : public EnableObserverPointer
 {};
 
 int
@@ -39,12 +39,10 @@ main()
   {
     deallog << "Checking copy assignment" << std::endl;
 
-    EnableRefCountingByObserverPointer                  subscriptor_1;
-    EnableRefCountingByObserverPointer                  subscriptor_2;
-    ObserverPointer<EnableRefCountingByObserverPointer> smart_pointer_1(
-      &subscriptor_1);
-    ObserverPointer<EnableRefCountingByObserverPointer> smart_pointer_2(
-      &subscriptor_2);
+    EnableObserverPointer                  subscriptor_1;
+    EnableObserverPointer                  subscriptor_2;
+    ObserverPointer<EnableObserverPointer> smart_pointer_1(&subscriptor_1);
+    ObserverPointer<EnableObserverPointer> smart_pointer_2(&subscriptor_2);
 
     subscriptor_2 = subscriptor_1;
 
@@ -75,11 +73,10 @@ main()
   {
     deallog << "Checking copy construction" << std::endl;
 
-    EnableRefCountingByObserverPointer                  subscriptor_1;
-    ObserverPointer<EnableRefCountingByObserverPointer> smart_pointer_1(
-      &subscriptor_1);
+    EnableObserverPointer                  subscriptor_1;
+    ObserverPointer<EnableObserverPointer> smart_pointer_1(&subscriptor_1);
 
-    EnableRefCountingByObserverPointer subscriptor_2(subscriptor_1);
+    EnableObserverPointer subscriptor_2(subscriptor_1);
 
     deallog << "Checking smart_pointer_1" << std::endl;
     try
@@ -97,12 +94,10 @@ main()
   {
     deallog << "Checking move assignment" << std::endl;
 
-    EnableRefCountingByObserverPointer                  subscriptor_1;
-    EnableRefCountingByObserverPointer                  subscriptor_2;
-    ObserverPointer<EnableRefCountingByObserverPointer> smart_pointer_1(
-      &subscriptor_1);
-    ObserverPointer<EnableRefCountingByObserverPointer> smart_pointer_2(
-      &subscriptor_2);
+    EnableObserverPointer                  subscriptor_1;
+    EnableObserverPointer                  subscriptor_2;
+    ObserverPointer<EnableObserverPointer> smart_pointer_1(&subscriptor_1);
+    ObserverPointer<EnableObserverPointer> smart_pointer_2(&subscriptor_2);
 
     subscriptor_2 = std::move(subscriptor_1);
 
@@ -133,11 +128,10 @@ main()
   {
     deallog << "Checking move construction" << std::endl;
 
-    EnableRefCountingByObserverPointer                  subscriptor_1;
-    ObserverPointer<EnableRefCountingByObserverPointer> smart_pointer_1(
-      &subscriptor_1);
+    EnableObserverPointer                  subscriptor_1;
+    ObserverPointer<EnableObserverPointer> smart_pointer_1(&subscriptor_1);
 
-    EnableRefCountingByObserverPointer subscriptor_2(std::move(subscriptor_1));
+    EnableObserverPointer subscriptor_2(std::move(subscriptor_1));
 
     deallog << "Checking smart_pointer_1" << std::endl;
     try

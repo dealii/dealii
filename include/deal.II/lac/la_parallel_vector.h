@@ -247,7 +247,7 @@ namespace LinearAlgebra
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
     class Vector : public ::dealii::ReadVector<Number>,
-                   public EnableRefCountingByObserverPointer
+                   public EnableObserverPointer
     {
     public:
       using memory_space    = MemorySpace;

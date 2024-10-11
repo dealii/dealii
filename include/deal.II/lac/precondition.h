@@ -215,7 +215,7 @@ namespace internal
  * Alternatively, the IdentityMatrix class can be used to precondition in this
  * way.
  */
-class PreconditionIdentity : public EnableRefCountingByObserverPointer
+class PreconditionIdentity : public EnableObserverPointer
 {
 public:
   /**
@@ -330,7 +330,7 @@ private:
  * multiplied. Still, this class is useful in multigrid smoother objects
  * (MGSmootherRelaxation).
  */
-class PreconditionRichardson : public EnableRefCountingByObserverPointer
+class PreconditionRichardson : public EnableObserverPointer
 {
 public:
   /**
@@ -494,7 +494,7 @@ private:
  */
 template <typename MatrixType = SparseMatrix<double>,
           typename VectorType = Vector<double>>
-class PreconditionUseMatrix : public EnableRefCountingByObserverPointer
+class PreconditionUseMatrix : public EnableObserverPointer
 {
 public:
   /**
@@ -562,7 +562,7 @@ private:
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename PreconditionerType = IdentityMatrix>
-class PreconditionRelaxation : public EnableRefCountingByObserverPointer
+class PreconditionRelaxation : public EnableObserverPointer
 {
 public:
   /**
@@ -2026,7 +2026,7 @@ public:
  * <h4>Requirements on the templated classes</h4>
  *
  * The class `MatrixType` must be derived from
- * EnableRefCountingByObserverPointer because a ObserverPointer to `MatrixType`
+ * EnableObserverPointer because a ObserverPointer to `MatrixType`
  * is held in the class. In particular, this means that the matrix object needs
  * to persist during the lifetime of PreconditionChebyshev. The preconditioner
  * is held in a shared_ptr that is copied into the AdditionalData member
@@ -2101,7 +2101,7 @@ public:
 template <typename MatrixType         = SparseMatrix<double>,
           typename VectorType         = Vector<double>,
           typename PreconditionerType = DiagonalMatrix<VectorType>>
-class PreconditionChebyshev : public EnableRefCountingByObserverPointer
+class PreconditionChebyshev : public EnableObserverPointer
 {
 public:
   /**

@@ -129,7 +129,7 @@ namespace Step31
   namespace LinearSolvers
   {
     template <class MatrixType, class PreconditionerType>
-    class InverseMatrix : public EnableRefCountingByObserverPointer
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const MatrixType         &m,
@@ -169,7 +169,7 @@ namespace Step31
         }
     }
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
-    class BlockSchurPreconditioner : public EnableRefCountingByObserverPointer
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       BlockSchurPreconditioner(

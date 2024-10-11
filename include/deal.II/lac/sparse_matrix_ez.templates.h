@@ -40,7 +40,7 @@ SparseMatrixEZ<number>::SparseMatrixEZ()
 
 template <typename number>
 SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
-  : EnableRefCountingByObserverPointer(m)
+  : EnableObserverPointer(m)
   , n_columns(0)
   , increment(m.increment)
   , saved_default_row_length(m.saved_default_row_length)

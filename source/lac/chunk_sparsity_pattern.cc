@@ -29,7 +29,7 @@ ChunkSparsityPattern::ChunkSparsityPattern()
 
 
 ChunkSparsityPattern::ChunkSparsityPattern(const ChunkSparsityPattern &s)
-  : EnableRefCountingByObserverPointer()
+  : EnableObserverPointer()
   , chunk_size(s.chunk_size)
   , sparsity_pattern(s.sparsity_pattern)
 {

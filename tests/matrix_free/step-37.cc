@@ -118,7 +118,7 @@ namespace Step37
 
 
   template <int dim, int fe_degree, typename number>
-  class LaplaceOperator : public EnableRefCountingByObserverPointer
+  class LaplaceOperator : public EnableObserverPointer
   {
   public:
     LaplaceOperator();
@@ -171,7 +171,7 @@ namespace Step37
 
   template <int dim, int fe_degree, typename number>
   LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
-    : EnableRefCountingByObserverPointer()
+    : EnableObserverPointer()
   {}
 
 

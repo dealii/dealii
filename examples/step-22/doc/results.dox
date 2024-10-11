@@ -407,7 +407,7 @@ according to the derivation above can be specified by three successive
 operations:
 @code
 template <class PreconditionerA, class PreconditionerMp>
-class BlockSchurPreconditioner : public EnableRefCountingByObserverPointer
+class BlockSchurPreconditioner : public EnableObserverPointer
 {
   public:
     BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,

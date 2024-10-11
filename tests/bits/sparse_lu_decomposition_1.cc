@@ -15,7 +15,7 @@
 
 // this file didn't compile at one point in time due to the private
 // inheritance of SparseMatrix by SparseLUDecomposition, and the
-// associated lack of accessibility of the EnableRefCountingByObserverPointer
+// associated lack of accessibility of the EnableObserverPointer
 // functions to the ObserverPointer
 //
 // it was fixed around 2003-05-22

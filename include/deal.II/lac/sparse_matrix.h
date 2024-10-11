@@ -516,7 +516,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Matrix1
  */
 template <typename number>
-class SparseMatrix : public virtual EnableRefCountingByObserverPointer
+class SparseMatrix : public virtual EnableObserverPointer
 {
 public:
   /**

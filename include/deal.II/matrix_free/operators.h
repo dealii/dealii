@@ -184,7 +184,7 @@ namespace MatrixFreeOperators
             typename VectorType = LinearAlgebra::distributed::Vector<double>,
             typename VectorizedArrayType =
               VectorizedArray<typename VectorType::value_type>>
-  class Base : public EnableRefCountingByObserverPointer
+  class Base : public EnableObserverPointer
   {
   public:
     /**
@@ -534,7 +534,7 @@ namespace MatrixFreeOperators
    * prolongation phase.
    */
   template <typename OperatorType>
-  class MGInterfaceOperator : public EnableRefCountingByObserverPointer
+  class MGInterfaceOperator : public EnableObserverPointer
   {
   public:
     /**
@@ -1215,7 +1215,7 @@ namespace MatrixFreeOperators
   //----------------- Base operator -----------------------------
   template <int dim, typename VectorType, typename VectorizedArrayType>
   Base<dim, VectorType, VectorizedArrayType>::Base()
-    : EnableRefCountingByObserverPointer()
+    : EnableObserverPointer()
     , have_interface_matrices(false)
   {}
 
@@ -1805,7 +1805,7 @@ namespace MatrixFreeOperators
 
   template <typename OperatorType>
   MGInterfaceOperator<OperatorType>::MGInterfaceOperator()
-    : EnableRefCountingByObserverPointer()
+    : EnableObserverPointer()
     , mf_base_operator(nullptr)
   {}
 

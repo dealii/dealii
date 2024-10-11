@@ -291,7 +291,7 @@ namespace PETScWrappers
    * @ingroup PETScWrappers
    * @ingroup Matrix1
    */
-  class MatrixBase : public EnableRefCountingByObserverPointer
+  class MatrixBase : public EnableObserverPointer
   {
   public:
     /**

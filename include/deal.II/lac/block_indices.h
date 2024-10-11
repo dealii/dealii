@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
  */
-class BlockIndices : public EnableRefCountingByObserverPointer
+class BlockIndices : public EnableObserverPointer
 {
 public:
   /**

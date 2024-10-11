@@ -64,7 +64,7 @@ namespace hp
    * @ingroup hp
    */
   template <int dim, int q_dim, typename FEValuesType>
-  class FEValuesBase : public EnableRefCountingByObserverPointer
+  class FEValuesBase : public EnableObserverPointer
   {
   public:
     /**

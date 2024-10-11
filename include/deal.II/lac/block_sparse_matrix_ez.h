@@ -57,7 +57,7 @@ class BlockVector;
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename Number>
-class BlockSparseMatrixEZ : public EnableRefCountingByObserverPointer
+class BlockSparseMatrixEZ : public EnableObserverPointer
 {
 public:
   /**

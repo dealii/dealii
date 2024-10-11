@@ -314,7 +314,7 @@ enum MappingKind
  * @ingroup mapping
  */
 template <int dim, int spacedim = dim>
-class Mapping : public EnableRefCountingByObserverPointer
+class Mapping : public EnableObserverPointer
 {
 public:
   /**

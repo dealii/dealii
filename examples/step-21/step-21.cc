@@ -409,7 +409,7 @@ namespace Step21
   // maximum number of iterations equal to the maximum of the size of the linear
   // system and 200.
   template <class MatrixType>
-  class InverseMatrix : public EnableRefCountingByObserverPointer
+  class InverseMatrix : public EnableObserverPointer
   {
   public:
     InverseMatrix(const MatrixType &m)
@@ -433,7 +433,7 @@ namespace Step21
 
 
 
-  class SchurComplement : public EnableRefCountingByObserverPointer
+  class SchurComplement : public EnableObserverPointer
   {
   public:
     SchurComplement(const BlockSparseMatrix<double>           &A,
@@ -460,7 +460,7 @@ namespace Step21
 
 
 
-  class ApproximateSchurComplement : public EnableRefCountingByObserverPointer
+  class ApproximateSchurComplement : public EnableObserverPointer
   {
   public:
     ApproximateSchurComplement(const BlockSparseMatrix<double> &A)

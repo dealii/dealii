@@ -438,7 +438,7 @@ namespace internal
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename VectorType>
-class BlockVectorBase : public EnableRefCountingByObserverPointer,
+class BlockVectorBase : public EnableObserverPointer,
                         public ReadVector<typename VectorType::value_type>
 {
 public:

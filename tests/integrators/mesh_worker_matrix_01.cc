@@ -40,7 +40,7 @@
 // Define a class that fills all available entries in the info objects
 // with recognizable numbers.
 template <int dim>
-class Local : public EnableRefCountingByObserverPointer
+class Local : public EnableObserverPointer
 {
 public:
   using CellInfo = MeshWorker::IntegrationInfo<dim>;

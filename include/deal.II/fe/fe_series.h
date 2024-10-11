@@ -86,7 +86,7 @@ namespace FESeries
    * $ \bf k $ .
    */
   template <int dim, int spacedim = dim>
-  class Fourier : public EnableRefCountingByObserverPointer
+  class Fourier : public EnableObserverPointer
   {
   public:
     using CoefficientType = typename std::complex<double>;
@@ -256,7 +256,7 @@ namespace FESeries
    * $ \widetilde P_m(x) $ using tensor product rule.
    */
   template <int dim, int spacedim = dim>
-  class Legendre : public EnableRefCountingByObserverPointer
+  class Legendre : public EnableObserverPointer
   {
   public:
     using CoefficientType = double;

@@ -107,7 +107,7 @@ namespace LinearAlgebra
      * the matrix, you must call SparseMatrix::compress() again.
      */
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
-    class SparseMatrix : public EnableRefCountingByObserverPointer
+    class SparseMatrix : public EnableObserverPointer
     {
     public:
       /**

@@ -545,8 +545,7 @@ namespace internal
        * for more information about artificial cells.
        */
       template <int dim, int spacedim = dim>
-      class TemporarilyRestoreSubdomainIds
-        : public EnableRefCountingByObserverPointer
+      class TemporarilyRestoreSubdomainIds : public EnableObserverPointer
       {
       public:
         /**

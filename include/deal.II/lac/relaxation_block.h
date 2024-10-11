@@ -77,7 +77,7 @@ public:
    * structure in #block_list and an optional ordering of the blocks in
    * #order.
    */
-  class AdditionalData : public EnableRefCountingByObserverPointer
+  class AdditionalData : public EnableObserverPointer
   {
   public:
     /**
@@ -283,7 +283,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockJacobi
-  : public virtual EnableRefCountingByObserverPointer,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:
@@ -379,7 +379,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockSOR
-  : public virtual EnableRefCountingByObserverPointer,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:
@@ -475,7 +475,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockSSOR
-  : public virtual EnableRefCountingByObserverPointer,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:

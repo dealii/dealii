@@ -360,9 +360,9 @@ namespace Step7
     // from the point of view of a using object. Basically, the method is along
     // the following line: all objects that are subject to such potentially
     // dangerous pointers are derived from a class called
-    // EnableRefCountingByObserverPointer. For example, the Triangulation,
+    // EnableObserverPointer. For example, the Triangulation,
     // DoFHandler, and a base class of the FiniteElement class are derived from
-    // EnableRefCountingByObserverPointer. This latter class does not offer much
+    // EnableObserverPointer. This latter class does not offer much
     // functionality, but it has a built-in counter which we can subscribe to,
     // thus the name of the class. Whenever we initialize a pointer to that
     // object, we can increase its use counter, and when we move away our
@@ -372,8 +372,8 @@ namespace Step7
     // to tell the subscribing object about its invalidation.
     //
     // If an object of a class that is derived from the
-    // EnableRefCountingByObserverPointer class is destroyed, it also has to
-    // call the destructor of the EnableRefCountingByObserverPointer class. In
+    // EnableObserverPointer class is destroyed, it also has to
+    // call the destructor of the EnableObserverPointer class. In
     // this destructor, we tell all the subscribing objects about the
     // invalidation of the object using the stored pointers. The same happens
     // when the object appears on the right hand side of a move expression,

@@ -97,7 +97,7 @@ class SparseMatrix;
  */
 template <typename MatrixType = SparseMatrix<double>,
           typename VectorType = dealii::Vector<double>>
-class PreconditionSelector : public EnableRefCountingByObserverPointer
+class PreconditionSelector : public EnableObserverPointer
 {
 public:
   /**

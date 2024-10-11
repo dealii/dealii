@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup data
  */
 template <class Object>
-class MGLevelObject : public EnableRefCountingByObserverPointer
+class MGLevelObject : public EnableObserverPointer
 {
 public:
   /**

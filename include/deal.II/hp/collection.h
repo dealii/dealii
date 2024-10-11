@@ -221,7 +221,7 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <typename T>
-  class Collection : public EnableRefCountingByObserverPointer
+  class Collection : public EnableObserverPointer
   {
   public:
     /**

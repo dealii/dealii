@@ -73,7 +73,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
    */
-  class PreconditionBase : public EnableRefCountingByObserverPointer
+  class PreconditionBase : public EnableObserverPointer
   {
   public:
     /**

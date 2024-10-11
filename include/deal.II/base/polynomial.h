@@ -62,7 +62,7 @@ namespace Polynomials
    * TensorProductPolynomials class.
    */
   template <typename number>
-  class Polynomial : public EnableRefCountingByObserverPointer
+  class Polynomial : public EnableObserverPointer
   {
   public:
     /**
@@ -1031,7 +1031,7 @@ namespace Polynomials
   Polynomial<number>::serialize(Archive &ar, const unsigned int)
   {
     // forward to serialization function in the base class.
-    ar &static_cast<EnableRefCountingByObserverPointer &>(*this);
+    ar &static_cast<EnableObserverPointer &>(*this);
     ar &coefficients;
     ar &in_lagrange_product_form;
     ar &lagrange_support_points;

@@ -213,7 +213,7 @@ namespace Step75
   // points. Here, we introduce an alias to FEEvaluation with the correct
   // template parameters so that we do not have to worry about them later on.
   template <int dim, typename number>
-  class LaplaceOperator : public EnableRefCountingByObserverPointer
+  class LaplaceOperator : public EnableObserverPointer
   {
   public:
     using VectorType = LinearAlgebra::distributed::Vector<number>;

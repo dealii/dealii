@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * deleted or moved from in the course of use of the pointer by signaling the
  * pointee its use. This is achieved by keeping a use count for the pointed-to
  * object (which for this purpose needs to be derived from the
- * EnableRefCountingByObserverPointer class), and ensuring that the pointed-to
+ * EnableObserverPointer class), and ensuring that the pointed-to
  * object's destructor triggers an error if that use-count is larger than zero
  * -- i.e., if there are still observing ObserverPointer objects pointing to it.
  *
@@ -96,7 +96,7 @@ DEAL_II_NAMESPACE_OPEN
  *   to a constant object (disallowing write access when dereferenced), while
  *   `ObserverPointer<T>` is a mutable pointer.
  *
- * @dealiiConceptRequires{std::is_base_of_v<EnableRefCountingByObserverPointer,
+ * @dealiiConceptRequires{std::is_base_of_v<EnableObserverPointer,
  * T>}
  *
  * @ingroup memory
@@ -135,8 +135,8 @@ public:
    * lock it, i.e. to prevent its destruction before the end of its use.
    *
    * The <tt>id</tt> is used in the call to
-   * EnableRefCountingByObserverPointer::subscribe(id) and by ~ObserverPointer()
-   * in the call to EnableRefCountingByObserverPointer::unsubscribe().
+   * EnableObserverPointer::subscribe(id) and by ~ObserverPointer()
+   * in the call to EnableObserverPointer::unsubscribe().
    */
   ObserverPointer(T *t, const std::string &id);
 
@@ -283,10 +283,9 @@ inline ObserverPointer<T, P>::ObserverPointer()
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {
-  static_assert(
-    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
-    "This class can only be used if the first template argument "
-    "is a class derived from 'EnableRefCountingByObserverPointer'.");
+  static_assert(std::is_base_of_v<EnableObserverPointer, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'EnableObserverPointer'.");
 }
 
 
@@ -297,10 +296,9 @@ inline ObserverPointer<T, P>::ObserverPointer(T *t)
   , id(typeid(P).name())
   , pointed_to_object_is_alive(false)
 {
-  static_assert(
-    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
-    "This class can only be used if the first template argument "
-    "is a class derived from 'EnableRefCountingByObserverPointer'.");
+  static_assert(std::is_base_of_v<EnableObserverPointer, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'EnableObserverPointer'.");
 
   if (t != nullptr)
     t->subscribe(&pointed_to_object_is_alive, id);
@@ -314,10 +312,9 @@ inline ObserverPointer<T, P>::ObserverPointer(T *t, const std::string &id)
   , id(id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(
-    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
-    "This class can only be used if the first template argument "
-    "is a class derived from 'EnableRefCountingByObserverPointer'.");
+  static_assert(std::is_base_of_v<EnableObserverPointer, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'EnableObserverPointer'.");
 
   if (pointer != nullptr)
     pointer->subscribe(&pointed_to_object_is_alive, id);
@@ -333,10 +330,9 @@ inline ObserverPointer<T, P>::ObserverPointer(
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(
-    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
-    "This class can only be used if the first template argument "
-    "is a class derived from 'EnableRefCountingByObserverPointer'.");
+  static_assert(std::is_base_of_v<EnableObserverPointer, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'EnableObserverPointer'.");
 
   if (other != nullptr)
     {
@@ -356,10 +352,9 @@ inline ObserverPointer<T, P>::ObserverPointer(
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(
-    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
-    "This class can only be used if the first template argument "
-    "is a class derived from 'EnableRefCountingByObserverPointer'.");
+  static_assert(std::is_base_of_v<EnableObserverPointer, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'EnableObserverPointer'.");
 
   if (other != nullptr)
     {
@@ -379,10 +374,9 @@ inline ObserverPointer<T, P>::ObserverPointer(
   , id(other.id)
   , pointed_to_object_is_alive(false)
 {
-  static_assert(
-    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
-    "This class can only be used if the first template argument "
-    "is a class derived from 'EnableRefCountingByObserverPointer'.");
+  static_assert(std::is_base_of_v<EnableObserverPointer, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'EnableObserverPointer'.");
 
   if (other != nullptr)
     {
@@ -414,10 +408,9 @@ inline ObserverPointer<T, P>::ObserverPointer(
 template <typename T, typename P>
 inline ObserverPointer<T, P>::~ObserverPointer()
 {
-  static_assert(
-    std::is_base_of_v<EnableRefCountingByObserverPointer, T>,
-    "This class can only be used if the first template argument "
-    "is a class derived from 'EnableRefCountingByObserverPointer'.");
+  static_assert(std::is_base_of_v<EnableObserverPointer, T>,
+                "This class can only be used if the first template argument "
+                "is a class derived from 'EnableObserverPointer'.");
 
   if (pointed_to_object_is_alive && pointer != nullptr)
     pointer->unsubscribe(&pointed_to_object_is_alive, id);

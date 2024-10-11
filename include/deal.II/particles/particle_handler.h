@@ -59,7 +59,7 @@ namespace Particles
    * finite-element solution see step-19, step-68, step-70, and step-83.
    */
   template <int dim, int spacedim = dim>
-  class ParticleHandler : public EnableRefCountingByObserverPointer
+  class ParticleHandler : public EnableObserverPointer
   {
   public:
     /**

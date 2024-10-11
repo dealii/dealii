@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * When using this class, please cite @cite SartoriGiulianiBardelloni-2018-a.
  */
-class GeneralDataStorage : public EnableRefCountingByObserverPointer
+class GeneralDataStorage : public EnableObserverPointer
 {
 public:
   /**

@@ -81,7 +81,7 @@ namespace LinearAlgebra
 #  endif
 
     Vector::Vector()
-      : EnableRefCountingByObserverPointer()
+      : EnableObserverPointer()
       , vector(new Epetra_FEVector(
           Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
@@ -89,7 +89,7 @@ namespace LinearAlgebra
 
 
     Vector::Vector(const Vector &V)
-      : EnableRefCountingByObserverPointer()
+      : EnableObserverPointer()
       , vector(new Epetra_FEVector(V.trilinos_vector()))
     {}
 
@@ -97,7 +97,7 @@ namespace LinearAlgebra
 
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const MPI_Comm  communicator)
-      : EnableRefCountingByObserverPointer()
+      : EnableObserverPointer()
       , vector(new Epetra_FEVector(
           parallel_partitioner.make_trilinos_map(communicator, false)))
     {}

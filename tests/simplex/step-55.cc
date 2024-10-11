@@ -118,7 +118,7 @@ namespace Step55
     // with an option to specify a preconditioner, and to allow for different
     // vector types in the vmult function.
     template <class Matrix, class Preconditioner>
-    class InverseMatrix : public EnableRefCountingByObserverPointer
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const Matrix &m, const Preconditioner &preconditioner);
@@ -170,8 +170,7 @@ namespace Step55
     // The class A template class for a simple block diagonal preconditioner
     // for 2x2 matrices.
     template <class PreconditionerA, class PreconditionerS>
-    class BlockDiagonalPreconditioner
-      : public EnableRefCountingByObserverPointer
+    class BlockDiagonalPreconditioner : public EnableObserverPointer
     {
     public:
       BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,

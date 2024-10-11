@@ -27,7 +27,7 @@
 
 #include "../tests.h"
 
-class Test : public EnableRefCountingByObserverPointer
+class Test : public EnableObserverPointer
 {};
 
 int
@@ -37,10 +37,10 @@ main()
 
   initlog();
 
-  EnableRefCountingByObserverPointer subscriptor;
-  std::atomic<bool>                  dummy_a;
-  const char                        *foo        = "a";
-  const std::string                  foo_string = "a";
+  EnableObserverPointer subscriptor;
+  std::atomic<bool>     dummy_a;
+  const char           *foo        = "a";
+  const std::string     foo_string = "a";
   subscriptor.subscribe(&dummy_a, foo);
   subscriptor.unsubscribe(&dummy_a, foo_string.c_str());
 

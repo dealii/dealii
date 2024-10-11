@@ -41,7 +41,7 @@ class DoFHandler;
  *
  * @ingroup mg
  */
-class MGConstrainedDoFs : public EnableRefCountingByObserverPointer
+class MGConstrainedDoFs : public EnableObserverPointer
 {
 public:
   using size_dof = std::vector<std::set<types::global_dof_index>>::size_type;

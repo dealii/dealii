@@ -89,7 +89,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename VectorType = Vector<double>>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-class SolverSelector : public EnableRefCountingByObserverPointer
+class SolverSelector : public EnableObserverPointer
 {
 public:
   /**

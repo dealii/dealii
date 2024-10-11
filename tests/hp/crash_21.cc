@@ -52,7 +52,7 @@
 namespace Step
 {
   template <int dim>
-  class Problem : public EnableRefCountingByObserverPointer
+  class Problem : public EnableObserverPointer
   {
   public:
     Problem();

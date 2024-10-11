@@ -282,7 +282,7 @@ namespace Manifolds
  * @ingroup manifold
  */
 template <int dim, int spacedim = dim>
-class Manifold : public EnableRefCountingByObserverPointer
+class Manifold : public EnableObserverPointer
 {
 public:
   // explicitly check for sensible template arguments

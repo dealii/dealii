@@ -3,24 +3,24 @@ DEAL::Exception: ExcNoSubscriber(object_info->name(), name)
 DEAL::
 --------------------------------------------------------
 An error occurred in file <enable_ref_counting_by_observer.cc> in function
-    void dealii::EnableRefCountingByObserverPointer::unsubscribe(std::atomic<bool> *const, const std::string &) const
+    void dealii::EnableObserverPointer::unsubscribe(std::atomic<bool> *const, const std::string &) const
 The violated condition was: 
     it != counter_map.end()
 Additional information: 
     No subscriber with identifier <b> subscribes to this object of class
-    N6dealii34EnableRefCountingByObserverPointerE. Consequently, it cannot
-    be unsubscribed.
+    N6dealii21EnableObserverPointerE. Consequently, it cannot be
+    unsubscribed.
 --------------------------------------------------------
 
-DEAL::Exception: ExcMessage( "This EnableRefCountingByObserverPointer object does not know anything about the supplied pointer!")
+DEAL::Exception: ExcMessage( "This EnableObserverPointer object does not know anything about the supplied pointer!")
 DEAL::
 --------------------------------------------------------
 An error occurred in file <enable_ref_counting_by_observer.cc> in function
-    void dealii::EnableRefCountingByObserverPointer::unsubscribe(std::atomic<bool> *const, const std::string &) const
+    void dealii::EnableObserverPointer::unsubscribe(std::atomic<bool> *const, const std::string &) const
 The violated condition was: 
     validity_ptr_it != validity_pointers.end()
 Additional information: 
-    This EnableRefCountingByObserverPointer object does not know anything
-    about the supplied pointer!
+    This EnableObserverPointer object does not know anything about the
+    supplied pointer!
 --------------------------------------------------------
 

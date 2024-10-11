@@ -26,11 +26,11 @@ DEAL_II_NAMESPACE_OPEN
 static const char *unknown_subscriber = "unknown subscriber";
 
 
-std::mutex EnableRefCountingByObserverPointer::mutex;
+std::mutex EnableObserverPointer::mutex;
 
 
-EnableRefCountingByObserverPointer::EnableRefCountingByObserverPointer(
-  EnableRefCountingByObserverPointer &&subscriptor) noexcept
+EnableObserverPointer::EnableObserverPointer(
+  EnableObserverPointer &&subscriptor) noexcept
   : counter(0)
   , object_info(subscriptor.object_info)
 {
@@ -41,7 +41,7 @@ EnableRefCountingByObserverPointer::EnableRefCountingByObserverPointer(
 
 
 
-EnableRefCountingByObserverPointer::~EnableRefCountingByObserverPointer()
+EnableObserverPointer::~EnableObserverPointer()
 {
   for (auto *const validity_ptr : validity_pointers)
     *validity_ptr = false;
@@ -50,7 +50,7 @@ EnableRefCountingByObserverPointer::~EnableRefCountingByObserverPointer()
 
 
 void
-EnableRefCountingByObserverPointer::check_no_subscribers() const noexcept
+EnableObserverPointer::check_no_subscribers() const noexcept
 {
   // Check whether there are still subscriptions to this object. If so, output
   // the actual name of the class to which this object belongs, i.e. the most
@@ -115,9 +115,8 @@ EnableRefCountingByObserverPointer::check_no_subscribers() const noexcept
 
 
 
-EnableRefCountingByObserverPointer &
-EnableRefCountingByObserverPointer::operator=(
-  EnableRefCountingByObserverPointer &&s) noexcept
+EnableObserverPointer &
+EnableObserverPointer::operator=(EnableObserverPointer &&s) noexcept
 {
   for (auto *const validity_ptr : s.validity_pointers)
     *validity_ptr = false;
@@ -129,8 +128,8 @@ EnableRefCountingByObserverPointer::operator=(
 
 
 void
-EnableRefCountingByObserverPointer::subscribe(std::atomic<bool> *const validity,
-                                              const std::string       &id) const
+EnableObserverPointer::subscribe(std::atomic<bool> *const validity,
+                                 const std::string       &id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -149,9 +148,8 @@ EnableRefCountingByObserverPointer::subscribe(std::atomic<bool> *const validity,
 
 
 void
-EnableRefCountingByObserverPointer::unsubscribe(
-  std::atomic<bool> *const validity,
-  const std::string       &id) const
+EnableObserverPointer::unsubscribe(std::atomic<bool> *const validity,
+                                   const std::string       &id) const
 {
   const std::string &name = id.empty() ? unknown_subscriber : id;
 
@@ -186,7 +184,7 @@ EnableRefCountingByObserverPointer::unsubscribe(
       AssertNothrow(
         validity_ptr_it != validity_pointers.end(),
         ExcMessage(
-          "This EnableRefCountingByObserverPointer object does not know anything about the supplied pointer!"));
+          "This EnableObserverPointer object does not know anything about the supplied pointer!"));
       return;
     }
 
@@ -198,7 +196,7 @@ EnableRefCountingByObserverPointer::unsubscribe(
 
 
 void
-EnableRefCountingByObserverPointer::list_subscribers() const
+EnableObserverPointer::list_subscribers() const
 {
   list_subscribers(deallog);
 }

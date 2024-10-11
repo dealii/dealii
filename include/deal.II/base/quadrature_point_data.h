@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * for example, adopting a level-set approach to describe material behavior.
  */
 template <typename CellIteratorType, typename DataType>
-class CellDataStorage : public EnableRefCountingByObserverPointer
+class CellDataStorage : public EnableObserverPointer
 {
 public:
   /**

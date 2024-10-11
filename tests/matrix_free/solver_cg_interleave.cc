@@ -49,7 +49,7 @@
 
 
 template <int dim, typename number = double>
-class HelmholtzOperator : public EnableRefCountingByObserverPointer
+class HelmholtzOperator : public EnableObserverPointer
 {
 public:
   using value_type = number;

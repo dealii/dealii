@@ -78,7 +78,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
-class PreconditionBlock : public virtual EnableRefCountingByObserverPointer,
+class PreconditionBlock : public virtual EnableObserverPointer,
                           protected PreconditionBlockBase<inverse_type>
 {
 private:
@@ -376,7 +376,7 @@ protected:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockJacobi
-  : public virtual EnableRefCountingByObserverPointer,
+  : public virtual EnableObserverPointer,
     private PreconditionBlock<MatrixType, inverse_type>
 {
 private:
@@ -653,7 +653,7 @@ private:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockSOR
-  : public virtual EnableRefCountingByObserverPointer,
+  : public virtual EnableObserverPointer,
     protected PreconditionBlock<MatrixType, inverse_type>
 {
 public:
@@ -810,7 +810,7 @@ protected:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockSSOR
-  : public virtual EnableRefCountingByObserverPointer,
+  : public virtual EnableObserverPointer,
     private PreconditionBlockSOR<MatrixType, inverse_type>
 {
 public:

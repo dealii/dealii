@@ -189,7 +189,7 @@ print(const DoFHandler<dim>          &dof,
 }
 
 template <int dim>
-class OutputCreator : public EnableRefCountingByObserverPointer
+class OutputCreator : public EnableObserverPointer
 {
 public:
   void

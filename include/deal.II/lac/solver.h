@@ -338,7 +338,7 @@ class Vector;
  */
 template <typename VectorType = Vector<double>>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-class SolverBase : public EnableRefCountingByObserverPointer
+class SolverBase : public EnableObserverPointer
 {
 public:
   /**

@@ -730,7 +730,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(
       const Vector<Number, MemorySpaceType> &v)
-      : EnableRefCountingByObserverPointer()
+      : EnableObserverPointer()
       , allocated_size(0)
       , vector_is_ghosted(false)
       , comm_sm(MPI_COMM_SELF)
@@ -749,8 +749,8 @@ namespace LinearAlgebra
       Vector<Number, MemorySpaceType> &&v)
       : Vector()
     {
-      static_cast<EnableRefCountingByObserverPointer &>(*this) =
-        static_cast<EnableRefCountingByObserverPointer &&>(v);
+      static_cast<EnableObserverPointer &>(*this) =
+        static_cast<EnableObserverPointer &&>(v);
       this->swap(v);
     }
 
@@ -1428,8 +1428,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::operator=( // NOLINT
       Vector<Number, MemorySpaceType> &&v)
     {
-      static_cast<EnableRefCountingByObserverPointer &>(*this) =
-        static_cast<EnableRefCountingByObserverPointer &&>(v);
+      static_cast<EnableObserverPointer &>(*this) =
+        static_cast<EnableObserverPointer &&>(v);
       this->swap(v);
       return *this;
     }

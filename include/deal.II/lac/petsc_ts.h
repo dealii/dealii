@@ -239,7 +239,7 @@ namespace PETScWrappers
    * methods:
    *
    * @code
-   * class VectorType : public EnableRefCountingByObserverPointer
+   * class VectorType : public EnableObserverPointer
    *    ...
    *    explicit VectorType(Vec);
    *    ...
@@ -248,7 +248,7 @@ namespace PETScWrappers
    * @endcode
    *
    * @code
-   * class MatrixType : public EnableRefCountingByObserverPointer
+   * class MatrixType : public EnableObserverPointer
    *    ...
    *    explicit MatrixType(Mat);
    *    ...

@@ -38,7 +38,7 @@ namespace mg
    * multigrid with local refinement.
    */
   template <typename number>
-  class SparseMatrixCollection : public EnableRefCountingByObserverPointer
+  class SparseMatrixCollection : public EnableObserverPointer
   {
   public:
     void

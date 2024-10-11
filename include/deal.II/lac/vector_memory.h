@@ -101,7 +101,7 @@ DEAL_II_NAMESPACE_OPEN
  * <i>always</i> returned.
  */
 template <typename VectorType = dealii::Vector<double>>
-class VectorMemory : public EnableRefCountingByObserverPointer
+class VectorMemory : public EnableObserverPointer
 {
 public:
   /**

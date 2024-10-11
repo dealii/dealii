@@ -207,7 +207,7 @@ extern "C"
  * PARPACK manual.
  */
 template <typename VectorType>
-class PArpackSolver : public EnableRefCountingByObserverPointer
+class PArpackSolver : public EnableObserverPointer
 {
 public:
   /**

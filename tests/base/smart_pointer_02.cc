@@ -28,7 +28,7 @@
 #include "../tests.h"
 
 
-class Test : public EnableRefCountingByObserverPointer
+class Test : public EnableObserverPointer
 {};
 
 

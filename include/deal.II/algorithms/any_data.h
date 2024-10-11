@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo GK: Deprecate access to AnyData by index and change to a map.
  */
-class AnyData : public EnableRefCountingByObserverPointer
+class AnyData : public EnableObserverPointer
 {
 public:
   /// Default constructor for empty object

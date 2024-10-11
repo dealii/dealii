@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This class, as a base class, allows to keep track of other objects using a
  * specific object. It is used to avoid that pointers that point to an object of
- * a class derived from EnableRefCountingByObserverPointer are referenced after
+ * a class derived from EnableObserverPointer are referenced after
  * that object has been invalidated. Here, invalidation is assumed to happen
  * when the object is moved from or destroyed. The mechanism works as follows:
  * The member function subscribe() accepts a pointer to a boolean that is
@@ -56,13 +56,13 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup memory
  */
-class EnableRefCountingByObserverPointer
+class EnableObserverPointer
 {
 public:
   /**
    * Constructor setting the counter to zero.
    */
-  EnableRefCountingByObserverPointer();
+  EnableObserverPointer();
 
   /**
    * Copy-constructor.
@@ -70,22 +70,20 @@ public:
    * The counter of the copy is zero, since references point to the original
    * object.
    */
-  EnableRefCountingByObserverPointer(
-    const EnableRefCountingByObserverPointer &);
+  EnableObserverPointer(const EnableObserverPointer &);
 
   /**
    * Move constructor.
    *
-   * An object inheriting from EnableRefCountingByObserverPointer can only be
+   * An object inheriting from EnableObserverPointer can only be
    * moved if no other objects are subscribing to it.
    */
-  EnableRefCountingByObserverPointer(
-    EnableRefCountingByObserverPointer &&) noexcept;
+  EnableObserverPointer(EnableObserverPointer &&) noexcept;
 
   /**
    * Destructor, asserting that the counter is zero.
    */
-  virtual ~EnableRefCountingByObserverPointer();
+  virtual ~EnableObserverPointer();
 
   /**
    * Assignment operator.
@@ -93,19 +91,19 @@ public:
    * This has to be handled with care, too, because the counter has to remain
    * the same. It therefore does nothing more than returning <tt>*this</tt>.
    */
-  EnableRefCountingByObserverPointer &
-  operator=(const EnableRefCountingByObserverPointer &);
+  EnableObserverPointer &
+  operator=(const EnableObserverPointer &);
 
   /**
    * Move assignment operator. Only invalidates the object moved from.
    */
-  EnableRefCountingByObserverPointer &
-  operator=(EnableRefCountingByObserverPointer &&) noexcept;
+  EnableObserverPointer &
+  operator=(EnableObserverPointer &&) noexcept;
 
   /**
-   * @name EnableRefCountingByObserverPointer functionality
+   * @name EnableObserverPointer functionality
    *
-   * Classes derived from EnableRefCountingByObserverPointer provide a facility
+   * Classes derived from EnableObserverPointer provide a facility
    * to subscribe to this object. This is mostly used by the ObserverPointer
    * class.
    * @{
@@ -175,7 +173,7 @@ public:
 
   /**
    * A subscriber with the identification string given to
-   * EnableRefCountingByObserverPointer::unsubscribe() did not subscribe to the
+   * EnableObserverPointer::unsubscribe() did not subscribe to the
    * object.
    */
   DeclException2(ExcNoSubscriber,
@@ -277,36 +275,35 @@ private:
 
 
 /**
- * A type alias for the EnableRefCountingByObserverPointer class that makes sure
+ * A type alias for the EnableObserverPointer class that makes sure
  * the previous name of the class, Subscriptor, continues to be available.
  *
  * @deprecated Use the new name of the class, ObserverPointer, instead.
  */
 using Subscriptor DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-  "Use the new name of the class, EnableRefCountingByObserverPointer.") =
-  EnableRefCountingByObserverPointer;
+  "Use the new name of the class, EnableObserverPointer.") =
+  EnableObserverPointer;
 
 
 //---------------------------------------------------------------------------
 
-inline EnableRefCountingByObserverPointer::EnableRefCountingByObserverPointer()
+inline EnableObserverPointer::EnableObserverPointer()
   : counter(0)
   , object_info(nullptr)
 {}
 
 
 
-inline EnableRefCountingByObserverPointer::EnableRefCountingByObserverPointer(
-  const EnableRefCountingByObserverPointer &)
+inline EnableObserverPointer::EnableObserverPointer(
+  const EnableObserverPointer &)
   : counter(0)
   , object_info(nullptr)
 {}
 
 
 
-inline EnableRefCountingByObserverPointer &
-EnableRefCountingByObserverPointer::operator=(
-  const EnableRefCountingByObserverPointer &s)
+inline EnableObserverPointer &
+EnableObserverPointer::operator=(const EnableObserverPointer &s)
 {
   object_info = s.object_info;
   return *this;
@@ -315,7 +312,7 @@ EnableRefCountingByObserverPointer::operator=(
 
 
 inline unsigned int
-EnableRefCountingByObserverPointer::n_subscriptions() const
+EnableObserverPointer::n_subscriptions() const
 {
   return counter;
 }
@@ -324,7 +321,7 @@ EnableRefCountingByObserverPointer::n_subscriptions() const
 
 template <class Archive>
 inline void
-EnableRefCountingByObserverPointer::serialize(Archive &, const unsigned int)
+EnableObserverPointer::serialize(Archive &, const unsigned int)
 {
   // do nothing, as explained in the
   // documentation of this function
@@ -332,7 +329,7 @@ EnableRefCountingByObserverPointer::serialize(Archive &, const unsigned int)
 
 template <typename StreamType>
 inline void
-EnableRefCountingByObserverPointer::list_subscribers(StreamType &stream) const
+EnableObserverPointer::list_subscribers(StreamType &stream) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
