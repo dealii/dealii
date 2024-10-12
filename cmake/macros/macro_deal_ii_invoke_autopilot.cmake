@@ -37,6 +37,22 @@
 macro(deal_ii_invoke_autopilot)
   message(STATUS "Autopilot invoked")
 
+  get_property(_generator_is_multi_config
+    GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG
+    )
+
+  if(${_generator_is_multi_config})
+    message(STATUS "Setting up multiple generator configurations")
+    set(CMAKE_BUILD_TYPE "multiple generator")
+    set(CMAKE_CONFIGURATION_TYPES "")
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
+      list(APPEND CMAKE_CONFIGURATION_TYPES "Debug")
+    endif()
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
+      list(APPEND CMAKE_CONFIGURATION_TYPES "Release")
+    endif()
+  endif()
+
   #
   # Generate compile_commands.json
   #
@@ -70,7 +86,27 @@ macro(deal_ii_invoke_autopilot)
 
   # Define and set up a compilation target:
   add_executable(${TARGET} ${TARGET_SRC})
-  target_link_libraries(${TARGET} dealii::dealii)
+
+  #
+  # To ensure maximal compatibility with existing user codes we use the
+  # deal_ii_setup_target() macro when setting up the target for a standard
+  # single-configuration generator und switch to the dealii::dealii target
+  # only for a multiple generator configuration.
+  #
+  # This hopefully ensures that subtle differences in how cmake expands
+  # compiler and linker flags coming from either the target directly or
+  # from the interface target dealii::dealii do not propagate to user
+  # project configurations.
+  #
+  if(${_generator_is_multi_config})
+    if(NOT DEAL_II_TARGET_CONFIG_INCLUDED)
+      include(${DEAL_II_TARGET_CONFIG})
+      set(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+    endif()
+    target_link_libraries(${TARGET} dealii::dealii)
+  else()
+    deal_ii_setup_target(${TARGET})
+  endif()
 
   # Generator specific values:
   if(CMAKE_GENERATOR MATCHES "Ninja")
@@ -157,30 +193,32 @@ macro(deal_ii_invoke_autopilot)
       )
   endif()
 
-  #
-  # Define custom targets to easily switch the build type:
-  #
+  if(NOT ${_generator_is_multi_config})
+    #
+    # Define custom targets to easily switch the build type:
+    #
 
-  if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
-    add_custom_target(debug
-      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
-      VERBATIM
-      )
-  endif()
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
+      add_custom_target(debug
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
+        VERBATIM
+        )
+    endif()
 
-  if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
-    add_custom_target(release
-      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
-      COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMENT "Switching CMAKE_BUILD_TYPE to Release"
-      VERBATIM
-      )
+    if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
+      add_custom_target(release
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
+        COMMAND ${CMAKE_COMMAND} -E echo "***"
+        COMMENT "Switching CMAKE_BUILD_TYPE to Release"
+        VERBATIM
+        )
+    endif()
   endif()
 
   #
@@ -227,7 +265,7 @@ macro(deal_ii_invoke_autopilot)
 
   # Only mention release and debug targets if it is actually possible to
   # switch between them:
-  if(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
+  if(NOT ${_generator_is_multi_config} AND ${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
     set(_switch_targets
 "#      ${_make_command} debug          - to switch the build type to 'Debug'
 #      ${_make_command} release        - to switch the build type to 'Release'\n"
