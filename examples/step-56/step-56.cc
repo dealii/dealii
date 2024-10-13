@@ -301,7 +301,7 @@ namespace Step56
   // Notice how we keep track of the sum of the inner iterations
   // (preconditioner applications).
   template <class PreconditionerAType, class PreconditionerSType>
-  class BlockSchurPreconditioner : public Subscriptor
+  class BlockSchurPreconditioner : public EnableObserverPointer
   {
   public:
     BlockSchurPreconditioner(

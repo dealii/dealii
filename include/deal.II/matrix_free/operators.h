@@ -19,8 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/lac/diagonal_matrix.h>
@@ -184,7 +184,7 @@ namespace MatrixFreeOperators
             typename VectorType = LinearAlgebra::distributed::Vector<double>,
             typename VectorizedArrayType =
               VectorizedArray<typename VectorType::value_type>>
-  class Base : public Subscriptor
+  class Base : public EnableObserverPointer
   {
   public:
     /**
@@ -534,7 +534,7 @@ namespace MatrixFreeOperators
    * prolongation phase.
    */
   template <typename OperatorType>
-  class MGInterfaceOperator : public Subscriptor
+  class MGInterfaceOperator : public EnableObserverPointer
   {
   public:
     /**
@@ -1215,7 +1215,7 @@ namespace MatrixFreeOperators
   //----------------- Base operator -----------------------------
   template <int dim, typename VectorType, typename VectorizedArrayType>
   Base<dim, VectorType, VectorizedArrayType>::Base()
-    : Subscriptor()
+    : EnableObserverPointer()
     , have_interface_matrices(false)
   {}
 
@@ -1804,7 +1804,7 @@ namespace MatrixFreeOperators
 
   template <typename OperatorType>
   MGInterfaceOperator<OperatorType>::MGInterfaceOperator()
-    : Subscriptor()
+    : EnableObserverPointer()
     , mf_base_operator(nullptr)
   {}
 

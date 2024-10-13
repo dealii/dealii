@@ -18,12 +18,12 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
@@ -1319,7 +1319,7 @@ namespace internal
  */
 template <int dim, int spacedim = dim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-class Triangulation : public Subscriptor
+class Triangulation : public EnableObserverPointer
 {
 private:
   /**

@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 
 #include <functional>
 #include <string>
@@ -56,7 +56,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim, typename number = double>
-  class DEAL_II_DEPRECATED LocalIntegrator : public Subscriptor
+  class DEAL_II_DEPRECATED LocalIntegrator : public EnableObserverPointer
   {
   public:
     /**

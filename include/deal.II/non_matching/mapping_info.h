@@ -218,7 +218,7 @@ namespace NonMatching
    * held.
    */
   template <int dim, int spacedim = dim, typename Number = double>
-  class MappingInfo : public Subscriptor
+  class MappingInfo : public EnableObserverPointer
   {
   public:
     /**

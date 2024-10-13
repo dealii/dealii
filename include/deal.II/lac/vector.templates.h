@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
 Vector<Number>::Vector(const Vector<Number> &v)
-  : Subscriptor()
+  : EnableObserverPointer()
 {
   *this = v;
 }

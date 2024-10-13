@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/sparsity_pattern.h>
 
@@ -241,7 +241,7 @@ namespace ChunkSparsityPatternIterators
  *
  * The use of this class is demonstrated in step-51.
  */
-class ChunkSparsityPattern : public Subscriptor
+class ChunkSparsityPattern : public EnableObserverPointer
 {
 public:
   /**

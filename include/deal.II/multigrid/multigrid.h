@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -159,7 +159,7 @@ namespace mg
  * MGTransferBase.
  */
 template <typename VectorType>
-class Multigrid : public Subscriptor
+class Multigrid : public EnableObserverPointer
 {
 public:
   /**
@@ -499,7 +499,7 @@ private:
  * to be initialized with a separate DoFHandler for each block.
  */
 template <int dim, typename VectorType, typename TransferType>
-class PreconditionMG : public Subscriptor
+class PreconditionMG : public EnableObserverPointer
 {
 public:
   /**

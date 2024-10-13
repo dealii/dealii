@@ -109,7 +109,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim,
           typename Number              = double,
           typename VectorizedArrayType = VectorizedArray<Number>>
-class MatrixFree : public Subscriptor
+class MatrixFree : public EnableObserverPointer
 {
   static_assert(
     std::is_same_v<Number, typename VectorizedArrayType::value_type>,

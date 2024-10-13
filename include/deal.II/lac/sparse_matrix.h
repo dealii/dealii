@@ -17,9 +17,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/identity_matrix.h>
@@ -516,7 +516,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup Matrix1
  */
 template <typename number>
-class SparseMatrix : public virtual Subscriptor
+class SparseMatrix : public virtual EnableObserverPointer
 {
 public:
   /**

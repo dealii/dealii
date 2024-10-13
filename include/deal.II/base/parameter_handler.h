@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/patterns.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <boost/archive/basic_archive.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
@@ -851,7 +851,7 @@ class MultipleParameterLoop;
  *
  * @ingroup input
  */
-class ParameterHandler : public Subscriptor
+class ParameterHandler : public EnableObserverPointer
 {
 public:
   /**
@@ -2330,7 +2330,7 @@ ParameterHandler::save(Archive &ar, const unsigned int) const
 {
   // Forward to serialization
   // function in the base class.
-  ar &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const EnableObserverPointer &>(*this);
 
   ar &*entries.get();
 
@@ -2350,7 +2350,7 @@ ParameterHandler::load(Archive &ar, const unsigned int)
 {
   // Forward to serialization
   // function in the base class.
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableObserverPointer &>(*this);
 
   ar &*entries.get();
 

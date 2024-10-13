@@ -19,10 +19,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <vector>
 
@@ -60,7 +60,7 @@ namespace Polynomials
    * @ingroup Polynomials
    */
   template <typename number>
-  class PiecewisePolynomial : public Subscriptor
+  class PiecewisePolynomial : public EnableObserverPointer
   {
   public:
     /**
@@ -301,7 +301,7 @@ namespace Polynomials
   PiecewisePolynomial<number>::serialize(Archive &ar, const unsigned int)
   {
     // forward to serialization function in the base class.
-    ar &static_cast<Subscriptor &>(*this);
+    ar &static_cast<EnableObserverPointer &>(*this);
     ar &polynomial;
     ar &n_intervals;
     ar &interval;

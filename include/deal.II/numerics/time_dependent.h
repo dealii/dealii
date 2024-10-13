@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <utility>
@@ -660,7 +660,7 @@ private:
  * following grids, and some functions to be called before a new loop over all
  * time steps is started.
  */
-class TimeStepBase : public Subscriptor
+class TimeStepBase : public EnableObserverPointer
 {
 public:
   /**

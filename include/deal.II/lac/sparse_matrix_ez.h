@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/exceptions.h>
 
@@ -100,7 +100,7 @@ class FullMatrix;
  *   where "EZ" is pronounced the same way as the word "easy".
  */
 template <typename number>
-class SparseMatrixEZ : public Subscriptor
+class SparseMatrixEZ : public EnableObserverPointer
 {
 public:
   /**

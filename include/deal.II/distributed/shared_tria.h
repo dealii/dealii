@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/distributed/tria_base.h>
@@ -545,7 +545,7 @@ namespace internal
        * for more information about artificial cells.
        */
       template <int dim, int spacedim = dim>
-      class TemporarilyRestoreSubdomainIds : public Subscriptor
+      class TemporarilyRestoreSubdomainIds : public EnableObserverPointer
       {
       public:
         /**

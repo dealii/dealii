@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/chunk_sparsity_pattern.h>
 #include <deal.II/lac/exceptions.h>
@@ -445,7 +445,7 @@ DEAL_II_NAMESPACE_OPEN
  * in the manual).
  */
 template <typename number>
-class ChunkSparseMatrix : public virtual Subscriptor
+class ChunkSparseMatrix : public virtual EnableObserverPointer
 {
 public:
   /**

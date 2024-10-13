@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <algorithm>
 #include <any>
@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo GK: Deprecate access to AnyData by index and change to a map.
  */
-class AnyData : public Subscriptor
+class AnyData : public EnableObserverPointer
 {
 public:
   /// Default constructor for empty object

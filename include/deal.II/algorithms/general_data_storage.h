@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <boost/core/demangle.hpp>
 
@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * When using this class, please cite @cite SartoriGiulianiBardelloni-2018-a.
  */
-class GeneralDataStorage : public Subscriptor
+class GeneralDataStorage : public EnableObserverPointer
 {
 public:
   /**

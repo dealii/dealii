@@ -18,8 +18,8 @@
 // std::any object.
 
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <any>
 #include <iostream>
@@ -27,7 +27,7 @@
 #include "../tests.h"
 
 
-class Test : public Subscriptor
+class Test : public EnableObserverPointer
 {};
 
 

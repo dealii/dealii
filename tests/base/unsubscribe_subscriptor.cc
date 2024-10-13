@@ -17,15 +17,15 @@
 // check that unsubscribing with a wrong id is handled correctly
 
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <iostream>
 #include <vector>
 
 #include "../tests.h"
 
-class Test : public Subscriptor
+class Test : public EnableObserverPointer
 {};
 
 int
@@ -35,10 +35,10 @@ main()
 
   initlog();
 
-  Subscriptor       subscriptor;
-  std::atomic<bool> dummy_a;
-  const char       *foo_a = "a";
-  const char       *foo_b = "b";
+  EnableObserverPointer subscriptor;
+  std::atomic<bool>     dummy_a;
+  const char           *foo_a = "a";
+  const char           *foo_b = "b";
   subscriptor.subscribe(&dummy_a, foo_a);
   subscriptor.unsubscribe(&dummy_a, foo_b);
   std::atomic<bool> dummy_b;

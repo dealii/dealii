@@ -20,7 +20,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/full_matrix.h>
@@ -291,7 +291,7 @@ namespace PETScWrappers
    * @ingroup PETScWrappers
    * @ingroup Matrix1
    */
-  class MatrixBase : public Subscriptor
+  class MatrixBase : public EnableObserverPointer
   {
   public:
     /**

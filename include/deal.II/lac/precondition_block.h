@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/precondition_block_base.h>
 
@@ -78,7 +78,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
-class PreconditionBlock : public virtual Subscriptor,
+class PreconditionBlock : public virtual EnableObserverPointer,
                           protected PreconditionBlockBase<inverse_type>
 {
 private:
@@ -376,7 +376,7 @@ protected:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockJacobi
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     private PreconditionBlock<MatrixType, inverse_type>
 {
 private:
@@ -653,7 +653,7 @@ private:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected PreconditionBlock<MatrixType, inverse_type>
 {
 public:
@@ -810,7 +810,7 @@ protected:
 template <typename MatrixType,
           typename inverse_type = typename MatrixType::value_type>
 class PreconditionBlockSSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     private PreconditionBlockSOR<MatrixType, inverse_type>
 {
 public:

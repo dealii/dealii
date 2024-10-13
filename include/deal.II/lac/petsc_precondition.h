@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #ifdef DEAL_II_WITH_PETSC
 
@@ -56,7 +56,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class PreconditionBase : public Subscriptor
+  class PreconditionBase : public EnableObserverPointer
   {
   public:
     /**

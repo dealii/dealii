@@ -39,7 +39,7 @@
 
 // Local integrators fill every matrix entry with 10*block_row + block_col
 template <int dim>
-class MatrixIntegrator : public Subscriptor
+class MatrixIntegrator : public EnableObserverPointer
 {
 public:
   static void

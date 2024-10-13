@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/distributed/p4est_wrappers.h>
@@ -1113,7 +1113,7 @@ namespace parallel
      * The use of this class is demonstrated in step-75.
      */
     template <int dim, int spacedim = dim>
-    class TemporarilyMatchRefineFlags : public Subscriptor
+    class TemporarilyMatchRefineFlags : public EnableObserverPointer
     {
     public:
       /**

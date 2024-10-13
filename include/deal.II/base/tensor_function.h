@@ -18,12 +18,12 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_time.h>
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <vector>
 
@@ -54,7 +54,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int rank, int dim, typename Number = double>
 class TensorFunction
   : public FunctionTime<typename numbers::NumberTraits<Number>::real_type>,
-    public Subscriptor
+    public EnableObserverPointer
 {
 public:
   /**

@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <string>
 
@@ -97,7 +97,7 @@ class SparseMatrix;
  */
 template <typename MatrixType = SparseMatrix<double>,
           typename VectorType = dealii::Vector<double>>
-class PreconditionSelector : public Subscriptor
+class PreconditionSelector : public EnableObserverPointer
 {
 public:
   /**

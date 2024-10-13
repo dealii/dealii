@@ -19,9 +19,9 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/sparsity_pattern_base.h>
 
@@ -1516,7 +1516,7 @@ inline void
 SparsityPattern::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar &boost::serialization::base_object<const Subscriptor>(*this);
+  ar &boost::serialization::base_object<const EnableObserverPointer>(*this);
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 
@@ -1539,7 +1539,7 @@ inline void
 SparsityPattern::load(Archive &ar, const unsigned int)
 {
   // forward to serialization function in the base class.
-  ar &boost::serialization::base_object<Subscriptor>(*this);
+  ar &boost::serialization::base_object<EnableObserverPointer>(*this);
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
 

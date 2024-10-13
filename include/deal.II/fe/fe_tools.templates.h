@@ -1073,7 +1073,8 @@ namespace FETools
       template <int dim>
       void
       fill_no_codim_fe_names(
-        std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
+        std::map<std::string, std::unique_ptr<const EnableObserverPointer>>
+          &result)
       {
         result["FE_Q_Hierarchical"] =
           std::make_unique<FETools::FEFactory<FE_Q_Hierarchical<dim>>>();
@@ -1153,7 +1154,8 @@ namespace FETools
       template <int dim, int spacedim>
       void
       fill_codim_fe_names(
-        std::map<std::string, std::unique_ptr<const Subscriptor>> &result)
+        std::map<std::string, std::unique_ptr<const EnableObserverPointer>>
+          &result)
       {
         result["FE_Bernstein"] =
           std::make_unique<FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
@@ -1192,13 +1194,15 @@ namespace FETools
       // fe_name_map[dimension][spacedimension] with the maps generated
       // by the functions above.
       std::array<
-        std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
-                   4>,
+        std::array<
+          std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
+          4>,
         4> inline fill_default_map()
       {
         std::array<
-          std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
-                     4>,
+          std::array<
+            std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
+            4>,
           4>
           result;
 
@@ -1242,14 +1246,16 @@ namespace FETools
       // compiled for all dimensions at once, need to create objects for
       // each dimension and then separate between them further down
       inline std::array<
-        std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
-                   4>,
+        std::array<
+          std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
+          4>,
         4> &
       get_fe_name_map()
       {
         static std::array<
-          std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
-                     4>,
+          std::array<
+            std::map<std::string, std::unique_ptr<const EnableObserverPointer>>,
+            4>,
           4>
           fe_name_map = fill_default_map();
         return fe_name_map;
@@ -2248,7 +2254,7 @@ namespace FETools
     std::unique_lock<std::shared_mutex> lock(
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
     internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].emplace(
-      name, std::unique_ptr<const Subscriptor>(factory));
+      name, std::unique_ptr<const EnableObserverPointer>(factory));
   }
 
 
@@ -2265,7 +2271,8 @@ namespace FETools
       std::unique_ptr<FiniteElement<dim, spacedim>>
       get_fe_by_name_ext(
         std::string &name,
-        const std::map<std::string, std::unique_ptr<const Subscriptor>>
+        const std::map<std::string,
+                       std::unique_ptr<const EnableObserverPointer>>
           &fe_name_map)
       {
         // Extract the name of the
@@ -2385,7 +2392,8 @@ namespace FETools
             // argument, which defaults to 1,
             // so this properly returns
             // FE_Nothing()
-            const Subscriptor *ptr = fe_name_map.find(name_part)->second.get();
+            const EnableObserverPointer *ptr =
+              fe_name_map.find(name_part)->second.get();
             const FETools::FEFactoryBase<dim, spacedim> *fef =
               dynamic_cast<const FETools::FEFactoryBase<dim, spacedim> *>(ptr);
             return fef->get(1);
@@ -2410,7 +2418,7 @@ namespace FETools
                 const std::pair<int, unsigned int> tmp =
                   Utilities::get_integer_at_position(name, 0);
                 name.erase(0, tmp.second + 1);
-                const Subscriptor *ptr =
+                const EnableObserverPointer *ptr =
                   fe_name_map.find(name_part)->second.get();
                 const FETools::FEFactoryBase<dim, spacedim> *fef =
                   dynamic_cast<const FETools::FEFactoryBase<dim, spacedim> *>(
@@ -2428,7 +2436,7 @@ namespace FETools
                       Utilities::get_integer_at_position(name, 0);
                     // delete "))"
                     name.erase(0, tmp.second + 2);
-                    const Subscriptor *ptr =
+                    const EnableObserverPointer *ptr =
                       fe_name_map.find(name_part)->second.get();
                     const FETools::FEFactoryBase<dim, spacedim> *fef =
                       dynamic_cast<
@@ -2441,7 +2449,7 @@ namespace FETools
                       Utilities::get_integer_at_position(name, 0);
                     // delete "))"
                     name.erase(0, tmp.second + 2);
-                    const Subscriptor *ptr =
+                    const EnableObserverPointer *ptr =
                       fe_name_map.find(name_part)->second.get();
                     const FETools::FEFactoryBase<dim, spacedim> *fef =
                       dynamic_cast<
@@ -2463,7 +2471,7 @@ namespace FETools
                       Utilities::get_integer_at_position(name, 0);
                     // delete "))"
                     name.erase(0, tmp.second + 2);
-                    const Subscriptor *ptr =
+                    const EnableObserverPointer *ptr =
                       fe_name_map.find(name_part)->second.get();
                     const FETools::FEFactoryBase<dim, spacedim> *fef =
                       dynamic_cast<

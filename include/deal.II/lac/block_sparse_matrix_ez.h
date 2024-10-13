@@ -23,9 +23,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/table.h>
 
 #include <deal.II/lac/block_indices.h>
@@ -57,7 +57,7 @@ class BlockVector;
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename Number>
-class BlockSparseMatrixEZ : public Subscriptor
+class BlockSparseMatrixEZ : public EnableObserverPointer
 {
 public:
   /**

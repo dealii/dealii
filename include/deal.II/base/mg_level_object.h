@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 
 #include <memory>
 #include <vector>
@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup data
  */
 template <class Object>
-class MGLevelObject : public Subscriptor
+class MGLevelObject : public EnableObserverPointer
 {
 public:
   /**

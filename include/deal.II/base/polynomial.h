@@ -19,9 +19,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <array>
 #include <limits>
@@ -62,7 +62,7 @@ namespace Polynomials
    * TensorProductPolynomials class.
    */
   template <typename number>
-  class Polynomial : public Subscriptor
+  class Polynomial : public EnableObserverPointer
   {
   public:
     /**
@@ -1031,7 +1031,7 @@ namespace Polynomials
   Polynomial<number>::serialize(Archive &ar, const unsigned int)
   {
     // forward to serialization function in the base class.
-    ar &static_cast<Subscriptor &>(*this);
+    ar &static_cast<EnableObserverPointer &>(*this);
     ar &coefficients;
     ar &in_lagrange_product_form;
     ar &lagrange_support_points;

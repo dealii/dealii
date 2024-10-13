@@ -55,7 +55,7 @@ SparseMatrix<number>::SparseMatrix()
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix(const SparseMatrix &m)
-  : Subscriptor(m)
+  : EnableObserverPointer(m)
   , cols(nullptr, "SparseMatrix")
   , val(nullptr)
   , max_len(0)
@@ -72,7 +72,7 @@ SparseMatrix<number>::SparseMatrix(const SparseMatrix &m)
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix(SparseMatrix<number> &&m) noexcept
-  : Subscriptor(std::move(m))
+  : EnableObserverPointer(std::move(m))
   , cols(std::move(m.cols))
   , val(std::move(m.val))
   , max_len(m.max_len)

@@ -346,7 +346,7 @@ namespace BlockMatrixIterators
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename MatrixType>
-class BlockMatrixBase : public Subscriptor
+class BlockMatrixBase : public EnableObserverPointer
 {
 public:
   /**

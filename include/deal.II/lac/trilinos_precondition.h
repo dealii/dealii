@@ -20,7 +20,7 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
@@ -73,7 +73,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
    */
-  class PreconditionBase : public Subscriptor
+  class PreconditionBase : public EnableObserverPointer
   {
   public:
     /**

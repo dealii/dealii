@@ -24,9 +24,9 @@
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
+#  include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
@@ -285,7 +285,7 @@ namespace LinearAlgebra
      * @ingroup Vectors
      */
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
-    class Vector : public ReadVector<Number>, public Subscriptor
+    class Vector : public ReadVector<Number>, public EnableObserverPointer
     {
     public:
       /**

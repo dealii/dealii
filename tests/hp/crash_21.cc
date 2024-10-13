@@ -52,7 +52,7 @@
 namespace Step
 {
   template <int dim>
-  class Problem : public Subscriptor
+  class Problem : public EnableObserverPointer
   {
   public:
     Problem();

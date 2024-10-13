@@ -17,9 +17,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/thread_local_storage.h>
@@ -503,7 +503,7 @@ namespace internal
  * @ingroup constraints
  */
 template <typename number = double>
-class AffineConstraints : public Subscriptor
+class AffineConstraints : public EnableObserverPointer
 {
 public:
   /**
@@ -2370,7 +2370,7 @@ inline AffineConstraints<number>::AffineConstraints(
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
   const AffineConstraints &affine_constraints)
-  : Subscriptor()
+  : EnableObserverPointer()
   , lines(affine_constraints.lines)
   , lines_cache(affine_constraints.lines_cache)
   , locally_owned_dofs(affine_constraints.locally_owned_dofs)

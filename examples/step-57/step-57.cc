@@ -182,7 +182,7 @@ namespace Step57
   // positive definite, we can use CG to solve the corresponding linear
   // system.
   template <class PreconditionerMp>
-  class BlockSchurPreconditioner : public Subscriptor
+  class BlockSchurPreconditioner : public EnableObserverPointer
   {
   public:
     BlockSchurPreconditioner(double                           gamma,

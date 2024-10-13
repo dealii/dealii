@@ -19,11 +19,11 @@
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/communication_pattern_base.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/parallel.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
 
@@ -123,7 +123,8 @@ namespace LinearAlgebra
    * get the first index of the largest range.
    */
   template <typename Number>
-  class ReadWriteVector : public Subscriptor, public ReadVector<Number>
+  class ReadWriteVector : public EnableObserverPointer,
+                          public ReadVector<Number>
   {
   public:
     /**
@@ -846,7 +847,7 @@ namespace LinearAlgebra
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(
     const ReadWriteVector<Number> &v)
-    : Subscriptor()
+    : EnableObserverPointer()
   {
     this->operator=(v);
   }

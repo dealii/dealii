@@ -19,11 +19,11 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -151,7 +151,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup feaccess
  */
 template <int dim, int spacedim>
-class FEValuesBase : public Subscriptor
+class FEValuesBase : public EnableObserverPointer
 {
 public:
   /**

@@ -312,7 +312,7 @@ namespace Step22
 
 
   template <class Matrix, class Preconditioner>
-  class InverseMatrix : public Subscriptor
+  class InverseMatrix : public EnableObserverPointer
   {
   public:
     InverseMatrix(const Matrix &m, const Preconditioner &preconditioner);
@@ -353,7 +353,7 @@ namespace Step22
   }
 
   template <class Preconditioner>
-  class SchurComplement : public Subscriptor
+  class SchurComplement : public EnableObserverPointer
   {
   public:
     SchurComplement(

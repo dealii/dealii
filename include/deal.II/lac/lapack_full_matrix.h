@@ -1007,7 +1007,7 @@ private:
  * @ingroup Preconditioners
  */
 template <typename number>
-class PreconditionLU : public Subscriptor
+class PreconditionLU : public EnableObserverPointer
 {
 public:
   void

@@ -123,7 +123,7 @@ namespace Step29
   // <code>declare_parameters</code> that declares all the necessary
   // parameters and a <code>read_parameters</code> function that is called
   // from outside to initiate the parameter reading process.
-  class ParameterReader : public Subscriptor
+  class ParameterReader : public EnableObserverPointer
   {
   public:
     ParameterReader(ParameterHandler &);

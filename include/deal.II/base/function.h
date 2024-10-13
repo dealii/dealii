@@ -18,10 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_time.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
@@ -148,7 +148,7 @@ class TensorFunction;
 template <int dim, typename RangeNumberType = double>
 class Function : public FunctionTime<
                    typename numbers::NumberTraits<RangeNumberType>::real_type>,
-                 public Subscriptor
+                 public EnableObserverPointer
 {
 public:
   /**

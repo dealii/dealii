@@ -12022,7 +12022,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::Triangulation(
   Triangulation<dim, spacedim> &&tria) noexcept
-  : Subscriptor(std::move(tria))
+  : EnableObserverPointer(std::move(tria))
   , smooth_grid(tria.smooth_grid)
   , reference_cells(std::move(tria.reference_cells))
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
@@ -12050,7 +12050,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::operator=(
   Triangulation<dim, spacedim> &&tria) noexcept
 {
-  Subscriptor::operator=(std::move(tria));
+  EnableObserverPointer::operator=(std::move(tria));
 
   smooth_grid                  = tria.smooth_grid;
   reference_cells              = std::move(tria.reference_cells);

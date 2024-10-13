@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/quadrature.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * for example, adopting a level-set approach to describe material behavior.
  */
 template <typename CellIteratorType, typename DataType>
-class CellDataStorage : public Subscriptor
+class CellDataStorage : public EnableObserverPointer
 {
 public:
   /**

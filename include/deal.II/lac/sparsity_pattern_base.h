@@ -19,8 +19,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <utility>
 
@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * Base class for all sparsity patterns, defining a common interface by which
  * new values can be added.
  */
-class SparsityPatternBase : public Subscriptor
+class SparsityPatternBase : public EnableObserverPointer
 {
 public:
   /**

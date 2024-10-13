@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/precondition_block_base.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -77,7 +77,7 @@ public:
    * structure in #block_list and an optional ordering of the blocks in
    * #order.
    */
-  class AdditionalData : public Subscriptor
+  class AdditionalData : public EnableObserverPointer
   {
   public:
     /**
@@ -283,7 +283,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockJacobi
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:
@@ -379,7 +379,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:
@@ -475,7 +475,7 @@ template <typename MatrixType,
           typename InverseNumberType = typename MatrixType::value_type,
           typename VectorType        = Vector<double>>
 class RelaxationBlockSSOR
-  : public virtual Subscriptor,
+  : public virtual EnableObserverPointer,
     protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
 public:

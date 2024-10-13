@@ -22,8 +22,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * of matrices, will be sufficient for applications.
  */
 template <typename VectorType>
-class MGMatrixBase : public Subscriptor
+class MGMatrixBase : public EnableObserverPointer
 {
 public:
   /*
@@ -104,7 +104,7 @@ public:
  * will be done by derived classes.
  */
 template <typename VectorType>
-class MGCoarseGridBase : public Subscriptor
+class MGCoarseGridBase : public EnableObserverPointer
 {
 public:
   /**
@@ -168,7 +168,7 @@ public:
  * needed.
  */
 template <typename VectorType>
-class MGTransferBase : public Subscriptor
+class MGTransferBase : public EnableObserverPointer
 {
 public:
   /**
@@ -248,7 +248,7 @@ public:
  * in the vector @p u given the right hand side, which is done by smooth().
  */
 template <typename VectorType>
-class MGSmootherBase : public Subscriptor
+class MGSmootherBase : public EnableObserverPointer
 {
 public:
   /**

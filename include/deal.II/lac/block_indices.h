@@ -18,9 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
  */
-class BlockIndices : public Subscriptor
+class BlockIndices : public EnableObserverPointer
 {
 public:
   /**

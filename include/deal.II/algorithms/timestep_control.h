@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/vector_memory.h>
 
@@ -57,7 +57,7 @@ namespace Algorithms
    * with a more modern interface and better programming guarantees. Consider
    * using DiscreteTime instead of TimestepControl.
    */
-  class TimestepControl : public Subscriptor
+  class TimestepControl : public EnableObserverPointer
   {
   public:
     /**

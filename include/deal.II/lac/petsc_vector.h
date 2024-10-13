@@ -20,9 +20,9 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+#  include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/partitioner.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/petsc_vector_base.h>

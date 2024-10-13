@@ -19,9 +19,9 @@
 
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/bounding_box.h>
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/distributed/tria.h>
 
@@ -59,7 +59,7 @@ namespace Particles
    * finite-element solution see step-19, step-68, step-70, and step-83.
    */
   template <int dim, int spacedim = dim>
-  class ParticleHandler : public Subscriptor
+  class ParticleHandler : public EnableObserverPointer
   {
   public:
     /**

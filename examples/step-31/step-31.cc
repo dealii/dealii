@@ -242,7 +242,7 @@ namespace Step31
     // we can abort the program preserving information about where the
     // problem happened.
     template <class MatrixType, class PreconditionerType>
-    class InverseMatrix : public Subscriptor
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const MatrixType         &m,
@@ -342,7 +342,7 @@ namespace Step31
     // preconditioners in the constructor and that the matrices we use here
     // are built upon Trilinos:
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       BlockSchurPreconditioner(

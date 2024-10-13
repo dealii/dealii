@@ -18,10 +18,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/exceptions.h>
@@ -438,7 +438,7 @@ namespace internal
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename VectorType>
-class BlockVectorBase : public Subscriptor,
+class BlockVectorBase : public EnableObserverPointer,
                         public ReadVector<typename VectorType::value_type>
 {
 public:

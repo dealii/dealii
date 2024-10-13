@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/affine_constraints.h>
 
@@ -41,7 +41,7 @@ class DoFHandler;
  *
  * @ingroup mg
  */
-class MGConstrainedDoFs : public Subscriptor
+class MGConstrainedDoFs : public EnableObserverPointer
 {
 public:
   using size_dof = std::vector<std::set<types::global_dof_index>>::size_type;
