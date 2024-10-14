@@ -17,7 +17,7 @@
 // check that unsubscribing with a wrong id is handled correctly
 
 
-#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
 
 #include <iostream>

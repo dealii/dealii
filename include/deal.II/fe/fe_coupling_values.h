@@ -20,7 +20,7 @@
 
 #include <deal.II/algorithms/general_data_storage.h>
 
-#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>

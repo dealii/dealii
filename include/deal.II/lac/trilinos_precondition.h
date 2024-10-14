@@ -20,7 +20,7 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#  include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
+#  include <deal.II/base/enable_observer_pointer.h>
 
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>

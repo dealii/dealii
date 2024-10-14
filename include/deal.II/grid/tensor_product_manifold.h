@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
