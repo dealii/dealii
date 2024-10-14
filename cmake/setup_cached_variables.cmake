@@ -140,6 +140,16 @@ if( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
 endif()
 
 #
+# We do not currently support a "multiple generator" setup with our
+# concurrent configuration and set up of a debug and release flavor within
+# our "DebugRelease" target. In order to avoid confusion simply force the
+# CMAKE_CONFIGURATION_TYPES variable to match the single-generator
+# counterpart:
+#
+
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}")
+
+#
 # Configuration behaviour:
 #
 
