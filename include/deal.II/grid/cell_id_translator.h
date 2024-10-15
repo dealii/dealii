@@ -77,6 +77,14 @@ namespace internal
     translate(const TriaIterator<Accessor> &cell) const;
 
     /**
+     * Convert a @p cell of type TriaAccessor, CellAccessor, DoFAccessor, or
+     * DoFCellAccessor to an index unique on a level.
+     */
+    template <typename Accessor>
+    static types::global_cell_index
+    translate_level(const TriaIterator<Accessor> &cell);
+
+    /**
      * Convert the @p i-th child of @p to an index.
      */
     template <typename Accessor>
@@ -187,16 +195,24 @@ namespace internal
                     dim == Accessor::structure_dimension,
                   "The information can only be queried for cells.");
 
-    types::global_cell_index id = 0;
+    return translate_level(cell) + tree_sizes[cell->level()];
+  }
 
-    id += convert_cell_id_binary_type_to_level_coarse_cell_id(
+
+
+  template <int dim>
+  template <typename Accessor>
+  types::global_cell_index
+  CellIDTranslator<dim>::translate_level(const TriaIterator<Accessor> &cell)
+  {
+    static_assert(dim == Accessor::dimension &&
+                    dim == Accessor::structure_dimension,
+                  "The information can only be queried for cells.");
+
+    return convert_cell_id_binary_type_to_level_coarse_cell_id(
       CellAccessor<Accessor::dimension, Accessor::space_dimension>(*cell)
         .id()
         .template to_binary<dim>());
-
-    id += tree_sizes[cell->level()];
-
-    return id;
   }
 
 
@@ -244,7 +260,7 @@ namespace internal
 
     std::reverse(child_indices.begin(), child_indices.end());
 
-    return {id_temp, child_indices}; // TODO
+    return {id_temp, child_indices};
   }
 
 
