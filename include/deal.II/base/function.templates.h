@@ -957,8 +957,6 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
   const unsigned int n_components,
   const double       initial_time)
   : Function<dim, RangeNumberType>(n_components, initial_time)
-  , function_values(n_components)
-  , function_gradients(n_components)
 {}
 
 
@@ -968,8 +966,20 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
   const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values,
   const double initial_time)
   : Function<dim, RangeNumberType>(values.size(), initial_time)
+{
+  this->set_function_values(values);
+}
+
+
+
+template <int dim, typename RangeNumberType>
+FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
+  const std::function<RangeNumberType(const Point<dim> &, const unsigned int)>
+                    &values,
+  const unsigned int n_components,
+  const double       initial_time)
+  : Function<dim, RangeNumberType>(n_components, initial_time)
   , function_values(values)
-  , function_gradients(values.size())
 {}
 
 
@@ -982,9 +992,10 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
               &gradients,
   const double initial_time)
   : Function<dim, RangeNumberType>(values.size(), initial_time)
-  , function_values(values)
-  , function_gradients(gradients)
-{}
+{
+  this->set_function_values(values);
+  this->set_function_gradients(gradients);
+}
 
 
 
@@ -995,10 +1006,10 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::value(
   const unsigned int component) const
 {
   AssertIndexRange(component, this->n_components);
-  Assert(function_values[component],
+  Assert(function_values,
          ExcMessage("Accessing value() in FunctionFromFunctionObjects requires "
                     "setting the std::function objects for the value"));
-  return function_values[component](p);
+  return function_values(p, component);
 }
 
 
@@ -1010,11 +1021,11 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::gradient(
   const unsigned int component) const
 {
   AssertIndexRange(component, this->n_components);
-  Assert(function_gradients[component],
+  Assert(function_gradients,
          ExcMessage(
            "Accessing gradient() in FunctionFromFunctionObjects "
            "requires setting the std::function objects for the gradient"));
-  return function_gradients[component](p);
+  return function_gradients(p, component);
 }
 
 
@@ -1025,7 +1036,10 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::set_function_values(
   const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values)
 {
   AssertDimension(this->n_components, values.size());
-  function_values = values;
+  function_values = [values](const auto &p, const auto c) {
+    AssertIndexRange(c, values.size());
+    return values[c](p);
+  };
 }
 
 
@@ -1038,7 +1052,10 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::set_function_gradients(
     &gradients)
 {
   AssertDimension(this->n_components, gradients.size());
-  function_gradients = gradients;
+  function_gradients = [gradients](const auto &p, const auto c) {
+    AssertIndexRange(c, gradients.size());
+    return gradients[c](p);
+  };
 }
 
 DEAL_II_NAMESPACE_CLOSE
