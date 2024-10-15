@@ -1387,7 +1387,8 @@ namespace Utilities
      * owned indices, these indices will be treated correctly and the rank of
      * this process is returned for those entries.
      *
-     * @note This is a @ref GlossCollectiveOperation "collective operation": all processes within the given
+     * @note This is a @ref GlossCollectiveOperation "collective operation":
+     * all processes within the given
      * communicator have to call this function. Since this function does not
      * use MPI_Alltoall or MPI_Allgather, but instead uses non-blocking
      * point-to-point communication instead, and only a single non-blocking
@@ -1408,6 +1409,21 @@ namespace Utilities
     compute_index_owner(const IndexSet &owned_indices,
                         const IndexSet &indices_to_look_up,
                         const MPI_Comm  comm);
+
+    /**
+     * Just like the function above, this function computes the owning MPI
+     * process rank of each element of a second index set according to the
+     * partitioned index set, given a partitioned index set space. In addition,
+     * it returns a map of processes and associated sets of indices that are
+     * requested from the current rank. In other words, this function returns
+     * for each rank that has requested information about indices owned by the
+     * current which indices it has requested about; the values of the map are
+     * therefore all subsets of the owned set of indices.
+     */
+    std::pair<std::vector<unsigned int>, std::map<unsigned int, IndexSet>>
+    compute_index_owner_and_requesters(const IndexSet &owned_indices,
+                                       const IndexSet &indices_to_look_up,
+                                       const MPI_Comm &comm);
 
     /**
      * Compute the union of the input vectors @p vec of all processes in the
