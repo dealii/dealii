@@ -24,7 +24,7 @@
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
-#  include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
+#  include <deal.II/base/enable_observer_pointer.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
 

@@ -12,8 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#ifndef dealii_enable_ref_counting_by_observer_h
-#define dealii_enable_ref_counting_by_observer_h
+#ifndef dealii_enable_observer_pointer_h
+#define dealii_enable_observer_pointer_h
 
 
 #include <deal.II/base/config.h>

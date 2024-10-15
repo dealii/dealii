@@ -18,7 +18,7 @@
 // available after the renaming to ObserverPointer.
 
 
-#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/smartpointer.h>
 

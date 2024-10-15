@@ -12,7 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
-#include <deal.II/base/enable_ref_counting_by_observer_pointer.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/logstream.h>
 
 #include <algorithm>

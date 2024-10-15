@@ -23,7 +23,7 @@ set(_unity_include_src
   conditional_ostream.cc
   convergence_table.cc
   discrete_time.cc
-  enable_ref_counting_by_observer.cc
+  enable_observer_pointer.cc
   event.cc
   exceptions.cc
   flow_function.cc
