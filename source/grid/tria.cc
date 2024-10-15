@@ -3539,11 +3539,16 @@ namespace internal
                         s += std::to_string(v) + ',';
                       return s;
                     }() +
-                    " which are located at positions " +
+                    " which are located at coordinates " +
                     [vertex_locations, subcell_object]() {
                       std::ostringstream s;
-                      for (const auto v : subcell_object->vertices)
-                        s << '(' << vertex_locations[v] << ')';
+                      for (unsigned int i = 0;
+                           i < subcell_object->vertices.size();
+                           ++i)
+                        s << '('
+                          << vertex_locations[subcell_object->vertices[i]]
+                          << (i != subcell_object->vertices.size() - 1 ? "), " :
+                                                                         ")");
                       return s.str();
                     }() +
                     "."));
