@@ -64,6 +64,8 @@ namespace internal
   inline unsigned int
   get_regularity_from_degree(const unsigned int fe_degree)
   {
+    Assert(fe_degree % 2 == 1,
+           ExcMessage("FE_Hermite only supports odd polynomial degrees."));
     return (fe_degree == 0) ? 0 : (fe_degree - 1) / 2;
   }
 
