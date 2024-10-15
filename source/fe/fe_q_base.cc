@@ -161,21 +161,16 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
     // Add midpoint
     constraint_points.emplace_back(0.5);
 
-    if (q_deg > 1)
-      {
-        const unsigned int n    = q_deg - 1;
-        const double       step = 1. / q_deg;
-        // subface 0
-        for (unsigned int i = 1; i <= n; ++i)
-          constraint_points.push_back(
-            GeometryInfo<dim - 1>::child_to_cell_coordinates(
-              Point<dim - 1>(i * step), 0));
-        // subface 1
-        for (unsigned int i = 1; i <= n; ++i)
-          constraint_points.push_back(
-            GeometryInfo<dim - 1>::child_to_cell_coordinates(
-              Point<dim - 1>(i * step), 1));
-      }
+    // subface 0
+    for (unsigned int i = 1; i < q_deg; ++i)
+      constraint_points.push_back(
+        GeometryInfo<dim - 1>::child_to_cell_coordinates(
+          Point<dim - 1>(i / double(q_deg)), 0));
+    // subface 1
+    for (unsigned int i = 1; i < q_deg; ++i)
+      constraint_points.push_back(
+        GeometryInfo<dim - 1>::child_to_cell_coordinates(
+          Point<dim - 1>(i / double(q_deg)), 1));
 
     // Now construct relation between destination (child) and source (mother)
     // dofs.
