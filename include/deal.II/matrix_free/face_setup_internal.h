@@ -852,7 +852,10 @@ namespace internal
                                     else if (face_is_owned[dcell->face(f)
                                                              ->child(c)
                                                              ->index()] ==
-                                             FaceCategory::ghosted)
+                                               FaceCategory::ghosted ||
+                                             face_is_owned[dcell->face(f)
+                                                             ->index()] ==
+                                               FaceCategory::ghosted)
                                       {
                                         inner_ghost_faces.push_back(create_face(
                                           neighbor_face_no,
@@ -863,15 +866,11 @@ namespace internal
                                           is_mixed_mesh));
                                       }
                                     else
-                                      Assert(
-                                        face_is_owned[dcell->face(f)
-                                                        ->index()] ==
-                                            FaceCategory::
-                                              locally_active_done_elsewhere ||
-                                          face_is_owned[dcell->face(f)
-                                                          ->index()] ==
-                                            FaceCategory::ghosted,
-                                        ExcInternalError());
+                                      Assert(face_is_owned[dcell->face(f)
+                                                             ->index()] ==
+                                               FaceCategory::
+                                                 locally_active_done_elsewhere,
+                                             ExcInternalError());
                                   }
                                 else
                                   {

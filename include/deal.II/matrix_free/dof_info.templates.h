@@ -243,7 +243,8 @@ namespace internal
     template <int length>
     void
     DoFInfo::compute_face_index_compression(
-      const std::vector<FaceToCellTopology<length>> &faces)
+      const std::vector<FaceToCellTopology<length>> &faces,
+      const bool hold_all_faces_to_owned_cells)
     {
       AssertDimension(length, vectorization_length);
 
@@ -256,20 +257,33 @@ namespace internal
       n_vectorization_lanes_filled[dof_access_face_interior].resize(
         faces.size());
 
-      // all interior faces come before the boundary faces
-      unsigned int n_exterior_faces = 0;
-      for (; n_exterior_faces < faces.size(); ++n_exterior_faces)
-        if (faces[n_exterior_faces].cells_exterior[0] ==
+      // all inner faces come before the boundary faces
+      unsigned int n_inner_faces = 0;
+      for (; n_inner_faces < faces.size(); ++n_inner_faces)
+        if (faces[n_inner_faces].cells_exterior[0] ==
             numbers::invalid_unsigned_int)
           break;
+
+      // all boundary faces come after the inner faces and before the ghosted
+      // inner faces
+      unsigned int n_boundary_faces = 0;
+      for (; n_inner_faces + n_boundary_faces < faces.size();
+           ++n_boundary_faces)
+        if (faces[n_inner_faces + n_boundary_faces].cells_exterior[0] !=
+            numbers::invalid_unsigned_int)
+          break;
+
+      const unsigned int size_exterior_faces =
+        hold_all_faces_to_owned_cells ? faces.size() : n_inner_faces;
+
       index_storage_variants[dof_access_face_exterior].resize(
-        n_exterior_faces, IndexStorageVariants::full);
+        size_exterior_faces, IndexStorageVariants::full);
       dof_indices_contiguous[dof_access_face_exterior].resize(
-        n_exterior_faces * length, numbers::invalid_unsigned_int);
+        size_exterior_faces * length, numbers::invalid_unsigned_int);
       dof_indices_interleave_strides[dof_access_face_exterior].resize(
         faces.size() * length, numbers::invalid_unsigned_int);
       n_vectorization_lanes_filled[dof_access_face_exterior].resize(
-        n_exterior_faces);
+        size_exterior_faces);
 
       for (unsigned int face = 0; face < faces.size(); ++face)
         {
@@ -362,7 +376,9 @@ namespace internal
 
           face_computation(dof_access_face_interior,
                            faces[face].cells_interior);
-          if (face < n_exterior_faces)
+          if (face < n_inner_faces ||
+              (hold_all_faces_to_owned_cells &&
+               face >= (n_inner_faces + n_boundary_faces)))
             face_computation(dof_access_face_exterior,
                              faces[face].cells_exterior);
         }

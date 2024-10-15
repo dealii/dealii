@@ -87,6 +87,32 @@ public:
               src);
   }
 
+  void
+  manual_loop_vmult(VectorType &dst, const VectorType &src) const
+  {
+    src.update_ghost_values();
+    dst = 0;
+    local_apply(data, dst, src, std::make_pair(0, data.n_cell_batches()));
+    local_apply_face(data,
+                     dst,
+                     src,
+                     std::make_pair(0, data.n_inner_face_batches()));
+    local_apply_boundary_face(data,
+                              dst,
+                              src,
+                              std::make_pair(data.n_inner_face_batches(),
+                                             data.n_inner_face_batches() +
+                                               data.n_boundary_face_batches()));
+    local_apply_face(data,
+                     dst,
+                     src,
+                     std::make_pair(data.n_inner_face_batches() +
+                                      data.n_boundary_face_batches(),
+                                    data.n_inner_face_batches() +
+                                      data.n_boundary_face_batches() +
+                                      data.n_ghost_inner_face_batches()));
+  }
+
 private:
   void
   local_apply(const MatrixFree<dim, number, VectorizedArrayType> &data,
