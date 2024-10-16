@@ -215,21 +215,15 @@ namespace SparseMatrixTools
       IndexSet locally_owned_dofs(total_sum);
       locally_owned_dofs.add_range(prefix_sum, prefix_sum + local_size);
 
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        process(locally_owned_dofs, locally_active_dofs, comm, dummy, true);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, comm);
-
       using T1 = std::vector<
         std::pair<types::global_dof_index,
                   std::vector<std::pair<types::global_dof_index, Number>>>>;
 
-      auto requesters = process.get_requesters();
+      std::map<unsigned int, IndexSet> requesters;
+      std::tie(std::ignore, requesters) =
+        Utilities::MPI::compute_index_owner_and_requesters(locally_owned_dofs,
+                                                           locally_active_dofs,
+                                                           comm);
 
       std::vector<std::vector<std::pair<types::global_dof_index, Number>>>
         locally_relevant_matrix_entries(locally_active_dofs.n_elements());

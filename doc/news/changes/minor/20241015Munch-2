@@ -1,0 +1,6 @@
+Improved: The new function
+Utilities::MPI::compute_index_owner_and_requesters()
+allows to compute index owners but also returns the requesters
+for locally owned indices.
+<br>
+(Peter Munch, 2024/10/15)
