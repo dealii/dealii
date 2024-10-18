@@ -31,6 +31,7 @@
 #
 #     CMAKE_BUILD_TYPE
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+#     DEAL_II_USE_LTO
 #     DEAL_II_SETUP_COVERAGE
 #     DEAL_II_UNITY_BUILD
 #     DEAL_II_EARLY_DEPRECATIONS
@@ -158,6 +159,12 @@ option(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   ON
   )
 mark_as_advanced(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+
+option(DEAL_II_USE_LTO
+  "Allow the compiler to use interprocedural and link-time optimization (LTO)."
+  OFF
+  )
+mark_as_advanced(DEAL_II_USE_LTO)
 
 option(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."
