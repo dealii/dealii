@@ -18,6 +18,7 @@
 # to _add_ compile definitions to every target we have specified.
 #
 
+
 macro(deal_ii_add_definitions _name)
 
   foreach(_build ${DEAL_II_BUILD_TYPES})
@@ -26,6 +27,14 @@ macro(deal_ii_add_definitions _name)
     set_property(TARGET ${_name}_${_build_lowercase}
       APPEND PROPERTY COMPILE_DEFINITIONS "${ARGN}"
       )
+
+   # For release builds (and their corresponding object files),
+   # use interprocedural optimizations if possible
+   if (("${_build}" STREQUAL "RELEASE") AND ("${DEAL_II_COMPILER_SUPPORTS_IPO}" STREQUAL "YES"))
+     set_property(TARGET ${_name}_${_build_lowercase}
+                  PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+     MESSAGE(STATUS "Setting LTO properties on ${_name}_${_build_lowercase} for build type ${_build}")
+   endif()
   endforeach()
 
 endmacro()
