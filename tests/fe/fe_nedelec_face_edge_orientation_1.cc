@@ -26,4 +26,3 @@ main()
   run<3, 3>(combined_face_orientation);
   run<3, 4>(combined_face_orientation);
 }
-
