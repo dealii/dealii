@@ -98,7 +98,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_orientation.h>
 
-#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/fe_field_function.h>
@@ -107,7 +106,7 @@
 #include <cmath>
 #include <string>
 
-#include "/home/siarhei/Documents/Temp/git/dealii-nedelec/dealii/tests/tests.h"
+#include "../tests.h"
 
 template <int dim>
 void
