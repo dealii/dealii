@@ -438,8 +438,7 @@ namespace internal
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename VectorType>
-class BlockVectorBase : public EnableObserverPointer,
-                        public ReadVector<typename VectorType::value_type>
+class BlockVectorBase : public ReadVector<typename VectorType::value_type>
 {
 public:
   /**
@@ -654,7 +653,7 @@ public:
 
   virtual void
   extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
-                       ArrayView<value_type> &entries) const override;
+                       const ArrayView<value_type> &entries) const override;
 
   /**
    * Instead of getting individual elements of a vector via operator(),
@@ -2175,7 +2174,7 @@ template <typename VectorType>
 inline void
 BlockVectorBase<VectorType>::extract_subvector_to(
   const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<value_type>                          &entries) const
+  const ArrayView<value_type>                    &entries) const
 {
   AssertDimension(indices.size(), entries.size());
   for (unsigned int i = 0; i < indices.size(); ++i)

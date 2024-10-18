@@ -1331,7 +1331,7 @@ namespace NonMatching
        * function must be called to specify which cell the function should be
        * evaluated on.
        */
-      template <int dim, typename VectorType = Vector<double>>
+      template <int dim, typename Number>
       class RefSpaceFEFieldFunction : public CellWiseFunction<dim>
       {
       public:
@@ -1342,8 +1342,8 @@ namespace NonMatching
          * have a longer lifetime than the created RefSpaceFEFieldFunction
          * object.
          */
-        RefSpaceFEFieldFunction(const DoFHandler<dim> &dof_handler,
-                                const VectorType      &dof_values);
+        RefSpaceFEFieldFunction(const DoFHandler<dim>    &dof_handler,
+                                const ReadVector<Number> &dof_values);
 
         /**
          * @copydoc CellWiseFunction::set_active_cell()
@@ -1420,7 +1420,7 @@ namespace NonMatching
          * Pointer to the vector of solution coefficients passed to the
          * constructor.
          */
-        const ObserverPointer<const VectorType> global_dof_values;
+        const ObserverPointer<const ReadVector<Number>> global_dof_values;
 
         /**
          * Pointer to the element associated with the cell in the last call to
@@ -1437,13 +1437,13 @@ namespace NonMatching
          * Local solution values of the cell in the last call to
          * set_active_cell().
          */
-        std::vector<typename VectorType::value_type> local_dof_values;
+        std::vector<Number> local_dof_values;
 
         /**
          * Local solution values of the subcell after the last call to
          * set_subcell().
          */
-        std::vector<typename VectorType::value_type> local_dof_values_subcell;
+        std::vector<Number> local_dof_values_subcell;
 
         /**
          * Bounding box of the subcell after the last call to set_subcell().
@@ -1481,10 +1481,10 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
-      RefSpaceFEFieldFunction<dim, VectorType>::RefSpaceFEFieldFunction(
-        const DoFHandler<dim> &dof_handler,
-        const VectorType      &dof_values)
+      template <int dim, typename Number>
+      RefSpaceFEFieldFunction<dim, Number>::RefSpaceFEFieldFunction(
+        const DoFHandler<dim>    &dof_handler,
+        const ReadVector<Number> &dof_values)
         : dof_handler(&dof_handler)
         , global_dof_values(&dof_values)
         , n_subdivisions_per_line(numbers::invalid_unsigned_int)
@@ -1495,9 +1495,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       void
-      RefSpaceFEFieldFunction<dim, VectorType>::set_active_cell(
+      RefSpaceFEFieldFunction<dim, Number>::set_active_cell(
         const typename Triangulation<dim>::active_cell_iterator &cell)
       {
         Assert(
@@ -1565,17 +1565,15 @@ namespace NonMatching
 
         local_dof_values.resize(element->dofs_per_cell);
 
-        for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-          local_dof_values[i] =
-            dealii::internal::ElementAccess<VectorType>::get(
-              *global_dof_values, local_dof_indices[i]);
+        global_dof_values->extract_subvector_to(local_dof_indices,
+                                                local_dof_values);
       }
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       void
-      RefSpaceFEFieldFunction<dim, VectorType>::set_subcell(
+      RefSpaceFEFieldFunction<dim, Number>::set_subcell(
         const std::vector<unsigned int> &mask,
         const BoundingBox<dim>          &subcell_box)
       {
@@ -1587,27 +1585,27 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       bool
-      RefSpaceFEFieldFunction<dim, VectorType>::is_fe_q_iso_q1() const
+      RefSpaceFEFieldFunction<dim, Number>::is_fe_q_iso_q1() const
       {
         return n_subdivisions_per_line != numbers::invalid_unsigned_int;
       }
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       unsigned int
-      RefSpaceFEFieldFunction<dim, VectorType>::n_subdivisions() const
+      RefSpaceFEFieldFunction<dim, Number>::n_subdivisions() const
       {
         return n_subdivisions_per_line;
       }
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       bool
-      RefSpaceFEFieldFunction<dim, VectorType>::cell_is_set() const
+      RefSpaceFEFieldFunction<dim, Number>::cell_is_set() const
       {
         // If set cell hasn't been called the size of local_dof_values will be
         // zero.
@@ -1616,9 +1614,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       double
-      RefSpaceFEFieldFunction<dim, VectorType>::value(
+      RefSpaceFEFieldFunction<dim, Number>::value(
         const Point<dim>  &point,
         const unsigned int component) const
       {
@@ -1654,9 +1652,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       Tensor<1, dim>
-      RefSpaceFEFieldFunction<dim, VectorType>::gradient(
+      RefSpaceFEFieldFunction<dim, Number>::gradient(
         const Point<dim>  &point,
         const unsigned int component) const
       {
@@ -1695,9 +1693,9 @@ namespace NonMatching
 
 
 
-      template <int dim, typename VectorType>
+      template <int dim, typename Number>
       SymmetricTensor<2, dim>
-      RefSpaceFEFieldFunction<dim, VectorType>::hessian(
+      RefSpaceFEFieldFunction<dim, Number>::hessian(
         const Point<dim>  &point,
         const unsigned int component) const
       {
@@ -2118,18 +2116,17 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   DiscreteQuadratureGenerator<dim>::DiscreteQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
     const DoFHandler<dim>    &dof_handler,
-    const VectorType         &level_set,
+    const ReadVector<Number> &level_set,
     const AdditionalData     &additional_data)
     : QuadratureGenerator<dim>(quadratures1D, additional_data)
     , reference_space_level_set(
         std::make_unique<internal::DiscreteQuadratureGeneratorImplementation::
-                           RefSpaceFEFieldFunction<dim, VectorType>>(
-          dof_handler,
-          level_set))
+                           RefSpaceFEFieldFunction<dim, Number>>(dof_handler,
+                                                                 level_set))
   {}
 
 
@@ -2211,18 +2208,17 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   DiscreteFaceQuadratureGenerator<dim>::DiscreteFaceQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
     const DoFHandler<dim>    &dof_handler,
-    const VectorType         &level_set,
+    const ReadVector<Number> &level_set,
     const AdditionalData     &additional_data)
     : FaceQuadratureGenerator<dim>(quadratures1D, additional_data)
     , reference_space_level_set(
         std::make_unique<internal::DiscreteQuadratureGeneratorImplementation::
-                           RefSpaceFEFieldFunction<dim, VectorType>>(
-          dof_handler,
-          level_set))
+                           RefSpaceFEFieldFunction<dim, Number>>(dof_handler,
+                                                                 level_set))
   {}
 
 

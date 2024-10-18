@@ -128,8 +128,7 @@ namespace PETScWrappers
 
 
   VectorBase::VectorBase(const VectorBase &v)
-    : EnableObserverPointer()
-    , ghosted(v.ghosted)
+    : ghosted(v.ghosted)
     , ghost_indices(v.ghost_indices)
     , last_action(VectorOperation::unknown)
   {
@@ -143,8 +142,7 @@ namespace PETScWrappers
 
 
   VectorBase::VectorBase(const Vec &v)
-    : EnableObserverPointer()
-    , vector(v)
+    : vector(v)
     , ghosted(false)
     , last_action(VectorOperation::unknown)
   {

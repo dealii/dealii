@@ -116,7 +116,7 @@ namespace parallel
  * in the manual).
  */
 template <typename Number>
-class Vector : public EnableObserverPointer, public ReadVector<Number>
+class Vector : public ReadVector<Number>
 {
 public:
   /**
@@ -726,7 +726,7 @@ public:
    */
   virtual void
   extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
-                       ArrayView<Number> &elements) const override;
+                       const ArrayView<Number> &elements) const override;
 
   /**
    * Instead of getting individual elements of a vector via operator(),

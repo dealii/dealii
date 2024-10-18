@@ -77,8 +77,7 @@ namespace TrilinosWrappers
   namespace MPI
   {
     Vector::Vector()
-      : EnableObserverPointer()
-      , last_action(Zero)
+      : last_action(Zero)
       , compressed(true)
       , has_ghosts(false)
       , vector(new Epetra_FEVector(

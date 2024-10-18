@@ -730,8 +730,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(
       const Vector<Number, MemorySpaceType> &v)
-      : EnableObserverPointer()
-      , allocated_size(0)
+      : allocated_size(0)
       , vector_is_ghosted(false)
       , comm_sm(MPI_COMM_SELF)
     {
@@ -1736,7 +1735,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<Number>                              &elements) const
+      const ArrayView<Number>                        &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       for (unsigned int i = 0; i < indices.size(); ++i)

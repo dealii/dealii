@@ -123,8 +123,7 @@ namespace LinearAlgebra
    * get the first index of the largest range.
    */
   template <typename Number>
-  class ReadWriteVector : public EnableObserverPointer,
-                          public ReadVector<Number>
+  class ReadWriteVector : public ReadVector<Number>
   {
   public:
     /**
@@ -583,7 +582,7 @@ namespace LinearAlgebra
     virtual void
     extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<Number>                              &entries) const override;
+      const ArrayView<Number>                        &entries) const override;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -847,7 +846,6 @@ namespace LinearAlgebra
   template <typename Number>
   inline ReadWriteVector<Number>::ReadWriteVector(
     const ReadWriteVector<Number> &v)
-    : EnableObserverPointer()
   {
     this->operator=(v);
   }
@@ -993,7 +991,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::extract_subvector_to(
     const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<Number>                              &entries) const
+    const ArrayView<Number>                        &entries) const
   {
     AssertDimension(indices.size(), entries.size());
     for (unsigned int i = 0; i < indices.size(); ++i)
