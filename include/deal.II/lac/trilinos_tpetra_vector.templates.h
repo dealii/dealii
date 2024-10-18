@@ -78,8 +78,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector()
-      : EnableObserverPointer()
-      , compressed(true)
+      : compressed(true)
       , has_ghost(false)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(
@@ -91,8 +90,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector(const Vector<Number, MemorySpace> &V)
-      : EnableObserverPointer()
-      , compressed(V.compressed)
+      : compressed(V.compressed)
       , has_ghost(V.has_ghost)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
@@ -109,8 +107,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector(
       const Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>> V)
-      : EnableObserverPointer()
-      , compressed(true)
+      : compressed(true)
       , has_ghost(V->getMap()->isOneToOne() == false)
       , vector(V)
     {}
@@ -120,8 +117,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector(const IndexSet &parallel_partitioner,
                                         const MPI_Comm  communicator)
-      : EnableObserverPointer()
-      , compressed(true)
+      : compressed(true)
       , has_ghost(false)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(
@@ -136,7 +132,6 @@ namespace LinearAlgebra
                                         const IndexSet &ghost_entries,
                                         const MPI_Comm  communicator,
                                         const bool      vector_writable)
-      : EnableObserverPointer()
     {
       if (!vector_writable)
         {
@@ -294,7 +289,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpace>::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<Number>                              &elements) const
+      const ArrayView<Number>                        &elements) const
     {
       AssertDimension(indices.size(), elements.size());
 

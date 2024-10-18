@@ -41,13 +41,13 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEValues<dim>::FEValues(const hp::FECollection<dim> &fe_collection,
                           const Quadrature<1>         &quadrature,
                           const RegionUpdateFlags      region_update_flags,
                           const MeshClassifier<dim>   &mesh_classifier,
                           const DoFHandler<dim>       &dof_handler,
-                          const VectorType            &level_set,
+                          const ReadVector<Number>    &level_set,
                           const AdditionalData        &additional_data)
     : mapping_collection(&dealii::hp::StaticMappingQ1<dim>::mapping_collection)
     , fe_collection(&fe_collection)
@@ -71,7 +71,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEValues<dim>::FEValues(const hp::MappingCollection<dim> &mapping_collection,
                           const hp::FECollection<dim>      &fe_collection,
                           const hp::QCollection<dim>       &q_collection,
@@ -79,7 +79,7 @@ namespace NonMatching
                           const RegionUpdateFlags           region_update_flags,
                           const MeshClassifier<dim>        &mesh_classifier,
                           const DoFHandler<dim>            &dof_handler,
-                          const VectorType                 &level_set,
+                          const ReadVector<Number>         &level_set,
                           const AdditionalData             &additional_data)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)
@@ -335,14 +335,14 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::FECollection<dim> &fe_collection,
     const Quadrature<1>         &quadrature,
     const RegionUpdateFlags      region_update_flags,
     const MeshClassifier<dim>   &mesh_classifier,
     const DoFHandler<dim>       &dof_handler,
-    const VectorType            &level_set,
+    const ReadVector<Number>    &level_set,
     const AdditionalData        &additional_data)
     : mapping_collection(&dealii::hp::StaticMappingQ1<dim>::mapping_collection)
     , fe_collection(&fe_collection)
@@ -366,7 +366,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <typename VectorType>
+  template <typename Number>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::MappingCollection<dim> &mapping_collection,
     const hp::FECollection<dim>      &fe_collection,
@@ -375,7 +375,7 @@ namespace NonMatching
     const RegionUpdateFlags           region_update_flags,
     const MeshClassifier<dim>        &mesh_classifier,
     const DoFHandler<dim>            &dof_handler,
-    const VectorType                 &level_set,
+    const ReadVector<Number>         &level_set,
     const AdditionalData             &additional_data)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)

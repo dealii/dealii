@@ -166,13 +166,13 @@ namespace NonMatching
      * and @p level_set are stored internally, so these need to have a longer life
      * span than the instance of this class.
      */
-    template <typename VectorType>
+    template <typename Number>
     FEValues(const hp::FECollection<dim> &fe_collection,
              const Quadrature<1>         &quadrature,
              const RegionUpdateFlags      region_update_flags,
              const MeshClassifier<dim>   &mesh_classifier,
              const DoFHandler<dim>       &dof_handler,
-             const VectorType            &level_set,
+             const ReadVector<Number>    &level_set,
              const AdditionalData        &additional_data = AdditionalData());
 
     /**
@@ -201,7 +201,7 @@ namespace NonMatching
      * internally, so these need to have a longer life span than the instance of
      * this class.
      */
-    template <typename VectorType>
+    template <typename Number>
     FEValues(const hp::MappingCollection<dim> &mapping_collection,
              const hp::FECollection<dim>      &fe_collection,
              const hp::QCollection<dim>       &q_collection,
@@ -209,7 +209,7 @@ namespace NonMatching
              const RegionUpdateFlags           region_update_flags,
              const MeshClassifier<dim>        &mesh_classifier,
              const DoFHandler<dim>            &dof_handler,
-             const VectorType                 &level_set,
+             const ReadVector<Number>         &level_set,
              const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -512,13 +512,13 @@ namespace NonMatching
      * and @p level_set are stored internally, so these need to have a longer life
      * span than the instance of this class.
      */
-    template <typename VectorType>
+    template <typename Number>
     FEInterfaceValues(const hp::FECollection<dim> &fe_collection,
                       const Quadrature<1>         &quadrature,
                       const RegionUpdateFlags      region_update_flags,
                       const MeshClassifier<dim>   &mesh_classifier,
                       const DoFHandler<dim>       &dof_handler,
-                      const VectorType            &level_set,
+                      const ReadVector<Number>    &level_set,
                       const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -547,7 +547,7 @@ namespace NonMatching
      * internally, so these need to have a longer life span than the instance of
      * this class.
      */
-    template <typename VectorType>
+    template <typename Number>
     FEInterfaceValues(const hp::MappingCollection<dim> &mapping_collection,
                       const hp::FECollection<dim>      &fe_collection,
                       const hp::QCollection<dim - 1>   &q_collection,
@@ -555,7 +555,7 @@ namespace NonMatching
                       const RegionUpdateFlags           region_update_flags,
                       const MeshClassifier<dim>        &mesh_classifier,
                       const DoFHandler<dim>            &dof_handler,
-                      const VectorType                 &level_set,
+                      const ReadVector<Number>         &level_set,
                       const AdditionalData &additional_data = AdditionalData());
 
     /**
