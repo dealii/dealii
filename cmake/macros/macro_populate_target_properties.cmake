@@ -15,7 +15,7 @@
 #
 # populate_target_properties(<target> <build>)
 #
-# This function populate target properties according to (globally) defined
+# This function populates target properties according to (globally) defined
 # DEAL_II_* variables. Specifically:
 #
 #   DEAL_II_LIBRARIES DEAL_II_LIBRARIES_<build>
@@ -126,4 +126,13 @@ function(populate_target_properties _target _build)
     ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${_build}}
     ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_${_build}}
     )
+
+
+   # For release builds (and their corresponding object files),
+   # use interprocedural optimizations if possible
+   if (DEAL_II_USE_LTO AND ("${_build}" STREQUAL "RELEASE"))
+     set_property(TARGET ${_target}
+                  PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+   endif()
+
 endfunction()
