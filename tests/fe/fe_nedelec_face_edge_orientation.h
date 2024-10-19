@@ -408,16 +408,16 @@ run(unsigned char combined_face_orientation)
 
   dealii::Functions::FEFieldFunction field_function(dof_handler, solution);
 
-  unsigned int n_shared_faces_theory;
+  unsigned int n_shared_dofs_theory;
 
   if (dim == 2)
-    n_shared_faces_theory = order + 1;
+    n_shared_dofs_theory = order + 1;
 
   if (dim == 3)
-    n_shared_faces_theory = (2 * order + 1) * (order + 1);
+    n_shared_dofs_theory = (2 * order + 1) * (order + 1);
 
-  unsigned int Q              = solution.size();
-  unsigned int n_shared_faces = 0;
+  unsigned int Q             = solution.size();
+  unsigned int n_shared_dofs = 0;
   for (unsigned int i = 0; i < Q; i++)
     {
       solution.reinit(Q);
@@ -438,14 +438,14 @@ run(unsigned char combined_face_orientation)
 
       if ((result.shared) && (!result.error))
         {
-          n_shared_faces++;
+          n_shared_dofs++;
           deallog << result.cum_norm_diff << std::endl;
         }
 
 
-      if (n_shared_faces == n_shared_faces_theory)
+      if (n_shared_dofs == n_shared_dofs_theory)
         break;
     }
 
-  deallog << n_shared_faces << " : " << n_shared_faces_theory << std::endl;
+  deallog << n_shared_dofs << " : " << n_shared_dofs_theory << std::endl;
 }
