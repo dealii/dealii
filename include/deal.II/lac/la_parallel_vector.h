@@ -246,8 +246,7 @@ namespace LinearAlgebra
      * @endcode
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
-    class Vector : public ::dealii::ReadVector<Number>,
-                   public EnableObserverPointer
+    class Vector : public ::dealii::ReadVector<Number>
     {
     public:
       using memory_space    = MemorySpace;
@@ -1135,7 +1134,7 @@ namespace LinearAlgebra
       virtual void
       extract_subvector_to(
         const ArrayView<const types::global_dof_index> &indices,
-        ArrayView<Number> &elements) const override;
+        const ArrayView<Number> &elements) const override;
 
       /**
        * Instead of getting individual elements of a vector via operator(),

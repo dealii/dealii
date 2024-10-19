@@ -52,7 +52,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
 Vector<Number>::Vector(const Vector<Number> &v)
-  : EnableObserverPointer()
 {
   *this = v;
 }
@@ -622,7 +621,7 @@ template <typename Number>
 void
 Vector<Number>::extract_subvector_to(
   const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<Number>                              &elements) const
+  const ArrayView<Number>                        &elements) const
 {
   AssertDimension(indices.size(), elements.size());
   for (unsigned int i = 0; i < indices.size(); ++i)
