@@ -19,7 +19,6 @@
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/communication_pattern_base.h>
-#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi_stub.h>

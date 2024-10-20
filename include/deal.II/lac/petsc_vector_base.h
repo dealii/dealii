@@ -20,7 +20,6 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <deal.II/base/enable_observer_pointer.h>
 #  include <deal.II/base/index_set.h>
 
 #  include <deal.II/lac/exceptions.h>
