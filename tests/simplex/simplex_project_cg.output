@@ -53,3 +53,27 @@ DEAL::L2 error = 2.324e-05
 DEAL::ratio = 15.31
 DEAL::L2 error = 1.447e-06
 DEAL::ratio = 16.06
+DEAL::FE = FE_SimplexP<2>(1)
+DEAL::using AMR
+DEAL::L2 error = 0.07022
+DEAL::ratio = 14.24
+DEAL::L2 error = 0.03106
+DEAL::ratio = 2.261
+DEAL::L2 error = 0.008068
+DEAL::ratio = 3.850
+DEAL::FE = FE_SimplexP<2>(2)
+DEAL::using AMR
+DEAL::L2 error = 0.004448
+DEAL::ratio = 224.8
+DEAL::L2 error = 0.002054
+DEAL::ratio = 2.165
+DEAL::L2 error = 0.0003406
+DEAL::ratio = 6.030
+DEAL::FE = FE_SimplexP<2>(3)
+DEAL::using AMR
+DEAL::L2 error = 0.003640
+DEAL::ratio = 274.7
+DEAL::L2 error = 0.0002153
+DEAL::ratio = 16.91
+DEAL::L2 error = 1.432e-05
+DEAL::ratio = 15.03

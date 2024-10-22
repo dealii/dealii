@@ -218,7 +218,6 @@ namespace
   constraints_fe_p<2>(const unsigned int degree)
   {
     constexpr int dim = 2;
-    Assert(degree <= 3, ExcNotImplemented());
 
     // the following implements the 2d case
     // (the 3d case is not implemented yet)
@@ -229,13 +228,16 @@ namespace
     std::vector<Point<dim - 1>> constraint_points;
     // midpoint
     constraint_points.emplace_back(0.5);
-    if (degree == 2)
-      {
-        // midpoint on subface 0
-        constraint_points.emplace_back(0.25);
-        // midpoint on subface 1
-        constraint_points.emplace_back(0.75);
-      }
+    // subface 0
+    for (unsigned int i = 1; i < degree; ++i)
+      constraint_points.push_back(
+        GeometryInfo<dim - 1>::child_to_cell_coordinates(
+          Point<dim - 1>(i / double(degree)), 0));
+    // subface 1
+    for (unsigned int i = 1; i < degree; ++i)
+      constraint_points.push_back(
+        GeometryInfo<dim - 1>::child_to_cell_coordinates(
+          Point<dim - 1>(i / double(degree)), 1));
 
     // Now construct relation between destination (child) and source (mother)
     // dofs.
