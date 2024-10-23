@@ -9,6 +9,9 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  MAKEFLAGS: "--jobs=4"
+
 jobs:
   indent:
     # run the indent checks
@@ -45,7 +48,7 @@ jobs:
         mkdir build
         cd build
         cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DDEAL_II_DOXYGEN_USE_MATHJAX=ON ..
-        make -j 2 documentation
+        make documentation
     - name: check for doxygen errors and warnings
       run: |
         cd build
