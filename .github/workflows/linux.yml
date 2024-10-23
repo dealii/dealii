@@ -184,7 +184,7 @@ jobs:
       run: |
         cd build
         make VERBOSE=1 -j2
-    - name: test
+    - name: test trilinos_tpetra
       run: |
         # Remove warning: "A high-performance Open MPI point-to-point
         # messaging module was unable to find any relevant network
@@ -192,17 +192,8 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make VERBOSE=1 -j2
-    - name: test
-      run: |
-        # Remove warning: "A high-performance Open MPI point-to-point
-        # messaging module was unable to find any relevant network
-        # interfaces."
-        export OMPI_MCA_btl_base_warn_component_unused='0'
-
-        cd build
-        make -j2 setup_tests
-        ctest --output-on-failure -j2 -VV -R "tpetra"
+        make -j2 setup_tests_trilinos_tpetra
+        ctest --output-on-failure -j2 -VV
 
   ############################
   # linux-debug-intel-oneapi #
