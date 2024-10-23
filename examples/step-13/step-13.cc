@@ -1376,8 +1376,7 @@ namespace Step13
                                                          results_table);
 
     // Also generate an evaluator which writes out the solution:
-    Evaluation::SolutionOutput<dim> postprocessor2(std::string("solution-") +
-                                                     solver_name,
+    Evaluation::SolutionOutput<dim> postprocessor2("solution-" + solver_name,
                                                    DataOutBase::gnuplot);
 
     // Take these two evaluation objects and put them in a list...

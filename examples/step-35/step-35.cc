@@ -238,7 +238,7 @@ namespace Step35
 
       prm.parse_input(file);
 
-      if (prm.get("Method_Form") == std::string("rotational"))
+      if (prm.get("Method_Form") == "rotational")
         form = Method::rotational;
       else
         form = Method::standard;
