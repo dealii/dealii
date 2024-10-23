@@ -81,6 +81,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::MatrixFree()
   , indices_are_initialized(false)
   , mapping_is_initialized(false)
   , mg_level(numbers::invalid_unsigned_int)
+  , first_dof_handler_index(0)
 {}
 
 
@@ -356,6 +357,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::copy_from(
   indices_are_initialized    = v.indices_are_initialized;
   mapping_is_initialized     = v.mapping_is_initialized;
   mg_level                   = v.mg_level;
+  first_dof_handler_index    = v.first_dof_handler_index;
 }
 
 
@@ -428,6 +430,21 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
               shape_info(c, nq, fe_no, q_no)
                 .reinit(quad[nq][q_no], dof_handler[no]->get_fe(fe_no), b);
   }
+
+  // Vector of DeFHandler indices of those that are in hp-mode
+  const std::vector<unsigned int> hp_dof_handler_index =
+    std::invoke([&dof_handler]() {
+      std::vector<unsigned int> hp_dof_handler_index;
+      hp_dof_handler_index.reserve(dof_handler.size());
+      for (unsigned int i = 0; i < dof_handler.size(); ++i)
+        {
+          if (dof_handler[i]->has_hp_capabilities())
+            hp_dof_handler_index.emplace_back(i);
+        }
+      return hp_dof_handler_index;
+    });
+  if (hp_dof_handler_index.size() > 0)
+    first_dof_handler_index = hp_dof_handler_index[0];
 
   // Store pointers to AffineConstraints objects if Number type matches
   affine_constraints.resize(constraints.size());
@@ -547,7 +564,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         }
     }
 
-
   // subdivide cell, face and boundary face partitioner data, s.t., all
   // ranges have the same active FE indices
   if (task_info.scheme != internal::MatrixFreeFunctions::TaskInfo::
@@ -576,7 +592,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                   for (unsigned int i = 0; i < this->n_active_fe_indices(); ++i)
                     {
                       const auto cell_subrange =
-                        this->create_cell_subrange_hp_by_index(range, i);
+                        this->create_cell_subrange_hp_by_index(
+                          range, i, first_dof_handler_index);
 
                       if (cell_subrange.second <= cell_subrange.first)
                         continue;
@@ -605,8 +622,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                 const unsigned int                           face_type,
                 const unsigned int                           fe_index_interior,
                 const unsigned int                           fe_index_exterior,
-                const unsigned int                           dof_handler_index =
-                  0) -> std::pair<unsigned int, unsigned int> {
+                const unsigned int                           dof_handler_index)
+            -> std::pair<unsigned int, unsigned int> {
             const unsigned int n_face_types =
               std::max<unsigned int>(dim - 1, 1);
 
@@ -677,10 +694,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                              ++j)
                           {
                             const auto subrange =
-                              create_inner_face_subrange_hp_by_index(range,
-                                                                     t,
-                                                                     i,
-                                                                     j);
+                              create_inner_face_subrange_hp_by_index(
+                                range, t, i, j, first_dof_handler_index);
 
                             if (subrange.second <= subrange.first)
                               continue;
@@ -708,8 +723,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
             [&](const std::pair<unsigned int, unsigned int> &range,
                 const unsigned int                           face_type,
                 const unsigned int                           fe_index,
-                const unsigned int                           dof_handler_index =
-                  0) -> std::pair<unsigned int, unsigned int> {
+                const unsigned int                           dof_handler_index)
+            -> std::pair<unsigned int, unsigned int> {
             const unsigned int n_face_types =
               std::max<unsigned int>(dim - 1, 1);
 
@@ -774,9 +789,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
                            ++i)
                         {
                           const auto cell_subrange =
-                            create_boundary_face_subrange_hp_by_index(range,
-                                                                      t,
-                                                                      i);
+                            create_boundary_face_subrange_hp_by_index(
+                              range, t, i, first_dof_handler_index);
 
                           if (cell_subrange.second <= cell_subrange.first)
                             continue;
@@ -796,24 +810,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   // determined in @p extract_local_to_global_indices.
   if (additional_data.initialize_mapping == true)
     {
-      if (dof_handler.size() > 1)
+      // check if active FE indices of all hp-DoFHandlers are the same.
+      for (unsigned int i = 1; i < hp_dof_handler_index.size(); ++i)
         {
-          // check if all DoHandlers are in the same hp-mode; and if hp-
-          // capabilities are enabled: check if active FE indices of all
-          // DoFHandlers are the same.
-          for (unsigned int i = 1; i < dof_handler.size(); ++i)
-            {
-              Assert(dof_handler[0]->has_hp_capabilities() ==
-                       dof_handler[i]->has_hp_capabilities(),
-                     ExcNotImplemented());
-
-              if (dof_handler[0]->has_hp_capabilities())
-                {
-                  Assert(dof_info[0].cell_active_fe_index ==
-                           dof_info[i].cell_active_fe_index,
-                         ExcNotImplemented());
-                }
-            }
+          Assert(dof_info[hp_dof_handler_index[0]].cell_active_fe_index ==
+                   dof_info[hp_dof_handler_index[i]].cell_active_fe_index,
+                 ExcNotImplemented());
         }
 
       // Will the piola transform be used? If so we need to update
@@ -837,8 +839,8 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         dof_handler[0]->get_triangulation(),
         cell_level_index,
         face_info,
-        dof_handler[0]->has_hp_capabilities() ?
-          dof_info[0].cell_active_fe_index :
+        hp_dof_handler_index.size() > 0 ?
+          dof_info[hp_dof_handler_index[0]].cell_active_fe_index :
           std::vector<unsigned int>(),
         mapping,
         quad,
@@ -895,11 +897,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::update_mapping(
   const std::shared_ptr<hp::MappingCollection<dim>> &mapping)
 {
   AssertDimension(shape_info.size(1), mapping_info.cell_data.size());
-  mapping_info.update_mapping(dof_handlers[0]->get_triangulation(),
-                              cell_level_index,
-                              face_info,
-                              dof_info[0].cell_active_fe_index,
-                              mapping);
+  mapping_info.update_mapping(
+    dof_handlers[0]->get_triangulation(),
+    cell_level_index,
+    face_info,
+    dof_info[first_dof_handler_index].cell_active_fe_index,
+    mapping);
 }
 
 
@@ -1491,9 +1494,20 @@ namespace internal
         }
     }
 
-    const bool hp_functionality_enabled =
-      std::any_of(dof_handlers.begin(), dof_handlers.end(), [](const auto &dh) {
-        return dh->has_hp_capabilities();
+    const auto [hp_functionality_enabled, first_dof_handler_index] =
+      std::invoke([&dof_handlers]() -> std::pair<bool, unsigned int> {
+        bool         hp_functionality_enabled = false;
+        unsigned int first_dof_handler_index  = 0;
+        for (unsigned int i = 0; i < dof_handlers.size(); ++i)
+          {
+            if (dof_handlers[i]->has_hp_capabilities())
+              {
+                hp_functionality_enabled = true;
+                first_dof_handler_index  = i;
+                break;
+              }
+          }
+        return {hp_functionality_enabled, first_dof_handler_index};
       });
 
     const unsigned int         n_lanes = task_info.vectorization_length;
@@ -1559,14 +1573,15 @@ namespace internal
                   parent_relation[i] = position;
                 ++position;
               }
-        task_info.create_blocks_serial(subdomain_boundary_cells,
-                                       max_dofs_per_cell,
-                                       hp_functionality_enabled,
-                                       dof_info[0].cell_active_fe_index,
-                                       strict_categories,
-                                       parent_relation,
-                                       renumbering,
-                                       irregular_cells);
+        task_info.create_blocks_serial(
+          subdomain_boundary_cells,
+          max_dofs_per_cell,
+          hp_functionality_enabled,
+          dof_info[first_dof_handler_index].cell_active_fe_index,
+          strict_categories,
+          parent_relation,
+          renumbering,
+          irregular_cells);
       }
     else
       {
@@ -1579,7 +1594,8 @@ namespace internal
         task_info.initial_setup_blocks_tasks(subdomain_boundary_cells,
                                              renumbering,
                                              irregular_cells);
-        task_info.guess_block_size(dof_info[0].dofs_per_cell[0]);
+        task_info.guess_block_size(
+          dof_info[first_dof_handler_index].dofs_per_cell[0]);
 
         unsigned int n_cell_batches_before =
           *(task_info.cell_partition_data.end() - 2);
@@ -1621,10 +1637,12 @@ namespace internal
             if (hp_functionality_enabled)
               {
                 irregular_cells.resize(0);
-                irregular_cells.resize(task_info.cell_partition_data.back() +
-                                       2 * dof_info[0].max_fe_index);
+                irregular_cells.resize(
+                  task_info.cell_partition_data.back() +
+                  2 * dof_info[first_dof_handler_index].max_fe_index);
                 std::vector<std::vector<unsigned int>> renumbering_fe_index;
-                renumbering_fe_index.resize(dof_info[0].max_fe_index);
+                renumbering_fe_index.resize(
+                  dof_info[first_dof_handler_index].max_fe_index);
                 unsigned int counter;
                 n_cell_batches_before = 0;
                 for (counter = 0;
@@ -1634,13 +1652,17 @@ namespace internal
                   {
                     AssertIndexRange(counter, renumbering.size());
                     AssertIndexRange(renumbering[counter],
-                                     dof_info[0].cell_active_fe_index.size());
+                                     dof_info[first_dof_handler_index]
+                                       .cell_active_fe_index.size());
                     renumbering_fe_index
-                      [dof_info[0].cell_active_fe_index[renumbering[counter]]]
+                      [dof_info[first_dof_handler_index]
+                         .cell_active_fe_index[renumbering[counter]]]
                         .push_back(renumbering[counter]);
                   }
                 counter = 0;
-                for (unsigned int j = 0; j < dof_info[0].max_fe_index; ++j)
+                for (unsigned int j = 0;
+                     j < dof_info[first_dof_handler_index].max_fe_index;
+                     ++j)
                   {
                     for (const auto jj : renumbering_fe_index[j])
                       renumbering[counter++] = jj;
@@ -1657,13 +1679,17 @@ namespace internal
                      counter++)
                   {
                     renumbering_fe_index
-                      [dof_info[0].cell_active_fe_index.empty() ?
+                      [dof_info[first_dof_handler_index]
+                           .cell_active_fe_index.empty() ?
                          0 :
-                         dof_info[0].cell_active_fe_index[renumbering[counter]]]
+                         dof_info[first_dof_handler_index]
+                           .cell_active_fe_index[renumbering[counter]]]
                         .push_back(renumbering[counter]);
                   }
                 counter = start_nonboundary * n_lanes;
-                for (unsigned int j = 0; j < dof_info[0].max_fe_index; ++j)
+                for (unsigned int j = 0;
+                     j < dof_info[first_dof_handler_index].max_fe_index;
+                     ++j)
                   {
                     for (const auto jj : renumbering_fe_index[j])
                       renumbering[counter++] = jj;
@@ -1673,9 +1699,10 @@ namespace internal
                     n_cell_batches_before +=
                       (renumbering_fe_index[j].size() + n_lanes - 1) / n_lanes;
                   }
-                AssertIndexRange(n_cell_batches_before,
-                                 task_info.cell_partition_data.back() +
-                                   2 * dof_info[0].max_fe_index + 1);
+                AssertIndexRange(
+                  n_cell_batches_before,
+                  task_info.cell_partition_data.back() +
+                    2 * dof_info[first_dof_handler_index].max_fe_index + 1);
                 irregular_cells.resize(n_cell_batches_before + n_ghost_slots);
                 *(task_info.cell_partition_data.end() - 2) =
                   n_cell_batches_before;
@@ -1743,15 +1770,15 @@ namespace internal
 #endif
           }
         if (task_info.n_active_cells > 0)
-          dof_info[0].make_connectivity_graph(task_info,
-                                              renumbering,
-                                              connectivity);
+          dof_info[first_dof_handler_index].make_connectivity_graph(
+            task_info, renumbering, connectivity);
 
-        task_info.make_thread_graph(dof_info[0].cell_active_fe_index,
-                                    connectivity,
-                                    renumbering,
-                                    irregular_cells,
-                                    hp_functionality_enabled);
+        task_info.make_thread_graph(
+          dof_info[first_dof_handler_index].cell_active_fe_index,
+          connectivity,
+          renumbering,
+          irregular_cells,
+          hp_functionality_enabled);
 
         Assert(irregular_cells.size() >= task_info.cell_partition_data.back(),
                ExcInternalError());
@@ -1989,7 +2016,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           hard_vectorization_boundary,
           task_info.face_partition_data,
           face_info.faces,
-          dof_info[0].cell_active_fe_index);
+          dof_info[first_dof_handler_index].cell_active_fe_index);
 
       // on boundary faces, we must also respect the vectorization boundary of
       // the inner faces because we might have dependencies on ghosts of
@@ -1999,7 +2026,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         hard_vectorization_boundary,
         task_info.boundary_partition_data,
         face_info.faces,
-        dof_info[0].cell_active_fe_index);
+        dof_info[first_dof_handler_index].cell_active_fe_index);
 
       // for the other ghosted faces, there are no scheduling restrictions
       hard_vectorization_boundary.clear();
@@ -2010,7 +2037,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         hard_vectorization_boundary,
         task_info.ghost_face_partition_data,
         face_info.faces,
-        dof_info[0].cell_active_fe_index);
+        dof_info[first_dof_handler_index].cell_active_fe_index);
       hard_vectorization_boundary.clear();
       hard_vectorization_boundary.resize(
         task_info.refinement_edge_face_partition_data.size(), false);
@@ -2019,7 +2046,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         hard_vectorization_boundary,
         task_info.refinement_edge_face_partition_data,
         face_info.faces,
-        dof_info[0].cell_active_fe_index);
+        dof_info[first_dof_handler_index].cell_active_fe_index);
 
       cell_level_index.resize(
         cell_level_index.size() +
