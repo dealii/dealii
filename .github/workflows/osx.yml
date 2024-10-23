@@ -51,6 +51,9 @@ jobs:
       run: |
         cd build
         make VERBOSE=1 -j2
+    - name: test
+      run: |
+        cd build
         make -j2 \
           setup_tests_a-framework \
           setup_tests_quick_tests
@@ -106,6 +109,9 @@ jobs:
       run: |
         cd build
         make VERBOSE=1 -j2
+    - name: test
+      run: |
+        cd build
         make -j2 \
           setup_tests_a-framework \
           setup_tests_quick_tests
