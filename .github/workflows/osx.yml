@@ -39,11 +39,17 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON .
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              ..
     - name: print detailed.log
-      run: cat detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
+        cd build
         make VERBOSE=1 -j2
         make -j2 \
           setup_tests_a-framework \
@@ -86,11 +92,19 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        CC=mpicc CXX=mpic++ cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_WITH_64BIT_INDICES=ON -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON -D DEAL_II_WITH_MPI=on .
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_WITH_64BIT_INDICES=ON \
+              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_MPI=ON \
+              ..
     - name: print detailed.log
-      run: cat detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
+        cd build
         make VERBOSE=1 -j2
         make -j2 \
           setup_tests_a-framework \
