@@ -230,9 +230,9 @@ namespace GridOutFlags
   void
   EpsFlagsBase::parse_parameters(ParameterHandler &param)
   {
-    if (param.get("Size by") == std::string("width"))
+    if (param.get("Size by") == "width")
       size_type = width;
-    else if (param.get("Size by") == std::string("height"))
+    else if (param.get("Size by") == "height")
       size_type = height;
     size                     = param.get_integer("Size");
     line_width               = param.get_double("Line width");

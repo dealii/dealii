@@ -61,7 +61,7 @@ DEAL_II_NAMESPACE_OPEN
  * double double_attribute = 2.2;
  * data_file.set_attribute("double_attribute", double_attribute);
  * auto group = data_file.create_group("group");
- * group.set_attribute("simulation_type", std::string("elastic_equation"));
+ * group.set_attribute("simulation_type", "elastic_equation");
  * auto dataset = group.create_dataset<double>("dataset_name", dimensions);
  * dataset.set_attribute("complex_double_attribute",
  *                       std::complex<double>(2,2.3));

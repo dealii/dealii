@@ -80,8 +80,8 @@ EnableObserverPointer::check_no_subscribers() const noexcept
           for (const auto &map_entry : counter_map)
             {
               if (map_entry.second > 0)
-                infostring += std::string("\n  from Subscriber ") +
-                              std::string(map_entry.first);
+                infostring +=
+                  "\n  from Subscriber " + std::string(map_entry.first);
             }
 
           if (infostring.empty())

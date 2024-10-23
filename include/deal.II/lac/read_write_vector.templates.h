@@ -556,7 +556,7 @@ namespace LinearAlgebra
           communication_pattern);
         AssertThrow(tpetra_comm_pattern != nullptr,
                     ExcMessage(
-                      std::string("The communication pattern is not of type ") +
+                      "The communication pattern is not of type "
                       "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
       }
 
@@ -686,7 +686,7 @@ namespace LinearAlgebra
             communication_pattern);
         AssertThrow(epetra_comm_pattern != nullptr,
                     ExcMessage(
-                      std::string("The communication pattern is not of type ") +
+                      "The communication pattern is not of type "
                       "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
       }
 

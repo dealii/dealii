@@ -224,9 +224,8 @@ namespace LinearAlgebra
               communication_pattern);
           AssertThrow(
             epetra_comm_pattern != nullptr,
-            ExcMessage(
-              std::string("The communication pattern is not of type ") +
-              "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
+            ExcMessage("The communication pattern is not of type "
+                       "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }
 
       Epetra_Import import_map(epetra_comm_pattern->get_epetra_import());

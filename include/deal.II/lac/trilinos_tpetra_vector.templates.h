@@ -528,9 +528,8 @@ namespace LinearAlgebra
 
           AssertThrow(
             !tpetra_comm_pattern.is_null(),
-            ExcMessage(
-              std::string("The communication pattern is not of type ") +
-              "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
+            ExcMessage("The communication pattern is not of type "
+                       "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
         }
 
       Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>> tpetra_export =

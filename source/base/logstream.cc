@@ -306,7 +306,7 @@ LogStream::push(const std::string &text)
     pre = get_prefixes().top();
 
   pre += text;
-  pre += std::string(":");
+  pre += ":";
   get_prefixes().push(pre);
 }
 

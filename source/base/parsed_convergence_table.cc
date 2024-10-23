@@ -248,9 +248,8 @@ ParsedConvergenceTable::output_table()
       else
         {
           AssertThrow(false,
-                      ExcInternalError(
-                        std::string("Unrecognized file format: ") +
-                        error_file_format));
+                      ExcInternalError("Unrecognized file format: " +
+                                       error_file_format));
         }
       table_file.close();
     }
