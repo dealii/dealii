@@ -58,13 +58,6 @@ jobs:
           setup_tests_a-framework \
           setup_tests_quick_tests
         ctest --output-on-failure -j2 -VV
-    - name: upload CMakeConfigureLog
-      uses: actions/upload-artifact@v4
-      if: always()
-      continue-on-error: true
-      with:
-        name: osx-serial-CMakeConfigureLog.yaml
-        path: CMakeFiles/CMakeConfigureLog.yaml
 
   osx-parallel64:
     # MPI build using apple clang and 64 bit indices
@@ -116,11 +109,3 @@ jobs:
           setup_tests_a-framework \
           setup_tests_quick_tests
         ctest --output-on-failure -j2 -VV
-    - name: upload CMakeConfigureLog
-      uses: actions/upload-artifact@v4
-      if: always()
-      continue-on-error: true
-      with:
-        name: osx-parallel64-CMakeConfigureLog.yaml
-        path: CMakeFiles/CMakeConfigureLog.yaml
-
