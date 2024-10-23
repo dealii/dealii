@@ -459,12 +459,8 @@ jobs:
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               ..
-        cat detailed.log
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-cuda-clang-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build deal.II
       run: |
         cd build
