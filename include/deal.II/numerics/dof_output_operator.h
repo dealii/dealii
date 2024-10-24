@@ -53,7 +53,7 @@ namespace Algorithms
      * last step command. Numbers with less digits are filled with
      * zeros from the left.
      */
-    DoFOutputOperator(const std::string &filename_base = std::string("output"),
+    DoFOutputOperator(const std::string &filename_base = "output",
                       const unsigned int digits        = 3);
 
     void

@@ -805,7 +805,7 @@ namespace Patterns
 
     /**
      * Constructor. This is needed to allow users to specify
-     * directly the separator without using std::string(";").
+     * directly the separator without using ";".
      *
      * Since we support a pure variadic templates version, without this
      * specialization, the compiler will fail with cryptic errors.
@@ -1441,7 +1441,7 @@ namespace Patterns
   template <class... PatternTypes>
   Tuple::Tuple(const PatternTypes &...ps)
     : // forward to the version with the separator argument
-    Tuple(std::string(":"), ps...)
+    Tuple(":", ps...)
   {}
 
 
