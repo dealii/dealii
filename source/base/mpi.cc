@@ -735,6 +735,44 @@ namespace Utilities
 
 
 
+    std::pair<std::vector<unsigned int>, std::map<unsigned int, IndexSet>>
+    compute_index_owner_and_requesters(const IndexSet &owned_indices,
+                                       const IndexSet &indices_to_look_up,
+                                       const MPI_Comm &comm)
+    {
+      Assert(owned_indices.size() == indices_to_look_up.size(),
+             ExcMessage("IndexSets have to have the same sizes."));
+
+      Assert(
+        owned_indices.size() == Utilities::MPI::max(owned_indices.size(), comm),
+        ExcMessage("IndexSets have to have the same size on all processes."));
+
+      std::vector<unsigned int> owning_ranks(indices_to_look_up.n_elements());
+
+      // Step 1: setup dictionary
+      // The input owned_indices can be partitioned arbitrarily. In the
+      // dictionary, the index set is statically repartitioned among the
+      // processes again and extended with information with the actual owner
+      // of that the index.
+      internal::ComputeIndexOwner::ConsensusAlgorithmsPayload process(
+        owned_indices, indices_to_look_up, comm, owning_ranks, true);
+
+      // Step 2: read dictionary
+      // Communicate with the process who owns the index in the static
+      // partition (i.e. in the dictionary). This process returns the actual
+      // owner of the index.
+      ConsensusAlgorithms::Selector<
+        std::vector<
+          std::pair<types::global_dof_index, types::global_dof_index>>,
+        std::vector<unsigned int>>
+        consensus_algorithm;
+      consensus_algorithm.run(process, comm);
+
+      return {owning_ranks, process.get_requesters()};
+    }
+
+
+
     namespace internal
     {
       namespace CollectiveMutexImplementation
