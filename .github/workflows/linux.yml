@@ -10,7 +10,7 @@ on:
     - ready_for_review
 
 concurrency:
-  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{github.event_name == 'pull_request'}}
 
 permissions:
@@ -184,7 +184,7 @@ jobs:
       run: |
         cd build
         make VERBOSE=1 -j2
-    - name: test
+    - name: test trilinos_tpetra
       run: |
         # Remove warning: "A high-performance Open MPI point-to-point
         # messaging module was unable to find any relevant network
@@ -192,17 +192,8 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make VERBOSE=1 -j2
-    - name: test
-      run: |
-        # Remove warning: "A high-performance Open MPI point-to-point
-        # messaging module was unable to find any relevant network
-        # interfaces."
-        export OMPI_MCA_btl_base_warn_component_unused='0'
-
-        cd build
-        make -j2 setup_tests
-        ctest --output-on-failure -j2 -VV -R "tpetra"
+        make -j2 setup_tests_trilinos_tpetra
+        ctest --output-on-failure -j2 -VV
 
   ############################
   # linux-debug-intel-oneapi #
@@ -468,12 +459,8 @@ jobs:
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               ..
-        cat detailed.log
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-cuda-clang-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build deal.II
       run: |
         cd build
