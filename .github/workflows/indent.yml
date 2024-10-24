@@ -61,14 +61,10 @@ jobs:
         sed -i '/^$/d' doxygen.log
         # Check if remaining log is zero size
         ! [ -s doxygen.log ] || exit 1
-    - name: compress
-      run: |
-        tar -czf doxygen_documentation.tar.gz build/doc/doxygen
-    - name: archive documentation
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
-        name: doxygen_documentation.tar.gz
-        path: doxygen_documentation.tar.gz
+        name: doxygen_documentation
+        path: build/doc/doxygen
 
   typos:
     # check for typos
