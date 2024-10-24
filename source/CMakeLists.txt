@@ -94,6 +94,18 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     set(build_camelcase "Release")
   endif()
 
+
+  # If this is the release target, and if we want to do interprocedural/link-time
+  # optimizations, then set the respective property on the object files
+  if(("${build}" MATCHES "RELEASE") AND ("${DEAL_II_COMPILER_SUPPORTS_IPO}" STREQUAL "YES"))
+    get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
+    foreach(_target ${_object_targets})
+       set_property(TARGET ${_target}
+                  PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+       message(STATUS "Setting LTO properties on ${_target}")
+    endforeach()
+  endif()
+
   #
   # Combine all ${build} OBJECT targets to a ${build} library:
   #
@@ -111,9 +123,15 @@ foreach(build ${DEAL_II_BUILD_TYPES})
 
   #
   # Add compile flags, definitions and (public) feature (recorded in
-  # DEAL_II_TARGETS(|_DEBUG|_RELEASE)).
+  # DEAL_II_TARGETS(|_DEBUG|_RELEASE), and in DEAL_II_COMPILER_SUPPORTS_IPO).
   #
   populate_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase} ${build})
+
+  if(("${build}" MATCHES "RELEASE") AND ("${DEAL_II_COMPILER_SUPPORTS_IPO}" STREQUAL "YES"))
+    set_property(TARGET ${DEAL_II_TARGET_NAME}_${build_lowercase}
+                 PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    message(STATUS "Setting LTO properties on ${DEAL_II_TARGET_NAME}_${build_lowercase}")
+  endif()
 
   #
   # Record the expected C++ standard as a compile feature. This target
