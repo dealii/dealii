@@ -1461,12 +1461,12 @@ int main(int argc, char *argv[])
               group.get_attribute<double>("frequency_range") / 2);
           group.set_attribute<unsigned int>("nb_frequency_points", 400);
 
-          if (group_name == std::string("displacement"))
-            group.set_attribute<std::string>(
-              "simulation_name", std::string("phononic_cavity_displacement"));
+          if (group_name == "displacement")
+            group.set_attribute<std::string>("simulation_name",
+                                             "phononic_cavity_displacement");
           else
-            group.set_attribute<std::string>(
-              "simulation_name", std::string("phononic_cavity_calibration"));
+            group.set_attribute<std::string>("simulation_name",
+                                             "phononic_cavity_calibration");
 
           group.set_attribute<bool>("save_vtu_files", false);
         }

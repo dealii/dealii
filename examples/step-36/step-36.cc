@@ -404,8 +404,7 @@ namespace Step36
 
     for (unsigned int i = 0; i < eigenfunctions.size(); ++i)
       data_out.add_data_vector(eigenfunctions[i],
-                               std::string("eigenfunction_") +
-                                 Utilities::int_to_string(i));
+                               "eigenfunction_" + Utilities::int_to_string(i));
 
     // The only thing worth discussing may be that because the potential is
     // specified as a function expression in the input file, it would be nice
