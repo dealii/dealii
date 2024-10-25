@@ -447,9 +447,7 @@ namespace Step42
       , ny(0)
     {
       std::ifstream f(name);
-      AssertThrow(f,
-                  ExcMessage(std::string("Can't read from file <") + name +
-                             ">!"));
+      AssertThrow(f, ExcMessage("Can't read from file <" + name + ">!"));
 
       std::string temp;
       f >> temp >> nx >> ny;

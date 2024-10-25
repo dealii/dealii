@@ -1104,7 +1104,7 @@ namespace Step28
   template <int dim>
   void EnergyGroup<dim>::output_results(const unsigned int cycle) const
   {
-    const std::string filename = std::string("solution-") +
+    const std::string filename = "solution-" +
                                  Utilities::int_to_string(group, 2) + "." +
                                  Utilities::int_to_string(cycle, 2) + ".vtu";
 
