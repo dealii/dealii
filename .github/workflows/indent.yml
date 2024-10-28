@@ -74,7 +74,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: crate-ci/typos@v1.26.0
+    - uses: crate-ci/typos@v1.26.8
       with:
         files: doc examples include source tests
         config: ./.typos.toml
