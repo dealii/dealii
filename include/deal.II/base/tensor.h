@@ -1292,7 +1292,11 @@ Tensor<rank_, dim, Number>::Tensor()
       // returning a zero instead.
       []<std::size_t... I>(
         const std::index_sequence<I...> &) constexpr -> decltype(values) {
-        if constexpr (rank_ == 1)
+        if constexpr (dim == 0)
+          {
+            return {};
+          }
+        else if constexpr (rank_ == 1)
           {
             auto get_zero_and_ignore_argument = [](int) {
               return internal::NumberType<Number>::value(0.0);
