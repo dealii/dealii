@@ -193,6 +193,17 @@ if(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
 
     endif()
   endforeach()
+
+  # PETSc does not expose Kokkos version, so we need to search for Kokkos
+  # ourselves.
+  if(PETSC_WITH_KOKKOS)
+    file(STRINGS "${PETSC_PETSCVARIABLES}" KOKKOS_INCLUDE
+      REGEX "^KOKKOS_INCLUDE =.*")
+    string(REGEX REPLACE "^KOKKOS_INCLUDE = -I" "" KOKKOS_INCLUDE "${KOKKOS_INCLUDE}")
+    find_package(Kokkos 3.7.0 QUIET
+      HINTS ${KOKKOS_INCLUDE}/..
+      )
+  endif()
 endif()
 
 if(PETSC_WITH_MPIUNI)
