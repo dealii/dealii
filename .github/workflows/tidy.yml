@@ -10,8 +10,11 @@ on:
     - ready_for_review
 
 concurrency:
-  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
+permissions:
+  contents: read
 
 jobs:
   tidy:

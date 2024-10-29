@@ -10,7 +10,7 @@ on:
     - ready_for_review
 
 concurrency:
-  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.event_name }}-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{github.event_name == 'pull_request'}}
 
 permissions:
@@ -39,23 +39,25 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON .
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              ..
     - name: print detailed.log
-      run: cat detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
+        cd build
         make VERBOSE=1 -j2
+    - name: test
+      run: |
+        cd build
         make -j2 \
           setup_tests_a-framework \
           setup_tests_quick_tests
         ctest --output-on-failure -j2 -VV
-    - name: upload CMakeConfigureLog
-      uses: actions/upload-artifact@v4
-      if: always()
-      continue-on-error: true
-      with:
-        name: osx-serial-CMakeConfigureLog.yaml
-        path: CMakeFiles/CMakeConfigureLog.yaml
 
   osx-parallel64:
     # MPI build using apple clang and 64 bit indices
@@ -86,21 +88,24 @@ jobs:
         cmake --version
     - name: configure
       run: |
-        CC=mpicc CXX=mpic++ cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_WITH_64BIT_INDICES=ON -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON -D DEAL_II_WITH_MPI=on .
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D DEAL_II_WITH_64BIT_INDICES=ON \
+              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_MPI=ON \
+              ..
     - name: print detailed.log
-      run: cat detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
+        cd build
         make VERBOSE=1 -j2
+    - name: test
+      run: |
+        cd build
         make -j2 \
           setup_tests_a-framework \
           setup_tests_quick_tests
         ctest --output-on-failure -j2 -VV
-    - name: upload CMakeConfigureLog
-      uses: actions/upload-artifact@v4
-      if: always()
-      continue-on-error: true
-      with:
-        name: osx-parallel64-CMakeConfigureLog.yaml
-        path: CMakeFiles/CMakeConfigureLog.yaml
-
