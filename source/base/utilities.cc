@@ -1047,7 +1047,8 @@ namespace Utilities
       const int ierr = ::posix_memalign(memptr, alignment, size);
 
       AssertThrow(ierr == 0, ExcOutOfMemory(size));
-      AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
+      if (size > 0)
+        AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #else
       // Windows does not appear to have posix_memalign. just use the
       // regular malloc in that case
