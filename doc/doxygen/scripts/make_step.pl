@@ -70,6 +70,7 @@ print
 "  <li> <a href=\"#$step_underscore-PlainProg\" class=bold>The plain program</a>
 </ol> </td> </tr> </table>
 \@endhtmlonly
+
 ";
 
 system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/intro.dox" , "--prefix=$step_underscore";
