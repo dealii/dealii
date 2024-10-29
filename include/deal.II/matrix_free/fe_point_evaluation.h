@@ -774,6 +774,15 @@ public:
   submit_divergence(const Number &value, const unsigned int point_index);
 
   /**
+   * Return the curl in real coordinates at the point with index
+   * `point_index` after a call to FEPointEvaluation::evaluate() with
+   * EvaluationFlags::gradients set. This functions only makes sense for a
+   * vector field with dim components and dim > 1.
+   */
+  Tensor<1, (dim == 2 ? 1 : dim), Number>
+  get_curl(const unsigned int point_index) const;
+
+  /**
    * Return the Jacobian of the transformation on the current cell with the
    * given point index. Prerequisite: This class needs to be constructed with
    * UpdateFlags containing `update_jacobian`.
@@ -2229,6 +2238,35 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_divergence(
   gradients[point_index] = gradient_type();
   for (unsigned int d = 0; d < dim; ++d)
     gradients[point_index][d][d] = value;
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+Tensor<1, (dim == 2 ? 1 : dim), Number>
+FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_curl(
+  const unsigned int point_index) const
+{
+  static_assert(
+    dim > 1 && n_components == dim,
+    "Only makes sense for a vector field with dim components and dim > 1");
+
+  const Tensor<2, dim, Number>            grad = get_gradient(point_index);
+  Tensor<1, (dim == 2 ? 1 : dim), Number> curl;
+  switch (dim)
+    {
+      case 2:
+        curl[0] = grad[1][0] - grad[0][1];
+        break;
+      case 3:
+        curl[0] = grad[2][1] - grad[1][2];
+        curl[1] = grad[0][2] - grad[2][0];
+        curl[2] = grad[1][0] - grad[0][1];
+        break;
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+  return curl;
 }
 
 
