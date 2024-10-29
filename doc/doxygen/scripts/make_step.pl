@@ -46,7 +46,7 @@ if ($buildson ne "")
 # then show the table of contents
 print
 "\@htmlonly
-<table class=\"tutorial\" width=\"50%\">
+<table class=\"tutorial\" width=\"75%\">
 <tr><th colspan=\"2\"><b><small>Table of contents</small></b></th></tr>
 <tr><td width=\"50%\" valign=\"top\">
 <ol>
