@@ -201,8 +201,11 @@ if(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       REGEX "^KOKKOS_INCLUDE =.*")
     string(REGEX REPLACE "^KOKKOS_INCLUDE = -I" "" KOKKOS_INCLUDE "${KOKKOS_INCLUDE}")
     find_package(Kokkos 3.7.0 QUIET
-      HINTS ${KOKKOS_INCLUDE}/..
+      PATHS ${KOKKOS_INCLUDE}/.. NO_DEFAULT_PATH
       )
+    if(NOT Kokkos_FOUND)
+      set(PETSC_FOUND FALSE)
+    endif()
   endif()
 endif()
 
