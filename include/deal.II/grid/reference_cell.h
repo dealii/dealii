@@ -421,7 +421,7 @@ public:
 
   /**
    * Return which child cells are adjacent to a certain face of the
-   * mother cell.
+   * parent cell.
    *
    * For example, in 2d the layout of a quadrilateral cell is as follows:
    * @verbatim

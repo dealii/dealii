@@ -618,7 +618,7 @@ private:
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
-   * the father cell. According to the philosophy of the Nédélec element,
+   * the parent cell. According to the philosophy of the Nédélec element,
    * this restriction operator preserves the curl of a function weakly.
    */
   void

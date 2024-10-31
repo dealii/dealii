@@ -61,11 +61,11 @@ DEAL_II_NAMESPACE_OPEN
  *          1  ------------------>  1
  *          2  ------------------>  1
  *          3  ------------------>  2
- *          4  ------------------>  mother cell of cells 3 and 4
+ *          4  ------------------>  parent cell of cells 3 and 4
  *                                  (a non-active cell, not shown here)
  * @endverbatim
  * Besides the mappings shown here, the non-active cells on grid 1 are also
- * valid keys. For example, the mapping for the mother cell of cells 1 and 2
+ * valid keys. For example, the mapping for the parent cell of cells 1 and 2
  * on the first grid will point to cell 1 on the second grid.
  *
  * @tparam MeshType This class may be used with any class that satisfies the

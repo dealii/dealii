@@ -877,15 +877,15 @@ public:
    * @ref GlossDistorted "this glossary entry").
    *
    * @note When a cell is refined, its children inherit the position of the
-   * vertex positions of those vertices they share with the mother cell (plus
+   * vertex positions of those vertices they share with the parent cell (plus
    * the locations of the new vertices on edges, faces, and cell interiors
    * that are created for the new child cells). If the vertex of a cell is
    * moved, this implies that its children will also use these new locations.
    * On the other hand, imagine a 2d situation where you have one cell that is
    * refined (with four children) and then you move the central vertex
    * connecting all four children. If you coarsen these four children again to
-   * the mother cell, then the location of the moved vertex is lost and if, in
-   * a later step, you refine the mother cell again, the then again new vertex
+   * the parent cell, then the location of the moved vertex is lost and if, in
+   * a later step, you refine the parent cell again, the then again new vertex
    * will be placed again at the same position as the first time around --
    * i.e., not at the location you had previously moved it to.
    *
@@ -3314,9 +3314,9 @@ public:
    *
    * Here, if you are on cell `1.3` and ask for its left neighbor (which is,
    * according to the conventions spelled out in the GeometryInfo class, its
-   * <i>zeroth</i> neighbor), then you will get the mother cell of `3.5`, since
+   * <i>zeroth</i> neighbor), then you will get the parent cell of `3.5`, since
    * this is the smallest cell for which we have `(1.3)->face(0) ==
-   * (3.5)->parent()->face(1)`. Note, that you will not obtain the mother cell
+   * (3.5)->parent()->face(1)`. Note, that you will not obtain the parent cell
    * of `2.8`.
    *
    * Further, if you ask for the right (i.e. the <i>first</i>) neighbor of cell
@@ -4113,7 +4113,7 @@ public:
 
   /**
    * Return a unique ID for the current cell. This ID is constructed from the
-   * path in the hierarchy from the coarse father cell and works correctly in
+   * path in the hierarchy from the coarse parent cell and works correctly in
    * parallel computations using objects of type
    * parallel::distributed::Triangulation. This function is therefore useful
    * in providing a unique identifier for cells (active or not) that also

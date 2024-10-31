@@ -584,7 +584,7 @@ namespace internal
     struct Implementation
     {
       /**
-       * Implementation of the function of some name in the mother class.
+       * Implementation of the function of some name in the parent class.
        */
       template <int dim, int spacedim>
       inline static unsigned int
@@ -626,7 +626,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function of some name in the mother class.
+       * Implementation of the function of some name in the parent class.
        */
       template <int structdim, int dim, int spacedim>
       inline static unsigned int
@@ -652,7 +652,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function of some name in the mother class.
+       * Implementation of the function of some name in the parent class.
        */
       template <int structdim, int dim, int spacedim>
       inline static void
@@ -690,7 +690,7 @@ namespace internal
       }
 
       /**
-       * Implementation of the function of some name in the mother class.
+       * Implementation of the function of some name in the parent class.
        */
       template <int dim, int spacedim>
       inline static void
