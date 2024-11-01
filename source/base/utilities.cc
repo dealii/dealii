@@ -1043,19 +1043,29 @@ namespace Utilities
     void
     posix_memalign(void **memptr, std::size_t alignment, std::size_t size)
     {
-#ifndef DEAL_II_MSVC
-      const int ierr = ::posix_memalign(memptr, alignment, size);
-
-      AssertThrow(ierr == 0, ExcOutOfMemory(size));
+      // Strictly speaking, one can call both posix_memalign() and malloc()
+      // with size==0. This is documented as returning a pointer that can
+      // be given to free(), but for which using it is otherwise undefined.
+      // That just seems like a bad idea -- let's just return a nullptr to
+      // *ensure* that it can not be used. free() is documented as accepting
+      // a nullptr, in which it simply does nothing.
       if (size > 0)
-        AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
+        {
+#ifndef DEAL_II_MSVC
+          const int ierr = ::posix_memalign(memptr, alignment, size);
+
+          AssertThrow(ierr == 0, ExcOutOfMemory(size));
+          AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #else
-      // Windows does not appear to have posix_memalign. just use the
-      // regular malloc in that case
-      *memptr = malloc(size);
-      (void)alignment;
-      AssertThrow(*memptr != 0, ExcOutOfMemory(size));
+          // Windows does not appear to have posix_memalign. just use the
+          // regular malloc in that case
+          *memptr = malloc(size);
+          (void)alignment;
+          AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #endif
+        }
+      else
+        *memptr = nullptr;
     }
 
 
