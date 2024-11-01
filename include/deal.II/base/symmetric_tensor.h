@@ -506,7 +506,7 @@ namespace internal
        * objects around. The only way to create such objects is via the
        * <tt>Table</tt> class, which only generates them as temporary objects.
        * This guarantees that the accessor objects go out of scope earlier
-       * than the mother object, avoid problems with data consistency.
+       * than the parent object, avoid problems with data consistency.
        */
       DEAL_II_HOST
       constexpr Accessor(tensor_type              &tensor,
@@ -592,7 +592,7 @@ namespace internal
        * objects around. The only way to create such objects is via the
        * <tt>Table</tt> class, which only generates them as temporary objects.
        * This guarantees that the accessor objects go out of scope earlier
-       * than the mother object, avoid problems with data consistency.
+       * than the parent object, avoid problems with data consistency.
        */
       DEAL_II_HOST
       constexpr Accessor(tensor_type              &tensor,

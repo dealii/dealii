@@ -357,7 +357,7 @@ class FESystem;
  * <h4>Interpolation matrices in three dimensions</h4>
  *
  * For the interface constraints, the 3d case is similar to the 2d case. The
- * numbering for the indices $n$ on the mother face is obvious and keeps to
+ * numbering for the indices $n$ on the parent face is obvious and keeps to
  * the usual numbering of degrees of freedom on quadrilaterals.
  *
  * The numbering of the degrees of freedom on the interior of the refined
@@ -367,7 +367,7 @@ class FESystem;
  * $m=d_v...5d_v-1$ for the dofs on the vertices at the center of the bounding
  * lines of the quadrilateral, $m=5d_v..5d_v+4*d_l-1$ are for the degrees of
  * freedom on the four lines connecting the center vertex to the outer
- * boundary of the mother face, $m=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the
+ * boundary of the parent face, $m=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the
  * degrees of freedom on the small lines surrounding the quad, and
  * $m=5d_v+12*d_l...5d_v+12*d_l+4*d_q-1$ for the dofs on the four child faces.
  * Note the direction of the lines at the boundary of the quads, as shown

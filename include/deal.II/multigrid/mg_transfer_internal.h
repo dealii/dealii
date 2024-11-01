@@ -110,7 +110,7 @@ namespace internal
 
       /**
        * This variable holds the one-dimensional embedding (prolongation) matrix
-       * from mother element to all the children.
+       * from parent element to all the children.
        */
       std::vector<Number> prolongation_matrix_1d;
     };

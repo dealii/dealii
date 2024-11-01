@@ -135,7 +135,7 @@ namespace parallel
      * detail in the
      * @ref distributed_paper.
      * Unfortunately, in this process, some information can get lost relating
-     * to flags that are set by user code and that are inherited from mother
+     * to flags that are set by user code and that are inherited from parent
      * to child cell but that are not moved along with a cell if that cell is
      * migrated from one processor to another.
      *
@@ -155,7 +155,7 @@ namespace parallel
      * The way to avoid this dilemma is to make sure that things like setting
      * boundary indicators or material ids is done immediately every time a
      * parallel triangulation is refined. This is not necessary for sequential
-     * triangulations because, there, these flags are inherited from mother to
+     * triangulations because, there, these flags are inherited from parent to
      * child cell and remain with a cell even if it is refined and the
      * children are later coarsened again, but this does not hold for
      * distributed triangulations. It is made even more difficult by the fact

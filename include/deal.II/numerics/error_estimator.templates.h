@@ -832,7 +832,7 @@ namespace internal
       }
 
     // finally loop over all subfaces to collect the contributions of the
-    // subfaces and store them with the mother face
+    // subfaces and store them with the parent face
     std::vector<double> sum(n_solution_vectors, 0);
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
