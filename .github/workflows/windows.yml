@@ -16,6 +16,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+  CTEST_OUTPUT_ON_FAILURE: 1
+  # test only in serial to avoid file locking error on ZERO_CHECK.lastbuildstate
+  CTEST_PARALLEL_LEVEL: 1
+
 jobs:
   windows-serial:
     # Serial build on Windows
@@ -54,12 +60,11 @@ jobs:
       run: type build/detailed.log
     - name: build
       run: |
-        cmake --build build --parallel 2 --target install
+        cmake --build build --target install
     - name: test
-      # test only in serial to avoid file locking error on ZERO_CHECK.lastbuildstate
       run: |
-        cmake --build build --parallel 2 --target setup_tests_a-framework setup_tests_examples setup_tests_quick_tests
-        ctest --test-dir build --build-config Debug --output-on-failure --extra-verbose
+        cmake --build build --target setup_tests_a-framework setup_tests_examples setup_tests_quick_tests
+        ctest --test-dir build --build-config Debug --extra-verbose
     - name: upload library
       # run only if a PR is merged into master
       if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}

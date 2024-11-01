@@ -16,6 +16,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 3
+  CTEST_OUTPUT_ON_FAILURE: 1
+  CTEST_PARALLEL_LEVEL: 3
+  MAKEFLAGS: "--jobs=3"
+
 jobs:
   osx-serial:
     # simple serial build using apple clang
@@ -50,14 +56,14 @@ jobs:
     - name: build
       run: |
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: test
       run: |
         cd build
-        make -j2 \
+        make \
           setup_tests_a-framework \
           setup_tests_quick_tests
-        ctest --output-on-failure -j2 -VV
+        ctest -VV
 
   osx-parallel64:
     # MPI build using apple clang and 64 bit indices
@@ -101,11 +107,11 @@ jobs:
     - name: build
       run: |
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: test
       run: |
         cd build
-        make -j2 \
+        make \
           setup_tests_a-framework \
           setup_tests_quick_tests
-        ctest --output-on-failure -j2 -VV
+        ctest -VV

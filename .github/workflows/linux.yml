@@ -16,6 +16,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+  CTEST_OUTPUT_ON_FAILURE: 1
+  CTEST_PARALLEL_LEVEL: 4
+  MAKEFLAGS: "--jobs=4"
+
 jobs:
 
   ########################
@@ -63,15 +69,15 @@ jobs:
     - name: build
       run: |
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: test
       run: |
         cd build
-        make -j2 \
+        make \
           setup_tests_a-framework \
           setup_tests_examples \
           setup_tests_quick_tests
-        ctest --output-on-failure -j2 -VV
+        ctest -VV
 
   ########################
   # linux-debug-parallel #
@@ -122,7 +128,7 @@ jobs:
     - name: build
       run: |
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: test
       run: |
         # Remove warning: "A high-performance Open MPI point-to-point
@@ -131,11 +137,11 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make -j2 \
+        make \
           setup_tests_a-framework \
           setup_tests_examples \
           setup_tests_quick_tests
-        ctest --output-on-failure -j2 -VV
+        ctest -VV
 
   ###############################
   # linux-debug-parallel-tpetra #
@@ -183,7 +189,7 @@ jobs:
     - name: build
       run: |
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: test trilinos_tpetra
       run: |
         # Remove warning: "A high-performance Open MPI point-to-point
@@ -192,8 +198,8 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make -j2 setup_tests_trilinos_tpetra
-        ctest --output-on-failure -j2 -VV
+        make setup_tests_trilinos_tpetra
+        ctest -VV
 
   ############################
   # linux-debug-intel-oneapi #
@@ -254,16 +260,16 @@ jobs:
       run: |
         source /opt/intel/oneapi/setvars.sh
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: test
       run: |
         source /opt/intel/oneapi/setvars.sh
         cd build
-        make -j2 \
+        make \
           setup_tests_a-framework \
           setup_tests_examples \
           setup_tests_quick_tests
-        ctest --output-on-failure -j2 -VV
+        ctest -VV
 
   #######################
   # linux-debug-cuda-11 #
@@ -370,13 +376,13 @@ jobs:
     - name: build deal.II
       run: |
         cd build
-        make VERBOSE=1 -j2
+        make VERBOSE=1
     - name: build CUDA tests
       run: |
         cd build
-        make -j2 setup_tests_matrix_free_kokkos
+        make setup_tests_matrix_free_kokkos
         cd tests/matrix_free_kokkos
-        make -j2 compile_test_executables
+        make compile_test_executables
 
   #############################
   # linux-debug-cuda-11-clang #
@@ -464,10 +470,10 @@ jobs:
     - name: build deal.II
       run: |
         cd build
-        make VERBOSE=1 -j 2
+        make VERBOSE=1
     - name: build CUDA tests
       run: |
         cd build
-        make -j2 setup_tests_matrix_free_kokkos
+        make setup_tests_matrix_free_kokkos
         cd tests/matrix_free_kokkos
-        make -j2 compile_test_executables
+        make compile_test_executables
