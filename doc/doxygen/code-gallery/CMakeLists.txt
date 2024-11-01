@@ -90,9 +90,10 @@ if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     string(REPLACE "${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}/" "" _relative_src_files
            "${_src_files}")
     list(REMOVE_ITEM _relative_src_files doc/author)
-    list(REMOVE_ITEM _relative_src_files doc/tooltip)
-    list(REMOVE_ITEM _relative_src_files doc/dependencies)
     list(REMOVE_ITEM _relative_src_files doc/builds-on)
+    list(REMOVE_ITEM _relative_src_files doc/dependencies)
+    list(REMOVE_ITEM _relative_src_files doc/entry-name)
+    list(REMOVE_ITEM _relative_src_files doc/tooltip)
 
 
     # Also remove files that were created by running 'cmake' in the
