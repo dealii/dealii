@@ -640,13 +640,15 @@ namespace SparsityTools
         for (const auto dof : last_round_dofs)
           {
             const unsigned int row_length = sparsity.row_length(dof);
+            dofs_by_coordination.clear();
             for (unsigned int i = 0; i < row_length; ++i)
               {
                 // skip dofs which are already numbered
                 const auto column = sparsity.column_number(dof, i);
                 if (new_indices[column] == numbers::invalid_size_type)
                   {
-                    next_round_dofs.push_back(column);
+                    dofs_by_coordination.emplace_back(
+                      sparsity.row_length(column), column);
 
                     // assign a dummy value to 'new_indices' to avoid adding
                     // the same index again; those will get the right number
@@ -654,6 +656,9 @@ namespace SparsityTools
                     new_indices[column] = 0;
                   }
               }
+            std::sort(dofs_by_coordination.begin(), dofs_by_coordination.end());
+            for (const auto &dof : dofs_by_coordination)
+              next_round_dofs.push_back(dof.second);
           }
 
         // check whether there are any new dofs in the list. if there are
@@ -685,16 +690,9 @@ namespace SparsityTools
           }
 
 
-        // find coordination number for each of these dofs
-        dofs_by_coordination.clear();
-        for (const types::global_dof_index next_round_dof : next_round_dofs)
-          dofs_by_coordination.emplace_back(sparsity.row_length(next_round_dof),
-                                            next_round_dof);
-        std::sort(dofs_by_coordination.begin(), dofs_by_coordination.end());
-
         // assign new DoF numbers to the elements of the present front:
-        for (const auto &i : dofs_by_coordination)
-          new_indices[i.second] = next_free_number++;
+        for (const auto i : next_round_dofs)
+          new_indices[i] = next_free_number++;
 
         // after that: use this round's dofs for the next round
         last_round_dofs.swap(next_round_dofs);
