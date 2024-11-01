@@ -2597,11 +2597,8 @@ namespace DoFRenumbering
       Assert(
         matrix_free.get_dof_handler(component).get_fe().n_base_elements() == 1,
         ExcNotImplemented());
-      Assert(dynamic_cast<const FE_Q_Base<dim> *>(
-               &matrix_free.get_dof_handler(component).get_fe().base_element(
-                 0)),
-             ExcNotImplemented("Matrix-free renumbering only works for "
-                               "FE_Q elements"));
+      const bool is_fe_q = dynamic_cast<const FE_Q_Base<dim> *>(
+        &matrix_free.get_dof_handler(component).get_fe().base_element(0));
 
       const unsigned int fe_degree =
         matrix_free.get_dof_handler(component).get_fe().degree;
@@ -2733,29 +2730,37 @@ namespace DoFRenumbering
                     data.get_cell_iterator(cell, v, component)
                       ->get_mg_dof_indices(dof_indices);
 
-                  for (unsigned int a = 0; a < dofs_on_objects.size(); ++a)
-                    {
-                      const auto &r = dofs_on_objects[a];
-                      if (a == 10 || a == 16)
-                        // switch order x-z for y faces in 3d to lexicographic
-                        // layout
-                        for (unsigned int i1 = 0; i1 < nn; ++i1)
-                          for (unsigned int i0 = 0; i0 < nn; ++i0)
+                  if (is_fe_q)
+                    for (unsigned int a = 0; a < dofs_on_objects.size(); ++a)
+                      {
+                        const auto &r = dofs_on_objects[a];
+                        if (a == 10 || a == 16)
+                          // switch order x-z for y faces in 3d to lexicographic
+                          // layout
+                          for (unsigned int i1 = 0; i1 < nn; ++i1)
+                            for (unsigned int i0 = 0; i0 < nn; ++i0)
+                              for (unsigned int c = 0; c < n_comp; ++c)
+                                renumber_func(
+                                  dof_indices[r.first + r.second * c + i1 +
+                                              i0 * nn],
+                                  owned_dofs,
+                                  dof_numbers_mf_order,
+                                  counter_dof_numbers);
+                        else
+                          for (unsigned int i = 0; i < r.second; ++i)
                             for (unsigned int c = 0; c < n_comp; ++c)
-                              renumber_func(dof_indices[r.first + r.second * c +
-                                                        i1 + i0 * nn],
-                                            owned_dofs,
-                                            dof_numbers_mf_order,
-                                            counter_dof_numbers);
-                      else
-                        for (unsigned int i = 0; i < r.second; ++i)
-                          for (unsigned int c = 0; c < n_comp; ++c)
-                            renumber_func(
-                              dof_indices[r.first + r.second * c + i],
-                              owned_dofs,
-                              dof_numbers_mf_order,
-                              counter_dof_numbers);
-                    }
+                              renumber_func(
+                                dof_indices[r.first + r.second * c + i],
+                                owned_dofs,
+                                dof_numbers_mf_order,
+                                counter_dof_numbers);
+                      }
+                  else
+                    for (const types::global_dof_index i : dof_indices)
+                      renumber_func(i,
+                                    owned_dofs,
+                                    dof_numbers_mf_order,
+                                    counter_dof_numbers);
                 }
 
               // part (b): increment the touch count of a dof appearing in the
