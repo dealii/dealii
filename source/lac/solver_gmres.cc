@@ -53,61 +53,74 @@ namespace internal
           constexpr unsigned int inner_batch_size =
             delayed_reorthogonalization ? 6 : 12;
 
-          for (; c < locally_owned_size / n_lanes / inner_batch_size;
-               ++c, j += n_lanes * inner_batch_size)
-            {
-              VectorizedArray<double> vvec[inner_batch_size];
-              for (unsigned int k = 0; k < inner_batch_size; ++k)
-                vvec[k].load(current_vector + j + k * n_lanes);
-              VectorizedArray<double> prev_vector[inner_batch_size];
-              for (unsigned int k = 0; k < inner_batch_size; ++k)
-                prev_vector[k].load(orthogonal_vectors[n_vectors - 1] + j +
-                                    k * n_lanes);
-
-              {
-                VectorizedArray<double> local_sum_0 = prev_vector[0] * vvec[0];
-                VectorizedArray<double> local_sum_1 =
-                  prev_vector[0] * prev_vector[0];
-                VectorizedArray<double> local_sum_2 = vvec[0] * vvec[0];
-                for (unsigned int k = 1; k < inner_batch_size; ++k)
-                  {
-                    local_sum_0 += prev_vector[k] * vvec[k];
-                    if (delayed_reorthogonalization)
-                      {
-                        local_sum_1 += prev_vector[k] * prev_vector[k];
-                        local_sum_2 += vvec[k] * vvec[k];
-                      }
-                  }
-                hs[n_vectors - 1] += local_sum_0;
-                if (delayed_reorthogonalization)
-                  {
-                    correct[n_vectors - 1] += local_sum_1;
-                    correct[n_vectors] += local_sum_2;
-                  }
-              }
-
-              for (unsigned int i = 0; i < n_vectors - 1; ++i)
+          const unsigned int loop_length_c =
+            locally_owned_size / n_lanes / inner_batch_size;
+          for (unsigned int c_block = 0; c_block < (loop_length_c + 63) / 64;
+               ++c_block)
+            for (unsigned int i_block = 0; i_block < (n_vectors + 7) / 8;
+                 ++i_block)
+              for (c = c_block * 64, j = c * n_lanes * inner_batch_size;
+                   c < std::min(loop_length_c, (c_block + 1) * 64);
+                   ++c, j += n_lanes * inner_batch_size)
                 {
-                  // break the dependency chain into the field hs[i] for
-                  // small sizes i by first accumulating 4 or 8 results
-                  // into a local variable
-                  VectorizedArray<double> temp;
-                  temp.load(orthogonal_vectors[i] + j);
-                  VectorizedArray<double> local_sum_0 = temp * vvec[0];
-                  VectorizedArray<double> local_sum_1 =
-                    delayed_reorthogonalization ? temp * prev_vector[0] : 0.;
-                  for (unsigned int k = 1; k < inner_batch_size; ++k)
+                  VectorizedArray<double> vvec[inner_batch_size];
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
+                    vvec[k].load(current_vector + j + k * n_lanes);
+                  VectorizedArray<double> prev_vector[inner_batch_size];
+                  if (delayed_reorthogonalization || i_block == 0)
+                    for (unsigned int k = 0; k < inner_batch_size; ++k)
+                      prev_vector[k].load(orthogonal_vectors[n_vectors - 1] +
+                                          j + k * n_lanes);
+
+                  if (i_block == 0)
                     {
-                      temp.load(orthogonal_vectors[i] + j + k * n_lanes);
-                      local_sum_0 += temp * vvec[k];
+                      VectorizedArray<double> local_sum_0 =
+                        prev_vector[0] * vvec[0];
+                      VectorizedArray<double> local_sum_1 =
+                        prev_vector[0] * prev_vector[0];
+                      VectorizedArray<double> local_sum_2 = vvec[0] * vvec[0];
+                      for (unsigned int k = 1; k < inner_batch_size; ++k)
+                        {
+                          local_sum_0 += prev_vector[k] * vvec[k];
+                          if (delayed_reorthogonalization)
+                            {
+                              local_sum_1 += prev_vector[k] * prev_vector[k];
+                              local_sum_2 += vvec[k] * vvec[k];
+                            }
+                        }
+                      hs[n_vectors - 1] += local_sum_0;
                       if (delayed_reorthogonalization)
-                        local_sum_1 += temp * prev_vector[k];
+                        {
+                          correct[n_vectors - 1] += local_sum_1;
+                          correct[n_vectors] += local_sum_2;
+                        }
                     }
-                  hs[i] += local_sum_0;
-                  if (delayed_reorthogonalization)
-                    correct[i] += local_sum_1;
+
+                  for (unsigned int i = i_block * 8;
+                       i < std::min(n_vectors - 1, (i_block + 1) * 8);
+                       ++i)
+                    {
+                      // break the dependency chain into the field hs[i] for
+                      // small sizes i by first accumulating 6 or 12 results
+                      // into a local variable
+                      VectorizedArray<double> temp;
+                      temp.load(orthogonal_vectors[i] + j);
+                      VectorizedArray<double> local_sum_0 = temp * vvec[0];
+                      VectorizedArray<double> local_sum_1 =
+                        delayed_reorthogonalization ? temp * prev_vector[0] :
+                                                      0.;
+                      for (unsigned int k = 1; k < inner_batch_size; ++k)
+                        {
+                          temp.load(orthogonal_vectors[i] + j + k * n_lanes);
+                          local_sum_0 += temp * vvec[k];
+                          if (delayed_reorthogonalization)
+                            local_sum_1 += temp * prev_vector[k];
+                        }
+                      hs[i] += local_sum_0;
+                      if (delayed_reorthogonalization)
+                        correct[i] += local_sum_1;
+                    }
                 }
-            }
 
           c *= inner_batch_size;
           for (; c < locally_owned_size / n_lanes; ++c, j += n_lanes)
@@ -186,60 +199,84 @@ namespace internal
              inverse_norm_previous / h(n_vectors + n_vectors) :
              inverse_norm_previous / h(n_vectors + n_vectors - 1)) :
           0.;
+      const double last_factor = h(n_vectors - 1);
+
       VectorizedArray<double> norm_vv_temp_vectorized = 0.0;
 
       static constexpr unsigned int n_lanes = VectorizedArray<double>::size();
       constexpr unsigned int        inner_batch_size =
         delayed_reorthogonalization ? 6 : 12;
 
-      unsigned int j = 0;
-      unsigned int c = 0;
-      for (; c < locally_owned_size / n_lanes / inner_batch_size;
-           ++c, j += n_lanes * inner_batch_size)
-        {
-          VectorizedArray<double> temp[inner_batch_size];
-          VectorizedArray<double> prev_vector[inner_batch_size];
-
-          const double last_factor = h(n_vectors - 1);
-          for (unsigned int k = 0; k < inner_batch_size; ++k)
+      unsigned int       j = 0;
+      unsigned int       c = 0;
+      const unsigned int loop_length_c =
+        locally_owned_size / n_lanes / inner_batch_size;
+      const unsigned int loop_length_i = (n_vectors + 7) / 8;
+      for (unsigned int c_block = 0; c_block < (loop_length_c + 63) / 64;
+           ++c_block)
+        for (unsigned int i_block = 0; i_block < (n_vectors + 7) / 8; ++i_block)
+          for (c = c_block * 64, j = c * n_lanes * inner_batch_size;
+               c < std::min(loop_length_c, (c_block + 1) * 64);
+               ++c, j += n_lanes * inner_batch_size)
             {
-              temp[k].load(current_vector + j + k * n_lanes);
-              prev_vector[k].load(previous_vector + j + k * n_lanes);
-              if (!delayed_reorthogonalization)
-                temp[k] -= last_factor * prev_vector[k];
-            }
-
-          for (unsigned int i = 0; i < n_vectors - 1; ++i)
-            {
-              const double factor = h(i);
-              const double correction_factor =
-                (delayed_reorthogonalization ? h(n_vectors + i) : 0.0);
+              VectorizedArray<double> temp[inner_batch_size];
               for (unsigned int k = 0; k < inner_batch_size; ++k)
+                temp[k].load(current_vector + j + k * n_lanes);
+              VectorizedArray<double> prev_vector[inner_batch_size];
+              if (delayed_reorthogonalization)
+                for (unsigned int k = 0; k < inner_batch_size; ++k)
+                  prev_vector[k].load(previous_vector + j + k * n_lanes);
+
+              for (unsigned int i = i_block * 8;
+                   i < std::min(n_vectors - 1, (i_block + 1) * 8);
+                   ++i)
                 {
-                  VectorizedArray<double> vec;
-                  vec.load(orthogonal_vectors[i] + j + k * n_lanes);
-                  temp[k] -= factor * vec;
-                  if (delayed_reorthogonalization)
-                    prev_vector[k] -= correction_factor * vec;
+                  const double factor = h(i);
+                  const double correction_factor =
+                    (delayed_reorthogonalization ? h(n_vectors + i) : 0.0);
+                  for (unsigned int k = 0; k < inner_batch_size; ++k)
+                    {
+                      VectorizedArray<double> vec;
+                      vec.load(orthogonal_vectors[i] + j + k * n_lanes);
+                      temp[k] -= factor * vec;
+                      if (delayed_reorthogonalization)
+                        prev_vector[k] -= correction_factor * vec;
+                    }
+                }
+
+              if (delayed_reorthogonalization)
+                {
+                  if (i_block + 1 == loop_length_i)
+                    for (unsigned int k = 0; k < inner_batch_size; ++k)
+                      {
+                        prev_vector[k] = prev_vector[k] * inverse_norm_previous;
+                        prev_vector[k].store(previous_vector + j + k * n_lanes);
+                        temp[k] -= last_factor * prev_vector[k];
+                        temp[k] = temp[k] * scaling_factor_vv;
+                        temp[k].store(current_vector + j + k * n_lanes);
+                      }
+                  else
+                    for (unsigned int k = 0; k < inner_batch_size; ++k)
+                      {
+                        prev_vector[k].store(previous_vector + j + k * n_lanes);
+                        temp[k].store(current_vector + j + k * n_lanes);
+                      }
+                }
+              else
+                {
+                  if (i_block + 1 == loop_length_i)
+                    for (unsigned int k = 0; k < inner_batch_size; ++k)
+                      {
+                        prev_vector[k].load(previous_vector + j + k * n_lanes);
+                        temp[k] -= last_factor * prev_vector[k];
+                        temp[k].store(current_vector + j + k * n_lanes);
+                        norm_vv_temp_vectorized += temp[k] * temp[k];
+                      }
+                  else
+                    for (unsigned int k = 0; k < inner_batch_size; ++k)
+                      temp[k].store(current_vector + j + k * n_lanes);
                 }
             }
-
-          if (delayed_reorthogonalization)
-            for (unsigned int k = 0; k < inner_batch_size; ++k)
-              {
-                prev_vector[k] = prev_vector[k] * inverse_norm_previous;
-                prev_vector[k].store(previous_vector + j + k * n_lanes);
-                temp[k] -= last_factor * prev_vector[k];
-                temp[k] = temp[k] * scaling_factor_vv;
-                temp[k].store(current_vector + j + k * n_lanes);
-              }
-          else
-            for (unsigned int k = 0; k < inner_batch_size; ++k)
-              {
-                temp[k].store(current_vector + j + k * n_lanes);
-                norm_vv_temp_vectorized += temp[k] * temp[k];
-              }
-        }
 
       c *= inner_batch_size;
       for (; c < locally_owned_size / n_lanes; ++c, j += n_lanes)
