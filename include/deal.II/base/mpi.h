@@ -1416,9 +1416,9 @@ namespace Utilities
      * partitioned index set, given a partitioned index set space. In addition,
      * it returns a map of processes and associated sets of indices that are
      * requested from the current rank. In other words, this function returns
-     * for each rank that has requested information about indices owned by the
-     * current which indices it has requested about; the values of the map are
-     * therefore all subsets of the owned set of indices.
+     * for each rank that has requested indices owned by the current rank
+     * those indices that have been queried. The values of the map are
+     * therefore all index sets describing subsets of the owned set of indices.
      */
     std::pair<std::vector<unsigned int>, std::map<unsigned int, IndexSet>>
     compute_index_owner_and_requesters(const IndexSet &owned_indices,
