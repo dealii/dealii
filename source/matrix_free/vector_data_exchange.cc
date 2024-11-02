@@ -428,22 +428,10 @@ namespace internal
           Utilities::MPI::mpi_processes_within_communicator(comm, comm_sm);
 
         // determine owners of ghost indices and determine requesters
-        std::vector<unsigned int> owning_ranks_of_ghosts(
-          is_locally_ghost.n_elements());
-
-        Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-          process(is_locally_owned,
-                  is_locally_ghost,
-                  comm,
-                  owning_ranks_of_ghosts,
-                  /*track_index_requests = */ true);
-
-        Utilities::MPI::ConsensusAlgorithms::Selector<
-          std::vector<
-            std::pair<types::global_dof_index, types::global_dof_index>>,
-          std::vector<unsigned int>>
-          consensus_algorithm;
-        consensus_algorithm.run(process, comm);
+        const auto [owning_ranks_of_ghosts, rank_to_global_indices] =
+          Utilities::MPI::compute_index_owner_and_requesters(is_locally_owned,
+                                                             is_locally_ghost,
+                                                             comm);
 
         // decompress ghost_indices_within_larger_ghost_set for simpler
         // data access during setup
@@ -525,8 +513,6 @@ namespace internal
 
         // process requesters
         {
-          const auto rank_to_global_indices = process.get_requesters();
-
           for (const auto &rank_and_global_indices : rank_to_global_indices)
             {
               const auto sm_ranks_ptr =
