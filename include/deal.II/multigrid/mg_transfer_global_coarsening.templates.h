@@ -851,29 +851,16 @@ namespace internal
                 is_dst_remote_potentially_relevant.nth_index_in_set(i));
         }
 
-      // determine owner of remote cells
-      std::vector<unsigned int> is_dst_remote_owners(
-        is_dst_remote.n_elements());
+      // determine owners of remote cells
+      const auto [is_dst_remote_owners, targets_with_indexset] =
+        Utilities::MPI::compute_index_owner_and_requesters(is_dst_locally_owned,
+                                                           is_dst_remote,
+                                                           communicator);
 
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        process(is_dst_locally_owned,
-                is_dst_remote,
-                communicator,
-                is_dst_remote_owners,
-                true);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_cell_index, types::global_cell_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, communicator);
 
       this->is_dst_locally_owned = is_dst_locally_owned;
       this->is_dst_remote        = is_dst_remote;
       this->is_src_locally_owned = is_src_locally_owned;
-
-      const auto targets_with_indexset = process.get_requesters();
 
 #ifndef DEAL_II_WITH_MPI
       Assert(targets_with_indexset.empty(), ExcInternalError());
