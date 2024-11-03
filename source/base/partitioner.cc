@@ -262,26 +262,10 @@ namespace Utilities
           local_range_data.second = my_shift + old_locally_owned_size;
         }
 
-      std::vector<unsigned int> owning_ranks_of_ghosts(
-        ghost_indices_data.n_elements());
+      const auto [owning_ranks_of_ghosts, import_data] =
+        Utilities::MPI::compute_index_owner_and_requesters(
+          locally_owned_range_data, ghost_indices_data, communicator);
 
-      // set up dictionary
-      internal::ComputeIndexOwner::ConsensusAlgorithmsPayload process(
-        locally_owned_range_data,
-        ghost_indices_data,
-        communicator,
-        owning_ranks_of_ghosts,
-        /* track origins of ghosts*/ true);
-
-      // read dictionary by communicating with the process who owns the index
-      // in the static partition (i.e. in the dictionary). This process
-      // returns the actual owner of the index.
-      ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, communicator);
 
       {
         ghost_targets_data = {};
@@ -302,9 +286,6 @@ namespace Utilities
               }
           }
       }
-
-      // find how much the individual processes that want import from me
-      std::map<unsigned int, IndexSet> import_data = process.get_requesters();
 
       // count import requests and set up the compressed indices
       n_import_indices_data = 0;
