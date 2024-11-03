@@ -174,10 +174,7 @@ namespace NonMatching
    * will also be positive.
    *
    * A detailed description of the underlying algorithm can be found in
-   * "High-Order %Quadrature Methods for Implicitly Defined Surfaces and
-   * Volumes in Hyperrectangles, R. I. Saye, SIAM J. Sci. Comput., 37(2), <a
-   * href="http://www.dx.doi.org/10.1137/140966290">
-   * doi:10.1137/140966290</a>". This implementation has some modifications
+   * @cite saye_2015. This implementation has some modifications
    * compared to the algorithm description in the paper. In particular, it
    * builds the three different types of quadratures (inside, outside and
    * surface) simultaneously. Further, the so-called "pruning" step is not yet
