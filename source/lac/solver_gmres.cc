@@ -55,6 +55,68 @@ namespace internal
 
           const unsigned int loop_length_c =
             locally_owned_size / n_lanes / inner_batch_size;
+
+          // At this point, we would like to run a loop over the variable 'c'
+          // from 0 all the way to loop_length_c, and then run a loop over 'i'
+          // to work on all vectors we want to compute the inner product
+          // against. In other words, the loop layout would be:
+          //
+          // for (unsigned int c = 0; c < loop_length_c; ++c)
+          //   {
+          //     // do some work that only depends on the index c or the
+          //     // derived index j = c * n_lanes * inner_batch_size
+          //     ...
+          //     for (unsigned int i = 0; i < n_vectors - 1; ++i)
+          //       {
+          //         // do the work with orthonormal_vectors[i][j] and
+          //         // current_vector[j] to fill the summation variables
+          //       }
+          //   }
+          //
+          // However, this access pattern leads to relatively poor memory
+          // behavior with low performance because we would access only a few
+          // entries of n_vectors 'orthonormal_vectors[i][j]' for an index j
+          // at a time, before we pass on to the next vector i. More
+          // precisely, we access inner_batch_size * n_lanes many entries
+          // before moving on to the next vector. Modern CPUs derive a good
+          // deal of performance from so-called hardware prefetching, which is
+          // a mechanism that speculatively initiates loads from main memory
+          // that the hardware guesses will be accessed soon, in order to
+          // reduce the waiting time once the access actually happens. This
+          // data is put into fast cache memory in the meantime. Prefetching
+          // gets typically initiated when we access the entries of an array
+          // consecutively, or also when looping over the data elements of a
+          // few vectors at the same time. However, for more than around 10
+          // vectors looped over simultaneously, the hardware gets to see too
+          // many streams and the capacity of the loop stream detectors gets
+          // exceeded. As a result, the hardware will first initiate a load
+          // when the entry is actually requested by the respective code with
+          // that loop index. As it takes many clock cycles for data to arrive
+          // from memory (on the order of 200-500 clock cycles on 2024
+          // hardware, whereas caches can deliver data in 4-20 cycles and
+          // computations can be done in 3-6 cycles), and since even CPUs with
+          // good out-of-order execution capabilities can issue only a limited
+          // number of loads, the memory interface will become under-utilized,
+          // which is counter-intuitive for a loop we expect to be very
+          // memory-bandwidth heavy.
+          //
+          // The solution is to perform so-called loop blocking, see, e.g.,
+          // https://en.wikipedia.org/wiki/Loop_nest_optimization - we split
+          // the loop over the variable i into tiles (or blocks) of size 8 to
+          // make sure the hardware prefetchers are able to follow all 8
+          // streams, using a variable called 'i_block', and then run the loop
+          // over 'c' inside. Since we do not want to re-load the entries of
+          // 'current_vector' every time we work on blocks of size 8 for the
+          // 'i' variable, but want to make sure to obtained it from faster
+          // cache memory, we also tile the loop over 'c' into blocks. These
+          // blocks have size 64, which is big enough to get most of the
+          // effect of prefetchers (64 * inner_block_size * n_lanes is already
+          // several kB of data) but small enough for 'current_vector' to
+          // still be in fast cache memory for the next round of
+          // 'i_block'. The end result are thus three nested loops visible
+          // here, over 'c_block', 'i_block', and 'c', and an inner loop over
+          // i and the inner batch size for the actual work. Not the prettiest
+          // code, but giving adequate performance.
           for (unsigned int c_block = 0; c_block < (loop_length_c + 63) / 64;
                ++c_block)
             for (unsigned int i_block = 0; i_block < (n_vectors + 7) / 8;
@@ -207,6 +269,10 @@ namespace internal
       constexpr unsigned int        inner_batch_size =
         delayed_reorthogonalization ? 6 : 12;
 
+      // As for the do_Tvmult_add loop above, we perform loop blocking on both
+      // the 'i' and 'c' variable to help hardware prefetchers to perform
+      // adequately, and get three nested loops here plus the inner loops. See
+      // the extensive comments above for the full rationale.
       unsigned int       j = 0;
       unsigned int       c = 0;
       const unsigned int loop_length_c =
