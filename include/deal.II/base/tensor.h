@@ -1426,7 +1426,7 @@ constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const
 {
   Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> x;
-  std::copy(values.begin(), values.end(), x.values.begin());
+  std::copy(values.data(), values.data() + values.size(), x.values.data());
   return x;
 }
 
