@@ -103,7 +103,7 @@ class occ_converter:
         self.surface_entity_range = [None,None]
         
     
-    # get the range of all used enity ID numbers (per type / level)    
+    # get the range of all used entity ID numbers (per type / level)    
     def calc_entities_min_max(self):
         # Points (level 0)
         for e,_ in self.pointdict.items():
@@ -321,7 +321,7 @@ class occ_converter:
         return rp
      
     """
-    find a mathing line between points "_p1" and "_p2"
+    find a matching line between points "_p1" and "_p2"
     consider even the orientation of the line, which for positive orientation shall start in "_p1" and end in "_p2"
     """
     def find_matching_line(self,_p1,_p2):
@@ -417,7 +417,7 @@ class occ_converter:
 
 
     """
-    In a list "lst" of entities, replace all occurences of entity ID "old" by entity ID "new" 
+    In a list "lst" of entities, replace all occurrences of entity ID "old" by entity ID "new" 
     """
     @staticmethod    
     def list_replace(lst, old=1, new=10):
@@ -432,7 +432,7 @@ class occ_converter:
         
     
     """
-    In this objects Lines, replace all occurences of the points listed 
+    In this objects Lines, replace all occurrences of the points listed 
     in a first index in the _pointzip zip by the second index in the _pointzip zip
     """
     def replace_points_in_lines(self,_pointzip):
@@ -445,7 +445,7 @@ class occ_converter:
     
     return two lists of entities:
     1) r_surface : list of surface entities without contact to any other surfaces
-    2) r_interface: list of "surface" entites in contact with other surfaces
+    2) r_interface: list of "surface" entities in contact with other surfaces
     
     The difference is simply:
     - interface curves will occur more than 1 time in the surfacedict
@@ -479,7 +479,7 @@ class occ_converter:
     
     This routine is keeping clean the entities lists of this and _other objects
     
-    "merge()" function simply shuffles the lists from this ond _other object into joined lists,
+    "merge()" function simply shuffles the lists from this and _other object into joined lists,
     but isn't doing any cleaning-up.
      
     """
@@ -597,7 +597,7 @@ class occ_converter:
     """
     "merge()" function
     
-    simply shuffles the lists from this ond _other object into joined lists,
+    simply shuffles the lists from this and _other object into joined lists,
     but isn't doing any cleaning-up.
     
     (use merge_entities instead)
