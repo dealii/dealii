@@ -1,4 +1,5 @@
-//#define NO_FULLY_DISTRIBUTED_TRIA	// do not use parallel::fullydistributed (instead: parallel::distributed)
+// #define NO_FULLY_DISTRIBUTED_TRIA	// do not use parallel::fullydistributed
+// (instead: parallel::distributed)
 
 /* ---------------------------------------------------------------------
  *
@@ -7,8 +8,8 @@
  *     Manaswinee Bezbaruah, Matthias Maier, Texas A&M University, 2021.
  *
  *
- * modifications/enhancements: Copyright (C) 2023 - 2024 by Dr.-Ing. Stephan Voss,
- *     Neunkirchen am Brand, Germany, stvoss@gmx.de
+ * modifications/enhancements: Copyright (C) 2023 - 2024 by Dr.-Ing. Stephan
+ * Voss, Neunkirchen am Brand, Germany, stvoss@gmx.de
  *
  * ---------------------------------------------------------------------
  *
@@ -23,10 +24,12 @@
  * ---------------------------------------------------------------------
  *
  * S. Voss' solver modifications / enhancements:
- * - complex valued (frequency domain) solvers for both, E- and H- field (see S1)...S3))
+ * - complex valued (frequency domain) solvers for both, E- and H- field (see
+ * S1)...S3))
  * - parallelization based on MPI
  * - adopted parameter file
- * - mesh-file import (.msh / usually generated using gmsh - see TO DO 2 for different model/mesh generation)
+ * - mesh-file import (.msh / usually generated using gmsh - see TO DO 2 for
+ * different model/mesh generation)
  * - data post-processors for output on cells, faces and also
  *
  *
@@ -67,27 +70,30 @@
  * E		: [V / m]		electric field strength (real or complex)
  * D		: [A s / m^2]	electric flux density (real or complex)
  *
- * rho_f	: [A s / m^3] 	electric charge density (in a volume) (real or complex)
- * J		: [A / m^2] 	current density (real or complex)
+ * rho_f	: [A s / m^3] 	electric charge density (in a volume) (real or
+ * complex) J		: [A / m^2] 	current density (real or complex)
  *
- * mu		: [V s / (A m)] magnetic permeability (index '_0' or '_vacuum' means vacuum permeability)
- * epsilon  : [A s / (V m)] electric permittivity (index '_0' or '_vacuum' means vacuum permittivity)
- * kappa	: [A / (V m)] 	electric conductivity
+ * mu		: [V s / (A m)] magnetic permeability (index '_0' or '_vacuum' means
+ * vacuum permeability) epsilon  : [A s / (V m)] electric permittivity (index
+ * '_0' or '_vacuum' means vacuum permittivity) kappa	: [A / (V m)] 	electric
+ * conductivity
  *
  * alpha	: [1/m]			skin constant, alpha^2 := i omega kappa mu ; [1/m^2]
- * beta		: [1/m]			wave number, beta^2 := omega^2 epsilon mu = -(i omega)^2 epsilon mu ; [1/m^2]
- * gamma	: [1/m]			complex wave number: gamma^2 := alpha^2 - beta^2 ; [1/m^2]
+ * beta		: [1/m]			wave number, beta^2 := omega^2 epsilon mu = -(i omega)^2
+ * epsilon mu ; [1/m^2] gamma	: [1/m]			complex wave number: gamma^2 :=
+ * alpha^2 - beta^2 ; [1/m^2]
  *
  *
  * x,y,z	: [m], [m], [m]			cartesian coordinates
  * rho,phi,z: [m], [radians], [m]	cylinder coordinates
  *
  *
- * usage of differential operators (div, grad, rot, curl, nabla) on scalar or vector fields :
+ * usage of differential operators (div, grad, rot, curl, nabla) on scalar or
+ * vector fields :
  *
- * 		rot vector_F = nabla x vector_F = curl vector_F  (rot operator is same as curl operator)
- * 		div vector_F = nabla * vector_F
- * 		grad scalar_f = nabla * scalar_f
+ * 		rot vector_F = nabla x vector_F = curl vector_F  (rot operator is same as
+ * curl operator) div vector_F = nabla * vector_F grad scalar_f = nabla *
+ * scalar_f
  *
  * ---------------------------------------------------------------------*/
 
@@ -192,7 +198,7 @@ namespace LA
 
 // class ConditionOStream allows to write
 // code that would output things to a stream (such as <code>std::cout</code>)
-// on every processor but throws the text away on all but one of them. 
+// on every processor but throws the text away on all but one of them.
 #include <deal.II/base/conditional_ostream.h>
 
 // Indicate which elements a particular
@@ -213,9 +219,9 @@ namespace LA
 // provides the namespace parallel::distributed::GridRefinement that offers
 // functions that can adaptively refine such distributed meshes:
 #ifndef NO_FULLY_DISTRIBUTED_TRIA
-#include <deal.II/distributed/fully_distributed_tria.h>
+#  include <deal.II/distributed/fully_distributed_tria.h>
 #else
-#include <deal.II/distributed/tria.h>
+#  include <deal.II/distributed/tria.h>
 #endif
 #include <deal.II/distributed/grid_refinement.h>
 
@@ -231,9 +237,14 @@ namespace LA
 
 namespace SV_Maxwell
 {
-  template <typename T> T sum (const T &, const T &);
+  template <typename T>
+  T sum(const T &, const T &);
 
-  template <typename T> double sum (const double &a, const double &b) { return a+b; };
+  template <typename T>
+  double sum(const double &a, const double &b)
+  {
+    return a + b;
+  };
 
   using namespace dealii;
   using namespace std::complex_literals;
@@ -267,87 +278,97 @@ namespace SV_Maxwell
 
     using curl_type = Tensor<1, dim == 2 ? 1 : dim, rank0_type>;
 
-    using Material_tuple = std::tuple<std::string,unsigned int,std::complex<double>,std::complex<double>,double>;
-    using FaceOperationalData_tuple = std::tuple<std::string,phys_ID,std::complex<double> >;
+    using Material_tuple = std::tuple<std::string,
+                                      unsigned int,
+                                      std::complex<double>,
+                                      std::complex<double>,
+                                      double>;
+    using FaceOperationalData_tuple =
+      std::tuple<std::string, phys_ID, std::complex<double>>;
 
 
-#define SV_NAN	1e40
+#define SV_NAN 1e40
 
-    class SV_physical {
-        public:
-        types::material_id   material_id;
-        std::string			 name;
-        std::complex<double> epsilon;		// absolute epsilon (not relative !! --> eps_r * eps_0)
-        std::complex<double> mu;			// absolute mu (not relative !! --> mu_r * mu_0)
-        double               kappa;
+    class SV_physical
+    {
+    public:
+      types::material_id material_id;
+      std::string        name;
+      std::complex<double>
+        epsilon; // absolute epsilon (not relative !! --> eps_r * eps_0)
+      std::complex<double> mu; // absolute mu (not relative !! --> mu_r * mu_0)
+      double               kappa;
 
-        std::complex<double> alpha_sq, beta_sq, gamma_sq;	// absolute values for skin (alpha) and wave constants (beta, gamma resp.)!
+      std::complex<double> alpha_sq, beta_sq,
+        gamma_sq; // absolute values for skin (alpha) and wave constants (beta,
+                  // gamma resp.)!
     };
 
-    class SV_operational_data {
-        public:
-        types::material_id   material_id;
-        std::string			 name;
-        std::complex<double> potential; // [V] electric potential
+    class SV_operational_data
+    {
+    public:
+      types::material_id   material_id;
+      std::string          name;
+      std::complex<double> potential; // [V] electric potential
     };
 
 
   public:
-
     double get_omega();
     double get_omega_sq();
 
-    double get_sigma(const Point<dim> & x,
+    double get_sigma(const Point<dim>  &x,
                      types::material_id left,
                      types::material_id right);
 
-    //rank1_type get_J_a(const Point<dim> &point, types::material_id material);
+    // rank1_type get_J_a(const Point<dim> &point, types::material_id material);
 
     SV_physical *get_p_physical(types::material_id material);
-    SV_physical get_physical(types::material_id material);
+    SV_physical  get_physical(types::material_id material);
 
     SV_operational_data *get_p_operational_data(types::material_id material);
-    SV_operational_data get_operational_data(types::material_id material);
+    SV_operational_data  get_operational_data(types::material_id material);
 
     std::string get_mesh_filename();
     std::string get_cells_solution_filename();
 
-    double         mu_vacuum;		// vacuum permeability: 4 pi 10e-7 V s / (A m)
-    double         epsilon_vacuum;  // vacuum permittivity: 8.8541878188(14)×10^−12 A s / (V m)
+    double mu_vacuum;      // vacuum permeability: 4 pi 10e-7 V s / (A m)
+    double epsilon_vacuum; // vacuum permittivity: 8.8541878188(14)×10^−12 A s /
+                           // (V m)
 
-    std::string mesh_filename,
-				cells_solution_filename;
+    std::string mesh_filename, cells_solution_filename;
 
   private:
-    double         frequency;		// [Hz] frequency
-    double         omega;			// [1/s] angular frequency omega = 2 pi frequency
-    double         omega_sq;		// = omega^2
+    double frequency; // [Hz] frequency
+    double omega;     // [1/s] angular frequency omega = 2 pi frequency
+    double omega_sq;  // = omega^2
 
-    int				default_physical_ix=-1;
+    int default_physical_ix = -1;
 
-    std::list<Material_tuple> material_list;
+    std::list<Material_tuple>            material_list;
     std::list<FaceOperationalData_tuple> operational_data_list;
 
-    /* TO DO: scaling of material properties and domains has not been maintained and may be faulty/buggy !!
-     * --> better remove this !!
-     */
-    #define SV_SCALE_OMEGA		1.0
-	#define SV_SCALE_KAPPA		1.0 //1.0e7
-	#define SV_SCALE_MU			1.0 //mu_vacuum
-	#define SV_SCALE_EPSILON	1.0 //epsilon_vacuum
+/* TO DO: scaling of material properties and domains has not been maintained and
+ * may be faulty/buggy !!
+ * --> better remove this !!
+ */
+#define SV_SCALE_OMEGA 1.0
+#define SV_SCALE_KAPPA 1.0   // 1.0e7
+#define SV_SCALE_MU 1.0      // mu_vacuum
+#define SV_SCALE_EPSILON 1.0 // epsilon_vacuum
 
 
   public:
     rank1_type r1null;
 
-    unsigned int	N_components;	// 1 for real (omega==0), 2 for complex (omega!=0)
-    bool			is_complex;
-    unsigned long N_physicals=0;
-    #define SV_N_max_physicals 20
-    SV_physical *pphysicals = NULL;
-    unsigned long N_operational_data=0;
+    unsigned int
+         N_components; // 1 for real (omega==0), 2 for complex (omega!=0)
+    bool is_complex;
+    unsigned long N_physicals = 0;
+#define SV_N_max_physicals 20
+    SV_physical         *pphysicals         = NULL;
+    unsigned long        N_operational_data = 0;
     SV_operational_data *p_operational_data = NULL;
-
   };
 
 
@@ -355,111 +376,123 @@ namespace SV_Maxwell
   ProblemParameters<dim>::ProblemParameters()
     : ParameterAcceptor("Problem")
   {
-	mu_vacuum = 4.0e-7*dealii::numbers::PI; // [ V s / (A m) ]
-	epsilon_vacuum = 8.8541878176204199e-12; // [ A s / (V m) ]
+    mu_vacuum      = 4.0e-7 * dealii::numbers::PI; // [ V s / (A m) ]
+    epsilon_vacuum = 8.8541878176204199e-12;       // [ A s / (V m) ]
 
 
-	frequency = 50.0;			// [Hz]
-	add_parameter("frequency",
-				  frequency,
-				  "frequency");
+    frequency = 50.0; // [Hz]
+    add_parameter("frequency", frequency, "frequency");
 
-	mesh_filename = "";
-	add_parameter("mesh filename", mesh_filename, "mesh file name");
-	cells_solution_filename = "";
-	add_parameter("cells solution filename", cells_solution_filename, "filename for exporting cells solution");
+    mesh_filename = "";
+    add_parameter("mesh filename", mesh_filename, "mesh file name");
+    cells_solution_filename = "";
+    add_parameter("cells solution filename",
+                  cells_solution_filename,
+                  "filename for exporting cells solution");
 
-    add_parameter("materials", material_list, "list of material definitions: \"name : ID : eps_r_r,eps_r_i : mu_r_r,mu_r_i : kappa_abs\"");
-	add_parameter("potentials", operational_data_list, "list of potential definitions: \"name : ID : epot_r, epot_i [V, abs.]\"");
-
+    add_parameter(
+      "materials",
+      material_list,
+      "list of material definitions: \"name : ID : eps_r_r,eps_r_i : mu_r_r,mu_r_i : kappa_abs\"");
+    add_parameter(
+      "potentials",
+      operational_data_list,
+      "list of potential definitions: \"name : ID : epot_r, epot_i [V, abs.]\"");
   }
 
   template <int dim>
   void ProblemParameters<dim>::finalize()
   {
-	const std::complex<double> cnull(0,0);
-	for (unsigned int ix=0;ix<dim;++ix)
-		r1null[ix] = cnull;
+    const std::complex<double> cnull(0, 0);
+    for (unsigned int ix = 0; ix < dim; ++ix)
+      r1null[ix] = cnull;
 
-    omega = 2.0*dealii::numbers::PI*frequency;
-    omega_sq = omega*omega;
-    N_components = ( omega==0 ? 1 : 2 );
-    is_complex = (N_components>1);
+    omega        = 2.0 * dealii::numbers::PI * frequency;
+    omega_sq     = omega * omega;
+    N_components = (omega == 0 ? 1 : 2);
+    is_complex   = (N_components > 1);
 
-    constexpr std::complex<double> real(1,0),imag(0,1);
+    constexpr std::complex<double> real(1, 0), imag(0, 1);
 
-    N_physicals = material_list.size()+1;
+    N_physicals = material_list.size() + 1;
 
     pphysicals = new SV_physical[N_physicals];
 
-    int ix = 0;
-    default_physical_ix=-1;
-    for (auto const& item : material_list) {
-	    std::string name =  std::get<0>(item);
-	    unsigned int id =  std::get<1>(item);
-	    std::complex<double> eps_r =  std::get<2>(item);
-	    std::complex<double> mu_r =  std::get<3>(item);
-	    double kappa =  std::get<4>(item);
+    int ix              = 0;
+    default_physical_ix = -1;
+    for (const auto &item : material_list)
+      {
+        std::string          name  = std::get<0>(item);
+        unsigned int         id    = std::get<1>(item);
+        std::complex<double> eps_r = std::get<2>(item);
+        std::complex<double> mu_r  = std::get<3>(item);
+        double               kappa = std::get<4>(item);
 
-    	pphysicals[ix].name 		  = name;
+        pphysicals[ix].name = name;
 
-    	pphysicals[ix].material_id    = id;
-    	if (id==0)
-    		default_physical_ix = ix;
+        pphysicals[ix].material_id = id;
+        if (id == 0)
+          default_physical_ix = ix;
 
-    	pphysicals[ix].epsilon        = eps_r * epsilon_vacuum;
-        pphysicals[ix].mu             = mu_r * mu_vacuum;
-        pphysicals[ix].kappa          = kappa;
+        pphysicals[ix].epsilon = eps_r * epsilon_vacuum;
+        pphysicals[ix].mu      = mu_r * mu_vacuum;
+        pphysicals[ix].kappa   = kappa;
 
-        pphysicals[ix].alpha_sq       = imag*omega*pphysicals[ix].mu*pphysicals[ix].kappa;
-        pphysicals[ix].beta_sq        = real*omega_sq*pphysicals[ix].mu*pphysicals[ix].epsilon;
-        pphysicals[ix].gamma_sq        = pphysicals[ix].alpha_sq - pphysicals[ix].beta_sq;
+        pphysicals[ix].alpha_sq =
+          imag * omega * pphysicals[ix].mu * pphysicals[ix].kappa;
+        pphysicals[ix].beta_sq =
+          real * omega_sq * pphysicals[ix].mu * pphysicals[ix].epsilon;
+        pphysicals[ix].gamma_sq =
+          pphysicals[ix].alpha_sq - pphysicals[ix].beta_sq;
 
-	    ix ++;
-    }
+        ix++;
+      }
 
     N_physicals = ix;
 
-    if (default_physical_ix<0) {
-    	N_physicals++;
-    	pphysicals[ix].name 		  = "default";
+    if (default_physical_ix < 0)
+      {
+        N_physicals++;
+        pphysicals[ix].name = "default";
 
-    	default_physical_ix = ix;
-    	pphysicals[ix].material_id    = 0;
+        default_physical_ix        = ix;
+        pphysicals[ix].material_id = 0;
 
-    	pphysicals[ix].epsilon        = epsilon_vacuum;
-        pphysicals[ix].mu             = mu_vacuum;
-        pphysicals[ix].kappa          = 0.0;
+        pphysicals[ix].epsilon = epsilon_vacuum;
+        pphysicals[ix].mu      = mu_vacuum;
+        pphysicals[ix].kappa   = 0.0;
 
-        pphysicals[ix].alpha_sq       = imag*omega*pphysicals[ix].mu*pphysicals[ix].kappa;
-        pphysicals[ix].beta_sq        = real*omega_sq*pphysicals[ix].mu*pphysicals[ix].epsilon;
-        pphysicals[ix].gamma_sq       = pphysicals[ix].alpha_sq - pphysicals[ix].beta_sq;
-    }
+        pphysicals[ix].alpha_sq =
+          imag * omega * pphysicals[ix].mu * pphysicals[ix].kappa;
+        pphysicals[ix].beta_sq =
+          real * omega_sq * pphysicals[ix].mu * pphysicals[ix].epsilon;
+        pphysicals[ix].gamma_sq =
+          pphysicals[ix].alpha_sq - pphysicals[ix].beta_sq;
+      }
 
     N_operational_data = operational_data_list.size();
     p_operational_data = new SV_operational_data[N_operational_data];
 
-    unsigned int ipot = 0;
+    unsigned int         ipot = 0;
     SV_operational_data *t_p_opdata;
-    for (auto const& item : operational_data_list) {
-	    std::string name =  std::get<0>(item);
-	    auto id =  std::get<1>(item);
-	    std::complex<double> potential =  std::get<2>(item);
+    for (const auto &item : operational_data_list)
+      {
+        std::string          name      = std::get<0>(item);
+        auto                 id        = std::get<1>(item);
+        std::complex<double> potential = std::get<2>(item);
 
-	    t_p_opdata = &p_operational_data[ipot];
-	    t_p_opdata->material_id = id;
-	    t_p_opdata->name = name;
-	    t_p_opdata->potential = potential;
+        t_p_opdata              = &p_operational_data[ipot];
+        t_p_opdata->material_id = id;
+        t_p_opdata->name        = name;
+        t_p_opdata->potential   = potential;
 
-	    ipot++;
-    }
-
+        ipot++;
+      }
   }
 
   template <int dim>
   ProblemParameters<dim>::~ProblemParameters()
-  {
-  }
+  {}
 
   template <int dim>
   std::string ProblemParameters<dim>::get_mesh_filename()
@@ -489,11 +522,13 @@ namespace SV_Maxwell
   typename ProblemParameters<dim>::SV_physical *
   ProblemParameters<dim>::get_p_physical(types::material_id material)
   {
-    for (unsigned int ix=0;ix<N_physicals;ix++) {
-        if (material==(pphysicals[ix].material_id)) {
+    for (unsigned int ix = 0; ix < N_physicals; ix++)
+      {
+        if (material == (pphysicals[ix].material_id))
+          {
             return &pphysicals[ix];
-        }
-    }
+          }
+      }
 
     return NULL;
   }
@@ -502,10 +537,10 @@ namespace SV_Maxwell
   typename ProblemParameters<dim>::SV_physical
   ProblemParameters<dim>::get_physical(types::material_id material)
   {
-    SV_physical *retval_physical=get_p_physical(material);
+    SV_physical *retval_physical = get_p_physical(material);
 
-    if (retval_physical==NULL)
-    	retval_physical = &pphysicals[default_physical_ix];
+    if (retval_physical == NULL)
+      retval_physical = &pphysicals[default_physical_ix];
 
     return *retval_physical;
   }
@@ -514,11 +549,13 @@ namespace SV_Maxwell
   typename ProblemParameters<dim>::SV_operational_data *
   ProblemParameters<dim>::get_p_operational_data(types::material_id material)
   {
-    for (unsigned int ix=0;ix<N_operational_data;ix++) {
-        if (material==(p_operational_data[ix].material_id)) {
+    for (unsigned int ix = 0; ix < N_operational_data; ix++)
+      {
+        if (material == (p_operational_data[ix].material_id))
+          {
             return &p_operational_data[ix];
-        }
-    }
+          }
+      }
 
     return NULL;
   }
@@ -527,10 +564,11 @@ namespace SV_Maxwell
   typename ProblemParameters<dim>::SV_operational_data
   ProblemParameters<dim>::get_operational_data(types::material_id material)
   {
-	  SV_operational_data *retval_operational_data=get_p_operational_data(material);
+    SV_operational_data *retval_operational_data =
+      get_p_operational_data(material);
 
-    if (retval_operational_data==NULL)
-    	retval_operational_data = &p_operational_data[0];
+    if (retval_operational_data == NULL)
+      retval_operational_data = &p_operational_data[0];
 
     return *retval_operational_data;
   }
@@ -543,38 +581,43 @@ namespace SV_Maxwell
   class DirichletBoundaryValues : public Function<dim>
   {
   public:
-	unsigned int N_components;
-	double *m_values;
+    unsigned int N_components;
+    double      *m_values;
 
 
-	DirichletBoundaryValues(unsigned int _N_components, // e.g.: 1 for real numbers, 2 for complex numbers
-							double *pvalues=NULL)		// pointer to array of _N_components values to set all components
+    DirichletBoundaryValues(
+      unsigned int
+              _N_components, // e.g.: 1 for real numbers, 2 for complex numbers
+      double *pvalues =
+        NULL) // pointer to array of _N_components values to set all components
       : Function<dim>(_N_components)
-	  , N_components(_N_components)
+      , N_components(_N_components)
     {
-    	m_values = new double[_N_components];
+      m_values = new double[_N_components];
 
-        for (unsigned int ix=0;ix<N_components;ix++)
-        	m_values[ix] = pvalues!=NULL ? pvalues[ix] : 0.0;
+      for (unsigned int ix = 0; ix < N_components; ix++)
+        m_values[ix] = pvalues != NULL ? pvalues[ix] : 0.0;
     }
 
 
     ~DirichletBoundaryValues()
     {
-    	delete m_values;
+      delete m_values;
     }
 
 
     // return (component of) function value at a point:
-    virtual double 	value (const Point< dim > &, const unsigned int _component) const override
+    virtual double value(const Point<dim> &,
+                         const unsigned int _component) const override
     {
-    	return(m_values[_component]);
+      return (m_values[_component]);
     }
 
     // return gradient of function value at a point:
-    virtual Tensor< 1, dim, double> gradient (const Point< dim > &, const unsigned int) const override
+    virtual Tensor<1, dim, double> gradient(const Point<dim> &,
+                                            const unsigned int) const override
     {
-    	return(Tensor<1,dim,double>({0,0,0}));
+      return (Tensor<1, dim, double>({0, 0, 0}));
     }
 
     // set function vector at point
@@ -583,15 +626,16 @@ namespace SV_Maxwell
     {
       AssertDimension(values.size(), N_components);
 
-      for (unsigned int ix=0;ix<N_components;ix++) {
-    	  values(ix) = m_values[ix];
-      }
+      for (unsigned int ix = 0; ix < N_components; ix++)
+        {
+          values(ix) = m_values[ix];
+        }
     }
 
     // set entire value list
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override
+                      std::vector<Vector<double>>   &value_list) const override
     {
       AssertDimension(value_list.size(), points.size());
 
@@ -599,7 +643,6 @@ namespace SV_Maxwell
         DirichletBoundaryValues<dim>::vector_value(points[p], value_list[p]);
     }
   };
-
 
 
 
@@ -618,13 +661,13 @@ namespace SV_Maxwell
 
     using rank1_type = Tensor<1, dim, std::complex<double>>;
 
-    ProblemParameters<dim>      problem_parameters;
+    ProblemParameters<dim> problem_parameters;
 
   private:
     MPI_Comm mpi_communicator;
 
     /* run time parameters */
-    unsigned int N_refinements,N_materials;
+    unsigned int N_refinements, N_materials;
     unsigned int fe_E_order;
     unsigned int quadrature_order;
     unsigned int N_BC_func_components;
@@ -647,17 +690,17 @@ namespace SV_Maxwell
 #endif
 
     std::unique_ptr<FiniteElement<dim>> fe;
-    DoFHandler<dim> dof_handler;
+    DoFHandler<dim>                     dof_handler;
 
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
 
     AffineConstraints<double> constraints;
 
-    SparsityPattern           sparsity_pattern;
-    LA::MPI::SparseMatrix     system_matrix;
-    LA::MPI::Vector           locally_relevant_solution;
-    LA::MPI::Vector           system_rhs;
+    SparsityPattern       sparsity_pattern;
+    LA::MPI::SparseMatrix system_matrix;
+    LA::MPI::Vector       locally_relevant_solution;
+    LA::MPI::Vector       system_rhs;
 
     class CellsPostprocessor;
     class FacesPostprocessor;
@@ -679,16 +722,14 @@ namespace SV_Maxwell
   template <int dim>
   Maxwell_Poisson<dim>::~Maxwell_Poisson()
   {
-      //if (locally_relevant_pots!=NULL) delete locally_relevant_pots;
-      //if (locally_relevant_curls!=NULL) delete locally_relevant_curls;
+    // if (locally_relevant_pots!=NULL) delete locally_relevant_pots;
+    // if (locally_relevant_curls!=NULL) delete locally_relevant_curls;
   }
 
 
   template <int dim>
   Maxwell_Poisson<dim>::Maxwell_Poisson()
-    : ParameterAcceptor(
-    		"Maxwell_E_solver"
-    		)
+    : ParameterAcceptor("Maxwell_E_solver")
     , mpi_communicator(MPI_COMM_WORLD)
     , pcout(std::cout,
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
@@ -699,7 +740,6 @@ namespace SV_Maxwell
     , triangulation(mpi_communicator)
     , dof_handler(triangulation)
   {
-
     ParameterAcceptor::parse_parameters_call_back.connect(
       [&]() { parse_parameters_callback(); });
 
@@ -709,12 +749,13 @@ namespace SV_Maxwell
                   "number of refinements of the geometry");
 
     N_materials = 0;
-    add_parameter("materials",
-                  N_materials,
-                  "number of materials");
+    add_parameter("materials", N_materials, "number of materials");
 
     fe_E_order = 0;
-    add_parameter("fe E order", fe_E_order, "order of the finite element space for scalar electric potential");
+    add_parameter(
+      "fe E order",
+      fe_E_order,
+      "order of the finite element space for scalar electric potential");
 
 
     quadrature_order = 1;
@@ -727,16 +768,16 @@ namespace SV_Maxwell
   template <int dim>
   void Maxwell_Poisson<dim>::parse_parameters_callback()
   {
-	  problem_parameters.finalize();
+    problem_parameters.finalize();
 
-	  N_BC_func_components = 0;
+    N_BC_func_components = 0;
 
-	  pcout << "fe_E_order = " << fe_E_order << std::endl;
-	  N_BC_func_components += problem_parameters.N_components;
-	  pcout << "quadrature order = " << quadrature_order << std::endl;
+    pcout << "fe_E_order = " << fe_E_order << std::endl;
+    N_BC_func_components += problem_parameters.N_components;
+    pcout << "quadrature order = " << quadrature_order << std::endl;
 
-	  fe = std::make_unique<FESystem<dim>>(FE_Q<dim>(fe_E_order) ^ problem_parameters.N_components);
-
+    fe = std::make_unique<FESystem<dim>>(FE_Q<dim>(fe_E_order) ^
+                                         problem_parameters.N_components);
   }
 
   // The Maxwell::make_grid() routine
@@ -760,11 +801,11 @@ namespace SV_Maxwell
     auto construction_data = TriangulationDescription::Utilities::
       create_description_from_triangulation_in_groups<dim, dim>(
         [&](Triangulation<dim> &tria) {
-    	    pcout
-              << "MPI-comm: " << Utilities::MPI::this_mpi_process(mpi_communicator)
-              << ", file: \"" << infilename << "\"" << std::endl;
-            gi.attach_triangulation(tria);
-            gi.read_msh(infilename);
+          pcout << "MPI-comm: "
+                << Utilities::MPI::this_mpi_process(mpi_communicator)
+                << ", file: \"" << infilename << "\"" << std::endl;
+          gi.attach_triangulation(tria);
+          gi.read_msh(infilename);
         },
         [&](Triangulation<dim> &tria_serial,
             const MPI_Comm /*mpi_comm*/,
@@ -775,11 +816,11 @@ namespace SV_Maxwell
         1);
     triangulation.create_triangulation(construction_data);
 #else //  #ifndef NO_FULLY_DISTRIBUTED_TRIA
-    Triangulation<dim> tria;
-	gi.attach_triangulation(tria);
-	gi.read_msh(infilename);
+    Triangulation<dim>                        tria;
+    gi.attach_triangulation(tria);
+    gi.read_msh(infilename);
 
-	triangulation.copy_triangulation(tria);
+    triangulation.copy_triangulation(tria);
 #endif
   }
 
@@ -795,7 +836,8 @@ namespace SV_Maxwell
 
     dof_handler.distribute_dofs(*fe);
     pcout << "  number of fe_systems: " << fe->n_components() << std::endl
-        	<< "  setup: number of degrees of freedom: " << dof_handler.n_dofs() << std::endl;
+          << "  setup: number of degrees of freedom: " << dof_handler.n_dofs()
+          << std::endl;
 
 
     // Two index sets that provide information about which degrees of
@@ -807,11 +849,11 @@ namespace SV_Maxwell
 
     // Initialize the solution and right hand side vectors.
     // Solution vector we seek does not only store
-    // elements locally owned, but also ghost entries; 
-    // Right hand side vector only needs to have the entries the current processor
-    // owns (It will only be written locally- never read.) 
-    // (Linear solvers will read from it, but they do not care about 
-    // the geometric location of degrees of freedom).
+    // elements locally owned, but also ghost entries;
+    // Right hand side vector only needs to have the entries the current
+    // processor owns (It will only be written locally- never read.) (Linear
+    // solvers will read from it, but they do not care about the geometric
+    // location of degrees of freedom).
     locally_relevant_solution.reinit(locally_owned_dofs,
                                      locally_relevant_dofs,
                                      mpi_communicator);
@@ -826,11 +868,11 @@ namespace SV_Maxwell
     // processor can store all information about the entire universe. As a
     // consequence, the AffineConstraints object needs information for which
     // degrees of freedom it can store constraints and for which it may not
-    // expect any information to store. 
+    // expect any information to store.
     // The degrees of freedom it needs to care about on
     // each processor are the locally relevant ones, so this is passed to the
-    // AffineConstraints::reinit function. 
-    
+    // AffineConstraints::reinit function.
+
     // As a side note, if it's forgotten to
     // pass this argument, the AffineConstraints class will allocate an array
     // with length equal to the largest DoF index it has seen so far. For
@@ -843,41 +885,49 @@ namespace SV_Maxwell
 
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
-#ifndef kdshfkahfs// not defined(DEBUG)
+#ifndef kdshfkahfs // not defined(DEBUG)
 
-    const FEValuesExtractors::Scalar 	phi_E_re(                         0     ),
-    									phi_E_im((problem_parameters.is_complex ? 1 : 0));
+    const FEValuesExtractors::Scalar phi_E_re(0),
+      phi_E_im((problem_parameters.is_complex ? 1 : 0));
 
-    for (unsigned int ix=0;ix<problem_parameters.N_operational_data;ix++)
-	{
-		pcout << "set physical " << problem_parameters.p_operational_data[ix].material_id;
+    for (unsigned int ix = 0; ix < problem_parameters.N_operational_data; ix++)
+      {
+        pcout << "set physical "
+              << problem_parameters.p_operational_data[ix].material_id;
 
-		const auto potential = problem_parameters.p_operational_data[ix].potential;
-		const auto pot_real = potential.real(), pot_imag = potential.imag();
-		if (pot_real<SV_NAN and -pot_real<SV_NAN and pot_imag<SV_NAN and -pot_imag<SV_NAN)
-		{
-			pcout << " potential " << problem_parameters.p_operational_data[ix].potential << " V";
+        const auto potential =
+          problem_parameters.p_operational_data[ix].potential;
+        const auto pot_real = potential.real(), pot_imag = potential.imag();
+        if (pot_real < SV_NAN and -pot_real < SV_NAN and pot_imag < SV_NAN and
+            -pot_imag < SV_NAN)
+          {
+            pcout << " potential "
+                  << problem_parameters.p_operational_data[ix].potential
+                  << " V";
 
-			VectorTools::interpolate_boundary_values(
-			  dof_handler, problem_parameters.p_operational_data[ix].material_id,
-			  Functions::ConstantFunction<dim,double>(pot_real,N_BC_func_components),
-			  constraints,
-			  fe->component_mask(phi_E_re));
+            VectorTools::interpolate_boundary_values(
+              dof_handler,
+              problem_parameters.p_operational_data[ix].material_id,
+              Functions::ConstantFunction<dim, double>(pot_real,
+                                                       N_BC_func_components),
+              constraints,
+              fe->component_mask(phi_E_re));
 
-			if (problem_parameters.is_complex)
-			{
-				VectorTools::interpolate_boundary_values(
-				  dof_handler, problem_parameters.p_operational_data[ix].material_id,
-				  Functions::ConstantFunction<dim,double>(pot_imag,N_BC_func_components),
-				  constraints,
-				  fe->component_mask(phi_E_im));
-			}
-		}
+            if (problem_parameters.is_complex)
+              {
+                VectorTools::interpolate_boundary_values(
+                  dof_handler,
+                  problem_parameters.p_operational_data[ix].material_id,
+                  Functions::ConstantFunction<dim, double>(
+                    pot_imag, N_BC_func_components),
+                  constraints,
+                  fe->component_mask(phi_E_im));
+              }
+          }
 
 
-		pcout << std::endl;
-
-	}
+        pcout << std::endl;
+      }
 #endif // _NOT_IN_USE_
 
 
@@ -903,7 +953,7 @@ namespace SV_Maxwell
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline Tensor<1, dim, std::complex<double>>
   tangential_part(const Tensor<1, dim, std::complex<double>> &tensor,
-                  const Tensor<1, dim> &                      normal)
+                  const Tensor<1, dim>                       &normal)
   {
     auto result = tensor;
     result[0]   = normal[1] * (tensor[0] * normal[1] - tensor[1] * normal[0]);
@@ -920,23 +970,23 @@ namespace SV_Maxwell
     QGauss<dim>     quadrature_formula(quadrature_order);
     QGauss<dim - 1> face_quadrature_formula(quadrature_order);
 
-    FEValues<dim>     fe_values(*fe,
-                                 quadrature_formula,
-                                 update_values | update_gradients |
-                                 update_quadrature_points |
-                                 update_JxW_values);
-                                 
+    FEValues<dim> fe_values(*fe,
+                            quadrature_formula,
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
+
     FEFaceValues<dim> fe_face_values(*fe,
                                      face_quadrature_formula,
                                      update_values | update_gradients |
-                                     update_quadrature_points |
-                                     update_normal_vectors |
-                                     update_JxW_values);
+                                       update_quadrature_points |
+                                       update_normal_vectors |
+                                       update_JxW_values);
 
     const auto dofs_per_cell = fe->dofs_per_cell;
 
-    const unsigned int n_q_points      = quadrature_formula.size();
-    [[maybe_unused]] const unsigned int n_face_q_points = face_quadrature_formula.size();
+    const unsigned int                  n_q_points = quadrature_formula.size();
+    [[maybe_unused]] const unsigned int n_face_q_points =
+      face_quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
@@ -944,21 +994,22 @@ namespace SV_Maxwell
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // This is assembling the interior of the domain on the left hand side.
-    // In doing so, test functions $\varphi_i$ and $\varphi_j$ are needed, and the
-    // curl of these test variables.
+    // In doing so, test functions $\varphi_i$ and $\varphi_j$ are needed, and
+    // the curl of these test variables.
 
-    const auto omega = problem_parameters.get_omega();
-    const std::complex<double> real{1.0,0.0},imag{0., problem_parameters.is_complex ? 1.0 : 0.0};
+    const auto                 omega = problem_parameters.get_omega();
+    const std::complex<double> real{1.0, 0.0},
+      imag{0., problem_parameters.is_complex ? 1.0 : 0.0};
     constexpr std::complex<double> cnull{0., 0.};
 
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-          if (cell->is_locally_owned())
+        if (cell->is_locally_owned())
           {
             fe_values.reinit(cell);
 
             const FEValuesExtractors::Scalar phi_E_real(0),
-            								 phi_E_imag((problem_parameters.is_complex ? 1 : 0));
+              phi_E_imag((problem_parameters.is_complex ? 1 : 0));
 
             cell_matrix = 0.;
             cell_rhs    = 0.;
@@ -966,118 +1017,152 @@ namespace SV_Maxwell
             cell->get_dof_indices(local_dof_indices);
             const auto material_id = cell->material_id();
 
-            const auto   material = problem_parameters.get_physical(material_id);
+            const auto material = problem_parameters.get_physical(material_id);
 
-            std::complex<double> psi_E{	/* real */ omega==0 ? (material.kappa==0 ? material.epsilon.real() : material.kappa) : material.kappa-omega*material.epsilon.imag(),
-            							/* imag */ omega==0 ? 0 : omega*material.epsilon.real()};
+            std::complex<double> psi_E{
+              /* real */ omega == 0 ?
+                (material.kappa == 0 ? material.epsilon.real() :
+                                       material.kappa) :
+                material.kappa - omega * material.epsilon.imag(),
+              /* imag */ omega == 0 ? 0 : omega * material.epsilon.real()};
 
             for (unsigned int q_point = 0; q_point < n_q_points; q_point++)
               {
-
-                for(const auto i : fe_values.dof_indices())
+                for (const auto i : fe_values.dof_indices())
                   {
-                    const auto grad_phi_E_i_r =        fe_values[phi_E_real].gradient(i, q_point),
-                               grad_phi_E_i_i = imag * fe_values[phi_E_imag].gradient(i, q_point);
+                    const auto grad_phi_E_i_r =
+                                 fe_values[phi_E_real].gradient(i, q_point),
+                               grad_phi_E_i_i =
+                                 imag *
+                                 fe_values[phi_E_imag].gradient(i, q_point);
 
-                    const auto grad_phi_E_i_conj      = grad_phi_E_i_r - grad_phi_E_i_i;
+                    const auto grad_phi_E_i_conj =
+                      grad_phi_E_i_r - grad_phi_E_i_i;
 
                     for (const auto j : fe_values.dof_indices())
                       {
-                        auto temp = cnull;
-                        const auto grad_phi_E_j_r =        fe_values[phi_E_real].gradient(j, q_point);
-						const auto grad_phi_E_j_i = imag * fe_values[phi_E_imag].gradient(j, q_point);
-                        const auto grad_phi_E_j   = grad_phi_E_j_r + grad_phi_E_j_i;
+                        auto       temp = cnull;
+                        const auto grad_phi_E_j_r =
+                          fe_values[phi_E_real].gradient(j, q_point);
+                        const auto grad_phi_E_j_i =
+                          imag * fe_values[phi_E_imag].gradient(j, q_point);
+                        const auto grad_phi_E_j =
+                          grad_phi_E_j_r + grad_phi_E_j_i;
 
                         // el. PDE: psi_E * nabla phi_E_j * nabla phi_E_i'
                         /* E.2 */
-						temp  += psi_E * scalar_product( grad_phi_E_j, grad_phi_E_i_conj ) * fe_values.JxW(q_point);
+                        temp +=
+                          psi_E *
+                          scalar_product(grad_phi_E_j, grad_phi_E_i_conj) *
+                          fe_values.JxW(q_point);
 
                         cell_matrix(i, j) += temp.real();
                       } // for j
-                  } // for i
+                  }     // for i
 
               } // for qpoint
 
 
 
-/*------------------------------------------------------------------------------------------
- *
- * FACES integral
- *
- *------------------------------------------------------------------------------------------*/
+            /*------------------------------------------------------------------------------------------
+             *
+             * FACES integral
+             *
+             *------------------------------------------------------------------------------------------*/
 
 
 
             // Assemble the face and the boundary.
             /*
-             * ....this section is not deleted for partial reusage while implementing following TO DO:
+             * ....this section is not deleted for partial reusage while
+             * implementing following TO DO:
              *
-             * TO DO: for magnetic field an integral boundary condition will be needed for connecting current sources to windings
-             * This connection will be done on boundaries (with boundary IDs) and integrating vector potential: A = J / (i omega kappa)
+             * TO DO: for magnetic field an integral boundary condition will be
+             * needed for connecting current sources to windings This connection
+             * will be done on boundaries (with boundary IDs) and integrating
+             * vector potential: A = J / (i omega kappa)
              */
 
 
-            if constexpr(dim>2)
-            {
-
+            if constexpr (dim > 2)
+              {
                 for (const auto &face : cell->face_iterators())
-				  {
-					if (face->at_boundary())
-					  {
+                  {
+                    if (face->at_boundary())
+                      {
+                        fe_face_values.reinit(cell, face);
 
-						fe_face_values.reinit(cell, face);
+                        std::complex<double> currdens_J(0, 0);
 
-			            std::complex<double> currdens_J(0,0);
+                        const FEValuesExtractors::Scalar phi_E_real(0),
+                          phi_E_imag((problem_parameters.is_complex ? 1 : 0));
+                        for (unsigned int q_point = 0;
+                             q_point < n_face_q_points;
+                             q_point++)
+                          {
+                            const auto normal =
+                              fe_face_values.normal_vector(q_point);
 
-			            const FEValuesExtractors::Scalar phi_E_real(                         0     ),
-			            								 phi_E_imag((problem_parameters.is_complex ? 1 : 0));
-						for (unsigned int q_point = 0; q_point < n_face_q_points; q_point++)
-						  {
-							const auto normal = fe_face_values.normal_vector(q_point);
+                            for (const auto i : fe_face_values.dof_indices())
+                              {
+                                const auto phi_E_i_r =
+                                             fe_face_values[phi_E_real].value(
+                                               i, q_point),
+                                           phi_E_i_i =
+                                             imag * fe_face_values[phi_E_imag]
+                                                      .value(i, q_point);
 
-							for (const auto i : fe_face_values.dof_indices())
-							  {
+                                const auto phi_E_i_conj = phi_E_i_r - phi_E_i_i;
 
-							    const auto 	phi_E_i_r =        fe_face_values[phi_E_real].value(i, q_point),
-											phi_E_i_i = imag * fe_face_values[phi_E_imag].value(i, q_point);
+                                for (const auto j :
+                                     fe_face_values.dof_indices())
+                                  {
+                                    std::complex<double> temp(0, 0);
 
-								const auto phi_E_i_conj = phi_E_i_r - phi_E_i_i;
+                                    {
+                                      const auto grad_phi_E_j_r =
+                                                   fe_face_values[phi_E_real]
+                                                     .gradient(j, q_point),
+                                                 grad_phi_E_j_i =
+                                                   imag *
+                                                   fe_face_values[phi_E_imag]
+                                                     .gradient(j, q_point);
 
-								for (const auto j : fe_face_values.dof_indices())
-								  {
-									std::complex<double> temp(0,0);
+                                      const auto grad_phi_E_j =
+                                        grad_phi_E_j_r + grad_phi_E_j_i;
 
-									{
-										const auto 	grad_phi_E_j_r =        fe_face_values[phi_E_real].gradient(j, q_point),
-													grad_phi_E_j_i = imag * fe_face_values[phi_E_imag].gradient(j, q_point);
+                                      // el. PDE: -psi_E (nabla phi_E_j) *
+                                      // phi_E_i' * e_n
+                                      /* E.3 */
+                                      temp -=
+                                        (psi_E /*-material.kappa*/) *
+                                        phi_E_i_conj *
+                                        scalar_product(grad_phi_E_j, normal) *
+                                        fe_face_values.JxW(q_point);
+                                    }
 
-										const auto grad_phi_E_j = grad_phi_E_j_r + grad_phi_E_j_i;
+                                    cell_matrix(i, j) += temp.real();
+                                  } /* for(j) */
 
-										// el. PDE: -psi_E (nabla phi_E_j) * phi_E_i' * e_n
-										/* E.3 */
-										temp -= (psi_E /*-material.kappa*/) * phi_E_i_conj * scalar_product(grad_phi_E_j,normal) * fe_face_values.JxW(q_point);
-									}
+                              } /* for(i) */
 
-									cell_matrix(i, j) += temp.real();
-								  } /* for(j) */
-
-							  }     /* for(i) */
-
-						  }         /* for(q_point) */
-					  } // if (face->at_boundary())
-				  } // END: for (const auto &face : cell->face_iterators())
-            } // END: if (dim>2)
+                          } /* for(q_point) */
+                      }     // if (face->at_boundary())
+                  } // END: for (const auto &face : cell->face_iterators())
+              }     // END: if (dim>2)
 
 
 
-
-            constraints.distribute_local_to_global(
-            cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
+            constraints.distribute_local_to_global(cell_matrix,
+                                                   cell_rhs,
+                                                   local_dof_indices,
+                                                   system_matrix,
+                                                   system_rhs);
 
 
           } // END: if (cell->is_locally_owned())
 
-    } // END: for (const auto &cell : dof_handler.active_cell_iterators())
+      } // END: for (const auto &cell : dof_handler.active_cell_iterators())
 
 
     // In the operations above, specifically the call to
@@ -1089,8 +1174,8 @@ namespace SV_Maxwell
     // but for efficiency reasons, this part of the operation is only
     // queued up, rather than executed right away. But now that we got
     // here, it is time to send these queued-up additions to those
-    // processes that actually own these matrix or vector entries. 
-    
+    // processes that actually own these matrix or vector entries.
+
     // In other words: This is "finalization" of the global data
     // structures. This is done by invoking the function `compress()`
     // on both the matrix and vector objects. See
@@ -1098,7 +1183,7 @@ namespace SV_Maxwell
     // for more information on what `compress()` actually does.
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
-    
+
     pcout << "  system assembled." << std::endl;
   }
 
@@ -1112,19 +1197,19 @@ namespace SV_Maxwell
     LA::MPI::Vector completely_distributed_solution(locally_owned_dofs,
                                                     mpi_communicator);
 
-    SolverControl solver_control;//(dof_handler.n_dofs(), 1e-12);
-    dealii::PETScWrappers::SparseDirectMUMPS solver(solver_control);//, mpi_communicator);
+    SolverControl solver_control; //(dof_handler.n_dofs(), 1e-12);
+    dealii::PETScWrappers::SparseDirectMUMPS solver(
+      solver_control); //, mpi_communicator);
     solver.set_symmetric_mode(true);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
-        
+
     auto nsteps = solver_control.last_step();
-    pcout << "  solved in " << nsteps << " iteration" << (nsteps>1 ? "s." : ".")
-          << std::endl;
+    pcout << "  solved in " << nsteps << " iteration"
+          << (nsteps > 1 ? "s." : ".") << std::endl;
 
     constraints.distribute(completely_distributed_solution);
 
     locally_relevant_solution = completely_distributed_solution;
-
   }
 
 
@@ -1155,9 +1240,7 @@ namespace SV_Maxwell
     parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
       triangulation, estimated_error_per_cell, 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement();
-
   }
-
 
 
 
@@ -1168,21 +1251,20 @@ namespace SV_Maxwell
   // DataOut. This allows to output derived quantities from the solution,
   // It overloads the
   // virtual function DataPostprocessor::evaluate_vector_field(),
-  // which is then internally called from DataOut::build_patches(). 
-  // It's given values of the numerical solution, its derivatives, normals to the
-  // cell, the actual evaluation points and any additional quantities.
+  // which is then internally called from DataOut::build_patches().
+  // It's given values of the numerical solution, its derivatives, normals to
+  // the cell, the actual evaluation points and any additional quantities.
 
   template <int dim>
-  class Maxwell_Poisson<dim>::CellsPostprocessor
-    : public DataPostprocessor<dim>
+  class Maxwell_Poisson<dim>::CellsPostprocessor : public DataPostprocessor<dim>
   {
   public:
-    CellsPostprocessor(Maxwell_Poisson<dim> * problem);
+    CellsPostprocessor(Maxwell_Poisson<dim> *problem);
 
-	  virtual void evaluate_field(
-			const DataPostprocessorInputs::Scalar<dim> *psinputs,
-			const DataPostprocessorInputs::Vector<dim> *pvinputs,
-		    std::vector<Vector<double>> &computed_quantities) const;
+    virtual void
+    evaluate_field(const DataPostprocessorInputs::Scalar<dim> *psinputs,
+                   const DataPostprocessorInputs::Vector<dim> *pvinputs,
+                   std::vector<Vector<double>> &computed_quantities) const;
 
 
     virtual void evaluate_scalar_field(
@@ -1208,10 +1290,9 @@ namespace SV_Maxwell
 
   template <int dim>
   Maxwell_Poisson<dim>::CellsPostprocessor::CellsPostprocessor(
-    Maxwell_Poisson<dim> * problem)
+    Maxwell_Poisson<dim> *problem)
     : problem(problem)
-  {
-  }
+  {}
 
 
   // Define the names for the variables in the output.
@@ -1219,7 +1300,7 @@ namespace SV_Maxwell
   std::vector<std::string>
   Maxwell_Poisson<dim>::CellsPostprocessor::get_names() const
   {
-    std::vector<std::string> solution_names = { };
+    std::vector<std::string> solution_names = {};
 
     solution_names.emplace_back("Phi_real");
     solution_names.emplace_back("Phi_real2_unused");
@@ -1281,59 +1362,102 @@ namespace SV_Maxwell
   Maxwell_Poisson<dim>::CellsPostprocessor::get_data_component_interpretation()
     const
   {
-
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       interpretation;
 
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // Phi real
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // (not in use)
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // (not in use)
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // Phi imag
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // (not in use)
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // (not in use)
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // Phi real
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // (not in use)
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // (not in use)
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // Phi imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // (not in use)
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // (not in use)
 
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // Phi abs
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // Phi abs
 
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // E x,y,z, real
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // E x,y,z, imag
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector); // E x,y,z,
+                                                                 // real
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector); // E x,y,z,
+                                                                 // imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
 
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // E real
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // E imag
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // E abs
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // E real
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // E imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // E abs
 
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // D x,y,z, real
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // D x,y,z, imag
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector); // D x,y,z,
+                                                                 // real
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector); // D x,y,z,
+                                                                 // imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
 
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // D real
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // D imag
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // D abs
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // D real
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // D imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // D abs
 
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // J x,y,z, imag
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // J x,y,z, imag
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector); // J x,y,z,
+                                                                 // imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector); // J x,y,z,
+                                                                 // imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_part_of_vector);
 
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // J real
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // J imag
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // J abs
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // J real
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // J imag
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // J abs
 
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // mat_ID
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // mat_ID
 
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // mu_r
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // mu_r
     interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // epsilon_r
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // epsilon_r
     interpretation.push_back(DataComponentInterpretation::component_is_scalar);
-    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // kappa
+    interpretation.push_back(
+      DataComponentInterpretation::component_is_scalar); // kappa
 
     return interpretation;
   }
@@ -1344,27 +1468,26 @@ namespace SV_Maxwell
   UpdateFlags
   Maxwell_Poisson<dim>::CellsPostprocessor::get_needed_update_flags() const
   {
-    return update_values | update_gradients | update_quadrature_points
-    		;
+    return update_values | update_gradients | update_quadrature_points;
   }
 
 
-  // This is the function that computes the derived quantities. 
+  // This is the function that computes the derived quantities.
   template <int dim>
   void Maxwell_Poisson<dim>::CellsPostprocessor::evaluate_scalar_field(
     const DataPostprocessorInputs::Scalar<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
-	  evaluate_field(&inputs,NULL,computed_quantities);
+    evaluate_field(&inputs, NULL, computed_quantities);
   }
 
   // This is the function that computes the derived quantities.
   template <int dim>
   void Maxwell_Poisson<dim>::CellsPostprocessor::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
-	  evaluate_field(NULL,&inputs,computed_quantities);
+    evaluate_field(NULL, &inputs, computed_quantities);
   }
 
 
@@ -1372,32 +1495,34 @@ namespace SV_Maxwell
   // This is the function that computes the derived quantities.
   template <int dim>
   void Maxwell_Poisson<dim>::CellsPostprocessor::evaluate_field(
-	const DataPostprocessorInputs::Scalar<dim> *psinputs,
-	const DataPostprocessorInputs::Vector<dim> *pvinputs,
-    std::vector<Vector<double>> &computed_quantities) const
+    const DataPostprocessorInputs::Scalar<dim> *psinputs,
+    const DataPostprocessorInputs::Vector<dim> *pvinputs,
+    std::vector<Vector<double>>                &computed_quantities) const
   {
-	unsigned int n_evaluation_points;
-	if (psinputs==NULL)
-	{
-		n_evaluation_points= pvinputs->solution_values.size();
-		Assert(pvinputs->solution_gradients.size() == n_evaluation_points,
-			   ExcInternalError());
-	}
-	else
-	{
-		n_evaluation_points= psinputs->solution_values.size();
-		Assert(psinputs->solution_gradients.size() == n_evaluation_points,
-			   ExcInternalError());
-	}
+    unsigned int n_evaluation_points;
+    if (psinputs == NULL)
+      {
+        n_evaluation_points = pvinputs->solution_values.size();
+        Assert(pvinputs->solution_gradients.size() == n_evaluation_points,
+               ExcInternalError());
+      }
+    else
+      {
+        n_evaluation_points = psinputs->solution_values.size();
+        Assert(psinputs->solution_gradients.size() == n_evaluation_points,
+               ExcInternalError());
+      }
     Assert(computed_quantities.size() == n_evaluation_points,
            ExcInternalError());
-    //Assert(inputs.solution_values[0].size() == 2*dim, ExcInternalError());
+    // Assert(inputs.solution_values[0].size() == 2*dim, ExcInternalError());
 
     const bool is_complex = problem->problem_parameters.is_complex;
 
-    const std::complex<double> real(1,0),imag(0,is_complex ? 1 : 0);
+    const std::complex<double> real(1, 0), imag(0, is_complex ? 1 : 0);
 
-    const typename DoFHandler<dim>::cell_iterator current_cell =  psinputs==NULL ? pvinputs->template get_cell<dim>() : psinputs->template get_cell<dim>();
+    const typename DoFHandler<dim>::cell_iterator current_cell =
+      psinputs == NULL ? pvinputs->template get_cell<dim>() :
+                         psinputs->template get_cell<dim>();
 
     const auto material_id = current_cell->material_id();
 
@@ -1406,112 +1531,117 @@ namespace SV_Maxwell
     for (unsigned int p = 0; p < n_evaluation_points; p++)
       {
         Maxwell_Poisson::rank1_type sJ;
-        double J_real=0,J_imag=0;
-        double  E_real=0,E_imag=0,D_real=0,D_imag=0;
+        double                      J_real = 0, J_imag = 0;
+        double E_real = 0, E_imag = 0, D_real = 0, D_imag = 0;
 
-        Maxwell_Poisson::rank1_type sE,sD;
-        std::complex<double> Phi;
+        Maxwell_Poisson::rank1_type sE, sD;
+        std::complex<double>        Phi;
 
 
-    	if (psinputs==NULL)
-    	{
-    		const auto t_sol_val = pvinputs->solution_values[p];
-    		const auto t_sol_grads = pvinputs->solution_gradients[p];
+        if (psinputs == NULL)
+          {
+            const auto t_sol_val   = pvinputs->solution_values[p];
+            const auto t_sol_grads = pvinputs->solution_gradients[p];
 
-			Phi = { std::complex<double>(			  t_sol_val(              0          ),
-										 is_complex ? t_sol_val((is_complex ? 1 : 0)) : 0) };
-			for (unsigned int d = 0; d < dim; d++)
-	        {
-	          sE[d] = { /* real */  			-t_sol_grads[0                   ][d]  ,
-	                    /* imag */ is_complex ? -t_sol_grads[(is_complex ? 1 : 0)][d]  : 0};
-	        }
-    	}
-    	else // if (psinputs==NULL)
-    	{
-    		const auto t_sol_val = psinputs->solution_values[p];
-    		const auto t_sol_grads = psinputs->solution_gradients[p];
+            Phi = {std::complex<double>(
+              t_sol_val(0), is_complex ? t_sol_val((is_complex ? 1 : 0)) : 0)};
+            for (unsigned int d = 0; d < dim; d++)
+              {
+                sE[d] = {/* real */ -t_sol_grads[0][d],
+                         /* imag */ is_complex ?
+                           -t_sol_grads[(is_complex ? 1 : 0)][d] :
+                           0};
+              }
+          }
+        else // if (psinputs==NULL)
+          {
+            const auto t_sol_val   = psinputs->solution_values[p];
+            const auto t_sol_grads = psinputs->solution_gradients[p];
 
-			Phi = {std::complex<double>(t_sol_val,0) };
+            Phi = {std::complex<double>(t_sol_val, 0)};
 
-			for (unsigned int d = 0; d < dim; d++)
-	        {
-	          sE[d] = { /* real */ -t_sol_grads[d] ,
-	                    /* imag */  0 };
-	        } // for (unsigned int d = 0; d < dim; d++)
-    	} // if (psinputs==NULL)
+            for (unsigned int d = 0; d < dim; d++)
+              {
+                sE[d] = {/* real */ -t_sol_grads[d],
+                         /* imag */ 0};
+              } // for (unsigned int d = 0; d < dim; d++)
+          }     // if (psinputs==NULL)
 
         sD = sE * material.epsilon;
 
         sJ = sE * material.kappa;
 
-        #define SV_OFF_E     (3+2*dim)
-        const unsigned int 	off_E_ePot = 0,
-        					off_E_vE   = 7,
-							off_E_vD   = off_E_vE  + SV_OFF_E,
-							off_E_vJe  = off_E_vD  + SV_OFF_E,
-							off_E_mat  = off_E_vJe + SV_OFF_E;
-        
+#define SV_OFF_E (3 + 2 * dim)
+        const unsigned int off_E_ePot = 0, off_E_vE = 7,
+                           off_E_vD  = off_E_vE + SV_OFF_E,
+                           off_E_vJe = off_E_vD + SV_OFF_E,
+                           off_E_mat = off_E_vJe + SV_OFF_E;
 
-        computed_quantities[p](off_E_ePot + 0 ) = Phi.real();
-        computed_quantities[p](off_E_ePot + 1 ) = 0;
-        computed_quantities[p](off_E_ePot + 2 ) = 0;
-        computed_quantities[p](off_E_ePot + 3 ) = Phi.imag();
-        computed_quantities[p](off_E_ePot + 4 ) = 0;
-        computed_quantities[p](off_E_ePot + 5 ) = 0;
-        computed_quantities[p](off_E_ePot + 6 ) = std::sqrt(Phi.real()*Phi.real()+Phi.imag()*Phi.imag());
+
+        computed_quantities[p](off_E_ePot + 0) = Phi.real();
+        computed_quantities[p](off_E_ePot + 1) = 0;
+        computed_quantities[p](off_E_ePot + 2) = 0;
+        computed_quantities[p](off_E_ePot + 3) = Phi.imag();
+        computed_quantities[p](off_E_ePot + 4) = 0;
+        computed_quantities[p](off_E_ePot + 5) = 0;
+        computed_quantities[p](off_E_ePot + 6) =
+          std::sqrt(Phi.real() * Phi.real() + Phi.imag() * Phi.imag());
 
         for (unsigned int d = 0; d < dim; d++)
-        {
-          const auto d2 = dim+d;
+          {
+            const auto d2 = dim + d;
 
-          computed_quantities[p](off_E_vE + d)  = sE[d].real();
-          computed_quantities[p](off_E_vE + d2) = sE[d].imag();
+            computed_quantities[p](off_E_vE + d)  = sE[d].real();
+            computed_quantities[p](off_E_vE + d2) = sE[d].imag();
 
-          computed_quantities[p](off_E_vD + d)  = sD[d].real();
-          computed_quantities[p](off_E_vD + d2) = sD[d].imag();
+            computed_quantities[p](off_E_vD + d)  = sD[d].real();
+            computed_quantities[p](off_E_vD + d2) = sD[d].imag();
 
-          computed_quantities[p](off_E_vJe + d)  = sJ[d].real();
-          computed_quantities[p](off_E_vJe + d2) = sJ[d].imag();
+            computed_quantities[p](off_E_vJe + d)  = sJ[d].real();
+            computed_quantities[p](off_E_vJe + d2) = sJ[d].imag();
 
-          E_real += sE[d].real()*sE[d].real();
-          E_imag += sE[d].imag()*sE[d].imag();
+            E_real += sE[d].real() * sE[d].real();
+            E_imag += sE[d].imag() * sE[d].imag();
 
-          D_real += sD[d].real()*sD[d].real();
-          D_imag += sD[d].imag()*sD[d].imag();
+            D_real += sD[d].real() * sD[d].real();
+            D_imag += sD[d].imag() * sD[d].imag();
 
-          J_real += sJ[d].real()*sJ[d].real();
-          J_imag += sJ[d].imag()*sJ[d].imag();
+            J_real += sJ[d].real() * sJ[d].real();
+            J_imag += sJ[d].imag() * sJ[d].imag();
+          }
 
-        }
+        const auto E_total = std::sqrt(E_real + E_imag);
+        E_real             = std::sqrt(E_real);
+        E_imag             = std::sqrt(E_imag);
+        const auto D_total = std::sqrt(D_real + D_imag);
+        D_real             = std::sqrt(D_real);
+        D_imag             = std::sqrt(D_imag);
+        const auto J_total = std::sqrt(J_real + J_imag);
+        J_real             = std::sqrt(J_real);
+        J_imag             = std::sqrt(J_imag);
 
-        const auto E_total = std::sqrt(E_real+E_imag);
-        E_real = std::sqrt(E_real);
-        E_imag = std::sqrt(E_imag);
-        const auto D_total = std::sqrt(D_real+D_imag);
-        D_real = std::sqrt(D_real);
-        D_imag = std::sqrt(D_imag);
-        const auto J_total = std::sqrt(J_real+J_imag);
-        J_real = std::sqrt(J_real);
-        J_imag = std::sqrt(J_imag);
+        computed_quantities[p](off_E_vD - 3 + 0) = E_real;
+        computed_quantities[p](off_E_vD - 3 + 1) = E_imag;
+        computed_quantities[p](off_E_vD - 3 + 2) = E_total;
 
-        computed_quantities[p](off_E_vD -3 + 0) = E_real;
-        computed_quantities[p](off_E_vD -3 + 1) = E_imag;
-        computed_quantities[p](off_E_vD -3 + 2) = E_total;
+        computed_quantities[p](off_E_vJe - 3 + 0) = D_real;
+        computed_quantities[p](off_E_vJe - 3 + 1) = D_imag;
+        computed_quantities[p](off_E_vJe - 3 + 2) = D_total;
 
-        computed_quantities[p](off_E_vJe -3 + 0) = D_real;
-        computed_quantities[p](off_E_vJe -3 + 1) = D_imag;
-        computed_quantities[p](off_E_vJe -3 + 2) = D_total;
+        computed_quantities[p](off_E_mat - 3 + 0) = J_real;
+        computed_quantities[p](off_E_mat - 3 + 1) = J_imag;
+        computed_quantities[p](off_E_mat - 3 + 2) = J_total;
 
-        computed_quantities[p](off_E_mat -3 + 0) = J_real;
-        computed_quantities[p](off_E_mat -3 + 1) = J_imag;
-        computed_quantities[p](off_E_mat -3 + 2) = J_total;
-        
-        computed_quantities[p](off_E_mat    + 0) = material_id;
-        computed_quantities[p](off_E_mat    + 1) = material.mu.real()/problem->problem_parameters.mu_vacuum;
-        computed_quantities[p](off_E_mat    + 2) = material.mu.imag()/problem->problem_parameters.mu_vacuum;
-        computed_quantities[p](off_E_mat    + 3) = material.epsilon.real()/problem->problem_parameters.epsilon_vacuum;
-        computed_quantities[p](off_E_mat    + 4) = material.epsilon.imag()/problem->problem_parameters.epsilon_vacuum;
-        computed_quantities[p](off_E_mat    + 5) = material.kappa;
+        computed_quantities[p](off_E_mat + 0) = material_id;
+        computed_quantities[p](off_E_mat + 1) =
+          material.mu.real() / problem->problem_parameters.mu_vacuum;
+        computed_quantities[p](off_E_mat + 2) =
+          material.mu.imag() / problem->problem_parameters.mu_vacuum;
+        computed_quantities[p](off_E_mat + 3) =
+          material.epsilon.real() / problem->problem_parameters.epsilon_vacuum;
+        computed_quantities[p](off_E_mat + 4) =
+          material.epsilon.imag() / problem->problem_parameters.epsilon_vacuum;
+        computed_quantities[p](off_E_mat + 5) = material.kappa;
 
       } // for (unsigned int p = 0; p < n_evaluation_points; p++)
 
@@ -1526,23 +1656,27 @@ namespace SV_Maxwell
   {
     TimerOutput::Scope t(computing_timer, "05. post-process");
 
-    std::string cells_solution_filename = problem_parameters.get_cells_solution_filename();
+    std::string cells_solution_filename =
+      problem_parameters.get_cells_solution_filename();
 
-    if (cells_solution_filename.size()>0)
-    {
-        CellsPostprocessor cell_postprocessor(this);//Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    if (cells_solution_filename.size() > 0)
+      {
+        CellsPostprocessor cell_postprocessor(
+          this); // Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
 
         cells_solution_filename += ".vtu";
 
-		DataOut<dim> data_out;
-		data_out.attach_dof_handler(dof_handler);
-		data_out.add_data_vector(locally_relevant_solution, cell_postprocessor);
+        DataOut<dim> data_out;
+        data_out.attach_dof_handler(dof_handler);
+        data_out.add_data_vector(locally_relevant_solution, cell_postprocessor);
 
-		data_out.build_patches();
-		data_out.write_vtu_in_parallel(cells_solution_filename, mpi_communicator);
+        data_out.build_patches();
+        data_out.write_vtu_in_parallel(cells_solution_filename,
+                                       mpi_communicator);
 
-		pcout << "exported cells solution into file \"" << cells_solution_filename << "\"" << std::endl;
-    }
+        pcout << "exported cells solution into file \""
+              << cells_solution_filename << "\"" << std::endl;
+      }
   }
 
 
@@ -1564,18 +1698,19 @@ namespace SV_Maxwell
 
     make_grid();
 
-    for (unsigned int cycle=0;cycle<=N_refinements;cycle++)
-    {
-    	pcout << "cycle: " << cycle+1 << " / " << N_refinements+1 << std::endl;
-    	if (cycle>0)
-    	{
-    		refine_grid();
-    	}
+    for (unsigned int cycle = 0; cycle <= N_refinements; cycle++)
+      {
+        pcout << "cycle: " << cycle + 1 << " / " << N_refinements + 1
+              << std::endl;
+        if (cycle > 0)
+          {
+            refine_grid();
+          }
 
-		setup_system();
+        setup_system();
         assemble_system();
-		solve();
-    }
+        solve();
+      }
 
     output_results();
 
@@ -1591,11 +1726,8 @@ namespace SV_Maxwell
 // main function call: set up MPI, Maxwell classes,
 // ParameterAcceptor, and call the run() function.
 
-int main(
-        int argc, char *argv[]
-)
+int main(int argc, char *argv[])
 {
-
   try
     {
       using namespace dealii;
@@ -1605,7 +1737,7 @@ int main(
       SV_Maxwell::Maxwell_Poisson<3> maxwell_solver;
 
 
-      ParameterAcceptor::initialize(argc<2 ? "parameters.prm": argv[1]);
+      ParameterAcceptor::initialize(argc < 2 ? "parameters.prm" : argv[1]);
 
       maxwell_solver.run();
     }

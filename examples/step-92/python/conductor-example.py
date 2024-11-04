@@ -46,7 +46,7 @@ from shutil import rmtree                   # needed for basic file-operations
 from occ_converter import occ_converter     # converting step-files into serialized (pickle-) objects (incl. file-import/export)
 
 """
-global paremeters section:
+global parameters section:
 
 TO DO: change this to your Linux-user's sub-folder in /home path
 """
@@ -103,7 +103,7 @@ if __name__=='__main__':
         os.makedirs(g_model_folder)
     
     # model geometry
-    terminal_dx = 1.0e-4                                    # terminals thickness
+    terminal_dx = 1.0e-1                                    # terminals thickness
     C_shape_gap_dz = 0.5                                    # z-gap in C-shape conductos 
     shape_dz = 0.2 if g_C_shape else 0.07                   # conductive height (z-coordinate)
     shape_dl = shape_dz                                     # temporary value to cut out a box of correct size for generating the C-shaped conductor(s)
@@ -225,9 +225,9 @@ if __name__=='__main__':
     """
     now compose all these step-files of the model components into a single mesh
     
-    For this we use the "Model" and "Component" classes fom "MeshComposer_pkl.py"
+    For this we use the "Model" and "Component" classes from "ModelComposer.py"
     
-    The "MeshComposer_pkl.py" is designed for
+    The "ModelComposer.py" is designed for
      1) converting step-files into serialized (pickle-) objects and store it in temporary files
      2) import the serialized (pickle-) objects into model components of class type "Component"
      3) manage a set of components in a "Model" class object
