@@ -1,0 +1,50 @@
+# Listing of Parameters
+# ---------------------
+subsection Maxwell_E_solver
+
+  # order of the finite element space
+  set fe E order                     = 1
+
+
+  # order of the quadrature
+  set quadrature order             = 2
+
+  # number of refinements of the geometry
+  set refinements                  = 0 
+
+end
+
+
+subsection Problem
+  
+  # frequency [Hz]
+  set frequency = 0
+  
+  # materials / physicals 
+  # each as "Name : ID : eps_rel_real, eps_rel_imag : mu_rel_real, mu_rel_imag : kappa"
+  set materials = conductor1  : 10 :  1.0 , 0 : 1,0 : 56e+6  ; \
+                  terminal11  : 11 :  1.0 , 0 : 1,0 :  0e-6  ; \
+                  terminal12  : 12 :  1.0 , 0 : 1,0 :  0e-6  ; \
+                  conductor2  : 20 :  1.0 , 0 : 1,0 : 56e+6  ; \
+                  terminal21  : 21 :  1.0 , 0 : 1,0 :  0e-6  ; \
+                  terminal22  : 22 :  1.0 , 0 : 1,0 :  0e-6  ; \
+                  solid       : 30 :  4.0 , 0 : 1,0 :  1e-6  ; \
+                  default     :  0 :  3.0 , 0 : 1,0 :  0e-6
+
+  # Dirichlet boundaries (between physical sections)
+  # each as "Name : ID : ePot_real, ePot_imag" (values>1e40 are NaN -> not a number -> no value)
+  set potentials = default     :  0 :   0    ,    0 ; \
+                   terminal11  : 11 :   1    ,    0 ; \
+                   terminal12  : 12 :  -1    ,    0 ; \
+                   terminal21  : 21 :  10    ,    0 ; \
+                   terminal22  : 22 :   1    ,    0 ; \
+                   solid       : 30 :   1e80 ,    0 
+
+  # mesh file name
+  set mesh filename = tmp/model/testmodel
+
+  # cells solution export filename
+  set cells solution filename = tmp/model/solution_cells
+
+end
+  
