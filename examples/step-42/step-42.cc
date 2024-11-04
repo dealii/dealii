@@ -260,7 +260,7 @@ namespace Step42
     stress_strain_tensor_linearized += stress_strain_tensor_kappa;
   }
 
-  // <h3>Equation data: boundary forces, boundary values, obstacles</h3>
+  // @sect3{Equation data: boundary forces, boundary values, obstacles}
   //
   // The following should be relatively standard. We need classes for
   // the boundary forcing term (which we here choose to be zero)
