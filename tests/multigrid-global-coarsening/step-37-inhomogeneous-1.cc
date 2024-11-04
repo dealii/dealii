@@ -80,7 +80,7 @@ namespace Step37
   public:
     virtual double
     value(const Point<dim> &p,
-          const unsigned int /*compononent*/ = 0) const override
+          const unsigned int /*component*/ = 0) const override
     {
       return value<double>(p);
     }

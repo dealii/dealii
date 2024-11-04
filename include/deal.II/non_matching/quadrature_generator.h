@@ -966,7 +966,7 @@ namespace NonMatching
         std::vector<Functions::PointRestriction<dim - 1>> point_restrictions;
 
         /**
-         * Class used to find the roots of the above 1d-restictions.
+         * Class used to find the roots of the above 1d-restrictions.
          */
         RootFinder root_finder;
 
