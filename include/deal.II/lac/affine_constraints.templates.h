@@ -18,7 +18,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_local_storage.h>
@@ -386,27 +385,14 @@ namespace internal
 
     // step 1: Identify the owners of DoFs we know to be constrained but do
     //         not own.
-    std::vector<unsigned int> owners_of_my_constraints(
-      my_constraint_indices.n_elements());
-    Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-      constrained_indices_process(locally_owned_dofs,
-                                  my_constraint_indices,
-                                  mpi_communicator,
-                                  owners_of_my_constraints,
-                                  true);
-
-    Utilities::MPI::ConsensusAlgorithms::Selector<
-      std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
-      std::vector<unsigned int>>
-      consensus_algorithm;
-    consensus_algorithm.run(constrained_indices_process, mpi_communicator);
+    const auto [owners_of_my_constraints, constrained_indices_by_ranks] =
+      Utilities::MPI::compute_index_owner_and_requesters(locally_owned_dofs,
+                                                         my_constraint_indices,
+                                                         mpi_communicator);
 
     // step 2: Collect all locally owned constraints into a data structure
     //         that we can send to other processes that want to know
     //         about them.
-    const std::map<unsigned int, IndexSet> constrained_indices_by_ranks =
-      constrained_indices_process.get_requesters();
-
     if (first_run)
       {
         std::map<unsigned int, std::vector<ConstraintLine>> send_data;
@@ -464,31 +450,17 @@ namespace internal
       IndexSet locally_relevant_dofs_non_local = locally_relevant_dofs;
       locally_relevant_dofs_non_local.subtract_set(locally_owned_dofs);
 
-      std::vector<unsigned int> locally_relevant_dofs_owners(
-        locally_relevant_dofs_non_local.n_elements());
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        locally_relevant_dofs_process(locally_owned_dofs,
-                                      locally_relevant_dofs_non_local,
-                                      mpi_communicator,
-                                      locally_relevant_dofs_owners,
-                                      /* keep track of requesters = */ true);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(locally_relevant_dofs_process, mpi_communicator);
-
       // We are, however, not actually interested in who owns a specific
       // DoF we have among our locally-stored-but-not-locally-owned constraints.
       // Rather, we want to know who requested information about our own
       // locally-owned DoFs. That's because we will want to send our own
       // locally-owned constraints to those processes for which these are
       // in their own locally-relevant index sets.
-      const std::map<unsigned int, IndexSet>
-        requesters_and_requested_constraints =
-          locally_relevant_dofs_process.get_requesters();
+      const auto [_, requesters_and_requested_constraints] =
+        Utilities::MPI::compute_index_owner_and_requesters(
+          locally_owned_dofs,
+          locally_relevant_dofs_non_local,
+          mpi_communicator);
 
       std::map<unsigned int, std::vector<ConstraintLine>> send_data;
       for (const auto &[destination, requested_indices] :
