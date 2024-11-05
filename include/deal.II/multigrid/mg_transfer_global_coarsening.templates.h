@@ -18,7 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
