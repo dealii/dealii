@@ -49,7 +49,6 @@ set(_unity_include_src
   hdf5.cc
   kokkos.cc
   mpi.cc
-  mpi_compute_index_owner_internal.cc
   mpi_noncontiguous_partitioner.cc
   mpi_remote_point_evaluation.cc
   mu_parser_internal.cc

@@ -17,7 +17,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/mpi_consensus_algorithms.h>
 #include <deal.II/base/mpi_large_count.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/utilities.h>
