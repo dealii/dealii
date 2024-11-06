@@ -225,17 +225,25 @@ namespace parallel
       Assert(
         currently_processing_create_triangulation_for_internal_usage,
         ExcMessage(
-          "You have called the method parallel::fullydistributed::Triangulation::create_triangulation() \n"
-          "that takes 3 arguments. If you have not called this function directly, \n"
-          "it might have been called via a function from the GridGenerator or GridIn \n"
-          "namespace. To be able to set up a fully-distributed Triangulation with these \n"
-          "utility functions nevertheless, please follow the following three steps:\n"
-          "  1) call the utility function for a (serial) Triangulation, \n"
-          "     a parallel::shared::Triangulation, or a parallel::distributed::Triangulation object,\n"
-          "  2) use the functions TriangulationDescription::Utilities::create_description_from_triangulation() \n"
-          "     or ::create_description_from_triangulation_in_groups() to create the \n"
-          "     description of the local partition, and\n"
-          "  3) pass the created description to parallel::fullydistributed::Triangulation::create_triangulation()."));
+          "You have called the overload of\n"
+          "\n"
+          "    parallel::fullydistributed::Triangulation::"
+          "create_triangulation()\n"
+          "\n"
+          "which takes 3 arguments. This function is not yet implemented for "
+          "this class. If you have not called this function directly, it "
+          "might have been called via a function from the GridGenerator or "
+          "GridIn namespace. To set up a fully-distributed Triangulation with "
+          "these utility functions, please start by using the same process to "
+          "set up a serial Triangulation, parallel::shared::Triangulation, or "
+          "a parallel::distributed::Triangulation. Once that is complete use "
+          "the copy_triangulation() member function to finish setting up the "
+          "original fully distributed Triangulation. Alternatively, you can "
+          "use TriangulationDescription::Utilities::"
+          "create_description_from_triangulation() or "
+          "create_description_from_triangulation_in_groups() to create the "
+          "description of the local partition, and pass that description to "
+          "parallel::fullydistributed::Triangulation::create_triangulation()."));
 
       dealii::Triangulation<dim, spacedim>::create_triangulation(vertices,
                                                                  cells,
