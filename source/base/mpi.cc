@@ -1182,7 +1182,7 @@ namespace Utilities
 
 
 
-        bool
+        inline bool
         FlexibleIndexStorage::entry_has_been_set(const std::size_t index) const
         {
           AssertIndexRange(index, size);
