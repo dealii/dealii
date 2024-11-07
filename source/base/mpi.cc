@@ -969,43 +969,34 @@ namespace Utilities
             indices_to_look_up_by_dict_rank;
 
           /**
-           * Implementation of
-           * Utilities::MPI::ConsensusAlgorithms::Process::answer_request(),
-           * adding the owner of a particular index in request_buffer (and
-           * keeping track of who requested a particular index in case that
-           * information is also desired).
-           */
-          void
-          answer_request(
-            const unsigned int                                     other_rank,
-            const std::vector<std::pair<types::global_dof_index,
-                                        types::global_dof_index>> &buffer_recv,
-            std::vector<unsigned int> &request_buffer);
-
-          /**
-           * Implementation of
-           * Utilities::MPI::ConsensusAlgorithms::Process::compute_targets().
+           * Return the recipients of requests.
            */
           std::vector<unsigned int>
           compute_targets();
 
           /**
-           * Implementation of
-           * Utilities::MPI::ConsensusAlgorithms::Process::create_request().
+           * The function that creates a request to another process.
            */
-          void
-          create_request(
-            const unsigned int                               other_rank,
-            std::vector<std::pair<types::global_dof_index,
-                                  types::global_dof_index>> &send_buffer);
+          std::vector<
+            std::pair<types::global_dof_index, types::global_dof_index>>
+          create_request(const unsigned int other_rank);
 
           /**
-           * Implementation of
-           * Utilities::MPI::ConsensusAlgorithms::Process::read_answer().
+           * The function that answers a request from another process.
+           */
+          std::vector<unsigned int>
+          answer_request(
+            const unsigned int                                     other_rank,
+            const std::vector<std::pair<types::global_dof_index,
+                                        types::global_dof_index>> &buffer_recv);
+
+          /**
+           * The function that processes an answer from an MPI process we
+           * have sent a request to.
            */
           void
-          read_answer(const unsigned int               other_rank,
-                      const std::vector<unsigned int> &recv_buffer);
+          process_answer(const unsigned int               other_rank,
+                         const std::vector<unsigned int> &recv_buffer);
 
           /**
            * Resolve the origin of the requests by sending the information
@@ -1511,31 +1502,6 @@ namespace Utilities
 
 
 
-        void
-        ConsensusAlgorithmsPayload::answer_request(
-          const unsigned int                                     other_rank,
-          const std::vector<std::pair<types::global_dof_index,
-                                      types::global_dof_index>> &buffer_recv,
-          std::vector<unsigned int>                             &request_buffer)
-        {
-          unsigned int owner_index_guess = 0;
-          for (const auto &interval : buffer_recv)
-            for (auto i = interval.first; i < interval.second; ++i)
-              {
-                const unsigned int actual_owner =
-                  dict.actually_owning_ranks[i - dict.local_range.first];
-                request_buffer.push_back(actual_owner);
-
-                if (track_index_requesters)
-                  append_index_origin(i - dict.local_range.first,
-                                      other_rank,
-                                      actual_owner,
-                                      owner_index_guess);
-              }
-        }
-
-
-
         std::vector<unsigned int>
         ConsensusAlgorithmsPayload::compute_targets()
         {
@@ -1576,12 +1542,14 @@ namespace Utilities
 
 
 
-        void
+        std::vector<std::pair<types::global_dof_index, types::global_dof_index>>
         ConsensusAlgorithmsPayload::create_request(
-          const unsigned int                               other_rank,
-          std::vector<std::pair<types::global_dof_index,
-                                types::global_dof_index>> &send_buffer)
+          const unsigned int other_rank)
         {
+          std::vector<
+            std::pair<types::global_dof_index, types::global_dof_index>>
+            send_buffer;
+
           // create index set and compress data to be sent
           auto &indices_i = indices_to_look_up_by_dict_rank[other_rank].first;
           IndexSet is(dict.size);
@@ -1592,12 +1560,42 @@ namespace Utilities
                interval != is.end_intervals();
                ++interval)
             send_buffer.emplace_back(*interval->begin(), interval->last() + 1);
+
+          return send_buffer;
+        }
+
+
+
+        std::vector<unsigned int>
+        ConsensusAlgorithmsPayload::answer_request(
+          const unsigned int                                     other_rank,
+          const std::vector<std::pair<types::global_dof_index,
+                                      types::global_dof_index>> &buffer_recv)
+        {
+          std::vector<unsigned int> request_buffer;
+
+          unsigned int owner_index_guess = 0;
+          for (const auto &interval : buffer_recv)
+            for (auto i = interval.first; i < interval.second; ++i)
+              {
+                const unsigned int actual_owner =
+                  dict.actually_owning_ranks[i - dict.local_range.first];
+                request_buffer.push_back(actual_owner);
+
+                if (track_index_requesters)
+                  append_index_origin(i - dict.local_range.first,
+                                      other_rank,
+                                      actual_owner,
+                                      owner_index_guess);
+              }
+
+          return request_buffer;
         }
 
 
 
         void
-        ConsensusAlgorithmsPayload::read_answer(
+        ConsensusAlgorithmsPayload::process_answer(
           const unsigned int               other_rank,
           const std::vector<unsigned int> &recv_buffer)
         {
@@ -1845,18 +1843,12 @@ namespace Utilities
       ConsensusAlgorithms::selector<RequestType, AnswerType>(
         process.compute_targets(),
         [&process](const unsigned int other_rank) -> RequestType {
-          RequestType r;
-          process.create_request(other_rank, r);
-          return r;
+          return process.create_request(other_rank);
         },
-        [&process](const unsigned int other_rank,
-                   const RequestType &r) -> AnswerType {
-          AnswerType a;
-          process.answer_request(other_rank, r, a);
-          return a;
-        },
+        [&process](const unsigned int other_rank, const RequestType &r)
+          -> AnswerType { return process.answer_request(other_rank, r); },
         [&process](const unsigned int other_rank, const AnswerType &a) -> void {
-          process.read_answer(other_rank, a);
+          process.process_answer(other_rank, a);
         },
         comm);
 
@@ -1898,18 +1890,12 @@ namespace Utilities
       ConsensusAlgorithms::selector<RequestType, AnswerType>(
         process.compute_targets(),
         [&process](const unsigned int other_rank) -> RequestType {
-          RequestType r;
-          process.create_request(other_rank, r);
-          return r;
+          return process.create_request(other_rank);
         },
-        [&process](const unsigned int other_rank,
-                   const RequestType &r) -> AnswerType {
-          AnswerType a;
-          process.answer_request(other_rank, r, a);
-          return a;
-        },
+        [&process](const unsigned int other_rank, const RequestType &r)
+          -> AnswerType { return process.answer_request(other_rank, r); },
         [&process](const unsigned int other_rank, const AnswerType &a) -> void {
-          process.read_answer(other_rank, a);
+          process.process_answer(other_rank, a);
         },
         comm);
 
