@@ -881,12 +881,12 @@ namespace Utilities
          * payload.
          */
         class ConsensusAlgorithmsPayload
-          : public ConsensusAlgorithms::Process<
-              std::vector<
-                std::pair<types::global_dof_index, types::global_dof_index>>,
-              std::vector<unsigned int>>
         {
         public:
+          using RequestType = std::vector<
+            std::pair<types::global_dof_index, types::global_dof_index>>;
+          using AnswerType = std::vector<unsigned int>;
+
           /**
            * Constructor.
            */
@@ -975,37 +975,37 @@ namespace Utilities
            * keeping track of who requested a particular index in case that
            * information is also desired).
            */
-          virtual void
+          void
           answer_request(
             const unsigned int                                     other_rank,
             const std::vector<std::pair<types::global_dof_index,
                                         types::global_dof_index>> &buffer_recv,
-            std::vector<unsigned int> &request_buffer) override;
+            std::vector<unsigned int> &request_buffer);
 
           /**
            * Implementation of
            * Utilities::MPI::ConsensusAlgorithms::Process::compute_targets().
            */
-          virtual std::vector<unsigned int>
-          compute_targets() override;
+          std::vector<unsigned int>
+          compute_targets();
 
           /**
            * Implementation of
            * Utilities::MPI::ConsensusAlgorithms::Process::create_request().
            */
-          virtual void
-          create_request(const unsigned int other_rank,
-                         std::vector<std::pair<types::global_dof_index,
-                                               types::global_dof_index>>
-                           &send_buffer) override;
+          void
+          create_request(
+            const unsigned int                               other_rank,
+            std::vector<std::pair<types::global_dof_index,
+                                  types::global_dof_index>> &send_buffer);
 
           /**
            * Implementation of
            * Utilities::MPI::ConsensusAlgorithms::Process::read_answer().
            */
-          virtual void
+          void
           read_answer(const unsigned int               other_rank,
-                      const std::vector<unsigned int> &recv_buffer) override;
+                      const std::vector<unsigned int> &recv_buffer);
 
           /**
            * Resolve the origin of the requests by sending the information
@@ -1838,12 +1838,27 @@ namespace Utilities
       // Communicate with the process who owns the index in the static
       // partition (i.e. in the dictionary). This process returns the actual
       // owner of the index.
-      ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, comm);
+      using RequestType =
+        ComputeIndexOwner::ConsensusAlgorithmsPayload::RequestType;
+      using AnswerType =
+        ComputeIndexOwner::ConsensusAlgorithmsPayload::AnswerType;
+      ConsensusAlgorithms::selector<RequestType, AnswerType>(
+        process.compute_targets(),
+        [&process](const unsigned int other_rank) -> RequestType {
+          RequestType r;
+          process.create_request(other_rank, r);
+          return r;
+        },
+        [&process](const unsigned int other_rank,
+                   const RequestType &r) -> AnswerType {
+          AnswerType a;
+          process.answer_request(other_rank, r, a);
+          return a;
+        },
+        [&process](const unsigned int other_rank, const AnswerType &a) -> void {
+          process.read_answer(other_rank, a);
+        },
+        comm);
 
       return owning_ranks;
     }
@@ -1876,12 +1891,27 @@ namespace Utilities
       // Communicate with the process who owns the index in the static
       // partition (i.e. in the dictionary). This process returns the actual
       // owner of the index.
-      ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, comm);
+      using RequestType =
+        ComputeIndexOwner::ConsensusAlgorithmsPayload::RequestType;
+      using AnswerType =
+        ComputeIndexOwner::ConsensusAlgorithmsPayload::AnswerType;
+      ConsensusAlgorithms::selector<RequestType, AnswerType>(
+        process.compute_targets(),
+        [&process](const unsigned int other_rank) -> RequestType {
+          RequestType r;
+          process.create_request(other_rank, r);
+          return r;
+        },
+        [&process](const unsigned int other_rank,
+                   const RequestType &r) -> AnswerType {
+          AnswerType a;
+          process.answer_request(other_rank, r, a);
+          return a;
+        },
+        [&process](const unsigned int other_rank, const AnswerType &a) -> void {
+          process.read_answer(other_rank, a);
+        },
+        comm);
 
       return {owning_ranks, process.get_requesters()};
     }
