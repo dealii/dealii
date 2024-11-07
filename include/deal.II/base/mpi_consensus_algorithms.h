@@ -151,9 +151,14 @@ namespace Utilities
        *    (1) deliver only references to empty vectors (of size 0) the data
        *    to be sent can be inserted to or read from, and (2) communicate
        *    these vectors blindly.
+       *
+       * @deprecated Instead of deriving a class from this base class and
+       *   providing a corresponding object to one of the run() functions,
+       *   use the free functions in this namespace that take function
+       *   objects as arguments.
        */
       template <typename RequestType, typename AnswerType>
-      class Process
+      class DEAL_II_DEPRECATED_EARLY Process
       {
       public:
         /**
@@ -249,7 +254,13 @@ namespace Utilities
          * This version of the run() function simply unpacks the functions
          * packaged in `process` and calls the version of the run() function
          * that takes a number of `std::function` arguments.
+         *
+         * @deprecated Instead of deriving a class from the Process base class and
+         *   providing a corresponding object to this function,
+         *   use the other run() function in this class that takes function
+         *   objects as arguments.
          */
+        DEAL_II_DEPRECATED_EARLY
         std::vector<unsigned int>
         run(Process<RequestType, AnswerType> &process, const MPI_Comm comm);
 
