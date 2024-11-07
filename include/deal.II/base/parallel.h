@@ -249,7 +249,7 @@ namespace parallel
     // warnings about unused arguments
     (void)grainsize;
 
-    for (InputIterator in1 = begin_in1; in1 != end_in1;)
+    for (InputIterator1 in1 = begin_in1; in1 != end_in1;)
       *out++ = function(*in1++, *in2++);
 #else
     using Iterators =
@@ -332,7 +332,7 @@ namespace parallel
     // warnings about unused arguments
     (void)grainsize;
 
-    for (InputIterator in1 = begin_in1; in1 != end_in1;)
+    for (InputIterator1 in1 = begin_in1; in1 != end_in1;)
       *out++ = function(*in1++, *in2++, *in3++);
 #else
     using Iterators = std::
