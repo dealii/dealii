@@ -251,43 +251,6 @@ namespace Step59
 
 
 
-  // This free-standing function is used in both the `LaplaceOperator` and
-  // `%PreconditionBlockJacobi` classes to adjust the ghost range. This function
-  // is necessary because some of the vectors that the `vmult()` functions are
-  // supplied with are not initialized properly with
-  // `LaplaceOperator::initialize_dof_vector` that includes the correct layout
-  // of ghost entries, but instead comes from the MGTransferMatrixFree class
-  // that has no notion on the ghost selection of the matrix-free classes. To
-  // avoid index confusion, we must adjust the ghost range before actually
-  // doing something with these vectors. Since the vectors are kept around in
-  // the multigrid smoother and transfer classes, a vector whose ghost range
-  // has once been adjusted will remain in this state throughout the lifetime
-  // of the object, so we can use a shortcut at the start of the function to
-  // see whether the partitioner object of the distributed vector, which is
-  // stored as a shared pointer, is the same as the layout expected by
-  // MatrixFree, which is stored in a data structure accessed by
-  // MatrixFree::get_dof_info(0), where the 0 indicates the DoFHandler number
-  // from which this was extracted; we only use a single DoFHandler in
-  // MatrixFree, so the only valid number is 0 here.
-
-  template <int dim, typename number>
-  void adjust_ghost_range_if_necessary(
-    const MatrixFree<dim, number>                    &data,
-    const LinearAlgebra::distributed::Vector<number> &vec)
-  {
-    if (vec.get_partitioner().get() ==
-        data.get_dof_info(0).vector_partitioner.get())
-      return;
-
-    LinearAlgebra::distributed::Vector<number> copy_vec(vec);
-    const_cast<LinearAlgebra::distributed::Vector<number> &>(vec).reinit(
-      data.get_dof_info(0).vector_partitioner);
-    const_cast<LinearAlgebra::distributed::Vector<number> &>(vec)
-      .copy_locally_owned_data_from(copy_vec);
-  }
-
-
-
   // The next five functions to clear and initialize the `LaplaceOperator`
   // class, to return the shared pointer holding the MatrixFree data
   // container, as well as the correct initialization of the vector and
@@ -339,13 +302,9 @@ namespace Step59
 
   // This function implements the action of the LaplaceOperator on a vector
   // `src` and stores the result in the vector `dst`. When compared to
-  // step-37, there are four new features present in this call.
+  // step-37, there are three new features present in this call.
   //
-  // The first new feature is the `adjust_ghost_range_if_necessary` function
-  // mentioned above that is needed to fit the vectors to the layout expected
-  // by FEEvaluation and FEFaceEvaluation in the cell and face functions.
-  //
-  // The second new feature is the fact that we do not implement a
+  // The first new feature is the fact that we do not implement a
   // `vmult_add()` function as we did in step-37 (through the virtual function
   // MatrixFreeOperators::Base::vmult_add()), but directly implement a
   // `vmult()` functionality. Since both cell and face integrals will sum into
@@ -373,7 +332,7 @@ namespace Step59
   // available for MatrixFree::cell_loop and for continuous bases, even though
   // it was not used in the step-37 or step-48 tutorial programs.
   //
-  // The third new feature is the way we provide the functions to compute on
+  // The second new feature is the way we provide the functions to compute on
   // cells, inner faces, and boundary faces: The class MatrixFree has a
   // function called `loop` that takes three function pointers to the three
   // cases, allowing to separate the implementations of different things. As
@@ -429,8 +388,6 @@ namespace Step59
     LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    adjust_ghost_range_if_necessary(*data, dst);
-    adjust_ghost_range_if_necessary(*data, src);
     data->loop(&LaplaceOperator::apply_cell,
                &LaplaceOperator::apply_face,
                &LaplaceOperator::apply_boundary,
@@ -877,9 +834,6 @@ namespace Step59
     LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    adjust_ghost_range_if_necessary(*data, dst);
-    adjust_ghost_range_if_necessary(*data, src);
-
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(*data);
     for (unsigned int cell = 0; cell < data->n_cell_batches(); ++cell)
       {
@@ -1197,8 +1151,10 @@ namespace Step59
 
   // The `solve()` function is copied almost verbatim from step-37. We set up
   // the same multigrid ingredients, namely the level transfer, a smoother,
-  // and a coarse grid solver. The only difference is the fact that we do not
-  // use the diagonal of the Laplacian for the preconditioner of the Chebyshev
+  // and a coarse grid solver. The only two differences are that we supply the
+  // transfer object with the underlying partitioners (since we do not use the
+  // MatrixFreeOperators::Base infrastructure) and that we do not use the
+  // diagonal of the Laplacian for the preconditioner of the Chebyshev
   // iteration used for smoothing, but instead our newly resolved class
   // `%PreconditionBlockJacobi`. The mechanisms are the same, though.
   template <int dim, int fe_degree>
@@ -1206,7 +1162,15 @@ namespace Step59
   {
     Timer                            time;
     MGTransferMatrixFree<dim, float> mg_transfer;
-    mg_transfer.build(dof_handler);
+    std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+      partitioners(dof_handler.get_triangulation().n_global_levels());
+    for (unsigned int level = 0; level < partitioners.size(); ++level)
+      {
+        LinearAlgebra::distributed::Vector<float> vec;
+        mg_matrices[level].initialize_dof_vector(vec);
+        partitioners[level] = vec.get_partitioner();
+      }
+    mg_transfer.build(dof_handler, partitioners);
     setup_time += time.wall_time();
     time_details << "MG build transfer time        " << time.wall_time()
                  << " s\n";
