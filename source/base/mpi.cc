@@ -776,6 +776,14 @@ namespace Utilities
            */
           static constexpr unsigned int sparsity_factor = 4;
 
+
+          /**
+           * Set up the dictionary by computing the partitioning from the
+           * global size and sending the rank information on locally owned
+           * ranges to the owner of the dictionary part.
+           */
+          Dictionary(const IndexSet &owned_indices, const MPI_Comm comm);
+
           /**
            * A vector with as many entries as there are dofs in the dictionary
            * of the current process, and each entry containing the rank of the
@@ -830,14 +838,6 @@ namespace Utilities
            * processes.
            */
           unsigned int stride_small_size;
-
-          /**
-           * Set up the dictionary by computing the partitioning from the
-           * global size and sending the rank information on locally owned
-           * ranges to the owner of the dictionary part.
-           */
-          void
-          reinit(const IndexSet &owned_indices, const MPI_Comm comm);
 
           /**
            * Translate a global dof index to the MPI rank in the dictionary
@@ -939,6 +939,11 @@ namespace Utilities
           std::vector<unsigned int> &owning_ranks;
 
           /**
+           * The dictionary handling the requests.
+           */
+          Dictionary dict;
+
+          /**
            * Keeps track of the origin of the requests. The layout of the data
            * structure is as follows: The outermost vector has as many entries
            * as Dictionary::actually_owning_rank_list and represents the
@@ -952,11 +957,6 @@ namespace Utilities
                       std::vector<std::pair<types::global_dof_index,
                                             types::global_dof_index>>>>>
             requesters;
-
-          /**
-           * The dictionary handling the requests.
-           */
-          Dictionary dict;
 
           /**
            * Array to collect the indices to look up (first vector) and their
@@ -1192,8 +1192,8 @@ namespace Utilities
 
 
 
-        void
-        Dictionary::reinit(const IndexSet &owned_indices, const MPI_Comm comm)
+        Dictionary::Dictionary(const IndexSet &owned_indices,
+                               const MPI_Comm  comm)
         {
           // 1) set up the partition
           this->partition(owned_indices, comm);
@@ -1495,10 +1495,9 @@ namespace Utilities
           , n_procs(n_mpi_processes(comm))
           , track_index_requesters(track_index_requesters)
           , owning_ranks(owning_ranks)
-        {
-          dict.reinit(owned_indices, comm);
-          requesters.resize(dict.actually_owning_rank_list.size());
-        }
+          , dict(owned_indices, comm)
+          , requesters(dict.actually_owning_rank_list.size())
+        {}
 
 
 
