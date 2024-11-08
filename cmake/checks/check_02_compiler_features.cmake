@@ -419,13 +419,7 @@ if(DEAL_II_USE_LTO)
   check_ipo_supported(RESULT _res OUTPUT _out LANGUAGES CXX)
   if (_res)
     message(STATUS "Compiler supports interprocedural/link-time optimizations")
-    set(DEAL_II_USE_LTO "YES")
   else()
     message(FATAL_ERROR "You asked for interprocedural/link-time optimizations, but the compiler does not support these optimizations: ${_out}")
-    set(DEAL_II_USE_LTO "NO")
   endif()
-else()
-  # User did not set DEAL_II_USE_LTO on the command line. Set the
-  # variable to a specific (negative) value.
-  set(DEAL_II_USE_LTO "NO")
 endif()
