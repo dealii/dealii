@@ -178,6 +178,9 @@ namespace Step59
 
     std::shared_ptr<const MatrixFree<dim, number>> get_matrix_free() const;
 
+    std::shared_ptr<const Utilities::MPI::Partitioner>
+    get_vector_partitioner() const;
+
     void vmult(LinearAlgebra::distributed::Vector<number>       &dst,
                const LinearAlgebra::distributed::Vector<number> &src) const;
 
@@ -278,6 +281,15 @@ namespace Step59
   LaplaceOperator<dim, fe_degree, number>::get_matrix_free() const
   {
     return data;
+  }
+
+
+
+  template <int dim, int fe_degree, typename number>
+  std::shared_ptr<const Utilities::MPI::Partitioner>
+  LaplaceOperator<dim, fe_degree, number>::get_vector_partitioner() const
+  {
+    return data->get_dof_info().vector_partitioner;
   }
 
 
@@ -1165,11 +1177,8 @@ namespace Step59
     std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
       partitioners(dof_handler.get_triangulation().n_global_levels());
     for (unsigned int level = 0; level < partitioners.size(); ++level)
-      {
-        LinearAlgebra::distributed::Vector<float> vec;
-        mg_matrices[level].initialize_dof_vector(vec);
-        partitioners[level] = vec.get_partitioner();
-      }
+      partitioners[level] = mg_matrices[level].get_vector_partitioner();
+
     mg_transfer.build(dof_handler, partitioners);
     setup_time += time.wall_time();
     time_details << "MG build transfer time        " << time.wall_time()
