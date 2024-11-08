@@ -272,8 +272,12 @@ are worthwhile browsing through before you start any large-scale programming:
 As a general recommendation: If you expect to spend more than a few days
 writing software in the future, do yourself the favor of learning tools that
 can make your life more productive, in particular debuggers and integrated
-development environments. (@dealiiVideoLectureSeeAlso{7,8,8.01,25})
-You will find that you will get the time spent
-learning these tools back severalfold soon by being more productive!
-Several of the video lectures referenced above show how to use tools
+development environments.
+Several of the video lectures mentioned above show how to use tools
 such as integrated development environments or debuggers.
+(@dealiiVideoLectureSeeAlso{7,8,8.01,25})
+A good overview of all sorts of approaches one can use towards
+finding bugs can be found in the article
+[Modern debugging: the art of finding a needle in a haystack](https://dl.acm.org/doi/10.1145/3186278).
+You will find that the time spent learning these tools amortizes very quickly:
+Knowing ways to debug efficiently will make you vastly more productive!
