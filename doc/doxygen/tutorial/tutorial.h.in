@@ -708,6 +708,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-95</td>
+ *       <td> Solve the Poisson equation with CutFEM/CutDG and a matrix-free operator.
+ *       <br/> Keywords: FEPointEvaluation, FEFacePointEvaluation, NonMatching::MappingInfo
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-97</td>
  *       <td> Application of the Nedelec and Raviart-Thomas finite elements to a magnetic
  *       problem formulated in terms of the magnetic vector potential and current vector potential.
@@ -1040,7 +1046,8 @@
  *       step-67,
  *       step-75,
  *       step-76,
- *       step-89
+ *       step-89,
+ *       step-95
  *     </td>
  *   </tr>
  *
@@ -1063,7 +1070,8 @@
  *       step-70,
  *       step-85,
  *       step-87,
- *       step-89
+ *       step-89,
+ *       step-95
  *     </td>
  *   </tr>
  *
