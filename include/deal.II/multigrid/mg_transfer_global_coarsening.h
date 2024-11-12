@@ -55,6 +55,11 @@ class MGTransferMF;
 #endif
 
 
+/**
+ * @addtogroup mg
+ * @{
+ */
+
 namespace mg
 {
   /**
@@ -1410,6 +1415,7 @@ using MGTransferBlockGlobalCoarsening =
   MGTransferBlockMF<dim, typename VectorType::value_type>;
 
 
+/** @} */
 
 #ifndef DOXYGEN
 
