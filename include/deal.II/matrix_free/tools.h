@@ -1374,7 +1374,11 @@ namespace MatrixFreeTools
   } // namespace internal
 
 
-  template <int dim, int fe_degree, typename Number, typename QuadOperation>
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            typename Number,
+            typename QuadOperation>
   class CellAction
   {
   public:
@@ -1393,7 +1397,7 @@ namespace MatrixFreeTools
                const Number *,
                Number *dst) const
     {
-      Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(
+      Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
         gpu_data, shared_data);
       m_quad_operation.set_matrix_free_data(*gpu_data);
       m_quad_operation.set_cell(cell);
@@ -1490,8 +1494,8 @@ namespace MatrixFreeTools
     matrix_free.initialize_dof_vector(diagonal_global);
 
 
-    CellAction<dim, fe_degree, Number, QuadOperation> cell_action(
-      quad_operation, evaluation_flags, integration_flags);
+    CellAction<dim, fe_degree, n_q_points_1d, Number, QuadOperation>
+      cell_action(quad_operation, evaluation_flags, integration_flags);
     LinearAlgebra::distributed::Vector<Number, MemorySpace> dummy;
     matrix_free.cell_loop(cell_action, dummy, diagonal_global);
 
