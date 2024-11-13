@@ -182,7 +182,7 @@ namespace Portable
             Kokkos::view_alloc("JxW_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
             n_cells,
-            scalar_dofs_per_cell);
+            q_points_per_cell);
 
       if (update_flags & update_gradients)
         data->inv_jacobian[color] =
@@ -190,7 +190,7 @@ namespace Portable
             Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
             n_cells,
-            scalar_dofs_per_cell);
+            q_points_per_cell);
 
       // Initialize to zero, i.e., unconstrained cell
       data->constraint_mask[color] =
