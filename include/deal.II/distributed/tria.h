@@ -142,25 +142,61 @@ namespace parallel
      * An example are boundary indicators. Assume, for example, that you start
      * with a single cell that is refined once globally, yielding four
      * children. If you have four processors, each one owns one cell. Assume
-     * now that processor 1 sets the boundary indicators of the external
-     * boundaries of the cell it owns to 42. Since processor 0 does not own
-     * this cell, it doesn't set the boundary indicators of its ghost cell
-     * copy of this cell. Now, assume we do several mesh refinement cycles and
-     * end up with a configuration where this processor suddenly finds itself
-     * as the owner of this cell. If boundary indicator 42 means that we need
+     * now that process 1 sets the boundary indicators of the external
+     * boundaries of the cell it owns to 42, using code such as this that
+     * is run right after creating the mesh:
+     * @code
+     *   for (const auto &cell : triangulation.active_cell_iterators())
+     *     if (cell->is_locally_owned())
+     *       for (const auto &face : cell->face_iterators())
+     *         face->set_boundary_id(42);
+     * @endcode
+     * On the other hand, process 0 does not own this cell (but has it as one
+     * of its ghost cells). Consequently, on process 0, executing the code above
+     * sets the boundary id of the cells the process owns, but not on the ghost
+     * cell and in particular not if the cell is just an artificial cell on that
+     * process (which in that case may not even correspond to an active cell
+     * on any other process). Now, assume we do several mesh refinement cycles
+     * and end up with a configuration where process 0 suddenly finds itself as
+     * the owner of this cell that was previously owned by process 1. If
+     * boundary indicator 42 means that we need
      * to integrate Neumann boundary conditions along this boundary, then
      * processor 0 will forget to do so because it has never set the boundary
      * indicator along this cell's boundary to 42.
      *
-     * The way to avoid this dilemma is to make sure that things like setting
-     * boundary indicators or material ids is done immediately every time a
-     * parallel triangulation is refined. This is not necessary for sequential
-     * triangulations because, there, these flags are inherited from parent to
-     * child cell and remain with a cell even if it is refined and the
-     * children are later coarsened again, but this does not hold for
-     * distributed triangulations. It is made even more difficult by the fact
-     * that in the process of refining a parallel distributed triangulation,
-     * the triangulation may call
+     * The way to avoid this dilemma is through one of two ways. The easier one
+     * is if you can set boundary ids and materials ids already correctly on
+     * the *coarse* mesh because a parallel::distributed::Triangulation keeps
+     * the entire coarse mesh around for its entire life time. In other words,
+     * if you can set boundary ids correctly already immediately after creating
+     * the coarse mesh (i.e., before any of its cells are ever refined), then
+     * the whole re-partitioning process will always ensure that every face
+     * inherits the boundary id from its parent which we know is already
+     * correct. This is, for example, what you would do if you had a cube domain
+     * in which each of the six faces has its own unique boundary id: You can
+     * already assign these at the very beginning, and the children will always
+     * have the right boundary id. It is important that if you want to go this
+     * way, right after creation, you assign the boundary ids for the boundary
+     * faces of *all* cells, not just the locally owned cells.
+     *
+     * In more complex cases, it is necessary to assign boundary ids later on,
+     * for example because what type a boundary face should have changes over
+     * time, changes with the solution (e.g., whether it's an inflow or outflow
+     * boundary condition), or because not all faces should have the same
+     * boundary id as their parent (say, because only part of one of the six
+     * faces of a cube should carry boundary id 42, whereas the rest should have
+     * boundary id 43; in other words, the decision must be made on a
+     * case-by-case basis on the faces of the *finest* mesh, rather than the
+     * faces of the coarse mesh). In such cases, the solution is to make sure
+     * that things like setting boundary indicators or material ids is done
+     * immediately every time a parallel triangulation is refined or
+     * partitioned. This is not necessary for sequential triangulations because,
+     * there, these flags are inherited from parent to child cell (or, for
+     * boundary ids, from parent to child face) and remain with a cell or face
+     * even if it is refined and the children are later coarsened again. But
+     * this does not hold for distributed triangulations. It is made even more
+     * difficult by the fact that in the process of refining a parallel
+     * distributed triangulation, the triangulation may call
      * dealii::Triangulation::execute_coarsening_and_refinement multiple times
      * and this function needs to know about boundaries. In other words, it is
      * <i>not</i> enough to just set boundary indicators on newly created
