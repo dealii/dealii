@@ -275,10 +275,10 @@ namespace
   }
 } // namespace
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 template <int dim, int spacedim>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   fill_and_communicate_copy_indices(const DoFHandler<dim, spacedim> &mg_dof)
 {
   const MPI_Comm mpi_communicator = mg_dof.get_mpi_communicator();
@@ -382,9 +382,10 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::clear()
+MGLevelGlobalTransfer<
+  LinearAlgebra::distributed::Vector<Number, MemorySpace>>::clear()
 {
   sizes.resize(0);
   copy_indices.clear();
@@ -404,9 +405,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::clear()
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   print_indices(std::ostream &os) const
 {
   for (unsigned int level = 0; level < copy_indices.size(); ++level)
@@ -435,10 +436,10 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 std::size_t
-MGLevelGlobalTransfer<
-  LinearAlgebra::distributed::Vector<Number>>::memory_consumption() const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
+  memory_consumption() const
 {
   std::size_t result = sizeof(*this);
   result += MemoryConsumption::memory_consumption(sizes);
@@ -458,10 +459,5 @@ MGLevelGlobalTransfer<
 
 // explicit instantiation
 #include "mg_level_global_transfer.inst"
-
-// create an additional instantiation currently not supported by the automatic
-// template instantiation scheme
-template class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float>>;
-
 
 DEAL_II_NAMESPACE_CLOSE

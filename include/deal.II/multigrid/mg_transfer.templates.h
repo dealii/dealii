@@ -394,27 +394,29 @@ MGLevelGlobalTransfer<VectorType>::assert_built(
 /* --------- MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector> -------
  */
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 template <int dim, typename Number2, int spacedim>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
-  const DoFHandler<dim, spacedim>                           &dof_handler,
-  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-  const LinearAlgebra::distributed::Vector<Number2>         &src) const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
+  copy_to_mg(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>> &dst,
+    const LinearAlgebra::distributed::Vector<Number2, MemorySpace> &src) const
 {
   assert_built(dof_handler);
   copy_to_mg(dof_handler, dst, src, false);
 }
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 template <int dim, typename Number2, int spacedim>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
-  const DoFHandler<dim, spacedim>                           &dof_handler,
-  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-  const LinearAlgebra::distributed::Vector<Number2>         &src,
-  const bool solution_transfer) const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
+  copy_to_mg(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>> &dst,
+    const LinearAlgebra::distributed::Vector<Number2, MemorySpace>         &src,
+    const bool solution_transfer) const
 {
   assert_built(dof_handler);
   LinearAlgebra::distributed::Vector<Number> &this_ghosted_global_vector =
@@ -513,13 +515,15 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 template <int dim, typename Number2, int spacedim>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
-  const DoFHandler<dim, spacedim>                                 &dof_handler,
-  LinearAlgebra::distributed::Vector<Number2>                     &dst,
-  const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
+  copy_from_mg(
+    const DoFHandler<dim, spacedim>                          &dof_handler,
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &dst,
+    const MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+      &src) const
 {
   assert_built(dof_handler);
   AssertIndexRange(src.max_level(),
@@ -598,14 +602,15 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 template <int dim, typename Number2, int spacedim>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   copy_from_mg_add(
-    const DoFHandler<dim, spacedim>             &dof_handler,
-    LinearAlgebra::distributed::Vector<Number2> &dst,
-    const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const
+    const DoFHandler<dim, spacedim>                          &dof_handler,
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &dst,
+    const MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+      &src) const
 {
   assert_built(dof_handler);
   // For non-DG: degrees of freedom in the refinement face may need special
@@ -645,19 +650,19 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
   set_component_to_block_map(const std::vector<unsigned int> &map)
 {
   component_to_block_map = map;
 }
 
-template <typename Number>
+template <typename Number, typename MemorySpace>
 template <int dim, int spacedim>
 void
-MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::assert_built(
-  const DoFHandler<dim, spacedim> &dof_handler) const
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
+  assert_built(const DoFHandler<dim, spacedim> &dof_handler) const
 {
   (void)dof_handler;
   Assert(copy_indices.size() ==
