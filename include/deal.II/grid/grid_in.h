@@ -23,6 +23,7 @@
 #include <deal.II/base/point.h>
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -878,6 +879,17 @@ public:
       std::to_string(arg1) + " lines and " + std::to_string(arg2) +
       " facets (surface triangles or quadrilaterals).");
 
+  /**
+   * Return a map containing field data. The format of the returned map is as
+   * follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - std::vector<double> stores value for the given identifier in each cell.
+   * To access the value use field_data[name_field][cell_id].
+   */
+  const std::map<std::string, std::vector<double>> &
+  get_field_data() const;
+
 protected:
   /**
    * Store address of the triangulation to be fed with the data read in.
@@ -948,6 +960,15 @@ private:
    * Input format used by read() if no format is given.
    */
   Format default_format;
+
+  /**
+   * Data member that stores cell data. The format is as follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - std::vector<double> stores value for the given identifier in each
+   * cell_id. To access the value use field_data[name_field][cell_id].
+   */
+  std::map<std::string, std::vector<double>> field_data;
 };
 
 /* -------------- declaration of explicit specializations ------------- */
