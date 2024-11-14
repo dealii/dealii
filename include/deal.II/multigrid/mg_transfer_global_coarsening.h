@@ -51,7 +51,9 @@ namespace RepartitioningPolicyTools
   class Base;
 }
 
-template <int dim, typename Number, typename MemorySpace>
+template <int dim,
+          typename Number,
+          typename MemorySpace = ::dealii::MemorySpace::Host>
 class MGTransferMF;
 #endif
 
