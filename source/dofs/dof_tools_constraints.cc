@@ -3905,6 +3905,7 @@ namespace DoFTools
   {
     namespace Assembler
     {
+      // We don't actually need a scratch object, so use an empty class for it.
       struct Scratch
       {};
 
@@ -3934,7 +3935,6 @@ namespace DoFTools
       void
       compute_intergrid_weights_3(
         const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-        const Assembler::Scratch &,
         Assembler::CopyData<dim, spacedim>            &copy_data,
         const unsigned int                             coarse_component,
         const FiniteElement<dim, spacedim>            &coarse_fe,
@@ -4107,7 +4107,6 @@ namespace DoFTools
         const std::vector<types::global_dof_index>    &weight_mapping,
         std::vector<std::map<types::global_dof_index, float>> &weights)
       {
-        Assembler::Scratch                 scratch;
         Assembler::CopyData<dim, spacedim> copy_data;
 
         unsigned int n_interesting_dofs = 0;
@@ -4165,11 +4164,10 @@ namespace DoFTools
            &coarse_to_fine_grid_map,
            &parameter_dofs](
             const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                                               &cell,
-            const Assembler::Scratch           &scratch_data,
+              &cell,
+            const Assembler::Scratch &,
             Assembler::CopyData<dim, spacedim> &copy_data) {
             compute_intergrid_weights_3<dim, spacedim>(cell,
-                                                       scratch_data,
                                                        copy_data,
                                                        coarse_component,
                                                        coarse_grid.get_fe(),
@@ -4195,7 +4193,7 @@ namespace DoFTools
                         coarse_grid.end(),
                         worker,
                         copier,
-                        scratch,
+                        Assembler::Scratch(),
                         copy_data);
 
 #ifdef DEAL_II_WITH_MPI
