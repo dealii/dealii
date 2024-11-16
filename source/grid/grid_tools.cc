@@ -919,7 +919,7 @@ namespace GridTools
               {
                 // If we have an rtree at our disposal, use it.
                 using ValueType = std::pair<Point<spacedim>, unsigned int>;
-                std::function<bool(const ValueType &)> marked;
+                std::function<auto(const ValueType &)->bool> marked;
                 if (marked_vertices.size() == mesh.n_vertices())
                   marked = [&marked_vertices](const ValueType &value) -> bool {
                     return marked_vertices[value.second];
@@ -1150,8 +1150,8 @@ namespace GridTools
   std::
     vector<BoundingBox<MeshType::space_dimension>> compute_mesh_predicate_bounding_box(
       const MeshType &mesh,
-      const std::function<bool(const typename MeshType::active_cell_iterator &)>
-                        &predicate,
+      const std::function<
+        auto(const typename MeshType::active_cell_iterator &)->bool> &predicate,
       const unsigned int refinement_level,
       const bool         allow_merge,
       const unsigned int max_boxes)

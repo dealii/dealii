@@ -151,7 +151,7 @@ namespace Utilities
     /**
      * An std::function that stores the original function.
      */
-    const std::function<ReturnType(FunctionArgs...)> function;
+    const std::function<auto(FunctionArgs...)->ReturnType> function;
 
     /**
      * Currently stored arguments. These are forwarded to the function object
@@ -191,7 +191,7 @@ namespace Utilities
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
-  mutable_bind(std::function<ReturnType(FunctionArgs...)>,
+  mutable_bind(std::function<auto(FunctionArgs...)->ReturnType>,
                std_cxx20::type_identity_t<FunctionArgs> &&...arguments);
 
   /**
@@ -213,7 +213,7 @@ namespace Utilities
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
-    mutable_bind(std::function<ReturnType(FunctionArgs...)>);
+    mutable_bind(std::function<auto(FunctionArgs...)->ReturnType>);
 
 
 
@@ -309,7 +309,7 @@ namespace Utilities
 
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
-  mutable_bind(std::function<ReturnType(FunctionArgs...)> function,
+  mutable_bind(std::function<auto(FunctionArgs...)->ReturnType> function,
                std_cxx20::type_identity_t<FunctionArgs> &&...arguments)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
@@ -320,7 +320,7 @@ namespace Utilities
 
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
-  mutable_bind(std::function<ReturnType(FunctionArgs...)> function)
+  mutable_bind(std::function<auto(FunctionArgs...)->ReturnType> function)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function);
   }

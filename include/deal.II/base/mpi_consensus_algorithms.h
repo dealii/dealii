@@ -289,13 +289,14 @@ namespace Utilities
          */
         virtual std::vector<unsigned int>
         run(
-          const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::vector<unsigned int> &targets,
+          const std::function<auto(const unsigned int)->RequestType>
+                                                               &create_request,
           const std::function<AnswerType(const unsigned int,
                                          const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm) = 0;
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm) = 0;
       };
 
 
@@ -334,13 +335,14 @@ namespace Utilities
          */
         virtual std::vector<unsigned int>
         run(
-          const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::vector<unsigned int> &targets,
+          const std::function<auto(const unsigned int)->RequestType>
+                                                               &create_request,
           const std::function<AnswerType(const unsigned int,
                                          const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm) override;
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm) override;
 
       private:
 #ifdef DEAL_II_WITH_MPI
@@ -389,9 +391,9 @@ namespace Utilities
          */
         bool
         all_locally_originated_receives_are_completed(
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm);
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm);
 
         /**
          * Signal to all other ranks that this rank has received all request
@@ -425,9 +427,10 @@ namespace Utilities
          */
         void
         start_communication(
-          const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const MPI_Comm                                        comm);
+          const std::vector<unsigned int> &targets,
+          const std::function<auto(const unsigned int)->RequestType>
+                        &create_request,
+          const MPI_Comm comm);
 
         /**
          * After all rank has received all answers, the MPI data structures can
@@ -484,13 +487,15 @@ namespace Utilities
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      nbx(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<AnswerType(const unsigned int,
-                                         const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm);
+      nbx(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<AnswerType(const unsigned int, const RequestType &)>
+          &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
+                      &process_answer,
+        const MPI_Comm comm);
 
       /**
        * This function provides a specialization of the one above for
@@ -531,11 +536,13 @@ namespace Utilities
        */
       template <typename RequestType>
       std::vector<unsigned int>
-      nbx(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<void(const unsigned int, const RequestType &)>
-                        &process_request,
-          const MPI_Comm comm);
+      nbx(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
+                      &process_request,
+        const MPI_Comm comm);
 
       /**
        * This class implements a concrete algorithm for the
@@ -584,13 +591,14 @@ namespace Utilities
          */
         virtual std::vector<unsigned int>
         run(
-          const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::vector<unsigned int> &targets,
+          const std::function<auto(const unsigned int)->RequestType>
+                                                               &create_request,
           const std::function<AnswerType(const unsigned int,
                                          const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm) override;
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm) override;
 
       private:
 #ifdef DEAL_II_WITH_MPI
@@ -630,9 +638,10 @@ namespace Utilities
          */
         unsigned int
         start_communication(
-          const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const MPI_Comm                                        comm);
+          const std::vector<unsigned int> &targets,
+          const std::function<auto(const unsigned int)->RequestType>
+                        &create_request,
+          const MPI_Comm comm);
 
         /**
          * The `index`th request message from another rank has been received:
@@ -652,9 +661,9 @@ namespace Utilities
         void
         process_incoming_answers(
           const unsigned int n_targets,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm);
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm);
 
         /**
          * After all answers have been exchanged, the MPI data structures can be
@@ -724,13 +733,15 @@ namespace Utilities
        */
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      pex(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<AnswerType(const unsigned int,
-                                         const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm);
+      pex(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<AnswerType(const unsigned int, const RequestType &)>
+          &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
+                      &process_answer,
+        const MPI_Comm comm);
 
       /**
        * This function provides a specialization of the one above for
@@ -771,11 +782,13 @@ namespace Utilities
        */
       template <typename RequestType>
       std::vector<unsigned int>
-      pex(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<void(const unsigned int, const RequestType &)>
-                        &process_request,
-          const MPI_Comm comm);
+      pex(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
+                      &process_request,
+        const MPI_Comm comm);
 
 
       /**
@@ -799,13 +812,14 @@ namespace Utilities
          */
         virtual std::vector<unsigned int>
         run(
-          const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::vector<unsigned int> &targets,
+          const std::function<auto(const unsigned int)->RequestType>
+                                                               &create_request,
           const std::function<AnswerType(const unsigned int,
                                          const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm) override;
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm) override;
       };
 
 
@@ -845,11 +859,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       serial(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm);
 
@@ -885,9 +900,10 @@ namespace Utilities
       template <typename RequestType>
       std::vector<unsigned int>
       serial(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<void(const unsigned int, const RequestType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
                       &process_request,
         const MPI_Comm comm);
 
@@ -929,13 +945,14 @@ namespace Utilities
          */
         virtual std::vector<unsigned int>
         run(
-          const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
+          const std::vector<unsigned int> &targets,
+          const std::function<auto(const unsigned int)->RequestType>
+                                                               &create_request,
           const std::function<AnswerType(const unsigned int,
                                          const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm) override;
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm) override;
 
       private:
         // Pointer to the actual ConsensusAlgorithms::Interface implementation.
@@ -991,11 +1008,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       selector(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm);
 
@@ -1039,9 +1057,10 @@ namespace Utilities
       template <typename RequestType>
       std::vector<unsigned int>
       selector(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<void(const unsigned int, const RequestType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
                       &process_request,
         const MPI_Comm comm);
 
@@ -1052,13 +1071,15 @@ namespace Utilities
 
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      nbx(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<AnswerType(const unsigned int,
-                                         const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm)
+      nbx(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<AnswerType(const unsigned int, const RequestType &)>
+          &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
+                      &process_answer,
+        const MPI_Comm comm)
       {
         return NBX<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
@@ -1068,11 +1089,13 @@ namespace Utilities
 
       template <typename RequestType>
       std::vector<unsigned int>
-      nbx(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<void(const unsigned int, const RequestType &)>
-                        &process_request,
-          const MPI_Comm comm)
+      nbx(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
+                      &process_request,
+        const MPI_Comm comm)
       {
         // TODO: For the moment, simply implement this special case by
         // forwarding to the other function with rewritten function
@@ -1104,13 +1127,15 @@ namespace Utilities
 
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
-      pex(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<AnswerType(const unsigned int,
-                                         const RequestType &)> &answer_request,
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm)
+      pex(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<AnswerType(const unsigned int, const RequestType &)>
+          &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
+                      &process_answer,
+        const MPI_Comm comm)
       {
         return PEX<RequestType, AnswerType>().run(
           targets, create_request, answer_request, process_answer, comm);
@@ -1120,11 +1145,13 @@ namespace Utilities
 
       template <typename RequestType>
       std::vector<unsigned int>
-      pex(const std::vector<unsigned int>                      &targets,
-          const std::function<RequestType(const unsigned int)> &create_request,
-          const std::function<void(const unsigned int, const RequestType &)>
-                        &process_request,
-          const MPI_Comm comm)
+      pex(
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
+                      &process_request,
+        const MPI_Comm comm)
       {
         // TODO: For the moment, simply implement this special case by
         // forwarding to the other function with rewritten function
@@ -1157,11 +1184,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       serial(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm)
       {
@@ -1174,9 +1202,10 @@ namespace Utilities
       template <typename RequestType>
       std::vector<unsigned int>
       serial(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<void(const unsigned int, const RequestType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
                       &process_request,
         const MPI_Comm comm)
       {
@@ -1211,11 +1240,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       selector(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm)
       {
@@ -1228,9 +1258,10 @@ namespace Utilities
       template <typename RequestType>
       std::vector<unsigned int>
       selector(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<void(const unsigned int, const RequestType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+          &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)->void>
                       &process_request,
         const MPI_Comm comm)
       {
@@ -1442,11 +1473,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       NBX<RequestType, AnswerType>::run(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm)
       {
@@ -1509,9 +1541,10 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       void
       NBX<RequestType, AnswerType>::start_communication(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const MPI_Comm                                        comm)
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                      &create_request,
+        const MPI_Comm comm)
       {
 #  ifdef DEAL_II_WITH_MPI
         // 1)
@@ -1564,9 +1597,9 @@ namespace Utilities
       bool
       NBX<RequestType, AnswerType>::
         all_locally_originated_receives_are_completed(
-          const std::function<void(const unsigned int, const AnswerType &)>
-                        &process_answer,
-          const MPI_Comm comm)
+          const std::function<
+            auto(const unsigned int, const AnswerType &)->void> &process_answer,
+          const MPI_Comm                                         comm)
       {
 #  ifdef DEAL_II_WITH_MPI
         // We know that all requests have come in when we have pending
@@ -1658,9 +1691,9 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       void
       NBX<RequestType, AnswerType>::maybe_answer_one_request(
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-                      &answer_request,
-        const MPI_Comm comm)
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const MPI_Comm                       comm)
       {
 #  ifdef DEAL_II_WITH_MPI
 
@@ -1813,11 +1846,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       PEX<RequestType, AnswerType>::run(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm)
       {
@@ -1861,9 +1895,10 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       unsigned int
       PEX<RequestType, AnswerType>::start_communication(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const MPI_Comm                                        comm)
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                      &create_request,
+        const MPI_Comm comm)
       {
 #  ifdef DEAL_II_WITH_MPI
         const int tag_request = Utilities::MPI::internal::Tags::
@@ -1921,10 +1956,10 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       void
       PEX<RequestType, AnswerType>::answer_one_request(
-        const unsigned int index,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-                      &answer_request,
-        const MPI_Comm comm)
+        const unsigned int                   index,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const MPI_Comm                       comm)
       {
 #  ifdef DEAL_II_WITH_MPI
         const int tag_request = Utilities::MPI::internal::Tags::
@@ -1996,7 +2031,7 @@ namespace Utilities
       void
       PEX<RequestType, AnswerType>::process_incoming_answers(
         const unsigned int n_targets,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm)
       {
@@ -2084,11 +2119,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       Serial<RequestType, AnswerType>::run(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm)
       {
@@ -2128,11 +2164,12 @@ namespace Utilities
       template <typename RequestType, typename AnswerType>
       std::vector<unsigned int>
       Selector<RequestType, AnswerType>::run(
-        const std::vector<unsigned int>                      &targets,
-        const std::function<RequestType(const unsigned int)> &create_request,
-        const std::function<AnswerType(const unsigned int, const RequestType &)>
-          &answer_request,
-        const std::function<void(const unsigned int, const AnswerType &)>
+        const std::vector<unsigned int> &targets,
+        const std::function<auto(const unsigned int)->RequestType>
+                                            &create_request,
+        const std::function<auto(const unsigned int, const RequestType &)
+                              ->AnswerType> &answer_request,
+        const std::function<auto(const unsigned int, const AnswerType &)->void>
                       &process_answer,
         const MPI_Comm comm)
       {

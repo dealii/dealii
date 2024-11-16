@@ -55,7 +55,7 @@ namespace MatrixFreeTools
       std::function<void(std::vector<std::unique_ptr<FEEvalType>> &,
                          const unsigned int)>
         op_reinit;
-      std::function<void(std::vector<std::unique_ptr<FEEvalType>> &)>
+      std::function<auto(std::vector<std::unique_ptr<FEEvalType>> &)->void>
         op_compute;
     };
   } // namespace internal

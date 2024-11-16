@@ -937,9 +937,9 @@ ParameterHandler::declare_entry(const std::string           &entry,
 
 void
 ParameterHandler::add_action(
-  const std::string                              &entry,
-  const std::function<void(const std::string &)> &action,
-  const bool                                      execute_action)
+  const std::string                                    &entry,
+  const std::function<auto(const std::string &)->void> &action,
+  const bool                                            execute_action)
 {
   actions.push_back(action);
 

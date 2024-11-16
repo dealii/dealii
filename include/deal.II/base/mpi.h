@@ -523,8 +523,8 @@ namespace Utilities
       /**
        * Function objects encoding the wait and clean-up operations.
        */
-      std::function<void()> wait_function;
-      std::function<T()>    get_and_cleanup_function;
+      std::function<auto()->void> wait_function;
+      std::function<auto()->T>    get_and_cleanup_function;
 
       /**
        * Whether or not wait() has already been called.
@@ -1273,10 +1273,10 @@ namespace Utilities
      */
     template <typename T>
     T
-    reduce(const T                                      &local_value,
-           const MPI_Comm                                comm,
-           const std::function<T(const T &, const T &)> &combiner,
-           const unsigned int                            root_process = 0);
+    reduce(const T                                            &local_value,
+           const MPI_Comm                                      comm,
+           const std::function<auto(const T &, const T &)->T> &combiner,
+           const unsigned int root_process = 0);
 
 
     /**
@@ -1306,9 +1306,9 @@ namespace Utilities
      */
     template <typename T>
     T
-    all_reduce(const T                                      &local_value,
-               const MPI_Comm                                comm,
-               const std::function<T(const T &, const T &)> &combiner);
+    all_reduce(const T                                            &local_value,
+               const MPI_Comm                                      comm,
+               const std::function<auto(const T &, const T &)->T> &combiner);
 
 
     /**

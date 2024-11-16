@@ -259,9 +259,9 @@ ParsedConvergenceTable::output_table()
 
 void
 ParsedConvergenceTable::add_extra_column(
-  const std::string             &column_name,
-  const std::function<double()> &custom_function,
-  const bool                     compute_rate)
+  const std::string                   &column_name,
+  const std::function<auto()->double> &custom_function,
+  const bool                           compute_rate)
 {
   extra_column_functions[column_name] = {custom_function, compute_rate};
 }

@@ -139,7 +139,7 @@ namespace hp
      */
     template <typename Number>
     using ComparisonFunction =
-      std::function<bool(const Number &, const Number &)>;
+      std::function<auto(const Number &, const Number &)->bool>;
 
     /**
      * @name Setting p-adaptivity flags

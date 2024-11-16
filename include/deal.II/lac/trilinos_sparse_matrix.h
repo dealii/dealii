@@ -2268,7 +2268,7 @@ namespace TrilinosWrappers
          * @note This is not called by a LinearOperator, but rather by Trilinos
          * functions that expect this to mimic the action of the LinearOperator.
          */
-        std::function<void(VectorType &, const VectorType &)> vmult;
+        std::function<auto(VectorType &, const VectorType &)->void> vmult;
 
         /**
          * The standard transpose matrix-vector operation to be performed by
@@ -2277,7 +2277,7 @@ namespace TrilinosWrappers
          * @note This is not called by a LinearOperator, but rather by Trilinos
          * functions that expect this to mimic the action of the LinearOperator.
          */
-        std::function<void(VectorType &, const VectorType &)> Tvmult;
+        std::function<auto(VectorType &, const VectorType &)->void> Tvmult;
 
         /**
          * The inverse matrix-vector operation to be performed by the payload
@@ -2287,7 +2287,7 @@ namespace TrilinosWrappers
          * functions that expect this to mimic the action of the
          * InverseOperator.
          */
-        std::function<void(VectorType &, const VectorType &)> inv_vmult;
+        std::function<auto(VectorType &, const VectorType &)->void> inv_vmult;
 
         /**
          * The inverse transpose matrix-vector operation to be performed by
@@ -2297,7 +2297,7 @@ namespace TrilinosWrappers
          * functions that expect this to mimic the action of the
          * InverseOperator.
          */
-        std::function<void(VectorType &, const VectorType &)> inv_Tvmult;
+        std::function<auto(VectorType &, const VectorType &)->void> inv_Tvmult;
 
         /** @} */
 

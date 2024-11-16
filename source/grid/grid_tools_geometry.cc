@@ -397,7 +397,7 @@ namespace GridTools
     const auto predicate = [](const iterator &) { return true; };
 
     return compute_bounding_box(
-      tria, std::function<bool(const iterator &)>(predicate));
+      tria, std::function<auto(const iterator &)->bool>(predicate));
   }
 
 

@@ -226,7 +226,7 @@ namespace SUNDIALS
       /**
        * Actual pointer to a vector viewed by this class.
        */
-      std::unique_ptr<_generic_N_Vector, std::function<void(N_Vector)>>
+      std::unique_ptr<_generic_N_Vector, std::function<auto(N_Vector)->void>>
         vector_ptr;
     };
   } // namespace internal

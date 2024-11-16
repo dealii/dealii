@@ -301,7 +301,7 @@ namespace Utilities
       evaluate_and_process(
         std::vector<T> &output,
         std::vector<T> &buffer,
-        const std::function<void(const ArrayView<T> &, const CellData &)>
+        const std::function<auto(const ArrayView<T> &, const CellData &)->void>
                   &evaluation_function,
         const bool sort_data = true) const;
 
@@ -312,7 +312,7 @@ namespace Utilities
       template <typename T, unsigned int n_components = 1>
       std::vector<T>
       evaluate_and_process(
-        const std::function<void(const ArrayView<T> &, const CellData &)>
+        const std::function<auto(const ArrayView<T> &, const CellData &)->void>
                   &evaluation_function,
         const bool sort_data = true) const;
 
@@ -333,11 +333,11 @@ namespace Utilities
       template <typename T, unsigned int n_components = 1>
       void
       process_and_evaluate(
-        const std::vector<T> &input,
-        std::vector<T>       &buffer,
-        const std::function<void(const ArrayView<const T> &, const CellData &)>
-                  &evaluation_function,
-        const bool sort_data = true) const;
+        const std::vector<T>          &input,
+        std::vector<T>                &buffer,
+        const std::function<auto(const ArrayView<const T> &, const CellData &)
+                              ->void> &evaluation_function,
+        const bool                     sort_data = true) const;
 
       /**
        * Same as above but without external allocation of a user-provided
@@ -346,10 +346,10 @@ namespace Utilities
       template <typename T, unsigned int n_components = 1>
       void
       process_and_evaluate(
-        const std::vector<T> &input,
-        const std::function<void(const ArrayView<const T> &, const CellData &)>
-                  &evaluation_function,
-        const bool sort_data = true) const;
+        const std::vector<T>          &input,
+        const std::function<auto(const ArrayView<const T> &, const CellData &)
+                              ->void> &evaluation_function,
+        const bool                     sort_data = true) const;
 
       /**
        * Return a CRS-like data structure to determine the position of the
@@ -709,7 +709,7 @@ namespace Utilities
     RemotePointEvaluation<dim, spacedim>::evaluate_and_process(
       std::vector<T> &output,
       std::vector<T> &buffer,
-      const std::function<void(const ArrayView<T> &, const CellData &)>
+      const std::function<auto(const ArrayView<T> &, const CellData &)->void>
                 &evaluation_function,
       const bool sort_data) const
     {
@@ -898,7 +898,7 @@ namespace Utilities
     template <typename T, unsigned int n_components>
     std::vector<T>
     RemotePointEvaluation<dim, spacedim>::evaluate_and_process(
-      const std::function<void(const ArrayView<T> &, const CellData &)>
+      const std::function<auto(const ArrayView<T> &, const CellData &)->void>
                 &evaluation_function,
       const bool sort_data) const
     {
@@ -919,11 +919,11 @@ namespace Utilities
     template <typename T, unsigned int n_components>
     void
     RemotePointEvaluation<dim, spacedim>::process_and_evaluate(
-      const std::vector<T> &input,
-      std::vector<T>       &buffer,
-      const std::function<void(const ArrayView<const T> &, const CellData &)>
-                &evaluation_function,
-      const bool sort_data) const
+      const std::vector<T>          &input,
+      std::vector<T>                &buffer,
+      const std::function<auto(const ArrayView<const T> &, const CellData &)
+                            ->void> &evaluation_function,
+      const bool                     sort_data) const
     {
 #ifndef DEAL_II_WITH_MPI
       Assert(false, ExcNeedsMPI());
@@ -1122,10 +1122,10 @@ namespace Utilities
     template <typename T, unsigned int n_components>
     void
     RemotePointEvaluation<dim, spacedim>::process_and_evaluate(
-      const std::vector<T> &input,
-      const std::function<void(const ArrayView<const T> &, const CellData &)>
-                &evaluation_function,
-      const bool sort_data) const
+      const std::vector<T>          &input,
+      const std::function<auto(const ArrayView<const T> &, const CellData &)
+                            ->void> &evaluation_function,
+      const bool                     sort_data) const
     {
       std::vector<T> buffer;
       this->process_and_evaluate<T, n_components>(input,

@@ -1112,7 +1112,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(VectorBase &dst, const VectorBase &src)> vmult;
+    std::function<auto(VectorBase &dst, const VectorBase &src)->void> vmult;
 
     /**
      * The callback for the transposed application of the preconditioner.
@@ -1122,7 +1122,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(VectorBase &dst, const VectorBase &src)> vmultT;
+    std::function<auto(VectorBase &dst, const VectorBase &src)->void> vmultT;
 
   protected:
     /**

@@ -691,7 +691,7 @@ ComponentSelectFunction<dim, RangeNumberType>::memory_consumption() const
 template <int dim, typename RangeNumberType>
 ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
   ScalarFunctionFromFunctionObject(
-    const std::function<RangeNumberType(const Point<dim> &)> &fu)
+    const std::function<auto(const Point<dim> &)->RangeNumberType> &fu)
   : ScalarFunctionFromFunctionObject<dim, RangeNumberType>(
       [fu](const double t, const Point<dim> &x) {
         (void)t; // we got a function object that only takes 'x', so ignore 't'
@@ -704,7 +704,7 @@ ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
 template <int dim, typename RangeNumberType>
 ScalarFunctionFromFunctionObject<dim, RangeNumberType>::
   ScalarFunctionFromFunctionObject(
-    const std::function<RangeNumberType(const double, const Point<dim> &)>
+    const std::function<auto(const double, const Point<dim> &)->RangeNumberType>
       &function_object)
   : Function<dim, RangeNumberType>(1)
   , function_object(function_object)
@@ -730,7 +730,8 @@ ScalarFunctionFromFunctionObject<dim, RangeNumberType>::value(
 template <int dim, typename RangeNumberType>
 VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::
   VectorFunctionFromScalarFunctionObject(
-    const std::function<RangeNumberType(const Point<dim> &)> &function_object,
+    const std::function<auto(const Point<dim> &)->RangeNumberType>
+                      &function_object,
     const unsigned int selected_component,
     const unsigned int n_components)
   : Function<dim, RangeNumberType>(n_components)
@@ -963,7 +964,8 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
 
 template <int dim, typename RangeNumberType>
 FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
-  const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values,
+  const std::vector<std::function<auto(const Point<dim> &)->RangeNumberType>>
+              &values,
   const double initial_time)
   : Function<dim, RangeNumberType>(values.size(), initial_time)
 {
@@ -974,8 +976,8 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
 
 template <int dim, typename RangeNumberType>
 FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
-  const std::function<RangeNumberType(const Point<dim> &, const unsigned int)>
-                    &values,
+  const std::function<
+    auto(const Point<dim> &, const unsigned int)->RangeNumberType> &values,
   const unsigned int n_components,
   const double       initial_time)
   : Function<dim, RangeNumberType>(n_components, initial_time)
@@ -986,7 +988,8 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
 
 template <int dim, typename RangeNumberType>
 FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
-  const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values,
+  const std::vector<std::function<auto(const Point<dim> &)->RangeNumberType>>
+    &values,
   const std::vector<
     std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &)>>
               &gradients,
@@ -1033,7 +1036,8 @@ FunctionFromFunctionObjects<dim, RangeNumberType>::gradient(
 template <int dim, typename RangeNumberType>
 void
 FunctionFromFunctionObjects<dim, RangeNumberType>::set_function_values(
-  const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values)
+  const std::vector<std::function<auto(const Point<dim> &)->RangeNumberType>>
+    &values)
 {
   AssertDimension(this->n_components, values.size());
   function_values = [values](const auto &p, const auto c) {

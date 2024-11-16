@@ -106,9 +106,9 @@ public:
    * $f(\mathbf x)$.
    */
   void
-  solve(
-    const std::function<Number(const VectorType &x, VectorType &g)> &compute,
-    VectorType                                                      &x);
+  solve(const std::function<auto(const VectorType &x, VectorType &g)->Number>
+                   &compute,
+        VectorType &x);
 
   /**
    * Connect a slot to perform a custom line-search.

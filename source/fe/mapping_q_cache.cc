@@ -163,7 +163,7 @@ MappingQCache<dim, spacedim>::initialize(
         (*support_point_cache)[cell->level()][cell->index()].size(),
         Utilities::pow(this->get_degree() + 1, dim));
     },
-    /* copier */ std::function<void(void *)>(),
+    /* copier */ std::function<auto(void *)->void>(),
     /* scratch_data */ nullptr,
     /* copy_data */ nullptr,
     2 * MultithreadInfo::n_threads(),

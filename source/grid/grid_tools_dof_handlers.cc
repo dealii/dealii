@@ -819,8 +819,8 @@ namespace GridTools
   std::
     vector<typename MeshType::active_cell_iterator> compute_active_cell_halo_layer(
       const MeshType &mesh,
-      const std::function<bool(const typename MeshType::active_cell_iterator &)>
-        &predicate)
+      const std::function<
+        auto(const typename MeshType::active_cell_iterator &)->bool> &predicate)
   {
     std::vector<typename MeshType::active_cell_iterator> active_halo_layer;
     std::vector<bool> locally_active_vertices_on_subdomain(
@@ -868,7 +868,7 @@ namespace GridTools
   std::
     vector<typename MeshType::cell_iterator> compute_cell_halo_layer_on_level(
       const MeshType &mesh,
-      const std::function<bool(const typename MeshType::cell_iterator &)>
+      const std::function<auto(const typename MeshType::cell_iterator &)->bool>
                         &predicate,
       const unsigned int level)
   {
@@ -951,7 +951,7 @@ namespace GridTools
     typename MeshType::
       active_cell_iterator> compute_ghost_cell_halo_layer(const MeshType &mesh)
   {
-    std::function<bool(const typename MeshType::active_cell_iterator &)>
+    std::function<auto(const typename MeshType::active_cell_iterator &)->bool>
       predicate = IteratorFilters::LocallyOwnedCell();
 
     const std::vector<typename MeshType::active_cell_iterator>
@@ -974,8 +974,8 @@ namespace GridTools
   std::
     vector<typename MeshType::active_cell_iterator> compute_active_cell_layer_within_distance(
       const MeshType &mesh,
-      const std::function<bool(const typename MeshType::active_cell_iterator &)>
-                  &predicate,
+      const std::function<
+        auto(const typename MeshType::active_cell_iterator &)->bool> &predicate,
       const double layer_thickness)
   {
     std::vector<typename MeshType::active_cell_iterator>
@@ -1124,7 +1124,7 @@ namespace GridTools
                                                                        layer_thickness)
   {
     IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
-    std::function<bool(const typename MeshType::active_cell_iterator &)>
+    std::function<auto(const typename MeshType::active_cell_iterator &)->bool>
       predicate(locally_owned_cell_predicate);
 
     const std::vector<typename MeshType::active_cell_iterator>

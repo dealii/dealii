@@ -895,7 +895,7 @@ namespace SUNDIALS
     /**
      * Reinit vector to have the right size, MPI communicator, etc.
      */
-    std::function<void(VectorType &)> reinit_vector;
+    std::function<auto(VectorType &)->void> reinit_vector;
 
     /**
      * Compute residual. Return $F(t, y, \dot y)$.
@@ -1037,7 +1037,8 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<bool(const double t, VectorType &sol, VectorType &sol_dot)>
+    std::function<
+      auto(const double t, VectorType &sol, VectorType &sol_dot)->bool>
       solver_should_restart;
 
     /**
@@ -1054,7 +1055,7 @@ namespace SUNDIALS
      * you only return the locally owned (or locally relevant) components, in
      * order to minimize communication between processes.
      */
-    std::function<IndexSet()> differential_components;
+    std::function<auto()->IndexSet> differential_components;
 
     /**
      * Return a vector whose components are the weights used by IDA to compute

@@ -2042,7 +2042,7 @@ namespace Utilities
     template bool
     reduce(const bool &,
            const MPI_Comm,
-           const std::function<bool(const bool &, const bool &)> &,
+           const std::function<auto(const bool &, const bool &)->bool> &,
            const unsigned int);
 
     template std::vector<bool>
@@ -2055,7 +2055,7 @@ namespace Utilities
     template bool
     all_reduce(const bool &,
                const MPI_Comm,
-               const std::function<bool(const bool &, const bool &)> &);
+               const std::function<auto(const bool &, const bool &)->bool> &);
 
     template std::vector<bool>
     all_reduce(

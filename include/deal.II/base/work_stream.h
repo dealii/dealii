@@ -551,11 +551,10 @@ namespace WorkStream
         // The second stage is the one that does the actual work. This is the
         // stage that runs in parallel
         auto item_worker =
-          [worker =
-             std::function<void(const Iterator &, ScratchData &, CopyData &)>(
-               worker),
-           copier_exists =
-             static_cast<bool>(std::function<void(const CopyData &)>(copier))](
+          [worker = std::function<
+             auto(const Iterator &, ScratchData &, CopyData &)->void>(worker),
+           copier_exists = static_cast<bool>(
+             std::function<auto(const CopyData &)->void>(copier))](
             ItemType *current_item) {
             // we need to find an unused scratch data object in the list that
             // corresponds to the current thread and then mark it as used. if
@@ -641,32 +640,33 @@ namespace WorkStream
         //
         // The last stage is the one that copies data from the CopyData objects
         // to the final destination. This stage runs sequentially again.
-        auto item_copier = [copier = std::function<void(const CopyData &)>(
-                              copier)](ItemType *current_item) {
-          if (copier)
-            {
-              // Initiate copying data. For the same reasons as in the worker
-              // class above, catch exceptions rather than letting them
-              // propagate into unknown territories:
-              for (unsigned int i = 0; i < current_item->n_iterators; ++i)
-                {
-                  try
-                    {
-                      copier(current_item->copy_datas[i]);
-                    }
-                  catch (const std::exception &exc)
-                    {
-                      Threads::internal::handle_std_exception(exc);
-                    }
-                  catch (...)
-                    {
-                      Threads::internal::handle_unknown_exception();
-                    }
-                }
-            }
-          // mark current item as usable again
-          current_item->currently_in_use = false;
-        };
+        auto item_copier =
+          [copier = std::function<auto(const CopyData &)->void>(copier)](
+            ItemType *current_item) {
+            if (copier)
+              {
+                // Initiate copying data. For the same reasons as in the worker
+                // class above, catch exceptions rather than letting them
+                // propagate into unknown territories:
+                for (unsigned int i = 0; i < current_item->n_iterators; ++i)
+                  {
+                    try
+                      {
+                        copier(current_item->copy_datas[i]);
+                      }
+                    catch (const std::exception &exc)
+                      {
+                        Threads::internal::handle_std_exception(exc);
+                      }
+                    catch (...)
+                      {
+                        Threads::internal::handle_unknown_exception();
+                      }
+                  }
+              }
+            // mark current item as usable again
+            current_item->currently_in_use = false;
+          };
 
 
         // Now we just have to set up the pipeline and run it:
@@ -884,7 +884,7 @@ namespace WorkStream
              void(const Iterator &, ScratchData &, CopyData &)> &>(worker)) !=
           nullptr;
         const bool have_copier =
-          (static_cast<const std::function<void(const CopyData &)> &>(
+          (static_cast<const std::function<auto(const CopyData &)->void> &>(
             copier)) != nullptr;
 
         // Finally loop over all items and perform the necessary work:
@@ -925,7 +925,7 @@ namespace WorkStream
              void(const Iterator &, ScratchData &, CopyData &)> &>(worker)) !=
           nullptr;
         const bool have_copier =
-          (static_cast<const std::function<void(const CopyData &)> &>(
+          (static_cast<const std::function<auto(const CopyData &)->void> &>(
             copier)) != nullptr;
 
         // Finally loop over all items and perform the necessary work:
@@ -967,11 +967,11 @@ namespace WorkStream
          * Constructor.
          */
         WorkerAndCopier(
-          const std::function<void(const Iterator &, ScratchData &, CopyData &)>
-                                                      &worker,
-          const std::function<void(const CopyData &)> &copier,
-          const ScratchData                           &sample_scratch_data,
-          const CopyData                              &sample_copy_data)
+          const std::function<
+            auto(const Iterator &, ScratchData &, CopyData &)->void> &worker,
+          const std::function<auto(const CopyData &)->void>          &copier,
+          const ScratchData &sample_scratch_data,
+          const CopyData    &sample_copy_data)
           : worker(worker)
           , copier(copier)
           , sample_scratch_data(sample_scratch_data)
@@ -1089,14 +1089,15 @@ namespace WorkStream
          * Pointer to the function that does the assembling on the sequence of
          * cells.
          */
-        const std::function<void(const Iterator &, ScratchData &, CopyData &)>
+        const std::function<
+          auto(const Iterator &, ScratchData &, CopyData &)->void>
           worker;
 
         /**
          * Pointer to the function that does the copying from local
          * contribution to global object.
          */
-        const std::function<void(const CopyData &)> copier;
+        const std::function<auto(const CopyData &)->void> copier;
 
         /**
          * References to sample scratch and copy data for when we need them.
@@ -1200,7 +1201,7 @@ namespace WorkStream
              void(const Iterator &, ScratchData &, CopyData &)> &>(worker)) !=
           nullptr;
         const bool have_copier =
-          (static_cast<const std::function<void(const CopyData &)> &>(
+          (static_cast<const std::function<auto(const CopyData &)->void> &>(
             copier)) != nullptr;
 
         // Generate a static task graph. Here we generate a task for each cell
@@ -1335,7 +1336,7 @@ namespace WorkStream
    * are generated.
    *
    * @note In case the copier does not do anything, pass
-   * `std::function<void(const CopyData &)>()` as @p copier to make sure
+   * `std::function<auto (const CopyData &) -> void>()` as @p copier to make sure
    * a more efficient algorithm is used internally. It is important, however,
    * to recognize that the empty function object created above is *not*
    * the same as a lambda function with an empty body,
@@ -1399,7 +1400,7 @@ namespace WorkStream
    * are generated.
    *
    * @note In case the copier does not do anything, pass
-   * `std::function<void(const CopyData &)>()` as @p copier to make sure
+   * `std::function<auto (const CopyData &) -> void>()` as @p copier to make sure
    * a more efficient algorithm is used internally. It is important, however,
    * to recognize that the empty function object created above is *not*
    * the same as a lambda function with an empty body,
@@ -1440,7 +1441,8 @@ namespace WorkStream
     if (MultithreadInfo::n_threads() > 1)
       {
 #  if defined(DEAL_II_WITH_TBB) || defined(DEAL_II_WITH_TASKFLOW)
-        if (static_cast<const std::function<void(const CopyData &)> &>(copier))
+        if (static_cast<const std::function<auto(const CopyData &)->void> &>(
+              copier))
           {
             // If we have a copier, run the algorithm:
 #    if defined(DEAL_II_WITH_TASKFLOW)
@@ -1658,7 +1660,7 @@ namespace WorkStream
    * are generated.
    *
    * @note In case the copier does not do anything, pass
-   * `std::function<void(const CopyData &)>()` as @p copier to make sure
+   * `std::function<auto (const CopyData &) -> void>()` as @p copier to make sure
    * a more efficient algorithm is used internally. It is important, however,
    * to recognize that the empty function object created above is *not*
    * the same as a lambda function with an empty body,

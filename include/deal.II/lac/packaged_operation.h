@@ -50,14 +50,14 @@ class PackagedOperation;
  * store the knowledge of how to generate the result of a computation and
  * store it in a vector:
  * @code
- *   std::function<void(Range &)> apply;
- *   std::function<void(Range &)> apply_add;
+ *   std::function<auto (Range &) -> void> apply;
+ *   std::function<auto (Range &) -> void> apply_add;
  * @endcode
  *
  * Similar to the LinearOperator class it also has knowledge about how to
  * initialize a vector of the @p Range space:
  * @code
- *   std::function<void(Range &, bool)> reinit_vector;
+ *   std::function<auto (Range &, bool) -> void> reinit_vector;
  * @endcode
  *
  * As an example consider the addition of multiple vectors
@@ -257,13 +257,13 @@ public:
    * Store the result of the PackagedOperation in a vector v of the @p Range
    * space.
    */
-  std::function<void(Range &v)> apply;
+  std::function<auto(Range &v)->void> apply;
 
   /**
    * Add the result of the PackagedOperation to a vector v of the @p Range
    * space.
    */
-  std::function<void(Range &v)> apply_add;
+  std::function<auto(Range &v)->void> apply_add;
 
   /**
    * Initializes a vector v of the Range space to be directly usable as the
@@ -272,7 +272,7 @@ public:
    * whether a fast initialization is done, i.e., if it is set to false the
    * content of the vector is set to 0.
    */
-  std::function<void(Range &v, bool omit_zeroing_entries)> reinit_vector;
+  std::function<auto(Range &v, bool omit_zeroing_entries)->void> reinit_vector;
 };
 
 

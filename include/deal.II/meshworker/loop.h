@@ -317,9 +317,9 @@ namespace MeshWorker
     IteratorType              cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
     INFOBOX                  &info,
-    const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
+    const std::function<auto(DOFINFO &, typename INFOBOX::CellInfo &)->void>
       &cell_worker,
-    const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
+    const std::function<auto(DOFINFO &, typename INFOBOX::CellInfo &)->void>
                                                             &boundary_worker,
     const std::function<void(DOFINFO &,
                              DOFINFO &,

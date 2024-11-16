@@ -109,7 +109,7 @@ namespace SUNDIALS
 
     private:
       using PointerType =
-        std::unique_ptr<VectorType, std::function<void(VectorType *)>>;
+        std::unique_ptr<VectorType, std::function<auto(VectorType *)->void>>;
 
       /**
        * Vector memory which might be used to allocate storage if

@@ -608,7 +608,8 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t, const VectorType &y, VectorType &res)>
+    std::function<
+      auto(const double t, const VectorType &y, VectorType &res)->void>
       implicit_function;
 
     /**
@@ -628,7 +629,8 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t, const VectorType &v, VectorType &Mv)>
+    std::function<
+      auto(const double t, const VectorType &v, VectorType &Mv)->void>
       mass_times_vector;
 
     /**
@@ -665,7 +667,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t)> mass_times_setup;
+    std::function<auto(const double t)->void> mass_times_setup;
 
     /**
      * A function object that users may supply and that is intended to compute
@@ -939,7 +941,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t)> mass_preconditioner_setup;
+    std::function<auto(const double t)->void> mass_preconditioner_setup;
 
     /**
      * A function object that users may supply and that is intended to
@@ -977,7 +979,8 @@ namespace SUNDIALS
      * The default implementation simply returns `false`, i.e., no restart is
      * performed during the evolution.
      */
-    std::function<bool(const double t, VectorType &sol)> solver_should_restart;
+    std::function<auto(const double t, VectorType &sol)->bool>
+      solver_should_restart;
 
     /**
      * A function object that users may supply and that is intended to return a
@@ -1011,7 +1014,7 @@ namespace SUNDIALS
      * @param arkode_mem pointer to the ARKODE memory block which can be used
      *   for custom calls to `ARKStepSet...` methods.
      */
-    std::function<void(void *arkode_mem)> custom_setup;
+    std::function<auto(void *arkode_mem)->void> custom_setup;
 
   private:
     /**

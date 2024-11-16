@@ -147,8 +147,9 @@ public:
    */
   template <typename PreconditionerType = DiagonalMatrix<VectorType>>
   void
-  solve(const std::function<double(VectorType &, const VectorType &)> &compute,
-        VectorType                                                    &x,
+  solve(const std::function<auto(VectorType &, const VectorType &)->double>
+                                 &compute,
+        VectorType               &x,
         const PreconditionerType &inverse_mass_matrix);
 
   /**
@@ -234,8 +235,8 @@ template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename PreconditionerType>
 void SolverFIRE<VectorType>::solve(
-  const std::function<double(VectorType &, const VectorType &)> &compute,
-  VectorType                                                    &x,
+  const std::function<auto(VectorType &, const VectorType &)->double> &compute,
+  VectorType                                                          &x,
   const PreconditionerType &inverse_mass_matrix)
 {
   LogStream::Prefix prefix("FIRE");
@@ -363,7 +364,7 @@ void SolverFIRE<VectorType>::solve(const MatrixType         &A,
                                    const VectorType         &b,
                                    const PreconditionerType &preconditioner)
 {
-  std::function<double(VectorType &, const VectorType &)> compute_func =
+  std::function<auto(VectorType &, const VectorType &)->double> compute_func =
     [&](VectorType &g, const VectorType &x) -> double {
     // Residual of the quadratic form $ \frac{1}{2} xAx - xb $.
     // G = b - Ax

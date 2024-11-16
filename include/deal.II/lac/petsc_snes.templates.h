@@ -71,9 +71,9 @@ namespace PETScWrappers
   template <typename F, typename... Args>
   int
   call_and_possibly_capture_snes_exception(
-    const F                     &f,
-    std::exception_ptr          &eptr,
-    const std::function<void()> &recoverable_action,
+    const F                           &f,
+    std::exception_ptr                &eptr,
+    const std::function<auto()->void> &recoverable_action,
     Args &&...args)
   {
     // See whether there is already something in the exception pointer

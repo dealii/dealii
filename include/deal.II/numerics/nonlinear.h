@@ -284,7 +284,7 @@ public:
    * block vectors are used), along with any
    * other properties necessary.
    */
-  std::function<void(VectorType &)> reinit_vector;
+  std::function<auto(VectorType &)->void> reinit_vector;
 
   /**
    * A function object that users should supply and that is intended to
@@ -299,7 +299,7 @@ public:
    * throws an exception of type RecoverableUserCallbackError, then this
    * exception may or may not be treated like any other exception.
    */
-  std::function<void(const VectorType &src, VectorType &dst)> residual;
+  std::function<auto(const VectorType &src, VectorType &dst)->void> residual;
 
   /**
    * A function object that users may supply and that is intended to
@@ -327,7 +327,7 @@ public:
    * throws an exception of type RecoverableUserCallbackError, then this
    * exception may or may not be treated like any other exception.
    */
-  std::function<void(const VectorType &current_u)> setup_jacobian;
+  std::function<auto(const VectorType &current_u)->void> setup_jacobian;
 
   /**
    * A function object that users may supply and that is intended to solve

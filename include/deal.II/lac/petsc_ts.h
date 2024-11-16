@@ -508,7 +508,8 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const real_type t, const VectorType &y, VectorType &res)>
+    std::function<
+      auto(const real_type t, const VectorType &y, VectorType &res)->void>
       explicit_function;
 
     /**
@@ -578,7 +579,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const VectorType &src, VectorType &dst)>
+    std::function<auto(const VectorType &src, VectorType &dst)->void>
       solve_with_jacobian;
 
     /**
@@ -611,14 +612,14 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<IndexSet()> algebraic_components;
+    std::function<auto()->IndexSet> algebraic_components;
 
     /**
      * @deprecated This callback is equivalent to `update_constrained_components`, but is
      * deprecated. Use `update_constrained_components` instead.
      */
     DEAL_II_DEPRECATED
-    std::function<void(const real_type t, VectorType &y)> distribute;
+    std::function<auto(const real_type t, VectorType &y)->void> distribute;
 
     /**
      * Callback to set the values of constrained components to their correct
@@ -638,7 +639,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const real_type t, VectorType &y)>
+    std::function<auto(const real_type t, VectorType &y)->void>
       update_constrained_components;
 
     /**

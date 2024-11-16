@@ -847,25 +847,27 @@ public:
    * Connect a function to mg::SignalsNonNested::prolongation_cell_loop.
    */
   boost::signals2::connection
-  connect_prolongation_cell_loop(const std::function<void(const bool)> &slot);
+  connect_prolongation_cell_loop(
+    const std::function<auto(const bool)->void> &slot);
 
   /**
    * Connect a function to mg::SignalsNonNested::restriction_cell_loop.
    */
   boost::signals2::connection
-  connect_restriction_cell_loop(const std::function<void(const bool)> &slot);
+  connect_restriction_cell_loop(
+    const std::function<auto(const bool)->void> &slot);
 
   /**
    * Connect a function to mg::SignalsNonNested::prolongation.
    */
   boost::signals2::connection
-  connect_prolongation(const std::function<void(const bool)> &slot);
+  connect_prolongation(const std::function<auto(const bool)->void> &slot);
 
   /**
    * Connect a function to mg::SignalsNonNested::restriction.
    */
   boost::signals2::connection
-  connect_restriction(const std::function<void(const bool)> &slot);
+  connect_restriction(const std::function<auto(const bool)->void> &slot);
 
 protected:
   AdditionalData additional_data;
@@ -1022,7 +1024,7 @@ public:
    */
   template <typename MGTwoLevelTransferObject>
   MGTransferMF(const MGLevelObject<MGTwoLevelTransferObject> &transfer,
-               const std::function<void(const unsigned int, VectorType &)>
+               const std::function<auto(const unsigned int, VectorType &)->void>
                  &initialize_dof_vector = {});
 
   /**
@@ -1050,7 +1052,7 @@ public:
    * partitioners.
    */
   void
-  build(const std::function<void(const unsigned int, VectorType &)>
+  build(const std::function<auto(const unsigned int, VectorType &)->void>
           &initialize_dof_vector);
 
   /** @} */
@@ -1108,7 +1110,7 @@ public:
    */
   void
   build(const DoFHandler<dim> &dof_handler,
-        const std::function<void(const unsigned int, VectorType &)>
+        const std::function<auto(const unsigned int, VectorType &)->void>
           &initialize_dof_vector);
 
   /** @} */
@@ -1427,7 +1429,7 @@ template <int dim, typename Number>
 template <typename MGTwoLevelTransferObject>
 MGTransferMF<dim, Number>::MGTransferMF(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer,
-  const std::function<void(const unsigned int, VectorType &)>
+  const std::function<auto(const unsigned int, VectorType &)->void>
     &initialize_dof_vector)
 {
   this->transfer.clear();
