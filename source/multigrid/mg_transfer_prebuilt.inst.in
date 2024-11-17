@@ -19,6 +19,12 @@ for (V1 : VECTORS_WITHOUT_LAVEC)
     template class MGTransferPrebuilt<V1>;
   }
 
+for (S1 : REAL_SCALARS)
+  {
+    template class MGTransferPrebuilt<
+      LinearAlgebra::distributed::Vector<S1, ::dealii::MemorySpace::Host>>;
+  }
+
 for (deal_II_dimension : DIMENSIONS; V1 : VECTORS_WITHOUT_LAVEC)
   {
     template void MGTransferPrebuilt<V1>::build<deal_II_dimension>(
