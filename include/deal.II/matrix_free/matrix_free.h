@@ -3877,12 +3877,11 @@ namespace internal
 
           if (part.n_ghost_indices() > 0)
             {
-              part.reset_ghost_values(ArrayView<Number>(
-                const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec)
-                    .begin() +
-                  part.locally_owned_size(),
-                matrix_free.get_dof_info(mf_component)
-                  .vector_partitioner->n_ghost_indices()));
+              part.reset_ghost_values(
+                ArrayView<Number>(const_cast<VectorType &>(vec).begin() +
+                                    part.locally_owned_size(),
+                                  matrix_free.get_dof_info(mf_component)
+                                    .vector_partitioner->n_ghost_indices()));
             }
 
 #  endif
