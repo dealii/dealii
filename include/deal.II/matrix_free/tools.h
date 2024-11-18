@@ -1700,7 +1700,8 @@ namespace MatrixFreeTools
       };
 
     data_cell.op_reinit = [](auto &phi, const unsigned batch) {
-      static_cast<FEEvalType &>(*phi[0]).reinit(batch);
+      if (phi.size() == 1)
+        static_cast<FEEvalType &>(*phi[0]).reinit(batch);
     };
 
     if (cell_operation)
@@ -1761,8 +1762,11 @@ namespace MatrixFreeTools
       };
 
     data_face.op_reinit = [](auto &phi, const unsigned batch) {
-      static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
-      static_cast<FEFaceEvalType &>(*phi[1]).reinit(batch);
+      if (phi.size() == 2)
+        {
+          static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
+          static_cast<FEFaceEvalType &>(*phi[1]).reinit(batch);
+        }
     };
 
     if (face_operation)
@@ -1801,7 +1805,8 @@ namespace MatrixFreeTools
     };
 
     data_boundary.op_reinit = [](auto &phi, const unsigned batch) {
-      static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
+      if (phi.size() == 1)
+        static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
     };
 
     if (boundary_operation)
@@ -2217,7 +2222,8 @@ namespace MatrixFreeTools
       };
 
     data_cell.op_reinit = [](auto &phi, const unsigned batch) {
-      static_cast<FEEvalType &>(*phi[0]).reinit(batch);
+      if (phi.size() == 1)
+        static_cast<FEEvalType &>(*phi[0]).reinit(batch);
     };
 
     if (cell_operation)
@@ -2278,8 +2284,11 @@ namespace MatrixFreeTools
       };
 
     data_face.op_reinit = [](auto &phi, const unsigned batch) {
-      static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
-      static_cast<FEFaceEvalType &>(*phi[1]).reinit(batch);
+      if (phi.size() == 2)
+        {
+          static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
+          static_cast<FEFaceEvalType &>(*phi[1]).reinit(batch);
+        }
     };
 
     if (face_operation)
@@ -2318,7 +2327,8 @@ namespace MatrixFreeTools
     };
 
     data_boundary.op_reinit = [](auto &phi, const unsigned batch) {
-      static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
+      if (phi.size() == 1)
+        static_cast<FEFaceEvalType &>(*phi[0]).reinit(batch);
     };
 
     if (boundary_operation)
