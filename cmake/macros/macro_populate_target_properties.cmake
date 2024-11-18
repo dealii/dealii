@@ -100,11 +100,19 @@ function(populate_target_properties _target _build)
   #  - set POSITION_INDEPENDENT_CODE to true to compile everything with
   #    the -fpic/-fPIC compiler flag. This ensures that we can link all
   #    object targets into a relocatable library at the end.
+  #  - compile deal.II's own files with -Werror or whatever else it
+  #    is that the compiler understands (if cmake is new enough)
   #
 
   set_target_properties(${_target} PROPERTIES
     POSITION_INDEPENDENT_CODE TRUE
     )
+
+  if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+    set_target_properties(${_target} PROPERTIES
+      COMPILE_WARNING_AS_ERROR ON
+      )
+  endif()
 
   #
   # Add compile and link options with private scope, and add the link
