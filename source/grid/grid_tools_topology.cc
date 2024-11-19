@@ -1855,7 +1855,40 @@ namespace GridTools
     const Triangulation<dim, spacedim> &triangulation,
     DynamicSparsityPattern             &cell_connectivity)
   {
-    // Assume at most 16 neighbors per cell (a structured hex mesh has 8)
+    // The choice of 16 or fewer neighbors here is based on empirical
+    // measurements.
+    //
+    // Vertices in a structured hexahedral mesh have 8 adjacent cells. In a
+    // structured tetrahedral mesh, about 98% of vertices have 16 neighbors or
+    // fewer. Similarly, in an unstructured tetrahedral mesh, if we count the
+    // number of neighbors each vertex has we obtain the following distribution:
+    //
+    // 3, 1
+    // 4, 728
+    // 5, 4084
+    // 6, 7614
+    // 7, 17329
+    // 8, 31145
+    // 9, 46698
+    // 10, 64193
+    // 11, 68269
+    // 12, 63574
+    // 13, 57016
+    // 14, 50476
+    // 15, 41886
+    // 16, 31820
+    // 17, 21269
+    // 18, 12217
+    // 19, 6072
+    // 20, 2527
+    // 21, 825
+    // 22, 262
+    // 23, 61
+    // 24, 12
+    // 26, 1
+    //
+    // so about 86% of vertices have 16 neighbors or fewer. Hence, we picked 16
+    // neighbors here to cover most cases without allocation.
     std::vector<boost::container::small_vector<unsigned int, 16>>
       vertex_to_cell(triangulation.n_vertices());
     for (const auto &cell : triangulation.active_cell_iterators())
