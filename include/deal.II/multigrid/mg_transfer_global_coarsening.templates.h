@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/memory_space.h"
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_consensus_algorithms.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
