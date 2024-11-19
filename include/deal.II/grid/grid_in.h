@@ -769,6 +769,24 @@ public:
   get_format_names();
 
   /**
+   * Return a map containing field data associated with the elements of an
+   * external vtk format mesh imported using read_vtk().
+   * The format of the returned map is as
+   * follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - std::vector<double> stores value for the given identifier in each cell.
+   * To access the value, use field_data[name_field][cell_id]. For example, if
+   * the vtk mesh contains field data 'Density' defined at the cells,
+   * field_data['Density'][0] would be the density defined at cell ID '0',
+   * which corresponds to index 0 of the vector. The length of the vector in
+   * field_data['Density'] would equal the number of elements in the coarse
+   * mesh.
+   */
+  const std::map<std::string, std::vector<double>> &
+  get_field_data() const;
+
+  /**
    * Exception
    */
   DeclException1(ExcUnknownSectionType,
@@ -879,17 +897,6 @@ public:
       std::to_string(arg1) + " lines and " + std::to_string(arg2) +
       " facets (surface triangles or quadrilaterals).");
 
-  /**
-   * Return a map containing field data. The format of the returned map is as
-   * follows:
-   * - std::string stores the name of the field data (identifier) as specified
-   * in the external mesh
-   * - std::vector<double> stores value for the given identifier in each cell.
-   * To access the value use field_data[name_field][cell_id].
-   */
-  const std::map<std::string, std::vector<double>> &
-  get_field_data() const;
-
 protected:
   /**
    * Store address of the triangulation to be fed with the data read in.
@@ -962,11 +969,13 @@ private:
   Format default_format;
 
   /**
-   * Data member that stores cell data. The format is as follows:
+   * Data member that stores field data defined at the cells of the mesh.
+   * The format is as follows:
    * - std::string stores the name of the field data (identifier) as specified
    * in the external mesh
    * - std::vector<double> stores value for the given identifier in each
-   * cell_id. To access the value use field_data[name_field][cell_id].
+   * cell_id.
+   * To access the value use field_data[name_field][cell_id].
    */
   std::map<std::string, std::vector<double>> field_data;
 };

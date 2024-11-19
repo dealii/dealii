@@ -467,8 +467,6 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               for (unsigned int i = 0; i < data_sets.size(); ++i)
                 {
                   // Ignore everything until we get to a SCALARS data set
-
-                  std::cout << "keyword: " << keyword << std::endl;
                   if (keyword == "SCALARS")
                     {
                       // Now see if we know about this type of data set,
