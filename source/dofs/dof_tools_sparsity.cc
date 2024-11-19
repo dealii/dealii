@@ -82,6 +82,13 @@ namespace DoFTools
                  "locally owned one does not make sense."));
       }
 
+    const auto                 &fe_collection = dof.get_fe_collection();
+    std::vector<Table<2, bool>> fe_dof_mask(fe_collection.size());
+    for (unsigned int f = 0; f < fe_collection.size(); ++f)
+      {
+        fe_dof_mask[f] = fe_collection[f].get_local_dof_sparsity_pattern();
+      }
+
     std::vector<types::global_dof_index> dofs_on_this_cell;
     dofs_on_this_cell.reserve(dof.get_fe_collection().max_dofs_per_cell());
 
@@ -100,9 +107,16 @@ namespace DoFTools
           // make sparsity pattern for this cell. if no constraints pattern
           // was given, then the following call acts as if simply no
           // constraints existed
-          constraints.add_entries_local_to_global(dofs_on_this_cell,
-                                                  sparsity,
-                                                  keep_constrained_dofs);
+          const types::fe_index fe_index = cell->active_fe_index();
+          if (fe_dof_mask[fe_index].empty())
+            constraints.add_entries_local_to_global(dofs_on_this_cell,
+                                                    sparsity,
+                                                    keep_constrained_dofs);
+          else
+            constraints.add_entries_local_to_global(dofs_on_this_cell,
+                                                    sparsity,
+                                                    keep_constrained_dofs,
+                                                    fe_dof_mask[fe_index]);
         }
   }
 
@@ -152,6 +166,12 @@ namespace DoFTools
     const std::vector<Table<2, Coupling>> dof_mask //(fe_collection.size())
       = dof_couplings_from_component_couplings(fe_collection, couplings);
 
+    std::vector<Table<2, bool>> fe_dof_mask(fe_collection.size());
+    for (unsigned int f = 0; f < fe_collection.size(); ++f)
+      {
+        fe_dof_mask[f] = fe_collection[f].get_local_dof_sparsity_pattern();
+      }
+
     // Convert the dof_mask to bool_dof_mask so we can pass it
     // to constraints.add_entries_local_to_global()
     std::vector<Table<2, bool>> bool_dof_mask(fe_collection.size());
@@ -163,7 +183,8 @@ namespace DoFTools
         bool_dof_mask[f].fill(false);
         for (unsigned int i = 0; i < fe_collection[f].n_dofs_per_cell(); ++i)
           for (unsigned int j = 0; j < fe_collection[f].n_dofs_per_cell(); ++j)
-            if (dof_mask[f](i, j) != none)
+            if (dof_mask[f](i, j) != none &&
+                (fe_dof_mask[f].empty() || fe_dof_mask[f](i, j)))
               bool_dof_mask[f](i, j) = true;
       }
 

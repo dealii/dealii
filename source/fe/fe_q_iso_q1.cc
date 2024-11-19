@@ -14,10 +14,12 @@
 
 
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q_iso_q1.h>
+#include <deal.II/fe/fe_tools.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -50,6 +52,42 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
   const QIterated<1>  points(trapez, subdivisions);
 
   this->initialize(points.get_points());
+
+  {
+    const std::vector<unsigned int> R =
+      FETools::lexicographic_to_hierarchic_numbering<dim>(subdivisions);
+
+    this->local_dof_sparsity_pattern.reinit(this->n_dofs_per_cell(),
+                                            this->n_dofs_per_cell());
+
+    {
+      this->local_dof_sparsity_pattern.fill(false);
+
+      const unsigned int N   = Utilities::pow(points.size(), dim);
+      const int          N1d = points.size();
+      for (unsigned int i = 0; i < N; ++i)
+        for (unsigned int j = 0; j < N; ++j)
+          {
+            // compute l1 distance:
+            int distance = 0;
+
+            int xi = i;
+            int xj = j;
+            for (unsigned int d = 0; d < dim; ++d)
+              {
+                int current_distance = std::abs((xi % N1d) - (xj % N1d));
+                xi /= N1d;
+                xj /= N1d;
+                distance = std::max(distance, current_distance);
+                if (distance > 1)
+                  break;
+              }
+
+            if (distance <= 1)
+              this->local_dof_sparsity_pattern(R[i], R[j]) = true;
+          }
+    }
+  }
 }
 
 
@@ -176,6 +214,7 @@ FE_Q_iso_Q1<dim, spacedim>::compare_for_domination(
   DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
+
 
 
 // explicit instantiations

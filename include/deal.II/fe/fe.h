@@ -1611,6 +1611,25 @@ public:
   is_primitive(const unsigned int i) const;
 
   /**
+   * Return a table (or sparsity pattern) with information which of the
+   * local DoFs per cell couple with each other.
+   *
+   * If the FiniteElement returns an empty (0 by 0) table, which is the
+   * default implementation for any class that does not override this
+   * function, all DoFs are assumed to couple.
+   *
+   * Otherwise, this function returns a square table with n_dofs_per_cell
+   * rows and columns. The entry (i,j) then denotes if the DoF i and j
+   * are coupled. This should be true if the support of the shape functions
+   * have a non-empty intersection.
+   *
+   * An example for an element that does make use of this feature is
+   * FE_Q_iso_Q1.
+   */
+  virtual const Table<2, bool> &
+  get_local_dof_sparsity_pattern() const;
+
+  /**
    * Number of base elements in a mixed discretization.
    *
    * Note that even for vector valued finite elements, the number of
@@ -2622,6 +2641,14 @@ protected:
   const bool cached_primitivity;
 
   /**
+   * This table is returned by get_local_dof_sparsity_pattern(). Its meaning
+   * is described there in detail. This variable has to be
+   * filled by any class derived from FiniteElement that does not want to keep
+   * the default empty table (meaning all DoFs couple within the cell).
+   */
+  Table<2, bool> local_dof_sparsity_pattern;
+
+  /**
    * Return the size of interface constraint matrices. Since this is
    * needed in every derived finite element class when initializing
    * their size, it is placed into this function, to avoid having to
@@ -3341,6 +3368,15 @@ FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
   // for good measure, short circuit the test
   // if the entire FE is primitive
   return (is_primitive() || (n_nonzero_components_table[i] == 1));
+}
+
+
+
+template <int dim, int spacedim>
+inline const Table<2, bool> &
+FiniteElement<dim, spacedim>::get_local_dof_sparsity_pattern() const
+{
+  return local_dof_sparsity_pattern;
 }
 
 
