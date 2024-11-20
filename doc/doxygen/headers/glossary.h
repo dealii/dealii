@@ -1595,8 +1595,12 @@
  *
  * <dd> Every object that makes up a Triangulation (cells, faces,
  * edges, etc.), is associated with a unique number (of type
- * types::manifold_id) that is used to identify which manifold object
- * is responsible to generate new points when the mesh is refined.
+ * types::manifold_id) which is used to identify which Manifold object
+ * describes the coordinate system on that cell, e.g., a PolarManifold will
+ * perform calculations in polar coordinates. For example, Manifold objects
+ * are responsible for generating new points when a Triangulation is refined,
+ * defining the locations of @ref GlossSupport "support points", and defining
+ * the locations of quadrature points.
  *
  * By default, all manifold indicators of a mesh are set to
  * numbers::flat_manifold_id. A typical piece of code that sets the
@@ -1607,24 +1611,17 @@
  * @code
  * for (auto &cell : triangulation.active_cell_iterators())
  *   if (cell->center()[0] < 0)
- *     cell->set_manifold_id (42);
+ *     cell->set_manifold_id(42);
  * @endcode
  *
  * Here we call the function TriaAccessor::set_manifold_id(). It may
- * also be appropriate to call TriaAccessor::set_all_manifold_ids
+ * also be appropriate to call TriaAccessor::set_all_manifold_ids()
  * instead, to set recursively the manifold id on each face (and edge,
  * if in 3d). To query the manifold indicator of a particular object
  * edge, use TriaAccessor::manifold_id().
  *
- * The code above only sets the manifold indicators of a particular
- * part of the Triangulation, but it does not by itself change the way
- * the Triangulation class treats this object for the purposes of mesh
- * refinement. For this, you need to call Triangulation::set_manifold()
- * to associate a manifold object with a particular manifold
- * indicator. This allows the Triangulation objects to use a different
- * method of finding new points on cells, faces or edges to be
- * refined; the default is to use a FlatManifold object for all faces
- * and edges.
+ * Every manifold id set on a Triangulation must have an associated Manifold
+ * object. This is assigned via Triangulation::set_manifold().
  *
  * @note Manifold indicators are inherited from parents to their
  * children upon mesh refinement. Some more information about manifold
