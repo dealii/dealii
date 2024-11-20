@@ -1,10 +1,10 @@
 /* This example can be compiled for usage with parallel::distributed or
  * parallel::fullydistributed triangulations
- *
+ * 
  * In order to force usage of parallel::fullydistributed triangulations
  * define
  * #define USE_FULLY_DISTRIBUTED_TRIA
- *
+ * 
  * otherwise (if not defined), parallel::distributed triangulation
  * will be used
  */
@@ -13,12 +13,12 @@
 /* ---------------------------------------------------------------------
  *
  * 2024-11, Stephan Voss, Neunkirchen am Brand, Germany, stvoss@gmx.de
- *
+ * 
  * This solver is derived by trying several deal.II examples and tutorials.
  * Thank You to all deal.II contributors.
  *
  */
-
+ 
 /* ---------------------------------------------------------------------
  *
  * deal.II: Copyright (C) 2021 - 2023 by the deal.II authors
@@ -186,55 +186,55 @@ namespace Step92
     using physical_ID = unsigned int;
 
     using Material_tuple = std::tuple<std::string, physical_ID, double, double>;
-
-    using BoundaryPotential_tuple =
-      std::tuple<std::string, physical_ID, double>;
+                                      
+    using BoundaryPotential_tuple = std::tuple<std::string, physical_ID, double>;
 
     class material_definition
     {
     public:
       types::material_id material_id;
       std::string        name;
-      double epsilon; // absolute electric permittivity epsilon (not relative !!
-                      // --> eps_r * eps_0)
-      double kappa;   // absolute electric conductivity
+      double             epsilon; // absolute electric permittivity epsilon (not relative !! --> eps_r * eps_0)
+      double             kappa;   // absolute electric conductivity
+
     };
 
     class boundary_potential
     {
     public:
-      types::material_id material_id;
-      std::string        name;
-      double             potential; // [V] electric potential
+      types::material_id   material_id;
+      std::string          name;
+      double               potential; // [V] electric potential
     };
 
 
   public:
-    material_definition get_physical(types::material_id material);
+    material_definition  get_physical(types::material_id material);
 
-    boundary_potential get_boundary_value(types::material_id material);
+    boundary_potential  get_boundary_value(types::material_id material);
 
     std::string get_mesh_filename();
     std::string get_cells_solution_filename();
 
-    // double mu_vacuum;      // vacuum permeability: 4 pi 10e-7 V s / (A m)
+    //double mu_vacuum;      // vacuum permeability: 4 pi 10e-7 V s / (A m)
     double epsilon_vacuum; // vacuum permittivity: 8.8541878188(14)×10^−12 A s /
                            // (V m)
 
     std::string mesh_filename, cells_solution_filename;
 
   private:
+
     int default_physical_ix = -1;
 
     std::list<Material_tuple>          materials_list;
     std::list<BoundaryPotential_tuple> boundary_values_list;
 
   public:
-    unsigned long        N_physicals = 0;
-    material_definition *p_physicals = NULL;
-
-    unsigned long       N_boundary_values = 0;
-    boundary_potential *p_boundary_values = NULL;
+    unsigned long         N_physicals = 0;
+    material_definition  *p_physicals = NULL;
+    
+    unsigned long         N_boundary_values = 0;
+    boundary_potential   *p_boundary_values = NULL;
   };
 
 
@@ -242,8 +242,8 @@ namespace Step92
   ProblemParameters<dim>::ProblemParameters()
     : ParameterAcceptor("Problem")
   {
-    // mu_vacuum      = 4.0e-7 * dealii::numbers::PI; // [ V s / (A m) ]
-    epsilon_vacuum = 8.8541878176204199e-12; // [ A s / (V m) ]
+    //mu_vacuum      = 4.0e-7 * dealii::numbers::PI; // [ V s / (A m) ]
+    epsilon_vacuum = 8.8541878176204199e-12;       // [ A s / (V m) ]
 
 
     mesh_filename = "";
@@ -257,9 +257,10 @@ namespace Step92
       "materials",
       materials_list,
       "list of material definitions: \"name : ID : eps_r : kappa\"");
-    add_parameter("potentials",
-                  boundary_values_list,
-                  "list of potential definitions: \"name : ID : epot [V]\"");
+    add_parameter(
+      "potentials",
+      boundary_values_list,
+      "list of potential definitions: \"name : ID : epot [V]\"");
   }
 
   template <int dim>
@@ -273,10 +274,10 @@ namespace Step92
     default_physical_ix = -1;
     for (const auto &item : materials_list)
       {
-        std::string  name  = std::get<0>(item);
-        unsigned int id    = std::get<1>(item);
-        double       eps_r = std::get<2>(item);
-        double       kappa = std::get<3>(item);
+        std::string          name  = std::get<0>(item);
+        unsigned int         id    = std::get<1>(item);
+        double               eps_r = std::get<2>(item);
+        double               kappa = std::get<3>(item);
 
         p_physicals[ix].name = name;
 
@@ -297,7 +298,7 @@ namespace Step92
         N_physicals++;
         p_physicals[ix].name = "default";
 
-        default_physical_ix         = ix;
+        default_physical_ix        = ix;
         p_physicals[ix].material_id = 0;
 
         p_physicals[ix].epsilon = epsilon_vacuum;
@@ -307,13 +308,13 @@ namespace Step92
     N_boundary_values = boundary_values_list.size();
     p_boundary_values = new boundary_potential[N_boundary_values];
 
-    unsigned int        ipot = 0;
+    unsigned int         ipot = 0;
     boundary_potential *t_p_opdata;
     for (const auto &item : boundary_values_list)
       {
-        std::string name      = std::get<0>(item);
-        auto        id        = std::get<1>(item);
-        double      potential = std::get<2>(item);
+        std::string          name      = std::get<0>(item);
+        auto                 id        = std::get<1>(item);
+        double               potential = std::get<2>(item);
 
         t_p_opdata              = &p_boundary_values[ipot];
         t_p_opdata->material_id = id;
@@ -393,7 +394,6 @@ namespace Step92
     unsigned int N_materials;
     unsigned int fe_order;
     unsigned int quadrature_order;
-    unsigned int N_BC_func_components;
 
     void parse_parameters_callback();
     void make_grid();
@@ -435,7 +435,7 @@ namespace Step92
   // discretization parameters (such as the domain size, mesh refinement,
   // and the order of finite elements and quadrature) and declaring a
   // corresponding entry via ParameterAcceptor::add_parameter(). All of
-  // these can be modified by editing the .prm file.
+  // these can be modified by editing the .prm file. 
 
   template <int dim>
   Laplace<dim>::Laplace()
@@ -586,17 +586,15 @@ namespace Step92
 
     for (unsigned int ix = 0; ix < problem_parameters.N_boundary_values; ix++)
       {
-        pcout << "set " << problem_parameters.p_boundary_values[ix].name
-              << " boundary (ID "
-              << problem_parameters.p_boundary_values[ix].material_id
-              << ") potential: "
-              << problem_parameters.p_boundary_values[ix].potential << " V";
+        pcout << "set "
+                        << problem_parameters.p_boundary_values[ix].name
+            << " boundary (ID " << problem_parameters.p_boundary_values[ix].material_id
+            << ") potential: " << problem_parameters.p_boundary_values[ix].potential << " V";
 
         VectorTools::interpolate_boundary_values(
           dof_handler,
           problem_parameters.p_boundary_values[ix].material_id,
-          Functions::ConstantFunction<dim, double>(
-            problem_parameters.p_boundary_values[ix].potential),
+          Functions::ConstantFunction<dim, double>(problem_parameters.p_boundary_values[ix].potential),
           constraints,
           fe->component_mask(phi_E));
 
@@ -634,7 +632,7 @@ namespace Step92
     FEValues<dim> fe_values(*fe,
                             quadrature_formula,
                             update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_quadrature_points | update_JxW_values);
 
     FEFaceValues<dim> fe_face_values(*fe,
                                      face_quadrature_formula,
@@ -674,23 +672,21 @@ namespace Step92
 
             const auto material = problem_parameters.get_physical(material_id);
 
-            double psi_E =
-              (material.kappa == 0 ? material.epsilon : material.kappa);
+            double psi_E = (material.kappa == 0 ? material.epsilon : material.kappa);
 
             for (unsigned int q_point = 0; q_point < n_q_points; q_point++)
               {
                 for (const auto i : fe_values.dof_indices())
                   {
-                    const auto grad_phi_E_i =
-                      fe_values[phi_E].gradient(i, q_point);
+                    const auto grad_phi_E_i = fe_values[phi_E].gradient(i, q_point);
 
                     for (const auto j : fe_values.dof_indices())
                       {
-                        const auto grad_phi_E_j =
-                          fe_values[phi_E].gradient(j, q_point);
+                        const auto grad_phi_E_j = fe_values[phi_E].gradient(j, q_point);
 
                         const auto temp =
-                          psi_E * scalar_product(grad_phi_E_j, grad_phi_E_i) *
+                          psi_E *
+                          scalar_product(grad_phi_E_j, grad_phi_E_i) *
                           fe_values.JxW(q_point);
 
                         cell_matrix(i, j) += temp;
@@ -707,8 +703,6 @@ namespace Step92
              *
              *------------------------------------------------------------------------------------------*/
 
-
-
             // Assemble the face and the boundary.
 
             for (const auto &face : cell->face_iterators())
@@ -718,24 +712,23 @@ namespace Step92
                     fe_face_values.reinit(cell, face);
 
                     const FEValuesExtractors::Scalar phi_E(0);
-                    for (unsigned int q_point = 0; q_point < n_face_q_points;
+                    for (unsigned int q_point = 0;
+                         q_point < n_face_q_points;
                          q_point++)
                       {
-                        const auto normal =
-                          fe_face_values.normal_vector(q_point);
+                        const auto normal = fe_face_values.normal_vector(q_point);
 
                         for (const auto i : fe_face_values.dof_indices())
                           {
-                            const auto phi_E_i =
-                              fe_face_values[phi_E].value(i, q_point);
+                            const auto phi_E_i = fe_face_values[phi_E].value(i, q_point);
 
                             for (const auto j : fe_face_values.dof_indices())
                               {
-                                const auto grad_phi_E_j =
-                                  fe_face_values[phi_E].gradient(j, q_point);
+                                const auto grad_phi_E_j = fe_face_values[phi_E].gradient(j, q_point);
 
-                                const auto temp =
-                                  -psi_E * phi_E_i *
+                                const auto temp = -
+                                  psi_E *
+                                  phi_E_i *
                                   scalar_product(grad_phi_E_j, normal) *
                                   fe_face_values.JxW(q_point);
 
@@ -746,7 +739,8 @@ namespace Step92
 
                       } /* for(q_point) */
                   }     // if (face->at_boundary())
-              }         // END: for (const auto &face : cell->face_iterators())
+              } // END: for (const auto &face : cell->face_iterators())
+
 
 
             constraints.distribute_local_to_global(cell_matrix,
@@ -793,8 +787,9 @@ namespace Step92
     LA::MPI::Vector completely_distributed_solution(locally_owned_dofs,
                                                     mpi_communicator);
 
-    SolverControl                            solver_control;
-    dealii::PETScWrappers::SparseDirectMUMPS solver(solver_control);
+    SolverControl solver_control;
+    dealii::PETScWrappers::SparseDirectMUMPS solver(
+      solver_control);
     solver.set_symmetric_mode(true);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
 
@@ -843,24 +838,26 @@ namespace Step92
 
 
   template <int dim>
-  Laplace<dim>::CellsPostprocessor::CellsPostprocessor(Laplace<dim> *problem)
+  Laplace<dim>::CellsPostprocessor::CellsPostprocessor(
+    Laplace<dim> *problem)
     : problem(problem)
   {}
 
 
   // Define the names for the variables in the output.
   template <int dim>
-  std::vector<std::string> Laplace<dim>::CellsPostprocessor::get_names() const
+  std::vector<std::string>
+  Laplace<dim>::CellsPostprocessor::get_names() const
   {
     std::vector<std::string> solution_names = {};
 
     solution_names.emplace_back("Phi"); // electric potential [V]
 
-    solution_names.emplace_back("Ex"); // electric field strength [V/m]
+    solution_names.emplace_back("Ex");  // electric field strength [V/m]
     solution_names.emplace_back("Ey");
     solution_names.emplace_back("Ez");
 
-    solution_names.emplace_back("Jx"); // electric current density [A/m^2]
+    solution_names.emplace_back("Jx");  // electric current density [A/m^2]
     solution_names.emplace_back("Jy");
     solution_names.emplace_back("Jz");
 
@@ -874,35 +871,26 @@ namespace Step92
 
   template <int dim>
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  Laplace<dim>::CellsPostprocessor::get_data_component_interpretation() const
+  Laplace<dim>::CellsPostprocessor::get_data_component_interpretation()
+    const
   {
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       interpretation;
 
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // Phi
+    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // Phi
 
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector); // E x,y,z
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // E x,y,z
+    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
 
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector); // J x,y,z
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector); // J x,y,z
+    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
+    interpretation.push_back(DataComponentInterpretation::component_is_part_of_vector);
 
 
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // mat_ID
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // epsilon_r
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // kappa
+    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // mat_ID
+    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // epsilon_r
+    interpretation.push_back(DataComponentInterpretation::component_is_scalar); // kappa
 
     return interpretation;
   }
@@ -910,7 +898,8 @@ namespace Step92
 
 
   template <int dim>
-  UpdateFlags Laplace<dim>::CellsPostprocessor::get_needed_update_flags() const
+  UpdateFlags
+  Laplace<dim>::CellsPostprocessor::get_needed_update_flags() const
   {
     return update_values | update_gradients | update_quadrature_points;
   }
@@ -930,8 +919,7 @@ namespace Step92
     Assert(computed_quantities.size() == n_evaluation_points,
            ExcInternalError());
 
-    const typename DoFHandler<dim>::cell_iterator current_cell =
-      inputs.template get_cell<dim>();
+    const typename DoFHandler<dim>::cell_iterator current_cell = inputs.template get_cell<dim>();
 
     const auto material_id = current_cell->material_id();
 
@@ -940,7 +928,7 @@ namespace Step92
     for (unsigned int p = 0; p < n_evaluation_points; p++)
       {
         Laplace::fieldvector_type sE, sJ;
-        double                    Phi;
+        double              Phi;
 
 
         const auto t_sol_val   = inputs.solution_values[p];
@@ -955,8 +943,9 @@ namespace Step92
 
         sJ = sE * material.kappa;
 
-        const unsigned int off_E_ePot = 0, off_E_vE = 1,
-                           off_E_vJ  = off_E_vE + dim,
+        const unsigned int off_E_ePot = 0,
+                           off_E_vE = 1,
+                           off_E_vJ = off_E_vE + dim,
                            off_E_mat = off_E_vJ + dim;
 
 
@@ -964,13 +953,12 @@ namespace Step92
 
         for (unsigned int d = 0; d < dim; d++)
           {
-            computed_quantities[p](off_E_vE + d) = sE[d];
-            computed_quantities[p](off_E_vJ + d) = sJ[d];
+            computed_quantities[p](off_E_vE + d)  = sE[d];
+            computed_quantities[p](off_E_vJ + d)  = sJ[d];
           }
 
         computed_quantities[p](off_E_mat + 0) = material_id;
-        computed_quantities[p](off_E_mat + 1) =
-          material.epsilon / problem->problem_parameters.epsilon_vacuum;
+        computed_quantities[p](off_E_mat + 1) = material.epsilon / problem->problem_parameters.epsilon_vacuum;
         computed_quantities[p](off_E_mat + 2) = material.kappa;
 
       } // for (unsigned int p = 0; p < n_evaluation_points; p++)
