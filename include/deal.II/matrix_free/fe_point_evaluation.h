@@ -685,8 +685,8 @@ protected:
    * faces.
    */
   FEPointEvaluationBase(
-    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim, spacedim>              &fe,
+    const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+    const FiniteElement<dim, spacedim>                    &fe,
     const unsigned int first_selected_component = 0,
     const bool         is_interior              = true);
 
@@ -1054,7 +1054,8 @@ protected:
    * Pointer to currently used mapping info (either on the fly or external
    * precomputed).
    */
-  ObserverPointer<NonMatching::MappingInfo<dim, spacedim, Number>> mapping_info;
+  ObserverPointer<const NonMatching::MappingInfo<dim, spacedim, Number>>
+    mapping_info;
 
   /**
    * The current cell index to access mapping data from mapping info.
@@ -1193,8 +1194,8 @@ public:
    * components starting from this parameter.
    */
   FEPointEvaluation(
-    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim, spacedim>              &fe,
+    const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+    const FiniteElement<dim, spacedim>                    &fe,
     const unsigned int first_selected_component = 0);
 
   /**
@@ -1567,10 +1568,10 @@ public:
    * Constructor. Allows to select if interior or exterior face is selected.
    */
   FEFacePointEvaluation(
-    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim, spacedim>              &fe,
-    const bool                                       is_interior = true,
-    const unsigned int first_selected_component                  = 0);
+    const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+    const FiniteElement<dim, spacedim>                    &fe,
+    const bool                                             is_interior = true,
+    const unsigned int first_selected_component                        = 0);
 
   /**
    * Reinitialize the evaluator to point to the correct precomputed mapping of
@@ -1854,10 +1855,10 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   FEPointEvaluationBase(
-    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim, spacedim>              &fe,
-    const unsigned int                               first_selected_component,
-    const bool                                       is_interior)
+    const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+    const FiniteElement<dim, spacedim>                    &fe,
+    const unsigned int first_selected_component,
+    const bool         is_interior)
   : n_q_batches(numbers::invalid_unsigned_int)
   , n_q_points(numbers::invalid_unsigned_int)
   , n_q_points_scalar(numbers::invalid_unsigned_int)
@@ -2377,9 +2378,9 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
-  NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-  const FiniteElement<dim, spacedim>              &fe,
-  const unsigned int                               first_selected_component)
+  const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+  const FiniteElement<dim, spacedim>                    &fe,
+  const unsigned int first_selected_component)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping_info,
       fe,
@@ -2439,7 +2440,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   AssertThrow(this->mapping_info_on_the_fly.get() != nullptr,
               ExcNotImplemented());
 
-  this->mapping_info->reinit(cell, unit_points);
+  this->mapping_info_on_the_fly->reinit(cell, unit_points);
   this->must_reinitialize_pointers = false;
 
   if (!this->fast_path)
@@ -3245,10 +3246,10 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::
 template <int n_components_, int dim, int spacedim, typename Number>
 FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
   FEFacePointEvaluation(
-    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim, spacedim>              &fe,
-    const bool                                       is_interior,
-    const unsigned int                               first_selected_component)
+    const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+    const FiniteElement<dim, spacedim>                    &fe,
+    const bool                                             is_interior,
+    const unsigned int first_selected_component)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping_info,
       fe,
