@@ -1,3 +1,22 @@
 <h1>Results</h1>
 
-...work in progress
+t.b.d.:
+
+<h3> Field plots </h3>
+
+<table width="100%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-1_field_plot_1.png" alt="3D visualization of electric field lines and current density" height="800"/>
+      <p> 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using Paraview)</p>
+      </td>
+  </tr>
+</table>
+
+
+<h3> Mesh import performance </h3>
+
+
+<h3> Possible Extensions </h3>
+
+...replace the direct solver with a matrix-free one to get into interesting problem dimensions...

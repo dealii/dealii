@@ -1,8 +1,114 @@
-<i>This program was contributed by Stephan Voss and Timo Heister</i>
+<i>DRAFT !! This tutorial was contributed by Stephan Voss. Special Thank You to Timo Heister for his support.</i>
 
 <a name="step-92-Intro"></a>
 
+
 <h1> Introduction </h1>
 
-...work in progress
+<h3> Abstract </h3>
 
+Main targets of this tutorial are:
+<ul>
+    <li>show how to import meshes (e.g. generated using gmsh) and</li>
+    <li>test the performance of the grid import for big mesh files.</li>
+</ul>
+
+
+<h3> example-1 </h3>
+
+The provided gmsh geometry "example-1.geo" has a simple electrical engineering background and basically has been generated from STEP-files.
+
+This example consists of two ohmic conductors (conductor 1, conductor 2). Each conductor shall be connected by two terminals (terminal 11, terminal 12 for conductor 1 and terminal 21, terminal 22 for conductor 2).
+
+In between the conductors a barrier is located as shown in the picture on the left:
+
+<table width="100%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-1_model_key.jpg" alt="3D model"/>
+      <p> 3D model: ohmic conductors (green), terminals (light blue), barrier (blue)</p>
+      </td>
+      <img src="../../../examples/step-92/doc/example-1_gmsh_geo.jpg" alt="gmsh 3D geometry"/>
+      <p> gmsh 3D geometry</p>
+      </td>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-1_mesh.jpg" alt="mesh"/>
+      <p> mesh, generated using "gmsh example-1.geo -clmax 0.3 -3"</p>
+      </td>
+  </tr>
+</table>
+
+
+The task is to calculate the elctrostatic potential $\varphi_e$,
+the electrostatic field
+@f{align*}{
+    \mathbf{E} = -\nabla \varphi_e
+@f}
+and also the current density inside ohmic conductors
+@f{align*}{
+    \mathbf{J} = \kappa \mathbf{E}.
+@f}
+
+
+<h3> Mathematical formulation </h3>
+
+For the previously described task, we have to solve the Laplace equation for the electrostatic potential
+
+@f{align*}{
+  \nabla \cdot \left( a \nabla {\varphi_e} \right) &= 0 \qquad\qquad & \text{in}\ \Omega,
+  \\
+  {\varphi_e} &= g \qquad\qquad & \text{on}\ \partial\Omega
+@f}
+
+
+Hence, the domain is a union $\Omega=\bigcup \left\{\Omega_{\kappa},\Omega_{\varepsilon}\right\}$
+of purely ohmic sub-domains
+$\Omega_\kappa=\bigcup\left\{\Omega_{\kappa m} | m \in \left\{1,\dots,M\right\} \right\}$ with $\kappa_m>0$
+and purely dielectric sub-domains
+$\Omega_\varepsilon=\bigcup\left\{\Omega_{\varepsilon n} | n \in \left\{1,\dots,N\right\} \right\}$
+with permittivity $\varepsilon_n$:
+@f{align*}{
+    a = \left\{
+        \begin{array}{cc}
+            \kappa_m \qquad\qquad & \text{in any ohmic sub-domain}\ \Omega_{\kappa m}
+            \\
+            \varepsilon_n \qquad\qquad & \text{in any dielectric sub-domain}\ \Omega_{\varepsilon n}
+        \end{array}
+        \right.
+@f}
+
+The domain boundary is a union
+$\partial\Omega=\bigcup \left\{\Gamma_k | k \in \left\{1,\dots,K\right\} \right\}$ of boundaries where different electric potentials can be defined
+@f{align*}{
+    g = {\varphi_{e k}} \qquad\qquad & \text{on}\ \Gamma_{k}
+@f}
+
+This definition can be used to set a reference shell $\Gamma_{k_0}$ surrounding the entire arrangement, where a reference potential can be set, e.g. ${\varphi_{e k_0}}= 0 \text{V}$.
+
+Furthermore, holes can be cut into the simulation domain and their boundaries can be set to an arbitrary potential $\varphi_{e k}\in\mathbb{R}$.
+
+Boundaries of such holes may even touch an ohmic sub-domain $\Omega_{\kappa m}$. This way, contacting terminals to ohmic conductors can be modeled and terminals potentials can be defined.
+
+<h3> Mesh import performance test proposals </h3>
+
+The solver program is parallelized using MPI and uses the MUMPS direct solver.
+
+
+...to be done:
+
+In the solver code, a macro-definition
+#define USE_FULLY_DISTRIBUTED_TRIA
+can be found.
+If this macro is defined, parallel::fullydistributed triangulation will be used instead of parallel::distributed.
+Import will also be slightly different.
+
+
+Some test proposals:
+<ul>
+    <li>compile as release (vs. debug)</li>
+    <li>increase mesh file size (e.g. call "gmsh example-1.geo -clmax 0.03 -3" or refine - see gmsh online documentation) and run the solver again</li>
+    <li>toggle the "Mesh.Binary" parameter in example-1.geo</li>
+    <li>inside the solver, find the line "#define USE_FULLE_DISTRIBUTED_TRIA" and either make it effective or ineffective, then: recompile and run the solver</li>
+    <li> ... </li>
+    <li>For testing bigger mesh file import, a matrix-free solver is recommended.</li>
+</ul>

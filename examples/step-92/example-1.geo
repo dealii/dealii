@@ -11,7 +11,7 @@
     - ....for further possibilities, refer to gmsh online documentation
 */
 
-Mesh.MeshSizeMax = 300e-3; 
+/* Mesh.MeshSizeMax = 300e-3; */
 General.Axes = 3;
 Mesh.Binary = 1;
 

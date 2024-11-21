@@ -1,4 +1,6 @@
-/* This example can be compiled for usage with parallel::distributed or
+/* ---------------------------------------------------------------------
+ *
+ * This example can be compiled for usage with parallel::distributed or
  * parallel::fullydistributed triangulations
  *
  * In order to force usage of parallel::fullydistributed triangulations
@@ -7,6 +9,7 @@
  *
  * otherwise (if not defined), parallel::distributed triangulation
  * will be used
+ * ---------------------------------------------------------------------
  */
 #define USE_FULLY_DISTRIBUTED_TRIA
 
@@ -14,9 +17,10 @@
  *
  * 2024-11, Stephan Voss, Neunkirchen am Brand, Germany, stvoss@gmx.de
  *
- * This solver is derived by trying several deal.II examples and tutorials.
+ * This solver is derived from several deal.II examples and tutorials.
  * Thank You to all deal.II contributors.
  *
+ * ---------------------------------------------------------------------
  */
 
 /* ---------------------------------------------------------------------
@@ -674,7 +678,7 @@ namespace Step92
             const auto material = problem_parameters.get_physical(material_id);
 
             double psi_E =
-              (material.kappa == 0 ? material.epsilon : material.kappa);
+              (material.kappa <= 0 ? material.epsilon : material.kappa);
 
             for (unsigned int q_point = 0; q_point < n_q_points; q_point++)
               {
@@ -852,7 +856,7 @@ namespace Step92
   {
     std::vector<std::string> solution_names = {};
 
-    solution_names.emplace_back("Phi"); // electric potential [V]
+    solution_names.emplace_back("phi_e"); // electric potential [V]
 
     solution_names.emplace_back("Ex"); // electric field strength [V/m]
     solution_names.emplace_back("Ey");
@@ -878,7 +882,7 @@ namespace Step92
       interpretation;
 
     interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // Phi
+      DataComponentInterpretation::component_is_scalar); // phi_e
 
     interpretation.push_back(
       DataComponentInterpretation::component_is_part_of_vector); // E x,y,z
@@ -989,8 +993,7 @@ namespace Step92
 
     if (cells_solution_filename.size() > 0)
       {
-        CellsPostprocessor cell_postprocessor(
-          this); // Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+        CellsPostprocessor cell_postprocessor(this);
 
         cells_solution_filename += ".vtu";
 
