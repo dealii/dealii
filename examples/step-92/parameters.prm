@@ -24,9 +24,9 @@ subsection Problem
   # each as "Name : ID : potential [V]"
   set potentials = default     :  0 :   0.0 , \
                    terminal11  : 11 :   1.0 , \
-                   terminal12  : 12 :  -1.0 , \
-                   terminal21  : 21 :  10.0 , \
-                   terminal22  : 22 :   1.0
+                   terminal12  : 12 :   0.5 , \
+                   terminal21  : 21 :   0.5 , \
+                   terminal22  : 22 :  -1.0
 
   # mesh file name
   set mesh filename = example-1
