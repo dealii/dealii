@@ -14,7 +14,7 @@ end
 subsection Problem
   
   # materials / physicals 
-  # each as "Name : ID : epsilon_rel : mu_rel : kappa"
+  # each as "Name : ID : epsilon_rel : kappa"
   set materials = default    :  0 : 1.0 :  0.0 , \
                   conductor1 : 10 : 1.0 : 56.0e+6 , \
                   conductor2 : 20 : 1.0 : 56.0e+6 , \
