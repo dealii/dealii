@@ -1,6 +1,6 @@
 /*
     Generate the example mesh by calling
-    gmsh step-92.geo -3
+    gmsh THIS_FILE_NAME -3
     
     A finer grid can be created by e.g.
     - decreasing the parameter Mesh.MeshSizeMax in this file, or

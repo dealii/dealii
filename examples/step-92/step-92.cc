@@ -922,7 +922,7 @@ namespace Step92
   {
     unsigned int n_evaluation_points;
     n_evaluation_points = inputs.solution_values.size();
-    Assert(psinputs->solution_gradients.size() == n_evaluation_points,
+    Assert(inputs.solution_gradients.size() == n_evaluation_points,
            ExcInternalError());
 
     Assert(computed_quantities.size() == n_evaluation_points,
