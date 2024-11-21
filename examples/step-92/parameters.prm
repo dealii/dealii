@@ -29,7 +29,7 @@ subsection Problem
                    terminal22  : 22 :   1.0
 
   # mesh file name
-  set mesh filename = step-92
+  set mesh filename = example-1
 
   # cells solution export filename
   set cells solution filename = solution_cells
