@@ -806,7 +806,7 @@ namespace Step92
   }
 
 
-  // @sect4{Laplace::output_results}
+  // @sect4{Cells Postprocessor for Data Output}
 
   // Generate output - using a class PostProcessor that
   // inherits from the class DataPostprocessor, which can be attached to
@@ -976,7 +976,7 @@ namespace Step92
   } // Laplace<dim>::CellsPostprocessor::evaluate_field
 
 
-  // @sect4{Laplace::output_results}
+  // @sect4{Data Output}
 
   // Write field outputs into files (for cells and faces)
   template <int dim>
@@ -1009,7 +1009,7 @@ namespace Step92
 
 
 
-  // @sect4{Laplace::run}
+  // @sect4{Main algorithm}
 
   // the central starting-point to run all simulation steps
   template <int dim>
