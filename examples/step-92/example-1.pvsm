@@ -41438,11 +41438,11 @@
     </Proxy>
     <Proxy group="sources" type="XMLUnstructuredGridReader" id="15178" servers="1">
       <Property name="FileName" id="15178.FileName" number_of_elements="1">
-        <Element index="0" value="./solution_cells.vtu"/>
+        <Element index="0" value="./example-1_solution_cells.vtu"/>
         <Domain name="files" id="15178.FileName.files"/>
       </Property>
       <Property name="FileNameInfo" id="15178.FileNameInfo" number_of_elements="1">
-        <Element index="0" value="./solution_cells.vtu"/>
+        <Element index="0" value="./example-1_solution_cells.vtu"/>
       </Property>
       <Property name="TimestepValues" id="15178.TimestepValues"/>
       <Property name="CellArrayInfo" id="15178.CellArrayInfo"/>
@@ -46225,19 +46225,19 @@
       <Item id="16947" name="RepresentationAnimationHelper"/>
     </ProxyCollection>
     <ProxyCollection name="pq_helper_proxies.15402">
-      <Item id="15166" name="DataAxesGrid" logname="solution_cells.vtu(UnstructuredGridRepresentation)/DataAxesGrid/GridAxesRepresentation"/>
-      <Item id="15226" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/ArrowSource"/>
-      <Item id="15237" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/ConeSource"/>
-      <Item id="15248" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/CubeSource"/>
-      <Item id="15259" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/CylinderSource"/>
-      <Item id="15270" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/LineSource"/>
-      <Item id="15281" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/SphereSource"/>
-      <Item id="15292" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/GlyphSource2D"/>
-      <Item id="15303" name="GlyphType" logname="solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/PipelineConnection"/>
-      <Item id="15317" name="OSPRayScaleFunction" logname="solution_cells.vtu(UnstructuredGridRepresentation)/SurfaceRepresentation/OSPRayScaleFunction/PiecewiseFunction"/>
-      <Item id="15318" name="OpacityTransferFunction" logname="solution_cells.vtu(UnstructuredGridRepresentation)/PointGaussianRepresentation/OpacityTransferFunction/PiecewiseFunction"/>
-      <Item id="15215" name="PolarAxes" logname="solution_cells.vtu(UnstructuredGridRepresentation)/PolarAxes/PolarAxesRepresentation"/>
-      <Item id="15319" name="ScaleTransferFunction" logname="solution_cells.vtu(UnstructuredGridRepresentation)/PointGaussianRepresentation/ScaleTransferFunction/PiecewiseFunction"/>
+      <Item id="15166" name="DataAxesGrid" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/DataAxesGrid/GridAxesRepresentation"/>
+      <Item id="15226" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/ArrowSource"/>
+      <Item id="15237" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/ConeSource"/>
+      <Item id="15248" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/CubeSource"/>
+      <Item id="15259" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/CylinderSource"/>
+      <Item id="15270" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/LineSource"/>
+      <Item id="15281" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/SphereSource"/>
+      <Item id="15292" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/GlyphSource2D"/>
+      <Item id="15303" name="GlyphType" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/Glyph3DRepresentation/GlyphType/PipelineConnection"/>
+      <Item id="15317" name="OSPRayScaleFunction" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/SurfaceRepresentation/OSPRayScaleFunction/PiecewiseFunction"/>
+      <Item id="15318" name="OpacityTransferFunction" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/PointGaussianRepresentation/OpacityTransferFunction/PiecewiseFunction"/>
+      <Item id="15215" name="PolarAxes" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/PolarAxes/PolarAxesRepresentation"/>
+      <Item id="15319" name="ScaleTransferFunction" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)/PointGaussianRepresentation/ScaleTransferFunction/PiecewiseFunction"/>
     </ProxyCollection>
     <ProxyCollection name="pq_helper_proxies.15459">
       <Item id="16948" name="RepresentationAnimationHelper"/>
@@ -46321,7 +46321,7 @@
     <ProxyCollection name="representations">
       <Item id="16228" name="GeometryRepresentation2" logname="StreamTracer1(GeometryRepresentation)"/>
       <Item id="16548" name="GeometryRepresentation4" logname="StreamTracer1(GeometryRepresentation)"/>
-      <Item id="15402" name="UnstructuredGridRepresentation1" logname="solution_cells.vtu(UnstructuredGridRepresentation)"/>
+      <Item id="15402" name="UnstructuredGridRepresentation1" logname="example-1_solution_cells.vtu(UnstructuredGridRepresentation)"/>
       <Item id="15680" name="UnstructuredGridRepresentation2" logname="PointDatatoCellData1(UnstructuredGridRepresentation)"/>
       <Item id="15953" name="UnstructuredGridRepresentation3" logname="ExtractSelection1(UnstructuredGridRepresentation)"/>
     </ProxyCollection>
@@ -46379,7 +46379,7 @@
       <Item id="16343" name="J-current_density" logname="StreamTracer1"/>
       <Item id="15459" name="PointDatatoCellData1" logname="PointDatatoCellData1"/>
       <Item id="15732" name="model_components" logname="ExtractSelection1"/>
-      <Item id="15178" name="solution_cells.vtu" logname="solution_cells.vtu"/>
+      <Item id="15178" name="example-1_solution_cells.vtu" logname="example-1_solution_cells.vtu"/>
     </ProxyCollection>
     <ProxyCollection name="timekeeper">
       <Item id="256" name="TimeKeeper1"/>

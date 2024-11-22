@@ -1058,7 +1058,7 @@ int main(int argc, char *argv[])
       Step92::Laplace<3> laplace_solver;
 
 
-      ParameterAcceptor::initialize(argc < 2 ? "parameters.prm" : argv[1]);
+      ParameterAcceptor::initialize(argc < 2 ? "example-1.prm" : argv[1]);
 
       laplace_solver.run();
     }

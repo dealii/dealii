@@ -32,7 +32,7 @@ subsection Problem
   set mesh filename = example-1
 
   # cells solution export filename
-  set cells solution filename = solution_cells
+  set cells solution filename = example-1_solution_cells
 
 end
   
