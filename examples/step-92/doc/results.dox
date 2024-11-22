@@ -34,5 +34,6 @@ t.b.d.:
     </li>
     <li>
     ...magnetic field solver (static/dc or low frequency time-harmonic) could be a good test for the Nedelec elements??...
+    (But most likely that solver may have a physical problem: driving the current based on the terminals voltages means problems in regard of conservation laws on those terminals; the current-loops will not be closed!)
     </li>
 </ul>
