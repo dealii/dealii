@@ -120,14 +120,14 @@ Some test proposals:
   <tr>
       <td align="center">
       <img src="../../../examples/step-92/doc/example-2_model_key.jpg" alt="example-2, 3D model"/>
-      <p> example-2, 3D model: two simple windings (green), terminals (light blue), cure (grey)</p>
+      <p> example-2, 3D model: two simple windings (green), terminals (light blue), core (grey)</p>
       </td>
       <img src="../../../examples/step-92/doc/example-2_gmsh_geo.jpg" alt="example-2, gmsh 3D geometry"/>
       <p> example-2, gmsh 3D geometry</p>
       </td>
       <td align="center">
       <img src="../../../examples/step-92/doc/example-2_mesh.jpg" alt="example-2, mesh"/>
-      <p> example-2, mesh, generated using "gmsh example-1.geo -clmax 300 -3"</p>
+      <p> example-2, mesh, generated using "gmsh example-2.geo -clmax 300 -3"</p>
       </td>
   </tr>
 </table>
