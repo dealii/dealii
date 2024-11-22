@@ -25,8 +25,8 @@ subsection Problem
                    core                  : 10 :   0.0 , \
                    winding_1_terminal_1  : 21 :   1.0 , \
                    winding_1_terminal_2  : 22 :   0.0 , \
-                   winding_2_terminal_1  : 31 :  -1.0 , \
-                   winding_2_terminal_2  : 32 :   1.0
+                   winding_2_terminal_1  : 31 :   0.5 , \
+                   winding_2_terminal_2  : 32 :  -0.5
 
   # mesh file name
   set mesh filename = example-2

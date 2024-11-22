@@ -4,6 +4,8 @@ t.b.d.:
 
 <h3> Field plots </h3>
 
+t.b.d. (explanations...):
+
 <table width="100%" align="center">
   <tr>
       <td align="center">
@@ -25,15 +27,19 @@ t.b.d.:
 
 <h3> Mesh import performance </h3>
 
+t.b.d.:
+
 
 <h3> Possible Extensions </h3>
+
+t.b.d.:
 
 <ul>
     <li>
     ...replace the direct solver with a matrix-free one to get into interesting problem dimensions...
     </li>
     <li>
-    ...magnetic field solver (static/dc or low frequency time-harmonic) could be a good test for the Nedelec elements??...
+    ...magnetic field solver (static/dc or low frequency time-harmonic) could be a good test for the Nedelec elements?? (Of course parameters and core-meshing would have to be adopted.)...
     (But most likely that solver may have a physical problem: driving the current based on the terminals voltages means problems in regard of conservation laws on those terminals; the current-loops will not be closed!)
     </li>
 </ul>

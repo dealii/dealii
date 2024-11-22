@@ -1,4 +1,4 @@
-<i>DRAFT !! This tutorial was contributed by Stephan Voss. Special Thank You to Timo Heister for his support.</i>
+<i>WORKING DRAFT !! Preparation of this tutorial is ongoing. B.R. Stephan Voss. Special Thank You to Timo Heister for his support.</i>
 
 <a name="step-92-Intro"></a>
 
@@ -29,7 +29,7 @@ In between the conductors a barrier is located as shown in the picture on the le
       <p> example-1, 3D model: ohmic conductors (green), terminals (light blue), barrier (blue)</p>
       </td>
       <img src="../../../examples/step-92/doc/example-1_gmsh_geo.jpg" alt="example-1, gmsh 3D geometry"/>
-      <p> example-1, gmsh 3D geometry</p>
+      <p> example-1, gmsh 3D geometry (axes x,y,z in meters)</p>
       </td>
       <td align="center">
       <img src="../../../examples/step-92/doc/example-1_mesh.jpg" alt="example-1, mesh"/>
@@ -115,6 +115,7 @@ Some test proposals:
 
 <h3> example-2 </h3>
 
+Simple/"theoretical" two-winding transformer in a steel-case.
 
 <table width="100%" align="center">
   <tr>
@@ -123,7 +124,7 @@ Some test proposals:
       <p> example-2, 3D model: two simple windings (green), terminals (light blue), core (grey)</p>
       </td>
       <img src="../../../examples/step-92/doc/example-2_gmsh_geo.jpg" alt="example-2, gmsh 3D geometry"/>
-      <p> example-2, gmsh 3D geometry</p>
+      <p> example-2, gmsh 3D geometry (axes x,y,z in milli meters !)</p>
       </td>
       <td align="center">
       <img src="../../../examples/step-92/doc/example-2_mesh.jpg" alt="example-2, mesh"/>
