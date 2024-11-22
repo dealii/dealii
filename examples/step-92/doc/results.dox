@@ -7,8 +7,17 @@ t.b.d.:
 <table width="100%" align="center">
   <tr>
       <td align="center">
-      <img src="../../../examples/step-92/doc/example-1_field_plot_1.png" alt="3D visualization of electric field lines and current density" height="800"/>
-      <p> 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using Paraview)</p>
+      <img src="../../../examples/step-92/doc/example-1_field_plot_1.jpg" alt="example-1: 3D visualization of electric field lines and current density" height="800"/>
+      <p> example-1: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using Paraview)</p>
+      </td>
+  </tr>
+</table>
+
+<table width="100%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-2_field_plot_1.jpg" alt="example-2: 3D visualization of electric field lines and current density" height="800"/>
+      <p> example-2: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using Paraview)</p>
       </td>
   </tr>
 </table>
@@ -19,4 +28,11 @@ t.b.d.:
 
 <h3> Possible Extensions </h3>
 
-...replace the direct solver with a matrix-free one to get into interesting problem dimensions...
+<ul>
+    <li>
+    ...replace the direct solver with a matrix-free one to get into interesting problem dimensions...
+    </li>
+    <li>
+    ...magnetic field solver (static/dc or low frequency time-harmonic) could be a good test for the Nedelec elements??...
+    </li>
+</ul>
