@@ -571,7 +571,13 @@ namespace internal
             for (unsigned int e = 0; e < dim; ++e)
               df[d][e] = p_real.second[e][d];
 
-          // check determinand(df) > 0 on all SIMD lanes
+          // Check determinant(df) > 0 on all SIMD lanes. The
+          // condition here is unreadable (but really corresponds to
+          // asking whether det(df) > 0 for all elements of the
+          // vector) because VectorizedArray does not have a member
+          // that can be used to check that all vector elements are
+          // positive. But VectorizedArray has a std::min() function,
+          // and operator==().
           if (!(std::min(determinant(df),
                          Number(std::numeric_limits<double>::min())) ==
                 Number(std::numeric_limits<double>::min())))
