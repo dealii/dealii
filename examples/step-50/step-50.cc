@@ -1355,9 +1355,10 @@ namespace Step50
            qpoint < fe_interface_values.n_quadrature_points;
            ++qpoint)
         {
-          const double jump =
-            coeff1 * grad_u[0][qpoint] * fe_interface_values.normal(qpoint) -
-            coeff2 * grad_u[1][qpoint] * fe_interface_values.normal(qpoint);
+          const double jump = coeff1 * grad_u[0][qpoint] *
+                                fe_interface_values.normal_vector(qpoint) -
+                              coeff2 * grad_u[1][qpoint] *
+                                fe_interface_values.normal_vector(qpoint);
 
           jump_norm_square += jump * jump * fe_interface_values.JxW(qpoint);
         }

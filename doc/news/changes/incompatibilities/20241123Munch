@@ -1,0 +1,3 @@
+Changed: FEInterfaceValues::normal() has been renamed FEInterfaceValues::normal_vector().
+<br>
+(Peter Munch, 2024/11/23)

@@ -1606,6 +1606,29 @@ public:
   get_JxW_values() const;
 
   /**
+   * Return the normal in a given quadrature point.
+   *
+   * The normal points in outwards direction as seen from the first cell of
+   * this interface.
+   *
+   * @dealiiRequiresUpdateFlags{update_normal_vectors}
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use the function normal_vector().")
+  Tensor<1, spacedim>
+  normal(const unsigned int q_point_index) const;
+
+  /**
+   * Return the normal in a given quadrature point.
+   *
+   * The normal points in outwards direction as seen from the first cell of
+   * this interface.
+   *
+   * @dealiiRequiresUpdateFlags{update_normal_vectors}
+   */
+  Tensor<1, spacedim>
+  normal_vector(const unsigned int q_point_index) const;
+
+  /**
    * Return the normal vector of the interface in each quadrature point.
    *
    * The return value is identical to get_fe_face_values(0).get_normal_vectors()
@@ -1626,6 +1649,15 @@ public:
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   quadrature_point_indices() const;
+
+  /**
+   * Return the location of the <tt>q_point</tt>th quadrature point in
+   * real space.
+   *
+   * @dealiiRequiresUpdateFlags{update_quadrature_points}
+   */
+  const Point<spacedim> &
+  quadrature_point(const unsigned int q_point) const;
 
   /**
    * Return a reference to the quadrature points in real space.
@@ -1705,17 +1737,6 @@ public:
    */
   std::array<unsigned int, 2>
   interface_dof_to_dof_indices(const unsigned int interface_dof_index) const;
-
-  /**
-   * Return the normal in a given quadrature point.
-   *
-   * The normal points in outwards direction as seen from the first cell of
-   * this interface.
-   *
-   * @dealiiRequiresUpdateFlags{update_normal_vectors}
-   */
-  Tensor<1, spacedim>
-  normal(const unsigned int q_point_index) const;
 
   /**
    * @}
@@ -2774,6 +2795,18 @@ FEInterfaceValues<dim, spacedim>::quadrature_point_indices() const
 
 
 template <int dim, int spacedim>
+const Point<spacedim> &
+FEInterfaceValues<dim, spacedim>::quadrature_point(
+  const unsigned int q_point) const
+{
+  Assert(fe_face_values != nullptr,
+         ExcMessage("This call requires a call to reinit() first."));
+  return fe_face_values->quadrature_point(q_point);
+}
+
+
+
+template <int dim, int spacedim>
 const std::vector<Point<spacedim>> &
 FEInterfaceValues<dim, spacedim>::get_quadrature_points() const
 {
@@ -2885,6 +2918,16 @@ FEInterfaceValues<dim, spacedim>::get_fe_face_values(
 template <int dim, int spacedim>
 Tensor<1, spacedim>
 FEInterfaceValues<dim, spacedim>::normal(const unsigned int q_point_index) const
+{
+  return normal_vector(q_point_index);
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<1, spacedim>
+FEInterfaceValues<dim, spacedim>::normal_vector(
+  const unsigned int q_point_index) const
 {
   return fe_face_values->normal_vector(q_point_index);
 }

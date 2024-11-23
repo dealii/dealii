@@ -1,0 +1,4 @@
+Improved: The function FEInterfaceValues::quadrature_point() has
+been added.
+<br>
+(Peter Munch, 2024/11/23)
