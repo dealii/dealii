@@ -12857,6 +12857,9 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::refine_global(const unsigned int times)
 {
+  Assert(n_cells() > 0,
+         ExcMessage("Error: An empty Triangulation can not be refined."));
+
   for (unsigned int i = 0; i < times; ++i)
     {
       set_all_refine_flags();
