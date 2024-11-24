@@ -1679,12 +1679,12 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
   for (const auto &cell : triangulation.active_cell_iterators())
     {
       bool cell_is_flat = true;
-      for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+      for (const auto l : cell->line_indices())
         if (cell->line(l)->manifold_id() != cell->manifold_id() &&
             cell->line(l)->manifold_id() != numbers::flat_manifold_id)
           cell_is_flat = false;
-      if (dim > 2)
-        for (unsigned int q = 0; q < GeometryInfo<dim>::quads_per_cell; ++q)
+      if constexpr (dim > 2)
+        for (const auto q : cell->face_indices())
           if (cell->quad(q)->manifold_id() != cell->manifold_id() &&
               cell->quad(q)->manifold_id() != numbers::flat_manifold_id)
             cell_is_flat = false;
