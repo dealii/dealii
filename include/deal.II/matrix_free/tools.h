@@ -1459,6 +1459,7 @@ namespace MatrixFreeTools
     };
 
     static constexpr unsigned int n_local_dofs = QuadOperation::n_local_dofs;
+    static constexpr unsigned int n_q_points   = QuadOperation::n_q_points;
 
   private:
     mutable QuadOperation                  m_quad_operation;
