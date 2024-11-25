@@ -753,7 +753,7 @@ namespace SUNDIALS
           //
           // Further, we need to cast away const here, as SUNDIALS demands the
           // communicator by value.
-          return const_cast<SUNComm>(get_communicator<VectorType>(v));
+          return const_cast<SUNComm &>(get_communicator<VectorType>(v));
         else
           return SUN_COMM_NULL;
 #    endif
