@@ -48,11 +48,10 @@ public:
   }
 };
 
+template <int dim>
 void
 test(const unsigned int mapping_degree)
 {
-  const int dim = 3;
-
   Triangulation<dim> tria;
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 2);
 
@@ -95,9 +94,19 @@ main()
 {
   initlog();
 
-  test(1); // linear mapping
+  deallog << std::endl << "cubic mapping" << std::endl << std::endl;
+
+  test<2>(3);
+
+  deallog << std::endl << "linear mapping" << std::endl << std::endl;
+
+  test<3>(1);
 
   deallog << std::endl << "quadratic mapping" << std::endl << std::endl;
 
-  test(2); // quadratic mapping
+  test<3>(2);
+
+  deallog << std::endl << "cubic mapping" << std::endl << std::endl;
+
+  test<3>(3);
 }

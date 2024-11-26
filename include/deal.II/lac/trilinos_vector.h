@@ -22,7 +22,6 @@
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/partitioner.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/read_vector.h>
@@ -401,7 +400,7 @@ namespace TrilinosWrappers
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public Subscriptor, public ReadVector<TrilinosScalar>
+    class Vector : public ReadVector<TrilinosScalar>
     {
     public:
       /**
@@ -1031,8 +1030,9 @@ namespace TrilinosWrappers
        * Extract a range of elements all at once.
        */
       virtual void
-      extract_subvector_to(const ArrayView<const size_type> &indices,
-                           ArrayView<TrilinosScalar> &elements) const override;
+      extract_subvector_to(
+        const ArrayView<const size_type> &indices,
+        const ArrayView<TrilinosScalar>  &elements) const override;
 
       /**
        * Instead of getting individual elements of a vector via operator(),
@@ -1581,8 +1581,9 @@ namespace TrilinosWrappers
 
 
     inline void
-    Vector::extract_subvector_to(const ArrayView<const size_type> &indices,
-                                 ArrayView<TrilinosScalar> &elements) const
+    Vector::extract_subvector_to(
+      const ArrayView<const size_type> &indices,
+      const ArrayView<TrilinosScalar>  &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       for (unsigned int i = 0; i < indices.size(); ++i)

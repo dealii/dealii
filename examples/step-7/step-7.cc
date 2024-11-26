@@ -359,20 +359,22 @@ namespace Step7
     // still active references to an object and the object is still alive
     // from the point of view of a using object. Basically, the method is along
     // the following line: all objects that are subject to such potentially
-    // dangerous pointers are derived from a class called Subscriptor. For
-    // example, the Triangulation, DoFHandler, and a base class of the
-    // FiniteElement class are derived from Subscriptor. This latter class
-    // does not offer much functionality, but it has a built-in counter which
-    // we can subscribe to, thus the name of the class. Whenever we initialize
-    // a pointer to that object, we can increase its use counter, and when we
-    // move away our pointer or do not need it any more, we decrease the
-    // counter again. This way, we can always check how many objects still use
-    // that object. Additionally, the class requires to know about a pointer
-    // that it can use to tell the subscribing object about its invalidation.
+    // dangerous pointers are derived from a class called
+    // EnableObserverPointer. For example, the Triangulation,
+    // DoFHandler, and a base class of the FiniteElement class are derived from
+    // EnableObserverPointer. This latter class does not offer much
+    // functionality, but it has a built-in counter which we can subscribe to,
+    // thus the name of the class. Whenever we initialize a pointer to that
+    // object, we can increase its use counter, and when we move away our
+    // pointer or do not need it any more, we decrease the counter again. This
+    // way, we can always check how many objects still use that object.
+    // Additionally, the class requires to know about a pointer that it can use
+    // to tell the subscribing object about its invalidation.
     //
-    // If an object of a class that is derived from the Subscriptor class is
-    // destroyed, it also has to call the destructor of the Subscriptor class.
-    // In this destructor, we tell all the subscribing objects about the
+    // If an object of a class that is derived from the
+    // EnableObserverPointer class is destroyed, it also has to
+    // call the destructor of the EnableObserverPointer class. In
+    // this destructor, we tell all the subscribing objects about the
     // invalidation of the object using the stored pointers. The same happens
     // when the object appears on the right hand side of a move expression,
     // i.e., it will no longer contain valid content after the operation. The

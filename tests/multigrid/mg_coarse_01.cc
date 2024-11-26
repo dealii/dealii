@@ -557,6 +557,20 @@ namespace Step50
 
     {
       deallog << "AMG:" << std::endl;
+
+      LA::MPI::PreconditionAMG prec;
+      prec.initialize(coarse_matrix);
+
+      MGCoarseGridApplyOperator<vector_t, LA::MPI::PreconditionAMG>
+        coarse_grid_solver(prec);
+
+      vcycle(coarse_grid_solver);
+      deallog << "coarse iterations: " << coarse_solver_control.last_step()
+              << std::endl;
+    }
+
+    {
+      deallog << "AMG:" << std::endl;
       LA::MPI::PreconditionAMG::AdditionalData Amg_data;
       Amg_data.elliptic              = true;
       Amg_data.higher_order_elements = true;

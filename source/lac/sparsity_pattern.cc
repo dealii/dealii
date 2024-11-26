@@ -341,7 +341,7 @@ SparsityPattern::compress()
   if (compressed)
     return;
 
-  size_type next_free_entry = 0, next_row_start = 0, row_length = 0;
+  std::size_t next_free_entry = 0, next_row_start = 0, row_length = 0;
 
   // first find out how many non-zero elements there are, in order to allocate
   // the right amount of memory
@@ -361,7 +361,7 @@ SparsityPattern::compress()
     {
       // copy used entries, break if first unused entry is reached
       row_length = 0;
-      for (size_type j = rowstart[line]; j < rowstart[line + 1];
+      for (std::size_t j = rowstart[line]; j < rowstart[line + 1];
            ++j, ++row_length)
         if (colnums[j] != invalid_entry)
           tmp_entries[row_length] = colnums[j];

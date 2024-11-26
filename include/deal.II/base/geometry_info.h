@@ -2196,7 +2196,7 @@ struct GeometryInfo
 
   /**
    * This field stores which child cells are adjacent to a certain face of the
-   * mother cell.
+   * parent cell.
    *
    * For example, in 2d the layout of a cell is as follows:
    * @verbatim
@@ -2446,7 +2446,7 @@ struct GeometryInfo
   /**
    * The reverse function to the one above: take a point in the coordinate
    * system of the child, and transform it to the coordinate system of the
-   * mother cell.
+   * parent cell.
    */
   static Point<dim>
   child_to_cell_coordinates(const Point<dim>         &p,

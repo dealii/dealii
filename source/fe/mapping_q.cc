@@ -575,7 +575,8 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
 
               default:
                 {
-                  // we should get here, based on the if-condition at the top
+                  // we should not get here, based on the if-condition at the
+                  // top
                   DEAL_II_ASSERT_UNREACHABLE();
                 }
             }

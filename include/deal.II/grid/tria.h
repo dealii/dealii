@@ -18,12 +18,12 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
@@ -1319,7 +1319,7 @@ namespace internal
  */
 template <int dim, int spacedim = dim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-class Triangulation : public Subscriptor
+class Triangulation : public EnableObserverPointer
 {
 private:
   /**
@@ -1959,7 +1959,9 @@ public:
    * Return a constant reference to a Manifold object used for this
    * triangulation. @p number is the same as in set_manifold().
    *
-   * @note If no manifold could be found, the default flat manifold is returned.
+   * @note In debug mode, this function checks that @p number has been
+   * previously associated with a Manifold via set_manifold(). If it has not
+   * then an assertion is triggered.
    *
    * @ingroup manifold
    *
@@ -4499,8 +4501,7 @@ private:
   std::vector<bool> vertices_used;
 
   /**
-   * Collection of manifold objects. We store only objects, which are not of
-   * type FlatManifold.
+   * Collection of Manifold objects.
    */
   std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>>
     manifolds;

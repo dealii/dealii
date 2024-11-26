@@ -215,7 +215,7 @@ namespace internal
  * Alternatively, the IdentityMatrix class can be used to precondition in this
  * way.
  */
-class PreconditionIdentity : public Subscriptor
+class PreconditionIdentity : public EnableObserverPointer
 {
 public:
   /**
@@ -330,7 +330,7 @@ private:
  * multiplied. Still, this class is useful in multigrid smoother objects
  * (MGSmootherRelaxation).
  */
-class PreconditionRichardson : public Subscriptor
+class PreconditionRichardson : public EnableObserverPointer
 {
 public:
   /**
@@ -494,7 +494,7 @@ private:
  */
 template <typename MatrixType = SparseMatrix<double>,
           typename VectorType = Vector<double>>
-class PreconditionUseMatrix : public Subscriptor
+class PreconditionUseMatrix : public EnableObserverPointer
 {
 public:
   /**
@@ -562,7 +562,7 @@ private:
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename PreconditionerType = IdentityMatrix>
-class PreconditionRelaxation : public Subscriptor
+class PreconditionRelaxation : public EnableObserverPointer
 {
 public:
   /**
@@ -1291,29 +1291,25 @@ namespace internal
                     const bool         transposed)
     {
       (void)transposed;
-      using Number = typename VectorType::value_type;
+      using Number          = typename VectorType::value_type;
+      Number       *dst_ptr = dst.begin();
+      const Number *src_ptr = src.begin();
 
       if (i == 0)
         {
-          Number       *dst_ptr = dst.begin();
-          const Number *src_ptr = src.begin();
-
           preconditioner.vmult(
             dst,
             src,
             [&](const unsigned int start_range, const unsigned int end_range) {
               // zero 'dst' before running the vmult operation
               if (end_range > start_range)
-                std::memset(dst.begin() + start_range,
+                std::memset(dst_ptr + start_range,
                             0,
                             sizeof(Number) * (end_range - start_range));
             },
             [&](const unsigned int start_range, const unsigned int end_range) {
               if (relaxation == 1.0)
                 return; // nothing to do
-
-              const auto src_ptr = src.begin();
-              const auto dst_ptr = dst.begin();
 
               DEAL_II_OPENMP_SIMD_PRAGMA
               for (std::size_t i = start_range; i < end_range; ++i)
@@ -1332,7 +1328,6 @@ namespace internal
             dst,
             tmp,
             [&](const unsigned int start_range, const unsigned int end_range) {
-              const auto src_ptr = src.begin();
               const auto tmp_ptr = tmp.begin();
 
               if (relaxation == 1.0)
@@ -1383,27 +1378,24 @@ namespace internal
       (void)transposed;
       using Number = typename VectorType::value_type;
 
+      Number       *dst_ptr = dst.begin();
+      const Number *src_ptr = src.begin();
+
       if (i == 0)
         {
-          Number       *dst_ptr = dst.begin();
-          const Number *src_ptr = src.begin();
-
           preconditioner.vmult(
             dst,
             src,
             [&](const unsigned int start_range, const unsigned int end_range) {
               // zero 'dst' before running the vmult operation
               if (end_range > start_range)
-                std::memset(dst.begin() + start_range,
+                std::memset(dst_ptr + start_range,
                             0,
                             sizeof(Number) * (end_range - start_range));
             },
             [&](const unsigned int start_range, const unsigned int end_range) {
               if (relaxation == 1.0)
                 return; // nothing to do
-
-              const auto src_ptr = src.begin();
-              const auto dst_ptr = dst.begin();
 
               DEAL_II_OPENMP_SIMD_PRAGMA
               for (std::size_t i = start_range; i < end_range; ++i)
@@ -1413,6 +1405,7 @@ namespace internal
       else
         {
           tmp.reinit(src, true);
+          const auto tmp_ptr = tmp.begin();
 
           Assert(transposed == false, ExcNotImplemented());
 
@@ -1423,14 +1416,11 @@ namespace internal
               // zero 'tmp' before running the vmult
               // operation
               if (end_range > start_range)
-                std::memset(tmp.begin() + start_range,
+                std::memset(tmp_ptr + start_range,
                             0,
                             sizeof(Number) * (end_range - start_range));
             },
             [&](const unsigned int start_range, const unsigned int end_range) {
-              const auto src_ptr = src.begin();
-              const auto tmp_ptr = tmp.begin();
-
               if (relaxation == 1.0)
                 {
                   DEAL_II_OPENMP_SIMD_PRAGMA
@@ -1500,15 +1490,15 @@ namespace internal
         {
           tmp.reinit(src, true);
 
-          Number       *dst_ptr  = dst.begin();
-          const Number *src_ptr  = src.begin();
-          const Number *tmp_ptr  = tmp.begin();
-          const Number *diag_ptr = preconditioner.get_vector().begin();
-
           if (transposed)
             Tvmult(A, tmp, dst);
           else
             A.vmult(tmp, dst);
+
+          Number       *dst_ptr  = dst.begin();
+          const Number *src_ptr  = src.begin();
+          const Number *tmp_ptr  = tmp.begin();
+          const Number *diag_ptr = preconditioner.get_vector().begin();
 
           if (relaxation == 1.0)
             {
@@ -2025,13 +2015,14 @@ public:
  *
  * <h4>Requirements on the templated classes</h4>
  *
- * The class `MatrixType` must be derived from Subscriptor because a
- * ObserverPointer to `MatrixType` is held in the class. In particular, this
- * means that the matrix object needs to persist during the lifetime of
- * PreconditionChebyshev. The preconditioner is held in a shared_ptr that is
- * copied into the AdditionalData member variable of the class, so the
- * variable used for initialization can safely be discarded after calling
- * initialize(). Both the matrix and the preconditioner need to provide
+ * The class `MatrixType` must be derived from
+ * EnableObserverPointer because a ObserverPointer to `MatrixType`
+ * is held in the class. In particular, this means that the matrix object needs
+ * to persist during the lifetime of PreconditionChebyshev. The preconditioner
+ * is held in a shared_ptr that is copied into the AdditionalData member
+ * variable of the class, so the variable used for initialization can safely be
+ * discarded after calling initialize(). Both the matrix and the preconditioner
+ * need to provide
  * @p vmult() functions for the matrix-vector product and @p m() functions for
  * accessing the number of rows in the (square) matrix. Furthermore, the
  * matrix must provide <tt>el(i,i)</tt> methods for accessing the matrix
@@ -2100,7 +2091,7 @@ public:
 template <typename MatrixType         = SparseMatrix<double>,
           typename VectorType         = Vector<double>,
           typename PreconditionerType = DiagonalMatrix<VectorType>>
-class PreconditionChebyshev : public Subscriptor
+class PreconditionChebyshev : public EnableObserverPointer
 {
 public:
   /**
@@ -3156,27 +3147,25 @@ namespace internal
 
       if (iteration_index == 0)
         {
-          const auto solution_old_ptr = solution_old.begin();
-
           // compute t = P^{-1} * (b)
           preconditioner.vmult(solution_old, rhs);
 
           // compute x^{n+1} = f_2 * t
+          const auto solution_old_ptr = solution_old.begin();
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
             solution_old_ptr[i] = solution_old_ptr[i] * factor2;
         }
       else if (iteration_index == 1)
         {
-          const auto solution_ptr     = solution.begin();
-          const auto solution_old_ptr = solution_old.begin();
-
           // compute t = P^{-1} * (b-A*x^{n})
           temp_vector1.sadd(-1.0, 1.0, rhs);
 
           preconditioner.vmult(solution_old, temp_vector1);
 
           // compute x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * t
+          const auto solution_ptr     = solution.begin();
+          const auto solution_old_ptr = solution_old.begin();
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
             solution_old_ptr[i] =
@@ -3184,16 +3173,15 @@ namespace internal
         }
       else
         {
-          const auto solution_ptr     = solution.begin();
-          const auto solution_old_ptr = solution_old.begin();
-          const auto temp_vector2_ptr = temp_vector2.begin();
-
           // compute t = P^{-1} * (b-A*x^{n})
           temp_vector1.sadd(-1.0, 1.0, rhs);
 
           preconditioner.vmult(temp_vector2, temp_vector1);
 
           // compute x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1}) + f_2 * t
+          const auto solution_ptr     = solution.begin();
+          const auto solution_old_ptr = solution_old.begin();
+          const auto temp_vector2_ptr = temp_vector2.begin();
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
             solution_old_ptr[i] = factor1_plus_1 * solution_ptr[i] -
@@ -3244,7 +3232,7 @@ namespace internal
             rhs,
             [&](const auto start_range, const auto end_range) {
               if (end_range > start_range)
-                std::memset(solution.begin() + start_range,
+                std::memset(solution_ptr + start_range,
                             0,
                             sizeof(Number) * (end_range - start_range));
             },
@@ -3261,7 +3249,7 @@ namespace internal
             temp_vector1,
             [&](const auto begin, const auto end) {
               if (end > begin)
-                std::memset(temp_vector2.begin() + begin,
+                std::memset(temp_vector2_ptr + begin,
                             0,
                             sizeof(Number) * (end - begin));
 

@@ -354,7 +354,7 @@ namespace TrilinosWrappers
       public:
         /**
          * Constructor. The class is initialized by the solution vector and
-         * functions to compute the residual, to set up the jacobian, and
+         * functions to compute the residual, to set up the Jacobian, and
          * to solve the Jacobian.
          */
         Group(

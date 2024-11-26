@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver_control.h>
@@ -338,7 +338,7 @@ class Vector;
  */
 template <typename VectorType = Vector<double>>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-class SolverBase : public Subscriptor
+class SolverBase : public EnableObserverPointer
 {
 public:
   /**

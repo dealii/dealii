@@ -77,8 +77,7 @@ namespace TrilinosWrappers
   namespace MPI
   {
     Vector::Vector()
-      : Subscriptor()
-      , last_action(Zero)
+      : last_action(Zero)
       , compressed(true)
       , has_ghosts(false)
       , vector(new Epetra_FEVector(
@@ -110,7 +109,8 @@ namespace TrilinosWrappers
       : Vector()
     {
       // initialize a minimal, valid object and swap
-      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      static_cast<EnableObserverPointer &>(*this) =
+        static_cast<EnableObserverPointer &&>(v);
       swap(v);
     }
 
@@ -522,7 +522,8 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator=(Vector &&v) noexcept
     {
-      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      static_cast<EnableObserverPointer &>(*this) =
+        static_cast<EnableObserverPointer &&>(v);
       swap(v);
       return *this;
     }

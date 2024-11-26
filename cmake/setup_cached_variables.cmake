@@ -31,6 +31,7 @@
 #
 #     CMAKE_BUILD_TYPE
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+#     DEAL_II_USE_LTO
 #     DEAL_II_SETUP_COVERAGE
 #     DEAL_II_UNITY_BUILD
 #     DEAL_II_EARLY_DEPRECATIONS
@@ -140,14 +141,30 @@ if( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
 endif()
 
 #
+# We do not currently support a "multiple generator" setup with our
+# concurrent configuration and set up of a debug and release flavor within
+# our "DebugRelease" target. In order to avoid confusion simply force the
+# CMAKE_CONFIGURATION_TYPES variable to match the single-generator
+# counterpart:
+#
+
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}")
+
+#
 # Configuration behaviour:
 #
 
 option(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
-  "Allow platform introspection for CPU command sets, SSE and AVX"
+  "Allow platform introspection, i.e., allow the compiler to query the CPU instruction set available on the current machine (e.g., whether the CPU supports the SSE or AVX vector instructions) and to compile for that instruction set. This generally results in faster code, but code that may not run on other machines (including, for example, machines that may use the same file system on which you are working, but have an older CPU architecture)."
   ON
   )
 mark_as_advanced(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+
+option(DEAL_II_USE_LTO
+  "Allow the compiler to use interprocedural and link-time optimization (LTO)."
+  OFF
+  )
+mark_as_advanced(DEAL_II_USE_LTO)
 
 option(DEAL_II_SETUP_COVERAGE
   "Setup debug compiler flags to provide additional test coverage information. Currently only gprof is supported."

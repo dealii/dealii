@@ -676,7 +676,7 @@ namespace FETools
 
               if (found_child)
                 {
-                  // interpolate these to the mother cell
+                  // interpolate these to the parent cell
                   fe.get_restriction_matrix(c, dealii_cell->refinement_case())
                     .vmult(tmp2, tmp1);
 

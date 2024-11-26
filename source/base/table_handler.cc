@@ -90,7 +90,10 @@ namespace internal
     else
       ss.setf(std::ios::fixed, std::ios::floatfield);
 
-    std::visit([&ss](const auto &v) { ss << v; }, value);
+    if (scientific)
+      ss << get_numeric_value();
+    else
+      std::visit([&ss](const auto &v) { ss << v; }, value);
 
     cached_value = ss.str();
     if (cached_value.empty())

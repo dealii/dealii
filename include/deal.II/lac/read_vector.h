@@ -18,6 +18,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/types.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -37,10 +38,14 @@ DEAL_II_NAMESPACE_OPEN
  * accessing vector elements.
  */
 template <typename Number>
-class ReadVector
+class ReadVector : public EnableObserverPointer
 {
 public:
-  using size_type = types::global_dof_index;
+  /**
+   * Declare some of the standard types used in all containers.
+   */
+  using value_type = Number;
+  using size_type  = types::global_dof_index;
 
   /**
    * Return the size of the vector.
@@ -54,7 +59,7 @@ public:
    */
   virtual void
   extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
-                       ArrayView<Number> &elements) const = 0;
+                       const ArrayView<Number> &elements) const = 0;
 };
 
 /** @} */

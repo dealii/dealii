@@ -262,7 +262,8 @@ namespace internal
       template <int length>
       void
       compute_face_index_compression(
-        const std::vector<FaceToCellTopology<length>> &faces);
+        const std::vector<FaceToCellTopology<length>> &faces,
+        bool hold_all_faces_to_owned_cells);
 
       /**
        * This function computes the connectivity of the currently stored

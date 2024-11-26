@@ -18,13 +18,13 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/communication_pattern_base.h>
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/memory_space_data.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/partitioner.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>
@@ -246,7 +246,7 @@ namespace LinearAlgebra
      * @endcode
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
-    class Vector : public ::dealii::ReadVector<Number>, public Subscriptor
+    class Vector : public ::dealii::ReadVector<Number>
     {
     public:
       using memory_space    = MemorySpace;
@@ -1134,7 +1134,7 @@ namespace LinearAlgebra
       virtual void
       extract_subvector_to(
         const ArrayView<const types::global_dof_index> &indices,
-        ArrayView<Number> &elements) const override;
+        const ArrayView<Number> &elements) const override;
 
       /**
        * Instead of getting individual elements of a vector via operator(),

@@ -244,7 +244,7 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
 
 template <>
 Quadrature<0>::Quadrature(const Quadrature<1> &)
-  : Subscriptor()
+  : EnableObserverPointer()
   , quadrature_points(1)
   , weights(1, 1.)
   , is_tensor_product_flag(false)
@@ -253,7 +253,7 @@ Quadrature<0>::Quadrature(const Quadrature<1> &)
 
 template <>
 Quadrature<1>::Quadrature(const Quadrature<0> &)
-  : Subscriptor()
+  : EnableObserverPointer()
 {
   // this function should never be called -- this should be the copy constructor
   // in 1d...
@@ -265,7 +265,7 @@ Quadrature<1>::Quadrature(const Quadrature<0> &)
 
 template <int dim>
 Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
-  : Subscriptor()
+  : EnableObserverPointer()
   , quadrature_points(Utilities::fixed_power<dim>(q.size()))
   , weights(Utilities::fixed_power<dim>(q.size()))
   , is_tensor_product_flag(true)
@@ -303,7 +303,7 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
 
 template <int dim>
 Quadrature<dim>::Quadrature(const Quadrature<dim> &q)
-  : Subscriptor()
+  : EnableObserverPointer()
   , quadrature_points(q.quadrature_points)
   , weights(q.weights)
   , is_tensor_product_flag(q.is_tensor_product_flag)

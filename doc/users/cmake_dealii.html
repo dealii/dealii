@@ -782,6 +782,14 @@ cmake -DLAPACK_FOUND=true \
           introspection for the given CPU.
 
         <li>
+          <code>DEAL_II_USE_LTO</code>: If set to "ON" (the default is
+          "OFF"), allow the compiler to use interprocedural and
+          link-time optimization for release builds. These
+          optimizations often substantially improve performance, but
+          take both a substantial amount of memory and CPU time when
+          compiling the library.
+
+        <li>
           <code>BUILD_SHARED_LIBS</code>: If set (default),
           <acronym>deal.II</acronym> will be linked as a shared library
 

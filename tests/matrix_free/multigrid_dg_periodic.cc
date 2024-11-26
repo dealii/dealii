@@ -55,7 +55,7 @@
 
 
 template <int dim, typename number = double>
-class LaplaceOperator : public Subscriptor
+class LaplaceOperator : public EnableObserverPointer
 {
 public:
   using value_type = number;

@@ -55,6 +55,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 // we need the following exception from a global function, so can't declare it
 // in the usual way inside a class
 namespace
@@ -64,19 +65,15 @@ namespace
                  std::string,
                  << "Unexpected input: expected line\n  <" << arg1
                  << ">\nbut got\n  <" << arg2 << ">");
-}
 
-
-namespace
-{
-#ifdef DEAL_II_WITH_ZLIB
+#  ifdef DEAL_II_WITH_ZLIB
   constexpr bool deal_ii_with_zlib = true;
-#else
+#  else
   constexpr bool deal_ii_with_zlib = false;
-#endif
+#  endif
 
 
-#ifdef DEAL_II_WITH_ZLIB
+#  ifdef DEAL_II_WITH_ZLIB
   /**
    * Convert between the CompressionLevel enum (used inside VtkFlags
    * for example) and the preprocessor constant defined by zlib.
@@ -100,7 +97,7 @@ namespace
       }
   }
 
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
   /**
    * Convert between the CompressionLevel enum and the preprocessor
    * constant defined by boost::iostreams::zlib.
@@ -123,8 +120,8 @@ namespace
           return boost::iostreams::zlib::no_compression;
       }
   }
+#    endif
 #  endif
-#endif
 
   /**
    * Do a zlib compression followed by a base64 encoding of the given data. The
@@ -135,7 +132,7 @@ namespace
   compress_array(const std::vector<T>               &data,
                  const DataOutBase::CompressionLevel compression_level)
   {
-#ifdef DEAL_II_WITH_ZLIB
+#  ifdef DEAL_II_WITH_ZLIB
     if (data.size() != 0)
       {
         const std::size_t uncompressed_size = (data.size() * sizeof(T));
@@ -186,14 +183,14 @@ namespace
       }
     else
       return {};
-#else
+#  else
     (void)data;
     (void)compression_level;
     Assert(false,
            ExcMessage("This function can only be called if cmake found "
                       "a working libz installation."));
     return {};
-#endif
+#  endif
   }
 
 
@@ -248,11 +245,13 @@ namespace
     std::uint64_t n_patches;
   };
 } // namespace
+#endif
 
 
 // some declarations of functions and locally used classes
 namespace DataOutBase
 {
+#ifndef DOXYGEN
   namespace
   {
     /**
@@ -416,6 +415,8 @@ namespace DataOutBase
     }
   } // namespace
 
+
+#endif
 
 
   DataOutFilter::DataOutFilter()

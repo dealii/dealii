@@ -175,7 +175,7 @@ namespace parallel
     (void)triangulation;
 
     // Skip if the DoFHandler has not been initialized yet.
-    if (dof_handler.get_fe_collection().size() == 0)
+    if (dof_handler.get_fe_collection().empty())
       return 0;
 
     // Convert cell type from Triangulation to DoFHandler to be able

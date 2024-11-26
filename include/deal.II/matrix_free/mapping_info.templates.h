@@ -259,13 +259,13 @@ namespace internal
 
     // For second derivatives on the real cell, we need the gradient of the
     // inverse Jacobian J. This involves some calculus and is done
-    // vectorized. If L is the gradient of the jacobian on the unit cell,
+    // vectorized. If L is the gradient of the Jacobian on the unit cell,
     // the gradient of the inverse is given by (multidimensional calculus) -
     // J * (J * L) * J (the third J is because we need to transform the
     // gradient L from the unit to the real cell, and then apply the inverse
     // Jacobian). Compare this with 1d with j(x) = 1/k(phi(x)), where j =
-    // phi' is the inverse of the jacobian and k is the derivative of the
-    // jacobian on the unit cell. Then j' = phi' k'/k^2 = j k' j^2.
+    // phi' is the inverse of the Jacobian and k is the derivative of the
+    // Jacobian on the unit cell. Then j' = phi' k'/k^2 = j k' j^2.
     template <int dim, typename Number>
     Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>>
     process_jacobian_gradient(const Tensor<2, dim, Number> &inv_jac_permut,
@@ -1330,7 +1330,7 @@ namespace internal
                                   vv,
                                   my_data.jacobian_gradients[0][idx][d][e]);
 
-                            // Also store the non-inverse jacobian gradient.
+                            // Also store the non-inverse Jacobian gradient.
                             // the diagonal part of Jacobian gradient comes
                             // first
                             for (unsigned int d = 0; d < dim; ++d)
@@ -2038,10 +2038,10 @@ namespace internal
                                 face_data.general_jac[n_q_points][d][e][v];
                       // we need to add the normal vector here because we
                       // store both the inverse jacobian and the normal vector
-                      // times the jacobian; of course, there will be
+                      // times the Jacobian; of course, there will be
                       // different values in their product for normal vectors
                       // oriented in different ways (the memory saving is
-                      // still significant); we need to divide by the jacobian
+                      // still significant); we need to divide by the Jacobian
                       // size to get the right scaling
                       for (unsigned int d = 0; d < dim; ++d)
                         for (unsigned int v = 0;
@@ -2252,7 +2252,7 @@ namespace internal
                                                         [offset + q][d][e]);
                         }
 
-                      // Also store the non-inverse jacobian gradient.
+                      // Also store the non-inverse Jacobian gradient.
                       // the diagonal part of Jacobian gradient comes first.
                       // jac_grad already has its derivatives reordered,
                       // so no need to compensate for this here

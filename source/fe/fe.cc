@@ -887,13 +887,38 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
     {
       case 1:
         return {0U, 0U};
+
       case 2:
+        // We have to interpolate from the DoFs in the interior of the
+        // the two child faces (=lines) and the one central vertex
+        // to the DoFs of the parent face:
         return {this->n_dofs_per_vertex() + 2 * this->n_dofs_per_line(),
                 this->n_dofs_per_face(face_no)};
+
       case 3:
-        return {5 * this->n_dofs_per_vertex() + 12 * this->n_dofs_per_line() +
-                  4 * this->n_dofs_per_quad(face_no),
-                this->n_dofs_per_face(face_no)};
+        // We have to interpolate from the DoFs in the interior of the
+        // the child faces (=quads or tris) and the vertices that are
+        // not part of the parent face, to the DoFs of the parent face:
+        if (this->reference_cell().face_reference_cell(face_no) ==
+            ReferenceCells::Quadrilateral)
+          return {
+            5 * this->n_dofs_per_vertex() +  // 4 vertices at mid-edge points
+                                             // + 1 at cell center
+              12 * this->n_dofs_per_line() + // 4*2 children of the old edges
+                                             // + 2*2 edges in the cell interior
+              4 * this->n_dofs_per_quad(face_no), // 4 child faces
+            this->n_dofs_per_face(face_no)};
+        else if (this->reference_cell().face_reference_cell(face_no) ==
+                 ReferenceCells::Triangle)
+          return {
+            3 * this->n_dofs_per_vertex() + // 3 vertices at mid-edge points
+              9 * this->n_dofs_per_line() + // 3*2 children of the old edges
+                                            // + 3 edges in the cell interior
+              4 * this->n_dofs_per_quad(face_no), // 4 child faces
+            this->n_dofs_per_face(face_no)};
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }

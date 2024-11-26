@@ -81,24 +81,21 @@ namespace LinearAlgebra
 #  endif
 
     Vector::Vector()
-      : Subscriptor()
-      , vector(new Epetra_FEVector(
+      : vector(new Epetra_FEVector(
           Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
 
 
 
     Vector::Vector(const Vector &V)
-      : Subscriptor()
-      , vector(new Epetra_FEVector(V.trilinos_vector()))
+      : vector(new Epetra_FEVector(V.trilinos_vector()))
     {}
 
 
 
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const MPI_Comm  communicator)
-      : Subscriptor()
-      , vector(new Epetra_FEVector(
+      : vector(new Epetra_FEVector(
           parallel_partitioner.make_trilinos_map(communicator, false)))
     {}
 
@@ -136,7 +133,7 @@ namespace LinearAlgebra
     void
     Vector::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<double>                              &elements) const
+      const ArrayView<double>                        &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       const auto &vector = trilinos_vector();
@@ -227,9 +224,8 @@ namespace LinearAlgebra
               communication_pattern);
           AssertThrow(
             epetra_comm_pattern != nullptr,
-            ExcMessage(
-              std::string("The communication pattern is not of type ") +
-              "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
+            ExcMessage("The communication pattern is not of type "
+                       "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }
 
       Epetra_Import import_map(epetra_comm_pattern->get_epetra_import());

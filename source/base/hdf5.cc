@@ -212,28 +212,28 @@ namespace HDF5
     switch (io_mode)
       {
         case (H5D_MPIO_NO_COLLECTIVE):
-          return std::string("H5D_MPIO_NO_COLLECTIVE");
+          return "H5D_MPIO_NO_COLLECTIVE";
           break;
         case (H5D_MPIO_CHUNK_INDEPENDENT):
-          return std::string("H5D_MPIO_CHUNK_INDEPENDENT");
+          return "H5D_MPIO_CHUNK_INDEPENDENT";
           break;
         case (H5D_MPIO_CHUNK_COLLECTIVE):
-          return std::string("H5D_MPIO_CHUNK_COLLECTIVE");
+          return "H5D_MPIO_CHUNK_COLLECTIVE";
           break;
         case (H5D_MPIO_CHUNK_MIXED):
-          return std::string("H5D_MPIO_CHUNK_MIXED");
+          return "H5D_MPIO_CHUNK_MIXED";
           break;
         case (H5D_MPIO_CONTIGUOUS_COLLECTIVE):
-          return std::string("H5D_MPIO_CONTIGUOUS_COLLECTIVE");
+          return "H5D_MPIO_CONTIGUOUS_COLLECTIVE";
           break;
         default:
           DEAL_II_ASSERT_UNREACHABLE();
-          return std::string("Internal error");
+          return "Internal error";
           break;
       }
     // The function should not reach this line.
     DEAL_II_ASSERT_UNREACHABLE();
-    return std::string("Internal error");
+    return "Internal error";
   }
 
 

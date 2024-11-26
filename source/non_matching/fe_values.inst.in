@@ -20,7 +20,7 @@ for (deal_II_dimension : DIMENSIONS)
     template class FEInterfaceValues<deal_II_dimension>;
   }
 
-for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
+for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
   {
     template FEValues<deal_II_dimension>::FEValues(
       const hp::MappingCollection<deal_II_dimension> &,
@@ -30,7 +30,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
       const RegionUpdateFlags,
       const MeshClassifier<deal_II_dimension> &,
       const DoFHandler<deal_II_dimension> &,
-      const VEC &,
+      const ReadVector<S> &,
       const typename FEValues<deal_II_dimension>::AdditionalData &);
 
 
@@ -40,7 +40,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
       const RegionUpdateFlags,
       const MeshClassifier<deal_II_dimension> &,
       const DoFHandler<deal_II_dimension> &,
-      const VEC &,
+      const ReadVector<S> &,
       const typename FEValues<deal_II_dimension>::AdditionalData &);
 
     template FEInterfaceValues<deal_II_dimension>::FEInterfaceValues(
@@ -49,7 +49,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
       const RegionUpdateFlags,
       const MeshClassifier<deal_II_dimension> &,
       const DoFHandler<deal_II_dimension> &,
-      const VEC &,
+      const ReadVector<S> &,
       const FEInterfaceValues<deal_II_dimension>::AdditionalData &);
 
     template FEInterfaceValues<deal_II_dimension>::FEInterfaceValues(
@@ -60,7 +60,7 @@ for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
       const RegionUpdateFlags,
       const MeshClassifier<deal_II_dimension> &,
       const DoFHandler<deal_II_dimension> &,
-      const VEC &,
+      const ReadVector<S> &,
       const AdditionalData &);
   }
 

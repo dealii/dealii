@@ -24,6 +24,8 @@
 #
 
 foreach(build ${DEAL_II_BUILD_TYPES})
+  set(CMAKE_TRY_COMPILE_CONFIGURATION ${build})
+
   macro(_check_linker_flags)
     check_compiler_setup(
       "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
@@ -90,6 +92,8 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       )
     _check_linker_flags()
   endif()
+
+  unset(CMAKE_TRY_COMPILE_CONFIGURATION)
 
   if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build})
     message(FATAL_ERROR "

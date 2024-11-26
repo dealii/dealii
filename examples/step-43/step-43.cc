@@ -318,7 +318,7 @@ namespace Step43
   namespace LinearSolvers
   {
     template <class MatrixType, class PreconditionerType>
-    class InverseMatrix : public Subscriptor
+    class InverseMatrix : public EnableObserverPointer
     {
     public:
       InverseMatrix(const MatrixType         &m,
@@ -366,7 +366,7 @@ namespace Step43
     }
 
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       BlockSchurPreconditioner(

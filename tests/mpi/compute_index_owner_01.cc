@@ -18,7 +18,6 @@
 // in the context of Vectors and Partitioners)
 
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/partitioner.h>
 
 #include "../tests.h"
@@ -53,17 +52,10 @@ test()
   local_relevant.print(deallog);
 
   {
-    std::vector<unsigned int> owning_ranks_of_ghosts(
-      local_relevant.n_elements());
-
-    Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-      process(local_owned, local_relevant, comm, owning_ranks_of_ghosts, true);
-
-    Utilities::MPI::ConsensusAlgorithms::Selector<
-      std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
-      std::vector<unsigned int>>
-      consensus_algorithm;
-    consensus_algorithm.run(process, comm);
+    const auto [owning_ranks_of_ghosts, import_data] =
+      Utilities::MPI::compute_index_owner_and_requesters(local_owned,
+                                                         local_relevant,
+                                                         comm);
 
     deallog << "owning_ranks_of_ghosts:" << std::endl;
     for (auto i : owning_ranks_of_ghosts)
@@ -71,7 +63,6 @@ test()
     deallog << std::endl;
 
     deallog << "requesters:" << std::endl;
-    std::map<unsigned int, IndexSet> import_data = process.get_requesters();
     for (const auto &m : import_data)
       {
         deallog << m.first << ": ";

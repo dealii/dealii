@@ -138,7 +138,7 @@ private:
 protected:
   /**
    * The actual prolongation matrix. column indices belong to the dof indices
-   * of the mother cell, i.e. the coarse level. while row indices belong to
+   * of the parent cell, i.e. the coarse level. while row indices belong to
    * the child cell, i.e. the fine level.
    */
   std::vector<std::shared_ptr<BlockSparseMatrix<double>>> prolongation_matrices;

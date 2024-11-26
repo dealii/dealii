@@ -765,7 +765,7 @@ protected:
   const Tensor<1, dim, Number> *normal_vectors;
 
   /**
-   * A pointer to the normal vectors times the jacobian at faces.
+   * A pointer to the normal vectors times the Jacobian at faces.
    */
   const Tensor<1, dim, Number> *normal_x_jacobian;
 

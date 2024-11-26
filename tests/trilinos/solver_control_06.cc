@@ -515,18 +515,22 @@ main(int argc, char *argv[])
   // We catch this output and it is written to the stdout logfile
   // Since we're interested in this output we read it back in and
   // write parts of it to the logstream
-  std::ifstream inputfile;
-  inputfile.open("stdout");
-  Assert(inputfile.good() && inputfile.is_open(), ExcIO());
-  std::string       line;
-  const std::string key = "*****";
-  while (std::getline(inputfile, line))
+  // We can only do this reliably if we are not running in parallel (sometimes
+  // stdout is not written yet otherwise)
+  if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1)
     {
-      if (line.find(key) != std::string::npos)
-        deallog << line << std::endl;
+      std::ifstream inputfile;
+      inputfile.open("stdout");
+      Assert(inputfile.good() && inputfile.is_open(), ExcIO());
+      std::string       line;
+      const std::string key = "*****";
+      while (std::getline(inputfile, line))
+        {
+          if (line.find(key) != std::string::npos)
+            deallog << line << std::endl;
+        }
+      inputfile.close();
     }
-  inputfile.close();
-
   deallog << "OK" << std::endl;
 
   return 0;

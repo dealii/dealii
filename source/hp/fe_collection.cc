@@ -67,7 +67,7 @@ namespace hp
     // check that the new element has the right number of components. only check
     // with the first element, since all the other elements have already passed
     // the test against the first element
-    Assert(this->size() == 0 ||
+    Assert(this->empty() ||
              new_fe.n_components() == this->operator[](0).n_components(),
            ExcMessage("All elements inside a collection need to have the "
                       "same number of vector components!"));

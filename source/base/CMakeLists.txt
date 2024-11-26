@@ -23,6 +23,7 @@ set(_unity_include_src
   conditional_ostream.cc
   convergence_table.cc
   discrete_time.cc
+  enable_observer_pointer.cc
   event.cc
   exceptions.cc
   flow_function.cc
@@ -48,7 +49,6 @@ set(_unity_include_src
   hdf5.cc
   kokkos.cc
   mpi.cc
-  mpi_compute_index_owner_internal.cc
   mpi_noncontiguous_partitioner.cc
   mpi_remote_point_evaluation.cc
   mu_parser_internal.cc
@@ -88,7 +88,6 @@ set(_unity_include_src
   quadrature_lib.cc
   quadrature_selector.cc
   scalar_polynomials_base.cc
-  subscriptor.cc
   symbolic_function.cc
   table_handler.cc
   tensor.cc

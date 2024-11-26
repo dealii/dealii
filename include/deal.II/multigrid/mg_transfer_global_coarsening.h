@@ -55,6 +55,11 @@ class MGTransferMF;
 #endif
 
 
+/**
+ * @addtogroup mg
+ * @{
+ */
+
 namespace mg
 {
   /**
@@ -216,7 +221,7 @@ namespace MGTransferGlobalCoarseningTools
  * accordingly.
  */
 template <typename VectorType>
-class MGTwoLevelTransferBase : public Subscriptor
+class MGTwoLevelTransferBase : public EnableObserverPointer
 {
 public:
   static_assert(
@@ -1410,6 +1415,7 @@ using MGTransferBlockGlobalCoarsening =
   MGTransferBlockMF<dim, typename VectorType::value_type>;
 
 
+/** @} */
 
 #ifndef DOXYGEN
 

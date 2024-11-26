@@ -149,7 +149,7 @@ namespace internal
        * In two and more dimensions, the neighbor is either on the same level
        * and refined (in which case its children have neighbor pointers to
        * this cell or its direct children), unrefined on the same level or one
-       * level down (in which case its neighbor pointer points to the mother
+       * level down (in which case its neighbor pointer points to the parent
        * cell of this cell).
        */
       std::vector<std::pair<int, int>> neighbors;

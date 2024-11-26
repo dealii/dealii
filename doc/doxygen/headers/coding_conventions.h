@@ -211,7 +211,7 @@ functions with their own user-defined types by including the
 <code>.templates.h</code> files.
 
 <li> Finally, if we can not assume in advance which values template arguments
-will take (e.g., any class derived from Subscriptor can be used as an argument),
+will take (e.g., any class derived from EnableObserverPointer can be used as an argument),
 the definitions of functions are provided at the bottom of the header
 file with declarations. The definitions should be guarded with <code>\#ifndef
 DOXYGEN ... \#endif</code> to prevent Doxygen from picking them up.</li>

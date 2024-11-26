@@ -506,7 +506,7 @@ namespace internal
        * objects around. The only way to create such objects is via the
        * <tt>Table</tt> class, which only generates them as temporary objects.
        * This guarantees that the accessor objects go out of scope earlier
-       * than the mother object, avoid problems with data consistency.
+       * than the parent object, avoid problems with data consistency.
        */
       DEAL_II_HOST
       constexpr Accessor(tensor_type              &tensor,
@@ -592,7 +592,7 @@ namespace internal
        * objects around. The only way to create such objects is via the
        * <tt>Table</tt> class, which only generates them as temporary objects.
        * This guarantees that the accessor objects go out of scope earlier
-       * than the mother object, avoid problems with data consistency.
+       * than the parent object, avoid problems with data consistency.
        */
       DEAL_II_HOST
       constexpr Accessor(tensor_type              &tensor,
@@ -3025,8 +3025,7 @@ enum struct SymmetricTensorEigenvectorMethod
  * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number>
-std::array<std::pair<Number, Tensor<1, dim, Number>>,
-           std::integral_constant<int, dim>::value>
+std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
 eigenvectors(const SymmetricTensor<2, dim, Number> &T,
              const SymmetricTensorEigenvectorMethod method =
                SymmetricTensorEigenvectorMethod::ql_implicit_shifts);

@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/lac/solver.h>

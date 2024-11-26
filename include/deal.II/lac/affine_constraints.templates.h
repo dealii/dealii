@@ -18,7 +18,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_local_storage.h>
@@ -345,17 +344,19 @@ namespace internal
   }
 
   template <typename number>
-  std::vector<typename dealii::AffineConstraints<number>::ConstraintLine>
+  void
   compute_locally_relevant_constraints(
     const dealii::AffineConstraints<number> &constraints_in,
     const IndexSet                          &locally_owned_dofs,
     const IndexSet                          &locally_relevant_dofs,
-    const MPI_Comm                           mpi_communicator)
+    const MPI_Comm                           mpi_communicator,
+    const bool                               first_run,
+    std::vector<typename dealii::AffineConstraints<number>::ConstraintLine>
+      &locally_relevant_constraints)
   {
     // The result vector filled step by step.
     using ConstraintLine =
       typename dealii::AffineConstraints<number>::ConstraintLine;
-    std::vector<ConstraintLine> locally_relevant_constraints;
 
 #ifndef DEAL_II_WITH_MPI
     AssertThrow(false, ExcNotImplemented()); // one should not come here
@@ -363,6 +364,8 @@ namespace internal
     (void)locally_owned_dofs;
     (void)locally_relevant_dofs;
     (void)mpi_communicator;
+    (void)first_run;
+    (void)locally_relevant_constraints;
 #else
 
     [[maybe_unused]] const unsigned int my_rank =
@@ -382,71 +385,62 @@ namespace internal
 
     // step 1: Identify the owners of DoFs we know to be constrained but do
     //         not own.
-    std::vector<unsigned int> owners_of_my_constraints(
-      my_constraint_indices.n_elements());
-    Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-      constrained_indices_process(locally_owned_dofs,
-                                  my_constraint_indices,
-                                  mpi_communicator,
-                                  owners_of_my_constraints,
-                                  true);
-
-    Utilities::MPI::ConsensusAlgorithms::Selector<
-      std::vector<std::pair<types::global_dof_index, types::global_dof_index>>,
-      std::vector<unsigned int>>
-      consensus_algorithm;
-    consensus_algorithm.run(constrained_indices_process, mpi_communicator);
+    const auto [owners_of_my_constraints, constrained_indices_by_ranks] =
+      Utilities::MPI::compute_index_owner_and_requesters(locally_owned_dofs,
+                                                         my_constraint_indices,
+                                                         mpi_communicator);
 
     // step 2: Collect all locally owned constraints into a data structure
     //         that we can send to other processes that want to know
     //         about them.
-    const std::map<unsigned int, IndexSet> constrained_indices_by_ranks =
-      constrained_indices_process.get_requesters();
-    {
-      std::map<unsigned int, std::vector<ConstraintLine>> send_data;
+    if (first_run)
+      {
+        std::map<unsigned int, std::vector<ConstraintLine>> send_data;
 
-      // For each constraint we know of but owned by another process, create a
-      // copy of the constraint and add it to the list of things to send to
-      // other processes:
-      for (unsigned int constraint_index = 0;
-           constraint_index < owners_of_my_constraints.size();
-           ++constraint_index)
-        {
-          ConstraintLine entry;
+        // For each constraint we know of but owned by another process, create a
+        // copy of the constraint and add it to the list of things to send to
+        // other processes:
+        for (unsigned int constraint_index = 0;
+             constraint_index < owners_of_my_constraints.size();
+             ++constraint_index)
+          {
+            ConstraintLine entry;
 
-          const types::global_dof_index index =
-            my_constraint_indices.nth_index_in_set(constraint_index);
+            const types::global_dof_index index =
+              my_constraint_indices.nth_index_in_set(constraint_index);
 
-          entry.index = index;
-          if (const std::vector<std::pair<types::global_dof_index, number>>
-                *constraints = constraints_in.get_constraint_entries(index))
-            entry.entries = *constraints;
-          entry.inhomogeneity = constraints_in.get_inhomogeneity(index);
+            entry.index = index;
+            if (const std::vector<std::pair<types::global_dof_index, number>>
+                  *constraints = constraints_in.get_constraint_entries(index))
+              entry.entries = *constraints;
+            entry.inhomogeneity = constraints_in.get_inhomogeneity(index);
 
 
-          Assert(owners_of_my_constraints[constraint_index] != my_rank,
-                 ExcInternalError());
-          send_data[owners_of_my_constraints[constraint_index]].push_back(
-            entry);
-        }
+            Assert(owners_of_my_constraints[constraint_index] != my_rank,
+                   ExcInternalError());
+            send_data[owners_of_my_constraints[constraint_index]].push_back(
+              entry);
+          }
 
-      // Now exchange this data between processes:
-      const std::map<unsigned int, std::vector<ConstraintLine>> received_data =
-        Utilities::MPI::some_to_some(mpi_communicator, send_data);
+        // Now exchange this data between processes:
+        const std::map<unsigned int, std::vector<ConstraintLine>>
+          received_data =
+            Utilities::MPI::some_to_some(mpi_communicator, send_data);
 
-      // Finally join things with the constraints we know about and own
-      // ourselves, collate everything we received into one array, sort,
-      // and make it unique:
-      for (const ConstraintLine &line : constraints_in.get_lines())
-        if (locally_owned_dofs.is_element(line.index))
-          locally_relevant_constraints.push_back(line);
-      for (const auto &[rank, constraints] : received_data)
-        locally_relevant_constraints.insert(locally_relevant_constraints.end(),
-                                            constraints.begin(),
-                                            constraints.end());
+        // Finally join things with the constraints we know about and own
+        // ourselves, collate everything we received into one array, sort,
+        // and make it unique:
+        for (const ConstraintLine &line : constraints_in.get_lines())
+          if (locally_owned_dofs.is_element(line.index))
+            locally_relevant_constraints.push_back(line);
+        for (const auto &[rank, constraints] : received_data)
+          locally_relevant_constraints.insert(
+            locally_relevant_constraints.end(),
+            constraints.begin(),
+            constraints.end());
 
-      sort_and_make_unique<number>(locally_relevant_constraints);
-    }
+        sort_and_make_unique<number>(locally_relevant_constraints);
+      }
 
     // step 3: communicate constraints so that each process knows how the
     // locally relevant dofs are constrained
@@ -456,31 +450,17 @@ namespace internal
       IndexSet locally_relevant_dofs_non_local = locally_relevant_dofs;
       locally_relevant_dofs_non_local.subtract_set(locally_owned_dofs);
 
-      std::vector<unsigned int> locally_relevant_dofs_owners(
-        locally_relevant_dofs_non_local.n_elements());
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        locally_relevant_dofs_process(locally_owned_dofs,
-                                      locally_relevant_dofs_non_local,
-                                      mpi_communicator,
-                                      locally_relevant_dofs_owners,
-                                      /* keep track of requesters = */ true);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(locally_relevant_dofs_process, mpi_communicator);
-
       // We are, however, not actually interested in who owns a specific
       // DoF we have among our locally-stored-but-not-locally-owned constraints.
       // Rather, we want to know who requested information about our own
       // locally-owned DoFs. That's because we will want to send our own
       // locally-owned constraints to those processes for which these are
       // in their own locally-relevant index sets.
-      const std::map<unsigned int, IndexSet>
-        requesters_and_requested_constraints =
-          locally_relevant_dofs_process.get_requesters();
+      const auto [_, requesters_and_requested_constraints] =
+        Utilities::MPI::compute_index_owner_and_requesters(
+          locally_owned_dofs,
+          locally_relevant_dofs_non_local,
+          mpi_communicator);
 
       std::map<unsigned int, std::vector<ConstraintLine>> send_data;
       for (const auto &[destination, requested_indices] :
@@ -533,8 +513,6 @@ namespace internal
     }
 
 #endif
-
-    return locally_relevant_constraints;
   }
 } // namespace internal
 
@@ -587,17 +565,21 @@ AffineConstraints<number>::make_consistent_in_parallel(
   // index sets match, we have converged.
   IndexSet constraints_made_consistent;
 
+  std::vector<typename dealii::AffineConstraints<number>::ConstraintLine>
+    imported_constraints;
+
   const unsigned int max_iterations  = 10;
   unsigned int       iteration_count = 0;
   for (; iteration_count < max_iterations; ++iteration_count)
     {
       // 1) Get all locally relevant constraints we need to know about:
-      const std::vector<ConstraintLine> imported_constraints =
-        internal::compute_locally_relevant_constraints(
-          *this,
-          locally_owned_dofs,
-          constraints_to_make_consistent,
-          mpi_communicator);
+      internal::compute_locally_relevant_constraints(
+        *this,
+        locally_owned_dofs,
+        constraints_to_make_consistent,
+        mpi_communicator,
+        iteration_count == 0,
+        imported_constraints);
 
       // 2) Add untracked DoFs to the index sets.
       constrained_indices.clear();

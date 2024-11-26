@@ -1153,8 +1153,14 @@ namespace StandardExceptions
   DeclExceptionMsg(
     ExcNeedsLAPACK,
     "You are attempting to use functionality that is only available "
-    "if deal.II was configured to use LAPACK, but cmake did not "
-    "find a valid LAPACK library.");
+    "if deal.II was configured to use LAPACK, but when you configured "
+    "the library, cmake did not find a valid LAPACK library."
+    "\n\n"
+    "You will have to ensure that your system has a usable LAPACK "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the LAPACK installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
 
   /**
    * This function requires support for the HDF5 library.
@@ -1163,7 +1169,13 @@ namespace StandardExceptions
     ExcNeedsHDF5,
     "You are attempting to use functionality that requires that deal.II is configured "
     "with HDF5 support. However, when you called 'cmake', HDF5 support "
-    "was not detected.");
+    "was not detected."
+    "\n\n"
+    "You will have to ensure that your system has a usable HDF5 "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the HDF5 installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
 
   /**
    * This function requires support for the MPI library.
@@ -1171,7 +1183,13 @@ namespace StandardExceptions
   DeclExceptionMsg(
     ExcNeedsMPI,
     "You are attempting to use functionality that is only available "
-    "if deal.II was configured to use MPI.");
+    "if deal.II was configured to use MPI."
+    "\n\n"
+    "You will have to ensure that your system has a usable MPI "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the MPI installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
 
   /**
    * This function requires support for the FunctionParser library.
@@ -1182,7 +1200,14 @@ namespace StandardExceptions
     "if deal.II was configured to use the function parser which "
     "relies on the muparser library, but cmake did not "
     "find a valid muparser library on your system and also did "
-    "not choose the one that comes bundled with deal.II.");
+    "not choose the one that comes bundled with deal.II."
+    "\n\n"
+    "You will have to ensure that your system has a usable muparser "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the muparser installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
+
 
   /**
    * This function requires support for the Assimp library.
@@ -1191,9 +1216,13 @@ namespace StandardExceptions
     ExcNeedsAssimp,
     "You are attempting to use functionality that is only available "
     "if deal.II was configured to use Assimp, but cmake did not "
-    "find a valid Assimp library.");
-
-  /** @} */
+    "find a valid Assimp library."
+    "\n\n"
+    "You will have to ensure that your system has a usable Assimp "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the Assimp installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
 
   /**
    * This function requires support for the Exodus II library.
@@ -1202,7 +1231,13 @@ namespace StandardExceptions
     ExcNeedsExodusII,
     "You are attempting to use functionality that is only available if deal.II "
     "was configured to use Trilinos' SEACAS library (which provides ExodusII), "
-    "but cmake did not find a valid SEACAS library.");
+    "but cmake did not find a valid SEACAS library."
+    "\n\n"
+    "You will have to ensure that your system has a usable ExodusII "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the ExodusII installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
 
   /**
    * This function requires support for the CGAL library.
@@ -1211,7 +1246,13 @@ namespace StandardExceptions
     ExcNeedsCGAL,
     "You are attempting to use functionality that is only available "
     "if deal.II was configured to use CGAL, but cmake did not "
-    "find a valid CGAL library.");
+    "find a valid CGAL library."
+    "\n\n"
+    "You will have to ensure that your system has a usable CGAL "
+    "installation and re-install deal.II, making sure that cmake "
+    "finds the CGAL installation. You can check this by "
+    "looking at the summary printed at the end of the cmake "
+    "output.");
 
 #ifdef DEAL_II_WITH_MPI
   /**
@@ -1293,6 +1334,9 @@ namespace StandardExceptions
     "\n\n"
     "See the glossary entry on user call-back functions for more "
     "information.");
+
+  /** @} */
+
 } /*namespace StandardExceptions*/
 
 

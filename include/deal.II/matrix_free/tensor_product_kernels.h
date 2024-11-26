@@ -195,7 +195,8 @@ namespace internal
             bool              add,
             bool              consider_strides,
             typename Number,
-            typename Number2>
+            typename Number2,
+            int n_components = 1>
   std::enable_if_t<(variant == evaluate_general), void>
   apply_matrix_vector_product(const Number2 *matrix,
                               const Number  *in,
@@ -222,12 +223,15 @@ namespace internal
     const int stride_in  = consider_strides ? stride_in_given : 1;
     const int stride_out = consider_strides ? stride_out_given : 1;
 
+    static_assert(n_components > 0 && n_components < 4,
+                  "Invalid number of components");
+
     // specialization for n_rows = 2 that manually unrolls the innermost loop
     // to make the operation perform better (not completely as good as the
     // templated one, but much better than the generic version down below,
     // because the loop over col can be more effectively unrolled by the
     // compiler)
-    if (transpose_matrix && n_rows == 2)
+    if (transpose_matrix && n_rows == 2 && n_components == 1)
       {
         const Number2 *matrix_1 = matrix + n_columns;
         const Number   x0 = in[0], x1 = in[stride_in];
@@ -240,7 +244,7 @@ namespace internal
               out[stride_out * col] = result;
           }
       }
-    else if (transpose_matrix && n_rows == 3)
+    else if (transpose_matrix && n_rows == 3 && n_components == 1)
       {
         const Number2 *matrix_1 = matrix + n_columns;
         const Number2 *matrix_2 = matrix_1 + n_columns;
@@ -255,7 +259,8 @@ namespace internal
               out[stride_out * col] = result;
           }
       }
-    else if (std::abs(in - out) < std::min(stride_out * nn, stride_in * mm))
+    else if (std::abs(in - out) < std::min(stride_out * nn, stride_in * mm) &&
+             n_components == 1)
       {
         Assert(mm <= 128,
                ExcNotImplemented("For large sizes, arrays may not overlap"));
@@ -286,24 +291,70 @@ namespace internal
       }
     else
       {
+        const Number *in0 = in;
+        const Number *in1 = n_components > 1 ? in + mm : nullptr;
+        const Number *in2 = n_components > 2 ? in + 2 * mm : nullptr;
+
+        Number *out0 = out;
+        Number *out1 = n_components > 1 ? out + nn : nullptr;
+        Number *out2 = n_components > 2 ? out + 2 * nn : nullptr;
+
         int nn_regular = (nn / 4) * 4;
         for (int col = 0; col < nn_regular; col += 4)
           {
-            Number res0, res1, res2, res3;
+            Number res[12];
             if (transpose_matrix == true)
               {
                 const Number2 *matrix_ptr = matrix + col;
-                res0                      = matrix_ptr[0] * in[0];
-                res1                      = matrix_ptr[1] * in[0];
-                res2                      = matrix_ptr[2] * in[0];
-                res3                      = matrix_ptr[3] * in[0];
+                const Number   a          = in0[0];
+                res[0]                    = matrix_ptr[0] * a;
+                res[1]                    = matrix_ptr[1] * a;
+                res[2]                    = matrix_ptr[2] * a;
+                res[3]                    = matrix_ptr[3] * a;
+
+                if (n_components > 1)
+                  {
+                    const Number b = in1[0];
+                    res[4]         = matrix_ptr[0] * b;
+                    res[5]         = matrix_ptr[1] * b;
+                    res[6]         = matrix_ptr[2] * b;
+                    res[7]         = matrix_ptr[3] * b;
+                  }
+
+                if (n_components > 2)
+                  {
+                    const Number c = in2[0];
+                    res[8]         = matrix_ptr[0] * c;
+                    res[9]         = matrix_ptr[1] * c;
+                    res[10]        = matrix_ptr[2] * c;
+                    res[11]        = matrix_ptr[3] * c;
+                  }
+
                 matrix_ptr += n_columns;
                 for (int i = 1; i < mm; ++i, matrix_ptr += n_columns)
                   {
-                    res0 += matrix_ptr[0] * in[stride_in * i];
-                    res1 += matrix_ptr[1] * in[stride_in * i];
-                    res2 += matrix_ptr[2] * in[stride_in * i];
-                    res3 += matrix_ptr[3] * in[stride_in * i];
+                    const Number a = in0[stride_in * i];
+                    res[0] += matrix_ptr[0] * a;
+                    res[1] += matrix_ptr[1] * a;
+                    res[2] += matrix_ptr[2] * a;
+                    res[3] += matrix_ptr[3] * a;
+
+                    if (n_components > 1)
+                      {
+                        const Number b = in1[stride_in * i];
+                        res[4] += matrix_ptr[0] * b;
+                        res[5] += matrix_ptr[1] * b;
+                        res[6] += matrix_ptr[2] * b;
+                        res[7] += matrix_ptr[3] * b;
+                      }
+                    if (n_components > 2)
+                      {
+                        const Number c = in2[stride_in * i];
+                        res[8] += matrix_ptr[0] * c;
+                        res[9] += matrix_ptr[1] * c;
+                        res[10] += matrix_ptr[2] * c;
+                        res[11] += matrix_ptr[3] * c;
+                      }
                   }
               }
             else
@@ -313,49 +364,144 @@ namespace internal
                 const Number2 *matrix_2 = matrix + (col + 2) * n_columns;
                 const Number2 *matrix_3 = matrix + (col + 3) * n_columns;
 
-                res0 = matrix_0[0] * in[0];
-                res1 = matrix_1[0] * in[0];
-                res2 = matrix_2[0] * in[0];
-                res3 = matrix_3[0] * in[0];
+                const Number a = in0[0];
+                res[0]         = matrix_0[0] * a;
+                res[1]         = matrix_1[0] * a;
+                res[2]         = matrix_2[0] * a;
+                res[3]         = matrix_3[0] * a;
+
+                if (n_components > 1)
+                  {
+                    const Number b = in1[0];
+                    res[4]         = matrix_0[0] * b;
+                    res[5]         = matrix_1[0] * b;
+                    res[6]         = matrix_2[0] * b;
+                    res[7]         = matrix_3[0] * b;
+                  }
+
+                if (n_components > 2)
+                  {
+                    const Number c = in2[0];
+                    res[8]         = matrix_0[0] * c;
+                    res[9]         = matrix_1[0] * c;
+                    res[10]        = matrix_2[0] * c;
+                    res[11]        = matrix_3[0] * c;
+                  }
+
                 for (int i = 1; i < mm; ++i)
                   {
-                    res0 += matrix_0[i] * in[stride_in * i];
-                    res1 += matrix_1[i] * in[stride_in * i];
-                    res2 += matrix_2[i] * in[stride_in * i];
-                    res3 += matrix_3[i] * in[stride_in * i];
+                    const Number a = in0[stride_in * i];
+                    res[0] += matrix_0[i] * a;
+                    res[1] += matrix_1[i] * a;
+                    res[2] += matrix_2[i] * a;
+                    res[3] += matrix_3[i] * a;
+
+                    if (n_components > 1)
+                      {
+                        const Number b = in1[stride_in * i];
+                        res[4] += matrix_0[i] * b;
+                        res[5] += matrix_1[i] * b;
+                        res[6] += matrix_2[i] * b;
+                        res[7] += matrix_3[i] * b;
+                      }
+
+                    if (n_components > 2)
+                      {
+                        const Number c = in2[stride_in * i];
+                        res[8] += matrix_0[i] * c;
+                        res[9] += matrix_1[i] * c;
+                        res[10] += matrix_2[i] * c;
+                        res[11] += matrix_3[i] * c;
+                      }
                   }
               }
             if (add)
               {
-                out[0] += res0;
-                out[stride_out] += res1;
-                out[2 * stride_out] += res2;
-                out[3 * stride_out] += res3;
+                out0[0] += res[0];
+                out0[stride_out] += res[1];
+                out0[2 * stride_out] += res[2];
+                out0[3 * stride_out] += res[3];
+                if (n_components > 1)
+                  {
+                    out1[0] += res[4];
+                    out1[stride_out] += res[5];
+                    out1[2 * stride_out] += res[6];
+                    out1[3 * stride_out] += res[7];
+                  }
+                if (n_components > 2)
+                  {
+                    out2[0] += res[8];
+                    out2[stride_out] += res[9];
+                    out2[2 * stride_out] += res[10];
+                    out2[3 * stride_out] += res[11];
+                  }
               }
             else
               {
-                out[0]              = res0;
-                out[stride_out]     = res1;
-                out[2 * stride_out] = res2;
-                out[3 * stride_out] = res3;
+                out0[0]              = res[0];
+                out0[stride_out]     = res[1];
+                out0[2 * stride_out] = res[2];
+                out0[3 * stride_out] = res[3];
+                if (n_components > 1)
+                  {
+                    out1[0]              = res[4];
+                    out1[stride_out]     = res[5];
+                    out1[2 * stride_out] = res[6];
+                    out1[3 * stride_out] = res[7];
+                  }
+                if (n_components > 2)
+                  {
+                    out2[0]              = res[8];
+                    out2[stride_out]     = res[9];
+                    out2[2 * stride_out] = res[10];
+                    out2[3 * stride_out] = res[11];
+                  }
               }
-            out += 4 * stride_out;
+            out0 += 4 * stride_out;
+            if (n_components > 1)
+              out1 += 4 * stride_out;
+            if (n_components > 2)
+              out2 += 4 * stride_out;
           }
         if (nn - nn_regular == 3)
           {
-            Number res0, res1, res2;
+            Number res0, res1, res2, res3, res4, res5, res6, res7, res8;
             if (transpose_matrix == true)
               {
                 const Number2 *matrix_ptr = matrix + nn_regular;
-                res0                      = matrix_ptr[0] * in[0];
-                res1                      = matrix_ptr[1] * in[0];
-                res2                      = matrix_ptr[2] * in[0];
+                res0                      = matrix_ptr[0] * in0[0];
+                res1                      = matrix_ptr[1] * in0[0];
+                res2                      = matrix_ptr[2] * in0[0];
+                if (n_components > 1)
+                  {
+                    res3 = matrix_ptr[0] * in1[0];
+                    res4 = matrix_ptr[1] * in1[0];
+                    res5 = matrix_ptr[2] * in1[0];
+                  }
+                if (n_components > 2)
+                  {
+                    res6 = matrix_ptr[0] * in2[0];
+                    res7 = matrix_ptr[1] * in2[0];
+                    res8 = matrix_ptr[2] * in2[0];
+                  }
                 matrix_ptr += n_columns;
                 for (int i = 1; i < mm; ++i, matrix_ptr += n_columns)
                   {
-                    res0 += matrix_ptr[0] * in[stride_in * i];
-                    res1 += matrix_ptr[1] * in[stride_in * i];
-                    res2 += matrix_ptr[2] * in[stride_in * i];
+                    res0 += matrix_ptr[0] * in0[stride_in * i];
+                    res1 += matrix_ptr[1] * in0[stride_in * i];
+                    res2 += matrix_ptr[2] * in0[stride_in * i];
+                    if (n_components > 1)
+                      {
+                        res3 += matrix_ptr[0] * in1[stride_in * i];
+                        res4 += matrix_ptr[1] * in1[stride_in * i];
+                        res5 += matrix_ptr[2] * in1[stride_in * i];
+                      }
+                    if (n_components > 2)
+                      {
+                        res6 += matrix_ptr[0] * in2[stride_in * i];
+                        res7 += matrix_ptr[1] * in2[stride_in * i];
+                        res8 += matrix_ptr[2] * in2[stride_in * i];
+                      }
                   }
               }
             else
@@ -364,42 +510,110 @@ namespace internal
                 const Number2 *matrix_1 = matrix + (nn_regular + 1) * n_columns;
                 const Number2 *matrix_2 = matrix + (nn_regular + 2) * n_columns;
 
-                res0 = matrix_0[0] * in[0];
-                res1 = matrix_1[0] * in[0];
-                res2 = matrix_2[0] * in[0];
+                res0 = matrix_0[0] * in0[0];
+                res1 = matrix_1[0] * in0[0];
+                res2 = matrix_2[0] * in0[0];
+                if (n_components > 1)
+                  {
+                    res3 = matrix_0[0] * in1[0];
+                    res4 = matrix_1[0] * in1[0];
+                    res5 = matrix_2[0] * in1[0];
+                  }
+                if (n_components > 2)
+                  {
+                    res6 = matrix_0[0] * in2[0];
+                    res7 = matrix_1[0] * in2[0];
+                    res8 = matrix_2[0] * in2[0];
+                  }
                 for (int i = 1; i < mm; ++i)
                   {
-                    res0 += matrix_0[i] * in[stride_in * i];
-                    res1 += matrix_1[i] * in[stride_in * i];
-                    res2 += matrix_2[i] * in[stride_in * i];
+                    res0 += matrix_0[i] * in0[stride_in * i];
+                    res1 += matrix_1[i] * in0[stride_in * i];
+                    res2 += matrix_2[i] * in0[stride_in * i];
+                    if (n_components > 1)
+                      {
+                        res3 += matrix_0[i] * in1[stride_in * i];
+                        res4 += matrix_1[i] * in1[stride_in * i];
+                        res5 += matrix_2[i] * in1[stride_in * i];
+                      }
+                    if (n_components > 2)
+                      {
+                        res6 += matrix_0[i] * in2[stride_in * i];
+                        res7 += matrix_1[i] * in2[stride_in * i];
+                        res8 += matrix_2[i] * in2[stride_in * i];
+                      }
                   }
               }
             if (add)
               {
-                out[0] += res0;
-                out[stride_out] += res1;
-                out[2 * stride_out] += res2;
+                out0[0] += res0;
+                out0[stride_out] += res1;
+                out0[2 * stride_out] += res2;
+                if (n_components > 1)
+                  {
+                    out1[0] += res3;
+                    out1[stride_out] += res4;
+                    out1[2 * stride_out] += res5;
+                  }
+                if (n_components > 2)
+                  {
+                    out2[0] += res6;
+                    out2[stride_out] += res7;
+                    out2[2 * stride_out] += res8;
+                  }
               }
             else
               {
-                out[0]              = res0;
-                out[stride_out]     = res1;
-                out[2 * stride_out] = res2;
+                out0[0]              = res0;
+                out0[stride_out]     = res1;
+                out0[2 * stride_out] = res2;
+                if (n_components > 1)
+                  {
+                    out1[0]              = res3;
+                    out1[stride_out]     = res4;
+                    out1[2 * stride_out] = res5;
+                  }
+                if (n_components > 2)
+                  {
+                    out2[0]              = res6;
+                    out2[stride_out]     = res7;
+                    out2[2 * stride_out] = res8;
+                  }
               }
           }
         else if (nn - nn_regular == 2)
           {
-            Number res0, res1;
+            Number res0, res1, res2, res3, res4, res5;
             if (transpose_matrix == true)
               {
                 const Number2 *matrix_ptr = matrix + nn_regular;
-                res0                      = matrix_ptr[0] * in[0];
-                res1                      = matrix_ptr[1] * in[0];
+                res0                      = matrix_ptr[0] * in0[0];
+                res1                      = matrix_ptr[1] * in0[0];
+                if (n_components > 1)
+                  {
+                    res2 = matrix_ptr[0] * in1[0];
+                    res3 = matrix_ptr[1] * in1[0];
+                  }
+                if (n_components > 2)
+                  {
+                    res4 = matrix_ptr[0] * in2[0];
+                    res5 = matrix_ptr[1] * in2[0];
+                  }
                 matrix_ptr += n_columns;
                 for (int i = 1; i < mm; ++i, matrix_ptr += n_columns)
                   {
-                    res0 += matrix_ptr[0] * in[stride_in * i];
-                    res1 += matrix_ptr[1] * in[stride_in * i];
+                    res0 += matrix_ptr[0] * in0[stride_in * i];
+                    res1 += matrix_ptr[1] * in0[stride_in * i];
+                    if (n_components > 1)
+                      {
+                        res2 += matrix_ptr[0] * in1[stride_in * i];
+                        res3 += matrix_ptr[1] * in1[stride_in * i];
+                      }
+                    if (n_components > 2)
+                      {
+                        res4 += matrix_ptr[0] * in2[stride_in * i];
+                        res5 += matrix_ptr[1] * in2[stride_in * i];
+                      }
                   }
               }
             else
@@ -407,47 +621,119 @@ namespace internal
                 const Number2 *matrix_0 = matrix + nn_regular * n_columns;
                 const Number2 *matrix_1 = matrix + (nn_regular + 1) * n_columns;
 
-                res0 = matrix_0[0] * in[0];
-                res1 = matrix_1[0] * in[0];
+                res0 = matrix_0[0] * in0[0];
+                res1 = matrix_1[0] * in0[0];
+                if (n_components > 1)
+                  {
+                    res2 = matrix_0[0] * in1[0];
+                    res3 = matrix_1[0] * in1[0];
+                  }
+                if (n_components > 2)
+                  {
+                    res4 = matrix_0[0] * in2[0];
+                    res5 = matrix_1[0] * in2[0];
+                  }
                 for (int i = 1; i < mm; ++i)
                   {
-                    res0 += matrix_0[i] * in[stride_in * i];
-                    res1 += matrix_1[i] * in[stride_in * i];
+                    res0 += matrix_0[i] * in0[stride_in * i];
+                    res1 += matrix_1[i] * in0[stride_in * i];
+                    if (n_components > 1)
+                      {
+                        res2 += matrix_0[i] * in1[stride_in * i];
+                        res3 += matrix_1[i] * in1[stride_in * i];
+                      }
+                    if (n_components > 2)
+                      {
+                        res4 += matrix_0[i] * in2[stride_in * i];
+                        res5 += matrix_1[i] * in2[stride_in * i];
+                      }
                   }
               }
             if (add)
               {
-                out[0] += res0;
-                out[stride_out] += res1;
+                out0[0] += res0;
+                out0[stride_out] += res1;
+                if (n_components > 1)
+                  {
+                    out1[0] += res2;
+                    out1[stride_out] += res3;
+                  }
+                if (n_components > 2)
+                  {
+                    out2[0] += res4;
+                    out2[stride_out] += res5;
+                  }
               }
             else
               {
-                out[0]          = res0;
-                out[stride_out] = res1;
+                out0[0]          = res0;
+                out0[stride_out] = res1;
+                if (n_components > 1)
+                  {
+                    out1[0]          = res2;
+                    out1[stride_out] = res3;
+                  }
+                if (n_components > 2)
+                  {
+                    out2[0]          = res4;
+                    out2[stride_out] = res5;
+                  }
               }
           }
         else if (nn - nn_regular == 1)
           {
-            Number res0;
+            Number res0, res1, res2;
             if (transpose_matrix == true)
               {
                 const Number2 *matrix_ptr = matrix + nn_regular;
-                res0                      = matrix_ptr[0] * in[0];
+                res0                      = matrix_ptr[0] * in0[0];
+                if (n_components > 1)
+                  res1 = matrix_ptr[0] * in1[0];
+                if (n_components > 2)
+                  res2 = matrix_ptr[0] * in2[0];
                 matrix_ptr += n_columns;
                 for (int i = 1; i < mm; ++i, matrix_ptr += n_columns)
-                  res0 += matrix_ptr[0] * in[stride_in * i];
+                  {
+                    res0 += matrix_ptr[0] * in0[stride_in * i];
+                    if (n_components > 1)
+                      res1 += matrix_ptr[0] * in1[stride_in * i];
+                    if (n_components > 2)
+                      res2 += matrix_ptr[0] * in2[stride_in * i];
+                  }
               }
             else
               {
                 const Number2 *matrix_ptr = matrix + nn_regular * n_columns;
-                res0                      = matrix_ptr[0] * in[0];
+                res0                      = matrix_ptr[0] * in0[0];
+                if (n_components > 1)
+                  res1 = matrix_ptr[0] * in1[0];
+                if (n_components > 2)
+                  res2 = matrix_ptr[0] * in2[0];
                 for (int i = 1; i < mm; ++i)
-                  res0 += matrix_ptr[i] * in[stride_in * i];
+                  {
+                    res0 += matrix_ptr[i] * in0[stride_in * i];
+                    if (n_components > 1)
+                      res1 += matrix_ptr[i] * in1[stride_in * i];
+                    if (n_components > 2)
+                      res2 += matrix_ptr[i] * in2[stride_in * i];
+                  }
               }
             if (add)
-              out[0] += res0;
+              {
+                out0[0] += res0;
+                if (n_components > 1)
+                  out1[0] += res1;
+                if (n_components > 2)
+                  out2[0] += res2;
+              }
             else
-              out[0] = res0;
+              {
+                out0[0] = res0;
+                if (n_components > 1)
+                  out1[0] = res1;
+                if (n_components > 2)
+                  out2[0] = res2;
+              }
           }
       }
   }

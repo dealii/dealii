@@ -140,7 +140,7 @@ public:
   norm() const;
 
   /**
-   * Compute the volume element associated with the jacobian of the
+   * Compute the volume element associated with the Jacobian of the
    * transformation $\mathbf F$. That is to say if $DF$ is square, it computes
    * $\det(DF)$, in case DF is not square returns $\sqrt{\det(DF^T \,DF)}$.
    */

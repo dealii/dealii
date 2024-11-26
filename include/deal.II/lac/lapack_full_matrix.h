@@ -917,6 +917,12 @@ public:
                   const double       threshold   = 0.,
                   const char        *separator   = " ") const;
 
+  /**
+   * Return current state after the last operation here.
+   */
+  LAPACKSupport::State
+  get_state() const;
+
 private:
   /**
    * Internal function to compute various norms.
@@ -1007,7 +1013,7 @@ private:
  * @ingroup Preconditioners
  */
 template <typename number>
-class PreconditionLU : public Subscriptor
+class PreconditionLU : public EnableObserverPointer
 {
 public:
   void

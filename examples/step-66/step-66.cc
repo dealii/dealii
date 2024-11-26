@@ -151,7 +151,7 @@ namespace Step66
 
   // The constructor of the <code>JacobianOperator</code> just calls the
   // constructor of the base class MatrixFreeOperators::Base, which is itself
-  // derived from the Subscriptor class.
+  // derived from the EnableObserverPointer class.
   template <int dim, int fe_degree, typename number>
   JacobianOperator<dim, fe_degree, number>::JacobianOperator()
     : MatrixFreeOperators::Base<dim,

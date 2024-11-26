@@ -26,7 +26,6 @@
 
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
@@ -285,7 +284,7 @@ namespace LinearAlgebra
      * @ingroup Vectors
      */
     template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
-    class Vector : public ReadVector<Number>, public Subscriptor
+    class Vector : public ReadVector<Number>
     {
     public:
       /**
@@ -420,7 +419,7 @@ namespace LinearAlgebra
       virtual void
       extract_subvector_to(
         const ArrayView<const types::global_dof_index> &indices,
-        ArrayView<Number> &elements) const override;
+        const ArrayView<Number> &elements) const override;
 
       /**
        * Copy function. This function takes a Vector and copies all the

@@ -2574,6 +2574,15 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream      &out,
 }
 
 
+
+template <typename number>
+LAPACKSupport::State
+LAPACKFullMatrix<number>::get_state() const
+{
+  return this->state;
+}
+
+
 //----------------------------------------------------------------------//
 
 template <typename number>

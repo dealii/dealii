@@ -407,3 +407,19 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
   reset_cmake_required()
 endif()
+
+
+#
+# Check whether the compiler supports interprocedural and link-time
+# optimization. If so, we can set the corresponding property on the
+# compile and link targets later on.
+#
+if(DEAL_II_USE_LTO)
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT _res OUTPUT _out LANGUAGES CXX)
+  if (_res)
+    message(STATUS "Compiler supports interprocedural/link-time optimizations")
+  else()
+    message(FATAL_ERROR "You asked for interprocedural/link-time optimizations, but the compiler does not support these optimizations: ${_out}")
+  endif()
+endif()

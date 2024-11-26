@@ -1527,15 +1527,45 @@ namespace internal
     DoFInfo::memory_consumption() const
     {
       std::size_t memory = sizeof(*this);
+      for (const auto &storage : index_storage_variants)
+        memory += storage.capacity() * sizeof(storage[0]);
       memory +=
         (row_starts.capacity() * sizeof(std::pair<unsigned int, unsigned int>));
       memory += MemoryConsumption::memory_consumption(dof_indices);
+      memory += MemoryConsumption::memory_consumption(dof_indices_interleaved);
+      memory += MemoryConsumption::memory_consumption(dof_indices_contiguous);
+      memory +=
+        MemoryConsumption::memory_consumption(dof_indices_contiguous_sm);
+      memory +=
+        MemoryConsumption::memory_consumption(dof_indices_interleave_strides);
+      memory +=
+        MemoryConsumption::memory_consumption(n_vectorization_lanes_filled);
+      memory += MemoryConsumption::memory_consumption(
+        hanging_node_constraint_masks_comp);
       memory +=
         MemoryConsumption::memory_consumption(hanging_node_constraint_masks);
+      memory += MemoryConsumption::memory_consumption(constrained_dofs);
       memory += MemoryConsumption::memory_consumption(row_starts_plain_indices);
       memory += MemoryConsumption::memory_consumption(plain_dof_indices);
       memory += MemoryConsumption::memory_consumption(constraint_indicator);
       memory += MemoryConsumption::memory_consumption(*vector_partitioner);
+      memory += MemoryConsumption::memory_consumption(n_components);
+      memory += MemoryConsumption::memory_consumption(start_components);
+      memory += MemoryConsumption::memory_consumption(component_to_base_index);
+      memory +=
+        MemoryConsumption::memory_consumption(component_dof_indices_offset);
+      memory += MemoryConsumption::memory_consumption(dofs_per_cell);
+      memory += MemoryConsumption::memory_consumption(dofs_per_face);
+      memory += MemoryConsumption::memory_consumption(cell_active_fe_index);
+      memory += MemoryConsumption::memory_consumption(fe_index_conversion);
+      memory +=
+        MemoryConsumption::memory_consumption(vector_zero_range_list_index);
+      memory += MemoryConsumption::memory_consumption(vector_zero_range_list);
+      memory += MemoryConsumption::memory_consumption(cell_loop_pre_list_index);
+      memory += MemoryConsumption::memory_consumption(cell_loop_pre_list);
+      memory +=
+        MemoryConsumption::memory_consumption(cell_loop_post_list_index);
+      memory += MemoryConsumption::memory_consumption(cell_loop_post_list);
       return memory;
     }
   } // namespace MatrixFreeFunctions
@@ -1589,19 +1619,24 @@ namespace internal
 
     template void
     DoFInfo::compute_face_index_compression<1>(
-      const std::vector<FaceToCellTopology<1>> &);
+      const std::vector<FaceToCellTopology<1>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<2>(
-      const std::vector<FaceToCellTopology<2>> &);
+      const std::vector<FaceToCellTopology<2>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<4>(
-      const std::vector<FaceToCellTopology<4>> &);
+      const std::vector<FaceToCellTopology<4>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<8>(
-      const std::vector<FaceToCellTopology<8>> &);
+      const std::vector<FaceToCellTopology<8>> &,
+      bool);
     template void
     DoFInfo::compute_face_index_compression<16>(
-      const std::vector<FaceToCellTopology<16>> &);
+      const std::vector<FaceToCellTopology<16>> &,
+      bool);
 
     template void
     DoFInfo::compute_vector_zero_access_pattern<1>(

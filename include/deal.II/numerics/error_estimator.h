@@ -228,9 +228,9 @@ namespace hp
  * reason is that finding neighborship information is a bit easier then, but
  * that's all practical reasoning, nothing fundamental.
  *
- * Since we integrate from the coarse side of the face, we have the mother
+ * Since we integrate from the coarse side of the face, we have the parent
  * face readily at hand and store the result of the integration over that
- * mother face (being the sum of the integrals along the subfaces) in the
+ * parent face (being the sum of the integrals along the subfaces) in the
  * abovementioned map of integrals as well. This consumes some memory more
  * than needed, but makes the summing up of the face contributions to the
  * cells easier, since then we have the information from all faces of all

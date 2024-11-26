@@ -105,7 +105,7 @@ namespace NonMatching
    * same way as for the discrete level set function.
    */
   template <int dim>
-  class MeshClassifier : public Subscriptor
+  class MeshClassifier : public EnableObserverPointer
   {
   public:
     /**

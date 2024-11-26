@@ -2570,14 +2570,14 @@ FEInterfaceValues<dim, spacedim>::reinit(
       for (unsigned int i = 0; i < n_dofs_per_cell_1; ++i)
         {
           interface_dof_indices[i] = numbers::invalid_dof_index;
-          dofmap[i]                = {i, numbers::invalid_unsigned_int};
+          dofmap[i]                = {{i, numbers::invalid_unsigned_int}};
         }
 
       for (unsigned int i = 0; i < n_dofs_per_cell_2; ++i)
         {
           interface_dof_indices[i + n_dofs_per_cell_1] =
             numbers::invalid_dof_index;
-          dofmap[i + n_dofs_per_cell_1] = {numbers::invalid_unsigned_int, i};
+          dofmap[i + n_dofs_per_cell_1] = {{numbers::invalid_unsigned_int, i}};
         }
     }
 }

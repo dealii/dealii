@@ -185,7 +185,7 @@ namespace Step45
 
 
   template <class MatrixType, class PreconditionerType>
-  class InverseMatrix : public Subscriptor
+  class InverseMatrix : public EnableObserverPointer
   {
   public:
     InverseMatrix(const MatrixType         &m,

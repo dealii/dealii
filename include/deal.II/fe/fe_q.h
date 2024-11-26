@@ -207,7 +207,7 @@ DEAL_II_NAMESPACE_OPEN
  *     |/       /       |       |/
  *     *-------*        *-------*
  *   @endverbatim
- * The center vertex has number 26.
+ * The center node has number 26.
  *
  * The respective coordinate values of the support points of the shape
  * functions are as follows:

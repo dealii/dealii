@@ -245,9 +245,9 @@ namespace Step37
 
   // This is the constructor of the @p LaplaceOperator class. All it does is
   // to call the default constructor of the base class
-  // MatrixFreeOperators::Base, which in turn is based on the Subscriptor
-  // class that asserts that this class is not accessed after going out of scope
-  // e.g. in a preconditioner.
+  // MatrixFreeOperators::Base, which in turn is based on the
+  // EnableObserverPointer class that asserts that this class is
+  // not accessed after going out of scope e.g. in a preconditioner.
   template <int dim, int fe_degree, typename number>
   LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
     : MatrixFreeOperators::Base<dim,

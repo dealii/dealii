@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <iterator>
 #include <memory>
@@ -221,7 +221,7 @@ namespace hp
    * @ingroup hp hpcollection
    */
   template <typename T>
-  class Collection : public Subscriptor
+  class Collection : public EnableObserverPointer
   {
   public:
     /**
@@ -251,6 +251,13 @@ namespace hp
      */
     unsigned int
     size() const;
+
+    /**
+     * The return value of this function is equivalent to
+     * <code>size() == 0</code>
+     */
+    bool
+    empty() const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -308,6 +315,15 @@ namespace hp
   Collection<T>::size() const
   {
     return entries.size();
+  }
+
+
+
+  template <typename T>
+  inline bool
+  Collection<T>::empty() const
+  {
+    return this->size() == 0;
   }
 
 

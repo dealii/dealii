@@ -33,17 +33,17 @@ PathSearch::initialize_classes()
 {
   std::vector<std::string> v;
   v.emplace_back();
-  path_lists.insert(map_type(std::string("PARAMETER"), v));
+  path_lists.insert(map_type("PARAMETER", v));
 
   /*
    * TODO: re-enable some sensible default paths. Maier, 2012
    */
-  path_lists.insert(map_type(std::string("MESH"), v));
+  path_lists.insert(map_type("MESH", v));
 
   v.clear();
   v.emplace_back();
   v.emplace_back(".prm");
-  suffix_lists.insert(map_type(std::string("PARAMETER"), v));
+  suffix_lists.insert(map_type("PARAMETER", v));
 
   /*
    * TODO: "Would require linking with the deal.II libraries"? This .cc
@@ -62,7 +62,7 @@ PathSearch::initialize_classes()
   v.emplace_back(".plt");
   v.emplace_back(".nc");
   v.emplace_back(".msh");
-  suffix_lists.insert(map_type(std::string("MESH"), v));
+  suffix_lists.insert(map_type("MESH", v));
 }
 
 std::vector<std::string> &
@@ -163,7 +163,7 @@ PathSearch::find(const std::string &filename,
         }
     }
   AssertThrow(false, ExcFileNotFound(filename, cls));
-  return std::string("");
+  return "";
 }
 
 std::string
@@ -189,7 +189,7 @@ PathSearch::find(const std::string &filename, const char *open_mode)
         }
     }
   AssertThrow(false, ExcFileNotFound(filename, cls));
-  return std::string("");
+  return "";
 }
 
 

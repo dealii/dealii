@@ -275,15 +275,15 @@ DEAL_II_NAMESPACE_OPEN
  *   values are then distributed on the finite element spaces of the children
  *   post-refinement. This may lose information if, for example, the old cell
  *   used a Q2 space and the children use Q1 spaces, or the information may be
- *   prolonged if the mother cell used a Q1 space and the children are Q2s.
+ *   prolonged if the parent cell used a Q1 space and the children are Q2s.
  * - If cells are to be coarsened, then the values from the child cells are
- *   interpolated to the mother cell using the largest of the child cell
+ *   interpolated to the parent cell using the largest of the child cell
  * future finite element spaces, which will be identified as the least
  * dominant element following the FiniteElementDomination logic (consult
  *   hp::FECollection::find_dominated_fe_extended() for more information). For
  *   example, if the children of a cell use Q1, Q2 and Q3 spaces, then the
- *   values from the children are interpolated into a Q3 space on the mother
- *   cell. After refinement, this Q3 function on the mother cell is then
+ *   values from the children are interpolated into a Q3 space on the parent
+ *   cell. After refinement, this Q3 function on the parent cell is then
  *   interpolated into the space the user has selected for this cell (which
  * may be different from Q3, in this example, if the user has set the active
  * FE index for a different space post-refinement and before calling
@@ -651,11 +651,11 @@ namespace Legacy
    *
    * <li> Solution transfer with coarsening and refinement. After calling
    * Triangulation::prepare_coarsening_and_refinement the coarsen flags of
-   * either all or none of the children of a (father-)cell are set. While
+   * either all or none of the children of a (parent-)cell are set. While
    * coarsening (Triangulation::execute_coarsening_and_refinement) the cells
    * that are not needed any more will be deleted from the Triangulation.
    *
-   * For the interpolation from the (to be coarsenend) children to their father
+   * For the interpolation from the (to be coarsenend) children to their parent
    * the children cells are needed. Hence this interpolation and the storing of
    * the interpolated values of each of the discrete functions that we want to
    * interpolate needs to take place before these children cells are coarsened
@@ -680,7 +680,7 @@ namespace Legacy
    *
    * In <tt>interpolate(all_in, all_out)</tt> the refined cells are treated
    * according to the solution transfer while pure refinement. Additionally, on
-   * each cell that is coarsened (hence previously was a father cell), the
+   * each cell that is coarsened (hence previously was a parent cell), the
    * values of the discrete functions in @p all_out are set to the stored local
    * interpolated values that are accessible due to the 'vector<VectorType>
    * *' pointer in @p Pointerstruct that is pointed to by the pointer of that
@@ -752,15 +752,15 @@ namespace Legacy
    *   values are then distributed on the finite element spaces of the children
    *   post-refinement. This may lose information if, for example, the old cell
    *   used a Q2 space and the children use Q1 spaces, or the information may be
-   *   prolonged if the mother cell used a Q1 space and the children are Q2s.
+   *   prolonged if the parent cell used a Q1 space and the children are Q2s.
    * - If cells are to be coarsened, then the values from the child cells are
-   *   interpolated to the mother cell using the largest of the child cell
+   *   interpolated to the parent cell using the largest of the child cell
    * future finite element spaces, which will be identified as the least
    * dominant element following the FiniteElementDomination logic (consult
    *   hp::FECollection::find_dominated_fe_extended() for more information). For
    *   example, if the children of a cell use Q1, Q2 and Q3 spaces, then the
-   *   values from the children are interpolated into a Q3 space on the mother
-   *   cell. After refinement, this Q3 function on the mother cell is then
+   *   values from the children are interpolated into a Q3 space on the parent
+   *   cell. After refinement, this Q3 function on the parent cell is then
    *   interpolated into the space the user has selected for this cell (which
    * may be different from Q3, in this example, if the user has set the active
    * FE index for a different space post-refinement and before calling

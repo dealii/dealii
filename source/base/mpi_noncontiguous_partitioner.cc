@@ -104,23 +104,10 @@ namespace Utilities
       requests.clear();
 
       // set up communication pattern
-      std::vector<unsigned int> owning_ranks_of_ghosts(
-        indexset_want.n_elements());
-
-      // set up dictionary
-      Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
-        process(indexset_has,
-                indexset_want,
-                communicator,
-                owning_ranks_of_ghosts,
-                true);
-
-      Utilities::MPI::ConsensusAlgorithms::Selector<
-        std::vector<
-          std::pair<types::global_dof_index, types::global_dof_index>>,
-        std::vector<unsigned int>>
-        consensus_algorithm;
-      consensus_algorithm.run(process, communicator);
+      const auto [owning_ranks_of_ghosts, targets_with_indexset] =
+        Utilities::MPI::compute_index_owner_and_requesters(indexset_has,
+                                                           indexset_want,
+                                                           communicator);
 
       // set up map of processes from where this rank will receive values
       {
@@ -146,8 +133,6 @@ namespace Utilities
       }
 
       {
-        const auto targets_with_indexset = process.get_requesters();
-
         send_ptr.push_back(recv_ptr.back());
         for (const auto &target_with_indexset : targets_with_indexset)
           {

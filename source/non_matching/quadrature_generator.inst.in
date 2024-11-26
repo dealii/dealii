@@ -84,17 +84,17 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #endif
   }
 
-for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
+for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
   {
     template NonMatching::DiscreteQuadratureGenerator<deal_II_dimension>::
       DiscreteQuadratureGenerator(const hp::QCollection<1> &,
                                   const DoFHandler<deal_II_dimension> &,
-                                  const VEC &,
+                                  const ReadVector<S> &,
                                   const AdditionalData &);
 
     template NonMatching::DiscreteFaceQuadratureGenerator<deal_II_dimension>::
       DiscreteFaceQuadratureGenerator(const hp::QCollection<1> &,
                                       const DoFHandler<deal_II_dimension> &,
-                                      const VEC &,
+                                      const ReadVector<S> &,
                                       const AdditionalData &);
   }

@@ -730,8 +730,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType>::Vector(
       const Vector<Number, MemorySpaceType> &v)
-      : Subscriptor()
-      , allocated_size(0)
+      : allocated_size(0)
       , vector_is_ghosted(false)
       , comm_sm(MPI_COMM_SELF)
     {
@@ -749,7 +748,8 @@ namespace LinearAlgebra
       Vector<Number, MemorySpaceType> &&v)
       : Vector()
     {
-      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      static_cast<EnableObserverPointer &>(*this) =
+        static_cast<EnableObserverPointer &&>(v);
       this->swap(v);
     }
 
@@ -1427,7 +1427,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpaceType>::operator=( // NOLINT
       Vector<Number, MemorySpaceType> &&v)
     {
-      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
+      static_cast<EnableObserverPointer &>(*this) =
+        static_cast<EnableObserverPointer &&>(v);
       this->swap(v);
       return *this;
     }
@@ -1734,7 +1735,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<Number>                              &elements) const
+      const ArrayView<Number>                        &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       for (unsigned int i = 0; i < indices.size(); ++i)

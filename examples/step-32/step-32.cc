@@ -224,7 +224,7 @@ namespace Step32
   namespace LinearSolvers
   {
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
-    class BlockSchurPreconditioner : public Subscriptor
+    class BlockSchurPreconditioner : public EnableObserverPointer
     {
     public:
       BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,

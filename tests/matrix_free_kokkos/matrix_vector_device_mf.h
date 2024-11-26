@@ -170,7 +170,7 @@ template <int dim,
           typename VectorType =
             LinearAlgebra::distributed::Vector<double, MemorySpace::Default>,
           int n_q_points_1d = fe_degree + 1>
-class MatrixFreeTest : public Subscriptor
+class MatrixFreeTest : public EnableObserverPointer
 {
 public:
   MatrixFreeTest(const Portable::MatrixFree<dim, Number> &data_in,

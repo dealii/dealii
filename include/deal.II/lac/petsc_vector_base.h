@@ -21,7 +21,6 @@
 #ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/index_set.h>
-#  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/vector.h>
@@ -249,7 +248,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class VectorBase : public ReadVector<PetscScalar>, public Subscriptor
+  class VectorBase : public ReadVector<PetscScalar>
   {
   public:
     /**
@@ -488,7 +487,7 @@ namespace PETScWrappers
     virtual void
     extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<PetscScalar>                         &elements) const override;
+      const ArrayView<PetscScalar>                   &elements) const override;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -1192,7 +1191,7 @@ namespace PETScWrappers
   inline void
   VectorBase::extract_subvector_to(
     const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<PetscScalar>                         &elements) const
+    const ArrayView<PetscScalar>                   &elements) const
   {
     AssertDimension(indices.size(), elements.size());
     extract_subvector_to(indices.begin(), indices.end(), elements.begin());
@@ -1321,7 +1320,7 @@ namespace PETScWrappers
   VectorBase::save(Archive &ar, const unsigned int) const
   {
     // forward to serialization function in the base class.
-    ar &static_cast<const Subscriptor &>(*this);
+    ar &static_cast<const EnableObserverPointer &>(*this);
     ar &size();
     ar &local_range();
 
@@ -1343,7 +1342,7 @@ namespace PETScWrappers
   inline void
   VectorBase::load(Archive &ar, const unsigned int)
   {
-    ar &static_cast<Subscriptor &>(*this);
+    ar &static_cast<EnableObserverPointer &>(*this);
 
     size_type                       size = 0;
     std::pair<size_type, size_type> local_range;

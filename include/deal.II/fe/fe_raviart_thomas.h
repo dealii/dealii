@@ -191,7 +191,7 @@ private:
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
-   * the father cell. According to the philosophy of the Raviart-Thomas
+   * the parent cell. According to the philosophy of the Raviart-Thomas
    * element, this restriction operator preserves the divergence of a function
    * weakly.
    */

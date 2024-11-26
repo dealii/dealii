@@ -22,7 +22,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/base/subscriptor.h>
 
 #include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>
@@ -116,7 +115,7 @@ namespace parallel
  * in the manual).
  */
 template <typename Number>
-class Vector : public Subscriptor, public ReadVector<Number>
+class Vector : public ReadVector<Number>
 {
 public:
   /**
@@ -726,7 +725,7 @@ public:
    */
   virtual void
   extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
-                       ArrayView<Number> &elements) const override;
+                       const ArrayView<Number> &elements) const override;
 
   /**
    * Instead of getting individual elements of a vector via operator(),
@@ -1480,7 +1479,7 @@ inline void
 Vector<Number>::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
-  ar &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const EnableObserverPointer &>(*this);
   ar &values;
 }
 
@@ -1492,7 +1491,7 @@ inline void
 Vector<Number>::load(Archive &ar, const unsigned int)
 {
   // the load stuff again from the archive
-  ar &static_cast<Subscriptor &>(*this);
+  ar &static_cast<EnableObserverPointer &>(*this);
   ar &values;
   maybe_reset_thread_partitioner();
 }
