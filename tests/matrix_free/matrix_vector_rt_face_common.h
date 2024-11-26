@@ -230,7 +230,7 @@ do_test(const DoFHandler<dim>           &dof,
   const MappingQ<dim>     mapping(m_degree);
   MatrixFree<dim, Number> mf_data;
   {
-    const QGaussLobatto<1>                           quad(n_q_points);
+    const QGauss<1>                                  quad(n_q_points);
     typename MatrixFree<dim, Number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, Number>::AdditionalData::none;
     data.mapping_update_flags  = update_piola;
@@ -266,7 +266,7 @@ do_test(const DoFHandler<dim>           &dof,
 
   FEFaceValues<dim> fe_val(mapping,
                            dof.get_fe(),
-                           QGaussLobatto<dim - 1>(n_q_points),
+                           QGauss<dim - 1>(n_q_points),
                            update_values | update_gradients |
                              update_JxW_values | update_piola);
 
