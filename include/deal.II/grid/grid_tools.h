@@ -1463,9 +1463,9 @@ namespace GridTools
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::
     vector<typename MeshType::active_cell_iterator> compute_active_cell_halo_layer(
-      const MeshType &mesh,
-      const std::function<bool(const typename MeshType::active_cell_iterator &)>
-        &predicate);
+      const MeshType                &mesh,
+      const std::function<auto(const typename MeshType::active_cell_iterator &)
+                            ->bool> &predicate);
 
 
   /**
@@ -1482,7 +1482,7 @@ namespace GridTools
   std::
     vector<typename MeshType::cell_iterator> compute_cell_halo_layer_on_level(
       const MeshType &mesh,
-      const std::function<bool(const typename MeshType::cell_iterator &)>
+      const std::function<auto(const typename MeshType::cell_iterator &)->bool>
                         &predicate,
       const unsigned int level);
 
@@ -1562,8 +1562,8 @@ namespace GridTools
   std::
     vector<typename MeshType::active_cell_iterator> compute_active_cell_layer_within_distance(
       const MeshType &mesh,
-      const std::function<bool(const typename MeshType::active_cell_iterator &)>
-                  &predicate,
+      const std::function<
+        auto(const typename MeshType::active_cell_iterator &)->bool> &predicate,
       const double layer_thickness);
 
   /**
@@ -1674,8 +1674,8 @@ namespace GridTools
   std::
     vector<BoundingBox<MeshType::space_dimension>> compute_mesh_predicate_bounding_box(
       const MeshType &mesh,
-      const std::function<bool(const typename MeshType::active_cell_iterator &)>
-                        &predicate,
+      const std::function<
+        auto(const typename MeshType::active_cell_iterator &)->bool> &predicate,
       const unsigned int refinement_level = 0,
       const bool         allow_merge      = false,
       const unsigned int max_boxes        = numbers::invalid_unsigned_int);
@@ -2716,9 +2716,9 @@ namespace GridTools
       const typename MeshType::active_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::active_cell_iterator &,
                              const DataType &)>         &unpack,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &cell_filter =
-        always_return<typename MeshType::active_cell_iterator, bool>{true});
+    const std::function<auto(const typename MeshType::active_cell_iterator &)
+                          ->bool>                       &cell_filter =
+      always_return<typename MeshType::active_cell_iterator, bool>{true});
 
   /**
    * Exchange arbitrary data of type @p DataType provided by the function
@@ -2740,9 +2740,9 @@ namespace GridTools
       const typename MeshType::level_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)>        &unpack,
-    const std::function<bool(const typename MeshType::level_cell_iterator &)> &
-      cell_filter = always_return<typename MeshType::level_cell_iterator, bool>{
-        true});
+    const std::function<
+      auto(const typename MeshType::level_cell_iterator &)->bool> &cell_filter =
+      always_return<typename MeshType::level_cell_iterator, bool>{true});
 
   /* Exchange with all processors of the MPI communicator @p mpi_communicator the vector of bounding
    * boxes @p local_bboxes.
@@ -3311,9 +3311,10 @@ namespace GridTools
       const MeshType &mesh,
       const std::function<std::optional<DataType>(const MeshCellIteratorType &)>
         &pack,
-      const std::function<void(const MeshCellIteratorType &, const DataType &)>
-                                                                 &unpack,
-      const std::function<bool(const MeshCellIteratorType &)>    &cell_filter,
+      const std::function<
+        auto(const MeshCellIteratorType &, const DataType &)->void> &unpack,
+      const std::function<auto(const MeshCellIteratorType &)->bool>
+                                                                 &cell_filter,
       const std::function<void(
         const std::function<void(const MeshCellIteratorType &,
                                  const types::subdomain_id)> &)> &process_cells,
@@ -3608,8 +3609,8 @@ namespace GridTools
       const typename MeshType::active_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::active_cell_iterator &,
                              const DataType &)>         &unpack,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &cell_filter)
+    const std::function<
+      auto(const typename MeshType::active_cell_iterator &)->bool> &cell_filter)
   {
 #  ifndef DEAL_II_WITH_MPI
     (void)mesh;
@@ -3644,8 +3645,8 @@ namespace GridTools
       const typename MeshType::level_cell_iterator &)> &pack,
     const std::function<void(const typename MeshType::level_cell_iterator &,
                              const DataType &)>        &unpack,
-    const std::function<bool(const typename MeshType::level_cell_iterator &)>
-      &cell_filter)
+    const std::function<
+      auto(const typename MeshType::level_cell_iterator &)->bool> &cell_filter)
   {
 #  ifndef DEAL_II_WITH_MPI
     (void)mesh;

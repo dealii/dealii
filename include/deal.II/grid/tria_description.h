@@ -696,7 +696,7 @@ namespace TriangulationDescription
     template <int dim, int spacedim = dim>
     Description<dim, spacedim>
     create_description_from_triangulation_in_groups(
-      const std::function<void(dealii::Triangulation<dim, spacedim> &)>
+      const std::function<auto(dealii::Triangulation<dim, spacedim> &)->void>
                                                     &serial_grid_generator,
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                const MPI_Comm,

@@ -101,7 +101,7 @@ block_diagonal_operator(
  * @code
  *   std::function<unsigned int()> n_block_rows;
  *   std::function<unsigned int()> n_block_cols;
- *   std::function<BlockType(unsigned int, unsigned int)> block;
+ *   std::function<auto (unsigned int, unsigned int) -> BlockType> block;
  * @endcode
  * that describe the underlying block structure (of an otherwise opaque)
  * linear operator.
@@ -306,7 +306,7 @@ public:
    * <code>std::function</code> object returns a LinearOperator representing
    * the $(i,j)$-th block of the BlockLinearOperator.
    */
-  std::function<BlockType(unsigned int, unsigned int)> block;
+  std::function<auto(unsigned int, unsigned int)->BlockType> block;
 };
 
 

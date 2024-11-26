@@ -478,7 +478,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(VectorType &)> reinit_vector;
+    std::function<auto(VectorType &)->void> reinit_vector;
 
     /**
      * A function object that users should supply and that is intended to
@@ -493,7 +493,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const VectorType &src, VectorType &dst)> residual;
+    std::function<auto(const VectorType &src, VectorType &dst)->void> residual;
 
     /**
      * A function object that users should supply and that is intended to
@@ -508,7 +508,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const VectorType &src, VectorType &dst)>
+    std::function<auto(const VectorType &src, VectorType &dst)->void>
       iteration_function;
 
     /**
@@ -702,7 +702,7 @@ namespace SUNDIALS
      * @param kinsol_mem pointer to the KINSOL memory block which can be used
      *   for custom calls to `KINSet...` functions.
      */
-    std::function<void(void *kinsol_mem)> custom_setup;
+    std::function<auto(void *kinsol_mem)->void> custom_setup;
 
     /**
      * Handle KINSOL exceptions.

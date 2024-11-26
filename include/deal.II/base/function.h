@@ -808,7 +808,8 @@ public:
    * RangeNumberType> interface.
    */
   explicit ScalarFunctionFromFunctionObject(
-    const std::function<RangeNumberType(const Point<dim> &)> &function_object);
+    const std::function<auto(const Point<dim> &)->RangeNumberType>
+      &function_object);
 
   /**
    * Given a function object that takes  a time and a Point and returns a
@@ -816,7 +817,7 @@ public:
    * Function<dim, RangeNumberType> interface.
    */
   explicit ScalarFunctionFromFunctionObject(
-    const std::function<RangeNumberType(const double, const Point<dim> &)>
+    const std::function<auto(const double, const Point<dim> &)->RangeNumberType>
       &function_object_t);
 
   /**
@@ -831,7 +832,7 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std::function<RangeNumberType(const double, const Point<dim> &)>
+  const std::function<auto(const double, const Point<dim> &)->RangeNumberType>
     function_object;
 };
 
@@ -893,7 +894,8 @@ public:
    * the first argument.
    */
   VectorFunctionFromScalarFunctionObject(
-    const std::function<RangeNumberType(const Point<dim> &)> &function_object,
+    const std::function<auto(const Point<dim> &)->RangeNumberType>
+                      &function_object,
     const unsigned int selected_component,
     const unsigned int n_components);
 
@@ -918,7 +920,8 @@ private:
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    */
-  const std::function<RangeNumberType(const Point<dim> &)> function_object;
+  const std::function<auto(const Point<dim> &)->RangeNumberType>
+    function_object;
 
   /**
    * The vector component whose value is to be filled by the given scalar
@@ -987,7 +990,7 @@ public:
    * set_function_gradients() method.
    */
   explicit FunctionFromFunctionObjects(
-    const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
+    const std::vector<std::function<auto(const Point<dim> &)->RangeNumberType>>
                 &values,
     const double initial_time = 0.0);
 
@@ -1000,8 +1003,8 @@ public:
    * set_function_gradients() method.
    */
   explicit FunctionFromFunctionObjects(
-    const std::function<RangeNumberType(const Point<dim> &, const unsigned int)>
-                      &values,
+    const std::function<
+      auto(const Point<dim> &, const unsigned int)->RangeNumberType> &values,
     const unsigned int n_components,
     const double       initial_time = 0.0);
 
@@ -1014,7 +1017,7 @@ public:
    * match, an exception is triggered.
    */
   FunctionFromFunctionObjects(
-    const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
+    const std::vector<std::function<auto(const Point<dim> &)->RangeNumberType>>
       &values,
     const std::vector<
       std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &)>>
@@ -1048,7 +1051,7 @@ public:
    */
   void
   set_function_values(
-    const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
+    const std::vector<std::function<auto(const Point<dim> &)->RangeNumberType>>
       &values);
 
   /**
@@ -1066,7 +1069,7 @@ private:
   /**
    * The actual function values.
    */
-  std::function<RangeNumberType(const Point<dim> &, const unsigned int)>
+  std::function<auto(const Point<dim> &, const unsigned int)->RangeNumberType>
     function_values;
 
   /**

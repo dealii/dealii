@@ -715,10 +715,10 @@ namespace internal
   using vmult_functions_t = decltype(std::declval<const MatrixType>().vmult(
     std::declval<VectorType &>(),
     std::declval<const VectorType &>(),
-    std::declval<
-      const std::function<void(const unsigned int, const unsigned int)> &>(),
-    std::declval<
-      const std::function<void(const unsigned int, const unsigned int)> &>()));
+    std::declval<const std::function<
+      auto(const unsigned int, const unsigned int)->void> &>(),
+    std::declval<const std::function<
+      auto(const unsigned int, const unsigned int)->void> &>()));
 
   template <typename MatrixType,
             typename VectorType,
@@ -2046,8 +2046,9 @@ public:
  * void MatrixType::vmult(
  *    VectorType &,
  *    const VectorType &,
- *    const std::function<void(const unsigned int, const unsigned int)> &,
- *    const std::function<void(const unsigned int, const unsigned int)> &) const
+ *    const std::function<auto (const unsigned int, const unsigned int) -> void>
+ * &, const std::function<auto (const unsigned int, const unsigned int) -> void>
+ * &) const
  * @endcode
  * where the two given functions run before and after the matrix-vector
  * product, respectively. They take as arguments a sub-range among the locally
@@ -2070,9 +2071,9 @@ public:
  * void
  * vmult(LinearAlgebra::distributed::Vector<number> &      dst,
  *       const LinearAlgebra::distributed::Vector<number> &src,
- *       const std::function<void(const unsigned int, const unsigned int)>
- *         &operation_before_matrix_vector_product,
- *       const std::function<void(const unsigned int, const unsigned int)>
+ *       const std::function<auto (const unsigned int, const unsigned int) ->
+ * void> &operation_before_matrix_vector_product, const std::function<auto
+ * (const unsigned int, const unsigned int) -> void>
  *         &operation_after_matrix_vector_product) const
  * {
  *   data.cell_loop(&LaplaceOperator::local_apply,

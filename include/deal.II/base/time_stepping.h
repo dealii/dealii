@@ -191,8 +191,8 @@ namespace TimeStepping
      */
     virtual double
     evolve_one_time_step(
-      std::vector<std::function<VectorType(const double, const VectorType &)>>
-                                                                     &F,
+      std::vector<
+        std::function<auto(const double, const VectorType &)->VectorType>> &F,
       std::vector<std::function<
         VectorType(const double, const double, const VectorType &)>> &J_inverse,
       double                                                          t,
@@ -245,8 +245,8 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      std::vector<std::function<VectorType(const double, const VectorType &)>>
-                                                                     &F,
+      std::vector<
+        std::function<auto(const double, const VectorType &)->VectorType>> &F,
       std::vector<std::function<
         VectorType(const double, const double, const VectorType &)>> &J_inverse,
       double                                                          t,
@@ -266,7 +266,8 @@ namespace TimeStepping
      */
     virtual double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+        &f,
       const std::function<
         VectorType(const double, const double, const VectorType &)>
                  &id_minus_tau_J_inverse,
@@ -341,7 +342,8 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+        &f,
       const std::function<
         VectorType(const double, const double, const VectorType &)>
                  &id_minus_tau_J_inverse,
@@ -358,8 +360,9 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
-      double                                                             t,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+                 &f,
+      double      t,
       double      delta_t,
       VectorType &y);
 
@@ -387,8 +390,9 @@ namespace TimeStepping
      */
     void
     compute_stages(
-      const std::function<VectorType(const double, const VectorType &)> &f,
-      const double                                                       t,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+                              &f,
+      const double             t,
       const double             delta_t,
       const VectorType        &y,
       std::vector<VectorType> &f_stages) const;
@@ -443,7 +447,8 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+        &f,
       const std::function<
         VectorType(const double, const double, const VectorType &)>
                  &id_minus_tau_J_inverse,
@@ -462,8 +467,9 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
-      double                                                             t,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+                 &f,
+      double      t,
       double      delta_t,
       VectorType &solution,
       VectorType &vec_ri,
@@ -504,8 +510,9 @@ namespace TimeStepping
      */
     void
     compute_one_stage(
-      const std::function<VectorType(const double, const VectorType &)> &f,
-      const double                                                       t,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+                       &f,
+      const double      t,
       const double      factor_solution,
       const double      factor_ai,
       const VectorType &current_ri,
@@ -566,7 +573,8 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+        &f,
       const std::function<
         VectorType(const double, const double, const VectorType &)>
                  &id_minus_tau_J_inverse,
@@ -611,7 +619,8 @@ namespace TimeStepping
      */
     void
     compute_stages(
-      const std::function<VectorType(const double, const VectorType &)> &f,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+        &f,
       const std::function<
         VectorType(const double, const double, const VectorType &)>
                               &id_minus_tau_J_inverse,
@@ -625,8 +634,9 @@ namespace TimeStepping
      */
     void
     newton_solve(
-      const std::function<void(const VectorType &, VectorType &)> &get_residual,
-      const std::function<VectorType(const VectorType &)>
+      const std::function<auto(const VectorType &, VectorType &)->void>
+        &get_residual,
+      const std::function<auto(const VectorType &)->VectorType>
                  &id_minus_tau_J_inverse,
       VectorType &y);
 
@@ -635,8 +645,9 @@ namespace TimeStepping
      */
     void
     compute_residual(
-      const std::function<VectorType(const double, const VectorType &)> &f,
-      double                                                             t,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+                       &f,
+      double            t,
       double            delta_t,
       const VectorType &new_y,
       const VectorType &y,
@@ -725,7 +736,8 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+        &f,
       const std::function<
         VectorType(const double, const double, const VectorType &)>
                  &id_minus_tau_J_inverse,
@@ -742,8 +754,9 @@ namespace TimeStepping
      */
     double
     evolve_one_time_step(
-      const std::function<VectorType(const double, const VectorType &)> &f,
-      double                                                             t,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+                 &f,
+      double      t,
       double      delta_t,
       VectorType &y);
 
@@ -789,8 +802,9 @@ namespace TimeStepping
      */
     void
     compute_stages(
-      const std::function<VectorType(const double, const VectorType &)> &f,
-      const double                                                       t,
+      const std::function<auto(const double, const VectorType &)->VectorType>
+                              &f,
+      const double             t,
       const double             delta_t,
       const VectorType        &y,
       std::vector<VectorType> &f_stages);

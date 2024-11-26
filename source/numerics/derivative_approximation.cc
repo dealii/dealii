@@ -997,7 +997,7 @@ namespace DerivativeApproximation
           approximate<DerivativeDescription, dim, InputVector, spacedim>(
             cell, mapping, dof_handler, solution, component);
         },
-        std::function<void(const internal::Assembler::CopyData &)>(),
+        std::function<auto(const internal::Assembler::CopyData &)->void>(),
         internal::Assembler::Scratch(),
         internal::Assembler::CopyData());
     }

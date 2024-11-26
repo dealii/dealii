@@ -85,10 +85,10 @@ identity_operator(const LinearOperator<Range, Domain, Payload> &);
  * store the knowledge of how to apply the linear operator by implementing the
  * abstract @p Matrix interface:
  * @code
- *   std::function<void(Range &, const Domain &)> vmult;
- *   std::function<void(Range &, const Domain &)> vmult_add;
- *   std::function<void(Domain &, const Range &)> Tvmult;
- *   std::function<void(Domain &, const Range &)> Tvmult_add;
+ *   std::function<auto (Range &, const Domain &) -> void> vmult;
+ *   std::function<auto (Range &, const Domain &) -> void> vmult_add;
+ *   std::function<auto (Domain &, const Range &) -> void> Tvmult;
+ *   std::function<auto (Domain &, const Range &) -> void> Tvmult_add;
  * @endcode
  *
  * But, in contrast to a usual matrix object, the domain and range of the
@@ -96,8 +96,8 @@ identity_operator(const LinearOperator<Range, Domain, Payload> &);
  * level. Because of this, `LinearOperator<Range, Domain>` has two
  * additional function objects
  * @code
- *   std::function<void(Range &, bool)> reinit_range_vector;
- *   std::function<void(Domain &, bool)> reinit_domain_vector;
+ *   std::function<auto (Range &, bool) -> void> reinit_range_vector;
+ *   std::function<auto (Domain &, bool) -> void> reinit_domain_vector;
  * @endcode
  * that store the knowledge how to initialize (resize + internal data
  * structures) an arbitrary vector of the @p Range and @p Domain space.
@@ -291,25 +291,25 @@ public:
    * Application of the LinearOperator object to a vector u of the @p Domain
    * space giving a vector v of the @p Range space.
    */
-  std::function<void(Range &v, const Domain &u)> vmult;
+  std::function<auto(Range &v, const Domain &u)->void> vmult;
 
   /**
    * Application of the LinearOperator object to a vector u of the @p Domain
    * space. The result is added to the vector v.
    */
-  std::function<void(Range &v, const Domain &u)> vmult_add;
+  std::function<auto(Range &v, const Domain &u)->void> vmult_add;
 
   /**
    * Application of the transpose LinearOperator object to a vector u of the
    * @p Range space giving a vector v of the @p Domain space.
    */
-  std::function<void(Domain &v, const Range &u)> Tvmult;
+  std::function<auto(Domain &v, const Range &u)->void> Tvmult;
 
   /**
    * Application of the transpose LinearOperator object to a vector @p u of
    * the @p Range space.The result is added to the vector @p v.
    */
-  std::function<void(Domain &v, const Range &u)> Tvmult_add;
+  std::function<auto(Domain &v, const Range &u)->void> Tvmult_add;
 
   /**
    * Initializes a vector v of the Range space to be directly usable as the
@@ -318,7 +318,8 @@ public:
    * initialization is done, i.e., if it is set to false the content of the
    * vector is set to 0.
    */
-  std::function<void(Range &v, bool omit_zeroing_entries)> reinit_range_vector;
+  std::function<auto(Range &v, bool omit_zeroing_entries)->void>
+    reinit_range_vector;
 
   /**
    * Initializes a vector of the Domain space to be directly usable as the
@@ -327,7 +328,7 @@ public:
    * initialization is done, i.e., if it is set to false the content of the
    * vector is set to 0.
    */
-  std::function<void(Domain &v, bool omit_zeroing_entries)>
+  std::function<auto(Domain &v, bool omit_zeroing_entries)->void>
     reinit_domain_vector;
 
   /**
@@ -882,7 +883,7 @@ template <
   typename Range,
   typename Payload = internal::LinearOperatorImplementation::EmptyPayload>
 LinearOperator<Range, Range, Payload>
-identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
+identity_operator(const std::function<auto(Range &, bool)->void> &reinit_vector)
 {
   LinearOperator<Range, Range, Payload> return_op{Payload()};
 
@@ -972,7 +973,7 @@ template <
   typename Range,
   typename Payload = internal::LinearOperatorImplementation::EmptyPayload>
 LinearOperator<Range, Range, Payload>
-mean_value_filter(const std::function<void(Range &, bool)> &reinit_vector)
+mean_value_filter(const std::function<auto(Range &, bool)->void> &reinit_vector)
 {
   LinearOperator<Range, Range, Payload> return_op{Payload()};
 

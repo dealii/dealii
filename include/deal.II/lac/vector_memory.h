@@ -185,7 +185,8 @@ public:
    * VectorMemory pool.
    */
   class Pointer
-    : public std::unique_ptr<VectorType, std::function<void(VectorType *)>>
+    : public std::unique_ptr<VectorType,
+                             std::function<auto(VectorType *)->void>>
   {
   public:
     /**
@@ -475,7 +476,7 @@ namespace internal
 
 template <typename VectorType>
 inline VectorMemory<VectorType>::Pointer::Pointer(VectorMemory<VectorType> &mem)
-  : std::unique_ptr<VectorType, std::function<void(VectorType *)>>(
+  : std::unique_ptr<VectorType, std::function<auto(VectorType *)->void>>(
       mem.alloc(),
       [&mem](VectorType *v) { mem.free(v); })
 {}

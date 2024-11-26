@@ -343,9 +343,9 @@ public:
    * key in the parameter file.
    */
   void
-  add_extra_column(const std::string             &column_name,
-                   const std::function<double()> &custom_function,
-                   const bool                     compute_rate = true);
+  add_extra_column(const std::string                   &column_name,
+                   const std::function<auto()->double> &custom_function,
+                   const bool                           compute_rate = true);
 
   /**
    * Difference between two solutions in the same vector space.
@@ -410,7 +410,7 @@ private:
   /**
    * Additional methods to call when adding rows to the table.
    */
-  std::map<std::string, std::pair<std::function<double()>, bool>>
+  std::map<std::string, std::pair<std::function<auto()->double>, bool>>
     extra_column_functions;
 
   /**
@@ -558,12 +558,12 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
           }
 
       // A vector of zero std::functions with n_components components
-      const std::vector<std::function<double(const Point<spacedim> &)>>
+      const std::vector<std::function<auto(const Point<spacedim> &)->double>>
         zero_components(n_components,
                         [](const Point<spacedim> &) { return 0.0; });
 
       // The default weight function, with n_components components
-      std::vector<std::function<double(const Point<spacedim> &)>>
+      std::vector<std::function<auto(const Point<spacedim> &)->double>>
         weight_components(n_components,
                           [](const Point<spacedim> &) { return 1.0; });
 

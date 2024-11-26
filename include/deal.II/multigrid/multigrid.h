@@ -311,49 +311,49 @@ public:
    */
   boost::signals2::connection
   connect_pre_smoother_step(
-    const std::function<void(const bool, const unsigned int)> &slot);
+    const std::function<auto(const bool, const unsigned int)->void> &slot);
 
   /**
    * Connect a function to mg::Signals::residual_step.
    */
   boost::signals2::connection
   connect_residual_step(
-    const std::function<void(const bool, const unsigned int)> &slot);
+    const std::function<auto(const bool, const unsigned int)->void> &slot);
 
   /**
    * Connect a function to mg::Signals::restriction.
    */
   boost::signals2::connection
   connect_restriction(
-    const std::function<void(const bool, const unsigned int)> &slot);
+    const std::function<auto(const bool, const unsigned int)->void> &slot);
 
   /**
    * Connect a function to mg::Signals::coarse_solve.
    */
   boost::signals2::connection
   connect_coarse_solve(
-    const std::function<void(const bool, const unsigned int)> &slot);
+    const std::function<auto(const bool, const unsigned int)->void> &slot);
 
   /**
    * Connect a function to mg::Signals::prolongation.
    */
   boost::signals2::connection
   connect_prolongation(
-    const std::function<void(const bool, const unsigned int)> &slot);
+    const std::function<auto(const bool, const unsigned int)->void> &slot);
 
   /**
    * Connect a function to mg::Signals::edge_prolongation.
    */
   boost::signals2::connection
   connect_edge_prolongation(
-    const std::function<void(const bool, const unsigned int)> &slot);
+    const std::function<auto(const bool, const unsigned int)->void> &slot);
 
   /**
    * Connect a function to mg::Signals::post_smoother_step.
    */
   boost::signals2::connection
   connect_post_smoother_step(
-    const std::function<void(const bool, const unsigned int)> &slot);
+    const std::function<auto(const bool, const unsigned int)->void> &slot);
 
 private:
   /**
@@ -588,13 +588,13 @@ public:
    * Connect a function to mg::Signals::transfer_to_mg.
    */
   boost::signals2::connection
-  connect_transfer_to_mg(const std::function<void(bool)> &slot);
+  connect_transfer_to_mg(const std::function<auto(bool)->void> &slot);
 
   /**
    * Connect a function to mg::Signals::transfer_to_global.
    */
   boost::signals2::connection
-  connect_transfer_to_global(const std::function<void(bool)> &slot);
+  connect_transfer_to_global(const std::function<auto(bool)->void> &slot);
 
   /**
    * Return the Multigrid object passed to the constructor.
@@ -925,7 +925,7 @@ PreconditionMG<dim, VectorType, TransferType>::get_mpi_communicator() const
 template <int dim, typename VectorType, typename TransferType>
 boost::signals2::connection
 PreconditionMG<dim, VectorType, TransferType>::connect_transfer_to_mg(
-  const std::function<void(bool)> &slot)
+  const std::function<auto(bool)->void> &slot)
 {
   return this->signals.transfer_to_mg.connect(slot);
 }
@@ -935,7 +935,7 @@ PreconditionMG<dim, VectorType, TransferType>::connect_transfer_to_mg(
 template <int dim, typename VectorType, typename TransferType>
 boost::signals2::connection
 PreconditionMG<dim, VectorType, TransferType>::connect_transfer_to_global(
-  const std::function<void(bool)> &slot)
+  const std::function<auto(bool)->void> &slot)
 {
   return this->signals.transfer_to_global.connect(slot);
 }

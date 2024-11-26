@@ -960,38 +960,40 @@ public:
    */
   template <typename CLASS, typename OutVector, typename InVector>
   void
-  cell_loop(void (CLASS::*cell_operation)(
-              const MatrixFree &,
-              OutVector &,
-              const InVector &,
-              const std::pair<unsigned int, unsigned int> &) const,
-            const CLASS    *owning_class,
-            OutVector      &dst,
-            const InVector &src,
-            const std::function<void(const unsigned int, const unsigned int)>
-              &operation_before_loop,
-            const std::function<void(const unsigned int, const unsigned int)>
-                              &operation_after_loop,
-            const unsigned int dof_handler_index_pre_post = 0) const;
+  cell_loop(
+    void (CLASS::*cell_operation)(const MatrixFree &,
+                                  OutVector &,
+                                  const InVector &,
+                                  const std::pair<unsigned int, unsigned int> &)
+      const,
+    const CLASS    *owning_class,
+    OutVector      &dst,
+    const InVector &src,
+    const std::function<auto(const unsigned int, const unsigned int)->void>
+      &operation_before_loop,
+    const std::function<auto(const unsigned int, const unsigned int)->void>
+                      &operation_after_loop,
+    const unsigned int dof_handler_index_pre_post = 0) const;
 
   /**
    * Same as above, but for class member functions which are non-const.
    */
   template <typename CLASS, typename OutVector, typename InVector>
   void
-  cell_loop(void (CLASS::*cell_operation)(
-              const MatrixFree &,
-              OutVector &,
-              const InVector &,
-              const std::pair<unsigned int, unsigned int> &),
-            CLASS          *owning_class,
-            OutVector      &dst,
-            const InVector &src,
-            const std::function<void(const unsigned int, const unsigned int)>
-              &operation_before_loop,
-            const std::function<void(const unsigned int, const unsigned int)>
-                              &operation_after_loop,
-            const unsigned int dof_handler_index_pre_post = 0) const;
+  cell_loop(
+    void (CLASS::*cell_operation)(
+      const MatrixFree &,
+      OutVector &,
+      const InVector &,
+      const std::pair<unsigned int, unsigned int> &),
+    CLASS          *owning_class,
+    OutVector      &dst,
+    const InVector &src,
+    const std::function<auto(const unsigned int, const unsigned int)->void>
+      &operation_before_loop,
+    const std::function<auto(const unsigned int, const unsigned int)->void>
+                      &operation_after_loop,
+    const unsigned int dof_handler_index_pre_post = 0) const;
 
   /**
    * Same as above, but taking an `std::function` as the `cell_operation`
@@ -999,18 +1001,19 @@ public:
    */
   template <typename OutVector, typename InVector>
   void
-  cell_loop(const std::function<void(
-              const MatrixFree<dim, Number, VectorizedArrayType> &,
-              OutVector &,
-              const InVector &,
-              const std::pair<unsigned int, unsigned int> &)> &cell_operation,
-            OutVector                                         &dst,
-            const InVector                                    &src,
-            const std::function<void(const unsigned int, const unsigned int)>
-              &operation_before_loop,
-            const std::function<void(const unsigned int, const unsigned int)>
-                              &operation_after_loop,
-            const unsigned int dof_handler_index_pre_post = 0) const;
+  cell_loop(
+    const std::function<
+      void(const MatrixFree<dim, Number, VectorizedArrayType> &,
+           OutVector &,
+           const InVector &,
+           const std::pair<unsigned int, unsigned int> &)> &cell_operation,
+    OutVector                                              &dst,
+    const InVector                                         &src,
+    const std::function<auto(const unsigned int, const unsigned int)->void>
+      &operation_before_loop,
+    const std::function<auto(const unsigned int, const unsigned int)->void>
+                      &operation_after_loop,
+    const unsigned int dof_handler_index_pre_post = 0) const;
 
   /**
    * This method runs a loop over all cells (in parallel) and performs the MPI
@@ -1397,9 +1400,9 @@ public:
        const CLASS    *owning_class,
        OutVector      &dst,
        const InVector &src,
-       const std::function<void(const unsigned int, const unsigned int)>
+       const std::function<auto(const unsigned int, const unsigned int)->void>
          &operation_before_loop,
-       const std::function<void(const unsigned int, const unsigned int)>
+       const std::function<auto(const unsigned int, const unsigned int)->void>
                               &operation_after_loop,
        const unsigned int      dof_handler_index_pre_post = 0,
        const DataAccessOnFaces dst_vector_face_access =
@@ -1430,9 +1433,9 @@ public:
        const CLASS    *owning_class,
        OutVector      &dst,
        const InVector &src,
-       const std::function<void(const unsigned int, const unsigned int)>
+       const std::function<auto(const unsigned int, const unsigned int)->void>
          &operation_before_loop,
-       const std::function<void(const unsigned int, const unsigned int)>
+       const std::function<auto(const unsigned int, const unsigned int)->void>
                               &operation_after_loop,
        const unsigned int      dof_handler_index_pre_post = 0,
        const DataAccessOnFaces dst_vector_face_access =
@@ -1465,9 +1468,9 @@ public:
       const std::pair<unsigned int, unsigned int> &)> &boundary_face_operation,
     OutVector                                         &dst,
     const InVector                                    &src,
-    const std::function<void(const unsigned int, const unsigned int)>
+    const std::function<auto(const unsigned int, const unsigned int)->void>
       &operation_before_loop,
-    const std::function<void(const unsigned int, const unsigned int)>
+    const std::function<auto(const unsigned int, const unsigned int)->void>
                            &operation_after_loop,
     const unsigned int      dof_handler_index_pre_post = 0,
     const DataAccessOnFaces dst_vector_face_access =
@@ -4695,23 +4698,24 @@ namespace internal
         function_type;
 
     // constructor, binds all the arguments to this class
-    MFWorker(const MF                            &matrix_free,
-             const InVector                      &src,
-             OutVector                           &dst,
-             const bool                           zero_dst_vector_setting,
-             const Container                     &container,
-             function_type                        cell_function,
-             function_type                        face_function,
-             function_type                        boundary_function,
-             const typename MF::DataAccessOnFaces src_vector_face_access =
-               MF::DataAccessOnFaces::none,
-             const typename MF::DataAccessOnFaces dst_vector_face_access =
-               MF::DataAccessOnFaces::none,
-             const std::function<void(const unsigned int, const unsigned int)>
-               &operation_before_loop = {},
-             const std::function<void(const unsigned int, const unsigned int)>
-                               &operation_after_loop       = {},
-             const unsigned int dof_handler_index_pre_post = 0)
+    MFWorker(
+      const MF                            &matrix_free,
+      const InVector                      &src,
+      OutVector                           &dst,
+      const bool                           zero_dst_vector_setting,
+      const Container                     &container,
+      function_type                        cell_function,
+      function_type                        face_function,
+      function_type                        boundary_function,
+      const typename MF::DataAccessOnFaces src_vector_face_access =
+        MF::DataAccessOnFaces::none,
+      const typename MF::DataAccessOnFaces dst_vector_face_access =
+        MF::DataAccessOnFaces::none,
+      const std::function<auto(const unsigned int, const unsigned int)->void>
+        &operation_before_loop = {},
+      const std::function<auto(const unsigned int, const unsigned int)->void>
+                        &operation_after_loop       = {},
+      const unsigned int dof_handler_index_pre_post = 0)
       : matrix_free(matrix_free)
       , container(const_cast<Container &>(container))
       , cell_function(cell_function)
@@ -4939,9 +4943,9 @@ namespace internal
                dst_data_exchanger;
     const bool src_and_dst_are_same;
     const bool zero_dst_vector_setting;
-    const std::function<void(const unsigned int, const unsigned int)>
+    const std::function<auto(const unsigned int, const unsigned int)->void>
       operation_before_loop;
-    const std::function<void(const unsigned int, const unsigned int)>
+    const std::function<auto(const unsigned int, const unsigned int)->void>
                        operation_after_loop;
     const unsigned int dof_handler_index_pre_post;
   };
@@ -5057,9 +5061,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::cell_loop(
                  &cell_operation,
   OutVector      &dst,
   const InVector &src,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
     &operation_before_loop,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
                     &operation_after_loop,
   const unsigned int dof_handler_index_pre_post) const
 {
@@ -5187,9 +5191,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::cell_loop(
   const CLASS    *owning_class,
   OutVector      &dst,
   const InVector &src,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
     &operation_before_loop,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
                     &operation_after_loop,
   const unsigned int dof_handler_index_pre_post) const
 {
@@ -5306,9 +5310,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::cell_loop(
   CLASS          *owning_class,
   OutVector      &dst,
   const InVector &src,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
     &operation_before_loop,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
                     &operation_after_loop,
   const unsigned int dof_handler_index_pre_post) const
 {
@@ -5402,9 +5406,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop(
                  &boundary_face_operation,
   OutVector      &dst,
   const InVector &src,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
     &operation_before_loop,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
                          &operation_after_loop,
   const unsigned int      dof_handler_index_pre_post,
   const DataAccessOnFaces dst_vector_face_access,
@@ -5461,9 +5465,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop(
   const CLASS    *owning_class,
   OutVector      &dst,
   const InVector &src,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
     &operation_before_loop,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
                          &operation_after_loop,
   const unsigned int      dof_handler_index_pre_post,
   const DataAccessOnFaces dst_vector_face_access,
@@ -5513,9 +5517,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::loop(
   const CLASS    *owning_class,
   OutVector      &dst,
   const InVector &src,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
     &operation_before_loop,
-  const std::function<void(const unsigned int, const unsigned int)>
+  const std::function<auto(const unsigned int, const unsigned int)->void>
                          &operation_after_loop,
   const unsigned int      dof_handler_index_pre_post,
   const DataAccessOnFaces dst_vector_face_access,

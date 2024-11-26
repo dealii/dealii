@@ -137,7 +137,7 @@ public:
    * Constructor. Takes a function object that is to be executed at the
    * place where the current object goes out of scope as argument.
    */
-  explicit ScopeExit(const std::function<void()> &exit_function);
+  explicit ScopeExit(const std::function<auto()->void> &exit_function);
 
   /**
    * Copy constructor. These kinds of objects cannot be copied, so the
@@ -161,12 +161,12 @@ private:
   /**
    * A copy of the function to be executed.
    */
-  const std::function<void()> exit_function;
+  const std::function<auto()->void> exit_function;
 };
 
 
 
-inline ScopeExit::ScopeExit(const std::function<void()> &exit_function)
+inline ScopeExit::ScopeExit(const std::function<auto()->void> &exit_function)
   : exit_function(exit_function)
 {}
 

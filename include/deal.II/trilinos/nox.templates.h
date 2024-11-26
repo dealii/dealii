@@ -358,10 +358,11 @@ namespace TrilinosWrappers
          * to solve the Jacobian.
          */
         Group(
-          VectorType                                                 &solution,
-          const std::function<int(const VectorType &, VectorType &)> &residual,
-          const std::function<int(const VectorType &)> &setup_jacobian,
-          const std::function<int(const VectorType &, VectorType &)>
+          VectorType &solution,
+          const std::function<auto(const VectorType &, VectorType &)->int>
+                                                             &residual,
+          const std::function<auto(const VectorType &)->int> &setup_jacobian,
+          const std::function<auto(const VectorType &, VectorType &)->int>
                                                  &apply_jacobian,
           const std::function<int(const VectorType &,
                                   VectorType &,
@@ -764,17 +765,18 @@ namespace TrilinosWrappers
         /**
          * A helper function to compute residual.
          */
-        std::function<int(const VectorType &x, VectorType &f)> residual;
+        std::function<auto(const VectorType &x, VectorType &f)->int> residual;
 
         /**
          * A helper function to set up Jacobian.
          */
-        std::function<int(const VectorType &x)> setup_jacobian;
+        std::function<auto(const VectorType &x)->int> setup_jacobian;
 
         /**
          * A helper function to apply Jacobian.
          */
-        std::function<int(const VectorType &x, VectorType &v)> apply_jacobian;
+        std::function<auto(const VectorType &x, VectorType &v)->int>
+          apply_jacobian;
 
         /**
          * A helper function to solve Jacobian.

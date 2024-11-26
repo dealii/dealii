@@ -477,7 +477,7 @@ public:
    * or because divergence has been detected).
    */
   boost::signals2::connection
-  connect_condition_number_slot(const std::function<void(double)> &slot,
+  connect_condition_number_slot(const std::function<auto(double)->void> &slot,
                                 const bool every_iteration = false);
 
   /**
@@ -488,7 +488,8 @@ public:
    */
   boost::signals2::connection
   connect_eigenvalues_slot(
-    const std::function<void(const std::vector<std::complex<double>> &)> &slot,
+    const std::function<auto(const std::vector<std::complex<double>> &)->void>
+              &slot,
     const bool every_iteration = false);
 
   /**
@@ -500,7 +501,7 @@ public:
    */
   boost::signals2::connection
   connect_hessenberg_slot(
-    const std::function<void(const FullMatrix<double> &)> &slot,
+    const std::function<auto(const FullMatrix<double> &)->void> &slot,
     const bool every_iteration = true);
 
   /**
@@ -521,7 +522,7 @@ public:
    * re-orthogonalized.
    */
   boost::signals2::connection
-  connect_re_orthogonalization_slot(const std::function<void(int)> &slot);
+  connect_re_orthogonalization_slot(const std::function<auto(int)->void> &slot);
 
 
   DeclException1(ExcTooFewTmpVectors,
@@ -1874,8 +1875,8 @@ template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 boost::signals2::connection
   SolverGMRES<VectorType>::connect_condition_number_slot(
-    const std::function<void(double)> &slot,
-    const bool                         every_iteration)
+    const std::function<auto(double)->void> &slot,
+    const bool                               every_iteration)
 {
   if (every_iteration)
     {
@@ -1892,7 +1893,8 @@ boost::signals2::connection
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 boost::signals2::connection SolverGMRES<VectorType>::connect_eigenvalues_slot(
-  const std::function<void(const std::vector<std::complex<double>> &)> &slot,
+  const std::function<auto(const std::vector<std::complex<double>> &)->void>
+            &slot,
   const bool every_iteration)
 {
   if (every_iteration)
@@ -1910,8 +1912,8 @@ boost::signals2::connection SolverGMRES<VectorType>::connect_eigenvalues_slot(
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 boost::signals2::connection SolverGMRES<VectorType>::connect_hessenberg_slot(
-  const std::function<void(const FullMatrix<double> &)> &slot,
-  const bool                                             every_iteration)
+  const std::function<auto(const FullMatrix<double> &)->void> &slot,
+  const bool                                                   every_iteration)
 {
   if (every_iteration)
     {
@@ -1940,7 +1942,7 @@ template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 boost::signals2::connection
   SolverGMRES<VectorType>::connect_re_orthogonalization_slot(
-    const std::function<void(int)> &slot)
+    const std::function<auto(int)->void> &slot)
 {
   return re_orthogonalize_signal.connect(slot);
 }

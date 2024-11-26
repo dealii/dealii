@@ -483,8 +483,8 @@ namespace internal
      * Constructor.
      */
     FineDoFHandlerViewCell(
-      const std::function<bool()> &has_children_function,
-      const std::function<void(std::vector<types::global_dof_index> &)>
+      const std::function<auto()->bool> &has_children_function,
+      const std::function<auto(std::vector<types::global_dof_index> &)->void>
                                           &get_dof_indices_function,
       const std::function<unsigned int()> &active_fe_index_function,
       const std::function<std::uint8_t()> &refinement_case_function)
@@ -532,12 +532,12 @@ namespace internal
     /**
      * Lambda function returning whether cell has children.
      */
-    const std::function<bool()> has_children_function;
+    const std::function<auto()->bool> has_children_function;
 
     /**
      * Lambda function returning DoF indices.
      */
-    const std::function<void(std::vector<types::global_dof_index> &)>
+    const std::function<auto(std::vector<types::global_dof_index> &)->void>
       get_dof_indices_function;
 
     /**
@@ -4492,7 +4492,7 @@ MGTransferMF<dim, Number>::build(
 template <int dim, typename Number>
 void
 MGTransferMF<dim, Number>::build(
-  const std::function<void(const unsigned int, VectorType &)>
+  const std::function<auto(const unsigned int, VectorType &)->void>
     &initialize_dof_vector)
 {
   if (initialize_dof_vector)
@@ -4553,7 +4553,7 @@ template <int dim, typename Number>
 void
 MGTransferMF<dim, Number>::build(
   const DoFHandler<dim> &dof_handler,
-  const std::function<void(const unsigned int, VectorType &)>
+  const std::function<auto(const unsigned int, VectorType &)->void>
     &initialize_dof_vector)
 {
   const bool use_local_smoothing =
@@ -5771,7 +5771,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::memory_consumption() const
 template <int dim, typename VectorType>
 boost::signals2::connection
 MGTwoLevelTransferNonNested<dim, VectorType>::connect_prolongation_cell_loop(
-  const std::function<void(const bool)> &slot)
+  const std::function<auto(const bool)->void> &slot)
 {
   return signals_non_nested.prolongation_cell_loop.connect(slot);
 }
@@ -5781,7 +5781,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::connect_prolongation_cell_loop(
 template <int dim, typename VectorType>
 boost::signals2::connection
 MGTwoLevelTransferNonNested<dim, VectorType>::connect_restriction_cell_loop(
-  const std::function<void(const bool)> &slot)
+  const std::function<auto(const bool)->void> &slot)
 {
   return signals_non_nested.restriction_cell_loop.connect(slot);
 }
@@ -5791,7 +5791,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::connect_restriction_cell_loop(
 template <int dim, typename VectorType>
 boost::signals2::connection
 MGTwoLevelTransferNonNested<dim, VectorType>::connect_prolongation(
-  const std::function<void(const bool)> &slot)
+  const std::function<auto(const bool)->void> &slot)
 {
   return signals_non_nested.prolongation.connect(slot);
 }
@@ -5801,7 +5801,7 @@ MGTwoLevelTransferNonNested<dim, VectorType>::connect_prolongation(
 template <int dim, typename VectorType>
 boost::signals2::connection
 MGTwoLevelTransferNonNested<dim, VectorType>::connect_restriction(
-  const std::function<void(const bool)> &slot)
+  const std::function<auto(const bool)->void> &slot)
 {
   return signals_non_nested.restriction.connect(slot);
 }

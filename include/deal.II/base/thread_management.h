@@ -499,7 +499,7 @@ namespace Threads
      * @post Using this constructor automatically makes the task object
      * joinable().
      */
-    Task(const std::function<RT()> &function_object)
+    Task(const std::function<auto()->RT> &function_object)
     {
       if (MultithreadInfo::n_threads() > 1)
         {
@@ -1150,7 +1150,7 @@ namespace Threads
    */
   template <typename RT>
   inline Task<RT>
-  new_task(const std::function<RT()> &function)
+  new_task(const std::function<auto()->RT> &function)
   {
     return Task<RT>(function);
   }
@@ -1334,7 +1334,7 @@ namespace Threads
            std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
-    return new_task(std::function<RT()>(std::bind(
+    return new_task(std::function<auto()->RT>(std::bind(
       fun_ptr, std::ref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 
@@ -1351,7 +1351,7 @@ namespace Threads
            std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
-    return new_task(std::function<RT()>(std::bind(
+    return new_task(std::function<auto()->RT>(std::bind(
       fun_ptr, std::cref(c), internal::maybe_make_ref<Args>::act(args)...)));
   }
 

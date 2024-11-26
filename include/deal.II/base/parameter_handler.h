@@ -1184,8 +1184,8 @@ public:
    *  ParameterHandler::parse_input() for more information.
    */
   void
-  add_action(const std::string                                   &entry,
-             const std::function<void(const std::string &value)> &action,
+  add_action(const std::string                                         &entry,
+             const std::function<auto(const std::string &value)->void> &action,
              const bool execute_action = true);
 
   /**
@@ -1841,7 +1841,7 @@ private:
    * tree corresponding to individual parameters
    * store indices into this array in order to reference specific actions.
    */
-  std::vector<std::function<void(const std::string &)>> actions;
+  std::vector<std::function<auto(const std::string &)->void>> actions;
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and

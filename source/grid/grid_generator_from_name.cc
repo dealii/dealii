@@ -35,7 +35,7 @@ namespace GridGenerator
                      const std::string            &arguments,
                      Triangulation<dim, spacedim> &tria)
     {
-      std::function<void(Arguments...)> wrapper =
+      std::function<auto(Arguments...)->void> wrapper =
         [&tria, &generator](Arguments... args) { generator(tria, args...); };
       auto bound_function = Utilities::mutable_bind(wrapper);
       bound_function.parse_arguments(arguments);

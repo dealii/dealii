@@ -404,10 +404,10 @@ namespace Utilities
 
     template <typename T>
     T
-    reduce(const T                                      &vec,
-           const MPI_Comm                                comm,
-           const std::function<T(const T &, const T &)> &combiner,
-           const unsigned int                            root_process)
+    reduce(const T                                            &vec,
+           const MPI_Comm                                      comm,
+           const std::function<auto(const T &, const T &)->T> &combiner,
+           const unsigned int                                  root_process)
     {
 #ifdef DEAL_II_WITH_MPI
       if (n_mpi_processes(comm) > 1)
@@ -488,9 +488,9 @@ namespace Utilities
 
     template <typename T>
     T
-    all_reduce(const T                                      &vec,
-               const MPI_Comm                                comm,
-               const std::function<T(const T &, const T &)> &combiner)
+    all_reduce(const T                                            &vec,
+               const MPI_Comm                                      comm,
+               const std::function<auto(const T &, const T &)->T> &combiner)
     {
       if (n_mpi_processes(comm) > 1)
         {

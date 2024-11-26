@@ -201,7 +201,7 @@ namespace TrilinosWrappers
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
-    std::function<void(const VectorType &u, VectorType &F)> residual;
+    std::function<auto(const VectorType &u, VectorType &F)->void> residual;
 
     /**
      * A user function that sets up the Jacobian, based on the
@@ -215,7 +215,7 @@ namespace TrilinosWrappers
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
-    std::function<void(const VectorType &current_u)> setup_jacobian;
+    std::function<auto(const VectorType &current_u)->void> setup_jacobian;
 
     /**
      * A user function that sets up the preconditioner for inverting
@@ -234,7 +234,7 @@ namespace TrilinosWrappers
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
-    std::function<void(const VectorType &current_u)> setup_preconditioner;
+    std::function<auto(const VectorType &current_u)->void> setup_preconditioner;
 
     /**
      * A user function that applies the Jacobian $\nabla_u F(u)$ to
@@ -256,7 +256,8 @@ namespace TrilinosWrappers
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
-    std::function<void(const VectorType &x, VectorType &y)> apply_jacobian;
+    std::function<auto(const VectorType &x, VectorType &y)->void>
+      apply_jacobian;
 
     /**
      * A user function that applies the inverse of the Jacobian
@@ -364,7 +365,7 @@ namespace TrilinosWrappers
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
-    std::function<bool()> update_preconditioner_predicate;
+    std::function<auto()->bool> update_preconditioner_predicate;
 
   private:
     /**

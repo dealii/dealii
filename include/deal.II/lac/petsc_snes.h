@@ -384,7 +384,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const VectorType &x, VectorType &res)> residual;
+    std::function<auto(const VectorType &x, VectorType &res)->void> residual;
 
     /**
      * Callback for the computation of the Jacobian
@@ -395,7 +395,8 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const VectorType &x, AMatrixType &A, PMatrixType &P)>
+    std::function<
+      auto(const VectorType &x, AMatrixType &A, PMatrixType &P)->void>
       jacobian;
 
     /**
@@ -428,7 +429,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const VectorType &x)> setup_jacobian;
+    std::function<auto(const VectorType &x)->void> setup_jacobian;
 
     /**
      * Callback for the solution of the tangent system set up with
@@ -441,7 +442,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const VectorType &src, VectorType &dst)>
+    std::function<auto(const VectorType &src, VectorType &dst)->void>
       solve_with_jacobian;
 
     /**
@@ -461,7 +462,8 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const VectorType &x, real_type &energy_value)> energy;
+    std::function<auto(const VectorType &x, real_type &energy_value)->void>
+      energy;
 
   private:
     /**

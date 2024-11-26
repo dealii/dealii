@@ -1253,7 +1253,7 @@ DataOut<dim, spacedim>::build_patches(
                     all_cells.data() + all_cells.size(),
                     worker,
                     // no copy-local-to-global function needed here
-                    std::function<void(const int)>(),
+                    std::function<auto(const int)->void>(),
                     thread_data,
                     /* dummy CopyData object = */ 0,
                     // experimenting shows that we can make things run a bit
