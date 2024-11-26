@@ -185,6 +185,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_DISABLE_EXTRA_DIAGNOSTICS= \
                          DEAL_II_DEPRECATED= \
                          DEAL_II_HOST_DEVICE= \
+                         DEAL_II_HOST_DEVICE_ALWAYS_INLINE= \
                          DEAL_II_ALWAYS_INLINE= \
                          DEAL_II_WITH_ADOLC=1 \
                          DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING=1 \
@@ -248,6 +249,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_TRILINOS_WITH_NOX=1 \
                          DEAL_II_TRILINOS_WITH_ROL=1 \
                          DEAL_II_TRILINOS_WITH_SACADO=1 \
+                         DEAL_II_TRILINOS_WITH_SEACAS=1 \
                          DEAL_II_TRILINOS_WITH_TPETRA=1 \
                          DEAL_II_TRILINOS_WITH_ZOLTAN=1 \
                          DEAL_II_TRILINOS_VERSION_GTE=1 \
