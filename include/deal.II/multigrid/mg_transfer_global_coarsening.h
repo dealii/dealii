@@ -15,6 +15,7 @@
 #ifndef dealii_mg_transfer_global_coarsening_h
 #define dealii_mg_transfer_global_coarsening_h
 
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/mpi_remote_point_evaluation.h>
 #include <deal.II/base/vectorization.h>
@@ -50,7 +51,9 @@ namespace RepartitioningPolicyTools
   class Base;
 }
 
-template <int dim, typename Number>
+template <int dim,
+          typename Number,
+          typename MemorySpace = ::dealii::MemorySpace::Host>
 class MGTransferMF;
 #endif
 
@@ -227,7 +230,12 @@ public:
   static_assert(
     std::is_same_v<
       VectorType,
-      LinearAlgebra::distributed::Vector<typename VectorType::value_type>>,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                         MemorySpace::Host>> ||
+      std::is_same_v<
+        VectorType,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                           MemorySpace::Default>>,
     "This class is currently only implemented for vectors of "
     "type LinearAlgebra::distributed::Vector.");
 
@@ -286,17 +294,13 @@ protected:
    * Perform prolongation on vectors with correct ghosting.
    */
   virtual void
-  prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
+  prolongate_and_add_internal(VectorType &dst, const VectorType &src) const = 0;
 
   /**
    * Perform restriction on vectors with correct ghosting.
    */
   virtual void
-  restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number>       &dst,
-    const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
+  restrict_and_add_internal(VectorType &dst, const VectorType &src) const = 0;
 
   /**
    * A wrapper around update_ghost_values() optimized in case the
@@ -360,7 +364,7 @@ protected:
   /**
    * Internal vector on which the actual prolongation/restriction is performed.
    */
-  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
+  mutable VectorType vec_coarse;
 
   /**
    * Internal vector needed for collecting all degrees of freedom of the fine
@@ -369,7 +373,7 @@ protected:
    * accessed by the given vectors in the prolongate/restrict functions),
    * otherwise it is left at size zero.
    */
-  mutable LinearAlgebra::distributed::Vector<Number> vec_fine;
+  mutable VectorType vec_fine;
 
   /**
    * Bool indicating whether fine vector has relevant ghost values.
@@ -436,7 +440,12 @@ public:
   static_assert(
     std::is_same_v<
       VectorType,
-      LinearAlgebra::distributed::Vector<typename VectorType::value_type>>,
+      LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                         MemorySpace::Host>> ||
+      std::is_same_v<
+        VectorType,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                           MemorySpace::Default>>,
     "This class is currently only implemented for vectors of "
     "type LinearAlgebra::distributed::Vector.");
 
@@ -725,7 +734,7 @@ private:
 
   friend class internal::MGTwoLevelTransferImplementation;
 
-  friend class MGTransferMF<dim, Number>;
+  friend class MGTransferMF<dim, Number, typename VectorType::memory_space>;
 };
 
 
@@ -956,7 +965,7 @@ private:
    */
   std::vector<unsigned int> level_dof_indices_fine_ptrs;
 
-  friend class MGTransferMF<dim, Number>;
+  friend class MGTransferMF<dim, Number, typename VectorType::memory_space>;
 };
 
 
@@ -989,15 +998,15 @@ private:
  *
  * The implementation of this class is explained in detail in @cite munch2022gc.
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 class MGTransferMF : public dealii::MGLevelGlobalTransfer<
-                       LinearAlgebra::distributed::Vector<Number>>
+                       LinearAlgebra::distributed::Vector<Number, MemorySpace>>
 {
 public:
   /**
    * Value type.
    */
-  using VectorType = LinearAlgebra::distributed::Vector<Number>;
+  using VectorType = LinearAlgebra::distributed::Vector<Number, MemorySpace>;
 
   /**
    * Default constructor.
@@ -1325,13 +1334,17 @@ private:
  */
 template <int dim, typename Number>
 class MGTransferBlockMF
-  : public MGTransferBlockMatrixFreeBase<dim, Number, MGTransferMF<dim, Number>>
+  : public MGTransferBlockMatrixFreeBase<
+      dim,
+      Number,
+      MGTransferMF<dim, Number, ::dealii::MemorySpace::Host>>
 {
 public:
   /**
    * Constructor.
    */
-  MGTransferBlockMF(const MGTransferMF<dim, Number> &transfer_operator);
+  MGTransferBlockMF(const MGTransferMF<dim, Number, ::dealii::MemorySpace::Host>
+                      &transfer_operator);
 
   /**
    * Constructor.
@@ -1388,27 +1401,30 @@ public:
   build(const std::vector<const DoFHandler<dim> *> &dof_handler);
 
 protected:
-  const MGTransferMF<dim, Number> &
+  const MGTransferMF<dim, Number, ::dealii::MemorySpace::Host> &
   get_matrix_free_transfer(const unsigned int b) const override;
 
 private:
   /**
    * Internal non-block version of transfer operation.
    */
-  std::vector<MGTransferMF<dim, Number>> transfer_operators_internal;
+  std::vector<MGTransferMF<dim, Number, ::dealii::MemorySpace::Host>>
+    transfer_operators_internal;
 
   /**
    * Non-block version of transfer operation.
    */
-  std::vector<ObserverPointer<const MGTransferMF<dim, Number>>>
+  std::vector<ObserverPointer<
+    const MGTransferMF<dim, Number, ::dealii::MemorySpace::Host>>>
     transfer_operators;
 };
 
 
 
 template <int dim, typename VectorType>
-using MGTransferGlobalCoarsening =
-  MGTransferMF<dim, typename VectorType::value_type>;
+using MGTransferGlobalCoarsening = MGTransferMF<dim,
+                                                typename VectorType::value_type,
+                                                ::dealii::MemorySpace::Host>;
 
 template <int dim, typename VectorType>
 using MGTransferBlockGlobalCoarsening =
@@ -1423,9 +1439,9 @@ using MGTransferBlockGlobalCoarsening =
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <typename MGTwoLevelTransferObject>
-MGTransferMF<dim, Number>::MGTransferMF(
+MGTransferMF<dim, Number, MemorySpace>::MGTransferMF(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer,
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
@@ -1439,10 +1455,10 @@ MGTransferMF<dim, Number>::MGTransferMF(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <typename MGTwoLevelTransferObject>
 void
-MGTransferMF<dim, Number>::initialize_two_level_transfers(
+MGTransferMF<dim, Number, MemorySpace>::initialize_two_level_transfers(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer)
 {
   this->initialize_transfer_references(transfer);
@@ -1450,10 +1466,10 @@ MGTransferMF<dim, Number>::initialize_two_level_transfers(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <typename MGTwoLevelTransferObject>
 void
-MGTransferMF<dim, Number>::initialize_transfer_references(
+MGTransferMF<dim, Number, MemorySpace>::initialize_transfer_references(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer)
 {
   const unsigned int min_level = transfer.min_level();
@@ -1470,10 +1486,10 @@ MGTransferMF<dim, Number>::initialize_transfer_references(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <class InVector>
 void
-MGTransferMF<dim, Number>::initialize_dof_vector(
+MGTransferMF<dim, Number, MemorySpace>::initialize_dof_vector(
   const unsigned int level,
   VectorType        &vec,
   const InVector    &vec_reference,
@@ -1518,12 +1534,13 @@ MGTransferMF<dim, Number>::initialize_dof_vector(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <class InVector>
 void
-MGTransferMF<dim, Number>::copy_to_mg(const DoFHandler<dim>     &dof_handler,
-                                      MGLevelObject<VectorType> &dst,
-                                      const InVector            &src) const
+MGTransferMF<dim, Number, MemorySpace>::copy_to_mg(
+  const DoFHandler<dim>     &dof_handler,
+  MGLevelObject<VectorType> &dst,
+  const InVector            &src) const
 {
   assert_dof_handler(dof_handler);
 
@@ -1576,10 +1593,10 @@ MGTransferMF<dim, Number>::copy_to_mg(const DoFHandler<dim>     &dof_handler,
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <class OutVector>
 void
-MGTransferMF<dim, Number>::copy_from_mg(
+MGTransferMF<dim, Number, MemorySpace>::copy_from_mg(
   const DoFHandler<dim>           &dof_handler,
   OutVector                       &dst,
   const MGLevelObject<VectorType> &src) const
@@ -1630,11 +1647,12 @@ MGTransferMF<dim, Number>::copy_from_mg(
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <class InVector>
 void
-MGTransferMF<dim, Number>::interpolate_to_mg(MGLevelObject<VectorType> &dst,
-                                             const InVector &src) const
+MGTransferMF<dim, Number, MemorySpace>::interpolate_to_mg(
+  MGLevelObject<VectorType> &dst,
+  const InVector            &src) const
 {
   DoFHandler<dim> dof_handler_dummy;
 
@@ -1643,12 +1661,13 @@ MGTransferMF<dim, Number>::interpolate_to_mg(MGLevelObject<VectorType> &dst,
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, typename MemorySpace>
 template <class InVector>
 void
-MGTransferMF<dim, Number>::interpolate_to_mg(const DoFHandler<dim> &dof_handler,
-                                             MGLevelObject<VectorType> &dst,
-                                             const InVector &src) const
+MGTransferMF<dim, Number, MemorySpace>::interpolate_to_mg(
+  const DoFHandler<dim>     &dof_handler,
+  MGLevelObject<VectorType> &dst,
+  const InVector            &src) const
 {
   assert_dof_handler(dof_handler);
 
