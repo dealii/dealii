@@ -178,7 +178,6 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
                          DEAL_II_WARNING(x)= \
-                         DEAL_II_USE_MT_POSIX=1 \
                          DEAL_II_CONSTEXPR=constexpr \
                          DEAL_II_NAMESPACE_OPEN= \
                          DEAL_II_NAMESPACE_CLOSE= \
@@ -187,7 +186,6 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_DEPRECATED= \
                          DEAL_II_HOST_DEVICE= \
                          DEAL_II_ALWAYS_INLINE= \
-                         __device__= \
                          DEAL_II_WITH_ADOLC=1 \
                          DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING=1 \
                          DEAL_II_ADOLC_WITH_ATRIG_ERF=1 \
