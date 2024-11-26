@@ -12,6 +12,10 @@
 //
 // ------------------------------------------------------------------------
 
+// Tests FE_Nedelec finite elements of orders 0...4 on a simple 2D mesh
+// with a shared face orientations 0 and 1 (the are only two possible face
+// orientations in 2D). See the notes in the header file for more detail.
+
 #include "fe_nedelec_face_edge_orientation.h"
 
 int

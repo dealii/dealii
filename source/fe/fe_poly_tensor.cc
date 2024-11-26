@@ -171,12 +171,8 @@ namespace internal
             {
               if (k == 0)
                 {
-                  // This is exactly how the sign adjustment has been done
-                  // before. The behaviour of the adjustment stays exactly the
-                  // same for the 2D Nedelec finite elements of the lowermost
-                  // order, k = 0. This adjustment is straightforward as the
-                  // edge dofs are the only dofs and there is only one dof per
-                  // edge if k = 0.
+                  // The lowest order element (k=0) is straightforward, because
+                  // there is a single dof per edge, which needs to be flipped:
                   line_dof_sign[l] = -1.0;
                 }
               else
@@ -245,12 +241,8 @@ namespace internal
             {
               if (k == 0)
                 {
-                  // This is exactly how the sign adjustment has been done
-                  // before. The behaviour of the adjustment stays exactly the
-                  // same for the 3D Nedelec finite elements of the lowermost
-                  // order, k = 0. This adjustment is straightforward as the
-                  // edge dofs are the only dofs and there is only one dof per
-                  // edge if k = 0.
+                  // The lowest order element (k=0) is straightforward, because
+                  // there is a single dof per edge, which needs to be flipped:
                   line_dof_sign[l] = -1.0;
                 }
               else

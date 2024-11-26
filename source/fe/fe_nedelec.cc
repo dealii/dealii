@@ -476,8 +476,7 @@ FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
     return;
 
   // The finite element orders > 4 are not implemented.
-  if (k > 4)
-    return;
+  AssertThrow(k < 5, ExcNotImplemented());
 
   // TODO: the implementation makes the assumption that all quads have the
   // same number of dofs
