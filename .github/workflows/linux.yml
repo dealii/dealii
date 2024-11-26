@@ -114,7 +114,6 @@ jobs:
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
-              -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_CGAL="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
@@ -178,7 +177,6 @@ jobs:
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D DEAL_II_CXX_FLAGS='-std=c++20' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
-              -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               -D DEAL_II_WITH_64BIT_INDICES="ON" \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
@@ -369,7 +367,6 @@ jobs:
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_MPI_WITH_DEVICE_SUPPORT="ON" \
               -D DEAL_II_WITH_P4EST="ON" \
-              -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               ..
     - name: print detailed.log
       run: cat build/detailed.log
@@ -463,7 +460,6 @@ jobs:
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_MPI_WITH_DEVICE_SUPPORT="OFF" \
               -D DEAL_II_WITH_P4EST="ON" \
-              -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               ..
     - name: print detailed.log
       run: cat build/detailed.log
