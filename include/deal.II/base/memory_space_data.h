@@ -175,6 +175,7 @@ namespace MemorySpace
     std::swap(u.values_host_buffer, v.values_host_buffer);
     std::swap(u.values, v.values);
     std::swap(u.values_sm_ptr, v.values_sm_ptr);
+    std::swap(u.values_sm, v.values_sm);
   }
 
 #endif
