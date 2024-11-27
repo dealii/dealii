@@ -592,8 +592,3 @@ assert(cur==[])
 
 for line in out:
     print (line)
-
-
-
-
-

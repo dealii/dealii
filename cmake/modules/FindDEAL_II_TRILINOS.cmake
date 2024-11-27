@@ -196,4 +196,3 @@ else()
       EPETRA_CONFIG_H ${_libraries} TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
     )
 endif()
-

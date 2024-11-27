@@ -326,4 +326,3 @@ ${_switch_targets}#
   endif()
 
 endmacro()
-

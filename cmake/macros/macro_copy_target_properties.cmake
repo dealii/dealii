@@ -154,4 +154,3 @@ function(copy_target_properties _destination_target)
     target_link_options(${_destination_target} INTERFACE ${_link_options})
   endif()
 endfunction()
-

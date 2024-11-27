@@ -344,7 +344,7 @@ namespace GridOutFlags
     param.declare_entry("Azimuth",
                         "30",
                         Patterns::Double(),
-                        "Azimuth of the viw point, that is, the angle "
+                        "Azimuth of the view point, that is, the angle "
                         "in the plane from the x-axis.");
     param.declare_entry("Elevation",
                         "30",
