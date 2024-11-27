@@ -1,0 +1,4 @@
+Changed: The minimum version for Trilinos has been bumped to 12.14.1
+if Trilinos bundles ROL.
+<br>
+(Marc Fehling, 2024/11/28)

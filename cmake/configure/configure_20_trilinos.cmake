@@ -82,7 +82,6 @@ macro(feature_trilinos_find_external var)
     # We require at least Trilinos 12.4
     #
     if(TRILINOS_VERSION VERSION_LESS 12.4)
-
       message(STATUS "Could not find a sufficient Trilinos installation: "
         "deal.II requires at least version 12.4, but version ${TRILINOS_VERSION} was found."
       )
@@ -222,6 +221,25 @@ macro(feature_trilinos_find_external var)
       # we don't know if CUDA support is enabled in Kokkos
       set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
       KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
+    endif()
+
+    if(TRILINOS_WITH_ROL)
+      #
+      # We require at least Trilinos 12.14.1
+      #
+      if(TRILINOS_VERSION VERSION_LESS 12.14.1)
+        message(STATUS "Could not find a sufficient Trilinos installation: "
+          "deal.II requires at least version 12.14.1 if the Trilinos installation includes ROL, "
+          "but version ${TRILINOS_VERSION} was found."
+        )
+        set(TRILINOS_ADDITIONAL_ERROR_STRING
+          ${TRILINOS_ADDITIONAL_ERROR_STRING}
+          "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+          "with version ${TRILINOS_VERSION} is too old.\n"
+          "deal.II requires at least version 12.14.1 if the Trilinos installation includes ROL.\n\n"
+        )
+        set(${var} FALSE)
+      endif()
     endif()
 
     if(TRILINOS_WITH_TPETRA)
