@@ -1429,12 +1429,16 @@ namespace MatrixFreeTools
 
           Kokkos::single(Kokkos::PerTeam(shared_data->team_member),
                          [&] { diagonal[i] = fe_eval.get_dof_value(i); });
+
+          shared_data->team_member.team_barrier();
         }
 
       Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           fe_eval.submit_dof_value(diagonal[i], i);
       });
+
+      shared_data->team_member.team_barrier();
 
       // We need to do the same as distribute_local_to_global but without
       // constraints since we have already taken care of them earlier
