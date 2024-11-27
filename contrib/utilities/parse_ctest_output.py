@@ -298,5 +298,3 @@ f.write('</table>')
 
 
 f.write('</body></html>')
-
-

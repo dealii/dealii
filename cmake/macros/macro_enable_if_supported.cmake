@@ -56,4 +56,3 @@ macro(enable_if_supported _variable _flag)
 
   unset(CMAKE_REQUIRED_FLAGS)
 endmacro()
-

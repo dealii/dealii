@@ -116,7 +116,3 @@ for c  in xrange(len(libraries)):
             print('Last command failed!')
             print(" ".join(command))
             print('*********************************************\n\n')
-
-
-
-

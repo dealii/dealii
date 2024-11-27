@@ -26,4 +26,3 @@
 <         output_results(cycle);
 ---
 >       //output_results(cycle);
-

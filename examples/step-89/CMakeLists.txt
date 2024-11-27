@@ -52,4 +52,3 @@ deal_ii_initialize_cached_variables()
 set(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.ucd *.d2 *.vtu *.pvtu)
 project(${TARGET})
 deal_ii_invoke_autopilot()
-

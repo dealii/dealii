@@ -78,4 +78,3 @@ macro(feature_arborx_find_external var)
 endmacro()
 
 configure_feature(ARBORX)
-
