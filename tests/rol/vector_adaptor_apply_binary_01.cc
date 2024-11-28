@@ -75,15 +75,15 @@ test()
   a.compress(VectorOperation::insert);
   b.compress(VectorOperation::insert);
 
-  Teuchos::RCP<VectorType> a_rcp(new VectorType(a));
-  Teuchos::RCP<VectorType> b_rcp(new VectorType(b));
+  ROL::Ptr<VectorType> a_ptr = ROL::makePtr<VectorType>(a);
+  ROL::Ptr<VectorType> b_ptr = ROL::makePtr<VectorType>(b);
 
   ROL::Elementwise::Multiply<double> mult;
   ROL::Elementwise::Plus<double>     plus;
 
   // --- Testing the constructor
-  Rol::VectorAdaptor<VectorType> a_rol(a_rcp);
-  Rol::VectorAdaptor<VectorType> b_rol(b_rcp);
+  Rol::VectorAdaptor<VectorType> a_rol(a_ptr);
+  Rol::VectorAdaptor<VectorType> b_rol(b_ptr);
 
   a_rol.print(std::cout);
   b_rol.print(std::cout);

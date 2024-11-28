@@ -78,22 +78,22 @@ test()
   b.compress(VectorOperation::insert);
   c.compress(VectorOperation::insert);
 
-  Teuchos::RCP<VectorType> a_rcp(new VectorType(a));
-  Teuchos::RCP<VectorType> b_rcp(new VectorType(b));
-  Teuchos::RCP<VectorType> c_rcp(new VectorType(c));
+  ROL::Ptr<VectorType> a_ptr = ROL::makePtr<VectorType>(a);
+  ROL::Ptr<VectorType> b_ptr = ROL::makePtr<VectorType>(b);
+  ROL::Ptr<VectorType> c_ptr = ROL::makePtr<VectorType>(c);
 
   // --- Testing the constructor
-  Rol::VectorAdaptor<VectorType> a_rol(a_rcp);
-  Rol::VectorAdaptor<VectorType> b_rol(b_rcp);
-  Rol::VectorAdaptor<VectorType> c_rol(c_rcp);
+  Rol::VectorAdaptor<VectorType> a_rol(a_ptr);
+  Rol::VectorAdaptor<VectorType> b_rol(b_ptr);
+  Rol::VectorAdaptor<VectorType> c_rol(c_ptr);
 
-  Teuchos::RCP<std::ostream> out_stream;
-  Teuchos::oblackholestream  bhs; // outputs nothing
+  ROL::Ptr<std::ostream> out_stream;
+  ROL::nullstream        bhs; // outputs nothing
 
   if (dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
-    out_stream = Teuchos::rcp(&std::cout, false);
+    out_stream = ROL::makePtrFromRef<std::ostream>(std::cout);
   else
-    out_stream = Teuchos::rcp(&bhs, false);
+    out_stream = ROL::makePtrFromRef<std::ostream>(bhs);
 
   a_rol.checkVector(b_rol, c_rol, true, *out_stream);
 }
