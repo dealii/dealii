@@ -94,10 +94,7 @@ namespace TrilinosWrappers
     parameter_list.set("coarse: type", coarse_type);
 
     // Force re-initialization of the random seed to make ML deterministic
-    // (only supported in trilinos >12.2):
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 4, 0)
     parameter_list.set("initialize random seed", true);
-#  endif
 
     parameter_list.set("smoother: sweeps", static_cast<int>(smoother_sweeps));
     parameter_list.set("cycle applications", static_cast<int>(n_cycles));
