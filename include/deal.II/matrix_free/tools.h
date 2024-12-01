@@ -1409,6 +1409,8 @@ namespace MatrixFreeTools
             Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
             [&](int j) { fe_eval.submit_dof_value(i == j ? 1 : 0, j); });
 
+          shared_data->team_member.team_barrier();
+
           Portable::internal::
             resolve_hanging_nodes<dim, fe_degree, false, Number>(
               shared_data->team_member,
