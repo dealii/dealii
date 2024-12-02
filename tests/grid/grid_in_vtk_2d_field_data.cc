@@ -60,14 +60,7 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
                cell != triangulation.end();
                ++cell)
             {
-              // store cell ID as a string
-              std::string text = boost::lexical_cast<std::string>(
-                cell->id().get_coarse_cell_id());
-              // Convert the string containing cell ID to an integer
-              boost::char_separator<char>                   sep{"_"};
-              boost::tokenizer<boost::char_separator<char>> tokens(text, sep);
-              unsigned int                                  cell_id =
-                boost::lexical_cast<int>(*(tokens.begin()));
+              unsigned int cell_id = cell->id().get_coarse_cell_id();
               deallog << '\t' << cell_density[cell_id] << std::endl;
             }
         }
