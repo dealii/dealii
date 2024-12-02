@@ -30,4 +30,3 @@ macro(strip_known_generator_expressions _variable)
     string(REGEX REPLACE ${expression} "\\1" ${_variable} "${${_variable}}")
   endforeach()
 endmacro()
-

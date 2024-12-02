@@ -40,7 +40,7 @@ cmake_policy(VERSION 3.13.4)
 
 if(POLICY CMP0074)
   # Introduced in CMake 3.12: find_package(<PackageName>) also searches
-  # <PackageName>_ROOT CMake and environment variables when set to NEW. 
+  # <PackageName>_ROOT CMake and environment variables when set to NEW.
   cmake_policy(SET CMP0074 NEW)
 endif()
 

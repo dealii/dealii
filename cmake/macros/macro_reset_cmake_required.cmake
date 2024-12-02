@@ -25,4 +25,3 @@ macro(reset_cmake_required)
   set(CMAKE_REQUIRED_INCLUDES)
   set(CMAKE_REQUIRED_LIBRARIES ${DEAL_II_LINKER_FLAGS_SAVED})
 endmacro()
-

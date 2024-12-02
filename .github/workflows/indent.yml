@@ -68,16 +68,3 @@ jobs:
       with:
         name: doxygen_documentation
         path: build/doc/doxygen
-
-  typos:
-    # check for typos
-
-    name: typos
-    runs-on: [ubuntu-24.04]
-
-    steps:
-    - uses: actions/checkout@v4
-    - uses: crate-ci/typos@v1.27.3
-      with:
-        files: doc examples include source tests
-        config: ./.typos.toml

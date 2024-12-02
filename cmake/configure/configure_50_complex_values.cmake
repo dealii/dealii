@@ -38,4 +38,3 @@ if(${DEAL_II_WITH_COMPLEX_VALUES})
        "LinearAlgebra::distributed::BlockVector<std::complex<float> >"
       )
 endif()
-

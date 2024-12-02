@@ -82,4 +82,3 @@ by running, for example:
 The above command would drop you into an isolated environment, in which you 
 will find the latest version of deal.II (master development branch) installed
 under `/usr/local`.
-

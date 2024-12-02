@@ -37,4 +37,3 @@ if(NOT DEAL_II_WITH_KOKKOS)
       )
   endif()
 endif()
-

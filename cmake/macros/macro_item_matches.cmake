@@ -30,4 +30,3 @@ macro(item_matches _var _regex)
     endif()
   endforeach()
 endmacro()
-

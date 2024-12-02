@@ -128,4 +128,3 @@ for commit in $commits ; do
 done
 
 git checkout -q ${current_branch}
-
