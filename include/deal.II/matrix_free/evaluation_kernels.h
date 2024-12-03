@@ -2055,7 +2055,7 @@ namespace internal
                                                                   do_values);
             eval.template tangential<1, 2>(shape_data[1], values, values);
             eval.template tangential<0, 2>(shape_data[1], values, values);
-            eval.template normal<0>(shape_data[0], values, values_dofs, add);
+            eval.template normal<2>(shape_data[0], values, values_dofs, add);
           }
       }
     else
