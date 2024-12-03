@@ -139,9 +139,9 @@ namespace Polynomials
         else
           {
             const double offset = step * interval;
-            // ROCm 5.7 throw a floating point exception in debug when trying to
-            // evaluate (x < offset && x > offset + step). Separating the
-            // conditions fixes the issue.
+            // ROCm 5.7 throws a floating point exception in debug mode when
+            // trying to evaluate (x < offset && x > offset + step). Separating
+            // the conditions fixes the issue.
             if (x < offset)
               {
                 for (unsigned int k = 0; k <= n_derivatives; ++k)

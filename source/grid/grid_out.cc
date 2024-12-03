@@ -2140,7 +2140,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
           if (n != 1)
             {
-              // The assert is a workaround a compiler bug in ROCm 5.7 which
+              // The assert is a workaround for a compiler bug in ROCm 5.7 which
               // evaluated index/(n-1) when n == 1 in debug mode. When adding
               // the assert the ratio is not evaluated.
               Assert((n - 1.) != 0., ExcInvalidState());
