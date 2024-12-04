@@ -51,14 +51,22 @@ if(POLICY CMP0075)
   cmake_policy(SET CMP0075 NEW)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+list(APPEND CMAKE_MODULE_PATH ${DEAL_II_SOURCE_DIR}/cmake/modules/)
+
+#
+# Record the top-level source and binary directory:
+#
+set(DEAL_II_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(DEAL_II_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+message(STATUS "DEAL_II_SOURCE_DIR = \"${DEAL_II_SOURCE_DIR}\"")
+message(STATUS "DEAL_II_BINARY_DIR = \"${DEAL_II_BINARY_DIR}\"")
 
 #
 # Load all macros:
 #
 file(GLOB _macro_files "cmake/macros/*.cmake")
-message(STATUS "Include ${CMAKE_SOURCE_DIR}/cmake/setup_external_macros.cmake")
-include(${CMAKE_SOURCE_DIR}/cmake/setup_external_macros.cmake)
+message(STATUS "Include ${DEAL_II_SOURCE_DIR}/cmake/setup_external_macros.cmake")
+include(${DEAL_II_SOURCE_DIR}/cmake/setup_external_macros.cmake)
 foreach(_file ${_macro_files})
   message(STATUS "Include ${_file}")
   include(${_file})
@@ -72,15 +80,15 @@ set_if_empty(CMAKE_INSTALL_MESSAGE "LAZY")
 #
 # Check for the existence of various optional folders:
 #
-if(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
+if(EXISTS ${DEAL_II_SOURCE_DIR}/bundled/CMakeLists.txt)
   set(DEAL_II_HAVE_BUNDLED_DIRECTORY TRUE)
 endif()
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
+if(EXISTS ${DEAL_II_SOURCE_DIR}/doc/CMakeLists.txt)
   set(DEAL_II_HAVE_DOC_DIRECTORY TRUE)
 endif()
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt)
+if(EXISTS ${DEAL_II_SOURCE_DIR}/tests/CMakeLists.txt)
   set(DEAL_II_HAVE_TESTS_DIRECTORY TRUE)
 endif()
 
@@ -88,7 +96,7 @@ endif()
 # We have to initialize some cached variables before PROJECT is called, so
 # do it at this point:
 #
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
 
 #
 # Now, set the project and set up the rest:
@@ -96,15 +104,15 @@ verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
 project(deal.II CXX C)
 enable_language_optional(Fortran)
 
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_deal_ii.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_deal_ii.cmake)
 
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_compiler_flags.cmake)
 
 #
 # Include information about bundled libraries:
 #
 if(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  verbose_include(${CMAKE_SOURCE_DIR}/bundled/setup_bundled.cmake)
+  verbose_include(${DEAL_II_SOURCE_DIR}/bundled/setup_bundled.cmake)
 endif()
 
 #
@@ -117,7 +125,7 @@ foreach(_file ${_check_files})
 endforeach()
 
 # include setup_finalize.cmake before any target definitions
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_finalize.cmake)
 
 #
 # Feature configuration:
@@ -128,9 +136,9 @@ foreach(_file ${_configure_files})
   verbose_include(${_file})
 endforeach()
 
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_sanity_checks.cmake)
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_cpack.cmake)
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_sanity_checks.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_cpack.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
 
 ########################################################################
 #                                                                      #
@@ -166,10 +174,10 @@ endif()
 
 add_subdirectory(contrib/python-bindings) # has to be included after tests
 
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_write_config.cmake)
+verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_write_config.cmake)
 
 #
 # And finally, print the configuration:
 #
-file(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
+file(READ ${DEAL_II_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
 message("${DEAL_II_LOG_SUMMARY}")
