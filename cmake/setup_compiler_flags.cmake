@@ -104,19 +104,19 @@ if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
   #
   # General setup for GCC and compilers sufficiently close to GCC:
   #
-  verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
+  verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_compiler_flags_gnu.cmake)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
   #
   # Setup for ICC compiler (version >= 10):
   #
-  verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
+  verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   #
   # Setup for MSVC compiler (version >= 2012):
   #
-  verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
+  verbose_include(${DEAL_II_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
 
 else()
   message(WARNING "\nUnknown compiler!\n"

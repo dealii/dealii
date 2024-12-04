@@ -39,7 +39,7 @@ set(_inst
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/hp/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/hp/*.h
   )
 
 define_object_library(object_hp OBJECT ${_src} ${_header} ${_inst})

@@ -26,7 +26,7 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
       )
     add_test(NAME ${_test}
       COMMAND ${CMAKE_COMMAND} -DTRGT=${_target} -DTEST=${_test}
-        -DBINARY_DIR=${CMAKE_BINARY_DIR} -DEXPECT=CONFIGURE
+        -DBINARY_DIR=${DEAL_II_BINARY_DIR} -DEXPECT=CONFIGURE
         -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       )

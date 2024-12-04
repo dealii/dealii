@@ -30,7 +30,7 @@ set(_src
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/non_matching/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/non_matching/*.h
   )
 
 define_object_library(object_non_matching OBJECT ${_src} ${_header} ${_inst})

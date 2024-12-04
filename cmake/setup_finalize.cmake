@@ -57,7 +57,7 @@ endforeach()
 
 deal_ii_query_git_information("DEAL_II")
 
-file(WRITE ${CMAKE_BINARY_DIR}/revision.log
+file(WRITE ${DEAL_II_BINARY_DIR}/revision.log
 "###
 #
 #  Git information:

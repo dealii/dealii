@@ -41,14 +41,14 @@ if(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   unset(Boost_FOUND)
   # On case-insensitive file systems, FindBOOST.cmake and FindBoost.cmake are indistinguishable.
   # Make sure FindBoost.cmake from CMake installation is found.
-  list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${DEAL_II_SOURCE_DIR}/cmake/modules/)
   set(Boost_USE_DEBUG_RUNTIME FALSE)
   if(${BOOST_VERSION} VERSION_LESS 1.67)
     find_package(Boost 1.59 COMPONENTS python REQUIRED)
   else()
     find_package(Boost 1.67 COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED)
   endif()
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  list(APPEND CMAKE_MODULE_PATH ${DEAL_II_SOURCE_DIR}/cmake/modules/)
 
   if(NOT Boost_FOUND)
     message(FATAL_ERROR

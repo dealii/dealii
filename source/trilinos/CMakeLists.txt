@@ -23,7 +23,7 @@ set(_inst
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/trilinos/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/trilinos/*.h
   )
 
 define_object_library(object_trilinos OBJECT ${_src} ${_header} ${_inst})

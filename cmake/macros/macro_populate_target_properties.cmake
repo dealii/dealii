@@ -58,8 +58,8 @@ function(populate_target_properties _target _build)
   # Build-directory specific includes:
 
   target_include_directories(${_target} PRIVATE
-    ${CMAKE_BINARY_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include
+    ${DEAL_II_BINARY_DIR}/include
+    ${DEAL_II_SOURCE_DIR}/include
     )
 
   #
@@ -77,8 +77,8 @@ function(populate_target_properties _target _build)
 
   if("${_visibility}" STREQUAL "PUBLIC")
     set(_includes
-      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-      $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${DEAL_II_BINARY_DIR}/include>
+      $<BUILD_INTERFACE:${DEAL_II_SOURCE_DIR}/include>
       "$<INSTALL_INTERFACE:${DEAL_II_INCLUDE_RELDIR}>"
       )
     foreach(_include ${DEAL_II_BUNDLED_INCLUDE_DIRS})

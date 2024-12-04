@@ -32,7 +32,7 @@ set(_inst
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/ad/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/differentiation/ad/*.h
   )
 
 define_object_library(object_differentiation_ad OBJECT ${_src} ${_header} ${_inst})

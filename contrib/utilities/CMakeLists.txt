@@ -20,7 +20,7 @@ set(_scripts
   ${CMAKE_CURRENT_SOURCE_DIR}/indent.py
   )
 file(COPY ${_scripts}
-  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts
+  DESTINATION ${DEAL_II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts
   )
 install(FILES ${_scripts}
   DESTINATION ${DEAL_II_SHARE_RELDIR}/scripts

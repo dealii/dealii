@@ -535,7 +535,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
             -DTRGT=${_test_executable_target}
             -DTEST=${_test_executable_full}
             -DEXPECT=PASSED
-            -DBINARY_DIR=${CMAKE_BINARY_DIR}
+            -DBINARY_DIR=${DEAL_II_BINARY_DIR}
             -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
           WORKING_DIRECTORY ${_test_directory}
           )
@@ -621,7 +621,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
           -DTRGT=${_test_target}
           -DTEST=${_test_full}
           -DEXPECT=${_expect}
-          -DBINARY_DIR=${CMAKE_BINARY_DIR}
+          -DBINARY_DIR=${DEAL_II_BINARY_DIR}
           -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
         WORKING_DIRECTORY ${_test_directory}
         )

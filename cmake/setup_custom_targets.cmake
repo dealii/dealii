@@ -40,7 +40,7 @@ else()
       COMMAND ${CMAKE_COMMAND}
         -DCOMPONENT="${_name}" -P cmake_install.cmake
       COMMENT "Build and install component \"library\"."
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      WORKING_DIRECTORY ${DEAL_II_BINARY_DIR}
       )
   endmacro()
 
@@ -103,7 +103,7 @@ endif()
 # the current feature branch
 #
 add_custom_target(indent
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  WORKING_DIRECTORY ${DEAL_II_SOURCE_DIR}
   COMMAND ./contrib/utilities/indent
   COMMENT "Indenting recently changed files in the deal.II directories"
   )
@@ -112,7 +112,7 @@ add_custom_target(indent
 # Provide "indent" target for indenting all headers and source files
 #
 add_custom_target(indent-all
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  WORKING_DIRECTORY ${DEAL_II_SOURCE_DIR}
   COMMAND ./contrib/utilities/indent-all
   COMMENT "Indenting all files in the deal.II directories"
   )
@@ -127,7 +127,7 @@ else()
   set(_make_command "make")
 endif()
 
-file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+file(WRITE ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 "message(
 \"###
 #
@@ -166,24 +166,24 @@ file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND
   NOT "${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}" STREQUAL "")
   add_custom_target(relocate
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${DEAL_II_SOURCE_DIR}
     COMMAND ./contrib/utilities/relocate_libraries.py
     COMMENT "Running install_name_tool under ${DEAL_II_CPACK_EXTERNAL_LIBS_TREE}"
     )
-  file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+  file(APPEND ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   "#
 #    relocate       - fix RPATH for external libraries, if packaging was requested
 "
    )
 endif()
 
-file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+file(APPEND ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 "#
 ###\")"
 )
 
 add_custom_target(info
-  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
+  COMMAND ${CMAKE_COMMAND} -P ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   )
 
 

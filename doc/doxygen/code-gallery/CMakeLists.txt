@@ -26,7 +26,7 @@ add_custom_target(code-gallery)
 # a top-level code-gallery/ directory alongside the tutorial/
 # directory
 #
-set_if_empty(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+set_if_empty(DEAL_II_CODE_GALLERY_DIRECTORY ${DEAL_II_SOURCE_DIR}/code-gallery)
 if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
 
   message(STATUS "Setting up code gallery documentation from ${DEAL_II_CODE_GALLERY_DIRECTORY}.")
@@ -58,13 +58,13 @@ if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
       ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
       ${DEAL_II_CODE_GALLERY_DIRECTORY}
       ${_code_gallery_names_sans_dir}
       > ${CMAKE_CURRENT_BINARY_DIR}/code-gallery.h
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/code-gallery.pl
       ${CMAKE_CURRENT_SOURCE_DIR}/code-gallery.h.in
       ${_code_gallery_h_deps}
     )
@@ -118,8 +118,8 @@ if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       COMMAND ${PERL_EXECUTABLE}
       ARGS
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${CMAKE_SOURCE_DIR}
+        ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${DEAL_II_SOURCE_DIR}
         ${_step}
         ${DEAL_II_CODE_GALLERY_DIRECTORY}/${_step}
         ${_relative_src_files}
@@ -127,8 +127,8 @@ if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
       WORKING_DIRECTORY
         ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen.pl
+        ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
+        ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen.pl
         ${_src_files}
       )
 

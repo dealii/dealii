@@ -43,8 +43,8 @@ endif()
 #
 
 install(FILES
-  ${CMAKE_SOURCE_DIR}/README.md
-  ${CMAKE_SOURCE_DIR}/LICENSE.md
+  ${DEAL_II_SOURCE_DIR}/README.md
+  ${DEAL_II_SOURCE_DIR}/LICENSE.md
   DESTINATION ${DEAL_II_DOCREADME_RELDIR}
   COMPONENT library
   )
@@ -54,8 +54,8 @@ install(FILES
 #
 
 install(FILES
-  ${CMAKE_BINARY_DIR}/summary.log
-  ${CMAKE_BINARY_DIR}/detailed.log
+  ${DEAL_II_BINARY_DIR}/summary.log
+  ${DEAL_II_BINARY_DIR}/detailed.log
   DESTINATION ${DEAL_II_DOCREADME_RELDIR}
   COMPONENT library
   )

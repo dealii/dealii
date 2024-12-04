@@ -40,7 +40,7 @@ if(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   message(STATUS "This is CMake ${CMAKE_VERSION}")
   message(STATUS "")
 
-  if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+  if("${DEAL_II_SOURCE_DIR}" STREQUAL "${DEAL_II_BINARY_DIR}")
     message(FATAL_ERROR "The testsuite cannot be configured in-source. "
       "Please create a separate build directory!"
       )
@@ -51,7 +51,7 @@ if(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   project(TESTSUITE CXX)
   set(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
 
-  file(WRITE ${CMAKE_BINARY_DIR}/detailed.log
+  file(WRITE ${DEAL_II_BINARY_DIR}/detailed.log
     "#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}"
     )
 endif()
@@ -65,11 +65,11 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   message(STATUS "Setting up testsuite")
 
   #
-  # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR:
+  # Write minimalistic CTestTestfile.cmake files to DEAL_II_BINARY_DIR:
   #
-  file(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "subdirs(tests)\n")
+  file(WRITE ${DEAL_II_BINARY_DIR}/CTestTestfile.cmake "subdirs(tests)\n")
 
-  set(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
+  set(_options "-DDEAL_II_DIR=${DEAL_II_BINARY_DIR}")
 endif()
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
@@ -169,7 +169,7 @@ endforeach()
 
 add_custom_target(test
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/run_quick_tests.cmake
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  WORKING_DIRECTORY ${DEAL_II_BINARY_DIR}
   COMMENT "Running quicktests..."
   USES_TERMINAL
   )

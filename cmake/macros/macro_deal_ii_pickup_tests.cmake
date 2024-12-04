@@ -191,9 +191,9 @@ macro(deal_ii_pickup_tests)
     )
   mark_as_advanced(NUMDIFF_EXECUTABLE)
 
-  set(_file_1 "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-1.txt")
-  set(_file_2 "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-2.txt")
-  set(_output "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-output.txt")
+  set(_file_1 "${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-1.txt")
+  set(_file_2 "${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-2.txt")
+  set(_output "${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-output.txt")
   file(WRITE "${_file_1}" "0.99999999998\n2.0\n1.0\n")
   file(WRITE "${_file_2}" "1.00000000001\n2.0\n1.0\n")
 

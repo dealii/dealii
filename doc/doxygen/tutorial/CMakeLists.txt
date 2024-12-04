@@ -15,7 +15,7 @@
 
 # Collect all of the directory names for the tutorial programs
 file(GLOB _deal_ii_steps
-  ${CMAKE_SOURCE_DIR}/examples/step-*
+  ${DEAL_II_SOURCE_DIR}/examples/step-*
   )
 
 # Also collect the names of all code gallery projects. To
@@ -25,7 +25,7 @@ file(GLOB _deal_ii_steps
 # For unclear reasons, the glob returns these files as
 # "/a/b/c/name//doc//author", so make sure we eat the
 # double slashes in the second step
-set_if_empty(DEAL_II_CODE_GALLERY_DIRECTORY ${CMAKE_SOURCE_DIR}/code-gallery)
+set_if_empty(DEAL_II_CODE_GALLERY_DIRECTORY ${DEAL_II_SOURCE_DIR}/code-gallery)
 file(GLOB _code_gallery_names
      "${DEAL_II_CODE_GALLERY_DIRECTORY}/*/doc/author")
 string(REGEX REPLACE "/+doc/+author" "" _code_gallery_names "${_code_gallery_names}")
@@ -61,17 +61,17 @@ add_custom_target(tutorial)
 #
 
 file(GLOB _deal_ii_steps_tooltip
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/tooltip
+  ${DEAL_II_SOURCE_DIR}/examples/step-*/doc/tooltip
   )
 foreach(_gallery ${_code_gallery_names})
   list(APPEND _deal_ii_code_gallery_tooltip
        ${_gallery}/doc/tooltip)
 endforeach()
 file(GLOB _deal_ii_steps_kind
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/kind
+  ${DEAL_II_SOURCE_DIR}/examples/step-*/doc/kind
   )
 file(GLOB _deal_ii_steps_buildson
-  ${CMAKE_SOURCE_DIR}/examples/step-*/doc/builds-on
+  ${DEAL_II_SOURCE_DIR}/examples/step-*/doc/builds-on
   )
 foreach(_gallery ${_code_gallery_names})
   list(APPEND _deal_ii_code_gallery_buildson
@@ -83,13 +83,13 @@ add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   COMMAND ${PERL_EXECUTABLE}
   ARGS
-    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
+    ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
     ${_deal_ii_steps}
     ${_code_gallery_names}
     > ${CMAKE_CURRENT_BINARY_DIR}/tutorial.h
   DEPENDS
-    ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
+    ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
     ${CMAKE_CURRENT_SOURCE_DIR}/tutorial.h.in
     ${_deal_ii_steps_tooltip}
     ${_deal_ii_steps_kind}
@@ -115,12 +115,12 @@ foreach(_step ${_deal_ii_steps})
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain.pl
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/program2plain.pl
+      < ${DEAL_II_SOURCE_DIR}/examples/${_step}/${_step}.cc
       > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain.pl
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/program2plain.pl
+      ${DEAL_II_SOURCE_DIR}/examples/${_step}/${_step}.cc
     VERBATIM
     )
 
@@ -128,19 +128,19 @@ foreach(_step ${_deal_ii_steps})
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
-      ${_step} ${CMAKE_SOURCE_DIR}
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
+      ${_step} ${DEAL_II_SOURCE_DIR}
       > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
     WORKING_DIRECTORY
       ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc.pl
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors.pl
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen.pl
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
-      ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/intro2toc.pl
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/create_anchors.pl
+      ${DEAL_II_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen.pl
+      ${DEAL_II_SOURCE_DIR}/examples/${_step}/${_step}.cc
+      ${DEAL_II_SOURCE_DIR}/examples/${_step}/doc/intro.dox
+      ${DEAL_II_SOURCE_DIR}/examples/${_step}/doc/results.dox
     )
 
   add_custom_target(tutorial_${_step}

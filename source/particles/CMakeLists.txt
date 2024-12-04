@@ -30,7 +30,7 @@ set(_inst
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/particles/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/particles/*.h
   )
 
 define_object_library(object_particle OBJECT ${_src} ${_header} ${_inst})
