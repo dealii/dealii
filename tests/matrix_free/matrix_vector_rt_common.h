@@ -171,7 +171,7 @@ do_test(const DoFHandler<dim>           &dof,
   //   constraints.distribute(solution);
   MatrixFree<dim, Number> mf_data;
   {
-    const QGaussLobatto<1>                           quad(fe_degree + 2);
+    const QGauss<1>                                  quad(fe_degree + 2);
     const MappingQ<dim>                              mapping(fe_degree + 2);
     typename MatrixFree<dim, Number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, Number>::AdditionalData::none;
