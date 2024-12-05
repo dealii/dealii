@@ -1,0 +1,27 @@
+
+DEAL:0::n_levels:                  6
+DEAL:0::n_cells:                   762
+DEAL:0::n_active_cells:            572
+DEAL:0::has_hanging_nodes:         false
+DEAL:0::
+
+DEAL:1::n_levels:                  6
+DEAL:1::n_cells:                   1222
+DEAL:1::n_active_cells:            917
+DEAL:1::has_hanging_nodes:         false
+DEAL:1::
+
+
+DEAL:2::n_levels:                  6
+DEAL:2::n_cells:                   2300
+DEAL:2::n_active_cells:            1726
+DEAL:2::has_hanging_nodes:         false
+DEAL:2::
+
+
+DEAL:3::n_levels:                  6
+DEAL:3::n_cells:                   3976
+DEAL:3::n_active_cells:            2983
+DEAL:3::has_hanging_nodes:         false
+DEAL:3::
+
