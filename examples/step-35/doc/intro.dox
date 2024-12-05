@@ -109,7 +109,7 @@ Without going into details, let us remark a few things about the projection meth
 <ul>
   <li> The advection term $u\cdot\nabla u$ is replaced by its <i>skew symmetric form</i>
   @f[
-    u \cdot \nabla u + \frac12 \left( \nabla\cdot u \right) u.
+    \frac12 u \cdot \nabla u + \frac12 \left( \nabla\cdot u \right) u.
   @f]
   This is consistent with the continuous equation (because $\nabla\cdot u = 0$,
   though this is not true pointwise for the discrete solution) and it is needed to
