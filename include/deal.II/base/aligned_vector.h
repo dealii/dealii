@@ -1542,10 +1542,7 @@ AlignedVector<T>::push_back(const T in_data)
   Assert(used_elements_end <= allocated_elements_end, ExcInternalError());
   if (used_elements_end == allocated_elements_end)
     reserve(std::max(2 * capacity(), static_cast<size_type>(16)));
-  if (std::is_trivial_v<T> == false)
-    new (used_elements_end++) T(in_data);
-  else
-    *used_elements_end++ = in_data;
+  new (used_elements_end++) T(in_data);
 }
 
 
@@ -1580,11 +1577,7 @@ AlignedVector<T>::insert_back(ForwardIterator begin, ForwardIterator end)
   const size_type old_size = size();
   reserve(old_size + (end - begin));
   for (; begin != end; ++begin, ++used_elements_end)
-    {
-      if (std::is_trivial_v<T> == false)
-        new (used_elements_end) T;
-      *used_elements_end = *begin;
-    }
+    new (used_elements_end) T(*begin);
 }
 
 
