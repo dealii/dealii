@@ -134,23 +134,20 @@ public:
   operator=(AlignedVector<T> &&vec) noexcept;
 
   /**
-   * Change the size of the vector. If the new size is larger than the
-   * previous size, then new elements will be added to the end of the
-   * vector; these elements will remain uninitialized (i.e., left in
-   * an undefined state) if `std::is_trivial<T>` is `true`, and
-   * will be default initialized if `std::is_trivial<T>` is `false`.
-   * See [here](https://en.cppreference.com/w/cpp/types/is_trivial) for
-   * a definition of what `std::is_trivial` does.
+   * Change the size of the vector. If the new size is larger than the previous
+   * size, then new elements will be added to the end of the vector; these
+   * elements will remain uninitialized (i.e., left in an undefined state) if
+   * `std::is_trivially_default_constructible_v<T>` is `true`, and will be
+   * default initialized if that type trait is `false`. See
+   * [here](https://en.cppreference.com/w/cpp/types/is_default_constructible)
+   * for a precise definition of `std::is_trivially_default_constructible`.
    *
-   * If the new size is less than the previous size, then the last few
-   * elements will be destroyed if `std::is_trivial<T>` will be `false`
-   * or will simply be ignored in the future if
-   * `std::is_trivial<T>` is `true`.
+   * If the new size is less than the previous size, then the `new_size`th and
+   * all subsequent elements will be destroyed.
    *
-   * As a consequence of the outline above, the "_fast" suffix of this
-   * function refers to the fact that for "trivial" classes `T`, this
-   * function omits constructor/destructor calls and in particular the
-   * initialization of new elements.
+   * As a consequence of the outline above, the "_fast" suffix of this function
+   * refers to the fact that for trivially default constructible types `T`, this
+   * function omits the initialization of new elements.
    *
    * @note This method can only be invoked for classes @p T that define a
    * default constructor, @p T(). Otherwise, compilation will fail.
@@ -1356,9 +1353,9 @@ AlignedVector<T>::resize_fast(const size_type new_size)
       reserve(new_size);
       used_elements_end = elements.get() + new_size;
 
-      // need to still set the values in case the class is non-trivial because
-      // virtual classes etc. need to run their (default) constructor
-      if (std::is_trivial_v<T> == false)
+      // Leave the new array entries as-is (with undefined values) unless T's
+      // default constructor is nontrivial (i.e., it is not a no-op)
+      if (std::is_trivially_default_constructible_v<T> == false)
         dealii::internal::AlignedVectorDefaultInitialize<T, true>(
           new_size - old_size, elements.get() + old_size);
     }
