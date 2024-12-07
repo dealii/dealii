@@ -820,8 +820,8 @@ namespace internal
       if (end == begin)
         return;
 
-      // for classes trivial assignment can use memcpy.
-      if constexpr (std::is_trivial_v<T> == true &&
+      // We can use memcpy() with trivially copyable objects.
+      if constexpr (std::is_trivially_copyable_v<T> == true &&
                     (std::is_same_v<T *, RandomAccessIterator> ||
                      std::is_same_v<const T *, RandomAccessIterator>) == true)
         std::memcpy(destination_ + begin,
@@ -888,8 +888,8 @@ namespace internal
       if (end == begin)
         return;
 
-      // Classes with trivial assignment can use memcpy.
-      if constexpr (std::is_trivial_v<T> == true &&
+      // We can use memcpy() with trivially copyable objects.
+      if constexpr (std::is_trivially_copyable_v<T> == true &&
                     (std::is_same_v<T *, RandomAccessIterator> ||
                      std::is_same_v<const T *, RandomAccessIterator>) == true)
         std::memcpy(destination_ + begin,
@@ -1790,11 +1790,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // has all of the data.
   if (is_shmem_root)
     {
-      if (std::is_trivial_v<T>)
+      if (std::is_trivially_copyable_v<T> == true)
         {
-          // The data is "trivial", i.e., we can copy things directly without
-          // having to go through the serialization/deserialization machinery of
-          // Utilities::MPI::broadcast.
+          // The data is trivially copyable, i.e., we can copy things directly
+          // without having to go through the serialization/deserialization
+          // machinery of Utilities::MPI::broadcast.
           //
           // In that case, first tell all of the other shmem roots how many
           // elements we will have to deal with, and let them resize their
@@ -1983,7 +1983,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // shared memory space.
   if (is_shmem_root)
     {
-      if (std::is_trivial_v<T> == true)
+      if (std::is_trivially_copyable_v<T> == true)
         std::memcpy(aligned_shmem_pointer, elements.get(), sizeof(T) * size());
       else
         for (std::size_t i = 0; i < size(); ++i)
