@@ -1133,7 +1133,7 @@ AlignedVector<T>::Deleter::operator()(T *ptr)
           Assert(owning_aligned_vector->used_elements_end != nullptr,
                  ExcInternalError());
 
-          if (std::is_trivial_v<T> == false)
+          if (std::is_trivially_destructible_v<T> == false)
             for (T *p = owning_aligned_vector->used_elements_end - 1; p >= ptr;
                  --p)
               p->~T();
@@ -1190,7 +1190,7 @@ AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   // it, not unique_ptr) so it is still set to its correct value.
 
   if (is_shmem_root)
-    if (std::is_trivial_v<T> == false)
+    if (std::is_trivially_destructible_v<T> == false)
       for (T *p = aligned_vector->used_elements_end - 1; p >= ptr; --p)
         p->~T();
 
@@ -1345,7 +1345,7 @@ AlignedVector<T>::resize_fast(const size_type new_size)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial_v<T> == false)
+      if (std::is_trivially_destructible_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1382,7 +1382,7 @@ AlignedVector<T>::resize(const size_type new_size)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial_v<T> == false)
+      if (std::is_trivially_destructible_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1417,7 +1417,7 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial_v<T> == false)
+      if (std::is_trivially_destructible_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
