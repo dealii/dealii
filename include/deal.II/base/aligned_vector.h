@@ -944,10 +944,10 @@ namespace internal
         return;
       Assert(destination != nullptr, ExcInternalError());
 
-      // do not use memcmp for long double because on some systems it does not
-      // completely fill its memory and may lead to false positives in
-      // e.g. valgrind
-      if constexpr (std::is_trivial_v<T> == true &&
+      // do not use memcmp() for long double because on some systems it does not
+      // completely fill its memory and may lead to false positives in e.g.
+      // valgrind
+      if constexpr (std::is_trivially_default_constructible_v<T> == true &&
                     std::is_same_v<T, long double> == false)
         {
           const unsigned char zero[sizeof(T)] = {};
@@ -967,8 +967,9 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // Classes with trivial assignment of zero can use memset.
-      if constexpr (std::is_trivial_v<T> == true)
+      // Only use memset() with types whose default constructors don't do
+      // anything.
+      if constexpr (std::is_trivially_default_constructible_v<T> == true)
         if (trivial_element)
           {
             std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
@@ -1052,8 +1053,9 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // Classes with trivial assignment of zero can use memset.
-      if constexpr (std::is_trivial_v<T> == true)
+      // Only use memset() with types whose default constructors don't do
+      // anything.
+      if constexpr (std::is_trivially_default_constructible_v<T> == true)
         std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
       else
         default_construct_or_assign(begin,
