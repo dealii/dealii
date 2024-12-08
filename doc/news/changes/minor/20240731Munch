@@ -1,0 +1,5 @@
+New: TrilinosWrappers::SolverDirect can now also
+be used for a matrix of type Epetra_Operator and
+vectors of type Epetra_MultiVector.
+<br>
+(Peter Munch, 2024/07/31)
