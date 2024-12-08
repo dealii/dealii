@@ -23,6 +23,7 @@
 #include <deal.II/base/point.h>
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -768,6 +769,24 @@ public:
   get_format_names();
 
   /**
+   * Return a map containing field data associated with the elements of an
+   * external vtk format mesh imported using read_vtk().
+   * The format of the returned map is as
+   * follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - std::vector<double> stores value for the given identifier in each cell.
+   * To access the value, use field_data[name_field][cell_id]. For example, if
+   * the vtk mesh contains field data 'Density' defined at the cells,
+   * field_data['Density'][0] would be the density defined at cell ID '0',
+   * which corresponds to index 0 of the vector. The length of the vector in
+   * field_data['Density'] would equal the number of elements in the coarse
+   * mesh.
+   */
+  const std::map<std::string, std::vector<double>> &
+  get_field_data() const;
+
+  /**
    * Exception
    */
   DeclException1(ExcUnknownSectionType,
@@ -948,6 +967,17 @@ private:
    * Input format used by read() if no format is given.
    */
   Format default_format;
+
+  /**
+   * Data member that stores field data defined at the cells of the mesh.
+   * The format is as follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - std::vector<double> stores value for the given identifier in each
+   * cell_id.
+   * To access the value use field_data[name_field][cell_id].
+   */
+  std::map<std::string, std::vector<double>> field_data;
 };
 
 /* -------------- declaration of explicit specializations ------------- */
