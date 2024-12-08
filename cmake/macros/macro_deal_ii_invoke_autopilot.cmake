@@ -66,19 +66,19 @@ macro(deal_ii_invoke_autopilot)
 
   # In order to check whether we have an "in source" build we have to make
   # sure to remove all symlinks and resolve to absolute file paths. This is
-  # necessary because with symlinks CMAKE_SOURCE_DIR and CMAKE_BINARY dir
+  # necessary because with symlinks DEAL_II_SOURCE_DIR and CMAKE_BINARY dir
   # might look different but are in fact the same (fully resolved)
   # directory...
-  get_filename_component(_source "${CMAKE_SOURCE_DIR}" REALPATH)
-  get_filename_component(_build  "${CMAKE_BINARY_DIR}" REALPATH)
+  get_filename_component(_source "${DEAL_II_SOURCE_DIR}" REALPATH)
+  get_filename_component(_build  "${DEAL_II_BINARY_DIR}" REALPATH)
   if(NOT "${_source}" STREQUAL "${_build}")
     # Ensure that we do not override "compile_commands.json" in the source
     # directory if already present and then create a symlink using the
-    # (unresolved) CMAKE_BINARY_DIR variable.
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/compile_commands.json")
+    # (unresolved) DEAL_II_BINARY_DIR variable.
+    if(NOT EXISTS "${DEAL_II_SOURCE_DIR}/compile_commands.json")
       file(CREATE_LINK
-        "${CMAKE_BINARY_DIR}/compile_commands.json"
-        "${CMAKE_SOURCE_DIR}/compile_commands.json"
+        "${DEAL_II_BINARY_DIR}/compile_commands.json"
+        "${DEAL_II_SOURCE_DIR}/compile_commands.json"
         SYMBOLIC
         )
     endif()
@@ -129,7 +129,7 @@ macro(deal_ii_invoke_autopilot)
     if(CMAKE_SYSTEM_NAME MATCHES "Windows")
       set(_delim ";")
     endif()
-    file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+    file(WRITE ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       "set(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR}${_delim}${DEAL_II_PATH}/${DEAL_II_EXECUTABLE_RELDIR}${_delim}\$ENV{PATH}\")\n"
       "execute_process(COMMAND ${CMAKE_BUILD_TYPE}\\\\${TARGET_RUN}\n"
       "  RESULT_VARIABLE _return_value\n"
@@ -139,7 +139,7 @@ macro(deal_ii_invoke_autopilot)
       "endif()\n"
       )
     set(_command
-      ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+      ${CMAKE_COMMAND} -P ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       )
   else()
     set(_command ${TARGET_RUN})
@@ -164,15 +164,15 @@ macro(deal_ii_invoke_autopilot)
 
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     if(DEFINED OSX_CERTIFICATE_NAME)
-      add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
+      add_custom_command(OUTPUT ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
         COMMAND codesign -f -s ${OSX_CERTIFICATE_NAME} ${TARGET}
-        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
+        COMMAND ${CMAKE_COMMAND} -E touch ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
         COMMENT "Digitally signing ${TARGET}"
         DEPENDS ${TARGET}
         VERBATIM
         )
       add_custom_target(sign ALL
-        DEPENDS ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
+        DEPENDS ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${TARGET}.signed
         )
       add_dependencies(run sign)
     else()
@@ -200,7 +200,7 @@ macro(deal_ii_invoke_autopilot)
 
     if(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
       add_custom_target(debug
-        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${DEAL_II_SOURCE_DIR}
         COMMAND ${CMAKE_COMMAND} -E echo "***"
         COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
         COMMAND ${CMAKE_COMMAND} -E echo "***"
@@ -211,7 +211,7 @@ macro(deal_ii_invoke_autopilot)
 
     if(${DEAL_II_BUILD_TYPE} MATCHES "Release")
       add_custom_target(release
-        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${DEAL_II_SOURCE_DIR}
         COMMAND ${CMAKE_COMMAND} -E echo "***"
         COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
         COMMAND ${CMAKE_COMMAND} -E echo "***"
@@ -238,8 +238,8 @@ macro(deal_ii_invoke_autopilot)
   #
 
   add_custom_target(distclean
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target runclean
+    COMMAND ${CMAKE_COMMAND} --build ${DEAL_II_BINARY_DIR} --target clean
+    COMMAND ${CMAKE_COMMAND} --build ${DEAL_II_BINARY_DIR} --target runclean
     COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
     COMMAND ${CMAKE_COMMAND} -E remove
       CMakeCache.txt cmake_install.cmake compile_commands.json Makefile
@@ -254,7 +254,7 @@ macro(deal_ii_invoke_autopilot)
   find_package(Perl QUIET)
   if(PERL_FOUND)
     add_custom_target(strip_comments
-      COMMAND ${PERL_EXECUTABLE} -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${CMAKE_SOURCE_DIR}/${TARGET_SRC}
+      COMMAND ${PERL_EXECUTABLE} -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${DEAL_II_SOURCE_DIR}/${TARGET_SRC}
       COMMENT "strip comments"
       )
   endif()
@@ -272,7 +272,7 @@ macro(deal_ii_invoke_autopilot)
       )
   endif()
 
-  file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+  file(WRITE ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "message(
 \"###
 #
@@ -287,19 +287,19 @@ ${_run_targets}#
 ${_switch_targets}#
 ")
   if(NOT CMAKE_GENERATOR MATCHES "Ninja")
-    file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+    file(APPEND ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} edit_cache     - to change (cached) configuration variables
 #                               and rerun the configure and generate phases of CMake
 #
 ")
   endif()
   if(PERL_FOUND)
-    file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+    file(APPEND ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} strip_comments - to strip the source files in this
 #                               directory off their comments; this is irreversible
 ")
   endif()
-  file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+  file(APPEND ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} clean          - to remove the generated executable as well as
 #                               all intermediate compilation files
 #      ${_make_command} runclean       - to remove all output generated by the program
@@ -314,12 +314,12 @@ ${_switch_targets}#
      )
 
   add_custom_target(info
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+    COMMAND ${CMAKE_COMMAND} -P ${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
     )
 
   # Print this message once:
   if(NOT USAGE_PRINTED)
-    include(${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake)
+    include(${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake)
     set(USAGE_PRINTED TRUE CACHE INTERNAL "")
   else()
     message(STATUS "Run  ${_make_command} info  to print a detailed help message")
