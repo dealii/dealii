@@ -51,6 +51,13 @@ if(POLICY CMP0075)
   cmake_policy(SET CMP0075 NEW)
 endif()
 
+if(POLICY CMP0167)
+  # Introduced in CMake 3.30: When set to true then CMake uses the Boost
+  # CMake Config installed with Boost instead of using the FindBoost.cmake
+  # module installed with CMake.
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
