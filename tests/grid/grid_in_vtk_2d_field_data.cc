@@ -45,16 +45,16 @@ check_file(const std::string name, typename GridIn<dim>::Format format)
   gridin.read(name, format);
   deallog << '\t' << triangulation.n_vertices() << '\t'
           << triangulation.n_cells() << std::endl;
-  std::map<std::string, std::vector<double>> field_data;
+  std::map<std::string, Vector<double>> cell_data;
 
-  field_data = gridin.get_field_data();
-  if (field_data.size() > 0)
+  cell_data = gridin.get_cell_data();
+  if (cell_data.size() > 0)
     {
-      std::map<std::string, std::vector<double>>::const_iterator iter =
-        field_data.find("Density");
-      if (iter != field_data.end())
+      std::map<std::string, Vector<double>>::const_iterator iter =
+        cell_data.find("Density");
+      if (iter != cell_data.end())
         {
-          std::vector<double> cell_density = iter->second;
+          Vector<double> cell_density = iter->second;
           for (typename Triangulation<dim>::active_cell_iterator cell =
                  triangulation.begin_active();
                cell != triangulation.end();
