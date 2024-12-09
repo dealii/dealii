@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
+#include <deal.II/lac/vector.h>
 
 #include <iostream>
 #include <map>
@@ -769,22 +770,23 @@ public:
   get_format_names();
 
   /**
-   * Return a map containing field data associated with the elements of an
+   * Return a map containing cell data associated with the elements of an
    * external vtk format mesh imported using read_vtk().
    * The format of the returned map is as
    * follows:
    * - std::string stores the name of the field data (identifier) as specified
    * in the external mesh
-   * - std::vector<double> stores value for the given identifier in each cell.
-   * To access the value, use field_data[name_field][cell_id]. For example, if
-   * the vtk mesh contains field data 'Density' defined at the cells,
-   * field_data['Density'][0] would be the density defined at cell ID '0',
+   * - Vector<double> stores value for the given identifier in each cell.
+   * To access the value, use cell_data[name_field][cell->active_cell_index()].
+   *  
+   * For example, if the vtk mesh contains field data 'Density' defined at the 
+   * cells, cell_data['Density'][0] would be the density defined at cell ID '0',
    * which corresponds to index 0 of the vector. The length of the vector in
-   * field_data['Density'] would equal the number of elements in the coarse
+   * cell_data['Density'] would equal the number of elements in the coarse
    * mesh.
    */
-  const std::map<std::string, std::vector<double>> &
-  get_field_data() const;
+  const std::map<std::string, Vector<double>> &
+  get_cell_data() const;
 
   /**
    * Exception
@@ -973,11 +975,11 @@ private:
    * The format is as follows:
    * - std::string stores the name of the field data (identifier) as specified
    * in the external mesh
-   * - std::vector<double> stores value for the given identifier in each
-   * cell_id.
-   * To access the value use field_data[name_field][cell_id].
+   * - Vector<double> stores value for the given identifier in each cell id.
+   *
+   * To access the value use cell_data[name_field][cell->active_cell_index()].
    */
-  std::map<std::string, std::vector<double>> field_data;
+  std::map<std::string, Vector<double>> cell_data;
 };
 
 /* -------------- declaration of explicit specializations ------------- */

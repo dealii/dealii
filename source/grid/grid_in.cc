@@ -625,15 +625,15 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                         subcelldata.boundary_lines.size()) +
                       ") in 2d."));
                   in >> data_type;
-                  std::vector<double> temp_data;
-                  temp_data.resize(n_ids);
+                  Vector<double> temp_data;
+                  temp_data.reinit(n_ids);
                   for (unsigned int j = 0; j < n_ids; ++j)
                     {
                       in >> data;
                       if (j < cells.size())
                         temp_data[j] = data;
                     }
-                  this->field_data[section_name] = std::move(temp_data);
+                  this->cell_data[section_name] = std::move(temp_data);
                 }
             }
           else
@@ -654,10 +654,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 }
 
 template <int dim, int spacedim>
-const std::map<std::string, std::vector<double>> &
-GridIn<dim, spacedim>::get_field_data() const
+const std::map<std::string, Vector<double>> &
+GridIn<dim, spacedim>::get_cell_data() const
 {
-  return this->field_data;
+  return this->cell_data;
 }
 
 template <int dim, int spacedim>
