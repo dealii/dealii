@@ -3146,6 +3146,17 @@ namespace DoFTools
           const unsigned int dofs_per_face =
             face_1->get_fe(face_1->nth_active_fe_index(0))
               .n_dofs_per_face(face_no);
+
+          // Skip further recursion if face_1 carries invalid dof indices,
+          // i.e., it is on an artificial cell.
+          std::vector<types::global_dof_index> dofs_1(dofs_per_face);
+          face_1->get_dof_indices(dofs_1, face_1->nth_active_fe_index(0));
+          for (unsigned int i = 0; i < dofs_per_face; ++i)
+            if (dofs_1[i] == numbers::invalid_dof_index)
+              {
+                return;
+              }
+
           FullMatrix<double> child_transformation(dofs_per_face, dofs_per_face);
           FullMatrix<double> subface_interpolation(dofs_per_face,
                                                    dofs_per_face);
