@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
+
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
@@ -778,8 +779,8 @@ public:
    * in the external mesh
    * - Vector<double> stores value for the given identifier in each cell.
    * To access the value, use cell_data[name_field][cell->active_cell_index()].
-   *  
-   * For example, if the vtk mesh contains field data 'Density' defined at the 
+   *
+   * For example, if the vtk mesh contains field data 'Density' defined at the
    * cells, cell_data['Density'][0] would be the density defined at cell ID '0',
    * which corresponds to index 0 of the vector. The length of the vector in
    * cell_data['Density'] would equal the number of elements in the coarse
