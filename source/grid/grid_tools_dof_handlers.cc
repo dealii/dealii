@@ -2127,7 +2127,8 @@ namespace GridTools
     std::vector<PeriodicFacePair<CellIterator>> &matched_pairs,
     const dealii::Tensor<1, CellIterator::AccessorType::space_dimension>
                              &offset,
-    const FullMatrix<double> &matrix)
+    const FullMatrix<double> &matrix,
+    const double              abs_tol = 1e-10)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     (void)space_dim;
@@ -2173,7 +2174,8 @@ namespace GridTools
                                                  cell2->face(face_idx2),
                                                  direction,
                                                  offset,
-                                                 matrix))
+                                                 matrix,
+                                                 abs_tol))
               {
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
@@ -2223,7 +2225,8 @@ namespace GridTools
     std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
                                                &matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
-    const FullMatrix<double>                   &matrix)
+    const FullMatrix<double>                   &matrix,
+    const double                                abs_tol)
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
@@ -2275,7 +2278,7 @@ namespace GridTools
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
-      pairs1, pairs2, direction, matched_pairs, offset, matrix);
+      pairs1, pairs2, direction, matched_pairs, offset, matrix, abs_tol);
 
     if constexpr (running_in_debug_mode())
       {
@@ -2305,7 +2308,8 @@ namespace GridTools
     std::vector<PeriodicFacePair<typename MeshType::cell_iterator>>
                                                &matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
-    const FullMatrix<double>                   &matrix)
+    const FullMatrix<double>                   &matrix,
+    const double                                abs_tol)
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
@@ -2370,7 +2374,7 @@ namespace GridTools
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
-      pairs1, pairs2, direction, matched_pairs, offset, matrix);
+      pairs1, pairs2, direction, matched_pairs, offset, matrix, abs_tol);
   }
 
 
@@ -2390,7 +2394,8 @@ namespace GridTools
                       const Point<spacedim>     &point2,
                       const unsigned int         direction,
                       const Tensor<1, spacedim> &offset,
-                      const FullMatrix<double>  &matrix)
+                      const FullMatrix<double>  &matrix,
+                      const double               abs_tol = 1e-10)
   {
     AssertIndexRange(direction, spacedim);
 
@@ -2413,7 +2418,7 @@ namespace GridTools
         if (i == direction)
           continue;
 
-        if (std::abs(distance[i]) > 1.e-10)
+        if (std::abs(distance[i]) > abs_tol)
           return false;
       }
 
@@ -2429,7 +2434,8 @@ namespace GridTools
     const FaceIterator                                           &face2,
     const unsigned int                                            direction,
     const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
-    const FullMatrix<double>                                     &matrix)
+    const FullMatrix<double>                                     &matrix,
+    const double                                                  abs_tol)
   {
     Assert(matrix.m() == matrix.n(),
            ExcMessage("The supplied matrix must be a square matrix"));
@@ -2458,7 +2464,8 @@ namespace GridTools
                                     face2->vertex(*it),
                                     direction,
                                     offset,
-                                    matrix))
+                                    matrix,
+                                    abs_tol))
               {
                 face1_vertices[i] = *it;
                 face2_vertices[i] = i;
