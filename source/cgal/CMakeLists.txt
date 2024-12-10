@@ -35,7 +35,7 @@ intersections.inst.in
 )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/cgal/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/cgal/*.h
   )
 
 define_object_library(object_cgal OBJECT ${_src} ${_header} ${_inst})

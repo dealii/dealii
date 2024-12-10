@@ -392,12 +392,12 @@ mark_as_advanced(DEAL_II_CPACK_BUNDLE_NAME)
 # much pain, not enough profit"):
 #
 
-if("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_INSTALL_PREFIX}")
+if("${DEAL_II_BINARY_DIR}" STREQUAL "${CMAKE_INSTALL_PREFIX}")
   message(FATAL_ERROR "
-Error CMAKE_INSTALL_PREFIX is equal to CMAKE_BINARY_DIR.
+Error CMAKE_INSTALL_PREFIX is equal to DEAL_II_BINARY_DIR.
 It is not possible to install into the build directory. Please set
 CMAKE_INSTALL_PREFIX to a designated install directory different than
-CMAKE_BINARY_DIR.
+DEAL_II_BINARY_DIR.
 (Please note that you can use deal.II directly out of a build directory
 without the need to install it, if this is what you tried to do.)
 "

@@ -55,7 +55,7 @@ set(_inst
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/dofs/*.h
   )
 
 define_object_library(object_dofs OBJECT ${_src} ${_header} ${_inst})
