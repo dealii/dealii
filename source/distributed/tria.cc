@@ -1780,7 +1780,7 @@ namespace parallel
       // for clarity be explicit on which function is called
       try
         {
-          Triangulation<dim, spacedim>::clear();
+          parallel::distributed::Triangulation<dim, spacedim>::clear();
         }
       catch (...)
         {}
