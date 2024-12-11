@@ -22,7 +22,10 @@
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
 
+#include <deal.II/lac/vector.h>
+
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -768,6 +771,25 @@ public:
   get_format_names();
 
   /**
+   * Return a map containing cell data associated with the elements of an
+   * external vtk format mesh imported using read_vtk().
+   * The format of the returned map is as
+   * follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each cell.
+   * To access the value, use cell_data[name_field][cell->active_cell_index()].
+   *
+   * For example, if the vtk mesh contains field data 'Density' defined at the
+   * cells, cell_data['Density'][0] would be the density defined at cell ID '0',
+   * which corresponds to index 0 of the vector. The length of the vector in
+   * cell_data['Density'] would equal the number of elements in the coarse
+   * mesh.
+   */
+  const std::map<std::string, Vector<double>> &
+  get_cell_data() const;
+
+  /**
    * Exception
    */
   DeclException1(ExcUnknownSectionType,
@@ -948,6 +970,17 @@ private:
    * Input format used by read() if no format is given.
    */
   Format default_format;
+
+  /**
+   * Data member that stores field data defined at the cells of the mesh.
+   * The format is as follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each cell id.
+   *
+   * To access the value use cell_data[name_field][cell->active_cell_index()].
+   */
+  std::map<std::string, Vector<double>> cell_data;
 };
 
 /* -------------- declaration of explicit specializations ------------- */
