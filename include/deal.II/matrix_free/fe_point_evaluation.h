@@ -2656,6 +2656,36 @@ template <std::size_t stride_view>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+  const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+  const EvaluationFlags::DoFNumbering                      numbering)
+{
+  do_evaluate(solution_values,
+              evaluation_flags,
+              numbering == EvaluationFlags::lexicographic);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
+  const ArrayView<const ScalarNumber>    &solution_values,
+  const EvaluationFlags::EvaluationFlags &evaluation_flags,
+  const EvaluationFlags::DoFNumbering     numbering)
+{
+  do_evaluate(StridedArrayView<const ScalarNumber, 1>(solution_values.data(),
+                                                      solution_values.size()),
+              evaluation_flags,
+              numbering == EvaluationFlags::lexicographic);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+template <std::size_t stride_view>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
+  const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
 {
   do_evaluate(solution_values, evaluation_flags, true);
@@ -2675,6 +2705,39 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
               this->renumber.empty());
 }
 
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+template <std::size_t stride_view>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
+  const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+  const EvaluationFlags::EvaluationFlags            &integration_flags,
+  const EvaluationFlags::DoFNumbering                numbering,
+  const bool                                         sum_into_values)
+{
+  do_integrate<true>(solution_values,
+                     integration_flags,
+                     sum_into_values,
+                     numbering == EvaluationFlags::lexicographic);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
+  const ArrayView<ScalarNumber>          &solution_values,
+  const EvaluationFlags::EvaluationFlags &integration_flags,
+  const EvaluationFlags::DoFNumbering     numbering,
+  const bool                              sum_into_values)
+{
+  do_integrate<true>(StridedArrayView<ScalarNumber, 1>(solution_values.data(),
+                                                       solution_values.size()),
+                     integration_flags,
+                     sum_into_values,
+                     numbering == EvaluationFlags::lexicographic);
+}
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
