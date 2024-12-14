@@ -1233,29 +1233,66 @@ public:
    * `solution_values`, on the cell and `unit_points` passed to reinit().
    *
    * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element read out by
-   * `FEEvaluation::read_dof_values(global_vector)`.
+   * values on the element.
    *
    * @param[in] evaluation_flags Flags specifying which quantities should be
    * evaluated at the points.
+   *
+   * @param[in] numbering Flag specifying the order in which the unknowns are
+   * stored. If set to `EvaluationFlags::lexicographic`, the unknowns are
+   * assumed to be stored as in FEEvaluation, i.e., as returned by
+   * FEEvaluation::read_dof_values(global_vector). If set to
+   * `EvaluationFlags::lexicographic`, the unknowns are assumed to be stored in
+   * the order of the FiniteElement object.
    */
   template <std::size_t stride_view>
   void
   evaluate(
     const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+    const EvaluationFlags::DoFNumbering                      numbering);
+
+  /**
+   * Same as above with `EvaluationFlags::lexicographic`.
+   * Deprecated. Use the function above.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the function with numbering specified.")
+  template <std::size_t stride_view>
+  void
+  evaluate(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+    const EvaluationFlags::DoFNumbering                      numbering);
 
   /**
    * This function interpolates the finite element solution, represented by
    * `solution_values`, on the cell and `unit_points` passed to reinit().
    *
    * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element as returned by `cell->get_dof_values(global_vector,
-   * solution_values)`.
+   * values.
    *
    * @param[in] evaluation_flags Flags specifying which quantities should be
    * evaluated at the points.
+   *
+   * @param[in] numbering Flag specifying the order in which the unknowns are
+   * provided. If set to `EvaluationFlags::lexicographic`, the unknowns are
+   * assumed to be stored as in FEEvaluation, i.e., as returned by
+   * FEEvaluation::read_dof_values(global_vector). If set to
+   * `EvaluationFlags::hierarchical`, the unknowns are assumed to be stored in
+   * the order of the FiniteElement object.
    */
+  void
+  evaluate(const ArrayView<const ScalarNumber>    &solution_values,
+           const EvaluationFlags::EvaluationFlags &evaluation_flags,
+           const EvaluationFlags::DoFNumbering     numbering);
+
+  /**
+   * Same as above with `EvaluationFlags::hierarchical`.
+   * Deprecated. Use the function above.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the function with numbering specified.")
   void
   evaluate(const ArrayView<const ScalarNumber>    &solution_values,
            const EvaluationFlags::EvaluationFlags &evaluation_flags);
@@ -1267,21 +1304,35 @@ public:
    * the Jacobian determinant times the quadrature weight (JxW).
    *
    * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used during
-   * `FEEvaluation::set_dof_values(global_vector)` or
-   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
+   * integral. Note that for multi-component systems where only some of the
+   * components are selected by the present class, the entries in
+   * `solution_values` not touched by this class will be set to zero.
    *
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
+   *
+   * @param[in] numbering Flag specifying the order in which the unknowns are
+   * stored in the solution_values array. Possible values are
+   * EvaluationFlags::lexicographic and EvaluationFlags::hierarchical.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
    * `sum_into_values=false` every value of @p solution_values is zeroed out.
    *
    */
+  template <std::size_t stride_view>
+  void
+  integrate(const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+            const EvaluationFlags::EvaluationFlags &integration_flags,
+            const EvaluationFlags::DoFNumbering     numbering,
+            const bool                              sum_into_values = false);
+
+  /**
+   * Same as above with `EvaluationFlags::lexicographic`.
+   * Deprecated. Use the function above.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the function with numbering specified.")
   template <std::size_t stride_view>
   void
   integrate(const StridedArrayView<ScalarNumber, stride_view> &solution_values,
@@ -1295,15 +1346,17 @@ public:
    * the Jacobian determinant times the quadrature weight (JxW).
    *
    * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used to during
-   * `cell->set_dof_values(solution_values, global_vector)` or
-   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * integral. Note
    * that for multi-component systems where only some of the components are
    * selected by the present class, the entries in `solution_values` not touched
    * by this class will be set to zero.
    *
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
+   *
+   * @param[in] numbering Flag specifying the order in which the unknowns are
+   * stored in the solution_values array. Possible values are
+   * EvaluationFlags::lexicographic and EvaluationFlags::hierarchical.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
@@ -1313,7 +1366,22 @@ public:
   void
   integrate(const ArrayView<ScalarNumber>          &solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags,
+            const EvaluationFlags::DoFNumbering     numbering,
             const bool                              sum_into_values = false);
+
+
+  /**
+   * Same as above with `EvaluationFlags::hierarchical`.
+   * Deprecated. Use the function above.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the function with numbering specified.")
+  void
+  integrate(const ArrayView<ScalarNumber>          &solution_values,
+            const EvaluationFlags::EvaluationFlags &integration_flags,
+            const EvaluationFlags::DoFNumbering     numbering,
+            const bool                              sum_into_values = false);
+
 
   /**
    * This function multiplies the quantities passed in by previous
@@ -1336,11 +1404,30 @@ public:
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
    *
+   * @param[in] numbering Flag specifying the order in which the unknowns are
+   * stored in the solution_values array. Possible values are
+   * EvaluationFlags::lexicographic and EvaluationFlags::hierarchical.
+   *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
    * `sum_into_values=false` every value of @p solution_values is zeroed out.
    *
    */
+  template <std::size_t stride_view>
+  void
+  test_and_sum(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags            &integration_flags,
+    const EvaluationFlags::DoFNumbering                numbering,
+    const bool                                         sum_into_values = false);
+
+
+  /**
+   *  Same as above with `EvaluationFlags::lexicographic`.
+   *  Deprecated. Use the function above.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the function with numbering specified.")
   template <std::size_t stride_view>
   void
   test_and_sum(
@@ -1369,11 +1456,28 @@ public:
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
    *
+   * @param[in] numbering Flag specifying the order in which the unknowns are
+   * stored in the solution_values array. Possible values are
+   * EvaluationFlags::lexicographic and EvaluationFlags::hierarchical.
+   *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
    * `sum_into_values=false` every value of @p solution_values is zeroed out.
    *
    */
+  void
+  test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
+               const EvaluationFlags::EvaluationFlags &integration_flags,
+               const EvaluationFlags::DoFNumbering     numbering,
+               const bool                              sum_into_values = false);
+
+
+  /**
+   * Same as above with `EvaluationFlags::hierarchical`.
+   *  Deprecated. Use the function above.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the function with numbering specified.")
   void
   test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
                const EvaluationFlags::EvaluationFlags &integration_flags,
