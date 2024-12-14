@@ -1262,8 +1262,7 @@ public:
   void
   evaluate(
     const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
-    const EvaluationFlags::DoFNumbering                      numbering);
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
 
   /**
    * This function interpolates the finite element solution, represented by
@@ -1379,7 +1378,6 @@ public:
   void
   integrate(const ArrayView<ScalarNumber>          &solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags,
-            const EvaluationFlags::DoFNumbering     numbering,
             const bool                              sum_into_values = false);
 
 
