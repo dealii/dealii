@@ -2807,6 +2807,39 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 }
 
 
+template <int n_components_, int dim, int spacedim, typename Number>
+template <std::size_t stride_view>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
+  const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+  const EvaluationFlags::EvaluationFlags            &integration_flags,
+  const EvaluationFlags::DoFNumbering                numbering,
+  const bool                                         sum_into_values)
+{
+  do_integrate<false>(solution_values,
+                      integration_flags,
+                      sum_into_values,
+                      numbering == EvaluationFlags::lexicographic);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
+  const ArrayView<ScalarNumber>          &solution_values,
+  const EvaluationFlags::EvaluationFlags &integration_flags,
+  const EvaluationFlags::DoFNumbering     numbering,
+  const bool                              sum_into_values)
+{
+  do_integrate<false>(StridedArrayView<ScalarNumber, 1>(solution_values.data(),
+                                                        solution_values.size()),
+                      integration_flags,
+                      sum_into_values,
+                      numbering == EvaluationFlags::lexicographic);
+}
+
+
 
 template <int n_components_, int dim, int spacedim, typename Number>
 template <std::size_t stride_view>
