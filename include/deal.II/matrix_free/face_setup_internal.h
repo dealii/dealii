@@ -1049,6 +1049,7 @@ namespace internal
             info.subface_index =
               cell->periodic_neighbor_of_coarser_periodic_neighbor(face_no)
                 .second;
+          // else if must be dim > 1 because dim == 1 adm creates no subfaces
           else if (dim > 1)
             info.subface_index =
               cell->neighbor_of_coarser_neighbor(face_no).second;
