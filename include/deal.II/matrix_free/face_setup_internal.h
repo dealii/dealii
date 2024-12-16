@@ -812,6 +812,7 @@ namespace internal
                           neighbor = dcell->neighbor_or_periodic_neighbor(f);
                         if (use_active_cells && neighbor->has_children() && dim>1)
                           {
+                            // dim > 1 because face()->n_children() = 0 when dim == 1
                             for (unsigned int c = 0;
                                  c < dcell->face(f)->n_children();
                                  ++c)
@@ -881,6 +882,9 @@ namespace internal
                           }
                           else if (dim == 1)
                             {
+                              // Follow much the same procedure of dim > 1 with one large exception:
+                              // Face is created on first visitation as long as neighbor has no children
+                              // face_visited is used as a flag that a face has already been created
                               if (face_visited[dcell->face(f)->index()] == 0 && !(neighbor->has_children()))
                                 {
                                   std::pair<unsigned int, unsigned int>
