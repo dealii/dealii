@@ -1250,7 +1250,7 @@ DEAL_II_NAMESPACE_CLOSE
 
 // if in optimized mode: include more templates
 #ifndef DEBUG
-#  include "tria_iterator.templates.h"
+#  include <deal.II/grid/tria_iterator.templates.h>
 #endif
 
 #endif
