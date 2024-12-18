@@ -160,30 +160,6 @@ SparseMatrix<number>::~SparseMatrix()
 
 
 
-namespace internal
-{
-  namespace SparseMatrixImplementation
-  {
-    using size_type = types::global_dof_index;
-
-    template <typename T>
-    std::enable_if_t<std::is_trivial_v<T>>
-    zero_subrange(const size_type begin, const size_type end, T *dst)
-    {
-      std::memset(dst + begin, 0, (end - begin) * sizeof(T));
-    }
-
-    template <typename T>
-    std::enable_if_t<!std::is_trivial_v<T>>
-    zero_subrange(const size_type begin, const size_type end, T *dst)
-    {
-      std::fill(dst + begin, dst + end, 0);
-    }
-  } // namespace SparseMatrixImplementation
-} // namespace internal
-
-
-
 template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator=(const double d)
@@ -210,18 +186,13 @@ SparseMatrix<number>::operator=(const double d)
     parallel::apply_to_subranges(
       0U,
       matrix_size,
-      [this](const size_type begin, const size_type end) {
-        internal::SparseMatrixImplementation::zero_subrange(begin,
-                                                            end,
-                                                            val.get());
+      [values = this->val.get()](const size_type begin, const size_type end) {
+        std::fill(values + begin, values + end, number(0.));
       },
       grain_size);
   else if (matrix_size > 0)
     {
-      if constexpr (std::is_trivial_v<number>)
-        std::memset(val.get(), 0, matrix_size * sizeof(number));
-      else
-        std::fill(val.get(), val.get() + matrix_size, 0);
+      std::fill(val.get(), val.get() + matrix_size, 0);
     }
 
   return *this;
@@ -477,6 +448,8 @@ namespace internal
 {
   namespace SparseMatrixImplementation
   {
+    using size_type = types::global_dof_index;
+
     /**
      * Perform a vmult using the SparseMatrix data structures, but only using
      * a subinterval for the row indices.
