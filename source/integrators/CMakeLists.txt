@@ -16,7 +16,7 @@ set(_src
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/integrators/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/integrators/*.h
   )
 
 define_object_library(object_integrators OBJECT ${_src} ${_header})
