@@ -14,6 +14,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/utilities.h>
 
 #include <algorithm>
@@ -70,8 +71,7 @@ Quadrature<dim>::initialize(const ArrayView<const Point<dim>> &points,
       this->weights.insert(this->weights.end(), weights.begin(), weights.end());
     }
   else
-    this->weights.resize(points.size(),
-                         std::numeric_limits<double>::infinity());
+    this->weights.resize(points.size(), numbers::signaling_nan<double>());
 
   quadrature_points.clear();
   quadrature_points.insert(quadrature_points.end(),
@@ -112,7 +112,7 @@ Quadrature<dim>::Quadrature(std::vector<Point<dim>> &&points,
 template <int dim>
 Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points)
   : quadrature_points(points)
-  , weights(points.size(), std::numeric_limits<double>::infinity())
+  , weights(points.size(), numbers::signaling_nan<double>())
   , is_tensor_product_flag(dim == 1)
 {
   Assert(weights.size() == points.size(),
