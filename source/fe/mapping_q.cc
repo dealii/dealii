@@ -615,7 +615,7 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
   // statement may throw an exception, which we simply pass up to the caller
   const Point<dim> p_unit =
     this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
-  AssertThrow(numbers::is_finite(p_unit[0]),
+  AssertThrow(p_unit[0] != std::numeric_limits<double>::lowest(),
               (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
   return p_unit;
 }
@@ -690,7 +690,7 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
         // determinants) from other SIMD lanes. Repeat the computation in this
         // unlikely case with scalar arguments.
         for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-          if (numbers::is_finite(unit_point[0][j]))
+          if (unit_point[0][j] != std::numeric_limits<double>::lowest())
             for (unsigned int d = 0; d < dim; ++d)
               unit_points[i + j][d] = unit_point[d][j];
           else

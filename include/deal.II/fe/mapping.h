@@ -498,7 +498,8 @@ public:
    * MappingQ. The only difference in behavior is that this function
    * will never throw an ExcTransformationFailed() exception. If the
    * transformation fails for `real_points[i]`, the returned `unit_points[i]`
-   * contains std::numeric_limits<double>::infinity() as the first entry.
+   * contains std::numeric_limits<double>::lowest() as the first component
+   * of the point, marking this one point as invalid.
    */
   virtual void
   transform_points_real_to_unit_cell(
