@@ -162,11 +162,11 @@ namespace parallel
        decltype(*std::declval<OutputIterator>()),
        std::invoke_result_t<Function,
                             decltype(*std::declval<InputIterator>())>>))
-  void transform(const InputIterator &begin_in,
-                 const InputIterator &end_in,
-                 OutputIterator       out,
-                 const Function      &function,
-                 const unsigned int   grainsize)
+  DEAL_II_DEPRECATED_EARLY void transform(const InputIterator &begin_in,
+                                          const InputIterator &end_in,
+                                          OutputIterator       out,
+                                          const Function      &function,
+                                          const unsigned int   grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -237,12 +237,12 @@ namespace parallel
        std::invoke_result_t<Function,
                             decltype(*std::declval<InputIterator1>()),
                             decltype(*std::declval<InputIterator2>())>>))
-  void transform(const InputIterator1 &begin_in1,
-                 const InputIterator1 &end_in1,
-                 InputIterator2        in2,
-                 OutputIterator        out,
-                 const Function       &function,
-                 const unsigned int    grainsize)
+  DEAL_II_DEPRECATED_EARLY void transform(const InputIterator1 &begin_in1,
+                                          const InputIterator1 &end_in1,
+                                          InputIterator2        in2,
+                                          OutputIterator        out,
+                                          const Function       &function,
+                                          const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -319,13 +319,13 @@ namespace parallel
                             decltype(*std::declval<InputIterator1>()),
                             decltype(*std::declval<InputIterator2>()),
                             decltype(*std::declval<InputIterator3>())>>))
-  void transform(const InputIterator1 &begin_in1,
-                 const InputIterator1 &end_in1,
-                 InputIterator2        in2,
-                 InputIterator3        in3,
-                 OutputIterator        out,
-                 const Function       &function,
-                 const unsigned int    grainsize)
+  DEAL_II_DEPRECATED_EARLY void transform(const InputIterator1 &begin_in1,
+                                          const InputIterator1 &end_in1,
+                                          InputIterator2        in2,
+                                          InputIterator3        in3,
+                                          OutputIterator        out,
+                                          const Function       &function,
+                                          const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
