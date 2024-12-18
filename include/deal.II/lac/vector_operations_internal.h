@@ -210,14 +210,9 @@ namespace internal
         Assert(end >= begin, ExcInternalError());
 
         if (value == Number())
-          {
-            if constexpr (std::is_trivial_v<Number>)
-              {
-                std::memset(dst + begin, 0, sizeof(Number) * (end - begin));
-                return;
-              }
-          }
-        std::fill(dst + begin, dst + end, value);
+          std::fill(dst + begin, dst + end, Number());
+        else
+          std::fill(dst + begin, dst + end, value);
       }
 
       const Number  value;
