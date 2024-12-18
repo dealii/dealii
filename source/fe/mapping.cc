@@ -142,8 +142,10 @@ Mapping<dim, spacedim>::transform_points_real_to_unit_cell(
         }
       catch (typename Mapping<dim>::ExcTransformationFailed &)
         {
+          // If the transformation for this one point failed, mark it
+          // as invalid as described in the documentation.
           unit_points[i]    = Point<dim>();
-          unit_points[i][0] = std::numeric_limits<double>::infinity();
+          unit_points[i][0] = std::numeric_limits<double>::lowest();
         }
     }
 }
