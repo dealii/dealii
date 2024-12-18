@@ -22,11 +22,18 @@ DEAL_II_NAMESPACE_OPEN
 // and it is trivial (can be statically default initialized)
 // Here, the trait std::is_pod cannot be used because it is deprecated
 // in C++20.
-static_assert(std::is_standard_layout_v<VectorizedArray<double>> &&
-                std::is_trivial_v<VectorizedArray<double>>,
-              "VectorizedArray<double> must be a POD type");
-static_assert(std::is_standard_layout_v<VectorizedArray<float>> &&
-                std::is_trivial_v<VectorizedArray<float>>,
-              "VectorizedArray<float> must be a POD type");
+//
+// Check these statements to ensure we catch problems if we accidentally
+// make these classes non-POD.
+static_assert(
+  std::is_standard_layout_v<VectorizedArray<double>> &&
+    std::is_trivially_default_constructible_v<VectorizedArray<double>> &&
+    std::is_trivially_copyable_v<VectorizedArray<double>>,
+  "VectorizedArray<double> must be a POD type");
+static_assert(
+  std::is_standard_layout_v<VectorizedArray<float>> &&
+    std::is_trivially_default_constructible_v<VectorizedArray<float>> &&
+    std::is_trivially_copyable_v<VectorizedArray<float>>,
+  "VectorizedArray<float> must be a POD type");
 
 DEAL_II_NAMESPACE_CLOSE
