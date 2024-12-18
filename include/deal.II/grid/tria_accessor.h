@@ -4344,8 +4344,6 @@ template <>
 void
 TriaAccessor<3, 3, 3>::set_all_manifold_ids(const types::manifold_id) const;
 
-#endif // DOXYGEN
-
 
 
 namespace internal
@@ -6562,7 +6560,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
             // outside the old ball.
           }
       }
-#ifdef DEBUG
+#  ifdef DEBUG
   bool all_vertices_within_ball = true;
 
   // Set all_vertices_within_ball false if any of the vertices of the object
@@ -6576,7 +6574,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
       }
   // If all the vertices are not within the ball throw error
   Assert(all_vertices_within_ball, ExcInternalError());
-#endif
+#  endif
   return std::make_pair(center, radius);
 }
 
@@ -8136,9 +8134,9 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
 {
   Assert(this->is_active(),
          ExcMessage("is_locally_owned() can only be called on active cells!"));
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
   return true;
-#else
+#  else
 
   // Serial triangulations report invalid_subdomain_id as their locally owned
   // subdomain, so the first condition checks whether we have a serial
@@ -8149,7 +8147,7 @@ CellAccessor<dim, spacedim>::is_locally_owned() const
   return (locally_owned_subdomain == numbers::invalid_subdomain_id ||
           this->subdomain_id() == locally_owned_subdomain);
 
-#endif
+#  endif
 }
 
 
@@ -8157,9 +8155,9 @@ template <int dim, int spacedim>
 inline bool
 CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
 {
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
   return true;
-#else
+#  else
 
   // Serial triangulations report invalid_subdomain_id as their locally owned
   // subdomain, so the first condition checks whether we have a serial
@@ -8170,7 +8168,7 @@ CellAccessor<dim, spacedim>::is_locally_owned_on_level() const
   return (locally_owned_subdomain == numbers::invalid_subdomain_id ||
           this->level_subdomain_id() == locally_owned_subdomain);
 
-#endif
+#  endif
 }
 
 
@@ -8183,9 +8181,9 @@ CellAccessor<dim, spacedim>::is_ghost() const
   if (this->has_children())
     return false;
 
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
   return false;
-#else
+#  else
 
   // Serial triangulations report invalid_subdomain_id as their locally owned
   // subdomain, so the first condition rules out that case as all cells to a
@@ -8199,7 +8197,7 @@ CellAccessor<dim, spacedim>::is_ghost() const
           subdomain_id != locally_owned_subdomain &&
           subdomain_id != numbers::artificial_subdomain_id);
 
-#endif
+#  endif
 }
 
 
@@ -8207,9 +8205,9 @@ template <int dim, int spacedim>
 inline bool
 CellAccessor<dim, spacedim>::is_ghost_on_level() const
 {
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
   return false;
-#else
+#  else
 
   // Serial triangulations report invalid_subdomain_id as their locally owned
   // subdomain, so the first condition checks whether we have a serial
@@ -8222,7 +8220,7 @@ CellAccessor<dim, spacedim>::is_ghost_on_level() const
           subdomain_id != locally_owned_subdomain &&
           subdomain_id != numbers::artificial_subdomain_id);
 
-#endif
+#  endif
 }
 
 
@@ -8233,9 +8231,9 @@ CellAccessor<dim, spacedim>::is_artificial() const
 {
   Assert(this->is_active(),
          ExcMessage("is_artificial() can only be called on active cells!"));
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
   return false;
-#else
+#  else
 
   // Serial triangulations report invalid_subdomain_id as their locally owned
   // subdomain, so the first condition rules out that case as all cells to a
@@ -8244,7 +8242,7 @@ CellAccessor<dim, spacedim>::is_artificial() const
             numbers::invalid_subdomain_id &&
           this->subdomain_id() == numbers::artificial_subdomain_id);
 
-#endif
+#  endif
 }
 
 
@@ -8253,13 +8251,13 @@ template <int dim, int spacedim>
 inline bool
 CellAccessor<dim, spacedim>::is_artificial_on_level() const
 {
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
   return false;
-#else
+#  else
   return (this->tria->locally_owned_subdomain() !=
             numbers::invalid_subdomain_id &&
           this->level_subdomain_id() == numbers::artificial_subdomain_id);
-#endif
+#  endif
 }
 
 
@@ -8346,6 +8344,8 @@ CellAccessor<dim, spacedim>::global_level_cell_index() const
   return this->tria->levels[this->present_level]
     ->global_level_cell_indices[this->present_index];
 }
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
