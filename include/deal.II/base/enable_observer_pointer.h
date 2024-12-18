@@ -29,6 +29,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+// Forward declaration
+template <typename T, typename P>
+class ObserverPointer;
+
+
 /**
  * This class supports the functioning of the ObserverPointer class.
  *
@@ -108,31 +114,10 @@ public:
   operator=(EnableObserverPointer &&) noexcept;
 
   /**
-   * @name EnableObserverPointer functionality
+   * @name Querying the observer pointers an object has.
    *
-   * Classes derived from EnableObserverPointer provide a facility
-   * to subscribe to this object. This is mostly used by the ObserverPointer
-   * class.
    * @{
    */
-
-  /**
-   * Subscribes a user of the object by storing the pointer @p validity. The
-   * subscriber may be identified by text supplied as @p identifier.
-   */
-  void
-  subscribe(std::atomic<bool> *const validity,
-            const std::string       &identifier = "") const;
-
-  /**
-   * Unsubscribes a user from the object.
-   *
-   * @note The @p identifier and the @p validity pointer must be the same as
-   * the one supplied to subscribe().
-   */
-  void
-  unsubscribe(std::atomic<bool> *const validity,
-              const std::string       &identifier = "") const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to
@@ -257,6 +242,40 @@ private:
   mutable const std::type_info *object_info;
 
   /**
+   * A mutex used to ensure data consistency when accessing the `mutable`
+   * members of this class. This lock is used in the subscribe() and
+   * unsubscribe() functions, as well as in `list_subscribers()`.
+   */
+  static std::mutex mutex;
+
+  /**
+   * @name EnableObserverPointer functionality
+   *
+   * Classes derived from EnableObserverPointer provide a facility
+   * to subscribe to this object. This is mostly used by the ObserverPointer
+   * class.
+   * @{
+   */
+
+  /**
+   * Subscribes a user of the object by storing the pointer @p validity. The
+   * subscriber may be identified by text supplied as @p identifier.
+   */
+  void
+  subscribe(std::atomic<bool> *const validity,
+            const std::string       &identifier = "") const;
+
+  /**
+   * Unsubscribes a user from the object.
+   *
+   * @note The @p identifier and the @p validity pointer must be the same as
+   * the one supplied to subscribe().
+   */
+  void
+  unsubscribe(std::atomic<bool> *const validity,
+              const std::string       &identifier = "") const;
+
+  /**
    * Check that there are no objects subscribing to this object. If this check
    * passes then it is safe to destroy the current object. It this check fails
    * then this function will either abort or print an error message to deallog
@@ -272,12 +291,10 @@ private:
   void
   check_no_subscribers() const noexcept;
 
-  /**
-   * A mutex used to ensure data consistency when accessing the `mutable`
-   * members of this class. This lock is used in the subscribe() and
-   * unsubscribe() functions, as well as in `list_subscribers()`.
-   */
-  static std::mutex mutex;
+  template <typename, typename>
+  friend class ObserverPointer;
+
+  /** @} */
 };
 
 
