@@ -1205,8 +1205,8 @@ namespace Step71
         const ConstitutiveParameters &constitutive_parameters)
       : Coupled_Magnetomechanical_Constitutive_Law_Base<dim>(
           constitutive_parameters)
-      , H_components(0)
-      , C_components(Tensor<1, dim>::n_independent_components)
+      , H_components(0)   // 'dim' components starting at vector component 0
+      , C_components(dim) // Starting after the 'dim' components of H_components
       , ad_helper(Tensor<1, dim>::n_independent_components +
                   SymmetricTensor<2, dim>::n_independent_components)
       , psi(0.0)
