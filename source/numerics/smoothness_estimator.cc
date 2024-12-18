@@ -236,7 +236,7 @@ namespace SmoothnessEstimator
 
               // choose the smallest decay of coefficients in each direction,
               // i.e. the maximum decay slope k_v as in exp(-k_v)
-              double k_v = std::numeric_limits<double>::infinity();
+              double k_v = std::numeric_limits<double>::max();
               for (unsigned int d = 0; d < dim; ++d)
                 {
                   x.resize(0);
@@ -521,7 +521,7 @@ namespace SmoothnessEstimator
 
               // choose the smallest decay of coefficients in each direction,
               // i.e. the maximum decay slope k_v as in exp(-k_v)
-              double k_v = std::numeric_limits<double>::infinity();
+              double k_v = std::numeric_limits<double>::max();
               for (unsigned int d = 0; d < dim; ++d)
                 {
                   x.resize(0);
