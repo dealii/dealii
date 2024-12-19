@@ -700,6 +700,12 @@
  *       <td> Solving the Laplace-Beltrami equation on a surface using the trace finite element method.
  *       <br/> Keywords: MeshWorker::mesh_loop(), NonMatching::FEImmersedSurfaceValues
  *       </td></tr>
+ * 
+ *   <tr valign="top">
+ *       <td>step-93</td>
+ *       <td> Using nonlocal dofs to solve a simple optimization problem with the Poisson equation
+ *       <br/> Keywords: nonlocal dofs, optimization, Poisson
+ *       </td></tr>
  * </table>
  *
  *
