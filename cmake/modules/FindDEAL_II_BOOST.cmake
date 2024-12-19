@@ -69,14 +69,14 @@ endif()
 if(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS FALSE)
 
-  # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
-  list(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  # temporarily disable ${DEAL_II_SOURCE_DIR}/cmake/modules for module lookup
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${DEAL_II_SOURCE_DIR}/cmake/modules/)
   if(DEAL_II_WITH_ZLIB)
     find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS iostreams serialization system thread)
   else()
     find_package(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS serialization system thread)
   endif()
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+  list(APPEND CMAKE_MODULE_PATH ${DEAL_II_SOURCE_DIR}/cmake/modules/)
 endif()
 
 unset(Boost_NO_BOOST_CMAKE)
