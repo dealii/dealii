@@ -1,0 +1,1299 @@
+
+DEAL::Testing FESystem<2>[FE_Q<2>(1)-FE_Nedelec<2>(1)-FE_Q<2>(1)^3-FE_Nedelec<2>(1)^2]
+DEAL::phi_0 is part of the scalar part: true
+DEAL::phi_1 is part of the scalar part: false
+DEAL::phi_2 is part of the scalar part: false
+DEAL::phi_3 is part of the scalar part: false
+DEAL::phi_4 is part of the scalar part: true
+DEAL::phi_5 is part of the scalar part: false
+DEAL::phi_6 is part of the scalar part: false
+DEAL::phi_7 is part of the scalar part: false
+DEAL::phi_8 is part of the scalar part: true
+DEAL::phi_9 is part of the scalar part: false
+DEAL::phi_10 is part of the scalar part: false
+DEAL::phi_11 is part of the scalar part: false
+DEAL::phi_12 is part of the scalar part: true
+DEAL::phi_13 is part of the scalar part: false
+DEAL::phi_14 is part of the scalar part: false
+DEAL::phi_15 is part of the scalar part: false
+DEAL::phi_16 is part of the scalar part: false
+DEAL::phi_17 is part of the scalar part: false
+DEAL::phi_18 is part of the scalar part: false
+DEAL::phi_19 is part of the scalar part: false
+DEAL::phi_20 is part of the scalar part: false
+DEAL::phi_21 is part of the scalar part: false
+DEAL::phi_22 is part of the scalar part: false
+DEAL::phi_23 is part of the scalar part: false
+DEAL::phi_24 is part of the scalar part: false
+DEAL::phi_25 is part of the scalar part: false
+DEAL::phi_26 is part of the scalar part: false
+DEAL::phi_27 is part of the scalar part: false
+DEAL::phi_28 is part of the scalar part: false
+DEAL::phi_29 is part of the scalar part: false
+DEAL::phi_30 is part of the scalar part: false
+DEAL::phi_31 is part of the scalar part: false
+DEAL::phi_32 is part of the scalar part: false
+DEAL::phi_33 is part of the scalar part: false
+DEAL::phi_34 is part of the scalar part: false
+DEAL::phi_35 is part of the scalar part: false
+DEAL::phi_36 is part of the scalar part: false
+DEAL::phi_37 is part of the scalar part: false
+DEAL::phi_38 is part of the scalar part: false
+DEAL::phi_39 is part of the scalar part: false
+DEAL::phi_40 is part of the scalar part: false
+DEAL::phi_41 is part of the scalar part: false
+DEAL::phi_42 is part of the scalar part: false
+DEAL::phi_43 is part of the scalar part: false
+DEAL::phi_44 is part of the scalar part: false
+DEAL::phi_45 is part of the scalar part: false
+DEAL::phi_46 is part of the scalar part: false
+DEAL::phi_47 is part of the scalar part: false
+DEAL::phi_48 is part of the scalar part: false
+DEAL::phi_49 is part of the scalar part: false
+DEAL::phi_50 is part of the scalar part: false
+DEAL::phi_51 is part of the scalar part: false
+DEAL::phi_0 is part of the vector part: false
+DEAL::phi_1 is part of the vector part: false
+DEAL::phi_2 is part of the vector part: false
+DEAL::phi_3 is part of the vector part: false
+DEAL::phi_4 is part of the vector part: false
+DEAL::phi_5 is part of the vector part: false
+DEAL::phi_6 is part of the vector part: false
+DEAL::phi_7 is part of the vector part: false
+DEAL::phi_8 is part of the vector part: false
+DEAL::phi_9 is part of the vector part: false
+DEAL::phi_10 is part of the vector part: false
+DEAL::phi_11 is part of the vector part: false
+DEAL::phi_12 is part of the vector part: false
+DEAL::phi_13 is part of the vector part: false
+DEAL::phi_14 is part of the vector part: false
+DEAL::phi_15 is part of the vector part: false
+DEAL::phi_16 is part of the vector part: true
+DEAL::phi_17 is part of the vector part: true
+DEAL::phi_18 is part of the vector part: false
+DEAL::phi_19 is part of the vector part: false
+DEAL::phi_20 is part of the vector part: false
+DEAL::phi_21 is part of the vector part: false
+DEAL::phi_22 is part of the vector part: true
+DEAL::phi_23 is part of the vector part: true
+DEAL::phi_24 is part of the vector part: false
+DEAL::phi_25 is part of the vector part: false
+DEAL::phi_26 is part of the vector part: false
+DEAL::phi_27 is part of the vector part: false
+DEAL::phi_28 is part of the vector part: true
+DEAL::phi_29 is part of the vector part: true
+DEAL::phi_30 is part of the vector part: false
+DEAL::phi_31 is part of the vector part: false
+DEAL::phi_32 is part of the vector part: false
+DEAL::phi_33 is part of the vector part: false
+DEAL::phi_34 is part of the vector part: true
+DEAL::phi_35 is part of the vector part: true
+DEAL::phi_36 is part of the vector part: false
+DEAL::phi_37 is part of the vector part: false
+DEAL::phi_38 is part of the vector part: false
+DEAL::phi_39 is part of the vector part: false
+DEAL::phi_40 is part of the vector part: true
+DEAL::phi_41 is part of the vector part: true
+DEAL::phi_42 is part of the vector part: true
+DEAL::phi_43 is part of the vector part: true
+DEAL::phi_44 is part of the vector part: false
+DEAL::phi_45 is part of the vector part: false
+DEAL::phi_46 is part of the vector part: false
+DEAL::phi_47 is part of the vector part: false
+DEAL::phi_48 is part of the vector part: false
+DEAL::phi_49 is part of the vector part: false
+DEAL::phi_50 is part of the vector part: false
+DEAL::phi_51 is part of the vector part: false
+DEAL::phi_0 is part of the symmetric tensor part: false
+DEAL::phi_1 is part of the symmetric tensor part: true
+DEAL::phi_2 is part of the symmetric tensor part: true
+DEAL::phi_3 is part of the symmetric tensor part: true
+DEAL::phi_4 is part of the symmetric tensor part: false
+DEAL::phi_5 is part of the symmetric tensor part: true
+DEAL::phi_6 is part of the symmetric tensor part: true
+DEAL::phi_7 is part of the symmetric tensor part: true
+DEAL::phi_8 is part of the symmetric tensor part: false
+DEAL::phi_9 is part of the symmetric tensor part: true
+DEAL::phi_10 is part of the symmetric tensor part: true
+DEAL::phi_11 is part of the symmetric tensor part: true
+DEAL::phi_12 is part of the symmetric tensor part: false
+DEAL::phi_13 is part of the symmetric tensor part: true
+DEAL::phi_14 is part of the symmetric tensor part: true
+DEAL::phi_15 is part of the symmetric tensor part: true
+DEAL::phi_16 is part of the symmetric tensor part: false
+DEAL::phi_17 is part of the symmetric tensor part: false
+DEAL::phi_18 is part of the symmetric tensor part: false
+DEAL::phi_19 is part of the symmetric tensor part: false
+DEAL::phi_20 is part of the symmetric tensor part: false
+DEAL::phi_21 is part of the symmetric tensor part: false
+DEAL::phi_22 is part of the symmetric tensor part: false
+DEAL::phi_23 is part of the symmetric tensor part: false
+DEAL::phi_24 is part of the symmetric tensor part: false
+DEAL::phi_25 is part of the symmetric tensor part: false
+DEAL::phi_26 is part of the symmetric tensor part: false
+DEAL::phi_27 is part of the symmetric tensor part: false
+DEAL::phi_28 is part of the symmetric tensor part: false
+DEAL::phi_29 is part of the symmetric tensor part: false
+DEAL::phi_30 is part of the symmetric tensor part: false
+DEAL::phi_31 is part of the symmetric tensor part: false
+DEAL::phi_32 is part of the symmetric tensor part: false
+DEAL::phi_33 is part of the symmetric tensor part: false
+DEAL::phi_34 is part of the symmetric tensor part: false
+DEAL::phi_35 is part of the symmetric tensor part: false
+DEAL::phi_36 is part of the symmetric tensor part: false
+DEAL::phi_37 is part of the symmetric tensor part: false
+DEAL::phi_38 is part of the symmetric tensor part: false
+DEAL::phi_39 is part of the symmetric tensor part: false
+DEAL::phi_40 is part of the symmetric tensor part: false
+DEAL::phi_41 is part of the symmetric tensor part: false
+DEAL::phi_42 is part of the symmetric tensor part: false
+DEAL::phi_43 is part of the symmetric tensor part: false
+DEAL::phi_44 is part of the symmetric tensor part: false
+DEAL::phi_45 is part of the symmetric tensor part: false
+DEAL::phi_46 is part of the symmetric tensor part: false
+DEAL::phi_47 is part of the symmetric tensor part: false
+DEAL::phi_48 is part of the symmetric tensor part: false
+DEAL::phi_49 is part of the symmetric tensor part: false
+DEAL::phi_50 is part of the symmetric tensor part: false
+DEAL::phi_51 is part of the symmetric tensor part: false
+DEAL::phi_0 is part of the tensor part: false
+DEAL::phi_1 is part of the tensor part: false
+DEAL::phi_2 is part of the tensor part: false
+DEAL::phi_3 is part of the tensor part: false
+DEAL::phi_4 is part of the tensor part: false
+DEAL::phi_5 is part of the tensor part: false
+DEAL::phi_6 is part of the tensor part: false
+DEAL::phi_7 is part of the tensor part: false
+DEAL::phi_8 is part of the tensor part: false
+DEAL::phi_9 is part of the tensor part: false
+DEAL::phi_10 is part of the tensor part: false
+DEAL::phi_11 is part of the tensor part: false
+DEAL::phi_12 is part of the tensor part: false
+DEAL::phi_13 is part of the tensor part: false
+DEAL::phi_14 is part of the tensor part: false
+DEAL::phi_15 is part of the tensor part: false
+DEAL::phi_16 is part of the tensor part: false
+DEAL::phi_17 is part of the tensor part: false
+DEAL::phi_18 is part of the tensor part: true
+DEAL::phi_19 is part of the tensor part: true
+DEAL::phi_20 is part of the tensor part: true
+DEAL::phi_21 is part of the tensor part: true
+DEAL::phi_22 is part of the tensor part: false
+DEAL::phi_23 is part of the tensor part: false
+DEAL::phi_24 is part of the tensor part: true
+DEAL::phi_25 is part of the tensor part: true
+DEAL::phi_26 is part of the tensor part: true
+DEAL::phi_27 is part of the tensor part: true
+DEAL::phi_28 is part of the tensor part: false
+DEAL::phi_29 is part of the tensor part: false
+DEAL::phi_30 is part of the tensor part: true
+DEAL::phi_31 is part of the tensor part: true
+DEAL::phi_32 is part of the tensor part: true
+DEAL::phi_33 is part of the tensor part: true
+DEAL::phi_34 is part of the tensor part: false
+DEAL::phi_35 is part of the tensor part: false
+DEAL::phi_36 is part of the tensor part: true
+DEAL::phi_37 is part of the tensor part: true
+DEAL::phi_38 is part of the tensor part: true
+DEAL::phi_39 is part of the tensor part: true
+DEAL::phi_40 is part of the tensor part: false
+DEAL::phi_41 is part of the tensor part: false
+DEAL::phi_42 is part of the tensor part: false
+DEAL::phi_43 is part of the tensor part: false
+DEAL::phi_44 is part of the tensor part: true
+DEAL::phi_45 is part of the tensor part: true
+DEAL::phi_46 is part of the tensor part: true
+DEAL::phi_47 is part of the tensor part: true
+DEAL::phi_48 is part of the tensor part: true
+DEAL::phi_49 is part of the tensor part: true
+DEAL::phi_50 is part of the tensor part: true
+DEAL::phi_51 is part of the tensor part: true
+DEAL::Testing FESystem<3>[FE_Q<3>(1)-FE_Nedelec<3>(1)-FE_Q<3>(1)^6-FE_Nedelec<3>(1)^3]
+DEAL::phi_0 is part of the scalar part: true
+DEAL::phi_1 is part of the scalar part: false
+DEAL::phi_2 is part of the scalar part: false
+DEAL::phi_3 is part of the scalar part: false
+DEAL::phi_4 is part of the scalar part: false
+DEAL::phi_5 is part of the scalar part: false
+DEAL::phi_6 is part of the scalar part: false
+DEAL::phi_7 is part of the scalar part: true
+DEAL::phi_8 is part of the scalar part: false
+DEAL::phi_9 is part of the scalar part: false
+DEAL::phi_10 is part of the scalar part: false
+DEAL::phi_11 is part of the scalar part: false
+DEAL::phi_12 is part of the scalar part: false
+DEAL::phi_13 is part of the scalar part: false
+DEAL::phi_14 is part of the scalar part: true
+DEAL::phi_15 is part of the scalar part: false
+DEAL::phi_16 is part of the scalar part: false
+DEAL::phi_17 is part of the scalar part: false
+DEAL::phi_18 is part of the scalar part: false
+DEAL::phi_19 is part of the scalar part: false
+DEAL::phi_20 is part of the scalar part: false
+DEAL::phi_21 is part of the scalar part: true
+DEAL::phi_22 is part of the scalar part: false
+DEAL::phi_23 is part of the scalar part: false
+DEAL::phi_24 is part of the scalar part: false
+DEAL::phi_25 is part of the scalar part: false
+DEAL::phi_26 is part of the scalar part: false
+DEAL::phi_27 is part of the scalar part: false
+DEAL::phi_28 is part of the scalar part: true
+DEAL::phi_29 is part of the scalar part: false
+DEAL::phi_30 is part of the scalar part: false
+DEAL::phi_31 is part of the scalar part: false
+DEAL::phi_32 is part of the scalar part: false
+DEAL::phi_33 is part of the scalar part: false
+DEAL::phi_34 is part of the scalar part: false
+DEAL::phi_35 is part of the scalar part: true
+DEAL::phi_36 is part of the scalar part: false
+DEAL::phi_37 is part of the scalar part: false
+DEAL::phi_38 is part of the scalar part: false
+DEAL::phi_39 is part of the scalar part: false
+DEAL::phi_40 is part of the scalar part: false
+DEAL::phi_41 is part of the scalar part: false
+DEAL::phi_42 is part of the scalar part: true
+DEAL::phi_43 is part of the scalar part: false
+DEAL::phi_44 is part of the scalar part: false
+DEAL::phi_45 is part of the scalar part: false
+DEAL::phi_46 is part of the scalar part: false
+DEAL::phi_47 is part of the scalar part: false
+DEAL::phi_48 is part of the scalar part: false
+DEAL::phi_49 is part of the scalar part: true
+DEAL::phi_50 is part of the scalar part: false
+DEAL::phi_51 is part of the scalar part: false
+DEAL::phi_52 is part of the scalar part: false
+DEAL::phi_53 is part of the scalar part: false
+DEAL::phi_54 is part of the scalar part: false
+DEAL::phi_55 is part of the scalar part: false
+DEAL::phi_56 is part of the scalar part: false
+DEAL::phi_57 is part of the scalar part: false
+DEAL::phi_58 is part of the scalar part: false
+DEAL::phi_59 is part of the scalar part: false
+DEAL::phi_60 is part of the scalar part: false
+DEAL::phi_61 is part of the scalar part: false
+DEAL::phi_62 is part of the scalar part: false
+DEAL::phi_63 is part of the scalar part: false
+DEAL::phi_64 is part of the scalar part: false
+DEAL::phi_65 is part of the scalar part: false
+DEAL::phi_66 is part of the scalar part: false
+DEAL::phi_67 is part of the scalar part: false
+DEAL::phi_68 is part of the scalar part: false
+DEAL::phi_69 is part of the scalar part: false
+DEAL::phi_70 is part of the scalar part: false
+DEAL::phi_71 is part of the scalar part: false
+DEAL::phi_72 is part of the scalar part: false
+DEAL::phi_73 is part of the scalar part: false
+DEAL::phi_74 is part of the scalar part: false
+DEAL::phi_75 is part of the scalar part: false
+DEAL::phi_76 is part of the scalar part: false
+DEAL::phi_77 is part of the scalar part: false
+DEAL::phi_78 is part of the scalar part: false
+DEAL::phi_79 is part of the scalar part: false
+DEAL::phi_80 is part of the scalar part: false
+DEAL::phi_81 is part of the scalar part: false
+DEAL::phi_82 is part of the scalar part: false
+DEAL::phi_83 is part of the scalar part: false
+DEAL::phi_84 is part of the scalar part: false
+DEAL::phi_85 is part of the scalar part: false
+DEAL::phi_86 is part of the scalar part: false
+DEAL::phi_87 is part of the scalar part: false
+DEAL::phi_88 is part of the scalar part: false
+DEAL::phi_89 is part of the scalar part: false
+DEAL::phi_90 is part of the scalar part: false
+DEAL::phi_91 is part of the scalar part: false
+DEAL::phi_92 is part of the scalar part: false
+DEAL::phi_93 is part of the scalar part: false
+DEAL::phi_94 is part of the scalar part: false
+DEAL::phi_95 is part of the scalar part: false
+DEAL::phi_96 is part of the scalar part: false
+DEAL::phi_97 is part of the scalar part: false
+DEAL::phi_98 is part of the scalar part: false
+DEAL::phi_99 is part of the scalar part: false
+DEAL::phi_100 is part of the scalar part: false
+DEAL::phi_101 is part of the scalar part: false
+DEAL::phi_102 is part of the scalar part: false
+DEAL::phi_103 is part of the scalar part: false
+DEAL::phi_104 is part of the scalar part: false
+DEAL::phi_105 is part of the scalar part: false
+DEAL::phi_106 is part of the scalar part: false
+DEAL::phi_107 is part of the scalar part: false
+DEAL::phi_108 is part of the scalar part: false
+DEAL::phi_109 is part of the scalar part: false
+DEAL::phi_110 is part of the scalar part: false
+DEAL::phi_111 is part of the scalar part: false
+DEAL::phi_112 is part of the scalar part: false
+DEAL::phi_113 is part of the scalar part: false
+DEAL::phi_114 is part of the scalar part: false
+DEAL::phi_115 is part of the scalar part: false
+DEAL::phi_116 is part of the scalar part: false
+DEAL::phi_117 is part of the scalar part: false
+DEAL::phi_118 is part of the scalar part: false
+DEAL::phi_119 is part of the scalar part: false
+DEAL::phi_120 is part of the scalar part: false
+DEAL::phi_121 is part of the scalar part: false
+DEAL::phi_122 is part of the scalar part: false
+DEAL::phi_123 is part of the scalar part: false
+DEAL::phi_124 is part of the scalar part: false
+DEAL::phi_125 is part of the scalar part: false
+DEAL::phi_126 is part of the scalar part: false
+DEAL::phi_127 is part of the scalar part: false
+DEAL::phi_128 is part of the scalar part: false
+DEAL::phi_129 is part of the scalar part: false
+DEAL::phi_130 is part of the scalar part: false
+DEAL::phi_131 is part of the scalar part: false
+DEAL::phi_132 is part of the scalar part: false
+DEAL::phi_133 is part of the scalar part: false
+DEAL::phi_134 is part of the scalar part: false
+DEAL::phi_135 is part of the scalar part: false
+DEAL::phi_136 is part of the scalar part: false
+DEAL::phi_137 is part of the scalar part: false
+DEAL::phi_138 is part of the scalar part: false
+DEAL::phi_139 is part of the scalar part: false
+DEAL::phi_140 is part of the scalar part: false
+DEAL::phi_141 is part of the scalar part: false
+DEAL::phi_142 is part of the scalar part: false
+DEAL::phi_143 is part of the scalar part: false
+DEAL::phi_144 is part of the scalar part: false
+DEAL::phi_145 is part of the scalar part: false
+DEAL::phi_146 is part of the scalar part: false
+DEAL::phi_147 is part of the scalar part: false
+DEAL::phi_148 is part of the scalar part: false
+DEAL::phi_149 is part of the scalar part: false
+DEAL::phi_150 is part of the scalar part: false
+DEAL::phi_151 is part of the scalar part: false
+DEAL::phi_152 is part of the scalar part: false
+DEAL::phi_153 is part of the scalar part: false
+DEAL::phi_154 is part of the scalar part: false
+DEAL::phi_155 is part of the scalar part: false
+DEAL::phi_156 is part of the scalar part: false
+DEAL::phi_157 is part of the scalar part: false
+DEAL::phi_158 is part of the scalar part: false
+DEAL::phi_159 is part of the scalar part: false
+DEAL::phi_160 is part of the scalar part: false
+DEAL::phi_161 is part of the scalar part: false
+DEAL::phi_162 is part of the scalar part: false
+DEAL::phi_163 is part of the scalar part: false
+DEAL::phi_164 is part of the scalar part: false
+DEAL::phi_165 is part of the scalar part: false
+DEAL::phi_166 is part of the scalar part: false
+DEAL::phi_167 is part of the scalar part: false
+DEAL::phi_168 is part of the scalar part: false
+DEAL::phi_169 is part of the scalar part: false
+DEAL::phi_170 is part of the scalar part: false
+DEAL::phi_171 is part of the scalar part: false
+DEAL::phi_172 is part of the scalar part: false
+DEAL::phi_173 is part of the scalar part: false
+DEAL::phi_174 is part of the scalar part: false
+DEAL::phi_175 is part of the scalar part: false
+DEAL::phi_176 is part of the scalar part: false
+DEAL::phi_177 is part of the scalar part: false
+DEAL::phi_178 is part of the scalar part: false
+DEAL::phi_179 is part of the scalar part: false
+DEAL::phi_180 is part of the scalar part: false
+DEAL::phi_181 is part of the scalar part: false
+DEAL::phi_182 is part of the scalar part: false
+DEAL::phi_183 is part of the scalar part: false
+DEAL::phi_184 is part of the scalar part: false
+DEAL::phi_185 is part of the scalar part: false
+DEAL::phi_186 is part of the scalar part: false
+DEAL::phi_187 is part of the scalar part: false
+DEAL::phi_188 is part of the scalar part: false
+DEAL::phi_189 is part of the scalar part: false
+DEAL::phi_190 is part of the scalar part: false
+DEAL::phi_191 is part of the scalar part: false
+DEAL::phi_192 is part of the scalar part: false
+DEAL::phi_193 is part of the scalar part: false
+DEAL::phi_194 is part of the scalar part: false
+DEAL::phi_195 is part of the scalar part: false
+DEAL::phi_196 is part of the scalar part: false
+DEAL::phi_197 is part of the scalar part: false
+DEAL::phi_198 is part of the scalar part: false
+DEAL::phi_199 is part of the scalar part: false
+DEAL::phi_200 is part of the scalar part: false
+DEAL::phi_201 is part of the scalar part: false
+DEAL::phi_202 is part of the scalar part: false
+DEAL::phi_203 is part of the scalar part: false
+DEAL::phi_204 is part of the scalar part: false
+DEAL::phi_205 is part of the scalar part: false
+DEAL::phi_206 is part of the scalar part: false
+DEAL::phi_207 is part of the scalar part: false
+DEAL::phi_208 is part of the scalar part: false
+DEAL::phi_209 is part of the scalar part: false
+DEAL::phi_210 is part of the scalar part: false
+DEAL::phi_211 is part of the scalar part: false
+DEAL::phi_212 is part of the scalar part: false
+DEAL::phi_213 is part of the scalar part: false
+DEAL::phi_214 is part of the scalar part: false
+DEAL::phi_215 is part of the scalar part: false
+DEAL::phi_216 is part of the scalar part: false
+DEAL::phi_217 is part of the scalar part: false
+DEAL::phi_218 is part of the scalar part: false
+DEAL::phi_219 is part of the scalar part: false
+DEAL::phi_220 is part of the scalar part: false
+DEAL::phi_221 is part of the scalar part: false
+DEAL::phi_222 is part of the scalar part: false
+DEAL::phi_223 is part of the scalar part: false
+DEAL::phi_224 is part of the scalar part: false
+DEAL::phi_225 is part of the scalar part: false
+DEAL::phi_226 is part of the scalar part: false
+DEAL::phi_227 is part of the scalar part: false
+DEAL::phi_228 is part of the scalar part: false
+DEAL::phi_229 is part of the scalar part: false
+DEAL::phi_230 is part of the scalar part: false
+DEAL::phi_231 is part of the scalar part: false
+DEAL::phi_232 is part of the scalar part: false
+DEAL::phi_233 is part of the scalar part: false
+DEAL::phi_234 is part of the scalar part: false
+DEAL::phi_235 is part of the scalar part: false
+DEAL::phi_236 is part of the scalar part: false
+DEAL::phi_237 is part of the scalar part: false
+DEAL::phi_238 is part of the scalar part: false
+DEAL::phi_239 is part of the scalar part: false
+DEAL::phi_240 is part of the scalar part: false
+DEAL::phi_241 is part of the scalar part: false
+DEAL::phi_242 is part of the scalar part: false
+DEAL::phi_243 is part of the scalar part: false
+DEAL::phi_244 is part of the scalar part: false
+DEAL::phi_245 is part of the scalar part: false
+DEAL::phi_246 is part of the scalar part: false
+DEAL::phi_247 is part of the scalar part: false
+DEAL::phi_248 is part of the scalar part: false
+DEAL::phi_249 is part of the scalar part: false
+DEAL::phi_250 is part of the scalar part: false
+DEAL::phi_251 is part of the scalar part: false
+DEAL::phi_252 is part of the scalar part: false
+DEAL::phi_253 is part of the scalar part: false
+DEAL::phi_254 is part of the scalar part: false
+DEAL::phi_255 is part of the scalar part: false
+DEAL::phi_256 is part of the scalar part: false
+DEAL::phi_257 is part of the scalar part: false
+DEAL::phi_258 is part of the scalar part: false
+DEAL::phi_259 is part of the scalar part: false
+DEAL::phi_260 is part of the scalar part: false
+DEAL::phi_261 is part of the scalar part: false
+DEAL::phi_262 is part of the scalar part: false
+DEAL::phi_263 is part of the scalar part: false
+DEAL::phi_264 is part of the scalar part: false
+DEAL::phi_265 is part of the scalar part: false
+DEAL::phi_266 is part of the scalar part: false
+DEAL::phi_267 is part of the scalar part: false
+DEAL::phi_268 is part of the scalar part: false
+DEAL::phi_269 is part of the scalar part: false
+DEAL::phi_270 is part of the scalar part: false
+DEAL::phi_271 is part of the scalar part: false
+DEAL::phi_0 is part of the vector part: false
+DEAL::phi_1 is part of the vector part: false
+DEAL::phi_2 is part of the vector part: false
+DEAL::phi_3 is part of the vector part: false
+DEAL::phi_4 is part of the vector part: false
+DEAL::phi_5 is part of the vector part: false
+DEAL::phi_6 is part of the vector part: false
+DEAL::phi_7 is part of the vector part: false
+DEAL::phi_8 is part of the vector part: false
+DEAL::phi_9 is part of the vector part: false
+DEAL::phi_10 is part of the vector part: false
+DEAL::phi_11 is part of the vector part: false
+DEAL::phi_12 is part of the vector part: false
+DEAL::phi_13 is part of the vector part: false
+DEAL::phi_14 is part of the vector part: false
+DEAL::phi_15 is part of the vector part: false
+DEAL::phi_16 is part of the vector part: false
+DEAL::phi_17 is part of the vector part: false
+DEAL::phi_18 is part of the vector part: false
+DEAL::phi_19 is part of the vector part: false
+DEAL::phi_20 is part of the vector part: false
+DEAL::phi_21 is part of the vector part: false
+DEAL::phi_22 is part of the vector part: false
+DEAL::phi_23 is part of the vector part: false
+DEAL::phi_24 is part of the vector part: false
+DEAL::phi_25 is part of the vector part: false
+DEAL::phi_26 is part of the vector part: false
+DEAL::phi_27 is part of the vector part: false
+DEAL::phi_28 is part of the vector part: false
+DEAL::phi_29 is part of the vector part: false
+DEAL::phi_30 is part of the vector part: false
+DEAL::phi_31 is part of the vector part: false
+DEAL::phi_32 is part of the vector part: false
+DEAL::phi_33 is part of the vector part: false
+DEAL::phi_34 is part of the vector part: false
+DEAL::phi_35 is part of the vector part: false
+DEAL::phi_36 is part of the vector part: false
+DEAL::phi_37 is part of the vector part: false
+DEAL::phi_38 is part of the vector part: false
+DEAL::phi_39 is part of the vector part: false
+DEAL::phi_40 is part of the vector part: false
+DEAL::phi_41 is part of the vector part: false
+DEAL::phi_42 is part of the vector part: false
+DEAL::phi_43 is part of the vector part: false
+DEAL::phi_44 is part of the vector part: false
+DEAL::phi_45 is part of the vector part: false
+DEAL::phi_46 is part of the vector part: false
+DEAL::phi_47 is part of the vector part: false
+DEAL::phi_48 is part of the vector part: false
+DEAL::phi_49 is part of the vector part: false
+DEAL::phi_50 is part of the vector part: false
+DEAL::phi_51 is part of the vector part: false
+DEAL::phi_52 is part of the vector part: false
+DEAL::phi_53 is part of the vector part: false
+DEAL::phi_54 is part of the vector part: false
+DEAL::phi_55 is part of the vector part: false
+DEAL::phi_56 is part of the vector part: true
+DEAL::phi_57 is part of the vector part: true
+DEAL::phi_58 is part of the vector part: false
+DEAL::phi_59 is part of the vector part: false
+DEAL::phi_60 is part of the vector part: false
+DEAL::phi_61 is part of the vector part: false
+DEAL::phi_62 is part of the vector part: false
+DEAL::phi_63 is part of the vector part: false
+DEAL::phi_64 is part of the vector part: true
+DEAL::phi_65 is part of the vector part: true
+DEAL::phi_66 is part of the vector part: false
+DEAL::phi_67 is part of the vector part: false
+DEAL::phi_68 is part of the vector part: false
+DEAL::phi_69 is part of the vector part: false
+DEAL::phi_70 is part of the vector part: false
+DEAL::phi_71 is part of the vector part: false
+DEAL::phi_72 is part of the vector part: true
+DEAL::phi_73 is part of the vector part: true
+DEAL::phi_74 is part of the vector part: false
+DEAL::phi_75 is part of the vector part: false
+DEAL::phi_76 is part of the vector part: false
+DEAL::phi_77 is part of the vector part: false
+DEAL::phi_78 is part of the vector part: false
+DEAL::phi_79 is part of the vector part: false
+DEAL::phi_80 is part of the vector part: true
+DEAL::phi_81 is part of the vector part: true
+DEAL::phi_82 is part of the vector part: false
+DEAL::phi_83 is part of the vector part: false
+DEAL::phi_84 is part of the vector part: false
+DEAL::phi_85 is part of the vector part: false
+DEAL::phi_86 is part of the vector part: false
+DEAL::phi_87 is part of the vector part: false
+DEAL::phi_88 is part of the vector part: true
+DEAL::phi_89 is part of the vector part: true
+DEAL::phi_90 is part of the vector part: false
+DEAL::phi_91 is part of the vector part: false
+DEAL::phi_92 is part of the vector part: false
+DEAL::phi_93 is part of the vector part: false
+DEAL::phi_94 is part of the vector part: false
+DEAL::phi_95 is part of the vector part: false
+DEAL::phi_96 is part of the vector part: true
+DEAL::phi_97 is part of the vector part: true
+DEAL::phi_98 is part of the vector part: false
+DEAL::phi_99 is part of the vector part: false
+DEAL::phi_100 is part of the vector part: false
+DEAL::phi_101 is part of the vector part: false
+DEAL::phi_102 is part of the vector part: false
+DEAL::phi_103 is part of the vector part: false
+DEAL::phi_104 is part of the vector part: true
+DEAL::phi_105 is part of the vector part: true
+DEAL::phi_106 is part of the vector part: false
+DEAL::phi_107 is part of the vector part: false
+DEAL::phi_108 is part of the vector part: false
+DEAL::phi_109 is part of the vector part: false
+DEAL::phi_110 is part of the vector part: false
+DEAL::phi_111 is part of the vector part: false
+DEAL::phi_112 is part of the vector part: true
+DEAL::phi_113 is part of the vector part: true
+DEAL::phi_114 is part of the vector part: false
+DEAL::phi_115 is part of the vector part: false
+DEAL::phi_116 is part of the vector part: false
+DEAL::phi_117 is part of the vector part: false
+DEAL::phi_118 is part of the vector part: false
+DEAL::phi_119 is part of the vector part: false
+DEAL::phi_120 is part of the vector part: true
+DEAL::phi_121 is part of the vector part: true
+DEAL::phi_122 is part of the vector part: false
+DEAL::phi_123 is part of the vector part: false
+DEAL::phi_124 is part of the vector part: false
+DEAL::phi_125 is part of the vector part: false
+DEAL::phi_126 is part of the vector part: false
+DEAL::phi_127 is part of the vector part: false
+DEAL::phi_128 is part of the vector part: true
+DEAL::phi_129 is part of the vector part: true
+DEAL::phi_130 is part of the vector part: false
+DEAL::phi_131 is part of the vector part: false
+DEAL::phi_132 is part of the vector part: false
+DEAL::phi_133 is part of the vector part: false
+DEAL::phi_134 is part of the vector part: false
+DEAL::phi_135 is part of the vector part: false
+DEAL::phi_136 is part of the vector part: true
+DEAL::phi_137 is part of the vector part: true
+DEAL::phi_138 is part of the vector part: false
+DEAL::phi_139 is part of the vector part: false
+DEAL::phi_140 is part of the vector part: false
+DEAL::phi_141 is part of the vector part: false
+DEAL::phi_142 is part of the vector part: false
+DEAL::phi_143 is part of the vector part: false
+DEAL::phi_144 is part of the vector part: true
+DEAL::phi_145 is part of the vector part: true
+DEAL::phi_146 is part of the vector part: false
+DEAL::phi_147 is part of the vector part: false
+DEAL::phi_148 is part of the vector part: false
+DEAL::phi_149 is part of the vector part: false
+DEAL::phi_150 is part of the vector part: false
+DEAL::phi_151 is part of the vector part: false
+DEAL::phi_152 is part of the vector part: true
+DEAL::phi_153 is part of the vector part: true
+DEAL::phi_154 is part of the vector part: true
+DEAL::phi_155 is part of the vector part: true
+DEAL::phi_156 is part of the vector part: false
+DEAL::phi_157 is part of the vector part: false
+DEAL::phi_158 is part of the vector part: false
+DEAL::phi_159 is part of the vector part: false
+DEAL::phi_160 is part of the vector part: false
+DEAL::phi_161 is part of the vector part: false
+DEAL::phi_162 is part of the vector part: false
+DEAL::phi_163 is part of the vector part: false
+DEAL::phi_164 is part of the vector part: false
+DEAL::phi_165 is part of the vector part: false
+DEAL::phi_166 is part of the vector part: false
+DEAL::phi_167 is part of the vector part: false
+DEAL::phi_168 is part of the vector part: true
+DEAL::phi_169 is part of the vector part: true
+DEAL::phi_170 is part of the vector part: true
+DEAL::phi_171 is part of the vector part: true
+DEAL::phi_172 is part of the vector part: false
+DEAL::phi_173 is part of the vector part: false
+DEAL::phi_174 is part of the vector part: false
+DEAL::phi_175 is part of the vector part: false
+DEAL::phi_176 is part of the vector part: false
+DEAL::phi_177 is part of the vector part: false
+DEAL::phi_178 is part of the vector part: false
+DEAL::phi_179 is part of the vector part: false
+DEAL::phi_180 is part of the vector part: false
+DEAL::phi_181 is part of the vector part: false
+DEAL::phi_182 is part of the vector part: false
+DEAL::phi_183 is part of the vector part: false
+DEAL::phi_184 is part of the vector part: true
+DEAL::phi_185 is part of the vector part: true
+DEAL::phi_186 is part of the vector part: true
+DEAL::phi_187 is part of the vector part: true
+DEAL::phi_188 is part of the vector part: false
+DEAL::phi_189 is part of the vector part: false
+DEAL::phi_190 is part of the vector part: false
+DEAL::phi_191 is part of the vector part: false
+DEAL::phi_192 is part of the vector part: false
+DEAL::phi_193 is part of the vector part: false
+DEAL::phi_194 is part of the vector part: false
+DEAL::phi_195 is part of the vector part: false
+DEAL::phi_196 is part of the vector part: false
+DEAL::phi_197 is part of the vector part: false
+DEAL::phi_198 is part of the vector part: false
+DEAL::phi_199 is part of the vector part: false
+DEAL::phi_200 is part of the vector part: true
+DEAL::phi_201 is part of the vector part: true
+DEAL::phi_202 is part of the vector part: true
+DEAL::phi_203 is part of the vector part: true
+DEAL::phi_204 is part of the vector part: false
+DEAL::phi_205 is part of the vector part: false
+DEAL::phi_206 is part of the vector part: false
+DEAL::phi_207 is part of the vector part: false
+DEAL::phi_208 is part of the vector part: false
+DEAL::phi_209 is part of the vector part: false
+DEAL::phi_210 is part of the vector part: false
+DEAL::phi_211 is part of the vector part: false
+DEAL::phi_212 is part of the vector part: false
+DEAL::phi_213 is part of the vector part: false
+DEAL::phi_214 is part of the vector part: false
+DEAL::phi_215 is part of the vector part: false
+DEAL::phi_216 is part of the vector part: true
+DEAL::phi_217 is part of the vector part: true
+DEAL::phi_218 is part of the vector part: true
+DEAL::phi_219 is part of the vector part: true
+DEAL::phi_220 is part of the vector part: false
+DEAL::phi_221 is part of the vector part: false
+DEAL::phi_222 is part of the vector part: false
+DEAL::phi_223 is part of the vector part: false
+DEAL::phi_224 is part of the vector part: false
+DEAL::phi_225 is part of the vector part: false
+DEAL::phi_226 is part of the vector part: false
+DEAL::phi_227 is part of the vector part: false
+DEAL::phi_228 is part of the vector part: false
+DEAL::phi_229 is part of the vector part: false
+DEAL::phi_230 is part of the vector part: false
+DEAL::phi_231 is part of the vector part: false
+DEAL::phi_232 is part of the vector part: true
+DEAL::phi_233 is part of the vector part: true
+DEAL::phi_234 is part of the vector part: true
+DEAL::phi_235 is part of the vector part: true
+DEAL::phi_236 is part of the vector part: false
+DEAL::phi_237 is part of the vector part: false
+DEAL::phi_238 is part of the vector part: false
+DEAL::phi_239 is part of the vector part: false
+DEAL::phi_240 is part of the vector part: false
+DEAL::phi_241 is part of the vector part: false
+DEAL::phi_242 is part of the vector part: false
+DEAL::phi_243 is part of the vector part: false
+DEAL::phi_244 is part of the vector part: false
+DEAL::phi_245 is part of the vector part: false
+DEAL::phi_246 is part of the vector part: false
+DEAL::phi_247 is part of the vector part: false
+DEAL::phi_248 is part of the vector part: true
+DEAL::phi_249 is part of the vector part: true
+DEAL::phi_250 is part of the vector part: true
+DEAL::phi_251 is part of the vector part: true
+DEAL::phi_252 is part of the vector part: true
+DEAL::phi_253 is part of the vector part: true
+DEAL::phi_254 is part of the vector part: false
+DEAL::phi_255 is part of the vector part: false
+DEAL::phi_256 is part of the vector part: false
+DEAL::phi_257 is part of the vector part: false
+DEAL::phi_258 is part of the vector part: false
+DEAL::phi_259 is part of the vector part: false
+DEAL::phi_260 is part of the vector part: false
+DEAL::phi_261 is part of the vector part: false
+DEAL::phi_262 is part of the vector part: false
+DEAL::phi_263 is part of the vector part: false
+DEAL::phi_264 is part of the vector part: false
+DEAL::phi_265 is part of the vector part: false
+DEAL::phi_266 is part of the vector part: false
+DEAL::phi_267 is part of the vector part: false
+DEAL::phi_268 is part of the vector part: false
+DEAL::phi_269 is part of the vector part: false
+DEAL::phi_270 is part of the vector part: false
+DEAL::phi_271 is part of the vector part: false
+DEAL::phi_0 is part of the symmetric tensor part: false
+DEAL::phi_1 is part of the symmetric tensor part: true
+DEAL::phi_2 is part of the symmetric tensor part: true
+DEAL::phi_3 is part of the symmetric tensor part: true
+DEAL::phi_4 is part of the symmetric tensor part: true
+DEAL::phi_5 is part of the symmetric tensor part: true
+DEAL::phi_6 is part of the symmetric tensor part: true
+DEAL::phi_7 is part of the symmetric tensor part: false
+DEAL::phi_8 is part of the symmetric tensor part: true
+DEAL::phi_9 is part of the symmetric tensor part: true
+DEAL::phi_10 is part of the symmetric tensor part: true
+DEAL::phi_11 is part of the symmetric tensor part: true
+DEAL::phi_12 is part of the symmetric tensor part: true
+DEAL::phi_13 is part of the symmetric tensor part: true
+DEAL::phi_14 is part of the symmetric tensor part: false
+DEAL::phi_15 is part of the symmetric tensor part: true
+DEAL::phi_16 is part of the symmetric tensor part: true
+DEAL::phi_17 is part of the symmetric tensor part: true
+DEAL::phi_18 is part of the symmetric tensor part: true
+DEAL::phi_19 is part of the symmetric tensor part: true
+DEAL::phi_20 is part of the symmetric tensor part: true
+DEAL::phi_21 is part of the symmetric tensor part: false
+DEAL::phi_22 is part of the symmetric tensor part: true
+DEAL::phi_23 is part of the symmetric tensor part: true
+DEAL::phi_24 is part of the symmetric tensor part: true
+DEAL::phi_25 is part of the symmetric tensor part: true
+DEAL::phi_26 is part of the symmetric tensor part: true
+DEAL::phi_27 is part of the symmetric tensor part: true
+DEAL::phi_28 is part of the symmetric tensor part: false
+DEAL::phi_29 is part of the symmetric tensor part: true
+DEAL::phi_30 is part of the symmetric tensor part: true
+DEAL::phi_31 is part of the symmetric tensor part: true
+DEAL::phi_32 is part of the symmetric tensor part: true
+DEAL::phi_33 is part of the symmetric tensor part: true
+DEAL::phi_34 is part of the symmetric tensor part: true
+DEAL::phi_35 is part of the symmetric tensor part: false
+DEAL::phi_36 is part of the symmetric tensor part: true
+DEAL::phi_37 is part of the symmetric tensor part: true
+DEAL::phi_38 is part of the symmetric tensor part: true
+DEAL::phi_39 is part of the symmetric tensor part: true
+DEAL::phi_40 is part of the symmetric tensor part: true
+DEAL::phi_41 is part of the symmetric tensor part: true
+DEAL::phi_42 is part of the symmetric tensor part: false
+DEAL::phi_43 is part of the symmetric tensor part: true
+DEAL::phi_44 is part of the symmetric tensor part: true
+DEAL::phi_45 is part of the symmetric tensor part: true
+DEAL::phi_46 is part of the symmetric tensor part: true
+DEAL::phi_47 is part of the symmetric tensor part: true
+DEAL::phi_48 is part of the symmetric tensor part: true
+DEAL::phi_49 is part of the symmetric tensor part: false
+DEAL::phi_50 is part of the symmetric tensor part: true
+DEAL::phi_51 is part of the symmetric tensor part: true
+DEAL::phi_52 is part of the symmetric tensor part: true
+DEAL::phi_53 is part of the symmetric tensor part: true
+DEAL::phi_54 is part of the symmetric tensor part: true
+DEAL::phi_55 is part of the symmetric tensor part: true
+DEAL::phi_56 is part of the symmetric tensor part: false
+DEAL::phi_57 is part of the symmetric tensor part: false
+DEAL::phi_58 is part of the symmetric tensor part: false
+DEAL::phi_59 is part of the symmetric tensor part: false
+DEAL::phi_60 is part of the symmetric tensor part: false
+DEAL::phi_61 is part of the symmetric tensor part: false
+DEAL::phi_62 is part of the symmetric tensor part: false
+DEAL::phi_63 is part of the symmetric tensor part: false
+DEAL::phi_64 is part of the symmetric tensor part: false
+DEAL::phi_65 is part of the symmetric tensor part: false
+DEAL::phi_66 is part of the symmetric tensor part: false
+DEAL::phi_67 is part of the symmetric tensor part: false
+DEAL::phi_68 is part of the symmetric tensor part: false
+DEAL::phi_69 is part of the symmetric tensor part: false
+DEAL::phi_70 is part of the symmetric tensor part: false
+DEAL::phi_71 is part of the symmetric tensor part: false
+DEAL::phi_72 is part of the symmetric tensor part: false
+DEAL::phi_73 is part of the symmetric tensor part: false
+DEAL::phi_74 is part of the symmetric tensor part: false
+DEAL::phi_75 is part of the symmetric tensor part: false
+DEAL::phi_76 is part of the symmetric tensor part: false
+DEAL::phi_77 is part of the symmetric tensor part: false
+DEAL::phi_78 is part of the symmetric tensor part: false
+DEAL::phi_79 is part of the symmetric tensor part: false
+DEAL::phi_80 is part of the symmetric tensor part: false
+DEAL::phi_81 is part of the symmetric tensor part: false
+DEAL::phi_82 is part of the symmetric tensor part: false
+DEAL::phi_83 is part of the symmetric tensor part: false
+DEAL::phi_84 is part of the symmetric tensor part: false
+DEAL::phi_85 is part of the symmetric tensor part: false
+DEAL::phi_86 is part of the symmetric tensor part: false
+DEAL::phi_87 is part of the symmetric tensor part: false
+DEAL::phi_88 is part of the symmetric tensor part: false
+DEAL::phi_89 is part of the symmetric tensor part: false
+DEAL::phi_90 is part of the symmetric tensor part: false
+DEAL::phi_91 is part of the symmetric tensor part: false
+DEAL::phi_92 is part of the symmetric tensor part: false
+DEAL::phi_93 is part of the symmetric tensor part: false
+DEAL::phi_94 is part of the symmetric tensor part: false
+DEAL::phi_95 is part of the symmetric tensor part: false
+DEAL::phi_96 is part of the symmetric tensor part: false
+DEAL::phi_97 is part of the symmetric tensor part: false
+DEAL::phi_98 is part of the symmetric tensor part: false
+DEAL::phi_99 is part of the symmetric tensor part: false
+DEAL::phi_100 is part of the symmetric tensor part: false
+DEAL::phi_101 is part of the symmetric tensor part: false
+DEAL::phi_102 is part of the symmetric tensor part: false
+DEAL::phi_103 is part of the symmetric tensor part: false
+DEAL::phi_104 is part of the symmetric tensor part: false
+DEAL::phi_105 is part of the symmetric tensor part: false
+DEAL::phi_106 is part of the symmetric tensor part: false
+DEAL::phi_107 is part of the symmetric tensor part: false
+DEAL::phi_108 is part of the symmetric tensor part: false
+DEAL::phi_109 is part of the symmetric tensor part: false
+DEAL::phi_110 is part of the symmetric tensor part: false
+DEAL::phi_111 is part of the symmetric tensor part: false
+DEAL::phi_112 is part of the symmetric tensor part: false
+DEAL::phi_113 is part of the symmetric tensor part: false
+DEAL::phi_114 is part of the symmetric tensor part: false
+DEAL::phi_115 is part of the symmetric tensor part: false
+DEAL::phi_116 is part of the symmetric tensor part: false
+DEAL::phi_117 is part of the symmetric tensor part: false
+DEAL::phi_118 is part of the symmetric tensor part: false
+DEAL::phi_119 is part of the symmetric tensor part: false
+DEAL::phi_120 is part of the symmetric tensor part: false
+DEAL::phi_121 is part of the symmetric tensor part: false
+DEAL::phi_122 is part of the symmetric tensor part: false
+DEAL::phi_123 is part of the symmetric tensor part: false
+DEAL::phi_124 is part of the symmetric tensor part: false
+DEAL::phi_125 is part of the symmetric tensor part: false
+DEAL::phi_126 is part of the symmetric tensor part: false
+DEAL::phi_127 is part of the symmetric tensor part: false
+DEAL::phi_128 is part of the symmetric tensor part: false
+DEAL::phi_129 is part of the symmetric tensor part: false
+DEAL::phi_130 is part of the symmetric tensor part: false
+DEAL::phi_131 is part of the symmetric tensor part: false
+DEAL::phi_132 is part of the symmetric tensor part: false
+DEAL::phi_133 is part of the symmetric tensor part: false
+DEAL::phi_134 is part of the symmetric tensor part: false
+DEAL::phi_135 is part of the symmetric tensor part: false
+DEAL::phi_136 is part of the symmetric tensor part: false
+DEAL::phi_137 is part of the symmetric tensor part: false
+DEAL::phi_138 is part of the symmetric tensor part: false
+DEAL::phi_139 is part of the symmetric tensor part: false
+DEAL::phi_140 is part of the symmetric tensor part: false
+DEAL::phi_141 is part of the symmetric tensor part: false
+DEAL::phi_142 is part of the symmetric tensor part: false
+DEAL::phi_143 is part of the symmetric tensor part: false
+DEAL::phi_144 is part of the symmetric tensor part: false
+DEAL::phi_145 is part of the symmetric tensor part: false
+DEAL::phi_146 is part of the symmetric tensor part: false
+DEAL::phi_147 is part of the symmetric tensor part: false
+DEAL::phi_148 is part of the symmetric tensor part: false
+DEAL::phi_149 is part of the symmetric tensor part: false
+DEAL::phi_150 is part of the symmetric tensor part: false
+DEAL::phi_151 is part of the symmetric tensor part: false
+DEAL::phi_152 is part of the symmetric tensor part: false
+DEAL::phi_153 is part of the symmetric tensor part: false
+DEAL::phi_154 is part of the symmetric tensor part: false
+DEAL::phi_155 is part of the symmetric tensor part: false
+DEAL::phi_156 is part of the symmetric tensor part: false
+DEAL::phi_157 is part of the symmetric tensor part: false
+DEAL::phi_158 is part of the symmetric tensor part: false
+DEAL::phi_159 is part of the symmetric tensor part: false
+DEAL::phi_160 is part of the symmetric tensor part: false
+DEAL::phi_161 is part of the symmetric tensor part: false
+DEAL::phi_162 is part of the symmetric tensor part: false
+DEAL::phi_163 is part of the symmetric tensor part: false
+DEAL::phi_164 is part of the symmetric tensor part: false
+DEAL::phi_165 is part of the symmetric tensor part: false
+DEAL::phi_166 is part of the symmetric tensor part: false
+DEAL::phi_167 is part of the symmetric tensor part: false
+DEAL::phi_168 is part of the symmetric tensor part: false
+DEAL::phi_169 is part of the symmetric tensor part: false
+DEAL::phi_170 is part of the symmetric tensor part: false
+DEAL::phi_171 is part of the symmetric tensor part: false
+DEAL::phi_172 is part of the symmetric tensor part: false
+DEAL::phi_173 is part of the symmetric tensor part: false
+DEAL::phi_174 is part of the symmetric tensor part: false
+DEAL::phi_175 is part of the symmetric tensor part: false
+DEAL::phi_176 is part of the symmetric tensor part: false
+DEAL::phi_177 is part of the symmetric tensor part: false
+DEAL::phi_178 is part of the symmetric tensor part: false
+DEAL::phi_179 is part of the symmetric tensor part: false
+DEAL::phi_180 is part of the symmetric tensor part: false
+DEAL::phi_181 is part of the symmetric tensor part: false
+DEAL::phi_182 is part of the symmetric tensor part: false
+DEAL::phi_183 is part of the symmetric tensor part: false
+DEAL::phi_184 is part of the symmetric tensor part: false
+DEAL::phi_185 is part of the symmetric tensor part: false
+DEAL::phi_186 is part of the symmetric tensor part: false
+DEAL::phi_187 is part of the symmetric tensor part: false
+DEAL::phi_188 is part of the symmetric tensor part: false
+DEAL::phi_189 is part of the symmetric tensor part: false
+DEAL::phi_190 is part of the symmetric tensor part: false
+DEAL::phi_191 is part of the symmetric tensor part: false
+DEAL::phi_192 is part of the symmetric tensor part: false
+DEAL::phi_193 is part of the symmetric tensor part: false
+DEAL::phi_194 is part of the symmetric tensor part: false
+DEAL::phi_195 is part of the symmetric tensor part: false
+DEAL::phi_196 is part of the symmetric tensor part: false
+DEAL::phi_197 is part of the symmetric tensor part: false
+DEAL::phi_198 is part of the symmetric tensor part: false
+DEAL::phi_199 is part of the symmetric tensor part: false
+DEAL::phi_200 is part of the symmetric tensor part: false
+DEAL::phi_201 is part of the symmetric tensor part: false
+DEAL::phi_202 is part of the symmetric tensor part: false
+DEAL::phi_203 is part of the symmetric tensor part: false
+DEAL::phi_204 is part of the symmetric tensor part: false
+DEAL::phi_205 is part of the symmetric tensor part: false
+DEAL::phi_206 is part of the symmetric tensor part: false
+DEAL::phi_207 is part of the symmetric tensor part: false
+DEAL::phi_208 is part of the symmetric tensor part: false
+DEAL::phi_209 is part of the symmetric tensor part: false
+DEAL::phi_210 is part of the symmetric tensor part: false
+DEAL::phi_211 is part of the symmetric tensor part: false
+DEAL::phi_212 is part of the symmetric tensor part: false
+DEAL::phi_213 is part of the symmetric tensor part: false
+DEAL::phi_214 is part of the symmetric tensor part: false
+DEAL::phi_215 is part of the symmetric tensor part: false
+DEAL::phi_216 is part of the symmetric tensor part: false
+DEAL::phi_217 is part of the symmetric tensor part: false
+DEAL::phi_218 is part of the symmetric tensor part: false
+DEAL::phi_219 is part of the symmetric tensor part: false
+DEAL::phi_220 is part of the symmetric tensor part: false
+DEAL::phi_221 is part of the symmetric tensor part: false
+DEAL::phi_222 is part of the symmetric tensor part: false
+DEAL::phi_223 is part of the symmetric tensor part: false
+DEAL::phi_224 is part of the symmetric tensor part: false
+DEAL::phi_225 is part of the symmetric tensor part: false
+DEAL::phi_226 is part of the symmetric tensor part: false
+DEAL::phi_227 is part of the symmetric tensor part: false
+DEAL::phi_228 is part of the symmetric tensor part: false
+DEAL::phi_229 is part of the symmetric tensor part: false
+DEAL::phi_230 is part of the symmetric tensor part: false
+DEAL::phi_231 is part of the symmetric tensor part: false
+DEAL::phi_232 is part of the symmetric tensor part: false
+DEAL::phi_233 is part of the symmetric tensor part: false
+DEAL::phi_234 is part of the symmetric tensor part: false
+DEAL::phi_235 is part of the symmetric tensor part: false
+DEAL::phi_236 is part of the symmetric tensor part: false
+DEAL::phi_237 is part of the symmetric tensor part: false
+DEAL::phi_238 is part of the symmetric tensor part: false
+DEAL::phi_239 is part of the symmetric tensor part: false
+DEAL::phi_240 is part of the symmetric tensor part: false
+DEAL::phi_241 is part of the symmetric tensor part: false
+DEAL::phi_242 is part of the symmetric tensor part: false
+DEAL::phi_243 is part of the symmetric tensor part: false
+DEAL::phi_244 is part of the symmetric tensor part: false
+DEAL::phi_245 is part of the symmetric tensor part: false
+DEAL::phi_246 is part of the symmetric tensor part: false
+DEAL::phi_247 is part of the symmetric tensor part: false
+DEAL::phi_248 is part of the symmetric tensor part: false
+DEAL::phi_249 is part of the symmetric tensor part: false
+DEAL::phi_250 is part of the symmetric tensor part: false
+DEAL::phi_251 is part of the symmetric tensor part: false
+DEAL::phi_252 is part of the symmetric tensor part: false
+DEAL::phi_253 is part of the symmetric tensor part: false
+DEAL::phi_254 is part of the symmetric tensor part: false
+DEAL::phi_255 is part of the symmetric tensor part: false
+DEAL::phi_256 is part of the symmetric tensor part: false
+DEAL::phi_257 is part of the symmetric tensor part: false
+DEAL::phi_258 is part of the symmetric tensor part: false
+DEAL::phi_259 is part of the symmetric tensor part: false
+DEAL::phi_260 is part of the symmetric tensor part: false
+DEAL::phi_261 is part of the symmetric tensor part: false
+DEAL::phi_262 is part of the symmetric tensor part: false
+DEAL::phi_263 is part of the symmetric tensor part: false
+DEAL::phi_264 is part of the symmetric tensor part: false
+DEAL::phi_265 is part of the symmetric tensor part: false
+DEAL::phi_266 is part of the symmetric tensor part: false
+DEAL::phi_267 is part of the symmetric tensor part: false
+DEAL::phi_268 is part of the symmetric tensor part: false
+DEAL::phi_269 is part of the symmetric tensor part: false
+DEAL::phi_270 is part of the symmetric tensor part: false
+DEAL::phi_271 is part of the symmetric tensor part: false
+DEAL::phi_0 is part of the tensor part: false
+DEAL::phi_1 is part of the tensor part: false
+DEAL::phi_2 is part of the tensor part: false
+DEAL::phi_3 is part of the tensor part: false
+DEAL::phi_4 is part of the tensor part: false
+DEAL::phi_5 is part of the tensor part: false
+DEAL::phi_6 is part of the tensor part: false
+DEAL::phi_7 is part of the tensor part: false
+DEAL::phi_8 is part of the tensor part: false
+DEAL::phi_9 is part of the tensor part: false
+DEAL::phi_10 is part of the tensor part: false
+DEAL::phi_11 is part of the tensor part: false
+DEAL::phi_12 is part of the tensor part: false
+DEAL::phi_13 is part of the tensor part: false
+DEAL::phi_14 is part of the tensor part: false
+DEAL::phi_15 is part of the tensor part: false
+DEAL::phi_16 is part of the tensor part: false
+DEAL::phi_17 is part of the tensor part: false
+DEAL::phi_18 is part of the tensor part: false
+DEAL::phi_19 is part of the tensor part: false
+DEAL::phi_20 is part of the tensor part: false
+DEAL::phi_21 is part of the tensor part: false
+DEAL::phi_22 is part of the tensor part: false
+DEAL::phi_23 is part of the tensor part: false
+DEAL::phi_24 is part of the tensor part: false
+DEAL::phi_25 is part of the tensor part: false
+DEAL::phi_26 is part of the tensor part: false
+DEAL::phi_27 is part of the tensor part: false
+DEAL::phi_28 is part of the tensor part: false
+DEAL::phi_29 is part of the tensor part: false
+DEAL::phi_30 is part of the tensor part: false
+DEAL::phi_31 is part of the tensor part: false
+DEAL::phi_32 is part of the tensor part: false
+DEAL::phi_33 is part of the tensor part: false
+DEAL::phi_34 is part of the tensor part: false
+DEAL::phi_35 is part of the tensor part: false
+DEAL::phi_36 is part of the tensor part: false
+DEAL::phi_37 is part of the tensor part: false
+DEAL::phi_38 is part of the tensor part: false
+DEAL::phi_39 is part of the tensor part: false
+DEAL::phi_40 is part of the tensor part: false
+DEAL::phi_41 is part of the tensor part: false
+DEAL::phi_42 is part of the tensor part: false
+DEAL::phi_43 is part of the tensor part: false
+DEAL::phi_44 is part of the tensor part: false
+DEAL::phi_45 is part of the tensor part: false
+DEAL::phi_46 is part of the tensor part: false
+DEAL::phi_47 is part of the tensor part: false
+DEAL::phi_48 is part of the tensor part: false
+DEAL::phi_49 is part of the tensor part: false
+DEAL::phi_50 is part of the tensor part: false
+DEAL::phi_51 is part of the tensor part: false
+DEAL::phi_52 is part of the tensor part: false
+DEAL::phi_53 is part of the tensor part: false
+DEAL::phi_54 is part of the tensor part: false
+DEAL::phi_55 is part of the tensor part: false
+DEAL::phi_56 is part of the tensor part: false
+DEAL::phi_57 is part of the tensor part: false
+DEAL::phi_58 is part of the tensor part: true
+DEAL::phi_59 is part of the tensor part: true
+DEAL::phi_60 is part of the tensor part: true
+DEAL::phi_61 is part of the tensor part: true
+DEAL::phi_62 is part of the tensor part: true
+DEAL::phi_63 is part of the tensor part: true
+DEAL::phi_64 is part of the tensor part: false
+DEAL::phi_65 is part of the tensor part: false
+DEAL::phi_66 is part of the tensor part: true
+DEAL::phi_67 is part of the tensor part: true
+DEAL::phi_68 is part of the tensor part: true
+DEAL::phi_69 is part of the tensor part: true
+DEAL::phi_70 is part of the tensor part: true
+DEAL::phi_71 is part of the tensor part: true
+DEAL::phi_72 is part of the tensor part: false
+DEAL::phi_73 is part of the tensor part: false
+DEAL::phi_74 is part of the tensor part: true
+DEAL::phi_75 is part of the tensor part: true
+DEAL::phi_76 is part of the tensor part: true
+DEAL::phi_77 is part of the tensor part: true
+DEAL::phi_78 is part of the tensor part: true
+DEAL::phi_79 is part of the tensor part: true
+DEAL::phi_80 is part of the tensor part: false
+DEAL::phi_81 is part of the tensor part: false
+DEAL::phi_82 is part of the tensor part: true
+DEAL::phi_83 is part of the tensor part: true
+DEAL::phi_84 is part of the tensor part: true
+DEAL::phi_85 is part of the tensor part: true
+DEAL::phi_86 is part of the tensor part: true
+DEAL::phi_87 is part of the tensor part: true
+DEAL::phi_88 is part of the tensor part: false
+DEAL::phi_89 is part of the tensor part: false
+DEAL::phi_90 is part of the tensor part: true
+DEAL::phi_91 is part of the tensor part: true
+DEAL::phi_92 is part of the tensor part: true
+DEAL::phi_93 is part of the tensor part: true
+DEAL::phi_94 is part of the tensor part: true
+DEAL::phi_95 is part of the tensor part: true
+DEAL::phi_96 is part of the tensor part: false
+DEAL::phi_97 is part of the tensor part: false
+DEAL::phi_98 is part of the tensor part: true
+DEAL::phi_99 is part of the tensor part: true
+DEAL::phi_100 is part of the tensor part: true
+DEAL::phi_101 is part of the tensor part: true
+DEAL::phi_102 is part of the tensor part: true
+DEAL::phi_103 is part of the tensor part: true
+DEAL::phi_104 is part of the tensor part: false
+DEAL::phi_105 is part of the tensor part: false
+DEAL::phi_106 is part of the tensor part: true
+DEAL::phi_107 is part of the tensor part: true
+DEAL::phi_108 is part of the tensor part: true
+DEAL::phi_109 is part of the tensor part: true
+DEAL::phi_110 is part of the tensor part: true
+DEAL::phi_111 is part of the tensor part: true
+DEAL::phi_112 is part of the tensor part: false
+DEAL::phi_113 is part of the tensor part: false
+DEAL::phi_114 is part of the tensor part: true
+DEAL::phi_115 is part of the tensor part: true
+DEAL::phi_116 is part of the tensor part: true
+DEAL::phi_117 is part of the tensor part: true
+DEAL::phi_118 is part of the tensor part: true
+DEAL::phi_119 is part of the tensor part: true
+DEAL::phi_120 is part of the tensor part: false
+DEAL::phi_121 is part of the tensor part: false
+DEAL::phi_122 is part of the tensor part: true
+DEAL::phi_123 is part of the tensor part: true
+DEAL::phi_124 is part of the tensor part: true
+DEAL::phi_125 is part of the tensor part: true
+DEAL::phi_126 is part of the tensor part: true
+DEAL::phi_127 is part of the tensor part: true
+DEAL::phi_128 is part of the tensor part: false
+DEAL::phi_129 is part of the tensor part: false
+DEAL::phi_130 is part of the tensor part: true
+DEAL::phi_131 is part of the tensor part: true
+DEAL::phi_132 is part of the tensor part: true
+DEAL::phi_133 is part of the tensor part: true
+DEAL::phi_134 is part of the tensor part: true
+DEAL::phi_135 is part of the tensor part: true
+DEAL::phi_136 is part of the tensor part: false
+DEAL::phi_137 is part of the tensor part: false
+DEAL::phi_138 is part of the tensor part: true
+DEAL::phi_139 is part of the tensor part: true
+DEAL::phi_140 is part of the tensor part: true
+DEAL::phi_141 is part of the tensor part: true
+DEAL::phi_142 is part of the tensor part: true
+DEAL::phi_143 is part of the tensor part: true
+DEAL::phi_144 is part of the tensor part: false
+DEAL::phi_145 is part of the tensor part: false
+DEAL::phi_146 is part of the tensor part: true
+DEAL::phi_147 is part of the tensor part: true
+DEAL::phi_148 is part of the tensor part: true
+DEAL::phi_149 is part of the tensor part: true
+DEAL::phi_150 is part of the tensor part: true
+DEAL::phi_151 is part of the tensor part: true
+DEAL::phi_152 is part of the tensor part: false
+DEAL::phi_153 is part of the tensor part: false
+DEAL::phi_154 is part of the tensor part: false
+DEAL::phi_155 is part of the tensor part: false
+DEAL::phi_156 is part of the tensor part: true
+DEAL::phi_157 is part of the tensor part: true
+DEAL::phi_158 is part of the tensor part: true
+DEAL::phi_159 is part of the tensor part: true
+DEAL::phi_160 is part of the tensor part: true
+DEAL::phi_161 is part of the tensor part: true
+DEAL::phi_162 is part of the tensor part: true
+DEAL::phi_163 is part of the tensor part: true
+DEAL::phi_164 is part of the tensor part: true
+DEAL::phi_165 is part of the tensor part: true
+DEAL::phi_166 is part of the tensor part: true
+DEAL::phi_167 is part of the tensor part: true
+DEAL::phi_168 is part of the tensor part: false
+DEAL::phi_169 is part of the tensor part: false
+DEAL::phi_170 is part of the tensor part: false
+DEAL::phi_171 is part of the tensor part: false
+DEAL::phi_172 is part of the tensor part: true
+DEAL::phi_173 is part of the tensor part: true
+DEAL::phi_174 is part of the tensor part: true
+DEAL::phi_175 is part of the tensor part: true
+DEAL::phi_176 is part of the tensor part: true
+DEAL::phi_177 is part of the tensor part: true
+DEAL::phi_178 is part of the tensor part: true
+DEAL::phi_179 is part of the tensor part: true
+DEAL::phi_180 is part of the tensor part: true
+DEAL::phi_181 is part of the tensor part: true
+DEAL::phi_182 is part of the tensor part: true
+DEAL::phi_183 is part of the tensor part: true
+DEAL::phi_184 is part of the tensor part: false
+DEAL::phi_185 is part of the tensor part: false
+DEAL::phi_186 is part of the tensor part: false
+DEAL::phi_187 is part of the tensor part: false
+DEAL::phi_188 is part of the tensor part: true
+DEAL::phi_189 is part of the tensor part: true
+DEAL::phi_190 is part of the tensor part: true
+DEAL::phi_191 is part of the tensor part: true
+DEAL::phi_192 is part of the tensor part: true
+DEAL::phi_193 is part of the tensor part: true
+DEAL::phi_194 is part of the tensor part: true
+DEAL::phi_195 is part of the tensor part: true
+DEAL::phi_196 is part of the tensor part: true
+DEAL::phi_197 is part of the tensor part: true
+DEAL::phi_198 is part of the tensor part: true
+DEAL::phi_199 is part of the tensor part: true
+DEAL::phi_200 is part of the tensor part: false
+DEAL::phi_201 is part of the tensor part: false
+DEAL::phi_202 is part of the tensor part: false
+DEAL::phi_203 is part of the tensor part: false
+DEAL::phi_204 is part of the tensor part: true
+DEAL::phi_205 is part of the tensor part: true
+DEAL::phi_206 is part of the tensor part: true
+DEAL::phi_207 is part of the tensor part: true
+DEAL::phi_208 is part of the tensor part: true
+DEAL::phi_209 is part of the tensor part: true
+DEAL::phi_210 is part of the tensor part: true
+DEAL::phi_211 is part of the tensor part: true
+DEAL::phi_212 is part of the tensor part: true
+DEAL::phi_213 is part of the tensor part: true
+DEAL::phi_214 is part of the tensor part: true
+DEAL::phi_215 is part of the tensor part: true
+DEAL::phi_216 is part of the tensor part: false
+DEAL::phi_217 is part of the tensor part: false
+DEAL::phi_218 is part of the tensor part: false
+DEAL::phi_219 is part of the tensor part: false
+DEAL::phi_220 is part of the tensor part: true
+DEAL::phi_221 is part of the tensor part: true
+DEAL::phi_222 is part of the tensor part: true
+DEAL::phi_223 is part of the tensor part: true
+DEAL::phi_224 is part of the tensor part: true
+DEAL::phi_225 is part of the tensor part: true
+DEAL::phi_226 is part of the tensor part: true
+DEAL::phi_227 is part of the tensor part: true
+DEAL::phi_228 is part of the tensor part: true
+DEAL::phi_229 is part of the tensor part: true
+DEAL::phi_230 is part of the tensor part: true
+DEAL::phi_231 is part of the tensor part: true
+DEAL::phi_232 is part of the tensor part: false
+DEAL::phi_233 is part of the tensor part: false
+DEAL::phi_234 is part of the tensor part: false
+DEAL::phi_235 is part of the tensor part: false
+DEAL::phi_236 is part of the tensor part: true
+DEAL::phi_237 is part of the tensor part: true
+DEAL::phi_238 is part of the tensor part: true
+DEAL::phi_239 is part of the tensor part: true
+DEAL::phi_240 is part of the tensor part: true
+DEAL::phi_241 is part of the tensor part: true
+DEAL::phi_242 is part of the tensor part: true
+DEAL::phi_243 is part of the tensor part: true
+DEAL::phi_244 is part of the tensor part: true
+DEAL::phi_245 is part of the tensor part: true
+DEAL::phi_246 is part of the tensor part: true
+DEAL::phi_247 is part of the tensor part: true
+DEAL::phi_248 is part of the tensor part: false
+DEAL::phi_249 is part of the tensor part: false
+DEAL::phi_250 is part of the tensor part: false
+DEAL::phi_251 is part of the tensor part: false
+DEAL::phi_252 is part of the tensor part: false
+DEAL::phi_253 is part of the tensor part: false
+DEAL::phi_254 is part of the tensor part: true
+DEAL::phi_255 is part of the tensor part: true
+DEAL::phi_256 is part of the tensor part: true
+DEAL::phi_257 is part of the tensor part: true
+DEAL::phi_258 is part of the tensor part: true
+DEAL::phi_259 is part of the tensor part: true
+DEAL::phi_260 is part of the tensor part: true
+DEAL::phi_261 is part of the tensor part: true
+DEAL::phi_262 is part of the tensor part: true
+DEAL::phi_263 is part of the tensor part: true
+DEAL::phi_264 is part of the tensor part: true
+DEAL::phi_265 is part of the tensor part: true
+DEAL::phi_266 is part of the tensor part: true
+DEAL::phi_267 is part of the tensor part: true
+DEAL::phi_268 is part of the tensor part: true
+DEAL::phi_269 is part of the tensor part: true
+DEAL::phi_270 is part of the tensor part: true
+DEAL::phi_271 is part of the tensor part: true
