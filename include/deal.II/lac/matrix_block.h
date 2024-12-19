@@ -330,7 +330,7 @@ private:
  * @ingroup vector_valued
  */
 template <typename MatrixType>
-class MatrixBlockVector : private AnyData
+class MatrixBlockVector : public AnyData
 {
 public:
   /**
