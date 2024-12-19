@@ -405,8 +405,6 @@ public:
    */
   using AnyData::name;
   using AnyData::size;
-  using AnyData::subscribe;
-  using AnyData::unsubscribe;
 };
 
 
