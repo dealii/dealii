@@ -1469,14 +1469,16 @@ namespace internal
 
                   if (subface_no != numbers::invalid_unsigned_int)
                     {
-#if false
-                       const double area_ratio =
-                        GeometryInfo<dim>::subface_ratio(
-                          cell->subface_case(face_no), subface_no);
-                       output_data.JxW_values[i] *= area_ratio;
-#else
-                      DEAL_II_NOT_IMPLEMENTED();
-#endif
+                      if (dim == 2)
+                        {
+                          // lines are the faces of quads and triangles
+                          const double area_ratio =
+                            GeometryInfo<dim>::subface_ratio(
+                              cell->subface_case(face_no), subface_no);
+                          output_data.JxW_values[i] *= area_ratio;
+                        }
+                      else
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
                 }
 
