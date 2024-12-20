@@ -21,7 +21,7 @@ set(_inst
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/gmsh/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/gmsh/*.h
   )
 
 define_object_library(object_gmsh OBJECT ${_src} ${_header} ${_inst})

@@ -23,7 +23,7 @@ set(_inst
   )
 
 file(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/opencascade/*.h
+  ${DEAL_II_SOURCE_DIR}/include/deal.II/opencascade/*.h
   )
 
 define_object_library(object_opencascade OBJECT ${_src} ${_header} ${_inst})
