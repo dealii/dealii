@@ -284,8 +284,8 @@ SparsityPattern::reinit(const size_type                      m,
     rowstart[i] =
       rowstart[i - 1] +
       (store_diagonal_first_in_row ?
-         std::max(std::min(static_cast<size_type>(row_lengths[i - 1]), n),
-                  static_cast<size_type>(1U)) :
+         std::clamp(n, static_cast<size_type>(row_lengths[i - 1]), 
+         static_cast<size_type>(1U)):
          std::min(static_cast<size_type>(row_lengths[i - 1]), n));
   Assert((rowstart[rows] == vec_len) ||
            ((vec_len == 1) && (rowstart[rows] == 0)),

@@ -4768,7 +4768,7 @@ GeometryInfo<dim>::project_to_unit_cell(const Point<dim, Number> &q)
 {
   Point<dim, Number> p;
   for (unsigned int i = 0; i < dim; ++i)
-    p[i] = std::min(std::max(q[i], Number(0.)), Number(1.));
+    p[i] = std::clamp(q[i], Number(0.), Number(1.0));
 
   return p;
 }
