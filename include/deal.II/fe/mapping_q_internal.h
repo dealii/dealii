@@ -552,7 +552,7 @@ namespace internal
       const unsigned int newton_iteration_limit = 20;
 
       Point<dim, Number> invalid_point;
-      invalid_point[0]                = std::numeric_limits<double>::infinity();
+      invalid_point[0]                = std::numeric_limits<double>::lowest();
       bool tried_project_to_unit_cell = false;
 
       unsigned int newton_iteration            = 0;

@@ -12,6 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/signaling_nan.h>
+
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
@@ -1324,12 +1326,8 @@ namespace Particles
 
       // Reuse these vectors below, but only with a single element.
       // Avoid resizing for every particle.
-      Point<dim>      invalid_reference_point;
-      Point<spacedim> invalid_point;
-      invalid_reference_point[0] = std::numeric_limits<double>::infinity();
-      invalid_point[0]           = std::numeric_limits<double>::infinity();
-      reference_locations.resize(1, invalid_reference_point);
-      real_locations.resize(1, invalid_point);
+      reference_locations.resize(1, numbers::signaling_nan<Point<dim>>());
+      real_locations.resize(1, numbers::signaling_nan<Point<spacedim>>());
 
       // Find the cells that the particles moved to.
       for (auto &out_particle : particles_out_of_cell)

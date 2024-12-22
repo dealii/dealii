@@ -780,11 +780,11 @@ public:
    * - Vector<double> stores value for the given identifier in each cell.
    * To access the value, use cell_data[name_field][cell->active_cell_index()].
    *
-   * For example, if the vtk mesh contains field data 'Density' defined at the
-   * cells, cell_data['Density'][0] would be the density defined at cell ID '0',
-   * which corresponds to index 0 of the vector. The length of the vector in
-   * cell_data['Density'] would equal the number of elements in the coarse
-   * mesh.
+   * For example, if the vtk mesh contains field data "Density" defined on
+   * cells, then `cell_data["Density"][0]` provides the density defined at cell
+   * ID '0', which corresponds to index 0 of the vector. The length of the
+   * vector in `cell_data["Density"]` equals the number of elements in the
+   * coarse mesh.
    */
   const std::map<std::string, Vector<double>> &
   get_cell_data() const;
