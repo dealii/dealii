@@ -51,8 +51,15 @@ namespace Portable
       const ViewTypeIn src,
       const int        N)
     {
+<<<<<<< HEAD
       Assert(dst.size() >= N, ExcInternalError());
       Assert(src.size() >= N, ExcInternalError());
+=======
+#ifdef DEBUG
+      KOKKOS_ASSERT(dst.size() >= N);
+      KOKKOS_ASSERT(src.size() >= N);
+#endif
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
       Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, N),
                            [&](const int i) {
@@ -91,9 +98,17 @@ namespace Portable
       constexpr int Nk = (contract_over_rows ? n_rows : n_columns),
                     Nq = (contract_over_rows ? n_columns : n_rows);
 
+<<<<<<< HEAD
       Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
       Assert(in.size() >= Nk, ExcInternalError());
       Assert(out.size() >= Nq, ExcInternalError());
+=======
+#  ifdef DEBUG
+      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
+      KOKKOS_ASSERT(in.size() >= Nk);
+      KOKKOS_ASSERT(out.size() >= Nq);
+#  endif
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
       Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, Nq),
                            [&](const int q) {
@@ -161,9 +176,17 @@ namespace Portable
                     Nk = (contract_over_rows ? n_rows : n_columns),
                     Nq = (contract_over_rows ? n_columns : n_rows);
 
+<<<<<<< HEAD
       Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
       Assert(in.size() >= Nj * Nk, ExcInternalError());
       Assert(out.size() >= Nj * Nq, ExcInternalError());
+=======
+#  ifdef DEBUG
+      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
+      KOKKOS_ASSERT(in.size() >= Nj * Nk);
+      KOKKOS_ASSERT(out.size() >= Nj * Nq);
+#  endif
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
       auto thread_policy =
         Kokkos::TeamThreadMDRange<Kokkos::Rank<2>, TeamType>(team_member,
@@ -243,9 +266,17 @@ namespace Portable
                     Nk = (contract_over_rows ? n_rows : n_columns),
                     Nq = (contract_over_rows ? n_columns : n_rows);
 
+<<<<<<< HEAD
       Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
       Assert(in.size() >= Ni * Nj * Nk, ExcInternalError());
       Assert(out.size() >= Ni * Nj * Nq, ExcInternalError());
+=======
+#  ifdef DEBUG
+      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
+      KOKKOS_ASSERT(in.size() >= Ni * Nj * Nk);
+      KOKKOS_ASSERT(out.size() >= Ni * Nj * Nq);
+#  endif
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
       auto thread_policy = Kokkos::TeamThreadMDRange<Kokkos::Rank<3>, TeamType>(
         team_member, Ni, Nj, Nq);
@@ -318,24 +349,41 @@ namespace Portable
       constexpr int Nk = contract_over_rows ? n_rows : n_columns;
       constexpr int Nq = contract_over_rows ? n_columns : n_rows;
 
+<<<<<<< HEAD
       Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
       Assert(in.size() >= NI * NJ * Nk, ExcInternalError());
       Assert(out.size() >= NI * NJ * Nq, ExcInternalError());
+=======
+#  ifdef DEBUG
+      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
+      KOKKOS_ASSERT(in.size() >= NI * NJ * Nk);
+      KOKKOS_ASSERT(out.size() >= NI * NJ * Nq);
+#  endif
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
       constexpr int N      = NI * NJ * Nq;
       constexpr int stride = Utilities::pow(n_columns, direction);
 
       Kokkos::parallel_for(
+<<<<<<< HEAD
         Kokkos::TeamThreadRange(team_member, N), [&](const int index_out) {
           // index_in  = (I Nk + k) n^direction + J
           // index_out = (I Nq + q) n^direction + J
           const int q = (index_out / stride) % Nq;
+=======
+        Kokkos::TeamThreadRange(team_member, N), [&](const int &index_out) {
+          // index_in  = (I Nk + k) n^direction + J
+          // index_out = (I Nq + q) n^direction + J
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
           const int I = (index_out / stride) / Nq;
           const int J = index_out % stride;
 
           const int base_shape   = contract_over_rows ? q : q * n_columns;
           const int stride_shape = contract_over_rows ? n_columns : 1;
+<<<<<<< HEAD
           const int base_in      = I * Nk * stride + J;
+=======
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
           Number sum = shape_data(base_shape) * in(base_in);
           for (int k = 1; k < Nk; ++k)
@@ -398,6 +446,55 @@ namespace Portable
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
                    co_shape_gradients,
         SharedView temp);
+<<<<<<< HEAD
+=======
+
+      /**
+       * Evaluate the finite element function at the quadrature points.
+       */
+      template <typename ViewType>
+      DEAL_II_HOST_DEVICE void
+      evaluate_values(ViewType u);
+
+      /**
+       * Evaluate the gradients of the finite element function at the quadrature
+       * points.
+       */
+      template <typename ViewTypeIn, typename ViewTypeOut>
+      DEAL_II_HOST_DEVICE void
+      evaluate_gradients(const ViewTypeIn u, ViewTypeOut grad_u);
+
+      /**
+       * Evaluate the values and the gradients of the finite element function at
+       * the quadrature points.
+       */
+      template <typename ViewType1, typename ViewType2>
+      DEAL_II_HOST_DEVICE void
+      evaluate_values_and_gradients(ViewType1 u, ViewType2 grad_u);
+
+      /**
+       * Helper function for integrate(). Integrate the finite element function.
+       */
+      template <typename ViewType>
+      DEAL_II_HOST_DEVICE void
+      integrate_values(ViewType u);
+
+      /**
+       * Helper function for integrate(). Integrate the gradients of the finite
+       * element function.
+       */
+      template <bool add, typename ViewType1, typename ViewType2>
+      DEAL_II_HOST_DEVICE void
+      integrate_gradients(ViewType1 u, ViewType2 grad_u);
+
+      /**
+       * Helper function for integrate(). Integrate the values and the gradients
+       * of the finite element function.
+       */
+      template <typename ViewType1, typename ViewType2>
+      DEAL_II_HOST_DEVICE void
+      integrate_values_and_gradients(ViewType1 u, ViewType2 grad_u);
+>>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
       /**
        * Evaluate/integrate the values of a finite element function at the

@@ -313,6 +313,7 @@ namespace Portable
 
     if (data->use_coloring)
       {
+<<<<<<< HEAD
         Kokkos::parallel_for(
           Kokkos::TeamThreadRange(shared_data->team_member,
                                   tensor_dofs_per_cell / n_components),
@@ -335,6 +336,28 @@ namespace Portable
                   cell_id, i + (tensor_dofs_per_cell / n_components) * c)],
                 shared_data->values(i, c));
           });
+=======
+        Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                     tensor_dofs_per_cell),
+                             [&](const int &i) {
+                               for (unsigned int c = 0; c < n_components_; ++c)
+                                 dst[data->local_to_global(
+                                   cell_id, i + tensor_dofs_per_cell * c)] +=
+                                   shared_data->values(i, c);
+                             });
+      }
+    else
+      {
+        Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                     tensor_dofs_per_cell),
+                             [&](const int &i) {
+                               for (unsigned int c = 0; c < n_components_; ++c)
+                                 Kokkos::atomic_add(
+                                   &dst[data->local_to_global(
+                                     cell_id, i + tensor_dofs_per_cell * c)],
+                                   shared_data->values(i, c));
+                             });
+>>>>>>> ebf2cd1792 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
       }
   }
 
