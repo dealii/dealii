@@ -336,14 +336,16 @@ namespace Portable
       constexpr int stride = Utilities::pow(n_columns, direction);
 
       Kokkos::parallel_for(
-        Kokkos::TeamThreadRange(team_member, N), [&](const int &index_out) {
+        Kokkos::TeamThreadRange(team_member, N), [&](const int index_out) {
           // index_in  = (I Nk + k) n^direction + J
           // index_out = (I Nq + q) n^direction + J
+          const int q = (index_out / stride) % Nq;
           const int I = (index_out / stride) / Nq;
           const int J = index_out % stride;
 
           const int base_shape   = contract_over_rows ? q : q * n_columns;
           const int stride_shape = contract_over_rows ? n_columns : 1;
+          const int base_in      = I * Nk * stride + J;
 
           Number sum = shape_data(base_shape) * in(base_in);
           for (int k = 1; k < Nk; ++k)
@@ -357,6 +359,8 @@ namespace Portable
           else
             out(index_out) = sum;
         });
+
+      team_member.team_barrier();
 #endif
     }
 
