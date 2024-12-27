@@ -4896,48 +4896,6 @@ namespace internal
       /**
        * Implementation of the function of some name in the parent class.
        */
-      template <int dim, int spacedim>
-      inline static unsigned int
-      line_index(const TriaAccessor<1, dim, spacedim> &, const unsigned int)
-      {
-        Assert(false,
-               ExcMessage("You can't ask for the index of a line bounding "
-                          "a one-dimensional cell because it is not "
-                          "bounded by lines."));
-        return numbers::invalid_unsigned_int;
-      }
-
-
-      template <int dim, int spacedim>
-      inline static unsigned int
-      line_index(const TriaAccessor<2, dim, spacedim> &accessor,
-                 const unsigned int                    i)
-      {
-        constexpr unsigned int max_faces_per_cell = 4;
-        return accessor.objects()
-          .cells[accessor.present_index * max_faces_per_cell + i];
-      }
-
-
-      inline static unsigned int
-      line_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
-      {
-        const auto [face_index, line_index] =
-          accessor.reference_cell().standard_line_to_face_and_line_index(i);
-        const auto line_within_face_index =
-          accessor.reference_cell().standard_to_real_face_line(
-            line_index,
-            face_index,
-            accessor.combined_face_orientation(face_index));
-
-        return accessor.quad(face_index)->line_index(line_within_face_index);
-      }
-
-
-
-      /**
-       * Implementation of the function of some name in the parent class.
-       */
       template <int structdim, int dim, int spacedim>
       inline static unsigned int
       quad_index(const TriaAccessor<structdim, dim, spacedim> &,
@@ -5491,9 +5449,30 @@ inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::line_index(const unsigned int i) const
 {
   AssertIndexRange(i, this->n_lines());
+  Assert(structdim != 1,
+         ExcMessage("You can't ask for the index of a line bounding a "
+                    "one-dimensional cell because it is not bounded by "
+                    "lines."));
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    line_index(*this, i);
+  if constexpr (structdim == 2)
+    {
+      constexpr unsigned int max_faces_per_cell = 4;
+      return this->objects()
+        .cells[this->present_index * max_faces_per_cell + i];
+    }
+  else if constexpr (structdim == 3)
+    {
+      const auto [face_index, line_index] =
+        this->reference_cell().standard_line_to_face_and_line_index(i);
+      const auto line_within_face_index =
+        this->reference_cell().standard_to_real_face_line(
+          line_index, face_index, this->combined_face_orientation(face_index));
+
+      return this->quad(face_index)->line_index(line_within_face_index);
+    }
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return numbers::invalid_unsigned_int;
 }
 
 
