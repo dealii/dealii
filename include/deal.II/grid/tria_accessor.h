@@ -4999,59 +4999,6 @@ namespace internal
               combined_orientation);
       }
 
-      /**
-       * Implementation of the function of some name in the parent class.
-       */
-      template <int dim, int spacedim>
-      inline static void
-      set_line_orientation(const TriaAccessor<1, dim, spacedim> &,
-                           const unsigned int,
-                           const bool)
-      {
-        DEAL_II_ASSERT_UNREACHABLE();
-      }
-
-
-      template <int spacedim>
-      inline static void
-      set_line_orientation(const TriaAccessor<2, 2, spacedim> &,
-                           const unsigned int,
-                           const bool)
-      {
-        // quads in 2d have no
-        // non-standard orientation
-        DEAL_II_ASSERT_UNREACHABLE();
-      }
-
-
-      template <int spacedim>
-      inline static void
-      set_line_orientation(const TriaAccessor<2, 3, spacedim> &accessor,
-                           const unsigned int                  line,
-                           const bool                          value)
-      {
-        Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        AssertIndexRange(line, accessor.n_lines());
-        Assert(accessor.present_index * GeometryInfo<3>::lines_per_face + line <
-                 accessor.tria->faces->quads_line_orientations.size(),
-               ExcInternalError());
-
-        // quads as part of 3d hexes can have non-standard orientation
-        accessor.tria->faces->quads_line_orientations
-          [accessor.present_index * GeometryInfo<3>::lines_per_face + line] =
-          value;
-      }
-
-
-      inline static void
-      set_line_orientation(const TriaAccessor<3, 3, 3> &,
-                           const unsigned int,
-                           const bool)
-      {
-        // it seems like we don't need this
-        // one
-        DEAL_II_NOT_IMPLEMENTED();
-      }
 
 
       /**
@@ -5698,9 +5645,29 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
   AssertIndexRange(line, this->n_lines());
+  Assert(dim != 1,
+         ExcMessage("In 1d lines are cells and thus do not need to have their "
+                    "orientations set."));
+  Assert(dim != 2,
+         ExcMessage("In 2d lines are faces, and, for compatibility with other "
+                    "dimensions, their orientations should be set via "
+                    "set_combined_orientation()."));
+  // work around a bogus GCC-9 warning which considers line and value unused
+  // except in 3d
+  (void)line;
+  (void)value;
 
-  dealii::internal::TriaAccessorImplementation::Implementation::
-    set_line_orientation(*this, line, value);
+  if constexpr (dim == 3)
+    {
+      // We set line orientations per face, not per cell, so this only works for
+      // faces in 3d
+      Assert(structdim == 2, ExcNotImplemented());
+      Assert(this->present_index * GeometryInfo<3>::lines_per_face + line <
+               this->tria->faces->quads_line_orientations.size(),
+             ExcInternalError());
+      this->tria->faces->quads_line_orientations
+        [this->present_index * GeometryInfo<3>::lines_per_face + line] = value;
+    }
 }
 
 
