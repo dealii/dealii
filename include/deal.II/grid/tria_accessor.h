@@ -5537,9 +5537,18 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
   if constexpr (structdim == 1)
     return ReferenceCell::default_combined_face_orientation();
   else if constexpr (structdim == 2)
-    return this->line_orientation(face) == true ?
-             ReferenceCell::default_combined_face_orientation() :
-             ReferenceCell::reversed_combined_line_orientation();
+    {
+      // if all elements are quads (or if we have a very special consistently
+      // oriented triangular mesh) then we do not store this array
+      if (this->tria->levels[this->present_level]
+            ->face_orientations.n_objects() == 0)
+        return ReferenceCell::default_combined_face_orientation();
+      else
+        return this->tria->levels[this->present_level]
+          ->face_orientations.get_orientation(
+            this->present_index * GeometryInfo<structdim>::faces_per_cell +
+            face);
+    }
   else
     return this->tria->levels[this->present_level]
       ->face_orientations.get_combined_orientation(
@@ -5639,20 +5648,16 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   else if constexpr (structdim == 2 && dim == 2)
     // lines in 2d are faces
     {
-      // if all elements are quads (or if we have a very special consistently
-      // oriented triangular mesh) then we do not store this array
-      if (this->tria->levels[this->present_level]
-            ->face_orientations.n_objects() == 0)
-        {
-          return true;
-        }
-      else
-        {
-          return this->tria->levels[this->present_level]
-            ->face_orientations.get_orientation(
-              this->present_index * GeometryInfo<structdim>::faces_per_cell +
-              line);
-        }
+      const auto combined_orientation = combined_face_orientation(line);
+      Assert(combined_orientation ==
+                 ReferenceCell::default_combined_face_orientation() ||
+               combined_orientation ==
+                 ReferenceCell::reversed_combined_line_orientation(),
+             ExcInternalError());
+      return combined_orientation ==
+                 ReferenceCell::default_combined_face_orientation() ?
+               true :
+               false;
     }
   else if constexpr (structdim == 2 && dim == 3)
     {
