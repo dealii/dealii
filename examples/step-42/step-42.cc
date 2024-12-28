@@ -495,7 +495,7 @@ namespace Step42
       const int ix = std::clamp(static_cast<int>(x / hx), 0, nx - 2);
       const int iy = std::clamp(static_cast<int>(y / hy), 0, ny - 2);
 
-      const double xi = std::clamp((x - ix * hx) / hx, 0., 1.);
+      const double xi  = std::clamp((x - ix * hx) / hx, 0., 1.);
       const double eta = std::clamp((y - iy * hy) / hy, 0., 1.);
 
       return ((1 - xi) * (1 - eta) * get_pixel_value(ix, iy) +

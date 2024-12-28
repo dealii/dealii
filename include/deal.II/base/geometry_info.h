@@ -813,7 +813,8 @@ public:
    * mapping from the symbolic flags defined in the RefinementPossibilities
    * base class to actual numerical values (the array indices).
    */
-  DEAL_II_HOST_DEVICE operator std::uint8_t() const;
+  DEAL_II_HOST_DEVICE
+  operator std::uint8_t() const;
 
   /**
    * Return the union of the refinement flags represented by the current
@@ -2899,7 +2900,7 @@ RefinementCase<dim>::serialize(Archive &ar, const unsigned int)
   // serialization can't deal with bitfields, so copy from/to a full sized
   // std::uint8_t
   std::uint8_t uchar_value = value;
-  ar          &uchar_value;
+  ar & uchar_value;
   value = uchar_value;
 }
 
@@ -4768,7 +4769,7 @@ GeometryInfo<dim>::project_to_unit_cell(const Point<dim, Number> &q)
 {
   Point<dim, Number> p;
   for (unsigned int i = 0; i < dim; ++i)
-    p[i] = std::clamp(q[i], Number(0.), Number(1.0));
+    p[i] = std::min(std::max(q[i], Number(0.)), Number(1.));
 
   return p;
 }
