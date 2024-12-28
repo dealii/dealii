@@ -51,10 +51,8 @@ namespace Portable
       const ViewTypeIn src,
       const int        N)
     {
-#ifdef DEBUG
-      KOKKOS_ASSERT(dst.size() >= N);
-      KOKKOS_ASSERT(src.size() >= N);
-#endif
+      Assert(dst.size() >= N, ExcInternalError());
+      Assert(src.size() >= N, ExcInternalError());
 
       Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, N),
                            [&](const int i) {
@@ -93,11 +91,9 @@ namespace Portable
       constexpr int Nk = (contract_over_rows ? n_rows : n_columns),
                     Nq = (contract_over_rows ? n_columns : n_rows);
 
-#  ifdef DEBUG
-      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
-      KOKKOS_ASSERT(in.size() >= Nk);
-      KOKKOS_ASSERT(out.size() >= Nq);
-#  endif
+      Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
+      Assert(in.size() >= Nk, ExcInternalError());
+      Assert(out.size() >= Nq, ExcInternalError());
 
       Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, Nq),
                            [&](const int q) {
@@ -165,11 +161,9 @@ namespace Portable
                     Nk = (contract_over_rows ? n_rows : n_columns),
                     Nq = (contract_over_rows ? n_columns : n_rows);
 
-#  ifdef DEBUG
-      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
-      KOKKOS_ASSERT(in.size() >= Nj * Nk);
-      KOKKOS_ASSERT(out.size() >= Nj * Nq);
-#  endif
+      Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
+      Assert(in.size() >= Nj * Nk, ExcInternalError());
+      Assert(out.size() >= Nj * Nq, ExcInternalError());
 
       auto thread_policy =
         Kokkos::TeamThreadMDRange<Kokkos::Rank<2>, TeamType>(team_member,
@@ -249,11 +243,9 @@ namespace Portable
                     Nk = (contract_over_rows ? n_rows : n_columns),
                     Nq = (contract_over_rows ? n_columns : n_rows);
 
-#  ifdef DEBUG
-      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
-      KOKKOS_ASSERT(in.size() >= Ni * Nj * Nk);
-      KOKKOS_ASSERT(out.size() >= Ni * Nj * Nq);
-#  endif
+      Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
+      Assert(in.size() >= Ni * Nj * Nk, ExcInternalError());
+      Assert(out.size() >= Ni * Nj * Nq, ExcInternalError());
 
       auto thread_policy = Kokkos::TeamThreadMDRange<Kokkos::Rank<3>, TeamType>(
         team_member, Ni, Nj, Nq);
@@ -326,11 +318,9 @@ namespace Portable
       constexpr int Nk = contract_over_rows ? n_rows : n_columns;
       constexpr int Nq = contract_over_rows ? n_columns : n_rows;
 
-#  ifdef DEBUG
-      KOKKOS_ASSERT(shape_data.size() == n_rows * n_columns);
-      KOKKOS_ASSERT(in.size() >= NI * NJ * Nk);
-      KOKKOS_ASSERT(out.size() >= NI * NJ * Nq);
-#  endif
+      Assert(shape_data.size() == n_rows * n_columns, ExcInternalError());
+      Assert(in.size() >= NI * NJ * Nk, ExcInternalError());
+      Assert(out.size() >= NI * NJ * Nq, ExcInternalError());
 
       constexpr int N      = NI * NJ * Nq;
       constexpr int stride = Utilities::pow(n_columns, direction);
