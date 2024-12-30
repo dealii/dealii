@@ -3737,7 +3737,6 @@ namespace
         // the side sets so that we can convert a set of side set indices into
         // a single deal.II boundary or manifold id (and save the
         // correspondence).
-        constexpr auto max_faces_per_cell = GeometryInfo<dim>::faces_per_cell;
         std::map<std::size_t, std::vector<int>> face_side_sets;
         for (const int side_set_id : side_set_ids)
           {
@@ -3772,7 +3771,7 @@ namespace
                     const long        element_n = elements[side_n] - 1;
                     const long        face_n    = faces[side_n] - 1;
                     const std::size_t face_id =
-                      element_n * max_faces_per_cell + face_n;
+                      element_n * ReferenceCell::max_n_faces<dim>() + face_n;
                     face_side_sets[face_id].push_back(side_set_id);
                   }
               }
@@ -3818,9 +3817,11 @@ namespace
                        ExcInternalError());
               }
             // Record the b_or_m_id of the current face.
-            const unsigned int   local_face_n = face_id % max_faces_per_cell;
-            const CellData<dim> &cell = cells[face_id / max_faces_per_cell];
-            const ReferenceCell  cell_type =
+            const unsigned int local_face_n =
+              face_id % ReferenceCell::max_n_faces<dim>();
+            const CellData<dim> &cell =
+              cells[face_id / ReferenceCell::max_n_faces<dim>()];
+            const ReferenceCell cell_type =
               ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
             const unsigned int deal_face_n =
               cell_type.exodusii_face_to_deal_face(local_face_n);
