@@ -1827,8 +1827,6 @@ namespace
           }
       }
   }
-
-
 } // end of anonymous namespace
 
 
@@ -3253,7 +3251,7 @@ namespace internal
             for (unsigned int line = 0; line < n_lines; ++line)
               for (unsigned int i = crs.ptr[line], j = 0; i < crs.ptr[line + 1];
                    ++i, ++j)
-                lines_0.cells[line * GeometryInfo<1>::faces_per_cell + j] =
+                lines_0.cells[line * ReferenceCell::max_n_faces<1>() + j] =
                   crs.col[i]; // set vertex indices
           }
 
@@ -3354,18 +3352,18 @@ namespace internal
                 {
                   // set neighbor if not at boundary
                   if (nei.col[i] != static_cast<unsigned int>(-1))
-                    level.neighbors[cell * GeometryInfo<dim>::faces_per_cell +
+                    level.neighbors[cell * ReferenceCell::max_n_faces<dim>() +
                                     j] = {0, nei.col[i]};
 
                   // set face indices
-                  cells_0.cells[cell * GeometryInfo<dim>::faces_per_cell + j] =
+                  cells_0.cells[cell * ReferenceCell::max_n_faces<dim>() + j] =
                     crs.col[i];
 
                   // set face orientation if needed
                   if (orientation_needed)
                     {
                       level.face_orientations.set_combined_orientation(
-                        cell * GeometryInfo<dim>::faces_per_cell + j,
+                        cell * ReferenceCell::max_n_faces<dim>() + j,
                         connectivity.entity_orientations(dim - 1)
                           .get_combined_orientation(i));
                     }
@@ -15976,7 +15974,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 
                 const unsigned char combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
-                    cell->index() * GeometryInfo<3>::faces_per_cell + face);
+                    cell->index() * ReferenceCell::max_n_faces<dim>() + face);
                 std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,

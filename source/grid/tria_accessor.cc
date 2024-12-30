@@ -2360,19 +2360,19 @@ CellAccessor<dim, spacedim>::set_neighbor(
   if (pointer.state() == IteratorState::valid)
     {
       this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
+        ->neighbors[this->present_index * ReferenceCell::max_n_faces<dim>() + i]
         .first = pointer->present_level;
       this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
+        ->neighbors[this->present_index * ReferenceCell::max_n_faces<dim>() + i]
         .second = pointer->present_index;
     }
   else
     {
       this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
+        ->neighbors[this->present_index * ReferenceCell::max_n_faces<dim>() + i]
         .first = -1;
       this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
+        ->neighbors[this->present_index * ReferenceCell::max_n_faces<dim>() + i]
         .second = -1;
     }
 }
