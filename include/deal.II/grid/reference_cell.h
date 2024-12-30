@@ -327,6 +327,25 @@ public:
   n_faces() const;
 
   /**
+   * Return the maximum number of faces an object of dimension `structdim` can
+   * have. This is always the number of faces of a `structdim`-dimensional
+   * hypercube.
+   *
+   * @note The primary use case of this and the other maxima functions is to
+   * enable simple array indexing to per-face data by cell index and face
+   * number, e.g.,
+   *
+   * @code
+   *     cell->index() * ReferenceCell::max_n_faces<dim>() + face_no;
+   * @endcode
+   *
+   * is a unique index to the `face_no`th face of the current cell.
+   */
+  template <int structdim>
+  static constexpr unsigned int
+  max_n_faces();
+
+  /**
    * Return an object that can be thought of as an array containing all
    * indices from zero to n_faces().
    */
@@ -1737,6 +1756,15 @@ ReferenceCell::n_faces() const
     }
 
   return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int structdim>
+inline constexpr unsigned int
+ReferenceCell::max_n_faces()
+{
+  return GeometryInfo<structdim>::faces_per_cell;
 }
 
 

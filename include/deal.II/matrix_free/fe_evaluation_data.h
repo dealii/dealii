@@ -30,6 +30,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/mapping_info_storage.h>
 #include <deal.II/matrix_free/shape_info.h>
@@ -1542,7 +1544,7 @@ FEEvaluationData<dim, Number, is_face>::get_current_cell_index() const
 {
   if (is_face && dof_access_index ==
                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-    return cell * GeometryInfo<dim>::faces_per_cell + face_numbers[0];
+    return cell * ReferenceCell::max_n_faces<dim>() + face_numbers[0];
   else
     return cell;
 }
