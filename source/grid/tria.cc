@@ -2066,15 +2066,11 @@ namespace internal
      * give the total number of cells, not only the number of newly to
      * accommodate ones, like in the <tt>TriaLevel<N>::reserve_space</tt>
      * functions, with <tt>N>0</tt>.
-     *
-     * Since the number of neighbors per cell depends on the dimensions, you
-     * have to pass that additionally.
      */
 
     void
     reserve_space(TriaLevel         &tria_level,
                   const unsigned int total_cells,
-                  const unsigned int dimension,
                   const unsigned int space_dimension,
                   const bool         tetraheder_in_mesh = false)
     {
@@ -2138,7 +2134,7 @@ namespace internal
             total_cells - tria_level.global_level_cell_indices.size(),
             numbers::invalid_dof_index);
 
-          if (dimension == space_dimension - 1)
+          if (tria_level.dim == space_dimension - 1)
             {
               tria_level.direction_flags.reserve(total_cells);
               tria_level.direction_flags.insert(
@@ -2155,17 +2151,16 @@ namespace internal
                                       tria_level.parents.size(),
                                     -1);
 
-          tria_level.neighbors.reserve(total_cells * (2 * dimension));
+          tria_level.neighbors.reserve(total_cells * 2 * tria_level.dim);
           tria_level.neighbors.insert(tria_level.neighbors.end(),
-                                      total_cells * (2 * dimension) -
+                                      total_cells * 2 * tria_level.dim -
                                         tria_level.neighbors.size(),
                                       std::make_pair(-1, -1));
 
           if (tria_level.dim == 2 || tria_level.dim == 3)
             {
-              const unsigned int max_faces_per_cell = 2 * dimension;
-              tria_level.face_orientations.resize(total_cells *
-                                                  max_faces_per_cell);
+              tria_level.face_orientations.resize(
+                total_cells * 2 * tria_level.dim);
 
               tria_level.reference_cell.reserve(total_cells);
               tria_level.reference_cell.insert(
@@ -4988,7 +4983,6 @@ namespace internal
 
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + needed_cells,
-                          2,
                           spacedim);
 
             reserve_space(triangulation.levels[level + 1]->cells,
@@ -5418,7 +5412,6 @@ namespace internal
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + GeometryInfo<1>::max_children_per_cell *
                                          flagged_cells,
-                          1,
                           spacedim);
             // reserve space for 2*flagged_cells new lines on the next
             // higher level
@@ -5733,7 +5726,6 @@ namespace internal
             // needed_cells that will be created on that level
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + needed_cells,
-                          2,
                           spacedim);
 
             // reserve space for needed_cells new quads on the next
@@ -6030,13 +6022,11 @@ namespace internal
             if (triangulation.all_reference_cells_are_hyper_cube())
               reserve_space(*triangulation.levels[level + 1],
                             used_cells + new_cells,
-                            3,
                             spacedim,
                             false);
             else
               reserve_space(*triangulation.levels[level + 1],
                             used_cells + new_cells,
-                            3,
                             spacedim,
                             true);
 
@@ -7316,7 +7306,6 @@ namespace internal
             // 8*flagged_cells that will be created on that level
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + new_cells,
-                          3,
                           spacedim);
             // reserve space for 8*flagged_cells new hexes on the next
             // higher level
