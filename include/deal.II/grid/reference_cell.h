@@ -312,6 +312,17 @@ public:
   n_lines() const;
 
   /**
+   * Return the maximum number of lines an object of dimension `structdim` can
+   * have. This is always the number of lines of a `structdim`-dimensional
+   * hypercube.
+   *
+   * @see ReferenceCell::max_n_faces()
+   */
+  template <int structdim>
+  static constexpr unsigned int
+  max_n_lines();
+
+  /**
    * Return an object that can be thought of as an array containing all
    * indices from zero to n_lines().
    */
@@ -1606,6 +1617,15 @@ ReferenceCell::n_lines() const
     }
 
   return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int structdim>
+inline constexpr unsigned int
+ReferenceCell::max_n_lines()
+{
+  return GeometryInfo<structdim>::lines_per_cell;
 }
 
 
