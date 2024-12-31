@@ -3240,7 +3240,12 @@ public:
    */
   boost::container::small_vector<
     TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-    ReferenceCell::max_n_faces<dim>()>
+#ifndef _MSC_VER // MSVC prior to 2022 cannot use a constexpr function this way
+    ReferenceCell::max_n_faces<dim>()
+#else
+    GeometryInfo<dim>::faces_per_cell
+#endif
+    >
   face_iterators() const;
 
   /**
@@ -7684,12 +7689,22 @@ CellAccessor<dim, spacedim>::face_iterator_to_index(
 template <int dim, int spacedim>
 inline boost::container::small_vector<
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-  ReferenceCell::max_n_faces<dim>()>
+#  ifndef _MSC_VER
+  ReferenceCell::max_n_faces<dim>()
+#  else
+  GeometryInfo<dim>::faces_per_cell
+#  endif
+  >
 CellAccessor<dim, spacedim>::face_iterators() const
 {
   boost::container::small_vector<
     TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-    ReferenceCell::max_n_faces<dim>()>
+#  ifndef _MSC_VER
+    ReferenceCell::max_n_faces<dim>()
+#  else
+    GeometryInfo<dim>::faces_per_cell
+#  endif
+    >
     face_iterators(this->n_faces());
 
   for (const unsigned int i : this->face_indices())
