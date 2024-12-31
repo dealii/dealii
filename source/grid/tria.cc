@@ -2070,7 +2070,7 @@ namespace internal
         {
           // reserve the field of the derived class
           tria_faces.quads_line_orientations.resize(
-            new_size * GeometryInfo<3>::lines_per_face, true);
+            new_size * ReferenceCell::max_n_lines<2>(), true);
 
           auto &q_is_q = tria_faces.quad_is_quadrilateral;
           q_is_q.reserve(new_size);
@@ -3289,14 +3289,16 @@ namespace internal
             for (unsigned int q = 0, k = 0; q < n_quads; ++q)
               {
                 // set entity type of quads
-                faces.set_quad_type(q, connectivity.entity_types(2)[q]);
+                const auto reference_cell = connectivity.entity_types(2)[q];
+                faces.set_quad_type(q, reference_cell);
 
                 // loop over all its lines
                 for (unsigned int i = crs.ptr[q], j = 0; i < crs.ptr[q + 1];
                      ++i, ++j, ++k)
                   {
+                    AssertIndexRange(j, reference_cell.n_lines());
                     // set line index
-                    quads_0.cells[q * GeometryInfo<3>::lines_per_face + j] =
+                    quads_0.cells[q * ReferenceCell::max_n_lines<2>() + j] =
                       crs.col[i];
 
                     // set line orientations
@@ -3312,7 +3314,7 @@ namespace internal
                           ReferenceCell::reversed_combined_line_orientation(),
                       ExcInternalError());
                     faces.quads_line_orientations
-                      [q * GeometryInfo<3>::lines_per_face + j] =
+                      [q * ReferenceCell::max_n_lines<2>() + j] =
                       combined_orientation ==
                       ReferenceCell::default_combined_face_orientation();
                   }

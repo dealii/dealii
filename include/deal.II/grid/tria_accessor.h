@@ -5586,11 +5586,11 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   else if constexpr (structdim == 2 && dim == 3)
     {
       // line orientations in 3d are stored in their own array
-      Assert(this->present_index * GeometryInfo<3>::lines_per_face + line <
+      Assert(this->present_index * ReferenceCell::max_n_lines<2>() + line <
                this->tria->faces->quads_line_orientations.size(),
              ExcInternalError());
       return this->tria->faces->quads_line_orientations
-        [this->present_index * GeometryInfo<3>::lines_per_face + line];
+        [this->present_index * ReferenceCell::max_n_lines<2>() + line];
     }
   else if constexpr (structdim == 3 && dim == 3)
     {
@@ -5644,11 +5644,11 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
       // We set line orientations per face, not per cell, so this only works for
       // faces in 3d
       Assert(structdim == 2, ExcNotImplemented());
-      Assert(this->present_index * GeometryInfo<3>::lines_per_face + line <
+      Assert(this->present_index * ReferenceCell::max_n_lines<2>() + line <
                this->tria->faces->quads_line_orientations.size(),
              ExcInternalError());
       this->tria->faces->quads_line_orientations
-        [this->present_index * GeometryInfo<3>::lines_per_face + line] = value;
+        [this->present_index * ReferenceCell::max_n_lines<2>() + line] = value;
     }
 }
 
