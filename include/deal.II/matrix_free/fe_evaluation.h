@@ -3912,8 +3912,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto src_data = internal::get_vector_data<n_components_>(
     src,
     first_index,
-    this->dof_access_index ==
-      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->dof_info != nullptr &&
+      this->dof_access_index ==
+        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
     this->active_fe_index,
     this->dof_info);
 
