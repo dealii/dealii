@@ -192,4 +192,3 @@ install(FILES
 #
 
 message(STATUS "Setting up project configuration - Done")
-

@@ -503,7 +503,8 @@ namespace Step85
                    q < fe_interface_values.n_quadrature_points;
                    ++q)
                 {
-                  const Tensor<1, dim> normal = fe_interface_values.normal(q);
+                  const Tensor<1, dim> normal =
+                    fe_interface_values.normal_vector(q);
                   for (unsigned int i = 0; i < n_interface_dofs; ++i)
                     for (unsigned int j = 0; j < n_interface_dofs; ++j)
                       {

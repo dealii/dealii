@@ -133,4 +133,3 @@ if 'intro.dox' in filename:
     
     # check the file group
     check_multiple_defined_headers(lines)
-

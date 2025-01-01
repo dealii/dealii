@@ -777,21 +777,14 @@ namespace Utilities
               Kokkos::deep_copy(
                 Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
                   ghost_array.data(), n_ghost_indices()),
-                0);
+                Number(0));
             }
           else
 #    endif
             {
-              if constexpr (std::is_trivial_v<Number>)
-                {
-                  std::memset(ghost_array.data(),
-                              0,
-                              sizeof(Number) * n_ghost_indices());
-                }
-              else
-                std::fill(ghost_array.data(),
-                          ghost_array.data() + n_ghost_indices(),
-                          0);
+              std::fill(ghost_array.data(),
+                        ghost_array.data() + n_ghost_indices(),
+                        Number(0));
             }
         }
 

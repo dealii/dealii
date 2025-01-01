@@ -407,9 +407,11 @@ private:
  * routines as compared to the %parallel vectors in the PETScWrappers and
  * TrilinosWrappers namespaces.
  */
-template <typename Number>
-class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>
-  : public MGTransferBase<LinearAlgebra::distributed::Vector<Number>>
+template <typename Number, typename MemorySpace>
+class MGLevelGlobalTransfer<
+  LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+  : public MGTransferBase<
+      LinearAlgebra::distributed::Vector<Number, MemorySpace>>
 {
 public:
   /**
@@ -426,9 +428,10 @@ public:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
-             MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-             const LinearAlgebra::distributed::Vector<Number2> &src) const;
+  copy_to_mg(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>> &dst,
+    const LinearAlgebra::distributed::Vector<Number2, MemorySpace> &src) const;
 
   /**
    * Transfer from multi-level vector to normal vector.
@@ -440,9 +443,10 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg(
-    const DoFHandler<dim, spacedim>             &dof_handler,
-    LinearAlgebra::distributed::Vector<Number2> &dst,
-    const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
+    const DoFHandler<dim, spacedim>                          &dof_handler,
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &dst,
+    const MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+      &src) const;
 
   /**
    * Add a multi-level vector to a normal vector.
@@ -452,9 +456,10 @@ public:
   template <int dim, typename Number2, int spacedim>
   void
   copy_from_mg_add(
-    const DoFHandler<dim, spacedim>             &dof_handler,
-    LinearAlgebra::distributed::Vector<Number2> &dst,
-    const MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &src) const;
+    const DoFHandler<dim, spacedim>                          &dof_handler,
+    LinearAlgebra::distributed::Vector<Number2, MemorySpace> &dst,
+    const MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
+      &src) const;
 
   /**
    * If this object operates on BlockVector objects, we need to describe how
@@ -493,10 +498,11 @@ protected:
    */
   template <int dim, typename Number2, int spacedim>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
-             MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-             const LinearAlgebra::distributed::Vector<Number2>         &src,
-             const bool solution_transfer) const;
+  copy_to_mg(
+    const DoFHandler<dim, spacedim> &dof_handler,
+    MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>> &dst,
+    const LinearAlgebra::distributed::Vector<Number2, MemorySpace>         &src,
+    const bool solution_transfer) const;
 
   /**
    * Internal function to @p fill copy_indices*. Called by derived classes.
@@ -581,26 +587,27 @@ protected:
    * global vector for inserting into the level vectors. This vector is
    * populated with those entries.
    */
-  mutable LinearAlgebra::distributed::Vector<Number> ghosted_global_vector;
+  mutable LinearAlgebra::distributed::Vector<Number, MemorySpace>
+    ghosted_global_vector;
 
   /**
    * Same as above but used when working with solution vectors.
    */
-  mutable LinearAlgebra::distributed::Vector<Number>
+  mutable LinearAlgebra::distributed::Vector<Number, MemorySpace>
     solution_ghosted_global_vector;
 
   /**
    * In the function copy_from_mg, we access all level vectors with certain
    * ghost entries for inserting the result into a global vector.
    */
-  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
+  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number, MemorySpace>>
     ghosted_level_vector;
 
   /**
    * Function to initialize internal level vectors.
    */
   std::function<void(const unsigned int,
-                     LinearAlgebra::distributed::Vector<Number> &)>
+                     LinearAlgebra::distributed::Vector<Number, MemorySpace> &)>
     initialize_dof_vector;
 
 private:

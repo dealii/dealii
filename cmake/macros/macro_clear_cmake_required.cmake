@@ -24,4 +24,3 @@ macro(clear_cmake_required)
   set(CMAKE_REQUIRED_INCLUDES)
   set(CMAKE_REQUIRED_LIBRARIES)
 endmacro()
-

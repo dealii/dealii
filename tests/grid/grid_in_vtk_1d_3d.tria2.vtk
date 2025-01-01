@@ -33,5 +33,3 @@ LOOKUP_TABLE default
 SCALARS ManifoldID int 1
 LOOKUP_TABLE default
 -1 -1 -1 -1 
-
-

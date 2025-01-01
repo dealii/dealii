@@ -67,4 +67,3 @@ file(WRITE ${CMAKE_BINARY_DIR}/revision.log
 #
 ###"
   )
-

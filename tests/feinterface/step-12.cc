@@ -313,6 +313,10 @@ namespace Step12
 
       for (unsigned int point = 0; point < q_points.size(); ++point)
         {
+          Assert(normals[point] ==
+                   scratch_data.fe_interface_values.normal_vector(point),
+                 ExcInternalError());
+
           const double beta_n = beta(q_points[point]) * normals[point];
 
           if (beta_n > 0)

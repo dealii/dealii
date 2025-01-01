@@ -42,4 +42,3 @@ macro(check_cxx_compiler_bug _source _var)
     set(${_var} TRUE)
   endif()
 endmacro()
-

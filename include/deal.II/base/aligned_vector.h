@@ -134,23 +134,20 @@ public:
   operator=(AlignedVector<T> &&vec) noexcept;
 
   /**
-   * Change the size of the vector. If the new size is larger than the
-   * previous size, then new elements will be added to the end of the
-   * vector; these elements will remain uninitialized (i.e., left in
-   * an undefined state) if `std::is_trivial<T>` is `true`, and
-   * will be default initialized if `std::is_trivial<T>` is `false`.
-   * See [here](https://en.cppreference.com/w/cpp/types/is_trivial) for
-   * a definition of what `std::is_trivial` does.
+   * Change the size of the vector. If the new size is larger than the previous
+   * size, then new elements will be added to the end of the vector; these
+   * elements will remain uninitialized (i.e., left in an undefined state) if
+   * `std::is_trivially_default_constructible_v<T>` is `true`, and will be
+   * default initialized if that type trait is `false`. See
+   * [here](https://en.cppreference.com/w/cpp/types/is_default_constructible)
+   * for a precise definition of `std::is_trivially_default_constructible`.
    *
-   * If the new size is less than the previous size, then the last few
-   * elements will be destroyed if `std::is_trivial<T>` will be `false`
-   * or will simply be ignored in the future if
-   * `std::is_trivial<T>` is `true`.
+   * If the new size is less than the previous size, then the `new_size`th and
+   * all subsequent elements will be destroyed.
    *
-   * As a consequence of the outline above, the "_fast" suffix of this
-   * function refers to the fact that for "trivial" classes `T`, this
-   * function omits constructor/destructor calls and in particular the
-   * initialization of new elements.
+   * As a consequence of the outline above, the "_fast" suffix of this function
+   * refers to the fact that for trivially default constructible types `T`, this
+   * function omits the initialization of new elements.
    *
    * @note This method can only be invoked for classes @p T that define a
    * default constructor, @p T(). Otherwise, compilation will fail.
@@ -820,8 +817,8 @@ namespace internal
       if (end == begin)
         return;
 
-      // for classes trivial assignment can use memcpy.
-      if constexpr (std::is_trivial_v<T> == true &&
+      // We can use memcpy() with trivially copyable objects.
+      if constexpr (std::is_trivially_copyable_v<T> == true &&
                     (std::is_same_v<T *, RandomAccessIterator> ||
                      std::is_same_v<const T *, RandomAccessIterator>) == true)
         std::memcpy(destination_ + begin,
@@ -888,8 +885,8 @@ namespace internal
       if (end == begin)
         return;
 
-      // Classes with trivial assignment can use memcpy.
-      if constexpr (std::is_trivial_v<T> == true &&
+      // We can use memcpy() with trivially copyable objects.
+      if constexpr (std::is_trivially_copyable_v<T> == true &&
                     (std::is_same_v<T *, RandomAccessIterator> ||
                      std::is_same_v<const T *, RandomAccessIterator>) == true)
         std::memcpy(destination_ + begin,
@@ -947,10 +944,10 @@ namespace internal
         return;
       Assert(destination != nullptr, ExcInternalError());
 
-      // do not use memcmp for long double because on some systems it does not
-      // completely fill its memory and may lead to false positives in
-      // e.g. valgrind
-      if constexpr (std::is_trivial_v<T> == true &&
+      // do not use memcmp() for long double because on some systems it does not
+      // completely fill its memory and may lead to false positives in e.g.
+      // valgrind
+      if constexpr (std::is_trivially_default_constructible_v<T> == true &&
                     std::is_same_v<T, long double> == false)
         {
           const unsigned char zero[sizeof(T)] = {};
@@ -970,8 +967,9 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // Classes with trivial assignment of zero can use memset.
-      if constexpr (std::is_trivial_v<T> == true)
+      // Only use memset() with types whose default constructors don't do
+      // anything.
+      if constexpr (std::is_trivially_default_constructible_v<T> == true)
         if (trivial_element)
           {
             std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
@@ -1055,8 +1053,9 @@ namespace internal
     apply_to_subrange(const std::size_t begin,
                       const std::size_t end) const override
     {
-      // Classes with trivial assignment of zero can use memset.
-      if constexpr (std::is_trivial_v<T> == true)
+      // Only use memset() with types whose default constructors don't do
+      // anything.
+      if constexpr (std::is_trivially_default_constructible_v<T> == true)
         std::memset(destination_ + begin, 0, (end - begin) * sizeof(T));
       else
         default_construct_or_assign(begin,
@@ -1133,7 +1132,7 @@ AlignedVector<T>::Deleter::operator()(T *ptr)
           Assert(owning_aligned_vector->used_elements_end != nullptr,
                  ExcInternalError());
 
-          if (std::is_trivial_v<T> == false)
+          if (std::is_trivially_destructible_v<T> == false)
             for (T *p = owning_aligned_vector->used_elements_end - 1; p >= ptr;
                  --p)
               p->~T();
@@ -1190,7 +1189,7 @@ AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   // it, not unique_ptr) so it is still set to its correct value.
 
   if (is_shmem_root)
-    if (std::is_trivial_v<T> == false)
+    if (std::is_trivially_destructible_v<T> == false)
       for (T *p = aligned_vector->used_elements_end - 1; p >= ptr; --p)
         p->~T();
 
@@ -1345,7 +1344,7 @@ AlignedVector<T>::resize_fast(const size_type new_size)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial_v<T> == false)
+      if (std::is_trivially_destructible_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1356,9 +1355,9 @@ AlignedVector<T>::resize_fast(const size_type new_size)
       reserve(new_size);
       used_elements_end = elements.get() + new_size;
 
-      // need to still set the values in case the class is non-trivial because
-      // virtual classes etc. need to run their (default) constructor
-      if (std::is_trivial_v<T> == false)
+      // Leave the new array entries as-is (with undefined values) unless T's
+      // default constructor is nontrivial (i.e., it is not a no-op)
+      if (std::is_trivially_default_constructible_v<T> == false)
         dealii::internal::AlignedVectorDefaultInitialize<T, true>(
           new_size - old_size, elements.get() + old_size);
     }
@@ -1382,7 +1381,7 @@ AlignedVector<T>::resize(const size_type new_size)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial_v<T> == false)
+      if (std::is_trivially_destructible_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1417,7 +1416,7 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial_v<T> == false)
+      if (std::is_trivially_destructible_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1543,10 +1542,7 @@ AlignedVector<T>::push_back(const T in_data)
   Assert(used_elements_end <= allocated_elements_end, ExcInternalError());
   if (used_elements_end == allocated_elements_end)
     reserve(std::max(2 * capacity(), static_cast<size_type>(16)));
-  if (std::is_trivial_v<T> == false)
-    new (used_elements_end++) T(in_data);
-  else
-    *used_elements_end++ = in_data;
+  new (used_elements_end++) T(in_data);
 }
 
 
@@ -1581,11 +1577,7 @@ AlignedVector<T>::insert_back(ForwardIterator begin, ForwardIterator end)
   const size_type old_size = size();
   reserve(old_size + (end - begin));
   for (; begin != end; ++begin, ++used_elements_end)
-    {
-      if (std::is_trivial_v<T> == false)
-        new (used_elements_end) T;
-      *used_elements_end = *begin;
-    }
+    new (used_elements_end) T(*begin);
 }
 
 
@@ -1790,11 +1782,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // has all of the data.
   if (is_shmem_root)
     {
-      if (std::is_trivial_v<T>)
+      if (std::is_trivially_copyable_v<T> == true)
         {
-          // The data is "trivial", i.e., we can copy things directly without
-          // having to go through the serialization/deserialization machinery of
-          // Utilities::MPI::broadcast.
+          // The data is trivially copyable, i.e., we can copy things directly
+          // without having to go through the serialization/deserialization
+          // machinery of Utilities::MPI::broadcast.
           //
           // In that case, first tell all of the other shmem roots how many
           // elements we will have to deal with, and let them resize their
@@ -1983,7 +1975,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // shared memory space.
   if (is_shmem_root)
     {
-      if (std::is_trivial_v<T> == true)
+      if (std::is_trivially_copyable_v<T> == true)
         std::memcpy(aligned_shmem_pointer, elements.get(), sizeof(T) * size());
       else
         for (std::size_t i = 0; i < size(); ++i)
