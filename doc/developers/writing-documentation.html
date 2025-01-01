@@ -248,9 +248,9 @@ void foobar ()
     of running the program. These three parts are written in separate
     files: for the <code>step-xx</code> program, for example, they
     would be in the
-    files <code>examples/doc/step-xx/doc/intro.dox</code>,
-    <code>examples/doc/step-xx/step-xx.cc</code> and
-    <code>examples/doc/step-xx/doc/results.dox</code>. There are a
+    files <code>dealii/examples/step-xx/doc/intro.dox</code>,
+    <code>dealii/examples/step-xx/step-xx.cc</code> and
+    <code>dealii/examples/step-xx/doc/results.dox</code>. There are a
     number of scripts that then process and concatenate these three
     different files and send them through doxygen for generation of
     HTML output. In general, if you want to see how certain markup
@@ -268,7 +268,7 @@ void foobar ()
       of deal.II than to run latex, most of the lengthier
       introductions are just written in latex (with a minimal amount
       of markup) and later converted into doxygen format. One thing to
-      be aware of is that you can reference formulas in doxygen, so
+      be aware of is that you can not reference formulas in doxygen, so
       you have to work around that using text rather than formula
       numbers.
     </p>
@@ -341,9 +341,9 @@ void foobar ()
     <h3>The actual code</h3>
     <p>
       At present, the tools that extract information from the actual example
-      programs code are rather dumb. They are, to be precise, three Perl
+      programs code are rather dumb. They are, to be precise, the Perl
       scripts located in the directory of the
-      <code>deal.II/doc/doxygen/tutorial</code> tree, where
+      <code>deal.II/doc/doxygen/scripts</code> tree, where
       the <code>.cc</code> files of the tutorial programs are converted
       into doxygen input files. In essence, what these scripts do is to
       create doxygen input that contains the comments of the program as
