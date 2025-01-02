@@ -1828,7 +1828,27 @@ namespace
       }
   }
 
-
+  // Several parts of Triangulation (e.g., TriaLevel) are not templated on the
+  // dimension and thus require de-templated versions of some ReferenceCell
+  // functions.
+  unsigned int
+  max_n_faces(const unsigned int structdim)
+  {
+    switch (structdim)
+      {
+        case 0:
+          return ReferenceCell::max_n_faces<0>();
+        case 1:
+          return ReferenceCell::max_n_faces<1>();
+        case 2:
+          return ReferenceCell::max_n_faces<2>();
+        case 3:
+          return ReferenceCell::max_n_faces<3>();
+        default:
+          DEAL_II_ASSERT_UNREACHABLE();
+          return numbers::invalid_unsigned_int;
+      }
+  }
 } // end of anonymous namespace
 
 
@@ -2050,7 +2070,7 @@ namespace internal
         {
           // reserve the field of the derived class
           tria_faces.quads_line_orientations.resize(
-            new_size * GeometryInfo<3>::lines_per_face, true);
+            new_size * ReferenceCell::max_n_lines<2>(), true);
 
           auto &q_is_q = tria_faces.quad_is_quadrilateral;
           q_is_q.reserve(new_size);
@@ -2068,18 +2088,16 @@ namespace internal
      * give the total number of cells, not only the number of newly to
      * accommodate ones, like in the <tt>TriaLevel<N>::reserve_space</tt>
      * functions, with <tt>N>0</tt>.
-     *
-     * Since the number of neighbors per cell depends on the dimensions, you
-     * have to pass that additionally.
      */
 
     void
     reserve_space(TriaLevel         &tria_level,
                   const unsigned int total_cells,
-                  const unsigned int dimension,
                   const unsigned int space_dimension,
                   const bool         tetraheder_in_mesh = false)
     {
+      const unsigned int dim = tria_level.dim;
+
       // we need space for total_cells cells. Maybe we have more already
       // with those cells which are unused, so only allocate new space if
       // needed.
@@ -2140,7 +2158,7 @@ namespace internal
             total_cells - tria_level.global_level_cell_indices.size(),
             numbers::invalid_dof_index);
 
-          if (dimension == space_dimension - 1)
+          if (dim == space_dimension - 1)
             {
               tria_level.direction_flags.reserve(total_cells);
               tria_level.direction_flags.insert(
@@ -2157,24 +2175,23 @@ namespace internal
                                       tria_level.parents.size(),
                                     -1);
 
-          tria_level.neighbors.reserve(total_cells * (2 * dimension));
+          tria_level.neighbors.reserve(total_cells * max_n_faces(dim));
           tria_level.neighbors.insert(tria_level.neighbors.end(),
-                                      total_cells * (2 * dimension) -
+                                      total_cells * max_n_faces(dim) -
                                         tria_level.neighbors.size(),
                                       std::make_pair(-1, -1));
 
-          if (tria_level.dim == 2 || tria_level.dim == 3)
+          if (dim == 2 || dim == 3)
             {
-              const unsigned int max_faces_per_cell = 2 * dimension;
               tria_level.face_orientations.resize(total_cells *
-                                                  max_faces_per_cell);
+                                                  max_n_faces(dim));
 
               tria_level.reference_cell.reserve(total_cells);
               tria_level.reference_cell.insert(
                 tria_level.reference_cell.end(),
                 total_cells - tria_level.reference_cell.size(),
-                tria_level.dim == 2 ? ReferenceCells::Quadrilateral :
-                                      ReferenceCells::Hexahedron);
+                dim == 2 ? ReferenceCells::Quadrilateral :
+                           ReferenceCells::Hexahedron);
             }
         }
     }
@@ -2281,15 +2298,14 @@ namespace internal
           // only allocate space if necessary
           if (new_size > tria_objects.n_objects())
             {
-              const unsigned int max_faces_per_cell =
-                2 * tria_objects.structdim;
               const unsigned int max_children_per_cell =
                 1 << tria_objects.structdim;
 
-              tria_objects.cells.reserve(new_size * max_faces_per_cell);
+              tria_objects.cells.reserve(new_size *
+                                         max_n_faces(tria_objects.structdim));
               tria_objects.cells.insert(tria_objects.cells.end(),
                                         (new_size - tria_objects.n_objects()) *
-                                          max_faces_per_cell,
+                                          max_n_faces(tria_objects.structdim),
                                         -1);
 
               tria_objects.used.reserve(new_size);
@@ -2352,13 +2368,11 @@ namespace internal
           // see above...
           if (new_size > tria_objects.n_objects())
             {
-              const unsigned int max_faces_per_cell =
-                2 * tria_objects.structdim;
-
-              tria_objects.cells.reserve(new_size * max_faces_per_cell);
+              tria_objects.cells.reserve(new_size *
+                                         max_n_faces(tria_objects.structdim));
               tria_objects.cells.insert(tria_objects.cells.end(),
                                         (new_size - tria_objects.n_objects()) *
-                                          max_faces_per_cell,
+                                          max_n_faces(tria_objects.structdim),
                                         -1);
 
               tria_objects.used.reserve(new_size);
@@ -3253,7 +3267,7 @@ namespace internal
             for (unsigned int line = 0; line < n_lines; ++line)
               for (unsigned int i = crs.ptr[line], j = 0; i < crs.ptr[line + 1];
                    ++i, ++j)
-                lines_0.cells[line * GeometryInfo<1>::faces_per_cell + j] =
+                lines_0.cells[line * ReferenceCell::max_n_faces<1>() + j] =
                   crs.col[i]; // set vertex indices
           }
 
@@ -3275,14 +3289,16 @@ namespace internal
             for (unsigned int q = 0, k = 0; q < n_quads; ++q)
               {
                 // set entity type of quads
-                faces.set_quad_type(q, connectivity.entity_types(2)[q]);
+                const auto reference_cell = connectivity.entity_types(2)[q];
+                faces.set_quad_type(q, reference_cell);
 
                 // loop over all its lines
                 for (unsigned int i = crs.ptr[q], j = 0; i < crs.ptr[q + 1];
                      ++i, ++j, ++k)
                   {
+                    AssertIndexRange(j, reference_cell.n_lines());
                     // set line index
-                    quads_0.cells[q * GeometryInfo<3>::lines_per_face + j] =
+                    quads_0.cells[q * ReferenceCell::max_n_lines<2>() + j] =
                       crs.col[i];
 
                     // set line orientations
@@ -3298,7 +3314,7 @@ namespace internal
                           ReferenceCell::reversed_combined_line_orientation(),
                       ExcInternalError());
                     faces.quads_line_orientations
-                      [q * GeometryInfo<3>::lines_per_face + j] =
+                      [q * ReferenceCell::max_n_lines<2>() + j] =
                       combined_orientation ==
                       ReferenceCell::default_combined_face_orientation();
                   }
@@ -3354,18 +3370,18 @@ namespace internal
                 {
                   // set neighbor if not at boundary
                   if (nei.col[i] != static_cast<unsigned int>(-1))
-                    level.neighbors[cell * GeometryInfo<dim>::faces_per_cell +
+                    level.neighbors[cell * ReferenceCell::max_n_faces<dim>() +
                                     j] = {0, nei.col[i]};
 
                   // set face indices
-                  cells_0.cells[cell * GeometryInfo<dim>::faces_per_cell + j] =
+                  cells_0.cells[cell * ReferenceCell::max_n_faces<dim>() + j] =
                     crs.col[i];
 
                   // set face orientation if needed
                   if (orientation_needed)
                     {
                       level.face_orientations.set_combined_orientation(
-                        cell * GeometryInfo<dim>::faces_per_cell + j,
+                        cell * ReferenceCell::max_n_faces<dim>() + j,
                         connectivity.entity_orientations(dim - 1)
                           .get_combined_orientation(i));
                     }
@@ -3570,15 +3586,13 @@ namespace internal
       {
         const unsigned int dim = faces.dim;
 
-        const unsigned int max_lines_per_face = 2 * structdim;
-
         if (dim == 3 && structdim == 2)
           {
             // quad entity types
             faces.quad_is_quadrilateral.assign(size, true);
 
             // quad line orientations
-            faces.quads_line_orientations.assign(size * max_lines_per_face,
+            faces.quads_line_orientations.assign(size * max_n_faces(structdim),
                                                  true);
           }
       }
@@ -3593,8 +3607,6 @@ namespace internal
       {
         const unsigned int dim = level.dim;
 
-        const unsigned int max_faces_per_cell = 2 * dim;
-
         level.active_cell_indices.assign(size, numbers::invalid_unsigned_int);
         level.subdomain_ids.assign(size, 0);
         level.level_subdomain_ids.assign(size, 0);
@@ -3608,12 +3620,12 @@ namespace internal
         if (dim == spacedim - 1)
           level.direction_flags.assign(size, true);
 
-        level.neighbors.assign(size * max_faces_per_cell, {-1, -1});
+        level.neighbors.assign(size * max_n_faces(dim), {-1, -1});
 
         level.reference_cell.assign(size, ReferenceCells::Invalid);
 
         if (orientation_needed)
-          level.face_orientations.reinit(size * max_faces_per_cell);
+          level.face_orientations.reinit(size * max_n_faces(dim));
 
 
         level.global_active_cell_indices.assign(size,
@@ -3630,7 +3642,6 @@ namespace internal
         const unsigned int structdim = obj.structdim;
 
         const unsigned int max_children_per_cell = 1 << structdim;
-        const unsigned int max_faces_per_cell    = 2 * structdim;
 
         obj.used.assign(size, true);
         obj.boundary_or_material_id.assign(
@@ -3646,7 +3657,7 @@ namespace internal
 
         obj.children.assign(max_children_per_cell / 2 * size, -1);
 
-        obj.cells.assign(max_faces_per_cell * size, -1);
+        obj.cells.assign(size * max_n_faces(structdim), -1);
 
         if (structdim <= 2)
           {
@@ -4990,7 +5001,6 @@ namespace internal
 
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + needed_cells,
-                          2,
                           spacedim);
 
             reserve_space(triangulation.levels[level + 1]->cells,
@@ -5420,7 +5430,6 @@ namespace internal
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + GeometryInfo<1>::max_children_per_cell *
                                          flagged_cells,
-                          1,
                           spacedim);
             // reserve space for 2*flagged_cells new lines on the next
             // higher level
@@ -5735,7 +5744,6 @@ namespace internal
             // needed_cells that will be created on that level
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + needed_cells,
-                          2,
                           spacedim);
 
             // reserve space for needed_cells new quads on the next
@@ -6032,13 +6040,11 @@ namespace internal
             if (triangulation.all_reference_cells_are_hyper_cube())
               reserve_space(*triangulation.levels[level + 1],
                             used_cells + new_cells,
-                            3,
                             spacedim,
                             false);
             else
               reserve_space(*triangulation.levels[level + 1],
                             used_cells + new_cells,
-                            3,
                             spacedim,
                             true);
 
@@ -7318,7 +7324,6 @@ namespace internal
             // 8*flagged_cells that will be created on that level
             reserve_space(*triangulation.levels[level + 1],
                           used_cells + new_cells,
-                          3,
                           spacedim);
             // reserve space for 8*flagged_cells new hexes on the next
             // higher level
@@ -15976,7 +15981,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 
                 const unsigned char combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
-                    cell->index() * GeometryInfo<3>::faces_per_cell + face);
+                    cell->index() * ReferenceCell::max_n_faces<dim>() + face);
                 std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,
