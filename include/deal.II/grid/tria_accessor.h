@@ -5395,6 +5395,7 @@ template <int structdim, int dim, int spacedim>
 inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::line_index(const unsigned int i) const
 {
+  (void)i;
   AssertIndexRange(i, this->n_lines());
   Assert(structdim != 1,
          ExcMessage("You can't ask for the index of a line bounding a "
