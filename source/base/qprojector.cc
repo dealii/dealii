@@ -1140,48 +1140,107 @@ Quadrature<2>
 QProjector<2>::project_to_all_subfaces(const ReferenceCell &reference_cell,
                                        const SubQuadrature &quadrature)
 {
-  if (reference_cell == ReferenceCells::Triangle ||
-      reference_cell == ReferenceCells::Tetrahedron)
-    return Quadrature<2>(); // nothing to do
-
-  Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
-
   const unsigned int dim = 2;
 
-  const unsigned int n_points = quadrature.size(),
-                     n_faces  = GeometryInfo<dim>::faces_per_cell,
-                     subfaces_per_face =
-                       GeometryInfo<dim>::max_children_per_face;
+  const unsigned int n_points          = quadrature.size(),
+                     n_faces           = reference_cell.n_faces(),
+                     subfaces_per_face = reference_cell.face_reference_cell(0)
+                                           .n_isotropic_children();
 
-  // first fix quadrature points
-  std::vector<Point<dim>> q_points;
-  q_points.reserve(n_points * n_faces * subfaces_per_face);
-  std::vector<Point<dim>> help(n_points);
+  if (reference_cell == ReferenceCells::Quadrilateral)
+    {
+      // first fix quadrature points
+      std::vector<Point<dim>> q_points;
+      q_points.reserve(n_points * n_faces * subfaces_per_face);
+      std::vector<Point<dim>> help(n_points);
 
-  // project to each face and copy
-  // results
-  for (unsigned int face = 0; face < n_faces; ++face)
-    for (unsigned int subface = 0; subface < subfaces_per_face; ++subface)
-      {
-        project_to_subface(reference_cell, quadrature, face, subface, help);
-        std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-      }
+      // project to each face and copy
+      // results
+      for (unsigned int face = 0; face < n_faces; ++face)
+        for (unsigned int subface = 0; subface < subfaces_per_face; ++subface)
+          {
+            project_to_subface(reference_cell, quadrature, face, subface, help);
+            std::copy(help.begin(), help.end(), std::back_inserter(q_points));
+          }
 
-  // next copy over weights
-  std::vector<double> weights;
-  weights.reserve(n_points * n_faces * subfaces_per_face);
-  for (unsigned int face = 0; face < n_faces; ++face)
-    for (unsigned int subface = 0; subface < subfaces_per_face; ++subface)
-      std::copy(quadrature.get_weights().begin(),
-                quadrature.get_weights().end(),
-                std::back_inserter(weights));
+      // next copy over weights
+      std::vector<double> weights;
+      weights.reserve(n_points * n_faces * subfaces_per_face);
+      for (unsigned int face = 0; face < n_faces; ++face)
+        for (unsigned int subface = 0; subface < subfaces_per_face; ++subface)
+          std::copy(quadrature.get_weights().begin(),
+                    quadrature.get_weights().end(),
+                    std::back_inserter(weights));
 
-  Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
+      Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
+             ExcInternalError());
+      Assert(weights.size() == n_points * n_faces * subfaces_per_face,
+             ExcInternalError());
 
-  return Quadrature<dim>(std::move(q_points), std::move(weights));
+      return Quadrature<dim>(std::move(q_points), std::move(weights));
+    }
+  else if (reference_cell == ReferenceCells::Triangle)
+    {
+      // new (projected) quadrature points and weights
+      std::vector<Point<2>> q_points;
+      q_points.reserve(2 * n_points * n_faces * subfaces_per_face);
+      std::vector<double> weights;
+      weights.reserve(2 * n_points * n_faces * subfaces_per_face);
+
+      // loop over all faces ...
+      for (unsigned int face = 0; face < n_faces; ++face)
+        // ... and over all possible orientations ...
+        for (unsigned int orientation = 0; orientation < 2; ++orientation)
+          // ... and over all subfaces
+          for (unsigned int subface = 0; subface < subfaces_per_face; ++subface)
+            {
+              // handle the points
+              std::vector<Point<dim>> points(n_points);
+
+              // orientation 1 is the standard orientation
+              // so invert lines for orientation 0
+              const unsigned int local_subface =
+                orientation == 0 ? subfaces_per_face - 1 - subface : subface;
+
+              project_to_subface(
+                reference_cell, quadrature, face, local_subface, points);
+
+              if (orientation == 0)
+                std::reverse(points.begin(), points.end());
+
+              std::copy(points.begin(),
+                        points.end(),
+                        std::back_inserter(q_points));
+
+
+              // handle the weights
+              std::vector<double> scaled_weights = quadrature.get_weights();
+
+              // face 1 is given by (1,0) (0,1) so scale the weights by the
+              // length
+              if (face == 1)
+                for (auto &w : scaled_weights)
+                  w *= std::sqrt(2);
+
+              if (orientation == 0)
+                std::reverse(scaled_weights.begin(), scaled_weights.end());
+
+              std::copy(scaled_weights.begin(),
+                        scaled_weights.end(),
+                        std::back_inserter(weights));
+            }
+
+      Assert(q_points.size() == 2 * n_points * n_faces * subfaces_per_face,
+             ExcInternalError());
+      Assert(weights.size() == 2 * n_points * n_faces * subfaces_per_face,
+             ExcInternalError());
+
+      // construct new quadrature rule
+      return Quadrature<2>(std::move(q_points), std::move(weights));
+    }
+  else
+    DEAL_II_ASSERT_UNREACHABLE();
+  return Quadrature<2>();
 }
 
 
@@ -1191,10 +1250,6 @@ Quadrature<3>
 QProjector<3>::project_to_all_subfaces(const ReferenceCell &reference_cell,
                                        const SubQuadrature &quadrature)
 {
-  if (reference_cell == ReferenceCells::Triangle ||
-      reference_cell == ReferenceCells::Tetrahedron)
-    return Quadrature<3>(); // nothing to do
-
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
   const unsigned int dim = 3;
@@ -1590,19 +1645,37 @@ QProjector<2>::DataSetDescriptor::subface(
   const ReferenceCell &reference_cell,
   const unsigned int   face_no,
   const unsigned int   subface_no,
-  const unsigned char /*combined_orientation*/,
-  const unsigned int n_quadrature_points,
+  const unsigned char  combined_orientation,
+  const unsigned int   n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
-  Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
-  (void)reference_cell;
-
-  Assert(face_no < GeometryInfo<2>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<2>::max_children_per_face,
+  Assert(face_no < reference_cell.n_faces(), ExcInternalError());
+  Assert(subface_no <
+           reference_cell.face_reference_cell(0).n_isotropic_children(),
          ExcInternalError());
 
-  return ((face_no * GeometryInfo<2>::max_children_per_face + subface_no) *
-          n_quadrature_points);
+  if (reference_cell == ReferenceCells::Quadrilateral)
+    return (
+      (face_no * reference_cell.face_reference_cell(0).n_isotropic_children() +
+       subface_no) *
+      n_quadrature_points);
+
+  else if (reference_cell == ReferenceCells::Triangle)
+    {
+      const unsigned int orientation_offset =
+        combined_orientation ==
+            ReferenceCell::default_combined_face_orientation() ?
+          1 :
+          0;
+      const unsigned int n_subfaces =
+        reference_cell.face_reference_cell(0).n_isotropic_children();
+      return (2 * face_no * n_subfaces + n_subfaces * orientation_offset +
+              subface_no) *
+             n_quadrature_points;
+    }
+  else
+    DEAL_II_ASSERT_UNREACHABLE();
+  return 0;
 }
 
 
