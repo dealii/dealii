@@ -400,6 +400,7 @@ namespace Differentiation
         directional_derivative(const Sacado::Fad::DFad<NumberType> &x,
                                const unsigned int                   direction)
         {
+          AssertIndexRange(direction, n_directional_derivatives(x));
           if (x.hasFastAccess())
             return x.fastAccessDx(direction);
           else
