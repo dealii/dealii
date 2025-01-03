@@ -686,6 +686,12 @@
  *       <td> Evaluation of finite element solutions at arbitrary points within a distributed
  *       mesh with application to two-phase flow.
  *       <br/> Keywords: Utilities::MPI::RemotePointEvaluation, VectorTools::point_values()
+ *      </td></tr>
+ *
+ *    <tr valign="top">
+ *       <td>step-88</td>
+ *       <td> A multigrid-implementation with non-matching levels.
+ *       <br/> Keywords: MGTwoLevelTransferNonNested, MGTransferMF, Multigrid
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -1049,6 +1055,7 @@
  *       step-70,
  *       step-85,
  *       step-87,
+ *       step-88,
  *       step-89
  *     </td>
  *   </tr>
