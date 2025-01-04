@@ -221,7 +221,7 @@ namespace NonMatching
            ExcNotImplemented());
 
     const bool tria_is_parallel =
-      (dynamic_cast<const parallel::TriangulationBase<dim1, spacedim> *>(
+      (dynamic_cast<const parallel::TriangulationBase<dim0, spacedim> *>(
          &space_dh.get_triangulation()) != nullptr);
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
@@ -411,7 +411,7 @@ namespace NonMatching
            ExcNotImplemented());
 
     const bool tria_is_parallel =
-      (dynamic_cast<const parallel::TriangulationBase<dim1, spacedim> *>(
+      (dynamic_cast<const parallel::TriangulationBase<dim0, spacedim> *>(
          &space_dh.get_triangulation()) != nullptr);
 
     const auto &space_fe    = space_dh.get_fe();
