@@ -61,7 +61,10 @@ test()
                 << (c->face_flip(f) ? "/true" : "/false") << std::endl;
       for (unsigned int e = 0; e < GeometryInfo<3>::lines_per_cell; ++e)
         deallog << "    edge=" << e
-                << (c->line_orientation(e) ? " -> true" : " -> false")
+                << (c->line_orientation(e) ==
+                        ReferenceCell::default_combined_face_orientation() ?
+                      " -> true" :
+                      " -> false")
                 << std::endl;
     }
 }

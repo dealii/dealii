@@ -147,7 +147,8 @@ namespace internal
         const unsigned int dim = 2;
         // TODO: This fixes only lowest order
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
+          if ((cell->line_orientation(l) ==
+               ReferenceCell::reversed_combined_line_orientation()) &&
               mapping_kind[0] == mapping_nedelec)
             line_dof_sign[l] = -1.0;
       }
@@ -165,7 +166,8 @@ namespace internal
         // TODO: This is probably only going to work for those elements for
         // which all dofs are face dofs
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
+          if ((cell->line_orientation(l) ==
+               ReferenceCell::reversed_combined_line_orientation()) &&
               mapping_kind[0] == mapping_nedelec)
             line_dof_sign[l] = -1.0;
       }

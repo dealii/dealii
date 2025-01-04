@@ -1122,14 +1122,14 @@ namespace VectorTools
             GeometryInfo<dim>::vertices_per_face * fe.n_dofs_per_vertex() +
             line * fe.n_dofs_per_line() + line_dof_idx;
 
-          // Note, assuming that the edge orientations are "standard"
-          //       i.e. cell->line_orientation(line) = true.
-          Assert(cell->line_orientation(line),
+          // Note, assuming that the edge orientations are "standard", i.e.,
+          //       cell->line_orientation(line) =
+          //       ReferenceCell::default_combined_face_orientation()
+          Assert(cell->line_orientation(line) ==
+                   ReferenceCell::default_combined_face_orientation(),
                  ExcMessage("Edge orientation does not meet expectation."));
           // Next, translate from face to cell. Note, this might be assuming
-          // that the edge orientations are "standard" (not sure any more at
-          // this time), i.e.
-          //       cell->line_orientation(line) = true.
+          // that the edge orientations are "standard"
           const unsigned int cell_dof_idx =
             fe.face_to_cell_index(face_dof_idx, face);
 
@@ -1558,9 +1558,7 @@ namespace VectorTools
                         line * fe.n_dofs_per_line() + line_dof_idx;
 
                       // Next, translate from face to cell. Note, this might be
-                      // assuming that the edge orientations are "standard" (not
-                      // sure any more at this time), i.e.
-                      //       cell->line_orientation(line) = true.
+                      // assuming that the edge orientations are "standard"
                       const unsigned int cell_dof_idx =
                         fe.face_to_cell_index(face_dof_idx, face);
 

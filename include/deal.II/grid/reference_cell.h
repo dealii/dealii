@@ -439,10 +439,6 @@ public:
    * lines only have two possible orientations, this function and
    * ReferenceCell::default_combined_face_orientation() encode all of its
    * possible orientation states.
-   *
-   * @note Line orientations are typically stored as booleans, but to better
-   * enable dimension-independent programming relevant functions typically
-   * present these values as the standard orientation type.
    */
   static constexpr types::geometric_orientation
   reversed_combined_line_orientation();
@@ -594,21 +590,16 @@ public:
     const types::geometric_orientation face_orientation) const;
 
   /**
-   * Return whether the line with index @p line is oriented in
-   * standard direction within a cell, given the @p face_orientation of
-   * the face within the current cell, and @p line_orientation flag
-   * for the line within that face. @p true indicates that the line is
-   * oriented from vertex 0 to vertex 1, whereas it is the other way
-   * around otherwise. In 1d and 2d, this is always @p true, but in 3d
-   * it may be different, see the respective discussion in the
-   * documentation of the GeometryInfo class.
+   * Return whether the line with index @p line is oriented in standard
+   * direction within a cell, given the @p face_orientation of the face within
+   * the current cell, and @p line_orientation for the line within that face.
    */
-  bool
+  types::geometric_orientation
   standard_vs_true_line_orientation(
     const unsigned int                 line,
     const unsigned int                 face,
     const types::geometric_orientation face_orientation,
-    const bool                         line_orientation) const;
+    const types::geometric_orientation line_orientation) const;
 
   /**
    * @}
@@ -3227,21 +3218,26 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
 
 
 
-inline bool
+inline types::geometric_orientation
 ReferenceCell::standard_vs_true_line_orientation(
   const unsigned int                 line,
   const unsigned int                 face,
   const types::geometric_orientation combined_face_orientation,
-  const bool                         line_orientation) const
+  const types::geometric_orientation line_orientation) const
 {
+  constexpr auto D = ReferenceCell::default_combined_face_orientation();
+  constexpr auto R = ReferenceCell::reversed_combined_line_orientation();
   if (*this == ReferenceCells::Hexahedron)
     {
-      static constexpr dealii::ndarray<bool, 2, 8> bool_table{
-        {{{true, true, false, true, false, false, true, false}},
-         {{true, true, true, false, false, false, false, true}}}};
+      static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
+        table{{{{D, D, R, D, R, R, D, R}}, {{D, D, D, R, R, R, R, D}}}};
+      // We use line / 2 here since lines i and i + 1 are parallel and, on a
+      // given face, have the same relative orientations.
+      const bool match =
+        line_orientation == table[line / 2][combined_face_orientation];
 
-      return (line_orientation ==
-              bool_table[line / 2][combined_face_orientation]);
+      return match ? ReferenceCell::default_combined_face_orientation() :
+                     ReferenceCell::reversed_combined_line_orientation();
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -3256,17 +3252,19 @@ ReferenceCell::standard_vs_true_line_orientation(
                "This function can only be called for following face-line "
                "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1),"));
 
-      static constexpr dealii::ndarray<bool, 2, 6> bool_table{
-        {{{false, true, false, true, false, true}},
-         {{true, false, true, false, true, false}}}};
+      static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
+        table{{{{R, D, R, D, R, D}}, {{D, R, D, R, D, R}}}};
 
-      return (line_orientation ==
-              bool_table[combined_line][combined_face_orientation]);
+      const bool match =
+        line_orientation == table[combined_line][combined_face_orientation];
+
+      return match ? ReferenceCell::default_combined_face_orientation() :
+                     ReferenceCell::reversed_combined_line_orientation();
     }
   else
     // TODO: This might actually be wrong for some of the other
     // kinds of objects. We should check this
-    return true;
+    return ReferenceCell::default_combined_face_orientation();
 }
 
 

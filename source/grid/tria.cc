@@ -3314,6 +3314,9 @@ namespace internal
                         combined_orientation ==
                           ReferenceCell::reversed_combined_line_orientation(),
                       ExcInternalError());
+                    // Same convention as TriaAccessor::set_line_orientation():
+                    // store true for the default orientation and false for
+                    // reversed.
                     faces.quads_line_orientations
                       [q * ReferenceCells::max_n_lines<2>() + j] =
                       combined_orientation ==
@@ -4304,11 +4307,12 @@ namespace internal
                                   switch_1->line_index(2)),
                                 static_cast<signed int>(
                                   switch_1->line_index(3))};
-                              const bool switch_1_line_orientations[4] = {
-                                switch_1->line_orientation(0),
-                                switch_1->line_orientation(1),
-                                switch_1->line_orientation(2),
-                                switch_1->line_orientation(3)};
+                              const types::geometric_orientation
+                                switch_1_line_orientations[4] = {
+                                  switch_1->line_orientation(0),
+                                  switch_1->line_orientation(1),
+                                  switch_1->line_orientation(2),
+                                  switch_1->line_orientation(3)};
                               const types::boundary_id switch_1_boundary_id =
                                 switch_1->boundary_id();
                               const unsigned int switch_1_user_index =
@@ -6449,11 +6453,7 @@ namespace internal
                             s.insert(i);
 #endif
 
-                          new_quad->set_line_orientation(
-                            f,
-                            orientation ==
-                              ReferenceCell::
-                                default_combined_face_orientation());
+                          new_quad->set_line_orientation(f, orientation);
                         }
 #ifdef DEBUG
                       AssertDimension(s.size(), 3);
@@ -6567,7 +6567,8 @@ namespace internal
                       numbers::internal_face_boundary_id);
                     new_quad->set_manifold_id(hex->manifold_id());
                     for (const auto j : new_quads[i]->line_indices())
-                      new_quad->set_line_orientation(j, true);
+                      new_quad->set_line_orientation(
+                        j, ReferenceCell::default_combined_face_orientation());
                   }
 
                 // we always get 8 children per refined cell
@@ -6912,11 +6913,7 @@ namespace internal
                                 make_array_view(vertices_0),
                                 make_array_view(vertices_1));
 
-                            new_quad->set_line_orientation(
-                              l,
-                              orientation ==
-                                ReferenceCell::
-                                  default_combined_face_orientation());
+                            new_quad->set_line_orientation(l, orientation);
 
                             // on a hex, inject the status of the current line
                             // also to the line on the other quad along the
@@ -6925,11 +6922,7 @@ namespace internal
                                 ReferenceCells::Hexahedron)
                               new_quads[representative_lines[q % 4][1] + q -
                                         (q % 4)]
-                                ->set_line_orientation(
-                                  l,
-                                  orientation ==
-                                    ReferenceCell::
-                                      default_combined_face_orientation());
+                                ->set_line_orientation(l, orientation);
                           }
                       }
                   }
@@ -7726,7 +7719,9 @@ namespace internal
                         for (unsigned int j = 0;
                              j < GeometryInfo<dim>::lines_per_face;
                              ++j)
-                          new_quad->set_line_orientation(j, true);
+                          new_quad->set_line_orientation(
+                            j,
+                            ReferenceCell::default_combined_face_orientation());
                       }
                     // now set the line orientation of children of
                     // outer lines correctly, the lines in the
@@ -7949,11 +7944,12 @@ namespace internal
                               switch_1->line_index(1),
                               switch_1->line_index(2),
                               switch_1->line_index(3)};
-                            const bool switch_1_line_orientations[4] = {
-                              switch_1->line_orientation(0),
-                              switch_1->line_orientation(1),
-                              switch_1->line_orientation(2),
-                              switch_1->line_orientation(3)};
+                            const types::geometric_orientation
+                              switch_1_line_orientations[4] = {
+                                switch_1->line_orientation(0),
+                                switch_1->line_orientation(1),
+                                switch_1->line_orientation(2),
+                                switch_1->line_orientation(3)};
                             const types::boundary_id switch_1_boundary_id =
                               switch_1->boundary_id();
                             const unsigned int switch_1_user_index =
@@ -8399,7 +8395,9 @@ namespace internal
                         for (unsigned int j = 0;
                              j < GeometryInfo<dim>::lines_per_face;
                              ++j)
-                          new_quad->set_line_orientation(j, true);
+                          new_quad->set_line_orientation(
+                            j,
+                            ReferenceCell::default_combined_face_orientation());
                       }
                     // now set the line orientation of children of
                     // outer lines correctly, the lines in the
@@ -8550,7 +8548,9 @@ namespace internal
                       for (unsigned int j = 0;
                            j < GeometryInfo<dim>::lines_per_face;
                            ++j)
-                        new_quads[i]->set_line_orientation(j, true);
+                        new_quads[i]->set_line_orientation(
+                          j,
+                          ReferenceCell::default_combined_face_orientation());
                     }
 
                   types::subdomain_id subdomainid = hex->subdomain_id();
@@ -8769,7 +8769,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[4];
+                          types::geometric_orientation line_orientation[4]{};
 
                           // the middle vertex marked as m0 above is the
                           // start vertex for lines 0 and 2 in standard
@@ -8782,15 +8782,16 @@ namespace internal
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(i % 2) ==
                                 middle_vertices[i % 2])
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
-                                // it must be the other
-                                // way round then
+                                // it must be the other way round then
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
 
                           // set up the new quad, line numbering is as
@@ -8996,7 +8997,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[4];
+                          types::geometric_orientation line_orientation[4]{};
 
                           // the middle vertex marked as m0 above is the
                           // start vertex for lines 0 and 2 in standard
@@ -9009,14 +9010,16 @@ namespace internal
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(i % 2) ==
                                 middle_vertices[i % 2])
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
 
                           // set up the new quad, line numbering is as
@@ -9224,7 +9227,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[4];
+                          types::geometric_orientation line_orientation[4]{};
 
                           // the middle vertex marked as m0 above is the
                           // start vertex for lines 0 and 2 in standard
@@ -9237,14 +9240,16 @@ namespace internal
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(i % 2) ==
                                 middle_vertices[i % 2])
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
 
                           // set up the new quad, line numbering is as
@@ -9537,7 +9542,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[13];
+                          types::geometric_orientation line_orientation[13]{};
 
                           // the middle vertices of the lines of our
                           // bottom face
@@ -9553,14 +9558,16 @@ namespace internal
                           // face
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(0) == middle_vertices[i])
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -9573,21 +9580,23 @@ namespace internal
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 middle_vertex_index<dim, spacedim>(
                                   hex->face(3 + i / 4)))
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
-                                // it must be the other way
-                                // round then
+                                // it must be the other way round then
                                 Assert(lines[i]->vertex_index(i % 2) ==
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(3 + i / 4))),
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
                           // for the last line the line orientation is
                           // always true, since it was just constructed
                           // that way
-                          line_orientation[12] = true;
+                          line_orientation[12] =
+                            ReferenceCell::default_combined_face_orientation();
 
                           // set up the 4 quads, numbered as follows (left
                           // quad numbering, right line numbering
@@ -9971,7 +9980,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[13];
+                          types::geometric_orientation line_orientation[13]{};
 
                           // the middle vertices of the
                           // lines of our front face
@@ -9986,14 +9995,16 @@ namespace internal
                           // line is 'true', if vertex 0 is on the front
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(0) == middle_vertices[i])
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -10006,7 +10017,8 @@ namespace internal
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 middle_vertex_index<dim, spacedim>(
                                   hex->face(1 + i / 4)))
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
                                 // it must be the other way
@@ -10015,12 +10027,14 @@ namespace internal
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(1 + i / 4))),
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
                           // for the last line the line orientation is
                           // always true, since it was just constructed
                           // that way
-                          line_orientation[12] = true;
+                          line_orientation[12] =
+                            ReferenceCell::default_combined_face_orientation();
 
                           // set up the 4 quads, numbered as follows (left
                           // quad numbering, right line numbering
@@ -10419,7 +10433,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[13];
+                          types::geometric_orientation line_orientation[13]{};
 
                           // the middle vertices of the lines of our front
                           // face
@@ -10434,14 +10448,16 @@ namespace internal
                           // line is 'true', if vertex 0 is on the front
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(0) == middle_vertices[i])
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -10454,21 +10470,22 @@ namespace internal
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 middle_vertex_index<dim, spacedim>(
                                   hex->face(i / 4 - 1)))
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
-                                // it must be the other way
-                                // round then
+                                // it must be the other way round then
                                 Assert(lines[i]->vertex_index(i % 2) ==
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(i / 4 - 1))),
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
-                          // for the last line the line orientation is
-                          // always true, since it was just constructed
-                          // that way
-                          line_orientation[12] = true;
+                          // for the last line the line orientation is always
+                          // the default, since it was just constructed that way
+                          line_orientation[12] =
+                            ReferenceCell::default_combined_face_orientation();
 
                           // set up the 4 quads, numbered as follows (left
                           // quad numbering, right line numbering
@@ -11009,7 +11026,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[30];
+                          types::geometric_orientation line_orientation[30]{};
 
                           // note: for the first 24 lines (inner lines of
                           // the outer quads) the following holds: the
@@ -11020,7 +11037,8 @@ namespace internal
                           for (unsigned int i = 0; i < 24; ++i)
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 vertex_indices[i / 4])
-                              line_orientation[i] = true;
+                              line_orientation[i] = ReferenceCell::
+                                default_combined_face_orientation();
                             else
                               {
                                 // it must be the other way
@@ -11028,13 +11046,15 @@ namespace internal
                                 Assert(lines[i]->vertex_index(i % 2) ==
                                          vertex_indices[i / 4],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] = ReferenceCell::
+                                  reversed_combined_line_orientation();
                               }
                           // for the last 6 lines the line orientation is
                           // always true, since they were just constructed
                           // that way
                           for (unsigned int i = 24; i < 30; ++i)
-                            line_orientation[i] = true;
+                            line_orientation[i] = ReferenceCell::
+                              default_combined_face_orientation();
 
                           // set up the 12 quads, numbered as follows
                           // (left quad numbering, right line numbering
@@ -15971,10 +15991,10 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
           if (ref_cell == ReferenceCells::Hexahedron)
             for (unsigned int face = 4; face < 6; ++face)
               {
-                const auto                face_iter = cell->face(face);
-                const std::array<bool, 2> line_orientations{
-                  {face_iter->line_orientation(0),
-                   face_iter->line_orientation(1)}};
+                const auto face_iter = cell->face(face);
+                const std::array<types::geometric_orientation, 2>
+                  line_orientations{{face_iter->line_orientation(0),
+                                     face_iter->line_orientation(1)}};
                 std::array<unsigned int, 4> raw_vertex_indices{
                   {face_iter->line(0)->vertex_index(1 - line_orientations[0]),
                    face_iter->line(1)->vertex_index(1 - line_orientations[1]),
@@ -16003,8 +16023,9 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
               }
           else if (ref_cell == ReferenceCells::Quadrilateral)
             {
-              const std::array<bool, 2> line_orientations{
-                {cell->line_orientation(0), cell->line_orientation(1)}};
+              const std::array<types::geometric_orientation, 2>
+                line_orientations{
+                  {cell->line_orientation(0), cell->line_orientation(1)}};
               std::array<unsigned int, 4> raw_vertex_indices{
                 {cell->line(0)->vertex_index(1 - line_orientations[0]),
                  cell->line(1)->vertex_index(1 - line_orientations[1]),
