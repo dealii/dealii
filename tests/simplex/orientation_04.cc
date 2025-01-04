@@ -161,7 +161,8 @@ test()
               p1.first  = cell->line(l)->vertex_index(0);
               p1.second = cell->line(l)->vertex_index(1);
 
-              if (orientation_exp == false)
+              if (orientation_exp ==
+                  ReferenceCell::reversed_combined_line_orientation())
                 std::swap(p1.first, p1.second);
 
               success &= (p0 == p1);
