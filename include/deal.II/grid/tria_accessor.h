@@ -7694,9 +7694,7 @@ CellAccessor<dim, spacedim>::face_index(const unsigned int i) const
   switch (dim)
     {
       case 1:
-        {
-          return this->vertex_index(i);
-        }
+        return this->vertex_index(i);
 
       case 2:
         return this->line_index(i);
