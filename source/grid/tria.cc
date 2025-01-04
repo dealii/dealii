@@ -1829,6 +1829,25 @@ namespace
       }
   }
 
+  // Given the child number and parent's line orientation, return the child face
+  // number.
+  unsigned int
+  child_line_index(const unsigned int                 child_no,
+                   const types::geometric_orientation line_orientation)
+  {
+    AssertIndexRange(child_no, ReferenceCells::Line.template n_children<1>());
+    Assert(line_orientation ==
+               ReferenceCell::default_combined_face_orientation() ||
+             line_orientation ==
+               ReferenceCell::reversed_combined_line_orientation(),
+           ExcInternalError());
+    constexpr auto D = ReferenceCell::default_combined_face_orientation();
+    if (child_no == 0)
+      return line_orientation == D ? 0 : 1;
+    else
+      return line_orientation == D ? 1 : 0;
+  }
+
   // Several parts of Triangulation (e.g., TriaLevel) are not templated on the
   // dimension and thus require de-templated versions of some ReferenceCell
   // functions.
@@ -6301,16 +6320,8 @@ namespace internal
               unsigned int                      n_lines = 0;
               for (unsigned int l = 0; l < quad->n_lines(); ++l)
                 for (unsigned int c = 0; c < 2; ++c)
-                  {
-                    static constexpr dealii::ndarray<unsigned int, 2, 2> index =
-                      {{// child 0, line_orientation=false and true
-                        {{1, 0}},
-                        // child 1, line_orientation=false and true
-                        {{0, 1}}}};
-
-                    lines[n_lines++] =
-                      quad->line(l)->child(index[c][quad->line_orientation(l)]);
-                  }
+                  lines[n_lines++] = quad->line(l)->child(
+                    child_line_index(c, quad->line_orientation(l)));
 
               for (unsigned int l = 0; l < quad->n_lines(); ++l)
                 lines[n_lines++] = new_lines[l];
@@ -7637,16 +7648,6 @@ namespace internal
                     new_line->set_boundary_id_internal(quad->boundary_id());
                     new_line->set_manifold_id(quad->manifold_id());
 
-                    // child 0 and 1 of a line are switched if the
-                    // line orientation is false. set up a miniature
-                    // table, indicating which child to take for line
-                    // orientations false and true. first index: child
-                    // index in standard orientation, second index:
-                    // line orientation
-                    const unsigned int index[2][2] = {
-                      {1, 0},  // child 0, line_orientation=false and true
-                      {0, 1}}; // child 1, line_orientation=false and true
-
                     // find some space (consecutive) for the two newly
                     // to be created quads.
                     typename Triangulation<dim, spacedim>::raw_quad_iterator
@@ -7668,38 +7669,46 @@ namespace internal
                           {static_cast<int>(quad->line_index(0)),
                            new_line->index(),
                            quad->line(2)
-                             ->child(index[0][quad->line_orientation(2)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(2)))
                              ->index(),
                            quad->line(3)
-                             ->child(index[0][quad->line_orientation(3)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(3)))
                              ->index()});
                         new_quads[1]->set_bounding_object_indices(
                           {new_line->index(),
                            static_cast<int>(quad->line_index(1)),
                            quad->line(2)
-                             ->child(index[1][quad->line_orientation(2)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(2)))
                              ->index(),
                            quad->line(3)
-                             ->child(index[1][quad->line_orientation(3)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(3)))
                              ->index()});
                       }
                     else
                       {
                         new_quads[0]->set_bounding_object_indices(
                           {quad->line(0)
-                             ->child(index[0][quad->line_orientation(0)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(0)))
                              ->index(),
                            quad->line(1)
-                             ->child(index[0][quad->line_orientation(1)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(1)))
                              ->index(),
                            static_cast<int>(quad->line_index(2)),
                            new_line->index()});
                         new_quads[1]->set_bounding_object_indices(
                           {quad->line(0)
-                             ->child(index[1][quad->line_orientation(0)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(0)))
                              ->index(),
                            quad->line(1)
-                             ->child(index[1][quad->line_orientation(1)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(1)))
                              ->index(),
                            new_line->index(),
                            static_cast<int>(quad->line_index(3))});
@@ -8289,40 +8298,30 @@ namespace internal
                     //   0   8   2
                     //   .-4-.-5-.
 
-                    // child 0 and 1 of a line are switched if the
-                    // line orientation is false. set up a miniature
-                    // table, indicating which child to take for line
-                    // orientations false and true. first index: child
-                    // index in standard orientation, second index:
-                    // line orientation
-                    const unsigned int index[2][2] = {
-                      {1, 0},  // child 0, line_orientation=false and true
-                      {0, 1}}; // child 1, line_orientation=false and true
-
                     const int line_indices[12] = {
                       quad->line(0)
-                        ->child(index[0][quad->line_orientation(0)])
+                        ->child(child_line_index(0, quad->line_orientation(0)))
                         ->index(),
                       quad->line(0)
-                        ->child(index[1][quad->line_orientation(0)])
+                        ->child(child_line_index(1, quad->line_orientation(0)))
                         ->index(),
                       quad->line(1)
-                        ->child(index[0][quad->line_orientation(1)])
+                        ->child(child_line_index(0, quad->line_orientation(1)))
                         ->index(),
                       quad->line(1)
-                        ->child(index[1][quad->line_orientation(1)])
+                        ->child(child_line_index(1, quad->line_orientation(1)))
                         ->index(),
                       quad->line(2)
-                        ->child(index[0][quad->line_orientation(2)])
+                        ->child(child_line_index(0, quad->line_orientation(2)))
                         ->index(),
                       quad->line(2)
-                        ->child(index[1][quad->line_orientation(2)])
+                        ->child(child_line_index(1, quad->line_orientation(2)))
                         ->index(),
                       quad->line(3)
-                        ->child(index[0][quad->line_orientation(3)])
+                        ->child(child_line_index(0, quad->line_orientation(3)))
                         ->index(),
                       quad->line(3)
-                        ->child(index[1][quad->line_orientation(3)])
+                        ->child(child_line_index(1, quad->line_orientation(3)))
                         ->index(),
                       new_lines[0]->index(),
                       new_lines[1]->index(),
