@@ -16011,10 +16011,28 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
               for (unsigned int i = 0; i < 4; ++i)
                 cache[my_index + i] = raw_vertex_indices[i];
             }
+          else if (ref_cell == ReferenceCells::Line)
+            {
+              cache[my_index + 0] = cell->vertex_index(0);
+              cache[my_index + 1] = cell->vertex_index(1);
+            }
           else
-            for (const unsigned int i : cell->vertex_indices())
-              cache[my_index + i] = internal::TriaAccessorImplementation::
-                Implementation::vertex_index(*cell, i);
+            {
+              Assert(dim == 2 || dim == 3, ExcInternalError());
+              for (const unsigned int i : cell->vertex_indices())
+                {
+                  const auto [face_index, vertex_index] =
+                    ref_cell.standard_vertex_to_face_and_vertex_index(i);
+                  const auto vertex_within_face_index =
+                    ref_cell.standard_to_real_face_vertex(
+                      vertex_index,
+                      face_index,
+                      cell->combined_face_orientation(face_index));
+                  cache[my_index + i] =
+                    cell->face(face_index)
+                      ->vertex_index(vertex_within_face_index);
+                }
+            }
         }
     }
 }
