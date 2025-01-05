@@ -49,13 +49,23 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
 
 template <int dim, typename VectorType, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCell::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
-    vertices(GeometryInfo<dim>::vertices_per_cell);
+#ifndef _MSC_VER
+                                 ReferenceCell::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
+    vertices(cell->n_vertices());
   // The assertions can not be in the constructor, since this would
   // require to call dof_handler.distribute_dofs(fe) *before* the mapping
   // object is constructed, which is not necessarily what we want.

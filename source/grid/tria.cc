@@ -3498,7 +3498,7 @@ namespace internal
         [[maybe_unused]] unsigned int counter = 0;
 
         std::vector<unsigned int> key;
-        key.reserve(GeometryInfo<structdim>::vertices_per_cell);
+        key.reserve(ReferenceCell::max_n_vertices<structdim>());
 
         for (unsigned int o = 0; o < obj.n_objects(); ++o)
           {
@@ -15953,14 +15953,15 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 {
   for (unsigned int l = 0; l < levels.size(); ++l)
     {
-      constexpr unsigned int     max_vertices_per_cell = 1 << dim;
       std::vector<unsigned int> &cache = levels[l]->cell_vertex_indices_cache;
       cache.clear();
-      cache.resize(levels[l]->refine_flags.size() * max_vertices_per_cell,
+      cache.resize(levels[l]->refine_flags.size() *
+                     ReferenceCell::max_n_vertices<dim>(),
                    numbers::invalid_unsigned_int);
       for (const auto &cell : cell_iterators_on_level(l))
         {
-          const unsigned int my_index = cell->index() * max_vertices_per_cell;
+          const unsigned int my_index =
+            cell->index() * ReferenceCell::max_n_vertices<dim>();
 
           // to reduce the cost of this function when passing down into quads,
           // then lines, then vertices, we use a more low-level access method

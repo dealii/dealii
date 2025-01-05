@@ -728,7 +728,12 @@ MappingQCache<dim, spacedim>::compute_mapping_support_points(
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCell::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingQCache<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -742,8 +747,12 @@ MappingQCache<dim, spacedim>::get_vertices(
   AssertIndexRange(cell->index(), (*support_point_cache)[cell->level()].size());
   const auto ptr = (*support_point_cache)[cell->level()][cell->index()].begin();
   return boost::container::small_vector<Point<spacedim>,
-                                        GeometryInfo<dim>::vertices_per_cell>(
-    ptr, ptr + cell->n_vertices());
+#ifndef _MSC_VER
+                                        ReferenceCell::max_n_vertices<dim>()
+#else
+                                        GeometryInfo<dim>::vertices_per_cell
+#endif
+                                        >(ptr, ptr + cell->n_vertices());
 }
 
 

@@ -642,7 +642,12 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
   AssertDimension(real_points.size(), unit_points.size());
   std::vector<Point<spacedim>> support_points_higher_order;
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                 ReferenceCell::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
     vertices;
   if (polynomial_degree == 1)
     vertices = this->get_vertices(cell);
