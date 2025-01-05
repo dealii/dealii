@@ -34,12 +34,22 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                               ReferenceCell::max_n_vertices<dim>()
+#  else
+                               GeometryInfo<dim>::vertices_per_cell
+#  endif
+                               >
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                                 ReferenceCell::max_n_vertices<dim>()
+#  else
+                                 GeometryInfo<dim>::vertices_per_cell
+#  endif
+                                 >
     vertices;
   for (const unsigned int i : cell->vertex_indices())
     vertices.push_back(cell->vertex(i));
@@ -51,13 +61,23 @@ Mapping<dim, spacedim>::get_vertices(
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_face>
+#  ifndef _MSC_VER
+                               ReferenceCell::max_n_vertices<dim - 1>()
+#  else
+                               GeometryInfo<dim - 1>::vertices_per_cell
+#  endif
+                               >
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no) const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_face>
+#  ifndef _MSC_VER
+                                 ReferenceCell::max_n_vertices<dim - 1>()
+#  else
+                                 GeometryInfo<dim - 1>::vertices_per_cell
+#  endif
+                                 >
     face_vertices;
 
   const auto &cell_vertices    = get_vertices(cell);

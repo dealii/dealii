@@ -5311,9 +5311,8 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
     {
       // This branch should only be used after the cell vertex index cache is
       // set up
-      constexpr unsigned int max_vertices_per_cell = 1 << dim;
-      const std::size_t      my_index =
-        static_cast<std::size_t>(this->present_index) * max_vertices_per_cell;
+      const auto my_index = static_cast<std::size_t>(this->present_index) *
+                            ReferenceCell::max_n_vertices<dim>();
       AssertIndexRange(my_index + corner,
                        this->tria->levels[this->present_level]
                          ->cell_vertex_indices_cache.size());
@@ -6347,7 +6346,12 @@ double
 TriaAccessor<structdim, dim, spacedim>::diameter() const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<structdim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                                 ReferenceCell::max_n_vertices<structdim>()
+#  else
+                                 GeometryInfo<structdim>::vertices_per_cell
+#  endif
+                                 >
     vertices(this->n_vertices());
 
   for (unsigned int v = 0; v < vertices.size(); ++v)
