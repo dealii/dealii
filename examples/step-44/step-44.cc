@@ -524,7 +524,9 @@ namespace Step44
       , J_tilde(1.0)
       , b_bar(Physics::Elasticity::StandardTensors<dim>::I)
     {
-      Assert(kappa > 0, ExcInternalError());
+      Assert(kappa > 0,
+             ExcMessage("The parameters mu and nu need to be so that kappa "
+                        "has a positive value."));
     }
 
     // We update the material model with various deformation dependent data
@@ -535,13 +537,14 @@ namespace Step44
                               const double          p_tilde_in,
                               const double          J_tilde_in)
     {
-      det_F                      = determinant(F);
+      det_F = determinant(F);
+      Assert(det_F > 0,
+             ExcMessage("The tensor F must have a positive determinant."));
+
       const Tensor<2, dim> F_bar = Physics::Elasticity::Kinematics::F_iso(F);
       b_bar                      = Physics::Elasticity::Kinematics::b(F_bar);
       p_tilde                    = p_tilde_in;
       J_tilde                    = J_tilde_in;
-
-      Assert(det_F > 0, ExcInternalError());
     }
 
     // The second function determines the Kirchhoff stress $\boldsymbol{\tau}
@@ -1212,11 +1215,10 @@ namespace Step44
       const unsigned int n_dofs_per_cell = Nx[0].size();
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         {
-          Assert(Nx[q_point].size() == n_dofs_per_cell, ExcInternalError());
-          Assert(grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
-          Assert(symm_grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
+          AssertDimension(Nx[q_point].size(), n_dofs_per_cell);
+          AssertDimension(grad_Nx[q_point].size(), n_dofs_per_cell);
+          AssertDimension(symm_grad_Nx[q_point].size(), n_dofs_per_cell);
+
           for (unsigned int k = 0; k < n_dofs_per_cell; ++k)
             {
               Nx[q_point][k]           = 0.0;
@@ -1553,7 +1555,7 @@ namespace Step44
       {
         const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        AssertDimension(lqph.size(), n_q_points);
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           lqph[q_point]->setup_lqp(parameters);
@@ -1605,14 +1607,11 @@ namespace Step44
   {
     const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
+    AssertDimension(lqph.size(), n_q_points);
 
-    Assert(scratch.solution_grads_u_total.size() == n_q_points,
-           ExcInternalError());
-    Assert(scratch.solution_values_p_total.size() == n_q_points,
-           ExcInternalError());
-    Assert(scratch.solution_values_J_total.size() == n_q_points,
-           ExcInternalError());
+    AssertDimension(scratch.solution_grads_u_total.size(), n_q_points);
+    AssertDimension(scratch.solution_values_p_total.size(), n_q_points);
+    AssertDimension(scratch.solution_values_J_total.size(), n_q_points);
 
     scratch.reset();
 
@@ -1820,7 +1819,7 @@ namespace Step44
         // marking this update function as constant.
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        AssertDimension(lqph.size(), n_q_points);
 
         for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
@@ -1854,7 +1853,7 @@ namespace Step44
 
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        AssertDimension(lqph.size(), n_q_points);
 
         for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
@@ -1999,7 +1998,7 @@ namespace Step44
 
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
+    AssertDimension(lqph.size(), n_q_points);
 
     for (const unsigned int q_point :
          scratch.fe_values.quadrature_point_indices())
