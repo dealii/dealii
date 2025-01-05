@@ -4964,61 +4964,6 @@ namespace internal
 
 
 
-      /**
-       * Implementation of the function of same name in the enclosing class.
-       */
-      template <int dim, int spacedim>
-      inline static unsigned int
-      vertex_index(const TriaAccessor<1, dim, spacedim> &accessor,
-                   const unsigned int                    corner)
-      {
-        return accessor.objects()
-          .cells[accessor.present_index * ReferenceCell::max_n_faces<1>() +
-                 corner];
-      }
-
-
-      template <int dim, int spacedim>
-      inline static unsigned int
-      vertex_index(const TriaAccessor<2, dim, spacedim> &accessor,
-                   const unsigned int                    corner)
-      {
-        const auto [line_index, vertex_index] =
-          accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
-            corner);
-        const auto vertex_within_line_index =
-          accessor.reference_cell().standard_to_real_face_vertex(
-            vertex_index,
-            line_index,
-            accessor.line_orientation(line_index) == true ?
-              ReferenceCell::default_combined_face_orientation() :
-              ReferenceCell::reversed_combined_line_orientation());
-
-        return accessor.line(line_index)
-          ->vertex_index(vertex_within_line_index);
-      }
-
-
-
-      inline static unsigned int
-      vertex_index(const TriaAccessor<3, 3, 3> &accessor,
-                   const unsigned int           corner)
-      {
-        const auto [face_index, vertex_index] =
-          accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
-            corner);
-        const auto vertex_within_face_index =
-          accessor.reference_cell().standard_to_real_face_vertex(
-            vertex_index,
-            face_index,
-            accessor.combined_face_orientation(face_index));
-
-        return accessor.quad(face_index)
-          ->vertex_index(vertex_within_face_index);
-      }
-
-
-
       template <int dim, int spacedim>
       static std::array<unsigned int, 1>
       get_line_indices_of_cell(const TriaAccessor<1, dim, spacedim> &)
@@ -5354,8 +5299,18 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
 {
   AssertIndexRange(corner, this->n_vertices());
 
-  if (structdim == dim)
+  if constexpr (structdim == 1)
     {
+      // This branch needs to be first (and not combined with the structdim ==
+      // dim branch) so that we can get line vertex indices when setting up the
+      // cell vertex index cache
+      return this->objects()
+        .cells[this->present_index * ReferenceCell::max_n_faces<1>() + corner];
+    }
+  else if constexpr (structdim == dim)
+    {
+      // This branch should only be used after the cell vertex index cache is
+      // set up
       constexpr unsigned int max_vertices_per_cell = 1 << dim;
       const std::size_t      my_index =
         static_cast<std::size_t>(this->present_index) * max_vertices_per_cell;
@@ -5368,9 +5323,25 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
       Assert(vertex_index != numbers::invalid_unsigned_int, ExcInternalError());
       return vertex_index;
     }
+  else if constexpr (structdim == 2)
+    {
+      const auto [line_index, vertex_index] =
+        this->reference_cell().standard_vertex_to_face_and_vertex_index(corner);
+      const auto vertex_within_line_index =
+        this->reference_cell().standard_to_real_face_vertex(
+          vertex_index,
+          line_index,
+          this->line_orientation(line_index) == true ?
+            ReferenceCell::default_combined_face_orientation() :
+            ReferenceCell::reversed_combined_line_orientation());
+
+      return this->line(line_index)->vertex_index(vertex_within_line_index);
+    }
   else
-    return dealii::internal::TriaAccessorImplementation::Implementation::
-      vertex_index(*this, corner);
+    {
+      DEAL_II_ASSERT_UNREACHABLE();
+      return numbers::invalid_unsigned_int;
+    }
 }
 
 
@@ -7647,15 +7618,15 @@ CellAccessor<dim, spacedim>::face(const unsigned int i) const
   AssertIndexRange(i, this->n_faces());
   if constexpr (dim == 1)
     {
-      TriaAccessor<0, 1, spacedim> a(
-        &this->get_triangulation(),
-        ((i == 0) && at_boundary(0) ?
-           TriaAccessor<0, 1, spacedim>::left_vertex :
-           ((i == 1) && at_boundary(1) ?
-              TriaAccessor<0, 1, spacedim>::right_vertex :
-              TriaAccessor<0, 1, spacedim>::interior_vertex)),
-        internal::TriaAccessorImplementation::Implementation::vertex_index(
-          *this, i));
+      using VertexKind = typename TriaAccessor<0, 1, spacedim>::VertexKind;
+      VertexKind vertex_kind = VertexKind::interior_vertex;
+      if (i == 0 && at_boundary(0))
+        vertex_kind = VertexKind::left_vertex;
+      if (i == 1 && at_boundary(1))
+        vertex_kind = VertexKind::right_vertex;
+      TriaAccessor<0, 1, spacedim> a(&this->get_triangulation(),
+                                     vertex_kind,
+                                     this->vertex_index(i));
       return TriaIterator<TriaAccessor<0, 1, spacedim>>(a);
     }
   else if constexpr (dim == 2)
@@ -7723,9 +7694,7 @@ CellAccessor<dim, spacedim>::face_index(const unsigned int i) const
   switch (dim)
     {
       case 1:
-        {
-          return this->vertex_index(i);
-        }
+        return this->vertex_index(i);
 
       case 2:
         return this->line_index(i);
