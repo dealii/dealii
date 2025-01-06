@@ -2127,7 +2127,7 @@ namespace GridTools
     const dealii::Tensor<1, CellIterator::AccessorType::space_dimension>
                              &offset,
     const FullMatrix<double> &matrix,
-    const double              tolerance = 1e-10)
+    const double              abs_tol = 1e-10)
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     (void)space_dim;
@@ -2173,7 +2173,7 @@ namespace GridTools
                                                  direction,
                                                  offset,
                                                  matrix,
-                                                 tolerance))
+                                                 abs_tol))
               {
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
@@ -2224,7 +2224,7 @@ namespace GridTools
                                                &matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
     const FullMatrix<double>                   &matrix,
-    const double                                tolerance)
+    const double                                abs_tol)
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
@@ -2278,7 +2278,7 @@ namespace GridTools
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
-      pairs1, pairs2, direction, matched_pairs, offset, matrix, tolerance);
+      pairs1, pairs2, direction, matched_pairs, offset, matrix, abs_tol);
 
 #ifdef DEBUG
     // check for standard orientation
@@ -2308,7 +2308,7 @@ namespace GridTools
                                                &matched_pairs,
     const Tensor<1, MeshType::space_dimension> &offset,
     const FullMatrix<double>                   &matrix,
-    const double                                tolerance)
+    const double                                abs_tol)
   {
     static const int dim       = MeshType::dimension;
     static const int space_dim = MeshType::space_dimension;
@@ -2373,7 +2373,7 @@ namespace GridTools
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
-      pairs1, pairs2, direction, matched_pairs, offset, matrix, tolerance);
+      pairs1, pairs2, direction, matched_pairs, offset, matrix, abs_tol);
   }
 
 
@@ -2394,7 +2394,7 @@ namespace GridTools
                       const unsigned int         direction,
                       const Tensor<1, spacedim> &offset,
                       const FullMatrix<double>  &matrix,
-                      const double               tolerance = 1e-10)
+                      const double               abs_tol = 1e-10)
   {
     AssertIndexRange(direction, spacedim);
 
@@ -2417,7 +2417,7 @@ namespace GridTools
         if (i == direction)
           continue;
 
-        if (std::abs(distance[i]) > tolerance)
+        if (std::abs(distance[i]) > abs_tol)
           return false;
       }
 
@@ -2434,7 +2434,7 @@ namespace GridTools
     const unsigned int                                            direction,
     const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
     const FullMatrix<double>                                     &matrix,
-    const double                                                  tolerance)
+    const double                                                  abs_tol)
   {
     Assert(matrix.m() == matrix.n(),
            ExcMessage("The supplied matrix must be a square matrix"));
@@ -2466,7 +2466,7 @@ namespace GridTools
                                     direction,
                                     offset,
                                     matrix,
-                                    tolerance))
+                                    abs_tol))
               {
                 face1_vertices[i] = *it;
                 face2_vertices[i] = i;
