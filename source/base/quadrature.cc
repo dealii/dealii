@@ -279,7 +279,7 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
   unsigned int k = 0;
   for (unsigned int i2 = 0; i2 < n2; ++i2)
     for (unsigned int i1 = 0; i1 < n1; ++i1)
-      for (unsigned int i0 = 0; i0 < n0; ++i0)
+      for (unsigned int i0 = 0; i0 < n0; ++i0, ++k)
         {
           quadrature_points[k][0] = q.point(i0)[0];
           if (dim > 1)
@@ -287,11 +287,28 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
           if (dim > 2)
             quadrature_points[k][2] = q.point(i2)[0];
           weights[k] = q.weight(i0);
+          if (numbers::is_nan(weights[k]))
+            break;
           if (dim > 1)
-            weights[k] *= q.weight(i1);
+            {
+              if (numbers::is_nan(q.weight(i1)))
+                {
+                  weights[k] = q.weight(i1);
+                  break;
+                }
+              else
+                weights[k] *= q.weight(i1);
+            }
           if (dim > 2)
-            weights[k] *= q.weight(i2);
-          ++k;
+            {
+              if (numbers::is_nan(q.weight(i2)))
+                {
+                  weights[k] = q.weight(i2);
+                  break;
+                }
+              else
+                weights[k] *= q.weight(i2);
+            }
         }
 
   tensor_basis = std::make_unique<std::array<Quadrature<1>, dim>>();
