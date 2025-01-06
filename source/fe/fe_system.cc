@@ -2009,6 +2009,61 @@ FESystem<dim, spacedim>::initialize(
       Assert(index == this->n_dofs_per_line(), ExcInternalError());
     });
 
+
+  // Compute local_dof_sparsity_pattern if any of our base elements contains a
+  // non-empty one (empty denotes the default of all DoFs coupling within a
+  // cell). Note the we currently only handle coupling within a base element and
+  // not between two different base elements. Handling the latter could be
+  // doable if the underlying element happens to be identical, but we currently
+  // have no functionality to compute the coupling between different elements
+  // with a pattern (for example FE_Q_iso_Q1 with different degrees).
+  {
+    // Does any of our base elements not couple all DoFs?
+    const bool have_nonempty = [&]() -> bool {
+      for (unsigned int b = 0; b < this->n_base_elements(); ++b)
+        {
+          if (!this->base_element(b).get_local_dof_sparsity_pattern().empty() &&
+              (this->element_multiplicity(b) > 0))
+            return true;
+        }
+      return false;
+    }();
+
+    if (have_nonempty)
+      {
+        this->local_dof_sparsity_pattern.reinit(this->n_dofs_per_cell(),
+                                                this->n_dofs_per_cell());
+
+        // by default, everything couples:
+        this->local_dof_sparsity_pattern.fill(true);
+
+        // Find shape functions within the same base element. If we do, grab the
+        // coupling from that base element pattern:
+        for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+            {
+              const auto vi = this->system_to_base_index(i);
+              const auto vj = this->system_to_base_index(j);
+
+              const auto base_index_i = vi.first.first;
+              const auto base_index_j = vj.first.first;
+              if (base_index_i == base_index_j)
+                {
+                  const auto shape_index_i = vi.second;
+                  const auto shape_index_j = vj.second;
+
+                  const auto &pattern = this->base_element(base_index_i)
+                                          .get_local_dof_sparsity_pattern();
+
+                  if (!pattern.empty())
+                    this->local_dof_sparsity_pattern(i, j) =
+                      pattern(shape_index_i, shape_index_j);
+                }
+            }
+      }
+  }
+
+
   // wait for all of this to finish
   init_tasks.join_all();
 }
