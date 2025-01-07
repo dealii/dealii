@@ -25,7 +25,8 @@ template <typename VectorType>
 void
 test(const VectorType &given_vector)
 {
-  Teuchos::RCP<VectorType> given_vector_rcp(new VectorType(given_vector));
+  ROL::Ptr<VectorType> given_vector_rcp =
+    ROL::makePtr<VectorType>(given_vector);
 
   // --- Testing the constructor
   Rol::VectorAdaptor<VectorType> given_vector_rol(given_vector_rcp);
@@ -33,7 +34,7 @@ test(const VectorType &given_vector)
               ExcInternalError());
 
 
-  Teuchos::RCP<VectorType>       w_rcp = Teuchos::rcp(new VectorType);
+  ROL::Ptr<VectorType>           w_rcp = ROL::makePtr<VectorType>();
   Rol::VectorAdaptor<VectorType> w_rol(w_rcp);
 
   // --- Testing VectorAdaptor::set()
