@@ -448,7 +448,7 @@ MappingFEField<dim, spacedim, VectorType>::is_compatible_with(
 template <int dim, int spacedim, typename VectorType>
 boost::container::small_vector<Point<spacedim>,
 #ifndef _MSC_VER
-                               ReferenceCell::max_n_vertices<dim>()
+                               ReferenceCells::max_n_vertices<dim>()
 #else
                                GeometryInfo<dim>::vertices_per_cell
 #endif
@@ -491,7 +491,7 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
 
   boost::container::small_vector<Point<spacedim>,
 #ifndef _MSC_VER
-                                 ReferenceCell::max_n_vertices<dim>()
+                                 ReferenceCells::max_n_vertices<dim>()
 #else
                                  GeometryInfo<dim>::vertices_per_cell
 #endif

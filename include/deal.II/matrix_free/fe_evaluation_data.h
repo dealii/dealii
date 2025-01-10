@@ -1544,7 +1544,7 @@ FEEvaluationData<dim, Number, is_face>::get_current_cell_index() const
 {
   if (is_face && dof_access_index ==
                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
-    return cell * ReferenceCell::max_n_faces<dim>() + face_numbers[0];
+    return cell * ReferenceCells::max_n_faces<dim>() + face_numbers[0];
   else
     return cell;
 }

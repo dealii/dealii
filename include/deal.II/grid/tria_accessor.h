@@ -3241,7 +3241,7 @@ public:
   boost::container::small_vector<
     TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
 #ifndef _MSC_VER // MSVC prior to 2022 cannot use a constexpr function this way
-    ReferenceCell::max_n_faces<dim>()
+    ReferenceCells::max_n_faces<dim>()
 #else
     GeometryInfo<dim>::faces_per_cell
 #endif
@@ -4919,7 +4919,7 @@ namespace internal
       {
         return accessor.tria->levels[accessor.present_level]
           ->cells
-          .cells[accessor.present_index * ReferenceCell::max_n_faces<3>() + i];
+          .cells[accessor.present_index * ReferenceCells::max_n_faces<3>() + i];
       }
 
 
@@ -4958,7 +4958,8 @@ namespace internal
         if (dim != 1)
           accessor.tria->levels[accessor.present_level]
             ->face_orientations.set_combined_orientation(
-              accessor.present_index * ReferenceCell::max_n_faces<dim>() + face,
+              accessor.present_index * ReferenceCells::max_n_faces<dim>() +
+                face,
               combined_orientation);
       }
 
@@ -5009,7 +5010,7 @@ namespace internal
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCell::max_n_faces<dim>() + f);
+                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
 
                 // It might seem superfluous to spell out the four indices
                 // that get later consumed by a for loop over these four
@@ -5033,7 +5034,7 @@ namespace internal
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCell::max_n_faces<dim>() + f);
+                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
@@ -5130,7 +5131,7 @@ namespace internal
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCell::max_n_faces<dim>() + f);
+                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
 
                 // It might seem superfluous to spell out the four indices and
                 // orientations that get later consumed by a for loop over
@@ -5165,7 +5166,7 @@ namespace internal
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCell::max_n_faces<3>() + f);
+                      cell.index() * ReferenceCells::max_n_faces<3>() + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
@@ -5305,14 +5306,14 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
       // dim branch) so that we can get line vertex indices when setting up the
       // cell vertex index cache
       return this->objects()
-        .cells[this->present_index * ReferenceCell::max_n_faces<1>() + corner];
+        .cells[this->present_index * ReferenceCells::max_n_faces<1>() + corner];
     }
   else if constexpr (structdim == dim)
     {
       // This branch should only be used after the cell vertex index cache is
       // set up
       const auto my_index = static_cast<std::size_t>(this->present_index) *
-                            ReferenceCell::max_n_vertices<dim>();
+                            ReferenceCells::max_n_vertices<dim>();
       AssertIndexRange(my_index + corner,
                        this->tria->levels[this->present_level]
                          ->cell_vertex_indices_cache.size());
@@ -5380,7 +5381,7 @@ TriaAccessor<structdim, dim, spacedim>::line_index(const unsigned int i) const
   if constexpr (structdim == 2)
     {
       return this->objects()
-        .cells[this->present_index * ReferenceCell::max_n_faces<2>() + i];
+        .cells[this->present_index * ReferenceCells::max_n_faces<2>() + i];
     }
   else if constexpr (structdim == 3)
     {
@@ -5447,12 +5448,12 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
       else
         return this->tria->levels[this->present_level]
           ->face_orientations.get_orientation(
-            this->present_index * ReferenceCell::max_n_faces<dim>() + face);
+            this->present_index * ReferenceCells::max_n_faces<dim>() + face);
     }
   else
     return this->tria->levels[this->present_level]
       ->face_orientations.get_combined_orientation(
-        this->present_index * ReferenceCell::max_n_faces<dim>() + face);
+        this->present_index * ReferenceCells::max_n_faces<dim>() + face);
 }
 
 
@@ -5479,7 +5480,7 @@ TriaAccessor<structdim, dim, spacedim>::face_orientation(
   else
     return this->tria->levels[this->present_level]
       ->face_orientations.get_orientation(
-        this->present_index * ReferenceCell::max_n_faces<structdim>() + face);
+        this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
 }
 
 
@@ -5499,7 +5500,7 @@ TriaAccessor<structdim, dim, spacedim>::face_flip(const unsigned int face) const
 
   if constexpr (structdim == 3)
     return this->tria->levels[this->present_level]->face_orientations.get_flip(
-      this->present_index * ReferenceCell::max_n_faces<structdim>() + face);
+      this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
   else
     // In 1d and 2d, face_flip is always false as faces can only be
     // 'flipped' in 3d.
@@ -5524,7 +5525,7 @@ TriaAccessor<structdim, dim, spacedim>::face_rotation(
   if constexpr (structdim == 3)
     return this->tria->levels[this->present_level]
       ->face_orientations.get_rotation(
-        this->present_index * ReferenceCell::max_n_faces<structdim>() + face);
+        this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
   else
     // In 1d and 2d, face_rotation is always false as faces can only be
     // 'rotated' in 3d.
@@ -5562,11 +5563,11 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   else if constexpr (structdim == 2 && dim == 3)
     {
       // line orientations in 3d are stored in their own array
-      Assert(this->present_index * ReferenceCell::max_n_lines<2>() + line <
+      Assert(this->present_index * ReferenceCells::max_n_lines<2>() + line <
                this->tria->faces->quads_line_orientations.size(),
              ExcInternalError());
       return this->tria->faces->quads_line_orientations
-        [this->present_index * ReferenceCell::max_n_lines<2>() + line];
+        [this->present_index * ReferenceCells::max_n_lines<2>() + line];
     }
   else if constexpr (structdim == 3 && dim == 3)
     {
@@ -5620,11 +5621,11 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
       // We set line orientations per face, not per cell, so this only works for
       // faces in 3d
       Assert(structdim == 2, ExcNotImplemented());
-      Assert(this->present_index * ReferenceCell::max_n_lines<2>() + line <
+      Assert(this->present_index * ReferenceCells::max_n_lines<2>() + line <
                this->tria->faces->quads_line_orientations.size(),
              ExcInternalError());
       this->tria->faces->quads_line_orientations
-        [this->present_index * ReferenceCell::max_n_lines<2>() + line] = value;
+        [this->present_index * ReferenceCells::max_n_lines<2>() + line] = value;
     }
 }
 
@@ -6347,7 +6348,7 @@ TriaAccessor<structdim, dim, spacedim>::diameter() const
 {
   boost::container::small_vector<Point<spacedim>,
 #  ifndef _MSC_VER
-                                 ReferenceCell::max_n_vertices<structdim>()
+                                 ReferenceCells::max_n_vertices<structdim>()
 #  else
                                  GeometryInfo<structdim>::vertices_per_cell
 #  endif
@@ -7666,7 +7667,7 @@ template <int dim, int spacedim>
 inline boost::container::small_vector<
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
 #  ifndef _MSC_VER
-  ReferenceCell::max_n_faces<dim>()
+  ReferenceCells::max_n_faces<dim>()
 #  else
   GeometryInfo<dim>::faces_per_cell
 #  endif
@@ -7676,7 +7677,7 @@ CellAccessor<dim, spacedim>::face_iterators() const
   boost::container::small_vector<
     TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
 #  ifndef _MSC_VER
-    ReferenceCell::max_n_faces<dim>()
+    ReferenceCells::max_n_faces<dim>()
 #  else
     GeometryInfo<dim>::faces_per_cell
 #  endif
@@ -7719,7 +7720,7 @@ CellAccessor<dim, spacedim>::neighbor_index(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
   return this->tria->levels[this->present_level]
-    ->neighbors[this->present_index * ReferenceCell::max_n_faces<dim>() +
+    ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
                 face_no]
     .second;
 }
@@ -7732,7 +7733,7 @@ CellAccessor<dim, spacedim>::neighbor_level(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
   return this->tria->levels[this->present_level]
-    ->neighbors[this->present_index * ReferenceCell::max_n_faces<dim>() +
+    ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
                 face_no]
     .first;
 }
