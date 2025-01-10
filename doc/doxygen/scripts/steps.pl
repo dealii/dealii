@@ -118,7 +118,7 @@ foreach $step (@ARGV)
       my $name = $step;
       $name =~ s/^.*code-gallery\///;
       my $tag = $name;
-      $tag =~ s/[^a-zA-Z]/_/g;
+      $tag =~ s/[^a-zA-Z_0-9]/_/g;
 
       $kind_map{"code_gallery_$tag"} = "code-gallery";
 
@@ -157,7 +157,7 @@ foreach $step (@ARGV)
       my $name = $step;
       $name =~ s/^.*code-gallery\///;
       my $tag = $name;
-      $tag =~ s/[^a-zA-Z]/_/g;
+      $tag =~ s/[^a-zA-Z_0-9]/_/g;
       $destination = "code_gallery_$tag";
     }
 
@@ -274,7 +274,7 @@ foreach $step (@ARGV)
                 }
             }
 
-            # If the destination is a code gallery program, used a dashed line
+            # If the destination is a code gallery program, use a dashed line
             if ($kind_map{$destination} eq "code-gallery")
             {
                 $edge_attributes .= "style=\"dashed\", arrowhead=\"empty\", color=\"gray\",";
