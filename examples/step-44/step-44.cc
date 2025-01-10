@@ -1527,9 +1527,7 @@ namespace Step44
         else if (k_group == J_dof)
           element_indices_J.push_back(k);
         else
-          {
-            Assert(k_group <= J_dof, ExcInternalError());
-          }
+          DEAL_II_ASSERT_UNREACHABLE();
       }
   }
 
@@ -2022,7 +2020,7 @@ namespace Step44
               scratch.Nx[q_point][k] =
                 scratch.fe_values[J_fe].value(k, q_point);
             else
-              Assert(k_group <= J_dof, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
       }
 
@@ -2084,7 +2082,7 @@ namespace Step44
             else if (i_group == J_dof)
               data.cell_rhs(i) -= N[i] * (dPsi_vol_dJ - p_tilde) * JxW;
             else
-              Assert(i_group <= J_dof, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
 
             // Before we go into the inner loop, we have one final chance to
             // introduce some optimizations. We've already taken into account
@@ -2127,7 +2125,7 @@ namespace Step44
                 // contribution. It comprises a material contribution, and a
                 // geometrical stress contribution which is only added along
                 // the local matrix diagonals:
-                if ((i_group == j_group) && (i_group == u_dof))
+                if ((i_group == u_dof) && (j_group == u_dof)) // UU block
                   {
                     // The material contribution:
                     data.cell_matrix(i, j) += symm_grad_Nx_i_x_Jc *  //
@@ -2140,7 +2138,7 @@ namespace Step44
                   }
                 // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$
                 // contribution
-                else if ((i_group == p_dof) && (j_group == u_dof))
+                else if ((i_group == p_dof) && (j_group == u_dof)) // PU block
                   {
                     data.cell_matrix(i, j) += N[i] * det_F *               //
                                               (symm_grad_Nx[j] * I) * JxW; //
@@ -2148,13 +2146,16 @@ namespace Step44
                 // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J}
                 // \widetilde{p}}$ and $\mathsf{\mathbf{k}}_{ \widetilde{J}
                 // \widetilde{J}}$ contributions:
-                else if ((i_group == J_dof) && (j_group == p_dof))
+                else if ((i_group == J_dof) && (j_group == p_dof)) // JP block
                   data.cell_matrix(i, j) -= N[i] * N[j] * JxW;
-                else if ((i_group == j_group) && (i_group == J_dof))
+                else if ((i_group == J_dof) && (j_group == J_dof)) // JJ block
                   data.cell_matrix(i, j) += N[i] * d2Psi_vol_dJ2 * N[j] * JxW;
+                else if ((i_group <= J_dof) && (j_group <= J_dof))
+                  {
+                    /* Nothing to do for the remaining blocks. */
+                  }
                 else
-                  Assert((i_group <= J_dof) && (j_group <= J_dof),
-                         ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
       }
