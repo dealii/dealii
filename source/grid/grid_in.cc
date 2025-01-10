@@ -3771,7 +3771,7 @@ namespace
                     const long        element_n = elements[side_n] - 1;
                     const long        face_n    = faces[side_n] - 1;
                     const std::size_t face_id =
-                      element_n * ReferenceCell::max_n_faces<dim>() + face_n;
+                      element_n * ReferenceCells::max_n_faces<dim>() + face_n;
                     face_side_sets[face_id].push_back(side_set_id);
                   }
               }
@@ -3818,9 +3818,9 @@ namespace
               }
             // Record the b_or_m_id of the current face.
             const unsigned int local_face_n =
-              face_id % ReferenceCell::max_n_faces<dim>();
+              face_id % ReferenceCells::max_n_faces<dim>();
             const CellData<dim> &cell =
-              cells[face_id / ReferenceCell::max_n_faces<dim>()];
+              cells[face_id / ReferenceCells::max_n_faces<dim>()];
             const ReferenceCell cell_type =
               ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
             const unsigned int deal_face_n =

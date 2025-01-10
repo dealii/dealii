@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
 #  ifndef _MSC_VER
-                               ReferenceCell::max_n_vertices<dim>()
+                               ReferenceCells::max_n_vertices<dim>()
 #  else
                                GeometryInfo<dim>::vertices_per_cell
 #  endif
@@ -45,7 +45,7 @@ Mapping<dim, spacedim>::get_vertices(
 {
   boost::container::small_vector<Point<spacedim>,
 #  ifndef _MSC_VER
-                                 ReferenceCell::max_n_vertices<dim>()
+                                 ReferenceCells::max_n_vertices<dim>()
 #  else
                                  GeometryInfo<dim>::vertices_per_cell
 #  endif
@@ -62,7 +62,7 @@ Mapping<dim, spacedim>::get_vertices(
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
 #  ifndef _MSC_VER
-                               ReferenceCell::max_n_vertices<dim - 1>()
+                               ReferenceCells::max_n_vertices<dim - 1>()
 #  else
                                GeometryInfo<dim - 1>::vertices_per_cell
 #  endif
@@ -73,7 +73,7 @@ Mapping<dim, spacedim>::get_vertices(
 {
   boost::container::small_vector<Point<spacedim>,
 #  ifndef _MSC_VER
-                                 ReferenceCell::max_n_vertices<dim - 1>()
+                                 ReferenceCells::max_n_vertices<dim - 1>()
 #  else
                                  GeometryInfo<dim - 1>::vertices_per_cell
 #  endif

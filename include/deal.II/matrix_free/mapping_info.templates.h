@@ -3099,10 +3099,10 @@ namespace internal
           // counting
           AssertDimension(cell_type.size(), cells.size() / n_lanes);
           face_data_by_cells[my_q].data_index_offsets.resize(
-            cell_type.size() * ReferenceCell::max_n_faces<dim>());
+            cell_type.size() * ReferenceCells::max_n_faces<dim>());
           if (update_flags & update_quadrature_points)
             face_data_by_cells[my_q].quadrature_point_offsets.resize(
-              cell_type.size() * ReferenceCell::max_n_faces<dim>());
+              cell_type.size() * ReferenceCells::max_n_faces<dim>());
           std::size_t storage_length = 0;
           for (unsigned int i = 0; i < cell_type.size(); ++i)
             for (const unsigned int face : GeometryInfo<dim>::face_indices())
@@ -3110,54 +3110,54 @@ namespace internal
                 if (faces_by_cells_type[i][face] <= affine)
                   {
                     face_data_by_cells[my_q].data_index_offsets
-                      [i * ReferenceCell::max_n_faces<dim>() + face] =
+                      [i * ReferenceCells::max_n_faces<dim>() + face] =
                       storage_length;
                     ++storage_length;
                   }
                 else
                   {
                     face_data_by_cells[my_q].data_index_offsets
-                      [i * ReferenceCell::max_n_faces<dim>() + face] =
+                      [i * ReferenceCells::max_n_faces<dim>() + face] =
                       storage_length;
                     storage_length +=
                       face_data_by_cells[my_q].descriptor[0].n_q_points;
                   }
                 if (update_flags & update_quadrature_points)
                   face_data_by_cells[my_q].quadrature_point_offsets
-                    [i * ReferenceCell::max_n_faces<dim>() + face] =
-                    (i * ReferenceCell::max_n_faces<dim>() + face) *
+                    [i * ReferenceCells::max_n_faces<dim>() + face] =
+                    (i * ReferenceCells::max_n_faces<dim>() + face) *
                     face_data_by_cells[my_q].descriptor[0].n_q_points;
               }
           face_data_by_cells[my_q].JxW_values.resize_fast(
-            storage_length * ReferenceCell::max_n_faces<dim>());
+            storage_length * ReferenceCells::max_n_faces<dim>());
           face_data_by_cells[my_q].jacobians[0].resize_fast(
-            storage_length * ReferenceCell::max_n_faces<dim>());
+            storage_length * ReferenceCells::max_n_faces<dim>());
           face_data_by_cells[my_q].jacobians[1].resize_fast(
-            storage_length * ReferenceCell::max_n_faces<dim>());
+            storage_length * ReferenceCells::max_n_faces<dim>());
           if (update_flags & update_normal_vectors)
             face_data_by_cells[my_q].normal_vectors.resize_fast(
-              storage_length * ReferenceCell::max_n_faces<dim>());
+              storage_length * ReferenceCells::max_n_faces<dim>());
           if (update_flags & update_normal_vectors &&
               update_flags & update_jacobians)
             face_data_by_cells[my_q].normals_times_jacobians[0].resize_fast(
-              storage_length * ReferenceCell::max_n_faces<dim>());
+              storage_length * ReferenceCells::max_n_faces<dim>());
           if (update_flags & update_normal_vectors &&
               update_flags & update_jacobians)
             face_data_by_cells[my_q].normals_times_jacobians[1].resize_fast(
-              storage_length * ReferenceCell::max_n_faces<dim>());
+              storage_length * ReferenceCells::max_n_faces<dim>());
           if (update_flags & update_jacobian_grads)
             {
               face_data_by_cells[my_q].jacobian_gradients[0].resize_fast(
-                storage_length * ReferenceCell::max_n_faces<dim>());
+                storage_length * ReferenceCells::max_n_faces<dim>());
               face_data_by_cells[my_q]
                 .jacobian_gradients_non_inverse[0]
                 .resize_fast(storage_length *
-                             ReferenceCell::max_n_faces<dim>());
+                             ReferenceCells::max_n_faces<dim>());
             }
 
           if (update_flags & update_quadrature_points)
             face_data_by_cells[my_q].quadrature_points.resize_fast(
-              cell_type.size() * ReferenceCell::max_n_faces<dim>() *
+              cell_type.size() * ReferenceCells::max_n_faces<dim>() *
               face_data_by_cells[my_q].descriptor[0].n_q_points);
         }
 
@@ -3195,9 +3195,8 @@ namespace internal
               dealii::FEFaceValues<dim> &fe_val_neigh =
                 *fe_face_values_neigh[my_q][fe_index];
               const unsigned int offset =
-                face_data_by_cells[my_q]
-                  .data_index_offsets[cell * ReferenceCell::max_n_faces<dim>() +
-                                      face];
+                face_data_by_cells[my_q].data_index_offsets
+                  [cell * ReferenceCells::max_n_faces<dim>() + face];
 
               const GeometryType my_cell_type = faces_by_cells_type[cell][face];
 
@@ -3334,7 +3333,8 @@ namespace internal
                       for (unsigned int d = 0; d < dim; ++d)
                         face_data_by_cells[my_q].quadrature_points
                           [face_data_by_cells[my_q].quadrature_point_offsets
-                             [cell * ReferenceCell::max_n_faces<dim>() + face] +
+                             [cell * ReferenceCells::max_n_faces<dim>() +
+                              face] +
                            q][d][v] = fe_val.quadrature_point(q)[d];
                 }
               if (update_flags & update_normal_vectors &&
@@ -3372,7 +3372,7 @@ namespace internal
       memory += cell_type.capacity() * sizeof(GeometryType);
       memory += face_type.capacity() * sizeof(GeometryType);
       memory += faces_by_cells_type.capacity() *
-                ReferenceCell::max_n_faces<dim>() * sizeof(GeometryType);
+                ReferenceCells::max_n_faces<dim>() * sizeof(GeometryType);
       memory += sizeof(*this);
       return memory;
     }
@@ -3398,7 +3398,7 @@ namespace internal
       out << "    Faces by cells types:            ";
       task_info.print_memory_statistics(out,
                                         faces_by_cells_type.capacity() *
-                                          ReferenceCell::max_n_faces<dim>() *
+                                          ReferenceCells::max_n_faces<dim>() *
                                           sizeof(GeometryType));
 
       for (unsigned int j = 0; j < cell_data.size(); ++j)

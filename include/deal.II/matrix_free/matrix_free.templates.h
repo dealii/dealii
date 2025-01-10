@@ -2062,7 +2062,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
         numbers::invalid_unsigned_int);
       face_info.cell_and_face_boundary_id.reinit(
         TableIndices<3>(task_info.cell_partition_data.back(),
-                        ReferenceCell::max_n_faces<dim>(),
+                        ReferenceCells::max_n_faces<dim>(),
                         VectorizedArrayType::size()),
         true);
       face_info.cell_and_face_boundary_id.fill(numbers::invalid_boundary_id);

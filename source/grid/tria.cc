@@ -1837,13 +1837,13 @@ namespace
     switch (structdim)
       {
         case 0:
-          return ReferenceCell::max_n_faces<0>();
+          return ReferenceCells::max_n_faces<0>();
         case 1:
-          return ReferenceCell::max_n_faces<1>();
+          return ReferenceCells::max_n_faces<1>();
         case 2:
-          return ReferenceCell::max_n_faces<2>();
+          return ReferenceCells::max_n_faces<2>();
         case 3:
-          return ReferenceCell::max_n_faces<3>();
+          return ReferenceCells::max_n_faces<3>();
         default:
           DEAL_II_ASSERT_UNREACHABLE();
           return numbers::invalid_unsigned_int;
@@ -2070,7 +2070,7 @@ namespace internal
         {
           // reserve the field of the derived class
           tria_faces.quads_line_orientations.resize(
-            new_size * ReferenceCell::max_n_lines<2>(), true);
+            new_size * ReferenceCells::max_n_lines<2>(), true);
 
           auto &q_is_q = tria_faces.quad_is_quadrilateral;
           q_is_q.reserve(new_size);
@@ -3267,7 +3267,7 @@ namespace internal
             for (unsigned int line = 0; line < n_lines; ++line)
               for (unsigned int i = crs.ptr[line], j = 0; i < crs.ptr[line + 1];
                    ++i, ++j)
-                lines_0.cells[line * ReferenceCell::max_n_faces<1>() + j] =
+                lines_0.cells[line * ReferenceCells::max_n_faces<1>() + j] =
                   crs.col[i]; // set vertex indices
           }
 
@@ -3298,7 +3298,7 @@ namespace internal
                   {
                     AssertIndexRange(j, reference_cell.n_lines());
                     // set line index
-                    quads_0.cells[q * ReferenceCell::max_n_lines<2>() + j] =
+                    quads_0.cells[q * ReferenceCells::max_n_lines<2>() + j] =
                       crs.col[i];
 
                     // set line orientations
@@ -3314,7 +3314,7 @@ namespace internal
                           ReferenceCell::reversed_combined_line_orientation(),
                       ExcInternalError());
                     faces.quads_line_orientations
-                      [q * ReferenceCell::max_n_lines<2>() + j] =
+                      [q * ReferenceCells::max_n_lines<2>() + j] =
                       combined_orientation ==
                       ReferenceCell::default_combined_face_orientation();
                   }
@@ -3370,18 +3370,18 @@ namespace internal
                 {
                   // set neighbor if not at boundary
                   if (nei.col[i] != static_cast<unsigned int>(-1))
-                    level.neighbors[cell * ReferenceCell::max_n_faces<dim>() +
+                    level.neighbors[cell * ReferenceCells::max_n_faces<dim>() +
                                     j] = {0, nei.col[i]};
 
                   // set face indices
-                  cells_0.cells[cell * ReferenceCell::max_n_faces<dim>() + j] =
+                  cells_0.cells[cell * ReferenceCells::max_n_faces<dim>() + j] =
                     crs.col[i];
 
                   // set face orientation if needed
                   if (orientation_needed)
                     {
                       level.face_orientations.set_combined_orientation(
-                        cell * ReferenceCell::max_n_faces<dim>() + j,
+                        cell * ReferenceCells::max_n_faces<dim>() + j,
                         connectivity.entity_orientations(dim - 1)
                           .get_combined_orientation(i));
                     }
@@ -3498,7 +3498,7 @@ namespace internal
         [[maybe_unused]] unsigned int counter = 0;
 
         std::vector<unsigned int> key;
-        key.reserve(ReferenceCell::max_n_vertices<structdim>());
+        key.reserve(ReferenceCells::max_n_vertices<structdim>());
 
         for (unsigned int o = 0; o < obj.n_objects(); ++o)
           {
@@ -15956,12 +15956,12 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
       std::vector<unsigned int> &cache = levels[l]->cell_vertex_indices_cache;
       cache.clear();
       cache.resize(levels[l]->refine_flags.size() *
-                     ReferenceCell::max_n_vertices<dim>(),
+                     ReferenceCells::max_n_vertices<dim>(),
                    numbers::invalid_unsigned_int);
       for (const auto &cell : cell_iterators_on_level(l))
         {
           const unsigned int my_index =
-            cell->index() * ReferenceCell::max_n_vertices<dim>();
+            cell->index() * ReferenceCells::max_n_vertices<dim>();
 
           // to reduce the cost of this function when passing down into quads,
           // then lines, then vertices, we use a more low-level access method
@@ -15982,7 +15982,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 
                 const unsigned char combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
-                    cell->index() * ReferenceCell::max_n_faces<dim>() + face);
+                    cell->index() * ReferenceCells::max_n_faces<dim>() + face);
                 std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,

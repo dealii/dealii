@@ -2571,7 +2571,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_faces_by_cells_boundary_id(
   const unsigned int face_number) const
 {
   AssertIndexRange(cell_batch_index, n_cell_batches());
-  AssertIndexRange(face_number, ReferenceCell::max_n_faces<dim>());
+  AssertIndexRange(face_number, ReferenceCells::max_n_faces<dim>());
   Assert(face_info.cell_and_face_boundary_id.size(0) >= n_cell_batches(),
          ExcNotInitialized());
   std::array<types::boundary_id, VectorizedArrayType::size()> result;

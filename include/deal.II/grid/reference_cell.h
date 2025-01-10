@@ -286,17 +286,6 @@ public:
   n_vertices() const;
 
   /**
-   * Return the maximum number of vertices an object of dimension `structdim`
-   * can have. This is always the number of vertices of a
-   * `structdim`-dimensional hypercube.
-   *
-   * @see ReferenceCell::max_n_faces()
-   */
-  template <int structdim>
-  static constexpr unsigned int
-  max_n_vertices();
-
-  /**
    * Return an object that can be thought of as an array containing all
    * indices from zero to n_vertices().
    */
@@ -323,17 +312,6 @@ public:
   n_lines() const;
 
   /**
-   * Return the maximum number of lines an object of dimension `structdim` can
-   * have. This is always the number of lines of a `structdim`-dimensional
-   * hypercube.
-   *
-   * @see ReferenceCell::max_n_faces()
-   */
-  template <int structdim>
-  static constexpr unsigned int
-  max_n_lines();
-
-  /**
    * Return an object that can be thought of as an array containing all
    * indices from zero to n_lines().
    */
@@ -347,25 +325,6 @@ public:
    */
   unsigned int
   n_faces() const;
-
-  /**
-   * Return the maximum number of faces an object of dimension `structdim` can
-   * have. This is always the number of faces of a `structdim`-dimensional
-   * hypercube.
-   *
-   * @note The primary use case of this and the other maxima functions is to
-   * enable simple array indexing to per-face data by cell index and face
-   * number, e.g.,
-   *
-   * @code
-   *     cell->index() * ReferenceCell::max_n_faces<dim>() + face_no;
-   * @endcode
-   *
-   * is a unique index to the `face_no`th face of the current cell.
-   */
-  template <int structdim>
-  static constexpr unsigned int
-  max_n_faces();
 
   /**
    * Return an object that can be thought of as an array containing all
@@ -1157,6 +1116,47 @@ namespace ReferenceCells
   template <int dim>
   constexpr const ReferenceCell &
   get_hypercube();
+
+  /**
+   * Return the maximum number of vertices an object of dimension `structdim`
+   * can have. This is always the number of vertices of a
+   * `structdim`-dimensional hypercube.
+   *
+   * @see ReferenceCells::max_n_faces()
+   */
+  template <int structdim>
+  constexpr unsigned int
+  max_n_vertices();
+
+  /**
+   * Return the maximum number of lines an object of dimension `structdim` can
+   * have. This is always the number of lines of a `structdim`-dimensional
+   * hypercube.
+   *
+   * @see ReferenceCells::max_n_faces()
+   */
+  template <int structdim>
+  constexpr unsigned int
+  max_n_lines();
+
+  /**
+   * Return the maximum number of faces an object of dimension `structdim` can
+   * have. This is always the number of faces of a `structdim`-dimensional
+   * hypercube.
+   *
+   * @note The primary use case of this and the other maxima functions is to
+   * enable simple array indexing to per-face data by cell index and face
+   * number, e.g.,
+   *
+   * @code
+   *     cell->index() * ReferenceCells::max_n_faces<dim>() + face_no;
+   * @endcode
+   *
+   * is a unique index to the `face_no`th face of the current cell.
+   */
+  template <int structdim>
+  constexpr unsigned int
+  max_n_faces();
 } // namespace ReferenceCells
 
 
@@ -1602,15 +1602,6 @@ ReferenceCell::n_vertices() const
 
 
 
-template <int structdim>
-inline constexpr unsigned int
-ReferenceCell::max_n_vertices()
-{
-  return GeometryInfo<structdim>::vertices_per_cell;
-}
-
-
-
 inline unsigned int
 ReferenceCell::n_lines() const
 {
@@ -1637,15 +1628,6 @@ ReferenceCell::n_lines() const
     }
 
   return numbers::invalid_unsigned_int;
-}
-
-
-
-template <int structdim>
-inline constexpr unsigned int
-ReferenceCell::max_n_lines()
-{
-  return GeometryInfo<structdim>::lines_per_cell;
 }
 
 
@@ -1796,15 +1778,6 @@ ReferenceCell::n_faces() const
     }
 
   return numbers::invalid_unsigned_int;
-}
-
-
-
-template <int structdim>
-inline constexpr unsigned int
-ReferenceCell::max_n_faces()
-{
-  return GeometryInfo<structdim>::faces_per_cell;
 }
 
 
@@ -2638,6 +2611,33 @@ namespace ReferenceCells
           DEAL_II_NOT_IMPLEMENTED();
       }
     return ReferenceCells::Invalid;
+  }
+
+
+
+  template <int structdim>
+  inline constexpr unsigned int
+  max_n_vertices()
+  {
+    return GeometryInfo<structdim>::vertices_per_cell;
+  }
+
+
+
+  template <int structdim>
+  inline constexpr unsigned int
+  max_n_lines()
+  {
+    return GeometryInfo<structdim>::lines_per_cell;
+  }
+
+
+
+  template <int structdim>
+  inline constexpr unsigned int
+  max_n_faces()
+  {
+    return GeometryInfo<structdim>::faces_per_cell;
   }
 } // namespace ReferenceCells
 
