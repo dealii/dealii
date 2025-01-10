@@ -21,7 +21,7 @@ my $cmake_source_dir = shift(@ARGV);
 
 my $gallery = shift(@ARGV);
 my $gallery_underscore = $gallery;
-$gallery_underscore    =~ s/-/_/;
+$gallery_underscore    =~ s/-/_/g;
 
 my $gallery_dir = shift(@ARGV);
 

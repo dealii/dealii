@@ -60,7 +60,7 @@ foreach my $gallery (@ARGV)
     chop $authors;
     $authors =~ s/,$//;
 
-    $gallery_underscore    =~ s/-/_/;
+    $gallery_underscore    =~ s/-/_/g;
 
     my $description;
     $description = "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$entryname\"</b> (by $authors)</dt>\n";
