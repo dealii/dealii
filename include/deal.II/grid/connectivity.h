@@ -1025,9 +1025,7 @@ namespace internal
       unsigned int n_entities = 0;
 
       for (const auto &c : cell_types_index)
-        n_entities +=
-          cell_types[static_cast<types::geometric_entity_type>(c)]->n_entities(
-            face_dimensionality);
+        n_entities += cell_types[c]->n_entities(face_dimensionality);
 
       // step 1: store each d-dimensional entity of a cell (described by their
       // vertices) into a vector and create a key for them
@@ -1055,9 +1053,7 @@ namespace internal
       // loop over all cells
       for (unsigned int c = 0, counter = 0; c < cell_types_index.size(); ++c)
         {
-          const auto &cell_type =
-            cell_types[static_cast<types::geometric_entity_type>(
-              cell_types_index[c])];
+          const auto &cell_type = cell_types[cell_types_index[c]];
           ptr_d[c + 1] = ptr_d[c] + cell_type->n_entities(face_dimensionality);
 
           // ... collect vertices of cell
@@ -1121,9 +1117,7 @@ namespace internal
 
                   ++n_unique_entities;
                   n_unique_entity_vertices +=
-                    cell_types[static_cast<types::geometric_entity_type>(
-                                 ad_entity_types[offset_i])]
-                      ->n_entities(0);
+                    cell_types[ad_entity_types[offset_i]]->n_entities(0);
 
                   new_key = ad_compatibility[offset_i];
                 }
@@ -1201,8 +1195,7 @@ namespace internal
 
       for (const auto &c : cell_types_index)
         {
-          const auto &cell_type =
-            cell_types[static_cast<types::geometric_entity_type>(c)];
+          const auto &cell_type = cell_types[c];
           for (unsigned int e = 0;
                e < cell_type->n_entities(face_dimensionality);
                ++e)
@@ -1278,9 +1271,7 @@ namespace internal
       // count the number of lines of each face
       for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
         {
-          const auto &cell_type =
-            cell_types[static_cast<types::geometric_entity_type>(
-              cell_types_index[c])];
+          const auto &cell_type = cell_types[cell_types_index[c]];
 
           // loop over faces
           for (unsigned int f_ = con_cq.ptr[c], f_index = 0;
@@ -1304,9 +1295,7 @@ namespace internal
       // loop over cells
       for (unsigned int c = 0; c < con_cq.ptr.size() - 1; ++c)
         {
-          const auto &cell_type =
-            cell_types[static_cast<types::geometric_entity_type>(
-              cell_types_index[c])];
+          const auto &cell_type = cell_types[cell_types_index[c]];
 
           // loop over faces
           for (unsigned int f_ = con_cq.ptr[c], f_index = 0;
@@ -1464,21 +1453,19 @@ namespace internal
       // vector of possible cell entity types
       std::vector<std::shared_ptr<CellTypeBase>> cell_types_impl(8);
 
-      cell_types_impl[static_cast<types::geometric_entity_type>(
-        ReferenceCells::Line)]     = std::make_shared<CellTypeLine>();
-      cell_types_impl[static_cast<types::geometric_entity_type>(
-        ReferenceCells::Triangle)] = std::make_shared<CellTypeTriangle>();
-      cell_types_impl[static_cast<types::geometric_entity_type>(
-        ReferenceCells::Quadrilateral)] =
+      cell_types_impl[ReferenceCells::Line] = std::make_shared<CellTypeLine>();
+      cell_types_impl[ReferenceCells::Triangle] =
+        std::make_shared<CellTypeTriangle>();
+      cell_types_impl[ReferenceCells::Quadrilateral] =
         std::make_shared<CellTypeQuadrilateral>();
-      cell_types_impl[static_cast<types::geometric_entity_type>(
-        ReferenceCells::Tetrahedron)] = std::make_shared<CellTypeTetrahedron>();
-      cell_types_impl[static_cast<types::geometric_entity_type>(
-        ReferenceCells::Pyramid)]     = std::make_shared<CellTypePyramid>();
-      cell_types_impl[static_cast<types::geometric_entity_type>(
-        ReferenceCells::Wedge)]       = std::make_shared<CellTypeWedge>();
-      cell_types_impl[static_cast<types::geometric_entity_type>(
-        ReferenceCells::Hexahedron)]  = std::make_shared<CellTypeHexahedron>();
+      cell_types_impl[ReferenceCells::Tetrahedron] =
+        std::make_shared<CellTypeTetrahedron>();
+      cell_types_impl[ReferenceCells::Pyramid] =
+        std::make_shared<CellTypePyramid>();
+      cell_types_impl[ReferenceCells::Wedge] =
+        std::make_shared<CellTypeWedge>();
+      cell_types_impl[ReferenceCells::Hexahedron] =
+        std::make_shared<CellTypeHexahedron>();
 
       // determine cell types and process vertices
       std::vector<T> cell_vertices;
@@ -1522,12 +1509,9 @@ namespace internal
 
           Assert(reference_cell != ReferenceCells::Invalid,
                  ExcNotImplemented());
-          AssertIndexRange(static_cast<types::geometric_entity_type>(
-                             reference_cell),
+          AssertIndexRange(static_cast<std::uint8_t>(reference_cell),
                            cell_types_impl.size());
-          Assert(cell_types_impl[static_cast<types::geometric_entity_type>(
-                                   reference_cell)]
-                     .get() != nullptr,
+          Assert(cell_types_impl[reference_cell].get() != nullptr,
                  ExcNotImplemented());
 
           cell_types_indices.push_back(reference_cell);
