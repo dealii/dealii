@@ -403,7 +403,7 @@ public:
    * Return the default combined face orientation flag (i.e., the default set of
    * orientations, defined by orientation, rotate, and flip for a face in 3d).
    */
-  static constexpr unsigned char
+  static constexpr types::geometric_orientation
   default_combined_face_orientation();
 
   /**
@@ -414,9 +414,9 @@ public:
    *
    * @note Line orientations are typically stored as booleans, but to better
    * enable dimension-independent programming relevant functions typically
-   * present these values as unsigned chars.
+   * present these values as the standard orientation type.
    */
-  static constexpr unsigned char
+  static constexpr types::geometric_orientation
   reversed_combined_line_orientation();
 
   /**
@@ -461,9 +461,9 @@ public:
    * entry.
    */
   unsigned int
-  child_cell_on_face(const unsigned int  face,
-                     const unsigned int  subface,
-                     const unsigned char face_orientation =
+  child_cell_on_face(const unsigned int                 face,
+                     const unsigned int                 subface,
+                     const types::geometric_orientation face_orientation =
                        default_combined_face_orientation()) const;
 
   /**
@@ -506,17 +506,18 @@ public:
    * Map face line number to cell line number.
    */
   unsigned int
-  face_to_cell_lines(const unsigned int  face,
-                     const unsigned int  line,
-                     const unsigned char face_orientation) const;
+  face_to_cell_lines(const unsigned int                 face,
+                     const unsigned int                 line,
+                     const types::geometric_orientation face_orientation) const;
 
   /**
    * Map face vertex number to cell vertex number.
    */
   unsigned int
-  face_to_cell_vertices(const unsigned int  face,
-                        const unsigned int  vertex,
-                        const unsigned char face_orientation) const;
+  face_to_cell_vertices(
+    const unsigned int                 face,
+    const unsigned int                 vertex,
+    const types::geometric_orientation face_orientation) const;
 
   /**
    * For a given face, in standard orientation, return the location of one
@@ -546,17 +547,19 @@ public:
    * Correct vertex index depending on face orientation.
    */
   unsigned int
-  standard_to_real_face_vertex(const unsigned int  vertex,
-                               const unsigned int  face,
-                               const unsigned char face_orientation) const;
+  standard_to_real_face_vertex(
+    const unsigned int                 vertex,
+    const unsigned int                 face,
+    const types::geometric_orientation face_orientation) const;
 
   /**
    * Correct line index depending on face orientation.
    */
   unsigned int
-  standard_to_real_face_line(const unsigned int  line,
-                             const unsigned int  face,
-                             const unsigned char face_orientation) const;
+  standard_to_real_face_line(
+    const unsigned int                 line,
+    const unsigned int                 face,
+    const types::geometric_orientation face_orientation) const;
 
   /**
    * Return whether the line with index @p line is oriented in
@@ -569,10 +572,11 @@ public:
    * documentation of the GeometryInfo class.
    */
   bool
-  standard_vs_true_line_orientation(const unsigned int  line,
-                                    const unsigned int  face,
-                                    const unsigned char face_orientation,
-                                    const bool          line_orientation) const;
+  standard_vs_true_line_orientation(
+    const unsigned int                 line,
+    const unsigned int                 face,
+    const types::geometric_orientation face_orientation,
+    const bool                         line_orientation) const;
 
   /**
    * @}
@@ -691,9 +695,9 @@ public:
    * @deprecated Use get_combined_orientation() instead.
    */
   template <typename T, std::size_t N>
-  DEAL_II_DEPRECATED unsigned char
-  compute_orientation(const std::array<T, N> &vertices_0,
-                      const std::array<T, N> &vertices_1) const;
+  DEAL_II_DEPRECATED types::geometric_orientation
+                     compute_orientation(const std::array<T, N> &vertices_0,
+                                         const std::array<T, N> &vertices_1) const;
 
   /**
    * Determine the relative orientation of the current entity described by its
@@ -721,7 +725,7 @@ public:
    *   these orientation indices.
    */
   template <typename T>
-  unsigned char
+  types::geometric_orientation
   get_combined_orientation(const ArrayView<const T> &vertices_0,
                            const ArrayView<const T> &vertices_1) const;
 
@@ -757,16 +761,18 @@ public:
    */
   template <typename T>
   boost::container::small_vector<T, 8>
-  permute_by_combined_orientation(const ArrayView<const T> &vertices,
-                                  const unsigned char       orientation) const;
+  permute_by_combined_orientation(
+    const ArrayView<const T>          &vertices,
+    const types::geometric_orientation orientation) const;
 
   /**
    * Return the inverse orientation. This is the value such that calling
    * permute_by_combined_orientation() with <tt>o</tt> and then calling it again
    * with get_inverse_combined_orientation(o) is the identity operation.
    */
-  unsigned char
-  get_inverse_combined_orientation(const unsigned char orientation) const;
+  types::geometric_orientation
+  get_inverse_combined_orientation(
+    const types::geometric_orientation orientation) const;
 
   /**
    * Return a vector of faces a given @p vertex_index belongs to.
@@ -1952,7 +1958,7 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
 
 
 
-inline constexpr unsigned char
+inline constexpr types::geometric_orientation
 ReferenceCell::default_combined_face_orientation()
 {
   // Our convention is that 'orientation' has a default value of true and
@@ -1963,7 +1969,7 @@ ReferenceCell::default_combined_face_orientation()
 
 
 
-inline constexpr unsigned char
+inline constexpr types::geometric_orientation
 ReferenceCell::reversed_combined_line_orientation()
 {
   // For a reversed line 'orientation' is false and neither flip nor rotate are
@@ -1975,9 +1981,9 @@ ReferenceCell::reversed_combined_line_orientation()
 
 inline unsigned int
 ReferenceCell::child_cell_on_face(
-  const unsigned int  face,
-  const unsigned int  subface,
-  const unsigned char combined_face_orientation) const
+  const unsigned int                 face,
+  const unsigned int                 subface,
+  const types::geometric_orientation combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(subface, face_reference_cell(face).n_isotropic_children());
@@ -2247,9 +2253,9 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
 
 inline unsigned int
 ReferenceCell::face_to_cell_lines(
-  const unsigned int  face,
-  const unsigned int  line,
-  const unsigned char combined_face_orientation) const
+  const unsigned int                 face,
+  const unsigned int                 line,
+  const types::geometric_orientation combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
@@ -2334,9 +2340,9 @@ ReferenceCell::face_to_cell_lines(
 
 inline unsigned int
 ReferenceCell::face_to_cell_vertices(
-  const unsigned int  face,
-  const unsigned int  vertex,
-  const unsigned char combined_face_orientation) const
+  const unsigned int                 face,
+  const unsigned int                 vertex,
+  const types::geometric_orientation combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
@@ -2446,9 +2452,9 @@ ReferenceCell::face_vertex_location(const unsigned int face,
 
 inline unsigned int
 ReferenceCell::standard_to_real_face_vertex(
-  const unsigned int  vertex,
-  const unsigned int  face,
-  const unsigned char face_orientation) const
+  const unsigned int                 vertex,
+  const unsigned int                 face,
+  const types::geometric_orientation face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
@@ -2494,9 +2500,9 @@ ReferenceCell::standard_to_real_face_vertex(
 
 inline unsigned int
 ReferenceCell::standard_to_real_face_line(
-  const unsigned int  line,
-  const unsigned int  face,
-  const unsigned char combined_face_orientation) const
+  const unsigned int                 line,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
@@ -3112,10 +3118,10 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
 
 inline bool
 ReferenceCell::standard_vs_true_line_orientation(
-  const unsigned int  line,
-  const unsigned int  face,
-  const unsigned char combined_face_orientation,
-  const bool          line_orientation) const
+  const unsigned int                 line,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_face_orientation,
+  const bool                         line_orientation) const
 {
   if (*this == ReferenceCells::Hexahedron)
     {
@@ -3247,7 +3253,7 @@ namespace internal
 
 
 template <typename T, std::size_t N>
-inline unsigned char
+inline types::geometric_orientation
 ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
                                    const std::array<T, N> &vertices_1) const
 {
@@ -3268,7 +3274,7 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
 
 
 template <typename T>
-unsigned char
+types::geometric_orientation
 ReferenceCell::get_combined_orientation(
   const ArrayView<const T> &vertices_0,
   const ArrayView<const T> &vertices_1) const
@@ -3283,7 +3289,7 @@ ReferenceCell::get_combined_orientation(
                     "referenced by this object."));
 
   auto compute_orientation = [&](const auto &table) {
-    for (unsigned char o = 0; o < table.size(); ++o)
+    for (types::geometric_orientation o = 0; o < table.size(); ++o)
       {
         bool match = true;
         for (unsigned int j = 0; j < table[o].size(); ++j)
@@ -3294,7 +3300,7 @@ ReferenceCell::get_combined_orientation(
       }
 
     Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
-    return std::numeric_limits<unsigned char>::max();
+    return std::numeric_limits<types::geometric_orientation>::max();
   };
 
   switch (this->kind)
@@ -3317,7 +3323,7 @@ ReferenceCell::get_combined_orientation(
     }
 
   Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
-  return std::numeric_limits<unsigned char>::max();
+  return std::numeric_limits<types::geometric_orientation>::max();
 }
 
 
@@ -3352,8 +3358,8 @@ ReferenceCell::permute_according_orientation(
 template <typename T>
 boost::container::small_vector<T, 8>
 ReferenceCell::permute_by_combined_orientation(
-  const ArrayView<const T> &vertices,
-  const unsigned char       orientation) const
+  const ArrayView<const T>          &vertices,
+  const types::geometric_orientation orientation) const
 {
   AssertDimension(vertices.size(), n_vertices());
   boost::container::small_vector<T, 8> result(n_vertices());
@@ -3389,9 +3395,9 @@ ReferenceCell::permute_by_combined_orientation(
 
 
 
-inline unsigned char
+inline types::geometric_orientation
 ReferenceCell::get_inverse_combined_orientation(
-  const unsigned char orientation) const
+  const types::geometric_orientation orientation) const
 {
   switch (this->kind)
     {
@@ -3407,13 +3413,14 @@ ReferenceCell::get_inverse_combined_orientation(
       case ReferenceCells::Triangle:
         {
           AssertIndexRange(orientation, 6);
-          constexpr std::array<unsigned char, 6> inverses{{0, 1, 2, 5, 4, 3}};
+          constexpr std::array<types::geometric_orientation, 6> inverses{
+            {0, 1, 2, 5, 4, 3}};
           return inverses[orientation];
         }
       case ReferenceCells::Quadrilateral:
         {
           AssertIndexRange(orientation, 8);
-          constexpr std::array<unsigned char, 8> inverses{
+          constexpr std::array<types::geometric_orientation, 8> inverses{
             {0, 1, 2, 7, 4, 5, 6, 3}};
           return inverses[orientation];
         }
@@ -3421,7 +3428,7 @@ ReferenceCell::get_inverse_combined_orientation(
         DEAL_II_NOT_IMPLEMENTED();
     }
 
-  return std::numeric_limits<unsigned char>::max();
+  return std::numeric_limits<types::geometric_orientation>::max();
 }
 
 

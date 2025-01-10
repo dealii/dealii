@@ -1109,9 +1109,9 @@ FE_Q_Base<dim, spacedim>::initialize_dof_index_permutations()
 template <int dim, int spacedim>
 unsigned int
 FE_Q_Base<dim, spacedim>::face_to_cell_index(
-  const unsigned int  face_index,
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 face_index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);

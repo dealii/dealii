@@ -39,7 +39,7 @@
 //                                const FaceIterator        &,
 //                                AffineConstraints<double> &,
 //                                const ComponentMask       &,
-//                                unsigned char)
+//                                types::geometric_orientation)
 //
 // for correct behavior with hanging nodes. This is done by additionally
 // refining the second cube once. Test that constraining face_1 -> face_2

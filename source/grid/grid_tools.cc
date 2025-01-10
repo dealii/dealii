@@ -4773,10 +4773,10 @@ namespace GridTools
           const auto face_a = pair.first.first->face(pair.first.second);
           const auto face_b =
             pair.second.first.first->face(pair.second.first.second);
-          const auto reference_cell      = pair.first.first->reference_cell();
-          const auto face_reference_cell = face_a->reference_cell();
-          const unsigned char combined_orientation = pair.second.second;
-          const unsigned char inverse_combined_orientation =
+          const auto reference_cell       = pair.first.first->reference_cell();
+          const auto face_reference_cell  = face_a->reference_cell();
+          const auto combined_orientation = pair.second.second;
+          const auto inverse_combined_orientation =
             face_reference_cell.get_inverse_combined_orientation(
               combined_orientation);
 

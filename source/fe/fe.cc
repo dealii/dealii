@@ -564,9 +564,9 @@ FiniteElement<dim, spacedim>::block_mask(
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::face_to_cell_index(
-  const unsigned int  face_index,
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 face_index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, this->reference_cell().n_faces());
@@ -638,9 +638,9 @@ FiniteElement<dim, spacedim>::face_to_cell_index(
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
-  const unsigned int  index,
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   // general template for 1d and 2d: not
   // implemented. in fact, the function
@@ -675,8 +675,8 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
-  const unsigned int  index,
-  const unsigned char combined_orientation) const
+  const unsigned int                 index,
+  const types::geometric_orientation combined_orientation) const
 {
   Assert(combined_orientation ==
              ReferenceCell::default_combined_face_orientation() ||

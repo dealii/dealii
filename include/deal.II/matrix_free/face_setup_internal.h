@@ -1003,10 +1003,11 @@ namespace internal
       // special treatment of periodic boundaries
       if (dim == 3 && cell->has_periodic_neighbor(face_no))
         {
-          unsigned char exterior_face_orientation = cell->get_triangulation()
-                                                      .get_periodic_face_map()
-                                                      .at({cell, face_no})
-                                                      .second;
+          const types::geometric_orientation exterior_face_orientation =
+            cell->get_triangulation()
+              .get_periodic_face_map()
+              .at({cell, face_no})
+              .second;
           const auto [orientation, rotation, flip] =
             ::dealii::internal::split_face_orientation(
               exterior_face_orientation);

@@ -249,7 +249,7 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
     namespace GridTools
     \{
 
-      template std::optional<unsigned char>
+      template std::optional<types::geometric_orientation>
       orthogonal_equality<X::active_face_iterator>(
         const X::active_face_iterator &,
         const X::active_face_iterator &,
@@ -257,7 +257,7 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
 
-      template std::optional<unsigned char>
+      template std::optional<types::geometric_orientation>
       orthogonal_equality<X::face_iterator>(
         const X::face_iterator &,
         const X::face_iterator &,

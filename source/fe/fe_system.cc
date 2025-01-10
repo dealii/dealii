@@ -982,9 +982,9 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
 template <int dim, int spacedim>
 unsigned int
 FESystem<dim, spacedim>::face_to_cell_index(
-  const unsigned int  face_dof_index,
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 face_dof_index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   // we need to ask the base elements how they want to translate
   // the DoFs within their own numbering. thus, translate to

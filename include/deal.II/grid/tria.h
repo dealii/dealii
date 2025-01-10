@@ -3646,9 +3646,9 @@ public:
   /**
    * Return the periodic_face_map.
    */
-  const std::map<
-    std::pair<cell_iterator, unsigned int>,
-    std::pair<std::pair<cell_iterator, unsigned int>, unsigned char>> &
+  const std::map<std::pair<cell_iterator, unsigned int>,
+                 std::pair<std::pair<cell_iterator, unsigned int>,
+                           types::geometric_orientation>> &
   get_periodic_face_map() const;
 
   /**
@@ -4106,7 +4106,8 @@ private:
    * face pairs.
    */
   std::map<std::pair<cell_iterator, unsigned int>,
-           std::pair<std::pair<cell_iterator, unsigned int>, unsigned char>>
+           std::pair<std::pair<cell_iterator, unsigned int>,
+                     types::geometric_orientation>>
     periodic_face_map;
 
   /**

@@ -3106,7 +3106,7 @@ namespace DoFTools
       const FullMatrix<double>                       &transformation,
       AffineConstraints<number>                      &affine_constraints,
       const ComponentMask                            &component_mask,
-      const unsigned char                             combined_orientation,
+      const types::geometric_orientation              combined_orientation,
       const number                                    periodicity_factor,
       const unsigned int                              level)
     {
@@ -3604,7 +3604,7 @@ namespace DoFTools
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number>                      &affine_constraints,
     const ComponentMask                            &component_mask,
-    const unsigned char                             combined_orientation,
+    const types::geometric_orientation              combined_orientation,
     const FullMatrix<double>                       &matrix,
     const std::vector<unsigned int>                &first_vector_components,
     const number                                    periodicity_factor)

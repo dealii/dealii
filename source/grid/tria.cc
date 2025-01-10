@@ -1647,19 +1647,19 @@ namespace
     const typename Triangulation<dim, spacedim>::cell_iterator &cell_2,
     unsigned int                                                n_face_1,
     unsigned int                                                n_face_2,
-    const unsigned char                                         orientation,
+    const types::geometric_orientation                          orientation,
     typename std::map<
       std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                 unsigned int>,
       std::pair<std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                           unsigned int>,
-                unsigned char>> &periodic_face_map)
+                types::geometric_orientation>> &periodic_face_map)
   {
     using FaceIterator = typename Triangulation<dim, spacedim>::face_iterator;
     const FaceIterator face_1 = cell_1->face(n_face_1);
     const FaceIterator face_2 = cell_2->face(n_face_2);
 
-    const unsigned char inverse_orientation =
+    const auto inverse_orientation =
       face_1->reference_cell().get_inverse_combined_orientation(orientation);
 
 #ifdef DEBUG
@@ -1694,12 +1694,12 @@ namespace
     using CellFace =
       std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                 unsigned int>;
-    const CellFace                           cell_face_1(cell_1, n_face_1);
-    const CellFace                           cell_face_2(cell_2, n_face_2);
-    const std::pair<CellFace, unsigned char> cell_face_orientation_2(
-      cell_face_2, orientation);
+    const CellFace cell_face_1(cell_1, n_face_1);
+    const CellFace cell_face_2(cell_2, n_face_2);
+    const std::pair<CellFace, types::geometric_orientation>
+      cell_face_orientation_2(cell_face_2, orientation);
 
-    const std::pair<CellFace, std::pair<CellFace, unsigned char>>
+    const std::pair<CellFace, std::pair<CellFace, types::geometric_orientation>>
       periodic_faces(cell_face_1, cell_face_orientation_2);
 
     // Only one periodic neighbor is allowed
@@ -3302,7 +3302,7 @@ namespace internal
                       crs.col[i];
 
                     // set line orientations
-                    const unsigned char combined_orientation =
+                    const auto combined_orientation =
                       connectivity.entity_orientations(1)
                         .get_combined_orientation(k);
                     // it doesn't make sense to set any flags except
@@ -5151,8 +5151,8 @@ namespace internal
 
           std::array<typename Triangulation<dim, spacedim>::raw_line_iterator,
                      12>
-                                        new_lines;
-          std::array<unsigned char, 12> inherited_orientations;
+                                                       new_lines;
+          std::array<types::geometric_orientation, 12> inherited_orientations;
           inherited_orientations.fill(
             ReferenceCell::default_combined_face_orientation());
           unsigned int lmin = 0;
@@ -5197,7 +5197,7 @@ namespace internal
               // orientation. This way we can index into this array in the
               // without special casing orientations (e.g., quadrilateral child
               // 3 will always have lines 9, 3, 11, 7) when setting child lines.
-              const unsigned char combined_orientation =
+              const auto combined_orientation =
                 cell->combined_face_orientation(face_no);
               Assert(combined_orientation ==
                          ReferenceCell::default_combined_face_orientation() ||
@@ -6811,7 +6811,7 @@ namespace internal
                                             {{2, 1, 0}}, // 4
                                             {{2, 0, 1}}}};
 
-                              const unsigned char combined_orientation =
+                              const auto combined_orientation =
                                 hex->combined_face_orientation(f);
                               relevant_lines[k] =
                                 hex->face(f)
@@ -6966,7 +6966,7 @@ namespace internal
                         for (unsigned int f = 0, k = n_new_quads; f < 4; ++f)
                           for (unsigned int c = 0; c < 4; ++c, ++k)
                             {
-                              const unsigned char combined_orientation =
+                              const auto combined_orientation =
                                 hex->combined_face_orientation(f);
                               quad_indices[k] = hex->face(f)->child_index(
                                 (c == 3) ? 3 :
@@ -7085,7 +7085,7 @@ namespace internal
                     if (hex->n_faces() == 6)
                       for (const auto f : hex->face_indices())
                         {
-                          const unsigned char combined_orientation =
+                          const auto combined_orientation =
                             hex->combined_face_orientation(f);
                           for (unsigned int c = 0; c < 4; ++c)
                             new_hexes[face_to_child_indices_hex[f][c]]
@@ -8633,7 +8633,7 @@ namespace internal
                                         hex->face_rotation(5)};
 
                   // combined orientation
-                  const unsigned char f_co[6] = {
+                  const types::geometric_orientation f_co[6] = {
                     hex->combined_face_orientation(0),
                     hex->combined_face_orientation(1),
                     hex->combined_face_orientation(2),
@@ -15620,7 +15620,7 @@ const typename std::map<
   std::pair<typename Triangulation<dim, spacedim>::cell_iterator, unsigned int>,
   std::pair<std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                       unsigned int>,
-            unsigned char>>
+            types::geometric_orientation>>
   &Triangulation<dim, spacedim>::get_periodic_face_map() const
 {
   return periodic_face_map;
@@ -15980,7 +15980,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                    face_iter->line(0)->vertex_index(line_orientations[0]),
                    face_iter->line(1)->vertex_index(line_orientations[1])}};
 
-                const unsigned char combined_orientation =
+                const auto combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
                     cell->index() * ReferenceCells::max_n_faces<dim>() + face);
                 std::array<unsigned int, 4> vertex_order{
@@ -16075,7 +16075,8 @@ void Triangulation<dim, spacedim>::update_periodic_face_map()
   // check consistency
   typename std::map<std::pair<cell_iterator, unsigned int>,
                     std::pair<std::pair<cell_iterator, unsigned int>,
-                              unsigned char>>::const_iterator it_test;
+                              types::geometric_orientation>>::const_iterator
+    it_test;
   for (it_test = periodic_face_map.begin(); it_test != periodic_face_map.end();
        ++it_test)
     {

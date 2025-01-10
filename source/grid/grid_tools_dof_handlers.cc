@@ -2166,7 +2166,7 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (const std::optional<unsigned char> orientation =
+            if (const std::optional<types::geometric_orientation> orientation =
                   GridTools::orthogonal_equality(cell1->face(face_idx1),
                                                  cell2->face(face_idx2),
                                                  direction,
@@ -2422,7 +2422,7 @@ namespace GridTools
 
 
   template <typename FaceIterator>
-  std::optional<unsigned char>
+  std::optional<types::geometric_orientation>
   orthogonal_equality(
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,

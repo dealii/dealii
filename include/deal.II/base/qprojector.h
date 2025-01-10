@@ -327,10 +327,10 @@ public:
      * projected onto the faces) has.
      */
     static DataSetDescriptor
-    face(const ReferenceCell &reference_cell,
-         const unsigned int   face_no,
-         const unsigned char  combined_orientation,
-         const unsigned int   n_quadrature_points);
+    face(const ReferenceCell               &reference_cell,
+         const unsigned int                 face_no,
+         const types::geometric_orientation combined_orientation,
+         const unsigned int                 n_quadrature_points);
 
     /**
      * Compute an offset object for the given face number and orientation,
@@ -358,10 +358,10 @@ public:
      *
      */
     static DataSetDescriptor
-    face(const ReferenceCell            &reference_cell,
-         const unsigned int              face_no,
-         const unsigned char             combined_orientation,
-         const hp::QCollection<dim - 1> &quadrature);
+    face(const ReferenceCell               &reference_cell,
+         const unsigned int                 face_no,
+         const types::geometric_orientation combined_orientation,
+         const hp::QCollection<dim - 1>    &quadrature);
 
     /**
      * Static function to generate an offset object for a given subface of a
@@ -405,12 +405,12 @@ public:
      * Through the last argument anisotropic refinement can be respected.
      */
     static DataSetDescriptor
-    subface(const ReferenceCell             &reference_cell,
-            const unsigned int               face_no,
-            const unsigned int               subface_no,
-            const unsigned char              combined_orientation,
-            const unsigned int               n_quadrature_points,
-            const internal::SubfaceCase<dim> ref_case =
+    subface(const ReferenceCell               &reference_cell,
+            const unsigned int                 face_no,
+            const unsigned int                 subface_no,
+            const types::geometric_orientation combined_orientation,
+            const unsigned int                 n_quadrature_points,
+            const internal::SubfaceCase<dim>   ref_case =
               internal::SubfaceCase<dim>::case_isotropic);
 
     /**
