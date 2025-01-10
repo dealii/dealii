@@ -2601,7 +2601,7 @@ namespace parallel
             const unsigned int   face_no_1            = it.first.second;
             const cell_iterator &cell_2               = it.second.first.first;
             const unsigned int   face_no_2            = it.second.first.second;
-            const unsigned char  combined_orientation = it.second.second;
+            const auto           combined_orientation = it.second.second;
 
             if (cell_1->level() == cell_2->level())
               {
@@ -3709,7 +3709,7 @@ namespace parallel
             const unsigned int   face_no_1            = it.first.second;
             const cell_iterator &cell_2               = it.second.first.first;
             const unsigned int   face_no_2            = it.second.first.second;
-            const unsigned char  combined_orientation = it.second.second;
+            const auto           combined_orientation = it.second.second;
             const auto [orientation, rotation, flip] =
               ::dealii::internal::split_face_orientation(combined_orientation);
 
@@ -3815,7 +3815,7 @@ namespace parallel
               const unsigned int  face_idx_list[] = {face_left, face_right};
               const cell_iterator cell_list[]     = {first_cell, second_cell};
               unsigned int        lower_idx, higher_idx;
-              unsigned char       orientation;
+              types::geometric_orientation orientation;
               if (face_left <= face_right)
                 {
                   higher_idx = 1;

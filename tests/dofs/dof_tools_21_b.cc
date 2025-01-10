@@ -39,7 +39,7 @@
 //                                const FaceIterator        &,
 //                                AffineConstraints<double> &,
 //                                const ComponentMask       &,
-//                                unsigned char)
+//                                types::geometric_orientation)
 // for correct behavior on non standard oriented meshes.
 //
 

@@ -1482,9 +1482,9 @@ public:
    */
   unsigned int
   adjust_quad_dof_index_for_face_orientation(
-    const unsigned int  index,
-    const unsigned int  face_no,
-    const unsigned char combined_orientation) const;
+    const unsigned int                 index,
+    const unsigned int                 face_no,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
@@ -1535,9 +1535,9 @@ public:
    */
   virtual unsigned int
   face_to_cell_index(
-    const unsigned int  face_dof_index,
-    const unsigned int  face,
-    const unsigned char combined_orientation =
+    const unsigned int                 face_dof_index,
+    const unsigned int                 face,
+    const types::geometric_orientation combined_orientation =
       ReferenceCell::default_combined_face_orientation()) const;
 
   /**
@@ -1551,8 +1551,8 @@ public:
    */
   unsigned int
   adjust_line_dof_index_for_line_orientation(
-    const unsigned int  index,
-    const unsigned char combined_orientation) const;
+    const unsigned int                 index,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Return in which of the vector components of this finite element the @p

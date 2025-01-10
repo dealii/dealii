@@ -154,9 +154,9 @@ generate_grid(Triangulation<3> &triangulation)
  */
 template <typename FaceIterator>
 void
-print_match(const FaceIterator &face_1,
-            const FaceIterator &face_2,
-            const unsigned char combined_orientation)
+print_match(const FaceIterator                &face_1,
+            const FaceIterator                &face_2,
+            const types::geometric_orientation combined_orientation)
 {
   static const int dim = FaceIterator::AccessorType::dimension;
 
