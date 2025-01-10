@@ -99,7 +99,12 @@ MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
 
 template <int dim, typename VectorType, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCell::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -107,9 +112,13 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
   const std::vector<Point<spacedim>> a = compute_mapping_support_points(cell);
 
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
-    vertex_locations(a.begin(),
-                     a.begin() + GeometryInfo<dim>::vertices_per_cell);
+#ifndef _MSC_VER
+                                 ReferenceCell::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
+    vertex_locations(a.begin(), a.begin() + cell->n_vertices());
 
   return vertex_locations;
 }

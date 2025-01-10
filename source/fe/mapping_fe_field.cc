@@ -447,7 +447,12 @@ MappingFEField<dim, spacedim, VectorType>::is_compatible_with(
 
 template <int dim, int spacedim, typename VectorType>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCell::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingFEField<dim, spacedim, VectorType>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -485,7 +490,12 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
     uses_level_dofs ? *euler_vector[cell->level()] : *euler_vector[0];
 
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                 ReferenceCell::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
     vertices(cell->n_vertices());
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {

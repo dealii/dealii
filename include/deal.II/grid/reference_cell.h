@@ -286,6 +286,17 @@ public:
   n_vertices() const;
 
   /**
+   * Return the maximum number of vertices an object of dimension `structdim`
+   * can have. This is always the number of vertices of a
+   * `structdim`-dimensional hypercube.
+   *
+   * @see ReferenceCell::max_n_faces()
+   */
+  template <int structdim>
+  static constexpr unsigned int
+  max_n_vertices();
+
+  /**
    * Return an object that can be thought of as an array containing all
    * indices from zero to n_vertices().
    */
@@ -1587,6 +1598,15 @@ ReferenceCell::n_vertices() const
     }
 
   return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int structdim>
+inline constexpr unsigned int
+ReferenceCell::max_n_vertices()
+{
+  return GeometryInfo<structdim>::vertices_per_cell;
 }
 
 
