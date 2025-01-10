@@ -729,7 +729,7 @@ MappingQCache<dim, spacedim>::compute_mapping_support_points(
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
 #ifndef _MSC_VER
-                               ReferenceCell::max_n_vertices<dim>()
+                               ReferenceCells::max_n_vertices<dim>()
 #else
                                GeometryInfo<dim>::vertices_per_cell
 #endif
@@ -748,7 +748,7 @@ MappingQCache<dim, spacedim>::get_vertices(
   const auto ptr = (*support_point_cache)[cell->level()][cell->index()].begin();
   return boost::container::small_vector<Point<spacedim>,
 #ifndef _MSC_VER
-                                        ReferenceCell::max_n_vertices<dim>()
+                                        ReferenceCells::max_n_vertices<dim>()
 #else
                                         GeometryInfo<dim>::vertices_per_cell
 #endif
