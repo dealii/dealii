@@ -123,7 +123,7 @@ public:
    */
   virtual boost::container::small_vector<Point<spacedim>,
 #ifndef _MSC_VER
-                                         ReferenceCell::max_n_vertices<dim>()
+                                         ReferenceCells::max_n_vertices<dim>()
 #else
                                          GeometryInfo<dim>::vertices_per_cell
 #endif
