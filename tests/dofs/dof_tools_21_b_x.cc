@@ -19,7 +19,7 @@
 //                                const FaceIterator        &,
 //                                AffineConstraints<double> &,
 //                                const ComponentMask       &,
-//                                unsigned char)
+//                                types::geometric_orientation)
 // for correct behavior on non standard oriented meshes.
 //
 // a redux of why the 21_b test failed starting in r29525. in essence,

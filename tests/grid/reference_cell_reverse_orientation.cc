@@ -28,9 +28,10 @@ main()
 
   deallog << "lines" << std::endl;
   {
-    const std::array<unsigned char, 2> inverse_permutations{{0u, 1u}};
+    const std::array<types::geometric_orientation, 2> inverse_permutations{
+      {0u, 1u}};
 
-    for (unsigned char o = 0; o < 2; ++o)
+    for (types::geometric_orientation o = 0; o < 2; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
         std::array<unsigned int, 2> vs{{0u, 1u}};
@@ -51,10 +52,10 @@ main()
 
   deallog << "triangles" << std::endl;
   {
-    const std::array<unsigned char, 6> inverse_permutations{
+    const std::array<types::geometric_orientation, 6> inverse_permutations{
       {0u, 1u, 2u, 5u, 4u, 3u}};
 
-    for (unsigned char o = 0; o < 6; ++o)
+    for (types::geometric_orientation o = 0; o < 6; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
         std::array<unsigned int, 3> vs{{0u, 1u, 2u}};
@@ -75,10 +76,10 @@ main()
 
   deallog << "quadrilaterals" << std::endl;
   {
-    const std::array<unsigned char, 8> inverse_permutations{
+    const std::array<types::geometric_orientation, 8> inverse_permutations{
       {0u, 1u, 2u, 7u, 4u, 5u, 6u, 3u}};
 
-    for (unsigned char o = 0; o < 8; ++o)
+    for (types::geometric_orientation o = 0; o < 8; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
         std::array<unsigned int, 4> vs{{0u, 1u, 2u, 3u}};
@@ -100,7 +101,7 @@ main()
   // Verify that the manual version created the same results.
   deallog << "quadrilaterals (manual)" << std::endl;
   {
-    for (unsigned char o = 0; o < 8; ++o)
+    for (types::geometric_orientation o = 0; o < 8; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
         std::array<unsigned int, 4> vs{{0u, 1u, 2u, 3u}};

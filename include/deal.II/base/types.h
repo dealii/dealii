@@ -31,6 +31,15 @@ DEAL_II_NAMESPACE_OPEN
 namespace types
 {
   /**
+   * The type used to represent face orientations.
+   *
+   * See the
+   * @ref GlossFaceOrientation "glossary"
+   * for more information.
+   */
+  using geometric_orientation = unsigned char;
+
+  /**
    * The type used to denote subdomain_ids of cells.
    *
    * See the

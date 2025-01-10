@@ -963,7 +963,7 @@ public:
    *
    * @ingroup reordering
    */
-  unsigned char
+  types::geometric_orientation
   combined_face_orientation(const unsigned int face) const;
 
   /**
@@ -1830,8 +1830,9 @@ private:
    * @ingroup reordering
    */
   void
-  set_combined_face_orientation(const unsigned int  face,
-                                const unsigned char combined_orientation) const;
+  set_combined_face_orientation(
+    const unsigned int                 face,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Set the @p used flag. Only for internal use in the library.
@@ -2155,7 +2156,7 @@ public:
    *
    * @ingroup reordering
    */
-  static unsigned char
+  static types::geometric_orientation
   combined_face_orientation(const unsigned int face);
 
   /**
@@ -2824,7 +2825,7 @@ public:
    *
    * @ingroup reordering
    */
-  static unsigned char
+  static types::geometric_orientation
   combined_face_orientation(const unsigned int face);
 
   /**
@@ -4932,7 +4933,7 @@ namespace internal
       set_combined_face_orientation(
         const TriaAccessor<structdim, dim, spacedim> &accessor,
         const unsigned int                            face,
-        const unsigned char                           combined_orientation)
+        const types::geometric_orientation            combined_orientation)
       {
         Assert(structdim == dim,
                ExcMessage("This function can only be used on objects that are "
@@ -5006,7 +5007,7 @@ namespace internal
           {
             for (unsigned int f = 4; f < 6; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
@@ -5030,7 +5031,7 @@ namespace internal
               }
             for (unsigned int f = 0; f < 2; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
@@ -5079,7 +5080,7 @@ namespace internal
        * cell->line_orientation(), 1d specialization
        */
       template <int dim, int spacedim>
-      static std::array<unsigned char, 1>
+      static std::array<types::geometric_orientation, 1>
       get_line_orientations_of_cell(const TriaAccessor<1, dim, spacedim> &)
       {
         DEAL_II_ASSERT_UNREACHABLE();
@@ -5093,12 +5094,12 @@ namespace internal
        * cell->line_orientation(), 2d specialization
        */
       template <int dim, int spacedim>
-      static std::array<unsigned char, 4>
+      static std::array<types::geometric_orientation, 4>
       get_line_orientations_of_cell(const TriaAccessor<2, dim, spacedim> &cell)
       {
         // For 2d cells the access cell->line_orientation() is already
         // efficient
-        std::array<unsigned char, 4> line_orientations = {};
+        std::array<types::geometric_orientation, 4> line_orientations = {};
         for (const unsigned int line : cell.line_indices())
           line_orientations[line] =
             cell.line_orientation(line) == true ?
@@ -5114,10 +5115,10 @@ namespace internal
        * cell->line_orientation(), 3d specialization
        */
       template <int dim, int spacedim>
-      static std::array<unsigned char, 12>
+      static std::array<types::geometric_orientation, 12>
       get_line_orientations_of_cell(const TriaAccessor<3, dim, spacedim> &cell)
       {
-        std::array<unsigned char, 12> line_orientations = {};
+        std::array<types::geometric_orientation, 12> line_orientations = {};
 
         // For hexahedra, the classical access via quads -> lines is too
         // inefficient. Unroll this code here to allow the compiler to inline
@@ -5127,7 +5128,7 @@ namespace internal
           {
             for (unsigned int f = 4; f < 6; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
@@ -5162,7 +5163,7 @@ namespace internal
               }
             for (unsigned int f = 0; f < 2; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
@@ -5423,7 +5424,7 @@ TriaAccessor<structdim, dim, spacedim>::quad_index(const unsigned int i) const
 
 
 template <int structdim, int dim, int spacedim>
-inline unsigned char
+inline types::geometric_orientation
 TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
   const unsigned int face) const
 {
@@ -5634,8 +5635,8 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
 template <int structdim, int dim, int spacedim>
 inline void
 TriaAccessor<structdim, dim, spacedim>::set_combined_face_orientation(
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
   AssertIndexRange(face, this->n_faces());
@@ -6887,11 +6888,11 @@ TriaAccessor<0, dim, spacedim>::measure() const
 
 
 template <int dim, int spacedim>
-inline unsigned char
+inline types::geometric_orientation
 TriaAccessor<0, dim, spacedim>::combined_face_orientation(
   const unsigned int /*face*/)
 {
-  return 0;
+  return ReferenceCell::default_combined_face_orientation();
 }
 
 
@@ -7336,7 +7337,7 @@ TriaAccessor<0, 1, spacedim>::manifold_id() const
 
 
 template <int spacedim>
-inline unsigned char
+inline types::geometric_orientation
 TriaAccessor<0, 1, spacedim>::combined_face_orientation(
   const unsigned int /*face*/)
 {

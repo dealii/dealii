@@ -147,8 +147,9 @@ namespace internal
       }
 
       std::vector<Point<2>>
-      mutate_points_with_offset(const std::vector<Point<2>> &points,
-                                const unsigned char combined_orientation)
+      mutate_points_with_offset(
+        const std::vector<Point<2>>       &points,
+        const types::geometric_orientation combined_orientation)
       {
         // These rotations are backwards (relative to the standard notion of,
         // e.g., what rotation index 7 means) since they are rotations about the
@@ -185,8 +186,8 @@ namespace internal
       }
 
       Quadrature<2>
-      mutate_quadrature(const Quadrature<2> &quadrature,
-                        const unsigned char  combined_orientation)
+      mutate_quadrature(const Quadrature<2>               &quadrature,
+                        const types::geometric_orientation combined_orientation)
       {
         return Quadrature<2>(mutate_points_with_offset(quadrature.get_points(),
                                                        combined_orientation),
@@ -925,7 +926,7 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
              static_cast<const ScalarPolynomialsBase<2> &>(poly_quad));
 
         // ... and over all possible orientations
-        for (unsigned char orientation = 0;
+        for (types::geometric_orientation orientation = 0;
              orientation < reference_cell.n_face_orientations(face_no);
              ++orientation)
           {
@@ -1366,10 +1367,10 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell &reference_cell,
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
 QProjector<dim>::DataSetDescriptor::face(
-  const ReferenceCell &reference_cell,
-  const unsigned int   face_no,
-  const unsigned char  combined_orientation,
-  const unsigned int   n_quadrature_points)
+  const ReferenceCell               &reference_cell,
+  const unsigned int                 face_no,
+  const types::geometric_orientation combined_orientation,
+  const unsigned int                 n_quadrature_points)
 {
   // TODO: once we move to representing the default orientation as 0 (instead of
   // 1) we can get rid of the dim = 1 check
@@ -1439,10 +1440,10 @@ QProjector<dim>::DataSetDescriptor::face(
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
 QProjector<dim>::DataSetDescriptor::face(
-  const ReferenceCell            &reference_cell,
-  const unsigned int              face_no,
-  const unsigned char             combined_orientation,
-  const hp::QCollection<dim - 1> &quadrature)
+  const ReferenceCell               &reference_cell,
+  const unsigned int                 face_no,
+  const types::geometric_orientation combined_orientation,
+  const hp::QCollection<dim - 1>    &quadrature)
 {
   if (reference_cell == ReferenceCells::Triangle ||
       reference_cell == ReferenceCells::Tetrahedron ||
@@ -1567,7 +1568,7 @@ QProjector<1>::DataSetDescriptor::subface(
   const ReferenceCell &reference_cell,
   const unsigned int   face_no,
   const unsigned int   subface_no,
-  const unsigned char /*combined_orientation*/,
+  const types::geometric_orientation /*combined_orientation*/,
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<1>)
 {
@@ -1590,7 +1591,7 @@ QProjector<2>::DataSetDescriptor::subface(
   const ReferenceCell &reference_cell,
   const unsigned int   face_no,
   const unsigned int   subface_no,
-  const unsigned char /*combined_orientation*/,
+  const types::geometric_orientation /*combined_orientation*/,
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
@@ -1610,12 +1611,12 @@ QProjector<2>::DataSetDescriptor::subface(
 template <>
 QProjector<3>::DataSetDescriptor
 QProjector<3>::DataSetDescriptor::subface(
-  const ReferenceCell           &reference_cell,
-  const unsigned int             face_no,
-  const unsigned int             subface_no,
-  const unsigned char            combined_orientation,
-  const unsigned int             n_quadrature_points,
-  const internal::SubfaceCase<3> ref_case)
+  const ReferenceCell               &reference_cell,
+  const unsigned int                 face_no,
+  const unsigned int                 subface_no,
+  const types::geometric_orientation combined_orientation,
+  const unsigned int                 n_quadrature_points,
+  const internal::SubfaceCase<3>     ref_case)
 {
   const unsigned int dim = 3;
 

@@ -2326,7 +2326,7 @@ namespace GridTools
      * face as described in orthogonal_equality() and
      * DoFTools::make_periodicity_constraints().
      */
-    unsigned char orientation;
+    types::geometric_orientation orientation;
 
     /**
      * A @p dim $\times$ @p dim rotation matrix that describes how vector
@@ -2365,14 +2365,15 @@ namespace GridTools
    * identity matrix.
    *
    * If the matching was successful, the _relative_ orientation of @p face1 with
-   * respect to @p face2 is returned a std::optional<unsigned char>, in which
-   * the stored value is the same orientation bit format used elsewhere in the
-   * library. More information on that topic can be found in the
-   * @ref GlossFaceOrientation "glossary"
-   * article.
+   * respect to @p face2 is returned a
+   * std::optional<types::geometric_orientation>, in which the stored value is
+   * the same orientation bit format used elsewhere in the library. More
+   * information on that topic can be found in the
+   * @ref GlossFaceOrientation
+   * "glossary" article.
    */
   template <typename FaceIterator>
-  std::optional<unsigned char>
+  std::optional<types::geometric_orientation>
   orthogonal_equality(
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
@@ -2394,9 +2395,9 @@ namespace GridTools
    * with faces belonging to the second boundary with the help of
    * orthogonal_equality().
    *
-   * The unsigned char that is returned inside of PeriodicFacePair encodes the
-   * _relative_ orientation of the first face with respect to the second face,
-   * see the documentation of orthogonal_equality() for further details.
+   * The value returned inside of PeriodicFacePair encodes the _relative_
+   * orientation of the first face with respect to the second face, see the
+   * documentation of orthogonal_equality() for further details.
    *
    * The @p direction refers to the space direction in which periodicity is
    * enforced. When matching periodic faces this vector component is ignored.
