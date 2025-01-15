@@ -843,7 +843,7 @@ namespace Step44
     void determine_component_extractors();
 
     // Create Dirichlet constraints for the incremental displacement field:
-    void make_constraints(const int it_nr);
+    void make_constraints(const unsigned int it_nr);
 
     // Several functions to assemble the system and right hand side matrices
     // using multithreading. Each of them comes as a wrapper function, one
@@ -2234,7 +2234,7 @@ namespace Step44
   // are hard to debug. In this spirit, we choose to make the code more verbose
   // in terms of what operations are performed at each Newton step.
   template <int dim>
-  void Solid<dim>::make_constraints(const int it_nr)
+  void Solid<dim>::make_constraints(const unsigned int it_nr)
   {
     // Since we (a) are dealing with an iterative Newton method, (b) are using
     // an incremental formulation for the displacement, and (c) apply the
