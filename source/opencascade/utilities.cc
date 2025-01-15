@@ -22,6 +22,8 @@
 #  include <deal.II/base/point.h>
 #  include <deal.II/base/utilities.h>
 
+#  include <deal.II/grid/tria_description.h>
+
 #  include <IGESControl_Controller.hxx>
 #  include <IGESControl_Reader.hxx>
 #  include <IGESControl_Writer.hxx>

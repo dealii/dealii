@@ -15,6 +15,7 @@
 #include <deal.II/base/ndarray.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_description.h>
 
 #ifdef DEAL_II_WITH_CGAL
 // Functions needed by the CGAL mesh generation utilities are inside

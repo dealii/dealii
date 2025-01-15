@@ -23,6 +23,8 @@
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/grid/tria_description.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
