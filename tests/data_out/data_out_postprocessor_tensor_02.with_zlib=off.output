@@ -2,8 +2,6 @@
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       16
 DEAL::   Number of degrees of freedom: 50
-DEAL:cg::Starting value 0.279006
-DEAL:cg::Convergence step 11 value 3.55007e-13
 <?xml version="1.0" ?> 
 <!-- 
 # vtk DataFile Version 3.0

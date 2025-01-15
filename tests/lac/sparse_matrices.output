@@ -64,46 +64,27 @@ Second conjugate
 1	1	549.
 DEAL::Structure
 DEAL::Assemble
-DEAL:5-SparseMatrix<double>:identity:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:identity:Richardson::Failure step 10 value 3.55
-DEAL:5-SparseMatrix<double>:jacobi:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:jacobi:Richardson::Failure step 10 value 1.34
-DEAL:5-SparseMatrix<double>:ssor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:ssor:Richardson::Failure step 10 value 0.000169
-DEAL:5-SparseMatrix<double>:sor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:sor:Richardson::Failure step 10 value 0.00188
-DEAL:5-SparseMatrix<double>:block_jacobi:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_jacobi:Richardson::Failure step 10 value 0.00594
-DEAL:5-SparseMatrix<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_ssor:Richardson::Failure step 10 value 3.24e-07
-DEAL:5-SparseMatrix<double>:block_sor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_sor:Richardson::Failure step 10 value 1.07e-06
-DEAL:5-SparseMatrix<double>:block_psor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_psor:Richardson::Failure step 10 value 9.25e-07
+DEAL:5-SparseMatrix<double>:identity::Failure step 10 value 3.55
+DEAL:5-SparseMatrix<double>:jacobi::Failure step 10 value 1.34
+DEAL:5-SparseMatrix<double>:ssor::Failure step 10 value 0.000169
+DEAL:5-SparseMatrix<double>:sor::Failure step 10 value 0.00188
+DEAL:5-SparseMatrix<double>:block_jacobi::Failure step 10 value 0.00594
+DEAL:5-SparseMatrix<double>:block_ssor::Failure step 10 value 3.24e-07
+DEAL:5-SparseMatrix<double>:block_sor::Failure step 10 value 1.07e-06
+DEAL:5-SparseMatrix<double>:block_psor::Failure step 10 value 9.25e-07
 DEAL:5-SparseMatrix<double>::Transpose
-DEAL:5-SparseMatrix<double>:identity:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:identity:RichardsonT::Failure step 10 value 3.55
-DEAL:5-SparseMatrix<double>:jacobi:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:jacobi:RichardsonT::Failure step 10 value 1.34
-DEAL:5-SparseMatrix<double>:ssor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:ssor:RichardsonT::Failure step 10 value 0.00836
-DEAL:5-SparseMatrix<double>:sor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:sor:RichardsonT::Failure step 10 value 0.230
-DEAL:5-SparseMatrix<double>:block_jacobi:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_jacobi:RichardsonT::Failure step 10 value 0.00341
-DEAL:5-SparseMatrix<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_ssor:RichardsonT::Failure step 10 value 3.24e-07
-DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 1.07e-06
-DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 8.62e-07
+DEAL:5-SparseMatrix<double>:identity::Failure step 10 value 3.55
+DEAL:5-SparseMatrix<double>:jacobi::Failure step 10 value 1.34
+DEAL:5-SparseMatrix<double>:ssor::Failure step 10 value 0.00836
+DEAL:5-SparseMatrix<double>:sor::Failure step 10 value 0.230
+DEAL:5-SparseMatrix<double>:block_jacobi::Failure step 10 value 0.00341
+DEAL:5-SparseMatrix<double>:block_ssor::Failure step 10 value 3.24e-07
+DEAL:5-SparseMatrix<double>:block_sor::Failure step 10 value 1.07e-06
+DEAL:5-SparseMatrix<double>:block_psor::Failure step 10 value 8.62e-07
 DEAL:5-SparseMatrix<double>::Vanka
-DEAL:5-SparseMatrix<double>:vanka:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:vanka:Richardson::Failure step 10 value 0.000523
-DEAL:5-SparseMatrix<double>:block_vanka_1:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_vanka_1:Richardson::Failure step 10 value 6.00
-DEAL:5-SparseMatrix<double>:block_vanka_2:Richardson::Starting value 4.00
-DEAL:5-SparseMatrix<double>:block_vanka_2:Richardson::Failure step 10 value 0.0179
+DEAL:5-SparseMatrix<double>:vanka::Failure step 10 value 0.000523
+DEAL:5-SparseMatrix<double>:block_vanka_1::Failure step 10 value 6.00
+DEAL:5-SparseMatrix<double>:block_vanka_2::Failure step 10 value 0.0179
 DEAL:5-SparseMatrix<double>::vanka residual: 0.0179
 DEAL:5-SparseMatrix<double>::vanka residual: 6.00
 DEAL:5-SparseMatrix<double>::vanka residual: 0.000523
@@ -178,19 +159,13 @@ DEAL::	2	3	-2.00
 DEAL::	2	6	-1.00
 DEAL::Structure
 DEAL::Assemble
-DEAL:5-BlockSparseMatrix<double>:identity:Richardson::Starting value 4.00
-DEAL:5-BlockSparseMatrix<double>:identity:Richardson::Failure step 10 value 3.55
-DEAL:5-BlockSparseMatrix<double>:jacobi:Richardson::Starting value 4.00
-DEAL:5-BlockSparseMatrix<double>:jacobi:Richardson::Failure step 10 value 1.34
-DEAL:5-BlockSparseMatrix<double>:block_jacobi:Richardson::Starting value 4.00
-DEAL:5-BlockSparseMatrix<double>:block_jacobi:Richardson::Failure step 10 value 0.00594
+DEAL:5-BlockSparseMatrix<double>:identity::Failure step 10 value 3.55
+DEAL:5-BlockSparseMatrix<double>:jacobi::Failure step 10 value 1.34
+DEAL:5-BlockSparseMatrix<double>:block_jacobi::Failure step 10 value 0.00594
 DEAL:5-BlockSparseMatrix<double>::Transpose
-DEAL:5-BlockSparseMatrix<double>:identity:RichardsonT::Starting value 4.00
-DEAL:5-BlockSparseMatrix<double>:identity:RichardsonT::Failure step 10 value 3.55
-DEAL:5-BlockSparseMatrix<double>:jacobi:RichardsonT::Starting value 4.00
-DEAL:5-BlockSparseMatrix<double>:jacobi:RichardsonT::Failure step 10 value 1.34
-DEAL:5-BlockSparseMatrix<double>:block_jacobi:RichardsonT::Starting value 4.00
-DEAL:5-BlockSparseMatrix<double>:block_jacobi:RichardsonT::Failure step 10 value 0.00341
+DEAL:5-BlockSparseMatrix<double>:identity::Failure step 10 value 3.55
+DEAL:5-BlockSparseMatrix<double>:jacobi::Failure step 10 value 1.34
+DEAL:5-BlockSparseMatrix<double>:block_jacobi::Failure step 10 value 0.00341
 DEAL::	0	0	5.00
 DEAL::	0	1	-2.00
 DEAL::	0	4	-1.00
@@ -261,39 +236,23 @@ DEAL::	2	1	-1.00
 DEAL::	2	3	-2.00
 DEAL::	2	6	-1.00
 DEAL::Assemble
-DEAL:5-SparseMatrixEZ<double>:identity:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:identity:Richardson::Failure step 10 value 3.55
-DEAL:5-SparseMatrixEZ<double>:jacobi:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:jacobi:Richardson::Failure step 10 value 1.34
-DEAL:5-SparseMatrixEZ<double>:ssor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:ssor:Richardson::Failure step 10 value 0.000169
-DEAL:5-SparseMatrixEZ<double>:sor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:sor:Richardson::Failure step 10 value 0.00188
-DEAL:5-SparseMatrixEZ<double>:block_jacobi:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_jacobi:Richardson::Failure step 10 value 0.00594
-DEAL:5-SparseMatrixEZ<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_ssor:Richardson::Failure step 10 value 3.24e-07
-DEAL:5-SparseMatrixEZ<double>:block_sor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_sor:Richardson::Failure step 10 value 1.07e-06
-DEAL:5-SparseMatrixEZ<double>:block_psor:Richardson::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_psor:Richardson::Failure step 10 value 9.25e-07
+DEAL:5-SparseMatrixEZ<double>:identity::Failure step 10 value 3.55
+DEAL:5-SparseMatrixEZ<double>:jacobi::Failure step 10 value 1.34
+DEAL:5-SparseMatrixEZ<double>:ssor::Failure step 10 value 0.000169
+DEAL:5-SparseMatrixEZ<double>:sor::Failure step 10 value 0.00188
+DEAL:5-SparseMatrixEZ<double>:block_jacobi::Failure step 10 value 0.00594
+DEAL:5-SparseMatrixEZ<double>:block_ssor::Failure step 10 value 3.24e-07
+DEAL:5-SparseMatrixEZ<double>:block_sor::Failure step 10 value 1.07e-06
+DEAL:5-SparseMatrixEZ<double>:block_psor::Failure step 10 value 9.25e-07
 DEAL:5-SparseMatrixEZ<double>::Transpose
-DEAL:5-SparseMatrixEZ<double>:identity:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:identity:RichardsonT::Failure step 10 value 3.55
-DEAL:5-SparseMatrixEZ<double>:jacobi:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:jacobi:RichardsonT::Failure step 10 value 1.34
-DEAL:5-SparseMatrixEZ<double>:ssor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:ssor:RichardsonT::Failure step 10 value 0.00836
-DEAL:5-SparseMatrixEZ<double>:sor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:sor:RichardsonT::Failure step 10 value 0.230
-DEAL:5-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Failure step 10 value 0.00341
-DEAL:5-SparseMatrixEZ<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_ssor:RichardsonT::Failure step 10 value 3.24e-07
-DEAL:5-SparseMatrixEZ<double>:block_sor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_sor:RichardsonT::Failure step 10 value 1.07e-06
-DEAL:5-SparseMatrixEZ<double>:block_psor:RichardsonT::Starting value 4.00
-DEAL:5-SparseMatrixEZ<double>:block_psor:RichardsonT::Failure step 10 value 8.62e-07
+DEAL:5-SparseMatrixEZ<double>:identity::Failure step 10 value 3.55
+DEAL:5-SparseMatrixEZ<double>:jacobi::Failure step 10 value 1.34
+DEAL:5-SparseMatrixEZ<double>:ssor::Failure step 10 value 0.00836
+DEAL:5-SparseMatrixEZ<double>:sor::Failure step 10 value 0.230
+DEAL:5-SparseMatrixEZ<double>:block_jacobi::Failure step 10 value 0.00341
+DEAL:5-SparseMatrixEZ<double>:block_ssor::Failure step 10 value 3.24e-07
+DEAL:5-SparseMatrixEZ<double>:block_sor::Failure step 10 value 1.07e-06
+DEAL:5-SparseMatrixEZ<double>:block_psor::Failure step 10 value 8.62e-07
 DEAL::	0	0	5.00
 DEAL::	0	1	-2.00
 DEAL::	0	4	-1.00
@@ -372,83 +331,48 @@ DEAL::SparseMatrixEZ:entries	5	rows	4
 DEAL::Matrices are equal
 DEAL::Structure
 DEAL::Assemble
-DEAL:9-SparseMatrix<double>:identity:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:identity:Richardson::Failure step 10 value 2.41
-DEAL:9-SparseMatrix<double>:jacobi:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:jacobi:Richardson::Failure step 10 value 1.17
-DEAL:9-SparseMatrix<double>:ssor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:ssor:Richardson::Failure step 10 value 0.000124
-DEAL:9-SparseMatrix<double>:sor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:sor:Richardson::Failure step 10 value 0.00112
-DEAL:9-SparseMatrix<double>:block_jacobi:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_jacobi:Richardson::Failure step 10 value 0.0255
-DEAL:9-SparseMatrix<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_ssor:Richardson::Failure step 10 value 9.12e-06
-DEAL:9-SparseMatrix<double>:block_sor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_sor:Richardson::Failure step 10 value 2.94e-06
-DEAL:9-SparseMatrix<double>:block_psor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_psor:Richardson::Failure step 10 value 2.09e-06
+DEAL:9-SparseMatrix<double>:identity::Failure step 10 value 2.41
+DEAL:9-SparseMatrix<double>:jacobi::Failure step 10 value 1.17
+DEAL:9-SparseMatrix<double>:ssor::Failure step 10 value 0.000124
+DEAL:9-SparseMatrix<double>:sor::Failure step 10 value 0.00112
+DEAL:9-SparseMatrix<double>:block_jacobi::Failure step 10 value 0.0255
+DEAL:9-SparseMatrix<double>:block_ssor::Failure step 10 value 9.12e-06
+DEAL:9-SparseMatrix<double>:block_sor::Failure step 10 value 2.94e-06
+DEAL:9-SparseMatrix<double>:block_psor::Failure step 10 value 2.09e-06
 DEAL:9-SparseMatrix<double>::Transpose
-DEAL:9-SparseMatrix<double>:identity:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:identity:RichardsonT::Failure step 10 value 2.41
-DEAL:9-SparseMatrix<double>:jacobi:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:jacobi:RichardsonT::Failure step 10 value 1.17
-DEAL:9-SparseMatrix<double>:ssor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:ssor:RichardsonT::Failure step 10 value 0.000124
-DEAL:9-SparseMatrix<double>:sor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:sor:RichardsonT::Failure step 10 value 0.00112
-DEAL:9-SparseMatrix<double>:block_jacobi:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_jacobi:RichardsonT::Failure step 10 value 0.0255
-DEAL:9-SparseMatrix<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_ssor:RichardsonT::Failure step 10 value 9.12e-06
-DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_sor:RichardsonT::Failure step 10 value 2.94e-06
-DEAL:9-SparseMatrix<double>:block_psor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_psor:RichardsonT::Failure step 10 value 1.86e-06
+DEAL:9-SparseMatrix<double>:identity::Failure step 10 value 2.41
+DEAL:9-SparseMatrix<double>:jacobi::Failure step 10 value 1.17
+DEAL:9-SparseMatrix<double>:ssor::Failure step 10 value 0.000124
+DEAL:9-SparseMatrix<double>:sor::Failure step 10 value 0.00112
+DEAL:9-SparseMatrix<double>:block_jacobi::Failure step 10 value 0.0255
+DEAL:9-SparseMatrix<double>:block_ssor::Failure step 10 value 9.12e-06
+DEAL:9-SparseMatrix<double>:block_sor::Failure step 10 value 2.94e-06
+DEAL:9-SparseMatrix<double>:block_psor::Failure step 10 value 1.86e-06
 DEAL:9-SparseMatrix<double>::Vanka
-DEAL:9-SparseMatrix<double>:vanka:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:vanka:Richardson::Failure step 10 value 1.75e-10
-DEAL:9-SparseMatrix<double>:block_vanka_1:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_vanka_1:Richardson::Failure step 10 value 5.61
-DEAL:9-SparseMatrix<double>:block_vanka_2:Richardson::Starting value 4.00
-DEAL:9-SparseMatrix<double>:block_vanka_2:Richardson::Failure step 10 value 0.00189
+DEAL:9-SparseMatrix<double>:vanka::Failure step 10 value 1.75e-10
+DEAL:9-SparseMatrix<double>:block_vanka_1::Failure step 10 value 5.61
+DEAL:9-SparseMatrix<double>:block_vanka_2::Failure step 10 value 0.00189
 DEAL:9-SparseMatrix<double>::vanka residual: 0.00189
 DEAL:9-SparseMatrix<double>::vanka residual: 5.61
 DEAL:9-SparseMatrix<double>::vanka residual: 1.75e-10
 DEAL::Assemble
-DEAL:9-SparseMatrixEZ<double>:identity:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:identity:Richardson::Failure step 10 value 2.41
-DEAL:9-SparseMatrixEZ<double>:jacobi:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:jacobi:Richardson::Failure step 10 value 1.17
-DEAL:9-SparseMatrixEZ<double>:ssor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:ssor:Richardson::Failure step 10 value 0.000124
-DEAL:9-SparseMatrixEZ<double>:sor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:sor:Richardson::Failure step 10 value 0.00112
-DEAL:9-SparseMatrixEZ<double>:block_jacobi:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_jacobi:Richardson::Failure step 10 value 0.0255
-DEAL:9-SparseMatrixEZ<double>:block_ssor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_ssor:Richardson::Failure step 10 value 9.12e-06
-DEAL:9-SparseMatrixEZ<double>:block_sor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_sor:Richardson::Failure step 10 value 2.94e-06
-DEAL:9-SparseMatrixEZ<double>:block_psor:Richardson::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_psor:Richardson::Failure step 10 value 2.09e-06
+DEAL:9-SparseMatrixEZ<double>:identity::Failure step 10 value 2.41
+DEAL:9-SparseMatrixEZ<double>:jacobi::Failure step 10 value 1.17
+DEAL:9-SparseMatrixEZ<double>:ssor::Failure step 10 value 0.000124
+DEAL:9-SparseMatrixEZ<double>:sor::Failure step 10 value 0.00112
+DEAL:9-SparseMatrixEZ<double>:block_jacobi::Failure step 10 value 0.0255
+DEAL:9-SparseMatrixEZ<double>:block_ssor::Failure step 10 value 9.12e-06
+DEAL:9-SparseMatrixEZ<double>:block_sor::Failure step 10 value 2.94e-06
+DEAL:9-SparseMatrixEZ<double>:block_psor::Failure step 10 value 2.09e-06
 DEAL:9-SparseMatrixEZ<double>::Transpose
-DEAL:9-SparseMatrixEZ<double>:identity:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:identity:RichardsonT::Failure step 10 value 2.41
-DEAL:9-SparseMatrixEZ<double>:jacobi:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:jacobi:RichardsonT::Failure step 10 value 1.17
-DEAL:9-SparseMatrixEZ<double>:ssor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:ssor:RichardsonT::Failure step 10 value 0.000124
-DEAL:9-SparseMatrixEZ<double>:sor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:sor:RichardsonT::Failure step 10 value 0.00112
-DEAL:9-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_jacobi:RichardsonT::Failure step 10 value 0.0255
-DEAL:9-SparseMatrixEZ<double>:block_ssor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_ssor:RichardsonT::Failure step 10 value 9.12e-06
-DEAL:9-SparseMatrixEZ<double>:block_sor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_sor:RichardsonT::Failure step 10 value 2.94e-06
-DEAL:9-SparseMatrixEZ<double>:block_psor:RichardsonT::Starting value 4.00
-DEAL:9-SparseMatrixEZ<double>:block_psor:RichardsonT::Failure step 10 value 1.86e-06
+DEAL:9-SparseMatrixEZ<double>:identity::Failure step 10 value 2.41
+DEAL:9-SparseMatrixEZ<double>:jacobi::Failure step 10 value 1.17
+DEAL:9-SparseMatrixEZ<double>:ssor::Failure step 10 value 0.000124
+DEAL:9-SparseMatrixEZ<double>:sor::Failure step 10 value 0.00112
+DEAL:9-SparseMatrixEZ<double>:block_jacobi::Failure step 10 value 0.0255
+DEAL:9-SparseMatrixEZ<double>:block_ssor::Failure step 10 value 9.12e-06
+DEAL:9-SparseMatrixEZ<double>:block_sor::Failure step 10 value 2.94e-06
+DEAL:9-SparseMatrixEZ<double>:block_psor::Failure step 10 value 1.86e-06
 DEAL::SparseMatrixEZ:used      entries:100
 DEAL::SparseMatrixEZ:allocated entries:111
 DEAL::SparseMatrixEZ:reserved  entries:192

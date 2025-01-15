@@ -1,6 +1,5 @@
 
 DEAL:BFGS::Check 0	4.2426
-DEAL:BFGS::Starting value 4.2426
 ------------------------------------------------
 Line search 0
 
@@ -235,6 +234,5 @@ function value: -383.83333  stepsize: 0.46154
          18.83333         -0.16667          0.16667
           9.83333         -0.16667          0.16667
 DEAL:BFGS::Check 9	0.0000
-DEAL:BFGS::Convergence step 9 value 0.0000
 DEAL::Limited memory BFGS solution:
 1.000e+01 1.900e+01 2.700e+01 3.400e+01 4.000e+01 4.500e+01 4.900e+01 5.200e+01 5.400e+01 5.500e+01 5.500e+01 5.400e+01 5.200e+01 4.900e+01 4.500e+01 4.000e+01 3.400e+01 2.700e+01 1.900e+01 1.000e+01 

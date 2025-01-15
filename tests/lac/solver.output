@@ -6,13 +6,13 @@ DEAL:no-fail:cg::Convergence step 3 value 4.807e-17
 DEAL:no-fail:cg::Starting value 3.000
 DEAL:no-fail:cg::Convergence step 3 value 9.679e-16
 DEAL:no-fail:Bicgstab::Starting value 3.000
-DEAL:no-fail:Bicgstab::Convergence step 3 value 1.104e-17
+DEAL:no-fail:Bicgstab::Convergence step 3 value 5.642e-18
 DEAL:no-fail:GMRES::Starting value 3.000
-DEAL:no-fail:GMRES::Convergence step 3 value 3.512e-09
+DEAL:no-fail:GMRES::Convergence step 3 value 0.000
 DEAL:no-fail:GMRES::Starting value 3.000
-DEAL:no-fail:GMRES::Convergence step 3 value 3.512e-09
+DEAL:no-fail:GMRES::Convergence step 3 value 0.000
 DEAL:no-fail:GMRES::Starting value 3.000
-DEAL:no-fail:GMRES::Convergence step 3 value 4.414e-16
+DEAL:no-fail:GMRES::Convergence step 3 value 3.929e-16
 DEAL:no-fail:SQMR::Starting value 3.000
 DEAL:no-fail:SQMR::Convergence step 3 value 1.280e-15
 DEAL:no-fail:FIRE::Starting value 9.000
@@ -24,13 +24,13 @@ DEAL:no:cg::Convergence step 3 value 4.807e-17
 DEAL:no:cg::Starting value 3.000
 DEAL:no:cg::Convergence step 3 value 9.679e-16
 DEAL:no:Bicgstab::Starting value 3.000
-DEAL:no:Bicgstab::Convergence step 3 value 1.104e-17
+DEAL:no:Bicgstab::Convergence step 3 value 5.642e-18
 DEAL:no:GMRES::Starting value 3.000
-DEAL:no:GMRES::Convergence step 3 value 3.512e-09
+DEAL:no:GMRES::Convergence step 3 value 0.000
 DEAL:no:GMRES::Starting value 3.000
-DEAL:no:GMRES::Convergence step 3 value 3.512e-09
+DEAL:no:GMRES::Convergence step 3 value 0.000
 DEAL:no:GMRES::Starting value 3.000
-DEAL:no:GMRES::Convergence step 3 value 4.414e-16
+DEAL:no:GMRES::Convergence step 3 value 3.929e-16
 DEAL:no:SQMR::Starting value 3.000
 DEAL:no:SQMR::Convergence step 3 value 1.280e-15
 DEAL:no:FIRE::Starting value 9.000
@@ -38,19 +38,19 @@ DEAL:no:FIRE::Convergence step 38 value 0.0002184
 DEAL:rich:Richardson::Starting value 3.000
 DEAL:rich:Richardson::Convergence step 42 value 0.0008696
 DEAL:rich:cg::Starting value 3.000
-DEAL:rich:cg::Convergence step 3 value 2.871e-16
+DEAL:rich:cg::Convergence step 3 value 1.630e-16
 DEAL:rich:cg::Starting value 3.000
-DEAL:rich:cg::Convergence step 3 value 1.691e-15
+DEAL:rich:cg::Convergence step 3 value 1.351e-15
 DEAL:rich:Bicgstab::Starting value 3.000
-DEAL:rich:Bicgstab::Convergence step 3 value 3.238e-18
+DEAL:rich:Bicgstab::Convergence step 3 value 4.083e-18
 DEAL:rich:GMRES::Starting value 1.800
-DEAL:rich:GMRES::Convergence step 3 value 3.512e-09
+DEAL:rich:GMRES::Convergence step 3 value 2.484e-09
 DEAL:rich:GMRES::Starting value 3.000
 DEAL:rich:GMRES::Convergence step 3 value 4.139e-09
 DEAL:rich:GMRES::Starting value 1.800
-DEAL:rich:GMRES::Convergence step 3 value 1.976e-16
+DEAL:rich:GMRES::Convergence step 3 value 1.996e-16
 DEAL:rich:SQMR::Starting value 3.000
-DEAL:rich:SQMR::Convergence step 3 value 1.422e-15
+DEAL:rich:SQMR::Convergence step 3 value 1.351e-15
 DEAL:rich:FIRE::Starting value 9.000
 DEAL:rich:FIRE::Convergence step 32 value 0.0009708
 DEAL:ssor:RichardsonT::Starting value 3.000
@@ -79,16 +79,18 @@ DEAL:sor:Richardson::Starting value 3.000
 DEAL:sor:Richardson::Convergence step 7 value 0.0004339
 DEAL:sor:cg::Starting value 3.000
 DEAL:sor:cg::Failure step 100 value 0.2585
+DEAL:sor::Failure step 100 value 0.2585
 DEAL:sor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:sor:cg::Starting value 3.000
 DEAL:sor:cg::Failure step 100 value 0.2585
+DEAL:sor::Failure step 100 value 0.2585
 DEAL:sor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:sor:Bicgstab::Starting value 3.000
-DEAL:sor:Bicgstab::Convergence step 5 value 4.331e-18
+DEAL:sor:Bicgstab::Convergence step 5 value 8.839e-19
 DEAL:sor:GMRES::Starting value 1.462
-DEAL:sor:GMRES::Convergence step 5 value 3.488e-10
+DEAL:sor:GMRES::Convergence step 5 value 2.848e-10
 DEAL:sor:GMRES::Starting value 3.000
-DEAL:sor:GMRES::Convergence step 5 value 1.520e-09
+DEAL:sor:GMRES::Convergence step 5 value 0.000
 DEAL:sor:GMRES::Starting value 1.462
 DEAL:sor:GMRES::Convergence step 21 value 0.0007019
 DEAL:sor:FIRE::Starting value 9.000
@@ -99,9 +101,11 @@ DEAL:psor:Richardson::Starting value 3.000
 DEAL:psor:Richardson::Convergence step 8 value 0.0004237
 DEAL:psor:cg::Starting value 3.000
 DEAL:psor:cg::Failure step 100 value 0.1024
+DEAL:psor::Failure step 100 value 0.1024
 DEAL:psor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:psor:cg::Starting value 3.000
 DEAL:psor:cg::Failure step 100 value 0.1024
+DEAL:psor::Failure step 100 value 0.1024
 DEAL:psor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:psor:Bicgstab::Starting value 3.000
 DEAL:psor:Bicgstab::Convergence step 4 value 0.0007969
@@ -117,31 +121,40 @@ DEAL::Size 12 Unknowns 121
 DEAL::SOR-diff:0.000
 DEAL:no-fail:cg::Starting value 11.00
 DEAL:no-fail:cg::Failure step 10 value 0.1496
+DEAL:no-fail::Failure step 10 value 0.1496
 DEAL:no-fail::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:no-fail:cg::Starting value 11.00
 DEAL:no-fail:cg::Failure step 10 value 0.1496
+DEAL:no-fail::Failure step 10 value 0.1496
 DEAL:no-fail::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:no-fail:Bicgstab::Starting value 11.00
 DEAL:no-fail:Bicgstab::Failure step 10 value 0.002830
 DEAL:no-fail:Bicgstab::Failure step 10 value 0.001961
+DEAL:no-fail::Failure step 10 value 0.001961
 DEAL:no-fail::Exception: SolverControl::NoConvergence(state.last_step, state.last_residual)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
+DEAL:no-fail::Failure step 10 value 0.8414
 DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, res)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
+DEAL:no-fail::Failure step 10 value 0.8414
 DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, res)
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
+DEAL:no-fail::Failure step 10 value 0.8414
 DEAL:no-fail::Exception: SolverControl::NoConvergence(accumulated_iterations, res)
 DEAL:no-fail:SQMR::Starting value 11.00
 DEAL:no-fail:SQMR::Failure step 10 value 0.4215
+DEAL:no-fail::Failure step 10 value 0.4215
 DEAL:no-fail::Exception: SolverControl::NoConvergence(step, state.last_residual)
 DEAL:no-fail:FIRE::Starting value 121.0
 DEAL:no-fail:FIRE::Failure step 50 value 2.971
+DEAL:no-fail::Failure step 50 value 2.971
 DEAL:no-fail::Exception: SolverControl::NoConvergence(iter, gradients * gradients)
 DEAL:no:Richardson::Starting value 11.00
 DEAL:no:Richardson::Failure step 100 value 0.3002
+DEAL:no::Failure step 100 value 0.3002
 DEAL:no::Exception: SolverControl::NoConvergence(iter, last_criterion)
 DEAL:no:cg::Starting value 11.00
 DEAL:no:cg::Convergence step 15 value 0.0005794
@@ -159,9 +172,11 @@ DEAL:no:SQMR::Starting value 11.00
 DEAL:no:SQMR::Convergence step 16 value 0.0002583
 DEAL:no:FIRE::Starting value 121.0
 DEAL:no:FIRE::Failure step 100 value 0.003317
+DEAL:no::Failure step 100 value 0.003317
 DEAL:no::Exception: SolverControl::NoConvergence(iter, gradients * gradients)
 DEAL:rich:Richardson::Starting value 11.00
 DEAL:rich:Richardson::Failure step 100 value 1.219
+DEAL:rich::Failure step 100 value 1.219
 DEAL:rich::Exception: SolverControl::NoConvergence(iter, last_criterion)
 DEAL:rich:cg::Starting value 11.00
 DEAL:rich:cg::Convergence step 15 value 0.0005794
@@ -205,9 +220,11 @@ DEAL:sor:Richardson::Starting value 11.00
 DEAL:sor:Richardson::Convergence step 88 value 0.0009636
 DEAL:sor:cg::Starting value 11.00
 DEAL:sor:cg::Failure step 100 value 5.643
+DEAL:sor::Failure step 100 value 5.643
 DEAL:sor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:sor:cg::Starting value 11.00
 DEAL:sor:cg::Failure step 100 value 5.643
+DEAL:sor::Failure step 100 value 5.643
 DEAL:sor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:sor:Bicgstab::Starting value 11.00
 DEAL:sor:Bicgstab::Convergence step 14 value 0.0009987
@@ -225,9 +242,11 @@ DEAL:psor:Richardson::Starting value 11.00
 DEAL:psor:Richardson::Convergence step 89 value 0.0009736
 DEAL:psor:cg::Starting value 11.00
 DEAL:psor:cg::Failure step 100 value 2.935
+DEAL:psor::Failure step 100 value 2.935
 DEAL:psor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:psor:cg::Starting value 11.00
 DEAL:psor:cg::Failure step 100 value 2.935
+DEAL:psor::Failure step 100 value 2.935
 DEAL:psor::Exception: SolverControl::NoConvergence(it, worker.residual_norm)
 DEAL:psor:Bicgstab::Starting value 11.00
 DEAL:psor:Bicgstab::Convergence step 11 value 0.0005151

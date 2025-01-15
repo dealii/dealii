@@ -724,11 +724,11 @@ run_simulation(
   LaplaceSolver::Base<dim>                           &solver,
   const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
 {
-  deallog << "Refinement cycle: ";
+  deallog << "Refinement cycle: " << std::endl;
 
   for (unsigned int step = 0; true; ++step)
     {
-      deallog << step << ' ' << std::flush;
+      deallog << step << ' ' << std::endl;
 
       solver.solve_problem();
 

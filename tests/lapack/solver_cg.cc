@@ -68,6 +68,8 @@ check_solve(SolverType         &solver,
     }
   catch (dealii::SolverControl::NoConvergence &e)
     {
+      deallog << "Failure step " << e.last_step << " value " << e.last_residual
+              << std::endl;
       deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 }
