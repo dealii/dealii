@@ -1811,13 +1811,13 @@ namespace FETools
 
   template <int dim, typename number, int spacedim>
   void
-  compute_face_embedding_matrices(
-    const FiniteElement<dim, spacedim> &fe,
-    FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
-    const unsigned int face_coarse,
-    const unsigned int face_fine,
-    const double       threshold)
+  compute_face_embedding_matrices(const FiniteElement<dim, spacedim>  &fe,
+                                  const ArrayView<FullMatrix<number>> &matrices,
+                                  const unsigned int face_coarse,
+                                  const unsigned int face_fine,
+                                  const double       threshold)
   {
+    AssertDimension(matrices.size(), GeometryInfo<dim>::max_children_per_face);
     const unsigned int face_no = face_coarse;
 
     Assert(face_coarse == 0, ExcNotImplemented());

@@ -93,13 +93,13 @@ FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
   // TODO[TL]: for anisotropic refinement we will probably need a table of
   // submatrices with an array for each refine case
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    face_embeddings[i].reinit(this->n_dofs_per_face(face_no),
-                              this->n_dofs_per_face(face_no));
-  FETools::compute_face_embedding_matrices<dim, double>(*this,
-                                                        face_embeddings,
-                                                        0,
-                                                        0);
+  for (auto &face_embedding : face_embeddings)
+    face_embedding.reinit(this->n_dofs_per_face(face_no),
+                          this->n_dofs_per_face(face_no));
+  FETools::compute_face_embedding_matrices(*this,
+                                           make_array_view(face_embeddings),
+                                           0,
+                                           0);
   this->interface_constraints.reinit((1 << (dim - 1)) *
                                        this->n_dofs_per_face(face_no),
                                      this->n_dofs_per_face(face_no));
