@@ -27,7 +27,6 @@
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
-#include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
 
