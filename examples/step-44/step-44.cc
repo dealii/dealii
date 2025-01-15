@@ -1519,12 +1519,11 @@ namespace Step44
 
     for (unsigned int k = 0; k < fe.n_dofs_per_cell(); ++k)
       {
-        const unsigned int k_group = fe.system_to_base_index(k).first.first;
-        if (k_group == u_dof)
+        if (fe.shape_function_belongs_to(k, u_fe))
           element_indices_u.push_back(k);
-        else if (k_group == p_dof)
+        else if (fe.shape_function_belongs_to(k, p_fe))
           element_indices_p.push_back(k);
-        else if (k_group == J_dof)
+        else if (fe.shape_function_belongs_to(k, J_fe))
           element_indices_J.push_back(k);
         else
           DEAL_II_ASSERT_UNREACHABLE();
