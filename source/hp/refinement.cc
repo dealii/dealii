@@ -22,7 +22,7 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/dofs/dof_accessor.templates.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/grid/filtered_iterator.h>
