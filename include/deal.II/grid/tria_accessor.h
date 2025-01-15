@@ -4903,32 +4903,6 @@ namespace internal
        * Implementation of the function of some name in the parent class.
        */
       template <int structdim, int dim, int spacedim>
-      inline static unsigned int
-      quad_index(const TriaAccessor<structdim, dim, spacedim> &,
-                 const unsigned int)
-      {
-        Assert(false,
-               ExcMessage("You can't ask for the index of a quad bounding "
-                          "a one- or two-dimensional cell because it is not "
-                          "bounded by quads."));
-        return numbers::invalid_unsigned_int;
-      }
-
-
-      inline static unsigned int
-      quad_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
-      {
-        return accessor.tria->levels[accessor.present_level]
-          ->cells
-          .cells[accessor.present_index * ReferenceCells::max_n_faces<3>() + i];
-      }
-
-
-
-      /**
-       * Implementation of the function of some name in the parent class.
-       */
-      template <int structdim, int dim, int spacedim>
       inline static void
       set_combined_face_orientation(
         const TriaAccessor<structdim, dim, spacedim> &accessor,
@@ -5417,8 +5391,21 @@ template <int structdim, int dim, int spacedim>
 inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::quad_index(const unsigned int i) const
 {
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    quad_index(*this, i);
+  Assert(structdim == 3,
+         ExcMessage("You can't ask for the index of a quad bounding "
+                    "a one- or two-dimensional cell because it is not "
+                    "bounded by quads."));
+  // work around a bogus GCC-9 warning which considers i unused except in 3d
+  (void)i;
+  if constexpr (structdim == 3)
+    {
+      AssertIndexRange(i, n_faces());
+      return this->tria->levels[this->present_level]
+        ->cells
+        .cells[this->present_index * ReferenceCells::max_n_faces<3>() + i];
+    }
+  else
+    return numbers::invalid_unsigned_int;
 }
 
 
