@@ -1,25 +1,5 @@
 
 DEAL::Size 4 Unknowns 9
-DEAL:alreadydone:cg::Starting value 0.000
-DEAL:alreadydone:cg::Convergence step 0 value 0.000
-DEAL:alreadydone:GMRES::Starting value 0.000
-DEAL:alreadydone:GMRES::Convergence step 0 value 0.000
-DEAL:alreadydone:Bicgstab::Starting value 0.000
-DEAL:alreadydone:Bicgstab::Convergence step 0 value 0.000
-DEAL:alreadydone:SQMR::Starting value 0.000
-DEAL:alreadydone:SQMR::Convergence step 0 value 0.000
 DEAL:alreadydone:GMRES::default_res=0.000
-DEAL:alreadydone:GMRES::Starting value 0.000
-DEAL:alreadydone:GMRES::Convergence step 0 value 0.000
 DEAL::Size 12 Unknowns 121
-DEAL:alreadydone:cg::Starting value 0.000
-DEAL:alreadydone:cg::Convergence step 0 value 0.000
-DEAL:alreadydone:GMRES::Starting value 0.000
-DEAL:alreadydone:GMRES::Convergence step 0 value 0.000
-DEAL:alreadydone:Bicgstab::Starting value 0.000
-DEAL:alreadydone:Bicgstab::Convergence step 0 value 0.000
-DEAL:alreadydone:SQMR::Starting value 0.000
-DEAL:alreadydone:SQMR::Convergence step 0 value 0.000
 DEAL:alreadydone:GMRES::default_res=0.000
-DEAL:alreadydone:GMRES::Starting value 0.000
-DEAL:alreadydone:GMRES::Convergence step 0 value 0.000

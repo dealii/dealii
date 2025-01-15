@@ -33,16 +33,21 @@
 
 
 
-#define PREC_CHECK(solver, method, precond) \
-  deallog.push(#precond);                   \
-  try                                       \
-    {                                       \
-      u = 0.;                               \
-      solver.method(A, u, f, precond);      \
-    }                                       \
-  catch (...)                               \
-    {}                                      \
-  deallog.pop();                            \
+#define PREC_CHECK(solver, method, precond)                  \
+  deallog.push(#precond);                                    \
+  try                                                        \
+    {                                                        \
+      u = 0.;                                                \
+      solver.method(A, u, f, precond);                       \
+    }                                                        \
+  catch (const SolverControl::NoConvergence &e)              \
+    {                                                        \
+      deallog << "Failure step " << e.last_step << " value " \
+              << e.last_residual << std::endl;               \
+    }                                                        \
+  catch (...)                                                \
+    {}                                                       \
+  deallog.pop();                                             \
   residuals.push_back(control.last_value())
 
 template <typename MatrixType>

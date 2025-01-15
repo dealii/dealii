@@ -15,8 +15,6 @@ DEAL::mg_interface_mat4 2.44949
 DEAL::mg_mat5 12.4007
 DEAL::mg_interface_mat5 2.86744
 DEAL::check3 iteration: 2.00470e-07
-DEAL:cg::Starting value 0.141831
-DEAL:cg::Convergence step 8 value 1.02533e-10
 DEAL:: sol: 0.00000 - 0.0765196
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       376
@@ -36,6 +34,4 @@ DEAL::mg_interface_mat5 3.74166
 DEAL::mg_mat6 28.2686
 DEAL::mg_interface_mat6 4.78423
 DEAL::check3 iteration: 4.05480e-08
-DEAL:cg::Starting value 0.0832842
-DEAL:cg::Convergence step 7 value 5.24092e-10
 DEAL:: sol: 0.00000 - 0.0743542
