@@ -1069,8 +1069,8 @@ namespace SUNDIALS
      */
     DeclException1(ExcIDAError,
                    int,
-                   << "One of the SUNDIALS IDA internal functions "
-                   << " returned a negative error code: " << arg1
+                   << "One of SUNDIALS IDA's internal functions "
+                   << "returned an error code: " << arg1
                    << ". Please consult SUNDIALS manual.");
 
 
