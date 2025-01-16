@@ -226,7 +226,8 @@ namespace Step55
 
     Table<2, double> elevation_data;
 
-    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+    const unsigned int root_process = 0;
+    if (Utilities::MPI::this_mpi_process(mpi_communicator) == root_process)
       {
         const std::string filename = "colorado-topography-1800m.txt.gz";
 
@@ -299,13 +300,17 @@ namespace Step55
             }
       }
 
-    n_rows    = Utilities::MPI::broadcast(mpi_communicator, n_rows, 0);
-    n_columns = Utilities::MPI::broadcast(mpi_communicator, n_columns, 0);
-    lower_left_corner =
-      Utilities::MPI::broadcast(mpi_communicator, lower_left_corner, 0);
-    pixel_size = Utilities::MPI::broadcast(mpi_communicator, pixel_size, 0);
+    n_rows = Utilities::MPI::broadcast(mpi_communicator, n_rows, root_process);
+    n_columns =
+      Utilities::MPI::broadcast(mpi_communicator, n_columns, root_process);
+    lower_left_corner = Utilities::MPI::broadcast(mpi_communicator,
+                                                  lower_left_corner,
+                                                  root_process);
+    pixel_size =
+      Utilities::MPI::broadcast(mpi_communicator, pixel_size, root_process);
 
-    elevation_data.replicate_across_communicator(mpi_communicator, 0);
+    elevation_data.replicate_across_communicator(mpi_communicator,
+                                                 root_process);
 
     data = std::make_unique<Functions::InterpolatedUniformGridData<2>>(
       std::array<std::pair<double, double>, 2>{
@@ -534,17 +539,24 @@ namespace Step55
                          "initial conditions: interpolate elevation");
     pcout << "Interpolate elevation... " << std::flush;
 
+    // Use a vector initial condition for which the zero'th component is
+    // the elevation and all other components (out of a total of 2) are
+    // zero.
     const ColoradoTopography colorado_topography(mpi_communicator);
     const VectorFunctionFromScalarFunctionObject<spacedim> initial_values(
       [&](const Point<spacedim> &p) { return colorado_topography.value(p); },
-      0,
-      2);
+      /* elevation vector component = */ 0,
+      /* total number of vector components = */ 2);
 
-    VectorType interpolated;
-    interpolated.reinit(owned_partitioning, MPI_COMM_WORLD);
-    VectorTools::interpolate(dof_handler, initial_values, interpolated);
+    // Interpolate into a fully distributed vector
+    VectorType interpolated_initial_condition(owned_partitioning,
+                                              MPI_COMM_WORLD);
+    VectorTools::interpolate(dof_handler,
+                             initial_values,
+                             interpolated_initial_condition);
 
-    locally_relevant_solution = interpolated;
+    // Copy into a ghosted vector
+    locally_relevant_solution = interpolated_initial_condition;
 
     pcout << "done. " << std::endl;
   }
