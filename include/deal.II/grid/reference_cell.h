@@ -184,6 +184,10 @@ public:
   /**
    * Compute the value of the $i$-th linear shape function at location $\xi$
    * for the current reference-cell type.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   double
@@ -192,6 +196,10 @@ public:
   /**
    * Compute the gradient of the $i$-th linear shape function at location
    * $\xi$ for the current reference-cell type.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Tensor<1, dim>
@@ -233,6 +241,10 @@ public:
    * @param[in] n_points_1d The number of quadrature points in each direction
    * (QGauss) or an indication of what polynomial degree needs to be
    * integrated exactly for the other types.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Quadrature<dim>
@@ -246,6 +258,10 @@ public:
    *
    * The object returned by this function generalizes what the QMidpoint class
    * represents to other reference cells.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Quadrature<dim>
@@ -263,6 +279,10 @@ public:
    *   consequently the object cannot usefully be used for actually
    *   computing integrals. This is in contrast to, for example, the QTrapezoid
    *   class that correctly sets quadrature weights.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   const Quadrature<dim> &
@@ -298,6 +318,10 @@ public:
    *
    * Because the ReferenceCell class does not have a `dim` argument,
    * it has to be explicitly specified in the call to this function.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Point<dim>
@@ -362,6 +386,10 @@ public:
   /**
    * Return the number of cells one would get by refining the
    * current cell with the given refinement case.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   unsigned int
@@ -532,6 +560,10 @@ public:
    * @return The location of the vertex so identified in `dim`-dimensional
    *   space.
    *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
+   *
    * @post The output of calling `reference_cell.face_vertex_location<dim>(f,v)`
    *   is identical to calling
    *   `reference_cell.vertex<dim>(
@@ -615,6 +647,10 @@ public:
    * @f]
    * where $V$ is the volume of the reference cell (see also the volume()
    * function).
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Point<dim>
@@ -638,6 +674,10 @@ public:
    *
    * The tolerance parameter may be less than zero, indicating that the point
    * should be safely inside the cell.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   bool
@@ -646,6 +686,10 @@ public:
   /**
    * Return the point on the surface of the reference cell closest (in the
    * Euclidean norm) to @p p.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Point<dim>
@@ -657,6 +701,10 @@ public:
    * cross product between the two vectors returns the unit normal vector.
    *
    * @pre $i$ must be between zero and `dim-1`.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Tensor<1, dim>
@@ -665,6 +713,10 @@ public:
 
   /**
    * Return the unit normal vector of a face of the reference cell.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   Tensor<1, dim>
@@ -867,6 +919,10 @@ public:
    * The last argument, @p legacy_format, indicates whether to use the
    * old, VTK legacy format (when `true`) or the new, VTU format (when
    * `false`).
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
    */
   template <int dim>
   unsigned int
@@ -1572,6 +1628,13 @@ template <int dim>
 Quadrature<dim>
 ReferenceCell::get_midpoint_quadrature() const
 {
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
+
   return Quadrature<dim>(std::vector<Point<dim>>({barycenter<dim>()}),
                          std::vector<double>({volume()}));
 }
@@ -1642,7 +1705,12 @@ template <int dim>
 Point<dim>
 ReferenceCell::vertex(const unsigned int v) const
 {
-  AssertDimension(dim, get_dimension());
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
   AssertIndexRange(v, n_vertices());
 
   switch (dim)
@@ -1888,6 +1956,13 @@ template <int dim>
 unsigned int
 ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
 {
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
+
   // Use GeometryInfo here to keep it the single source of truth
   if (this->is_hyper_cube())
     return GeometryInfo<dim>::n_children(ref_case);
@@ -2444,6 +2519,12 @@ Point<dim>
 ReferenceCell::face_vertex_location(const unsigned int face,
                                     const unsigned int vertex) const
 {
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
   return this->template vertex<dim>(
     face_to_cell_vertices(face, vertex, default_combined_face_orientation()));
 }
@@ -2694,7 +2775,12 @@ inline double
 ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
                                        const unsigned int i) const
 {
-  AssertDimension(dim, get_dimension());
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
   AssertIndexRange(i, n_vertices());
   switch (this->kind)
     {
@@ -2783,7 +2869,12 @@ inline Tensor<1, dim>
 ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
                                                 const unsigned int i) const
 {
-  AssertDimension(dim, get_dimension());
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -2847,7 +2938,12 @@ template <int dim>
 inline Point<dim>
 ReferenceCell::barycenter() const
 {
-  AssertDimension(dim, get_dimension());
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
 
   switch (this->kind)
     {
@@ -2880,7 +2976,12 @@ template <int dim>
 inline bool
 ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
 {
-  AssertDimension(dim, get_dimension());
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
 
   // Introduce abbreviations to silence compiler warnings about invalid
   // array accesses (that can't happen, of course, but the compiler
@@ -2990,7 +3091,12 @@ inline Tensor<1, dim>
 ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
                                        const unsigned int i) const
 {
-  AssertDimension(dim, get_dimension());
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
   AssertIndexRange(i, dim - 1);
 
   switch (this->kind)
@@ -3070,7 +3176,12 @@ template <int dim>
 inline Tensor<1, dim>
 ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
 {
-  AssertDimension(dim, this->get_dimension());
+  Assert(dim == get_dimension(),
+         ExcMessage("You can only call this function with arguments for "
+                    "which 'dim' equals the dimension of the space in which "
+                    "the current reference cell lives. You have dim=" +
+                    std::to_string(dim) + " but the reference cell is " +
+                    std::to_string(get_dimension()) + " dimensional."));
 
   if (is_hyper_cube())
     {
