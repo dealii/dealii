@@ -840,8 +840,6 @@ namespace Step44
     // Set up the finite element system to be solved:
     void system_setup();
 
-    void determine_component_extractors();
-
     // Create Dirichlet constraints for the incremental displacement field:
     void make_constraints(const unsigned int it_nr);
 
@@ -1059,7 +1057,25 @@ namespace Step44
   {
     Assert(dim == 2 || dim == 3,
            ExcMessage("This problem only works in 2 or 3 space dimensions."));
-    determine_component_extractors();
+
+    // Next we compute some information from the FE system that describes which
+    // local element DOFs are attached to which block component.  This is used
+    // later to extract sub-blocks from the global matrix.
+    //
+    // In essence, all we need is for the FESystem object to indicate to which
+    // block component a DOF is attached. We can do that via the
+    // FiniteElement::shape_function_belongs_to() function.
+    for (unsigned int k = 0; k < fe.n_dofs_per_cell(); ++k)
+      {
+        if (fe.shape_function_belongs_to(k, u_fe))
+          element_indices_u.push_back(k);
+        else if (fe.shape_function_belongs_to(k, p_fe))
+          element_indices_p.push_back(k);
+        else if (fe.shape_function_belongs_to(k, J_fe))
+          element_indices_J.push_back(k);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+      }
   }
 
 
@@ -1500,35 +1516,6 @@ namespace Step44
     timer.leave_subsection();
   }
 
-
-  // @sect4{Solid::determine_component_extractors}
-  // Next we compute some information from the FE system that describes which
-  // local element DOFs are attached to which block component.  This is used
-  // later to extract sub-blocks from the global matrix.
-  //
-  // In essence, all we need is for the FESystem object to indicate to which
-  // block component a DOF on the reference cell is attached to.  Currently, the
-  // interpolation fields are setup such that 0 indicates a displacement DOF, 1
-  // a pressure DOF and 2 a dilatation DOF.
-  template <int dim>
-  void Solid<dim>::determine_component_extractors()
-  {
-    element_indices_u.clear();
-    element_indices_p.clear();
-    element_indices_J.clear();
-
-    for (unsigned int k = 0; k < fe.n_dofs_per_cell(); ++k)
-      {
-        if (fe.shape_function_belongs_to(k, u_fe))
-          element_indices_u.push_back(k);
-        else if (fe.shape_function_belongs_to(k, p_fe))
-          element_indices_p.push_back(k);
-        else if (fe.shape_function_belongs_to(k, J_fe))
-          element_indices_J.push_back(k);
-        else
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
-  }
 
   // @sect4{Solid::setup_qph}
   // The method used to store quadrature information is already described in
