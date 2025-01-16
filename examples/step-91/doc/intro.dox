@@ -1039,14 +1039,18 @@ shape, but we're going to leave that for another time.
 TODO: Need to attach a manifold.
 
 
-<h3> A test case to check correctness of the program </h3>
+<h3> How we tested the correctness of the program </h3>
 
 As with all other tutorial programs, we spent a substantial amount of time
-verifying that it actually works correctly. To this end, here is a test case
-that is relatively simple to implement and for which one can compute the
+verifying that it actually works correctly. To this end, here is two test cases
+that are relatively simple to implement and for which one can compute the
 exact solution as well.
 
-The test case is posed on a two-dimensional (flat) domain that is a rectangle,
+<h4> A one-dimensional test case </h4>
+
+The simplest test case one can easily come up with has only one real space variable
+plus the time dimension. In practice, we pose the test case on a two-dimensional
+(flat) domain that is a rectangle,
 but everything only depends on the $x$ coordinate and so it is, in essence,
 a one-dimensional (but time-dependent) problem. We choose the rectangle
 so that $0 < x < L$ (the extent of the $y$ coordinate does not matter).
@@ -1056,7 +1060,7 @@ We start with a linear initial elevation profile:
 @f]
 where we will choose $a<0$ so that the initial elevation slopes down from
 left to right. For this initial profile, the slope equals $S(x,0)=a$
-and the downhill direction field is $\mathbd d(x,0) = (1,0)^T$. (Here
+and the downhill direction field is $\mathbf d(x,0) = (1,0)^T$. (Here
 and in the following, we will use $\epsilon=0$ in the regularization of
 functions that are not differentiable.)
 Because $\mathbf d$ is spatially constant, we then recognize that
@@ -1071,14 +1075,14 @@ of the elevation is governed by
 @f[
   \frac{\partial H(\mathbf x,t)}{\partial t}
   =
-  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
   + K_d \Delta H(\mathbf x, t).
 @f]
 In other words, at the initial time, the rate of change of the elevation field is
 @f[
   \frac{\partial H(\mathbf x,0)}{\partial t}
   =
-  - k w(\mathbf x,0)^m S(\mathbf x,0)^n
+  - k w(\mathbf x,0)^m S(H(\mathbf x,0))^n
   + K_d \Delta H(\mathbf x, 0)
   =
   - k (px)^m |a|^n
