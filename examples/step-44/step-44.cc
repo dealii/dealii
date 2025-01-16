@@ -920,22 +920,26 @@ namespace Step44
     // polynomial degree, the degree-of-freedom handler, number of DoFs per
     // cell and the extractor objects used to retrieve information from the
     // solution vectors:
-    const unsigned int               degree;
-    const FESystem<dim>              fe;
-    DoFHandler<dim>                  dof_handler;
-    const unsigned int               dofs_per_cell;
-    const FEValuesExtractors::Vector u_fe;
-    const FEValuesExtractors::Scalar p_fe;
-    const FEValuesExtractors::Scalar J_fe;
+    const unsigned int  degree;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
+    const unsigned int  dofs_per_cell;
 
     // Description of how the block-system is arranged. There are 3 blocks,
     // the first contains a vector DOF $\mathbf{u}$ while the other two
     // describe scalar DOFs, $\widetilde{p}$ and $\widetilde{J}$.
-    static const unsigned int n_blocks          = 3;
-    static const unsigned int n_components      = dim + 2;
-    static const unsigned int first_u_component = 0;
-    static const unsigned int p_component       = dim;
-    static const unsigned int J_component       = dim + 1;
+    static constexpr unsigned int n_blocks          = 3;
+    static constexpr unsigned int n_components      = dim + 2;
+    static constexpr unsigned int first_u_component = 0;
+    static constexpr unsigned int p_component       = dim;
+    static constexpr unsigned int J_component       = dim + 1;
+
+    static constexpr FEValuesExtractors::Vector u_fe =
+      FEValuesExtractors::Vector(first_u_component);
+    static constexpr FEValuesExtractors::Scalar p_fe =
+      FEValuesExtractors::Scalar(p_component);
+    static constexpr FEValuesExtractors::Scalar J_fe =
+      FEValuesExtractors::Scalar(J_component);
 
     enum
     {
@@ -1046,9 +1050,6 @@ namespace Step44
        FE_DGP<dim>(parameters.poly_degree - 1)) // dilatation
     , dof_handler(triangulation)
     , dofs_per_cell(fe.n_dofs_per_cell())
-    , u_fe(first_u_component)
-    , p_fe(p_component)
-    , J_fe(J_component)
     , dofs_per_block(n_blocks)
     , qf_cell(parameters.quad_order)
     , qf_face(parameters.quad_order)
