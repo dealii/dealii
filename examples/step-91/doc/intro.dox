@@ -6,7 +6,7 @@ This program was contributed by Wolfgang Bangerth (Colorado State University)
 and Jean-Paul Pelteret.
 
 This material is based upon work partially supported by National Science
-Foundation grants OAC-1835673 and EAR-1925595.
+Foundation grants OAC-1835673, EAR-1925595, and OAC-2410847.
 </i>
 <br>
 
@@ -186,7 +186,7 @@ In summary, the equations we would like to solve then look as follows:
 @f{align*}{
   \frac{\partial H(\mathbf x,t)}{\partial t}
   &=
-  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  - k w(\mathbf x,t)^m |\nabla H(\mathbf x,t)|^n
   + K_d \Delta H(\mathbf x, t),
   \\
   \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{|\nabla H(\mathbf x,t)|} w(\mathbf x,t)\right) &= p.
@@ -194,19 +194,20 @@ In summary, the equations we would like to solve then look as follows:
 These equations are nonlinear, and to derive efficient ways of solving
 them, we will see below that we need to form derivatives -- but the
 term $S(\mathbf x,t)=|\nabla H(\mathbf x,t)|$ is not differentiable,
-and neither is $\frac{\nabla h}{|\nabla h|}$. As a consequence,
+and neither is $\frac{\nabla H}{|\nabla H|}$. As a consequence,
 we make one final change to the equations by regularizing these
 offending term to obtain the following form:
 @f{align*}{
   \frac{\partial H(\mathbf x,t)}{\partial t}
   &=
-  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
   + K_d \Delta H(\mathbf x, t),
   \\
-  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf x,t) + \epsilon^2}} w(\mathbf x,t)\right) &= p,
+  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) &= p,
 @f}
-where we will use $S(\mathbf x,t)=\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf
-x,t) +\epsilon^2}$, where $\epsilon$ is a regularization parameter whose choice we discuss
+where we will use $S(H)=\sqrt{\nabla H\cdot \nabla H +\epsilon^2}$ as a differentiable approximation
+of the *slope* as a function of the elevation $H$,
+with $\epsilon$ a regularization parameter whose choice we discuss
 below.
 
 TODO: Perhaps replace S everywhere below?
@@ -222,7 +223,7 @@ are obvious, some not so much:
   the United States Geologic Survey (see below).
 - We need boundary conditions for the advection-diffusion equation for $H(\mathbf x,t)$.
   For no better reason than simplicity, we choose Neumann boundary conditions
-  that read $\mathbf n\cdot \left[K_d \nabla h\right] = 0$ with the normal
+  that read $\mathbf n\cdot \left[K_d \nabla H\right] = 0$ with the normal
   vector $\mathbf n$. This is likely not realistic, but we leave it to
   others to implement better methods for this program.
 - For the water flow rate $w(\mathbf x,t)$, boundary conditions are more difficult.
@@ -278,12 +279,12 @@ TODO: Double check units!
   approximately in line with the
   [annual precipitation in the wetter (mountainous) parts of Colorado](https://gisgeography.com/us-precipitation-map/).
 - For the regularization parameter $\epsilon$ that appears in the replacement
-  of $|\nabla h|$ by $\sqrt{\nabla h \cdot \nabla h + \epsilon^2}$, we want
-  to choose something that is small compared to typical values of $|\nabla h|$
+  of $|\nabla H|$ by $\sqrt{\nabla H \cdot \nabla H + \epsilon^2}$, we want
+  to choose something that is small compared to typical values of $|\nabla H|$
   but nonzero. Recall that $\nabla H$ is the derivative of the elevation with
   regard to the horizontal coordinates -- i.e., it has units meters per meter
-  (in other words, no units at all). A large value for $|\nabla h|$ would then
-  be one -- a mountain side of 45 degrees, fairly steep. A small value would
+  (in other words, no units at all). A large value for $|\nabla H|$ would then
+  be 1.0 -- a mountain side of 45 degrees, fairly steep. A small value would
   be the 450 meter drop of the Mississippi river over its entire length of
   3,766 kilometers, or 0.00012. The Mississippi does not actually run in
   Colorado, but we can estimate something for the South Platte river between
@@ -308,10 +309,10 @@ As described in detail above, the model we want to solve looks as follows:
 @f{align*}{
   \frac{\partial H(\mathbf x,t)}{\partial t}
   &=
-  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
   + K_d \Delta H(\mathbf x, t),
   \\
-  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf x,t) + \epsilon^2}} w(\mathbf x,t)\right) &= p,
+  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) &= p,
 @f}
 
 For the purposes of this program, we will use the
@@ -324,7 +325,7 @@ by parts, and application of the boundary conditions for $H$:
 @f{align*}{
   \left(\varphi^H,\frac{\partial H}{\partial t}\right)
   &=
-  - \left(\varphi^H, k w^m S^n\right)
+  - \left(\varphi^H, k w^m S(H)^n\right)
   - \left(\nabla \varphi^H, K_d \nabla H\right).
 @f}
 Spatial discretization then requires us to test with the $i$th shape
@@ -334,7 +335,7 @@ coefficients for the discretized variable $H_h$) to result in
 @f{align*}{
   \sum_j \left(\varphi^H_i,\varphi^H_j\right) \frac{\partial V_j}{\partial t}
   &=
-  - \left(\varphi^H_i, k w^m S^n\right)
+  - \left(\varphi^H_i, k w^m S(H_h)^n\right)
   - \sum_j \left(\nabla\varphi^H_i, K_d \nabla \varphi^H_j\right) V_j.
 @f}
 We can write this in the following form in terms of matrices and vectors:
@@ -350,10 +351,11 @@ with
   \\
   A^H_{ij} &= \left(\nabla\varphi^H_i, K_d \nabla \varphi^H_j\right) V_j,
   \\
-  F^H(V,W)_i &= - \left(\varphi^H_i, k w^m S^n\right).
+  F^H(V,W)_i &= - \left(\varphi^H_i, k w^m S_h(V)^n\right).
 @f}
 The last term is nonlinear: It depends on $H(\mathbf x,t)$ (and thus
-$V$) by way of the dependence $S(\mathbf x,t)=|\nabla H(\mathbf x,t)|$, and it
+$V$) by way of the dependence $S(H_h)$, which for simplicity we will express
+as $S_h(V)\dealcoloneq S(H_h)$. This last term also
 depends on the expansion coefficients $W=W(t)$ of $w(\mathbf x,t)$.
 
 
@@ -369,8 +371,12 @@ does not look all that different,
 @f[
   \nabla \cdot (\mathbf d w) = p,
 @f]
-where $\mathbf d(\mathbf x,t)=-\frac{\nabla H(\mathbf x,t)}{\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf x,t) + \epsilon^2}}$.
-The difference was that in step-9, the vector field $\beta$ was divergence-free,
+where
+$\mathbf d(\mathbf x,t)
+ =-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))}
+ =-\frac{\nabla H(\mathbf x,t)}{\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf x,t) + \epsilon^2}}$
+ is our approximation of the *downhill* unit vector.
+The difference is that in step-9, the vector field $\beta$ was divergence-free,
 whereas here it definitely is not. As a consequence,
 $\nabla \cdot (\mathbf d w) \neq \mathbf d \cdot \nabla w$
 and that makes all the difference.
@@ -398,7 +404,7 @@ do not know how to deal with $\nabla \cdot (\mathbf d w_h)$. Traditionally,
 in the finite element method, if you don't know how to deal with a derivative,
 you integrate by parts. This is not an option here because all that would
 happen is that we roll the derivative onto the test function
-$\varphi^w_h+\mathbf d \cdot \nabla \varphi^w_h)$ where we would again
+$\varphi^w_h+\mathbf d \cdot \nabla \varphi^w_h$ where we would again
 end up with a derivative on $\mathbf d$.
 
 Both of these difficulties *could* be avoided by recognizing that while $\mathbf d$
@@ -413,7 +419,7 @@ to two more problems: First, this results in lengthy formulas we may perhaps
 not want to implement; and, second and more importantly, if $H(\mathbf x,t)$
 is discretized by $Q_1$ elements, then $\nabla H_h$ (and consequently
 $\mathbf d_h$) is a discontinuous function for which can not easily take
-more derivatives. We could avoid this by first projecting $\mathbf d$
+more derivatives. We could avoid this as well by first projecting $\mathbf d$
 onto a continuous finite element space, and then taking its derivative,
 but in the end this is perhaps a bit too much.
 
@@ -445,7 +451,7 @@ $\varphi^w_h(\mathbf x) = \varphi^w_i(\mathbf x)$. This gives us
   = (\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,p),
 @f]
 where we can realize that both the weak form and the interpolation operator
-are linear and so we can re-write this as
+are linear in the coefficients $W_j$ and so we can re-write this as
 @f[
   \sum_j
   \left(\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,
@@ -464,16 +470,18 @@ with
   \\
   F^w(V)_i &= (\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,p).
 @f}
-The dependence of both $A^w$ and $F^w$ on $H$ is through the vector
-field $\mathbf d$.
-Now consider what $I_h(\mathbf d \varphi^w_j)$ is: It is a finite element
-function that, because $\varphi^w_j$ is zero at all node points other than
-the node $\mathbf x_j$, must be proportional to $\varphi^w_j$ itself. In
-other words,
+The dependence of both $A^w$ and $F^w$ on the expansion coefficients $V$
+of $H_h$ is through the vector field $\mathbf d$.
+Now consider what $I_h(\mathbf d \varphi^w_j)$ is: First, as the result of the
+interpolation operator it is a finite element
+function; second, because $\varphi^w_j$ is zero at all node points other than
+the node $\mathbf x_j$ and because $\mathbf d \varphi^w_j$ clearly has this
+property at the node points as well, the term $I_h(\mathbf d \varphi^w_j)$ must
+be proportional to $\varphi^w_j$ itself. In other words,
 @f[
   [I_h(\mathbf d \varphi^w_j)](\mathbf x,t) = \mathbf d(\mathbf x_j,t) \varphi^w_j(\mathbf x)
 @f]
-and consequently (because $v(\mathbf x_j,t)$ is fixed and no longer
+and consequently (because $\mathbf d(\mathbf x_j,t)$ is fixed and no longer
 depends on $\mathbf x$)
 @f[
   \nabla \cdot \left[I_h(\mathbf d \varphi^w_j)\right] =
@@ -486,12 +494,16 @@ This gives us a way to compute the matrix:
   \left(\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,
         \mathbf d(\mathbf x_j,t) \cdot \nabla \varphi^w_j \right).
 @f}
-This is easily computable.
+This is easily computable: We just need to evaluate the direction vector at
+node points. (In actuality, $\mathbf d$ is not a continuous function because
+it depends on the gradient of the finite element field $H_h$. As a consequence,
+whenever we need to evaluate $\mathbf d(\mathbf x_j,t)$ we take the value
+from the side of the cell on which we are currently assembling matrix terms.)
 
 The form above involving a matrix is useful in the first step when we need to
 solve for $w$ given the initial elevation. For later time steps, however, all
 we will need is a residual. That is, given the coefficients $V,W$ of fields
-$w_h$ and $H_h$, and the known dependence of $\mathbf d$ on $H$,
+$H_h$ and $w_h$, and the known dependence of $\mathbf d$ on $H_h$,
 we will have to compute the vector
 @f[
   F^w_i =
@@ -534,10 +546,10 @@ Recall that the model we want to solve is
 @f{align*}{
   \frac{\partial H(\mathbf x,t)}{\partial t}
   &=
-  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
   + K_d \Delta H(\mathbf x, t),
   \\
-  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf x,t) + \epsilon^2}} w(\mathbf x,t)\right) &= p,
+  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) &= p,
 @f}
 and that its spatially discretized version reads as
 @f{align*}{
@@ -589,10 +601,10 @@ in the following way to make clear the missing time derivative:
 @f{align*}{
   \frac{\partial H(\mathbf x,t)}{\partial t}
   &=
-  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
   + K_d \Delta H(\mathbf x, t),
   \\
-  0 &= \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf x,t) + \epsilon^2}} w(\mathbf x,t)\right) - p.
+  0 &= \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) - p.
 @f}
 Similarly, the spatially discretized version should be read as
 @f{align*}{
@@ -607,8 +619,10 @@ Similarly, the spatially discretized version should be read as
 
 The name we give these sorts of equations is
 [differential-algebraic equations](https://en.wikipedia.org/wiki/Differential-algebraic_system_of_equations)
-to indicate that some variables are "differential" (here, $H$ and $V$)
-and that others are "algebraic" (here, $w$ and $W$) where the term
+to indicate that some variables are "differential" (here, $H$ or its
+expansion coefficients $V$)
+and that others are "algebraic" (here, $w$ or its expansion
+coefficients $W$) where the term
 only applies to the time derivative ($w$ does satisfy a *spatial*
 differential equation, after all).
 
@@ -682,7 +696,9 @@ IDA can solve it, but in essence it comes down to the following:
   current time step size.
 - We need to be able to solve linear systems with this matrix $J_\alpha$.
 - We need to somehow provide IDA with initial conditions for $V(0),
-  W(0)$, or let it compute these itself.
+  W(0)$; alternatively, we can only provide initial conditions $V(0)$
+  for the differential components and let IDA compute the initial conditions
+  for the algebraic components $W(0)$ itself.
 
 None of this is inherently difficult -- this is exactly the sort of thing
 we do in finite element codes all the time. The only awkwardness is
