@@ -28,7 +28,7 @@ option(DEAL_II_FORCE_BUNDLED_BOOST
   "Always use the bundled boost library instead of an external one."
   OFF)
 
-set(BOOST_FOLDER "${CMAKE_SOURCE_DIR}/bundled/boost-1.84.0")
+set(BOOST_FOLDER "${DEAL_II_SOURCE_DIR}/bundled/boost-1.84.0")
 
 macro(feature_boost_configure_bundled)
   set(BOOST_VERSION "1.84.0")
@@ -73,7 +73,7 @@ option(DEAL_II_FORCE_BUNDLED_KOKKOS
   "Always use the bundled Kokkos library instead of an external one."
   OFF)
 
-set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
+set(KOKKOS_FOLDER "${DEAL_II_SOURCE_DIR}/bundled/kokkos-3.7.00")
 
 macro(feature_kokkos_configure_bundled)
   set(KOKKOS_VERSION "3.7.0")
@@ -100,7 +100,7 @@ option(DEAL_II_FORCE_BUNDLED_TASKFLOW
   "Always use the bundled taskflow header library instead of an external one."
   OFF)
 
-set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-3.7.0")
+set(TASKFLOW_FOLDER "${DEAL_II_SOURCE_DIR}/bundled/taskflow-3.7.0")
 
 macro(feature_taskflow_configure_bundled)
   set(TASKFLOW_VERSION "3.7.0")
@@ -124,7 +124,7 @@ if( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     "Always use the bundled tbb library instead of an external one."
     OFF)
 
-  set(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
+  set(TBB_FOLDER "${DEAL_II_SOURCE_DIR}/bundled/tbb-2018_U2")
 endif()
 
 macro(feature_tbb_configure_bundled)
@@ -158,7 +158,7 @@ option(DEAL_II_FORCE_BUNDLED_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
 
-set(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
+set(UMFPACK_FOLDER "${DEAL_II_SOURCE_DIR}/bundled/umfpack")
 
 macro(feature_umfpack_configure_bundled)
   set(UMFPACK_VERSION "5.0.2")
@@ -181,7 +181,7 @@ option(DEAL_II_FORCE_BUNDLED_MUPARSER
   "Always use the bundled functionparser library instead of an external one."
   OFF)
 
-set(MUPARSER_FOLDER "${CMAKE_SOURCE_DIR}/bundled/muparser_v2_3_3/")
+set(MUPARSER_FOLDER "${DEAL_II_SOURCE_DIR}/bundled/muparser_v2_3_3/")
 
 macro(feature_muparser_configure_bundled)
   set(MUPARSER_VERSION "2.3.3")

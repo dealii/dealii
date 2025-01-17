@@ -13,9 +13,9 @@
 ## ------------------------------------------------------------------------
 
 include_directories(
-  ${CMAKE_BINARY_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/contrib/python-bindings/include/
+  ${DEAL_II_BINARY_DIR}/include/
+  ${DEAL_II_SOURCE_DIR}/include/
+  ${DEAL_II_SOURCE_DIR}/contrib/python-bindings/include/
   SYSTEM
   ${DEAL_II_INCLUDE_DIRS}
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
@@ -58,8 +58,8 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
     LINKER_LANGUAGE "CXX"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
     COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
+    ARCHIVE_OUTPUT_DIRECTORY "${DEAL_II_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${DEAL_II_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}"
     )
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set_target_properties(PyDealII_${_build_lowercase} PROPERTIES
@@ -76,7 +76,7 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
     )
 
   export(TARGETS PyDealII_${_build_lowercase}
-    FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+    FILE ${DEAL_II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
     APPEND
     )
 
@@ -98,7 +98,7 @@ set(_python_sources
   __init__.py
   )
 file(COPY ${_python_sources}
-  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}
+  DESTINATION ${DEAL_II_BINARY_DIR}/${DEAL_II_PYTHON_RELDIR}
   )
 install(FILES ${_python_sources}
   DESTINATION ${DEAL_II_PYTHON_RELDIR}

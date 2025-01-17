@@ -23,7 +23,7 @@
 
 macro(evaluate_expression _the_expression)
   set(_tmp_name
-    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/evaluate_expression.tmp"
+    "${DEAL_II_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/evaluate_expression.tmp"
     )
   file(WRITE ${_tmp_name} "${_the_expression}")
   include("${_tmp_name}")

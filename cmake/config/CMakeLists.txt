@@ -30,7 +30,7 @@ message(STATUS "Setting up project configuration")
 #
 configure_file( # for binary dir:
   ${CMAKE_CURRENT_SOURCE_DIR}/template-arguments.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
+  ${DEAL_II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
   )
 
 
@@ -41,18 +41,18 @@ configure_file( # for binary dir:
 ########################################################################
 
 set(_macros
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_shell_escape_option_groups.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_target_compile_flags.cmake
-  ${CMAKE_SOURCE_DIR}/cmake/macros/macro_target_link_flags.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_deal_ii_add_test.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_deal_ii_invoke_autopilot.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_deal_ii_pickup_tests.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_deal_ii_query_git_information.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_deal_ii_setup_target.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_shell_escape_option_groups.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_target_compile_flags.cmake
+  ${DEAL_II_SOURCE_DIR}/cmake/macros/macro_target_link_flags.cmake
   )
 file(COPY ${_macros}
-  DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
+  DESTINATION ${DEAL_II_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/macros
   )
 install(FILES ${_macros}
   DESTINATION ${DEAL_II_SHARE_RELDIR}/macros
@@ -144,17 +144,17 @@ set(CONFIG_BUILD_DIR TRUE)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${DEAL_II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
   @ONLY
   )
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigGit.cmake.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigGit.cmake
+  ${DEAL_II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigGit.cmake
   @ONLY
   )
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
+  ${DEAL_II_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
   )
 
