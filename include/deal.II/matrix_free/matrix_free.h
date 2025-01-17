@@ -3940,8 +3940,9 @@ namespace internal
      */
     template <typename VectorType,
               std::enable_if_t<!has_exchange_on_subset<VectorType>, VectorType>
-                                              * = nullptr,
-              typename VectorType::value_type * = nullptr>
+                * = nullptr,
+              std::enable_if_t<has_assignment_operator<VectorType>, VectorType>
+                * = nullptr>
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
@@ -3963,14 +3964,15 @@ namespace internal
 
     /**
      * Zero out vector region for non-vector types, i.e., classes that do not
-     * have VectorType::value_type
+     * have operator=(const VectorType::value_type)
      */
     void
     zero_vector_region(const unsigned int, ...) const
     {
       Assert(false,
-             ExcNotImplemented("Zeroing is only implemented for vector types "
-                               "which provide VectorType::value_type"));
+             ExcNotImplemented(
+               "Zeroing is only implemented for vector types "
+               "which provide operator=(const VectorType::value_type)"));
     }
 
 

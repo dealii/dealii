@@ -147,6 +147,18 @@ namespace internal
 
 
   // a helper type-trait that leverage SFINAE to figure out if type T has
+  // T & T::operator=(const T::value_type) const
+  template <typename T>
+  using assignment_operator_t =
+    decltype(std::declval<T>().operator=(typename T::value_type()));
+
+  template <typename T>
+  constexpr bool has_assignment_operator =
+    is_supported_operation<assignment_operator_t, T>;
+
+
+
+  // a helper type-trait that leverage SFINAE to figure out if type T has
   // T::communication_block_size
   template <typename T>
   using communication_block_size_t = decltype(T::communication_block_size);
