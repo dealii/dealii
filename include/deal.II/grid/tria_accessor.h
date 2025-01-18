@@ -154,12 +154,6 @@ class TriaAccessor<0, dim, spacedim>;
 template <int spacedim>
 class TriaAccessor<0, 1, spacedim>;
 
-// note: the file tria_accessor.templates.h is included at the end of
-// this file.  this includes a lot of templates. originally, this was
-// only done in debug mode, but led to cyclic reduction problems and
-// so is now on by default.
-
-
 /**
  * A namespace that contains exception classes used by the accessor classes.
  */
