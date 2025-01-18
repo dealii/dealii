@@ -19,7 +19,6 @@
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
 
 #include <vector>
 
