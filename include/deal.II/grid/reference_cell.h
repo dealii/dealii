@@ -593,11 +593,44 @@ public:
    * Return whether the line with index @p line is oriented in standard
    * direction within a cell, given the @p face_orientation of the face within
    * the current cell, and @p line_orientation for the line within that face.
+   *
+   * @deprecated Use face_to_cell_line_orientation() instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use face_to_cell_line_orientation() instead.")
   types::geometric_orientation
   standard_vs_true_line_orientation(
     const unsigned int                 line,
     const unsigned int                 face,
+    const types::geometric_orientation face_orientation,
+    const types::geometric_orientation line_orientation) const;
+
+  /**
+   * @brief Convert a line orientation defined relative to a face to the
+   * canonical per-cell line orientation.
+   *
+   * Line orientations are used in both face and line contexts. Since a line is
+   * always shared by two faces, it may need to be reversed (relative to the
+   * first face) on the second face to guarantee that the per-face lines always
+   * point in their canonical directions (e.g., so that lines 0 and 1 of a
+   * quadrilateral point up and lines 2 and 3 point right) and that the vertex
+   * ordering on that line remains correct.
+   *
+   * To achieve this, this function computes the per-cell line orientation based
+   * on the face's number, orientation and line number.
+   *
+   * @param[in] face_line_no The index of the line on the face.
+   *
+   * @param[in] face_no The number of the face.
+   *
+   * @param[in] face_orientation The orientation of the face.
+   *
+   * @param[in] line_orientation The orientation of the line on the given face.
+   */
+  types::geometric_orientation
+  face_to_cell_line_orientation(
+    const unsigned int                 face_line_no,
+    const unsigned int                 face_no,
     const types::geometric_orientation face_orientation,
     const types::geometric_orientation line_orientation) const;
 
@@ -3225,16 +3258,30 @@ ReferenceCell::standard_vs_true_line_orientation(
   const types::geometric_orientation combined_face_orientation,
   const types::geometric_orientation line_orientation) const
 {
+  return face_to_cell_line_orientation(line,
+                                       face,
+                                       combined_face_orientation,
+                                       line_orientation);
+}
+
+
+inline types::geometric_orientation
+ReferenceCell::face_to_cell_line_orientation(
+  const unsigned int                 face_line_no,
+  const unsigned int                 face_no,
+  const types::geometric_orientation combined_face_orientation,
+  const types::geometric_orientation line_orientation) const
+{
   constexpr auto D = ReferenceCell::default_combined_face_orientation();
   constexpr auto R = ReferenceCell::reversed_combined_line_orientation();
   if (*this == ReferenceCells::Hexahedron)
     {
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
         table{{{{D, D, R, D, R, R, D, R}}, {{D, D, D, R, R, R, R, D}}}};
-      // We use line / 2 here since lines i and i + 1 are parallel and, on a
-      // given face, have the same relative orientations.
+      // We use face_line_no / 2 here since lines i and i + 1 are parallel and,
+      // on a given face, have the same relative orientations.
       const bool match =
-        line_orientation == table[line / 2][combined_face_orientation];
+        line_orientation == table[face_line_no / 2][combined_face_orientation];
 
       return match ? ReferenceCell::default_combined_face_orientation() :
                      ReferenceCell::reversed_combined_line_orientation();
@@ -3245,7 +3292,7 @@ ReferenceCell::standard_vs_true_line_orientation(
       static constexpr dealii::ndarray<unsigned int, 4, 3> combined_lines{
         {{{0, 0, 0}}, {{X, 0, 1}}, {{X, 0, X}}, {{X, X, X}}}};
 
-      const auto combined_line = combined_lines[face][line];
+      const auto combined_line = combined_lines[face_no][face_line_no];
 
       Assert(combined_line != X,
              ExcMessage(
