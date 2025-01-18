@@ -1004,7 +1004,7 @@ public:
    * @warning This function is really only for internal use in the library
    * unless you absolutely know what this is all about.
    *
-   * @note This function queries ReferenceCell::standard_vs_true_line_orientation().
+   * @note This function queries ReferenceCell::face_to_cell_line_orientation().
    */
   types::geometric_orientation
   line_orientation(const unsigned int line) const;
@@ -5109,22 +5109,22 @@ namespace internal
                    ref_cell.standard_to_real_face_line(3, f, orientation)}};
                 const auto quad = cell.quad(f);
                 const std::array<types::geometric_orientation, 4>
-                  my_orientations{{ref_cell.standard_vs_true_line_orientation(
+                  my_orientations{{ref_cell.face_to_cell_line_orientation(
                                      0,
                                      f,
                                      orientation,
                                      quad->line_orientation(my_indices[0])),
-                                   ref_cell.standard_vs_true_line_orientation(
+                                   ref_cell.face_to_cell_line_orientation(
                                      1,
                                      f,
                                      orientation,
                                      quad->line_orientation(my_indices[1])),
-                                   ref_cell.standard_vs_true_line_orientation(
+                                   ref_cell.face_to_cell_line_orientation(
                                      2,
                                      f,
                                      orientation,
                                      quad->line_orientation(my_indices[2])),
-                                   ref_cell.standard_vs_true_line_orientation(
+                                   ref_cell.face_to_cell_line_orientation(
                                      3,
                                      f,
                                      orientation,
@@ -5144,12 +5144,12 @@ namespace internal
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
                 const auto quad = cell.quad(f);
                 const std::array<types::geometric_orientation, 2>
-                  my_orientations{{ref_cell.standard_vs_true_line_orientation(
+                  my_orientations{{ref_cell.face_to_cell_line_orientation(
                                      0,
                                      f,
                                      orientation,
                                      quad->line_orientation(my_indices[0])),
-                                   ref_cell.standard_vs_true_line_orientation(
+                                   ref_cell.face_to_cell_line_orientation(
                                      1,
                                      f,
                                      orientation,
@@ -5171,32 +5171,32 @@ namespace internal
                ref_cell.standard_to_real_face_line(1, 1, orientations[1]),
                ref_cell.standard_to_real_face_line(2, 1, orientations[1]),
                ref_cell.standard_to_real_face_line(1, 2, orientations[2])}};
-            line_orientations[0] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[0] = ref_cell.face_to_cell_line_orientation(
               0,
               0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[0]));
-            line_orientations[1] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[1] = ref_cell.face_to_cell_line_orientation(
               1,
               0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[1]));
-            line_orientations[2] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[2] = ref_cell.face_to_cell_line_orientation(
               2,
               0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[2]));
-            line_orientations[3] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[3] = ref_cell.face_to_cell_line_orientation(
               1,
               1,
               orientations[1],
               cell.quad(1)->line_orientation(my_indices[3]));
-            line_orientations[4] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[4] = ref_cell.face_to_cell_line_orientation(
               2,
               1,
               orientations[1],
               cell.quad(1)->line_orientation(my_indices[4]));
-            line_orientations[5] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[5] = ref_cell.face_to_cell_line_orientation(
               1,
               2,
               orientations[2],
@@ -5567,7 +5567,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
           line_index, face_index, this->combined_face_orientation(face_index));
 
       // Then query how that line is oriented within that face:
-      return reference_cell.standard_vs_true_line_orientation(
+      return reference_cell.face_to_cell_line_orientation(
         line_index,
         face_index,
         this->combined_face_orientation(face_index),
