@@ -15,12 +15,11 @@
 #ifndef dealii_petsc_parallel_block_vector_h
 #define dealii_petsc_parallel_block_vector_h
 
-
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/petsc_block_vector.h>
 
-DEAL_II_WARNING(
-  "This file is deprecated. Use deal.II/lac/petsc_block_vector.h instead!")
+DEAL_II_WARNING("This file is deprecated."
+                "Use deal.II/lac/petsc_block_vector.h instead.")
 
 #endif
