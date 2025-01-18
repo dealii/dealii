@@ -1130,5 +1130,24 @@ We end up with two special cases for which we can compute the exact solution:
   erosion happens and correctly our solution predicts that the elevation
   remains constant with time.
 
+In order to make these two cases reasonably realistic with regard to the coefficients
+used, we solve the benchmark on a domain of size $100 km \times 100 km = 10^5 m \times 10^5 m$, in
+which the elevation decreases from left to right from 4000 m to zero. In other
+words, the initial elevation is given by $H(\mathbf x,0)=-\frac{4000 m}{100000 m} x + 4000$,
+corresponding to $a=-0.04, b=4000 m$ in the description above. With this, we get the following
+solutions to the equations we are trying to solve here:
+- If $m=0$:
+  @f{align*}{
+    H(x,t) &= 4000 - 0.04x - k 0.04^n t, \\
+    w(x,t) &= px.
+  @f}
+
+- If $m=1, n=1$:
+  @f{align*}{
+    H(x,t) &= 4000 -0.04e^{kpt} x, \\
+    w(x,t) &= px.
+  @f}
+
+
 TODO: Discuss how we can check this in the program. Perhaps make it a run-time
 parameter?

@@ -70,7 +70,13 @@
 #include <fstream>
 #include <iostream>
 
-// #define DO_FULL_3D
+
+#define BENCHMARK 0 // the 1d benchmark with the linear ramp, using m=0, n=1
+// #define BENCHMARK 1  // the 1d benchmark with the linear ramp, using m=1, n=1
+// #define BENCHMARK 2  // the 2d benchmark with the parabolic cone
+// #define BENCHMARK 3  // the Colorado elevation map, but on a 2d domain
+// #define BENCHMARK 4  // the Colorado elevation map on a curved domain
+
 
 namespace Step55
 {
@@ -95,6 +101,31 @@ namespace Step55
 
   namespace ModelParameters
   {
+// Recall:
+// BENCHMARK 0 // the 1d benchmark with the linear ramp, using m=0, n=1
+// BENCHMARK 1  // the 1d benchmark with the linear ramp, using m=1, n=1
+// BENCHMARK 2  // the 2d benchmark with the parabolic cone
+// BENCHMARK 3  // the Colorado elevation map, but on a 2d domain
+// BENCHMARK 4  // the Colorado elevation map on a curved domain
+#if BENCHMARK == 0 || BENCHMARK == 1
+#  if BENCHMARK == 0
+    constexpr double stream_power_exponent_m = 0;
+#  else
+    constexpr double stream_power_exponent_m = 1;
+#  endif
+    constexpr double stream_power_exponent_n    = 1;
+    constexpr double stream_power_coefficient_k = 2e-5;
+    constexpr double diffusion_coefficient_Kd   = 0.01;
+    constexpr double rainfall_rate_p            = 0.6;
+    constexpr double regularization_epsilon     = 0.0001;
+    constexpr double stabilization_c            = 1; // TODO: This should be 0.1
+
+    constexpr double solution_a = -0.04;
+    constexpr double solution_b = 4000;
+#elif BENCHMARK == 2
+#  error "Not yet implemented"
+#elif BENCHMARK == 3 || \
+  BENCHMARK == 4 // Colorado elevation map, flat or curved domain
     constexpr double stream_power_exponent_m    = 0.4;
     constexpr double stream_power_exponent_n    = 1;
     constexpr double stream_power_coefficient_k = 2e-5;
@@ -102,6 +133,9 @@ namespace Step55
     constexpr double rainfall_rate_p            = 0.6;
     constexpr double regularization_epsilon     = 0.0001;
     constexpr double stabilization_c            = 1; // TODO: This should be 0.1
+#else
+#  error "No such benchmark"
+#endif
   } // namespace ModelParameters
 
 
@@ -186,7 +220,17 @@ namespace Step55
     virtual double value(const Point<3> &p,
                          const unsigned int /*component*/ = 0) const override
     {
-#ifdef DO_FULL_3D
+// Recall:
+// BENCHMARK 0 // the 1d benchmark with the linear ramp, using m=0, n=1
+// BENCHMARK 1  // the 1d benchmark with the linear ramp, using m=1, n=1
+// BENCHMARK 2  // the 2d benchmark with the parabolic cone
+// BENCHMARK 3  // the Colorado elevation map, but on a 2d domain
+// BENCHMARK 4  // the Colorado elevation map on a curved domain
+#if BENCHMARK == 0 || BENCHMARK == 1
+      return ModelParameters::solution_a * p[0] + ModelParameters::solution_b;
+#elif BENCHMARK == 2 || BENCHMARK == 3
+#  error "Not yet implemented"
+#elif BENCHMARK == 4
       // First pull back p to longitude/latitude, expressed in degrees
       const Point<2> p_long_lat(
         std::atan2(p[1], p[0]) * 360 / (2 * numbers::PI),
@@ -194,20 +238,8 @@ namespace Step55
         std::atan2(p[2], std::sqrt(p[0] * p[0] + p[1] * p[1])) * 360 /
           (2 * numbers::PI));
 
-      // TODO: This is of course just a dummy elevation:
-      return 4000 *
-             (1 -
-              std::pow(Point<2>(-105.5, 39).distance(p_long_lat), 2) /
-                std::pow(Point<2>(-105.5, 39).distance(Point<2>(-109, 37)), 2));
-#else
-      // Convert p to long-lat by scaling to what a degree corresponds
-      // to in meters
-      const Point<2> p_long_lat(p[0] / 111000,
-                                p[1] / 111000); // about 111km per arc degree
-      return 4000 * (1 - (p_long_lat[0] + 109) / 7);
+      return data->value(p_long_lat);
 #endif
-
-      //      return data->value(p_long_lat);
     }
 
   private:
@@ -447,14 +479,35 @@ namespace Step55
   {
     pcout << "Make grid... " << std::flush;
 
+// Recall:
+// BENCHMARK 0 // the 1d benchmark with the linear ramp, using m=0, n=1
+// BENCHMARK 1  // the 1d benchmark with the linear ramp, using m=1, n=1
+// BENCHMARK 2  // the 2d benchmark with the parabolic cone
+// BENCHMARK 3  // the Colorado elevation map, but on a 2d domain
+// BENCHMARK 4  // the Colorado elevation map on a curved domain
+#if BENCHMARK == 0 || BENCHMARK == 1
+    GridGenerator::hyper_cube(triangulation, 0, 100000);
+    triangulation.refine_global(4);
+#elif BENCHMARK == 3
     GridGenerator::subdivided_hyper_rectangle(
       triangulation,
-      {7, 4}, // number of subdivisions to make cells square
+      {7, 4}, // number of subdivisions to make cells exactly square -- the
+              // domain is 7x4 degrees
       Point<2>(-109., 37.),
       Point<2>(-102., 41.));
     triangulation.refine_global(4);
 
-#ifdef DO_FULL_3D
+    // 111km per degree on the earth surface
+    GridTools::scale(111000., triangulation);
+#elif BENCHMARK == 4
+    GridGenerator::subdivided_hyper_rectangle(
+      triangulation,
+      {7, 4}, // number of subdivisions to make cells roughly square -- the
+              // domain is 380x280 miles
+      Point<2>(-109., 37.),
+      Point<2>(-102., 41.));
+    triangulation.refine_global(4);
+
     GridTools::transform(
       [](const Point<spacedim> &p_long_lat_degrees) {
         const Point<2> p_long_lat(p_long_lat_degrees[0] / 360 *
@@ -469,9 +522,6 @@ namespace Step55
                                R * std::sin(p_long_lat[1])); // Z
       },
       triangulation);
-#else
-    // 111km per degree on the earth surface
-    GridTools::scale(111000., triangulation);
 #endif
 
     pcout << "done. " << std::endl;
