@@ -15,7 +15,11 @@
 #ifndef dealii_tria_accessor_templates_h
 #define dealii_tria_accessor_templates_h
 
-#warning \
-  "The use of this header file is deprecated. Just include <deal.II/grid/tria_accessor.h>."
+#include <deal.II/base/config.h>
+
+#include <deal.II/grid/tria_accessor.h>
+
+DEAL_II_WARNING("This file is deprecated."
+                "Use deal.II/grid/tria_accessor.h instead.")
 
 #endif
