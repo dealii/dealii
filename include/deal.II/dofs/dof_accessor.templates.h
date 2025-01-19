@@ -15,7 +15,11 @@
 #ifndef dealii_dof_accessor_templates_h
 #define dealii_dof_accessor_templates_h
 
-DEAL_II_WARNING(
-  "The use of this header file is deprecated. Just include <deal.II/dofs/dof_accessor.h>.")
+#include <deal.II/base/config.h>
+
+#include <deal.II/dofs/dof_accessor.h>
+
+DEAL_II_WARNING("This file is deprecated."
+                "Use deal.II/dofs/dof_accessor.h instead.")
 
 #endif

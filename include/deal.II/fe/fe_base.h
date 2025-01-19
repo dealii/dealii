@@ -17,6 +17,9 @@
 
 #include <deal.II/base/config.h>
 
-DEAL_II_WARNING("This file is deprecated. Simply use <deal.II/fe/fe_data.h>.")
+#include <deal.II/fe/fe_data.h>
+
+DEAL_II_WARNING("This file is deprecated."
+                "Use deal.II/fe/fe_data.h instead.")
 
 #endif

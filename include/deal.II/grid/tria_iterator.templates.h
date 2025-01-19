@@ -15,10 +15,13 @@
 #ifndef dealii_tria_iterator_templates_h
 #define dealii_tria_iterator_templates_h
 
-
 #include <deal.II/base/config.h>
 
-DEAL_II_WARNING(
-  "The use of this header file is deprecated. Just include <deal.II/grid/tria_iterator.h>.")
+#include <deal.II/grid/tria_iterator.h>
+
+#ifdef DEAL_II_EARLY_DEPRECATIONS
+DEAL_II_WARNING("This file is deprecated."
+                "Use deal.II/grid/tria_iterator.h instead.")
+#endif
 
 #endif
