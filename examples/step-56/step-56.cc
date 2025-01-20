@@ -490,7 +490,7 @@ namespace Step56
     // Velocities start at component 0:
     const FEValuesExtractors::Vector velocities(0);
 
-    // ILU behaves better if we apply a reordering to reduce fillin. There
+    // ILU behaves better if we apply a reordering to reduce filling. There
     // is no advantage in doing this for the other solvers.
     if (solver_type == SolverType::FGMRES_ILU)
       {
