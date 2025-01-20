@@ -46,3 +46,10 @@ repos:
   hooks:
   - id: typos
     files: (?x) ^(doc|examples|include|source|tests)/
+- repo: local
+  hooks:
+  - id: detect-include-cycles
+    name: Detect '#include' cycles
+    entry: python contrib/utilities/detect_include_cycles.py
+    pass_filenames: false
+    language: system
