@@ -22,10 +22,10 @@
 # other module partitions.
 #
 # Call this script via
-#   python3 detect_include_cycles.py include/deal.II/*/*.h
+#   python3 contrib/utilities/detect_include_cycles.py
 # from the top-level directory.
 
-import sys
+from glob import glob
 import networkx as nx
 
 
@@ -47,11 +47,13 @@ def add_includes_for_file(header_file_name, G) :
 
 
 
-# Take the list of call arguments, excluding the first that contains
-# the name of the executable (i.e., this program). For each, add the
-# includes as the edges of a directed graph.
+# Create a list of all header files in the include folder.
+filelist = glob("include/**/*.h", recursive=True)
+assert filelist, "Please call the script from the top-level directory."
+
+# For each header file, add the includes as the edges of a directed graph.
 G = nx.DiGraph()
-for header_file_name in sys.argv[1:] :
+for header_file_name in filelist :
     add_includes_for_file(header_file_name, G)
 
 # Then figure out whether there are cycles and if so, print them:
