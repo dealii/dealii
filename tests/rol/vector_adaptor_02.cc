@@ -20,6 +20,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "../tests.h"
+
 #include "ROL_Algorithm.hpp"
 #include "ROL_LineSearchStep.hpp"
 #include "ROL_Objective.hpp"
