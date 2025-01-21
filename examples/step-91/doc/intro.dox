@@ -1248,7 +1248,8 @@ from which, if we choose $n=1$, we can eliminate $a(t)$ altogether:
   + k \left(\frac{p}{2}\right)^m r^m b'(r)
   +K_d \left( \frac{b'(r)}{r} + b''(r) \right)
 @f]
-This equation is an eigenvalue problem! After some rearranging, we recognize
+If we leave $\lambda$ unknown for the moment, we can see this as
+an eigenvalue problem! Indeed, after some rearranging, we recognize
 that we are looking for a function $b(r)$ and value $\lambda$ so that
 @f[
   - K_d b''(r)
@@ -1267,11 +1268,53 @@ operator
 where $\alpha=K_d, \beta = k \left(\frac{p}{2}\right)^m$. If it weren't for the fact
 that the second term contains a derivative of $b(r)$, this would be what is known
 as a [Sturm-Liouville problem](https://en.wikipedia.org/wiki/Sturm%E2%80%93Liouville_theory).
-With the derivative, it doesn't fall into the same framework, but instead satisfies
-a variation of
-[Kummer's equation](https://en.wikipedia.org/wiki/Confluent_hypergeometric_function#Kummer's_equation)
+With the derivative, however, it doesn't fall into the same framework. Instead,
+a better way to see this equation is that it satisfies
+a variation of the
+[Kummer equation](https://en.wikipedia.org/wiki/Confluent_hypergeometric_function#Kummer's_equation),
 with solutions that were pointed out to us by Robert Israel
-[on this StackExchange post](https://math.stackexchange.com/questions/5025287/solution-of-a-nonsymmetric-eigenfunction-equation)
+[on this StackExchange post](https://math.stackexchange.com/questions/5025287/solution-of-a-nonsymmetric-eigenfunction-equation).
+More specifically, we can rearrange the equation for $b(r)$, multiply it by $r$, and divide by $K_d$ to read as
+@f[
+  r b''(r)
+  + \left(k \frac{1}{K_d} \left(\frac{p}{2}\right)^m r^{m+1} + 1 \right) b'(r)
+  + \frac{\lambda}{K_d} r b(r) = 0.
+@f]
+If we consider the case $m=0$ (i.e., erosion is independent of the
+amount of water available), then this equation *almost* (but not quite)
+has the same form as Kummer's equation
+mentioned on the Wikipedia page above, namely
+@f[
+  z\frac{d^2w}{dz^2} + (b-z)\frac{dw}{dz} - aw = 0,
+@f]
+if we replace $z\to r, w\to b, b\to 1, a\to \frac{\lambda}{K_d}$. But it isn't *exactly*
+the same because our equation still has the factor $r$ in front of $b(r)$, its
+sign is wrong, and the sign of the term $k \frac{1}{K_d} \left(\frac{p}{2}\right)^m r^{m+1} b'(r)$
+is also wrong. Yet, the equations are similarly enough that it is, then, perhaps not
+surprising that one can find some kind of transform than converts the two equations
+and that the solution of our equation involves the Kummer (hypergeometric)
+functions that appear in the solution of Kummer's equation, and that the same can also be
+done for the more interesting case $m=1$.
+
+As pointed out in the StackExchange post mentioned above, the solutions for
+our equation are given as follows:
+
+- $m=0$ (erosion is independent of the amount of water flowing):
+  @f{align*}{
+  b\left(r \right) &=
+  c_{1} M\! \left(\frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta}{2 \sqrt{-4 \lambda  \alpha +\beta^{2}}}, 1, \frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}\, r}{\alpha}\right) {\mathrm e}^{-\frac{r \left(\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta \right)}{2 \alpha}}\cr
+  &+c_{2}\; U\left(\frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta}{2 \sqrt{-4 \lambda  \alpha +\beta^{2}}}, 1, \frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}\, r}{\alpha}\right) {\mathrm e}^{-\frac{r \left(\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta \right)}{2 \alpha}},
+  @f}
+  where $M$ and $U$ are Kummer functions.
+
+- $m=1$ (erosion is proportional to the amount of water flowing):
+  @f{align*}{
+  b\left(r \right) &=
+  c_{1} {\mathrm e}^{-\frac{\beta  \,r^{2}}{2 \alpha}} M\! \left(\frac{2 \beta -\lambda}{2 \beta}, 1, \frac{\beta  \,r^{2}}{2 \alpha}\right)+c_{2} {\mathrm e}^{-\frac{\beta  \,r^{2}}{2 \alpha}} U\! \left(\frac{2 \beta -\lambda}{2 \beta}, 1, \frac{\beta  \,r^{2}}{2 \alpha}\right).
+  @f}
+
+TODO: Replace alpha, beta.
+
 
 TODO: Complete this section of the benchmarking effort.
 
