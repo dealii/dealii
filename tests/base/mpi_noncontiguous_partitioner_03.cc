@@ -15,6 +15,7 @@
 
 // Test Utilities::MPI::NoncontiguousPartitioner for padding.
 
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_noncontiguous_partitioner.h>
 
