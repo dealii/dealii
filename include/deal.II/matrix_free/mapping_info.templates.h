@@ -268,25 +268,25 @@ namespace internal
     // Jacobian on the unit cell. Then j' = phi' k'/k^2 = j k' j^2.
     template <int dim, typename Number>
     Tensor<1, dim *(dim + 1) / 2, Tensor<1, dim, Number>>
-    process_jacobian_gradient(const Tensor<2, dim, Number> &inv_jac_permut,
+    process_jacobian_gradient(const Tensor<2, dim, Number> &inv_jac_permutation,
                               const Tensor<2, dim, Number> &inv_jac,
                               const Tensor<3, dim, Number> &jac_grad)
     {
       Number inv_jac_grad[dim][dim][dim];
 
-      // compute: inv_jac_grad = inv_jac_permut * grad_unit(jac)
+      // compute: inv_jac_grad = inv_jac_permutation * grad_unit(jac)
       for (unsigned int d = 0; d < dim; ++d)
         for (unsigned int e = 0; e < dim; ++e)
           for (unsigned int f = 0; f < dim; ++f)
             {
               inv_jac_grad[f][e][d] =
-                (inv_jac_permut[f][0] * jac_grad[d][e][0]);
+                (inv_jac_permutation[f][0] * jac_grad[d][e][0]);
               for (unsigned int g = 1; g < dim; ++g)
                 inv_jac_grad[f][e][d] +=
-                  (inv_jac_permut[f][g] * jac_grad[d][e][g]);
+                  (inv_jac_permutation[f][g] * jac_grad[d][e][g]);
             }
 
-      // compute: transpose (-inv_jac_permut * inv_jac_grad[d] * inv_jac)
+      // compute: transpose (-inv_jac_permutation * inv_jac_grad[d] * inv_jac)
       Number tmp[dim];
       Number grad_jac_inv[dim][dim][dim];
       for (unsigned int d = 0; d < dim; ++d)
@@ -302,9 +302,9 @@ namespace internal
             // needed for non-diagonal part of Jacobian grad
             for (unsigned int f = 0; f < dim; ++f)
               {
-                grad_jac_inv[f][d][e] = inv_jac_permut[f][0] * tmp[0];
+                grad_jac_inv[f][d][e] = inv_jac_permutation[f][0] * tmp[0];
                 for (unsigned int g = 1; g < dim; ++g)
-                  grad_jac_inv[f][d][e] += inv_jac_permut[f][g] * tmp[g];
+                  grad_jac_inv[f][d][e] += inv_jac_permutation[f][g] * tmp[g];
               }
           }
 
@@ -2210,14 +2210,14 @@ namespace internal
                     unsigned int                                   q,
                     Tensor<2, dim, VectorizedDouble>               inv_jac,
                     FEEvaluationData<dim, VectorizedDouble, true> &eval) {
-                  Tensor<2, dim, VectorizedDouble> inv_transp_jac_permut;
+                  Tensor<2, dim, VectorizedDouble> inv_transp_jac_permutation;
                   for (unsigned int d = 0; d < dim; ++d)
                     for (unsigned int e = 0; e < dim; ++e)
                       {
                         const unsigned int ee =
                           ExtractFaceHelper::reorder_face_derivative_indices<
                             dim>(face_no, e);
-                        inv_transp_jac_permut[d][e] = inv_jac[ee][d];
+                        inv_transp_jac_permutation[d][e] = inv_jac[ee][d];
                       }
                   Tensor<2, dim, VectorizedDouble> jacobi;
                   for (unsigned int e = 0; e < dim; ++e)
@@ -2239,7 +2239,7 @@ namespace internal
                             eval.begin_hessians()[q + (d * hess_dim + c) *
                                                         n_q_points];
                       const auto inv_jac_grad =
-                        process_jacobian_gradient(inv_transp_jac_permut,
+                        process_jacobian_gradient(inv_transp_jac_permutation,
                                                   inv_transp_jac,
                                                   jac_grad);
                       for (unsigned int e = 0; e < dim; ++e)
