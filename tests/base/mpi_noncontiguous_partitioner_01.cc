@@ -15,6 +15,8 @@
 
 // Test Utilities::MPI::NoncontiguousPartitioner for non-contiguous index space.
 
+#include <deal.II/base/aligned_vector.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_noncontiguous_partitioner.h>
 
