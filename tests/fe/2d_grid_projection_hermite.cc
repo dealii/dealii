@@ -51,6 +51,8 @@
 #include <sstream>
 #include <vector>
 
+#include "../tests.h"
+
 #define PRECISION 8
 
 /**
