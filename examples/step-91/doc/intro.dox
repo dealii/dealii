@@ -1149,5 +1149,131 @@ solutions to the equations we are trying to solve here:
   @f}
 
 
+<h4> A circularly symmetric test case </h4>
+
+Another case for which one can generate an analytical solution is where the
+initial elevation field is circularly symmetric, i.e., only depends on the distance
+$r$ from the origin. To this end, consider a situation where the high point in
+the domain is at the origin, and the elevation $H(r,t)$ decreases monotonically from
+the origin. (We will derive the exact form of $H(r,t)$ below and for now only
+assume a monotonic decrease.)
+In this case, water flows from this high point away from the origin.
+Whereas in the example above, the amount of water that flows through a transect
+of size $ds$ perpendicular to the flow direction at a point $(x,y)$ was whatever
+water falls onto a *rectangle* that reaches from the high ridge at the left
+end to $x$ and from $y$ to $y + ds$, here the amount of water is only *half*
+as much: Namely, the water that falls on the *triangle* of length $r$ and
+height $ds$. In other words, for an elevation that decreases with distance from
+the origin, the water flow rate is
+@f{align*}{
+  w(r,t) = \frac{pr}{2},
+@f}
+where $r=\sqrt{x^2+y^2}$.
+
+One can double-check that this intuitive derivation of
+the solution $w$ is correct by verifying that
+@f{align*}{
+  \nabla \cdot \left[\mathbf d(r,t) w(r,t) \right] = p,
+@f}
+where the direction field is
+@f{align*}{
+  \mathbf d(r,t) = \frac{1}{\sqrt{x^2+y^2}}\begin{pmatrix} x \\ y \end{pmatrix}.
+@f}
+Then, $\mathbf d w= \frac{p}{2} \begin{pmatrix} x \\ y \end{pmatrix}$, and indeed
+$\nabla \cdot \left[\mathbf d(r,t) w(r,t) \right] = p$, as desired. Note that just
+as in the first test case, the water flow rate $w(r)$ does not depend on time.
+
+Having computed the water flow rate, we can consider the evolution of the
+elevation $H(r,t)$ through the equation
+@f[
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  =
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
+  + K_d \Delta H(\mathbf x, t)
+  =
+  - k \left(\frac{pr}{2}\right)^m \left|\frac{\partial H(r,t)}{\partial r}\right|^n
+  + K_d \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right),
+@f]
+where in the last equality we have used that for radially symmetric functions,
+$\Delta H(\mathbf x, t) = \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right)$.
+Note that our assumption of a monotonically decreasing elevation away from
+the origin implies that
+$\left|\frac{\partial H(r,t)}{\partial r}\right| = -\frac{\partial H(r,t)}{\partial r}$,
+and so the equation we need to consider is
+@f[
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  =
+  - k \left(\frac{pr}{2}\right)^m \left(-\frac{\partial H(r,t)}{\partial r}\right)^n
+  + K_d \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right).
+@f]
+We then need to find functions $H(r,t)$ that satisfy this equation. After trying (and failing)
+a number of approaches, one hits on the following idea: Let us try a function of the form
+$H(r,t) = a(t) b(r)$ where we need to choose $b'(r)<0$ to make $H(r,t)$ decrease
+with distance from the origin. In that case, we have
+@f{align*}{
+  \frac{\partial H(r,t)}{\partial t} &= a'(t) b(r),
+  \\
+  \frac{\partial H(r,t)}{\partial r} &= a(t) b'(r),
+  \\
+  \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right)
+  &=
+  a(t) \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} b(r) \right)
+  =
+  a(t) \frac{1}{r}\frac{\partial}{\partial r}\left( r b'(r) \right)
+  =
+  a(t) \frac{1}{r}\left( b'(r) + r b''(r) \right)
+  =
+  a(t) \left( \frac{b'(r)}{r} + b''(r) \right)
+@f}
+Consequently, the evolution equation for $H(r,t)$ leads to the following:
+@f[
+  a'(t) b(r)
+  =
+  - k \left(\frac{p}{2}\right)^m r^m \left(-a(t) b'(r)\right)^n
+  +K_d a(t) \left( \frac{b'(r)}{r} + b''(r) \right).
+@f]
+This does not immediately look useful to finding functions $a(t),b(r)$ that
+satisfy the equations. But we can choose $a(t)=e^{-\lambda t}$, because in that
+case $a'(t)=-\lambda a(t)$, and the previous equation turns into
+@f[
+  -\lambda a(t) b(r)
+  =
+  - k \left(\frac{p}{2}\right)^m r^m \left(-a(t) b'(r)\right)^n
+  +K_d a(t) \left( \frac{b'(r)}{r} + b''(r) \right),
+@f]
+from which, if we choose $n=1$, we can eliminate $a(t)$ altogether:
+@f[
+  -\lambda b(r)
+  =
+  + k \left(\frac{p}{2}\right)^m r^m b'(r)
+  +K_d \left( \frac{b'(r)}{r} + b''(r) \right)
+@f]
+This equation is an eigenvalue problem! After some rearranging, we recognize
+that we are looking for a function $b(r)$ and value $\lambda$ so that
+@f[
+  - K_d b''(r)
+  - \left(k \left(\frac{p}{2}\right)^m r^m + \frac{K_d}{r} \right) b'(r)
+  =
+  \lambda b(r).
+@f]
+Put differently, we are looking for eigenfunctions and eigenvectors of the
+operator
+@f[
+  {\cal L} b(r)
+  =
+  - \alpha \frac{1}{r} \frac{\partial}{\partial r}\left(r \frac{\partial}{\partial r}b(r)\right)
+  - \beta r^m b'(r).
+@f]
+where $\alpha=K_d, \beta = k \left(\frac{p}{2}\right)^m$. If it weren't for the fact
+that the second term contains a derivative of $b(r)$, this would be what is known
+as a [Sturm-Liouville problem](https://en.wikipedia.org/wiki/Sturm%E2%80%93Liouville_theory).
+With the derivative, it doesn't fall into the same framework, but instead satisfies
+a variation of
+[Kummer's equation](https://en.wikipedia.org/wiki/Confluent_hypergeometric_function#Kummer's_equation)
+with solutions that were pointed out to us by Robert Israel
+[on this StackExchange post](https://math.stackexchange.com/questions/5025287/solution-of-a-nonsymmetric-eigenfunction-equation)
+
+TODO: Complete this section of the benchmarking effort.
+
 TODO: Discuss how we can check this in the program. Perhaps make it a run-time
 parameter?
