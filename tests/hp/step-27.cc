@@ -58,6 +58,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "../tests.h"
 
 namespace Step27
 {
