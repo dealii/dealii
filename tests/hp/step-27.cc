@@ -30,6 +30,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_series.h>
 
+#include <deal.II/grid/cell_data.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
