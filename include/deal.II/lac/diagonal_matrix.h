@@ -43,7 +43,7 @@ namespace LinearAlgebra
  * VectorType::scale, so the template vector class needs to provide a
  * @p scale() method.
  *
- * When using this class with ConstraintsMatrix::distribute_local_to_global(),
+ * When using this class with AffineConstraints::distribute_local_to_global(),
  * the underlying vector needs to provide write access to all entries referenced
  * by cells in an assembly process. This means that this class also needs access
  * to ghost entries that are owned by other processors than the calling one.
