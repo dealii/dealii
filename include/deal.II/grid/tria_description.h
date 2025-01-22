@@ -12,8 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#ifndef dealii_grid_construction_utilities_h
-#define dealii_grid_construction_utilities_h
+#ifndef dealii_grid_tria_description_h
+#define dealii_grid_tria_description_h
 
 #include <deal.II/base/config.h>
 
