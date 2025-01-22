@@ -107,9 +107,14 @@ check_grid()
            ++line)
         {
           deallog << line << ": "
-                  << (cell->line_orientation(line) ? "true" : "false")
+                  << (cell->line_orientation(line) ==
+                          ReferenceCell::default_combined_face_orientation() ?
+                        "true" :
+                        "false")
                   << std::endl;
-          Assert(cell->line_orientation(line) == true, ExcInternalError());
+          Assert(cell->line_orientation(line) ==
+                   ReferenceCell::default_combined_face_orientation(),
+                 ExcInternalError());
         }
     }
 }

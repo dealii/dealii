@@ -3044,21 +3044,19 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
               // determine indices for this cell's subface from the perspective
               // of the neighboring cell
-              const unsigned int neighbor_face =
-                this->neighbor_of_neighbor(face);
+              const auto neighbor_face_no = this->neighbor_of_neighbor(face);
+
               // two neighboring cells have an opposed orientation on their
               // shared face if both of them follow the same orientation type
-              // (i.e., standard or non-standard).
-              // we verify this with a XOR operation.
-              const unsigned int neighbor_subface =
-                (!(this->line_orientation(face)) !=
-                 !(neighbor_cell->line_orientation(neighbor_face))) ?
-                  (1 - subface) :
-                  subface;
+              const unsigned int neighbor_subface_no =
+                this->face_orientation(face) ==
+                    neighbor_cell->face_orientation(neighbor_face_no) ?
+                  subface :
+                  1 - subface;
 
               const unsigned int neighbor_child_index =
                 neighbor_cell->reference_cell().child_cell_on_face(
-                  neighbor_face, neighbor_subface);
+                  neighbor_face_no, neighbor_subface_no);
               const TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
                 neighbor_cell->child(neighbor_child_index);
 
