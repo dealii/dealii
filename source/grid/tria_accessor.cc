@@ -2538,7 +2538,9 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // in the table provided by
           // GeometryInfo and try it
           const unsigned int face_no_guess =
-            GeometryInfo<2>::opposite_face[neighbor];
+            this->reference_cell() == ReferenceCells::Triangle ?
+              0 :
+              GeometryInfo<2>::opposite_face[neighbor];
 
           const TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> face_guess =
             neighbor_cell->face(face_no_guess);
