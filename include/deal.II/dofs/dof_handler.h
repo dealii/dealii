@@ -93,6 +93,13 @@ namespace parallel
     class CellDataTransfer;
   }
 } // namespace parallel
+
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+class DoFAccessor;
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+class DoFCellAccessor;
+
 #endif
 
 /**
