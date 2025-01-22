@@ -1,0 +1,145 @@
+
+DEAL:2d-1::face_no=0 subface_no=0 face_orientation=true:
+DEAL:2d-1::0.250000 0.00000 1.00000 
+DEAL:2d-1::
+DEAL:2d-1::face_no=0 subface_no=0 face_orientation=false:
+DEAL:2d-1::0.750000 0.00000 1.00000 
+DEAL:2d-1::
+DEAL:2d-1::face_no=0 subface_no=1 face_orientation=true:
+DEAL:2d-1::0.750000 0.00000 1.00000 
+DEAL:2d-1::
+DEAL:2d-1::face_no=0 subface_no=1 face_orientation=false:
+DEAL:2d-1::0.250000 0.00000 1.00000 
+DEAL:2d-1::
+DEAL:2d-1::face_no=1 subface_no=0 face_orientation=true:
+DEAL:2d-1::0.750000 0.250000 1.41421 
+DEAL:2d-1::
+DEAL:2d-1::face_no=1 subface_no=0 face_orientation=false:
+DEAL:2d-1::0.250000 0.750000 1.41421 
+DEAL:2d-1::
+DEAL:2d-1::face_no=1 subface_no=1 face_orientation=true:
+DEAL:2d-1::0.250000 0.750000 1.41421 
+DEAL:2d-1::
+DEAL:2d-1::face_no=1 subface_no=1 face_orientation=false:
+DEAL:2d-1::0.750000 0.250000 1.41421 
+DEAL:2d-1::
+DEAL:2d-1::face_no=2 subface_no=0 face_orientation=true:
+DEAL:2d-1::0.00000 0.750000 1.00000 
+DEAL:2d-1::
+DEAL:2d-1::face_no=2 subface_no=0 face_orientation=false:
+DEAL:2d-1::0.00000 0.250000 1.00000 
+DEAL:2d-1::
+DEAL:2d-1::face_no=2 subface_no=1 face_orientation=true:
+DEAL:2d-1::0.00000 0.250000 1.00000 
+DEAL:2d-1::
+DEAL:2d-1::face_no=2 subface_no=1 face_orientation=false:
+DEAL:2d-1::0.00000 0.750000 1.00000 
+DEAL:2d-1::
+DEAL:2d-2::face_no=0 subface_no=0 face_orientation=true:
+DEAL:2d-2::0.105662 0.00000 0.500000 
+DEAL:2d-2::0.394338 0.00000 0.500000 
+DEAL:2d-2::
+DEAL:2d-2::face_no=0 subface_no=0 face_orientation=false:
+DEAL:2d-2::0.894338 0.00000 0.500000 
+DEAL:2d-2::0.605662 0.00000 0.500000 
+DEAL:2d-2::
+DEAL:2d-2::face_no=0 subface_no=1 face_orientation=true:
+DEAL:2d-2::0.605662 0.00000 0.500000 
+DEAL:2d-2::0.894338 0.00000 0.500000 
+DEAL:2d-2::
+DEAL:2d-2::face_no=0 subface_no=1 face_orientation=false:
+DEAL:2d-2::0.394338 0.00000 0.500000 
+DEAL:2d-2::0.105662 0.00000 0.500000 
+DEAL:2d-2::
+DEAL:2d-2::face_no=1 subface_no=0 face_orientation=true:
+DEAL:2d-2::0.894338 0.105662 0.707107 
+DEAL:2d-2::0.605662 0.394338 0.707107 
+DEAL:2d-2::
+DEAL:2d-2::face_no=1 subface_no=0 face_orientation=false:
+DEAL:2d-2::0.105662 0.894338 0.707107 
+DEAL:2d-2::0.394338 0.605662 0.707107 
+DEAL:2d-2::
+DEAL:2d-2::face_no=1 subface_no=1 face_orientation=true:
+DEAL:2d-2::0.394338 0.605662 0.707107 
+DEAL:2d-2::0.105662 0.894338 0.707107 
+DEAL:2d-2::
+DEAL:2d-2::face_no=1 subface_no=1 face_orientation=false:
+DEAL:2d-2::0.605662 0.394338 0.707107 
+DEAL:2d-2::0.894338 0.105662 0.707107 
+DEAL:2d-2::
+DEAL:2d-2::face_no=2 subface_no=0 face_orientation=true:
+DEAL:2d-2::0.00000 0.894338 0.500000 
+DEAL:2d-2::0.00000 0.605662 0.500000 
+DEAL:2d-2::
+DEAL:2d-2::face_no=2 subface_no=0 face_orientation=false:
+DEAL:2d-2::0.00000 0.105662 0.500000 
+DEAL:2d-2::0.00000 0.394338 0.500000 
+DEAL:2d-2::
+DEAL:2d-2::face_no=2 subface_no=1 face_orientation=true:
+DEAL:2d-2::0.00000 0.394338 0.500000 
+DEAL:2d-2::0.00000 0.105662 0.500000 
+DEAL:2d-2::
+DEAL:2d-2::face_no=2 subface_no=1 face_orientation=false:
+DEAL:2d-2::0.00000 0.605662 0.500000 
+DEAL:2d-2::0.00000 0.894338 0.500000 
+DEAL:2d-2::
+DEAL:2d-3::face_no=0 subface_no=0 face_orientation=true:
+DEAL:2d-3::0.0563508 0.00000 0.277778 
+DEAL:2d-3::0.250000 0.00000 0.444444 
+DEAL:2d-3::0.443649 0.00000 0.277778 
+DEAL:2d-3::
+DEAL:2d-3::face_no=0 subface_no=0 face_orientation=false:
+DEAL:2d-3::0.943649 0.00000 0.277778 
+DEAL:2d-3::0.750000 0.00000 0.444444 
+DEAL:2d-3::0.556351 0.00000 0.277778 
+DEAL:2d-3::
+DEAL:2d-3::face_no=0 subface_no=1 face_orientation=true:
+DEAL:2d-3::0.556351 0.00000 0.277778 
+DEAL:2d-3::0.750000 0.00000 0.444444 
+DEAL:2d-3::0.943649 0.00000 0.277778 
+DEAL:2d-3::
+DEAL:2d-3::face_no=0 subface_no=1 face_orientation=false:
+DEAL:2d-3::0.443649 0.00000 0.277778 
+DEAL:2d-3::0.250000 0.00000 0.444444 
+DEAL:2d-3::0.0563508 0.00000 0.277778 
+DEAL:2d-3::
+DEAL:2d-3::face_no=1 subface_no=0 face_orientation=true:
+DEAL:2d-3::0.943649 0.0563508 0.392837 
+DEAL:2d-3::0.750000 0.250000 0.628539 
+DEAL:2d-3::0.556351 0.443649 0.392837 
+DEAL:2d-3::
+DEAL:2d-3::face_no=1 subface_no=0 face_orientation=false:
+DEAL:2d-3::0.0563508 0.943649 0.392837 
+DEAL:2d-3::0.250000 0.750000 0.628539 
+DEAL:2d-3::0.443649 0.556351 0.392837 
+DEAL:2d-3::
+DEAL:2d-3::face_no=1 subface_no=1 face_orientation=true:
+DEAL:2d-3::0.443649 0.556351 0.392837 
+DEAL:2d-3::0.250000 0.750000 0.628539 
+DEAL:2d-3::0.0563508 0.943649 0.392837 
+DEAL:2d-3::
+DEAL:2d-3::face_no=1 subface_no=1 face_orientation=false:
+DEAL:2d-3::0.556351 0.443649 0.392837 
+DEAL:2d-3::0.750000 0.250000 0.628539 
+DEAL:2d-3::0.943649 0.0563508 0.392837 
+DEAL:2d-3::
+DEAL:2d-3::face_no=2 subface_no=0 face_orientation=true:
+DEAL:2d-3::0.00000 0.943649 0.277778 
+DEAL:2d-3::0.00000 0.750000 0.444444 
+DEAL:2d-3::0.00000 0.556351 0.277778 
+DEAL:2d-3::
+DEAL:2d-3::face_no=2 subface_no=0 face_orientation=false:
+DEAL:2d-3::0.00000 0.0563508 0.277778 
+DEAL:2d-3::0.00000 0.250000 0.444444 
+DEAL:2d-3::0.00000 0.443649 0.277778 
+DEAL:2d-3::
+DEAL:2d-3::face_no=2 subface_no=1 face_orientation=true:
+DEAL:2d-3::0.00000 0.443649 0.277778 
+DEAL:2d-3::0.00000 0.250000 0.444444 
+DEAL:2d-3::0.00000 0.0563508 0.277778 
+DEAL:2d-3::
+DEAL:2d-3::face_no=2 subface_no=1 face_orientation=false:
+DEAL:2d-3::0.00000 0.556351 0.277778 
+DEAL:2d-3::0.00000 0.750000 0.444444 
+DEAL:2d-3::0.00000 0.943649 0.277778 
+DEAL:2d-3::
