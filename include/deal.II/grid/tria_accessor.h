@@ -4906,13 +4906,12 @@ namespace internal
         AssertIndexRange(face, accessor.n_faces());
 
         if (dim == 1)
-          Assert(combined_orientation ==
-                   ReferenceCell::default_combined_face_orientation(),
+          Assert(combined_orientation == numbers::default_geometric_orientation,
                  ExcMessage("In 1d, faces do not have an orientation, so the "
                             "only valid value is the default."));
         else if (dim == 2)
           Assert(combined_orientation ==
-                     ReferenceCell::default_combined_face_orientation() ||
+                     numbers::default_geometric_orientation ||
                    combined_orientation ==
                      ReferenceCell::reversed_combined_line_orientation(),
                  ExcMessage(
@@ -5421,14 +5420,14 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
   (void)face;
 
   if constexpr (structdim == 1)
-    return ReferenceCell::default_combined_face_orientation();
+    return numbers::default_geometric_orientation;
   else if constexpr (structdim == 2)
     {
       // if all elements are quads (or if we have a very special consistently
       // oriented triangular mesh) then we do not store this array
       if (this->tria->levels[this->present_level]
             ->face_orientations.n_objects() == 0)
-        return ReferenceCell::default_combined_face_orientation();
+        return numbers::default_geometric_orientation;
       else
         return this->tria->levels[this->present_level]
           ->face_orientations.get_orientation(
@@ -5461,7 +5460,7 @@ TriaAccessor<structdim, dim, spacedim>::face_orientation(
     return true;
   else if constexpr (structdim == 2)
     return this->line_orientation(face) ==
-           ReferenceCell::default_combined_face_orientation();
+           numbers::default_geometric_orientation;
   else
     return this->tria->levels[this->present_level]
       ->face_orientations.get_orientation(
@@ -5530,13 +5529,12 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   (void)line;
 
   if constexpr (structdim == 1)
-    return ReferenceCell::default_combined_face_orientation();
+    return numbers::default_geometric_orientation;
   else if constexpr (structdim == 2 && dim == 2)
     // lines in 2d are faces
     {
       const auto combined_orientation = combined_face_orientation(line);
-      Assert(combined_orientation ==
-                 ReferenceCell::default_combined_face_orientation() ||
+      Assert(combined_orientation == numbers::default_geometric_orientation ||
                combined_orientation ==
                  ReferenceCell::reversed_combined_line_orientation(),
              ExcInternalError());
@@ -5552,7 +5550,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
       Assert(index < this->tria->faces->quads_line_orientations.size(),
              ExcInternalError());
       return this->tria->faces->quads_line_orientations[index] ?
-               ReferenceCell::default_combined_face_orientation() :
+               numbers::default_geometric_orientation :
                ReferenceCell::reversed_combined_line_orientation();
     }
   else if constexpr (structdim == 3 && dim == 3)
@@ -5612,7 +5610,7 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
       Assert(index < this->tria->faces->quads_line_orientations.size(),
              ExcInternalError());
       this->tria->faces->quads_line_orientations[index] =
-        value == ReferenceCell::default_combined_face_orientation();
+        value == numbers::default_geometric_orientation;
     }
 }
 
@@ -6878,7 +6876,7 @@ inline types::geometric_orientation
 TriaAccessor<0, dim, spacedim>::combined_face_orientation(
   const unsigned int /*face*/)
 {
-  return ReferenceCell::default_combined_face_orientation();
+  return numbers::default_geometric_orientation;
 }
 
 

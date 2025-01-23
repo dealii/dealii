@@ -1534,11 +1534,10 @@ public:
    * freedom actually represent.
    */
   virtual unsigned int
-  face_to_cell_index(
-    const unsigned int                 face_dof_index,
-    const unsigned int                 face,
-    const types::geometric_orientation combined_orientation =
-      ReferenceCell::default_combined_face_orientation()) const;
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const;
 
   /**
    * Given a local dof @p index on a line and the orientation @p
