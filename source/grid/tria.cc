@@ -1837,8 +1837,7 @@ namespace
   {
     AssertIndexRange(child_no, ReferenceCells::Line.template n_children<1>());
     Assert(line_orientation == numbers::default_geometric_orientation ||
-             line_orientation ==
-               ReferenceCell::reversed_combined_line_orientation(),
+             line_orientation == numbers::reverse_line_orientation,
            ExcInternalError());
     constexpr auto D = numbers::default_geometric_orientation;
     if (child_no == 0)
@@ -3326,12 +3325,11 @@ namespace internal
                         .get_combined_orientation(k);
                     // it doesn't make sense to set any flags except
                     // orientation for a line
-                    Assert(
-                      combined_orientation ==
-                          numbers::default_geometric_orientation ||
-                        combined_orientation ==
-                          ReferenceCell::reversed_combined_line_orientation(),
-                      ExcInternalError());
+                    Assert(combined_orientation ==
+                               numbers::default_geometric_orientation ||
+                             combined_orientation ==
+                               numbers::reverse_line_orientation,
+                           ExcInternalError());
                     // Same convention as TriaAccessor::set_line_orientation():
                     // store true for the default orientation and false for
                     // reversed.
@@ -5189,7 +5187,7 @@ namespace internal
               // the last one.
               std::fill(inherited_orientations.begin() + lmin,
                         inherited_orientations.begin() + lmax,
-                        ReferenceCell::reversed_combined_line_orientation());
+                        numbers::reverse_line_orientation);
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -5224,7 +5222,7 @@ namespace internal
               Assert(combined_orientation ==
                          numbers::default_geometric_orientation ||
                        combined_orientation ==
-                         ReferenceCell::reversed_combined_line_orientation(),
+                         numbers::reverse_line_orientation,
                      ExcInternalError());
               for (unsigned int c = 0; c < 2; ++c)
                 {
@@ -5232,8 +5230,7 @@ namespace internal
                   inherited_orientations[2 * face_no + c] =
                     cell->combined_face_orientation(face_no);
                 }
-              if (combined_orientation ==
-                  ReferenceCell::reversed_combined_line_orientation())
+              if (combined_orientation == numbers::reverse_line_orientation)
                 std::swap(new_lines[2 * face_no], new_lines[2 * face_no + 1]);
             }
 
@@ -8782,8 +8779,8 @@ namespace internal
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // set up the new quad, line numbering is as
@@ -9010,8 +9007,8 @@ namespace internal
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // set up the new quad, line numbering is as
@@ -9240,8 +9237,8 @@ namespace internal
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // set up the new quad, line numbering is as
@@ -9558,8 +9555,8 @@ namespace internal
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -9581,8 +9578,8 @@ namespace internal
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(3 + i / 4))),
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
                           // for the last line the line orientation is
                           // always true, since it was just constructed
@@ -9995,8 +9992,8 @@ namespace internal
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -10019,8 +10016,8 @@ namespace internal
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(1 + i / 4))),
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
                           // for the last line the line orientation is
                           // always true, since it was just constructed
@@ -10448,8 +10445,8 @@ namespace internal
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -10471,8 +10468,8 @@ namespace internal
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(i / 4 - 1))),
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
                           // for the last line the line orientation is always
                           // the default, since it was just constructed that way
@@ -11038,8 +11035,8 @@ namespace internal
                                 Assert(lines[i]->vertex_index(i % 2) ==
                                          vertex_indices[i / 4],
                                        ExcInternalError());
-                                line_orientation[i] = ReferenceCell::
-                                  reversed_combined_line_orientation();
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
                           // for the last 6 lines the line orientation is
                           // always true, since they were just constructed

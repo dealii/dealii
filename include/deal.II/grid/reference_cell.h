@@ -444,7 +444,11 @@ public:
    * lines only have two possible orientations, this function and
    * ReferenceCell::default_combined_face_orientation() encode all of its
    * possible orientation states.
+   *
+   * @deprecated Use numbers::reverse_line_orientation instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use numbers::reverse_line_orientation instead.")
   static constexpr types::geometric_orientation
   reversed_combined_line_orientation();
 
@@ -2075,7 +2079,7 @@ ReferenceCell::reversed_combined_line_orientation()
 {
   // For a reversed line 'orientation' is false and neither flip nor rotate are
   // defined.
-  return 0b000;
+  return numbers::reverse_line_orientation;
 }
 
 
@@ -3274,7 +3278,7 @@ ReferenceCell::face_to_cell_line_orientation(
   const types::geometric_orientation line_orientation) const
 {
   constexpr auto D = numbers::default_geometric_orientation;
-  constexpr auto R = ReferenceCell::reversed_combined_line_orientation();
+  constexpr auto R = numbers::reverse_line_orientation;
   if (*this == ReferenceCells::Hexahedron)
     {
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
@@ -3285,7 +3289,7 @@ ReferenceCell::face_to_cell_line_orientation(
         line_orientation == table[face_line_no / 2][combined_face_orientation];
 
       return match ? numbers::default_geometric_orientation :
-                     ReferenceCell::reversed_combined_line_orientation();
+                     numbers::reverse_line_orientation;
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -3307,7 +3311,7 @@ ReferenceCell::face_to_cell_line_orientation(
         line_orientation == table[combined_line][combined_face_orientation];
 
       return match ? numbers::default_geometric_orientation :
-                     ReferenceCell::reversed_combined_line_orientation();
+                     numbers::reverse_line_orientation;
     }
   else
     // TODO: This might actually be wrong for some of the other
