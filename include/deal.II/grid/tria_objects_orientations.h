@@ -151,8 +151,8 @@ namespace internal
     TriaObjectsOrientations::reinit(const unsigned int n_objects)
     {
       n_stored_objects = n_objects;
-      object_orientations.assign(
-        n_objects, ReferenceCell::default_combined_face_orientation());
+      object_orientations.assign(n_objects,
+                                 numbers::default_geometric_orientation);
     }
 
 
@@ -160,8 +160,8 @@ namespace internal
     inline void
     TriaObjectsOrientations::resize(const unsigned int n_objects)
     {
-      object_orientations.resize(
-        n_objects, ReferenceCell::default_combined_face_orientation());
+      object_orientations.resize(n_objects,
+                                 numbers::default_geometric_orientation);
       n_stored_objects = n_objects;
     }
 

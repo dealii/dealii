@@ -338,6 +338,16 @@ namespace numbers
     static_cast<types::manifold_id>(-1);
 
   /**
+   * Value indicating that a face or line is in its default orientation.
+   *
+   * See the
+   * @ref GlossFaceOrientation "glossary"
+   * for more information.
+   */
+  const types::geometric_orientation default_geometric_orientation =
+    static_cast<types::geometric_orientation>(0b001);
+
+  /**
    * A special id for an invalid subdomain id. This value may not be used as a
    * valid id but is used, for example, for default arguments to indicate a
    * subdomain id that is not to be used.

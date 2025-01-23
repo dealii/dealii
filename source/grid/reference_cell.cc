@@ -1017,7 +1017,7 @@ ReferenceCell::closest_point(const Point<dim> &p) const
           std::array<Point<dim>, 3> vertices;
           for (unsigned int vertex_no = 0; vertex_no < 3; ++vertex_no)
             vertices[vertex_no] = vertex<dim>(face_to_cell_vertices(
-              face_no, vertex_no, default_combined_face_orientation()));
+              face_no, vertex_no, numbers::default_geometric_orientation));
 
           auto pair = project_to_quad(vertices, p, face_cell);
           if (pair.second < min_distance_square)
@@ -1036,7 +1036,7 @@ ReferenceCell::closest_point(const Point<dim> &p) const
               const auto cell_line_no =
                 face_to_cell_lines(face_no,
                                    face_line_no,
-                                   default_combined_face_orientation());
+                                   numbers::default_geometric_orientation);
               const auto v0 =
                 vertex<dim>(line_to_cell_vertices(cell_line_no, 0));
               const auto v1 =

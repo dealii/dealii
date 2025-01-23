@@ -1124,9 +1124,9 @@ namespace VectorTools
 
           // Note, assuming that the edge orientations are "standard", i.e.,
           //       cell->line_orientation(line) =
-          //       ReferenceCell::default_combined_face_orientation()
+          //       numbers::default_geometric_orientation
           Assert(cell->line_orientation(line) ==
-                   ReferenceCell::default_combined_face_orientation(),
+                   numbers::default_geometric_orientation,
                  ExcMessage("Edge orientation does not meet expectation."));
           // Next, translate from face to cell. Note, this might be assuming
           // that the edge orientations are "standard"

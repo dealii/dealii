@@ -1155,8 +1155,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
             break;
 
           case 2:
-            if (combined_orientation ==
-                ReferenceCell::default_combined_face_orientation())
+            if (combined_orientation == numbers::default_geometric_orientation)
               adjusted_dof_index_on_line = dof_index_on_line;
             else
               adjusted_dof_index_on_line =
@@ -1173,7 +1172,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
             // case where everything is in standard orientation
             Assert((this->n_dofs_per_line() <= 1) ||
                      combined_orientation ==
-                       ReferenceCell::default_combined_face_orientation(),
+                       numbers::default_geometric_orientation,
                    ExcNotImplemented());
             adjusted_dof_index_on_line = dof_index_on_line;
             break;
@@ -1202,8 +1201,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
       // just have to draw a bunch of pictures. in the meantime,
       // we can implement the Q2 case in which it is simple
       Assert((this->n_dofs_per_quad(face) <= 1) ||
-               combined_orientation ==
-                 ReferenceCell::default_combined_face_orientation(),
+               combined_orientation == numbers::default_geometric_orientation,
              ExcNotImplemented());
       return (this->get_first_quad_index(face) + index);
     }

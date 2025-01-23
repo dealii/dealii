@@ -69,7 +69,7 @@ test(std::ostream &out)
       for (unsigned int e = 0; e < GeometryInfo<3>::lines_per_cell; ++e)
         deallog << "    edge=" << e
                 << (c->line_orientation(e) ==
-                        ReferenceCell::default_combined_face_orientation() ?
+                        numbers::default_geometric_orientation ?
                       " -> true" :
                       " -> false")
                 << std::endl;

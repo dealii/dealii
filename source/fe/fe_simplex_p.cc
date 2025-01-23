@@ -44,9 +44,7 @@ namespace
     for (const auto face_vertex_no : face_reference_cell.vertex_indices())
       {
         const auto vertex_no = reference_cell.face_to_cell_vertices(
-          face_no,
-          face_vertex_no,
-          ReferenceCell::default_combined_face_orientation());
+          face_no, face_vertex_no, numbers::default_geometric_orientation);
 
         midpoint += reference_cell.template vertex<dim>(vertex_no);
       }

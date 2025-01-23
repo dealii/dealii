@@ -3169,8 +3169,7 @@ namespace internal
             for (const auto line : accessor.line_indices())
               {
                 const auto line_orientation = line_orientations[line];
-                if (line_orientation ==
-                    ReferenceCell::default_combined_face_orientation())
+                if (line_orientation == numbers::default_geometric_orientation)
                   dof_operation.process_dofs(
                     accessor.get_dof_handler(),
                     0,
@@ -3211,7 +3210,7 @@ namespace internal
                 accessor.combined_face_orientation(face_no);
               const unsigned int quad_index = accessor.quad_index(face_no);
               if (combined_orientation ==
-                  ReferenceCell::default_combined_face_orientation())
+                  numbers::default_geometric_orientation)
                 dof_operation.process_dofs(
                   accessor.get_dof_handler(),
                   0,

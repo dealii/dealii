@@ -1306,7 +1306,7 @@ namespace internal
 
               // only faces with default orientation have to do something
               if (ori_cq.get_combined_orientation(f_) !=
-                  ReferenceCell::default_combined_face_orientation())
+                  numbers::default_geometric_orientation)
                 continue;
 
               // determine entity type of face
@@ -1340,7 +1340,7 @@ namespace internal
                   // ... comparison gives orientation
                   ori_ql.set_combined_orientation(
                     con_ql.ptr[f] + l,
-                    same ? ReferenceCell::default_combined_face_orientation() :
+                    same ? numbers::default_geometric_orientation :
                            ReferenceCell::reversed_combined_line_orientation());
                 }
             }
