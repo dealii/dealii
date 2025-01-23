@@ -729,9 +729,9 @@ public:
   closest_point(const Point<dim> &p) const;
 
   /**
-   * Return $i$-th unit tangential vector of a face of the reference cell.
-   * The vectors are arranged such that the
-   * cross product between the two vectors returns the unit normal vector.
+   * Return $i$-th unit tangent vector to a face of the reference cell.
+   * The vectors are arranged in such an order that the
+   * cross product between the two vectors returns the face normal vector.
    *
    * @pre $i$ must be between zero and `dim-1`.
    *
@@ -741,8 +741,25 @@ public:
    */
   template <int dim>
   Tensor<1, dim>
-  unit_tangential_vectors(const unsigned int face_no,
-                          const unsigned int i) const;
+  face_tangent_vector(const unsigned int face_no, const unsigned int i) const;
+
+  /**
+   * Return $i$-th unit tangent vector to a face of the reference cell.
+   * The vectors are arranged in such an order that the
+   * cross product between the two vectors returns the face normal vector.
+   *
+   * @pre $i$ must be between zero and `dim-1`.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
+   *
+   * @deprecated Use face_tangent_vector() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use face_tangent_vector() instead.")
+  Tensor<1, dim> unit_tangential_vectors(const unsigned int face_no,
+                                         const unsigned int i) const;
 
   /**
    * Return the unit normal vector of a face of the reference cell.
@@ -753,7 +770,20 @@ public:
    */
   template <int dim>
   Tensor<1, dim>
-  unit_normal_vectors(const unsigned int face_no) const;
+  face_normal_vector(const unsigned int face_no) const;
+
+  /**
+   * Return the unit normal vector of a face of the reference cell.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
+   *
+   * @deprecated Use face_normal_vector() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use face_normal_vector() instead.")
+  Tensor<1, dim> unit_normal_vectors(const unsigned int face_no) const;
 
   /**
    * Return the number of orientations for a face in the ReferenceCell. For
@@ -3120,6 +3150,16 @@ inline Tensor<1, dim>
 ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
                                        const unsigned int i) const
 {
+  return face_tangent_vector<dim>(face_no, i);
+}
+
+
+
+template <int dim>
+inline Tensor<1, dim>
+ReferenceCell::face_tangent_vector(const unsigned int face_no,
+                                   const unsigned int i) const
+{
   Assert(dim == get_dimension(),
          ExcMessage("You can only call this function with arguments for "
                     "which 'dim' equals the dimension of the space in which "
@@ -3205,6 +3245,15 @@ template <int dim>
 inline Tensor<1, dim>
 ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
 {
+  return face_normal_vector<dim>(face_no);
+}
+
+
+
+template <int dim>
+inline Tensor<1, dim>
+ReferenceCell::face_normal_vector(const unsigned int face_no) const
+{
   Assert(dim == get_dimension(),
          ExcMessage("You can only call this function with arguments for "
                     "which 'dim' equals the dimension of the space in which "
@@ -3222,12 +3271,12 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
       Assert(*this == ReferenceCells::Triangle, ExcInternalError());
 
       // Return the rotated vector
-      return cross_product_2d(unit_tangential_vectors<dim>(face_no, 0));
+      return cross_product_2d(face_tangent_vector<dim>(face_no, 0));
     }
   else if (dim == 3)
     {
-      return cross_product_3d(unit_tangential_vectors<dim>(face_no, 0),
-                              unit_tangential_vectors<dim>(face_no, 1));
+      return cross_product_3d(face_tangent_vector<dim>(face_no, 0),
+                              face_tangent_vector<dim>(face_no, 1));
     }
 
   DEAL_II_NOT_IMPLEMENTED();
