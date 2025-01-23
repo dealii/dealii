@@ -21,7 +21,6 @@
 #include <deal.II/base/types.h>
 
 #include <deal.II/dofs/dof_faces.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/dof_levels.h>
 

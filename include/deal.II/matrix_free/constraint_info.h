@@ -101,9 +101,9 @@ namespace internal
        * constraints are resolved with the help of AffineConstraints.
        */
       void
-      reinit(const DoFHandler<dim> &dof_handler,
-             const unsigned int     n_cells,
-             const bool             use_fast_hanging_node_algorithm = true);
+      reinit(const DoFHandler<dim, dim> &dof_handler,
+             const unsigned int          n_cells,
+             const bool use_fast_hanging_node_algorithm = true);
 
       void
       read_dof_indices(
@@ -296,9 +296,9 @@ namespace internal
     template <int dim, typename Number, typename IndexType>
     inline void
     ConstraintInfo<dim, Number, IndexType>::reinit(
-      const DoFHandler<dim> &dof_handler,
-      const unsigned int     n_cells,
-      const bool             use_fast_hanging_node_algorithm)
+      const DoFHandler<dim, dim> &dof_handler,
+      const unsigned int          n_cells,
+      const bool                  use_fast_hanging_node_algorithm)
     {
       this->dof_indices_per_cell.resize(n_cells);
       this->plain_dof_indices_per_cell.resize(n_cells);
