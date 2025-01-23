@@ -94,7 +94,7 @@ namespace FE_P_BubblesImplementation
                           reference_cell.face_to_cell_vertices(
                             face_no,
                             face_vertex_no,
-                            ReferenceCell::default_combined_face_orientation());
+                            numbers::default_geometric_orientation);
 
                         midpoint +=
                           reference_cell.template vertex<dim>(vertex_no);
@@ -177,7 +177,7 @@ namespace FE_P_BubblesImplementation
                       vertices.push_back(reference_cell.face_to_cell_vertices(
                         face_no,
                         face_vertex_no,
-                        ReferenceCell::default_combined_face_orientation()));
+                        numbers::default_geometric_orientation));
 
                     Assert(vertices.size() == 3, ExcInternalError());
                     auto b =

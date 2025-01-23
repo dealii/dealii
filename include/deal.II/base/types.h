@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace types
 {
   /**
-   * The type used to represent face orientations.
+   * The type used to represent face and line orientations.
    *
    * See the
    * @ref GlossFaceOrientation "glossary"
@@ -336,6 +336,29 @@ namespace numbers
    */
   const types::manifold_id flat_manifold_id =
     static_cast<types::manifold_id>(-1);
+
+  /**
+   * Value indicating that a face or line is in its default orientation.
+   *
+   * See the
+   * @ref GlossFaceOrientation "glossary"
+   * for more information.
+   */
+  const types::geometric_orientation default_geometric_orientation =
+    static_cast<types::geometric_orientation>(0b001);
+
+  /**
+   * Value indicating that a line is in the reverse orientation. Since lines can
+   * only have two possible orientations, this value and
+   * default_geometric_orientation completely encode the possible values for
+   * line orientations.
+   *
+   * See the
+   * @ref GlossFaceOrientation "glossary"
+   * for more information.
+   */
+  const types::geometric_orientation reverse_line_orientation =
+    static_cast<types::geometric_orientation>(0b000);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a

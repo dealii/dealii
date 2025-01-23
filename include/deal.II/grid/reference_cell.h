@@ -22,6 +22,7 @@
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/tria_orientation.h>
@@ -430,7 +431,11 @@ public:
   /**
    * Return the default combined face orientation flag (i.e., the default set of
    * orientations, defined by orientation, rotate, and flip for a face in 3d).
+   *
+   * @deprecated Use numbers::default_geometric_orientation instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use numbers::default_geometric_orientation instead.")
   static constexpr types::geometric_orientation
   default_combined_face_orientation();
 
@@ -439,7 +444,11 @@ public:
    * lines only have two possible orientations, this function and
    * ReferenceCell::default_combined_face_orientation() encode all of its
    * possible orientation states.
+   *
+   * @deprecated Use numbers::reverse_line_orientation instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use numbers::reverse_line_orientation instead.")
   static constexpr types::geometric_orientation
   reversed_combined_line_orientation();
 
@@ -488,7 +497,7 @@ public:
   child_cell_on_face(const unsigned int                 face,
                      const unsigned int                 subface,
                      const types::geometric_orientation face_orientation =
-                       default_combined_face_orientation()) const;
+                       numbers::default_geometric_orientation) const;
 
   /**
    * For a given vertex in a cell, return a pair of a face index and a
@@ -564,7 +573,7 @@ public:
    *   is identical to calling
    *   `reference_cell.vertex<dim>(
    *       reference_cell.face_to_cell_vertices(
-                   f, v, ReferenceCell::default_combined_face_orientation()))`.
+                   f, v, numbers::default_geometric_orientation))`.
    */
   template <int dim>
   Point<dim>
@@ -2060,10 +2069,7 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
 inline constexpr types::geometric_orientation
 ReferenceCell::default_combined_face_orientation()
 {
-  // Our convention is that 'orientation' has a default value of true and
-  // occupies the least-significant bit while rotate and flip have default
-  // values of 'false' and occupy the second and third bits.
-  return 0b001;
+  return numbers::default_geometric_orientation;
 }
 
 
@@ -2073,7 +2079,7 @@ ReferenceCell::reversed_combined_line_orientation()
 {
   // For a reversed line 'orientation' is false and neither flip nor rotate are
   // defined.
-  return 0b000;
+  return numbers::reverse_line_orientation;
 }
 
 
@@ -2448,8 +2454,7 @@ ReferenceCell::face_to_cell_vertices(
   // TODO: once the default orientation is switched to 0 then we can remove this
   // special case for 1D.
   if (get_dimension() == 1)
-    Assert(combined_face_orientation ==
-             ReferenceCell::default_combined_face_orientation(),
+    Assert(combined_face_orientation == numbers::default_geometric_orientation,
            ExcMessage("In 1D, all faces must have the default orientation."));
   else
     AssertIndexRange(combined_face_orientation, n_face_orientations(face));
@@ -2475,7 +2480,7 @@ ReferenceCell::face_to_cell_vertices(
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
           return table[face][combined_face_orientation ==
-                                 default_combined_face_orientation() ?
+                                 numbers::default_geometric_orientation ?
                                vertex :
                                (1 - vertex)];
         }
@@ -2549,8 +2554,8 @@ ReferenceCell::face_vertex_location(const unsigned int face,
                     "the current reference cell lives. You have dim=" +
                     std::to_string(dim) + " but the reference cell is " +
                     std::to_string(get_dimension()) + " dimensional."));
-  return this->template vertex<dim>(
-    face_to_cell_vertices(face, vertex, default_combined_face_orientation()));
+  return this->template vertex<dim>(face_to_cell_vertices(
+    face, vertex, numbers::default_geometric_orientation));
 }
 
 
@@ -2570,7 +2575,7 @@ ReferenceCell::standard_to_real_face_vertex(
         DEAL_II_NOT_IMPLEMENTED();
         break;
       case ReferenceCells::Line:
-        Assert(face_orientation == default_combined_face_orientation(),
+        Assert(face_orientation == numbers::default_geometric_orientation,
                ExcMessage(
                  "In 1D, all faces must have the default orientation."));
         return vertex;
@@ -3272,8 +3277,8 @@ ReferenceCell::face_to_cell_line_orientation(
   const types::geometric_orientation combined_face_orientation,
   const types::geometric_orientation line_orientation) const
 {
-  constexpr auto D = ReferenceCell::default_combined_face_orientation();
-  constexpr auto R = ReferenceCell::reversed_combined_line_orientation();
+  constexpr auto D = numbers::default_geometric_orientation;
+  constexpr auto R = numbers::reverse_line_orientation;
   if (*this == ReferenceCells::Hexahedron)
     {
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
@@ -3283,8 +3288,8 @@ ReferenceCell::face_to_cell_line_orientation(
       const bool match =
         line_orientation == table[face_line_no / 2][combined_face_orientation];
 
-      return match ? ReferenceCell::default_combined_face_orientation() :
-                     ReferenceCell::reversed_combined_line_orientation();
+      return match ? numbers::default_geometric_orientation :
+                     numbers::reverse_line_orientation;
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -3305,13 +3310,13 @@ ReferenceCell::face_to_cell_line_orientation(
       const bool match =
         line_orientation == table[combined_line][combined_face_orientation];
 
-      return match ? ReferenceCell::default_combined_face_orientation() :
-                     ReferenceCell::reversed_combined_line_orientation();
+      return match ? numbers::default_geometric_orientation :
+                     numbers::reverse_line_orientation;
     }
   else
     // TODO: This might actually be wrong for some of the other
     // kinds of objects. We should check this
-    return ReferenceCell::default_combined_face_orientation();
+    return numbers::default_geometric_orientation;
 }
 
 
@@ -3466,7 +3471,7 @@ ReferenceCell::get_combined_orientation(
         // vertex_vertex_permutations once we make 0 the default orientation.
         (void)vertex_vertex_permutations;
         if (vertices_0[0] == vertices_1[0])
-          return default_combined_face_orientation();
+          return numbers::default_geometric_orientation;
         break;
       case ReferenceCells::Line:
         return compute_orientation(line_vertex_permutations);

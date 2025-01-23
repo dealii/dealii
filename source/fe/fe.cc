@@ -575,8 +575,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(
   // assertion -- in essence, derived classes have to implement
   // an overloaded version of this function if we are to use any
   // other than default (standard) orientation
-  if (combined_orientation !=
-      ReferenceCell::default_combined_face_orientation())
+  if (combined_orientation != numbers::default_geometric_orientation)
     Assert((this->n_dofs_per_line() <= 1) && (this->n_dofs_per_quad(face) <= 1),
            ExcMessage(
              "The function in this base class can not handle this case. "
@@ -678,18 +677,15 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   const unsigned int                 index,
   const types::geometric_orientation combined_orientation) const
 {
-  Assert(combined_orientation ==
-             ReferenceCell::default_combined_face_orientation() ||
-           combined_orientation ==
-             ReferenceCell::reversed_combined_line_orientation(),
+  Assert(combined_orientation == numbers::default_geometric_orientation ||
+           combined_orientation == numbers::reverse_line_orientation,
          ExcInternalError());
 
   AssertIndexRange(index, this->n_dofs_per_line());
   Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
            this->n_dofs_per_line(),
          ExcInternalError());
-  if (combined_orientation ==
-      ReferenceCell::default_combined_face_orientation())
+  if (combined_orientation == numbers::default_geometric_orientation)
     return index;
   else
     return index + adjust_line_dof_index_for_line_orientation_table[index];

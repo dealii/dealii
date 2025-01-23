@@ -192,7 +192,7 @@ namespace FEConforimityTest
               {
                 deallog << "      {" << line_index << " -> "
                         << (cell->line_orientation(line_index) ==
-                            ReferenceCell::default_combined_face_orientation())
+                            numbers::default_geometric_orientation)
                         << "}" << std::endl;
               } // line_index
           }     // cell
@@ -245,7 +245,7 @@ namespace FEConforimityTest
               {
                 deallog << "      {" << line_index << " -> "
                         << (cell->line_orientation(line_index) ==
-                            ReferenceCell::default_combined_face_orientation())
+                            numbers::default_geometric_orientation)
                         << "}" << std::endl;
               } // line_index
           }     // cell

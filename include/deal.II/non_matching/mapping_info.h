@@ -1540,9 +1540,9 @@ namespace NonMatching
 
         Assert(
           cell_m->combined_face_orientation(f_m) ==
-              ReferenceCell::default_combined_face_orientation() &&
+              numbers::default_geometric_orientation &&
             cell_p->combined_face_orientation(f_p) ==
-              ReferenceCell::default_combined_face_orientation(),
+              numbers::default_geometric_orientation,
           ExcMessage(
             "Non standard face orientation is currently not implemented."));
 

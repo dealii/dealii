@@ -56,7 +56,7 @@ plot_all_info(const Triangulation<dim> &tria)
            ++line_index)
         {
           deallog << (cell->line_orientation(line_index) ==
-                      ReferenceCell::default_combined_face_orientation())
+                      numbers::default_geometric_orientation)
                   << "  ";
         } // line_index
       deallog << '}' << std::endl << std::endl;
