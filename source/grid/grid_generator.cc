@@ -3931,15 +3931,6 @@ namespace GridGenerator
 
   template <>
   void
-  hyper_ball(Triangulation<1> &, const Point<1> &, const double, const bool)
-  {
-    DEAL_II_NOT_IMPLEMENTED();
-  }
-
-
-
-  template <>
-  void
   hyper_ball_balanced(Triangulation<1> &, const Point<1> &, const double)
   {
     DEAL_II_NOT_IMPLEMENTED();
@@ -4293,48 +4284,125 @@ namespace GridGenerator
 
 
 
-  // Implementation for 2d only
-  template <>
+  template <int dim, int spacedim>
   void
-  hyper_ball(Triangulation<2> &tria,
-             const Point<2>   &p,
-             const double      radius,
-             const bool        internal_manifolds)
+  hyper_ball(Triangulation<dim, spacedim> &tria,
+             const Point<spacedim>        &p,
+             const double                  radius,
+             const bool                    internal_manifolds)
   {
-    // equilibrate cell sizes at
-    // transition from the inner part
-    // to the radial cells
-    const double   a           = 1. / (1 + std::sqrt(2.0));
-    const Point<2> vertices[8] = {
-      p + Point<2>(-1, -1) * (radius / std::sqrt(2.0)),
-      p + Point<2>(+1, -1) * (radius / std::sqrt(2.0)),
-      p + Point<2>(-1, -1) * (radius / std::sqrt(2.0) * a),
-      p + Point<2>(+1, -1) * (radius / std::sqrt(2.0) * a),
-      p + Point<2>(-1, +1) * (radius / std::sqrt(2.0) * a),
-      p + Point<2>(+1, +1) * (radius / std::sqrt(2.0) * a),
-      p + Point<2>(-1, +1) * (radius / std::sqrt(2.0)),
-      p + Point<2>(+1, +1) * (radius / std::sqrt(2.0))};
-
-    std::vector<CellData<2>> cells(5, CellData<2>());
-
-    for (unsigned int i = 0; i < 5; ++i)
+    if constexpr (dim == 2)
       {
-        for (unsigned int j = 0; j < 4; ++j)
-          cells[i].vertices[j] = circle_cell_vertices[i][j];
-        cells[i].material_id = 0;
-        cells[i].manifold_id = i == 2 ? numbers::flat_manifold_id : 1;
-      }
+        const auto embed_point = [](const double x,
+                                    const double y) -> Point<spacedim> {
+          if constexpr (spacedim == 2)
+            return {x, y};
+          else if constexpr (spacedim == 3)
+            return {x, y, 0};
+          else
+            DEAL_II_NOT_IMPLEMENTED();
+        };
 
-    tria.create_triangulation(std::vector<Point<2>>(std::begin(vertices),
-                                                    std::end(vertices)),
-                              cells,
-                              SubCellData()); // no boundary information
-    tria.set_all_manifold_ids_on_boundary(0);
-    tria.set_manifold(0, SphericalManifold<2>(p));
-    if (internal_manifolds)
-      tria.set_manifold(1, SphericalManifold<2>(p));
+
+        // Equilibrate cell sizes at transition from the inner part
+        // to the radial cells
+        const double          a           = 1. / (1 + std::sqrt(2.0));
+        const Point<spacedim> vertices[8] = {
+          p + embed_point(-1, -1) * (radius / std::sqrt(2.0)),
+          p + embed_point(+1, -1) * (radius / std::sqrt(2.0)),
+          p + embed_point(-1, -1) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(+1, -1) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(-1, +1) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(+1, +1) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(-1, +1) * (radius / std::sqrt(2.0)),
+          p + embed_point(+1, +1) * (radius / std::sqrt(2.0))};
+
+        std::vector<CellData<2>> cells(5, CellData<2>());
+
+        for (unsigned int i = 0; i < 5; ++i)
+          {
+            for (unsigned int j = 0; j < 4; ++j)
+              cells[i].vertices[j] = circle_cell_vertices[i][j];
+            cells[i].material_id = 0;
+            cells[i].manifold_id = i == 2 ? numbers::flat_manifold_id : 1;
+          }
+
+        tria.create_triangulation(std::vector<Point<spacedim>>(
+                                    std::begin(vertices), std::end(vertices)),
+                                  cells,
+                                  SubCellData()); // no boundary information
+        tria.set_all_manifold_ids_on_boundary(0);
+        tria.set_manifold(0, SphericalManifold<dim, spacedim>(p));
+        if (internal_manifolds)
+          tria.set_manifold(1, SphericalManifold<dim, spacedim>(p));
+        else
+          tria.set_manifold(1, FlatManifold<dim, spacedim>());
+      }
+    else if constexpr (dim == 3)
+      {
+        const double a =
+          1. / (1 + std::sqrt(3.0)); // equilibrate cell sizes at transition
+        // from the inner part to the radial
+        // cells
+        const unsigned int n_vertices           = 16;
+        const Point<3>     vertices[n_vertices] = {
+          // first the vertices of the inner
+          // cell
+          p + Point<3>(-1, -1, -1) * (radius / std::sqrt(3.0) * a),
+          p + Point<3>(+1, -1, -1) * (radius / std::sqrt(3.0) * a),
+          p + Point<3>(+1, -1, +1) * (radius / std::sqrt(3.0) * a),
+          p + Point<3>(-1, -1, +1) * (radius / std::sqrt(3.0) * a),
+          p + Point<3>(-1, +1, -1) * (radius / std::sqrt(3.0) * a),
+          p + Point<3>(+1, +1, -1) * (radius / std::sqrt(3.0) * a),
+          p + Point<3>(+1, +1, +1) * (radius / std::sqrt(3.0) * a),
+          p + Point<3>(-1, +1, +1) * (radius / std::sqrt(3.0) * a),
+          // now the eight vertices at
+          // the outer sphere
+          p + Point<3>(-1, -1, -1) * (radius / std::sqrt(3.0)),
+          p + Point<3>(+1, -1, -1) * (radius / std::sqrt(3.0)),
+          p + Point<3>(+1, -1, +1) * (radius / std::sqrt(3.0)),
+          p + Point<3>(-1, -1, +1) * (radius / std::sqrt(3.0)),
+          p + Point<3>(-1, +1, -1) * (radius / std::sqrt(3.0)),
+          p + Point<3>(+1, +1, -1) * (radius / std::sqrt(3.0)),
+          p + Point<3>(+1, +1, +1) * (radius / std::sqrt(3.0)),
+          p + Point<3>(-1, +1, +1) * (radius / std::sqrt(3.0)),
+        };
+
+        // one needs to draw the seven cubes to
+        // understand what's going on here
+        const unsigned int n_cells                   = 7;
+        const int          cell_vertices[n_cells][8] = {
+          {0, 1, 4, 5, 3, 2, 7, 6},      // center
+          {8, 9, 12, 13, 0, 1, 4, 5},    // bottom
+          {9, 13, 1, 5, 10, 14, 2, 6},   // right
+          {11, 10, 3, 2, 15, 14, 7, 6},  // top
+          {8, 0, 12, 4, 11, 3, 15, 7},   // left
+          {8, 9, 0, 1, 11, 10, 3, 2},    // front
+          {12, 4, 13, 5, 15, 7, 14, 6}}; // back
+
+        std::vector<CellData<3>> cells(n_cells, CellData<3>());
+
+        for (unsigned int i = 0; i < n_cells; ++i)
+          {
+            for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+              cells[i].vertices[j] = cell_vertices[i][j];
+            cells[i].material_id = 0;
+            cells[i].manifold_id = i == 0 ? numbers::flat_manifold_id : 1;
+          }
+
+        tria.create_triangulation(std::vector<Point<3>>(std::begin(vertices),
+                                                        std::end(vertices)),
+                                  cells,
+                                  SubCellData()); // no boundary information
+        tria.set_all_manifold_ids_on_boundary(0);
+        tria.set_manifold(0, SphericalManifold<3>(p));
+        if (internal_manifolds)
+          tria.set_manifold(1, SphericalManifold<3>(p));
+        else
+          tria.set_manifold(1, FlatManifold<3>());
+      }
     else
-      tria.set_manifold(1, FlatManifold<2>());
+      DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -5075,78 +5143,6 @@ namespace GridGenerator
       {
         DEAL_II_NOT_IMPLEMENTED();
       }
-  }
-
-
-
-  // Implementation for 3d only
-  template <>
-  void
-  hyper_ball(Triangulation<3> &tria,
-             const Point<3>   &p,
-             const double      radius,
-             const bool        internal_manifold)
-  {
-    const double a =
-      1. / (1 + std::sqrt(3.0)); // equilibrate cell sizes at transition
-    // from the inner part to the radial
-    // cells
-    const unsigned int n_vertices           = 16;
-    const Point<3>     vertices[n_vertices] = {
-      // first the vertices of the inner
-      // cell
-      p + Point<3>(-1, -1, -1) * (radius / std::sqrt(3.0) * a),
-      p + Point<3>(+1, -1, -1) * (radius / std::sqrt(3.0) * a),
-      p + Point<3>(+1, -1, +1) * (radius / std::sqrt(3.0) * a),
-      p + Point<3>(-1, -1, +1) * (radius / std::sqrt(3.0) * a),
-      p + Point<3>(-1, +1, -1) * (radius / std::sqrt(3.0) * a),
-      p + Point<3>(+1, +1, -1) * (radius / std::sqrt(3.0) * a),
-      p + Point<3>(+1, +1, +1) * (radius / std::sqrt(3.0) * a),
-      p + Point<3>(-1, +1, +1) * (radius / std::sqrt(3.0) * a),
-      // now the eight vertices at
-      // the outer sphere
-      p + Point<3>(-1, -1, -1) * (radius / std::sqrt(3.0)),
-      p + Point<3>(+1, -1, -1) * (radius / std::sqrt(3.0)),
-      p + Point<3>(+1, -1, +1) * (radius / std::sqrt(3.0)),
-      p + Point<3>(-1, -1, +1) * (radius / std::sqrt(3.0)),
-      p + Point<3>(-1, +1, -1) * (radius / std::sqrt(3.0)),
-      p + Point<3>(+1, +1, -1) * (radius / std::sqrt(3.0)),
-      p + Point<3>(+1, +1, +1) * (radius / std::sqrt(3.0)),
-      p + Point<3>(-1, +1, +1) * (radius / std::sqrt(3.0)),
-    };
-
-    // one needs to draw the seven cubes to
-    // understand what's going on here
-    const unsigned int n_cells                   = 7;
-    const int          cell_vertices[n_cells][8] = {
-      {0, 1, 4, 5, 3, 2, 7, 6},      // center
-      {8, 9, 12, 13, 0, 1, 4, 5},    // bottom
-      {9, 13, 1, 5, 10, 14, 2, 6},   // right
-      {11, 10, 3, 2, 15, 14, 7, 6},  // top
-      {8, 0, 12, 4, 11, 3, 15, 7},   // left
-      {8, 9, 0, 1, 11, 10, 3, 2},    // front
-      {12, 4, 13, 5, 15, 7, 14, 6}}; // back
-
-    std::vector<CellData<3>> cells(n_cells, CellData<3>());
-
-    for (unsigned int i = 0; i < n_cells; ++i)
-      {
-        for (const unsigned int j : GeometryInfo<3>::vertex_indices())
-          cells[i].vertices[j] = cell_vertices[i][j];
-        cells[i].material_id = 0;
-        cells[i].manifold_id = i == 0 ? numbers::flat_manifold_id : 1;
-      }
-
-    tria.create_triangulation(std::vector<Point<3>>(std::begin(vertices),
-                                                    std::end(vertices)),
-                              cells,
-                              SubCellData()); // no boundary information
-    tria.set_all_manifold_ids_on_boundary(0);
-    tria.set_manifold(0, SphericalManifold<3>(p));
-    if (internal_manifold)
-      tria.set_manifold(1, SphericalManifold<3>(p));
-    else
-      tria.set_manifold(1, FlatManifold<3>());
   }
 
 
