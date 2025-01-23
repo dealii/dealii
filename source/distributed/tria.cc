@@ -3805,11 +3805,10 @@ namespace parallel
           if (dim == 2)
             {
               AssertIndexRange(face_pair.orientation, 2);
-              p4est_orientation =
-                face_pair.orientation ==
-                    ReferenceCell::default_combined_face_orientation() ?
-                  0u :
-                  1u;
+              p4est_orientation = face_pair.orientation ==
+                                      numbers::default_geometric_orientation ?
+                                    0u :
+                                    1u;
             }
           else
             {

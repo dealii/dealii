@@ -108,12 +108,12 @@ check_grid()
         {
           deallog << line << ": "
                   << (cell->line_orientation(line) ==
-                          ReferenceCell::default_combined_face_orientation() ?
+                          numbers::default_geometric_orientation ?
                         "true" :
                         "false")
                   << std::endl;
           Assert(cell->line_orientation(line) ==
-                   ReferenceCell::default_combined_face_orientation(),
+                   numbers::default_geometric_orientation,
                  ExcInternalError());
         }
     }

@@ -191,7 +191,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
           faces.point(k + QProjector<dim>::DataSetDescriptor::face(
                             this->reference_cell(),
                             0,
-                            ReferenceCell::default_combined_face_orientation(),
+                            numbers::default_geometric_orientation,
                             this->n_dofs_per_face(face_no)));
 
       current =
