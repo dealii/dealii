@@ -17,14 +17,14 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/template_constraints.h>
-
 DEAL_II_NAMESPACE_OPEN
 
-// Forward declarations
 #ifndef DOXYGEN
+
+// Forward declarations
 template <typename T, typename U>
 struct ProductType;
+
 #endif
 
 #ifndef DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
