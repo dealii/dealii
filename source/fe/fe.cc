@@ -678,8 +678,7 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   const types::geometric_orientation combined_orientation) const
 {
   Assert(combined_orientation == numbers::default_geometric_orientation ||
-           combined_orientation ==
-             ReferenceCell::reversed_combined_line_orientation(),
+           combined_orientation == numbers::reverse_line_orientation,
          ExcInternalError());
 
   AssertIndexRange(index, this->n_dofs_per_line());

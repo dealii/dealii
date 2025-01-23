@@ -348,6 +348,19 @@ namespace numbers
     static_cast<types::geometric_orientation>(0b001);
 
   /**
+   * Value indicating that a line is in the reverse orientation. Since lines can
+   * only have two possible orientations, this value and
+   * default_geometric_orientation completely encode the possible values for
+   * line orientations.
+   *
+   * See the
+   * @ref GlossFaceOrientation "glossary"
+   * for more information.
+   */
+  const types::geometric_orientation reverse_line_orientation =
+    static_cast<types::geometric_orientation>(0b000);
+
+  /**
    * A special id for an invalid subdomain id. This value may not be used as a
    * valid id but is used, for example, for default arguments to indicate a
    * subdomain id that is not to be used.

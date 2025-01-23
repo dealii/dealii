@@ -195,12 +195,11 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler)
     deallog << dofs_2[i] << " is located at " << support_points[dofs_2[i]]
             << std::endl;
 
-  DoFTools::make_periodicity_constraints(
-    face_1,
-    face_2,
-    constraint_matrix,
-    ComponentMask(),
-    ReferenceCell::reversed_combined_line_orientation());
+  DoFTools::make_periodicity_constraints(face_1,
+                                         face_2,
+                                         constraint_matrix,
+                                         ComponentMask(),
+                                         numbers::reverse_line_orientation);
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
   deallog << "Matching:" << std::endl;
