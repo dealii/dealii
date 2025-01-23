@@ -42,7 +42,7 @@ test_face(const std::vector<Point<3>>    &vertices_,
       face_n, i, numbers::default_geometric_orientation));
 
   extra_vertex /= 3.0;
-  extra_vertex += ref_cell.template unit_normal_vectors<3>(face_n);
+  extra_vertex += ref_cell.template face_normal_vector<3>(face_n);
 
   vertices.push_back(extra_vertex);
 
