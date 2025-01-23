@@ -120,10 +120,19 @@ namespace Step55
     constexpr double regularization_epsilon     = 0.0001;
     constexpr double stabilization_c            = 1; // TODO: This should be 0.1
 
-    constexpr double solution_a = -0.04;
+    constexpr double solution_a = -0.04; // Initial value is a*x+b
     constexpr double solution_b = 4000;
 #elif BENCHMARK == 2
-#  error "Not yet implemented"
+    constexpr double stream_power_exponent_m    = 1;
+    constexpr double stream_power_exponent_n    = 1;
+    constexpr double stream_power_coefficient_k = 2e-5;
+    constexpr double diffusion_coefficient_Kd   = 0.01;
+    constexpr double rainfall_rate_p            = 0.6;
+    constexpr double regularization_epsilon     = 0.0001;
+    constexpr double stabilization_c            = 1; // TODO: This should be 0.1
+
+    constexpr double solution_a = -0.04; // Initial value is a*r+b
+    constexpr double solution_b = 4000;
 #elif BENCHMARK == 3 || \
   BENCHMARK == 4 // Colorado elevation map, flat or curved domain
     constexpr double stream_power_exponent_m    = 0.4;
@@ -228,9 +237,10 @@ namespace Step55
 // BENCHMARK 4  // the Colorado elevation map on a curved domain
 #if BENCHMARK == 0 || BENCHMARK == 1
       return ModelParameters::solution_a * p[0] + ModelParameters::solution_b;
-#elif BENCHMARK == 2 || BENCHMARK == 3
-#  error "Not yet implemented"
-#elif BENCHMARK == 4
+#elif BENCHMARK == 2
+      return ModelParameters::solution_a * p.norm() +
+             ModelParameters::solution_b;
+#elif BENCHMARK == 3 || BENCHMARK == 4
       // First pull back p to longitude/latitude, expressed in degrees
       const Point<2> p_long_lat(
         std::atan2(p[1], p[0]) * 360 / (2 * numbers::PI),
@@ -488,6 +498,9 @@ namespace Step55
 #if BENCHMARK == 0 || BENCHMARK == 1
     GridGenerator::hyper_cube(triangulation, 0, 100000);
     triangulation.refine_global(4);
+#elif BENCHMARK == 2
+    GridGenerator::hyper_ball(triangulation, Point<spacedim>(), 100000);
+    triangulation.refine_global(3);
 #elif BENCHMARK == 3
     GridGenerator::subdivided_hyper_rectangle(
       triangulation,
