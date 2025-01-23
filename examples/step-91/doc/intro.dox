@@ -1291,7 +1291,7 @@ if we replace $z\to r, w\to b, b\to 1, a\to \frac{\lambda}{K_d}$. But it isn't *
 the same because our equation still has the factor $r$ in front of $b(r)$, its
 sign is wrong, and the sign of the term $k \frac{1}{K_d} \left(\frac{p}{2}\right)^m r^{m+1} b'(r)$
 is also wrong. Yet, the equations are similarly enough that it is, then, perhaps not
-surprising that one can find some kind of transform than converts the two equations
+surprising that one can find some kind of transform that converts the two equations
 and that the solution of our equation involves the Kummer (hypergeometric)
 functions that appear in the solution of Kummer's equation, and that the same can also be
 done for the more interesting case $m=1$.
