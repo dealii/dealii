@@ -44,6 +44,7 @@ if(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "topography.txt.gz"                 # step-53
     PATTERN "input/initial_mesh_3d.vtk"         # step-54
     PATTERN "input/DTMB-5415_bulbous_bow.iges"  # step-54
+    PATTERN "colorado-topography-1800m.txt.gz"  # step-91
     )
 
   message(STATUS "Setting up examples - Done")

@@ -1,0 +1,1322 @@
+<a name="step-91-Intro"></a>
+<h1>Introduction</h1>
+
+<i>
+This program was contributed by Wolfgang Bangerth (Colorado State University)
+and Jean-Paul Pelteret.
+
+This material is based upon work partially supported by National Science
+Foundation grants OAC-1835673, EAR-1925595, and OAC-2410847.
+</i>
+<br>
+
+In this tutorial program, we will be solving the equations that form one of the
+simpler models of erosion of the Earth surface, namely the "stream-power erosion
+equations". Specifically, the aims for this program are the following:
+<ol>
+  <li> We want to solve the stream-power erosion model, using a realistic
+       data set of the topography of Colorado, using massively parallel
+       computations.
+  <li> The stream-power equations form a system of differential equations that
+       contain the time derivative of one variable, but not the time derivative
+       of the other variable. Such equations are called
+       [differential-algebraic equations](https://en.wikipedia.org/wiki/Differential-algebraic_system_of_equations)
+       and they are generally more difficult to solve accurately than
+       equations in which all variables have time derivatives.
+       We will solve the system of equations using deal.II's interfaces to
+       SUNDIAL's IDA package (via the SUNDIALS::IDA class) that is
+       intended for exactly this sort of equations.
+  <li> The data set describing the topography of Colorado is large, even
+       after downsampling it. We will here show a couple of approaches toward
+       dealing with large data sets in parallel programs.
+  <li> We will solve these equations not on a map coordinate system
+       ($x$-$y$ or latitude-longitude)
+       but on the curved surface of the earth.
+</ol>
+
+None of these points are idle occupations: At the time of writing this
+program, typical erosion simulations use algorithms for flow routing
+(i.e., the task of determining how much water is available where) that
+are not parallel; do not scale to large computations; and the whole
+simulation is run on flat geometries rather than the curved earth
+surface. Moreover, the standard algorithms alternate between solving
+the erosion equation and solving the equation for the water flow rate;
+this alternating algorithm is only first order accurate. We will
+improve on all of these aspects of the current state of the art in
+this program.
+
+
+<h3> The stream-power erosion model </h3>
+
+<h4> The equations </h4>
+
+The physical problem we want to address in this program is a description of how
+erosion shapes a landscape on geologic time scales. On very long time scales, landscape
+evolution is a process that balances the creation of vertical relief due to
+processes such as the collision of plates (such as in the Himalayas or the
+European Alps) or the subduction of one plate under another (such as in the
+Mariana Trench); and the forces of erosion that erase vertical relief by
+transporting material from higher to lower places.
+
+In this program, we will be concerned with shorter time scales in which
+we are given an initial topography and ask about how it will evolve due to
+erosion alone. As a test case, we will consider Colorado -- the current home state
+of the author of this program, and a place he knows well from its highest highs to
+its (not particularly low) lows. To set the stage, here is a picture of the
+elevation of Colorado (east-west extent: 380 miles/610 km; north-south extent:
+280 miles/450 km):
+
+@image html step-91.colorado-topography-1800m.png
+
+One can clearly see in this picture that in the center of the mountainous western
+part of the state, the [Colorado River](https://en.wikipedia.org/wiki/Colorado_River)
+and its tributaries have cut deep valleys. The eastern half of the state is mostly
+flat, with the [South Platte River](https://en.wikipedia.org/wiki/South_Platte_River)
+flowing from the mountains to the top right, and the
+[Arkansas River](https://en.wikipedia.org/wiki/Arkansas_River) flowing out of
+Colorado at the bottom of the ridge edge.
+
+The question we want to answer is whether we can describe how this landscape will
+evolve on time scales of hundreds to hundreds of thousands of years. To this end, let us denote
+the elevation above sea level, i.e., the height shown in the picture above, at
+location $\mathbf x$ and at
+time $t$ by $H(\mathbf x,t)$. The question is then how it changes with time, i.e.,
+what $\partial H/\partial t$ is. The simplest model to answer this question is
+the ["stream-power model"](https://en.wikipedia.org/wiki/Stream_power_law) that
+posits that erosion is a spatially variable process in which the dominant
+force is that of flowing water. There are many variations of this model in the
+literature; a good description can be found in @cite Yuan2019 along with the many
+references therein.
+
+Specifically, the model we will use assumes that the vertical incision (erosion)
+rate is the sum of two terms. The first term is proportional to a power $m$ of
+the amount of water $w(\mathbf x,t)$
+flowing at a point $\mathbf x$, times a power $n$ of the slope
+$S(\mathbf x,t)=|\nabla H(\mathbf x,t)|$. This is based on the realization that
+more water will create more erosion, and that a larger slope will lead to
+faster-running waters with consequently more power to cause erosion. The
+second term is a diffusion term: Erosion tends to level concave features
+such as hills (a negative change in elevation) and fill in convex features
+such as depressions (a positive change).
+Taken together, we have on time scales where plate
+tectonics and related processes play no role, that
+@f[
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  =
+  - k w(\mathbf x,t)^m S(\mathbf x,t)^n
+  + K_d \Delta H(\mathbf x, t),
+@f]
+where $k$ is a proportionality constant and the negative sign in front of it
+implies that landscape incission *removes* material; $K_d>0$ is another
+proportionality constant.
+
+There remains the matter of how the amount of water $w$ flowing at $\mathbf x,t$
+is related to the elevation $H(\mathbf x,t)$. A first assumption (which can
+easily be removed -- see below) is that we have a spatially and temporally constant rain
+fall rate $p$ (measured, for example, in mm of precipitation per year -- or,
+since we are in the US, in inches per year). Then the water flowing at
+a location is
+@f[
+  w(\mathbf x,t)=pa(\mathbf x,t)
+@f]
+where the literature has historically interpreted $a(\mathbf x,t)$ as the "catchment
+area" of $\mathbf x,t$, i.e., the upstream area from which water flows
+through $\mathbf x,t$. This is not the correct way of describing things
+because the catchment "area" of a single point only consists of those
+points that are exactly upstream of that point, which form a stream line
+(or stream lines, if several stream lines merge) and these have area zero.
+But one can make sense of the term "catchment area" after discretization
+by considering the area of all those cells that are upstream of the
+cell in which $\mathbf x$ is located, divided by the width of that cell
+perpendicular to stream flow. Indeed, most computer codes simulating
+these equations start by discretizing the domain into cells and computing
+$a(\mathbf x,t)$ for each cell by adding up the areas of all upstream
+cells, a process that can be made very efficient by sorting cells from
+high to low and always giving each cell's accumulated upstream area to
+its lowest neighbor.
+
+A better formulation emerged during the 2010s and was put on a solid
+theoretical formulation in @cite Bonetti2018 .
+It reads as follows:
+@f[
+  \nabla \cdot \left(\mathbf d(\mathbf x,t) a(\mathbf x,t)\right) = 1.
+@f]
+Here,
+@f[
+  \mathbf d(\mathbf x,t)
+  = -\frac{\nabla H(\mathbf x,t)}{|\nabla H(\mathbf x,t)|}
+@f]
+is a unit vector pointing in the *downhill* direction. In essence, the equation for $a(\mathbf x,t)$
+says that the derivative in downhill direction is one, i.e., we are picking
+up a unit of (specific) area for each unit of distance downhill. The
+fact that we are formulating the equation in conservative form with
+$\nabla \cdot \left(\mathbf d a\right)$ on the left hand side, rather
+than the simpler advection equation $\mathbf d \cdot \nabla a$ we solved
+in, for example, step-9 and step-12, accounts for the fact that multiple stream
+lines can converge and merge.
+
+It is worth noting that $a(\mathbf x,t)$ does indeed depend on time
+(even though the equation has no time derivative) because the erosive
+processes will move the positions of ridges and consequently change
+what parts of the domain are "upstream" of a point $\mathbf x$ as time evolves. Separately,
+if instead of the drainage area $a(\mathbf x,t)$, we want to
+compute the water flow, we can easily modify the equation to read
+@f[
+  \nabla \cdot \left(\mathbf d(\mathbf x,t) w(\mathbf x,t)\right) = p,
+@f]
+by multiplying the previous equation by the rain fall rate $p$ and recalling
+that we had $w(\mathbf x,t)=pa(\mathbf x,t)$. Indeed, if we had
+spatially or temporally varying rain fall rates $p=p(\mathbf x,t)$,
+the previous equation for $w$ remains correct by just making the
+right hand side non-constant. We will not use this in the program
+here, but the modification would be easy.
+
+Besides the fact that @cite Bonetti2018 provides us with a solid
+theoretical foundation for computing $a(\mathbf x,t)$, we note that having
+a PDE description also allows us to bring to the table the decades
+of work by the PDE (and deal.II) communities to solve these equations
+in parallel. This is in notable contrast to the algorithm outlined
+above whereby each cell hands its own drainage area to its lowest
+neighbor -- an algorithm that can be efficiently implemented on
+a single process but not easily in parallel. Indeed, many papers
+cite this step as the critical one towards achieving higher mesh resolution
+in erosion models (see for example @cite Braun2013).
+
+In summary, the equations we would like to solve then look as follows:
+@f{align*}{
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  &=
+  - k w(\mathbf x,t)^m |\nabla H(\mathbf x,t)|^n
+  + K_d \Delta H(\mathbf x, t),
+  \\
+  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{|\nabla H(\mathbf x,t)|} w(\mathbf x,t)\right) &= p.
+@f}
+These equations are nonlinear, and to derive efficient ways of solving
+them, we will see below that we need to form derivatives -- but the
+term $S(\mathbf x,t)=|\nabla H(\mathbf x,t)|$ is not differentiable,
+and neither is $\frac{\nabla H}{|\nabla H|}$. As a consequence,
+we make one final change to the equations by regularizing these
+offending term to obtain the following form:
+@f{align*}{
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  &=
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
+  + K_d \Delta H(\mathbf x, t),
+  \\
+  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) &= p,
+@f}
+where we will use $S(H)=\sqrt{\nabla H\cdot \nabla H +\epsilon^2}$ as a differentiable approximation
+of the *slope* as a function of the elevation $H$,
+with $\epsilon$ a regularization parameter whose choice we discuss
+below.
+
+TODO: Perhaps replace S everywhere below?
+
+
+<h4> Boundary and initial conditions </h4>
+
+The model outlined above requires boundary and initial conditions. Some of these
+are obvious, some not so much:
+
+- We need initial conditions for $H(\mathbf x,t=0)$. These will be provided
+  by a digital elevation model of Colorado, obtained from
+  the United States Geologic Survey (see below).
+- We need boundary conditions for the advection-diffusion equation for $H(\mathbf x,t)$.
+  For no better reason than simplicity, we choose Neumann boundary conditions
+  that read $\mathbf n\cdot \left[K_d \nabla H\right] = 0$ with the normal
+  vector $\mathbf n$. This is likely not realistic, but we leave it to
+  others to implement better methods for this program.
+- For the water flow rate $w(\mathbf x,t)$, boundary conditions are more difficult.
+  The right description (see again @cite Bonetti2018) is to impose that
+  $w=0$ at mountain tops: These are the only places where there is no water
+  flow, as all other places (in actual elevation fields) have an uphill direction
+  from which they receive water. In the program, we will therefore have to find
+  those points that are higher than all of their neighbors and impose zero flow
+  rates at these points.
+- If we were solving for the entire earth surface, that would be enough: The
+  only places without inflowing water are indeed mountain tops. But since we
+  rather arbitrarily cut out Colorado from the rest of the world, there are
+  of course also places along the boundary of our domain where the terrain slopes
+  down into the domain. In these places, water would flow from Wyoming, Nebraska,
+  Kansas, Oklahoma, New Mexico, or Utah into Colorado (ignoring for a moment
+  the issue of whether water from Arizona could reach Colorado at the
+  [Four Corners point](https://en.wikipedia.org/wiki/Four_Corners)). How
+  much water would flow into Colorado at these points is, of course,
+  something we cannot really know without also solving for the "outside
+  world"; that is, whatever we impose is an "artificial boundary condition"
+  in that it makes assumptions about the world outside the domain on which
+  we pose our equations. Because we do not know better, we will simply
+  assume zero boundary conditions there: We assume that no water
+  enters Colorado at these boundaries. In practice, this is of course
+  wrong, but not majorly so: None of the major rivers in Colorado enter the
+  state from somewhere else (perhaps ignoring the
+  [Little Snake River](https://en.wikipedia.org/wiki/Little_Snake_River)
+  that enters Colorado from Wyoming, and the
+  [Green River](https://en.wikipedia.org/wiki/Green_River_(Colorado_River_tributary))
+  that briefly crosses Colorado from Utah).
+
+
+<h4> The coefficients in the model </h4>
+
+How exactly the various parameters $m,n,k,K_d$ need to be chosen to describe
+realistic situations is of course a difficult question. In truth, they are
+spatially and temporally variable given that different types of rock
+a river is currently eroding into will resist the erosion differently --
+for example, if a river is eating into granite, $k$ will likely be quite
+small whereas a river running on sandstone or soil will encounter a
+large $k$. For the purposes of this program, we will ignore these
+issues and simply choose the following values:
+
+TODO: Double check units!
+
+- For the exponents, we use $m=0.4$, $n=1$ in accordance
+  with @cite Yuan2019 .
+- For the proportionality constants, we use $K_d=0.01 \frac{\text{m}^2}{\text{year}}$
+  and $k=2\cdot 10^{-5} \frac{\text{m}^{1-2m}}{\text{year}}
+  =2\cdot 10^{-5} \frac{\text{m}^{0.2}}{\text{year}}$, also in accordance
+  with @cite Yuan2019 .
+- For the rainfall rate we use a constant $p=600 \frac{\text{mm}}{\text{year}}=0.6 \frac{\text{m}}{\text{year}}$,
+  approximately in line with the
+  [annual precipitation in the wetter (mountainous) parts of Colorado](https://gisgeography.com/us-precipitation-map/).
+- For the regularization parameter $\epsilon$ that appears in the replacement
+  of $|\nabla H|$ by $\sqrt{\nabla H \cdot \nabla H + \epsilon^2}$, we want
+  to choose something that is small compared to typical values of $|\nabla H|$
+  but nonzero. Recall that $\nabla H$ is the derivative of the elevation with
+  regard to the horizontal coordinates -- i.e., it has units meters per meter
+  (in other words, no units at all). A large value for $|\nabla H|$ would then
+  be 1.0 -- a mountain side of 45 degrees, fairly steep. A small value would
+  be the 450 meter drop of the Mississippi river over its entire length of
+  3,766 kilometers, or 0.00012. The Mississippi does not actually run in
+  Colorado, but we can estimate something for the South Platte river between
+  Denver (on the flat side of the area pretty much in the center of the
+  picture above) which lies at exactly one mile high (1600 meters)
+  to Julesburg where the river leaves Colorado into Nebraska. Julesburg
+  lies at 1060 meters of elevation, and is by car (along a route that essentially
+  follows the South Platte river) about 300 km away. So a reasonable
+  guess for the average slope of the South Platte river along that stretch
+  is $\frac{(1600-1060) \text{m}}{300,000 \text{m}} \approx 0.0018$,
+  about 15 times larger than the value for the Mississippi. In
+  reality, it's probably smaller because the river meanders,
+  whereas Interstate 76 does not. In any case, though, using
+  a Mississippi-based value of $\epsilon=0.0001$ seems like a
+  reasonable choice for something "small".
+
+
+
+<h3> Discretization </h3>
+
+As described in detail above, the model we want to solve looks as follows:
+@f{align*}{
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  &=
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
+  + K_d \Delta H(\mathbf x, t),
+  \\
+  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) &= p,
+@f}
+
+For the purposes of this program, we will use the
+usual $Q_1$ elements for both $H$ and $w$. There is no fundamental challenge
+for the equation involving $H$, which is simply a time-dependent diffusion
+equation with a reaction term (the vertical incision rate). step-26 may serve
+as the basis for solving it. For this equation, we then obtain the following
+weak formulation after multiplication by a test function, integration
+by parts, and application of the boundary conditions for $H$:
+@f{align*}{
+  \left(\varphi^H,\frac{\partial H}{\partial t}\right)
+  &=
+  - \left(\varphi^H, k w^m S(H)^n\right)
+  - \left(\nabla \varphi^H, K_d \nabla H\right).
+@f}
+Spatial discretization then requires us to test with the $i$th shape
+function, $\varphi^H=\varphi^H_i$, and substituting $H_h(\mathbf x,t) =
+\sum_j V_j(t) \varphi^H_j(\mathbf x)$ (where the $V_j$ are the expansion
+coefficients for the discretized variable $H_h$) to result in
+@f{align*}{
+  \sum_j \left(\varphi^H_i,\varphi^H_j\right) \frac{\partial V_j}{\partial t}
+  &=
+  - \left(\varphi^H_i, k w^m S(H_h)^n\right)
+  - \sum_j \left(\nabla\varphi^H_i, K_d \nabla \varphi^H_j\right) V_j.
+@f}
+We can write this in the following form in terms of matrices and vectors:
+@f{align*}{
+  M^H \frac{\partial V}{\partial t}
+  &=
+  -A^H V
+  + F^H(V,W)
+@f}
+with
+@f{align*}{
+  M^H_{ij} &= \left(\varphi^H_i,\varphi^H_j\right) \frac{\partial V_j}{\partial t},
+  \\
+  A^H_{ij} &= \left(\nabla\varphi^H_i, K_d \nabla \varphi^H_j\right) V_j,
+  \\
+  F^H(V,W)_i &= - \left(\varphi^H_i, k w^m S_h(V)^n\right).
+@f}
+The last term is nonlinear: It depends on $H(\mathbf x,t)$ (and thus
+$V$) by way of the dependence $S(H_h)$, which for simplicity we will express
+as $S_h(V)\dealcoloneq S(H_h)$. This last term also
+depends on the expansion coefficients $W=W(t)$ of $w(\mathbf x,t)$.
+
+
+
+It is substantially more complicated to discretize the equation for $w$.
+Recall that for the equation
+@f[
+  \beta \cdot \nabla u = 0
+@f]
+in step-9, we had to use the streamline-upwind Petrov-Galerkin (SUPG)
+method to derive a stable discretization. Here, we have an equation that
+does not look all that different,
+@f[
+  \nabla \cdot (\mathbf d w) = p,
+@f]
+where
+$\mathbf d(\mathbf x,t)
+ =-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))}
+ =-\frac{\nabla H(\mathbf x,t)}{\sqrt{\nabla H(\mathbf x,t)\cdot \nabla H(\mathbf x,t) + \epsilon^2}}$
+ is our approximation of the *downhill* unit vector.
+The difference is that in step-9, the vector field $\beta$ was divergence-free,
+whereas here it definitely is not. As a consequence,
+$\nabla \cdot (\mathbf d w) \neq \mathbf d \cdot \nabla w$
+and that makes all the difference.
+
+The reason why this is troublesome is because for SUPG, we wanted
+to choose a bilinear form in which we didn't just multiply by
+a test function $\varphi$, but by one that is modified to read
+$\varphi+ch\beta\cdot\nabla \varphi$ with a unitless constant $c$ and $h$ being
+the diameter of the current cell (i.e., the test function has a small *upstream*
+component as discussed in step-9 in great detail), to yield a weak formulation that
+would, in the current context and after discretization, look like this:
+@f[
+  \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot (\mathbf d w_h)\right)
+  = (\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,p).
+@f]
+There are two issues here. First, the test function is modified as
+$\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h$ instead of the conservative
+form $\varphi^w_h+\nabla \cdot (\mathbf d \varphi^w_h)$ because we don't know how
+to take derivatives of $\mathbf d$. This is probably fine: All that matters
+is that we have an upstream component, and we get that here.
+
+The other difficulty is that in the second factor, we face the same issue: We
+do not know how to deal with $\nabla \cdot (\mathbf d w_h)$. Traditionally,
+in the finite element method, if you don't know how to deal with a derivative,
+you integrate by parts. This is not an option here because all that would
+happen is that we roll the derivative onto the test function
+$\varphi^w_h+\mathbf d \cdot \nabla \varphi^w_h$ where we would again
+end up with a derivative on $\mathbf d$.
+
+Both of these difficulties *could* be avoided by recognizing that while $\mathbf d$
+is not a finite element field, it is obtained from one via the relationship
+@f[
+  \mathbf d =
+  -\frac{\nabla H_h(\mathbf x,t)}{\sqrt{\nabla H_h(\mathbf x,t)\cdot \nabla H_h(\mathbf x,t) + \epsilon^2}},
+@f]
+where $H_h$ is the discretized elevation field. One could *try* to compute
+the divergence $\nabla \cdot \mathbf d$ using the chain rule, but this leads
+to two more problems: First, this results in lengthy formulas we may perhaps
+not want to implement; and, second and more importantly, if $H(\mathbf x,t)$
+is discretized by $Q_1$ elements, then $\nabla H_h$ (and consequently
+$\mathbf d_h$) is a discontinuous function for which can not easily take
+more derivatives. We could avoid this as well by first projecting $\mathbf d$
+onto a continuous finite element space, and then taking its derivative,
+but in the end this is perhaps a bit too much.
+
+Rather than chasing these leads, we will use a trick Martin Kronbichler
+showed us: We will replace the SUPG-stabilized weak formulation
+@f[
+  \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot (\mathbf d w_h)\right)
+  = (\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,p).
+@f]
+by
+@f[
+  \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot \left[I_h(\mathbf d w_h)\right]\right)
+  = (\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,p),
+@f]
+where $I_h$ is the interpolation operator onto the (vector version of the)
+finite element space we use for $w_h$, i.e., onto $Q_1$. To see why this
+is useful, consider that for the purposes of computing the solution,
+we expand
+@f[
+  w_h(\mathbf x,t) = \sum W_j(t) \varphi^w_j(x)
+@f]
+and we obtain the $i$th row of the linear system to solve by choosing
+$\varphi^w_h(\mathbf x) = \varphi^w_i(\mathbf x)$. This gives us
+@f[
+  \left(\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,
+        \nabla \cdot \left[I_h(\mathbf d \sum_j W_j \varphi^w_j)\right]\right)
+  = (\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,p),
+@f]
+where we can realize that both the weak form and the interpolation operator
+are linear in the coefficients $W_j$ and so we can re-write this as
+@f[
+  \sum_j
+  \left(\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,
+        \nabla \cdot \left[I_h(\mathbf d \varphi^w_j)\right]\right) W_j
+  = (\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,p),
+@f]
+which is a linear system
+@f[
+  A^w(V) W = F^w(V),
+@f]
+with
+@f{align*}{
+  A^w(V)_{ij} &=
+  \left(\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,
+        \nabla \cdot \left[I_h(\mathbf d \varphi^w_j)\right]\right),
+  \\
+  F^w(V)_i &= (\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,p).
+@f}
+The dependence of both $A^w$ and $F^w$ on the expansion coefficients $V$
+of $H_h$ is through the vector field $\mathbf d$.
+Now consider what $I_h(\mathbf d \varphi^w_j)$ is: First, as the result of the
+interpolation operator it is a finite element
+function; second, because $\varphi^w_j$ is zero at all node points other than
+the node $\mathbf x_j$ and because $\mathbf d \varphi^w_j$ clearly has this
+property at the node points as well, the term $I_h(\mathbf d \varphi^w_j)$ must
+be proportional to $\varphi^w_j$ itself. In other words,
+@f[
+  [I_h(\mathbf d \varphi^w_j)](\mathbf x,t) = \mathbf d(\mathbf x_j,t) \varphi^w_j(\mathbf x)
+@f]
+and consequently (because $\mathbf d(\mathbf x_j,t)$ is fixed and no longer
+depends on $\mathbf x$)
+@f[
+  \nabla \cdot \left[I_h(\mathbf d \varphi^w_j)\right] =
+  \mathbf d(\mathbf x_j,t) \cdot \nabla \varphi^w_j
+@f]
+
+This gives us a way to compute the matrix:
+@f{align*}{
+  A^w_{ij} &=
+  \left(\varphi^w_i+ch\mathbf d \cdot\nabla \varphi^w_i,
+        \mathbf d(\mathbf x_j,t) \cdot \nabla \varphi^w_j \right).
+@f}
+This is easily computable: We just need to evaluate the direction vector at
+node points. (In actuality, $\mathbf d$ is not a continuous function because
+it depends on the gradient of the finite element field $H_h$. As a consequence,
+whenever we need to evaluate $\mathbf d(\mathbf x_j,t)$ we take the value
+from the side of the cell on which we are currently assembling matrix terms.)
+
+The form above involving a matrix is useful in the first step when we need to
+solve for $w$ given the initial elevation. For later time steps, however, all
+we will need is a residual. That is, given the coefficients $V,W$ of fields
+$H_h$ and $w_h$, and the known dependence of $\mathbf d$ on $H_h$,
+we will have to compute the vector
+@f[
+  F^w_i =
+    -\left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot \left[I_h(\mathbf d w_h)\right]\right)
+    + (\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,p).
+@f]
+The second term is straightforward. For the first term, recall
+that $w_h(\mathbf x,t)=\sum_j W_j(t) \varphi^w_j(\mathbf x)$
+and that (because the operator $I_h$ is linear)
+@f{align*}
+  [I_h(\mathbf d w_h)](\mathbf x,t)
+  &= [I_h(\mathbf d \sum_j W_j(t) \varphi^w_j)](\mathbf x,t) \\
+  &= \sum_j W_j(t) [I_h(\mathbf d \varphi^w_j)](\mathbf x,t) \\
+  &= \sum_j W_j(t) \mathbf d(\mathbf x_j,t) \varphi^w_j(\mathbf x) \\
+  &= \sum_j \underbrace{[W_j(t) \mathbf d(\mathbf x_j,t)]}_{=: \Psi_j(t)} \varphi^w_j(\mathbf x) \\
+  &= \sum_j \Psi_j(t) \varphi^w_j(\mathbf x) \\
+  &= \psi_h(\mathbf x,t).
+@f}
+In other words, $[I_h(\mathbf d w_h)](\mathbf x,t)$ is a (vector-valued)
+finite element field with coefficients $\Psi_j$ that are simply the
+product of $\mathbf d$ evaluated at the node points $j$ times the corresponding
+coefficient $W_j$ at the same node.
+
+You will see in the code how we represent this field $\psi_h$, and then
+compute the integral
+@f[
+  \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot \left[I_h(\mathbf d w_h)\right]\right)
+  =
+  \left(\varphi^w_h+ch\mathbf d \cdot\nabla \varphi^w_h,
+        \nabla \cdot \psi_h \right)
+@f]
+that appears in the computation of the residual.
+
+
+<h3> Solving differential-algebraic equations </h3>
+
+Recall that the model we want to solve is
+@f{align*}{
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  &=
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
+  + K_d \Delta H(\mathbf x, t),
+  \\
+  \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) &= p,
+@f}
+and that its spatially discretized version reads as
+@f{align*}{
+  M^H \frac{\partial V}{\partial t}
+  &=
+  -A^H V
+  + F^H(V,W),
+  \\
+  A^w(V) W &= F^w(V).
+@f}
+
+An important observation is that the set of equations has a time
+derivative for $H$ (and the discretized version for the expansion
+coefficients $V$ of $H$), but that there are no time derivatives for
+the water flow rate $w$ (or its expansion coefficients $W$).
+This is not uncommon, and we have seen this in
+numerous other tutorial programs:
+
+- In step-21, there is a time derivative on the saturation of a concentration $S$ of
+  one component of a fluid, but not on the pressure $p$ that drives the flow.
+- In step-43, the reformulation of the equations in step-21 has the same time
+  derivative on the saturation of a concentration $S$, but not on the pressure $p$
+  that drives the flow, or the velocity $\mathbf u$ of the flow.
+- In step-31 and step-32, a temperature field $T$ drives convection. The equation for
+  $T$ contains a time derivative of $T$, but there are no time derivatives on the
+  pressure or velocity variables that describe the flow field.
+- The time-dependent Navier-Stokes equations of step-35 have a time derivative on
+  the velocity $\mathbf u$, but not on the pressure $p$.
+
+Conceptually, the lack of a time derivative almost always is a result of an
+assumption that certain processes happen at time scales far faster than we
+are interested in -- i.e., that one variable is always in instantaneous *equilibrium*
+with the other, even though it *changes with time*. In the case of the Navier-Stokes
+equation, the time scale we are interested in is that of fluid flow -- say the
+time it takes the fluid to flow all the way through the domain. On the other hand,
+the pressure equilibrates with the flow at the speed of sound, which is assumed to
+be far faster than the flow speed in the derivation of the equations,
+and the pressure can
+consequently be *assumed* to always be in equilibrium. In the context of the
+current model, something similar happens: We assume that water flows from mountain
+tops to the sea (or the edge of the domain) on time scales of days or perhaps weeks,
+but we are interested in erosion acting on time scales of hundreds or thousands of
+years; as a consequence, the water flow rate $w(\mathbf x,t)$ changes in response
+to changes in drainage basin boundaries, but at any given time $t$, the water
+flow rate is determined by *that moment's* drainage basin boundaries.
+
+For the further development, it is then useful to rewrite the equations above
+in the following way to make clear the missing time derivative:
+@f{align*}{
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  &=
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
+  + K_d \Delta H(\mathbf x, t),
+  \\
+  0 &= \nabla \cdot \left(-\frac{\nabla H(\mathbf x,t)}{S(H(\mathbf x,t))} w(\mathbf x,t)\right) - p.
+@f}
+Similarly, the spatially discretized version should be read as
+@f{align*}{
+  M^H \frac{\partial V}{\partial t}
+  &=
+  -A^H V
+  + F^H(V,W),
+  \\
+  0 &= -A^w(V) W + F^w(V).
+@f}
+
+
+The name we give these sorts of equations is
+[differential-algebraic equations](https://en.wikipedia.org/wiki/Differential-algebraic_system_of_equations)
+to indicate that some variables are "differential" (here, $H$ or its
+expansion coefficients $V$)
+and that others are "algebraic" (here, $w$ or its expansion
+coefficients $W$) where the term
+only applies to the time derivative ($w$ does satisfy a *spatial*
+differential equation, after all).
+
+The simplest way to solve these equations is generally to solve them
+alternatingly: For a given elevation field $H$ find the water flow rate
+$w$, and then use that in the computation of the rate of change on
+the right hand side of the equation for $H$ to compute $H$ at the
+next time step. This is what we do in step-21 and step-43, for example,
+where the algorithm is called "implicit pressure, explicit saturation
+(IMPES)" in accordance with the term used by the community that cares
+about this equation for groundwater or oil reservoir modeling.
+The step-31
+and step-32 programs do something related. In the Navier-Stokes community, there
+are some specialized algorithms such as the one used in step-35, but
+a general challenge is that it is difficult to derive algorithms
+that are higher-order accurate in time if one splits the system
+in a way where the differential and algebraic solution variables are
+computed separately (alternatingly).
+
+A better way is to think of the equations above in the implicit
+form. For this, let us now switch to the spatially-discretized version
+and consequently only deal with the vectors $V,W$ of expansion
+coefficient along with the corresponding matrix. Then, the
+semi-discrete system can be written
+@f[
+  {\cal F}(t,y,\dot y) = 0,
+@f]
+where $y=[V,W]$, the dot represents a time derivative, and $\cal F$
+is the "residual":
+@f{align*}{
+  {\cal F}(t,y,\dot y) =
+  {\cal F}([V,W],[\dot V,\dot W]) =
+  \begin{pmatrix}
+    {\cal F}^H([V,W],[\dot V,\dot W])
+    \\
+    {\cal F}^w([V,W],[\dot V,\dot W])
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+  M^H \dot V
+  + A^H V
+  - F^H(V,W)
+  \\
+  A^w(V) W - F^w(V)
+  \end{pmatrix}.
+@f}
+
+A number of specialized algorithms have been developed for this
+"implicit" formulation. Fortunately, we do not have to implement them ourselves:
+We can rely on one of the packages that deal.II has interfaces
+to, namely
+[SUNDIALS](https://computing.llnl.gov/projects/sundials)
+and in particular its
+[IDA sub-package](https://computing.llnl.gov/projects/sundials/ida).
+The interfaces we use are in the SUNDIALS::IDA class, which has a great
+deal of information about how one needs to formulate a problem so that
+IDA can solve it, but in essence it comes down to the following:
+- We need to be able to describe which variables (after discretization)
+  are differential and which are algebraic. Here, the components of
+  $V$ are differential, and those of $W$ are algebraic.
+- For given vectors $y=[V,W], \dot y=[\dot V,\dot W]$, we
+  need to be able to evaluate the residual vector ${\cal F}(t,y,\dot y)$.
+- For given vectors $y=[V,W], \dot y=[\dot V,\dot W]$, we need to be
+  able to form a "Jacobian matrix" of the system,
+  @f[
+    J_\alpha(t,y,\dot y) =
+    \dfrac{\partial {\cal F}(t,y,\dot y)}{\partial y} +
+    \alpha \dfrac{\partial {\cal F}(t,y,\dot y)}{\partial \dot y},
+  @f]
+  where $\alpha$ is a number provided by IDA that is related to the
+  current time step size.
+- We need to be able to solve linear systems with this matrix $J_\alpha$.
+- We need to somehow provide IDA with initial conditions for $V(0),
+  W(0)$; alternatively, we can only provide initial conditions $V(0)$
+  for the differential components and let IDA compute the initial conditions
+  for the algebraic components $W(0)$ itself.
+
+None of this is inherently difficult -- this is exactly the sort of thing
+we do in finite element codes all the time. The only awkwardness is
+through the complicated nonlinearities. In the following, let us
+consider the computation of ${\cal F}$ and $J_\alpha$ separately, and
+then come back to the issue of initial conditions.
+
+
+<h4> Assembling the residual vector </h4>
+
+Recall that we want to compute
+@f{align*}{
+  {\cal F}(t,y,\dot y) =
+  {\cal F}([V,W],[\dot V,\dot W]) =
+  \begin{pmatrix}
+  M^H \dot V
+  + A^H V
+  - F^H(V,W)
+  \\
+  A^w(V) W - F^w(V)
+  \end{pmatrix}
+@f}
+for given $[V,W],[\dot V,\dot W]$. We could do this
+
+TODO: complete
+
+
+
+<h4> Assembling the Jacobian matrix </h4>
+
+The second key task is to assemble the "Jacobian matrix"
+@f[
+  J_\alpha(t,y,\dot y) =
+  \dfrac{\partial {\cal F}(t,y,\dot y)}{\partial y} +
+  \alpha \dfrac{\partial {\cal F}(t,y,\dot y)}{\partial \dot y}.
+@f]
+The second of these terms is easy, so let us get that out of the way
+right now already:
+@f[
+  \alpha \frac{\partial {\cal F}(t,y,\dot y)}{\partial \dot y}
+  =
+  \alpha
+  \begin{pmatrix}
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial \dot y}
+    \\
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial \dot y}
+  \end{pmatrix}
+  =
+  \alpha
+  \begin{pmatrix}
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial \dot V}
+    &
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial \dot W}
+    \\
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial \dot V}
+    &
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial \dot W}
+  \end{pmatrix}
+  =
+  \alpha
+  \begin{pmatrix}
+    M
+    &
+    0
+    \\
+    0
+    &
+    0
+  \end{pmatrix}
+@f]
+
+The other term is not so nice. Conceptually, it has the form
+@f[
+  \frac{\partial {\cal F}(t,y,\dot y)}{\partial y}
+  =
+  \begin{pmatrix}
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial y}
+    \\
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial y}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial V}
+    &
+    \frac{\partial {\cal F}^H(t,y,\dot y)}{\partial W}
+    \\
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial V}
+    &
+    \frac{\partial {\cal F}^w(t,y,\dot y)}{\partial W}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    A^H - \frac{\partial F^H(V,W)}{\partial V}
+    &
+    -\frac{\partial F^H(V,W)}{\partial W}
+    \\
+    \frac{\partial [A^w(V)W]}{\partial V}
+    -\frac{\partial F^w(V)}{\partial V}
+    &
+    A^w(V)
+  \end{pmatrix}.
+@f]
+Not all of these terms are easy to compute, and we have to make a choice
+whether we want to compute and implement all of these derivatives by
+hand, or whether we want the computer to help us.
+
+If one were to implement the derivatives by hand, one could observe that
+perhaps not terms all are really necessary. As is common in nonlinear
+solvers, it is often acceptable to
+"fudge" a bit by providing a Jacobian that is an *approximation* of
+the true Jacobian by omitting terms considered unimportant. Here, the
+term could consider omitting is $\frac{\partial F^w(V)}{\partial V}$ because the
+right hand side of the water flow equation only depends on the
+elevation expansion coefficients $V$ via the flow direction vector
+$\mathbf d$ that only shows up in the stabilization term for the shape
+function; the whole term is consequently proportional to the mesh size
+$h$ -- i.e., it is small. Perhaps we could also see whether other
+terms could be considered if they are too cumbersome to derive or
+implement.
+
+At the end, however, computing derivatives is something computers can
+do for us: We shouldn't spend our time doing this ourselves, in
+particular because if we ever change the equations (i.e., the
+function ${\cal F}(t,y,\dot y)$) we also have to update the
+implementation of the Jacobian. Rather, we will use symbolic
+differentiation (see step-71) in a way where we only
+have to describe ${\cal F}(t,y,\dot y)$ once, and use this
+description to compute both the residual and its derivative
+$\frac{\partial {\cal F}(t,y,\dot y)}{\partial y}$. We will not
+describe how we do this here, instead pointing to step-71
+and the implementation of the code below.
+
+As mentioned above, computing the other term in the Jacobian,
+$\alpha \frac{\partial {\cal F}(t,y,\dot y)}{\partial \dot y}
+  =
+  \alpha
+  \begin{pmatrix}
+    M
+    &
+    0
+    \\
+    0
+    &
+    0
+  \end{pmatrix}$,
+is easy enough, and we will do this part by hand.
+
+
+<h4> Providing IDA with initial conditions </h4>
+
+TODO. Two options: (i) given initial elevation, compute corresponding water flow rate at the initial time; (ii) let IDA do it.
+
+
+
+<h3> The initial elevation data set and loading large data in general </h3>
+
+The program, at its start, needs to load a file that describes the
+initial elevation $H(\mathbf x,t=0)$. This information is then
+interpolated onto the finite element mesh to obtain the initial values for the elements of the
+expansion vector $V(t=0)$ used for the elevation.
+
+The data we will use can be obtained from a United States Geological
+Survey (USGS) website, with details provided below. The issue here is
+that the data is large. One can download data that provides the
+elevation on a 30-by-30 meter grid, which given the dimension of
+Colorado mentioned above results in 305 million data points. That's
+manageable in actual programs, but perhaps not for a tutorial
+program. Rather, I downloaded the 90-by-90 meter data and then
+downsampled it 20-fold in each coordinate direction. This results in
+approximately $451\times 260=117,260$ data points -- much more
+manageable, and if the file is stored in gzipped form, also taking
+only 617 kB. (The original $90\times 90$ meter data set is, expectedly,
+about 400 times larger: 234 MB after running gzip, encompassing
+$9025\times 5214=47,056,350$ data points that would take
+about 376 MB to store in memory.) I did not try to
+download the $30\times 30$ meter data, but would expect that it is
+another factor of 9 larger -- which would then take about 3.2 GB in
+memory, approximately as much as or more than what many machines have
+per core or MPI process.)
+
+We read this file from disk at the beginning of the program into a
+Table<2,double> object that describes data that can be indexed with
+two indices (for longitude and latitude). This table is then given to
+Functions::InterpolatedUniformGridData<2> to represent a function that
+can be evaluates at arbitrary points via interpolation between the
+known data points. The details of all this are not
+particularly interesting and can be looked up in the program;
+fundamentally, one just needs to know the format in which this data is
+stored in the input file.
+
+That said, the program here runs in parallel. That means that *every
+MPI process* needs to load this data and store it in memory. This
+seems wasteful: If you run the program on a big workstation with, say,
+128 MPI processes (if you happen to have 128 cores on your machine),
+then the data will be read 128 times on the same machine, and will
+occupy 128 times $117,260 \times 8=938,080$ bytes. This is an
+acceptable amount of memory to waste, but you won't be able to do that
+if you had loaded the $30\times 30$ meter data set mentioned above.
+
+But deal.II has facilities to deal with these situations. The key
+insight is that we want to read this data only once, and then only
+ever access it by reading. We could put this data into a memory space
+that is read-only and *shared* between all MPI processes running on
+the same machine. That is, if you had all 128 processes running on the
+same machine, you'd have to store it only once; if you had 128
+processes running on 8 machines, each with 16 processes, then you
+would have to store the data 8 times. This kind of scheme makes
+dealing with large data set possible, and this is only going to get
+better as machines gain more and more cores, increasing the potential
+to share data.
+
+In practice, this is facilitated by the function
+Table::replicate_across_communicator() that, when you have imported
+the data on one process, moves the data into shared memory spaces in
+such a way that on all other processes, you can access the elements of
+the table *as if the data was owned by that process*.
+
+
+<h4> The data set used </h3>
+
+To give credit where credit is due, let us be concrete about where the
+Colorado data set comes from. It was downloaded from
+https://portal.opentopography.org/dataCatalog, by selecting the
+"Copernicus Global Digital Elevation Models 90 meters". This data set
+was collected by the European Space Agency (ESA) through the
+[Copernicus
+Programme](https://en.wikipedia.org/wiki/Copernicus_Programme), and in
+particular using data from the German
+[TanDEM-X](https://en.wikipedia.org/wiki/TanDEM-X) satellite.
+Specifics of this data set can be found at
+https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.032021.4326.1
+and the data set itself can be referenced via
+[DOI 10.5069/G9028PQB](https://doi.org/10.5069/G9028PQB).
+The formal citation is as follows:
+
+> European Space Agency, Sinergise (2021).
+> *Copernicus Global Digital Elevation Model*.  Distributed by OpenTopography.  https://doi.org/10.5069/G9028PQB.
+
+The data described above can be downloaded from the website in different
+formats. For simplicity of importing it here, I chose the
+[ESRI
+ASCII](https://desktop.arcgis.com/en/arcmap/latest/manage-data/raster-and-images/esri-ascii-raster-format.htm)
+format that is in essence just a text file with six lines of headers
+that describe how many data points there are in the file, the bottom
+left corner of the domain for which I selected the data (in longitude
+and latitude), and the spacing of data points in degrees. I then used
+the following small Perl script to downsample the data into the file
+you have in the tutorial directory:
+@code{.pl}
+### Define the downsampling factor at the top
+$downsample_factor = 20;
+
+### First process the first five lines that constitute the header
+# Number of columns in the original file
+$_ = <>;
+m/ncols[ \t]+([0-9]+)/g;
+$n_new_cols = int($1/$downsample_factor);
+print ("ncols ", $n_new_cols, "\n");
+
+# Number of rows in the original file
+$_ = <>;
+m/nrows[ \t]+([0-9]+)/g;
+$n_new_rows = int($1/$downsample_factor);
+print ("nrows ", $n_new_rows, "\n");
+
+# Copy lower left corner x- and y-coordinates s verbatim
+$_ = <>;
+print ($_);
+$_ = <>;
+print ($_);
+
+# Output the scaled cell sizes:
+$_ = <>;
+m/cellsize[ \t]+([0-9\.]+)/g;
+print ("cellsize ", $1*$downsample_factor, "\n");
+
+
+# Then loop over all of the rows in the original data table.
+# Output every 'downsample_factor'th line:
+$row = 0;
+while ($_ = <>)
+{
+    if ($row % $downsample_factor == 0)
+    {
+        # For a line we want to treat, split the line into its
+        # constituent numbers at spaces, then filter for every
+        # 'downsample_factor'th number, and then output everything
+        # with spaces in between again:
+        @values = split(' ', $_);
+        $column = 0;
+        @values = grep {++$column % $downsample_factor == 0 } @values;
+        print (join(' ', @values), "\n");
+    }
+    ++$row;
+}
+@endcode
+
+It is perhaps worth noting that the program is written in a way that
+it can read any ESRI ASCII file, and so if you want to play, you can
+also provide the program with the $90\times 90$ or even $30\times 30$
+meter data as long as you are willing to provide enough memory and
+patience to load and store the data.
+
+
+<h3> Working on a curved surface </h3>
+
+At the end of the day, the earth is not flat, even when looking at a relatively
+small part of its surface like Colorado. The US Congress defined
+Colorado as deliminited by lines of constant latitude and longitude,
+and so it is tempting to show it as a rectangle as was done in the picture
+at the top of this page. In reality, Colorado is today defined by surveys
+done in the 1860s and 1870s, and the markers laid
+back then make Colorado a polygon with 697 sides. But more importantly
+is that the lines of constant latitude and longitude still lead to a
+part of the Earth surface that is 35 km shorter along its northern side
+than its southern side, simply because it is further north and so closer
+to the north pole where the circles of constant latitude are smaller. As
+a consequence, it is probably useful to just solve our model on a *surface*,
+rather than a flat rectangle.
+
+This is what we will do in this program. In practice, this actually does
+not require many changes. As was first shown in step-34, we just need
+a triangulation of dimension `dim=2` in `spacedim=3` space dimensions,
+i.e., a `Triangulation<dim,spacedim>`. There are many other places in the
+program where we have to add this second template argument, but in
+practice everything else just works as it did before.
+
+We then create the domain by first creating a two-dimensional rectangle
+with the correct longitude and latitude bounds, and then transform it
+from this coordinate system to a Cartesian $x-y-z$ coordinate system
+in which it becomes part of the surface of a sphere of the correct
+radius of the earth. This transformation is facilitated by
+GridTools::transform(). One *could* use a better description than
+just the surface of a sphere, say the
+[WGS 84](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS_84)
+shape, but we're going to leave that for another time.
+
+TODO: Need to attach a manifold.
+
+
+<h3> How we tested the correctness of the program </h3>
+
+As with all other tutorial programs, we spent a substantial amount of time
+verifying that it actually works correctly. To this end, here is two test cases
+that are relatively simple to implement and for which one can compute the
+exact solution as well.
+
+<h4> A one-dimensional test case </h4>
+
+The simplest test case one can easily come up with has only one real space variable
+plus the time dimension. In practice, we pose the test case on a two-dimensional
+(flat) domain that is a rectangle,
+but everything only depends on the $x$ coordinate and so it is, in essence,
+a one-dimensional (but time-dependent) problem. We choose the rectangle
+so that $0 < x < L$ (the extent of the $y$ coordinate does not matter).
+We start with a linear initial elevation profile:
+@f[
+  H(x,0) = ax+b,
+@f]
+where we will choose $a<0$ so that the initial elevation slopes down from
+left to right. For this initial profile, the slope equals $S(x,0)=a$
+and the downhill direction field is $\mathbf d(x,0) = (1,0)^T$. (Here
+and in the following, we will use $\epsilon=0$ in the regularization of
+functions that are not differentiable.)
+Because $\mathbf d$ is spatially constant, we then recognize that
+in the equation for the water flow rate, we have
+@f[
+  \nabla\cdot (\mathbf d(x,0) w(x,0)) = \frac{\partial w(x,0)}{\partial x} = p.
+@f]
+That is, at the initial time, we have that $w(x,0)=px$, recognizing that
+at the left end of the domain, $w(x=0,0)=0$ because that is an inflow
+boundary (the domain sloping to the right). Now recall that the evolution
+of the elevation is governed by
+@f[
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  =
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
+  + K_d \Delta H(\mathbf x, t).
+@f]
+In other words, at the initial time, the rate of change of the elevation field is
+@f[
+  \frac{\partial H(\mathbf x,0)}{\partial t}
+  =
+  - k w(\mathbf x,0)^m S(H(\mathbf x,0))^n
+  + K_d \Delta H(\mathbf x, 0)
+  =
+  - k (px)^m |a|^n
+  + 0,
+@f]
+where in the last step we have used that the Laplacian of a linear function
+is zero.
+
+We end up with two special cases for which we can compute the exact solution:
+- If $m=0$ (which implies that the amount of water does not actually
+  matter for the amount of erosion), then we get
+  @f[
+  \frac{\partial H(\mathbf x,0)}{\partial t}
+  =
+  - k |a|^n,
+  @f]
+  which means that the elevation field recedes downward at a spatially constant rate
+  at the initial time. In other words, it remains linear, with the same slope,
+  and we can easily verify that
+  @f{align*}{
+    H(x,t) &= ax + b - k |a|^n t, \\
+    w(x,t) &= px
+  @f}
+  is the solution. Correctly, this model reflects that if the erosion rate is $k=0$
+  (no erosion at all), then the elevation field does not change.
+
+- If $m=1, n=1$, the situation is only marginally more complex. In that case, because
+  we have a linear growth of the amount of water flowing from left to right,
+  and because for $m=1$ the erosion rate grows linearly with the amount of
+  water (i.e., here also linearly from left to right), we end up with a slope
+  that keeps steepening. Trying the ansatz
+  @f{align*}{
+    H(x,t) &= \alpha(t) x + \beta(t), \\
+    w(x,t) &= px
+  @f}
+  with $\alpha(0)=a, \beta(0)$, we quickly find by plugging everything into
+  the equations that we need $\beta(t)=b$, and that $\alpha'(t)=kp\alpha(t)$,
+  which solves to $\alpha(t)=ae^{kpt}$ and so
+  @f{align*}{
+    H(x,t) &= ae^{kpt} x + b, \\
+    w(x,t) &= px
+  @f}
+  as the exact solution. As before, if $k=0$ (no erosion), then the elevation
+  field stays the same. Similarly, if there is no water ($p=0$), then no
+  erosion happens and correctly our solution predicts that the elevation
+  remains constant with time.
+
+In order to make these two cases reasonably realistic with regard to the coefficients
+used, we solve the benchmark on a domain of size $100 km \times 100 km = 10^5 m \times 10^5 m$, in
+which the elevation decreases from left to right from 4000 m to zero. In other
+words, the initial elevation is given by $H(\mathbf x,0)=-\frac{4000 m}{100000 m} x + 4000$,
+corresponding to $a=-0.04, b=4000 m$ in the description above. With this, we get the following
+solutions to the equations we are trying to solve here:
+- If $m=0$:
+  @f{align*}{
+    H(x,t) &= 4000 - 0.04x - k 0.04^n t, \\
+    w(x,t) &= px.
+  @f}
+
+- If $m=1, n=1$:
+  @f{align*}{
+    H(x,t) &= 4000 -0.04e^{kpt} x, \\
+    w(x,t) &= px.
+  @f}
+
+
+<h4> A circularly symmetric test case </h4>
+
+Another case for which one can generate an analytical solution is where the
+initial elevation field is circularly symmetric, i.e., only depends on the distance
+$r$ from the origin. To this end, consider a situation where the high point in
+the domain is at the origin, and the elevation $H(r,t)$ decreases monotonically from
+the origin. (We will derive the exact form of $H(r,t)$ below and for now only
+assume a monotonic decrease.)
+In this case, water flows from this high point away from the origin.
+Whereas in the example above, the amount of water that flows through a transect
+of size $ds$ perpendicular to the flow direction at a point $(x,y)$ was whatever
+water falls onto a *rectangle* that reaches from the high ridge at the left
+end to $x$ and from $y$ to $y + ds$, here the amount of water is only *half*
+as much: Namely, the water that falls on the *triangle* of length $r$ and
+height $ds$. In other words, for an elevation that decreases with distance from
+the origin, the water flow rate is
+@f{align*}{
+  w(r,t) = \frac{pr}{2},
+@f}
+where $r=\sqrt{x^2+y^2}$.
+
+One can double-check that this intuitive derivation of
+the solution $w$ is correct by verifying that
+@f{align*}{
+  \nabla \cdot \left[\mathbf d(r,t) w(r,t) \right] = p,
+@f}
+where the direction field is
+@f{align*}{
+  \mathbf d(r,t) = \frac{1}{\sqrt{x^2+y^2}}\begin{pmatrix} x \\ y \end{pmatrix}.
+@f}
+Then, $\mathbf d w= \frac{p}{2} \begin{pmatrix} x \\ y \end{pmatrix}$, and indeed
+$\nabla \cdot \left[\mathbf d(r,t) w(r,t) \right] = p$, as desired. Note that just
+as in the first test case, the water flow rate $w(r)$ does not depend on time.
+
+Having computed the water flow rate, we can consider the evolution of the
+elevation $H(r,t)$ through the equation
+@f[
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  =
+  - k w(\mathbf x,t)^m S(H(\mathbf x,t))^n
+  + K_d \Delta H(\mathbf x, t)
+  =
+  - k \left(\frac{pr}{2}\right)^m \left|\frac{\partial H(r,t)}{\partial r}\right|^n
+  + K_d \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right),
+@f]
+where in the last equality we have used that for radially symmetric functions,
+$\Delta H(\mathbf x, t) = \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right)$.
+Note that our assumption of a monotonically decreasing elevation away from
+the origin implies that
+$\left|\frac{\partial H(r,t)}{\partial r}\right| = -\frac{\partial H(r,t)}{\partial r}$,
+and so the equation we need to consider is
+@f[
+  \frac{\partial H(\mathbf x,t)}{\partial t}
+  =
+  - k \left(\frac{pr}{2}\right)^m \left(-\frac{\partial H(r,t)}{\partial r}\right)^n
+  + K_d \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right).
+@f]
+We then need to find functions $H(r,t)$ that satisfy this equation. After trying (and failing)
+a number of approaches, one hits on the following idea: Let us try a function of the form
+$H(r,t) = a(t) b(r)$ where we need to choose $b'(r)<0$ to make $H(r,t)$ decrease
+with distance from the origin. In that case, we have
+@f{align*}{
+  \frac{\partial H(r,t)}{\partial t} &= a'(t) b(r),
+  \\
+  \frac{\partial H(r,t)}{\partial r} &= a(t) b'(r),
+  \\
+  \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} H(r,t) \right)
+  &=
+  a(t) \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\partial}{\partial r} b(r) \right)
+  =
+  a(t) \frac{1}{r}\frac{\partial}{\partial r}\left( r b'(r) \right)
+  =
+  a(t) \frac{1}{r}\left( b'(r) + r b''(r) \right)
+  =
+  a(t) \left( \frac{b'(r)}{r} + b''(r) \right)
+@f}
+Consequently, the evolution equation for $H(r,t)$ leads to the following:
+@f[
+  a'(t) b(r)
+  =
+  - k \left(\frac{p}{2}\right)^m r^m \left(-a(t) b'(r)\right)^n
+  +K_d a(t) \left( \frac{b'(r)}{r} + b''(r) \right).
+@f]
+This does not immediately look useful to finding functions $a(t),b(r)$ that
+satisfy the equations. But we can choose $a(t)=e^{-\lambda t}$, because in that
+case $a'(t)=-\lambda a(t)$, and the previous equation turns into
+@f[
+  -\lambda a(t) b(r)
+  =
+  - k \left(\frac{p}{2}\right)^m r^m \left(-a(t) b'(r)\right)^n
+  +K_d a(t) \left( \frac{b'(r)}{r} + b''(r) \right),
+@f]
+from which, if we choose $n=1$, we can eliminate $a(t)$ altogether:
+@f[
+  -\lambda b(r)
+  =
+  + k \left(\frac{p}{2}\right)^m r^m b'(r)
+  +K_d \left( \frac{b'(r)}{r} + b''(r) \right)
+@f]
+If we leave $\lambda$ unknown for the moment, we can see this as
+an eigenvalue problem! Indeed, after some rearranging, we recognize
+that we are looking for a function $b(r)$ and value $\lambda$ so that
+@f[
+  - K_d b''(r)
+  - \left(k \left(\frac{p}{2}\right)^m r^m + \frac{K_d}{r} \right) b'(r)
+  =
+  \lambda b(r).
+@f]
+Put differently, we are looking for eigenfunctions and eigenvectors of the
+operator
+@f[
+  {\cal L} b(r)
+  =
+  - \alpha \frac{1}{r} \frac{\partial}{\partial r}\left(r \frac{\partial}{\partial r}b(r)\right)
+  - \beta r^m b'(r).
+@f]
+where $\alpha=K_d, \beta = k \left(\frac{p}{2}\right)^m$. If it weren't for the fact
+that the second term contains a derivative of $b(r)$, this would be what is known
+as a [Sturm-Liouville problem](https://en.wikipedia.org/wiki/Sturm%E2%80%93Liouville_theory).
+With the derivative, however, it doesn't fall into the same framework. Instead,
+a better way to see this equation is that it satisfies
+a variation of the
+[Kummer equation](https://en.wikipedia.org/wiki/Confluent_hypergeometric_function#Kummer's_equation),
+with solutions that were pointed out to us by Robert Israel
+[on this StackExchange post](https://math.stackexchange.com/questions/5025287/solution-of-a-nonsymmetric-eigenfunction-equation).
+More specifically, we can rearrange the equation for $b(r)$, multiply it by $r$, and divide by $K_d$ to read as
+@f[
+  r b''(r)
+  + \left(k \frac{1}{K_d} \left(\frac{p}{2}\right)^m r^{m+1} + 1 \right) b'(r)
+  + \frac{\lambda}{K_d} r b(r) = 0.
+@f]
+If we consider the case $m=0$ (i.e., erosion is independent of the
+amount of water available), then this equation *almost* (but not quite)
+has the same form as Kummer's equation
+mentioned on the Wikipedia page above, namely
+@f[
+  z\frac{d^2w}{dz^2} + (b-z)\frac{dw}{dz} - aw = 0,
+@f]
+if we replace $z\to r, w\to b, b\to 1, a\to \frac{\lambda}{K_d}$. But it isn't *exactly*
+the same because our equation still has the factor $r$ in front of $b(r)$, its
+sign is wrong, and the sign of the term $k \frac{1}{K_d} \left(\frac{p}{2}\right)^m r^{m+1} b'(r)$
+is also wrong. Yet, the equations are similarly enough that it is, then, perhaps not
+surprising that one can find some kind of transform than converts the two equations
+and that the solution of our equation involves the Kummer (hypergeometric)
+functions that appear in the solution of Kummer's equation, and that the same can also be
+done for the more interesting case $m=1$.
+
+As pointed out in the StackExchange post mentioned above, the solutions for
+our equation are given as follows:
+
+- $m=0$ (erosion is independent of the amount of water flowing):
+  @f{align*}{
+  b\left(r \right) &=
+  c_{1} M\! \left(\frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta}{2 \sqrt{-4 \lambda  \alpha +\beta^{2}}}, 1, \frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}\, r}{\alpha}\right) {\mathrm e}^{-\frac{r \left(\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta \right)}{2 \alpha}}\cr
+  &+c_{2}\; U\left(\frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta}{2 \sqrt{-4 \lambda  \alpha +\beta^{2}}}, 1, \frac{\sqrt{-4 \lambda  \alpha +\beta^{2}}\, r}{\alpha}\right) {\mathrm e}^{-\frac{r \left(\sqrt{-4 \lambda  \alpha +\beta^{2}}+\beta \right)}{2 \alpha}},
+  @f}
+  where $M$ and $U$ are Kummer functions.
+
+- $m=1$ (erosion is proportional to the amount of water flowing):
+  @f{align*}{
+  b\left(r \right) &=
+  c_{1} {\mathrm e}^{-\frac{\beta  \,r^{2}}{2 \alpha}} M\! \left(\frac{2 \beta -\lambda}{2 \beta}, 1, \frac{\beta  \,r^{2}}{2 \alpha}\right)+c_{2} {\mathrm e}^{-\frac{\beta  \,r^{2}}{2 \alpha}} U\! \left(\frac{2 \beta -\lambda}{2 \beta}, 1, \frac{\beta  \,r^{2}}{2 \alpha}\right).
+  @f}
+
+TODO: Replace alpha, beta.
+
+
+TODO: Complete this section of the benchmarking effort.
+
+TODO: Discuss how we can check this in the program. Perhaps make it a run-time
+parameter?

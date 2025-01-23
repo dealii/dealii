@@ -1444,7 +1444,7 @@ namespace Functions
    *          interpolation_function (std::move(coordinate_values),
    *                                  std::move(data_table));
    * @endcode
-   *
+   * A complete use case of this functionality is presented in step-91.
    *
    * @ingroup functions
    */
@@ -1487,7 +1487,9 @@ namespace Functions
      * shared memory into local memory whenever one creates an
      * InterpolatedTensorProductGridData object. See the
      * TableBase::replicate_across_communicator() function on how to share a
-     * data set between multiple processes.
+     * data set between multiple processes. A complete use case of this
+     * functionality, using a different tensor product class, is presented in
+     * step-91.
      */
     InterpolatedTensorProductGridData(
       std::array<std::vector<double>, dim> &&coordinate_values,
@@ -1632,7 +1634,8 @@ namespace Functions
      * shared memory into local memory whenever one creates an
      * InterpolatedUniformGridData object. See the
      * TableBase::replicate_across_communicator() function on how to share a
-     * data set between multiple processes.
+     * data set between multiple processes. A complete use case of this function
+     * is presented in step-91.
      */
     InterpolatedUniformGridData(
       std::array<std::pair<double, double>, dim> &&interval_endpoints,

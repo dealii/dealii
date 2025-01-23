@@ -434,6 +434,8 @@ namespace internal
  * by creating copies in shared memory once for all processes located
  * on each of the machines used by the MPI job.
  *
+ * A complete use case of this approach is presented in step-91.
+ *
  * @ingroup data
  */
 template <int N, typename T>
@@ -649,7 +651,7 @@ public:
    * memory regions on each of the machines that host MPI processes and
    * let all MPI processes on this machine then access this shared memory
    * region instead of keeping their own copy. See the general documentation
-   * of this class for a code example.
+   * of this class for a code example. The function is also used in step-91.
    *
    * The intent of this function is to quickly exchange large arrays from
    * one process to others, rather than having to compute or create it on
