@@ -466,8 +466,17 @@ endif()
 
 
 #
-# Check whether the standard library provides operator* overloads for mixed
-# floating point multiplication of complex and real valued numbers.
+# Check whether the standard library provides operator* overloads for
+# mixed floating point multiplication of complex and real valued
+# numbers. The C++ standard does not say that such overloads should
+# exist, and so they shouldn't. In other words, a standards compliant
+# compiler will fail this check.
+#
+# In practice, the absence of these overloads makes it quite difficult
+# to write mixed-precision linear algebra functions. To make this less
+# of a pain, we declare such overloads ourselves (in namespace dealii)
+# unless the compiler already has them (which, as mentioned above, it
+# shouldn't).
 #
 # - Matthias Maier, 2015
 #
