@@ -1341,7 +1341,7 @@ namespace internal
                   ori_ql.set_combined_orientation(
                     con_ql.ptr[f] + l,
                     same ? numbers::default_geometric_orientation :
-                           ReferenceCell::reversed_combined_line_orientation());
+                           numbers::reverse_line_orientation);
                 }
             }
         }

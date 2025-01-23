@@ -2169,7 +2169,7 @@ public:
   face_rotation(const unsigned int face);
 
   /**
-   * @brief Always return ReferenceCell::reversed_combined_line_orientation()
+   * @brief Always return numbers::reverse_line_orientation
    */
   static types::geometric_orientation
   line_orientation(const unsigned int line);
@@ -2838,7 +2838,7 @@ public:
   face_rotation(const unsigned int face);
 
   /**
-   * @brief Always return ReferenceCell::reversed_combined_line_orientation()
+   * @brief Always return numbers::reverse_line_orientation
    */
   static types::geometric_orientation
   line_orientation(const unsigned int line);
@@ -4912,8 +4912,7 @@ namespace internal
         else if (dim == 2)
           Assert(combined_orientation ==
                      numbers::default_geometric_orientation ||
-                   combined_orientation ==
-                     ReferenceCell::reversed_combined_line_orientation(),
+                   combined_orientation == numbers::reverse_line_orientation,
                  ExcMessage(
                    "In 2d, the only valid values of the combined orientation "
                    "are the standard orientation or the reversed line "
@@ -5535,8 +5534,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
     {
       const auto combined_orientation = combined_face_orientation(line);
       Assert(combined_orientation == numbers::default_geometric_orientation ||
-               combined_orientation ==
-                 ReferenceCell::reversed_combined_line_orientation(),
+               combined_orientation == numbers::reverse_line_orientation,
              ExcInternalError());
       return combined_orientation;
     }
@@ -5551,7 +5549,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
              ExcInternalError());
       return this->tria->faces->quads_line_orientations[index] ?
                numbers::default_geometric_orientation :
-               ReferenceCell::reversed_combined_line_orientation();
+               numbers::reverse_line_orientation;
     }
   else if constexpr (structdim == 3 && dim == 3)
     {
@@ -6912,7 +6910,7 @@ template <int dim, int spacedim>
 inline types::geometric_orientation
 TriaAccessor<0, dim, spacedim>::line_orientation(const unsigned int /*line*/)
 {
-  return ReferenceCell::reversed_combined_line_orientation();
+  return numbers::reverse_line_orientation;
 }
 
 
@@ -7360,7 +7358,7 @@ template <int spacedim>
 inline types::geometric_orientation
 TriaAccessor<0, 1, spacedim>::line_orientation(const unsigned int /*line*/)
 {
-  return ReferenceCell::reversed_combined_line_orientation();
+  return numbers::reverse_line_orientation;
 }
 
 
