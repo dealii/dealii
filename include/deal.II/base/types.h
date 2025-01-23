@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace types
 {
   /**
-   * The type used to represent face orientations.
+   * The type used to represent face and line orientations.
    *
    * See the
    * @ref GlossFaceOrientation "glossary"
