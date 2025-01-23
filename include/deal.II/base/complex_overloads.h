@@ -28,10 +28,33 @@ struct ProductType;
 #endif
 
 #ifndef DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+
 /**
  * Provide an <tt>operator*</tt> that operates on mixed complex floating point
  * types. Annoyingly, the standard library does not provide such an
- * operator...
+ * operator.
+ *
+ * @note Because the C++ standard does not provide for mixed-precision complex
+ *   operators, code such as the following does not compile:
+ *   @code
+ *     double              factor = 3.141;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     auto z = factor*x;                 // error
+ *   @endcode
+ *   Because this does not compile, writing mixed-precision complex linear
+ * algebra libraries is not easily possible without much additional work that
+ * requires explicit casts. For example, one would have to write the code above
+ * as follows:
+ *   @code
+ *     double              factor = 1.0;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     using P = ProductType<double,std::complex<float>>::type;
+ *     auto z = static_cast<P>(factor) * static_cast<P>(x);
+ *   @endcode
+ *   This makes much code unreadable. As a consequence, we define the
+ *   necessary overloaded multiplication and division operators for mixed
+ *   complex arithmetic (in namespace `dealii`) to make the code above
+ *   compile without the extra casts.
  *
  * @relatesalso ProductType
  */
@@ -49,7 +72,29 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
 /**
  * Provide an <tt>operator/</tt> that operates on mixed complex floating point
  * types. Annoyingly, the standard library does not provide such an
- * operator...
+ * operator.
+ *
+ * @note Because the C++ standard does not provide for mixed-precision complex
+ *   operators, code such as the following does not compile:
+ *   @code
+ *     double              factor = 3.141;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     auto z = factor*x;                 // error
+ *   @endcode
+ *   Because this does not compile, writing mixed-precision complex linear
+ * algebra libraries is not easily possible without much additional work that
+ * requires explicit casts. For example, one would have to write the code above
+ * as follows:
+ *   @code
+ *     double              factor = 1.0;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     using P = ProductType<double,std::complex<float>>::type;
+ *     auto z = static_cast<P>(factor) * static_cast<P>(x);
+ *   @endcode
+ *   This makes much code unreadable. As a consequence, we define the
+ *   necessary overloaded multiplication and division operators for mixed
+ *   complex arithmetic (in namespace `dealii`) to make the code above
+ *   compile without the extra casts.
  *
  * @relatesalso ProductType
  */
@@ -67,7 +112,29 @@ operator/(const std::complex<T> &left, const std::complex<U> &right)
 /**
  * Provide an <tt>operator*</tt> for a scalar multiplication of a complex
  * floating point type with a different real floating point type. Annoyingly,
- * the standard library does not provide such an operator...
+ * the standard library does not provide such an operator.
+ *
+ * @note Because the C++ standard does not provide for mixed-precision complex
+ *   operators, code such as the following does not compile:
+ *   @code
+ *     double              factor = 3.141;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     auto z = factor*x;                 // error
+ *   @endcode
+ *   Because this does not compile, writing mixed-precision complex linear
+ * algebra libraries is not easily possible without much additional work that
+ * requires explicit casts. For example, one would have to write the code above
+ * as follows:
+ *   @code
+ *     double              factor = 1.0;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     using P = ProductType<double,std::complex<float>>::type;
+ *     auto z = static_cast<P>(factor) * static_cast<P>(x);
+ *   @endcode
+ *   This makes much code unreadable. As a consequence, we define the
+ *   necessary overloaded multiplication and division operators for mixed
+ *   complex arithmetic (in namespace `dealii`) to make the code above
+ *   compile without the extra casts.
  *
  * @relatesalso ProductType
  */
@@ -84,7 +151,29 @@ operator*(const std::complex<T> &left, const U &right)
 /**
  * Provide an <tt>operator/</tt> for a scalar division of a complex
  * floating point type with a different real floating point type. Annoyingly,
- * the standard library does not provide such an operator...
+ * the standard library does not provide such an operator.
+ *
+ * @note Because the C++ standard does not provide for mixed-precision complex
+ *   operators, code such as the following does not compile:
+ *   @code
+ *     double              factor = 3.141;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     auto z = factor*x;                 // error
+ *   @endcode
+ *   Because this does not compile, writing mixed-precision complex linear
+ * algebra libraries is not easily possible without much additional work that
+ * requires explicit casts. For example, one would have to write the code above
+ * as follows:
+ *   @code
+ *     double              factor = 1.0;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     using P = ProductType<double,std::complex<float>>::type;
+ *     auto z = static_cast<P>(factor) * static_cast<P>(x);
+ *   @endcode
+ *   This makes much code unreadable. As a consequence, we define the
+ *   necessary overloaded multiplication and division operators for mixed
+ *   complex arithmetic (in namespace `dealii`) to make the code above
+ *   compile without the extra casts.
  *
  * @relatesalso ProductType
  */
@@ -101,7 +190,29 @@ operator/(const std::complex<T> &left, const U &right)
 /**
  * Provide an <tt>operator*</tt> for a scalar multiplication of a real
  * floating point type with a different complex floating point type.
- * Annoyingly, the standard library does not provide such an operator...
+ * Annoyingly, the standard library does not provide such an operator.
+ *
+ * @note Because the C++ standard does not provide for mixed-precision complex
+ *   operators, code such as the following does not compile:
+ *   @code
+ *     double              factor = 3.141;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     auto z = factor*x;                 // error
+ *   @endcode
+ *   Because this does not compile, writing mixed-precision complex linear
+ * algebra libraries is not easily possible without much additional work that
+ * requires explicit casts. For example, one would have to write the code above
+ * as follows:
+ *   @code
+ *     double              factor = 1.0;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     using P = ProductType<double,std::complex<float>>::type;
+ *     auto z = static_cast<P>(factor) * static_cast<P>(x);
+ *   @endcode
+ *   This makes much code unreadable. As a consequence, we define the
+ *   necessary overloaded multiplication and division operators for mixed
+ *   complex arithmetic (in namespace `dealii`) to make the code above
+ *   compile without the extra casts.
  *
  * @relatesalso ProductType
  */
@@ -118,7 +229,29 @@ operator*(const T &left, const std::complex<U> &right)
 /**
  * Provide an <tt>operator/</tt> for a scalar division of a real
  * floating point type with a different complex floating point type.
- * Annoyingly, the standard library does not provide such an operator...
+ * Annoyingly, the standard library does not provide such an operator.
+ *
+ * @note Because the C++ standard does not provide for mixed-precision complex
+ *   operators, code such as the following does not compile:
+ *   @code
+ *     double              factor = 3.141;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     auto z = factor*x;                 // error
+ *   @endcode
+ *   Because this does not compile, writing mixed-precision complex linear
+ * algebra libraries is not easily possible without much additional work that
+ * requires explicit casts. For example, one would have to write the code above
+ * as follows:
+ *   @code
+ *     double              factor = 1.0;
+ *     std::complex<float> x(1,2);        // =1+2i
+ *     using P = ProductType<double,std::complex<float>>::type;
+ *     auto z = static_cast<P>(factor) * static_cast<P>(x);
+ *   @endcode
+ *   This makes much code unreadable. As a consequence, we define the
+ *   necessary overloaded multiplication and division operators for mixed
+ *   complex arithmetic (in namespace `dealii`) to make the code above
+ *   compile without the extra casts.
  *
  * @relatesalso ProductType
  */
@@ -131,6 +264,8 @@ operator/(const T &left, const std::complex<U> &right)
   using result_type = typename ProductType<T, std::complex<U>>::type;
   return static_cast<result_type>(left) / static_cast<result_type>(right);
 }
+
+
 #endif /* DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS */
 
 DEAL_II_NAMESPACE_CLOSE
