@@ -484,14 +484,24 @@ public:
   /**
    * Remove and return the last element of the last range.
    * This function throws an exception if the IndexSet is empty.
+   *
+   * @deprecated This function is deprecated. Conceptually, an index set is a
+   *   set; it should not be seen as a sorted container in which it is clear
+   *   what element is stored "last".
    */
+  DEAL_II_DEPRECATED_EARLY
   size_type
   pop_back();
 
   /**
    * Remove and return the first element of the first range.
    * This function throws an exception if the IndexSet is empty.
+   *
+   * @deprecated This function is deprecated. Conceptually, an index set is a
+   *   set; it should not be seen as a sorted container in which it is clear
+   *   what element is stored "first".
    */
+  DEAL_II_DEPRECATED_EARLY
   size_type
   pop_front();
 
