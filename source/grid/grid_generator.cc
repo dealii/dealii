@@ -4296,9 +4296,9 @@ namespace GridGenerator
         const auto embed_point = [](const double x,
                                     const double y) -> Point<spacedim> {
           if constexpr (spacedim == 2)
-            return {x, y};
+            return Point<spacedim>(x, y);
           else if constexpr (spacedim == 3)
-            return {x, y, 0};
+            return Point<spacedim>(x, y, 0);
           else
             DEAL_II_NOT_IMPLEMENTED();
         };
