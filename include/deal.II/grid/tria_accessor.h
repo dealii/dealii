@@ -26,7 +26,6 @@
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/reference_cell.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_faces.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_iterator_base.h>
