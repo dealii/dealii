@@ -673,8 +673,9 @@ namespace Step56
                              data_component_interpretation);
     data_out.build_patches();
 
-    std::ofstream output(
-      "solution-" + Utilities::int_to_string(refinement_cycle, 2) + ".vtk");
+    std::ofstream output("solution-" +
+                         Utilities::int_to_string(refinement_cycle, 2) +
+                         "-dim-" + Utilities::int_to_string(dim, 2) + ".vtk");
     data_out.write_vtk(output);
   }
 
@@ -682,7 +683,11 @@ namespace Step56
   void
   StokesProblem<dim>::run()
   {
-    for (unsigned int refinement_cycle = 0; refinement_cycle < 3;
+    // For Scott-Vogelius elements in 3D, we must use a cubic velocity space and
+    // so we must use fewer refinements.
+    const unsigned int max_refinements_cycles = dim < 3 ? 3 : 2;
+    for (unsigned int refinement_cycle = 0;
+         refinement_cycle < max_refinements_cycles;
          ++refinement_cycle)
       {
         deallog << "Refinement cycle " << refinement_cycle << std::endl;
@@ -718,6 +723,15 @@ main()
 
     const int          degree = 1;
     const int          dim    = 2;
+    StokesProblem<dim> flow_problem(degree);
+
+    flow_problem.run();
+  }
+  {
+    using namespace Step56;
+
+    const int          degree = 2; // In 3D, not stable unless degree >= 2.
+    const int          dim    = 3;
     StokesProblem<dim> flow_problem(degree);
 
     flow_problem.run();
