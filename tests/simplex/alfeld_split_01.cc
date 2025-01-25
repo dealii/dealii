@@ -12,7 +12,7 @@
  *
  * ------------------------------------------------------------------------
  *
- * Test function GridGenerator::alfeld_split_of_simplex_mesh() in 2D.
+ * Test function GridGenerator::alfeld_split_of_simplex_mesh() in 2D and 3D.
  */
 
 #include <deal.II/grid/grid_generator.h>
@@ -22,7 +22,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <fstream>
 #include <iostream>
 
 #include "../tests.h"
@@ -91,5 +90,9 @@ main()
 
   deallog.push("2d");
   check<2, 2>();
+  deallog.pop();
+
+  deallog.push("3d");
+  check<3, 3>();
   deallog.pop();
 }

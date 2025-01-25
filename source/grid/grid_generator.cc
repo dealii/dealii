@@ -8395,8 +8395,6 @@ namespace GridGenerator
   alfeld_split_of_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
                                Triangulation<dim, spacedim>       &out_tria)
   {
-    Assert(dim == 2, ExcNotImplemented());
-
     Triangulation<dim, spacedim> temp_tria;
     if (in_tria.n_global_levels() > 1)
       {
@@ -8415,6 +8413,27 @@ namespace GridGenerator
     static const ndarray<unsigned int, 4, 2, 2>
       vertex_ids_for_boundary_faces_2d = {
         {{{{{0, 1}}}}, {{{{1, 2}}}}, {{{{2, 0}}}}}};
+
+    // Three tetrahedra connecting to barycenter with vertex index 4:
+    static const ndarray<unsigned int, 4, 4> table_3D_cell = {
+      {{{0, 1, 2, 4}}, {{1, 0, 3, 4}}, {{0, 2, 3, 4}}, {{2, 1, 3, 4}}}};
+
+    // Boundary-faces 3d:
+    // Each face of the original simplex is defined by the following vertices:
+    static const ndarray<unsigned int, 4, 2, 3>
+      vertex_ids_for_boundary_faces_3d = {
+        {{{{{0, 1, 2}}}}, {{{{1, 0, 3}}}}, {{{{0, 2, 3}}}}, {{{{2, 1, 3}}}}}};
+
+    // Boundary-lines 3d:
+    // Each line/edge of the original simplex is defined by the following
+    // vertices:
+    static const ndarray<unsigned int, 6, 2, 2>
+      vertex_ids_for_boundary_lines_3d = {{{{{{0, 1}}}},
+                                           {{{{1, 2}}}},
+                                           {{{{2, 0}}}},
+                                           {{{{0, 3}}}},
+                                           {{{{1, 3}}}},
+                                           {{{{2, 3}}}}}};
 
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
@@ -8440,7 +8459,7 @@ namespace GridGenerator
 
         // temporary array storing the global indices of each cell entity in the
         // sequence: vertices, edges/faces, cell
-        std::array<unsigned int, 4> local_vertex_indices;
+        std::array<unsigned int, (dim == 3) ? 5 : 4> local_vertex_indices;
 
         // (i) copy the existing vertex locations
         Point<spacedim> barycenter;
@@ -8462,8 +8481,8 @@ namespace GridGenerator
           }
 
         // (ii) barycenter:
-        local_vertex_indices[3] = vertices.size();
-        vertices.push_back(barycenter / 3.);
+        local_vertex_indices[local_vertex_indices.size() - 1] = vertices.size();
+        vertices.push_back(barycenter / static_cast<double>(dim + 1));
 
         // helper function for creating cells and subcells
         const auto add_cell = [&](const unsigned int struct_dim,
@@ -8546,14 +8565,17 @@ namespace GridGenerator
         };
 
         const auto material_id_cell = cell->material_id();
+        const auto manifold_id_cell = cell->manifold_id();
 
         // create cells one by one
         if (dim == 2)
           {
-            // get cell-manifold id from current quad cell
-            const auto manifold_id_cell = cell->manifold_id();
-
             for (const auto &cell_vertices : table_2D_cell)
+              add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
+          }
+        else if (dim == 3)
+          {
+            for (const auto &cell_vertices : table_3D_cell)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
           }
         else
@@ -8572,8 +8594,28 @@ namespace GridGenerator
                      vertex_ids_for_boundary_faces_2d[f])
                   add_cell(1, face_vertices, bid, mid);
               }
+            else if (dim == 3)
+              {
+                for (const auto &face_vertices :
+                     vertex_ids_for_boundary_faces_3d[f])
+                  add_cell(2, face_vertices, bid, mid);
+              }
             else
               DEAL_II_NOT_IMPLEMENTED();
+          }
+
+        // In 3D we need to treat boundary lines separately.
+        if (dim == 3)
+          {
+            for (const auto l : cell->line_indices())
+              {
+                const auto bid = cell->line(l)->boundary_id();
+                const auto mid = cell->line(l)->manifold_id();
+
+                for (const auto &line_vertices :
+                     vertex_ids_for_boundary_lines_3d[l])
+                  add_cell(1, line_vertices, bid, mid);
+              }
           }
       }
 
