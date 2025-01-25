@@ -327,7 +327,7 @@ namespace internal
       rotate_subface_index(int times, unsigned int &subface_index) const;
 
       void
-      rotate_face(const types::geometric_orientation    combined_orientation,
+      orient_face(const types::geometric_orientation    combined_orientation,
                   const unsigned int                    n_dofs_1d,
                   std::vector<types::global_dof_index> &dofs) const;
 
@@ -335,10 +335,6 @@ namespace internal
       line_dof_idx(int          local_line,
                    unsigned int dof,
                    unsigned int n_dofs_1d) const;
-
-      void
-      transpose_face(const unsigned int                    fe_degree,
-                     std::vector<types::global_dof_index> &dofs) const;
 
       void
       transpose_subface_index(unsigned int &subface) const;
@@ -755,12 +751,9 @@ namespace internal
                     }
                   else if (dim == 3)
                     {
-                      rotate_face(cell->combined_face_orientation(face_no),
+                      orient_face(cell->combined_face_orientation(face_no),
                                   n_dofs_1d,
                                   neighbor_dofs);
-
-                      if (cell->face_orientation(face_no) == false)
-                        transpose_face(n_dofs_1d - 1, neighbor_dofs);
                     }
                   else
                     {
@@ -919,19 +912,20 @@ namespace internal
 
     template <int dim>
     inline void
-    HangingNodes<dim>::rotate_face(
+    HangingNodes<dim>::orient_face(
       const types::geometric_orientation    combined_orientation,
       const unsigned int                    n_dofs_1d,
       std::vector<types::global_dof_index> &dofs) const
     {
       const auto [orientation, rotation, flip] =
         ::dealii::internal::split_face_orientation(combined_orientation);
-      (void)orientation;
       const int n_rotations =
         rotation || flip ? 4 - int(rotation) - 2 * int(flip) : 0;
 
       const unsigned int rot_mapping[4] = {2, 0, 3, 1};
+      const unsigned int n_int          = n_dofs_1d - 2;
 
+      // rotate:
       std::vector<types::global_dof_index> copy(dofs.size());
       for (int t = 0; t < n_rotations; ++t)
         {
@@ -942,8 +936,7 @@ namespace internal
             dofs[rot_mapping[i]] = copy[i];
 
           // Edges
-          const unsigned int n_int  = n_dofs_1d - 2;
-          unsigned int       offset = 4;
+          unsigned int offset = 4;
           for (unsigned int i = 0; i < n_int; ++i)
             {
               // Left edge
@@ -964,6 +957,37 @@ namespace internal
             for (unsigned int j = 0; j < n_int; ++j)
               dofs[offset + i * n_int + j] =
                 copy[offset + j * n_int + (n_int - 1 - i)];
+        }
+
+      // transpose (note that we are using the standard geometric orientation
+      // here so orientation = true is the default):
+      if (!orientation)
+        {
+          copy = dofs;
+
+          // Vertices
+          dofs[1] = copy[2];
+          dofs[2] = copy[1];
+
+          // Edges
+          unsigned int offset = 4;
+          for (unsigned int i = 0; i < n_int; ++i)
+            {
+              // Right edge
+              dofs[offset + i] = copy[offset + 2 * n_int + i];
+              // Left edge
+              dofs[offset + n_int + i] = copy[offset + 3 * n_int + i];
+              // Bottom edge
+              dofs[offset + 2 * n_int + i] = copy[offset + i];
+              // Top edge
+              dofs[offset + 3 * n_int + i] = copy[offset + n_int + i];
+            }
+
+          // Interior
+          offset += 4 * n_int;
+          for (unsigned int i = 0; i < n_int; ++i)
+            for (unsigned int j = 0; j < n_int; ++j)
+              dofs[offset + i * n_int + j] = copy[offset + j * n_int + i];
         }
     }
 
@@ -997,42 +1021,6 @@ namespace internal
         }
 
       return n_dofs_1d * n_dofs_1d * z + n_dofs_1d * y + x;
-    }
-
-
-
-    template <int dim>
-    inline void
-    HangingNodes<dim>::transpose_face(
-      const unsigned int                    fe_degree,
-      std::vector<types::global_dof_index> &dofs) const
-    {
-      const std::vector<types::global_dof_index> copy(dofs);
-
-      // Vertices
-      dofs[1] = copy[2];
-      dofs[2] = copy[1];
-
-      // Edges
-      const unsigned int n_int  = fe_degree - 1;
-      unsigned int       offset = 4;
-      for (unsigned int i = 0; i < n_int; ++i)
-        {
-          // Right edge
-          dofs[offset + i] = copy[offset + 2 * n_int + i];
-          // Left edge
-          dofs[offset + n_int + i] = copy[offset + 3 * n_int + i];
-          // Bottom edge
-          dofs[offset + 2 * n_int + i] = copy[offset + i];
-          // Top edge
-          dofs[offset + 3 * n_int + i] = copy[offset + n_int + i];
-        }
-
-      // Interior
-      offset += 4 * n_int;
-      for (unsigned int i = 0; i < n_int; ++i)
-        for (unsigned int j = 0; j < n_int; ++j)
-          dofs[offset + i * n_int + j] = copy[offset + j * n_int + i];
     }
 
 
