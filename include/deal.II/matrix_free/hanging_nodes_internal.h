@@ -327,8 +327,8 @@ namespace internal
       rotate_subface_index(int times, unsigned int &subface_index) const;
 
       void
-      rotate_face(int                                   times,
-                  unsigned int                          n_dofs_1d,
+      rotate_face(const types::geometric_orientation    combined_orientation,
+                  const unsigned int                    n_dofs_1d,
                   std::vector<types::global_dof_index> &dofs) const;
 
       unsigned int
@@ -747,20 +747,17 @@ namespace internal
                   // fix DoFs depending on orientation, rotation, and flip
                   if (dim == 2)
                     {
-                      // TODO: for mixed meshes we need to take care of
-                      // orientation here
-                      Assert(cell->face_orientation(face_no),
+                      // TODO: this needs to be implemented for simplices but
+                      // all-quad meshes are OK
+                      Assert(cell->combined_face_orientation(face_no) ==
+                               numbers::default_geometric_orientation,
                              ExcNotImplemented());
                     }
                   else if (dim == 3)
                     {
-                      int rotate = 0;                   // TODO
-                      if (cell->face_rotation(face_no)) //
-                        rotate -= 1;                    //
-                      if (cell->face_flip(face_no))     //
-                        rotate -= 2;                    //
-
-                      rotate_face(rotate, n_dofs_1d, neighbor_dofs);
+                      rotate_face(cell->combined_face_orientation(face_no),
+                                  n_dofs_1d,
+                                  neighbor_dofs);
 
                       if (cell->face_orientation(face_no) == false)
                         transpose_face(n_dofs_1d - 1, neighbor_dofs);
@@ -923,17 +920,20 @@ namespace internal
     template <int dim>
     inline void
     HangingNodes<dim>::rotate_face(
-      int                                   times,
-      unsigned int                          n_dofs_1d,
+      const types::geometric_orientation    combined_orientation,
+      const unsigned int                    n_dofs_1d,
       std::vector<types::global_dof_index> &dofs) const
     {
+      const auto [orientation, rotation, flip] =
+        ::dealii::internal::split_face_orientation(combined_orientation);
+      (void)orientation;
+      const int n_rotations =
+        rotation || flip ? 4 - int(rotation) - 2 * int(flip) : 0;
+
       const unsigned int rot_mapping[4] = {2, 0, 3, 1};
 
-      times = times % 4;
-      times = times < 0 ? times + 4 : times;
-
       std::vector<types::global_dof_index> copy(dofs.size());
-      for (int t = 0; t < times; ++t)
+      for (int t = 0; t < n_rotations; ++t)
         {
           std::swap(copy, dofs);
 
