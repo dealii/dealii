@@ -669,49 +669,6 @@ namespace Portable
 
 
 
-  namespace
-  {
-    /**
-     * Helper function for determining the scratch pad size.
-     */
-    unsigned int
-    compute_scratch_pad_size(
-      const ::dealii::internal::MatrixFreeFunctions::ElementType element_type,
-      const int                                                  dim,
-      const int                                                  fe_degree,
-      const int                                                  n_q_points_1d)
-    {
-      using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
-
-      if (fe_degree >= 0 && element_type <= ElementType::tensor_symmetric)
-        {
-          // evaluate/integrate with FEEvaluationImplCollocation or
-          // FEEvaluationImplTransformToCollocation
-          return Utilities::pow(n_q_points_1d, dim);
-        }
-      else if (fe_degree >= 0 &&
-               element_type <= ElementType::tensor_symmetric_no_collocation)
-        {
-          // evaluate/integrate with FEEvaluationImpl
-          if (dim == 1)
-            return n_q_points_1d;
-          else if (dim == 2)
-            return (fe_degree + 1) * n_q_points_1d;
-          else if (dim == 3)
-            return (fe_degree + 1) * n_q_points_1d *
-                   (fe_degree + 1 + n_q_points_1d);
-          else
-            AssertThrow(false, ExcNotImplemented());
-        }
-      else
-        AssertThrow(false, ExcNotImplemented());
-
-      return numbers::invalid_unsigned_int;
-    }
-  } // namespace
-
-
-
   template <int dim, typename Number>
   template <typename IteratorFiltersType>
   void
@@ -761,11 +718,31 @@ namespace Portable
     ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quad,
                                                                           fe);
 
-    this->element_type     = shape_info.element_type;
-    this->scratch_pad_size = compute_scratch_pad_size(shape_info.element_type,
-                                                      dim,
-                                                      fe_degree,
-                                                      n_q_points_1d);
+    this->element_type = shape_info.element_type;
+
+    // compute the scratch pad size
+    using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
+    if (element_type <= ElementType::tensor_symmetric)
+      {
+        // evaluate/integrate with FEEvaluationImplCollocation or
+        // FEEvaluationImplTransformToCollocation
+        this->scratch_pad_size = Utilities::pow(n_q_points_1d, dim);
+      }
+    else if (element_type <= ElementType::tensor_symmetric_no_collocation)
+      {
+        // evaluate/integrate with FEEvaluationImpl
+        if (dim == 1)
+          this->scratch_pad_size = n_q_points_1d;
+        else if (dim == 2)
+          this->scratch_pad_size = (fe_degree + 1) * n_q_points_1d;
+        else if (dim == 3)
+          this->scratch_pad_size =
+            (fe_degree + 1) * n_q_points_1d * (fe_degree + 1 + n_q_points_1d);
+        else
+          AssertThrow(false, ExcNotImplemented());
+      }
+    else
+      AssertThrow(false, ExcNotImplemented());
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
