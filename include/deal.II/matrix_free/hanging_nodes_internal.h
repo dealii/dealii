@@ -626,7 +626,6 @@ namespace internal
         return;
 
       const auto &fe = cell->get_fe();
-
       AssertDimension(fe.n_unique_faces(), 1);
 
       std::vector<std::vector<unsigned int>>
@@ -640,14 +639,14 @@ namespace internal
       std::vector<unsigned int> idx_offset = {0};
 
       for (unsigned int base_element_index = 0;
-           base_element_index < cell->get_fe().n_base_elements();
+           base_element_index < fe.n_base_elements();
            ++base_element_index)
         for (unsigned int c = 0;
-             c < cell->get_fe().element_multiplicity(base_element_index);
+             c < fe.element_multiplicity(base_element_index);
              ++c)
           idx_offset.push_back(
             idx_offset.back() +
-            cell->get_fe().base_element(base_element_index).n_dofs_per_cell());
+            fe.base_element(base_element_index).n_dofs_per_cell());
 
       std::vector<types::global_dof_index> neighbor_dofs_all(idx_offset.back());
       std::vector<types::global_dof_index> neighbor_dofs_all_temp(
@@ -712,10 +711,10 @@ namespace internal
                 index = partitioner->global_to_local(index);
 
             for (unsigned int base_element_index = 0, comp = 0;
-                 base_element_index < cell->get_fe().n_base_elements();
+                 base_element_index < fe.n_base_elements();
                  ++base_element_index)
               for (unsigned int c = 0;
-                   c < cell->get_fe().element_multiplicity(base_element_index);
+                   c < fe.element_multiplicity(base_element_index);
                    ++c, ++comp)
                 {
                   if (supported_components[cell->active_fe_index()][comp] ==
@@ -819,11 +818,10 @@ namespace internal
                 neighbor_cell.line_orientation(local_line_neighbor);
 
               for (unsigned int base_element_index = 0, comp = 0;
-                   base_element_index < cell->get_fe().n_base_elements();
+                   base_element_index < fe.n_base_elements();
                    ++base_element_index)
                 for (unsigned int c = 0;
-                     c <
-                     cell->get_fe().element_multiplicity(base_element_index);
+                     c < fe.element_multiplicity(base_element_index);
                      ++c, ++comp)
                   {
                     if (supported_components[cell->active_fe_index()][comp] ==
