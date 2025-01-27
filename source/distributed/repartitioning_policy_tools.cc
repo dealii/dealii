@@ -18,8 +18,14 @@
 #include <deal.II/distributed/repartitioning_policy_tools.h>
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/fe/mapping_q1.h>
+
 #include <deal.II/grid/cell_id_translator.h>
 #include <deal.II/grid/filtered_iterator.h>
+
+#include <deal.II/multigrid/mg_transfer_global_coarsening.templates.h>
+
+#include <deal.II/numerics/vector_tools.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -305,6 +311,223 @@ namespace RepartitioningPolicyTools
 
     return partition;
 #endif
+  }
+
+
+  template <int dim, int spacedim>
+  ImmersedMeshPolicy<dim, spacedim>::AdditionalData::AdditionalData()
+    : reduction_type(ReductionType::highest_count)
+    , immersed_identification(true)
+    , n_samples(1)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  ImmersedMeshPolicy<dim, spacedim>::ImmersedMeshPolicy(
+    const Triangulation<dim, spacedim> &tria_background,
+    const AdditionalData               &data)
+    : tria_background(&tria_background)
+    , dof_handler_background(nullptr)
+    , data(data)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  ImmersedMeshPolicy<dim, spacedim>::ImmersedMeshPolicy(
+    const DoFHandler<dim, spacedim> &dof_handler_background,
+    const AdditionalData            &data)
+    : tria_background(&dof_handler_background.get_triangulation())
+    , dof_handler_background(&dof_handler_background)
+    , data(data)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  LinearAlgebra::distributed::Vector<double>
+  ImmersedMeshPolicy<dim, spacedim>::partition(
+    const Triangulation<dim, spacedim> &tria_immersed) const
+  {
+    std::vector<std::vector<unsigned int>> cell_ranks(
+      tria_immersed.n_active_cells());
+
+    MappingQ1<dim, spacedim> mapping_default;
+
+    const Mapping<dim, spacedim> &mapping_background =
+      data.mapping_background ? *data.mapping_background : mapping_default;
+    const Mapping<dim, spacedim> &mapping_immersed =
+      data.mapping_immersed ? *data.mapping_immersed : mapping_default;
+
+    if ((dof_handler_background == nullptr) && data.immersed_identification)
+      {
+        std::vector<Point<spacedim>> points;
+
+        Quadrature<dim> quadrature;
+
+        if (data.n_samples == 1)
+          quadrature = QGauss<dim>(1);
+        else
+          quadrature = QGaussLobatto<dim>(data.n_samples);
+
+        for (const auto &cell : tria_immersed.active_cell_iterators())
+          if (cell->is_locally_owned())
+            for (const auto &p : quadrature.get_points())
+              points.push_back(
+                mapping_immersed.transform_unit_to_real_cell(cell, p));
+
+        Utilities::MPI::RemotePointEvaluation<dim, spacedim> rpe;
+        rpe.reinit(points, *tria_background, mapping_background);
+
+        const auto evaluate_function = [&](const ArrayView<double> &values,
+                                           const auto              &cell_data) {
+          for (const auto cell : cell_data.cell_indices())
+            {
+              const auto unit_points = cell_data.get_unit_points(cell);
+              const auto local_value = cell_data.get_data_view(cell, values);
+
+              for (unsigned int q = 0; q < unit_points.size(); ++q)
+                local_value[q] = Utilities::MPI::this_mpi_process(
+                  tria_background->get_communicator());
+            }
+        };
+
+        const std::vector<double> point_ranks =
+          rpe.template evaluate_and_process<double>(evaluate_function);
+
+        unsigned int counter = 0;
+        for (const auto &cell : tria_immersed.active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              unsigned int start =
+                rpe.get_point_ptrs()[counter * quadrature.size()];
+              unsigned int end =
+                rpe.get_point_ptrs()[(counter + 1) * quadrature.size()];
+
+              for (unsigned int i = start; i < end; ++i)
+                cell_ranks[cell->active_cell_index()].push_back(
+                  static_cast<unsigned int>(point_ranks[i]));
+
+              counter++;
+            }
+      }
+    else
+      {
+        std::vector<Point<spacedim>> points;
+
+        if (dof_handler_background == nullptr)
+          {
+            Quadrature<dim> quadrature;
+
+            if (data.n_samples == 1)
+              quadrature = QGauss<dim>(1);
+            else
+              quadrature = QGaussLobatto<dim>(data.n_samples);
+
+            for (const auto &cell : tria_background->active_cell_iterators())
+              if (cell->is_locally_owned())
+                for (const auto &p : quadrature.get_points())
+                  points.push_back(
+                    mapping_background.transform_unit_to_real_cell(cell, p));
+          }
+        else
+          {
+            std::tie(points, std::ignore, std::ignore) =
+              internal::collect_unconstrained_unique_support_points(
+                *dof_handler_background,
+                mapping_background,
+                AffineConstraints<double>());
+          }
+
+        Utilities::MPI::RemotePointEvaluation<dim, spacedim> rpe;
+        rpe.reinit(points, tria_immersed, mapping_immersed);
+
+        std::vector<double> integration_values(
+          points.size(),
+          Utilities::MPI::this_mpi_process(
+            tria_background->get_communicator()));
+
+        const auto integration_function = [&](const auto &values,
+                                              const auto &cell_data) {
+          for (const auto cell : cell_data.cell_indices())
+            {
+              const auto unit_points = cell_data.get_unit_points(cell);
+              const auto local_value = cell_data.get_data_view(cell, values);
+
+              for (unsigned int q = 0; q < unit_points.size(); ++q)
+                cell_ranks[cell_data.get_active_cell_iterator(cell)
+                             ->active_cell_index()]
+                  .push_back(static_cast<unsigned int>(local_value[q]));
+            }
+        };
+
+        rpe.template process_and_evaluate<double>(integration_values,
+                                                  integration_function);
+      }
+
+    const auto tria =
+      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+        &tria_immersed);
+
+    Assert(tria, ExcNotImplemented());
+
+    // 3) set partitioning
+    LinearAlgebra::distributed::Vector<double> partition(
+      tria->global_active_cell_index_partitioner().lock());
+
+
+    const auto reduce = [this](const auto &vector) -> unsigned int {
+      AssertThrow(!vector.empty(), ExcInternalError());
+
+      if (data.reduction_type == ReductionType::smallest_rank)
+        {
+          unsigned int rank = numbers::invalid_unsigned_int;
+
+          for (const auto rank_i : vector)
+            rank = std::min<unsigned int>(rank, rank_i);
+
+          return rank;
+        }
+      else if (data.reduction_type == ReductionType::highest_count)
+        {
+          std::map<unsigned int, unsigned int> rank_counter;
+
+          for (const auto rank_i : vector)
+            rank_counter[rank_i] = 0;
+          for (const auto rank_i : vector)
+            rank_counter[rank_i]++;
+
+          const auto pr =
+            std::max_element(rank_counter.begin(),
+                             rank_counter.end(),
+                             [](const auto &p1, const auto &p2) {
+                               if (p1.second != p2.second)
+                                 return p1.second < p2.second;
+
+                               return p1.first > p2.first; // stable search
+                             });
+
+          AssertThrow(pr != rank_counter.end(), ExcInternalError());
+
+          return pr->first;
+        }
+      else
+        {
+          AssertThrow(false, ExcNotImplemented());
+
+          return 0;
+        }
+    };
+
+    for (const auto &cell : tria_immersed.active_cell_iterators())
+      if (cell->is_locally_owned())
+        partition[cell->global_active_cell_index()] =
+          reduce(cell_ranks[cell->active_cell_index()]);
+
+    partition.update_ghost_values();
+
+    return partition;
   }
 
 
