@@ -110,7 +110,7 @@ namespace Portable
      * Number of tensor degrees of freedoms per cell.
      */
     static constexpr unsigned int tensor_dofs_per_cell =
-      Utilities::pow(fe_degree + 1, dim);
+      Utilities::pow(fe_degree + 1, dim) * n_components;
 
     /**
      * Constructor.
@@ -276,8 +276,8 @@ namespace Portable
       Kokkos::TeamThreadRange(shared_data->team_member, tensor_dofs_per_cell),
       [&](const int &i) {
         for (unsigned int c = 0; c < n_components_; ++c)
-          shared_data->values(i, c) =
-            src[data->local_to_global(cell_id, i + tensor_dofs_per_cell * c)];
+          shared_data->values(i, c) = src[data->local_to_global(
+            cell_id, i + (tensor_dofs_per_cell / n_components) * c)];
       });
     shared_data->team_member.team_barrier();
 
@@ -286,7 +286,7 @@ namespace Portable
         internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
           shared_data->team_member,
           data->constraint_weights,
-          data->constraint_mask(cell_id),
+          data->constraint_mask(cell_id * n_components + c),
           Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
   }
@@ -307,32 +307,34 @@ namespace Portable
         internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
           shared_data->team_member,
           data->constraint_weights,
-          data->constraint_mask(cell_id),
+          data->constraint_mask(cell_id * n_components + c),
           Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
 
     if (data->use_coloring)
       {
-        Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
-                                                     tensor_dofs_per_cell),
-                             [&](const int &i) {
-                               for (unsigned int c = 0; c < n_components_; ++c)
-                                 dst[data->local_to_global(
-                                   cell_id, i + tensor_dofs_per_cell * c)] +=
-                                   shared_data->values(i, c);
-                             });
+        Kokkos::parallel_for(
+          Kokkos::TeamThreadRange(shared_data->team_member,
+                                  tensor_dofs_per_cell / n_components),
+          [&](const int &i) {
+            for (unsigned int c = 0; c < n_components_; ++c)
+              dst[data->local_to_global(
+                cell_id, i + (tensor_dofs_per_cell / n_components) * c)] +=
+                shared_data->values(i, c);
+          });
       }
     else
       {
-        Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
-                                                     tensor_dofs_per_cell),
-                             [&](const int &i) {
-                               for (unsigned int c = 0; c < n_components_; ++c)
-                                 Kokkos::atomic_add(
-                                   &dst[data->local_to_global(
-                                     cell_id, i + tensor_dofs_per_cell * c)],
-                                   shared_data->values(i, c));
-                             });
+        Kokkos::parallel_for(
+          Kokkos::TeamThreadRange(shared_data->team_member,
+                                  tensor_dofs_per_cell / n_components),
+          [&](const int &i) {
+            for (unsigned int c = 0; c < n_components_; ++c)
+              Kokkos::atomic_add(
+                &dst[data->local_to_global(
+                  cell_id, i + (tensor_dofs_per_cell / n_components) * c)],
+                shared_data->values(i, c));
+          });
       }
   }
 
