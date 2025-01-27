@@ -196,7 +196,7 @@ namespace Portable
       data->constraint_mask[color] =
         Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
                      MemorySpace::Default::kokkos_space>(
-          "constraint_mask_" + std::to_string(color), n_cells);
+          "constraint_mask_" + std::to_string(color), n_cells * n_components);
 
       // Create the host mirrow Views and fill them
       auto constraint_mask_host =
@@ -251,7 +251,8 @@ namespace Portable
 
           const ArrayView<
             dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-            cell_id_view(constraint_mask_host[cell_id]);
+            cell_id_view(&constraint_mask_host[cell_id * n_components],
+                         n_components);
 
           hanging_nodes.setup_constraints(*cell,
                                           partitioner,

@@ -367,7 +367,7 @@ namespace Step64
     HelmholtzOperatorQuad<dim, fe_degree> helmholtz_operator_quad(
       nullptr, coef.get_values(), -1);
 
-    MatrixFreeTools::compute_diagonal<dim, fe_degree, fe_degree + 1, 0, double>(
+    MatrixFreeTools::compute_diagonal<dim, fe_degree, fe_degree + 1, 1, double>(
       mf_data,
       inverse_diagonal,
       helmholtz_operator_quad,

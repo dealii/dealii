@@ -84,4 +84,9 @@ main(int argc, char **argv)
   test<2, 1, 2, 1, float>(); // scalar
   test<3, 1, 2, 1>();        // scalar
   test<3, 1, 2, 1, float>(); // scalar
+
+  test<2, 1, 2, 2>();        // vectorial
+  test<2, 1, 2, 2, float>(); // vectorial
+  test<3, 1, 2, 2>();        // vectorial
+  test<3, 1, 2, 2, float>(); // vectorial
 }
