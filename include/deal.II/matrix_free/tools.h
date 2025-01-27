@@ -2485,7 +2485,7 @@ namespace MatrixFreeTools
               for (unsigned int v = 0; v < n_filled_lanes; ++v)
                 for (unsigned int b = 0; b < n_blocks; ++b)
                   {
-                    unsigned int const cell_index =
+                    const unsigned int cell_index =
                       (data.batch_type[b] == 0) ?
                         (batch * VectorizedArrayType::size() + v) :
                         ((data.batch_type[b] == 1) ?
