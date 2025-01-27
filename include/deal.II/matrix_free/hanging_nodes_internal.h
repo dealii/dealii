@@ -744,7 +744,7 @@ namespace internal
                     neighbor_dofs[i] = neighbor_dofs_face
                       [component_to_system_index_face_array[comp][i]];
 
-                  // fix DoFs depending on orientation, flip, and rotation
+                  // fix DoFs depending on orientation, rotation, and flip
                   if (dim == 2)
                     {
                       // TODO: for mixed meshes we need to take care of

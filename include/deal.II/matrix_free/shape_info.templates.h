@@ -448,8 +448,8 @@ namespace internal
                             reference_cell,
                             f,
                             (o ^ 1) & 1,  // face_orientation
-                            (o >> 1) & 1, // face_flip
-                            (o >> 2) & 1, // face_rotation
+                            (o >> 2) & 1, // face_flip
+                            (o >> 1) & 1, // face_rotation
                             quad_face);
 
                         for (unsigned int i = 0; i < n_dofs; ++i)
@@ -1291,21 +1291,21 @@ namespace internal
       for (unsigned int j = 0, i = 0; j < n; ++j)
         for (unsigned int k = 0; k < n; ++k, ++i)
           {
-            // face_orientation=true,  face_flip=false, face_rotation=false
+            // face_orientation=true,  face_rotation=false, face_flip=false
             face_orientations[0][i] = i;
-            // face_orientation=false, face_flip=false, face_rotation=false
+            // face_orientation=false, face_rotation=false, face_flip=false
             face_orientations[1][i] = j + k * n;
-            // face_orientation=true,  face_flip=true, face_rotation=false
-            face_orientations[2][i] = (n - 1 - k) + (n - 1 - j) * n;
-            // face_orientation=false, face_flip=true, face_rotation=false
-            face_orientations[3][i] = (n - 1 - j) + (n - 1 - k) * n;
-            // face_orientation=true,  face_flip=false, face_rotation=true
-            face_orientations[4][i] = j + (n - 1 - k) * n;
-            // face_orientation=false, face_flip=false, face_rotation=true
-            face_orientations[5][i] = k + (n - 1 - j) * n;
-            // face_orientation=true,  face_flip=true, face_rotation=true
+            // face_orientation=true,  face_rotation=true, face_flip=false
+            face_orientations[2][i] = j + (n - 1 - k) * n;
+            // face_orientation=false, face_rotation=true, face_flip=false
+            face_orientations[3][i] = k + (n - 1 - j) * n;
+            // face_orientation=true,  face_rotation=false, face_flip=true
+            face_orientations[4][i] = (n - 1 - k) + (n - 1 - j) * n;
+            // face_orientation=false, face_rotation=false, face_flip=true
+            face_orientations[5][i] = (n - 1 - j) + (n - 1 - k) * n;
+            // face_orientation=true,  face_rotation=true, face_flip=true
             face_orientations[6][i] = (n - 1 - j) + k * n;
-            // face_orientation=false, face_flip=true, face_rotation=true
+            // face_orientation=false, face_rotation=true, face_flip=true
             face_orientations[7][i] = (n - 1 - k) + j * n;
           }
       return face_orientations;
