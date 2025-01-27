@@ -810,8 +810,11 @@ namespace internal
                       {
                         typename dealii::Triangulation<dim>::cell_iterator
                           neighbor = dcell->neighbor_or_periodic_neighbor(f);
-                        if (use_active_cells && neighbor->has_children())
+                        if (use_active_cells && neighbor->has_children() &&
+                            dim > 1)
                           {
+                            // dim > 1 because face()->n_children() = 0 when dim
+                            // == 1
                             for (unsigned int c = 0;
                                  c < dcell->face(f)->n_children();
                                  ++c)
@@ -877,6 +880,62 @@ namespace internal
                                     face_visited
                                       [dcell->face(f)->child(c)->index()] = 1;
                                   }
+                              }
+                          }
+                        else if (dim == 1)
+                          {
+                            // Follow much the same procedure of dim > 1 with
+                            // one large exception: Face is created on first
+                            // visitation as long as neighbor has no children
+                            // face_visited is used as a flag that a face has
+                            // already been created
+                            if (face_visited[dcell->face(f)->index()] == 0 &&
+                                !(neighbor->has_children()))
+                              {
+                                std::pair<unsigned int, unsigned int>
+                                  level_index(neighbor->level(),
+                                              neighbor->index());
+                                if (face_is_owned[dcell->face(f)->index()] ==
+                                    FaceCategory::locally_active_done_here)
+                                  {
+                                    Assert(use_active_cells ||
+                                             dcell->level() ==
+                                               neighbor->level(),
+                                           ExcInternalError());
+                                    ++inner_counter;
+                                    inner_faces.push_back(create_face(
+                                      f,
+                                      dcell,
+                                      cell,
+                                      neighbor,
+                                      map_to_vectorized[level_index],
+                                      is_mixed_mesh));
+                                    face_visited[dcell->face(f)->index()] = 1;
+                                  }
+                                else if (face_is_owned[dcell->face(f)
+                                                         ->index()] ==
+                                         FaceCategory::ghosted)
+                                  {
+                                    inner_ghost_faces.push_back(create_face(
+                                      f,
+                                      dcell,
+                                      cell,
+                                      neighbor,
+                                      map_to_vectorized[level_index],
+                                      is_mixed_mesh));
+                                    face_visited[dcell->face(f)->index()] = 1;
+                                  }
+                              }
+                            if (face_is_owned[dcell->face(f)->index()] ==
+                                FaceCategory::multigrid_refinement_edge)
+                              {
+                                refinement_edge_faces.push_back(
+                                  create_face(f,
+                                              dcell,
+                                              cell,
+                                              neighbor,
+                                              refinement_edge_faces.size(),
+                                              is_mixed_mesh));
                               }
                           }
                         else
@@ -995,7 +1054,8 @@ namespace internal
             info.subface_index =
               cell->periodic_neighbor_of_coarser_periodic_neighbor(face_no)
                 .second;
-          else
+          // else if must be dim > 1 because dim == 1 adm creates no subfaces
+          else if (dim > 1)
             info.subface_index =
               cell->neighbor_of_coarser_neighbor(face_no).second;
         }
