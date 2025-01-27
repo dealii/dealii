@@ -7464,7 +7464,7 @@ FEFaceEvaluation<dim,
           if (face_identifies_as_interior != orientation_interior_face)
             {
               constexpr std::array<std::uint8_t, 8> table{
-                {0, 1, 2, 3, 6, 5, 4, 7}};
+                {0, 1, 6, 3, 4, 5, 2, 7}};
               face_orientation = table[face_orientation];
             }
           this->face_orientations[i] = face_orientation;
