@@ -387,12 +387,12 @@ namespace Portable
       {
         // Get the scratch memory
         SharedViewValues     values(team_member.team_shmem(),
-                                    Functor::n_q_points,
-                                    gpu_data.n_components);
+                                Functor::n_q_points,
+                                gpu_data.n_components);
         SharedViewGradients  gradients(team_member.team_shmem(),
-                                       Functor::n_q_points,
-                                       dim,
-                                       gpu_data.n_components);
+                                      Functor::n_q_points,
+                                      dim,
+                                      gpu_data.n_components);
         SharedViewScratchPad scratch_pad(team_member.team_shmem(),
                                          gpu_data.scratch_pad_size);
 
