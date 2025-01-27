@@ -813,7 +813,8 @@ public:
    * mapping from the symbolic flags defined in the RefinementPossibilities
    * base class to actual numerical values (the array indices).
    */
-  DEAL_II_HOST_DEVICE operator std::uint8_t() const;
+  DEAL_II_HOST_DEVICE
+  operator std::uint8_t() const;
 
   /**
    * Return the union of the refinement flags represented by the current
@@ -2899,7 +2900,7 @@ RefinementCase<dim>::serialize(Archive &ar, const unsigned int)
   // serialization can't deal with bitfields, so copy from/to a full sized
   // std::uint8_t
   std::uint8_t uchar_value = value;
-  ar          &uchar_value;
+  ar & uchar_value;
   value = uchar_value;
 }
 
