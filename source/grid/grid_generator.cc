@@ -4308,14 +4308,14 @@ namespace GridGenerator
         // to the radial cells
         const double          a           = 1. / (1 + std::sqrt(2.0));
         const Point<spacedim> vertices[8] = {
-          p + embed_point(-1, -1) * (radius / std::sqrt(2.0)),
-          p + embed_point(+1, -1) * (radius / std::sqrt(2.0)),
-          p + embed_point(-1, -1) * (radius / std::sqrt(2.0) * a),
-          p + embed_point(+1, -1) * (radius / std::sqrt(2.0) * a),
-          p + embed_point(-1, +1) * (radius / std::sqrt(2.0) * a),
-          p + embed_point(+1, +1) * (radius / std::sqrt(2.0) * a),
-          p + embed_point(-1, +1) * (radius / std::sqrt(2.0)),
-          p + embed_point(+1, +1) * (radius / std::sqrt(2.0))};
+          p + embed_point(-1., -1.) * (radius / std::sqrt(2.0)),
+          p + embed_point(+1., -1.) * (radius / std::sqrt(2.0)),
+          p + embed_point(-1., -1.) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(+1., -1.) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(-1., +1.) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(+1., +1.) * (radius / std::sqrt(2.0) * a),
+          p + embed_point(-1., +1.) * (radius / std::sqrt(2.0)),
+          p + embed_point(+1., +1.) * (radius / std::sqrt(2.0))};
 
         std::vector<CellData<2>> cells(5, CellData<2>());
 
@@ -4324,7 +4324,7 @@ namespace GridGenerator
             for (unsigned int j = 0; j < 4; ++j)
               cells[i].vertices[j] = circle_cell_vertices[i][j];
             cells[i].material_id = 0;
-            cells[i].manifold_id = i == 2 ? numbers::flat_manifold_id : 1;
+            cells[i].manifold_id = (i == 2 ? numbers::flat_manifold_id : 1);
           }
 
         tria.create_triangulation(std::vector<Point<spacedim>>(
