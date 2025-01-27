@@ -1013,19 +1013,19 @@ namespace internal
               exterior_face_orientation);
 
           info.face_orientation =
-            (orientation ? 0u : 1u) + 2 * flip + 4 * rotation;
+            (orientation ? 0u : 1u) + 2 * rotation + 4 * flip;
 
           return info;
         }
 
       info.face_orientation = 0;
       const unsigned int interior_face_orientation =
-        !cell->face_orientation(face_no) + 2 * cell->face_flip(face_no) +
-        4 * cell->face_rotation(face_no);
+        !cell->face_orientation(face_no) + 2 * cell->face_rotation(face_no) +
+        4 * cell->face_flip(face_no);
       const unsigned int exterior_face_orientation =
         !neighbor->face_orientation(info.exterior_face_no) +
-        2 * neighbor->face_flip(info.exterior_face_no) +
-        4 * neighbor->face_rotation(info.exterior_face_no);
+        2 * neighbor->face_rotation(info.exterior_face_no) +
+        4 * neighbor->face_flip(info.exterior_face_no);
       if (interior_face_orientation != 0)
         {
           info.face_orientation = 8 + interior_face_orientation;
@@ -1043,7 +1043,7 @@ namespace internal
           const Table<2, unsigned int> orientation =
             ShapeInfo<double>::compute_orientation_table(2);
           const std::array<unsigned int, 8> inverted_orientations{
-            {0, 1, 2, 3, 6, 5, 4, 7}};
+            {0, 1, 6, 3, 4, 5, 2, 7}};
           info.subface_index =
             orientation[inverted_orientations[exterior_face_orientation]]
                        [info.subface_index];
