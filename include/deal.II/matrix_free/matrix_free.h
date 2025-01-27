@@ -2705,7 +2705,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_active_fe_index(
     dof_info[first_hp_dof_handler_index].cell_active_fe_index;
 
   if (fe_indices.empty() == true ||
-      dof_handlers[0]->get_fe_collection().size() == 1)
+      dof_handlers[first_hp_dof_handler_index]->get_fe_collection().size() == 1)
     return 0;
 
   const auto index = fe_indices[range.first];
