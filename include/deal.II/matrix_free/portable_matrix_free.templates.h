@@ -344,6 +344,11 @@ namespace Portable
                      MemorySpace::Default::kokkos_space::execution_space::
                        scratch_memory_space,
                      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+      using SharedViewScratchPad =
+        Kokkos::View<Number *,
+                     MemorySpace::Default::kokkos_space::execution_space::
+                       scratch_memory_space,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
       ApplyKernel(Functor                                      func,
                   const typename MatrixFree<dim, Number>::Data gpu_data,
@@ -366,11 +371,12 @@ namespace Portable
       size_t
       team_shmem_size(int /*team_size*/) const
       {
-        return SharedViewValues::shmem_size(Functor::n_local_dofs,
+        return SharedViewValues::shmem_size(Functor::n_q_points,
                                             gpu_data.n_components) +
-               SharedViewGradients::shmem_size(Functor::n_local_dofs,
+               SharedViewGradients::shmem_size(Functor::n_q_points,
                                                dim,
-                                               gpu_data.n_components);
+                                               gpu_data.n_components) +
+               SharedViewScratchPad::shmem_size(gpu_data.scratch_pad_size);
       }
 
 
@@ -379,15 +385,20 @@ namespace Portable
       operator()(const TeamHandle &team_member) const
       {
         // Get the scratch memory
-        SharedViewValues    values(team_member.team_shmem(),
-                                Functor::n_local_dofs,
+        SharedViewValues     values(team_member.team_shmem(),
+                                Functor::n_q_points,
                                 gpu_data.n_components);
-        SharedViewGradients gradients(team_member.team_shmem(),
-                                      Functor::n_local_dofs,
+        SharedViewGradients  gradients(team_member.team_shmem(),
+                                      Functor::n_q_points,
                                       dim,
                                       gpu_data.n_components);
+        SharedViewScratchPad scratch_pad(team_member.team_shmem(),
+                                         gpu_data.scratch_pad_size);
 
-        SharedData<dim, Number> shared_data(team_member, values, gradients);
+        SharedData<dim, Number> shared_data(team_member,
+                                            values,
+                                            gradients,
+                                            scratch_pad);
         func(team_member.league_rank(), &gpu_data, &shared_data, src, dst);
       }
     };
@@ -496,6 +507,8 @@ namespace Portable
     data_copy.padding_length     = padding_length;
     data_copy.row_start          = row_start[color];
     data_copy.use_coloring       = use_coloring;
+    data_copy.element_type       = element_type;
+    data_copy.scratch_pad_size   = scratch_pad_size;
 
     return data_copy;
   }
@@ -687,13 +700,15 @@ namespace Portable
     const unsigned int n_dofs_1d     = fe_degree + 1;
     const unsigned int n_q_points_1d = quad.size();
 
-    Assert(n_dofs_1d == n_q_points_1d,
-           ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
+    // TODO remove the limitation in the future
+    AssertThrow(n_dofs_1d <= n_q_points_1d,
+                ExcMessage("n_q_points_1d must be greater than or equal to "
+                           "fe_degree + 1."));
 
     // Set padding length to the closest power of two larger than or equal to
     // the number of threads.
-    padding_length = 1 << static_cast<unsigned int>(
-                       std::ceil(dim * std::log2(fe_degree + 1.)));
+    padding_length = 1 << static_cast<unsigned int>(std::ceil(
+                       dim * std::log2(static_cast<float>(n_q_points_1d))));
 
     dofs_per_cell        = fe.n_dofs_per_cell();
     n_components         = fe.n_components();
@@ -702,6 +717,32 @@ namespace Portable
 
     ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quad,
                                                                           fe);
+
+    this->element_type = shape_info.element_type;
+
+    // compute the scratch pad size
+    using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
+    if (element_type <= ElementType::tensor_symmetric)
+      {
+        // evaluate/integrate with FEEvaluationImplCollocation or
+        // FEEvaluationImplTransformToCollocation
+        this->scratch_pad_size = Utilities::pow(n_q_points_1d, dim);
+      }
+    else if (element_type <= ElementType::tensor_symmetric_no_collocation)
+      {
+        // evaluate/integrate with FEEvaluationImpl
+        if (dim == 1)
+          this->scratch_pad_size = n_q_points_1d;
+        else if (dim == 2)
+          this->scratch_pad_size = (fe_degree + 1) * n_q_points_1d;
+        else if (dim == 3)
+          this->scratch_pad_size =
+            (fe_degree + 1) * n_q_points_1d * (fe_degree + 1 + n_q_points_1d);
+        else
+          AssertThrow(false, ExcNotImplemented());
+      }
+    else
+      AssertThrow(false, ExcNotImplemented());
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
