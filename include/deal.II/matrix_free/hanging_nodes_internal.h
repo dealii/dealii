@@ -921,7 +921,10 @@ namespace internal
         rotation || flip ? 4 - int(rotation) - 2 * int(flip) : 0;
 
       const unsigned int rot_mapping[4] = {2, 0, 3, 1};
-      const unsigned int n_int          = n_dofs_1d - 2;
+      Assert(n_dofs_1d > 1, ExcInternalError());
+      // 'per line' has the same meaning here as in FiniteElementData, i.e., the
+      // number of dofs assigned to a line (not including vertices).
+      const unsigned int dofs_per_line = n_dofs_1d - 2;
 
       // rotate:
       std::vector<types::global_dof_index> copy(dofs.size());
@@ -935,26 +938,28 @@ namespace internal
 
           // Edges
           unsigned int offset = 4;
-          for (unsigned int i = 0; i < n_int; ++i)
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
             {
               // Left edge
-              dofs[offset + i] = copy[offset + 2 * n_int + (n_int - 1 - i)];
+              dofs[offset + i] =
+                copy[offset + 2 * dofs_per_line + (dofs_per_line - 1 - i)];
               // Right edge
-              dofs[offset + n_int + i] =
-                copy[offset + 3 * n_int + (n_int - 1 - i)];
+              dofs[offset + dofs_per_line + i] =
+                copy[offset + 3 * dofs_per_line + (dofs_per_line - 1 - i)];
               // Bottom edge
-              dofs[offset + 2 * n_int + i] = copy[offset + n_int + i];
+              dofs[offset + 2 * dofs_per_line + i] =
+                copy[offset + dofs_per_line + i];
               // Top edge
-              dofs[offset + 3 * n_int + i] = copy[offset + i];
+              dofs[offset + 3 * dofs_per_line + i] = copy[offset + i];
             }
 
           // Interior points
-          offset += 4 * n_int;
+          offset += 4 * dofs_per_line;
 
-          for (unsigned int i = 0; i < n_int; ++i)
-            for (unsigned int j = 0; j < n_int; ++j)
-              dofs[offset + i * n_int + j] =
-                copy[offset + j * n_int + (n_int - 1 - i)];
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
+            for (unsigned int j = 0; j < dofs_per_line; ++j)
+              dofs[offset + i * dofs_per_line + j] =
+                copy[offset + j * dofs_per_line + (dofs_per_line - 1 - i)];
         }
 
       // transpose (note that we are using the standard geometric orientation
@@ -969,23 +974,26 @@ namespace internal
 
           // Edges
           unsigned int offset = 4;
-          for (unsigned int i = 0; i < n_int; ++i)
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
             {
               // Right edge
-              dofs[offset + i] = copy[offset + 2 * n_int + i];
+              dofs[offset + i] = copy[offset + 2 * dofs_per_line + i];
               // Left edge
-              dofs[offset + n_int + i] = copy[offset + 3 * n_int + i];
+              dofs[offset + dofs_per_line + i] =
+                copy[offset + 3 * dofs_per_line + i];
               // Bottom edge
-              dofs[offset + 2 * n_int + i] = copy[offset + i];
+              dofs[offset + 2 * dofs_per_line + i] = copy[offset + i];
               // Top edge
-              dofs[offset + 3 * n_int + i] = copy[offset + n_int + i];
+              dofs[offset + 3 * dofs_per_line + i] =
+                copy[offset + dofs_per_line + i];
             }
 
           // Interior
-          offset += 4 * n_int;
-          for (unsigned int i = 0; i < n_int; ++i)
-            for (unsigned int j = 0; j < n_int; ++j)
-              dofs[offset + i * n_int + j] = copy[offset + j * n_int + i];
+          offset += 4 * dofs_per_line;
+          for (unsigned int i = 0; i < dofs_per_line; ++i)
+            for (unsigned int j = 0; j < dofs_per_line; ++j)
+              dofs[offset + i * dofs_per_line + j] =
+                copy[offset + j * dofs_per_line + i];
         }
     }
 
