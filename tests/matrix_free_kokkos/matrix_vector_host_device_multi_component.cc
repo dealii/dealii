@@ -198,6 +198,10 @@ public:
 
     phi.distribute_local_to_global(dst);
   }
+<<<<<<< HEAD
+=======
+  static const unsigned int n_dofs_1d = fe_degree + 1;
+>>>>>>> 3c6f411f38 (Consider number of components in n_local_dofs)
   static const unsigned int n_local_dofs =
     Utilities::pow(fe_degree + 1, dim) * n_components;
   static const unsigned int n_q_points = Utilities::pow(fe_degree + 1, dim);
