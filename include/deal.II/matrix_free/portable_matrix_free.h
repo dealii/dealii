@@ -341,7 +341,6 @@ namespace Portable
      *   Portable::SharedData<dim, Number> *                     shared_data,
      *   const Number *                                              src,
      *   Number *                                                    dst) const;
-     *   static const unsigned int n_dofs_1d;
      *   static const unsigned int n_local_dofs;
      *   static const unsigned int n_q_points;
      * \endcode
@@ -363,7 +362,6 @@ namespace Portable
      *  DEAL_II_HOST_DEVICE void operator()(
      *    const unsigned int                                          cell,
      *    const typename Portable::MatrixFree<dim, Number>::Data *gpu_data);
-     * static const unsigned int n_dofs_1d;
      * static const unsigned int n_local_dofs;
      * static const unsigned int n_q_points;
      * \endcode
