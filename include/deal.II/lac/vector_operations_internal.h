@@ -2005,10 +2005,15 @@ namespace internal
              real_type      &sum,
              ::dealii::MemorySpace::MemorySpaceData<Number,
                                                     ::dealii::MemorySpace::Host>
-               &data)
+                            &data,
+             const size_type optional_offset = 0)
       {
         Norm1<Number, real_type> norm1(data.values.data());
-        parallel_reduce(norm1, 0, size, sum, thread_loop_partitioner);
+        parallel_reduce(norm1,
+                        optional_offset,
+                        optional_offset + size,
+                        sum,
+                        thread_loop_partitioner);
       }
 
       template <typename real_type>
@@ -2502,7 +2507,8 @@ namespace internal
         real_type      &sum,
         ::dealii::MemorySpace::MemorySpaceData<Number,
                                                ::dealii::MemorySpace::Default>
-          &data)
+                       &data,
+        const size_type optional_offset = 0)
       {
         auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
           execution_space{};
@@ -2510,7 +2516,7 @@ namespace internal
           "dealii::norm_1",
           Kokkos::RangePolicy<
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            exec, optional_offset, optional_offset + size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
 #if KOKKOS_VERSION < 30400
             update += std::abs(data.values(i));
