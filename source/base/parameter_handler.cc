@@ -1592,7 +1592,9 @@ ParameterHandler::recursively_print_parameters(
 
                 for (const auto &doc_line : doc_lines)
                   {
-                    out << std::setw(overall_indent_level * 2) << '#';
+                    // Start with the comment start ('#'), padded with
+                    // overall_indent_level*2 spaces at the front.
+                    out << std::setw(overall_indent_level * 2) << "" << '#';
 
                     if (!doc_line.empty())
                       out << ' ' << doc_line;
@@ -1601,9 +1603,10 @@ ParameterHandler::recursively_print_parameters(
                   }
               }
 
-            // print the name and (if set) value of this entry
-            out << std::setw(overall_indent_level * 2) << "set "
-                << demangle(p.first)
+            // Print the name and (if set) value of this entry. Ensure proper
+            // padding with overall_indent_level*2 spaces at the front.
+            out << std::setw(overall_indent_level * 2) << ""
+                << "set " << demangle(p.first)
                 << std::setw(longest_name - demangle(p.first).size() + 1) << ' '
                 << '=';
             if (!value.empty())
