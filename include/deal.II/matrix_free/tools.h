@@ -1492,11 +1492,7 @@ namespace MatrixFreeTools
     };
 
     static constexpr unsigned int n_local_dofs =
-<<<<<<< HEAD
       dealii::Utilities::pow(fe_degree + 1, dim) * n_components;
-=======
-      dealii::Utilities::pow(fe_degree + 1, dim);
->>>>>>> a7e466fb6b (Extend portable compute_diagonal() to multiple components)
     static constexpr unsigned int n_q_points =
       dealii::Utilities::pow(n_q_points_1d, dim);
 

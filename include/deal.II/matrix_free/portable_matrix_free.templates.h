@@ -375,6 +375,7 @@ namespace Portable
         return SharedViewValues::shmem_size(Functor::n_q_points,
                                             gpu_data.n_components) +
                SharedViewGradients::shmem_size(Functor::n_q_points,
+
                                                dim,
                                                gpu_data.n_components) +
                SharedViewScratchPad::shmem_size(gpu_data.scratch_pad_size);
