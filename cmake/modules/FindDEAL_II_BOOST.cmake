@@ -27,11 +27,9 @@
 #
 
 #
-# We require at least boost 1.59.
-# - Boost::container::small_vector was introduced in 1.58 and some
-#   serialization bugs in 1.58 were not fixed until 1.59.
+# We require at least boost 1.74.
 #
-set(BOOST_VERSION_REQUIRED 1.59)
+set(BOOST_VERSION_REQUIRED 1.74)
 
 set(BOOST_DIR "" CACHE PATH "An optional hint to a BOOST installation")
 set_if_empty(BOOST_DIR "$ENV{BOOST_DIR}")
