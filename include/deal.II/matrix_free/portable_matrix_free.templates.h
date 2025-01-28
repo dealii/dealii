@@ -367,9 +367,11 @@ namespace Portable
       size_t
       team_shmem_size(int /*team_size*/) const
       {
-        return SharedViewValues::shmem_size(Functor::n_local_dofs,
+        return SharedViewValues::shmem_size(Functor::n_local_dofs /
+                                              gpu_data.n_components,
                                             gpu_data.n_components) +
-               SharedViewGradients::shmem_size(Functor::n_local_dofs,
+               SharedViewGradients::shmem_size(Functor::n_local_dofs /
+                                                 gpu_data.n_components,
                                                dim,
                                                gpu_data.n_components);
       }
@@ -381,10 +383,11 @@ namespace Portable
       {
         // Get the scratch memory
         SharedViewValues    values(team_member.team_shmem(),
-                                Functor::n_local_dofs,
+                                Functor::n_local_dofs / gpu_data.n_components,
                                 gpu_data.n_components);
         SharedViewGradients gradients(team_member.team_shmem(),
-                                      Functor::n_local_dofs,
+                                      Functor::n_local_dofs /
+                                        gpu_data.n_components,
                                       dim,
                                       gpu_data.n_components);
 
