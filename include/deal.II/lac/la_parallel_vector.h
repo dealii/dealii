@@ -1365,6 +1365,16 @@ namespace LinearAlgebra
                         const Vector<Number, MemorySpace> &W);
 
       /**
+       * Assert that there are no spurious non-zero entries in the ghost
+       * region of the vector caused by some forgotten compress() or
+       * zero_out_ghost_values() calls, which is an invariant of the vector
+       * space operations such as the addition of vectors, scaling a vector,
+       * and similar.
+       */
+      void
+      assert_no_residual_content_in_ghost_region() const;
+
+      /**
        * Shared pointer to store the parallel partitioning information. This
        * information can be shared between several vectors that have the same
        * partitioning.
