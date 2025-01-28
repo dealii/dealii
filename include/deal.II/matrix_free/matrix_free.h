@@ -35,6 +35,7 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/diagonal_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/vector_operation.h>
 
@@ -4613,6 +4614,21 @@ namespace internal
   {
     for (unsigned int comp = 0; comp < vec.size(); ++comp)
       zero_vector_region(range_index, *vec[comp], exchanger);
+  }
+
+
+  // for DiagonalMatrix
+  template <int dim,
+            typename VectorStruct,
+            typename Number,
+            typename VectorizedArrayType>
+  inline void
+  zero_vector_region(
+    const unsigned int                                    range_index,
+    dealii::DiagonalMatrix<VectorStruct>                 &vec,
+    VectorDataExchange<dim, Number, VectorizedArrayType> &exchanger)
+  {
+    zero_vector_region(range_index, vec.get_vector(), exchanger);
   }
 
 
