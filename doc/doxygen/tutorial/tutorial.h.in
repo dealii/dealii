@@ -706,6 +706,14 @@
  *       <td> Using nonlocal dofs to solve a simple optimization problem with the Poisson equation
  *       <br/> Keywords: nonlocal dofs, optimization, Poisson
  *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-97</td>
+ *       <td> Application of the Nedelec and Raviart-Thomas finite elements to a magnetic
+ *       problem formulated in terms of the magnetic vector potential and current vector potential.
+ *       Solving the curl-curl equation.
+ *       <br/> Keywords: FE_Nedelec, FE_RaviartThomas, WorkStream::run()
+ *       </td></tr>
  * </table>
  *
  *
@@ -1377,6 +1385,15 @@
  *     <td>step-46</td>
  *   </tr>
  *
+ *   <tr valign="top">
+ *     <td> The curl-curl equation
+ *     </td>
+ *     <td>
+ *       step-81,
+ *       step-97
+ *     </td>
+ *   </tr>
+ *
  * </table>
  *
  *
@@ -1441,6 +1458,12 @@
  *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
  *     <td>step-46</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> The magnetic vector potential and current vector potential
+ *     </td>
+ *     <td>step-97</td>
  *   </tr>
  *
  * </table>
