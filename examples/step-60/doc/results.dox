@@ -333,8 +333,6 @@ The output of the program will look like the following:
 DEAL::Embedded dofs: 257
 DEAL::Embedding minimal diameter: 0.0110485, embedded maximal diameter: 0.00736292, ratio: 0.666416
 DEAL::Embedding dofs: 2429
-DEAL:cg::Starting value 0.117692
-DEAL:cg::Convergence step 594 value 8.06558e-13
 
 
 +---------------------------------------------+------------+------------+

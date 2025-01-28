@@ -837,6 +837,9 @@ namespace Step39
       preconditioner(dof_handler, mg, mg_transfer);
     // and use it to solve the system.
     solver.solve(matrix, solution, right_hand_side, preconditioner);
+
+    deallog << "Converged in " << control.last_step() << " iterations"
+            << std::endl;
   }
 
 

@@ -1,8 +1,6 @@
 
 DEAL::Number of active cells: 128
 DEAL::Number of degrees of freedom: 81
-DEAL:cg::Starting value 0.109746
-DEAL:cg::Convergence step 9 value 1.24504e-18
 # vtk DataFile Version 3.0
 #This file was generated 
 ASCII

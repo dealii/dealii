@@ -144,8 +144,11 @@ test(const FiniteElement<dim> &fe, const unsigned int n_iterations)
     {
       solver.solve(mf, out, in, PreconditionIdentity());
     }
-  catch (...)
-    {}
+  catch (const SolverControl::NoConvergence &e)
+    {
+      deallog << "Failure step " << e.last_step << " value " << e.last_residual
+              << std::endl;
+    }
   deallog << std::endl;
 }
 

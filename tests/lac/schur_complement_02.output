@@ -1,14 +1,6 @@
 
 DEAL::Schur complement
 DEAL:SC_SparseMatrix::SparseMatrix 1
-DEAL:SC_SparseMatrix:cg::Starting value 12.00000000
-DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:cg::Starting value 18.00000000
-DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:cg::Starting value 12.00000000
-DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
-DEAL:SC_SparseMatrix:cg::Starting value 18.00000000
-DEAL:SC_SparseMatrix:cg::Convergence step 1 value 0.000000000
 DEAL:SC_SparseMatrix::RHS vector: g1: -12.00000000
 DEAL:SC_SparseMatrix::RHS vector: g2: -12.00000000
 DEAL:SC_SparseMatrix::RHS vector: g3: -10.00000000

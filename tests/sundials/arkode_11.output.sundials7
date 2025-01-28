@@ -5,76 +5,48 @@ DEAL:mass_preconditioner_setup::applied
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.00144957
-DEAL:cg::Convergence step 1 value 3.06659e-19
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.00144957
-DEAL:cg::Convergence step 1 value 3.06659e-19
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.00144957
-DEAL:cg::Convergence step 1 value 3.06659e-19
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.00144957
-DEAL:cg::Convergence step 1 value 3.06659e-19
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.00144957
-DEAL:cg::Convergence step 1 value 3.06659e-19
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.00144957
-DEAL:cg::Convergence step 1 value 3.06659e-19
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.00144957
-DEAL:cg::Convergence step 1 value 3.06659e-19
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.0392202
-DEAL:cg::Convergence step 1 value 0.00000
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.0392202
-DEAL:cg::Convergence step 1 value 0.00000
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.0392202
-DEAL:cg::Convergence step 1 value 0.00000
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.0392202
-DEAL:cg::Convergence step 1 value 0.00000
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.0392202
-DEAL:cg::Convergence step 1 value 0.00000
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.0392202
-DEAL:cg::Convergence step 1 value 0.00000
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.0392202
-DEAL:cg::Convergence step 1 value 0.00000
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL:mass_preconditioner_setup::applied
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL::Reporting recoverable failure when solving with the mass matrix.
+DEAL:mass_preconditioner_setup::applied
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
@@ -87,38 +59,24 @@ DEAL:mass_preconditioner_setup::applied
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::0.200000 1.00000 0.00000
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.104287
-DEAL:cg::Convergence step 1 value 1.96262e-17
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.104287
-DEAL:cg::Convergence step 1 value 1.96262e-17
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.104287
-DEAL:cg::Convergence step 1 value 1.96262e-17
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.104287
-DEAL:cg::Convergence step 1 value 1.96262e-17
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.104287
-DEAL:cg::Convergence step 1 value 1.96262e-17
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.104287
-DEAL:cg::Convergence step 1 value 1.96262e-17
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied
-DEAL:cg::Starting value 0.104287
-DEAL:cg::Convergence step 1 value 1.96262e-17
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL:mass_preconditioner_setup::applied

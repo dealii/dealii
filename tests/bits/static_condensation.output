@@ -4,28 +4,12 @@ DEAL::=============================================
 DEAL::
 DEAL::Number of DoFs:       9 / 9
 DEAL::Number of matrix nnz: 21 / 21
-DEAL:cg::Starting value 5.5
-DEAL:cg::Convergence step 4 value 0
-DEAL:cg::Starting value 5.5
-DEAL:cg::Convergence step 4 value 0
 DEAL::Number of DoFs:       14 / 14
 DEAL::Number of matrix nnz: 46 / 46
-DEAL:cg::Starting value 5.1
-DEAL:cg::Convergence step 7 value 0
-DEAL:cg::Starting value 5.1
-DEAL:cg::Convergence step 7 value 0
 DEAL::Number of DoFs:       22 / 22
 DEAL::Number of matrix nnz: 86 / 86
-DEAL:cg::Starting value 6.0
-DEAL:cg::Convergence step 11 value 0
-DEAL:cg::Starting value 6.0
-DEAL:cg::Convergence step 11 value 0
 DEAL::Number of DoFs:       38 / 38
 DEAL::Number of matrix nnz: 170 / 170
-DEAL:cg::Starting value 5.7
-DEAL:cg::Convergence step 12 value 0
-DEAL:cg::Starting value 5.7
-DEAL:cg::Convergence step 12 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     4     9    4.037e+00 4.590e+00 4.037e+00 4.590e+00 
@@ -38,28 +22,12 @@ DEAL::=============================================
 DEAL::
 DEAL::Number of DoFs:       25 / 21
 DEAL::Number of matrix nnz: 153 / 107
-DEAL:cg::Starting value 11.
-DEAL:cg::Convergence step 11 value 0
-DEAL:cg::Starting value 1.5
-DEAL:cg::Convergence step 11 value 0
 DEAL::Number of DoFs:       43 / 36
 DEAL::Number of matrix nnz: 335 / 238
-DEAL:cg::Starting value 9.7
-DEAL:cg::Convergence step 15 value 0
-DEAL:cg::Starting value 2.2
-DEAL:cg::Convergence step 13 value 0
 DEAL::Number of DoFs:       71 / 58
 DEAL::Number of matrix nnz: 643 / 460
-DEAL:cg::Starting value 3.9
-DEAL:cg::Convergence step 19 value 0
-DEAL:cg::Starting value 3.9
-DEAL:cg::Convergence step 16 value 0
 DEAL::Number of DoFs:       133 / 108
 DEAL::Number of matrix nnz: 1305 / 926
-DEAL:cg::Starting value 3.6
-DEAL:cg::Convergence step 25 value 0
-DEAL:cg::Starting value 3.7
-DEAL:cg::Convergence step 20 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     4     25   1.471e+00 2.988e+00 1.471e+00 2.988e+00 
@@ -72,28 +40,12 @@ DEAL::=============================================
 DEAL::
 DEAL::Number of DoFs:       49 / 33
 DEAL::Number of matrix nnz: 589 / 261
-DEAL:cg::Starting value 5.0
-DEAL:cg::Convergence step 18 value 0
-DEAL:cg::Starting value 0.29
-DEAL:cg::Convergence step 12 value 0
 DEAL::Number of DoFs:       86 / 58
 DEAL::Number of matrix nnz: 1238 / 574
-DEAL:cg::Starting value 4.4
-DEAL:cg::Convergence step 24 value 0
-DEAL:cg::Starting value 1.8
-DEAL:cg::Convergence step 17 value 0
 DEAL::Number of DoFs:       169 / 105
 DEAL::Number of matrix nnz: 2941 / 1397
-DEAL:cg::Starting value 3.1
-DEAL:cg::Convergence step 32 value 0
-DEAL:cg::Starting value 3.1
-DEAL:cg::Convergence step 21 value 0
 DEAL::Number of DoFs:       342 / 218
 DEAL::Number of matrix nnz: 6126 / 2902
-DEAL:cg::Starting value 2.6
-DEAL:cg::Convergence step 46 value 0
-DEAL:cg::Starting value 2.8
-DEAL:cg::Convergence step 28 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     4     49   3.603e-01 1.673e+00 3.603e-01 1.673e+00 
@@ -106,28 +58,12 @@ DEAL::=============================================
 DEAL::
 DEAL::Number of DoFs:       81 / 45
 DEAL::Number of matrix nnz: 1617 / 483
-DEAL:cg::Starting value 6.4
-DEAL:cg::Convergence step 25 value 0
-DEAL:cg::Starting value 0.72
-DEAL:cg::Convergence step 14 value 0
 DEAL::Number of DoFs:       143 / 80
 DEAL::Number of matrix nnz: 3295 / 1054
-DEAL:cg::Starting value 5.4
-DEAL:cg::Convergence step 34 value 0
-DEAL:cg::Starting value 1.6
-DEAL:cg::Convergence step 19 value 0
 DEAL::Number of DoFs:       247 / 130
 DEAL::Number of matrix nnz: 6311 / 2072
-DEAL:cg::Starting value 2.4
-DEAL:cg::Convergence step 44 value 0
-DEAL:cg::Starting value 2.7
-DEAL:cg::Convergence step 23 value 0
 DEAL::Number of DoFs:       473 / 248
 DEAL::Number of matrix nnz: 12665 / 4142
-DEAL:cg::Starting value 2.2
-DEAL:cg::Convergence step 58 value 0
-DEAL:cg::Starting value 2.6
-DEAL:cg::Convergence step 28 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     4     81   4.689e-02 5.588e-01 4.689e-02 5.588e-01 
@@ -140,28 +76,12 @@ DEAL::===========================================
 DEAL::
 DEAL::Number of DoFs:       9 / 9
 DEAL::Number of matrix nnz: 21 / 21
-DEAL:cg::Starting value 5.5
-DEAL:cg::Convergence step 4 value 0
-DEAL:cg::Starting value 5.5
-DEAL:cg::Convergence step 4 value 0
 DEAL::Number of DoFs:       25 / 25
 DEAL::Number of matrix nnz: 109 / 109
-DEAL:cg::Starting value 6.0
-DEAL:cg::Convergence step 11 value 0
-DEAL:cg::Starting value 6.0
-DEAL:cg::Convergence step 11 value 0
 DEAL::Number of DoFs:       81 / 81
 DEAL::Number of matrix nnz: 501 / 501
-DEAL:cg::Starting value 3.8
-DEAL:cg::Convergence step 16 value 0
-DEAL:cg::Starting value 3.8
-DEAL:cg::Convergence step 16 value 0
 DEAL::Number of DoFs:       289 / 289
 DEAL::Number of matrix nnz: 2149 / 2149
-DEAL:cg::Starting value 2.3
-DEAL:cg::Convergence step 26 value 0
-DEAL:cg::Starting value 2.3
-DEAL:cg::Convergence step 26 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     4     9    4.037e+00 4.590e+00 4.037e+00 4.590e+00 
@@ -174,28 +94,12 @@ DEAL::===========================================
 DEAL::
 DEAL::Number of DoFs:       25 / 21
 DEAL::Number of matrix nnz: 153 / 107
-DEAL:cg::Starting value 11.
-DEAL:cg::Convergence step 11 value 0
-DEAL:cg::Starting value 1.5
-DEAL:cg::Convergence step 11 value 0
 DEAL::Number of DoFs:       81 / 65
 DEAL::Number of matrix nnz: 801 / 575
-DEAL:cg::Starting value 3.8
-DEAL:cg::Convergence step 20 value 0
-DEAL:cg::Starting value 3.8
-DEAL:cg::Convergence step 17 value 0
 DEAL::Number of DoFs:       289 / 225
 DEAL::Number of matrix nnz: 3633 / 2639
-DEAL:cg::Starting value 2.6
-DEAL:cg::Convergence step 40 value 0
-DEAL:cg::Starting value 2.6
-DEAL:cg::Convergence step 29 value 0
 DEAL::Number of DoFs:       1089 / 833
 DEAL::Number of matrix nnz: 15441 / 11279
-DEAL:cg::Starting value 1.4
-DEAL:cg::Convergence step 79 value 0
-DEAL:cg::Starting value 1.5
-DEAL:cg::Convergence step 53 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     4     25   1.471e+00 2.988e+00 1.471e+00 2.988e+00 
@@ -208,28 +112,12 @@ DEAL::===========================================
 DEAL::
 DEAL::Number of DoFs:       49 / 33
 DEAL::Number of matrix nnz: 589 / 261
-DEAL:cg::Starting value 5.0
-DEAL:cg::Convergence step 18 value 0
-DEAL:cg::Starting value 0.29
-DEAL:cg::Convergence step 12 value 0
 DEAL::Number of DoFs:       169 / 105
 DEAL::Number of matrix nnz: 2941 / 1397
-DEAL:cg::Starting value 3.1
-DEAL:cg::Convergence step 32 value 0
-DEAL:cg::Starting value 3.1
-DEAL:cg::Convergence step 21 value 0
 DEAL::Number of DoFs:       625 / 369
 DEAL::Number of matrix nnz: 13045 / 6381
-DEAL:cg::Starting value 1.9
-DEAL:cg::Convergence step 61 value 0
-DEAL:cg::Starting value 2.1
-DEAL:cg::Convergence step 37 value 0
 DEAL::Number of DoFs:       2401 / 1377
 DEAL::Number of matrix nnz: 54853 / 27197
-DEAL:cg::Starting value 1.2
-DEAL:cg::Convergence step 117 value 0
-DEAL:cg::Starting value 1.3
-DEAL:cg::Convergence step 68 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     4     49   3.603e-01 1.673e+00 3.603e-01 1.673e+00 
@@ -242,22 +130,10 @@ DEAL::=============================================
 DEAL::
 DEAL::Number of DoFs:       125 / 117
 DEAL::Number of matrix nnz: 1085 / 893
-DEAL:cg::Starting value 7.8
-DEAL:cg::Convergence step 11 value 0
-DEAL:cg::Starting value 3.6
-DEAL:cg::Convergence step 10 value 0
 DEAL::Number of DoFs:       321 / 299
 DEAL::Number of matrix nnz: 4713 / 3975
-DEAL:cg::Starting value 5.7
-DEAL:cg::Convergence step 16 value 0
-DEAL:cg::Starting value 2.8
-DEAL:cg::Convergence step 14 value 0
 DEAL::Number of DoFs:       845 / 774
 DEAL::Number of matrix nnz: 19895 / 17168
-DEAL:cg::Starting value 1.6
-DEAL:cg::Convergence step 22 value 0
-DEAL:cg::Starting value 1.6
-DEAL:cg::Convergence step 18 value 0
 DEAL::
 cycle cells dofs    L2        H1       L2 sc     H1 sc   
 0     8     125  5.433e-01 2.365e+00 5.433e-01 2.365e+00 
