@@ -1,165 +1,121 @@
 
 DEAL::Test solution accuracy with 1 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 1 value 2.09165
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 1 value 2.09165
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 1.250e-01 
 DEAL::Test solution accuracy with 2 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 2 value 1.41681
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 3.309e-01 3.088e-01 2.868e-01 2.647e-01 2.426e-01 2.206e-01 1.985e-01 1.765e-01 1.544e-01 1.324e-01 1.103e-01 8.824e-02 6.618e-02 4.412e-02 2.206e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 2 value 1.41681
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 3.309e-01 3.088e-01 2.868e-01 2.647e-01 2.426e-01 2.206e-01 1.985e-01 1.765e-01 1.544e-01 1.324e-01 1.103e-01 8.824e-02 6.618e-02 4.412e-02 2.206e-02 
 DEAL::Test solution accuracy with 3 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 3 value 0.977692
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 5.539e-01 4.681e-01 3.905e-01 3.211e-01 2.598e-01 2.067e-01 1.618e-01 1.250e-01 9.641e-02 7.598e-02 6.373e-02 5.964e-02 6.373e-02 7.598e-02 9.641e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 3 value 0.977692
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 5.539e-01 4.681e-01 3.905e-01 3.211e-01 2.598e-01 2.067e-01 1.618e-01 1.250e-01 9.641e-02 7.598e-02 6.373e-02 5.964e-02 6.373e-02 7.598e-02 9.641e-02 
 DEAL::Test solution accuracy with 4 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 4 value 0.656069
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 7.417e-01 5.553e-01 4.081e-01 2.954e-01 2.128e-01 1.559e-01 1.200e-01 1.006e-01 9.331e-02 9.352e-02 9.675e-02 9.847e-02 9.417e-02 7.933e-02 4.945e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 4 value 0.656069
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 7.417e-01 5.553e-01 4.081e-01 2.954e-01 2.128e-01 1.559e-01 1.200e-01 1.006e-01 9.331e-02 9.352e-02 9.675e-02 9.847e-02 9.417e-02 7.933e-02 4.945e-02 
 DEAL::Test solution accuracy with 5 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 5 value 0.419623
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 8.709e-01 5.738e-01 3.754e-01 2.514e-01 1.806e-01 1.452e-01 1.304e-01 1.250e-01 1.208e-01 1.129e-01 9.972e-02 8.286e-02 6.721e-02 6.089e-02 7.528e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 5 value 0.419623
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 8.709e-01 5.738e-01 3.754e-01 2.514e-01 1.806e-01 1.452e-01 1.304e-01 1.250e-01 1.208e-01 1.129e-01 9.972e-02 8.286e-02 6.721e-02 6.089e-02 7.528e-02 
 DEAL::Test solution accuracy with 6 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 6 value 0.252694
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.447e-01 5.553e-01 3.404e-01 2.330e-01 1.848e-01 1.634e-01 1.498e-01 1.347e-01 1.165e-01 9.807e-02 8.398e-02 7.766e-02 7.856e-02 7.933e-02 6.298e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 6 value 0.252694
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.447e-01 5.553e-01 3.404e-01 2.330e-01 1.848e-01 1.634e-01 1.498e-01 1.347e-01 1.165e-01 9.807e-02 8.398e-02 7.766e-02 7.856e-02 7.933e-02 6.298e-02 
 DEAL::Test solution accuracy with 7 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 7 value 0.141859
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.799e-01 5.302e-01 3.246e-01 2.380e-01 1.991e-01 1.731e-01 1.484e-01 1.250e-01 1.068e-01 9.613e-02 9.133e-02 8.733e-02 7.895e-02 6.712e-02 6.801e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 7 value 0.141859
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.799e-01 5.302e-01 3.246e-01 2.380e-01 1.991e-01 1.731e-01 1.484e-01 1.250e-01 1.068e-01 9.613e-02 9.133e-02 8.733e-02 7.895e-02 6.712e-02 6.801e-02 
 DEAL::Test solution accuracy with 8 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 8 value 0.0735126
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.939e-01 5.127e-01 3.240e-01 2.474e-01 2.042e-01 1.698e-01 1.417e-01 1.221e-01 1.102e-01 1.019e-01 9.281e-02 8.245e-02 7.477e-02 7.324e-02 6.626e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 8 value 0.0735126
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.939e-01 5.127e-01 3.240e-01 2.474e-01 2.042e-01 1.698e-01 1.417e-01 1.221e-01 1.102e-01 1.019e-01 9.281e-02 8.245e-02 7.477e-02 7.324e-02 6.626e-02 
 DEAL::Test solution accuracy with 9 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 9 value 0.0347680
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.985e-01 5.042e-01 3.283e-01 2.514e-01 2.022e-01 1.660e-01 1.412e-01 1.250e-01 1.124e-01 1.004e-01 8.990e-02 8.285e-02 7.809e-02 7.083e-02 6.677e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 9 value 0.0347680
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.985e-01 5.042e-01 3.283e-01 2.514e-01 2.022e-01 1.660e-01 1.412e-01 1.250e-01 1.124e-01 1.004e-01 8.990e-02 8.285e-02 7.809e-02 7.083e-02 6.677e-02 
 DEAL::Test solution accuracy with 10 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 10 value 0.0147898
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.997e-01 5.010e-01 3.315e-01 2.515e-01 2.001e-01 1.658e-01 1.429e-01 1.256e-01 1.111e-01 9.947e-02 9.096e-02 8.382e-02 7.650e-02 7.158e-02 6.665e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 10 value 0.0147898
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 9.997e-01 5.010e-01 3.315e-01 2.515e-01 2.001e-01 1.658e-01 1.429e-01 1.256e-01 1.111e-01 9.947e-02 9.096e-02 8.382e-02 7.650e-02 7.158e-02 6.665e-02 
 DEAL::Test solution accuracy with 11 iterations
 DEAL::Solve with PreconditionIdentity: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 11 value 0.00554307
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:
 1.000e+00 5.002e-01 3.329e-01 2.506e-01 1.997e-01 1.665e-01 1.431e-01 1.250e-01 1.109e-01 1.001e-01 9.106e-02 8.313e-02 7.703e-02 7.140e-02 6.667e-02 
 DEAL::Solve with diagonal preconditioner: 
-DEAL:cg::Starting value 3.87298
-DEAL:cg::Convergence step 11 value 0.00554307
 Process #0
 Local range: [0, 15), global size: 15
 Vector data:

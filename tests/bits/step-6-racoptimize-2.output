@@ -2,8 +2,6 @@
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       20
 DEAL::   Number of degrees of freedom: 89
-DEAL:cg::Starting value 0.351647
-DEAL:cg::Convergence step 22 value 3.77494e-13
 %!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library
@@ -100,18 +98,12 @@ showpage
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       80
 DEAL::   Number of degrees of freedom: 337
-DEAL:cg::Starting value 0.199472
-DEAL:cg::Convergence step 46 value 7.35629e-13
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       284
 DEAL::   Number of degrees of freedom: 1201
-DEAL:cg::Starting value 0.109916
-DEAL:cg::Convergence step 83 value 6.59879e-13
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       788
 DEAL::   Number of degrees of freedom: 3457
-DEAL:cg::Starting value 0.0835794
-DEAL:cg::Convergence step 134 value 7.67090e-13
 %!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
 %%Creator: the deal.II library

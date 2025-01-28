@@ -1,14 +1,6 @@
 
 DEAL::Size 37 Unknowns 1296
 DEAL:cg::MySolverControl 0
-DEAL:cg::Starting value 0
-DEAL:cg::Convergence step 0 value 0
 DEAL:Bicgstab::MySolverControl 0
-DEAL:Bicgstab::Starting value 0
-DEAL:Bicgstab::Convergence step 0 value 0
 DEAL:GMRES::MySolverControl 0
-DEAL:GMRES::Starting value 0
-DEAL:GMRES::Convergence step 0 value 0
 DEAL:FGMRES::MySolverControl 0
-DEAL:FGMRES::Starting value 0
-DEAL:FGMRES::Convergence step 0 value 0

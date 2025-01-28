@@ -5,7 +5,6 @@ DEAL:Newton::update 0
 DEAL:Newton::residual 98.0000
 DEAL:Newton::
 DEAL:Newton::Check 0	98.0000
-DEAL:Newton::Starting value 98.0000
 DEAL:Newton::Step 1
 DEAL:Newton::solution 10.0000
 DEAL:Newton::update 4.90000
@@ -48,5 +47,4 @@ DEAL:Newton::update 3.44292e-08
 DEAL:Newton::residual 9.73804e-08
 DEAL:Newton::
 DEAL:Newton::Check 7	0
-DEAL:Newton::Convergence step 7 value 0
 DEAL:: square root 1.41421
