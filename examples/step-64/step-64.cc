@@ -76,9 +76,8 @@ namespace Step64
     // arrays, we need to store the number of quadrature points and the
     // number of degrees of freedom in this class to do necessary index
     // conversions.
-    static const unsigned int n_dofs_1d    = fe_degree + 1;
-    static const unsigned int n_local_dofs = Utilities::pow(n_dofs_1d, dim);
-    static const unsigned int n_q_points   = Utilities::pow(n_dofs_1d, dim);
+    static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
+    static const unsigned int n_q_points   = Utilities::pow(fe_degree + 1, dim);
 
   private:
     double *coef;
@@ -191,7 +190,6 @@ namespace Step64
     // Again, the Portable::MatrixFree object doesn't know about the number
     // of degrees of freedom and the number of quadrature points so we need
     // to store these for index calculations in the call operator.
-    static constexpr unsigned int n_dofs_1d = fe_degree + 1;
     static constexpr unsigned int n_local_dofs =
       Utilities::pow(fe_degree + 1, dim);
     static constexpr unsigned int n_q_points =
