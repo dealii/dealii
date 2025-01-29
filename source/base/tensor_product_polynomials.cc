@@ -714,12 +714,13 @@ AnisotropicPolynomials<dim>::compute_index(
   const unsigned int             i,
   std::array<unsigned int, dim> &indices) const
 {
-#ifdef DEBUG
-  unsigned int n_poly = 1;
-  for (unsigned int d = 0; d < dim; ++d)
-    n_poly *= polynomials[d].size();
-  Assert(i < n_poly, ExcInternalError());
-#endif
+  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    {
+      unsigned int n_poly = 1;
+      for (unsigned int d = 0; d < dim; ++d)
+        n_poly *= polynomials[d].size();
+      Assert(i < n_poly, ExcInternalError());
+    }
 
   if (dim == 0)
     {

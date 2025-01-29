@@ -836,11 +836,12 @@ namespace SparsityTools
                 }
               current_neighbors.resize(write_index);
 
-#ifdef DEBUG
-              for (const types::global_dof_index node : current_neighbors)
-                Assert(touched_nodes[node] == available_node,
-                       ExcInternalError());
-#endif
+              if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+                {
+                  for (const types::global_dof_index node : current_neighbors)
+                    Assert(touched_nodes[node] == available_node,
+                           ExcInternalError());
+                }
 
               // No more neighbors left -> terminate loop
               if (current_neighbors.empty())

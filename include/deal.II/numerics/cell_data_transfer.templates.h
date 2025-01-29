@@ -125,11 +125,14 @@ CellDataTransfer<dim, spacedim, VectorType>::
         }
     }
 
-#ifdef DEBUG
-  n_active_cells_pre = triangulation->n_active_cells();
-#else
-  (void)n_active_cells_pre;
-#endif
+  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    {
+      n_active_cells_pre = triangulation->n_active_cells();
+    }
+  else
+    {
+      (void)n_active_cells_pre;
+    }
 }
 
 
@@ -139,14 +142,17 @@ void
 CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
                                                     VectorType       &out)
 {
-#ifdef DEBUG
-  Assert(in.size() == n_active_cells_pre,
-         ExcDimensionMismatch(in.size(), n_active_cells_pre));
-  Assert(out.size() == triangulation->n_active_cells(),
-         ExcDimensionMismatch(out.size(), triangulation->n_active_cells()));
-#else
-  (void)n_active_cells_pre;
-#endif
+  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    {
+      Assert(in.size() == n_active_cells_pre,
+             ExcDimensionMismatch(in.size(), n_active_cells_pre));
+      Assert(out.size() == triangulation->n_active_cells(),
+             ExcDimensionMismatch(out.size(), triangulation->n_active_cells()));
+    }
+  else
+    {
+      (void)n_active_cells_pre;
+    }
 
   // Transfer data of persisting cells.
   for (const auto &persisting : persisting_cells_active_index)

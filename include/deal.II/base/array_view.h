@@ -521,14 +521,17 @@ inline void
 ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
                                                 const std::size_t n_elements)
 {
-#ifdef DEBUG
-  if (n_elements > 0)
-    this->starting_element = starting_element;
+  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    {
+      if (n_elements > 0)
+        this->starting_element = starting_element;
+      else
+        this->starting_element = nullptr;
+    }
   else
-    this->starting_element = nullptr;
-#else
-  this->starting_element = starting_element;
-#endif
+    {
+      this->starting_element = starting_element;
+    }
   this->n_elements = n_elements;
 }
 
