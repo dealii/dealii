@@ -588,7 +588,7 @@ SparseMatrix<number>::add(const size_type  row,
         {
           // Use the same algorithm as above, but because the matrix is
           // not square, we can now do without the split for diagonal/
-          // entries before the diagional/entries are the diagonal.
+          // entries before the diagonal/entries are the diagonal.
           size_type counter = 0;
           for (size_type i = 0; i < n_cols; ++i)
             {
