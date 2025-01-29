@@ -46,8 +46,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR true)
 # compile jobs come first so that 'make -j N' saturates many processors also
 # towards the end of compiling rather than having to wait for one long
 # compilation that, because it has been listed last, is started towards the
-# end of everything (e.g. numerics/vectors.cc takes several minutes to
-# compile...)
+# end of everything (e.g. some of the numerics/vector_tools_*.cc files can
+# take quite a long time to compile).
 #
 add_subdirectory(numerics)
 add_subdirectory(fe)
