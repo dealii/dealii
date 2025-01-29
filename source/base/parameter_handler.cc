@@ -868,7 +868,7 @@ ParameterHandler::parse_input_from_json(std::istream &in,
     }
 
   // The xml function is reused to read in the xml into the parameter file.
-  // This function can only read mangled files. Therefore, we create a mangeled
+  // This function can only read mangled files. Therefore, we create a mangled
   // tree first.
   boost::property_tree::ptree node_tree_mangled;
   recursively_mangle_or_demangle(node_tree,

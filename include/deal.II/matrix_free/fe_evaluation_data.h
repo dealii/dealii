@@ -102,7 +102,7 @@ namespace internal
  * quadrature dimension the same as the space dimension) or for a face
  * integrator (with quadrature dimension one less)
  *
- * @tparam VectorizedArrayType Type of array to be woked on in a vectorized
+ * @tparam VectorizedArrayType Type of array to be worked on in a vectorized
  *                             fashion, defaults to VectorizedArray<Number>
  *
  * @note Currently only VectorizedArray<Number, width> is supported as

@@ -196,7 +196,7 @@ create_tria(Triangulation<3> &triangulation,
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
 
-  // create grid with all possible combintations of face_flip, face_orientation
+  // create grid with all possible combinations of face_flip, face_orientation
   // and face_rotation flags
   static const int cell_vertices[][GeometryInfo<3>::vertices_per_cell] = {
     {0, 1, 9, 10, 3, 4, 12, 13},  // cell 1 standard

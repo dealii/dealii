@@ -200,7 +200,7 @@ namespace MGTools
 
         // At this point, we have
         // counted all dofs
-        // contributiong from cells
+        // contributing from cells
         // coupled topologically to the
         // adjacent cells, but we
         // subtracted some faces.
@@ -457,7 +457,7 @@ namespace MGTools
 
         // At this point, we have
         // counted all dofs
-        // contributiong from cells
+        // contributing from cells
         // coupled topologically to the
         // adjacent cells, but we
         // subtracted some faces.
