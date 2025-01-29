@@ -13,7 +13,7 @@
 ## ------------------------------------------------------------------------
 
 #
-# define_object_target(<library>)
+# define_object_library(<library>)
 #
 # A small wrapper around add_library that will define a target for each
 # build type specified in DEAL_II_BUILD_TYPES. The specified library name
