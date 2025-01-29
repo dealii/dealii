@@ -85,11 +85,14 @@ namespace PETScWrappers
   inline void
   close_matrix(Mat &matrix)
   {
-#  ifdef DEBUG
-    set_matrix_option(matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
-#  else
-    set_matrix_option(matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
-#  endif
+    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      {
+        set_matrix_option(matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
+      }
+    else
+      {
+        set_matrix_option(matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+      }
   }
 
 
