@@ -383,7 +383,8 @@ MappingCartesian<dim, spacedim>::maybe_update_normal_vectors(
       Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
       std::fill(normal_vectors.begin(),
                 normal_vectors.end(),
-                GeometryInfo<dim>::unit_normal_vector[face_no]);
+                ReferenceCells::get_hypercube<dim>()
+                  .template face_normal_vector<dim>(face_no));
     }
 }
 

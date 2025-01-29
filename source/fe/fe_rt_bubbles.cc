@@ -71,8 +71,8 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
        RefinementCase<dim>::all_refinement_cases())
     if (ref_case != RefinementCase<dim>::no_refinement)
       {
-        const unsigned int nc =
-          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+        const unsigned int nc = this->reference_cell().template n_children<dim>(
+          RefinementCase<dim>(ref_case));
 
         for (unsigned int i = 0; i < nc; ++i)
           this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
