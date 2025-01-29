@@ -208,7 +208,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
         QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               face_points);
 
-      for (; current < GeometryInfo<dim>::faces_per_cell * n_face_points;
+      for (; current < this->reference_cell().n_faces() * n_face_points;
            ++current)
         {
           // Enter the support point into the vector
