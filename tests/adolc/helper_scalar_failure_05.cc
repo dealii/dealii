@@ -96,13 +96,17 @@ main()
   initlog();
 
   deal_II_exceptions::disable_abort_on_exception();
-#ifdef DEBUG
-  // Asserts should be triggered
-  const bool expected_result = false;
-#else
-  // User beware: Asserts ignored
-  const bool expected_result = true;
-#endif
+  bool expected_result;
+  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    {
+      // Asserts should be triggered
+      expected_result = false;
+    }
+  else
+    {
+      // User beware: Asserts ignored
+      expected_result = true;
+    }
 
   const unsigned int dim = 2;
   AssertThrow(
