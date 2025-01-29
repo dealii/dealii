@@ -177,7 +177,7 @@ LaplaceProblem::run()
       solve();
     }
 
-  // finialise output
+  // finalise output
   output_table.write_text(std::cout);
   deallog << std::endl;
 }
