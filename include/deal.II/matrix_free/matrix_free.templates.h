@@ -949,6 +949,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   const AdditionalData                            &additional_data)
 {
   cell_level_index.clear();
+  auto ghosted_cell_index = cell_level_index;
   dof_handlers.resize(dof_handler_in.size());
   for (unsigned int no = 0; no < dof_handler_in.size(); ++no)
     dof_handlers[no] = dof_handler_in[no];
@@ -970,6 +971,9 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
       for (const auto &cell : tria.cell_iterators_on_level(0))
         internal::MatrixFreeFunctions::resolve_cell(cell, cell_level_index);
 
+      Assert(additional_data.store_ghost_cells == false,
+             ExcMessage(
+               "Storing ghost cells is only supported for level operator."));
       Assert(task_info.n_procs > 1 ||
                cell_level_index.size() == tria.n_active_cells(),
              ExcInternalError());
@@ -983,12 +987,23 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
           for (const auto &cell : tria.cell_iterators_on_level(level))
             if (cell->is_locally_owned_on_level())
               cell_level_index.emplace_back(cell->level(), cell->index());
+            else if (additional_data.store_ghost_cells == true &&
+                     cell->is_ghost_on_level())
+              ghosted_cell_index.emplace_back(cell->level(), cell->index());
         }
     }
 
   // All these are cells local to this processor. Therefore, set
   // cell_level_index_end_local to the size of cell_level_index.
   cell_level_index_end_local = cell_level_index.size();
+
+  Assert(ghosted_cell_index.size() == 0 || additional_data.store_ghost_cells,
+         ExcInternalError());
+
+  // If ghost cells are stored, add them to the end of the cell_level_index
+  cell_level_index.insert(cell_level_index.end(),
+                          ghosted_cell_index.begin(),
+                          ghosted_cell_index.end());
 }
 
 
