@@ -22,38 +22,10 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/multigrid/mg_base.templates.h>
 
 
 DEAL_II_NAMESPACE_OPEN
-
-
-template <typename VectorType>
-void
-MGSmootherBase<VectorType>::apply(const unsigned int level,
-                                  VectorType        &u,
-                                  const VectorType  &rhs) const
-{
-  u = typename VectorType::value_type(0.);
-  smooth(level, u, rhs);
-}
-
-
-
-template <typename VectorType>
-void
-MGTransferBase<VectorType>::prolongate_and_add(const unsigned int to_level,
-                                               VectorType        &dst,
-                                               const VectorType  &src) const
-{
-  VectorType temp;
-  temp.reinit(dst, true);
-
-  this->prolongate(to_level, temp, src);
-
-  dst += temp;
-}
-
 
 // Explicit instantiations
 
