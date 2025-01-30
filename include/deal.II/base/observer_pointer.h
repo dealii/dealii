@@ -611,7 +611,7 @@ template <class Q>
 inline void
 ObserverPointer<T, P>::swap(ObserverPointer<T, Q> &other)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       ObserverPointer<T, P> aux(pointer, id);
       *this = other;

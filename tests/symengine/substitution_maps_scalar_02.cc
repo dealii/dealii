@@ -125,7 +125,7 @@ main()
     SD::merge_substitution_maps(substitution_map, substitution_map_1);
   }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // Check that exceptions are raised when duplicate symbols
       // associated with unequal values are found in a substitution map

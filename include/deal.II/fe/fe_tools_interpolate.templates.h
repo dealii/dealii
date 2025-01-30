@@ -87,7 +87,7 @@ namespace FETools
 
 
     const IndexSet u2_elements = u2.locally_owned_elements();
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
         const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
@@ -151,7 +151,7 @@ namespace FETools
                  ExcDimensionMismatch(cell1->get_fe().n_components(),
                                       cell2->get_fe().n_components()));
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // For continuous elements on grids with hanging nodes we need
               // hanging node constraints. Consequently, when the elements are
@@ -271,7 +271,7 @@ namespace FETools
     Assert(u1_interpolated.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
         const IndexSet  u1_elements     = u1.locally_owned_elements();
@@ -309,7 +309,7 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // For continuous elements on grids with hanging nodes we need
               // hanging node constraints. Consequently, when the elements are
@@ -612,7 +612,7 @@ namespace FETools
     Assert(u1_difference.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
         const IndexSet  u1_elements     = u1.locally_owned_elements();
@@ -647,7 +647,7 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // For continuous elements on grids with hanging nodes we need
               // hanging node constraints. Consequently, when the elements are

@@ -96,7 +96,7 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       parallel::distributed::Triangulation<dim> other_tria(MPI_COMM_WORLD);
       GridGenerator::hyper_cube(other_tria);

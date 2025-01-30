@@ -714,7 +714,7 @@ AnisotropicPolynomials<dim>::compute_index(
   const unsigned int             i,
   std::array<unsigned int, dim> &indices) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       unsigned int n_poly = 1;
       for (unsigned int d = 0; d < dim; ++d)

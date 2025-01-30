@@ -600,8 +600,7 @@ namespace hp
               if (future_fe_indices_on_coarsened_cells.find(parent) ==
                   future_fe_indices_on_coarsened_cells.end())
                 {
-                  if constexpr (library_build_mode ==
-                                LibraryBuildMode::debug_build)
+                  if constexpr (library_build_mode == LibraryBuildMode::debug)
                     {
                       for (const auto &child : parent->child_iterators())
                         Assert(child->is_active() && child->coarsen_flag_set(),

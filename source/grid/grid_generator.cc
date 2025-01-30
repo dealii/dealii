@@ -1623,7 +1623,7 @@ namespace GridGenerator
     Assert(dim > 1, ExcNotImplemented());
     Assert(dim < 4, ExcNotImplemented());
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         Tensor<2, dim> vector_matrix;
         for (unsigned int d = 0; d < dim; ++d)
@@ -2680,7 +2680,7 @@ namespace GridGenerator
             std::reverse(step_sizes[i].begin(), step_sizes[i].end());
           }
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             double x = 0;
             for (unsigned int j = 0; j < step_sizes.at(i).size(); ++j)
@@ -6853,7 +6853,7 @@ namespace GridGenerator
                           Triangulation<dim, spacedim>       &result)
   {
     AssertDimension(dim, extents.size());
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         for (const auto &extent : extents)
           Assert(0 < extent,
@@ -7140,7 +7140,7 @@ namespace GridGenerator
       // mode)
       if (0 < manifold_priorities.size())
         {
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // check that the provided manifold_priorities is valid
               std::vector<types::manifold_id> sorted_manifold_priorities =

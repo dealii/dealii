@@ -897,7 +897,7 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
           block_column_indices[0].push_back(local_index);
 
           // Check that calculation:
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               {
                 auto check_block_and_col = column_indices.global_to_local(*it);

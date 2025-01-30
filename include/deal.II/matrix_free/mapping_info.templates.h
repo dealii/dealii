@@ -1253,8 +1253,7 @@ namespace internal
 
                     const VectorizedDouble jac_det = determinant(jac);
 
-                    if constexpr (library_build_mode ==
-                                  LibraryBuildMode::debug_build)
+                    if constexpr (library_build_mode == LibraryBuildMode::debug)
                       {
                         for (unsigned int v = 0; v < n_lanes_d; ++v)
                           {
@@ -2356,8 +2355,7 @@ namespace internal
                        1. :
                        my_data.descriptor[0].quadrature.weight(q));
 
-                  if constexpr (library_build_mode ==
-                                LibraryBuildMode::debug_build)
+                  if constexpr (library_build_mode == LibraryBuildMode::debug)
                     {
                       for (unsigned int v = 0; v < n_lanes_d; ++v)
                         Assert(JxW[v] > 0.0, ExcInternalError());

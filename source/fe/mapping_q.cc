@@ -1636,7 +1636,7 @@ MappingQ<3, 3>::add_quad_support_points(
     {
       const Triangulation<3>::face_iterator face = cell->face(face_no);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           const bool face_orientation = cell->face_orientation(face_no),
                      face_flip        = cell->face_flip(face_no),

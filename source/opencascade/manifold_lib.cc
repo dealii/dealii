@@ -131,7 +131,7 @@ namespace OpenCASCADE
     const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         for (unsigned int i = 0; i < surrounding_points.size(); ++i)
           Assert(closest_point(sh, surrounding_points[i], tolerance)
@@ -176,7 +176,7 @@ namespace OpenCASCADE
     const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         for (unsigned int i = 0; i < surrounding_points.size(); ++i)
           Assert(closest_point(sh, surrounding_points[i], tolerance)
@@ -238,7 +238,7 @@ namespace OpenCASCADE
       constexpr int       spacedim = 3;
       TopoDS_Shape        out_shape;
       Tensor<1, spacedim> average_normal;
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (const auto &point : surrounding_points)
             {

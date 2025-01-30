@@ -734,7 +734,7 @@ namespace TriangulationDescription
                    "in the given communicator."));
         }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // If we are dealing with a sequential triangulation, then someone
           // will have needed to set the subdomain_ids by hand. Make sure that

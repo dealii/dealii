@@ -1663,7 +1663,7 @@ namespace
     const auto inverse_orientation =
       face_1->reference_cell().get_inverse_combined_orientation(orientation);
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         const auto [face_orientation, face_rotation, face_flip] =
           internal::split_face_orientation(orientation);
@@ -6142,7 +6142,7 @@ namespace internal
         //
         // this check is very simple to implement here, since we have
         // all lines flagged if they shall be refined
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             for (const auto &cell : triangulation.active_cell_iterators())
               if (!cell->refine_flag_set())
@@ -6265,7 +6265,7 @@ namespace internal
                   DEAL_II_NOT_IMPLEMENTED();
                 }
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+              if constexpr (library_build_mode == LibraryBuildMode::debug)
                 {
                   for (const unsigned int line : quad->line_indices())
                     AssertIsNotUsed(new_lines[line]);
@@ -6287,7 +6287,7 @@ namespace internal
                 }
               quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+              if constexpr (library_build_mode == LibraryBuildMode::debug)
                 {
                   for (const auto &quad : new_quads)
                     AssertIsNotUsed(quad);
@@ -6457,7 +6457,7 @@ namespace internal
                               make_array_view(vertices_1));
 
                           if constexpr (library_build_mode ==
-                                        LibraryBuildMode::debug_build)
+                                        LibraryBuildMode::debug)
                             {
                               for (const auto i : vertices_0)
                                 s.insert(i);
@@ -6468,7 +6468,7 @@ namespace internal
                           new_quad->set_line_orientation(f, orientation);
                         }
                       if constexpr (library_build_mode ==
-                                    LibraryBuildMode::debug_build)
+                                    LibraryBuildMode::debug)
                         {
                           AssertDimension(s.size(), 3);
                         }
@@ -7436,7 +7436,7 @@ namespace internal
         //
         // this check is very simple to implement here, since we have
         // all lines flagged if they shall be refined
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             for (const auto &cell : triangulation.active_cell_iterators())
               if (!cell->refine_flag_set())
@@ -15880,7 +15880,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   if (this->cell_attached_data.n_attached_data_sets == 0)
     this->update_cell_relations();
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // In debug mode, we want to check for some consistency of the
       // result of this function. Because there are multiple exit
@@ -16332,7 +16332,7 @@ void Triangulation<dim, spacedim>::load_attached_data(
 
       this->data_serializer.unpack_cell_status(this->local_cell_relations);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // the CellStatus of all stored cells should always be
           // CellStatus::cell_will_persist.
@@ -16395,7 +16395,7 @@ typename Triangulation<dim, spacedim>::DistortedCellList
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       for (const auto &level : levels)
         monitor_memory(level->cells, dim);
@@ -16775,7 +16775,7 @@ namespace
   {
     Assert(cell->is_active(), ExcInternalError());
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         // If this is not a parallel::distributed::Triangulation, then we really
         // should only get here if the cell is marked for refinement:

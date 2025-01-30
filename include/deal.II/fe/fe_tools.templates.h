@@ -2233,7 +2233,7 @@ namespace FETools
     // Ensure that the element we are looking for isn't in the map
     // yet. This only requires us to read the map, so it can happen
     // in a shared locked state
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         {
           std::shared_lock<std::shared_mutex> lock(

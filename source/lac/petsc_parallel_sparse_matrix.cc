@@ -206,7 +206,7 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // check indexsets
           types::global_dof_index row_owners =
@@ -517,7 +517,7 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // check indexsets
           const types::global_dof_index row_owners =

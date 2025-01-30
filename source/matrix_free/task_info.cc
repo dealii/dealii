@@ -1136,7 +1136,7 @@ namespace internal
       cell_partition_data.push_back(n_cell_batches + n_ghost_batches);
       partition_row_index.back() = cell_partition_data.size() - 1;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           std::vector<unsigned int> renumber_cpy(renumbering);
           std::sort(renumber_cpy.begin(), renumber_cpy.end());
@@ -1303,7 +1303,7 @@ namespace internal
 
       partition_list = renumbering;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // in debug mode, check that the partition color list is one-to-one
           {
@@ -1371,7 +1371,7 @@ namespace internal
       AssertDimension(counter_macro, n_cell_batches);
 
       // check that the renumbering is one-to-one
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           {
             std::vector<unsigned int> sorted_renumbering(renumbering);
@@ -1487,7 +1487,7 @@ namespace internal
         }
 
       // in debug mode, check that the partition_2layers_list is one-to-one
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           {
             std::vector<unsigned int> sorted_pc_list(partition_2layers_list);
@@ -1570,7 +1570,7 @@ namespace internal
           AssertDimension(counter, n_active_cells);
           AssertDimension(counter_macro, n_cell_batches);
           // check that the renumbering is one-to-one
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               {
                 std::vector<unsigned int> sorted_renumbering(renumbering);

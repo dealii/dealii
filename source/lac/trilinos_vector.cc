@@ -188,7 +188,7 @@ namespace TrilinosWrappers
       else
         owned_elements = parallel_partitioner;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           const size_type n_elements_global =
             Utilities::MPI::sum(owned_elements.n_elements(), communicator);
@@ -270,7 +270,7 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           const Epetra_MpiComm *comm_ptr =
             dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
@@ -348,7 +348,7 @@ namespace TrilinosWrappers
         }
       else
         vector = std::move(actual_vec);
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           const Epetra_MpiComm *comm_ptr =
             dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
@@ -410,7 +410,7 @@ namespace TrilinosWrappers
 
       last_action = Zero;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           const size_type n_elements_global =
             Utilities::MPI::sum(owned_elements.n_elements(), communicator);
@@ -650,7 +650,7 @@ namespace TrilinosWrappers
         }
 
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // check that every process has decided to use the same mode. This
           // will otherwise result in undefined behavior in the call to

@@ -599,7 +599,7 @@ block_operator(const BlockMatrixType &block_matrix)
 
   return_op.block = [&block_matrix](unsigned int i,
                                     unsigned int j) -> BlockType {
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         const unsigned int m = block_matrix.n_block_rows();
         const unsigned int n = block_matrix.n_block_cols();
@@ -721,7 +721,7 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
 
   return_op.block = [&block_matrix](unsigned int i,
                                     unsigned int j) -> BlockType {
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         const unsigned int m = block_matrix.n_block_rows();
         const unsigned int n = block_matrix.n_block_cols();

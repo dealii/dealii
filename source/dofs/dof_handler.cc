@@ -713,7 +713,7 @@ namespace internal
           // vertices, all vertices are actually active). this is of
           // course only true for vertices that are part of either
           // ghost or locally owned cells
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               for (unsigned int v = 0; v < dof_handler.tria->n_vertices(); ++v)
                 if (locally_used_vertices[v] == true)
@@ -1501,7 +1501,7 @@ namespace internal
                         // children. Consider the childrens' hypothetical future
                         // index when they have been flagged for p-refinement.
                         if constexpr (library_build_mode ==
-                                      LibraryBuildMode::debug_build)
+                                      LibraryBuildMode::debug)
                           {
                             for (const auto &child : parent->child_iterators())
                               Assert(child->is_active() &&
@@ -2162,7 +2162,7 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
          ExcMessage("The given hp::FECollection contains more finite elements "
                     "than the DoFHandler can cover with active FE indices."));
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // make sure that the provided FE collection is large enough to
       // cover all FE indices presently in use on the mesh
@@ -2405,7 +2405,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
 
       AssertDimension(new_numbers.size(), this->n_locally_owned_dofs());
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // assert that the new indices are consecutively numbered if we are
           // working on a single processor. this doesn't need to
@@ -2462,7 +2462,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
              ExcMessage(
                "You need to distribute DoFs before you can renumber them."));
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
                              *>(&*this->tria) != nullptr)
@@ -2526,7 +2526,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
   AssertDimension(new_numbers.size(),
                   this->locally_owned_mg_dofs(level).n_elements());
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // assert that the new indices are consecutively numbered if we are
       // working on a single processor. this doesn't need to hold in the case of

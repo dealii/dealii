@@ -1499,7 +1499,7 @@ template <class T>
 inline void
 AlignedVector<T>::shrink_to_fit()
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(replicated_across_communicator == false,
              ExcAlignedVectorChangeAfterReplication());
@@ -2016,7 +2016,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // **** Consistency check ****
   // At this point, each process should have a copy of the data.
   // Verify this in some sort of round-about way
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       replicated_across_communicator      = true;
       const std::vector<char> packed_data = Utilities::pack(*this);

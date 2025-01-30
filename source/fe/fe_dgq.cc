@@ -322,7 +322,7 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
           if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
             interpolation_matrix(i, j) = 0.;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // make sure that the row sum of
           // each of the matrices is 1 at

@@ -506,7 +506,7 @@ test_symmetric_tensor_tensor_vector_scalar_coupled(
   symb_d2psi_ds_x_dv  = SD::differentiate(symb_dpsi_ds, symb_v);
   symb_d2psi_ds_x_ds  = SD::differentiate(symb_dpsi_ds, symb_s);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       print(std::cout, "symb_st", symb_st);
       print(std::cout, "symb_t", symb_t);

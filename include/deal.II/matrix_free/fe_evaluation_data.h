@@ -498,7 +498,7 @@ public:
   get_cell_ids() const
   {
     // implemented inline to avoid compilation problems on Windows
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         Assert(is_reinitialized, ExcNotInitialized());
       }
@@ -513,7 +513,7 @@ public:
   get_face_ids() const
   {
     // implemented inline to avoid compilation problems on Windows
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         Assert(is_reinitialized && is_face, ExcNotInitialized());
       }
@@ -528,7 +528,7 @@ public:
   get_cell_or_face_batch_id() const
   {
     // implemented inline to avoid compilation problems on Windows
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         Assert(is_reinitialized, ExcNotInitialized());
       }
@@ -544,7 +544,7 @@ public:
   get_cell_or_face_ids() const
   {
     // implemented inline to avoid compilation problems on Windows
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         Assert(is_reinitialized, ExcNotInitialized());
       }
@@ -1162,7 +1162,7 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
   quadrature_points              = nullptr;
   quadrature_weights             = other.quadrature_weights;
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       is_reinitialized           = false;
       dof_values_initialized     = false;
@@ -1216,7 +1216,7 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
   // include 12 extra fields to insert some padding between values, gradients
   // and hessians, which helps to reduce the probability of cache conflicts
   const unsigned int allocated_size = size_scratch_data + size_data_arrays + 12;
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       scratch_data_array->clear();
       scratch_data_array->resize(
@@ -1394,7 +1394,7 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_dof_values()
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       dof_values_initialized = true;
     }
@@ -1407,7 +1407,7 @@ template <int dim, typename Number, bool is_face>
 inline const Number *
 FEEvaluationData<dim, Number, is_face>::begin_values() const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(values_quad_initialized || values_quad_submitted,
              ExcNotInitialized());
@@ -1421,7 +1421,7 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_values()
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       values_quad_initialized = true;
       values_quad_submitted   = true;
@@ -1435,7 +1435,7 @@ template <int dim, typename Number, bool is_face>
 inline const Number *
 FEEvaluationData<dim, Number, is_face>::begin_gradients() const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(gradients_quad_initialized || gradients_quad_submitted,
              ExcNotInitialized());
@@ -1449,7 +1449,7 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_gradients()
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       gradients_quad_submitted   = true;
       gradients_quad_initialized = true;
@@ -1463,7 +1463,7 @@ template <int dim, typename Number, bool is_face>
 inline const Number *
 FEEvaluationData<dim, Number, is_face>::begin_hessians() const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(hessians_quad_initialized, ExcNotInitialized());
     }
@@ -1476,7 +1476,7 @@ template <int dim, typename Number, bool is_face>
 inline Number *
 FEEvaluationData<dim, Number, is_face>::begin_hessians()
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       hessians_quad_initialized = true;
     }
@@ -1506,7 +1506,7 @@ template <int dim, typename Number, bool is_face>
 inline internal::MatrixFreeFunctions::GeometryType
 FEEvaluationData<dim, Number, is_face>::get_cell_type() const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(is_reinitialized, ExcNotInitialized());
     }

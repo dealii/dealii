@@ -365,7 +365,7 @@ namespace internal
               AssertThrowMPI(ierr);
               requests.clear();
             }
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // Make sure in debug mode, that everybody sent/received all
               // packages on this level. If a deadlock occurs here, the list of
@@ -635,7 +635,7 @@ namespace internal
       dirichlet_indices.clear();
       weights_on_refined.clear();
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           if (mg_constrained_dofs)
             {

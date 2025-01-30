@@ -195,7 +195,7 @@ namespace parallel
           break;
 
         case CellStatus::children_will_be_coarsened:
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               for (const auto &child : cell->child_iterators())
                 Assert(child->is_active() && child->coarsen_flag_set(),

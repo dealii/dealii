@@ -171,7 +171,7 @@ namespace internal
     {
       use_active_cells = mg_level == numbers::invalid_unsigned_int;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // safety check
           if (use_active_cells)
@@ -544,7 +544,7 @@ namespace internal
                       inner_face.second.shared_faces[i]);
                   }
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+              if constexpr (library_build_mode == LibraryBuildMode::debug)
                 {
                   // check consistency of faces on both sides
                   std::vector<std::pair<CellId, CellId>> check_faces;
@@ -1399,7 +1399,7 @@ namespace internal
           faces_type = std::move(new_faces_type);
         }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // final safety checks
           for (const auto &face_type : faces_type)

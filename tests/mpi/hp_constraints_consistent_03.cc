@@ -89,7 +89,7 @@ test(const unsigned int degree_center,
           // set different FE on center cell
           cell->set_active_fe_index(1);
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // verify that our scenario is initialized correctly
               // by checking the number of neighbors of the center cell

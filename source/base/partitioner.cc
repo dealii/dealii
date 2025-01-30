@@ -321,7 +321,7 @@ namespace Utilities
                                                local_range_data.first);
         }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // simple check: the number of processors to which we want to send
           // ghosts and the processors to which ghosts reference should be the

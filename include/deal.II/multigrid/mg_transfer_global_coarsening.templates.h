@@ -2345,7 +2345,7 @@ namespace internal
                              fe.n_dofs_per_vertex() > 0;
                     });
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           const bool fine_element_is_discontinuous =
             std::all_of(dof_handler_fine.get_fe_collection().begin(),

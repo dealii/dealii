@@ -213,7 +213,7 @@ namespace Utilities
       ierr = MPI_Type_commit(&result);
       AssertThrowMPI(ierr);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           MPI_Count size64;
           ierr = MPI_Type_size_x(result, &size64);
@@ -256,7 +256,7 @@ namespace Utilities
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (const unsigned int destination : destinations)
             AssertIndexRange(destination, n_procs);
@@ -392,7 +392,7 @@ namespace Utilities
           const unsigned int n_procs =
             Utilities::MPI::n_mpi_processes(mpi_comm);
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               for (const unsigned int destination : destinations)
                 {
@@ -1136,8 +1136,7 @@ namespace Utilities
                   // this function in release mode to avoid touching data
                   // unnecessarily (and overwrite the smaller pieces), as the
                   // locally owned part comes first
-                  if constexpr (library_build_mode ==
-                                LibraryBuildMode::debug_build)
+                  if constexpr (library_build_mode == LibraryBuildMode::debug)
                     {
                       data.resize(size, invalid_index_value);
                       std::fill(data.begin() + start,
@@ -1254,8 +1253,7 @@ namespace Utilities
 
                   Assert(next_index > index_range.first, ExcInternalError());
 
-                  if constexpr (library_build_mode ==
-                                LibraryBuildMode::debug_build)
+                  if constexpr (library_build_mode == LibraryBuildMode::debug)
                     {
                       // make sure that the owner is the same on the current
                       // interval
@@ -1356,7 +1354,7 @@ namespace Utilities
                   for (auto interval : buffer)
                     {
                       if constexpr (library_build_mode ==
-                                    LibraryBuildMode::debug_build)
+                                    LibraryBuildMode::debug)
                         {
                           for (types::global_dof_index i = interval.first;
                                i < interval.second;
@@ -1415,7 +1413,7 @@ namespace Utilities
                   for (auto interval : request)
                     {
                       if constexpr (library_build_mode ==
-                                    LibraryBuildMode::debug_build)
+                                    LibraryBuildMode::debug)
                         {
                           for (types::global_dof_index i = interval.first;
                                i < interval.second;
@@ -1769,7 +1767,7 @@ namespace Utilities
             }
 
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               for (const auto &it : requested_indices)
                 {

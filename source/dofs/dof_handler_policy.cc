@@ -127,7 +127,7 @@ namespace internal
                     DEAL_II_NOT_IMPLEMENTED();
                 }
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+              if constexpr (library_build_mode == LibraryBuildMode::debug)
                 {
                   // Each entry of 'complete_identities' contains a set of
                   // pairs (fe_index,dof_index). Because we put in exactly
@@ -166,7 +166,7 @@ namespace internal
                   reduced_identities.emplace_back(dof_index_1, dof_index_2);
                 }
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+              if constexpr (library_build_mode == LibraryBuildMode::debug)
                 {
                   // double check whether the newly created entries make
                   // any sense at all
@@ -3763,7 +3763,7 @@ namespace internal
 
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               for (const auto &cell : dof_handler->active_cell_iterators())
                 Assert(cell_marked[cell->active_cell_index()] == false,
@@ -3771,7 +3771,7 @@ namespace internal
             }
         }
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             // check that we are really done
             {
@@ -3953,7 +3953,7 @@ namespace internal
           // in Phase 1.
           communicate_mg_ghost_cells(*dof_handler, cell_marked);
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // make sure we have finished all cells:
               for (const auto &cell : dof_handler->cell_iterators())
@@ -3964,7 +3964,7 @@ namespace internal
 
 
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             // check that we are really done
             {

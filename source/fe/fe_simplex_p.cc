@@ -519,7 +519,7 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
               restriction_mat[i][j] =
                 this->shape_value(j, transformed_point[0]);
         }
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (unsigned int i = 0; i < this->n_dofs_per_cell(); i++)
             {
@@ -605,7 +605,7 @@ FE_SimplexPoly<dim, spacedim>::get_face_interpolation_matrix(
             interpolation_matrix(i, j) = matrix_entry;
           }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
             {
@@ -679,7 +679,7 @@ FE_SimplexPoly<dim, spacedim>::get_subface_interpolation_matrix(
             interpolation_matrix(i, j) = matrix_entry;
           }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
             {

@@ -2295,7 +2295,7 @@ namespace DoFRenumbering
                                           std::vector<unsigned int>(),
                                           false);
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         {
           const std::vector<types::global_dof_index> dofs_per_component =
@@ -2339,7 +2339,7 @@ namespace DoFRenumbering
                                               component_dofs.end());
       }
     component_renumbered_dofs.compress();
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         {
           IndexSet component_renumbered_dofs2(dof_handler.n_dofs());
