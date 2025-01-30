@@ -1135,7 +1135,7 @@ inline TriaIterator<Accessor>::TriaIterator(
   const TriaRawIterator<OtherAccessor> &i)
   : TriaRawIterator<Accessor>(i.accessor)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1153,7 +1153,7 @@ template <typename OtherAccessor>
 TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a)
   : TriaRawIterator<Accessor>(a)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1181,7 +1181,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaRawIterator<OtherAccessor> &i)
   : TriaIterator<Accessor>(i)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1353,7 +1353,7 @@ template <typename Accessor>
 inline TriaIterator<Accessor>::TriaIterator(const TriaRawIterator<Accessor> &i)
   : TriaRawIterator<Accessor>(i.accessor)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1375,7 +1375,7 @@ inline TriaIterator<Accessor>::TriaIterator(
   const typename Accessor::AccessorData *local_data)
   : TriaRawIterator<Accessor>(parent, level, index, local_data)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1397,7 +1397,7 @@ inline TriaIterator<Accessor>::TriaIterator(
   const typename Accessor::AccessorData             *local_data)
   : TriaRawIterator<Accessor>(tria_accessor, local_data)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1435,7 +1435,7 @@ inline TriaIterator<Accessor> &
 TriaIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1456,7 +1456,7 @@ inline TriaIterator<Accessor> &
 TriaIterator<Accessor>::operator=(const TriaRawIterator<OtherAccessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1538,7 +1538,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaRawIterator<Accessor> &i)
   : TriaIterator<Accessor>(i)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1558,7 +1558,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaIterator<Accessor> &i)
   : TriaIterator<Accessor>(i)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1581,7 +1581,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const typename Accessor::AccessorData *local_data)
   : TriaIterator<Accessor>(parent, level, index, local_data)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1604,7 +1604,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const typename Accessor::AccessorData             *local_data)
   : TriaIterator<Accessor>(tria_accessor, local_data)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1644,7 +1644,7 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1666,7 +1666,7 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaRawIterator<OtherAccessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1688,7 +1688,7 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaIterator<OtherAccessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write
@@ -1709,7 +1709,7 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaIterator<Accessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // do this like this, because:
       // if we write

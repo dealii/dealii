@@ -1602,7 +1602,7 @@ namespace LinearAlgebra
     {
       Assert(m() == n(), ExcNotQuadratic());
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // use operator() in debug mode because it checks if this is a valid
           // element (in parallel)

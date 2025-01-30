@@ -96,7 +96,7 @@ AffineConstraints<number>::add_constraint(
   // of Q4 elements in 3d, and so should cover the vast majority of
   // cases. If we have a constraint with more dependencies, then
   // that's just going to require a heap allocation.
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       {
         boost::container::small_vector<size_type, 25> column_indices;
@@ -800,7 +800,7 @@ AffineConstraints<number>::close()
   // number of constraints because it is an approximation for the number of dofs
   // in our system.
   [[maybe_unused]] size_type largest_idx = 0;
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       for (const ConstraintLine &line : lines)
         for (const std::pair<size_type, number> &entry : line.entries)
@@ -950,7 +950,7 @@ AffineConstraints<number>::close()
               }
           }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // increase iteration count. note that we should not iterate more
           // times than there are constraints, since this puts a natural upper
@@ -1171,7 +1171,7 @@ AffineConstraints<number>::shift(const size_type offset)
         entry.first += offset;
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // make sure that lines, lines_cache and local_lines
       // are still linked correctly
@@ -1216,7 +1216,7 @@ AffineConstraints<number>::get_view(const IndexSet &mask) const
   for (const ConstraintLine &line : lines)
     if (mask.is_element(line.index))
       {
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             for (const std::pair<size_type, number> &entry : line.entries)
               {
@@ -2865,7 +2865,7 @@ AffineConstraints<number>::distribute(VectorType &vec) const
           // with a locally-relevant index set that is indeed a superset
           // of the locally-owned indices. But you never know what people
           // pass as arguments...
-          if constexpr (library_build_mode == LibraryBuildMode::debug)
+          if constexpr (compiling_for_debug_build())
             {
               if (needed_elements_for_distribute != IndexSet())
                 {

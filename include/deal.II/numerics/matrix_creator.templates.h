@@ -1725,7 +1725,7 @@ namespace MatrixCreator
                 copy_data.cell->face(face)->boundary_id()) !=
               boundary_functions.end())
             {
-              if constexpr (library_build_mode == LibraryBuildMode::debug)
+              if constexpr (compiling_for_debug_build())
                 {
                   // in debug mode: compute an element in the matrix which is
                   // guaranteed to belong to a boundary dof. We do this to check

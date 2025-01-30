@@ -311,7 +311,7 @@ namespace VectorTools
       const DiagonalMatrix<decltype(rhs)> &preconditioner =
         use_lumped ? *mass_matrix.get_matrix_lumped_diagonal_inverse() :
                      *mass_matrix.get_matrix_diagonal_inverse();
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // Make sure we picked a valid preconditioner
           const auto &diagonal = preconditioner.get_vector();

@@ -59,7 +59,7 @@ namespace PETScWrappers
       // iterator for an empty line (what
       // would it point to?)
       Assert(ncols != 0, ExcInternalError());
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           for (PetscInt j = 0; j < ncols; ++j)
             {
@@ -166,7 +166,7 @@ namespace PETScWrappers
     assert_is_compressed();
 
     // now set all the entries of these rows to zero
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         for (const auto &row : rows)
           AssertIntegerConversion(static_cast<PetscInt>(row), row);
@@ -199,7 +199,7 @@ namespace PETScWrappers
     assert_is_compressed();
 
     // now set all the entries of these rows to zero
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         for (const auto &row : rows)
           AssertIntegerConversion(static_cast<PetscInt>(row), row);
@@ -263,7 +263,7 @@ namespace PETScWrappers
   MatrixBase::compress(const VectorOperation::values operation)
   {
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // Check that all processors agree that last_action is the same (or
           // none!)

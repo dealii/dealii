@@ -125,7 +125,7 @@ CellDataTransfer<dim, spacedim, VectorType>::
         }
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       n_active_cells_pre = triangulation->n_active_cells();
     }
@@ -142,7 +142,7 @@ void
 CellDataTransfer<dim, spacedim, VectorType>::unpack(const VectorType &in,
                                                     VectorType       &out)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       Assert(in.size() == n_active_cells_pre,
              ExcDimensionMismatch(in.size(), n_active_cells_pre));

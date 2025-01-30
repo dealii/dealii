@@ -67,7 +67,7 @@ main()
 
   SD::Utilities::print_substitution_map(deallog, substitution_map);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // Check that exceptions are raised when duplicate symbols
       // are found in a substitution map

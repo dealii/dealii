@@ -337,7 +337,7 @@ namespace Particles
              owned_particles_end->particles.empty(),
            ExcInternalError());
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // check that no cache element hits the three anchor states in the list
         // of particles
@@ -777,7 +777,7 @@ namespace Particles
     if (!properties.empty())
       {
         AssertDimension(properties.size(), positions.size());
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             for (const auto &p : properties)
               AssertDimension(p.size(), n_properties_per_particle());

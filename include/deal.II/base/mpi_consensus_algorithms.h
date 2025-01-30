@@ -1798,7 +1798,7 @@ namespace Utilities
               AssertThrowMPI(ierr);
             }
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug)
+          if constexpr (compiling_for_debug_build())
             {
               // note: IBarrier seems to make problem during testing, this
               // additional Barrier seems to help

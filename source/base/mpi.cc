@@ -213,7 +213,7 @@ namespace Utilities
       ierr = MPI_Type_commit(&result);
       AssertThrowMPI(ierr);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           MPI_Count size64;
           ierr = MPI_Type_size_x(result, &size64);
@@ -256,7 +256,7 @@ namespace Utilities
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           for (const unsigned int destination : destinations)
             AssertIndexRange(destination, n_procs);
@@ -392,7 +392,7 @@ namespace Utilities
           const unsigned int n_procs =
             Utilities::MPI::n_mpi_processes(mpi_comm);
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug)
+          if constexpr (compiling_for_debug_build())
             {
               for (const unsigned int destination : destinations)
                 {
@@ -1136,7 +1136,7 @@ namespace Utilities
                   // this function in release mode to avoid touching data
                   // unnecessarily (and overwrite the smaller pieces), as the
                   // locally owned part comes first
-                  if constexpr (library_build_mode == LibraryBuildMode::debug)
+                  if constexpr (compiling_for_debug_build())
                     {
                       data.resize(size, invalid_index_value);
                       std::fill(data.begin() + start,
@@ -1253,7 +1253,7 @@ namespace Utilities
 
                   Assert(next_index > index_range.first, ExcInternalError());
 
-                  if constexpr (library_build_mode == LibraryBuildMode::debug)
+                  if constexpr (compiling_for_debug_build())
                     {
                       // make sure that the owner is the same on the current
                       // interval
@@ -1767,7 +1767,7 @@ namespace Utilities
             }
 
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug)
+          if constexpr (compiling_for_debug_build())
             {
               for (const auto &it : requested_indices)
                 {

@@ -102,7 +102,7 @@ test(const unsigned int fes_size,
       deallog << "cycle:" << i << ", fe count:" << count << std::endl;
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // check each cell's active FE index by its distance from the center
       for (const auto &cell :

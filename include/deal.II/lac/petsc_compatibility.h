@@ -85,7 +85,7 @@ namespace PETScWrappers
   inline void
   close_matrix(Mat &matrix)
   {
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         set_matrix_option(matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
       }

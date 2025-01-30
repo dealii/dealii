@@ -1086,7 +1086,7 @@ namespace DoFTools
                        cell->active_fe_index()) == true,
                      ExcInternalError());
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug)
+              if constexpr (compiling_for_debug_build())
                 {
                   for (unsigned int c = 0; c < cell->face(f)->n_children(); ++c)
                     {
@@ -1223,7 +1223,7 @@ namespace DoFTools
                        cell->active_fe_index()) == true,
                      ExcInternalError());
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug)
+              if constexpr (compiling_for_debug_build())
                 {
                   for (unsigned int c = 0; c < cell->face(face)->n_children();
                        ++c)
@@ -3621,7 +3621,7 @@ namespace DoFTools
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         const auto [orientation, rotation, flip] =
           ::dealii::internal::split_face_orientation(combined_orientation);
@@ -4294,7 +4294,7 @@ namespace DoFTools
                    fine_fe.component_to_base_index(fine_component).first),
                ExcFiniteElementsDontMatch());
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             // if in debug mode, check whether the coarse grid is indeed coarser
             // everywhere than the fine grid
@@ -4430,7 +4430,7 @@ namespace DoFTools
         // respective dofs of the other components have sum of weights zero, of
         // course. we do not explicitly ask which component a dof belongs to,
         // but this at least tests some errors
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             for (unsigned int col = 0; col < n_parameters_on_fine_grid; ++col)
               {

@@ -290,7 +290,7 @@ namespace GridGenerator
     constexpr unsigned int n_pipes   = 3;
     constexpr double       tolerance = 1.e-12;
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // Verify user input.
         Assert(bifurcation.second > 0,

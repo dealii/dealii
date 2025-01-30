@@ -557,7 +557,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
         }
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
@@ -649,7 +649,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
         }
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1

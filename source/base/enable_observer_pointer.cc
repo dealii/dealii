@@ -57,7 +57,7 @@ EnableObserverPointer::check_no_subscribers() const noexcept
   // derived class. Note that the name may be mangled, so it need not be the
   // clear-text class name. However, you can obtain the latter by running the
   // c++filt program over the output.
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // If there are still active pointers, show a message and kill the
       // program. However, under some circumstances, this is not so desirable.

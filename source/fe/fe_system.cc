@@ -1930,7 +1930,7 @@ FESystem<dim, spacedim>::initialize(
           }
       }
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // check generalized_support_points_index_table for consistency
         for (unsigned int i = 0; i < base_elements.size(); ++i)

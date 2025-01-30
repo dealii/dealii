@@ -48,7 +48,7 @@ namespace GridTools
     // tria.n_levels()==1, since this is something that can happen on one
     // processor without being true on all. however, we can ask for the
     // global number of active cells and use that
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         if (const auto *p_tria = dynamic_cast<
               const parallel::DistributedTriangulationBase<dim, spacedim> *>(

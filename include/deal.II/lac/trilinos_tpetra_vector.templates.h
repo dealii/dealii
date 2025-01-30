@@ -168,7 +168,7 @@ namespace LinearAlgebra
 
       has_ghost = (vector->getMap()->isOneToOne() == false);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           MPI_Comm comm = Utilities::Trilinos::teuchos_comm_to_mpi_comm(
             vector->getMap()->getComm());
@@ -1071,7 +1071,7 @@ namespace LinearAlgebra
       const size_type begin = vector->getMap()->getMinGlobalIndex();
       const size_type end   = vector->getMap()->getMaxGlobalIndex() + 1;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           const size_type n_local_elements =
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)

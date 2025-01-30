@@ -317,7 +317,7 @@ namespace PETScWrappers
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // test ghost allocation in debug mode
           PetscInt begin, end;

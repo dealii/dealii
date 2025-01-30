@@ -137,7 +137,7 @@ namespace dealii
     else
       this->data = this->shape_info_base;
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         this->is_reinitialized           = true;
         this->dof_values_initialized     = false;
@@ -242,7 +242,7 @@ namespace dealii
     else
       this->data = this->shape_info_base;
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         this->is_reinitialized           = true;
         this->dof_values_initialized     = false;

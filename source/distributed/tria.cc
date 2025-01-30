@@ -2630,7 +2630,7 @@ namespace parallel
               }
           }
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             // There must not be any chains!
             for (unsigned int i = 0; i < topological_vertex_numbering.size();
@@ -3015,7 +3015,7 @@ namespace parallel
         }
       while (mesh_changed);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // check if correct number of ghosts is created
           unsigned int num_ghosts = 0;
@@ -3125,7 +3125,7 @@ namespace parallel
 
 
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // check that our local copy has exactly as many cells as the p4est
           // original (at least if we are on only one processor); for parallel
@@ -3291,7 +3291,7 @@ namespace parallel
     void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
     {
       // do not allow anisotropic refinement
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           for (const auto &cell : this->active_cell_iterators())
             if (cell->is_locally_owned() && cell->refine_flag_set())
@@ -3489,7 +3489,7 @@ namespace parallel
           this->data_serializer.unpack_cell_status(this->local_cell_relations);
         }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // Check that we know the level subdomain ids of all our neighbors.
           // This also involves coarser cells that share a vertex if they are
@@ -3560,7 +3560,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::repartition()
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           for (const auto &cell : this->active_cell_iterators())
             if (cell->is_locally_owned())

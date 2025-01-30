@@ -388,7 +388,7 @@ namespace DoFTools
     AssertDimension(dof_to_boundary_mapping.size(), n_dofs);
     AssertDimension(sparsity.n_rows(), dof.n_boundary_dofs());
     AssertDimension(sparsity.n_cols(), dof.n_boundary_dofs());
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         if (sparsity.n_rows() != 0)
           {
@@ -504,7 +504,7 @@ namespace DoFTools
                                 dof.n_boundary_dofs(boundary_ids)));
     (void)fe_is_hermite;
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         if (sparsity.n_rows() != 0)
           {

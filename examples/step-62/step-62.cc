@@ -1317,7 +1317,7 @@ namespace step62
   template <int dim>
   void ElasticWave<dim>::run()
   {
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       pcout << "Debug mode" << std::endl;
     else
       pcout << "Release mode" << std::endl;

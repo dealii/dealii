@@ -365,7 +365,7 @@ SolutionTransfer<dim, VectorType, spacedim>::pack_callback(
               // In case of coarsening, we need to find a suitable FE index
               // for the parent cell. We choose the 'least dominant fe'
               // on all children from the associated FECollection.
-              if constexpr (library_build_mode == LibraryBuildMode::debug)
+              if constexpr (compiling_for_debug_build())
                 {
                   for (const auto &child : cell->child_iterators())
                     Assert(child->is_active() && child->coarsen_flag_set(),
@@ -765,7 +765,7 @@ namespace Legacy
     n_dofs_old                 = dof_handler->n_dofs();
     const unsigned int in_size = all_in.size();
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         Assert(in_size != 0,
                ExcMessage("The array of input vectors you pass to this "
@@ -927,7 +927,7 @@ namespace Legacy
     std::vector<VectorType>       &all_out) const
   {
     const unsigned int size = all_in.size();
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         Assert(prepared_for == coarsening_and_refinement, ExcNotPrepared());
         Assert(all_out.size() == size,

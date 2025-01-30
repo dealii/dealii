@@ -545,7 +545,7 @@ namespace PETScWrappers
                       "vectors."));
 
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // Check that all processors agree that last_action is the same (or
           // none!)

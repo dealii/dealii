@@ -1471,7 +1471,7 @@ FunctionManifold<dim, spacedim, chartdim>::push_forward(
   for (unsigned int i = 0; i < spacedim; ++i)
     result[i] = pf[i];
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       Vector<double> pb(chartdim);
       pull_back_function->vector_value(result, pb);

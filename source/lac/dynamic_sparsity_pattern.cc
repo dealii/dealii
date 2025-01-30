@@ -44,7 +44,7 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
     {
       // in debug mode, check whether the
       // indices really are sorted.
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           {
             ForwardIterator test = begin, test1 = begin;

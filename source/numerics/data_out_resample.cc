@@ -150,7 +150,7 @@ DataOutResample<dim, patch_dim, spacedim>::build_patches(
 
       const auto &dh = *data_ptr->dof_handler;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           for (const auto &fe : dh.get_fe_collection())
             Assert(

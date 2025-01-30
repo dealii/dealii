@@ -98,7 +98,7 @@ namespace LinearAlgebra
       const MPI_Comm                  communicator,
       const bool                      exchange_data)
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           std::vector<typename TpetraTypes::MapType<MemorySpace>> tpetra_maps;
           for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)

@@ -84,7 +84,7 @@ MGTransferBlock<number>::prolongate(const unsigned int         to_level,
   Assert(dst.n_blocks() == this->n_mg_blocks,
          ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       if (this->mg_constrained_dofs != nullptr)
         Assert(this->mg_constrained_dofs
@@ -270,7 +270,7 @@ MGTransferBlockSelect<number>::prolongate(const unsigned int    to_level,
   Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
          ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       if (this->mg_constrained_dofs != nullptr)
         Assert(this->mg_constrained_dofs

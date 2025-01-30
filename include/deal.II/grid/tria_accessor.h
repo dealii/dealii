@@ -6473,7 +6473,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
             // outside the old ball.
           }
       }
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       bool all_vertices_within_ball = true;
 
