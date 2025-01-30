@@ -734,6 +734,7 @@ namespace TriangulationDescription
                    "in the given communicator."));
         }
 
+#ifdef DEBUG
       // If we are dealing with a sequential triangulation, then someone
       // will have needed to set the subdomain_ids by hand. Make sure that
       // all ids we see are less than the number of processes we are
@@ -741,7 +742,6 @@ namespace TriangulationDescription
       if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &tria) == nullptr)
         {
-#if DEBUG
           const unsigned int n_mpi_processes =
             dealii::Utilities::MPI::n_mpi_processes(comm);
           for (const auto &cell : tria.active_cell_iterators())
@@ -751,8 +751,8 @@ namespace TriangulationDescription
                               " when splitting the triangulation using an MPI "
                               " communicator with only " +
                               std::to_string(n_mpi_processes) + " processes."));
-#endif
         }
+#endif
 
       // First, figure out for what rank we are supposed to build the
       // TriangulationDescription::Description object
