@@ -269,7 +269,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
             }
           // Apply inverse diagonal
           this->inverse_vmult(block, x_cell, b_cell);
-          if constexpr (library_build_mode == LibraryBuildMode::debug)
+          if constexpr (compiling_for_debug_build())
             {
               for (unsigned int i = 0; i < x_cell.size(); ++i)
                 {

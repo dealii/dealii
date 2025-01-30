@@ -70,6 +70,17 @@ constexpr LibraryBuildMode library_build_mode
  = LibraryBuildMode::release;
 #endif
 
+
+/**
+ * A function that returns whether we are currently compiling for a debug
+ * build (rather than a release build).
+ */
+constexpr bool compiling_for_debug_build()
+{
+  return (library_build_mode == LibraryBuildMode::debug);
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 

@@ -1208,7 +1208,7 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
   const unsigned int first_selected =
     mask.first_selected_component(n_total_components);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // check that it is contiguous:
       for (unsigned int c = 0; c < n_total_components; ++c)

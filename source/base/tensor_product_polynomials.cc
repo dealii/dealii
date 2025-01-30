@@ -710,7 +710,7 @@ AnisotropicPolynomials<dim>::compute_index(
     }
   else
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (compiling_for_debug_build())
         {
           unsigned int n_poly = 1;
           for (unsigned int d = 0; d < dim; ++d)

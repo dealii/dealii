@@ -169,7 +169,7 @@ namespace Differentiation
              ExcMessage(
                "Cannot register symbols once the optimizer is finalized."));
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // Ensure that all of the keys in the map are actually symbolic
           // in nature
@@ -404,7 +404,7 @@ namespace Differentiation
 
       // Check that the registered symbol map and the input map are compatible
       // with one another
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           const SD::types::symbol_vector symbol_sub_vec =
             Utilities::extract_symbols(substitution_map);
@@ -737,7 +737,7 @@ namespace Differentiation
       dependent_variables_output.reserve(n_dependent_variables() + 1);
       const bool entry_registered =
         (map_dep_expr_vec_entry.find(func) != map_dep_expr_vec_entry.end());
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           if (entry_registered == true &&
               is_valid_nonunique_dependent_variable(func) == false)
@@ -771,7 +771,7 @@ namespace Differentiation
         {
           const bool entry_registered =
             (map_dep_expr_vec_entry.find(func) != map_dep_expr_vec_entry.end());
-          if constexpr (library_build_mode == LibraryBuildMode::debug)
+          if constexpr (compiling_for_debug_build())
             {
               if (entry_registered == true &&
                   is_valid_nonunique_dependent_variable(func) == false)

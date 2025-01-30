@@ -164,7 +164,7 @@ namespace internal
       const unsigned int n_owned  = (vector_partitioner->local_range().second -
                                     vector_partitioner->local_range().first);
       const std::size_t  n_ghosts = ghost_dofs.size();
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           for (const auto dof_index : dof_indices)
             AssertIndexRange(dof_index, n_owned + n_ghosts);
@@ -475,7 +475,7 @@ namespace internal
       new_rowstart_plain.swap(row_starts_plain_indices);
       new_hanging_node_constraint_masks.swap(hanging_node_constraint_masks);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // sanity check 1: all indices should be smaller than the number of
           // dofs locally owned plus the number of ghosts

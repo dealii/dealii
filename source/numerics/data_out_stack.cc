@@ -94,7 +94,7 @@ DataOutStack<dim, spacedim>::declare_data_vector(
   const std::vector<std::string> &names,
   const VectorType                vector_type)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // make sure this function is
       // not called after some parameter

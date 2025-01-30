@@ -1973,7 +1973,7 @@ namespace MatrixFreeOperators
     for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
          ++i)
       {
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             // only define the type alias in debug mode to avoid a warning
             using Number =

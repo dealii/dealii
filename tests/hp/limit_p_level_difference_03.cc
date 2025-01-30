@@ -98,7 +98,7 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   (void)fe_indices_changed;
   Assert(fe_indices_changed, ExcInternalError());
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // check each cell's active FE by its h-level
       for (unsigned int l = 0; l < tria.n_levels(); ++l)

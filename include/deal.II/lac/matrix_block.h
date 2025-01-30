@@ -716,7 +716,7 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
   // leave it at this. While it may
   // not be the most efficient way,
   // it is at least thread safe.
-  // if constexpr (library_build_mode == LibraryBuildMode::debug){
+  // if constexpr (compiling_for_debug_build()){
   Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
 
   for (size_type j = 0; j < n_cols; ++j)

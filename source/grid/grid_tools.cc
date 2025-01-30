@@ -959,7 +959,7 @@ namespace GridTools
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             {
               // Double-check if found index is at marked cell
@@ -3475,7 +3475,7 @@ namespace GridTools
     AssertDimension(cells_out.size(), maps_out.size());
     AssertDimension(cells_out.size(), qpoints_out.size());
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         unsigned int c   = cells_out.size();
         unsigned int qps = 0;

@@ -186,7 +186,7 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
         ++present_index;
       }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       if (size() > 0)
         {
@@ -228,7 +228,7 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
       ++present_index;
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       if (size() > 0)
         {
@@ -625,7 +625,7 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
     else if (std::abs(i[0] - 1.0) < 1e-12)
       i[0] = 1.0;
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       double sum_of_weights = 0;
       for (unsigned int i = 0; i < this->size(); ++i)

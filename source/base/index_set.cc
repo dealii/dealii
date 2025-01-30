@@ -202,7 +202,7 @@ IndexSet::do_compress() const
     Assert(next_index == n_elements(), ExcInternalError());
   }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // A consistency check: We should only ever have added indices
       // that are within the range of the index set. Instead of doing
@@ -459,7 +459,7 @@ IndexSet::split_by_block(
       start += n_block_indices;
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       types::global_dof_index sum = 0;
       for (const auto &partition : partitioned)
@@ -975,7 +975,7 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
   compress();
   (void)communicator;
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       if (!overlapping)
         {
@@ -1050,7 +1050,7 @@ IndexSet::make_trilinos_map(const MPI_Comm communicator,
   compress();
   (void)communicator;
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       if (!overlapping)
         {

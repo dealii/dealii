@@ -557,7 +557,7 @@ namespace TrilinosWrappers
     IndexSet nonlocal_partitioner = writable_rows;
     AssertDimension(nonlocal_partitioner.size(),
                     row_parallel_partitioning.size());
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         {
           IndexSet tmp = writable_rows & row_parallel_partitioning;

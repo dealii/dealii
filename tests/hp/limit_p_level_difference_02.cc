@@ -95,7 +95,7 @@ test(const unsigned int fes_size, const unsigned int max_difference)
     }
   Assert(center_cell->active_fe_index() == sequence.back(), ExcInternalError());
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       // check each cell's active FE index by its distance from the center
       for (const auto &cell : dofh.active_cell_iterators())

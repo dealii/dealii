@@ -47,7 +47,7 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
-            if constexpr (library_build_mode == LibraryBuildMode::debug)
+            if constexpr (compiling_for_debug_build())
               {
                 {
                   const unsigned int rank = this_mpi_process(mpi_communicator);

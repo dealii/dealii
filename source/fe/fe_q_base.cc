@@ -559,7 +559,7 @@ FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
           if (std::fabs(interpolation_matrix(i, j)) < eps)
             interpolation_matrix(i, j) = 0.;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // make sure that the row sum of each of the matrices is 1 at this
           // point. this must be so since the shape functions sum up to 1
@@ -696,7 +696,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
             }
         }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // make sure that the row sum of each of the matrices is 1 at this
           // point. this must be so since the shape functions sum up to 1
@@ -1271,7 +1271,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
       // evaluations of the Lagrange polynomials are zero or one.
       const double eps = 1e-15 * q_degree * dim;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // in DEBUG mode, check that the evaluation of support points in the
           // current numbering gives the identity operation
@@ -1409,7 +1409,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
 
       // and make sure that the row sum is 1. this must be so since for this
       // element, the shape functions add up to one
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           for (unsigned int row = 0; row < this->n_dofs_per_cell(); ++row)
             {

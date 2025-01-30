@@ -118,7 +118,7 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // Validate user inputs.
         Assert(codim <= dim, ExcImpossibleInDim(dim));
@@ -159,7 +159,7 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // Validate user inputs.
         Assert(codim <= dim, ExcImpossibleInDim(dim));
@@ -205,7 +205,7 @@ namespace hp
     if (fes.size() == 1)
       return *fes.begin();
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // Validate user inputs.
         Assert(codim <= dim, ExcImpossibleInDim(dim));
@@ -253,7 +253,7 @@ namespace hp
     if (fes.size() == 1)
       return *fes.begin();
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // Validate user inputs.
         Assert(codim <= dim, ExcImpossibleInDim(dim));
@@ -395,7 +395,7 @@ namespace hp
               identities_graph.emplace(Node(fe_index_1, identity.first),
                                        Node(fe_index_2, identity.second));
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug)
+      if constexpr (compiling_for_debug_build())
         {
           // Now verify that indeed the graph is symmetric: If one element
           // declares that certain ones of its DoFs are to be unified with those
@@ -480,7 +480,7 @@ namespace hp
           for (const Edge &e : sub_graph)
             identities_graph.erase(e);
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug)
+          if constexpr (compiling_for_debug_build())
             {
               // There are three checks we ought to perform:
               // - That the sub-graph is undirected, i.e. that every edge

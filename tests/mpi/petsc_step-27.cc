@@ -222,7 +222,7 @@ namespace Step27
                                              0,
                                              Functions::ZeroFunction<dim>(),
                                              constraints);
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // We have not dealt with chains of constraints on ghost cells yet.
         // Thus, we are content with verifying their consistency for now.

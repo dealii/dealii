@@ -69,7 +69,7 @@ namespace GridTools
         // it should never be necessary to check the material or manifold
         // ids as a 'tiebreaker' (since they must be equal if the vertex
         // indices are equal). Assert it anyway:
-        if constexpr (library_build_mode == LibraryBuildMode::debug)
+        if constexpr (compiling_for_debug_build())
           {
             if (std::equal(std::begin(a.vertices),
                            std::end(a.vertices),

@@ -1954,7 +1954,7 @@ IndexSet::n_elements() const
       v              = r.nth_index_in_set + r.end - r.begin;
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug)
+  if constexpr (compiling_for_debug_build())
     {
       size_type s = 0;
       for (const auto &range : ranges)

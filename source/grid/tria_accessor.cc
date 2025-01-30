@@ -3368,7 +3368,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                   neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
                     neighbor_child->refinement_case(), neighbor_neighbor, 0));
 
-              if constexpr (library_build_mode == LibraryBuildMode::debug)
+              if constexpr (compiling_for_debug_build())
                 {
                   // check, whether the face neighbor_child matches the
                   // requested subface.

@@ -2132,7 +2132,7 @@ namespace GridTools
     (void)space_dim;
     AssertIndexRange(direction, space_dim);
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         {
           constexpr int dim      = CellIterator::AccessorType::dimension;
@@ -2276,7 +2276,7 @@ namespace GridTools
     match_periodic_face_pairs(
       pairs1, pairs2, direction, matched_pairs, offset, matrix);
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug)
+    if constexpr (compiling_for_debug_build())
       {
         // check for standard orientation
         const unsigned int size_new = matched_pairs.size();
