@@ -368,7 +368,7 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
   const unsigned int this_mpi_process(
     Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
              ExcMessage(
@@ -541,7 +541,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   const unsigned int this_mpi_process(
     Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
              ExcMessage(

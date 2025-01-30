@@ -96,7 +96,7 @@ main()
 
   deal_II_exceptions::disable_abort_on_exception();
   bool expected_result;
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // Asserts should be triggered
       expected_result = false;

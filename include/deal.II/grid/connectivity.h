@@ -1489,7 +1489,7 @@ namespace internal
       // loop over cells and create CRS
       for (const auto &cell : cells)
         {
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               auto vertices_unique = cell.vertices;
               std::sort(vertices_unique.begin(), vertices_unique.end());

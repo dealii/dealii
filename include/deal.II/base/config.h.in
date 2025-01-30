@@ -54,8 +54,8 @@ DEAL_II_NAMESPACE_OPEN
  */
 enum class LibraryBuildMode
 {
-  debug_build, 
-  release_build
+  debug, 
+  release
 };
 
 /**
@@ -65,9 +65,9 @@ enum class LibraryBuildMode
  */
 constexpr LibraryBuildMode library_build_mode
 #ifdef DEBUG
- = LibraryBuildMode::debug_build;
+ = LibraryBuildMode::debug;
 #else
- = LibraryBuildMode::release_build;
+ = LibraryBuildMode::release;
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

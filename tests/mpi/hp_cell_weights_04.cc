@@ -99,7 +99,7 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       parallel::shared::Triangulation<dim> other_tria(
         MPI_COMM_WORLD,

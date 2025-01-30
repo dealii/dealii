@@ -775,7 +775,7 @@ namespace VectorTools
       // but it needs to be implemented
       if (dim >= 3)
         {
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               // Assert that there are no hanging nodes at the boundary
               int level = -1;

@@ -195,7 +195,7 @@ namespace Utilities
       AssertThrowMPI(ierr);
 
       // Double check that the process with rank 0 in subgroup is active:
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
               Utilities::MPI::this_mpi_process(

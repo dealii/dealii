@@ -218,7 +218,7 @@ namespace FE_P_BubblesImplementation
               lump_polys.push_back(std::move(p));
 
             // Sanity check:
-            if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+            if constexpr (library_build_mode == LibraryBuildMode::debug)
               {
                 BarycentricPolynomial<dim> unity;
                 for (const auto &p : lump_polys)

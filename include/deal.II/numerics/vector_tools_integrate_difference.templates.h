@@ -653,7 +653,7 @@ namespace VectorTools
   {
     Assert(cellwise_error.size() == tria.n_active_cells(),
            ExcMessage("input vector cell_error has invalid size!"));
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         {
           // check that off-processor entries are zero. Otherwise we will

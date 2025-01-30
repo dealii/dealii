@@ -444,8 +444,7 @@ namespace VectorTools
 
             if (selected)
               {
-                if constexpr (library_build_mode ==
-                              LibraryBuildMode::debug_build)
+                if constexpr (library_build_mode == LibraryBuildMode::debug)
                   {
                     // make sure that all selected base elements are indeed
                     // interpolatory

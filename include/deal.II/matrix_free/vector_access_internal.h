@@ -205,7 +205,7 @@ namespace internal
     (void)matrix_free;
     (void)dof_info;
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         if (vec.partitioners_are_compatible(*dof_info.vector_partitioner) ==
             false)
@@ -308,7 +308,7 @@ namespace internal
                             VectorizedArrayType *dof_values,
                             std::bool_constant<true>) const
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // in debug mode, run non-vectorized version because this path
           // has additional checks (e.g., regarding ghosting)
@@ -449,7 +449,7 @@ namespace internal
       (void)constant_offset;
       (void)vec;
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // in debug mode, run non-vectorized version because this path
           // has additional checks (e.g., regarding ghosting)

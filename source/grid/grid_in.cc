@@ -2848,7 +2848,7 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
         AssertDimension(node_tags[i], i + 1);
         for (unsigned int d = 0; d < spacedim; ++d)
           vertices[i][d] = coord[i * 3 + d];
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             // Make sure the embedded dimension is right
             for (unsigned int d = spacedim; d < 3; ++d)

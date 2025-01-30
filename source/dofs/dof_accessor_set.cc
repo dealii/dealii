@@ -137,7 +137,7 @@ namespace internal
   {
     (void)perform_check;
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         if (perform_check && is_dealii_vector<OutputVector>)
           {

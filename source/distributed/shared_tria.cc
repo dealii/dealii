@@ -86,7 +86,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::partition()
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // Check that all meshes are the same (or at least have the same
           // total number of active cells):
@@ -285,7 +285,7 @@ namespace parallel
             true_subdomain_ids_of_cells[index] = cell->subdomain_id();
         }
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           {
             // Assert that each cell is owned by a processor

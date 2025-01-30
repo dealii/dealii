@@ -1372,7 +1372,7 @@ namespace LinearAlgebra
     {
 #ifdef DEAL_II_WITH_MPI
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           Assert(Utilities::MPI::job_supports_mpi() ||
                    (update_ghost_values_requests.empty() &&
@@ -1757,7 +1757,7 @@ namespace LinearAlgebra
     Vector<Number,
            MemorySpaceType>::assert_no_residual_content_in_ghost_region() const
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // This should only be called for non-ghosted vectors
           Assert(!vector_is_ghosted, ExcInternalError());

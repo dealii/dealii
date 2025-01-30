@@ -412,7 +412,7 @@ namespace dealii
 
       // add simplex cell in coordinate direction
       const unsigned int coordinate = face_no / 2;
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // all vertices should be in a plane
           for (const auto &vertex : vertices)

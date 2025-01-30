@@ -3923,7 +3923,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   apply_hanging_node_constraints(false);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->dof_values_initialized = true;
     }
@@ -3954,7 +3954,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader, src_data.first, src_data.second, mask, false);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->dof_values_initialized = true;
     }
@@ -3974,7 +3974,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                              const unsigned int          first_index,
                              const std::bitset<n_lanes> &mask) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->dof_values_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4009,7 +4009,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                  const unsigned int          first_index,
                  const std::bitset<n_lanes> &mask) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->dof_values_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4041,7 +4041,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                        const unsigned int          first_index,
                        const std::bitset<n_lanes> &mask) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->dof_values_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4108,7 +4108,7 @@ inline DEAL_II_ALWAYS_INLINE
   FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     get_value(const unsigned int q_point) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->values_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4124,7 +4124,7 @@ inline DEAL_II_ALWAYS_INLINE
             internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
         {
           // Piola transform is required
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               Assert(this->values_quad_initialized == true,
                      internal::ExcAccessToUninitializedField());
@@ -4209,7 +4209,7 @@ inline DEAL_II_ALWAYS_INLINE
   FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     get_gradient(const unsigned int q_point) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->gradients_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4227,7 +4227,7 @@ inline DEAL_II_ALWAYS_INLINE
           internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
         {
           // Piola transform is required
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               Assert(this->gradients_quad_initialized == true,
                      internal::ExcAccessToUninitializedField());
@@ -4459,7 +4459,7 @@ inline DEAL_II_ALWAYS_INLINE
     get_normal_derivative(const unsigned int q_point) const
 {
   AssertIndexRange(q_point, this->n_quadrature_points);
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->gradients_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4565,7 +4565,7 @@ inline typename FEEvaluationBase<dim,
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_hessian(const unsigned int q_point) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->hessians_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4711,7 +4711,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_hessian_diagonal(const unsigned int q_point) const
 {
   Assert(!is_face, ExcNotImplemented());
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->hessians_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4809,7 +4809,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_laplacian(const unsigned int q_point) const
 {
   Assert(is_face == false, ExcNotImplemented());
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->hessians_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4852,7 +4852,7 @@ inline typename FEEvaluationBase<dim,
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_normal_hessian(const unsigned int q_point) const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->hessians_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -4933,7 +4933,7 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_dof_value(const value_type val_in, const unsigned int dof)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->dof_values_initialized = true;
     }
@@ -4957,7 +4957,7 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_value(const value_type val_in, const unsigned int q_point)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->is_reinitialized, ExcNotInitialized());
     }
@@ -4965,7 +4965,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->J_value != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_values"));
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->values_quad_submitted = true;
     }
@@ -4990,7 +4990,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           Assert(this->J_value != nullptr,
                  internal::ExcMatrixFreeAccessToUninitializedMappingField(
                    "update_value"));
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               Assert(this->is_reinitialized, ExcNotInitialized());
               this->values_quad_submitted = true;
@@ -5079,7 +5079,7 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_gradient(const gradient_type grad_in, const unsigned int q_point)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->is_reinitialized, ExcNotInitialized());
     }
@@ -5090,7 +5090,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->gradients_quad_submitted = true;
     }
@@ -5102,7 +5102,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           // Piola transform is required
 
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               Assert(this->is_reinitialized, ExcNotInitialized());
             }
@@ -5113,7 +5113,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           Assert(this->jacobian != nullptr,
                  internal::ExcMatrixFreeAccessToUninitializedMappingField(
                    "update_gradients"));
-          if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+          if constexpr (library_build_mode == LibraryBuildMode::debug)
             {
               this->gradients_quad_submitted = true;
             }
@@ -5370,7 +5370,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->normal_x_jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->gradients_quad_submitted = true;
     }
@@ -5423,7 +5423,7 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_hessian(const hessian_type hessian_in, const unsigned int q_point)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->is_reinitialized, ExcNotInitialized());
     }
@@ -5434,7 +5434,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_hessians"));
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->hessians_quad_submitted = true;
     }
@@ -5596,7 +5596,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_normal_hessian(const value_type   normal_hessian_in,
                         const unsigned int q_point)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->is_reinitialized, ExcNotInitialized());
     }
@@ -5607,7 +5607,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_hessians"));
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->hessians_quad_submitted = true;
     }
@@ -5683,7 +5683,7 @@ inline typename FEEvaluationBase<dim,
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   integrate_value() const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->is_reinitialized, ExcNotInitialized());
       Assert(this->values_quad_submitted == true,
@@ -5717,7 +5717,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 "Do not try to modify the default template parameters used for"
                 " selectively enabling this function via std::enable_if!");
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->gradients_quad_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -5884,7 +5884,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 "Do not try to modify the default template parameters used for"
                 " selectively enabling this function via std::enable_if!");
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->is_reinitialized, ExcNotInitialized());
     }
@@ -5895,7 +5895,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->gradients_quad_submitted = true;
     }
@@ -5991,7 +5991,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // could have used base class operator, but that involves some overhead
   // which is inefficient. it is nice to have the symmetric tensor because
   // that saves some operations
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->is_reinitialized, ExcNotInitialized());
     }
@@ -6002,7 +6002,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->gradients_quad_submitted = true;
     }
@@ -6339,7 +6339,7 @@ FEEvaluation<dim,
       "is the index of the active FE, which you can use to exclude "
       "FE_Nothing."));
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // print error message when the dimensions do not match. Propose a
       // possible fix
@@ -6553,7 +6553,7 @@ FEEvaluation<dim,
       &this->mapping_data->quadrature_points
          [this->mapping_data->quadrature_point_offsets[this->cell]];
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->is_reinitialized           = true;
       this->dof_values_initialized     = false;
@@ -6817,7 +6817,7 @@ FEEvaluation<dim,
         }
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->is_reinitialized           = true;
       this->dof_values_initialized     = false;
@@ -6859,7 +6859,7 @@ FEEvaluation<dim,
   else
     cell->get_dof_indices(this->local_dof_indices);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->is_reinitialized = true;
     }
@@ -6890,7 +6890,7 @@ FEEvaluation<dim,
   Assert(this->mapped_geometry.get() != 0, ExcNotInitialized());
   this->mapped_geometry->reinit(cell);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->is_reinitialized = true;
     }
@@ -6913,7 +6913,7 @@ FEEvaluation<dim,
              VectorizedArrayType>::
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flags)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->dof_values_initialized == true,
              internal::ExcAccessToUninitializedField());
@@ -6969,7 +6969,7 @@ FEEvaluation<dim,
         *this);
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->values_quad_initialized =
         evaluation_flag_actual & EvaluationFlags::values;
@@ -7102,7 +7102,7 @@ FEEvaluation<dim,
 {
   integrate(integration_flag, this->values_dofs);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->dof_values_initialized = true;
     }
@@ -7127,7 +7127,7 @@ FEEvaluation<dim,
             VectorizedArrayType                   *values_array,
             const bool                             sum_into_values_array)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       if (integration_flag & EvaluationFlags::values)
         Assert(this->values_quad_submitted == true,
@@ -7207,7 +7207,7 @@ FEEvaluation<dim,
         sum_into_values_array);
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->dof_values_initialized = true;
     }
@@ -7414,7 +7414,7 @@ FEFaceEvaluation<dim,
         this->mapping_data->quadrature_point_offsets[this->cell];
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->is_reinitialized           = true;
       this->dof_values_initialized     = false;
@@ -7599,7 +7599,7 @@ FEFaceEvaluation<dim,
                                   .quadrature_point_offsets[index];
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->is_reinitialized           = true;
       this->dof_values_initialized     = false;
@@ -7626,7 +7626,7 @@ FEFaceEvaluation<dim,
                  VectorizedArrayType>::
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->dof_values_initialized, ExcNotInitialized());
     }
@@ -7681,7 +7681,7 @@ FEFaceEvaluation<dim,
     internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::evaluate(
       n_components, evaluation_flag_actual, values_array, *this);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->values_quad_initialized =
         evaluation_flag_actual & EvaluationFlags::values;
@@ -7709,7 +7709,7 @@ FEFaceEvaluation<dim,
                  VectorizedArrayType>::
   project_to_face(const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(this->dof_values_initialized, ExcNotInitialized());
     }
@@ -7817,7 +7817,7 @@ FEFaceEvaluation<dim,
     internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::
       evaluate_in_face(n_components, evaluation_flag_actual, *this);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->values_quad_initialized =
         evaluation_flag_actual & EvaluationFlags::values;
@@ -7848,7 +7848,7 @@ FEFaceEvaluation<dim,
 {
   integrate(integration_flag, this->values_dofs, sum_into_values);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->dof_values_initialized = true;
     }
@@ -8027,7 +8027,7 @@ FEFaceEvaluation<dim,
 {
   collect_from_face(integration_flag, this->values_dofs, sum_into_values);
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->dof_values_initialized = true;
     }
@@ -8167,7 +8167,7 @@ FEFaceEvaluation<dim,
       this->evaluate(evaluation_flag);
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       this->values_quad_initialized = evaluation_flag & EvaluationFlags::values;
       this->gradients_quad_initialized =

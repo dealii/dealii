@@ -1316,7 +1316,7 @@ namespace TrilinosWrappers
   {
     Assert(m() == n(), ExcNotQuadratic());
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         // use operator() in debug mode because
         // it checks if this is a valid element
@@ -1638,7 +1638,7 @@ namespace TrilinosWrappers
             col_indices);
         col_value_ptr = values;
         n_columns     = n_cols;
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             for (size_type j = 0; j < n_cols; ++j)
               AssertIsFinite(values[j]);
@@ -1721,7 +1721,7 @@ namespace TrilinosWrappers
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         if (ierr > 0)
           {

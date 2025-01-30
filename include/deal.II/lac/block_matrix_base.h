@@ -1786,7 +1786,7 @@ BlockMatrixBase<MatrixType>::set(const size_type  row,
       temporary_data.column_values[col_index.first][local_index] = value;
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // If in debug mode, do a check whether
       // the right length has been obtained.
@@ -1930,7 +1930,7 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
   // efficiently.
   if (col_indices_are_sorted == true)
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           // check whether indices really are
           // sorted.
@@ -2047,7 +2047,7 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
       temporary_data.column_values[col_index.first][local_index] = value;
     }
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       // If in debug mode, do a check whether
       // the right length has been obtained.

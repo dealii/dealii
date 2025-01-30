@@ -521,7 +521,7 @@ SparseMatrix<number>::add(const size_type  row,
     {
       // check whether the given indices are
       // really sorted
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (size_type i = 1; i < n_cols; ++i)
             Assert(col_indices[i] > col_indices[i - 1],
@@ -622,7 +622,7 @@ SparseMatrix<number>::add(const size_type  row,
       const number value = number(values[j]);
       AssertIsFinite(value);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           if (elide_zero_values == true && value == number())
             continue;
@@ -1348,7 +1348,7 @@ namespace internal
     void
     AssertNoZerosOnDiagonal(const SparseMatrix<number> &matrix)
     {
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (typename SparseMatrix<number>::size_type row = 0;
                row < matrix.m();

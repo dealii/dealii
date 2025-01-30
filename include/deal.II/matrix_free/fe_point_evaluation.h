@@ -2082,7 +2082,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::do_reinit()
     mapping_info->compute_data_index_offset(geometry_index);
   const unsigned int compressed_data_offset =
     mapping_info->compute_compressed_data_index_offset(geometry_index);
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       const UpdateFlags update_flags_mapping =
         mapping_info->get_update_flags_mapping();

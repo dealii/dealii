@@ -1087,7 +1087,7 @@ namespace FEValuesViews
     , quadrature_renumbering(quadrature_renumbering)
   {
     // Check that the renumbering vectors are valid.
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         // While for dofs we admit invalid values, this is not the case for
         // quadrature points.

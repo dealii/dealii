@@ -3818,7 +3818,7 @@ namespace Differentiation
       // function, in the sense that we simply populate our array of independent
       // values with a meaningful number. However, in this case we need to
       // double check that we're not registering these variables twice
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           const std::vector<unsigned int> index_set(
             internal::extract_field_component_indices<dim>(extractor));

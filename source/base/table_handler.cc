@@ -753,7 +753,7 @@ TableHandler::n_rows() const
   std::map<std::string, Column>::const_iterator col_iter = columns.begin();
   unsigned int n = col_iter->second.entries.size();
 
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       std::string first_name = col_iter->first;
       for (++col_iter; col_iter != columns.end(); ++col_iter)

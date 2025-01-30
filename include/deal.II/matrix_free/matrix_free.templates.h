@@ -117,7 +117,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp_by_index(
     {
       // the range over which we are searching must be ordered, otherwise we
       // got a range that spans over too many cells
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (unsigned int i = range.first + 1; i < range.second; ++i)
             Assert(
@@ -469,7 +469,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       task_info.n_procs =
         Utilities::MPI::n_mpi_processes(task_info.communicator);
 
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (const auto &constraint : constraints)
             Assert(
@@ -1801,7 +1801,7 @@ namespace internal
             irregular_cells.back() = task_info.n_ghost_cells % n_lanes;
           }
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             {
               unsigned int n_cells = 0;
@@ -1828,7 +1828,7 @@ namespace internal
     // together to a batch of cells for SIMD (vectorized) execution (where the
     // arithmetic operations of several cells will then be done
     // simultaneously).
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         {
           AssertDimension(renumbering.size(),

@@ -43,7 +43,7 @@ project(const hp::FECollection<dim> &fe_collection,
         const hp::QCollection<dim>  &q_collection,
         const Function<dim>         &function)
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       Assert(fe_collection.size() == 2, ExcInternalError());
       Assert(q_collection.size() == 2, ExcInternalError());

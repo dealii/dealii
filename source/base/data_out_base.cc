@@ -8057,7 +8057,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
       Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
 
       // We currently don't support writing mixed meshes:
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (const auto &patch : patches)
             Assert(patch.reference_cell == patches[0].reference_cell,
@@ -9061,7 +9061,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::validate_dataset_names() const
 {
-  if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+  if constexpr (library_build_mode == LibraryBuildMode::debug)
     {
       {
         // Check that names for datasets are only used once. This is somewhat

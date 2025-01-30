@@ -199,7 +199,7 @@ namespace LinearAlgebra
     BlockVector<Number, MemorySpace>::has_ghost_elements() const
     {
       bool ghosted = this->block(0).has_ghost_elements();
-      if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+      if constexpr (library_build_mode == LibraryBuildMode::debug)
         {
           for (unsigned int i = 0; i < this->n_blocks(); ++i)
             Assert(this->block(i).has_ghost_elements() == ghosted,

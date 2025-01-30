@@ -233,7 +233,7 @@ namespace parallel
             this->number_cache.level_ghost_owners.insert(
               cell->level_subdomain_id());
 
-        if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+        if constexpr (library_build_mode == LibraryBuildMode::debug)
           {
             // Check that level_ghost_owners is symmetric by sending a message
             // to everyone
@@ -584,7 +584,7 @@ namespace parallel
     const std::vector<bool> &vertex_locally_moved)
   {
     AssertDimension(vertex_locally_moved.size(), this->n_vertices());
-    if constexpr (library_build_mode == LibraryBuildMode::debug_build)
+    if constexpr (library_build_mode == LibraryBuildMode::debug)
       {
         {
           const std::vector<bool> locally_owned_vertices =
