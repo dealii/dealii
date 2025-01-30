@@ -1208,9 +1208,7 @@ inline AlignedVector<T>::AlignedVector()
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
-#  ifdef DEBUG
   , replicated_across_communicator(false)
-#  endif
 {}
 
 
@@ -1237,9 +1235,7 @@ inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
-#  ifdef DEBUG
   , replicated_across_communicator(false)
-#  endif
 {
   if (size > 0)
     resize(size, init);
@@ -1252,9 +1248,7 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
-#  ifdef DEBUG
   , replicated_across_communicator(false)
-#  endif
 {
   // copy the data from vec
   reserve(vec.size());
