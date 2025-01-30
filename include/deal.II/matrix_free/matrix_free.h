@@ -249,6 +249,7 @@ public:
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(allow_ghosted_vectors_in_loops)
+      , store_ghost_cells(false)
       , communicator_sm(MPI_COMM_SELF)
     {}
 
@@ -275,6 +276,7 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(other.allow_ghosted_vectors_in_loops)
+      , store_ghost_cells(other.store_ghost_cells)
       , communicator_sm(other.communicator_sm)
     {}
 
@@ -303,6 +305,7 @@ public:
       cell_vectorization_categories_strict =
         other.cell_vectorization_categories_strict;
       allow_ghosted_vectors_in_loops = other.allow_ghosted_vectors_in_loops;
+      store_ghost_cells              = other.store_ghost_cells;
       communicator_sm                = other.communicator_sm;
 
       return *this;
@@ -546,6 +549,13 @@ public:
      * difference is only in whether the initial non-ghosted state is restored.
      */
     bool allow_ghosted_vectors_in_loops;
+
+    /**
+     * Option to control whether data should be generated on ghost cells.
+     * If set to true, the data on ghost cells will be generated.
+     * The default value is false.
+     */
+    bool store_ghost_cells;
 
     /**
      * Shared-memory MPI communicator. Default: MPI_COMM_SELF.
