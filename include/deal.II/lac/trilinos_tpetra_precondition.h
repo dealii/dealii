@@ -18,10 +18,10 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/exceptions.h"
-#include "deal.II/base/memory_space.h"
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_space.h>
 
-#include "deal.II/lac/vector.h"
+#include <deal.II/lac/vector.h>
 
 #include <Teuchos_BLAS_types.hpp>
 
