@@ -17,16 +17,16 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/grid/grid_generator.h"
+#include <deal.II/grid/grid_generator.h>
 
-#include "deal.II/lac/trilinos_tpetra_types.h"
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #include <string>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #  ifdef DEAL_II_TRILINOS_WITH_AMESOS2
 
-#    include "deal.II/base/types.h"
+#    include <deal.II/base/types.h>
 
 #    include <deal.II/lac/la_parallel_vector.h>
 #    include <deal.II/lac/solver_control.h>
