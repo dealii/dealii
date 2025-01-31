@@ -13,7 +13,7 @@
 ## ------------------------------------------------------------------------
 
 #
-# This file sets up the project configuration consisting of
+# This file sets up the project installation and configuration consisting of
 #
 #   deal.IIConfig.cmake
 #   deal.IIVersionConfig.cmake
@@ -22,6 +22,38 @@
 # from the build directory or after installation. So we have to prepare
 # two distinct setups.
 #
+
+
+message(STATUS "Setting up library installation")
+
+set(_targets ${DEAL_II_TARGET_NAME})
+foreach(build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${build} build_lowercase)
+  list(APPEND _targets ${DEAL_II_TARGET_NAME}_${build_lowercase})
+endforeach()
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR})
+export(TARGETS ${_targets} ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_DEBUG} ${DEAL_II_TARGETS_RELEASE}
+  NAMESPACE "${DEAL_II_TARGET_NAME}::"
+  FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+)
+
+install(TARGETS ${_targets} ${DEAL_II_TARGETS} ${DEAL_II_TARGETS_DEBUG} ${DEAL_II_TARGETS_RELEASE}
+  COMPONENT library
+  EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+  RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
+  LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+  ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+  )
+
+install(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+  NAMESPACE "${DEAL_II_TARGET_NAME}::"
+  DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
+  COMPONENT library
+  )
+
+message(STATUS "Setting up library installation - Done")
+
 
 message(STATUS "Setting up project configuration")
 
