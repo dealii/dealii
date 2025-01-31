@@ -94,16 +94,19 @@ main()
   initlog();
 
   deal_II_exceptions::disable_abort_on_exception();
-  bool expected_result;
+  bool expected_result_taped;
+  bool expected_result_tapeless;
   if constexpr (compiling_for_debug_build())
     {
       // Asserts should be triggered
-      expected_result = false;
+      expected_result_taped    = false;
+      expected_result_tapeless = false;
     }
   else
     {
       // User beware: Asserts ignored
-      expected_result = true;
+      expected_result_taped    = true;
+      expected_result_tapeless = false;
     }
 
   const unsigned int dim = 2;
