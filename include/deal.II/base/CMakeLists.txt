@@ -14,24 +14,20 @@
 
 
 #
+# Configure config.h and revision.h
+#
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/config.h
+  )
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/revision.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/revision.h
+  )
+
+
+#
 # Recurse into the sub-directories:
 #
-add_subdirectory(deal.II)
-
-#
-# Add a rule for how to install the header files that are part of the source tree:
-#
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/deal.II
-  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
-  COMPONENT library
-  FILES_MATCHING PATTERN "*.h"
-  )
-
-#
-# and don't forget to install all generated header files, too:
-#
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/deal.II
-  DESTINATION ${DEAL_II_INCLUDE_RELDIR}
-  COMPONENT library
-  FILES_MATCHING PATTERN "*.h"
-  )
+add_subdirectory(std_cxx17)
+add_subdirectory(std_cxx20)
