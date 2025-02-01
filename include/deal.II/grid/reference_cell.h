@@ -456,6 +456,19 @@ public:
    * Return which child cells are adjacent to a certain face of the
    * parent cell.
    *
+   * @deprecated Use the version of this function which takes the orientation as
+   * the third parameter instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes the orientation as the third "
+    "parameter instead.")
+  unsigned int
+  child_cell_on_face(const unsigned int face, const unsigned int subface) const;
+
+  /**
+   * Return which child cells are adjacent to a certain face of the
+   * parent cell.
+   *
    * For example, in 2d the layout of a quadrilateral cell is as follows:
    * @verbatim
    *      3
@@ -496,8 +509,7 @@ public:
   unsigned int
   child_cell_on_face(const unsigned int                 face,
                      const unsigned int                 subface,
-                     const types::geometric_orientation face_orientation =
-                       numbers::default_geometric_orientation) const;
+                     const types::geometric_orientation face_orientation) const;
 
   /**
    * For a given vertex in a cell, return a pair of a face index and a
@@ -2115,6 +2127,17 @@ ReferenceCell::reversed_combined_line_orientation()
 
 
 inline unsigned int
+ReferenceCell::child_cell_on_face(const unsigned int face,
+                                  const unsigned int subface) const
+{
+  return child_cell_on_face(face,
+                            subface,
+                            numbers::default_geometric_orientation);
+}
+
+
+
+inline unsigned int
 ReferenceCell::child_cell_on_face(
   const unsigned int                 face,
   const unsigned int                 subface,
@@ -2136,7 +2159,15 @@ ReferenceCell::child_cell_on_face(
           static constexpr ndarray<unsigned int, 3, 2> subcells = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
-          return subcells[face][subface];
+          Assert(combined_face_orientation ==
+                     numbers::default_geometric_orientation ||
+                   combined_face_orientation ==
+                     numbers::reverse_line_orientation,
+                 ExcInternalError());
+          return subcells[face][combined_face_orientation ==
+                                    numbers::default_geometric_orientation ?
+                                  subface :
+                                  1 - subface];
         }
       case ReferenceCells::Quadrilateral:
         {
