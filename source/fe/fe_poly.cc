@@ -368,9 +368,8 @@ FE_Poly<dim, spacedim>::fill_fe_face_values(
   const auto offset =
     QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
                                              face_no,
-                                             cell->face_orientation(face_no),
-                                             cell->face_flip(face_no),
-                                             cell->face_rotation(face_no),
+                                             cell->combined_face_orientation(
+                                               face_no),
                                              quadrature);
 
   const UpdateFlags flags(fe_data.update_each);
@@ -458,9 +457,8 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
     QProjector<dim>::DataSetDescriptor::subface(this->reference_cell(),
                                                 face_no,
                                                 sub_no,
-                                                cell->face_orientation(face_no),
-                                                cell->face_flip(face_no),
-                                                cell->face_rotation(face_no),
+                                                cell->combined_face_orientation(
+                                                  face_no),
                                                 quadrature.size(),
                                                 cell->subface_case(face_no));
 
