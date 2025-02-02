@@ -167,10 +167,10 @@ SparsityPatternBase::n_cols() const
 
 
 inline void
-SparsityPatternBase::resize(const size_type nRows, const size_type nCols)
+SparsityPatternBase::resize(const size_type n_rows, const size_type n_cols)
 {
-  this->rows = nRows;
-  this->cols = nCols;
+  this->rows = n_rows;
+  this->cols = n_cols;
 }
 #endif
 
