@@ -17,6 +17,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <complex>
+#include <type_traits>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN

@@ -594,16 +594,13 @@ _Pragma("GCC diagnostic pop")
 
 /*
  * Some systems require including mpi.h before stdio.h which happens in
- * types.h
+ * base/types.h and perhaps other places. So just include it unconditionally.
  */
 #if defined(DEAL_II_WITH_MPI)
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
-
-#include <deal.II/base/numbers.h>
-#include <deal.II/base/types.h>
 
 /*
  * Include the boost version header to do a quick version check in case, by
