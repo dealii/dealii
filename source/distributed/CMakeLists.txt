@@ -69,3 +69,16 @@ file(GLOB _header
 
 define_object_library(object_distributed OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_distributed "${_inst}")
+
+
+# Keep track of a complete list of all source files, based on the
+# variables we have set above.  Prepend each source name by the
+# current directory.
+set(_source_files)
+list(APPEND _source_files ${_unity_include_src} ${_separate_src})
+list(TRANSFORM _source_files PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+
+# Add all of these source files to the global list and propagate
+# things back up one directory level
+list(APPEND DEAL_II_SOURCE_FILES ${_source_files})
+set(DEAL_II_SOURCE_FILES ${DEAL_II_SOURCE_FILES} PARENT_SCOPE)

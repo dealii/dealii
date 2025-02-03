@@ -67,6 +67,24 @@ add_subdirectory(sundials)
 add_subdirectory(trilinos)
 add_subdirectory(arborx)
 
+
+
+# We will eventually need the names of source files to build implementation
+# module partitions. The subdirectories all reported the names of
+# source files as global paths, so let us now strip the global parts
+# so that all header files are reported relative to the 'source/'
+# directory. That is, we need to strip CMAKE_CURRENT_SOURCE_DIR from
+# all of the file names.
+list(TRANSFORM DEAL_II_SOURCE_FILES
+     REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "")
+
+# Propagate the list of header files back up one directory level
+set(DEAL_II_SOURCE_FILES ${DEAL_II_SOURCE_FILES} PARENT_SCOPE)
+
+
+
+
+# -------------------------------------------------------------------------
 #
 # Set up and configure the two library targets dealii_debug and
 # dealii_release, i.e., "${DEAL_II_TARGET_NAME}_${build}."

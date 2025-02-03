@@ -14,3 +14,7 @@
 
 add_subdirectory(ad)
 add_subdirectory(sd)
+
+
+# Propagate a value up to the parent directory:
+set(DEAL_II_SOURCE_FILES ${DEAL_II_SOURCE_FILES} PARENT_SCOPE)
