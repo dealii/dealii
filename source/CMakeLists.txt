@@ -75,25 +75,17 @@ add_subdirectory(trilinos)
 add_subdirectory(arborx)
 
 #
-# Define a "dealii", i.e., "${DEAL_II_TARGET_NAME}", target that contains
-# DEAL_II_CXX_FLAGS[_DEBUG|_RELEASE] and otherwise aliases dealii_debug or
-# dealii_release depending on the downstream CMAKE_BUILD_TYPE.
+# Set up and configure the two library targets dealii_debug and
+# dealii_release, i.e., "${DEAL_II_TARGET_NAME}_${build}."
 #
-
-add_library(${DEAL_II_TARGET_NAME} INTERFACE)
-target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
-  "$<COMPILE_LANGUAGE:CXX>" "${DEAL_II_CXX_FLAGS}"
-  )
-target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE "${DEAL_II_LINKER_FLAGS}")
+# Both library targets are composed of the object and bundled object
+# targets that have been set up in the various subdirectories under source/
+# and bundled/ and that we recorded in the DEAL_II_OBJECT_TARGETS_${build}
+# global property.
+#
 
 foreach(build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${build} build_lowercase)
-  if("${build}" MATCHES "DEBUG")
-    set(build_camelcase "Debug")
-  elseif("${build}" MATCHES "RELEASE")
-    set(build_camelcase "Release")
-  endif()
-
 
   #
   # Combine all ${build} OBJECT targets to a ${build} library:
@@ -154,14 +146,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 
-  target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
-    "$<AND:$<CONFIG:${build_camelcase}>,$<COMPILE_LANGUAGE:CXX>>"
-    "${DEAL_II_CXX_FLAGS_${build}}"
-    )
-  target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE
-    "$<CONFIG:${build_camelcase}>" "${DEAL_II_LINKER_FLAGS_${build}}"
-    )
-
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
       PROPERTIES
@@ -201,10 +185,72 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       ALIAS ${DEAL_II_TARGET_NAME}_${build_lowercase}
       )
   endif()
+endforeach()
+
+#
+# Now, define a "dealii", i.e., "${DEAL_II_TARGET_NAME}", target that can
+# be used by user projects to automatically switch between the release and
+# debug versions of the library depending on the build type.
+#
+# For convenience, we also add our compiler and linker flags to the target.
+# This is useful for user projects that simply want to use our compiler and
+# linker flags and not set up their own.
+#
+# If a downstream project does not want us to override their compiler and
+# linker flags, then they will need to use the "dealii_debug" and
+# "dealii_release" targets directly.
+#
+
+add_library(${DEAL_II_TARGET_NAME} INTERFACE)
+add_dependencies(library ${DEAL_II_TARGET_NAME})
+
+#
+# Record the libraries, as well as our compiler and linker flags as a
+# *public* interface property.
+#
+# This way all targets linking against dealii::dealii will be compiled and
+# linked with our compiler and linker flags.
+#
+# We start with the configuration independent bits...
+#
+
+target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
+  "$<COMPILE_LANGUAGE:CXX>" "${DEAL_II_CXX_FLAGS}"
+  )
+target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE "${DEAL_II_LINKER_FLAGS}")
+
+
+foreach(build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${build} build_lowercase)
+  if("${build}" MATCHES "DEBUG")
+    set(build_camelcase "Debug")
+  elseif("${build}" MATCHES "RELEASE")
+    set(build_camelcase "Release")
+  endif()
+
+  #
+  # ... and then add debug and release configuration dependent flags
+  # guarded with a "generator expression" [1]. Note that we further guard
+  # the compiler flags with $<COMPILE_LANGUAGE:CXX> so that they are only
+  # used for compiling C++ code.
+  #
+
+  target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<AND:$<CONFIG:${build_camelcase}>,$<COMPILE_LANGUAGE:CXX>>"
+    "${DEAL_II_CXX_FLAGS_${build}}"
+    )
+  target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<CONFIG:${build_camelcase}>" "${DEAL_II_LINKER_FLAGS_${build}}"
+    )
+
+  #
+  # Attach the debug and release libraries:
+  #
 
   target_link_libraries(${DEAL_II_TARGET_NAME} INTERFACE
     "$<$<CONFIG:${build_camelcase}>:${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_${build_lowercase}>"
     )
+
 endforeach()
 
 message(STATUS "Setting up library - Done")
