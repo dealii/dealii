@@ -1,0 +1,10 @@
+
+DEAL:0::
+DEAL:0::Test with doubles
+DEAL:0::
+DEAL:0:3d::Verification FESystem<3>[FE_DGQ<3>(1)^3]-FESystem<3>[FE_DGQ<3>(1)^3]: 3.71362e-16
+DEAL:0:3d::
+DEAL:0:3d::Verification FESystem<3>[FE_DGQ<3>(2)^3]-FESystem<3>[FE_DGQ<3>(2)^3]: 3.65502e-16
+DEAL:0:3d::
+DEAL:0:3d::Verification FESystem<3>[FE_DGQ<3>(3)^3]-FESystem<3>[FE_DGQ<3>(3)^3]: 7.48139e-16
+DEAL:0:3d::
