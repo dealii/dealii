@@ -3372,6 +3372,6 @@ FE_NedelecSZ<dim, spacedim>::get_prolongation_matrix(
 }
 
 // explicit instantiations
-#include "fe_nedelec_sz.inst"
+#include "fe/fe_nedelec_sz.inst"
 
 DEAL_II_NAMESPACE_CLOSE

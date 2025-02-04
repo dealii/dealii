@@ -17,6 +17,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "block_sparse_matrix.inst"
+#include "lac/block_sparse_matrix.inst"
 
 DEAL_II_NAMESPACE_CLOSE

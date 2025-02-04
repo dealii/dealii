@@ -116,7 +116,7 @@ namespace internal
 
 
 // explicit instantiations
-#include "fe_point_evaluation.inst"
+#include "matrix_free/fe_point_evaluation.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE
