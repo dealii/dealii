@@ -2308,5 +2308,5 @@ namespace NonMatching
                                              face_index);
   }
 } // namespace NonMatching
-#include "quadrature_generator.inst"
+#include "non_matching/quadrature_generator.inst"
 DEAL_II_NAMESPACE_CLOSE

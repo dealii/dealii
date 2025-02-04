@@ -1184,6 +1184,6 @@ FE_SimplexDGP<dim, spacedim>::get_restriction_matrix(
 }
 
 // explicit instantiations
-#include "fe_simplex_p.inst"
+#include "fe/fe_simplex_p.inst"
 
 DEAL_II_NAMESPACE_CLOSE

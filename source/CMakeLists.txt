@@ -35,13 +35,6 @@ endif()
 #
 
 #
-# Automatically add the current source and binary directory as include
-# directory. The binary directory is needed in order to find the expanded
-# .inst include files.
-#
-set(CMAKE_INCLUDE_CURRENT_DIR true)
-
-#
 # List the directories where we have source files. the ones with the longest
 # compile jobs come first so that 'make -j N' saturates many processors also
 # towards the end of compiling rather than having to wait for one long
