@@ -48,6 +48,7 @@ PolynomialsBernstein<number>::PolynomialsBernstein(const unsigned int index,
 {}
 
 
-#include "polynomials_bernstein.inst"
+template class dealii::PolynomialsBernstein<double>;
+
 
 DEAL_II_NAMESPACE_CLOSE
