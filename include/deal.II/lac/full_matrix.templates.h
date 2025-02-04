@@ -519,10 +519,19 @@ FullMatrix<number>::mmult(FullMatrix<number2>       &dst,
   Assert(n() == src.m(), ExcDimensionMismatch(n(), src.m()));
   Assert(dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
   Assert(dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
+  if constexpr (std::is_same_v<number, number2>)
+    {
+      Assert(&dst != this,
+             ExcMessage(
+               "The output matrix cannot be the same as the current matrix."));
+      Assert(&dst != &src,
+             ExcMessage(
+               "The output matrix cannot be the same as the input matrix."));
+    }
 
-  // see if we can use BLAS algorithms for this and if the type for 'number'
-  // works for us (it is usually not efficient to use BLAS for very small
-  // matrices):
+    // see if we can use BLAS algorithms for this and if the type for 'number'
+    // works for us (it is usually not efficient to use BLAS for very small
+    // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
   if ((std::is_same_v<number, double> ||
