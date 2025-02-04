@@ -2498,7 +2498,7 @@ namespace GridTools
 } // namespace GridTools
 
 
-#include "grid_tools_dof_handlers.inst"
+#include "grid/grid_tools_dof_handlers.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

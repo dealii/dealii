@@ -67,6 +67,6 @@ namespace FunctionTools
 
 } // namespace FunctionTools
 
-#include "function_tools.inst"
+#include "base/function_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

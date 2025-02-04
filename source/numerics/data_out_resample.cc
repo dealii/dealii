@@ -204,6 +204,6 @@ DataOutResample<dim, patch_dim, spacedim>::get_patches() const
 
 
 // explicit instantiations
-#include "data_out_resample.inst"
+#include "numerics/data_out_resample.inst"
 
 DEAL_II_NAMESPACE_CLOSE

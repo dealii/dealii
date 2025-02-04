@@ -831,7 +831,7 @@ namespace Differentiation
 
 
 /* --- Explicit instantiations --- */
-#  include "symengine_optimizer.inst"
+#  include "differentiation/sd/symengine_optimizer.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

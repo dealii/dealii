@@ -1122,6 +1122,6 @@ ChartManifold<dim, spacedim, chartdim>::get_periodicity() const
 }
 
 // explicit instantiations
-#include "manifold.inst"
+#include "grid/manifold.inst"
 
 DEAL_II_NAMESPACE_CLOSE

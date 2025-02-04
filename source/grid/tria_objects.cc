@@ -78,7 +78,7 @@ namespace internal
 
     // explicit instantiations
 #ifndef DOXYGEN
-#  include "tria_objects.inst"
+#  include "grid/tria_objects.inst"
 #endif
   } // namespace TriangulationImplementation
 } // namespace internal

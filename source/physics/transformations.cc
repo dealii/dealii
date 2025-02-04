@@ -17,6 +17,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
-#include "transformations.inst"
+#include "physics/transformations.inst"
 
 DEAL_II_NAMESPACE_CLOSE

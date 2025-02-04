@@ -367,7 +367,7 @@ MGTransferPrebuilt<VectorType>::memory_consumption() const
 
 
 // explicit instantiation
-#include "mg_transfer_prebuilt.inst"
+#include "multigrid/mg_transfer_prebuilt.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

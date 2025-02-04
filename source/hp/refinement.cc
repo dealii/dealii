@@ -1069,6 +1069,6 @@ namespace hp
 
 
 // explicit instantiations
-#include "refinement.inst"
+#include "hp/refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE

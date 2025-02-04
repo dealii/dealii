@@ -159,7 +159,7 @@ eigenvectors<3, adtl::adouble>(const SymmetricTensor<2, 3, adtl::adouble> &,
 #endif
 
 // explicit instantiations
-#include "symmetric_tensor.inst"
+#include "base/symmetric_tensor.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

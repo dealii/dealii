@@ -758,7 +758,7 @@ MappingQCache<dim, spacedim>::get_vertices(
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q_cache.inst"
+#include "fe/mapping_q_cache.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -61,6 +61,6 @@ DEAL_II_CONSTEXPR const SymmetricTensor<4, dim>
 #endif // DOXYGEN
 
 // explicit instantiations
-#include "standard_tensors.inst"
+#include "physics/elasticity/standard_tensors.inst"
 
 DEAL_II_NAMESPACE_CLOSE

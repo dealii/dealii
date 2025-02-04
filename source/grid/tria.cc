@@ -18016,6 +18016,6 @@ Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList() noexcept =
 #endif
 
 // explicit instantiations
-#include "tria.inst"
+#include "grid/tria.inst"
 
 DEAL_II_NAMESPACE_CLOSE

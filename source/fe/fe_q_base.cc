@@ -1694,6 +1694,6 @@ FE_Q_Base<dim, spacedim>::get_constant_modes() const
 #endif
 
 // explicit instantiations
-#include "fe_q_base.inst"
+#include "fe/fe_q_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

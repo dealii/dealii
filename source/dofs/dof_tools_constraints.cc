@@ -4846,7 +4846,7 @@ namespace DoFTools
 
 // explicit instantiations
 
-#include "dof_tools_constraints.inst"
+#include "dofs/dof_tools_constraints.inst"
 
 
 

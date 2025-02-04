@@ -109,7 +109,7 @@ namespace GeometricUtilities
     }
 
     // explicit instantiations
-#include "geometric_utilities.inst"
+#include "base/geometric_utilities.inst"
 
   } // namespace Coordinates
 } // namespace GeometricUtilities

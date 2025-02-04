@@ -29,6 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 
 // Explicit instantiations
 
-#include "mg_base.inst"
+#include "multigrid/mg_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

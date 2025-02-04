@@ -611,7 +611,7 @@ namespace MatrixTools
 
 
 // explicit instantiations
-#include "matrix_tools.inst"
+#include "numerics/matrix_tools.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

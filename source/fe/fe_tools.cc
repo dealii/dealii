@@ -31,7 +31,7 @@ namespace FETools
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_tools.inst"
+#include "fe/fe_tools.inst"
 
 // these do not fit into the templates of the dimension in the inst file
 namespace FETools
