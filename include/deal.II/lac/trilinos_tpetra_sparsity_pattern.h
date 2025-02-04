@@ -29,7 +29,6 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/sparsity_pattern_base.h>
-#  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
 #  include <Tpetra_CrsGraph.hpp>
 
