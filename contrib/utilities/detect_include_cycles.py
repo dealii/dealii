@@ -27,21 +27,24 @@
 
 from glob import glob
 import networkx as nx
+import re
+
+match_includes = re.compile(r"# *include *<(deal.II/.*.h)>")
 
 
 # For a given header file, read through all the lines and extract the
-# ones that correspond to #include statements. For those, add a link
-# from header file to the one it includes to the graph.
+# ones that correspond to #include statements for deal.II header
+# files. For those, add a link from header file to the one it includes
+# to the graph.
 def add_includes_for_file(header_file_name, G) :
     f = open(header_file_name)
     lines = f.readlines()
     f.close()
 
     for line in lines :
-        if "#include" in line :
-            line = line.strip()
-            line = line.replace("#include <", "")
-            included_file = line.replace(">", "")
+        m = match_includes.match(line)
+        if m :
+            included_file = m.group(1)
             G.add_edge(header_file_name.replace("include/", ""),
                        included_file)
 
