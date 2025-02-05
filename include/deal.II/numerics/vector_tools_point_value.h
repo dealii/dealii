@@ -18,6 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/template_constraints.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>

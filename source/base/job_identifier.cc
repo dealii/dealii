@@ -15,6 +15,8 @@
 #include <deal.II/base/job_identifier.h>
 
 #include <ctime>
+#include <string>
+
 
 #ifdef DEAL_II_HAVE_UNISTD_H
 #  include <unistd.h>

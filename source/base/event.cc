@@ -15,6 +15,10 @@
 
 #include <deal.II/base/event.h>
 
+#include <string>
+#include <vector>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // TODO: Thread safety
