@@ -24,6 +24,9 @@
 #  include <adolc/adouble.h> // Taped double
 #  include <adolc/adtl.h>    // Tapeless double
 
+#  include <complex>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
