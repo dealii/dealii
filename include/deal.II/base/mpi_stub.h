@@ -24,9 +24,13 @@
 #if defined(DEAL_II_WITH_MPI)
 #  include <mpi.h>
 #else
-// without MPI, we would still like to use
-// some constructs with MPI data
-// types. Therefore, create some dummies
+
+// Without MPI, we would still like to use some constructs with MPI
+// data types. Therefore, create some dummies. Since we only ever use
+// them inside our own constructs, the right thing to do is to put
+// them into namespace dealii:
+DEAL_II_NAMESPACE_OPEN
+
 using MPI_Comm     = int;
 using MPI_Request  = int;
 using MPI_Datatype = int;
@@ -40,6 +44,8 @@ constexpr MPI_Op      MPI_MIN          = 0;
 constexpr MPI_Op      MPI_MAX          = 0;
 constexpr MPI_Op      MPI_SUM          = 0;
 constexpr MPI_Op      MPI_LOR          = 0;
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 #endif
