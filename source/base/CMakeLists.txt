@@ -46,7 +46,6 @@ set(_unity_include_src
   index_set.cc
   job_identifier.cc
   logstream.cc
-  hdf5.cc
   kokkos.cc
   mpi.cc
   mpi_noncontiguous_partitioner.cc
@@ -82,7 +81,6 @@ set(_unity_include_src
   polynomials_raviart_thomas.cc
   polynomials_rt_bubbles.cc
   polynomials_wedge.cc
-  process_grid.cc
   qprojector.cc
   quadrature.cc
   quadrature_lib.cc
@@ -108,6 +106,21 @@ set(_separate_src
   data_out_base.cc
   symmetric_tensor.cc
   )
+
+if(DEAL_II_WITH_SCALAPACK)
+  set(_unity_include_src
+    ${_unity_include_src}
+    process_grid.cc
+  )
+endif()
+
+if(DEAL_II_WITH_HDF5)
+  set(_unity_include_src
+    ${_unity_include_src}
+    hdf5.cc
+  )
+endif()
+
 
 # determined by profiling
 set(_n_includes_per_unity_file 29)
@@ -140,6 +153,7 @@ set(_inst
   mu_parser_internal.inst.in
   time_stepping.inst.in
   )
+
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
