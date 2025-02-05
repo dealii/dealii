@@ -12,13 +12,23 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  access_traits.cc
-  )
 
-set(_inst
-  access_traits.inst.in
-  )
+
+set(_src)
+set(_inst)
+
+if(DEAL_II_WITH_ARBORX)
+  set(_src
+    ${_src}
+    access_traits.cc
+    )
+
+  set(_inst
+    ${_inst}
+    access_traits.inst.in
+    )
+endif()
+
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/arborx/*.h
