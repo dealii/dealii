@@ -633,6 +633,6 @@ FE_Poly<dim, spacedim>::memory_consumption() const
 
 #endif
 
-#include "fe_poly.inst"
+#include "fe/fe_poly.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -579,7 +579,7 @@ DataOutRotation<dim, spacedim>::next_cell(const cell_iterator &cell)
 
 
 // explicit instantiations
-#include "data_out_rotation.inst"
+#include "numerics/data_out_rotation.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

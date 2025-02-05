@@ -313,6 +313,6 @@ namespace RepartitioningPolicyTools
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "repartitioning_policy_tools.inst"
+#include "distributed/repartitioning_policy_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

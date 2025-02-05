@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-#  include "nox.inst"
+#  include "trilinos/nox.inst"
 }
 
 DEAL_II_NAMESPACE_CLOSE

@@ -955,7 +955,7 @@ namespace NonMatching
       }
   }
 #ifndef DOXYGEN
-#  include "coupling.inst"
+#  include "non_matching/coupling.inst"
 #endif
 } // namespace NonMatching
 

@@ -2477,6 +2477,6 @@ namespace Particles
   }
 } // namespace Particles
 
-#include "particle_handler.inst"
+#include "particles/particle_handler.inst"
 
 DEAL_II_NAMESPACE_CLOSE

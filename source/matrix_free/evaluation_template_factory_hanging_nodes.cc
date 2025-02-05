@@ -17,6 +17,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "evaluation_template_factory_hanging_nodes.inst"
+#include "matrix_free/evaluation_template_factory_hanging_nodes.inst"
 
 DEAL_II_NAMESPACE_CLOSE

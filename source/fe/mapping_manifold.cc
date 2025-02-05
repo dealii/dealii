@@ -1438,7 +1438,7 @@ MappingManifold<dim, spacedim>::transform(
 }
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_manifold.inst"
+#include "fe/mapping_manifold.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE
