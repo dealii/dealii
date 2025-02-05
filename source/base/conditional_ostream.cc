@@ -15,6 +15,9 @@
 
 #include <deal.II/base/conditional_ostream.h>
 
+#include <ostream>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 ConditionalOStream::ConditionalOStream(std::ostream &stream, const bool active)
