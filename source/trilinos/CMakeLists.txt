@@ -14,13 +14,22 @@
 
 include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-set(_src
-  nox.cc
-  )
 
-set(_inst
-  nox.inst.in
-  )
+set(_src)
+set(_inst)
+
+if(DEAL_II_TRILINOS_WITH_NOX)
+  set(_src
+    ${_src}
+    nox.cc
+    )
+
+  set(_inst
+    ${_inst}
+    nox.inst.in
+    )
+endif()
+
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/trilinos/*.h
