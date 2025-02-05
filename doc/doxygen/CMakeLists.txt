@@ -83,26 +83,20 @@ else()
 endif()
 
 
-# Collect where the build system will write the .inst files after
+# Note where the build system will write the .inst files after
 # expansion from the .inst.in files. We need this because we let
 # doxygen read the .cc files and they #include the .inst files.
 #
-# To get at this, find all of the .inst.in files, strip all but the
-# directory name under $CMAKE_SOURCE_DIR/source, and then prepend
-# the build directory to it
+# The .cc files #include the .inst files with the directory name
+# relative to the /source directory under the build directory, so the
+# correct include path is <build dir>/source
 #
-# See options.dox.in where ${_inst_in_dirs} is later added to INCLUDE_PATH.
-file(GLOB _inst_in_files
-     "${CMAKE_SOURCE_DIR}/source/*/*.inst.in")
-string(REPLACE "${CMAKE_SOURCE_DIR}/source/" "" _inst_in_dirs_x "${_inst_in_files}")
-string(REGEX REPLACE "/[a-zA-Z0-9_\\.]*.inst.in" "/" _inst_in_dirs_y "${_inst_in_dirs_x}")
-list(REMOVE_DUPLICATES _inst_in_dirs_y)
-set(_inst_in_dirs "")
-foreach (_dir ${_inst_in_dirs_y})
-  set(_inst_in_dirs "${_inst_in_dirs} ${CMAKE_BINARY_DIR}/source/${_dir}")
-endforeach()
+# This variable is used in options.dox.in where ${_inst_in_dir} is
+# added to INCLUDE_PATH.
+set(_inst_in_dir "${CMAKE_BINARY_DIR}/source/")
 
-message(STATUS "Additional doxygen include paths: ${_inst_in_dirs}")
+
+message(STATUS "Additional doxygen include path: ${_inst_in_dir}")
 
 # make sure doxygen sees the extra.sty stylefile:
 set(_extra_packages "${CMAKE_CURRENT_SOURCE_DIR}/extra")
