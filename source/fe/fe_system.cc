@@ -1799,8 +1799,9 @@ FESystem<dim, spacedim>::initialize(
       {
         const unsigned int base = this->system_to_base_table[i].first.first,
                            base_index = this->system_to_base_table[i].second;
-        // Do not use this in Assert because nvcc when using C++20 assumes that
-        // this is an integer and we get the following error: base operand of
+        // Do not use `this` in Assert because nvcc when using C++20 assumes
+        // that `this` is an integer and we get the following error: base
+        // operand of
         // '->' is not a pointer
         [[maybe_unused]] const unsigned int n_base_elements =
           this->n_base_elements();
@@ -1962,10 +1963,9 @@ FESystem<dim, spacedim>::initialize(
         {
           // the array into which we want to write should have the correct size
           // already.
-          // Do not use this in Assert because nvcc when using C++20 assumes
-          // that this is an integer and we get the following error: base
-          // operand of
-          // '->' is not a pointer
+          // Do not use `this` in Assert because nvcc when using C++20 assumes
+          // that `this` is an integer and we get the following error: base
+          // operand of '->' is not a pointer
           [[maybe_unused]] const unsigned int n_elements =
             this->adjust_quad_dof_index_for_face_orientation_table[face_no]
               .n_elements();
@@ -1996,13 +1996,12 @@ FESystem<dim, spacedim>::initialize(
                   index += temp.size(0);
                 }
             }
-          // error: base operand of '->' is not a pointer
           Assert(index == n_dofs_per_quad, ExcInternalError());
         }
 
       // additionally compose the permutation information for lines
-      // Do not use this in Assert because nvcc when using C++20 assumes that
-      // this is an integer and we get the following error: base operand of
+      // Do not use `this` in Assert because nvcc when using C++20 assumes that
+      // `this` is an integer and we get the following error: base operand of
       // '->' is not a pointer
       [[maybe_unused]] const unsigned int table_size =
         this->adjust_line_dof_index_for_line_orientation_table.size();

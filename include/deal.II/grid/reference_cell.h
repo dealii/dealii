@@ -3540,9 +3540,9 @@ ReferenceCell::get_combined_orientation(
           return o;
       }
 
-    // Do not use this in Assert because nvcc when using C++20 assumes that this
-    // is an integer and we get the following error: invalid type argument of
-    // unary '*' (have 'int')
+    // Do not use `this` in Assert because nvcc when using C++20 assumes that
+    // `this` is an integer and we get the following error: invalid type
+    // argument of unary '*' (have 'int')
     [[maybe_unused]] const auto &ref_cell = *this;
     Assert(false,
            (internal::NoPermutation<T>(ref_cell, vertices_0, vertices_1)));
