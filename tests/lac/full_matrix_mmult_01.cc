@@ -23,6 +23,7 @@ int
 main()
 {
   initlog();
+  deal_II_exceptions::disable_abort_on_exception();
 
   try
     {
@@ -34,7 +35,8 @@ main()
     }
   catch (const dealii::ExceptionBase &exc)
     {
-      deallog << exc.get_exc_name() << std::endl;
+      exc.print_info(deallog.get_file_stream());
+      deallog << std::flush;
     }
 
   return 0;
