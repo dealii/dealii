@@ -17,6 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <cstdint>
+
 DEAL_II_NAMESPACE_OPEN
 
 
