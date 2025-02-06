@@ -36,8 +36,14 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-#  include "trilinos/nox.inst"
-}
+// We don't build the nox.inst file if Trilinos isn't configured
+// with NOX, but doxygen doesn't know that and tries to find that
+// file anyway for parsing -- which then of course it fails on. So
+// exclude the following from doxygen consideration.
+#  ifndef DOXYGEN
+#    include "trilinos/nox.inst"
+#  endif
+} // namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
