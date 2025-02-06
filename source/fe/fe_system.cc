@@ -1799,7 +1799,12 @@ FESystem<dim, spacedim>::initialize(
       {
         const unsigned int base = this->system_to_base_table[i].first.first,
                            base_index = this->system_to_base_table[i].second;
-        Assert(base < this->n_base_elements(), ExcInternalError());
+        // Do not use this in Assert because nvcc when using C++20 assumes that
+        // this is an integer and we get the following error: base operand of
+        // '->' is not a pointer
+        [[maybe_unused]] const unsigned int n_base_elements =
+          this->n_base_elements();
+        Assert(base < n_base_elements, ExcInternalError());
         Assert(base_index < base_element(base).unit_support_points.size(),
                ExcInternalError());
         this->unit_support_points[i] =
@@ -1957,10 +1962,18 @@ FESystem<dim, spacedim>::initialize(
         {
           // the array into which we want to write should have the correct size
           // already.
-          Assert(this->adjust_quad_dof_index_for_face_orientation_table[face_no]
-                     .n_elements() ==
-                   this->reference_cell().n_face_orientations(face_no) *
-                     this->n_dofs_per_quad(face_no),
+          // Do not use this in Assert because nvcc when using C++20 assumes
+          // that this is an integer and we get the following error: base
+          // operand of
+          // '->' is not a pointer
+          [[maybe_unused]] const unsigned int n_elements =
+            this->adjust_quad_dof_index_for_face_orientation_table[face_no]
+              .n_elements();
+          [[maybe_unused]] const unsigned int n_face_orientations =
+            this->reference_cell().n_face_orientations(face_no);
+          [[maybe_unused]] const unsigned int n_dofs_per_quad =
+            this->n_dofs_per_quad(face_no);
+          Assert(n_elements == n_face_orientations * n_dofs_per_quad,
                  ExcInternalError());
 
           // to obtain the shifts for this composed element, copy the shift
@@ -1983,13 +1996,19 @@ FESystem<dim, spacedim>::initialize(
                   index += temp.size(0);
                 }
             }
-          Assert(index == this->n_dofs_per_quad(face_no), ExcInternalError());
+          // error: base operand of '->' is not a pointer
+          Assert(index == n_dofs_per_quad, ExcInternalError());
         }
 
       // additionally compose the permutation information for lines
-      Assert(this->adjust_line_dof_index_for_line_orientation_table.size() ==
-               this->n_dofs_per_line(),
-             ExcInternalError());
+      // Do not use this in Assert because nvcc when using C++20 assumes that
+      // this is an integer and we get the following error: base operand of
+      // '->' is not a pointer
+      [[maybe_unused]] const unsigned int table_size =
+        this->adjust_line_dof_index_for_line_orientation_table.size();
+      [[maybe_unused]] const unsigned int n_dofs_per_line =
+        this->n_dofs_per_line();
+      Assert(table_size == n_dofs_per_line, ExcInternalError());
       unsigned int index = 0;
       for (unsigned int b = 0; b < this->n_base_elements(); ++b)
         {
@@ -2006,7 +2025,7 @@ FESystem<dim, spacedim>::initialize(
               index += temp2.size();
             }
         }
-      Assert(index == this->n_dofs_per_line(), ExcInternalError());
+      Assert(index == n_dofs_per_line, ExcInternalError());
     });
 
 
