@@ -14,8 +14,7 @@
 
 
 
-// same as matrix_vector_10.cc but with matrix free stores data for ghosted
-// cells too. Check if all ghost cells are included in MatrixFree storage.
+// same as matrix_vector_26.cc but for level operator
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
@@ -51,41 +50,19 @@ test()
 {
   using number = double;
 
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(1);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  cell                                                   = tria.begin_active();
-  for (; cell != endc; ++cell)
-    if (cell->is_locally_owned())
-      if (cell->center().norm() < 0.2)
-        cell->set_refine_flag();
-  tria.execute_coarsening_and_refinement();
-  if (dim < 3 && fe_degree < 2)
-    tria.refine_global(2);
-  else
-    tria.refine_global(1);
-  if (tria.begin(tria.n_levels() - 1)->is_locally_owned())
-    tria.begin(tria.n_levels() - 1)->set_refine_flag();
-  if (tria.last()->is_locally_owned())
-    tria.last()->set_refine_flag();
-  tria.execute_coarsening_and_refinement();
-  cell = tria.begin_active();
-  for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
-    {
-      cell                 = tria.begin_active();
-      unsigned int counter = 0;
-      for (; cell != endc; ++cell, ++counter)
-        if (cell->is_locally_owned())
-          if (counter % (7 - i) == 0)
-            cell->set_refine_flag();
-      tria.execute_coarsening_and_refinement();
-    }
+  tria.refine_global(3);
+  unsigned int max_level = tria.n_global_levels() - 1;
 
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
+  dof.distribute_mg_dofs();
 
   IndexSet owned_set = dof.locally_owned_dofs();
   IndexSet relevant_set;
@@ -112,6 +89,7 @@ test()
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.tasks_block_size      = 7;
     data.store_ghost_cells     = true;
+    data.mg_level              = max_level;
     mf_data.reinit(MappingQ1<dim>{}, dof, constraints, quad, data);
   }
 
@@ -130,14 +108,14 @@ test()
              lane < mf_data.n_active_entries_per_cell_batch(batch);
              ++lane)
           {
-            const typename Triangulation<dim>::active_cell_iterator cell =
+            const typename Triangulation<dim>::level_cell_iterator cell =
               mf_data.get_cell_iterator(batch, lane);
             IndexLevel index_level(cell->index(), cell->level());
             ghost_cells.insert(index_level);
           }
       }
 
-    for (const auto &cell : tria.active_cell_iterators())
+    for (const auto &cell : tria.cell_iterators_on_level(max_level))
       if (cell->is_ghost())
         {
           IndexLevel index_level(cell->index(), cell->level());
