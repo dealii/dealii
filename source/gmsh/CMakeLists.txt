@@ -12,13 +12,22 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  utilities.cc
-  )
 
-set(_inst
-  utilities.inst.in
-  )
+set(_src)
+set(_inst)
+
+if(DEAL_II_WITH_GMSH)
+  set(_src
+    ${_src}
+    utilities.cc
+    )
+
+  set(_inst
+    ${_inst}
+    utilities.inst.in
+    )
+endif()
+
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/gmsh/*.h
