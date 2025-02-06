@@ -927,16 +927,23 @@ namespace internal
     // steps through all children and adds the active cells recursively
     template <typename InIterator>
     void
-    resolve_cell(const InIterator                                   &cell,
-                 std::vector<std::pair<unsigned int, unsigned int>> &cell_its)
+    resolve_cell(
+      const InIterator                                   &cell,
+      std::vector<std::pair<unsigned int, unsigned int>> &cell_its,
+      std::vector<std::pair<unsigned int, unsigned int>> &ghost_cell_its)
     {
       if (cell->has_children())
         for (unsigned int child = 0; child < cell->n_children(); ++child)
-          resolve_cell(cell->child(child), cell_its);
+          resolve_cell(cell->child(child), cell_its, ghost_cell_its);
       else if (cell->is_locally_owned())
         {
           Assert(cell->is_active(), ExcInternalError());
           cell_its.emplace_back(cell->level(), cell->index());
+        }
+      else if (cell->is_ghost())
+        {
+          Assert(cell->is_active(), ExcInternalError());
+          ghost_cell_its.emplace_back(cell->level(), cell->index());
         }
     }
   } // namespace MatrixFreeFunctions
@@ -971,11 +978,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
       // when setting up neighboring relations between cells for thread
       // parallelization
       for (const auto &cell : tria.cell_iterators_on_level(0))
-        internal::MatrixFreeFunctions::resolve_cell(cell, cell_level_index);
+        internal::MatrixFreeFunctions::resolve_cell(cell,
+                                                    cell_level_index,
+                                                    ghosted_cell_index);
 
-      Assert(additional_data.store_ghost_cells == false,
-             ExcMessage(
-               "Storing ghost cells is only supported for level operator."));
       Assert(task_info.n_procs > 1 ||
                cell_level_index.size() == tria.n_active_cells(),
              ExcInternalError());
@@ -999,13 +1005,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   // cell_level_index_end_local to the size of cell_level_index.
   cell_level_index_end_local = cell_level_index.size();
 
-  Assert(ghosted_cell_index.size() == 0 || additional_data.store_ghost_cells,
-         ExcInternalError());
-
   // If ghost cells are stored, add them to the end of the cell_level_index
-  cell_level_index.insert(cell_level_index.end(),
-                          ghosted_cell_index.begin(),
-                          ghosted_cell_index.end());
+  if (additional_data.store_ghost_cells == true)
+    cell_level_index.insert(cell_level_index.end(),
+                            ghosted_cell_index.begin(),
+                            ghosted_cell_index.end());
 }
 
 
