@@ -12,9 +12,6 @@
 ##
 ## ------------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
-
 set(_src)
 set(_inst)
 
