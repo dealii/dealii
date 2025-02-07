@@ -43,8 +43,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// Shorthand notation for KINSOL error codes.
-#  define AssertKINSOL(code) Assert(code >= 0, ExcKINSOLError(code))
 
 namespace SUNDIALS
 {
