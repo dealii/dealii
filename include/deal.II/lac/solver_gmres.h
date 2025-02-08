@@ -31,6 +31,8 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
 
+#include <boost/signals2/signal.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <limits>

@@ -16,8 +16,11 @@
 #include <deal.II/base/point.h>
 
 #ifdef DEAL_II_WITH_GSL
+#  include <gsl/gsl_spline.h>
+
 #  include <algorithm>
 #  include <cmath>
+
 
 DEAL_II_NAMESPACE_OPEN
 namespace Functions

@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/utilities.h>
 
 DEAL_II_NAMESPACE_OPEN

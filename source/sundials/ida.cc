@@ -37,6 +37,9 @@
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/utilities.h>
 
+#  include <idas/idas.h>
+#  include <sundials/sundials_context.h>
+
 #  include <iomanip>
 #  include <iostream>
 

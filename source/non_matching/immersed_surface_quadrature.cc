@@ -12,7 +12,11 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
+
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching

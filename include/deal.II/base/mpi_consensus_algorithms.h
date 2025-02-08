@@ -21,6 +21,9 @@
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_tags.h>
 
+#include <set>
+#include <vector>
+
 DEAL_II_NAMESPACE_OPEN
 
 

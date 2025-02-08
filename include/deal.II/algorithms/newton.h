@@ -21,6 +21,7 @@
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/operator.h>
 
+#include <deal.II/base/event.h>
 #include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/lac/solver_control.h>

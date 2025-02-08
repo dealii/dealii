@@ -35,6 +35,8 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/vector_memory.h>
 
+#  include <sundials/sundials_nvector.h>
+
 #  include <limits>
 
 DEAL_II_NAMESPACE_OPEN

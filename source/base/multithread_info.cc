@@ -12,7 +12,9 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
 #include <algorithm>

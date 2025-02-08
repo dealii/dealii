@@ -15,6 +15,8 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometric_utilities.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/point.h>
 
 #include <array>
 #include <cmath>

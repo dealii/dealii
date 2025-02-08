@@ -13,6 +13,8 @@
 // ------------------------------------------------------------------------
 
 #include <deal.II/base/convergence_table.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/table_handler.h>
 
 #include <cmath>
 

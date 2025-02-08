@@ -20,6 +20,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/vector_operation.h>
 
