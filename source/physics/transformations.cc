@@ -12,6 +12,9 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/tensor.h>
+
 #include <deal.II/physics/transformations.h>
 
 DEAL_II_NAMESPACE_OPEN

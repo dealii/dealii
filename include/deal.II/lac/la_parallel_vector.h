@@ -33,6 +33,11 @@
 #include <iomanip>
 #include <memory>
 
+#if defined(DEAL_II_WITH_MPI)
+#  include <mpi.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations

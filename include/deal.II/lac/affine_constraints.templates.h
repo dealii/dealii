@@ -52,6 +52,8 @@
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <boost/container/small_vector.hpp>
+#include <boost/range/iterator_range_core.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/utility.hpp>
 

@@ -33,6 +33,11 @@
 #include <set>
 #include <vector>
 
+#if defined(DEAL_II_WITH_MPI)
+#  include <mpi.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 

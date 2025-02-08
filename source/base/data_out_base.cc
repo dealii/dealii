@@ -29,9 +29,11 @@
 #include <cstring>
 #include <ctime>
 #include <fstream>
+#include <future>
 #include <iomanip>
 #include <limits>
 #include <memory>
+#include <numeric>
 #include <set>
 #include <sstream>
 #include <vector>

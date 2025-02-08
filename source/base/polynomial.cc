@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <memory>
+#include <shared_mutex>
 
 DEAL_II_NAMESPACE_OPEN
 

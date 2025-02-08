@@ -28,6 +28,9 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/tridiagonal_matrix.h>
 
+#include <boost/signals2/connection.hpp>
+#include <boost/signals2/variadic_signal.hpp>
+
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN

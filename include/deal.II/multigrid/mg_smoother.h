@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/observer_pointer.h>
 

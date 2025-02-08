@@ -30,6 +30,12 @@
 #include <cstdio>
 #include <cstring>
 
+#ifdef DEAL_II_WITH_TBB
+#  include <tbb/blocked_range.h>
+#  include <tbb/partitioner.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal

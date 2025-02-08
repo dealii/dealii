@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/lac/read_vector.h>
+
 #include <deal.II/numerics/vector_tools_common.h>
 
 DEAL_II_NAMESPACE_OPEN

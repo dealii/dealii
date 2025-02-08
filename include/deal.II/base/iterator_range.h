@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/std_cxx20/type_traits.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <iterator>

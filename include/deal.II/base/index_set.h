@@ -22,6 +22,7 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/trilinos_utilities.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/trilinos_tpetra_types.h>
 

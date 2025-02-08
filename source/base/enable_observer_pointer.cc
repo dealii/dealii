@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 #include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 
 #include <algorithm>
