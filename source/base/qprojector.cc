@@ -462,6 +462,82 @@ QProjector<3>::project_to_oriented_face(const ReferenceCell &reference_cell,
 
 
 
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_face(const ReferenceCell       &reference_cell,
+                                 const Quadrature<dim - 1> &quadrature,
+                                 const unsigned int         face_no,
+                                 const types::geometric_orientation orientation)
+{
+  AssertIndexRange(face_no, reference_cell.n_faces());
+  AssertIndexRange(orientation, reference_cell.n_face_orientations(face_no));
+  AssertDimension(reference_cell.get_dimension(), dim);
+
+  std::vector<Point<dim>> q_points;
+  std::vector<double>     q_weights = quadrature.get_weights();
+  q_points.reserve(quadrature.size());
+  if constexpr (dim == 1)
+    {
+      AssertDimension(quadrature.size(), 1);
+      q_points.emplace_back(static_cast<double>(face_no));
+    }
+  else if constexpr (dim == 2)
+    {
+      if (reference_cell == ReferenceCells::Triangle)
+        // use linear polynomial to map the reference quadrature points
+        // correctly on faces, i.e., BarycentricPolynomials<1>(1)
+        for (unsigned int p = 0; p < quadrature.size(); ++p)
+          {
+            if (face_no == 0)
+              q_points.emplace_back(quadrature.point(p)[0], 0);
+            else if (face_no == 1)
+              q_points.emplace_back(1.0 - quadrature.point(p)[0],
+                                    quadrature.point(p)[0]);
+            else if (face_no == 2)
+              q_points.emplace_back(0, 1.0 - quadrature.point(p)[0]);
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+      else if (reference_cell == ReferenceCells::Quadrilateral)
+        for (unsigned int p = 0; p < quadrature.size(); ++p)
+          {
+            if (face_no == 0)
+              q_points.emplace_back(0, quadrature.point(p)[0]);
+            else if (face_no == 1)
+              q_points.emplace_back(1, quadrature.point(p)[0]);
+            else if (face_no == 2)
+              q_points.emplace_back(quadrature.point(p)[0], 0);
+            else if (face_no == 3)
+              q_points.emplace_back(quadrature.point(p)[0], 1);
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+      else
+        DEAL_II_ASSERT_UNREACHABLE();
+
+      if (orientation == numbers::reverse_line_orientation)
+        {
+          std::reverse(q_points.begin(), q_points.end());
+          std::reverse(q_weights.begin(), q_weights.end());
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
+      const Quadrature<2> mutation =
+        internal::QProjector::mutate_quadrature(quadrature, orientation);
+      return QProjector<3>::project_to_face(reference_cell, mutation, face_no);
+    }
+  else
+    {
+      DEAL_II_ASSERT_UNREACHABLE();
+    }
+
+  return Quadrature<dim>(std::move(q_points), std::move(q_weights));
+}
+
+
+
 template <>
 void
 QProjector<1>::project_to_subface(const ReferenceCell &reference_cell,
