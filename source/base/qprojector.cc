@@ -365,57 +365,43 @@ QProjector<2>::project_to_face(const ReferenceCell   &reference_cell,
                                const unsigned int     face_no,
                                std::vector<Point<2>> &q_points)
 {
-  const unsigned int dim = 2;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(face_no, reference_cell.n_faces());
+  AssertDimension(reference_cell.get_dimension(), 2);
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
+  q_points.resize(0);
   if (reference_cell == ReferenceCells::Triangle)
-    {
-      // use linear polynomial to map the reference quadrature points correctly
-      // on faces, i.e., BarycentricPolynomials<1>(1)
-      for (unsigned int p = 0; p < quadrature.size(); ++p)
-        switch (face_no)
-          {
-            case 0:
-              q_points[p] = Point<dim>(quadrature.point(p)[0], 0);
-              break;
-            case 1:
-              q_points[p] =
-                Point<dim>(1 - quadrature.point(p)[0], quadrature.point(p)[0]);
-              break;
-            case 2:
-              q_points[p] = Point<dim>(0, 1 - quadrature.point(p)[0]);
-              break;
-            default:
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
-    }
+    // use linear polynomial to map the reference quadrature points correctly
+    // on faces, i.e., BarycentricPolynomials<1>(1)
+    for (unsigned int p = 0; p < quadrature.size(); ++p)
+      {
+        if (face_no == 0)
+          q_points.emplace_back(quadrature.point(p)[0], 0);
+        else if (face_no == 1)
+          q_points.emplace_back(1.0 - quadrature.point(p)[0],
+                                quadrature.point(p)[0]);
+        else if (face_no == 2)
+          q_points.emplace_back(0, 1.0 - quadrature.point(p)[0]);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+      }
   else if (reference_cell == ReferenceCells::Quadrilateral)
-    {
-      for (unsigned int p = 0; p < quadrature.size(); ++p)
-        switch (face_no)
-          {
-            case 0:
-              q_points[p] = Point<dim>(0, quadrature.point(p)[0]);
-              break;
-            case 1:
-              q_points[p] = Point<dim>(1, quadrature.point(p)[0]);
-              break;
-            case 2:
-              q_points[p] = Point<dim>(quadrature.point(p)[0], 0);
-              break;
-            case 3:
-              q_points[p] = Point<dim>(quadrature.point(p)[0], 1);
-              break;
-            default:
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
-    }
+    for (unsigned int p = 0; p < quadrature.size(); ++p)
+      {
+        if (face_no == 0)
+          q_points.emplace_back(0, quadrature.point(p)[0]);
+        else if (face_no == 1)
+          q_points.emplace_back(1, quadrature.point(p)[0]);
+        else if (face_no == 2)
+          q_points.emplace_back(quadrature.point(p)[0], 0);
+        else if (face_no == 3)
+          q_points.emplace_back(quadrature.point(p)[0], 1);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+      }
   else
-    {
-      DEAL_II_ASSERT_UNREACHABLE();
-    }
+    DEAL_II_ASSERT_UNREACHABLE();
 }
 
 
