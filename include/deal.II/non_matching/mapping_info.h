@@ -124,13 +124,11 @@ namespace NonMatching
               dynamic_cast<typename MappingQ<dim, spacedim>::InternalData &>(
                 *internal_mapping_data);
             data.initialize_face(update_flags_mapping,
-                                 QProjector<dim>::project_to_oriented_face(
-                                   ReferenceCells::get_hypercube<dim>(),
+                                 QProjector<dim>::project_to_face(
+                                   cell->reference_cell(),
                                    quadrature,
                                    face_no,
-                                   cell->face_orientation(face_no),
-                                   cell->face_flip(face_no),
-                                   cell->face_rotation(face_no)),
+                                   cell->combined_face_orientation(face_no)),
                                  quadrature.size());
 
             mapping_q->fill_mapping_data_for_face_quadrature(

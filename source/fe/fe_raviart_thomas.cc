@@ -465,8 +465,11 @@ FE_RaviartThomas<dim>::initialize_restriction()
       // child cell are evaluated
       // in the quadrature points
       // of a full face.
-      const Quadrature<dim> q_face =
-        QProjector<dim>::project_to_face(this->reference_cell(), q_base, face);
+      const Quadrature<dim> q_face = QProjector<dim>::project_to_face(
+        this->reference_cell(),
+        q_base,
+        face,
+        numbers::default_geometric_orientation);
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point

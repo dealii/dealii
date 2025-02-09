@@ -1915,7 +1915,10 @@ namespace FETools
     // hating the anisotropic implementation
     QGauss<dim - 1>       q_gauss(degree + 1);
     const Quadrature<dim> q_fine =
-      QProjector<dim>::project_to_face(fe.reference_cell(), q_gauss, face_fine);
+      QProjector<dim>::project_to_face(fe.reference_cell(),
+                                       q_gauss,
+                                       face_fine,
+                                       numbers::default_geometric_orientation);
     const unsigned int nq = q_fine.size();
 
     FEValues<dim> fine(mapping,

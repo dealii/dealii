@@ -1960,8 +1960,10 @@ namespace VectorTools
                               QProjector<dim - 1>::project_to_face(
                                 ReferenceCells::get_hypercube<dim - 1>(),
                                 reference_edge_quadrature,
-                                line),
-                              face));
+                                line,
+                                numbers::default_geometric_orientation),
+                              face,
+                              numbers::default_geometric_orientation));
                         }
                     }
                 }
@@ -2377,7 +2379,10 @@ namespace VectorTools
 
     for (const unsigned int face : GeometryInfo<dim>::face_indices())
       quadrature_collection.push_back(QProjector<dim>::project_to_face(
-        ReferenceCells::get_hypercube<dim>(), face_quadrature, face));
+        ReferenceCells::get_hypercube<dim>(),
+        face_quadrature,
+        face,
+        numbers::default_geometric_orientation));
 
     hp::FEValues<dim> fe_values(mapping_collection,
                                 fe_collection,
@@ -2538,7 +2543,10 @@ namespace VectorTools
 
         for (const unsigned int face : GeometryInfo<dim>::face_indices())
           quadrature_collection.push_back(QProjector<dim>::project_to_face(
-            ReferenceCells::get_hypercube<dim>(), quadrature, face));
+            ReferenceCells::get_hypercube<dim>(),
+            quadrature,
+            face,
+            numbers::default_geometric_orientation));
       }
 
     hp::FEFaceValues<dim> fe_face_values(mapping_collection,
