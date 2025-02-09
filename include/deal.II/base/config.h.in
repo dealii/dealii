@@ -1708,6 +1708,67 @@ static_assert(
 #endif // DEAL_II_TRILINOS_WITH_SEACAS
 
 
+#ifdef DEAL_II_WITH_SUNDIALS
+/**
+ * Assertion that checks that the error code produced by calling one
+ * of SUNDIALS' ARKode functions.
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ */
+#  define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
+
+/**
+ * Assertion that checks that the error code produced by calling one
+ * of SUNDIALS' KINSOL functions.
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ */
+#  define AssertKINSOL(code) Assert(code >= 0, ExcKINSOLError(code))
+
+/**
+ * Assertion that checks that the error code produced by calling one
+ * of SUNDIALS' IDA functions.
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ */
+#  define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
+#endif
+
+
+
 // The #defines above reference functions and classes that are
 // declared in exceptions.h. This is ok -- places that use the Assert
 // macro (for example) simply have to #include
