@@ -212,6 +212,14 @@
 #  endif
 #endif
 
+#cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
+#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
+
+
+
+/***********************************************************************
+ * Dealing with deprecations.
+ */
 
 /**
  * Macro indicating that the current feature will be removed in a future
@@ -244,9 +252,6 @@
 #define DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(comment)
 #endif
 #endif
-
-#cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
-#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
 
 /***********************************************************************
