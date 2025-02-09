@@ -31,30 +31,15 @@ using MPI_Comm     = int;
 using MPI_Request  = int;
 using MPI_Datatype = int;
 using MPI_Op       = int;
-#  ifndef MPI_COMM_WORLD
-#    define MPI_COMM_WORLD 0
-#  endif
-#  ifndef MPI_COMM_SELF
-#    define MPI_COMM_SELF 0
-#  endif
-#  ifndef MPI_COMM_NULL
-#    define MPI_COMM_NULL 0
-#  endif
-#  ifndef MPI_REQUEST_NULL
-#    define MPI_REQUEST_NULL 0
-#  endif
-#  ifndef MPI_MIN
-#    define MPI_MIN 0
-#  endif
-#  ifndef MPI_MAX
-#    define MPI_MAX 0
-#  endif
-#  ifndef MPI_SUM
-#    define MPI_SUM 0
-#  endif
-#  ifndef MPI_LOR
-#    define MPI_LOR 0
-#  endif
-#endif
 
+constexpr MPI_Comm    MPI_COMM_WORLD   = 0;
+constexpr MPI_Comm    MPI_COMM_SELF    = 0;
+constexpr MPI_Comm    MPI_COMM_NULL    = 0;
+constexpr MPI_Request MPI_REQUEST_NULL = 0;
+constexpr MPI_Op      MPI_MIN          = 0;
+constexpr MPI_Op      MPI_MAX          = 0;
+constexpr MPI_Op      MPI_SUM          = 0;
+constexpr MPI_Op      MPI_LOR          = 0;
+
+#endif
 #endif
