@@ -123,6 +123,17 @@ public:
                            const bool           face_rotation);
 
   /**
+   * Compute the cell quadrature formula corresponding to using
+   * <tt>quadrature</tt> on face <tt>face_no</tt>. For further details, see
+   * the general doc for this class.
+   */
+  static Quadrature<dim>
+  project_to_face(const ReferenceCell &reference_cell,
+                  const SubQuadrature &quadrature,
+                  const unsigned int   face_no,
+                  const types::geometric_orientation orientation);
+
+  /**
    * Compute the quadrature points on the cell if the given quadrature formula
    * is used on face <tt>face_no</tt>, subface number <tt>subface_no</tt>
    * corresponding to RefineCase::Type <tt>ref_case</tt>. The last argument is
