@@ -28,7 +28,6 @@ set(_unity_include_src
   exceptions.cc
   flow_function.cc
   function.cc
-  function_cspline.cc
   function_derivative.cc
   function_signed_distance.cc
   function_lib.cc
@@ -118,6 +117,13 @@ if(DEAL_II_WITH_HDF5)
   set(_unity_include_src
     ${_unity_include_src}
     hdf5.cc
+  )
+endif()
+
+if(DEAL_II_WITH_GSL)
+  set(_unity_include_src
+    ${_unity_include_src}
+    function_cspline.cc
   )
 endif()
 
