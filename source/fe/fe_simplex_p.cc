@@ -580,11 +580,12 @@ FE_SimplexPoly<dim, spacedim>::get_face_interpolation_matrix(
 
       const double eps = 2e-13 * this->degree * (dim - 1);
 
-      std::vector<Point<dim>> face_quadrature_points(quad_face_support.size());
-      QProjector<dim>::project_to_face(this->reference_cell(),
-                                       quad_face_support,
-                                       face_no,
-                                       face_quadrature_points);
+      const std::vector<Point<dim>> face_quadrature_points =
+        QProjector<dim>::project_to_face(this->reference_cell(),
+                                         quad_face_support,
+                                         face_no,
+                                         numbers::default_geometric_orientation)
+          .get_points();
 
       for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
         for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)

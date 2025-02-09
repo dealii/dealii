@@ -265,7 +265,8 @@ FE_P1NC::fill_fe_face_values(
   const Quadrature<2> quadrature_on_face =
     QProjector<2>::project_to_face(this->reference_cell(),
                                    quadrature[0],
-                                   face_no);
+                                   face_no,
+                                   numbers::default_geometric_orientation);
 
   if (flags & update_values)
     for (unsigned int i = 0; i < quadrature_on_face.size(); ++i)
