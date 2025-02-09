@@ -341,19 +341,18 @@ namespace internal
 
 template <>
 void
-QProjector<1>::project_to_face(const ReferenceCell &reference_cell,
-                               const Quadrature<0> &,
+QProjector<1>::project_to_face(const ReferenceCell   &reference_cell,
+                               const Quadrature<0>   &quadrature,
                                const unsigned int     face_no,
                                std::vector<Point<1>> &q_points)
 {
-  Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
-  (void)reference_cell;
-
-  const unsigned int dim = 1;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertDimension(q_points.size(), 1);
-
-  q_points[0] = Point<dim>(static_cast<double>(face_no));
+  AssertDimension(quadrature.size(), q_points.size());
+  const auto face_quadrature =
+    QProjector<1>::project_to_face(reference_cell,
+                                   quadrature,
+                                   face_no,
+                                   numbers::default_geometric_orientation);
+  q_points = face_quadrature.get_points();
 }
 
 
@@ -365,43 +364,13 @@ QProjector<2>::project_to_face(const ReferenceCell   &reference_cell,
                                const unsigned int     face_no,
                                std::vector<Point<2>> &q_points)
 {
-  AssertIndexRange(face_no, reference_cell.n_faces());
-  AssertDimension(reference_cell.get_dimension(), 2);
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
-
-  q_points.resize(0);
-  if (reference_cell == ReferenceCells::Triangle)
-    // use linear polynomial to map the reference quadrature points correctly
-    // on faces, i.e., BarycentricPolynomials<1>(1)
-    for (unsigned int p = 0; p < quadrature.size(); ++p)
-      {
-        if (face_no == 0)
-          q_points.emplace_back(quadrature.point(p)[0], 0);
-        else if (face_no == 1)
-          q_points.emplace_back(1.0 - quadrature.point(p)[0],
-                                quadrature.point(p)[0]);
-        else if (face_no == 2)
-          q_points.emplace_back(0, 1.0 - quadrature.point(p)[0]);
-        else
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
-  else if (reference_cell == ReferenceCells::Quadrilateral)
-    for (unsigned int p = 0; p < quadrature.size(); ++p)
-      {
-        if (face_no == 0)
-          q_points.emplace_back(0, quadrature.point(p)[0]);
-        else if (face_no == 1)
-          q_points.emplace_back(1, quadrature.point(p)[0]);
-        else if (face_no == 2)
-          q_points.emplace_back(quadrature.point(p)[0], 0);
-        else if (face_no == 3)
-          q_points.emplace_back(quadrature.point(p)[0], 1);
-        else
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
-  else
-    DEAL_II_ASSERT_UNREACHABLE();
+  AssertDimension(quadrature.size(), q_points.size());
+  const auto face_quadrature =
+    QProjector<2>::project_to_face(reference_cell,
+                                   quadrature,
+                                   face_no,
+                                   numbers::default_geometric_orientation);
+  q_points = face_quadrature.get_points();
 }
 
 
@@ -426,38 +395,23 @@ QProjector<3>::project_to_face(const ReferenceCell   &reference_cell,
 }
 
 
+
 template <int dim>
 Quadrature<dim>
 QProjector<dim>::project_to_oriented_face(const ReferenceCell &reference_cell,
                                           const Quadrature<dim - 1> &quadrature,
                                           const unsigned int         face_no,
-                                          const bool,
-                                          const bool,
-                                          const bool)
+                                          const bool face_orientation,
+                                          const bool face_flip,
+                                          const bool face_rotation)
 {
-  return QProjector<dim>::project_to_face(reference_cell, quadrature, face_no);
-}
-
-
-
-template <>
-Quadrature<3>
-QProjector<3>::project_to_oriented_face(const ReferenceCell &reference_cell,
-                                        const Quadrature<2> &quadrature,
-                                        const unsigned int   face_no,
-                                        const bool           face_orientation,
-                                        const bool           face_flip,
-                                        const bool           face_rotation)
-{
-  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
-
-  const Quadrature<2> mutation = internal::QProjector::mutate_quadrature(
+  return QProjector<dim>::project_to_face(
+    reference_cell,
     quadrature,
+    face_no,
     internal::combined_face_orientation(face_orientation,
                                         face_rotation,
                                         face_flip));
-
-  return QProjector<3>::project_to_face(reference_cell, mutation, face_no);
 }
 
 
@@ -470,7 +424,9 @@ QProjector<dim>::project_to_face(const ReferenceCell       &reference_cell,
                                  const types::geometric_orientation orientation)
 {
   AssertIndexRange(face_no, reference_cell.n_faces());
-  AssertIndexRange(orientation, reference_cell.n_face_orientations(face_no));
+  // TODO once the default orientation is zero we can remove this special case
+  AssertIndexRange(dim == 1 ? 1 - orientation : orientation,
+                   reference_cell.n_face_orientations(face_no));
   AssertDimension(reference_cell.get_dimension(), dim);
 
   std::vector<Point<dim>> q_points;
