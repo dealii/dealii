@@ -19,6 +19,16 @@
 
 #include <deal.II/base/point.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/geometry/core/coordinate_dimension.hpp>
+#include <boost/geometry/core/coordinate_system.hpp>
+#include <boost/geometry/core/coordinate_type.hpp>
+#include <boost/geometry/core/cs.hpp>
+#include <boost/geometry/core/tag.hpp>
+#include <boost/geometry/strategies/strategies.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+
 namespace boost
 {
   namespace geometry
