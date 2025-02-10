@@ -91,7 +91,13 @@ public:
    * Compute the quadrature points on the cell if the given quadrature formula
    * is used on face <tt>face_no</tt>. For further details, see the general
    * doc for this class.
+   *
+   * @deprecated Use the version of this function which takes a
+   * combined_orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a combined_orientation "
+    "argument instead.")
   static void
   project_to_face(const ReferenceCell     &reference_cell,
                   const SubQuadrature     &quadrature,
@@ -102,7 +108,13 @@ public:
    * Compute the cell quadrature formula corresponding to using
    * <tt>quadrature</tt> on face <tt>face_no</tt>. For further details, see
    * the general doc for this class.
+   *
+   * @deprecated Use the version of this function which takes a
+   * combined_orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a combined_orientation "
+    "argument instead.")
   static Quadrature<dim>
   project_to_face(const ReferenceCell &reference_cell,
                   const SubQuadrature &quadrature,
@@ -113,7 +125,13 @@ public:
    * <tt>quadrature</tt> on face <tt>face_no</tt> taking into account the
    * orientation of the face. For further details, see the general doc for this
    * class.
+   *
+   * @deprecated Use the version of project_to_face() which takes a
+   * combined_orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of project_to_face() which takes a combined_orientation "
+    "argument instead.")
   static Quadrature<dim>
   project_to_oriented_face(const ReferenceCell &reference_cell,
                            const SubQuadrature &quadrature,
@@ -121,6 +139,17 @@ public:
                            const bool           face_orientation,
                            const bool           face_flip,
                            const bool           face_rotation);
+
+  /**
+   * Compute the cell quadrature formula corresponding to using
+   * <tt>quadrature</tt> on face <tt>face_no</tt>. For further details, see
+   * the general doc for this class.
+   */
+  static Quadrature<dim>
+  project_to_face(const ReferenceCell               &reference_cell,
+                  const SubQuadrature               &quadrature,
+                  const unsigned int                 face_no,
+                  const types::geometric_orientation orientation);
 
   /**
    * Compute the quadrature points on the cell if the given quadrature formula
