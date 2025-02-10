@@ -66,6 +66,22 @@ public:
       RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
+   * @copydoc dealii::FE_Q_Base::face_to_cell_index()
+   *
+   * @note This function is only implemented for:
+   * 1. @p combined_orientation is the default orientation
+   * 2. @p dim is 2, or
+   * 3. The degree of this element is no greater than 3 and
+   * @p combined_orientation is either default or `(false,false,false)`.
+   */
+  virtual unsigned int
+  face_to_cell_index(
+    const unsigned int  face_dof_index,
+    const unsigned int  face,
+    const unsigned char combined_orientation =
+      ReferenceCell::default_combined_face_orientation()) const override;
+
+  /**
    * @copydoc dealii::FiniteElement::get_restriction_matrix()
    *
    * @note Only implemented for RefinementCase::isotropic_refinement.
