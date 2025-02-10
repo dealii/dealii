@@ -1135,16 +1135,17 @@ inline TriaIterator<Accessor>::TriaIterator(
   const TriaRawIterator<OtherAccessor> &i)
   : TriaRawIterator<Accessor>(i.accessor)
 {
-#ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || used)"
-  // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || used)"
+      // used() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    }
 }
 
 template <typename Accessor>
@@ -1152,16 +1153,17 @@ template <typename OtherAccessor>
 TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a)
   : TriaRawIterator<Accessor>(a)
 {
-#ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || used)"
-  // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || used)"
+      // used() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    }
 }
 
 template <typename Accessor>
@@ -1179,17 +1181,18 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaRawIterator<OtherAccessor> &i)
   : TriaIterator<Accessor>(i)
 {
-#ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
 }
 
 
@@ -1350,16 +1353,17 @@ template <typename Accessor>
 inline TriaIterator<Accessor>::TriaIterator(const TriaRawIterator<Accessor> &i)
   : TriaRawIterator<Accessor>(i.accessor)
 {
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || used)"
-  // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || used)"
+      // used() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    }
 }
 
 
@@ -1371,16 +1375,17 @@ inline TriaIterator<Accessor>::TriaIterator(
   const typename Accessor::AccessorData *local_data)
   : TriaRawIterator<Accessor>(parent, level, index, local_data)
 {
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || used)"
-  // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || used)"
+      // used() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    }
 }
 
 
@@ -1392,16 +1397,17 @@ inline TriaIterator<Accessor>::TriaIterator(
   const typename Accessor::AccessorData             *local_data)
   : TriaRawIterator<Accessor>(tria_accessor, local_data)
 {
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || used)"
-  // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || used)"
+      // used() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    }
 }
 
 
@@ -1429,16 +1435,17 @@ inline TriaIterator<Accessor> &
 TriaIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || used)"
-  // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || used)"
+      // used() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    }
   return *this;
 }
 
@@ -1449,16 +1456,17 @@ inline TriaIterator<Accessor> &
 TriaIterator<Accessor>::operator=(const TriaRawIterator<OtherAccessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || used)"
-  // used() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || used)"
+      // used() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    }
   return *this;
 }
 
@@ -1530,17 +1538,18 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaRawIterator<Accessor> &i)
   : TriaIterator<Accessor>(i)
 {
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
 }
 
 
@@ -1549,17 +1558,18 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaIterator<Accessor> &i)
   : TriaIterator<Accessor>(i)
 {
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
 }
 
 
@@ -1571,17 +1581,18 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const typename Accessor::AccessorData *local_data)
   : TriaIterator<Accessor>(parent, level, index, local_data)
 {
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
 }
 
 
@@ -1593,17 +1604,18 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const typename Accessor::AccessorData             *local_data)
   : TriaIterator<Accessor>(tria_accessor, local_data)
 {
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
 }
 
 
@@ -1632,17 +1644,18 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used() && this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used() && this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
   return *this;
 }
 
@@ -1653,17 +1666,18 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaRawIterator<OtherAccessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used() && this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.used() && this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
   return *this;
 }
 
@@ -1674,17 +1688,18 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaIterator<OtherAccessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
   return *this;
 }
 
@@ -1694,17 +1709,18 @@ inline TriaActiveIterator<Accessor> &
 TriaActiveIterator<Accessor>::operator=(const TriaIterator<Accessor> &i)
 {
   this->accessor.copy_from(i.accessor);
-#  ifdef DEBUG
-  // do this like this, because:
-  // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
-  // has_children() is called anyway, even if
-  // state==IteratorState::past_the_end, and will then
-  // throw the exception!
-  if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
-#  endif
+  if constexpr (compiling_for_debug_build())
+    {
+      // do this like this, because:
+      // if we write
+      // "Assert (IteratorState::past_the_end || !has_children())"
+      // has_children() is called anyway, even if
+      // state==IteratorState::past_the_end, and will then
+      // throw the exception!
+      if (this->state() != IteratorState::past_the_end)
+        Assert(this->accessor.has_children() == false,
+               ExcAssignmentOfInactiveObject());
+    }
   return *this;
 }
 

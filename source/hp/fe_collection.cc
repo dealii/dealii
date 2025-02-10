@@ -117,13 +117,14 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-#ifdef DEBUG
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    Assert(this->size() > 0, ExcEmptyObject());
-    for (const auto &fe : fes)
-      AssertIndexRange(fe, this->size());
-#endif
+    if constexpr (compiling_for_debug_build())
+      {
+        // Validate user inputs.
+        Assert(codim <= dim, ExcImpossibleInDim(dim));
+        Assert(this->size() > 0, ExcEmptyObject());
+        for (const auto &fe : fes)
+          AssertIndexRange(fe, this->size());
+      }
 
     // Check if any element of this FECollection is able to dominate all
     // elements of @p fes. If one was found, we add it to the set of
@@ -157,13 +158,14 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            codim) const
   {
-#ifdef DEBUG
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    Assert(this->size() > 0, ExcEmptyObject());
-    for (const auto &fe : fes)
-      AssertIndexRange(fe, this->size());
-#endif
+    if constexpr (compiling_for_debug_build())
+      {
+        // Validate user inputs.
+        Assert(codim <= dim, ExcImpossibleInDim(dim));
+        Assert(this->size() > 0, ExcEmptyObject());
+        for (const auto &fe : fes)
+          AssertIndexRange(fe, this->size());
+      }
 
     // Check if any element of this FECollection is dominated by all
     // elements of @p fes. If one was found, we add it to the set of
@@ -202,13 +204,14 @@ namespace hp
     if (fes.size() == 1)
       return *fes.begin();
 
-#ifdef DEBUG
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    Assert(this->size() > 0, ExcEmptyObject());
-    for (const auto &fe : fes)
-      AssertIndexRange(fe, this->size());
-#endif
+    if constexpr (compiling_for_debug_build())
+      {
+        // Validate user inputs.
+        Assert(codim <= dim, ExcImpossibleInDim(dim));
+        Assert(this->size() > 0, ExcEmptyObject());
+        for (const auto &fe : fes)
+          AssertIndexRange(fe, this->size());
+      }
 
     // There may also be others, in which case we'll check if any of these
     // elements is able to dominate all others. If one was found, we stop
@@ -249,13 +252,14 @@ namespace hp
     if (fes.size() == 1)
       return *fes.begin();
 
-#ifdef DEBUG
-    // Validate user inputs.
-    Assert(codim <= dim, ExcImpossibleInDim(dim));
-    Assert(this->size() > 0, ExcEmptyObject());
-    for (const auto &fe : fes)
-      AssertIndexRange(fe, this->size());
-#endif
+    if constexpr (compiling_for_debug_build())
+      {
+        // Validate user inputs.
+        Assert(codim <= dim, ExcImpossibleInDim(dim));
+        Assert(this->size() > 0, ExcEmptyObject());
+        for (const auto &fe : fes)
+          AssertIndexRange(fe, this->size());
+      }
 
     // There may also be others, in which case we'll check if any of these
     // elements is dominated by all others. If one was found, we stop
@@ -390,17 +394,18 @@ namespace hp
               identities_graph.emplace(Node(fe_index_1, identity.first),
                                        Node(fe_index_2, identity.second));
 
-#ifdef DEBUG
-      // Now verify that indeed the graph is symmetric: If one element
-      // declares that certain ones of its DoFs are to be unified with those
-      // of the other, then the other one should agree with this. As a
-      // consequence of this test succeeding, we know that the graph is actually
-      // undirected.
-      for (const auto &edge : identities_graph)
-        Assert(identities_graph.find({edge.second, edge.first}) !=
-                 identities_graph.end(),
-               ExcInternalError());
-#endif
+      if constexpr (compiling_for_debug_build())
+        {
+          // Now verify that indeed the graph is symmetric: If one element
+          // declares that certain ones of its DoFs are to be unified with those
+          // of the other, then the other one should agree with this. As a
+          // consequence of this test succeeding, we know that the graph is
+          // actually undirected.
+          for (const auto &edge : identities_graph)
+            Assert(identities_graph.find({edge.second, edge.first}) !=
+                     identities_graph.end(),
+                   ExcInternalError());
+        }
 
       // The next step is that we ought to verify that if there is an identity
       // between (fe1,dof1) and (fe2,dof2), as well as with (fe2,dof2) and
@@ -474,32 +479,35 @@ namespace hp
           for (const Edge &e : sub_graph)
             identities_graph.erase(e);
 
-#ifdef DEBUG
-          // There are three checks we ought to perform:
-          // - That the sub-graph is undirected, i.e. that every edge appears
-          //   in both directions
-          for (const auto &edge : sub_graph)
-            Assert(sub_graph.find({edge.second, edge.first}) != sub_graph.end(),
-                   ExcInternalError());
+          if constexpr (compiling_for_debug_build())
+            {
+              // There are three checks we ought to perform:
+              // - That the sub-graph is undirected, i.e. that every edge
+              // appears
+              //   in both directions
+              for (const auto &edge : sub_graph)
+                Assert(sub_graph.find({edge.second, edge.first}) !=
+                         sub_graph.end(),
+                       ExcInternalError());
 
-          // - None of the nodes in the sub-graph should have appeared in
-          //   any of the other sub-graphs. If they did, then we have a bug
-          //   in extracting sub-graphs. This is actually more easily checked
-          //   the other way around: none of the nodes of the sub-graph we
-          //   just extracted should be in any of the edges of the *remaining*
-          //   graph
-          for (const Node &n : sub_graph_nodes)
-            for (const Edge &e : identities_graph)
-              Assert((n != e.first) && (n != e.second), ExcInternalError());
-          // - Second, the sub-graph we just extracted needs to be complete,
-          //   i.e.,
-          //   be a "clique". We check this by counting how many edges it has.
-          //   for 'n' nodes in 'N', we need to have n*(n-1) edges (we store
-          //   both directed edges).
-          Assert(sub_graph.size() ==
-                   sub_graph_nodes.size() * (sub_graph_nodes.size() - 1),
-                 ExcInternalError());
-#endif
+              // - None of the nodes in the sub-graph should have appeared in
+              //   any of the other sub-graphs. If they did, then we have a bug
+              //   in extracting sub-graphs. This is actually more easily
+              //   checked the other way around: none of the nodes of the
+              //   sub-graph we just extracted should be in any of the edges of
+              //   the *remaining* graph
+              for (const Node &n : sub_graph_nodes)
+                for (const Edge &e : identities_graph)
+                  Assert((n != e.first) && (n != e.second), ExcInternalError());
+              // - Second, the sub-graph we just extracted needs to be complete,
+              //   i.e.,
+              //   be a "clique". We check this by counting how many edges it
+              //   has. for 'n' nodes in 'N', we need to have n*(n-1) edges (we
+              //   store both directed edges).
+              Assert(sub_graph.size() ==
+                       sub_graph_nodes.size() * (sub_graph_nodes.size() - 1),
+                     ExcInternalError());
+            }
 
           // At this point we're sure that we have extracted a complete
           // sub-graph ("clique"). The DoFs involved are all identical then, and

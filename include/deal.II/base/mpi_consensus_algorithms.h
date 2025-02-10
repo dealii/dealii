@@ -1798,12 +1798,13 @@ namespace Utilities
               AssertThrowMPI(ierr);
             }
 
-#    ifdef DEBUG
-          // note: IBarrier seems to make problem during testing, this
-          // additional Barrier seems to help
-          ierr = MPI_Barrier(comm);
-          AssertThrowMPI(ierr);
-#    endif
+          if constexpr (compiling_for_debug_build())
+            {
+              // note: IBarrier seems to make problem during testing, this
+              // additional Barrier seems to help
+              ierr = MPI_Barrier(comm);
+              AssertThrowMPI(ierr);
+            }
         }
 #  endif
       }

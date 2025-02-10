@@ -213,13 +213,14 @@ namespace Utilities
       ierr = MPI_Type_commit(&result);
       AssertThrowMPI(ierr);
 
-#  ifdef DEBUG
-      MPI_Count size64;
-      ierr = MPI_Type_size_x(result, &size64);
-      AssertThrowMPI(ierr);
+      if constexpr (compiling_for_debug_build())
+        {
+          MPI_Count size64;
+          ierr = MPI_Type_size_x(result, &size64);
+          AssertThrowMPI(ierr);
 
-      Assert(size64 == static_cast<MPI_Count>(n_bytes), ExcInternalError());
-#  endif
+          Assert(size64 == static_cast<MPI_Count>(n_bytes), ExcInternalError());
+        }
 
       // Now put the new data type into a std::unique_ptr with a custom
       // deleter. We call the std::unique_ptr constructor that as first
@@ -255,10 +256,11 @@ namespace Utilities
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
-#  ifdef DEBUG
-      for (const unsigned int destination : destinations)
-        AssertIndexRange(destination, n_procs);
-#  endif
+      if constexpr (compiling_for_debug_build())
+        {
+          for (const unsigned int destination : destinations)
+            AssertIndexRange(destination, n_procs);
+        }
 
       // Have a little function that checks if destinations provided
       // to the current process are unique. The way it does this is
@@ -390,15 +392,17 @@ namespace Utilities
           const unsigned int n_procs =
             Utilities::MPI::n_mpi_processes(mpi_comm);
 
-#  ifdef DEBUG
-          for (const unsigned int destination : destinations)
+          if constexpr (compiling_for_debug_build())
             {
-              AssertIndexRange(destination, n_procs);
-              Assert(destination != Utilities::MPI::this_mpi_process(mpi_comm),
-                     ExcMessage(
-                       "There is no point in communicating with ourselves."));
+              for (const unsigned int destination : destinations)
+                {
+                  AssertIndexRange(destination, n_procs);
+                  Assert(
+                    destination != Utilities::MPI::this_mpi_process(mpi_comm),
+                    ExcMessage(
+                      "There is no point in communicating with ourselves."));
+                }
             }
-#  endif
 
           // Calculate the number of messages to send to each process
           std::vector<unsigned int> dest_vector(n_procs);
@@ -1132,12 +1136,17 @@ namespace Utilities
                   // this function in release mode to avoid touching data
                   // unnecessarily (and overwrite the smaller pieces), as the
                   // locally owned part comes first
-#ifdef DEBUG
-                  data.resize(size, invalid_index_value);
-                  std::fill(data.begin() + start, data.begin() + end, value);
-#else
-                  data.resize(size, value);
-#endif
+                  if constexpr (compiling_for_debug_build())
+                    {
+                      data.resize(size, invalid_index_value);
+                      std::fill(data.begin() + start,
+                                data.begin() + end,
+                                value);
+                    }
+                  else
+                    {
+                      data.resize(size, value);
+                    }
                 }
               else
                 {
@@ -1244,14 +1253,15 @@ namespace Utilities
 
                   Assert(next_index > index_range.first, ExcInternalError());
 
-#ifdef DEBUG
-                  // make sure that the owner is the same on the current
-                  // interval
-                  for (types::global_dof_index i = index_range.first + 1;
-                       i < next_index;
-                       ++i)
-                    AssertDimension(owner, dof_to_dict_rank(i));
-#endif
+                  if constexpr (compiling_for_debug_build())
+                    {
+                      // make sure that the owner is the same on the current
+                      // interval
+                      for (types::global_dof_index i = index_range.first + 1;
+                           i < next_index;
+                           ++i)
+                        AssertDimension(owner, dof_to_dict_rank(i));
+                    }
 
                   // add the interval, either to the local range or into a
                   // buffer to be sent to another processor
@@ -1343,20 +1353,22 @@ namespace Utilities
                   // process message: loop over all intervals
                   for (auto interval : buffer)
                     {
-#  ifdef DEBUG
-                      for (types::global_dof_index i = interval.first;
-                           i < interval.second;
-                           i++)
-                        Assert(actually_owning_ranks.entry_has_been_set(
-                                 i - local_range.first) == false,
-                               ExcInternalError());
-                      Assert(interval.first >= local_range.first &&
-                               interval.first < local_range.second,
-                             ExcInternalError());
-                      Assert(interval.second > local_range.first &&
-                               interval.second <= local_range.second,
-                             ExcInternalError());
-#  endif
+                      if constexpr (library_build_mode ==
+                                    LibraryBuildMode::debug)
+                        {
+                          for (types::global_dof_index i = interval.first;
+                               i < interval.second;
+                               i++)
+                            Assert(actually_owning_ranks.entry_has_been_set(
+                                     i - local_range.first) == false,
+                                   ExcInternalError());
+                          Assert(interval.first >= local_range.first &&
+                                   interval.first < local_range.second,
+                                 ExcInternalError());
+                          Assert(interval.second > local_range.first &&
+                                   interval.second <= local_range.second,
+                                 ExcInternalError());
+                        }
 
                       actually_owning_ranks.fill(interval.first -
                                                    local_range.first,
@@ -1400,25 +1412,27 @@ namespace Utilities
                   // process message: loop over all intervals
                   for (auto interval : request)
                     {
-#  ifdef DEBUG
-                      for (types::global_dof_index i = interval.first;
-                           i < interval.second;
-                           i++)
-                        Assert(
-                          actually_owning_ranks.entry_has_been_set(
-                            i - local_range.first) == false,
-                          ExcMessage(
-                            "Multiple processes seem to own the same global index. "
-                            "A possible reason is that the sets of locally owned "
-                            "indices are not distinct."));
-                      Assert(interval.first < interval.second,
-                             ExcInternalError());
-                      Assert(
-                        local_range.first <= interval.first &&
-                          interval.second <= local_range.second,
-                        ExcMessage(
-                          "The specified interval is not handled by the current process."));
-#  endif
+                      if constexpr (library_build_mode ==
+                                    LibraryBuildMode::debug)
+                        {
+                          for (types::global_dof_index i = interval.first;
+                               i < interval.second;
+                               i++)
+                            Assert(
+                              actually_owning_ranks.entry_has_been_set(
+                                i - local_range.first) == false,
+                              ExcMessage(
+                                "Multiple processes seem to own the same global index. "
+                                "A possible reason is that the sets of locally owned "
+                                "indices are not distinct."));
+                          Assert(interval.first < interval.second,
+                                 ExcInternalError());
+                          Assert(
+                            local_range.first <= interval.first &&
+                              interval.second <= local_range.second,
+                            ExcMessage(
+                              "The specified interval is not handled by the current process."));
+                        }
                       actually_owning_ranks.fill(interval.first -
                                                    local_range.first,
                                                  interval.second -
@@ -1753,17 +1767,18 @@ namespace Utilities
             }
 
 
-#  ifdef DEBUG
-          for (const auto &it : requested_indices)
+          if constexpr (compiling_for_debug_build())
             {
-              IndexSet copy_set = it.second;
-              copy_set.subtract_set(owned_indices);
-              Assert(copy_set.n_elements() == 0,
-                     ExcInternalError(
-                       "The indices requested from the current "
-                       "MPI rank should be locally owned here!"));
+              for (const auto &it : requested_indices)
+                {
+                  IndexSet copy_set = it.second;
+                  copy_set.subtract_set(owned_indices);
+                  Assert(copy_set.n_elements() == 0,
+                         ExcInternalError(
+                           "The indices requested from the current "
+                           "MPI rank should be locally owned here!"));
+                }
             }
-#  endif
 
 #endif // DEAL_II_WITH_MPI
 
