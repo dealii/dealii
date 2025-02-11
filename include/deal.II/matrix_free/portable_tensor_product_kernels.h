@@ -398,55 +398,6 @@ namespace Portable
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
                    co_shape_gradients,
         SharedView temp);
-<<<<<<< HEAD
-=======
-
-      /**
-       * Evaluate the finite element function at the quadrature points.
-       */
-      template <typename ViewType>
-      DEAL_II_HOST_DEVICE void
-      evaluate_values(ViewType u);
-
-      /**
-       * Evaluate the gradients of the finite element function at the quadrature
-       * points.
-       */
-      template <typename ViewTypeIn, typename ViewTypeOut>
-      DEAL_II_HOST_DEVICE void
-      evaluate_gradients(const ViewTypeIn u, ViewTypeOut grad_u);
-
-      /**
-       * Evaluate the values and the gradients of the finite element function at
-       * the quadrature points.
-       */
-      template <typename ViewType1, typename ViewType2>
-      DEAL_II_HOST_DEVICE void
-      evaluate_values_and_gradients(ViewType1 u, ViewType2 grad_u);
-
-      /**
-       * Helper function for integrate(). Integrate the finite element function.
-       */
-      template <typename ViewType>
-      DEAL_II_HOST_DEVICE void
-      integrate_values(ViewType u);
-
-      /**
-       * Helper function for integrate(). Integrate the gradients of the finite
-       * element function.
-       */
-      template <bool add, typename ViewType1, typename ViewType2>
-      DEAL_II_HOST_DEVICE void
-      integrate_gradients(ViewType1 u, ViewType2 grad_u);
-
-      /**
-       * Helper function for integrate(). Integrate the values and the gradients
-       * of the finite element function.
-       */
-      template <typename ViewType1, typename ViewType2>
-      DEAL_II_HOST_DEVICE void
-      integrate_values_and_gradients(ViewType1 u, ViewType2 grad_u);
->>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
 
       /**
        * Evaluate/integrate the values of a finite element function at the

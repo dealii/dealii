@@ -675,11 +675,7 @@ namespace Portable
     /**
      * Helper function for determining the scratch pad size.
      */
-<<<<<<< HEAD
     inline unsigned int
-=======
-    unsigned int
->>>>>>> 504c449052 (generalize the portable MF methods to fe_degree < n_q_points_1d cases)
     compute_scratch_pad_size(
       const ::dealii::internal::MatrixFreeFunctions::ElementType element_type,
       const int                                                  dim,
