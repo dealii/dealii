@@ -43,13 +43,23 @@ evaluate_tensor_product(
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> src)
 {
+  Kokkos::View<
+    Number *,
+    MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+    Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+    dummy_scratch(team_member.team_shmem(), 0);
+
   Portable::internal::EvaluatorTensorProduct<
     Portable::internal::evaluate_general,
     2,
     M - 1,
     N,
     double>
-    evaluator(team_member, shape_values, shape_gradients, co_shape_gradients);
+    evaluator(team_member,
+              shape_values,
+              shape_gradients,
+              co_shape_gradients,
+              dummy_scratch);
 
   if (type == 0)
     {
