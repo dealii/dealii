@@ -64,7 +64,8 @@ struct ProductType;
  */
 template <typename T, typename U>
 inline std::enable_if_t<
-  std::is_floating_point_v<T> && std::is_floating_point_v<U>,
+  std::is_floating_point_v<T> && std::is_floating_point_v<U> &&
+    !std::is_same_v<T, U>,
   typename ProductType<std::complex<T>, std::complex<U>>::type>
 operator*(const std::complex<T> &left, const std::complex<U> &right)
 {
@@ -104,7 +105,8 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
  */
 template <typename T, typename U>
 inline std::enable_if_t<
-  std::is_floating_point_v<T> && std::is_floating_point_v<U>,
+  std::is_floating_point_v<T> && std::is_floating_point_v<U> &&
+    !std::is_same_v<T, U>,
   typename ProductType<std::complex<T>, std::complex<U>>::type>
 operator/(const std::complex<T> &left, const std::complex<U> &right)
 {
@@ -144,7 +146,7 @@ operator/(const std::complex<T> &left, const std::complex<U> &right)
  */
 template <typename T, typename U>
 inline std::enable_if_t<std::is_floating_point_v<T> &&
-                          std::is_floating_point_v<U>,
+                          std::is_floating_point_v<U> && !std::is_same_v<T, U>,
                         typename ProductType<std::complex<T>, U>::type>
 operator*(const std::complex<T> &left, const U &right)
 {
@@ -183,7 +185,7 @@ operator*(const std::complex<T> &left, const U &right)
  */
 template <typename T, typename U>
 inline std::enable_if_t<std::is_floating_point_v<T> &&
-                          std::is_floating_point_v<U>,
+                          std::is_floating_point_v<U> && !std::is_same_v<T, U>,
                         typename ProductType<std::complex<T>, U>::type>
 operator/(const std::complex<T> &left, const U &right)
 {
@@ -222,7 +224,7 @@ operator/(const std::complex<T> &left, const U &right)
  */
 template <typename T, typename U>
 inline std::enable_if_t<std::is_floating_point_v<T> &&
-                          std::is_floating_point_v<U>,
+                          std::is_floating_point_v<U> && !std::is_same_v<T, U>,
                         typename ProductType<T, std::complex<U>>::type>
 operator*(const T &left, const std::complex<U> &right)
 {
@@ -261,7 +263,7 @@ operator*(const T &left, const std::complex<U> &right)
  */
 template <typename T, typename U>
 inline std::enable_if_t<std::is_floating_point_v<T> &&
-                          std::is_floating_point_v<U>,
+                          std::is_floating_point_v<U> && !std::is_same_v<T, U>,
                         typename ProductType<T, std::complex<U>>::type>
 operator/(const T &left, const std::complex<U> &right)
 {
