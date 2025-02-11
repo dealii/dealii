@@ -21,8 +21,6 @@
 #   DEAL_II_LIBRARIES DEAL_II_LIBRARIES_<build>
 #   DEAL_II_TARGETS DEAL_II_TARGETS_<build>
 #     - populating the LINK_LIBRARIES target property
-#   DEAL_II_INCLUDE_DIRS
-#     - populating the INCLUDE_DIRECTORIES target property
 #   DEAL_II_DEFINITIONS DEAL_II_DEFINITIONS_<build>
 #     - populating the COMPILE_DEFINITIONS target property
 #   DEAL_II_CXX_FLAGS DEAL_II_CXX_FLAGS_<build>
@@ -49,11 +47,6 @@ function(populate_target_properties _target _build)
   endif()
 
   set_target_properties(${_target} PROPERTIES LINKER_LANGUAGE "CXX")
-
-  #
-  # Add the contents of ${DEAL_II_INCLUDE_DIRS} as a public interface.
-  #
-  target_include_directories(${_target} SYSTEM ${_visibility} ${DEAL_II_INCLUDE_DIRS})
 
   # Build-directory specific includes:
 
