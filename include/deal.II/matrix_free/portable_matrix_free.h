@@ -244,7 +244,7 @@ namespace Portable
       ::dealii::internal::MatrixFreeFunctions::ElementType element_type;
 
       /**
-       * Size of the scratch pad for temprary storage in shared memory.
+       * Size of the scratch pad for temporary storage in shared memory.
        */
       unsigned int scratch_pad_size;
 
