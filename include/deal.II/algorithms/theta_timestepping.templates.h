@@ -118,7 +118,11 @@ namespace Algorithms
     if (output != nullptr)
       (*output) << 0U << out;
 
-    for (unsigned int count = 1; d_explicit.time < control.final(); ++count)
+    // When using nvcc 12.6 with C++20, the compiler has trouble determining the
+    // type of d_explicit.time. We need to use a static_cast to help it.
+    for (unsigned int count = 1;
+         static_cast<double>(d_explicit.time) < control.final();
+         ++count)
       {
         const bool step_change = control.advance();
         d_implicit.time        = control.now();

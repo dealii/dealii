@@ -865,7 +865,7 @@ namespace CGALWrappers
       vertices0, vertices1, tol);
   }
 
-#  include "intersections.inst"
+#  include "cgal/intersections.inst"
 
 } // namespace CGALWrappers
 

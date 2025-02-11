@@ -1048,14 +1048,15 @@ namespace internal
 
       info.subface_index = GeometryInfo<dim>::max_children_per_cell;
       Assert(neighbor->level() <= cell->level(), ExcInternalError());
-      if (cell->level() > neighbor->level())
+
+      // for dim > 1 and hanging faces we must set a subface index
+      if (dim > 1 && cell->level() > neighbor->level())
         {
           if (cell->has_periodic_neighbor(face_no))
             info.subface_index =
               cell->periodic_neighbor_of_coarser_periodic_neighbor(face_no)
                 .second;
-          // else if must be dim > 1 because dim == 1 adm creates no subfaces
-          else if (dim > 1)
+          else
             info.subface_index =
               cell->neighbor_of_coarser_neighbor(face_no).second;
         }

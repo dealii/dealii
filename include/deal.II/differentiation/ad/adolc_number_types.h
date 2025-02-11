@@ -17,7 +17,23 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
+
+#include <deal.II/differentiation/ad/ad_number_traits.h>
+#include <deal.II/differentiation/ad/ad_number_types.h>
+
+#ifdef DEAL_II_WITH_ADOLC
+#  include <adolc/adouble.h> // Taped double
+#  include <adolc/adtl.h>    // Tapeless double
+#  include <adolc/internal/adolc_settings.h>
+#  include <adolc/internal/adubfunc.h> // Taped double math functions
+#endif
+
+#include <complex>
+#include <limits>
 #include <type_traits>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -58,26 +74,8 @@ namespace Differentiation
 } // namespace Differentiation
 
 
-DEAL_II_NAMESPACE_CLOSE
-
 
 #ifdef DEAL_II_WITH_ADOLC
-
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/numbers.h>
-
-#  include <deal.II/differentiation/ad/ad_number_traits.h>
-#  include <deal.II/differentiation/ad/ad_number_types.h>
-
-#  include <adolc/adouble.h> // Taped double
-#  include <adolc/adtl.h>    // Tapeless double
-#  include <adolc/internal/adolc_settings.h>
-#  include <adolc/internal/adubfunc.h> // Taped double math functions
-
-#  include <complex>
-#  include <limits>
-
-DEAL_II_NAMESPACE_OPEN
 
 /**
  * An exception which states that a function has been disabled due to the
@@ -495,9 +493,9 @@ namespace Differentiation
 #  endif // DOXYGEN
 
 
+#endif // DEAL_II_WITH_ADOLC
+
 DEAL_II_NAMESPACE_CLOSE
 
-
-#endif // DEAL_II_WITH_ADOLC
 
 #endif

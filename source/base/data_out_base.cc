@@ -9722,6 +9722,6 @@ namespace DataOutBase
 
 
 // explicit instantiations
-#include "data_out_base.inst"
+#include "base/data_out_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -534,7 +534,8 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   const Quadrature<dim> face_projection =
     QProjector<dim>::project_to_face(this->reference_cell(),
                                      quad_face_support,
-                                     0);
+                                     0,
+                                     numbers::default_geometric_orientation);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
@@ -787,7 +788,7 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
 
 
 // explicit instantiations
-#include "fe_raviart_thomas_nodal.inst"
+#include "fe/fe_raviart_thomas_nodal.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

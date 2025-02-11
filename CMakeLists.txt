@@ -51,6 +51,13 @@ if(POLICY CMP0075)
   cmake_policy(SET CMP0075 NEW)
 endif()
 
+if(POLICY CMP0167)
+  # Introduced in CMake 3.30: When set to true then CMake uses the Boost
+  # CMake Config installed with Boost instead of using the FindBoost.cmake
+  # module installed with CMake.
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
@@ -153,9 +160,18 @@ endif()
 if(DEAL_II_HAVE_BUNDLED_DIRECTORY)
   add_subdirectory(bundled)
 endif()
-add_subdirectory(source) # has to be included after bundled
 
-add_subdirectory(cmake/config) # has to be included after source
+# Now that we have collected information about the configuration
+# and the bundled directory, set up the compilation of the
+# library from the files in the source/ directory.
+add_subdirectory(source)
+
+# Then also set up installation and other targets.
+add_subdirectory(cmake/config)
+
+# Now also configure installation of the examples. This relies on
+# the correctly set up library, so needs to come after configuration
+# in source/ and cmake/config/
 add_subdirectory(examples)
 
 add_subdirectory(contrib/utilities)

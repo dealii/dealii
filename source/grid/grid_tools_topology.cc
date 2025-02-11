@@ -1957,6 +1957,6 @@ namespace GridTools
 } /* namespace GridTools */
 
 // explicit instantiations
-#include "grid_tools_topology.inst"
+#include "grid/grid_tools_topology.inst"
 
 DEAL_II_NAMESPACE_CLOSE

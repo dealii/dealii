@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/template_constraints.h>
+
 #include <vector>
 
 

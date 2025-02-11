@@ -667,9 +667,11 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
       // be done for the face orientation flag in 3d.
       const Quadrature<dim> subface_quadrature =
         subface == numbers::invalid_unsigned_int ?
-          QProjector<dim>::project_to_face(this->reference_cell(),
-                                           quad_face_support,
-                                           0) :
+          QProjector<dim>::project_to_face(
+            this->reference_cell(),
+            quad_face_support,
+            0,
+            numbers::default_geometric_orientation) :
           QProjector<dim>::project_to_subface(this->reference_cell(),
                                               quad_face_support,
                                               0,
@@ -1694,6 +1696,6 @@ FE_Q_Base<dim, spacedim>::get_constant_modes() const
 #endif
 
 // explicit instantiations
-#include "fe_q_base.inst"
+#include "fe/fe_q_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

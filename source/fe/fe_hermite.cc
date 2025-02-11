@@ -956,6 +956,6 @@ FE_Hermite<dim, spacedim>::fill_fe_face_values(
 
 
 // Explicit instantiations
-#include "fe_hermite.inst"
+#include "fe/fe_hermite.inst"
 
 DEAL_II_NAMESPACE_CLOSE

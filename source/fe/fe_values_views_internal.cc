@@ -1166,6 +1166,6 @@ namespace FEValuesViews
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-#include "fe_values_views_internal.inst"
+#include "fe/fe_values_views_internal.inst"
 
 DEAL_II_NAMESPACE_CLOSE
