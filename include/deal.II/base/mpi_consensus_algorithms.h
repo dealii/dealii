@@ -1279,7 +1279,7 @@ namespace Utilities
   {
     namespace ConsensusAlgorithms
     {
-      namespace
+      namespace internal
       {
         /**
          * Return whether a vector of targets (MPI ranks) has only unique
@@ -1373,7 +1373,7 @@ namespace Utilities
           std::rethrow_exception(exception);
 #  endif
         }
-      } // namespace
+      } // namespace internal
 
 
 
@@ -1450,7 +1450,7 @@ namespace Utilities
                       &process_answer,
         const MPI_Comm comm)
       {
-        Assert(has_unique_elements(targets),
+        Assert(internal::has_unique_elements(targets),
                ExcMessage("The consensus algorithms expect that each process "
                           "only sends a single message to another process, "
                           "but the targets provided include duplicates."));
@@ -1497,7 +1497,7 @@ namespace Utilities
           }
         catch (...)
           {
-            handle_exception(std::current_exception(), comm);
+            internal::handle_exception(std::current_exception(), comm);
           }
 
         return std::vector<unsigned int>(requesting_processes.begin(),
@@ -1821,7 +1821,7 @@ namespace Utilities
                       &process_answer,
         const MPI_Comm comm)
       {
-        Assert(has_unique_elements(targets),
+        Assert(internal::has_unique_elements(targets),
                ExcMessage("The consensus algorithms expect that each process "
                           "only sends a single message to another process, "
                           "but the targets provided include duplicates."));
@@ -1849,7 +1849,7 @@ namespace Utilities
           }
         catch (...)
           {
-            handle_exception(std::current_exception(), comm);
+            internal::handle_exception(std::current_exception(), comm);
           }
 
         return std::vector<unsigned int>(requesting_processes.begin(),
