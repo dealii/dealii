@@ -22,6 +22,7 @@
 #  include <deal.II/base/iterator_range.h>
 #  include <deal.II/base/multithread_info.h>
 #  include <deal.II/base/parallel.h>
+#  include <deal.II/base/std_cxx20/type_traits.h>
 #  include <deal.II/base/template_constraints.h>
 #  include <deal.II/base/thread_local_storage.h>
 #  include <deal.II/base/thread_management.h>
@@ -32,10 +33,16 @@
 #    else
 #      include <tbb/pipeline.h>
 #    endif
+#    include <tbb/blocked_range.h>
+#  endif
+
+#  ifdef DEAL_II_WITH_TASKFLOW
+#    include <taskflow/taskflow.hpp>
 #  endif
 
 #  include <functional>
 #  include <iterator>
+#  include <list>
 #  include <memory>
 #  include <utility>
 #  include <vector>

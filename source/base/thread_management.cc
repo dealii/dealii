@@ -12,6 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/thread_management.h>
 
 #include <atomic>

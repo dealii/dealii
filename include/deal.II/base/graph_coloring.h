@@ -19,7 +19,9 @@
 
 #  include <deal.II/base/config.h>
 
+#  include <deal.II/base/std_cxx20/type_traits.h>
 #  include <deal.II/base/thread_management.h>
+#  include <deal.II/base/types.h>
 
 #  include <algorithm>
 #  include <functional>

@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <algorithm>

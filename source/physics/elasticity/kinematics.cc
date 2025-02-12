@@ -12,6 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/tensor.h>
+
 #include <deal.II/physics/elasticity/kinematics.h>
 
 DEAL_II_NAMESPACE_OPEN
