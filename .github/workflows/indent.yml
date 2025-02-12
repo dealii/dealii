@@ -17,7 +17,7 @@ jobs:
     # run the indent checks
 
     name: indent
-    runs-on: [ubuntu-24.04]
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
     # build the documentation
 
     name: doxygen
-    runs-on: [ubuntu-24.04]
+    runs-on: ubuntu-24.04
 
     steps:
     - name: setup
