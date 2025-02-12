@@ -7858,125 +7858,91 @@ CellAccessor<dim, spacedim>::flag_for_line_refinement(
 
 
 
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1, 2>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1, 3>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<2>
-CellAccessor<2>::subface_case(const unsigned int face_no) const
+template <int dim, int spacedim>
+inline dealii::internal::SubfaceCase<dim>
+CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, this->n_faces());
-  return ((face(face_no)->has_children()) ?
-            dealii::internal::SubfaceCase<2>::case_x :
-            dealii::internal::SubfaceCase<2>::case_none);
-}
 
-template <>
-inline dealii::internal::SubfaceCase<2>
-CellAccessor<2, 3>::subface_case(const unsigned int face_no) const
-{
-  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, this->n_faces());
-  return ((face(face_no)->has_children()) ?
-            dealii::internal::SubfaceCase<2>::case_x :
-            dealii::internal::SubfaceCase<2>::case_none);
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<3>
-CellAccessor<3>::subface_case(const unsigned int face_no) const
-{
-  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, this->n_faces());
-  switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
+  if constexpr (dim == 1)
+    return dealii::internal::SubfaceCase<1>::case_none;
+  else if constexpr (dim == 2)
+    return ((face(face_no)->has_children()) ?
+              dealii::internal::SubfaceCase<2>::case_x :
+              dealii::internal::SubfaceCase<2>::case_none);
+  else if constexpr (dim == 3)
     {
-      case RefinementCase<3>::no_refinement:
-        return dealii::internal::SubfaceCase<3>::case_none;
-      case RefinementCase<3>::cut_x:
-        if (face(face_no)->child(0)->has_children())
-          {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_y,
-                   ExcInternalError());
-            if (face(face_no)->child(1)->has_children())
+      switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
+        {
+          case RefinementCase<3>::no_refinement:
+            return dealii::internal::SubfaceCase<3>::case_none;
+          case RefinementCase<3>::cut_x:
+            if (face(face_no)->child(0)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
+                Assert(face(face_no)->child(0)->refinement_case() ==
                          RefinementCase<2>::cut_y,
                        ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_y,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_x1y;
               }
             else
-              return dealii::internal::SubfaceCase<3>::case_x1y;
-          }
-        else
-          {
-            if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_y,
-                       ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_x2y;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_y,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_x2y;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_x;
               }
-            else
-              return dealii::internal::SubfaceCase<3>::case_x;
-          }
-      case RefinementCase<3>::cut_y:
-        if (face(face_no)->child(0)->has_children())
-          {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_x,
-                   ExcInternalError());
-            if (face(face_no)->child(1)->has_children())
+          case RefinementCase<3>::cut_y:
+            if (face(face_no)->child(0)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
+                Assert(face(face_no)->child(0)->refinement_case() ==
                          RefinementCase<2>::cut_x,
                        ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_x,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_y1x;
               }
             else
-              return dealii::internal::SubfaceCase<3>::case_y1x;
-          }
-        else
-          {
-            if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_x,
-                       ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_y2x;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_x,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_y2x;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_y;
               }
-            else
-              return dealii::internal::SubfaceCase<3>::case_y;
-          }
-      case RefinementCase<3>::cut_xy:
-        return dealii::internal::SubfaceCase<3>::case_xy;
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
+          case RefinementCase<3>::cut_xy:
+            return dealii::internal::SubfaceCase<3>::case_xy;
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
     }
+
   // we should never get here
-  return dealii::internal::SubfaceCase<3>::case_none;
+  DEAL_II_ASSERT_UNREACHABLE();
+  return dealii::internal::SubfaceCase<dim>::case_none;
 }
 
 
