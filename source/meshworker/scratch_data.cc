@@ -1022,10 +1022,8 @@ namespace MeshWorker
   }
 
 } // namespace MeshWorker
-DEAL_II_NAMESPACE_CLOSE
 
 // Explicit instantiations
-DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
 #include "meshworker/scratch_data.inst"
