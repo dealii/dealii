@@ -236,8 +236,8 @@ jobs:
     # Based on https://github.com/oneapi-src/oneapi-ci
     # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
 
-    name: ubuntu-22.04 debug intel oneapi
-    runs-on: ubuntu-22.04
+    name: ubuntu-24.04 debug intel oneapi
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
