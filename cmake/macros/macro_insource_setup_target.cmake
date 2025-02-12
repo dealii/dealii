@@ -47,6 +47,7 @@ function(insource_setup_target _target _build)
       "${CMAKE_SOURCE_DIR}/include"
     SYSTEM PRIVATE
       ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+      ${DEAL_II_INCLUDE_DIRS}
     )
 
   target_link_libraries(${_target} ${DEAL_II_TARGET_NAME}_${_build_lowercase})
