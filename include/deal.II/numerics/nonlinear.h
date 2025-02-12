@@ -12,6 +12,9 @@
 //
 // ------------------------------------------------------------------------
 
+#ifndef dealii_nonlinear_h
+#define dealii_nonlinear_h
+
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
@@ -710,3 +713,5 @@ NonlinearSolverSelector<VectorType>::solve(
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif

@@ -23,9 +23,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <Teuchos_BLAS_types.hpp>
-
-
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  include <deal.II/base/enable_observer_pointer.h>
@@ -33,6 +30,7 @@
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
+#  include <Teuchos_BLAS_types.hpp>
 #  include <Teuchos_ConfigDefs.hpp>
 #  include <Teuchos_ParameterList.hpp>
 #  include <Teuchos_RCPDecl.hpp>
