@@ -26,8 +26,8 @@ jobs:
   serial:
     # simple serial build using apple clang
 
-    name: serial
-    runs-on: [macos-latest]
+    name: ${{ matrix.os }} serial
+    runs-on: ${{ matrix.os }}
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -36,6 +36,11 @@ jobs:
     # requests.
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14]
 
     steps:
     - uses: actions/checkout@v4
@@ -68,8 +73,8 @@ jobs:
   parallel64:
     # MPI build using apple clang and 64 bit indices
 
-    name: OSX parallel 64bit
-    runs-on: [macos-latest]
+    name: ${{ matrix.os }} parallel 64bit
+    runs-on: ${{ matrix.os }}
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -78,6 +83,11 @@ jobs:
     # requests.
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14]
 
     steps:
     - uses: actions/checkout@v4
