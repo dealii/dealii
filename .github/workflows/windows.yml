@@ -1,4 +1,4 @@
-name: github-windows
+name: windows
 
 on:
   push:
@@ -23,7 +23,7 @@ env:
   CTEST_PARALLEL_LEVEL: 1
 
 jobs:
-  windows-serial:
+  serial:
     # Serial build on Windows
 
     name: ${{ matrix.os }} serial
