@@ -46,10 +46,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       "Unable to compile a simple test program. "
       "Trying to drop \"${_linker_flag}\" from the linker flags."
       )
-    foreach(_flags
-        DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build}
-        BASE_LINKER_FLAGS BASE_LINKER_FLAGS_${build}
-        )
+    foreach(_flags DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build})
       string(REPLACE "${_linker_flag}" "${_replacement_flag}"
         ${_flags} "${${_flags}}"
         )
