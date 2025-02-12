@@ -1,4 +1,4 @@
-name: github-windows
+name: windows
 
 on:
   push:
@@ -25,8 +25,8 @@ env:
 jobs:
   windows-serial:
     # Serial build on Windows
-    #
-    name: Windows Serial
+
+    name: ${{ matrix.os }} serial
     runs-on: ${{ matrix.os }}
 
     #

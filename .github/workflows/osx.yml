@@ -1,4 +1,4 @@
-name: github-OSX
+name: osx
 
 on:
   push:
@@ -23,10 +23,10 @@ env:
   MAKEFLAGS: "--jobs=3"
 
 jobs:
-  osx-serial:
+  serial:
     # simple serial build using apple clang
 
-    name: OSX serial
+    name: serial
     runs-on: [macos-latest]
 
     #
@@ -65,7 +65,7 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  osx-parallel64:
+  parallel64:
     # MPI build using apple clang and 64 bit indices
 
     name: OSX parallel 64bit
