@@ -72,9 +72,13 @@ struct DisableWindowsDebugRuntimeDialog
 // Redefine Assert as AssertThrow to make sure that the code is tested similarly
 // in Release mode and in Debug mode. clang-format makes sure that this file is
 // included after all regular header files but before all the other local header
-// files.
-#undef Assert
-#define Assert AssertThrow
+// files. The redefinition is not applied when Kokkos GPU backend is enabled,
+// because AssertThrow is not defined for device codes.
+#if !defined(KOKKOS_ENABLE_CUDA) && !defined(KOKKOS_ENABLE_HIP) && \
+  !defined(KOKKOS_ENABLE_SYCL)
+#  undef Assert
+#  define Assert AssertThrow
+#endif
 
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase

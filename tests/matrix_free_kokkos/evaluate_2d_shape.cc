@@ -41,27 +41,41 @@ evaluate_tensor_product(
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst,
-  Kokkos::View<double *, MemorySpace::Default::kokkos_space> src)
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> src,
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> tmp)
 {
+  Kokkos::View<
+    double *,
+    MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+    Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+    dummy_scratch(team_member.team_shmem(), 0);
+
   Portable::internal::EvaluatorTensorProduct<
     Portable::internal::evaluate_general,
     2,
-    M - 1,
+    M,
     N,
     double>
-    evaluator(team_member, shape_values, shape_gradients, co_shape_gradients);
+    evaluator(team_member,
+              shape_values,
+              shape_gradients,
+              co_shape_gradients,
+              dummy_scratch);
+
+  constexpr int d0 = dof_to_quad ? 0 : 1;
+  constexpr int d1 = dof_to_quad ? 1 : 0;
 
   if (type == 0)
     {
-      evaluator.template values<0, dof_to_quad, false, false>(src, src);
+      evaluator.template values<d0, dof_to_quad, false, false>(src, tmp);
       team_member.team_barrier();
-      evaluator.template values<1, dof_to_quad, add, false>(src, dst);
+      evaluator.template values<d1, dof_to_quad, add, false>(tmp, dst);
     }
   if (type == 1)
     {
-      evaluator.template gradients<0, dof_to_quad, false, false>(src, src);
+      evaluator.template gradients<d0, dof_to_quad, false, false>(src, tmp);
       team_member.team_barrier();
-      evaluator.template gradients<1, dof_to_quad, add, false>(src, dst);
+      evaluator.template gradients<d1, dof_to_quad, add, false>(tmp, dst);
     }
 }
 
@@ -93,11 +107,14 @@ test()
 
   constexpr int                          M_2d = M * M;
   constexpr int                          N_2d = N * N;
+  constexpr int                          MN   = M * N;
   LinearAlgebra::ReadWriteVector<double> x_ref(N_2d), y_ref(M_2d);
   Kokkos::View<double[N_2d], MemorySpace::Default::kokkos_space> x_dev(
     Kokkos::view_alloc("x_dev", Kokkos::WithoutInitializing));
   Kokkos::View<double[M_2d], MemorySpace::Default::kokkos_space> y_dev(
     Kokkos::view_alloc("y_dev", Kokkos::WithoutInitializing));
+  Kokkos::View<double[MN], MemorySpace::Default::kokkos_space> tmp_dev(
+    Kokkos::view_alloc("tmp_dev", Kokkos::WithoutInitializing));
   auto x_host = Kokkos::create_mirror_view(x_dev);
   auto y_host = Kokkos::create_mirror_view(y_dev);
 
@@ -160,7 +177,8 @@ test()
                                                       shape_gradients,
                                                       co_shape_gradients,
                                                       y_dev,
-                                                      x_dev);
+                                                      x_dev,
+                                                      tmp_dev);
     });
 
   // Check the results on the host
@@ -197,7 +215,8 @@ test()
                                                      shape_gradients,
                                                      co_shape_gradients,
                                                      x_dev,
-                                                     y_dev);
+                                                     y_dev,
+                                                     tmp_dev);
     });
 
   // Check the results on the host
@@ -219,11 +238,15 @@ main()
   deallog.push("values");
   test<4, 4, 0, false>();
   test<3, 3, 0, false>();
+  test<3, 4, 0, false>();
+  test<3, 5, 0, false>();
   deallog.pop();
 
   deallog.push("gradients");
   test<4, 4, 1, false>();
   test<3, 3, 1, false>();
+  test<3, 4, 1, false>();
+  test<3, 5, 1, false>();
   deallog.pop();
 
   deallog.push("add");
@@ -231,11 +254,15 @@ main()
   deallog.push("values");
   test<4, 4, 0, true>();
   test<3, 3, 0, true>();
+  test<3, 4, 0, true>();
+  test<3, 5, 0, true>();
   deallog.pop();
 
   deallog.push("gradients");
   test<4, 4, 1, true>();
   test<3, 3, 1, true>();
+  test<3, 4, 1, true>();
+  test<3, 5, 1, true>();
   deallog.pop();
 
   deallog.pop();
