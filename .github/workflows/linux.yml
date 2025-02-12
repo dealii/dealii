@@ -1,4 +1,4 @@
-name: github-linux
+name: linux
 
 on:
   push:
@@ -24,11 +24,11 @@ env:
 
 jobs:
 
-  ########################
-  # linux-release-serial #
-  ########################
+  ##################
+  # release-serial #
+  ##################
 
-  linux-release-serial:
+  release-serial:
     # simple serial release build using g++
 
     name: ${{ matrix.ubuntu_version }} release serial
@@ -84,11 +84,11 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  ########################
-  # linux-debug-parallel #
-  ########################
+  ##################
+  # debug-parallel #
+  ##################
 
-  linux-debug-parallel:
+  debug-parallel:
     # simple parallel debug build using g++
 
     name: ${{ matrix.ubuntu_version }} ${{ matrix.architecture }} debug parallel
@@ -160,11 +160,11 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  ###############################
-  # linux-debug-parallel-tpetra #
-  ###############################
+  #########################
+  # debug-parallel-tpetra #
+  #########################
 
-  linux-debug-parallel-tpetra:
+  debug-parallel-tpetra:
     # simple parallel debug build using g++ and trilinos+tpetra
 
     name: ${{ matrix.ubuntu_version }} debug parallel tpetra
@@ -222,17 +222,17 @@ jobs:
         make setup_tests_trilinos_tpetra
         ctest -VV
 
-  ############################
-  # linux-debug-intel-oneapi #
-  ############################
+  ######################
+  # debug-intel-oneapi #
+  ######################
 
-  linux-debug-intel-oneapi:
+  debug-intel-oneapi:
     # parallel debug build with Intel oneAPI including MPI and MKL
     #
     # Based on https://github.com/oneapi-src/oneapi-ci
     # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
 
-    name: linux debug intel oneapi
+    name: jammy debug intel oneapi
     runs-on: [ubuntu-22.04]
 
     #
@@ -292,14 +292,14 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  #######################
-  # linux-debug-cuda-11 #
-  #######################
+  #################
+  # debug-cuda-11 #
+  #################
 
-  linux-debug-cuda-11:
+  debug-cuda-11:
     # simple parallel debug build using cuda-11
 
-    name: linux debug cuda-11
+    name: jammy debug cuda-11
     runs-on: [ubuntu-22.04]
 
     #
@@ -404,14 +404,14 @@ jobs:
         cd tests/matrix_free_kokkos
         make compile_test_executables
 
-  #############################
-  # linux-debug-cuda-11-clang #
-  #############################
+  #######################
+  # debug-cuda-11-clang #
+  #######################
 
-  linux-debug-cuda-11-clang:
+  debug-cuda-11-clang:
     # simple parallel debug build using cuda-11 and clang
 
-    name: linux debug cuda-11 clang
+    name: jammy debug cuda-11 clang
     runs-on: [ubuntu-22.04]
 
     #

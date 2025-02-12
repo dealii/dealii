@@ -1,4 +1,4 @@
-name: github-OSX
+name: osx
 
 on:
   push:
@@ -23,7 +23,7 @@ env:
   MAKEFLAGS: "--jobs=3"
 
 jobs:
-  osx-serial:
+  serial:
     # simple serial build using apple clang
 
     name: ${{ matrix.os }} serial
@@ -70,7 +70,7 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  osx-parallel64:
+  parallel64:
     # MPI build using apple clang and 64 bit indices
 
     name: ${{ matrix.os }} parallel 64bit
