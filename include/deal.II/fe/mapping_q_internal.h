@@ -41,6 +41,7 @@
 
 #include <array>
 #include <limits>
+#include <numeric>
 
 
 DEAL_II_NAMESPACE_OPEN

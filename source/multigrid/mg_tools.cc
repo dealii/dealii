@@ -43,7 +43,9 @@
 
 #include <algorithm>
 #include <numeric>
+#include <set>
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 

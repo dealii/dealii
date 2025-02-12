@@ -25,6 +25,10 @@
 
 #ifdef DEAL_II_WITH_GMSH
 
+#  ifdef DEAL_II_WITH_OPENCASCADE
+#    include <TopoDS_Edge.hxx>
+#  endif
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Gmsh

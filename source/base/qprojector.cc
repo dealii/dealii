@@ -21,6 +21,9 @@
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_orientation.h>
 
+#include <boost/container/small_vector.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 

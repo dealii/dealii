@@ -20,6 +20,9 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/mg_tools.h>
 
+#include <set>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 

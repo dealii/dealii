@@ -28,6 +28,9 @@
 
 #include <deal.II/hp/fe_collection.h>
 
+#include <boost/container/small_vector.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal

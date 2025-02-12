@@ -35,6 +35,8 @@
 
 #include <deal.II/numerics/data_postprocessor.h>
 
+#include <boost/signals2/connection.hpp>
+
 #include <fstream>
 #include <iostream>
 #include <map>

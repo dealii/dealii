@@ -23,6 +23,8 @@
 
 #include <deal.II/fe/mapping_q.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <array>
 
 DEAL_II_NAMESPACE_OPEN

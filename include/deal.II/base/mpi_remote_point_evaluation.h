@@ -22,6 +22,9 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <boost/signals2/connection.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations

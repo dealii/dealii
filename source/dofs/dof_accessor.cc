@@ -20,6 +20,8 @@
 
 #include <deal.II/grid/tria_iterator.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

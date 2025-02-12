@@ -45,6 +45,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Projection_traits_xy_3.h>
 #  include <CGAL/Segment_3.h>
 #  include <CGAL/Simple_cartesian.h>
+#  include <CGAL/Surface_mesh/Surface_mesh.h>
 #  include <CGAL/Tetrahedron_3.h>
 #  include <CGAL/Triangle_2.h>
 #  include <CGAL/Triangle_3.h>

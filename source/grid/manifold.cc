@@ -29,6 +29,8 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 

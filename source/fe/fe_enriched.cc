@@ -20,6 +20,8 @@
 #include <deal.II/lac/sparsity_tools.h>
 
 #include <memory>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
