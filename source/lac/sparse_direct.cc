@@ -27,15 +27,12 @@
 #include <typeinfo>
 #include <vector>
 
-
-DEAL_II_NAMESPACE_OPEN
-
-
-// include UMFPACK file.
 #ifdef DEAL_II_WITH_UMFPACK
 #  include <umfpack.h>
 #endif
 
+
+DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
