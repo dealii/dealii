@@ -31,6 +31,7 @@
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
 
+#include <boost/range/iterator_range_core.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/unique_ptr.hpp>

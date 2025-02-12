@@ -25,6 +25,11 @@
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/property_pool.h>
 
+#include <boost/serialization/array_wrapper.hpp>
+
+#include <list>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Particles

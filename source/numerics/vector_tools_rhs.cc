@@ -15,6 +15,9 @@
 
 #include <deal.II/numerics/vector_tools_rhs.templates.h>
 
+#include <set>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 

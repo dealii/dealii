@@ -30,6 +30,7 @@
 #include <deal.II/matrix_free/task_info.h>
 
 #include <fstream>
+#include <set>
 
 
 DEAL_II_NAMESPACE_OPEN

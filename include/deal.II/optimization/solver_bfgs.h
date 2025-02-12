@@ -23,7 +23,7 @@
 
 #include <deal.II/optimization/line_minimization.h>
 
-#include <boost/signals2/connection.hpp>
+#include <boost/signals2.hpp>
 
 #include <limits>
 

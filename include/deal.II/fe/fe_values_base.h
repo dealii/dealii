@@ -43,6 +43,8 @@
 
 #include <deal.II/lac/read_vector.h>
 
+#include <boost/signals2/connection.hpp>
+
 #include <algorithm>
 #include <memory>
 #include <optional>

@@ -19,6 +19,8 @@
 #include <deal.II/hp/fe_values.h>
 
 #include <memory>
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 

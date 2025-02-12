@@ -22,6 +22,8 @@
 
 #include <deal.II/numerics/cell_data_transfer.h>
 
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 

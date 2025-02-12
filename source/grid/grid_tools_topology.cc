@@ -20,8 +20,11 @@
 #include <deal.II/grid/grid_tools_geometry.h>
 #include <deal.II/grid/grid_tools_topology.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <algorithm>
 #include <map>
+#include <numeric>
 #include <set>
 #include <vector>
 
