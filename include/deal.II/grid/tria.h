@@ -27,6 +27,7 @@
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
+#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
 
@@ -4945,11 +4946,5 @@ extern template class Triangulation<3, 3>;
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
-
-// Include tria_accessor.h here, so that it is possible for an end
-// user to use the iterators of Triangulation<dim> directly without
-// the need to include tria_accessor.h separately. (Otherwise the
-// iterators are an 'opaque' or 'incomplete' type.)
-#include <deal.II/grid/tria_accessor.h>
 
 #endif
