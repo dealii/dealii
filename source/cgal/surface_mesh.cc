@@ -18,6 +18,11 @@
 
 #ifdef DEAL_II_WITH_CGAL
 
+#  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#  include <CGAL/Simple_cartesian.h>
+#  include <CGAL/Surface_mesh/Surface_mesh.h>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace

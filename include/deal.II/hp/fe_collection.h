@@ -24,6 +24,8 @@
 #include <deal.II/hp/collection.h>
 
 #include <memory>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 

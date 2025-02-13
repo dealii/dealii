@@ -36,6 +36,10 @@
 #include <boost/random.hpp>
 #undef BOOST_BIND_GLOBAL_PLACEHOLDERS
 
+#ifdef DEAL_II_WITH_ZLIB
+#  include <boost/iostreams/filter/gzip.hpp>
+#endif
+
 #include <algorithm>
 #include <bitset>
 #include <cctype>

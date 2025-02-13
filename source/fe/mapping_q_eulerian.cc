@@ -33,10 +33,12 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <memory>
 
-DEAL_II_NAMESPACE_OPEN
 
+DEAL_II_NAMESPACE_OPEN
 
 
 // .... MAPPING Q EULERIAN CONSTRUCTOR

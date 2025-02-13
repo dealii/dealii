@@ -28,6 +28,8 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <boost/range/iterator_range_core.hpp>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

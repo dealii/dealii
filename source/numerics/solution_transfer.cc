@@ -41,8 +41,11 @@
 
 #include <deal.II/numerics/solution_transfer.h>
 
+#include <boost/range/iterator_range_core.hpp>
+
 #include <functional>
 #include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 

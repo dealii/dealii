@@ -31,6 +31,8 @@
 #include <array>
 #include <limits>
 #include <map>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
