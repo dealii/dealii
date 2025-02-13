@@ -376,7 +376,8 @@ namespace Portable
       }
     else
       {
-        AssertThrow(false, ExcNotImplemented());
+        Kokkos::abort("The element type is not yet supported by the portable "
+                      "matrix-free module.");
       }
   }
 
@@ -434,7 +435,8 @@ namespace Portable
       }
     else
       {
-        AssertThrow(false, ExcNotImplemented());
+        Kokkos::abort("The element type is not yet supported by the portable "
+                      "matrix-free module.");
       }
   }
 
