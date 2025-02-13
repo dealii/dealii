@@ -63,8 +63,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     set(_replacement "")
     if(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
       set(_replacement "-fuse-ld=lld")
-    elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-      set(_replacement "-fuse-ld=gold")
     endif()
     _drop_linker_flag(
       "-fuse-ld=mold" ${_replacement}
@@ -75,9 +73,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
 
   if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     set(_replacement "")
-    if(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-      set(_replacement "-fuse-ld=gold")
-    endif()
     _drop_linker_flag(
       "-fuse-ld=lld" ${_replacement}
       DEAL_II_COMPILER_HAS_FUSE_LD_LLD

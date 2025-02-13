@@ -401,8 +401,6 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=mold")
   elseif(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
-  elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-    add_flags(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
   endif()
 
   reset_cmake_required()
