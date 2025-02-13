@@ -24,6 +24,12 @@
 
 #include <deal.II/lac/vector.h>
 
+#ifdef DEAL_II_WITH_ADOLC
+#  include <adolc/adouble.h>
+#  include <adolc/adtl.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
