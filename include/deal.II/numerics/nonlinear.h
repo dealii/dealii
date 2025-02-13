@@ -18,8 +18,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/mpi_stub.h>
 
 #include <deal.II/lac/petsc_snes.h>
+#include <deal.II/lac/vector.h>
 
 #include <deal.II/sundials/kinsol.h>
 
