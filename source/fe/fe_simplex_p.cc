@@ -652,20 +652,21 @@ FE_SimplexPoly<dim, spacedim>::get_subface_interpolation_matrix(
 
       const double eps = 2e-13 * this->degree * (dim - 1);
 
-      std::vector<Point<dim>> subface_quadrature_points(
-        quad_face_support.size());
-      QProjector<dim>::project_to_subface(this->reference_cell(),
-                                          quad_face_support,
-                                          face_no,
-                                          subface,
-                                          subface_quadrature_points);
+      const Quadrature<dim> subface_quadrature =
+        QProjector<dim>::project_to_subface(
+          this->reference_cell(),
+          quad_face_support,
+          face_no,
+          subface,
+          numbers::default_geometric_orientation,
+          RefinementCase<dim - 1>::isotropic_refinement);
 
       for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
         for (unsigned int j = 0; j < this->n_dofs_per_face(face_no); ++j)
           {
             double matrix_entry =
               this->shape_value(this->face_to_cell_index(j, 0),
-                                subface_quadrature_points[i]);
+                                subface_quadrature.point(i));
 
             // Correct the interpolated value. I.e. if it is close to 1 or
             // 0, make it exactly 1 or 0. Unfortunately, this is required to

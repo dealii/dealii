@@ -623,10 +623,13 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // compute the interpolation matrix by simply taking the value at the
   // support points.
   const Quadrature<dim> subface_projection =
-    QProjector<dim>::project_to_subface(this->reference_cell(),
-                                        quad_face_support,
-                                        0,
-                                        subface);
+    QProjector<dim>::project_to_subface(
+      this->reference_cell(),
+      quad_face_support,
+      0,
+      subface,
+      numbers::default_geometric_orientation,
+      RefinementCase<dim - 1>::isotropic_refinement);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
