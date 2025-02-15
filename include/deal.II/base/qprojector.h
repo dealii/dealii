@@ -210,6 +210,23 @@ public:
                               const internal::SubfaceCase<dim> ref_case);
 
   /**
+   * Compute the cell quadrature formula corresponding to using
+   * <tt>quadrature</tt> on subface <tt>subface_no</tt> of face
+   * <tt>face_no</tt> with RefinementCase<dim-1> <tt>ref_case</tt>. The last
+   * argument is only used in 3d.
+   *
+   * @note Only the points are transformed. The quadrature weights are the
+   * same as those of the original rule.
+   */
+  static Quadrature<dim>
+  project_to_subface(const ReferenceCell               &reference_cell,
+                     const SubQuadrature               &quadrature,
+                     const unsigned int                 face_no,
+                     const unsigned int                 subface_no,
+                     const types::geometric_orientation orientation,
+                     const RefinementCase<dim - 1>     &ref_case);
+
+  /**
    * Take a collection of face quadrature formulas and generate a cell
    * quadrature formula from it where the quadrature points of the given
    * argument are projected on all faces.
