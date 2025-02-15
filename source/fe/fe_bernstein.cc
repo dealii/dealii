@@ -158,10 +158,13 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
             quad_face_support,
             0,
             numbers::default_geometric_orientation) :
-          QProjector<dim>::project_to_subface(this->reference_cell(),
-                                              quad_face_support,
-                                              0,
-                                              subface);
+          QProjector<dim>::project_to_subface(
+            this->reference_cell(),
+            quad_face_support,
+            0,
+            subface,
+            numbers::default_geometric_orientation,
+            RefinementCase<dim - 1>::isotropic_refinement);
 
       for (unsigned int i = 0; i < source_fe->n_dofs_per_face(face_no); ++i)
         {
