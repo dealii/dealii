@@ -52,7 +52,7 @@ evaluate_tensor_product(
   Portable::internal::EvaluatorTensorProduct<
     Portable::internal::evaluate_general,
     2,
-    M - 1,
+    M,
     N,
     double>
     evaluator(team_member,
