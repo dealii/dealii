@@ -534,125 +534,75 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
+  q_points.resize(0);
   if (reference_cell == ReferenceCells::Triangle)
     {
       // use linear polynomial to map the reference quadrature points correctly
       // on faces, i.e., BarycentricPolynomials<1>(1)
       for (unsigned int p = 0; p < quadrature.size(); ++p)
-        switch (face_no)
-          {
-            case 0:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 0);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(0.5 + quadrature.point(p)[0] / 2, 0);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 1:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(1 - quadrature.point(p)[0] / 2,
-                                             quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] = Point<dim>(0.5 - quadrature.point(p)[0] / 2,
-                                             0.5 + quadrature.point(p)[0] / 2);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 2:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(0, 1 - quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(0, 0.5 - quadrature.point(p)[0] / 2);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            default:
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
+        {
+          if (face_no == 0)
+            {
+              if (subface_no == 0)
+                q_points.emplace_back(quadrature.point(p)[0] / 2, 0);
+              else
+                q_points.emplace_back(0.5 + quadrature.point(p)[0] / 2, 0);
+            }
+          else if (face_no == 1)
+            {
+              if (subface_no == 0)
+                q_points.emplace_back(1 - quadrature.point(p)[0] / 2,
+                                      quadrature.point(p)[0] / 2);
+              else
+                q_points.emplace_back(0.5 - quadrature.point(p)[0] / 2,
+                                      0.5 + quadrature.point(p)[0] / 2);
+            }
+          else if (face_no == 2)
+            {
+              if (subface_no == 0)
+                q_points.emplace_back(0, 1 - quadrature.point(p)[0] / 2);
+              else
+                q_points.emplace_back(0, 0.5 - quadrature.point(p)[0] / 2);
+            }
+          else
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
     }
   else if (reference_cell == ReferenceCells::Quadrilateral)
     {
       for (unsigned int p = 0; p < quadrature.size(); ++p)
-        switch (face_no)
-          {
-            case 0:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(0, quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(0, quadrature.point(p)[0] / 2 + 0.5);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 1:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(1, quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(1, quadrature.point(p)[0] / 2 + 0.5);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 2:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 0);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 0);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 3:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 1);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 1);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-
-            default:
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
+        {
+          if (face_no == 0)
+            {
+              if (subface_no == 0)
+                q_points.emplace_back(0, quadrature.point(p)[0] / 2);
+              else
+                q_points.emplace_back(0, quadrature.point(p)[0] / 2 + 0.5);
+            }
+          else if (face_no == 1)
+            {
+              if (subface_no == 0)
+                q_points.emplace_back(1, quadrature.point(p)[0] / 2);
+              else
+                q_points.emplace_back(1, quadrature.point(p)[0] / 2 + 0.5);
+            }
+          else if (face_no == 2)
+            {
+              if (subface_no == 0)
+                q_points.emplace_back(quadrature.point(p)[0] / 2, 0);
+              else
+                q_points.emplace_back(quadrature.point(p)[0] / 2 + 0.5, 0);
+            }
+          else if (face_no == 3)
+            {
+              if (subface_no == 0)
+                q_points.emplace_back(quadrature.point(p)[0] / 2, 1);
+              else
+                q_points.emplace_back(quadrature.point(p)[0] / 2 + 0.5, 1);
+            }
+          else
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
     }
   else
     {
