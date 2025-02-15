@@ -2728,11 +2728,12 @@ namespace Functions
         const double delta_x =
           ((interval_endpoints[d].second - interval_endpoints[d].first) /
            n_subintervals[d]);
-        p_unit[d] = std::clamp(
-          std::min((p[d] - interval_endpoints[d].first - ix[d] * delta_x) /
-                     delta_x,
-                   0.,
-                   1.);)
+
+        p_unit[d] =
+          std::clamp((p[d] - interval_endpoints[d].first - ix[d] * delta_x) /
+                       delta_x,
+                     0.,
+                     1.);
       }
 
     return interpolate(data_values, ix, p_unit);

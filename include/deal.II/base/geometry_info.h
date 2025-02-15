@@ -2901,7 +2901,7 @@ RefinementCase<dim>::serialize(Archive &ar, const unsigned int)
   // serialization can't deal with bitfields, so copy from/to a full sized
   // std::uint8_t
   std::uint8_t uchar_value = value;
-  ar & uchar_value;
+  ar          &uchar_value;
   value = uchar_value;
 }
 
