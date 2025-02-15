@@ -247,38 +247,38 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
 
     if (q_deg > 1)
       {
-        const unsigned int          n    = q_deg - 1;
-        const double                step = 1. / q_deg;
-        std::vector<Point<dim - 2>> line_support_points(n);
+        const unsigned int    n    = q_deg - 1;
+        const double          step = 1. / q_deg;
+        std::vector<Point<1>> line_support_points(n);
         for (unsigned int i = 0; i < n; ++i)
           line_support_points[i][0] = (i + 1) * step;
-        const Quadrature<dim - 2> qline(line_support_points);
-
-        // auxiliary points in 2d
-        std::vector<Point<dim - 1>> p_line(n);
+        const Quadrature<1> qline(line_support_points);
 
         // Add nodes of lines interior in the "mother-face"
+        auto get_points = [&](const unsigned int face_no,
+                              const unsigned int subface_no) {
+          return QProjector<2>::project_to_subface(
+                   ReferenceCells::get_hypercube<2>(),
+                   qline,
+                   face_no,
+                   subface_no,
+                   numbers::default_geometric_orientation,
+                   RefinementCase<1>::isotropic_refinement)
+            .get_points();
+        };
 
         // line 5: use line 9
-        QProjector<dim - 1>::project_to_subface(
-          ReferenceCells::get_hypercube<dim - 1>(), qline, 0, 0, p_line);
-        for (unsigned int i = 0; i < n; ++i)
-          constraint_points.push_back(p_line[i] + Point<dim - 1>(0.5, 0));
+        for (const Point<dim - 1> &p : get_points(0, 0))
+          constraint_points.push_back(p + Point<dim - 1>(0.5, 0));
         // line 6: use line 10
-        QProjector<dim - 1>::project_to_subface(
-          ReferenceCells::get_hypercube<dim - 1>(), qline, 0, 1, p_line);
-        for (unsigned int i = 0; i < n; ++i)
-          constraint_points.push_back(p_line[i] + Point<dim - 1>(0.5, 0));
+        for (const Point<dim - 1> &p : get_points(0, 1))
+          constraint_points.push_back(p + Point<dim - 1>(0.5, 0));
         // line 7: use line 13
-        QProjector<dim - 1>::project_to_subface(
-          ReferenceCells::get_hypercube<dim - 1>(), qline, 2, 0, p_line);
-        for (unsigned int i = 0; i < n; ++i)
-          constraint_points.push_back(p_line[i] + Point<dim - 1>(0, 0.5));
+        for (const Point<dim - 1> &p : get_points(2, 0))
+          constraint_points.push_back(p + Point<dim - 1>(0, 0.5));
         // line 8: use line 14
-        QProjector<dim - 1>::project_to_subface(
-          ReferenceCells::get_hypercube<dim - 1>(), qline, 2, 1, p_line);
-        for (unsigned int i = 0; i < n; ++i)
-          constraint_points.push_back(p_line[i] + Point<dim - 1>(0, 0.5));
+        for (const Point<dim - 1> &p : get_points(2, 1))
+          constraint_points.push_back(p + Point<dim - 1>(0, 0.5));
 
         // DoFs on bordering lines lines 9-16
         for (unsigned int face = 0;
@@ -288,12 +288,7 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
                subface < GeometryInfo<dim - 1>::max_children_per_face;
                ++subface)
             {
-              QProjector<dim - 1>::project_to_subface(
-                ReferenceCells::get_hypercube<dim - 1>(),
-                qline,
-                face,
-                subface,
-                p_line);
+              const auto p_line = get_points(face, subface);
               constraint_points.insert(constraint_points.end(),
                                        p_line.begin(),
                                        p_line.end());
@@ -672,10 +667,13 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
             quad_face_support,
             0,
             numbers::default_geometric_orientation) :
-          QProjector<dim>::project_to_subface(this->reference_cell(),
-                                              quad_face_support,
-                                              0,
-                                              subface);
+          QProjector<dim>::project_to_subface(
+            this->reference_cell(),
+            quad_face_support,
+            0,
+            subface,
+            numbers::default_geometric_orientation,
+            RefinementCase<dim - 1>::isotropic_refinement);
       for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
         {
           const Point<dim> &p = subface_quadrature.point(i);

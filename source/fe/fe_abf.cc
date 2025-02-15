@@ -382,7 +382,12 @@ FE_ABF<dim>::initialize_restriction()
           // evaluated on the subface
           // only.
           Quadrature<dim> q_sub = QProjector<dim>::project_to_subface(
-            this->reference_cell(), q_base, face, sub);
+            this->reference_cell(),
+            q_base,
+            face,
+            sub,
+            numbers::default_geometric_orientation,
+            RefinementCase<dim - 1>::isotropic_refinement);
           const unsigned int child = GeometryInfo<dim>::child_cell_on_face(
             RefinementCase<dim>::isotropic_refinement, face, sub);
 
