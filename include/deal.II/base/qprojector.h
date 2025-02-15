@@ -159,7 +159,13 @@ public:
    *
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
+   *
+   * @deprecated Use the version of project_to_face() which takes an
+   * orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of project_to_subface() which takes an orientation "
+    "argument instead.")
   static void
   project_to_subface(const ReferenceCell           &reference_cell,
                      const SubQuadrature           &quadrature,
@@ -181,7 +187,13 @@ public:
    * @note This function is deprecated since it makes an implicit assumption
    * that the cell is a line (1D), a quad (2d), or a hex (3d). Use the other
    * version of this function that takes the reference cell type instead.
+   *
+   * @deprecated Use the version of project_to_face() which takes an
+   * orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of project_to_subface() which takes an orientation "
+    "argument instead.")
   static Quadrature<dim>
   project_to_subface(const ReferenceCell           &reference_cell,
                      const SubQuadrature           &quadrature,
@@ -198,7 +210,13 @@ public:
    *
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
+   *
+   * @deprecated Use the version of project_to_face() which takes an
+   * orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of project_to_subface() which takes an orientation "
+    "argument instead.")
   static Quadrature<dim>
   project_to_oriented_subface(const ReferenceCell             &reference_cell,
                               const SubQuadrature             &quadrature,
@@ -217,7 +235,13 @@ public:
    *
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
+   *
+   * @deprecated Use the version of project_to_face() which takes an
+   * orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of project_to_subface() which takes an orientation "
+    "argument instead.")
   static Quadrature<dim>
   project_to_subface(const ReferenceCell               &reference_cell,
                      const SubQuadrature               &quadrature,
