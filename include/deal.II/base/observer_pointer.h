@@ -611,13 +611,16 @@ template <class Q>
 inline void
 ObserverPointer<T, P>::swap(ObserverPointer<T, Q> &other)
 {
-#ifdef DEBUG
-  ObserverPointer<T, P> aux(pointer, id);
-  *this = other;
-  other = aux;
-#else
-  std::swap(pointer, other.pointer);
-#endif
+  if constexpr (compiling_for_debug_build())
+    {
+      ObserverPointer<T, P> aux(pointer, id);
+      *this = other;
+      other = aux;
+    }
+  else
+    {
+      std::swap(pointer, other.pointer);
+    }
 }
 
 
