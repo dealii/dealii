@@ -19,6 +19,8 @@
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/trilinos_tpetra_types.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS

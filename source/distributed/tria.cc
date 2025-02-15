@@ -1775,11 +1775,12 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     Triangulation<dim, spacedim>::~Triangulation()
     {
-      // virtual functions called in constructors and destructors never use the
-      // override in a derived class
-      // for clarity be explicit on which function is called
       try
         {
+          // Calling virtual functions in constructors and destructors
+          // is not entirely intuitive and may not result in what one
+          // expects. For clarity be explicit on which function is
+          // called:
           parallel::distributed::Triangulation<dim, spacedim>::clear();
         }
       catch (...)
@@ -2601,7 +2602,7 @@ namespace parallel
             const unsigned int   face_no_1            = it.first.second;
             const cell_iterator &cell_2               = it.second.first.first;
             const unsigned int   face_no_2            = it.second.first.second;
-            const unsigned char  combined_orientation = it.second.second;
+            const auto           combined_orientation = it.second.second;
 
             if (cell_1->level() == cell_2->level())
               {
@@ -3709,7 +3710,7 @@ namespace parallel
             const unsigned int   face_no_1            = it.first.second;
             const cell_iterator &cell_2               = it.second.first.first;
             const unsigned int   face_no_2            = it.second.first.second;
-            const unsigned char  combined_orientation = it.second.second;
+            const auto           combined_orientation = it.second.second;
             const auto [orientation, rotation, flip] =
               ::dealii::internal::split_face_orientation(combined_orientation);
 
@@ -3804,18 +3805,17 @@ namespace parallel
           if (dim == 2)
             {
               AssertIndexRange(face_pair.orientation, 2);
-              p4est_orientation =
-                face_pair.orientation ==
-                    ReferenceCell::default_combined_face_orientation() ?
-                  0u :
-                  1u;
+              p4est_orientation = face_pair.orientation ==
+                                      numbers::default_geometric_orientation ?
+                                    0u :
+                                    1u;
             }
           else
             {
               const unsigned int  face_idx_list[] = {face_left, face_right};
               const cell_iterator cell_list[]     = {first_cell, second_cell};
               unsigned int        lower_idx, higher_idx;
-              unsigned char       orientation;
+              types::geometric_orientation orientation;
               if (face_left <= face_right)
                 {
                   higher_idx = 1;
@@ -4335,7 +4335,7 @@ namespace parallel
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "tria.inst"
+#include "distributed/tria.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

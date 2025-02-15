@@ -79,18 +79,17 @@ macro(feature_trilinos_find_external var)
     endif()
 
     #
-    # We require at least Trilinos 12.4
+    # We require at least Trilinos 12.14.1
     #
-    if(TRILINOS_VERSION VERSION_LESS 12.4)
-
+    if(TRILINOS_VERSION VERSION_LESS 12.14.1)
       message(STATUS "Could not find a sufficient Trilinos installation: "
-        "deal.II requires at least version 12.4, but version ${TRILINOS_VERSION} was found."
+        "deal.II requires at least version 12.14.1, but version ${TRILINOS_VERSION} was found."
       )
       set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "with version ${TRILINOS_VERSION} is too old.\n"
-        "deal.II requires at least version 12.4.\n\n"
+        "deal.II requires at least version 12.14.1.\n\n"
       )
       set(${var} FALSE)
     endif()
@@ -193,23 +192,6 @@ macro(feature_trilinos_find_external var)
           ${TRILINOS_ADDITIONAL_ERROR_STRING}
           "The Trilinos installation (found at \"${TRILINOS_DIR}\")"
           "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
-        set(${var} FALSE)
-      endif()
-
-      #
-      # We require at least Trilinos 12.14.1
-      #
-      if(TRILINOS_VERSION VERSION_LESS 12.14.1)
-        message(STATUS "Could not find a sufficient Trilinos installation: "
-          "deal.II requires at least version 12.14.1 if the Trilinos installation includes Kokkos, "
-          "but version ${TRILINOS_VERSION} was found."
-        )
-        set(TRILINOS_ADDITIONAL_ERROR_STRING
-          ${TRILINOS_ADDITIONAL_ERROR_STRING}
-          "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-          "with version ${TRILINOS_VERSION} is too old.\n"
-          "deal.II requires at least version 12.14.1 if the Trilinos installation includes Kokkos.\n\n"
-        )
         set(${var} FALSE)
       endif()
     endif()

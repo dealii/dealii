@@ -196,7 +196,7 @@ namespace Portable
       data->constraint_mask[color] =
         Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
                      MemorySpace::Default::kokkos_space>(
-          "constraint_mask_" + std::to_string(color), n_cells);
+          "constraint_mask_" + std::to_string(color), n_cells * n_components);
 
       // Create the host mirrow Views and fill them
       auto constraint_mask_host =
@@ -251,7 +251,8 @@ namespace Portable
 
           const ArrayView<
             dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-            cell_id_view(constraint_mask_host[cell_id]);
+            cell_id_view(&constraint_mask_host[cell_id * n_components],
+                         n_components);
 
           hanging_nodes.setup_constraints(*cell,
                                           partitioner,
@@ -366,9 +367,11 @@ namespace Portable
       size_t
       team_shmem_size(int /*team_size*/) const
       {
-        return SharedViewValues::shmem_size(Functor::n_local_dofs,
+        return SharedViewValues::shmem_size(Functor::n_local_dofs /
+                                              gpu_data.n_components,
                                             gpu_data.n_components) +
-               SharedViewGradients::shmem_size(Functor::n_local_dofs,
+               SharedViewGradients::shmem_size(Functor::n_local_dofs /
+                                                 gpu_data.n_components,
                                                dim,
                                                gpu_data.n_components);
       }
@@ -380,10 +383,11 @@ namespace Portable
       {
         // Get the scratch memory
         SharedViewValues    values(team_member.team_shmem(),
-                                Functor::n_local_dofs,
+                                Functor::n_local_dofs / gpu_data.n_components,
                                 gpu_data.n_components);
         SharedViewGradients gradients(team_member.team_shmem(),
-                                      Functor::n_local_dofs,
+                                      Functor::n_local_dofs /
+                                        gpu_data.n_components,
                                       dim,
                                       gpu_data.n_components);
 

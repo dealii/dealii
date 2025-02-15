@@ -23,7 +23,7 @@
 #include "../tests.h"
 
 void
-test(const unsigned char orientation)
+test(const types::geometric_orientation orientation)
 {
   const unsigned int face_no = 0;
 

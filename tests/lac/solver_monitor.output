@@ -1,7 +1,6 @@
 
 DEAL::Size 4 Unknowns 9
 DEAL::SOR-diff:0
-DEAL:cg::Starting value 3.000
 DEAL:cg::   -- 0 3.000
 DEAL:cg::   Norm=0
 DEAL:cg::   Mean=0
@@ -14,11 +13,9 @@ DEAL:cg::   Mean=0.8194
 DEAL:cg::   -- 3 0.001494
 DEAL:cg::   Norm=2.494
 DEAL:cg::   Mean=0.8194
-DEAL:cg::Convergence step 4 value 6.018e-05
 DEAL:cg::   -- 4 6.018e-05
 DEAL:cg::   Norm=2.494
 DEAL:cg::   Mean=0.8194
-DEAL:GMRES::Starting value 1.920
 DEAL:GMRES::   -- 0 1.920
 DEAL:GMRES::   Norm=0
 DEAL:GMRES::   Mean=0
@@ -28,13 +25,11 @@ DEAL:GMRES::   Mean=0
 DEAL:GMRES::   -- 2 0.009469
 DEAL:GMRES::   Norm=0
 DEAL:GMRES::   Mean=0
-DEAL:GMRES::Convergence step 3 value 0.0003574
 DEAL:GMRES::   -- 3 0.0003574
 DEAL:GMRES::   Norm=0
 DEAL:GMRES::   Mean=0
 DEAL::Size 12 Unknowns 121
 DEAL::SOR-diff:0
-DEAL:cg::Starting value 11.00
 DEAL:cg::   -- 0 11.00
 DEAL:cg::   Norm=0
 DEAL:cg::   Mean=0
@@ -59,11 +54,9 @@ DEAL:cg::   Mean=5.889
 DEAL:cg::   -- 7 0.001234
 DEAL:cg::   Norm=70.88
 DEAL:cg::   Mean=5.889
-DEAL:cg::Convergence step 8 value 0.0005816
 DEAL:cg::   -- 8 0.0005816
 DEAL:cg::   Norm=70.88
 DEAL:cg::   Mean=5.889
-DEAL:GMRES::Starting value 13.27
 DEAL:GMRES::   -- 0 13.27
 DEAL:GMRES::   Norm=0
 DEAL:GMRES::   Mean=0
@@ -88,7 +81,6 @@ DEAL:GMRES::   Mean=0
 DEAL:GMRES::   -- 6 0.002554
 DEAL:GMRES::   Norm=70.88
 DEAL:GMRES::   Mean=5.889
-DEAL:GMRES::Convergence step 7 value 0.0008206
 DEAL:GMRES::   -- 7 0.0008206
 DEAL:GMRES::   Norm=70.88
 DEAL:GMRES::   Mean=5.889

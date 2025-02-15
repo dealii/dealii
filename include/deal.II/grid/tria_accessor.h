@@ -26,10 +26,8 @@
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/reference_cell.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_faces.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/grid/tria_iterator_base.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
@@ -154,12 +152,6 @@ template <int dim, int spacedim>
 class TriaAccessor<0, dim, spacedim>;
 template <int spacedim>
 class TriaAccessor<0, 1, spacedim>;
-
-// note: the file tria_accessor.templates.h is included at the end of
-// this file.  this includes a lot of templates. originally, this was
-// only done in debug mode, but led to cyclic reduction problems and
-// so is now on by default.
-
 
 /**
  * A namespace that contains exception classes used by the accessor classes.
@@ -963,7 +955,7 @@ public:
    *
    * @ingroup reordering
    */
-  unsigned char
+  types::geometric_orientation
   combined_face_orientation(const unsigned int face) const;
 
   /**
@@ -1006,17 +998,14 @@ public:
 
   /**
    * Return whether the line with index @p line is oriented in standard
-   * direction. @p true indicates, that the line is oriented from vertex 0 to
-   * vertex 1, whereas it is the other way around otherwise. In 1d and 2d,
-   * this is always @p true, but in 3d it may be different, see the respective
-   * discussion in the documentation of the GeometryInfo class.
+   * direction.
    *
-   * This function is really only for internal use in the library unless you
-   * absolutely know what this is all about.
+   * @warning This function is really only for internal use in the library
+   * unless you absolutely know what this is all about.
    *
-   * This function queries ReferenceCell::standard_vs_true_line_orientation().
+   * @note This function queries ReferenceCell::face_to_cell_line_orientation().
    */
-  bool
+  types::geometric_orientation
   line_orientation(const unsigned int line) const;
   /**
    * @}
@@ -1820,7 +1809,8 @@ private:
    * <code>structdim==2 && dim==3</code>).
    */
   void
-  set_line_orientation(const unsigned int line, const bool orientation) const;
+  set_line_orientation(const unsigned int                 line,
+                       const types::geometric_orientation orientation) const;
 
   /**
    * Set the combined face orientation (i.e., the integer that uniquely encodes
@@ -1830,8 +1820,9 @@ private:
    * @ingroup reordering
    */
   void
-  set_combined_face_orientation(const unsigned int  face,
-                                const unsigned char combined_orientation) const;
+  set_combined_face_orientation(
+    const unsigned int                 face,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Set the @p used flag. Only for internal use in the library.
@@ -2155,7 +2146,7 @@ public:
    *
    * @ingroup reordering
    */
-  static unsigned char
+  static types::geometric_orientation
   combined_face_orientation(const unsigned int face);
 
   /**
@@ -2177,9 +2168,9 @@ public:
   face_rotation(const unsigned int face);
 
   /**
-   * @brief Always return false
+   * @brief Always return numbers::reverse_line_orientation
    */
-  static bool
+  static types::geometric_orientation
   line_orientation(const unsigned int line);
 
   /**
@@ -2824,7 +2815,7 @@ public:
    *
    * @ingroup reordering
    */
-  static unsigned char
+  static types::geometric_orientation
   combined_face_orientation(const unsigned int face);
 
   /**
@@ -2846,9 +2837,9 @@ public:
   face_rotation(const unsigned int face);
 
   /**
-   * @brief Always return false
+   * @brief Always return numbers::reverse_line_orientation
    */
-  static bool
+  static types::geometric_orientation
   line_orientation(const unsigned int line);
 
   /**
@@ -3240,7 +3231,12 @@ public:
    */
   boost::container::small_vector<
     TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-    GeometryInfo<dim>::faces_per_cell>
+#ifndef _MSC_VER // MSVC prior to 2022 cannot use a constexpr function this way
+    ReferenceCells::max_n_faces<dim>()
+#else
+    GeometryInfo<dim>::faces_per_cell
+#endif
+    >
   face_iterators() const;
 
   /**
@@ -4896,80 +4892,12 @@ namespace internal
       /**
        * Implementation of the function of some name in the parent class.
        */
-      template <int dim, int spacedim>
-      inline static unsigned int
-      line_index(const TriaAccessor<1, dim, spacedim> &, const unsigned int)
-      {
-        Assert(false,
-               ExcMessage("You can't ask for the index of a line bounding "
-                          "a one-dimensional cell because it is not "
-                          "bounded by lines."));
-        return numbers::invalid_unsigned_int;
-      }
-
-
-      template <int dim, int spacedim>
-      inline static unsigned int
-      line_index(const TriaAccessor<2, dim, spacedim> &accessor,
-                 const unsigned int                    i)
-      {
-        constexpr unsigned int max_faces_per_cell = 4;
-        return accessor.objects()
-          .cells[accessor.present_index * max_faces_per_cell + i];
-      }
-
-
-      inline static unsigned int
-      line_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
-      {
-        const auto [face_index, line_index] =
-          accessor.reference_cell().standard_line_to_face_and_line_index(i);
-        const auto line_within_face_index =
-          accessor.reference_cell().standard_to_real_face_line(
-            line_index,
-            face_index,
-            accessor.combined_face_orientation(face_index));
-
-        return accessor.quad(face_index)->line_index(line_within_face_index);
-      }
-
-
-
-      /**
-       * Implementation of the function of some name in the parent class.
-       */
-      template <int structdim, int dim, int spacedim>
-      inline static unsigned int
-      quad_index(const TriaAccessor<structdim, dim, spacedim> &,
-                 const unsigned int)
-      {
-        Assert(false,
-               ExcMessage("You can't ask for the index of a quad bounding "
-                          "a one- or two-dimensional cell because it is not "
-                          "bounded by quads."));
-        return numbers::invalid_unsigned_int;
-      }
-
-
-      inline static unsigned int
-      quad_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
-      {
-        constexpr unsigned int max_faces_per_cell = 6;
-        return accessor.tria->levels[accessor.present_level]
-          ->cells.cells[accessor.present_index * max_faces_per_cell + i];
-      }
-
-
-
-      /**
-       * Implementation of the function of some name in the parent class.
-       */
       template <int structdim, int dim, int spacedim>
       inline static void
       set_combined_face_orientation(
         const TriaAccessor<structdim, dim, spacedim> &accessor,
         const unsigned int                            face,
-        const unsigned char                           combined_orientation)
+        const types::geometric_orientation            combined_orientation)
       {
         Assert(structdim == dim,
                ExcMessage("This function can only be used on objects that are "
@@ -4977,15 +4905,13 @@ namespace internal
         AssertIndexRange(face, accessor.n_faces());
 
         if (dim == 1)
-          Assert(combined_orientation ==
-                   ReferenceCell::default_combined_face_orientation(),
+          Assert(combined_orientation == numbers::default_geometric_orientation,
                  ExcMessage("In 1d, faces do not have an orientation, so the "
                             "only valid value is the default."));
         else if (dim == 2)
           Assert(combined_orientation ==
-                     ReferenceCell::default_combined_face_orientation() ||
-                   combined_orientation ==
-                     ReferenceCell::reversed_combined_line_orientation(),
+                     numbers::default_geometric_orientation ||
+                   combined_orientation == numbers::reverse_line_orientation,
                  ExcMessage(
                    "In 2d, the only valid values of the combined orientation "
                    "are the standard orientation or the reversed line "
@@ -4995,116 +4921,9 @@ namespace internal
         if (dim != 1)
           accessor.tria->levels[accessor.present_level]
             ->face_orientations.set_combined_orientation(
-              accessor.present_index * GeometryInfo<dim>::faces_per_cell + face,
+              accessor.present_index * ReferenceCells::max_n_faces<dim>() +
+                face,
               combined_orientation);
-      }
-
-      /**
-       * Implementation of the function of some name in the parent class.
-       */
-      template <int dim, int spacedim>
-      inline static void
-      set_line_orientation(const TriaAccessor<1, dim, spacedim> &,
-                           const unsigned int,
-                           const bool)
-      {
-        DEAL_II_ASSERT_UNREACHABLE();
-      }
-
-
-      template <int spacedim>
-      inline static void
-      set_line_orientation(const TriaAccessor<2, 2, spacedim> &,
-                           const unsigned int,
-                           const bool)
-      {
-        // quads in 2d have no
-        // non-standard orientation
-        DEAL_II_ASSERT_UNREACHABLE();
-      }
-
-
-      template <int spacedim>
-      inline static void
-      set_line_orientation(const TriaAccessor<2, 3, spacedim> &accessor,
-                           const unsigned int                  line,
-                           const bool                          value)
-      {
-        Assert(accessor.used(), TriaAccessorExceptions::ExcCellNotUsed());
-        AssertIndexRange(line, accessor.n_lines());
-        Assert(accessor.present_index * GeometryInfo<3>::lines_per_face + line <
-                 accessor.tria->faces->quads_line_orientations.size(),
-               ExcInternalError());
-
-        // quads as part of 3d hexes can have non-standard orientation
-        accessor.tria->faces->quads_line_orientations
-          [accessor.present_index * GeometryInfo<3>::lines_per_face + line] =
-          value;
-      }
-
-
-      inline static void
-      set_line_orientation(const TriaAccessor<3, 3, 3> &,
-                           const unsigned int,
-                           const bool)
-      {
-        // it seems like we don't need this
-        // one
-        DEAL_II_NOT_IMPLEMENTED();
-      }
-
-
-      /**
-       * Implementation of the function of same name in the enclosing class.
-       */
-      template <int dim, int spacedim>
-      inline static unsigned int
-      vertex_index(const TriaAccessor<1, dim, spacedim> &accessor,
-                   const unsigned int                    corner)
-      {
-        constexpr unsigned int max_faces_per_cell = 2;
-        return accessor.objects()
-          .cells[accessor.present_index * max_faces_per_cell + corner];
-      }
-
-
-      template <int dim, int spacedim>
-      inline static unsigned int
-      vertex_index(const TriaAccessor<2, dim, spacedim> &accessor,
-                   const unsigned int                    corner)
-      {
-        const auto [line_index, vertex_index] =
-          accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
-            corner);
-        const auto vertex_within_line_index =
-          accessor.reference_cell().standard_to_real_face_vertex(
-            vertex_index,
-            line_index,
-            accessor.line_orientation(line_index) == true ?
-              ReferenceCell::default_combined_face_orientation() :
-              ReferenceCell::reversed_combined_line_orientation());
-
-        return accessor.line(line_index)
-          ->vertex_index(vertex_within_line_index);
-      }
-
-
-
-      inline static unsigned int
-      vertex_index(const TriaAccessor<3, 3, 3> &accessor,
-                   const unsigned int           corner)
-      {
-        const auto [face_index, vertex_index] =
-          accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
-            corner);
-        const auto vertex_within_face_index =
-          accessor.reference_cell().standard_to_real_face_vertex(
-            vertex_index,
-            face_index,
-            accessor.combined_face_orientation(face_index));
-
-        return accessor.quad(face_index)
-          ->vertex_index(vertex_within_face_index);
       }
 
 
@@ -5150,11 +4969,11 @@ namespace internal
           {
             for (unsigned int f = 4; f < 6; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
+                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
 
                 // It might seem superfluous to spell out the four indices
                 // that get later consumed by a for loop over these four
@@ -5174,11 +4993,11 @@ namespace internal
               }
             for (unsigned int f = 0; f < 2; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
+                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
@@ -5223,7 +5042,7 @@ namespace internal
        * cell->line_orientation(), 1d specialization
        */
       template <int dim, int spacedim>
-      static std::array<unsigned char, 1>
+      static std::array<types::geometric_orientation, 1>
       get_line_orientations_of_cell(const TriaAccessor<1, dim, spacedim> &)
       {
         DEAL_II_ASSERT_UNREACHABLE();
@@ -5237,17 +5056,14 @@ namespace internal
        * cell->line_orientation(), 2d specialization
        */
       template <int dim, int spacedim>
-      static std::array<unsigned char, 4>
+      static std::array<types::geometric_orientation, 4>
       get_line_orientations_of_cell(const TriaAccessor<2, dim, spacedim> &cell)
       {
         // For 2d cells the access cell->line_orientation() is already
         // efficient
-        std::array<unsigned char, 4> line_orientations = {};
+        std::array<types::geometric_orientation, 4> line_orientations = {};
         for (const unsigned int line : cell.line_indices())
-          line_orientations[line] =
-            cell.line_orientation(line) == true ?
-              ReferenceCell::default_combined_face_orientation() :
-              ReferenceCell::reversed_combined_line_orientation();
+          line_orientations[line] = cell.line_orientation(line);
         return line_orientations;
       }
 
@@ -5258,10 +5074,10 @@ namespace internal
        * cell->line_orientation(), 3d specialization
        */
       template <int dim, int spacedim>
-      static std::array<unsigned char, 12>
+      static std::array<types::geometric_orientation, 12>
       get_line_orientations_of_cell(const TriaAccessor<3, dim, spacedim> &cell)
       {
-        std::array<unsigned char, 12> line_orientations = {};
+        std::array<types::geometric_orientation, 12> line_orientations = {};
 
         // For hexahedra, the classical access via quads -> lines is too
         // inefficient. Unroll this code here to allow the compiler to inline
@@ -5271,11 +5087,11 @@ namespace internal
           {
             for (unsigned int f = 4; f < 6; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
+                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
 
                 // It might seem superfluous to spell out the four indices and
                 // orientations that get later consumed by a for loop over
@@ -5288,41 +5104,53 @@ namespace internal
                    ref_cell.standard_to_real_face_line(1, f, orientation),
                    ref_cell.standard_to_real_face_line(2, f, orientation),
                    ref_cell.standard_to_real_face_line(3, f, orientation)}};
-                const auto                quad = cell.quad(f);
-                const std::array<bool, 4> my_orientations{
-                  {ref_cell.standard_vs_true_line_orientation(
-                     0, f, orientation, quad->line_orientation(my_indices[0])),
-                   ref_cell.standard_vs_true_line_orientation(
-                     1, f, orientation, quad->line_orientation(my_indices[1])),
-                   ref_cell.standard_vs_true_line_orientation(
-                     2, f, orientation, quad->line_orientation(my_indices[2])),
-                   ref_cell.standard_vs_true_line_orientation(
-                     3,
-                     f,
-                     orientation,
-                     quad->line_orientation(my_indices[3]))}};
+                const auto quad = cell.quad(f);
+                const std::array<types::geometric_orientation, 4>
+                  my_orientations{{ref_cell.face_to_cell_line_orientation(
+                                     0,
+                                     f,
+                                     orientation,
+                                     quad->line_orientation(my_indices[0])),
+                                   ref_cell.face_to_cell_line_orientation(
+                                     1,
+                                     f,
+                                     orientation,
+                                     quad->line_orientation(my_indices[1])),
+                                   ref_cell.face_to_cell_line_orientation(
+                                     2,
+                                     f,
+                                     orientation,
+                                     quad->line_orientation(my_indices[2])),
+                                   ref_cell.face_to_cell_line_orientation(
+                                     3,
+                                     f,
+                                     orientation,
+                                     quad->line_orientation(my_indices[3]))}};
                 for (unsigned int l = 0; l < 4; ++l)
                   line_orientations[4 * (f - 4) + l] = my_orientations[l];
               }
             for (unsigned int f = 0; f < 2; ++f)
               {
-                const unsigned char orientation =
+                const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
                     ->face_orientations.get_combined_orientation(
-                      cell.index() * GeometryInfo<3>::faces_per_cell + f);
+                      cell.index() * ReferenceCells::max_n_faces<3>() + f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
-                const auto                quad = cell.quad(f);
-                const std::array<bool, 2> my_orientations{
-                  {ref_cell.standard_vs_true_line_orientation(
-                     0, f, orientation, quad->line_orientation(my_indices[0])),
-                   ref_cell.standard_vs_true_line_orientation(
-                     1,
-                     f,
-                     orientation,
-                     quad->line_orientation(my_indices[1]))}};
+                const auto quad = cell.quad(f);
+                const std::array<types::geometric_orientation, 2>
+                  my_orientations{{ref_cell.face_to_cell_line_orientation(
+                                     0,
+                                     f,
+                                     orientation,
+                                     quad->line_orientation(my_indices[0])),
+                                   ref_cell.face_to_cell_line_orientation(
+                                     1,
+                                     f,
+                                     orientation,
+                                     quad->line_orientation(my_indices[1]))}};
                 line_orientations[8 + f]  = my_orientations[0];
                 line_orientations[10 + f] = my_orientations[1];
               }
@@ -5340,32 +5168,32 @@ namespace internal
                ref_cell.standard_to_real_face_line(1, 1, orientations[1]),
                ref_cell.standard_to_real_face_line(2, 1, orientations[1]),
                ref_cell.standard_to_real_face_line(1, 2, orientations[2])}};
-            line_orientations[0] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[0] = ref_cell.face_to_cell_line_orientation(
               0,
               0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[0]));
-            line_orientations[1] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[1] = ref_cell.face_to_cell_line_orientation(
               1,
               0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[1]));
-            line_orientations[2] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[2] = ref_cell.face_to_cell_line_orientation(
               2,
               0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[2]));
-            line_orientations[3] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[3] = ref_cell.face_to_cell_line_orientation(
               1,
               1,
               orientations[1],
               cell.quad(1)->line_orientation(my_indices[3]));
-            line_orientations[4] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[4] = ref_cell.face_to_cell_line_orientation(
               2,
               1,
               orientations[1],
               cell.quad(1)->line_orientation(my_indices[4]));
-            line_orientations[5] = ref_cell.standard_vs_true_line_orientation(
+            line_orientations[5] = ref_cell.face_to_cell_line_orientation(
               1,
               2,
               orientations[2],
@@ -5444,11 +5272,20 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
 {
   AssertIndexRange(corner, this->n_vertices());
 
-  if (structdim == dim)
+  if constexpr (structdim == 1)
     {
-      constexpr unsigned int max_vertices_per_cell = 1 << dim;
-      const std::size_t      my_index =
-        static_cast<std::size_t>(this->present_index) * max_vertices_per_cell;
+      // This branch needs to be first (and not combined with the structdim ==
+      // dim branch) so that we can get line vertex indices when setting up the
+      // cell vertex index cache
+      return this->objects()
+        .cells[this->present_index * ReferenceCells::max_n_faces<1>() + corner];
+    }
+  else if constexpr (structdim == dim)
+    {
+      // This branch should only be used after the cell vertex index cache is
+      // set up
+      const auto my_index = static_cast<std::size_t>(this->present_index) *
+                            ReferenceCells::max_n_vertices<dim>();
       AssertIndexRange(my_index + corner,
                        this->tria->levels[this->present_level]
                          ->cell_vertex_indices_cache.size());
@@ -5458,9 +5295,21 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
       Assert(vertex_index != numbers::invalid_unsigned_int, ExcInternalError());
       return vertex_index;
     }
+  else if constexpr (structdim == 2)
+    {
+      const auto [line_index, vertex_index] =
+        this->reference_cell().standard_vertex_to_face_and_vertex_index(corner);
+      const auto vertex_within_line_index =
+        this->reference_cell().standard_to_real_face_vertex(
+          vertex_index, line_index, this->line_orientation(line_index));
+
+      return this->line(line_index)->vertex_index(vertex_within_line_index);
+    }
   else
-    return dealii::internal::TriaAccessorImplementation::Implementation::
-      vertex_index(*this, corner);
+    {
+      DEAL_II_ASSERT_UNREACHABLE();
+      return numbers::invalid_unsigned_int;
+    }
 }
 
 
@@ -5490,10 +5339,31 @@ template <int structdim, int dim, int spacedim>
 inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::line_index(const unsigned int i) const
 {
+  (void)i;
   AssertIndexRange(i, this->n_lines());
+  Assert(structdim != 1,
+         ExcMessage("You can't ask for the index of a line bounding a "
+                    "one-dimensional cell because it is not bounded by "
+                    "lines."));
 
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    line_index(*this, i);
+  if constexpr (structdim == 2)
+    {
+      return this->objects()
+        .cells[this->present_index * ReferenceCells::max_n_faces<2>() + i];
+    }
+  else if constexpr (structdim == 3)
+    {
+      const auto [face_index, line_index] =
+        this->reference_cell().standard_line_to_face_and_line_index(i);
+      const auto line_within_face_index =
+        this->reference_cell().standard_to_real_face_line(
+          line_index, face_index, this->combined_face_orientation(face_index));
+
+      return this->quad(face_index)->line_index(line_within_face_index);
+    }
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -5514,14 +5384,27 @@ template <int structdim, int dim, int spacedim>
 inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::quad_index(const unsigned int i) const
 {
-  return dealii::internal::TriaAccessorImplementation::Implementation::
-    quad_index(*this, i);
+  Assert(structdim == 3,
+         ExcMessage("You can't ask for the index of a quad bounding "
+                    "a one- or two-dimensional cell because it is not "
+                    "bounded by quads."));
+  // work around a bogus GCC-9 warning which considers i unused except in 3d
+  (void)i;
+  if constexpr (structdim == 3)
+    {
+      AssertIndexRange(i, n_faces());
+      return this->tria->levels[this->present_level]
+        ->cells
+        .cells[this->present_index * ReferenceCells::max_n_faces<3>() + i];
+    }
+  else
+    return numbers::invalid_unsigned_int;
 }
 
 
 
 template <int structdim, int dim, int spacedim>
-inline unsigned char
+inline types::geometric_orientation
 TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
   const unsigned int face) const
 {
@@ -5535,15 +5418,23 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
   (void)face;
 
   if constexpr (structdim == 1)
-    return ReferenceCell::default_combined_face_orientation();
+    return numbers::default_geometric_orientation;
   else if constexpr (structdim == 2)
-    return this->line_orientation(face) == true ?
-             ReferenceCell::default_combined_face_orientation() :
-             ReferenceCell::reversed_combined_line_orientation();
+    {
+      // if all elements are quads (or if we have a very special consistently
+      // oriented triangular mesh) then we do not store this array
+      if (this->tria->levels[this->present_level]
+            ->face_orientations.n_objects() == 0)
+        return numbers::default_geometric_orientation;
+      else
+        return this->tria->levels[this->present_level]
+          ->face_orientations.get_orientation(
+            this->present_index * ReferenceCells::max_n_faces<dim>() + face);
+    }
   else
     return this->tria->levels[this->present_level]
       ->face_orientations.get_combined_orientation(
-        this->present_index * GeometryInfo<structdim>::faces_per_cell + face);
+        this->present_index * ReferenceCells::max_n_faces<dim>() + face);
 }
 
 
@@ -5566,11 +5457,12 @@ TriaAccessor<structdim, dim, spacedim>::face_orientation(
     // in 1d 'faces' are vertices and those are always consistently oriented
     return true;
   else if constexpr (structdim == 2)
-    return this->line_orientation(face);
+    return this->line_orientation(face) ==
+           numbers::default_geometric_orientation;
   else
     return this->tria->levels[this->present_level]
       ->face_orientations.get_orientation(
-        this->present_index * GeometryInfo<structdim>::faces_per_cell + face);
+        this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
 }
 
 
@@ -5590,7 +5482,7 @@ TriaAccessor<structdim, dim, spacedim>::face_flip(const unsigned int face) const
 
   if constexpr (structdim == 3)
     return this->tria->levels[this->present_level]->face_orientations.get_flip(
-      this->present_index * GeometryInfo<3>::faces_per_cell + face);
+      this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
   else
     // In 1d and 2d, face_flip is always false as faces can only be
     // 'flipped' in 3d.
@@ -5615,7 +5507,7 @@ TriaAccessor<structdim, dim, spacedim>::face_rotation(
   if constexpr (structdim == 3)
     return this->tria->levels[this->present_level]
       ->face_orientations.get_rotation(
-        this->present_index * GeometryInfo<3>::faces_per_cell + face);
+        this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
   else
     // In 1d and 2d, face_rotation is always false as faces can only be
     // 'rotated' in 3d.
@@ -5625,7 +5517,7 @@ TriaAccessor<structdim, dim, spacedim>::face_rotation(
 
 
 template <int structdim, int dim, int spacedim>
-inline bool
+inline types::geometric_orientation
 TriaAccessor<structdim, dim, spacedim>::line_orientation(
   const unsigned int line) const
 {
@@ -5635,33 +5527,28 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   (void)line;
 
   if constexpr (structdim == 1)
-    return true;
+    return numbers::default_geometric_orientation;
   else if constexpr (structdim == 2 && dim == 2)
     // lines in 2d are faces
     {
-      // if all elements are quads (or if we have a very special consistently
-      // oriented triangular mesh) then we do not store this array
-      if (this->tria->levels[this->present_level]
-            ->face_orientations.n_objects() == 0)
-        {
-          return true;
-        }
-      else
-        {
-          return this->tria->levels[this->present_level]
-            ->face_orientations.get_orientation(
-              this->present_index * GeometryInfo<structdim>::faces_per_cell +
-              line);
-        }
+      const auto combined_orientation = combined_face_orientation(line);
+      Assert(combined_orientation == numbers::default_geometric_orientation ||
+               combined_orientation == numbers::reverse_line_orientation,
+             ExcInternalError());
+      return combined_orientation;
     }
   else if constexpr (structdim == 2 && dim == 3)
     {
-      // line orientations in 3d are stored in their own array
-      Assert(this->present_index * GeometryInfo<3>::lines_per_face + line <
-               this->tria->faces->quads_line_orientations.size(),
+      // line orientations in 3d are stored in their own array as bools: here
+      // 'true' is the default orientation and 'false' is the reversed one
+      // (which matches set_line_orientation())
+      const auto index =
+        this->present_index * ReferenceCells::max_n_lines<2>() + line;
+      Assert(index < this->tria->faces->quads_line_orientations.size(),
              ExcInternalError());
-      return this->tria->faces->quads_line_orientations
-        [this->present_index * GeometryInfo<3>::lines_per_face + line];
+      return this->tria->faces->quads_line_orientations[index] ?
+               numbers::default_geometric_orientation :
+               numbers::reverse_line_orientation;
     }
   else if constexpr (structdim == 3 && dim == 3)
     {
@@ -5675,7 +5562,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
           line_index, face_index, this->combined_face_orientation(face_index));
 
       // Then query how that line is oriented within that face:
-      return reference_cell.standard_vs_true_line_orientation(
+      return reference_cell.face_to_cell_line_orientation(
         line_index,
         face_index,
         this->combined_face_orientation(face_index),
@@ -5693,14 +5580,35 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
 template <int structdim, int dim, int spacedim>
 inline void
 TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
-  const unsigned int line,
-  const bool         value) const
+  const unsigned int                 line,
+  const types::geometric_orientation value) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
   AssertIndexRange(line, this->n_lines());
+  Assert(dim != 1,
+         ExcMessage("In 1d lines are cells and thus do not need to have their "
+                    "orientations set."));
+  Assert(dim != 2,
+         ExcMessage("In 2d lines are faces, and, for compatibility with other "
+                    "dimensions, their orientations should be set via "
+                    "set_combined_orientation()."));
+  // work around a bogus GCC-9 warning which considers line and value unused
+  // except in 3d
+  (void)line;
+  (void)value;
 
-  dealii::internal::TriaAccessorImplementation::Implementation::
-    set_line_orientation(*this, line, value);
+  if constexpr (dim == 3)
+    {
+      // We set line orientations per face, not per cell, so this only works for
+      // faces in 3d.
+      Assert(structdim == 2, ExcNotImplemented());
+      const auto index =
+        this->present_index * ReferenceCells::max_n_lines<2>() + line;
+      Assert(index < this->tria->faces->quads_line_orientations.size(),
+             ExcInternalError());
+      this->tria->faces->quads_line_orientations[index] =
+        value == numbers::default_geometric_orientation;
+    }
 }
 
 
@@ -5708,8 +5616,8 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
 template <int structdim, int dim, int spacedim>
 inline void
 TriaAccessor<structdim, dim, spacedim>::set_combined_face_orientation(
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
   AssertIndexRange(face, this->n_faces());
@@ -6421,7 +6329,12 @@ double
 TriaAccessor<structdim, dim, spacedim>::diameter() const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<structdim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<structdim>()
+#  else
+                                 GeometryInfo<structdim>::vertices_per_cell
+#  endif
+                                 >
     vertices(this->n_vertices());
 
   for (unsigned int v = 0; v < vertices.size(); ++v)
@@ -6956,11 +6869,11 @@ TriaAccessor<0, dim, spacedim>::measure() const
 
 
 template <int dim, int spacedim>
-inline unsigned char
+inline types::geometric_orientation
 TriaAccessor<0, dim, spacedim>::combined_face_orientation(
   const unsigned int /*face*/)
 {
-  return 0;
+  return numbers::default_geometric_orientation;
 }
 
 
@@ -6993,10 +6906,10 @@ TriaAccessor<0, dim, spacedim>::face_rotation(const unsigned int /*face*/)
 
 
 template <int dim, int spacedim>
-inline bool
+inline types::geometric_orientation
 TriaAccessor<0, dim, spacedim>::line_orientation(const unsigned int /*line*/)
 {
-  return false;
+  return numbers::reverse_line_orientation;
 }
 
 
@@ -7405,7 +7318,7 @@ TriaAccessor<0, 1, spacedim>::manifold_id() const
 
 
 template <int spacedim>
-inline unsigned char
+inline types::geometric_orientation
 TriaAccessor<0, 1, spacedim>::combined_face_orientation(
   const unsigned int /*face*/)
 {
@@ -7441,10 +7354,10 @@ TriaAccessor<0, 1, spacedim>::face_rotation(const unsigned int /*face*/)
 
 
 template <int spacedim>
-inline bool
+inline types::geometric_orientation
 TriaAccessor<0, 1, spacedim>::line_orientation(const unsigned int /*line*/)
 {
-  return false;
+  return numbers::reverse_line_orientation;
 }
 
 
@@ -7692,15 +7605,15 @@ CellAccessor<dim, spacedim>::face(const unsigned int i) const
   AssertIndexRange(i, this->n_faces());
   if constexpr (dim == 1)
     {
-      TriaAccessor<0, 1, spacedim> a(
-        &this->get_triangulation(),
-        ((i == 0) && at_boundary(0) ?
-           TriaAccessor<0, 1, spacedim>::left_vertex :
-           ((i == 1) && at_boundary(1) ?
-              TriaAccessor<0, 1, spacedim>::right_vertex :
-              TriaAccessor<0, 1, spacedim>::interior_vertex)),
-        internal::TriaAccessorImplementation::Implementation::vertex_index(
-          *this, i));
+      using VertexKind = typename TriaAccessor<0, 1, spacedim>::VertexKind;
+      VertexKind vertex_kind = VertexKind::interior_vertex;
+      if (i == 0 && at_boundary(0))
+        vertex_kind = VertexKind::left_vertex;
+      if (i == 1 && at_boundary(1))
+        vertex_kind = VertexKind::right_vertex;
+      TriaAccessor<0, 1, spacedim> a(&this->get_triangulation(),
+                                     vertex_kind,
+                                     this->vertex_index(i));
       return TriaIterator<TriaAccessor<0, 1, spacedim>>(a);
     }
   else if constexpr (dim == 2)
@@ -7735,12 +7648,22 @@ CellAccessor<dim, spacedim>::face_iterator_to_index(
 template <int dim, int spacedim>
 inline boost::container::small_vector<
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-  GeometryInfo<dim>::faces_per_cell>
+#  ifndef _MSC_VER
+  ReferenceCells::max_n_faces<dim>()
+#  else
+  GeometryInfo<dim>::faces_per_cell
+#  endif
+  >
 CellAccessor<dim, spacedim>::face_iterators() const
 {
   boost::container::small_vector<
     TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>,
-    GeometryInfo<dim>::faces_per_cell>
+#  ifndef _MSC_VER
+    ReferenceCells::max_n_faces<dim>()
+#  else
+    GeometryInfo<dim>::faces_per_cell
+#  endif
+    >
     face_iterators(this->n_faces());
 
   for (const unsigned int i : this->face_indices())
@@ -7758,9 +7681,7 @@ CellAccessor<dim, spacedim>::face_index(const unsigned int i) const
   switch (dim)
     {
       case 1:
-        {
-          return this->vertex_index(i);
-        }
+        return this->vertex_index(i);
 
       case 2:
         return this->line_index(i);
@@ -7781,7 +7702,7 @@ CellAccessor<dim, spacedim>::neighbor_index(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
   return this->tria->levels[this->present_level]
-    ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell +
+    ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
                 face_no]
     .second;
 }
@@ -7794,7 +7715,7 @@ CellAccessor<dim, spacedim>::neighbor_level(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
   return this->tria->levels[this->present_level]
-    ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell +
+    ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
                 face_no]
     .first;
 }
@@ -7937,125 +7858,91 @@ CellAccessor<dim, spacedim>::flag_for_line_refinement(
 
 
 
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1, 2>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<1>
-CellAccessor<1, 3>::subface_case(const unsigned int) const
-{
-  return dealii::internal::SubfaceCase<1>::case_none;
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<2>
-CellAccessor<2>::subface_case(const unsigned int face_no) const
+template <int dim, int spacedim>
+inline dealii::internal::SubfaceCase<dim>
+CellAccessor<dim, spacedim>::subface_case(const unsigned int face_no) const
 {
   Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
   AssertIndexRange(face_no, this->n_faces());
-  return ((face(face_no)->has_children()) ?
-            dealii::internal::SubfaceCase<2>::case_x :
-            dealii::internal::SubfaceCase<2>::case_none);
-}
 
-template <>
-inline dealii::internal::SubfaceCase<2>
-CellAccessor<2, 3>::subface_case(const unsigned int face_no) const
-{
-  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, this->n_faces());
-  return ((face(face_no)->has_children()) ?
-            dealii::internal::SubfaceCase<2>::case_x :
-            dealii::internal::SubfaceCase<2>::case_none);
-}
-
-
-template <>
-inline dealii::internal::SubfaceCase<3>
-CellAccessor<3>::subface_case(const unsigned int face_no) const
-{
-  Assert(is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  AssertIndexRange(face_no, this->n_faces());
-  switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
+  if constexpr (dim == 1)
+    return dealii::internal::SubfaceCase<1>::case_none;
+  else if constexpr (dim == 2)
+    return ((face(face_no)->has_children()) ?
+              dealii::internal::SubfaceCase<2>::case_x :
+              dealii::internal::SubfaceCase<2>::case_none);
+  else if constexpr (dim == 3)
     {
-      case RefinementCase<3>::no_refinement:
-        return dealii::internal::SubfaceCase<3>::case_none;
-      case RefinementCase<3>::cut_x:
-        if (face(face_no)->child(0)->has_children())
-          {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_y,
-                   ExcInternalError());
-            if (face(face_no)->child(1)->has_children())
+      switch (static_cast<std::uint8_t>(face(face_no)->refinement_case()))
+        {
+          case RefinementCase<3>::no_refinement:
+            return dealii::internal::SubfaceCase<3>::case_none;
+          case RefinementCase<3>::cut_x:
+            if (face(face_no)->child(0)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
+                Assert(face(face_no)->child(0)->refinement_case() ==
                          RefinementCase<2>::cut_y,
                        ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_y,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_x1y2y;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_x1y;
               }
             else
-              return dealii::internal::SubfaceCase<3>::case_x1y;
-          }
-        else
-          {
-            if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_y,
-                       ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_x2y;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_y,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_x2y;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_x;
               }
-            else
-              return dealii::internal::SubfaceCase<3>::case_x;
-          }
-      case RefinementCase<3>::cut_y:
-        if (face(face_no)->child(0)->has_children())
-          {
-            Assert(face(face_no)->child(0)->refinement_case() ==
-                     RefinementCase<2>::cut_x,
-                   ExcInternalError());
-            if (face(face_no)->child(1)->has_children())
+          case RefinementCase<3>::cut_y:
+            if (face(face_no)->child(0)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
+                Assert(face(face_no)->child(0)->refinement_case() ==
                          RefinementCase<2>::cut_x,
                        ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_x,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_y1x2x;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_y1x;
               }
             else
-              return dealii::internal::SubfaceCase<3>::case_y1x;
-          }
-        else
-          {
-            if (face(face_no)->child(1)->has_children())
               {
-                Assert(face(face_no)->child(1)->refinement_case() ==
-                         RefinementCase<2>::cut_x,
-                       ExcInternalError());
-                return dealii::internal::SubfaceCase<3>::case_y2x;
+                if (face(face_no)->child(1)->has_children())
+                  {
+                    Assert(face(face_no)->child(1)->refinement_case() ==
+                             RefinementCase<2>::cut_x,
+                           ExcInternalError());
+                    return dealii::internal::SubfaceCase<3>::case_y2x;
+                  }
+                else
+                  return dealii::internal::SubfaceCase<3>::case_y;
               }
-            else
-              return dealii::internal::SubfaceCase<3>::case_y;
-          }
-      case RefinementCase<3>::cut_xy:
-        return dealii::internal::SubfaceCase<3>::case_xy;
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
+          case RefinementCase<3>::cut_xy:
+            return dealii::internal::SubfaceCase<3>::case_xy;
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
     }
+
   // we should never get here
-  return dealii::internal::SubfaceCase<3>::case_none;
+  DEAL_II_ASSERT_UNREACHABLE();
+  return dealii::internal::SubfaceCase<dim>::case_none;
 }
 
 

@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/vectorization.h>
+
 #include <array>
 #include <complex>
 #include <cstddef>

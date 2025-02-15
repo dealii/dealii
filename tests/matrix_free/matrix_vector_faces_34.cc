@@ -56,11 +56,11 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
   /* cell 1 */
   int cell_vertices_1[8][GeometryInfo<3>::vertices_per_cell] = {
     {4, 5, 6, 7, 8, 9, 10, 11},
-    {5, 7, 4, 6, 9, 11, 8, 10},
-    {7, 6, 5, 4, 11, 10, 9, 8},
     {6, 4, 7, 5, 10, 8, 11, 9},
     {9, 8, 11, 10, 5, 4, 7, 6},
     {8, 10, 9, 11, 4, 6, 5, 7},
+    {5, 7, 4, 6, 9, 11, 8, 10},
+    {7, 6, 5, 4, 11, 10, 9, 8},
     {10, 11, 8, 9, 6, 7, 4, 5},
     {11, 9, 10, 8, 7, 5, 6, 4}};
 
@@ -75,12 +75,16 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
 
   triangulation.create_triangulation(vertices, cells, SubCellData());
 
-  const unsigned int face_no = orientation < 4 ? 4 : 5;
-  const auto         cell    = ++(triangulation.begin());
-  deallog << "Orientation index within MatrixFree: "
-          << (!cell->face_orientation(face_no) + 2 * cell->face_flip(face_no) +
-              4 * cell->face_rotation(face_no))
-          << std::endl;
+  const auto cell = ++(triangulation.begin());
+  for (const auto face_no : cell->face_indices())
+    if (!cell->face(face_no)->at_boundary())
+      {
+        deallog << "Orientation index within MatrixFree: "
+                << (!cell->face_orientation(face_no) +
+                    2 * cell->face_rotation(face_no) +
+                    4 * cell->face_flip(face_no))
+                << std::endl;
+      }
 }
 
 

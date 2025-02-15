@@ -22,7 +22,6 @@ set(_unity_include_src
   chunk_sparsity_pattern.cc
   dynamic_sparsity_pattern.cc
   exceptions.cc
-  scalapack.cc
   la_parallel_vector.cc
   la_parallel_block_vector.cc
   matrix_out.cc
@@ -71,7 +70,6 @@ set(_inst
   petsc_communication_pattern.inst.in
   relaxation_block.inst.in
   read_write_vector.inst.in
-  scalapack.inst.in
   solver.inst.in
   solver_gmres.inst.in
   sparse_matrix_ez.inst.in
@@ -158,6 +156,18 @@ if(DEAL_II_WITH_TRILINOS)
     trilinos_vector.inst.in
   )
 endif()
+
+if(DEAL_II_WITH_SCALAPACK)
+  set(_unity_include_src
+    ${_unity_include_src}
+    scalapack.cc
+  )
+  set(_inst
+    ${_inst}
+    scalapack.inst.in
+  )
+endif()
+
 
 # determined by profiling
 set(_n_includes_per_unity_file 20)

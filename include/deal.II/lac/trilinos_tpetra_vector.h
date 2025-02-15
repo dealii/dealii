@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/types.h"
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/trilinos_tpetra_types.h>
 

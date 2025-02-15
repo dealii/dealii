@@ -17,8 +17,9 @@
 
 #include <deal.II/base/config.h>
 
-DEAL_II_WARNING(
-  "This file is deprecated. Simply use <deal.II/base/mpi_consensus_algorithms.h>.")
+#include <deal.II/base/mpi_consensus_algorithms.h>
 
+DEAL_II_WARNING("This file is deprecated."
+                "Use deal.II/base/mpi_consensus_algorithms.h instead.")
 
 #endif

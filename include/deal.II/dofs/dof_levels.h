@@ -20,6 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/dofs/dof_objects.h>
 

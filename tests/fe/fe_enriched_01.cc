@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-// test basic output of the class (name, n_blocks, n_compoennts,
+// test basic output of the class (name, n_blocks, n_components,
 // n_dofs_per_cell)
 
 #include <deal.II/base/function.h>

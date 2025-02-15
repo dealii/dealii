@@ -22,6 +22,7 @@
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
+#include <deal.II/base/tensor.h>
 
 #include <array>
 #include <cstdint>

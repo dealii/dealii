@@ -20,7 +20,10 @@
 
 #include <deal.II/multigrid/multigrid.h>
 
+#include <boost/signals2.hpp>
+
 #include <iostream>
+
 
 DEAL_II_NAMESPACE_OPEN
 

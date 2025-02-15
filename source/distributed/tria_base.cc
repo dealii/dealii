@@ -724,6 +724,6 @@ namespace parallel
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "tria_base.inst"
+#include "distributed/tria_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

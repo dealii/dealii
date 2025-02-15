@@ -16,7 +16,7 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_bdm.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -71,12 +71,11 @@ check_support(const FiniteElement<dim> &finel, const char *name)
 
   for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
-      std::vector<Point<dim>> q_points(q.get_points().size());
-      QProjector<dim>::project_to_face(ReferenceCells::get_hypercube<dim>(),
-                                       q,
-                                       i,
-                                       q_points);
-      Quadrature<dim> qp(q_points);
+      const auto qp = QProjector<dim>::project_to_face(
+        ReferenceCells::get_hypercube<dim>(),
+        q,
+        i,
+        numbers::default_geometric_orientation);
       deallog << name << '<' << dim << '>' << " face " << i << " support points"
               << std::endl;
 

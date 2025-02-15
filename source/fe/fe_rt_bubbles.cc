@@ -71,8 +71,8 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
        RefinementCase<dim>::all_refinement_cases())
     if (ref_case != RefinementCase<dim>::no_refinement)
       {
-        const unsigned int nc =
-          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+        const unsigned int nc = this->reference_cell().template n_children<dim>(
+          RefinementCase<dim>(ref_case));
 
         for (unsigned int i = 0; i < nc; ++i)
           this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
@@ -191,7 +191,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
           faces.point(k + QProjector<dim>::DataSetDescriptor::face(
                             this->reference_cell(),
                             0,
-                            ReferenceCell::default_combined_face_orientation(),
+                            numbers::default_geometric_orientation,
                             this->n_dofs_per_face(face_no)));
 
       current =
@@ -349,7 +349,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
 
 
 // explicit instantiations
-#include "fe_rt_bubbles.inst"
+#include "fe/fe_rt_bubbles.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

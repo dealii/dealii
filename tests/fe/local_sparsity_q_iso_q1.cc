@@ -12,7 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
-// Assemble the sparsity pattern for a Q1 finite element space and a an iso Q
+// Assemble the sparsity pattern for a Q1 finite element space and an iso Q
 // element space with the same number of subdivisions, and check we get the same
 // sparsity patterns.
 

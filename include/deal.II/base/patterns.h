@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/component_mask.h>

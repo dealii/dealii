@@ -90,7 +90,8 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
     face_embeddings[i].reinit(this->n_dofs_per_face(face_no),
                               this->n_dofs_per_face(face_no));
-  FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0, 1.);
+  FETools::compute_face_embedding_matrices(
+    *this, make_array_view(face_embeddings), 0, 0, 1.);
   this->interface_constraints.reinit((1 << (dim - 1)) *
                                        this->n_dofs_per_face(face_no),
                                      this->n_dofs_per_face(face_no));
@@ -391,7 +392,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
       const auto offset = QProjector<dim>::DataSetDescriptor::face(
         this->reference_cell(),
         f,
-        ReferenceCell::default_combined_face_orientation(),
+        numbers::default_geometric_orientation,
         face_points.size());
       for (unsigned int k = 0; k < face_points.size(); ++k)
         this->generalized_support_points[face_points.size() * f + k] =
@@ -428,6 +429,6 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_bdm.inst"
+#include "fe/fe_bdm.inst"
 
 DEAL_II_NAMESPACE_CLOSE

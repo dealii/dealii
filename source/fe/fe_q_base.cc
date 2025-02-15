@@ -667,9 +667,11 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
       // be done for the face orientation flag in 3d.
       const Quadrature<dim> subface_quadrature =
         subface == numbers::invalid_unsigned_int ?
-          QProjector<dim>::project_to_face(this->reference_cell(),
-                                           quad_face_support,
-                                           0) :
+          QProjector<dim>::project_to_face(
+            this->reference_cell(),
+            quad_face_support,
+            0,
+            numbers::default_geometric_orientation) :
           QProjector<dim>::project_to_subface(this->reference_cell(),
                                               quad_face_support,
                                               0,
@@ -1109,9 +1111,9 @@ FE_Q_Base<dim, spacedim>::initialize_dof_index_permutations()
 template <int dim, int spacedim>
 unsigned int
 FE_Q_Base<dim, spacedim>::face_to_cell_index(
-  const unsigned int  face_index,
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 face_index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
@@ -1155,8 +1157,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
             break;
 
           case 2:
-            if (combined_orientation ==
-                ReferenceCell::default_combined_face_orientation())
+            if (combined_orientation == numbers::default_geometric_orientation)
               adjusted_dof_index_on_line = dof_index_on_line;
             else
               adjusted_dof_index_on_line =
@@ -1173,7 +1174,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
             // case where everything is in standard orientation
             Assert((this->n_dofs_per_line() <= 1) ||
                      combined_orientation ==
-                       ReferenceCell::default_combined_face_orientation(),
+                       numbers::default_geometric_orientation,
                    ExcNotImplemented());
             adjusted_dof_index_on_line = dof_index_on_line;
             break;
@@ -1202,8 +1203,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
       // just have to draw a bunch of pictures. in the meantime,
       // we can implement the Q2 case in which it is simple
       Assert((this->n_dofs_per_quad(face) <= 1) ||
-               combined_orientation ==
-                 ReferenceCell::default_combined_face_orientation(),
+               combined_orientation == numbers::default_geometric_orientation,
              ExcNotImplemented());
       return (this->get_first_quad_index(face) + index);
     }
@@ -1246,7 +1246,8 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -1445,7 +1446,8 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -1559,7 +1561,7 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
           if (q_dofs_per_cell < this->n_dofs_per_cell())
             my_restriction(this->n_dofs_per_cell() - 1,
                            this->n_dofs_per_cell() - 1) =
-              1. / GeometryInfo<dim>::n_children(
+              1. / this->reference_cell().template n_children<dim>(
                      RefinementCase<dim>(refinement_case));
         }
 
@@ -1694,6 +1696,6 @@ FE_Q_Base<dim, spacedim>::get_constant_modes() const
 #endif
 
 // explicit instantiations
-#include "fe_q_base.inst"
+#include "fe/fe_q_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

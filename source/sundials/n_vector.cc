@@ -21,9 +21,14 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
+#  include <sundials/sundials_nvector.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#    include <sundials/sundials_context.h>
+#  endif
+
 DEAL_II_NAMESPACE_OPEN
 
-#  include "n_vector.inst"
+#  include "sundials/n_vector.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

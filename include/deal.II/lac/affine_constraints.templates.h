@@ -52,6 +52,8 @@
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <boost/container/small_vector.hpp>
+#include <boost/range/iterator_range_core.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/utility.hpp>
 
@@ -3524,7 +3526,7 @@ namespace internal
     // the origin of each global entry and finds out which data we need to
     // collect.
     template <typename number>
-    static inline number
+    inline number
     resolve_matrix_entry(const GlobalRowsFromLocal<number> &global_rows,
                          const GlobalRowsFromLocal<number> &global_cols,
                          const size_type                    i,
@@ -3638,7 +3640,7 @@ namespace internal
     namespace dealiiSparseMatrix
     {
       template <typename SparseMatrixIterator, typename LocalType>
-      static inline void
+      inline void
       add_value(const LocalType       value,
                 const size_type       row,
                 const size_type       column,

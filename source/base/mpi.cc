@@ -33,6 +33,11 @@
 #include <set>
 #include <vector>
 
+#if defined(DEAL_II_WITH_MPI)
+#  include <mpi.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -2092,7 +2097,7 @@ namespace Utilities
     compute_set_union(const std::set<unsigned int> &set, const MPI_Comm comm);
 #endif
 
-#include "mpi.inst"
+#include "base/mpi.inst"
   } // end of namespace MPI
 } // end of namespace Utilities
 

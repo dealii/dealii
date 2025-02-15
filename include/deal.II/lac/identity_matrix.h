@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/types.h>
+
 #include <deal.II/lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN

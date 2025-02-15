@@ -228,10 +228,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       compute_face_embedding_matrices<deal_II_dimension, double>(
         const FiniteElement<deal_II_dimension> &,
-        FullMatrix<double> (
-            &)[GeometryInfo<deal_II_dimension>::max_children_per_face],
-        unsigned int,
-        unsigned int,
+        const ArrayView<FullMatrix<double>> &,
+        const unsigned int,
+        const unsigned int,
         const double);
 
       template void

@@ -230,6 +230,6 @@ namespace Utilities
   } // namespace MPI
 } // namespace Utilities
 
-#include "mpi_noncontiguous_partitioner.inst"
+#include "base/mpi_noncontiguous_partitioner.inst"
 
 DEAL_II_NAMESPACE_CLOSE

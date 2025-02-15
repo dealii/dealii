@@ -32,6 +32,11 @@
 
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
 
+#include <set>
+#include <string>
+#include <vector>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN

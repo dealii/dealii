@@ -91,7 +91,13 @@ public:
    * Compute the quadrature points on the cell if the given quadrature formula
    * is used on face <tt>face_no</tt>. For further details, see the general
    * doc for this class.
+   *
+   * @deprecated Use the version of this function which takes a
+   * combined_orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a combined_orientation "
+    "argument instead.")
   static void
   project_to_face(const ReferenceCell     &reference_cell,
                   const SubQuadrature     &quadrature,
@@ -102,7 +108,13 @@ public:
    * Compute the cell quadrature formula corresponding to using
    * <tt>quadrature</tt> on face <tt>face_no</tt>. For further details, see
    * the general doc for this class.
+   *
+   * @deprecated Use the version of this function which takes a
+   * combined_orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a combined_orientation "
+    "argument instead.")
   static Quadrature<dim>
   project_to_face(const ReferenceCell &reference_cell,
                   const SubQuadrature &quadrature,
@@ -113,7 +125,13 @@ public:
    * <tt>quadrature</tt> on face <tt>face_no</tt> taking into account the
    * orientation of the face. For further details, see the general doc for this
    * class.
+   *
+   * @deprecated Use the version of project_to_face() which takes a
+   * combined_orientation argument instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of project_to_face() which takes a combined_orientation "
+    "argument instead.")
   static Quadrature<dim>
   project_to_oriented_face(const ReferenceCell &reference_cell,
                            const SubQuadrature &quadrature,
@@ -121,6 +139,17 @@ public:
                            const bool           face_orientation,
                            const bool           face_flip,
                            const bool           face_rotation);
+
+  /**
+   * Compute the cell quadrature formula corresponding to using
+   * <tt>quadrature</tt> on face <tt>face_no</tt>. For further details, see
+   * the general doc for this class.
+   */
+  static Quadrature<dim>
+  project_to_face(const ReferenceCell               &reference_cell,
+                  const SubQuadrature               &quadrature,
+                  const unsigned int                 face_no,
+                  const types::geometric_orientation orientation);
 
   /**
    * Compute the quadrature points on the cell if the given quadrature formula
@@ -327,10 +356,10 @@ public:
      * projected onto the faces) has.
      */
     static DataSetDescriptor
-    face(const ReferenceCell &reference_cell,
-         const unsigned int   face_no,
-         const unsigned char  combined_orientation,
-         const unsigned int   n_quadrature_points);
+    face(const ReferenceCell               &reference_cell,
+         const unsigned int                 face_no,
+         const types::geometric_orientation combined_orientation,
+         const unsigned int                 n_quadrature_points);
 
     /**
      * Compute an offset object for the given face number and orientation,
@@ -358,10 +387,10 @@ public:
      *
      */
     static DataSetDescriptor
-    face(const ReferenceCell            &reference_cell,
-         const unsigned int              face_no,
-         const unsigned char             combined_orientation,
-         const hp::QCollection<dim - 1> &quadrature);
+    face(const ReferenceCell               &reference_cell,
+         const unsigned int                 face_no,
+         const types::geometric_orientation combined_orientation,
+         const hp::QCollection<dim - 1>    &quadrature);
 
     /**
      * Static function to generate an offset object for a given subface of a
@@ -405,12 +434,12 @@ public:
      * Through the last argument anisotropic refinement can be respected.
      */
     static DataSetDescriptor
-    subface(const ReferenceCell             &reference_cell,
-            const unsigned int               face_no,
-            const unsigned int               subface_no,
-            const unsigned char              combined_orientation,
-            const unsigned int               n_quadrature_points,
-            const internal::SubfaceCase<dim> ref_case =
+    subface(const ReferenceCell               &reference_cell,
+            const unsigned int                 face_no,
+            const unsigned int                 subface_no,
+            const types::geometric_orientation combined_orientation,
+            const unsigned int                 n_quadrature_points,
+            const internal::SubfaceCase<dim>   ref_case =
               internal::SubfaceCase<dim>::case_isotropic);
 
     /**

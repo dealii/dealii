@@ -208,7 +208,8 @@ public:
      *
      * Computed each.
      */
-    mutable std::vector<Point<spacedim>> vertices;
+    mutable std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+      vertices;
 
     /**
      * The current cell.
@@ -242,23 +243,20 @@ public:
      *
      * Computed once.
      */
-    std::vector<std::vector<double>> cell_manifold_quadrature_weights;
+    std::vector<std::array<double, GeometryInfo<dim>::vertices_per_cell>>
+      cell_manifold_quadrature_weights;
 
     /**
-     * A vector of weights for use in Manifold::get_new_point(). For
+     * An array of weights for use in Manifold::get_new_point(). For
      * each point (interior to a cell), we compute the weight each
      * vertex has for this point. If the point lies at a vertex, then
      * this vertex has weight one and all others have weight zero. If
      * the point lies interior to a cell, then the weight every vertex
      * has is just the $d$-linear shape functions associated with each
      * vertex evaluated at that point.
-     *
-     * This array has size GeometryInfo<dim>::vertices_per_cell, but it
-     * can't be converted into a fixed size array because it is used
-     * as input for Manifold::get_new_point() which wants to see a
-     * std::vector<double> for the weights.
      */
-    mutable std::vector<double> vertex_weights;
+    mutable std::array<double, GeometryInfo<dim>::vertices_per_cell>
+      vertex_weights;
 
     /**
      * Unit tangential vectors. Used for the computation of boundary forms and

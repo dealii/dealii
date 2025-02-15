@@ -57,6 +57,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "../tests.h"
+
 #define USE_SIMPLEX
 
 namespace Step38

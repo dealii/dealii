@@ -15,8 +15,6 @@
 set(_src
   ad_drivers.cc
   ad_helpers.cc
-  adolc_number_types.cc
-  sacado_number_types.cc
   )
 
 set(_inst
@@ -26,10 +24,35 @@ set(_inst
   ad_helpers.inst.in
   ad_helpers.inst1.in
   ad_helpers.inst2.in
-  adolc_number_types.inst.in
-  sacado_number_types.inst1.in
-  sacado_number_types.inst2.in
   )
+
+
+if(DEAL_II_WITH_ADOLC)
+  set(_src
+    ${_src}
+    adolc_number_types.cc
+    )
+
+  set(_inst
+    ${_inst}
+    adolc_number_types.inst.in
+    )
+endif()
+
+
+if(DEAL_II_TRILINOS_WITH_SACADO)
+  set(_src
+    ${_src}
+    sacado_number_types.cc
+    )
+
+  set(_inst
+    ${_inst}
+    sacado_number_types.inst1.in
+    sacado_number_types.inst2.in
+    )
+endif()
+
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/ad/*.h

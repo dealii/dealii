@@ -31,6 +31,8 @@
 #include <array>
 #include <limits>
 #include <map>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -730,12 +732,12 @@ namespace GridGenerator
   /**
    * Initialize the given triangulation with several
    * @ref GlossCoarseMesh "coarse mesh cells"
-   * that cover a hyperball, i.e. a circle in 2d or a
-   * ball in 3d, around @p center with given @p radius. The function is
+   * that cover a hyperball, i.e. a circular disk if `dim==2` or a
+   * ball if `dim==3`, around @p center with given @p radius. The function is
    * used in step-6.
    *
-   * In order to avoid degenerate cells at the boundaries, the circle is
-   * triangulated by five cells, whereas in 3d the ball is subdivided by
+   * In order to avoid degenerate cells at the boundaries, the circular disk is
+   * triangulated by five cells, whereas in 3d the ball is subdivided into
    * seven cells. Specifically, these
    * cells are one cell in the center plus one "cap" cell on each of the faces
    * of this center cell. This ensures that under repeated refinement, none
@@ -747,7 +749,10 @@ namespace GridGenerator
    * after one refinement is optimized.
    *
    * This function is declared to exist for triangulations of all space
-   * dimensions, but throws an error if called in 1d.
+   * dimensions, but throws an error if called if `dim==1`. If `spacedim>dim`
+   * (which is only possible if `dim==2, spacedim==3`) then the function
+   * creates a circular disk for which all vertices have a $z$ value equal
+   * to the $z$ coordinate of the center point provided by the second argument.
    *
    * By default, the manifold_id is set to 0 on the boundary faces, 1 on the
    * boundary cells, and numbers::flat_manifold_id on the central cell and on
@@ -806,11 +811,11 @@ namespace GridGenerator
    * @note This function is available through the python interface as
    * `triangulation.generate_hyper_ball(point, radius = 1.)`.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  hyper_ball(Triangulation<dim> &tria,
-             const Point<dim>   &center = Point<dim>(),
-             const double        radius = 1.,
+  hyper_ball(Triangulation<dim, spacedim> &tria,
+             const Point<spacedim>        &center                   = {},
+             const double                  radius                   = 1.,
              const bool attach_spherical_manifold_on_boundary_cells = false);
 
   /**

@@ -17,6 +17,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
 #include <tuple>
@@ -28,7 +29,7 @@ namespace internal
   /**
    * Combine orientation flags.
    */
-  inline unsigned char
+  inline types::geometric_orientation
   combined_face_orientation(const bool face_orientation,
                             const bool face_rotation,
                             const bool face_flip)
@@ -42,7 +43,8 @@ namespace internal
    * rotation flag, flip flag.
    */
   inline std::tuple<bool, bool, bool>
-  split_face_orientation(const unsigned char combined_face_orientation)
+  split_face_orientation(
+    const types::geometric_orientation combined_face_orientation)
   {
     return {Utilities::get_bit(combined_face_orientation, 0),
             Utilities::get_bit(combined_face_orientation, 1),

@@ -534,7 +534,8 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
   const Quadrature<dim> face_projection =
     QProjector<dim>::project_to_face(this->reference_cell(),
                                      quad_face_support,
-                                     0);
+                                     0,
+                                     numbers::default_geometric_orientation);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
@@ -677,7 +678,8 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -698,7 +700,8 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
@@ -735,7 +738,8 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -756,7 +760,8 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
           std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
             RefinementCase<dim>::isotropic_refinement);
           isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+            this->reference_cell().template n_children<dim>(
+              RefinementCase<dim>(refinement_case)),
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_projection_matrices(*this, isotropic_matrices, true);
@@ -783,7 +788,7 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
 
 
 // explicit instantiations
-#include "fe_raviart_thomas_nodal.inst"
+#include "fe/fe_raviart_thomas_nodal.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

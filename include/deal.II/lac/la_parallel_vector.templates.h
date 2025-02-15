@@ -1473,6 +1473,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
 
       return *this;
     }
@@ -1495,6 +1497,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
 
       return *this;
     }
@@ -1513,6 +1517,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
     }
 
 
@@ -1551,6 +1557,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
     }
 
 
@@ -1581,6 +1589,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
     }
 
 
@@ -1617,6 +1627,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
     }
 
 
@@ -1655,6 +1667,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
     }
 
 
@@ -1674,6 +1688,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
 
       return *this;
     }
@@ -1703,6 +1719,8 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
     }
 
 
@@ -1727,6 +1745,43 @@ namespace LinearAlgebra
 
       if (vector_is_ghosted)
         update_ghost_values();
+      else
+        assert_no_residual_content_in_ghost_region();
+    }
+
+
+
+    template <typename Number, typename MemorySpaceType>
+    void
+    Vector<Number,
+           MemorySpaceType>::assert_no_residual_content_in_ghost_region() const
+    {
+#ifdef DEBUG
+      // This should only be called for non-ghosted vectors
+      Assert(!vector_is_ghosted, ExcInternalError());
+
+      // Run a reduction over the ghost range only to find out whether some
+      // entries are non-zero
+      real_type sum = real_type();
+      dealii::internal::VectorOperations::
+        functions<Number, Number, MemorySpaceType>::norm_1(
+          thread_loop_partitioner,
+          partitioner->n_ghost_indices(),
+          sum,
+          data,
+          partitioner->locally_owned_size());
+
+      Assert(sum == real_type(),
+             ExcMessage("You called a vector space operation like add(), "
+                        "scale(), operator* for a non-ghosted vector, which "
+                        "will not update the content in the memory locations "
+                        "reserved for ghost values. However, a non-zero "
+                        "content was detected for some of those entries, which "
+                        "can lead to an invalid state of the vector. Please "
+                        "call Vector::compress(VectorOperation::add) or "
+                        "Vector::zero_out_ghost_values() before calling a "
+                        "vector space operation to avoid this problem."));
+#endif
     }
 
 

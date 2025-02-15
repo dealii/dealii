@@ -573,7 +573,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int n_q_points_1d)
     preconditioner(dof, mg, mg_transfer);
 
   {
-    ReductionControl control(30, 1e-20, 1e-10);
+    ReductionControl control(30, 1e-20, 1e-10, false, true);
     SolverCG<LinearAlgebra::distributed::Vector<double>> solver(control);
     solver.solve(fine_matrix, sol, in, preconditioner);
   }

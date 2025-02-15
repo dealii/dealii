@@ -17,6 +17,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 

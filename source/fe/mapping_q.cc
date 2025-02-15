@@ -642,7 +642,12 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
   AssertDimension(real_points.size(), unit_points.size());
   std::vector<Point<spacedim>> support_points_higher_order;
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
     vertices;
   if (polynomial_degree == 1)
     vertices = this->get_vertices(cell);
@@ -1101,9 +1106,7 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
     QProjector<dim>::DataSetDescriptor::face(
       ReferenceCells::get_hypercube<dim>(),
       face_no,
-      cell->face_orientation(face_no),
-      cell->face_flip(face_no),
-      cell->face_rotation(face_no),
+      cell->combined_face_orientation(face_no),
       quadrature[0].size()),
     quadrature[0],
     data,
@@ -1852,7 +1855,7 @@ MappingQ<dim, spacedim>::is_compatible_with(
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q.inst"
+#include "fe/mapping_q.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

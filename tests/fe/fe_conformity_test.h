@@ -191,8 +191,9 @@ namespace FEConforimityTest
                  ++line_index)
               {
                 deallog << "      {" << line_index << " -> "
-                        << cell->line_orientation(line_index) << "}"
-                        << std::endl;
+                        << (cell->line_orientation(line_index) ==
+                            numbers::default_geometric_orientation)
+                        << "}" << std::endl;
               } // line_index
           }     // cell
       }         // plot_mesh_properties
@@ -243,8 +244,9 @@ namespace FEConforimityTest
                  ++line_index)
               {
                 deallog << "      {" << line_index << " -> "
-                        << cell->line_orientation(line_index) << "}"
-                        << std::endl;
+                        << (cell->line_orientation(line_index) ==
+                            numbers::default_geometric_orientation)
+                        << "}" << std::endl;
               } // line_index
           }     // cell
       }         // plot_mesh_properties

@@ -1446,14 +1446,19 @@ namespace internal
     }
 
     // 3) specialized implementation for inverse-diagonal preconditioner
-    template <typename MatrixType,
-              typename VectorType,
-              std::enable_if_t<!IsBlockVector<VectorType>::value &&
-                                 !has_vmult_with_std_functions<
-                                   MatrixType,
-                                   VectorType,
-                                   dealii::DiagonalMatrix<VectorType>>,
-                               VectorType> * = nullptr>
+    template <
+      typename MatrixType,
+      typename VectorType,
+      std::enable_if_t<
+        !IsBlockVector<VectorType>::value &&
+          !std::is_same_v<
+            VectorType,
+            LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                               MemorySpace::Default>> &&
+          !has_vmult_with_std_functions<MatrixType,
+                                        VectorType,
+                                        dealii::DiagonalMatrix<VectorType>>,
+        VectorType> * = nullptr>
     void
     step_operations(const MatrixType                         &A,
                     const dealii::DiagonalMatrix<VectorType> &preconditioner,
@@ -3344,7 +3349,7 @@ namespace internal
               // already modified during vmult (in best case, the modified
               // values are not written back to main memory yet so that
               // we do not have to pay additional costs for writing and
-              // read-for-ownershop)
+              // read-for-ownership)
               tmp_vector[i] =
                 factor1_plus_1 * solution[i] - factor1 * solution_old[i] +
                 factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);

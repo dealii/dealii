@@ -1334,6 +1334,6 @@ DataOut<dim, spacedim>::get_cell_selection() const
 
 
 // explicit instantiations
-#include "data_out.inst"
+#include "numerics/data_out.inst"
 
 DEAL_II_NAMESPACE_CLOSE

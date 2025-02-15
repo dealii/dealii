@@ -14,7 +14,7 @@
 
 
 
-// Test FE_Nothing::operator==(). The base clase operator should suffice
+// Test FE_Nothing::operator==(). The base class operator should suffice
 
 #include <deal.II/fe/fe_nothing.h>
 

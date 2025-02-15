@@ -30,6 +30,8 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/grid/cell_data.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <fstream>

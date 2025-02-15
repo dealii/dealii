@@ -27,7 +27,10 @@
 
 #  include <deal.II/grid/tria.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Boolean_set_operations_2.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #  include <CGAL/Cartesian.h>
 #  include <CGAL/Circular_kernel_intersections.h>
 #  include <CGAL/Constrained_Delaunay_triangulation_2.h>
@@ -42,6 +45,7 @@
 #  include <CGAL/Projection_traits_xy_3.h>
 #  include <CGAL/Segment_3.h>
 #  include <CGAL/Simple_cartesian.h>
+#  include <CGAL/Surface_mesh/Surface_mesh.h>
 #  include <CGAL/Tetrahedron_3.h>
 #  include <CGAL/Triangle_2.h>
 #  include <CGAL/Triangle_3.h>
@@ -862,7 +866,7 @@ namespace CGALWrappers
       vertices0, vertices1, tol);
   }
 
-#  include "intersections.inst"
+#  include "cgal/intersections.inst"
 
 } // namespace CGALWrappers
 

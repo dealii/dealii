@@ -1253,7 +1253,7 @@ Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
 }
 
 
-#  ifdef DEAL_II_HAVE_CXX20
+#  if defined(DEAL_II_HAVE_CXX20) && !defined(__NVCC__)
 
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE

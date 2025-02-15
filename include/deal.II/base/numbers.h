@@ -27,19 +27,6 @@
 #include <cstddef>
 #include <type_traits>
 
-#define DEAL_II_HOST_DEVICE KOKKOS_FUNCTION
-#define DEAL_II_HOST_DEVICE_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
-
-// clang++ assumes that all constexpr functions are __host__ __device__ when
-// Kokkos was configured with CUDA or HIP support. This is problematic
-// when calling non-constexpr functions in constexpr functions. Hence, we
-// need a way to annotate functions explicitly as host-only.
-#if (defined(__clang__) && defined(__CUDA__)) || defined(KOKKOS_ENABLE_HIP)
-#  define DEAL_II_HOST __host__
-#else
-#  define DEAL_II_HOST
-#endif
-
 // Forward-declare the automatic differentiation types so we can add prototypes
 // for our own wrappers.
 #ifdef DEAL_II_WITH_ADOLC
@@ -226,52 +213,52 @@ namespace numbers
   /**
    * e
    */
-  static constexpr double E = 2.7182818284590452354;
+  constexpr double E = 2.7182818284590452354;
 
   /**
    * log_2 e
    */
-  static constexpr double LOG2E = 1.4426950408889634074;
+  constexpr double LOG2E = 1.4426950408889634074;
 
   /**
    * log_10 e
    */
-  static constexpr double LOG10E = 0.43429448190325182765;
+  constexpr double LOG10E = 0.43429448190325182765;
 
   /**
    * log_e 2
    */
-  static constexpr double LN2 = 0.69314718055994530942;
+  constexpr double LN2 = 0.69314718055994530942;
 
   /**
    * log_e 10
    */
-  static constexpr double LN10 = 2.30258509299404568402;
+  constexpr double LN10 = 2.30258509299404568402;
 
   /**
    * pi
    */
-  static constexpr double PI = 3.14159265358979323846;
+  constexpr double PI = 3.14159265358979323846;
 
   /**
    * pi/2
    */
-  static constexpr double PI_2 = 1.57079632679489661923;
+  constexpr double PI_2 = 1.57079632679489661923;
 
   /**
    * pi/4
    */
-  static constexpr double PI_4 = 0.78539816339744830962;
+  constexpr double PI_4 = 0.78539816339744830962;
 
   /**
    * sqrt(2)
    */
-  static constexpr double SQRT2 = 1.41421356237309504880;
+  constexpr double SQRT2 = 1.41421356237309504880;
 
   /**
    * 1/sqrt(2)
    */
-  static constexpr double SQRT1_2 = 0.70710678118654752440;
+  constexpr double SQRT1_2 = 0.70710678118654752440;
 
   /**
    * Return @p true if the given value is a finite floating point number, i.e.

@@ -364,7 +364,7 @@ namespace FETools
    * @param fe The finite element for which to compute these matrices.
    *
    * @param matrices An array of <i>GeometryInfo<dim>::subfaces_per_face =
-   * 2<sup>dim-1</sup></i> FullMatrix objects,holding the embedding matrix for
+   * 2<sup>dim-1</sup></i> FullMatrix objects, holding the embedding matrix for
    * each subface.
    *
    * @param face_coarse The number of the face on the coarse side of the face
@@ -381,12 +381,11 @@ namespace FETools
    */
   template <int dim, typename number, int spacedim>
   void
-  compute_face_embedding_matrices(
-    const FiniteElement<dim, spacedim> &fe,
-    FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
-    const unsigned int face_coarse,
-    const unsigned int face_fine,
-    const double       threshold = 1.e-12);
+  compute_face_embedding_matrices(const FiniteElement<dim, spacedim>  &fe,
+                                  const ArrayView<FullMatrix<number>> &matrices,
+                                  const unsigned int face_coarse,
+                                  const unsigned int face_fine,
+                                  const double       threshold = 1.e-12);
 
   /**
    * For all possible (isotropic and anisotropic) refinement cases compute the

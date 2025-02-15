@@ -837,8 +837,4 @@ struct is_serial_vector<LinearAlgebra::distributed::BlockVector<Number>>
 
 DEAL_II_NAMESPACE_CLOSE
 
-#ifdef DEAL_II_MSVC
-#  include <deal.II/lac/la_parallel_block_vector.templates.h>
-#endif
-
 #endif

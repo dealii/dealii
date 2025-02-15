@@ -56,6 +56,6 @@ namespace MGTransferGlobalCoarseningTools
   }
 } // namespace MGTransferGlobalCoarseningTools
 
-#include "mg_transfer_global_coarsening.inst"
+#include "multigrid/mg_transfer_global_coarsening.inst"
 
 DEAL_II_NAMESPACE_CLOSE

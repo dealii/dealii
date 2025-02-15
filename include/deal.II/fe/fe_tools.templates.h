@@ -1811,13 +1811,13 @@ namespace FETools
 
   template <int dim, typename number, int spacedim>
   void
-  compute_face_embedding_matrices(
-    const FiniteElement<dim, spacedim> &fe,
-    FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
-    const unsigned int face_coarse,
-    const unsigned int face_fine,
-    const double       threshold)
+  compute_face_embedding_matrices(const FiniteElement<dim, spacedim>  &fe,
+                                  const ArrayView<FullMatrix<number>> &matrices,
+                                  const unsigned int face_coarse,
+                                  const unsigned int face_fine,
+                                  const double       threshold)
   {
+    AssertDimension(matrices.size(), GeometryInfo<dim>::max_children_per_face);
     const unsigned int face_no = face_coarse;
 
     Assert(face_coarse == 0, ExcNotImplemented());
@@ -1915,7 +1915,10 @@ namespace FETools
     // hating the anisotropic implementation
     QGauss<dim - 1>       q_gauss(degree + 1);
     const Quadrature<dim> q_fine =
-      QProjector<dim>::project_to_face(fe.reference_cell(), q_gauss, face_fine);
+      QProjector<dim>::project_to_face(fe.reference_cell(),
+                                       q_gauss,
+                                       face_fine,
+                                       numbers::default_geometric_orientation);
     const unsigned int nq = q_fine.size();
 
     FEValues<dim> fine(mapping,
@@ -2233,7 +2236,7 @@ namespace FETools
       // Ensure that the element we are looking for isn't in the map
       // yet. This only requires us to read the map, so it can happen
       // in a shared locked state
-#if DEBUG
+#ifdef DEBUG
     {
       std::shared_lock<std::shared_mutex> lock(
         internal::FEToolsAddFENameHelper::fe_name_map_lock);

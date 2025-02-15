@@ -437,6 +437,6 @@ namespace GridTools
 
 
 // explicit instantiations
-#include "grid_tools_geometry.inst"
+#include "grid/grid_tools_geometry.inst"
 
 DEAL_II_NAMESPACE_CLOSE

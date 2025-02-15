@@ -59,7 +59,7 @@ test_preconditioner_block(const MatrixType      &A,
   PRECONDITIONER preconditioner;
   preconditioner.initialize(A, data);
 
-  SolverControl        solver_control(100, 1.0e-10);
+  SolverControl        solver_control(100, 1.0e-10, false, true);
   SolverCG<VectorType> solver(solver_control);
 
   // Exact inverse
@@ -98,7 +98,7 @@ test_preconditioner(const SparseMatrix<double>                    &A,
   // Exact inverse
   {
     deallog.push("Exact inverse");
-    SolverControl            solver_control(100, 1.0e-10);
+    SolverControl            solver_control(100, 1.0e-10, false, true);
     SolverCG<Vector<double>> solver(solver_control);
     const auto lo_A_inv = inverse_operator(lo_A, solver, preconditioner);
 
@@ -130,7 +130,7 @@ test_solver(const SparseMatrix<double> &A, const Vector<double> &b)
   // Standard solver
   {
     deallog.push("Standard solver");
-    SolverControl solver_control(100, 1.0e-10);
+    SolverControl solver_control(100, 1.0e-10, false, true);
     SolverType    solver(solver_control);
 
     PreconditionJacobi<SparseMatrix<double>> preconditioner;
@@ -148,7 +148,7 @@ test_solver(const SparseMatrix<double> &A, const Vector<double> &b)
     deallog.push("Linear operator");
     const auto lo_A = linear_operator(A);
 
-    SolverControl solver_control(100, 1.0e-10);
+    SolverControl solver_control(100, 1.0e-10, false, true);
     SolverType    solver(solver_control);
 
     PreconditionJacobi<SparseMatrix<double>> preconditioner;
@@ -268,7 +268,7 @@ main()
         "jacobi");
       preconditioner.use_matrix(A);
 
-      SolverControl            solver_control(100, 1.0e-10);
+      SolverControl            solver_control(100, 1.0e-10, false, true);
       SolverCG<Vector<double>> solver(solver_control);
 
       // Exact inverse
@@ -357,7 +357,7 @@ main()
       deallog << "SolverSelector" << std::endl;
       const auto lo_A = linear_operator(A);
 
-      ReductionControl               solver_control(10, 1.e-30, 1.e-2);
+      ReductionControl solver_control(10, 1.e-30, 1.e-2, false, true);
       SolverSelector<Vector<double>> solver;
       solver.select("cg");
       solver.set_control(solver_control);

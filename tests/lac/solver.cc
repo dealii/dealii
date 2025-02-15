@@ -50,6 +50,8 @@ check_solve(SolverType         &solver,
     }
   catch (dealii::SolverControl::NoConvergence &e)
     {
+      deallog << "Failure step " << e.last_step << " value " << e.last_residual
+              << std::endl;
       deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 }
@@ -73,6 +75,8 @@ check_Tsolve(SolverType         &solver,
     }
   catch (dealii::SolverControl::NoConvergence &e)
     {
+      deallog << "Failure step " << e.last_step << " value " << e.last_residual
+              << std::endl;
       deallog << "Exception: " << e.get_exc_name() << std::endl;
     }
 }
@@ -86,8 +90,8 @@ main()
   deallog.attach(logfile);
 
   GrowingVectorMemory<>         mem;
-  SolverControl                 control(100, 1.e-3);
-  SolverControl                 verbose_control(100, 1.e-3, true);
+  SolverControl                 control(100, 1.e-3, false, true);
+  SolverControl                 verbose_control(100, 1.e-3, true, true);
   SolverCG<>                    cg(control, mem);
   SolverCG<>::AdditionalData    data0(false);
   SolverCG<>                    cg_add_data(control, mem, data0);

@@ -30,6 +30,8 @@
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <array>
 #include <cmath>
 #include <memory>
@@ -349,7 +351,12 @@ public:
    * <code>cell-@>vertex(v)</code>.
    */
   virtual boost::container::small_vector<Point<spacedim>,
-                                         GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                         ReferenceCells::max_n_vertices<dim>()
+#else
+                                         GeometryInfo<dim>::vertices_per_cell
+#endif
+                                         >
   get_vertices(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
@@ -362,7 +369,12 @@ public:
    * @param[in] face_no The number of the face within the cell.
    */
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_face>
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim - 1>()
+#else
+                                 GeometryInfo<dim - 1>::vertices_per_cell
+#endif
+                                 >
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
                const unsigned int face_no) const;
 

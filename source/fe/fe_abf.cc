@@ -359,8 +359,11 @@ FE_ABF<dim>::initialize_restriction()
       // child cell are evaluated
       // in the quadrature points
       // of a full face.
-      Quadrature<dim> q_face =
-        QProjector<dim>::project_to_face(this->reference_cell(), q_base, face);
+      Quadrature<dim> q_face = QProjector<dim>::project_to_face(
+        this->reference_cell(),
+        q_base,
+        face,
+        numbers::default_geometric_orientation);
       // Store shape values, since the
       // evaluation suffers if not
       // ordered by point
@@ -625,7 +628,7 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
           unsigned int k = QProjector<dim>::DataSetDescriptor::face(
             this->reference_cell(),
             face,
-            ReferenceCell::default_combined_face_orientation(),
+            numbers::default_geometric_orientation,
             n_face_points);
           for (unsigned int i = 0; i < boundary_weights_abf.size(1); ++i)
             nodal_values[start_abf_dofs + i] +=
@@ -654,6 +657,6 @@ FE_ABF<dim>::memory_consumption() const
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_abf.inst"
+#include "fe/fe_abf.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -21,7 +21,9 @@
 
 #include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/types.h>
 
 #include <array>
 #include <limits>
