@@ -25,6 +25,7 @@
 
 #  ifdef DEAL_II_WITH_ADOLC
 #    include <adolc/adouble.h> // Taped double
+#    include <adolc/adtl.h>    // Tapeless double
 #  endif
 
 DEAL_II_NAMESPACE_OPEN
