@@ -1,0 +1,37 @@
+
+DEAL::Mesh refinement step 0
+DEAL::  Target_tolerance: 1.00000e-10
+DEAL::
+DEAL::  Computed residual vector with norm 0.867975
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.212073
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.0189603
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.000314854
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 1.14048e-07
+DEAL::Mesh refinement step 1
+DEAL::  Target_tolerance: 1.00000e-11
+DEAL::
+DEAL::  Computed residual vector with norm 0.246479
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.0359168
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.00208943
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 8.26297e-06
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 1.43448e-10
+DEAL::Mesh refinement step 2
+DEAL::  Target_tolerance: 1.00000e-12
+DEAL::
+DEAL::  Computed residual vector with norm 0.504420
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.171685
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.0241205
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 0.000550324
+DEAL::  Computing Jacobian matrix
+DEAL::  Computed residual vector with norm 5.73528e-07
