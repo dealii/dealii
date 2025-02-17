@@ -193,8 +193,17 @@ namespace CGALWrappers
       {
         Assert(false, ExcImpossibleInDimSpacedim(dim, spacedim));
       }
-  } // explicit instantiations
-#    include "cgal/surface_mesh.inst"
+  }
+
+// Explicit instantiations.
+//
+// We don't build the instantiations.inst file if deal.II isn't
+// configured with CGAL, but doxygen doesn't know that and tries to
+// find that file anyway for parsing -- which then of course it fails
+// on. So exclude the following from doxygen consideration.
+#    ifndef DOXYGEN
+#      include "cgal/surface_mesh.inst"
+#    endif
 
 } // namespace CGALWrappers
 #  endif
