@@ -330,7 +330,7 @@ private:
  * @ingroup vector_valued
  */
 template <typename MatrixType>
-class MatrixBlockVector : private AnyData
+class MatrixBlockVector : public AnyData
 {
 public:
   /**
@@ -405,8 +405,6 @@ public:
    */
   using AnyData::name;
   using AnyData::size;
-  using AnyData::subscribe;
-  using AnyData::unsubscribe;
 };
 
 

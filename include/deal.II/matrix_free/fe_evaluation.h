@@ -76,7 +76,7 @@ DEAL_II_NAMESPACE_OPEN
  * quadrature dimension the same as the space dimension) or for a face
  * integrator (with quadrature dimension one less)
  *
- * @tparam VectorizedArrayType Type of array to be woked on in a vectorized
+ * @tparam VectorizedArrayType Type of array to be worked on in a vectorized
  *                             fashion, defaults to VectorizedArray<Number>
  *
  * @note Currently only VectorizedArray<Number, width> is supported as
@@ -1829,7 +1829,7 @@ private:
  *
  * @tparam Number Number format, usually @p double or @p float
  *
- * @tparam VectorizedArrayType Type of array to be woked on in a vectorized
+ * @tparam VectorizedArrayType Type of array to be worked on in a vectorized
  *                             fashion, defaults to VectorizedArray<Number>
  *
  * @note Currently only VectorizedArray<Number, width> is supported as
@@ -3912,8 +3912,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto src_data = internal::get_vector_data<n_components_>(
     src,
     first_index,
-    this->dof_access_index ==
-      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->dof_info != nullptr &&
+      this->dof_access_index ==
+        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
     this->active_fe_index,
     this->dof_info);
 
@@ -7463,7 +7464,7 @@ FEFaceEvaluation<dim,
           if (face_identifies_as_interior != orientation_interior_face)
             {
               constexpr std::array<std::uint8_t, 8> table{
-                {0, 1, 2, 3, 6, 5, 4, 7}};
+                {0, 1, 6, 3, 4, 5, 2, 7}};
               face_orientation = table[face_orientation];
             }
           this->face_orientations[i] = face_orientation;

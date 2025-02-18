@@ -41,11 +41,20 @@ endif()
 # Call the system FindMPI.cmake module:
 #
 
-# in case MPIEXEC is specified first call find_program() so that in case of
-# success its subsequent runs inside find_package(MPI) do not alter the
-# desired result.
-if(DEFINED ENV{MPIEXEC})
-  find_program(MPIEXEC $ENV{MPIEXEC})
+#
+# Make sure we pick up the correct MPI implementation for the case that
+# environment variables MPIEXEC_EXECUTABLE, or MPIEXEC are set. If
+# MPIEXEC_EXECUTABLE is already set as a CMake variable simply ignore the
+# environment variables.
+#
+if(NOT MPIEXEC_EXECUTABLE)
+  if(DEFINED ENV{MPIEXEC_EXECUTABLE})
+    find_program(MPIEXEC_EXECUTABLE $ENV{MPIEXEC_EXECUTABLE})
+  elseif(DEFINED ENV{MPIEXEC})
+    find_program(MPIEXEC_EXECUTABLE $ENV{MPIEXEC})
+  endif()
+  # For backwards compatbility with old cmake versions:
+  set(MPIEXEC "${MPIEXEC_EXECUTABLE}")
 endif()
 
 find_package(MPI)

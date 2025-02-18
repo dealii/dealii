@@ -159,9 +159,13 @@ MappingQCache<dim, spacedim>::initialize(
         void *) {
       (*support_point_cache)[cell->level()][cell->index()] =
         compute_points_on_cell(cell);
+      // Do not use `this` in Assert because nvcc when using C++20 assumes that
+      // `this` is an integer and we get the following error: invalid type
+      // argument of unary '*' (have 'int')
+      [[maybe_unused]] const unsigned int d = this->get_degree() + 1;
       AssertDimension(
         (*support_point_cache)[cell->level()][cell->index()].size(),
-        Utilities::pow(this->get_degree() + 1, dim));
+        Utilities::pow(d, dim));
     },
     /* copier */ std::function<void(void *)>(),
     /* scratch_data */ nullptr,
@@ -728,7 +732,12 @@ MappingQCache<dim, spacedim>::compute_mapping_support_points(
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingQCache<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -742,14 +751,18 @@ MappingQCache<dim, spacedim>::get_vertices(
   AssertIndexRange(cell->index(), (*support_point_cache)[cell->level()].size());
   const auto ptr = (*support_point_cache)[cell->level()][cell->index()].begin();
   return boost::container::small_vector<Point<spacedim>,
-                                        GeometryInfo<dim>::vertices_per_cell>(
-    ptr, ptr + cell->n_vertices());
+#ifndef _MSC_VER
+                                        ReferenceCells::max_n_vertices<dim>()
+#else
+                                        GeometryInfo<dim>::vertices_per_cell
+#endif
+                                        >(ptr, ptr + cell->n_vertices());
 }
 
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q_cache.inst"
+#include "fe/mapping_q_cache.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

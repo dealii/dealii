@@ -34,12 +34,22 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim>()
+#  else
+                               GeometryInfo<dim>::vertices_per_cell
+#  endif
+                               >
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#  ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim>()
+#  else
+                                 GeometryInfo<dim>::vertices_per_cell
+#  endif
+                                 >
     vertices;
   for (const unsigned int i : cell->vertex_indices())
     vertices.push_back(cell->vertex(i));
@@ -51,13 +61,23 @@ Mapping<dim, spacedim>::get_vertices(
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_face>
+#  ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim - 1>()
+#  else
+                               GeometryInfo<dim - 1>::vertices_per_cell
+#  endif
+                               >
 Mapping<dim, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no) const
 {
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_face>
+#  ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim - 1>()
+#  else
+                                 GeometryInfo<dim - 1>::vertices_per_cell
+#  endif
+                                 >
     face_vertices;
 
   const auto &cell_vertices    = get_vertices(cell);
@@ -142,8 +162,10 @@ Mapping<dim, spacedim>::transform_points_real_to_unit_cell(
         }
       catch (typename Mapping<dim>::ExcTransformationFailed &)
         {
+          // If the transformation for this one point failed, mark it
+          // as invalid as described in the documentation.
           unit_points[i]    = Point<dim>();
-          unit_points[i][0] = std::numeric_limits<double>::infinity();
+          unit_points[i][0] = std::numeric_limits<double>::lowest();
         }
     }
 }
@@ -310,7 +332,7 @@ get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation)
 
 
 // explicit instantiations
-#include "mapping.inst"
+#include "fe/mapping.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -16,6 +16,7 @@
 #include <deal.II/base/quadrature.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping.h>
@@ -24,9 +25,7 @@
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/grid/tria_levels.h>
 
 #include <array>
@@ -2358,23 +2357,18 @@ CellAccessor<dim, spacedim>::set_neighbor(
 {
   AssertIndexRange(i, this->n_faces());
 
+  auto &neighbor =
+    this->tria->levels[this->present_level]
+      ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() + i];
   if (pointer.state() == IteratorState::valid)
     {
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .first = pointer->present_level;
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .second = pointer->present_index;
+      neighbor.first  = pointer->present_level;
+      neighbor.second = pointer->present_index;
     }
   else
     {
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .first = -1;
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .second = -1;
+      neighbor.first  = -1;
+      neighbor.second = -1;
     }
 }
 
@@ -3042,40 +3036,27 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
         {
           if (this->reference_cell() == ReferenceCells::Triangle)
             {
-              const auto neighbor_cell = this->neighbor(face);
-
-              // only for isotropic refinement at the moment
-              Assert(neighbor_cell->refinement_case() ==
+              const unsigned int neighbor_neighbor =
+                this->neighbor_of_neighbor(face);
+              const auto neighbor = this->neighbor(face);
+              // Triangles do not support anisotropic refinement
+              Assert(neighbor->refinement_case() ==
                        RefinementCase<2>::isotropic_refinement,
                      ExcNotImplemented());
-
-              // determine indices for this cell's subface from the perspective
-              // of the neighboring cell
-              const unsigned int neighbor_face =
-                this->neighbor_of_neighbor(face);
-              // two neighboring cells have an opposed orientation on their
-              // shared face if both of them follow the same orientation type
-              // (i.e., standard or non-standard).
-              // we verify this with a XOR operation.
-              const unsigned int neighbor_subface =
-                (!(this->line_orientation(face)) !=
-                 !(neighbor_cell->line_orientation(neighbor_face))) ?
-                  (1 - subface) :
-                  subface;
-
+              // Since we are looking at two faces at once, we need to check if
+              // they have the same or opposing orientations rather than one
+              // individual face orientation value.
+              const auto relative_orientation =
+                neighbor->combined_face_orientation(neighbor_neighbor) ==
+                    this->combined_face_orientation(face) ?
+                  numbers::default_geometric_orientation :
+                  numbers::reverse_line_orientation;
               const unsigned int neighbor_child_index =
-                neighbor_cell->reference_cell().child_cell_on_face(
-                  neighbor_face, neighbor_subface);
-              const TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
-                neighbor_cell->child(neighbor_child_index);
-
-              // neighbor's child is not allowed to be further refined for the
-              // moment
-              Assert(sub_neighbor->refinement_case() ==
-                       RefinementCase<dim>::no_refinement,
-                     ExcNotImplemented());
-
-              return sub_neighbor;
+                neighbor->reference_cell().child_cell_on_face(
+                  neighbor_neighbor, subface, relative_orientation);
+              auto child = neighbor->child(neighbor_child_index);
+              Assert(!child->has_children(), ExcInternalError());
+              return child;
             }
           else if (this->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -3500,6 +3481,6 @@ InvalidAccessor<structdim, dim, spacedim>::index()
 
 
 // explicit instantiations
-#include "tria_accessor.inst"
+#include "grid/tria_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -30,6 +30,8 @@
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <array>
 #include <cmath>
 #include <memory>
@@ -349,7 +351,12 @@ public:
    * <code>cell-@>vertex(v)</code>.
    */
   virtual boost::container::small_vector<Point<spacedim>,
-                                         GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                         ReferenceCells::max_n_vertices<dim>()
+#else
+                                         GeometryInfo<dim>::vertices_per_cell
+#endif
+                                         >
   get_vertices(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
@@ -362,7 +369,12 @@ public:
    * @param[in] face_no The number of the face within the cell.
    */
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_face>
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim - 1>()
+#else
+                                 GeometryInfo<dim - 1>::vertices_per_cell
+#endif
+                                 >
   get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
                const unsigned int face_no) const;
 
@@ -498,7 +510,8 @@ public:
    * MappingQ. The only difference in behavior is that this function
    * will never throw an ExcTransformationFailed() exception. If the
    * transformation fails for `real_points[i]`, the returned `unit_points[i]`
-   * contains std::numeric_limits<double>::infinity() as the first entry.
+   * contains std::numeric_limits<double>::lowest() as the first component
+   * of the point, marking this one point as invalid.
    */
   virtual void
   transform_points_real_to_unit_cell(

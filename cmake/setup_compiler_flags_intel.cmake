@@ -184,4 +184,3 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-gdwarf-2")
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-grecord-gcc-switches")
 endif()
-

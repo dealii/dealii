@@ -501,11 +501,9 @@ LaplaceProblem<dim>::setup_transfer()
   std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>> partitioners(
     dof_handler.get_triangulation().n_global_levels());
   for (unsigned int level = 0; level < partitioners.size(); ++level)
-    {
-      LinearAlgebra::distributed::Vector<float> vec;
-      mg_matrices[level].initialize_dof_vector(vec);
-      partitioners[level] = vec.get_partitioner();
-    }
+    partitioners[level] =
+      mg_matrices[level].get_matrix_free()->get_dof_info().vector_partitioner;
+
   mg_transfer.build(dof_handler, partitioners);
 }
 

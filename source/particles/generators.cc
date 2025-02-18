@@ -504,6 +504,6 @@ namespace Particles
   } // namespace Generators
 } // namespace Particles
 
-#include "generators.inst"
+#include "particles/generators.inst"
 
 DEAL_II_NAMESPACE_CLOSE

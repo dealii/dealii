@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-DEAL_II_WARNING(
-  "This file is deprecated. Use ArrayView instead of VectorSlice.")
+DEAL_II_WARNING("This file is deprecated."
+                "Use ArrayView instead of VectorSlice.")
 
 #endif

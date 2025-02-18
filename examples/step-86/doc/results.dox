@@ -278,4 +278,3 @@ you have somewhere in the range of 50,000 to 100,000 unknowns *per MPI
 process*. But it is not difficult to adapt the program at hand here to
 run with a much finer mesh, or perhaps in 3d, so that one is beyond
 that limit and sees the benefits of parallel computing.
-

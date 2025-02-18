@@ -18,11 +18,13 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 
 #include <array>
 
@@ -3025,8 +3027,7 @@ enum struct SymmetricTensorEigenvectorMethod
  * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number>
-std::array<std::pair<Number, Tensor<1, dim, Number>>,
-           std::integral_constant<int, dim>::value>
+std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
 eigenvectors(const SymmetricTensor<2, dim, Number> &T,
              const SymmetricTensorEigenvectorMethod method =
                SymmetricTensorEigenvectorMethod::ql_implicit_shifts);

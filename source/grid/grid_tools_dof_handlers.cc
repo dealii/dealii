@@ -2166,7 +2166,7 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (const std::optional<unsigned char> orientation =
+            if (const std::optional<types::geometric_orientation> orientation =
                   GridTools::orthogonal_equality(cell1->face(face_idx1),
                                                  cell2->face(face_idx2),
                                                  direction,
@@ -2283,7 +2283,7 @@ namespace GridTools
     for (unsigned int i = size_old; i < size_new; ++i)
       {
         Assert(matched_pairs[i].orientation ==
-                 ReferenceCell::default_combined_face_orientation(),
+                 numbers::default_geometric_orientation,
                ExcMessage(
                  "Found a face match with non standard orientation. "
                  "This function is only suitable for meshes with cells "
@@ -2422,7 +2422,7 @@ namespace GridTools
 
 
   template <typename FaceIterator>
-  std::optional<unsigned char>
+  std::optional<types::geometric_orientation>
   orthogonal_equality(
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
@@ -2498,7 +2498,7 @@ namespace GridTools
 } // namespace GridTools
 
 
-#include "grid_tools_dof_handlers.inst"
+#include "grid/grid_tools_dof_handlers.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -3106,7 +3106,7 @@ namespace DoFTools
       const FullMatrix<double>                       &transformation,
       AffineConstraints<number>                      &affine_constraints,
       const ComponentMask                            &component_mask,
-      const unsigned char                             combined_orientation,
+      const types::geometric_orientation              combined_orientation,
       const number                                    periodicity_factor,
       const unsigned int                              level)
     {
@@ -3146,6 +3146,17 @@ namespace DoFTools
           const unsigned int dofs_per_face =
             face_1->get_fe(face_1->nth_active_fe_index(0))
               .n_dofs_per_face(face_no);
+
+          // Skip further recursion if face_1 carries invalid dof indices,
+          // i.e., it is on an artificial cell.
+          std::vector<types::global_dof_index> dofs_1(dofs_per_face);
+          face_1->get_dof_indices(dofs_1, face_1->nth_active_fe_index(0));
+          for (unsigned int i = 0; i < dofs_per_face; ++i)
+            if (dofs_1[i] == numbers::invalid_dof_index)
+              {
+                return;
+              }
+
           FullMatrix<double> child_transformation(dofs_per_face, dofs_per_face);
           FullMatrix<double> subface_interpolation(dofs_per_face,
                                                    dofs_per_face);
@@ -3593,7 +3604,7 @@ namespace DoFTools
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number>                      &affine_constraints,
     const ComponentMask                            &component_mask,
-    const unsigned char                             combined_orientation,
+    const types::geometric_orientation              combined_orientation,
     const FullMatrix<double>                       &matrix,
     const std::vector<unsigned int>                &first_vector_components,
     const number                                    periodicity_factor)
@@ -3905,6 +3916,7 @@ namespace DoFTools
   {
     namespace Assembler
     {
+      // We don't actually need a scratch object, so use an empty class for it.
       struct Scratch
       {};
 
@@ -3934,7 +3946,6 @@ namespace DoFTools
       void
       compute_intergrid_weights_3(
         const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-        const Assembler::Scratch &,
         Assembler::CopyData<dim, spacedim>            &copy_data,
         const unsigned int                             coarse_component,
         const FiniteElement<dim, spacedim>            &coarse_fe,
@@ -4107,7 +4118,6 @@ namespace DoFTools
         const std::vector<types::global_dof_index>    &weight_mapping,
         std::vector<std::map<types::global_dof_index, float>> &weights)
       {
-        Assembler::Scratch                 scratch;
         Assembler::CopyData<dim, spacedim> copy_data;
 
         unsigned int n_interesting_dofs = 0;
@@ -4165,11 +4175,10 @@ namespace DoFTools
            &coarse_to_fine_grid_map,
            &parameter_dofs](
             const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                                               &cell,
-            const Assembler::Scratch           &scratch_data,
+              &cell,
+            const Assembler::Scratch &,
             Assembler::CopyData<dim, spacedim> &copy_data) {
             compute_intergrid_weights_3<dim, spacedim>(cell,
-                                                       scratch_data,
                                                        copy_data,
                                                        coarse_component,
                                                        coarse_grid.get_fe(),
@@ -4195,7 +4204,7 @@ namespace DoFTools
                         coarse_grid.end(),
                         worker,
                         copier,
-                        scratch,
+                        Assembler::Scratch(),
                         copy_data);
 
 #ifdef DEAL_II_WITH_MPI
@@ -4837,7 +4846,7 @@ namespace DoFTools
 
 // explicit instantiations
 
-#include "dof_tools_constraints.inst"
+#include "dofs/dof_tools_constraints.inst"
 
 
 

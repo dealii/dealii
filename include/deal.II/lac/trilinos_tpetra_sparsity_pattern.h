@@ -17,9 +17,9 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/types.h"
+#include <deal.II/base/types.h>
 
-#include "deal.II/lac/trilinos_tpetra_types.h"
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
@@ -29,7 +29,6 @@
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/sparsity_pattern_base.h>
-#  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 
 #  include <Tpetra_CrsGraph.hpp>
 

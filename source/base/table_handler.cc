@@ -12,6 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_handler.h>
 
 #include <boost/io/ios_state.hpp>

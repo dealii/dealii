@@ -12,7 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/partitioner.templates.h>
 
@@ -553,6 +554,6 @@ namespace Utilities
 #endif
 
 // explicit instantiations from .templates.h file
-#include "partitioner.inst"
+#include "base/partitioner.inst"
 
 DEAL_II_NAMESPACE_CLOSE

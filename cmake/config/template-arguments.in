@@ -169,17 +169,12 @@ EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                                @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
                              }
 
-// TODO: I don't understand this one. LA::distributed::Vector does not have a
-// native matrix type, especially if we don't compile with Trilinos. Currently
-// only used: mg_transfer_prebuilt.inst.in and
-// mg_level_global_transfer.inst.in
-VECTORS_WITH_MATRIX := { Vector<double>;
+// Vectors we can do GMG with excluding the LinearAlgebra::distributed::Vector<> (which is handled separately):
+VECTORS_WITHOUT_LAVEC := { Vector<double>;
                          Vector<float> ;
 
                          BlockVector<double>;
                          BlockVector<float>;
-
-                         LinearAlgebra::distributed::Vector<double>;
 
                          @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;

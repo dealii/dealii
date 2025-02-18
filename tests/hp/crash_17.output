@@ -5,8 +5,6 @@ digraph constraints {
 }
 DEAL::   Number of degrees of freedom: 125
 DEAL::   Number of constraints       : 0
-DEAL:cg::Starting value 0.43760
-DEAL:cg::Convergence step 6 value 2.5740e-09
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       22
 digraph constraints {
@@ -603,8 +601,6 @@ digraph constraints {
 }
 DEAL::   Number of degrees of freedom: 385
 DEAL::   Number of constraints       : 128
-DEAL:cg::Starting value 0.33710
-DEAL:cg::Convergence step 11 value 6.9904e-10
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       50
 digraph constraints {
@@ -1338,8 +1334,6 @@ digraph constraints {
 }
 DEAL::   Number of degrees of freedom: 761
 DEAL::   Number of constraints       : 132
-DEAL:cg::Starting value 0.21788
-DEAL:cg::Convergence step 18 value 5.8290e-10
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       113
 digraph constraints {
@@ -5428,5 +5422,3 @@ digraph constraints {
 }
 DEAL::   Number of degrees of freedom: 2465
 DEAL::   Number of constraints       : 717
-DEAL:cg::Starting value 0.11766
-DEAL:cg::Convergence step 28 value 8.6276e-10

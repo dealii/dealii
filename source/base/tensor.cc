@@ -36,7 +36,7 @@ namespace
     // major ordering, we take the SVD of A^T by running the gesvd command.
     // The results (V^T)^T and U^T are provided in column major that we use
     // as row major results V^T and U.
-    // It essentially computs A^T = (V^T)^T S U^T and gives us V^T and U.
+    // It essentially computes A^T = (V^T)^T S U^T and gives us V^T and U.
     // This trick gives what we originally wanted (A = U S V^T) but the order
     // of U and V^T is reversed.
     std::array<Number, dim> S;

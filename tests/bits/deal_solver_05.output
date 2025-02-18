@@ -1,6 +1,4 @@
 
 DEAL::Size 32 Unknowns 961
 DEAL::Solver type: N6dealii10SolverQMRSINS_6VectorIdEEEE
-DEAL:SQMR::Starting value 31.00
-DEAL:SQMR::Convergence step 46 value 0.0009063
 DEAL::Solver stopped after 46 iterations

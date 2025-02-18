@@ -79,9 +79,6 @@ MappingManifold<dim, spacedim>::InternalData::reinit(
   // Store the quadrature
   this->quad.initialize(q.get_points(), q.get_weights());
 
-  // Resize the weights
-  this->vertex_weights.resize(GeometryInfo<dim>::vertices_per_cell);
-
   // see if we need the (transformation) shape function values
   // and/or gradients and resize the necessary arrays
   if (this->update_each &
@@ -157,7 +154,6 @@ void
 MappingManifold<dim, spacedim>::InternalData::store_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  vertices.resize(GeometryInfo<dim>::vertices_per_cell);
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     vertices[i] = cell->vertex(i);
   this->cell = cell;
@@ -170,8 +166,7 @@ void
 MappingManifold<dim, spacedim>::InternalData::
   compute_manifold_quadrature_weights(const Quadrature<dim> &quad)
 {
-  cell_manifold_quadrature_weights.resize(
-    quad.size(), std::vector<double>(GeometryInfo<dim>::vertices_per_cell));
+  cell_manifold_quadrature_weights.resize(quad.size());
   for (unsigned int q = 0; q < quad.size(); ++q)
     {
       for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
@@ -384,9 +379,6 @@ namespace internal
       {
         const UpdateFlags update_flags = data.update_each;
 
-        AssertDimension(data.vertices.size(),
-                        GeometryInfo<dim>::vertices_per_cell);
-
         if (update_flags & update_quadrature_points)
           {
             for (unsigned int point = 0; point < quadrature_points.size();
@@ -425,8 +417,6 @@ namespace internal
                       data.contravariant.end(),
                       DerivativeForm<1, dim, spacedim>());
 
-            AssertDimension(GeometryInfo<dim>::vertices_per_cell,
-                            data.vertices.size());
             for (unsigned int point = 0; point < n_q_points; ++point)
               {
                 // Start by figuring out how to compute the direction in
@@ -1448,7 +1438,7 @@ MappingManifold<dim, spacedim>::transform(
 }
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_manifold.inst"
+#include "fe/mapping_manifold.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -287,27 +287,12 @@ namespace LinearAlgebra
           Assert(this->size() == V.size(),
                  ExcDimensionMismatch(this->size(), V.size()));
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(11, 11, 0)
           Epetra_Import data_exchange(vector->Map(), V.trilinos_vector().Map());
           const int     ierr = vector->Import(V.trilinos_vector(),
                                           data_exchange,
                                           Epetra_AddLocalAlso);
           Assert(ierr == 0, ExcTrilinosError(ierr));
           (void)ierr;
-#  else
-          // In versions older than 11.11 the Import function is broken for
-          // adding Hence, we provide a workaround in this case
-
-          Epetra_MultiVector dummy(vector->Map(), 1, false);
-          Epetra_Import data_exchange(dummy.Map(), V.trilinos_vector().Map());
-
-          int ierr = dummy.Import(V.trilinos_vector(), data_exchange, Insert);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
-
-          ierr = vector->Update(1.0, dummy, 1.0);
-          Assert(ierr == 0, ExcTrilinosError(ierr));
-          (void)ierr;
-#  endif
         }
 
       return *this;

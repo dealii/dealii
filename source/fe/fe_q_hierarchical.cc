@@ -209,7 +209,8 @@ FE_Q_Hierarchical<dim>::get_prolongation_matrix(
     ExcMessage(
       "Prolongation matrices are only available for isotropic refinement!"));
 
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   return this->prolongation[refinement_case - 1][child];
 }
@@ -2457,7 +2458,7 @@ FE_Q_Hierarchical<dim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_q_hierarchical.inst"
+#include "fe/fe_q_hierarchical.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

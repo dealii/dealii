@@ -24,6 +24,7 @@
 #include <boost/signals2/signal.hpp>
 
 #include <mutex>
+#include <set>
 #include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN

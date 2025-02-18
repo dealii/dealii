@@ -886,11 +886,10 @@ public:
    * dofs_per_cell.
    */
   virtual unsigned int
-  face_to_cell_index(
-    const unsigned int  face_dof_index,
-    const unsigned int  face,
-    const unsigned char combined_orientation =
-      ReferenceCell::default_combined_face_orientation()) const override;
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const override;
 
   /**
    * Implementation of the respective function in the base class.

@@ -56,4 +56,3 @@ function(print_target_properties _target)
     set(${ARGN} "${_messages}" PARENT_SCOPE)
   endif()
 endfunction()
-

@@ -6,18 +6,12 @@ DEAL::
 DEAL::Solving with P1 elements, global refinement
 DEAL::===========================================
 DEAL::
-DEAL:cg::Starting value 4.31042
-DEAL:cg::Convergence step 32 value 4.40009e-13
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       512
 DEAL::   Number of degrees of freedom: 289
-DEAL:cg::Starting value 2.73770
-DEAL:cg::Convergence step 58 value 8.84330e-13
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       2048
 DEAL::   Number of degrees of freedom: 1089
-DEAL:cg::Starting value 1.49432
-DEAL:cg::Convergence step 113 value 6.96029e-13
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       8192
 DEAL::   Number of degrees of freedom: 4225
@@ -51,18 +45,12 @@ DEAL::
 DEAL::Solving with P2 elements, global refinement
 DEAL::===========================================
 DEAL::
-DEAL:cg::Starting value 3.03300
-DEAL:cg::Convergence step 76 value 7.67913e-13
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       512
 DEAL::   Number of degrees of freedom: 1089
-DEAL:cg::Starting value 1.71371
-DEAL:cg::Convergence step 150 value 8.04906e-13
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       2048
 DEAL::   Number of degrees of freedom: 4225
-DEAL:cg::Starting value 0.880749
-DEAL:cg::Convergence step 296 value 9.07150e-13
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       8192
 DEAL::   Number of degrees of freedom: 16641

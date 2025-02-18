@@ -557,11 +557,10 @@ namespace TrilinosWrappers
        * Reinit functionality. This function destroys the old vector content
        * and generates a new one based on the input partitioning.  The flag
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be
-       * filled with zero (false). If the flag is set to <tt>true</tt>, the
-       * vector entries are in an unspecified state and the user has to set
-       * all elements. In the current implementation, this method still sets
-       * the entries to zero, but this might change between releases without
-       * notification.
+       * filled with zeros (if set to <tt>false</tt>) or left in an unspecified
+       * state (if the flag is set to <tt>true</tt>). In the current
+       * implementation, this method still sets the entries to zero, but this
+       * might change between releases without notification.
        *
        * Depending on whether the @p parallel_partitioning argument uniquely
        * subdivides elements among processors or not, the resulting vector may

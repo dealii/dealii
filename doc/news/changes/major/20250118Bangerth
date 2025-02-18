@@ -1,0 +1,3 @@
+Updated: deal.II now bundles TaskFlow 3.10 to support parallel computations.
+<br>
+(Wolfgang Bangerth, 2025/01/18)

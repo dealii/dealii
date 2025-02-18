@@ -13,6 +13,8 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/signaling_nan.h>
 
 #include <deal.II/particles/property_pool.h>

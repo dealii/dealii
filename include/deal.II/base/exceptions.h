@@ -17,6 +17,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/numbers.h>
+
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <Kokkos_Macros.hpp>
 #if KOKKOS_VERSION >= 40200

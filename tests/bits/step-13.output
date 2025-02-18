@@ -1,16 +1,12 @@
 
 DEAL::Running tests with "global" refinement criterion:
 DEAL::-------------------------------------------------
-DEAL::Refinement cycle: 0 Starting value 7.7
-DEAL:cg::Convergence step 8 value 0
-DEAL::1 Starting value 32.
-DEAL:cg::Convergence step 14 value 0
-DEAL::2 Starting value 37.
-DEAL:cg::Convergence step 23 value 0
-DEAL::3 Starting value 38.
-DEAL:cg::Convergence step 41 value 0
-DEAL::4 Starting value 44.
-DEAL:cg::Convergence step 79 value 0
+DEAL::Refinement cycle: 
+DEAL::0 
+DEAL::1 
+DEAL::2 
+DEAL::3 
+DEAL::4 
 DEAL::
 DoFs u(x_0) 
 25   1.2868 
@@ -21,24 +17,16 @@ DoFs u(x_0)
 DEAL::
 DEAL::Running tests with "kelly" refinement criterion:
 DEAL::------------------------------------------------
-DEAL::Refinement cycle: 0 Starting value 7.7
-DEAL:cg::Convergence step 8 value 0
-DEAL::1 Starting value 19.
-DEAL:cg::Convergence step 11 value 0
-DEAL::2 Starting value 29.
-DEAL:cg::Convergence step 14 value 0
-DEAL::3 Starting value 35.
-DEAL:cg::Convergence step 19 value 0
-DEAL::4 Starting value 41.
-DEAL:cg::Convergence step 26 value 0
-DEAL::5 Starting value 39.
-DEAL:cg::Convergence step 35 value 0
-DEAL::6 Starting value 43.
-DEAL:cg::Convergence step 48 value 0
-DEAL::7 Starting value 45.
-DEAL:cg::Convergence step 64 value 0
-DEAL::8 Starting value 50.
-DEAL:cg::Convergence step 88 value 0
+DEAL::Refinement cycle: 
+DEAL::0 
+DEAL::1 
+DEAL::2 
+DEAL::3 
+DEAL::4 
+DEAL::5 
+DEAL::6 
+DEAL::7 
+DEAL::8 
 DEAL::
 DoFs u(x_0) 
 25   1.2868 

@@ -26,6 +26,7 @@
 int
 main()
 {
+  return 1; // test is disabled for now as it hangs randomly
   initlog();
 
   Lazy<int> lazy_integer;

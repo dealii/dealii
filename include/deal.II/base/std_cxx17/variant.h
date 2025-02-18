@@ -11,17 +11,18 @@
 // LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
 // ------------------------------------------------------------------------
+
 #ifndef dealii_cxx17_variant_h
 #define dealii_cxx17_variant_h
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_EARLY_DEPRECATIONS
-DEAL_II_WARNING(
-  "This file is deprecated. Simply use the corresponding C++17 header <variant>.")
-#endif
-
 #include <variant>
+
+#ifdef DEAL_II_EARLY_DEPRECATIONS
+DEAL_II_WARNING("This file is deprecated."
+                "Use the corresponding C++17 header variant instead.")
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
@@ -32,4 +33,4 @@ namespace std_cxx17
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii_cxx17_variant_h
+#endif

@@ -20,6 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/types.h>
 
 #include <vector>
 

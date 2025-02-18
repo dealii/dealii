@@ -166,16 +166,13 @@ FE_DGP<dim, spacedim>::hp_constraints_are_implemented() const
 template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_DGP<dim, spacedim>::hp_vertex_dof_identities(
-  const FiniteElement<dim, spacedim> &fe_other) const
+  const FiniteElement<dim, spacedim> & /*fe_other*/) const
 {
-  // there are no such constraints for DGP elements at all
-  if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
-    return std::vector<std::pair<unsigned int, unsigned int>>();
-  else
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-      return std::vector<std::pair<unsigned int, unsigned int>>();
-    }
+  // this element is discontinuous, so by definition there can
+  // be no identities between its dofs and those of any neighbor
+  // (of whichever type the neighbor may be -- after all, we have
+  // no face dofs on this side to begin with)
+  return std::vector<std::pair<unsigned int, unsigned int>>();
 }
 
 
@@ -295,7 +292,7 @@ FE_DGP<dim, spacedim>::memory_consumption() const
 
 
 // explicit instantiations
-#include "fe_dgp.inst"
+#include "fe/fe_dgp.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

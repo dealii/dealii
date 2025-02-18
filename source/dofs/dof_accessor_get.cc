@@ -19,7 +19,6 @@
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -185,6 +184,6 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
 
 // --------------------------------------------------------------------------
 // explicit instantiations
-#include "dof_accessor_get.inst"
+#include "dofs/dof_accessor_get.inst"
 
 DEAL_II_NAMESPACE_CLOSE

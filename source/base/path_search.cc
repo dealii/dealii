@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>

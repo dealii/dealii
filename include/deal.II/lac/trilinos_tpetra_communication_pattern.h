@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/memory_space.h"
+#include <deal.II/base/memory_space.h>
 
 #include <deal.II/lac/trilinos_tpetra_types.h>
 

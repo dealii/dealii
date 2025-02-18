@@ -23,6 +23,8 @@
 
 #include <deal.II/optimization/line_minimization.h>
 
+#include <boost/signals2.hpp>
+
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN

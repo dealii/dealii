@@ -41,8 +41,11 @@
 
 #include <deal.II/numerics/solution_transfer.h>
 
+#include <boost/range/iterator_range_core.hpp>
+
 #include <functional>
 #include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1124,6 +1127,6 @@ namespace Legacy
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-#include "solution_transfer.inst"
+#include "numerics/solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

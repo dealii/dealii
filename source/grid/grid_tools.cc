@@ -22,25 +22,6 @@
 #ifdef DEAL_II_WITH_ARBORX
 #  include <deal.II/arborx/access_traits.h>
 #  include <deal.II/arborx/distributed_tree.h>
-#else
-template <int dim, typename Number>
-class BoundingBox;
-
-namespace ArborXWrappers
-{
-  class DistributedTree
-  {
-  public:
-    template <int dim, typename Number>
-    DistributedTree(const MPI_Comm &,
-                    const std::vector<BoundingBox<dim, Number>> &);
-    template <typename QueryType>
-    std::pair<std::vector<std::pair<int, int>>, std::vector<int>>
-    query(const QueryType &queries);
-  };
-  class BoundingBoxIntersectPredicate
-  {};
-} // namespace ArborXWrappers
 #endif
 
 #ifdef DEAL_II_WITH_CGAL
@@ -101,6 +82,33 @@ namespace ArborXWrappers
 #include <unordered_map>
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DEAL_II_WITH_ARBORX
+
+// If we configured without ArborX, we still need to have a couple of
+// dummy types that we can reference in code below. They do not
+// actually do anything useful.
+template <int dim, typename Number>
+class BoundingBox;
+
+namespace ArborXWrappers
+{
+  class DistributedTree
+  {
+  public:
+    template <int dim, typename Number>
+    DistributedTree(const MPI_Comm &,
+                    const std::vector<BoundingBox<dim, Number>> &);
+
+    template <typename QueryType>
+    std::pair<std::vector<std::pair<int, int>>, std::vector<int>>
+    query(const QueryType &queries);
+  };
+
+  class BoundingBoxIntersectPredicate
+  {};
+} // namespace ArborXWrappers
+#endif
 
 
 namespace GridTools
@@ -4773,10 +4781,10 @@ namespace GridTools
           const auto face_a = pair.first.first->face(pair.first.second);
           const auto face_b =
             pair.second.first.first->face(pair.second.first.second);
-          const auto reference_cell      = pair.first.first->reference_cell();
-          const auto face_reference_cell = face_a->reference_cell();
-          const unsigned char combined_orientation = pair.second.second;
-          const unsigned char inverse_combined_orientation =
+          const auto reference_cell       = pair.first.first->reference_cell();
+          const auto face_reference_cell  = face_a->reference_cell();
+          const auto combined_orientation = pair.second.second;
+          const auto inverse_combined_orientation =
             face_reference_cell.get_inverse_combined_orientation(
               combined_orientation);
 
@@ -5656,6 +5664,6 @@ namespace GridTools
 
 
 // explicit instantiations
-#include "grid_tools.inst"
+#include "grid/grid_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

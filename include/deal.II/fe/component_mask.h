@@ -19,6 +19,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/types.h>
 
 #include <algorithm>
 #include <iosfwd>

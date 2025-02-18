@@ -46,6 +46,7 @@
 #  else
 #    include <kinsol/kinsol_direct.h>
 #  endif
+#  include <kinsol/kinsol.h>
 #  include <sunlinsol/sunlinsol_dense.h>
 #  include <sunmatrix/sunmatrix_dense.h>
 

@@ -27,4 +27,3 @@ macro(add_flags _variable _flags)
     string(STRIP "${${_variable}}" ${_variable})
   endif()
 endmacro()
-

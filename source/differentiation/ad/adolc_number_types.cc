@@ -23,6 +23,11 @@
 #  include <functional>
 #  include <utility>
 
+#  ifdef DEAL_II_WITH_ADOLC
+#    include <adolc/adouble.h> // Taped double
+#    include <adolc/adtl.h>    // Tapeless double
+#  endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -82,7 +87,7 @@ namespace numbers
 
 /*---------------------- Explicit Instantiations ----------------------*/
 
-#  include "adolc_number_types.inst"
+#  include "differentiation/ad/adolc_number_types.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

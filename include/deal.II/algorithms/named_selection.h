@@ -19,6 +19,8 @@
 
 #include <deal.II/algorithms/any_data.h>
 
+#include <deal.II/base/exceptions.h>
+
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN

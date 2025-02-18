@@ -163,10 +163,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 {
   std::string line;
 
-  // verify that the first, third and fourth lines match
-  // expectations. the second line of the file may essentially be
-  // anything the author of the file chose to identify what's in
-  // there, so we just ensure that we can read it
+  // verify that the third and fourth lines match
+  // expectations. the first line is not checked to allow use of
+  // different vtk versions and the second line of the file may
+  // essentially be anything the author of the file chose to
+  // identify what's in there, so we just ensure that we can read it.
   {
     std::string text[4];
     text[0] = "# vtk DataFile Version 3.0";
@@ -177,7 +178,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
     for (unsigned int i = 0; i < 4; ++i)
       {
         getline(in, line);
-        if (i != 1)
+        if (i == 2 || i == 3)
           AssertThrow(
             line.compare(text[i]) == 0,
             ExcMessage(
@@ -433,35 +434,39 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       for (unsigned int i = 0; i < n_ints; ++i)
         in >> tmp_int;
 
+
+      // Processing the CELL_DATA and FIELD_DATA sections
+
       // Ignore everything up to CELL_DATA
       while (in >> keyword)
-        if (keyword == "CELL_DATA")
-          {
-            unsigned int n_ids;
-            in >> n_ids;
+        {
+          if (keyword == "CELL_DATA")
+            {
+              unsigned int n_ids;
+              in >> n_ids;
 
-            AssertThrow(n_ids == n_geometric_objects,
-                        ExcMessage("The VTK reader found a CELL_DATA statement "
-                                   "that lists a total of " +
-                                   Utilities::int_to_string(n_ids) +
-                                   " cell data objects, but this needs to "
-                                   "equal the number of cells (which is " +
-                                   Utilities::int_to_string(cells.size()) +
-                                   ") plus the number of quads (" +
-                                   Utilities::int_to_string(
-                                     subcelldata.boundary_quads.size()) +
-                                   " in 3d or the number of lines (" +
-                                   Utilities::int_to_string(
-                                     subcelldata.boundary_lines.size()) +
-                                   ") in 2d."));
+              AssertThrow(
+                n_ids == n_geometric_objects,
+                ExcMessage(
+                  "The VTK reader found a CELL_DATA statement "
+                  "that lists a total of " +
+                  Utilities::int_to_string(n_ids) +
+                  " cell data objects, but this needs to "
+                  "equal the number of cells (which is " +
+                  Utilities::int_to_string(cells.size()) +
+                  ") plus the number of quads (" +
+                  Utilities::int_to_string(subcelldata.boundary_quads.size()) +
+                  " in 3d or the number of lines (" +
+                  Utilities::int_to_string(subcelldata.boundary_lines.size()) +
+                  ") in 2d."));
 
-            const std::vector<std::string> data_sets{"MaterialID",
-                                                     "ManifoldID"};
+              const std::vector<std::string> data_sets{"MaterialID",
+                                                       "ManifoldID"};
 
-            for (unsigned int i = 0; i < data_sets.size(); ++i)
-              {
-                // Ignore everything until we get to a SCALARS data set
-                while (in >> keyword)
+              in >> keyword;
+              for (unsigned int i = 0; i < data_sets.size(); ++i)
+                {
+                  // Ignore everything until we get to a SCALARS data set
                   if (keyword == "SCALARS")
                     {
                       // Now see if we know about this type of data set,
@@ -568,8 +573,76 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                             }
                         }
                     }
-              }
-          }
+                  // check if a second SCALAR exists. If so, read the new
+                  // keyword SCALARS, otherwise, return to the bookmarked
+                  // position.
+                  std::streampos oldpos = in.tellg();
+                  in >> keyword;
+                  if (keyword == "SCALARS")
+                    continue;
+                  else
+                    in.seekg(oldpos);
+                }
+            }
+
+
+          // Addition of FIELD DATA:
+
+
+          else if (keyword == "FIELD")
+            {
+              unsigned int n_fields;
+              in >> keyword;
+              AssertThrow(
+                keyword == "FieldData",
+                ExcMessage(
+                  "While reading VTK file, missing keyword FieldData"));
+
+              in >> n_fields;
+
+              for (unsigned int i = 0; i < n_fields; ++i)
+                {
+                  std::string  section_name;
+                  std::string  data_type;
+                  unsigned int temp, n_ids;
+                  double       data;
+                  in >> section_name;
+                  in >> temp;
+                  in >> n_ids;
+                  AssertThrow(
+                    n_ids == n_geometric_objects,
+                    ExcMessage(
+                      "The VTK reader found a FIELD statement "
+                      "that lists a total of " +
+                      Utilities::int_to_string(n_ids) +
+                      " cell data objects, but this needs to equal the number of cells (which is " +
+                      Utilities::int_to_string(cells.size()) +
+                      ") plus the number of quads (" +
+                      Utilities::int_to_string(
+                        subcelldata.boundary_quads.size()) +
+                      " in 3d or the number of lines (" +
+                      Utilities::int_to_string(
+                        subcelldata.boundary_lines.size()) +
+                      ") in 2d."));
+                  in >> data_type;
+                  Vector<double> temp_data;
+                  temp_data.reinit(n_ids);
+                  for (unsigned int j = 0; j < n_ids; ++j)
+                    {
+                      in >> data;
+                      if (j < cells.size())
+                        temp_data[j] = data;
+                    }
+                  this->cell_data[section_name] = std::move(temp_data);
+                }
+            }
+          else
+            {
+              // just ignore a line that doesn't start with any of the
+              // recognized tags
+            }
+        } // end of while loop
+      Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
       apply_grid_fixup_functions(vertices, cells, subcelldata);
       tria->create_triangulation(vertices, cells, subcelldata);
@@ -580,7 +653,12 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   "While reading VTK file, failed to find CELLS section"));
 }
 
-
+template <int dim, int spacedim>
+const std::map<std::string, Vector<double>> &
+GridIn<dim, spacedim>::get_cell_data() const
+{
+  return this->cell_data;
+}
 
 template <int dim, int spacedim>
 void
@@ -3659,7 +3737,6 @@ namespace
         // the side sets so that we can convert a set of side set indices into
         // a single deal.II boundary or manifold id (and save the
         // correspondence).
-        constexpr auto max_faces_per_cell = GeometryInfo<dim>::faces_per_cell;
         std::map<std::size_t, std::vector<int>> face_side_sets;
         for (const int side_set_id : side_set_ids)
           {
@@ -3694,7 +3771,7 @@ namespace
                     const long        element_n = elements[side_n] - 1;
                     const long        face_n    = faces[side_n] - 1;
                     const std::size_t face_id =
-                      element_n * max_faces_per_cell + face_n;
+                      element_n * ReferenceCells::max_n_faces<dim>() + face_n;
                     face_side_sets[face_id].push_back(side_set_id);
                   }
               }
@@ -3740,9 +3817,11 @@ namespace
                        ExcInternalError());
               }
             // Record the b_or_m_id of the current face.
-            const unsigned int   local_face_n = face_id % max_faces_per_cell;
-            const CellData<dim> &cell = cells[face_id / max_faces_per_cell];
-            const ReferenceCell  cell_type =
+            const unsigned int local_face_n =
+              face_id % ReferenceCells::max_n_faces<dim>();
+            const CellData<dim> &cell =
+              cells[face_id / ReferenceCells::max_n_faces<dim>()];
+            const ReferenceCell cell_type =
               ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
             const unsigned int deal_face_n =
               cell_type.exodusii_face_to_deal_face(local_face_n);
@@ -4937,6 +5016,6 @@ namespace
 
 
 // explicit instantiations
-#include "grid_in.inst"
+#include "grid/grid_in.inst"
 
 DEAL_II_NAMESPACE_CLOSE

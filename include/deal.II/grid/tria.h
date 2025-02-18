@@ -27,10 +27,11 @@
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
-#include <deal.II/grid/tria_description.h>
+#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
 
+#include <boost/range/iterator_range_core.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/unique_ptr.hpp>
@@ -1959,7 +1960,9 @@ public:
    * Return a constant reference to a Manifold object used for this
    * triangulation. @p number is the same as in set_manifold().
    *
-   * @note If no manifold could be found, the default flat manifold is returned.
+   * @note In debug mode, this function checks that @p number has been
+   * previously associated with a Manifold via set_manifold(). If it has not
+   * then an assertion is triggered.
    *
    * @ingroup manifold
    *
@@ -3644,9 +3647,9 @@ public:
   /**
    * Return the periodic_face_map.
    */
-  const std::map<
-    std::pair<cell_iterator, unsigned int>,
-    std::pair<std::pair<cell_iterator, unsigned int>, unsigned char>> &
+  const std::map<std::pair<cell_iterator, unsigned int>,
+                 std::pair<std::pair<cell_iterator, unsigned int>,
+                           types::geometric_orientation>> &
   get_periodic_face_map() const;
 
   /**
@@ -4104,7 +4107,8 @@ private:
    * face pairs.
    */
   std::map<std::pair<cell_iterator, unsigned int>,
-           std::pair<std::pair<cell_iterator, unsigned int>, unsigned char>>
+           std::pair<std::pair<cell_iterator, unsigned int>,
+                     types::geometric_orientation>>
     periodic_face_map;
 
   /**
@@ -4499,8 +4503,7 @@ private:
   std::vector<bool> vertices_used;
 
   /**
-   * Collection of manifold objects. We store only objects, which are not of
-   * type FlatManifold.
+   * Collection of Manifold objects.
    */
   std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>>
     manifolds;
@@ -4944,11 +4947,5 @@ extern template class Triangulation<3, 3>;
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
-
-// Include tria_accessor.h here, so that it is possible for an end
-// user to use the iterators of Triangulation<dim> directly without
-// the need to include tria_accessor.h separately. (Otherwise the
-// iterators are an 'opaque' or 'incomplete' type.)
-#include <deal.II/grid/tria_accessor.h>
 
 #endif

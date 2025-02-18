@@ -53,6 +53,10 @@
 #  include <zoltan_cpp.h>
 #endif
 
+#include <set>
+#include <string>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 

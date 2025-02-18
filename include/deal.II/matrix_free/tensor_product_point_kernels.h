@@ -1503,7 +1503,7 @@ namespace internal
       }
     else if (dim == 1)
       {
-        const auto x0 = 1. - p[0], x1 = p[0];
+        const auto x0 = Number(1.) - p[0], x1 = p[0];
 
         if (add)
           {
@@ -1518,7 +1518,8 @@ namespace internal
       }
     else if (dim == 2)
       {
-        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
+        const auto x0 = Number(1.) - p[0], x1 = p[0], y0 = Number(1.) - p[1],
+                   y1 = p[1];
 
         const auto test_value_y0 = value * y0;
         const auto test_value_y1 = value * y1;
@@ -1540,8 +1541,8 @@ namespace internal
       }
     else if (dim == 3)
       {
-        const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
-                   z0 = 1. - p[2], z1 = p[2];
+        const auto x0 = Number(1.) - p[0], x1 = p[0], y0 = Number(1.) - p[1],
+                   y1 = p[1], z0 = Number(1.) - p[2], z1 = p[2];
 
         const auto test_value_z0 = value * z0;
         const auto test_value_z1 = value * z1;

@@ -18,6 +18,7 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/mapping_collection.h>
 
+#include <deque>
 #include <limits>
 #include <set>
 
@@ -861,7 +862,7 @@ namespace hp
 
 
 // explicit instantiations
-#include "fe_collection.inst"
+#include "hp/fe_collection.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

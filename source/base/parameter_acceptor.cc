@@ -19,6 +19,8 @@
 #include <boost/core/demangle.hpp>
 
 #include <fstream>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 

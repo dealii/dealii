@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/mpi_compute_index_owner_internal.h>
+#include <deal.II/base/mpi_consensus_algorithms.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

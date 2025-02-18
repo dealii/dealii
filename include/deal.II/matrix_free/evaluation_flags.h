@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/numbers.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 

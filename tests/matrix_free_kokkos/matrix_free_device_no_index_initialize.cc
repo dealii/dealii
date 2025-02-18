@@ -32,8 +32,7 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  static const unsigned int n_dofs_1d    = fe_degree + 1;
-  static const unsigned int n_local_dofs = Utilities::pow(n_dofs_1d, dim);
+  static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points   = Utilities::pow(n_q_points_1d, dim);
 
   MatrixFreeTest(const Portable::MatrixFree<dim, Number> &data_in)
@@ -93,10 +92,6 @@ public:
 protected:
   const Portable::MatrixFree<dim, Number> &data;
 };
-
-template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-const unsigned int
-  MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::n_dofs_1d;
 
 template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 const unsigned int

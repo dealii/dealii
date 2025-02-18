@@ -21,7 +21,14 @@
 #include <deal.II/differentiation/ad/adolc_product_types.h>
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
+#ifdef DEAL_II_WITH_ADOLC
+#  include <adolc/adouble.h>
+#  include <adolc/adtl.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
+
 #ifdef DEAL_II_WITH_ADOLC
 #  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
 
@@ -83,8 +90,8 @@ eigenvalues(const SymmetricTensor<2, 3, adouble> & /*T*/)
 
 template <>
 std::array<std::pair<adouble, Tensor<1, 1, adouble>>, 1>
-eigenvectors(const SymmetricTensor<2, 1, adouble> & /*T*/,
-             const SymmetricTensorEigenvectorMethod /*method*/)
+eigenvectors<1, adouble>(const SymmetricTensor<2, 1, adouble> & /*T*/,
+                         const SymmetricTensorEigenvectorMethod /*method*/)
 {
   AssertThrow(false, ExcADOLCAdvancedBranching());
   return std::array<std::pair<adouble, Tensor<1, 1, adouble>>, 1>();
@@ -94,8 +101,8 @@ eigenvectors(const SymmetricTensor<2, 1, adouble> & /*T*/,
 
 template <>
 std::array<std::pair<adouble, Tensor<1, 2, adouble>>, 2>
-eigenvectors(const SymmetricTensor<2, 2, adouble> & /*T*/,
-             const SymmetricTensorEigenvectorMethod /*method*/)
+eigenvectors<2, adouble>(const SymmetricTensor<2, 2, adouble> & /*T*/,
+                         const SymmetricTensorEigenvectorMethod /*method*/)
 {
   AssertThrow(false, ExcADOLCAdvancedBranching());
   return std::array<std::pair<adouble, Tensor<1, 2, adouble>>, 2>();
@@ -105,8 +112,8 @@ eigenvectors(const SymmetricTensor<2, 2, adouble> & /*T*/,
 
 template <>
 std::array<std::pair<adouble, Tensor<1, 3, adouble>>, 3>
-eigenvectors(const SymmetricTensor<2, 3, adouble> & /*T*/,
-             const SymmetricTensorEigenvectorMethod /*method*/)
+eigenvectors<3, adouble>(const SymmetricTensor<2, 3, adouble> & /*T*/,
+                         const SymmetricTensorEigenvectorMethod /*method*/)
 {
   AssertThrow(false, ExcADOLCAdvancedBranching());
   return std::array<std::pair<adouble, Tensor<1, 3, adouble>>, 3>();
@@ -124,16 +131,16 @@ template std::array<adouble, 3>
 eigenvalues(const SymmetricTensor<2, 3, adouble> &);
 
 template std::array<std::pair<adouble, Tensor<1, 1, adouble>>, 1>
-eigenvectors(const SymmetricTensor<2, 1, adouble> &,
-             const SymmetricTensorEigenvectorMethod);
+eigenvectors<1, adouble>(const SymmetricTensor<2, 1, adouble> &,
+                         const SymmetricTensorEigenvectorMethod);
 
 template std::array<std::pair<adouble, Tensor<1, 2, adouble>>, 2>
-eigenvectors(const SymmetricTensor<2, 2, adouble> &,
-             const SymmetricTensorEigenvectorMethod);
+eigenvectors<2, adouble>(const SymmetricTensor<2, 2, adouble> &,
+                         const SymmetricTensorEigenvectorMethod);
 
 template std::array<std::pair<adouble, Tensor<1, 3, adouble>>, 3>
-eigenvectors(const SymmetricTensor<2, 3, adouble> &,
-             const SymmetricTensorEigenvectorMethod);
+eigenvectors<3, adouble>(const SymmetricTensor<2, 3, adouble> &,
+                         const SymmetricTensorEigenvectorMethod);
 #  endif
 
 template std::array<adtl::adouble, 1>
@@ -146,20 +153,20 @@ template std::array<adtl::adouble, 3>
 eigenvalues(const SymmetricTensor<2, 3, adtl::adouble> &);
 
 template std::array<std::pair<adtl::adouble, Tensor<1, 1, adtl::adouble>>, 1>
-eigenvectors(const SymmetricTensor<2, 1, adtl::adouble> &,
-             const SymmetricTensorEigenvectorMethod);
+eigenvectors<1, adtl::adouble>(const SymmetricTensor<2, 1, adtl::adouble> &,
+                               const SymmetricTensorEigenvectorMethod);
 
 template std::array<std::pair<adtl::adouble, Tensor<1, 2, adtl::adouble>>, 2>
-eigenvectors(const SymmetricTensor<2, 2, adtl::adouble> &,
-             const SymmetricTensorEigenvectorMethod);
+eigenvectors<2, adtl::adouble>(const SymmetricTensor<2, 2, adtl::adouble> &,
+                               const SymmetricTensorEigenvectorMethod);
 
 template std::array<std::pair<adtl::adouble, Tensor<1, 3, adtl::adouble>>, 3>
-eigenvectors(const SymmetricTensor<2, 3, adtl::adouble> &,
-             const SymmetricTensorEigenvectorMethod);
+eigenvectors<3, adtl::adouble>(const SymmetricTensor<2, 3, adtl::adouble> &,
+                               const SymmetricTensorEigenvectorMethod);
 #endif
 
 // explicit instantiations
-#include "symmetric_tensor.inst"
+#include "base/symmetric_tensor.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE
