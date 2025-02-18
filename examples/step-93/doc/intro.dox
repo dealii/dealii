@@ -78,7 +78,7 @@ The discretized Lagrangian is
 @f{align*}{
   L =& \frac{1}{2}||u_h - \overline{u}||^2 - (\lambda_h, (-\Delta u_h - f))\\
    =& \frac{1}{2}\left[\sum_{i=0}^n\sum_{j=0}^n U^iU^j\int_{\Omega}\varphi_i\varphi_j
-   - 2\sum_{i=0}^n U^i\int_\Omega \phi_i \overline{u} + \int_\Omega\overline{u}^2\right]
+   - 2\sum_{i=0}^n U^i\int_\Omega \varphi_i \overline{u} + \int_\Omega\overline{u}^2\right]
    - \sum_{i=0}^n\sum_{j=0}^n\left[\Lambda^iU^j\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]
    + \sum_{i=0}^n \sum_{k=0}^m \left[\Lambda^i C^k \int_{\Omega}\varphi_i f_k\right].
 @f}
