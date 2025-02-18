@@ -282,7 +282,7 @@ one would expect. In particular:
   rather than last -- because they are on equal footing to all of the other
   field-based variables.
 - We can use functions such as
-  DoFTools::count_dofs_per_fe_block() or DoFTools::count_dofs_per_component()
+  DoFTools::count_dofs_per_fe_block() or DoFTools::count_dofs_per_fe_component()
   to create a $3\times 3$ block structure
   of the linear system, because the finite elements used on all cells have
   three vector components.
