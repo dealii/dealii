@@ -15,7 +15,7 @@ many others). In other words, the *unknowns* we were considering were
 always functions of space (and sometimes time) that we discretized on
 a Triangulation.
 
-But there are also situations where we have unknowns in the equations
+There are also situations where we have unknowns in the equations
 we consider that are *not* functions but are *scalars* instead. The
 example we will consider here to illustrate this kind of situation is
 an optimization problem: Let's assume we have a body to which we have
