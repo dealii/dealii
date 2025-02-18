@@ -13,7 +13,7 @@ whether we were solving a single differential equation (say, in step-4
 or step-6), or a system of coupled equations (step-8, step-22, and
 many others). In other words, the *unknowns* we were considering were
 always functions of space (and sometimes time) that we discretized on
-a triangulation.
+a Triangulation.
 
 But there are also situations where we have unknowns in the equations
 we consider that are *not* functions but are *scalars* instead. The
