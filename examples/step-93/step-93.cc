@@ -317,8 +317,7 @@ namespace Step93
                                            0.2));
           break;
         default:
-          std::cout << "Constructor not implemented for dim not 1, 2, or 3"
-                    << std::endl;
+          DEAL_II_ASSERT_UNREACHABLE();
           break;
       }
   }
