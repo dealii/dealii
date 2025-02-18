@@ -584,10 +584,6 @@ namespace Step93
                     cell_matrix(i, j) += -grad_i_l * grad_j_u * JxW;
                   }
 
-
-                // Here, we actually create a quadrature point object (rather
-                // than an index), and use this to construct the RHS of the
-                // linear system.
                 const Point<dim> q_point = fe_values.quadrature_point(q_index);
                 cell_rhs(i) += (phi_i_u * target_function.value(q_point) * JxW);
 
