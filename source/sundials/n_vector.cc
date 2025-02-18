@@ -28,7 +28,13 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#  include "sundials/n_vector.inst"
+// We don't build the .inst file if deal.II isn't configured
+// with SUNDIALS, but doxygen doesn't know that and tries to find that
+// file anyway for parsing -- which then of course it fails on. So
+// exclude the following from doxygen consideration.
+#  ifndef DOXYGEN
+#    include "sundials/n_vector.inst"
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 

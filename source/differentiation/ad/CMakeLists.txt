@@ -12,20 +12,26 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  ad_drivers.cc
-  ad_helpers.cc
-  )
+set(_src)
+set(_inst)
 
-set(_inst
-  ad_drivers.inst.in
-  ad_drivers.inst1.in
-  ad_drivers.inst2.in
-  ad_helpers.inst.in
-  ad_helpers.inst1.in
-  ad_helpers.inst2.in
-  )
+if (DEAL_II_WITH_ADOLC OR DEAL_II_TRILINOS_WITH_SACADO)
+  set(_src
+    ${_src}
+    ad_drivers.cc
+    ad_helpers.cc
+    )
 
+  set(_inst
+    ${_inst}
+    ad_drivers.inst.in
+    ad_drivers.inst1.in
+    ad_drivers.inst2.in
+    ad_helpers.inst.in
+    ad_helpers.inst1.in
+    ad_helpers.inst2.in
+    )
+endif()
 
 if(DEAL_II_WITH_ADOLC)
   set(_src
