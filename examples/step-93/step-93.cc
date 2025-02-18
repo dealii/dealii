@@ -274,7 +274,7 @@ namespace Step93
     // centered at 0, with side length 1. The block of code below
     // then creates the CircularIndicatorFunction
     // objects for the main class. To make these, we check the dimension of the
-    // problem, and creat 2, 4, or 8 function objects.
+    // problem and create 2, 4, or 8 function objects.
     switch (dim)
       {
         case (1):
