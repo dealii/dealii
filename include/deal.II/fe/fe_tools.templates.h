@@ -1968,7 +1968,12 @@ namespace FETools
          ++cell_number)
       {
         const Quadrature<dim> q_coarse = QProjector<dim>::project_to_subface(
-          fe.reference_cell(), q_gauss, face_coarse, cell_number);
+          fe.reference_cell(),
+          q_gauss,
+          face_coarse,
+          cell_number,
+          numbers::default_geometric_orientation,
+          RefinementCase<dim - 1>::isotropic_refinement);
         FEValues<dim> coarse(mapping, fe, q_coarse, update_values);
 
         typename Triangulation<dim, spacedim>::active_cell_iterator fine_cell =

@@ -520,144 +520,22 @@ QProjector<1>::project_to_subface(const ReferenceCell &reference_cell,
 
 template <>
 void
-QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
-                                  const Quadrature<1>   &quadrature,
-                                  const unsigned int     face_no,
-                                  const unsigned int     subface_no,
-                                  std::vector<Point<2>> &q_points,
-                                  const RefinementCase<1> &)
+QProjector<2>::project_to_subface(const ReferenceCell     &reference_cell,
+                                  const Quadrature<1>     &quadrature,
+                                  const unsigned int       face_no,
+                                  const unsigned int       subface_no,
+                                  std::vector<Point<2>>   &q_points,
+                                  const RefinementCase<1> &ref_case)
 {
-  const unsigned int dim = 2;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertIndexRange(subface_no, GeometryInfo<dim>::max_children_per_face);
-
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
-
-  if (reference_cell == ReferenceCells::Triangle)
-    {
-      // use linear polynomial to map the reference quadrature points correctly
-      // on faces, i.e., BarycentricPolynomials<1>(1)
-      for (unsigned int p = 0; p < quadrature.size(); ++p)
-        switch (face_no)
-          {
-            case 0:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 0);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(0.5 + quadrature.point(p)[0] / 2, 0);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 1:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(1 - quadrature.point(p)[0] / 2,
-                                             quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] = Point<dim>(0.5 - quadrature.point(p)[0] / 2,
-                                             0.5 + quadrature.point(p)[0] / 2);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 2:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(0, 1 - quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(0, 0.5 - quadrature.point(p)[0] / 2);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            default:
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
-    }
-  else if (reference_cell == ReferenceCells::Quadrilateral)
-    {
-      for (unsigned int p = 0; p < quadrature.size(); ++p)
-        switch (face_no)
-          {
-            case 0:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(0, quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(0, quadrature.point(p)[0] / 2 + 0.5);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 1:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(1, quadrature.point(p)[0] / 2);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(1, quadrature.point(p)[0] / 2 + 0.5);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 2:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 0);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 0);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-            case 3:
-              switch (subface_no)
-                {
-                  case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 1);
-                    break;
-                  case 1:
-                    q_points[p] =
-                      Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 1);
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                }
-              break;
-
-            default:
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
-    }
-  else
-    {
-      DEAL_II_ASSERT_UNREACHABLE();
-    }
+  AssertDimension(quadrature.size(), q_points.size());
+  const auto face_quadrature =
+    project_to_subface(reference_cell,
+                       quadrature,
+                       face_no,
+                       subface_no,
+                       numbers::default_geometric_orientation,
+                       ref_case);
+  q_points = face_quadrature.get_points();
 }
 
 
@@ -673,15 +551,15 @@ QProjector<3>::project_to_subface(const ReferenceCell     &reference_cell,
 {
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
   (void)reference_cell;
-
-  AssertIndexRange(face_no, GeometryInfo<3>::faces_per_cell);
-  AssertIndexRange(subface_no, GeometryInfo<3>::max_children_per_face);
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
-
-  q_points.clear();
-  internal::QProjector::project_to_hex_face_and_append(
-    quadrature.get_points(), face_no, q_points, ref_case, subface_no);
+  AssertDimension(quadrature.size(), q_points.size());
+  const auto face_quadrature =
+    project_to_subface(reference_cell,
+                       quadrature,
+                       face_no,
+                       subface_no,
+                       numbers::default_geometric_orientation,
+                       ref_case);
+  q_points = face_quadrature.get_points();
 }
 
 
@@ -708,37 +586,122 @@ QProjector<dim>::project_to_oriented_subface(
 
 
 
-template <>
-Quadrature<3>
-QProjector<3>::project_to_oriented_subface(
-  const ReferenceCell           &reference_cell,
-  const Quadrature<2>           &quadrature,
-  const unsigned int             face_no,
-  const unsigned int             subface_no,
-  const bool                     face_orientation,
-  const bool                     face_flip,
-  const bool                     face_rotation,
-  const internal::SubfaceCase<3> ref_case)
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_subface(
+  const ReferenceCell               &reference_cell,
+  const SubQuadrature               &quadrature,
+  const unsigned int                 face_no,
+  const unsigned int                 subface_no,
+  const types::geometric_orientation orientation,
+  const RefinementCase<dim - 1>     &ref_case)
 {
-  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
+  AssertIndexRange(face_no, reference_cell.n_faces());
+  // TODO once the default orientation is zero we can remove this special case
+  AssertIndexRange(dim == 1 ? 1 - orientation : orientation,
+                   reference_cell.n_face_orientations(face_no));
+  AssertDimension(reference_cell.get_dimension(), dim);
+  AssertIndexRange(subface_no,
+                   reference_cell.face_reference_cell(face_no)
+                     .template n_children<dim - 1>(ref_case));
 
-  const Quadrature<2> mutation = internal::QProjector::mutate_quadrature(
-    quadrature,
-    internal::combined_face_orientation(face_orientation,
-                                        face_rotation,
-                                        face_flip));
+  std::vector<Point<dim>> q_points;
+  std::vector<double>     q_weights = quadrature.get_weights();
+  q_points.reserve(quadrature.size());
 
-  const std::pair<unsigned int, RefinementCase<2>>
-    final_subface_no_and_ref_case =
-      internal::QProjector::select_subface_no_and_refinement_case(
-        subface_no, face_orientation, face_flip, face_rotation, ref_case);
+  if constexpr (dim == 1)
+    {
+      AssertDimension(quadrature.size(), 1);
+      q_points.emplace_back(static_cast<double>(face_no));
+    }
+  else if constexpr (dim == 2)
+    {
+      if (reference_cell == ReferenceCells::Triangle)
+        // use linear polynomial to map the reference quadrature points
+        // correctly on faces, i.e., BarycentricPolynomials<1>(1)
+        for (unsigned int p = 0; p < quadrature.size(); ++p)
+          {
+            if (face_no == 0)
+              {
+                if (subface_no == 0)
+                  q_points.emplace_back(quadrature.point(p)[0] / 2, 0);
+                else
+                  q_points.emplace_back(0.5 + quadrature.point(p)[0] / 2, 0);
+              }
+            else if (face_no == 1)
+              {
+                if (subface_no == 0)
+                  q_points.emplace_back(1 - quadrature.point(p)[0] / 2,
+                                        quadrature.point(p)[0] / 2);
+                else
+                  q_points.emplace_back(0.5 - quadrature.point(p)[0] / 2,
+                                        0.5 + quadrature.point(p)[0] / 2);
+              }
+            else if (face_no == 2)
+              {
+                if (subface_no == 0)
+                  q_points.emplace_back(0, 1 - quadrature.point(p)[0] / 2);
+                else
+                  q_points.emplace_back(0, 0.5 - quadrature.point(p)[0] / 2);
+              }
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+      else if (reference_cell == ReferenceCells::Quadrilateral)
+        for (unsigned int p = 0; p < quadrature.size(); ++p)
+          {
+            if (face_no == 0)
+              {
+                if (subface_no == 0)
+                  q_points.emplace_back(0, quadrature.point(p)[0] / 2);
+                else
+                  q_points.emplace_back(0, quadrature.point(p)[0] / 2 + 0.5);
+              }
+            else if (face_no == 1)
+              {
+                if (subface_no == 0)
+                  q_points.emplace_back(1, quadrature.point(p)[0] / 2);
+                else
+                  q_points.emplace_back(1, quadrature.point(p)[0] / 2 + 0.5);
+              }
+            else if (face_no == 2)
+              {
+                if (subface_no == 0)
+                  q_points.emplace_back(quadrature.point(p)[0] / 2, 0);
+                else
+                  q_points.emplace_back(quadrature.point(p)[0] / 2 + 0.5, 0);
+              }
+            else if (face_no == 3)
+              {
+                if (subface_no == 0)
+                  q_points.emplace_back(quadrature.point(p)[0] / 2, 1);
+                else
+                  q_points.emplace_back(quadrature.point(p)[0] / 2 + 0.5, 1);
+              }
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+      else
+        DEAL_II_ASSERT_UNREACHABLE();
 
-  return QProjector<3>::project_to_subface(
-    reference_cell,
-    mutation,
-    face_no,
-    final_subface_no_and_ref_case.first,
-    final_subface_no_and_ref_case.second);
+      if (orientation == numbers::reverse_line_orientation)
+        {
+          std::reverse(q_points.begin(), q_points.end());
+          std::reverse(q_weights.begin(), q_weights.end());
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
+      internal::QProjector::project_to_hex_face_and_append(
+        quadrature.get_points(), face_no, q_points, ref_case, subface_no);
+    }
+  else
+    {
+      DEAL_II_ASSERT_UNREACHABLE();
+    }
+
+  return Quadrature<dim>(std::move(q_points), std::move(q_weights));
 }
 
 
