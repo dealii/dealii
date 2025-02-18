@@ -370,7 +370,7 @@ namespace Step93
                        n_dofs_l = dofs_per_component[1],
                        n_dofs_c = dofs_per_component[2];
     std::cout << "Number of degrees of freedom: " << n_dofs_u << "+" << n_dofs_l
-              << "+" << n_dofs_l << " = " << n_dofs_u + n_dofs_l + n_dofs_c
+              << "+" << n_dofs_c << " = " << n_dofs_u + n_dofs_l + n_dofs_c
               << std::endl;
 
     // Finally, we need to extract the indices of the finite elements which
