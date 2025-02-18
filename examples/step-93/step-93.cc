@@ -446,7 +446,7 @@ namespace Step93
     // nonlocal contributions in the `assemble_system()` function
     // below.
     //
-    // To get this started, we create a dummy `hp_fe_values` that we
+    // To get this started, we create an `hp_fe_values` that we
     // will only use to query the quadrature point locations.  The
     // non-local dofs will need to interact with the second component
     // of the fe system (namely, $\lambda$), so we also declare a
@@ -705,22 +705,22 @@ namespace Step93
     // the target heat distribution $\bar u$ we are trying to match.
     //
     // To do so, we
-    // create a new dummy dof handler to output the target function
+    // create a new dof handler to output the target function
     // and heat plate values, and associate it with
     // a finite element with a degree that matches what we used to solve for $u$
     // and $\lambda$, although in reality this is an arbitrary choice:
-    DoFHandler<dim> toy_dof_handler(triangulation);
+    DoFHandler<dim> new_dof_handler(triangulation);
 
-    const FE_Q<dim> toy_fe(2);
-    toy_dof_handler.distribute_dofs(toy_fe);
+    const FE_Q<dim> new_fe(2);
+    new_dof_handler.distribute_dofs(new_fe);
 
     // To get started with the visualization, we need a vector which
     // stores the interpolated target function. We create the vector,
     // interpolate the target function $\bar u$ onto the mesh, then
     // add the data to our data_out object.
-    Vector<double> target(toy_dof_handler.n_dofs());
-    VectorTools::interpolate(toy_dof_handler, target_function, target);
-    data_out.add_data_vector(toy_dof_handler, target, "u_bar");
+    Vector<double> target(new_dof_handler.n_dofs());
+    VectorTools::interpolate(new_dof_handler, target_function, target);
+    data_out.add_data_vector(new_dof_handler, target, "u_bar");
 
     // In order to visualize the sum of the heat sources $\sum_k C^k
     // f_k(\mathbf x)$, we create a vector which will store the
@@ -733,13 +733,13 @@ namespace Step93
     // sources. Because we can, we also add the vector for each source
     // individually to the DataOut object, so that they can be
     // visualized individually.
-    Vector<double> full_heat_profile(toy_dof_handler.n_dofs());
+    Vector<double> full_heat_profile(new_dof_handler.n_dofs());
 
     for (unsigned int i = 0; i < heat_functions.size(); ++i)
       {
-        Vector<double> hot_plate_i(toy_dof_handler.n_dofs());
+        Vector<double> hot_plate_i(new_dof_handler.n_dofs());
 
-        VectorTools::interpolate(toy_dof_handler,
+        VectorTools::interpolate(new_dof_handler,
                                  heat_functions[i],
                                  hot_plate_i);
 
@@ -748,12 +748,12 @@ namespace Step93
 
         const std::string data_name =
           "Heat_Source_" + Utilities::int_to_string(i);
-        data_out.add_data_vector(toy_dof_handler, hot_plate_i, data_name);
+        data_out.add_data_vector(new_dof_handler, hot_plate_i, data_name);
       }
 
     // Once all the heat functions have been combined, we add them to the
     // data_out object, and output everything into a file:
-    data_out.add_data_vector(toy_dof_handler,
+    data_out.add_data_vector(new_dof_handler,
                              full_heat_profile,
                              "Full_Heat_Profile");
 
