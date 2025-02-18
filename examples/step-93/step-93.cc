@@ -46,9 +46,6 @@
 
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
-#include <deal.II/hp/refinement.h>
-#include <deal.II/fe/fe_series.h>
-#include <deal.II/numerics/smoothness_estimator.h>
 
 #include <deal.II/fe/fe_enriched.h>
 
