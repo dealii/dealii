@@ -104,8 +104,8 @@ To find a critical point, we take a partial derivative with respect to each $U^i
  $\Lambda^j$, and $C^k$. The derivatives have the following form:
 
 @f{align*}{
-  \frac{\partial L}{\partial U^i} =& \sum_{j=0}^nU^j\int_{\Omega}\phi_i\phi_j
-   - \int_\Omega \phi_i\overline{u}
+  \frac{\partial L}{\partial U^i} =& \sum_{j=0}^nU^j\int_{\Omega}\varphi_i\varphi_j
+   - \int_\Omega \varphi_i\overline{u}
    - \sum_{j=0}^n\left[\Lambda^j\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]\\
   \frac{\partial L}{\partial \Lambda^j} =& -\sum_{i=0}^n\left[U^i\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]
   + \sum_{k=0}^m C^k\int_{\Omega}\varphi_j f_k\\
@@ -117,8 +117,8 @@ these derivatives must all be 0. This gives us $n + n + m$ linear equations to s
 for the coefficient vectors $U$, $\Lambda$, and $C$:
 
 @f{align*}{
-  \frac{\partial L}{\partial U^i} =& \sum_{j=0}^nU^j\int_{\Omega}\phi_i\phi_j
-   - \int_\Omega\phi_i\overline{u}
+  \frac{\partial L}{\partial U^i} =& \sum_{j=0}^nU^j\int_{\Omega}\varphi_i\varphi_j
+   - \int_\Omega\varphi_i\overline{u}
    - \sum_{j=0}^n\left[\Lambda^j\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right] = 0\\
   \frac{\partial L}{\partial \Lambda^j} =& -\sum_{i=0}^n\left[U^i\int_{\Omega}\nabla\varphi_i\cdot\nabla\varphi_j\right]
   + \sum_{k=0}^m C^k\int_{\Omega}\varphi_j f_k = 0\\
@@ -127,7 +127,7 @@ for the coefficient vectors $U$, $\Lambda$, and $C$:
 
 The summations are suggestive of matrix-vector multiplication, and in fact we can write the equations
 in such a form. Take $(\mathcal{M}_{i, j}) = \int_\Omega\varphi_i\varphi_j$, $(\mathcal{N}_{i, j})
- = \int_\Omega \nabla\varphi_i\cdot\nabla\varphi_j$, $(\overline{\mathcal{U}}_i) = \int_\Omega\phi_i\overline{u}$,
+ = \int_\Omega \nabla\varphi_i\cdot\nabla\varphi_j$, $(\overline{\mathcal{U}}_i) = \int_\Omega\varphi_i\overline{u}$,
   and $(\mathcal{F}_{j, k}) = \int_\Omega\varphi_j
  f_k$, and note that $\mathcal{F}$ is an $n\times m$ matrix. Then we get the matrix system
 
