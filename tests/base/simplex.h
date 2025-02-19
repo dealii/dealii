@@ -269,7 +269,6 @@ exact_integral_one_over_r_middle(const unsigned int i, const unsigned int j)
   if (v[0][0] == 0)
     {
       v[0][0] = 3.52549435;
-      ;
       v[1][0] = 1.76274717;
       v[2][0] = 1.07267252;
       v[3][0] = 0.727635187;

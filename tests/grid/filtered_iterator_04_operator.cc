@@ -83,7 +83,6 @@ main()
   test();
 
   deallog << "OK" << std::endl;
-  ;
 
   return 0;
 }
