@@ -28,8 +28,7 @@ void
 test()
 {
   const unsigned int n = 2;
-  ;
-  Vector<number> rhs(n), sol(n);
+  Vector<number>     rhs(n), sol(n);
   rhs = 0.;
 
   LAPACKFullMatrix<number> matrix(n, n);

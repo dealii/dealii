@@ -125,7 +125,6 @@ public:
   vmult(dealii::PETScWrappers::MPI::Vector       &dst,
         const dealii::PETScWrappers::MPI::Vector &src) const
   {
-    ;
     solver.solve(matrix, dst, src, preconditioner);
   }
 

@@ -2330,7 +2330,6 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::real_point(
   const unsigned int point_index) const
 {
   return quadrature_point(point_index);
-  ;
 }
 
 
