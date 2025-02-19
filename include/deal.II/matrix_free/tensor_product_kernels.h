@@ -906,7 +906,6 @@ namespace internal
                   {
                     const Number2 val0 = matrix[n_cols * n_columns + ind];
                     res0 += val0 * (x[ind] + x[mm - 1 - ind]);
-                    ;
                   }
                 if (mm % 2)
                   res0 += x[mid];
