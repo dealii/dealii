@@ -281,8 +281,7 @@ namespace Step93
     switch (dim)
       {
         case (1):
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({0.5}), 0.2));
+          heat_functions.emplace_back(Point<dim>({0.5}), 0.2);
           heat_functions.emplace_back(
             CircularIndicatorFunction<dim>(Point<dim>({-0.5}), 0.2));
           break;
