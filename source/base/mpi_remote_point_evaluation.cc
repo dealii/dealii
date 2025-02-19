@@ -278,7 +278,8 @@ namespace Utilities
     std_cxx20::ranges::iota_view<unsigned int, unsigned int>
     RemotePointEvaluation<dim, spacedim>::CellData::cell_indices() const
     {
-      return {0, static_cast<unsigned int>(cells.size())};
+      return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+        0, static_cast<unsigned int>(cells.size()));
     }
 
 

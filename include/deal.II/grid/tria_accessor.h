@@ -6592,7 +6592,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -6601,7 +6602,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 
@@ -6610,7 +6612,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::face_indices() const
 {
-  return {0U, n_faces()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_faces());
 }
 
 
@@ -7530,7 +7533,8 @@ template <int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<0, 1, spacedim>::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -7539,7 +7543,8 @@ template <int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<0, 1, spacedim>::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 /*------------------ Functions: CellAccessor<dim,spacedim> ------------------*/
