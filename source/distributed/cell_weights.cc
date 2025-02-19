@@ -146,12 +146,8 @@ namespace parallel
              const typename dealii::Triangulation<dim, spacedim>::cell_iterator
                              &cell,
              const CellStatus status) -> unsigned int {
-      return CellWeights<dim, spacedim>::weighting_callback(cell,
-                                                            status,
-                                                            std::cref(
-                                                              dof_handler),
-                                                            std::cref(*tria),
-                                                            weighting_function);
+      return CellWeights<dim, spacedim>::weighting_callback(
+        cell, status, dof_handler, *tria, weighting_function);
     };
   }
 
