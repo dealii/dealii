@@ -282,37 +282,24 @@ namespace Step93
       {
         case (1):
           heat_functions.emplace_back(Point<dim>({0.5}), 0.2);
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({-0.5}), 0.2));
+          heat_functions.emplace_back(Point<dim>({-0.5}), 0.2);
           break;
         case (2):
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({0.5, 0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({0.5, -0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({-0.5, 0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({-0.5, -0.5}), 0.2));
+          heat_functions.emplace_back(Point<dim>({0.5, 0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({0.5, -0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({-0.5, 0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({-0.5, -0.5}), 0.2);
           break;
         case (3):
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({0.5, 0.5, 0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({0.5, 0.5, -0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({0.5, -0.5, 0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({0.5, -0.5, -0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({-0.5, 0.5, 0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({-0.5, 0.5, -0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({-0.5, -0.5, 0.5}), 0.2));
-          heat_functions.emplace_back(
-            CircularIndicatorFunction<dim>(Point<dim>({-0.5, -0.5, -0.5}),
-                                           0.2));
+          heat_functions.emplace_back(Point<dim>({0.5, 0.5, 0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({0.5, 0.5, -0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({0.5, -0.5, 0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({0.5, -0.5, -0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({-0.5, 0.5, 0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({-0.5, 0.5, -0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({-0.5, -0.5, 0.5}), 0.2);
+          heat_functions.emplace_back(Point<dim>({-0.5, -0.5, -0.5}),
+                                           0.2);
           break;
         default:
           DEAL_II_ASSERT_UNREACHABLE();
