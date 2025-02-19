@@ -20,8 +20,6 @@
 
 #include <deal.II/base/types.h>
 
-#include <Kokkos_Macros.hpp>
-
 #include <cmath>
 #include <complex>
 #include <cstddef>
