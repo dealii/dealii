@@ -196,7 +196,7 @@
  * available.
  */
 #ifdef DEAL_II_HAVE_CXX23
-#  define define DEAL_II_ASSUME(expr) [[assume(expr)]]
+#  define DEAL_II_CXX23_ASSUME(expr) [[assume(expr)]]
 #else
 #  if defined(__clang__)
 #    define DEAL_II_CXX23_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
