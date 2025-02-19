@@ -4,12 +4,12 @@ When you run the program with the step target function (in 2D), the output looks
 
 @code
 Number of active cells: 16384
-Number of degrees of freedom: 66049+66049+66049 = 132102
+Number of degrees of freedom: 66049+66049+4 = 132102
 Number of nonlocal dofs: 4
 Beginning solve...
-Wall time: 68.4734s
+Wall time: 63.9265s
 Solved in 39973 MINRES iterations.
-The c coefficients are
+The c coefficients are 
 	c1: 28.7408
 	c2: -6.51604
 	c3: -6.51604
@@ -20,12 +20,12 @@ When you run the program with the Gaussian target function (in 2D), the output s
 
 @code
 Number of active cells: 16384
-Number of degrees of freedom: 66049+66049+66049 = 132102
+Number of degrees of freedom: 66049+66049+4 = 132102
 Number of nonlocal dofs: 4
 Beginning solve...
-Wall time: 101.905s
+Wall time: 98.4858s
 Solved in 62131 MINRES iterations.
-The c coefficients are
+The c coefficients are 
 	c1: 23.553
 	c2: -4.86562
 	c3: -4.86562
