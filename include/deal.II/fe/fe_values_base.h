@@ -2349,7 +2349,8 @@ template <int dim, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::dof_indices() const
 {
-  return {0U, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, dofs_per_cell);
 }
 
 
@@ -2361,7 +2362,8 @@ FEValuesBase<dim, spacedim>::dof_indices_starting_at(
 {
   Assert(start_dof_index <= dofs_per_cell,
          ExcIndexRange(start_dof_index, 0, dofs_per_cell + 1));
-  return {start_dof_index, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    start_dof_index, dofs_per_cell);
 }
 
 
@@ -2373,7 +2375,8 @@ FEValuesBase<dim, spacedim>::dof_indices_ending_at(
 {
   Assert(end_dof_index < dofs_per_cell,
          ExcIndexRange(end_dof_index, 0, dofs_per_cell));
-  return {0U, end_dof_index + 1};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, end_dof_index + 1);
 }
 
 
@@ -2382,7 +2385,8 @@ template <int dim, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEValuesBase<dim, spacedim>::quadrature_point_indices() const
 {
-  return {0U, n_quadrature_points};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_quadrature_points);
 }
 
 

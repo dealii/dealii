@@ -2370,7 +2370,8 @@ inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   quadrature_point_indices() const
 {
-  return {0U, n_q_points};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_q_points);
 }
 
 
