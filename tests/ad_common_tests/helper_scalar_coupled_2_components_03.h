@@ -202,7 +202,6 @@ test_tensor_scalar_coupled()
     ad_helper.extract_gradient_component(Dpsi, s_dof);
   std::cout << "extracted Dpsi (t): " << dpsi_dt << "\n"
             << "extracted Dpsi (s): " << dpsi_ds << "\n";
-  ;
 
   // Verify the result
   using func = FunctionsTestTensorScalarCoupled<dim, ScalarNumberType>;
