@@ -141,8 +141,7 @@ namespace Step93
   class CircularIndicatorFunction : public Function<dim>
   {
   public:
-    CircularIndicatorFunction()
-    {}
+    CircularIndicatorFunction();
 
     CircularIndicatorFunction(const Point<dim> &center, const double radius);
 
@@ -153,6 +152,12 @@ namespace Step93
     const Point<dim> center;
     const double     radius;
   };
+
+  template <int dim>
+  CircularIndicatorFunction<dim>::CircularIndicatorFunction()
+    : center(Point<dim>())
+    , radius(20)
+  {}
 
 
   template <int dim>
