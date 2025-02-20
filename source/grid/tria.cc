@@ -13728,6 +13728,11 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::load(const std::string &file_basename)
 {
+  // It's probably prudent to first get rid of any all content of the
+  // triangulation, rather than hope that the deserialization below
+  // overwrites everything:
+  clear();
+
   // Load triangulation information.
   {
     std::ifstream ifs_tria(file_basename + "_triangulation.data");
