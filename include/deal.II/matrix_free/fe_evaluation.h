@@ -7210,7 +7210,8 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::dof_indices() const
 {
-  return {0U, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, dofs_per_cell);
 }
 
 
@@ -8240,7 +8241,8 @@ FEFaceEvaluation<dim,
                  Number,
                  VectorizedArrayType>::dof_indices() const
 {
-  return {0U, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, dofs_per_cell);
 }
 
 
