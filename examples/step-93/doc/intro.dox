@@ -8,7 +8,9 @@ Bangerth.</i>
 In all previous tutorial programs, we have only ever dealt with
 discretizations of partial differential equations posed on a
 Triangulation where every degree of freedom was associated with
-a node that was clearly part of one cell or another. This was true
+a local geometric element (vertices, lines, quadrangles, etc.) which
+is clearly part of one cell or another (or, in the worst case, some
+small number of adjascent cells). This was true
 whether we were solving a single differential equation (say, in step-4
 or step-6), or a system of coupled equations (step-8, step-22, and
 many others). In other words, the *unknowns* we were considering were
