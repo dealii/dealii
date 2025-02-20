@@ -67,8 +67,8 @@ To write this optimization problem in a more compact form, we introduce a Lagran
   L = \frac{1}{2}||u - \overline{u}||^2 - \left(\lambda, \left(-\Delta u - \sum_k C^k f_k\right)\right),
 @f}
 
-where $\lambda$ is a Lagrange multiplier and $(\cdot, \cdot)$ denotes the usual $L^2$ scalar
-product. We do this because finding a critical point of $L$
+where $\lambda = \lambda(x)$ is a Lagrange multiplier and $(\cdot, \cdot)$ denotes the usual $L^2$ scalar
+product (note that $\lambda$ is a function that lives in the space of test functions, not just a scalar). We do this because finding a critical point of $L$
 is equivalent to solving the original optimization problem, and we can find a critical point
 of $L$ by finding roots of its derivatives. At this point, we have a choice: we can either
 derive the optimality conditions first, then discretize the problem (in the literature this
