@@ -19,7 +19,7 @@ permissions:
 jobs:
   tidy:
     name: tidy
-    runs-on: [ubuntu-24.04]
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -35,8 +35,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
-            clang-18 \
-            clang-tidy-18 \
+            clang \
+            clang-tidy \
             libboost-all-dev \
             libcgal-dev \
             libhdf5-mpi-dev \

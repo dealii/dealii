@@ -19,7 +19,7 @@ jobs:
     if: (github.event_name == 'schedule' && github.repository == 'dealii/dealii') || github.event_name != 'schedule'
 
     name: build master docker ${{ matrix.ubuntu_version }} ${{ matrix.platform }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -93,7 +93,7 @@ jobs:
   merge:
     if: (github.event_name == 'schedule' && github.repository == 'dealii/dealii') || github.event_name != 'schedule'
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs:
       - build-master-docker-ubuntu
 
