@@ -298,8 +298,7 @@ namespace Step93
           heat_functions.emplace_back(Point<dim>({-0.5, 0.5, 0.5}), 0.2);
           heat_functions.emplace_back(Point<dim>({-0.5, 0.5, -0.5}), 0.2);
           heat_functions.emplace_back(Point<dim>({-0.5, -0.5, 0.5}), 0.2);
-          heat_functions.emplace_back(Point<dim>({-0.5, -0.5, -0.5}),
-                                           0.2);
+          heat_functions.emplace_back(Point<dim>({-0.5, -0.5, -0.5}), 0.2);
           break;
         default:
           DEAL_II_ASSERT_UNREACHABLE();
@@ -328,21 +327,23 @@ namespace Step93
   template <int dim>
   void Step93<dim>::setup_system()
   {
-    // To start, we create an unsigned int variable to count how many
-    // non-local dofs have been assigned.  Then, we loop over the
-    // cells and set the FESystem index to 1, which corresponds to the
-    // system with 2 FE_Q elements and one FE_DGQ element. We do this
-    // until we have enough dofs for each heat function.  Then, we
-    // call DoFHandler::distribute_dofs() to actually enumerate all
+    // Here, we loop over the cells and set the FESystem index to 1, which
+    // corresponds to the system with 2 FE_Q elements and one FE_DGQ element. We
+    // do this until we have enough dofs for each heat function. Note that we
+    // use the global active cell index to measure when to stop the
+    // loop. This allows the loop to be run in parallel with no alteration.
+    // Then, we call DoFHandler::distribute_dofs() to actually enumerate all
     // degrees of freedom.
-    unsigned int number_of_c_active_cells = 0;
-
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        cell->set_active_fe_index(1);
-        ++number_of_c_active_cells;
-        if (number_of_c_active_cells >= heat_functions.size())
-          break;
+        if (cell->global_active_cell_index() < heat_functions.size())
+          {
+            cell->set_active_fe_index(1);
+          }
+        else
+          {
+            break;
+          }
       }
     dof_handler.distribute_dofs(fe_collection);
 

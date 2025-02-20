@@ -9,7 +9,7 @@ Number of nonlocal dofs: 4
 Beginning solve...
 Wall time: 63.9265s
 Solved in 39973 MINRES iterations.
-The c coefficients are 
+The c coefficients are
 	c1: 28.7408
 	c2: -6.51604
 	c3: -6.51604
@@ -25,7 +25,7 @@ Number of nonlocal dofs: 4
 Beginning solve...
 Wall time: 98.4858s
 Solved in 62131 MINRES iterations.
-The c coefficients are 
+The c coefficients are
 	c1: 23.553
 	c2: -4.86562
 	c3: -4.86562
