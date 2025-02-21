@@ -1411,30 +1411,6 @@ namespace
   }
 
 
-  template <int dim, int spacedim>
-  Point<spacedim>
-  get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
-  {
-    TriaIterator<TriaAccessor<1, dim, spacedim>> it(obj);
-    return obj.get_manifold().get_new_point_on_line(it);
-  }
-
-  template <int dim, int spacedim>
-  Point<spacedim>
-  get_new_point_on_object(const TriaAccessor<2, dim, spacedim> &obj)
-  {
-    TriaIterator<TriaAccessor<2, dim, spacedim>> it(obj);
-    return obj.get_manifold().get_new_point_on_quad(it);
-  }
-
-  template <int dim, int spacedim>
-  Point<spacedim>
-  get_new_point_on_object(const TriaAccessor<3, dim, spacedim> &obj)
-  {
-    TriaIterator<TriaAccessor<3, dim, spacedim>> it(obj);
-    return obj.get_manifold().get_new_point_on_hex(it);
-  }
-
   template <int structdim, int dim, int spacedim>
   Point<spacedim>
   get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
@@ -1442,7 +1418,7 @@ namespace
   {
     if (use_interpolation)
       {
-        TriaRawIterator<TriaAccessor<structdim, dim, spacedim>> it(obj);
+        const TriaRawIterator<TriaAccessor<structdim, dim, spacedim>> it(obj);
         const auto points_and_weights =
           Manifolds::get_default_points_and_weights(it, use_interpolation);
         return obj.get_manifold().get_new_point(
@@ -1453,7 +1429,17 @@ namespace
       }
     else
       {
-        return get_new_point_on_object(obj);
+        const TriaIterator<TriaAccessor<structdim, dim, spacedim>> it(obj);
+        if constexpr (structdim == 1)
+          return obj.get_manifold().get_new_point_on_line(it);
+        else if constexpr (structdim == 2)
+          return obj.get_manifold().get_new_point_on_quad(it);
+        else if constexpr (structdim == 3)
+          return obj.get_manifold().get_new_point_on_hex(it);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+
+        return {};
       }
   }
 } // namespace

@@ -1702,8 +1702,8 @@ MappingQ<2, 3>::add_quad_support_points(
   for (unsigned int q = 0, q2 = 0; q2 < polynomial_degree - 1; ++q2)
     for (unsigned int q1 = 0; q1 < polynomial_degree - 1; ++q1, ++q)
       {
-        Point<2> point(line_support_points[q1 + 1][0],
-                       line_support_points[q2 + 1][0]);
+        const Point<2> point(line_support_points[q1 + 1][0],
+                             line_support_points[q2 + 1][0]);
         for (const unsigned int i : GeometryInfo<2>::vertex_indices())
           weights(q, i) = GeometryInfo<2>::d_linear_shape_function(point, i);
       }
