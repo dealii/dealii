@@ -1634,7 +1634,8 @@ template <int dim1, int dim2, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FECouplingValues<dim1, dim2, spacedim>::quadrature_point_indices() const
 {
-  return {0U, n_quadrature_points_};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_quadrature_points_);
 }
 
 
@@ -1646,7 +1647,8 @@ FECouplingValues<dim1, dim2, spacedim>::coupling_dof_indices() const
   AssertThrow(n_coupling_dofs_ != numbers::invalid_unsigned_int,
               ExcMessage(
                 "Dofs are independent. You cannot ask for coupling dofs."));
-  return {0U, n_coupling_dofs_};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_coupling_dofs_);
 }
 
 
@@ -1655,7 +1657,8 @@ template <int dim1, int dim2, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FECouplingValues<dim1, dim2, spacedim>::first_dof_indices() const
 {
-  return {0U, n_first_dofs()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_first_dofs());
 }
 
 
@@ -1664,7 +1667,8 @@ template <int dim1, int dim2, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FECouplingValues<dim1, dim2, spacedim>::second_dof_indices() const
 {
-  return {0U, n_second_dofs()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_second_dofs());
 }
 
 
