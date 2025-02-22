@@ -1,0 +1,21 @@
+
+DEAL::SP::is_compressed(): 1
+DEAL::Creating entries...
+DEAL::SP::is_compressed(): 0
+DEAL::SP::is_compressed(): 0
+DEAL::SP::is_compressed(): 1
+DEAL::Number of entries: 11
+DEAL::Number of rows: 5
+DEAL::Number of columns: 7
+DEAL::Local size: 5
+DEAL::Max row length: 3
+DEAL::SP::row_length(0): 2
+DEAL::Bandwidth: 4
+DEAL::SP::empty(): 0
+DEAL::SP::is_compressed(): 1
+DEAL::Clearing...
+DEAL::SP::is_compressed(): 1
+DEAL::Bandwidth: 0
+DEAL::SP::empty(): 1
+DEAL::Number of rows: 0
+DEAL::OK

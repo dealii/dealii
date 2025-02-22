@@ -1,0 +1,37 @@
+
+DEAL:0::owned IndexSet: {[0,3]}
+DEAL:0::ghosted IndexSet: {[2,5]}
+DEAL:0::trilinos vec:
+size:8 locally_owned_size:4 :
+[0]: 0.000e+00
+[1]: 1.000e+00
+[2]: 2.000e+00
+[3]: 3.000e+00
+DEAL:0::trilinos vec ghosted:
+size:8 locally_owned_size:6 :
+[0]: 0.000e+00
+[1]: 1.000e+00
+[2]: 2.000e+00
+[3]: 3.000e+00
+[4]: 4.000e+00
+[5]: 5.000e+00
+DEAL:0::OK
+
+DEAL:1::owned IndexSet: {[4,7]}
+DEAL:1::ghosted IndexSet: {[2,5]}
+DEAL:1::trilinos vec:
+size:8 locally_owned_size:4 :
+[4]: 4.000e+00
+[5]: 5.000e+00
+[6]: 6.000e+00
+[7]: 7.000e+00
+DEAL:1::trilinos vec ghosted:
+size:8 locally_owned_size:6 :
+[2]: 2.000e+00
+[3]: 3.000e+00
+[4]: 4.000e+00
+[5]: 5.000e+00
+[6]: 6.000e+00
+[7]: 7.000e+00
+DEAL:1::OK
+
