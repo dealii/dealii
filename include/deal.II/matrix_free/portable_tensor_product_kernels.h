@@ -550,7 +550,7 @@ namespace Portable
     EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
       co_gradients(const ViewTypeIn in, ViewTypeOut out) const
     {
-      if (in_place)
+      if constexpr (in_place)
         {
           apply<dim,
                 n_columns,
