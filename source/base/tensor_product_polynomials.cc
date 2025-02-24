@@ -86,6 +86,8 @@ TensorProductPolynomials<dim, PolynomialType>::compute_index(
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)indices;
       DEAL_II_NOT_IMPLEMENTED();
     }
   else
@@ -108,6 +110,7 @@ TensorProductPolynomials<dim, PolynomialType>::output_indices(
 {
   if constexpr (dim == 0)
     {
+      (void)out;
       DEAL_II_NOT_IMPLEMENTED();
     }
   else
@@ -201,6 +204,8 @@ TensorProductPolynomials<dim, PolynomialType>::compute_value(
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)p;
       DEAL_II_NOT_IMPLEMENTED();
       return 0;
     }
@@ -227,6 +232,8 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)p;
       DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
@@ -272,6 +279,8 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad_grad(
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)p;
       DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
@@ -527,6 +536,12 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
 {
   if constexpr (dim == 0)
     {
+      (void)p;
+      (void)values;
+      (void)grads;
+      (void)grad_grads;
+      (void)third_derivatives;
+      (void)fourth_derivatives;
       DEAL_II_NOT_IMPLEMENTED();
     }
   else
@@ -689,6 +704,8 @@ AnisotropicPolynomials<dim>::compute_index(
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)indices;
       DEAL_II_NOT_IMPLEMENTED();
     }
   else
@@ -725,6 +742,8 @@ AnisotropicPolynomials<dim>::compute_value(const unsigned int i,
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)p;
       DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
@@ -750,6 +769,8 @@ AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)p;
       DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
@@ -787,6 +808,8 @@ AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)p;
       DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
@@ -836,6 +859,12 @@ AnisotropicPolynomials<dim>::evaluate(
 {
   if constexpr (dim == 0)
     {
+      (void)p;
+      (void)values;
+      (void)grads;
+      (void)grad_grads;
+      (void)third_derivatives;
+      (void)fourth_derivatives;
       DEAL_II_NOT_IMPLEMENTED();
     }
   else
@@ -930,6 +959,7 @@ AnisotropicPolynomials<dim>::get_n_tensor_pols(
 {
   if constexpr (dim == 0)
     {
+      (void)pols;
       DEAL_II_NOT_IMPLEMENTED();
       return {};
     }

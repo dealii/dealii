@@ -100,8 +100,10 @@ TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
 {
   if constexpr (dim == 0)
     {
+      (void)i;
+      (void)p;
       DEAL_II_NOT_IMPLEMENTED();
-      return 0.;
+      return {};
     }
   else
     {
