@@ -182,7 +182,7 @@ public:
    * @param face_dof_index The index of the degree of freedom on a face. This
    * index must be between zero and dofs_per_face.
    * @param face The number of the face this degree of freedom lives on. This
-   * number must be between zero and GeometryInfo::faces_per_cell.
+   * number must be between zero and ReferenceCell::n_faces
    * @param combined_orientation The combined orientation flag containing the
    * orientation, rotation, and flip of the face. See @ref GlossFaceOrientation.
    * @return The index of this degree of freedom within the set of degrees of
