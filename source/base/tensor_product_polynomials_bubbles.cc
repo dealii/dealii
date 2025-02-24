@@ -93,59 +93,56 @@ TensorProductPolynomialsBubbles<dim>::compute_value(const unsigned int i,
 
 
 
-template <>
-double
-TensorProductPolynomialsBubbles<0>::compute_value(const unsigned int,
-                                                  const Point<0> &) const
-{
-  DEAL_II_NOT_IMPLEMENTED();
-  return 0.;
-}
-
-
-
 template <int dim>
 Tensor<1, dim>
 TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
                                                    const Point<dim>  &p) const
 {
-  const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
-  const unsigned int max_q_indices = tensor_polys.n();
-  Assert(i < max_q_indices + /* n_bubbles= */ ((q_degree <= 1) ? 1 : dim),
-         ExcInternalError());
-
-  // treat the regular basis functions
-  if (i < max_q_indices)
-    return tensor_polys.compute_grad(i, p);
-
-  const unsigned int comp = i - tensor_polys.n();
-  Tensor<1, dim>     grad;
-
-  for (unsigned int d = 0; d < dim; ++d)
+  if constexpr (dim == 0)
     {
-      grad[d] = 1.;
-      // compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
-      for (unsigned j = 0; j < dim; ++j)
-        grad[d] *= (d == j ? 4 * (1 - 2 * p[j]) : 4 * p[j] * (1 - p[j]));
-      // and multiply with (2*x_i-1)^{r-1}
-      for (unsigned int i = 0; i < q_degree - 1; ++i)
-        grad[d] *= 2 * p[comp] - 1;
+      DEAL_II_NOT_IMPLEMENTED();
+      return 0.;
     }
-
-  if (q_degree >= 2)
+  else
     {
-      // add \prod_{i=1}^d 4*(x_i(1-x_i))(p)
-      double value = 1.;
-      for (unsigned int j = 0; j < dim; ++j)
-        value *= 4 * p[j] * (1 - p[j]);
-      // and multiply with grad(2*x_i-1)^{r-1}
-      double tmp = value * 2 * (q_degree - 1);
-      for (unsigned int i = 0; i < q_degree - 2; ++i)
-        tmp *= 2 * p[comp] - 1;
-      grad[comp] += tmp;
-    }
+      const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
+      const unsigned int max_q_indices = tensor_polys.n();
+      Assert(i < max_q_indices + /* n_bubbles= */ ((q_degree <= 1) ? 1 : dim),
+             ExcInternalError());
 
-  return grad;
+      // treat the regular basis functions
+      if (i < max_q_indices)
+        return tensor_polys.compute_grad(i, p);
+
+      const unsigned int comp = i - tensor_polys.n();
+      Tensor<1, dim>     grad;
+
+      for (unsigned int d = 0; d < dim; ++d)
+        {
+          grad[d] = 1.;
+          // compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
+          for (unsigned j = 0; j < dim; ++j)
+            grad[d] *= (d == j ? 4 * (1 - 2 * p[j]) : 4 * p[j] * (1 - p[j]));
+          // and multiply with (2*x_i-1)^{r-1}
+          for (unsigned int i = 0; i < q_degree - 1; ++i)
+            grad[d] *= 2 * p[comp] - 1;
+        }
+
+      if (q_degree >= 2)
+        {
+          // add \prod_{i=1}^d 4*(x_i(1-x_i))(p)
+          double value = 1.;
+          for (unsigned int j = 0; j < dim; ++j)
+            value *= 4 * p[j] * (1 - p[j]);
+          // and multiply with grad(2*x_i-1)^{r-1}
+          double tmp = value * 2 * (q_degree - 1);
+          for (unsigned int i = 0; i < q_degree - 2; ++i)
+            tmp *= 2 * p[comp] - 1;
+          grad[comp] += tmp;
+        }
+
+      return grad;
+    }
 }
 
 
