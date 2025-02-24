@@ -91,13 +91,14 @@ namespace Functions
     ParsedFunction(const unsigned int n_components = 1, const double h = 1e-8);
 
     /**
-     * Declare parameters needed by this class. The additional parameter @p
+     * Declare parameters needed by this class. The parameter @p
      * n_components is used to generate the right code according to the number
      * of components of the function that will parse this ParameterHandler. If
      * the number of components which is parsed does not match the number of
      * components of this object, an assertion is thrown and the program is
-     * aborted.  The default behavior for this class is to declare the
-     * following entries:
+     * aborted. The additional parameter @p expr is used to declare the default
+     * expression used by the function. The default behavior for this class is
+     * to declare the following entries:
      *
      *  @code
      *
@@ -109,7 +110,8 @@ namespace Functions
      */
     static void
     declare_parameters(ParameterHandler  &prm,
-                       const unsigned int n_components = 1);
+                       const unsigned int n_components = 1,
+                       const std::string  &input_expr   = "");
 
     /**
      * Parse parameters needed by this class.  If the number of components
