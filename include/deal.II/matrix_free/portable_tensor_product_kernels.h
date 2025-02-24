@@ -500,7 +500,7 @@ namespace Portable
     EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
       values(const ViewTypeIn in, ViewTypeOut out) const
     {
-      if (in_place)
+      if constexpr (in_place)
         {
           apply<dim, n_rows, n_columns, Number, direction, dof_to_quad, false>(
             team_member, shape_values, in, temp);
