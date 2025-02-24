@@ -1,0 +1,11 @@
+{
+  "MeshType": "mesh_file",
+  "MeshFileFormat": "./grids/piston_%d.inp",
+  "Dimension": 3,
+  "NGlobalRefinements": 3,
+  "Degree": 2,
+  "SolverMaxIterations": 100,
+  "SolverAbsTolerance": 1e-20,
+  "SolverRelTolerance": 1e-4,
+  "MGNonNested": true
+}
