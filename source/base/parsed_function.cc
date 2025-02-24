@@ -33,7 +33,7 @@ namespace Functions
   void
   ParsedFunction<dim>::declare_parameters(ParameterHandler  &prm,
                                           const unsigned int n_components,
-                                          const std::string  &input_expr)
+                                          const std::string &input_expr)
   {
     Assert(n_components > 0, ExcZero());
 
@@ -82,7 +82,8 @@ namespace Functions
       {
         // If the user specified an input expr, the number of component
         // specified need to match n_components.
-        AssertDimension((std::count(expr.begin(), expr.end(), ';') + 1) , n_components);
+        AssertDimension((std::count(expr.begin(), expr.end(), ';') + 1),
+                        n_components);
       }
 
 
