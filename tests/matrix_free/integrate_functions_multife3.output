@@ -1,0 +1,39 @@
+
+DEAL:2d::Testing FE_Q<2>(1) and FE_Q<2>(2)
+DEAL:2d::FE 0, Quad 0; integration difference: 0
+DEAL:2d::FE 1, Quad 1; integration difference: 0
+DEAL:2d::FE 0, Quad 1; integration difference: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(2) and FE_Q<2>(3)
+DEAL:2d::FE 0, Quad 0; integration difference: 0
+DEAL:2d::FE 1, Quad 1; integration difference: 0
+DEAL:2d::FE 0, Quad 1; integration difference: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(3) and FE_Q<2>(4)
+DEAL:2d::FE 0, Quad 0; integration difference: 0
+DEAL:2d::FE 1, Quad 1; integration difference: 0
+DEAL:2d::FE 0, Quad 1; integration difference: 0
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1) and FE_Q<3>(2)
+DEAL:3d::FE 0, Quad 0; integration difference: 0
+DEAL:3d::FE 1, Quad 1; integration difference: 0
+DEAL:3d::FE 0, Quad 1; integration difference: 0
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(2) and FE_Q<3>(3)
+DEAL:3d::FE 0, Quad 0; integration difference: 0
+DEAL:3d::FE 1, Quad 1; integration difference: 0
+DEAL:3d::FE 0, Quad 1; integration difference: 0
+DEAL:3d::
+DEAL::
+DEAL::Test with floats
+DEAL::
+DEAL:2d::Testing FE_Q<2>(1) and FE_Q<2>(2)
+DEAL:2d::FE 0, Quad 0; integration difference: 0
+DEAL:2d::FE 1, Quad 1; integration difference: 0
+DEAL:2d::FE 0, Quad 1; integration difference: 0
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1) and FE_Q<3>(2)
+DEAL:3d::FE 0, Quad 0; integration difference: 0
+DEAL:3d::FE 1, Quad 1; integration difference: 0
+DEAL:3d::FE 0, Quad 1; integration difference: 0
+DEAL:3d::
