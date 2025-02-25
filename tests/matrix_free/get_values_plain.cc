@@ -28,7 +28,6 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -151,22 +150,19 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  const SphericalManifold<dim> manifold;
-  Triangulation<dim>           tria;
+  Triangulation<dim> tria;
   GridGenerator::hyper_shell(tria, Point<dim>(), 1., 2., 96, true);
-  tria.set_all_manifold_ids(0);
-  tria.set_manifold(0, manifold);
 
   // refine a few cells
   for (unsigned int i = 0; i < 11 - 3 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tria.begin_active(),
-                                                        endc = tria.end();
-      unsigned int counter                                   = 0;
-      for (; cell != endc; ++cell, ++counter)
-        if (counter % (7 - i) == 0)
-          cell->set_refine_flag();
+      unsigned int counter = 0;
+      for (const auto &cell : tria.active_cell_iterators())
+        {
+          if (counter % (7 - i) == 0)
+            cell->set_refine_flag();
+          ++counter;
+        }
       tria.execute_coarsening_and_refinement();
     }
 

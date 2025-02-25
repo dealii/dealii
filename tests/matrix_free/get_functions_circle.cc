@@ -29,16 +29,8 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  const SphericalManifold<dim> manifold;
-  Triangulation<dim>           tria;
+  Triangulation<dim> tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  for (; cell != endc; ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
-      if (cell->at_boundary(f))
-        cell->face(f)->set_all_manifold_ids(0);
-  tria.set_manifold(0, manifold);
 
   // refine first and last cell
   tria.begin(tria.n_levels() - 1)->set_refine_flag();
