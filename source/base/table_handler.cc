@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <variant>
 
 
 DEAL_II_NAMESPACE_OPEN
