@@ -64,19 +64,6 @@
 #endif
 
 
-#ifdef DEAL_II_WITH_TRILINOS
-#  ifdef DEAL_II_WITH_MPI
-#    include <deal.II/lac/trilinos_parallel_block_vector.h>
-#    include <deal.II/lac/trilinos_vector.h>
-#    include <deal.II/lac/vector_memory.h>
-
-#    include <Epetra_MpiComm.h>
-#    include <Teuchos_DefaultComm.hpp>
-#  endif
-#  include <Epetra_SerialComm.h>
-#  include <Teuchos_RCP.hpp>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 
