@@ -29,7 +29,6 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -121,11 +120,8 @@ template <int dim>
 void
 test(const unsigned int fe_degree)
 {
-  SphericalManifold<dim> manifold;
-  Triangulation<dim>     triangulation;
+  Triangulation<dim> triangulation;
   GridGenerator::hyper_shell(triangulation, Point<dim>(), 0.5, 1., 96, true);
-  triangulation.set_all_manifold_ids(0);
-  triangulation.set_manifold(0, manifold);
 
   triangulation.begin_active()->set_refine_flag();
   triangulation.last()->set_refine_flag();
