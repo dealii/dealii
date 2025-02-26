@@ -32,7 +32,8 @@ namespace Functions
   template <int dim>
   void
   ParsedFunction<dim>::declare_parameters(ParameterHandler  &prm,
-                                          const unsigned int n_components)
+                                          const unsigned int n_components,
+                                          const std::string &input_expr)
   {
     Assert(n_components > 0, ExcZero());
 
@@ -69,9 +70,22 @@ namespace Functions
       "variable names in your function expression.");
 
     // The expression of the function
-    std::string expr = "0";
-    for (unsigned int i = 1; i < n_components; ++i)
-      expr += "; 0";
+    // If the string is an empty string, 0 is set for each components.
+    std::string expr = input_expr;
+    if (expr == "")
+      {
+        expr = "0";
+        for (unsigned int i = 1; i < n_components; ++i)
+          expr += "; 0";
+      }
+    else
+      {
+        // If the user specified an input expr, the number of component
+        // specified need to match n_components.
+        AssertDimension((std::count(expr.begin(), expr.end(), ';') + 1),
+                        n_components);
+      }
+
 
     prm.declare_entry(
       "Function expression",
