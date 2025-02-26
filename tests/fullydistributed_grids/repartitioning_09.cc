@@ -19,6 +19,7 @@
 // mesh).
 
 #include <deal.II/base/mpi_consensus_algorithms.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/repartitioning_policy_tools.h>
@@ -33,69 +34,12 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <deal.II/multigrid/mg_transfer_global_coarsening.templates.h>
+
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include "../grid/tests.h"
-
-
-
-template <int dim, int spacedim = dim>
-class MyPolicy : public RepartitioningPolicyTools::Base<dim, spacedim>
-{
-public:
-  MyPolicy(const Triangulation<dim, spacedim> &tria_background)
-    : tria_background(tria_background)
-  {}
-
-  virtual LinearAlgebra::distributed::Vector<double>
-  partition(const Triangulation<dim, spacedim> &tria_immersed) const override
-  {
-    // 1) collect centers of immeresed mesh
-    std::vector<Point<spacedim>> points;
-
-    for (const auto &cell : tria_immersed.active_cell_iterators())
-      if (cell->is_locally_owned())
-        points.push_back(cell->center());
-
-    // 2) determine owner on background mesh
-    Utilities::MPI::RemotePointEvaluation<dim, spacedim> rpe;
-    Vector<double> ranks(tria_background.n_active_cells());
-    ranks =
-      Utilities::MPI::this_mpi_process(tria_background.get_communicator());
-
-    const auto point_ranks =
-      VectorTools::point_values<1>(mapping,
-                                   tria_background,
-                                   ranks,
-                                   points,
-                                   rpe,
-                                   VectorTools::EvaluationFlags::min);
-
-    const auto tria =
-      dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &tria_immersed);
-
-    Assert(tria, ExcNotImplemented());
-
-    // 3) set partitioning
-    LinearAlgebra::distributed::Vector<double> partition(
-      tria->global_active_cell_index_partitioner().lock());
-
-    unsigned int counter = 0;
-    for (const auto &cell : tria_immersed.active_cell_iterators())
-      if (cell->is_locally_owned())
-        partition[cell->global_active_cell_index()] = point_ranks[counter++];
-
-    partition.update_ghost_values();
-
-    return partition;
-  }
-
-private:
-  const Triangulation<dim, spacedim> &tria_background;
-  const MappingQ1<dim, spacedim>      mapping; // TODO
-};
 
 
 template <int dim>
@@ -116,24 +60,50 @@ output_mesh(const Triangulation<dim> &tria_background, const std::string label)
 
 template <int dim>
 void
-test()
+test(const unsigned int v)
 {
   const MPI_Comm comm = MPI_COMM_WORLD;
 
   // create background mesh
   parallel::distributed::Triangulation<dim> tria_background(comm);
   GridGenerator::hyper_cube(tria_background, -1, +1);
-  tria_background.refine_global(5);
+
+  if (v == 0)
+    tria_background.refine_global(5);
+  else
+    tria_background.refine_global(6);
+
+  DoFHandler<dim> dof_handler_background(tria_background);
+  dof_handler_background.distribute_dofs(FE_Q<dim>(2));
 
   // create immersed mesh (default partitioning)
   parallel::distributed::Triangulation<dim> tria_immersed_old(comm);
   GridGenerator::hyper_ball(tria_immersed_old, Point<dim>(0.1, 0.2), 0.5);
-  tria_immersed_old.refine_global(5);
+
+  if (v == 0)
+    tria_immersed_old.refine_global(5);
+  else
+    tria_immersed_old.refine_global(3);
 
   // create immersed mesh with partitioning as in the case of the
   // background mesh
-  MyPolicy<dim> policy_0(tria_background);
-  const auto    partition_0 = policy_0.partition(tria_immersed_old);
+  std::shared_ptr<RepartitioningPolicyTools::ImmersedMeshPolicy<dim>> policy_0;
+
+  typename RepartitioningPolicyTools::ImmersedMeshPolicy<dim>::AdditionalData
+    ad;
+  ad.immersed_identification = v == 0;
+  ad.n_samples               = 3;
+
+  if (v == 0 || v == 1)
+    policy_0 =
+      std::make_shared<RepartitioningPolicyTools::ImmersedMeshPolicy<dim>>(
+        tria_background, ad);
+  else
+    policy_0 =
+      std::make_shared<RepartitioningPolicyTools::ImmersedMeshPolicy<dim>>(
+        dof_handler_background);
+
+  const auto partition_0 = policy_0->partition(tria_immersed_old);
 
   const auto construction_data =
     TriangulationDescription::Utilities::create_description_from_triangulation(
@@ -163,5 +133,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll                    all;
 
-  test<2>();
+  test<2>(0);
+  test<2>(1);
+  test<2>(2);
 }
