@@ -423,9 +423,9 @@ namespace Utilities
   std::string
   encode_base64(const std::vector<unsigned char> &binary_input)
   {
-    using namespace boost::archive::iterators;
-    using It = base64_from_binary<
-      transform_width<std::vector<unsigned char>::const_iterator, 6, 8>>;
+    using It = boost::archive::iterators::base64_from_binary<
+      boost::archive::iterators::
+        transform_width<std::vector<unsigned char>::const_iterator, 6, 8>>;
     auto base64 = std::string(It(binary_input.begin()), It(binary_input.end()));
     // Add padding.
     return base64.append((3 - binary_input.size() % 3) % 3, '=');
@@ -436,9 +436,11 @@ namespace Utilities
   std::vector<unsigned char>
   decode_base64(const std::string &base64_input)
   {
-    using namespace boost::archive::iterators;
-    using It =
-      transform_width<binary_from_base64<std::string::const_iterator>, 8, 6>;
+    using It = boost::archive::iterators::transform_width<
+      boost::archive::iterators::binary_from_base64<
+        std::string::const_iterator>,
+      8,
+      6>;
     auto binary = std::vector<unsigned char>(It(base64_input.begin()),
                                              It(base64_input.end()));
     // Remove padding.
