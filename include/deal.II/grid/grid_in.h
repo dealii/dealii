@@ -41,8 +41,8 @@ struct CellData;
 #endif
 
 /**
- * This class implements an input mechanism for grid data. It allows to read a
- * grid structure into a triangulation object. At present, UCD (unstructured
+ * This class implements an input mechanism for mesh data. It allows to read a
+ * mesh structure into a Triangulation object. At present, UCD (unstructured
  * cell data), DB Mesh, XDA, %Gmsh, Tecplot, UNV, VTK, ASSIMP, and Cubit
  * are supported as input format for grid data. Any numerical data other than
  * geometric (vertex locations) and topological (how vertices form cells,
@@ -54,12 +54,14 @@ struct CellData;
  * @ref GlossBoundaryIndicator "this"
  * glossary entry for more information).
  *
- * @note Since deal.II only supports line, quadrilateral and hexahedral
- * meshes, the functions in this class can only read meshes that consist
- * exclusively of such cells. If you absolutely need to work with a mesh that
- * uses triangles or tetrahedra, then your only option is to convert the mesh
- * to quadrilaterals and hexahedra. A tool that can do this is tethex,
- * available <a href="https://github.com/martemyev/tethex">here</a>.
+ * In practice, the list of formats this class supports is of course limited.
+ * However, other people have written tools to convert mesh files from one
+ * format to another, and if you have a mesh you cannot read with the functions
+ * of this class, you may want to convert it into a format that is in fact
+ * supported. One of these tools you may want to look up is
+ * [meshio](https://github.com/nschloe/meshio).
+ * A separate tool that can convert tetrahedral to hexahedral mesges is tethex,
+ * available [here](https://github.com/martemyev/tethex).
  *
  * The mesh you read will form the coarsest level of a @p Triangulation
  * object. As such, it must not contain hanging nodes or other forms of
