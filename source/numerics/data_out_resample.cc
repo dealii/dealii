@@ -150,14 +150,15 @@ DataOutResample<dim, patch_dim, spacedim>::build_patches(
 
       const auto &dh = *data_ptr->dof_handler;
 
-#ifdef DEBUG
-      for (const auto &fe : dh.get_fe_collection())
-        Assert(
-          fe.n_base_elements() == 1,
-          ExcMessage(
-            "This class currently only supports scalar elements and elements "
-            "with a single base element."));
-#endif
+      if constexpr (compiling_for_debug_build())
+        {
+          for (const auto &fe : dh.get_fe_collection())
+            Assert(
+              fe.n_base_elements() == 1,
+              ExcMessage(
+                "This class currently only supports scalar elements and elements "
+                "with a single base element."));
+        }
 
       for (unsigned int comp = 0; comp < dh.get_fe_collection().n_components();
            ++comp)
