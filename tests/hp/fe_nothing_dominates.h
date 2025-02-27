@@ -43,13 +43,14 @@ project(const hp::FECollection<dim> &fe_collection,
         const hp::QCollection<dim>  &q_collection,
         const Function<dim>         &function)
 {
-#ifdef DEBUG
-  Assert(fe_collection.size() == 2, ExcInternalError());
-  Assert(q_collection.size() == 2, ExcInternalError());
-  for (unsigned int f = 0; f < fe_collection.size(); ++f)
-    Assert(fe_collection[f].n_components() == function.n_components,
-           ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(fe_collection.size() == 2, ExcInternalError());
+      Assert(q_collection.size() == 2, ExcInternalError());
+      for (unsigned int f = 0; f < fe_collection.size(); ++f)
+        Assert(fe_collection[f].n_components() == function.n_components,
+               ExcInternalError());
+    }
 
   // setup
   // +---+---+
