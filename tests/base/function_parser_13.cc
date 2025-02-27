@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2010 - 2023 by the deal.II authors
+// Copyright (C) 2025 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,9 @@
 
 
 // This program tests the functionality of imposing a default expression
-// when declaring a ParsedFunction.
+// when declaring a ParsedFunction. This functionality is tested for
+// functions with 1, 2 and 3 components and when the default expression is
+// not explicitly specified.
 
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/parsed_function.h>
