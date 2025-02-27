@@ -34,6 +34,8 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_wedge_p.h>
 
+#include <deal.II/grid/reference_cell.h>
+
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -1114,7 +1116,7 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(
   const types::geometric_orientation combined_orientation) const
 {
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
-  AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(face, this->reference_cell().n_faces());
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
