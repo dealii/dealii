@@ -32,6 +32,57 @@
 #define DEAL_II_VERSION_MINOR @DEAL_II_VERSION_MINOR@
 #define DEAL_II_VERSION_SUBMINOR @DEAL_II_VERSION_SUBMINOR@
 
+/***********************************************************************
+ * Two macro names that we put at the top and bottom of all deal.II files
+ * and that will be expanded to "namespace dealii {" and "}".
+ */
+
+#define DEAL_II_NAMESPACE_OPEN namespace dealii {
+#define DEAL_II_NAMESPACE_CLOSE }
+
+/***********************************************************************
+ * A variable that can be used to query whether we are compiling in
+ * debug or release mode.
+ */
+
+DEAL_II_NAMESPACE_OPEN
+
+/**
+ * An enum type that is used to describe what kind of build has
+ * been used to compile the deal.II library: Namely, whether it is
+ * a debug or a release build.
+ */
+enum class LibraryBuildMode
+{
+  debug,
+  release
+};
+
+/**
+ * A variable that can be queried to determine whether the deal.II
+ * library you are trying to compile against is a debug or a release
+ * mode build.
+ */
+constexpr LibraryBuildMode library_build_mode
+#ifdef DEBUG
+ = LibraryBuildMode::debug;
+#else
+ = LibraryBuildMode::release;
+#endif
+
+
+/**
+ * A function that returns whether we are currently compiling for a debug
+ * build (rather than a release build).
+ */
+constexpr bool running_in_debug_mode()
+{
+  return (library_build_mode == LibraryBuildMode::debug);
+}
+
+
+DEAL_II_NAMESPACE_CLOSE
+
 
 /***********************************************************************
  * Configured deal.II features:
@@ -513,14 +564,6 @@
 #endif
 
 #cmakedefine DEAL_II_MPI_WITH_DEVICE_SUPPORT
-
-/***********************************************************************
- * Two macro names that we put at the top and bottom of all deal.II files
- * and that will be expanded to "namespace dealii {" and "}".
- */
-
-#define DEAL_II_NAMESPACE_OPEN namespace dealii {
-#define DEAL_II_NAMESPACE_CLOSE }
 
 /***********************************************************************
  * Two macros to guard external header includes.
