@@ -1395,12 +1395,6 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
     fe_values_2.n_quadrature_points;
 
   // Initialize counters and renumbering vectors to zero
-  unsigned int first_n_dofs  = 0;
-  unsigned int second_n_dofs = 0;
-
-  unsigned int first_n_quadrature_points  = 0;
-  unsigned int second_n_quadrature_points = 0;
-
   std::vector<unsigned int> first_dofs_map;
   std::vector<unsigned int> second_dofs_map;
 
@@ -1420,17 +1414,12 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
           n_coupling_dofs_ = numbers::invalid_unsigned_int;
           first_dofs_map.clear();
           second_dofs_map.clear();
-          first_n_dofs  = first_fe_values->dofs_per_cell;
-          second_n_dofs = second_fe_values->dofs_per_cell;
           break;
         }
       case DoFCouplingType::contiguous:
         {
           n_coupling_dofs_ =
             fe_values_1.dofs_per_cell + fe_values_2.dofs_per_cell;
-
-          first_n_dofs  = n_coupling_dofs_;
-          second_n_dofs = n_coupling_dofs_;
 
           first_dofs_map.resize(n_coupling_dofs_);
           second_dofs_map.resize(n_coupling_dofs_);
@@ -1464,9 +1453,6 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
           n_quadrature_points_ =
             quadrature_points_1.size() * quadrature_points_2.size();
 
-          first_n_quadrature_points  = n_quadrature_points_;
-          second_n_quadrature_points = n_quadrature_points_;
-
           first_quad_map.resize(n_quadrature_points_);
           second_quad_map.resize(n_quadrature_points_);
 
@@ -1488,9 +1474,6 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
                             "number of quadrature points"));
 
           n_quadrature_points_ = fe_values_1.get_quadrature_points().size();
-
-          first_n_quadrature_points  = n_quadrature_points_;
-          second_n_quadrature_points = n_quadrature_points_;
 
           first_quad_map.clear();
           second_quad_map.clear();
@@ -1517,9 +1500,6 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
 
           n_quadrature_points_ = fe_values_1.get_quadrature_points().size();
 
-          first_n_quadrature_points  = n_quadrature_points_;
-          second_n_quadrature_points = n_quadrature_points_;
-
           first_quad_map.clear();
           second_quad_map.clear();
 
@@ -1535,9 +1515,6 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
                             "number of quadrature points"));
 
           n_quadrature_points_ = fe_values_1.get_quadrature_points().size();
-
-          first_n_quadrature_points  = n_quadrature_points_;
-          second_n_quadrature_points = n_quadrature_points_;
 
           // The first is the id. The second is renumbered.
           first_quad_map.clear();
@@ -1583,8 +1560,6 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
             }
           n_quadrature_points_ = first_quad_map.size();
 
-          first_n_quadrature_points  = n_quadrature_points_;
-          second_n_quadrature_points = n_quadrature_points_;
           break;
         }
       default:
