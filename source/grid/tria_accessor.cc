@@ -3368,60 +3368,63 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                   neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
                     neighbor_child->refinement_case(), neighbor_neighbor, 0));
 
-#ifdef DEBUG
-              // check, whether the face neighbor_child matches the requested
-              // subface.
-              typename Triangulation<dim, spacedim>::face_iterator requested;
-              switch (this->subface_case(face))
+              if constexpr (running_in_debug_mode())
                 {
-                  case internal::SubfaceCase<3>::case_x:
-                  case internal::SubfaceCase<3>::case_y:
-                  case internal::SubfaceCase<3>::case_xy:
-                    requested = mother_face->child(subface);
-                    break;
-                  case internal::SubfaceCase<3>::case_x1y2y:
-                  case internal::SubfaceCase<3>::case_y1x2x:
-                    requested =
-                      mother_face->child(subface / 2)->child(subface % 2);
-                    break;
+                  // check, whether the face neighbor_child matches the
+                  // requested subface.
+                  typename Triangulation<dim, spacedim>::face_iterator
+                    requested;
+                  switch (this->subface_case(face))
+                    {
+                      case internal::SubfaceCase<3>::case_x:
+                      case internal::SubfaceCase<3>::case_y:
+                      case internal::SubfaceCase<3>::case_xy:
+                        requested = mother_face->child(subface);
+                        break;
+                      case internal::SubfaceCase<3>::case_x1y2y:
+                      case internal::SubfaceCase<3>::case_y1x2x:
+                        requested =
+                          mother_face->child(subface / 2)->child(subface % 2);
+                        break;
 
-                  case internal::SubfaceCase<3>::case_x1y:
-                  case internal::SubfaceCase<3>::case_y1x:
-                    switch (subface)
-                      {
-                        case 0:
-                        case 1:
-                          requested = mother_face->child(0)->child(subface);
-                          break;
-                        case 2:
-                          requested = mother_face->child(1);
-                          break;
-                        default:
-                          DEAL_II_ASSERT_UNREACHABLE();
-                      }
-                    break;
-                  case internal::SubfaceCase<3>::case_x2y:
-                  case internal::SubfaceCase<3>::case_y2x:
-                    switch (subface)
-                      {
-                        case 0:
-                          requested = mother_face->child(0);
-                          break;
-                        case 1:
-                        case 2:
-                          requested = mother_face->child(1)->child(subface - 1);
-                          break;
-                        default:
-                          DEAL_II_ASSERT_UNREACHABLE();
-                      }
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                    break;
+                      case internal::SubfaceCase<3>::case_x1y:
+                      case internal::SubfaceCase<3>::case_y1x:
+                        switch (subface)
+                          {
+                            case 0:
+                            case 1:
+                              requested = mother_face->child(0)->child(subface);
+                              break;
+                            case 2:
+                              requested = mother_face->child(1);
+                              break;
+                            default:
+                              DEAL_II_ASSERT_UNREACHABLE();
+                          }
+                        break;
+                      case internal::SubfaceCase<3>::case_x2y:
+                      case internal::SubfaceCase<3>::case_y2x:
+                        switch (subface)
+                          {
+                            case 0:
+                              requested = mother_face->child(0);
+                              break;
+                            case 1:
+                            case 2:
+                              requested =
+                                mother_face->child(1)->child(subface - 1);
+                              break;
+                            default:
+                              DEAL_II_ASSERT_UNREACHABLE();
+                          }
+                        break;
+                      default:
+                        DEAL_II_ASSERT_UNREACHABLE();
+                        break;
+                    }
+                  Assert(requested == neighbor_child->face(neighbor_neighbor),
+                         ExcInternalError());
                 }
-              Assert(requested == neighbor_child->face(neighbor_neighbor),
-                     ExcInternalError());
-#endif
 
               return neighbor_child;
             }

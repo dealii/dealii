@@ -2238,23 +2238,24 @@ namespace FETools
     if (name_end < name.size())
       name.erase(name_end);
 
-      // Ensure that the element we are looking for isn't in the map
-      // yet. This only requires us to read the map, so it can happen
-      // in a shared locked state
-#ifdef DEBUG
-    {
-      std::shared_lock<std::shared_mutex> lock(
-        internal::FEToolsAddFENameHelper::fe_name_map_lock);
+    // Ensure that the element we are looking for isn't in the map
+    // yet. This only requires us to read the map, so it can happen
+    // in a shared locked state
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          std::shared_lock<std::shared_mutex> lock(
+            internal::FEToolsAddFENameHelper::fe_name_map_lock);
 
-      Assert(
-        internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].find(
-          name) ==
-          internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
-            .end(),
-        ExcMessage(
-          "Cannot change existing element in finite element name list"));
-    }
-#endif
+          Assert(
+            internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+                .find(name) ==
+              internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+                .end(),
+            ExcMessage(
+              "Cannot change existing element in finite element name list"));
+        }
+      }
 
 
     // Insert the normalized name into the map. This changes the map, so it

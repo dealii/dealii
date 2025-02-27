@@ -1086,17 +1086,18 @@ namespace FEValuesViews
     , dof_renumbering(dof_renumbering)
     , quadrature_renumbering(quadrature_renumbering)
   {
-// Check that the renumbering vectors are valid.
-#  ifdef DEBUG
-    // While for dofs we admit invalid values, this is not the case for
-    // quadrature points.
-    for (const auto i : dof_renumbering)
-      Assert(i < n_inner_dofs || i == numbers::invalid_unsigned_int,
-             ExcIndexRange(i, 0, n_inner_dofs));
+    // Check that the renumbering vectors are valid.
+    if constexpr (running_in_debug_mode())
+      {
+        // While for dofs we admit invalid values, this is not the case for
+        // quadrature points.
+        for (const auto i : dof_renumbering)
+          Assert(i < n_inner_dofs || i == numbers::invalid_unsigned_int,
+                 ExcIndexRange(i, 0, n_inner_dofs));
 
-    for (const auto q : quadrature_renumbering)
-      AssertIndexRange(q, n_inner_quadrature_points);
-#  endif
+        for (const auto q : quadrature_renumbering)
+          AssertIndexRange(q, n_inner_quadrature_points);
+      }
   }
 
 

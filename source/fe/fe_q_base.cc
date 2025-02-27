@@ -559,18 +559,19 @@ FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
           if (std::fabs(interpolation_matrix(i, j)) < eps)
             interpolation_matrix(i, j) = 0.;
 
-#  ifdef DEBUG
-      // make sure that the row sum of each of the matrices is 1 at this
-      // point. this must be so since the shape functions sum up to 1
-      for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
-          for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
-            sum += interpolation_matrix(i, j);
+          // make sure that the row sum of each of the matrices is 1 at this
+          // point. this must be so since the shape functions sum up to 1
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+            {
+              double sum = 0.;
+              for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
+                sum += interpolation_matrix(i, j);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+              Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+            }
         }
-#  endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe))
     {
@@ -695,19 +696,20 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
             }
         }
 
-#  ifdef DEBUG
-      // make sure that the row sum of each of the matrices is 1 at this
-      // point. this must be so since the shape functions sum up to 1
-      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          // make sure that the row sum of each of the matrices is 1 at this
+          // point. this must be so since the shape functions sum up to 1
+          for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+            {
+              double sum = 0.;
 
-          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            sum += interpolation_matrix(j, i);
+              for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+                sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+              Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+            }
         }
-#  endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
     {
@@ -1269,23 +1271,14 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
       // evaluations of the Lagrange polynomials are zero or one.
       const double eps = 1e-15 * q_degree * dim;
 
-#  ifdef DEBUG
-      // in DEBUG mode, check that the evaluation of support points in the
-      // current numbering gives the identity operation
-      for (unsigned int i = 0; i < q_dofs_per_cell; ++i)
+      if constexpr (running_in_debug_mode())
         {
-          Assert(std::fabs(1. - this->poly_space->compute_value(
-                                  i, this->unit_support_points[i])) < eps,
-                 ExcInternalError("The Lagrange polynomial does not evaluate "
-                                  "to one or zero in a nodal point. "
-                                  "This typically indicates that the "
-                                  "polynomial interpolation is "
-                                  "ill-conditioned such that round-off "
-                                  "prevents the sum to be one."));
-          for (unsigned int j = 0; j < q_dofs_per_cell; ++j)
-            if (j != i)
-              Assert(std::fabs(this->poly_space->compute_value(
-                       i, this->unit_support_points[j])) < eps,
+          // in DEBUG mode, check that the evaluation of support points in the
+          // current numbering gives the identity operation
+          for (unsigned int i = 0; i < q_dofs_per_cell; ++i)
+            {
+              Assert(std::fabs(1. - this->poly_space->compute_value(
+                                      i, this->unit_support_points[i])) < eps,
                      ExcInternalError(
                        "The Lagrange polynomial does not evaluate "
                        "to one or zero in a nodal point. "
@@ -1293,8 +1286,19 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
                        "polynomial interpolation is "
                        "ill-conditioned such that round-off "
                        "prevents the sum to be one."));
+              for (unsigned int j = 0; j < q_dofs_per_cell; ++j)
+                if (j != i)
+                  Assert(std::fabs(this->poly_space->compute_value(
+                           i, this->unit_support_points[j])) < eps,
+                         ExcInternalError(
+                           "The Lagrange polynomial does not evaluate "
+                           "to one or zero in a nodal point. "
+                           "This typically indicates that the "
+                           "polynomial interpolation is "
+                           "ill-conditioned such that round-off "
+                           "prevents the sum to be one."));
+            }
         }
-#  endif
 
       // to efficiently evaluate the polynomial at the subcell, make use of
       // the tensor product structure of this element and only evaluate 1d
@@ -1403,24 +1407,26 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
       if (q_dofs_per_cell < this->n_dofs_per_cell())
         prolongate(q_dofs_per_cell, q_dofs_per_cell) = 1.;
 
-        // and make sure that the row sum is 1. this must be so since for this
-        // element, the shape functions add up to one
-#  ifdef DEBUG
-      for (unsigned int row = 0; row < this->n_dofs_per_cell(); ++row)
+      // and make sure that the row sum is 1. this must be so since for this
+      // element, the shape functions add up to one
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0;
-          for (unsigned int col = 0; col < this->n_dofs_per_cell(); ++col)
-            sum += prolongate(row, col);
-          Assert(std::fabs(sum - 1.) <
-                   std::max(eps, 5e-16 * std::sqrt(this->n_dofs_per_cell())),
-                 ExcInternalError("The entries in a row of the local "
-                                  "prolongation matrix do not add to one. "
-                                  "This typically indicates that the "
-                                  "polynomial interpolation is "
-                                  "ill-conditioned such that round-off "
-                                  "prevents the sum to be one."));
+          for (unsigned int row = 0; row < this->n_dofs_per_cell(); ++row)
+            {
+              double sum = 0;
+              for (unsigned int col = 0; col < this->n_dofs_per_cell(); ++col)
+                sum += prolongate(row, col);
+              Assert(std::fabs(sum - 1.) <
+                       std::max(eps,
+                                5e-16 * std::sqrt(this->n_dofs_per_cell())),
+                     ExcInternalError("The entries in a row of the local "
+                                      "prolongation matrix do not add to one. "
+                                      "This typically indicates that the "
+                                      "polynomial interpolation is "
+                                      "ill-conditioned such that round-off "
+                                      "prevents the sum to be one."));
+            }
         }
-#  endif
 
       // move result into place
       const_cast<FullMatrix<double> &>(

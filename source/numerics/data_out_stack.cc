@@ -94,26 +94,27 @@ DataOutStack<dim, spacedim>::declare_data_vector(
   const std::vector<std::string> &names,
   const VectorType                vector_type)
 {
-#ifdef DEBUG
-  // make sure this function is
-  // not called after some parameter
-  // values have already been
-  // processed
-  Assert(patches.empty(), ExcDataAlreadyAdded());
-
-  // also make sure that no name is
-  // used twice
-  for (const auto &name : names)
+  if constexpr (running_in_debug_mode())
     {
-      for (const auto &data_set : dof_data)
-        for (const auto &data_set_name : data_set.names)
-          Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+      // make sure this function is
+      // not called after some parameter
+      // values have already been
+      // processed
+      Assert(patches.empty(), ExcDataAlreadyAdded());
 
-      for (const auto &data_set : cell_data)
-        for (const auto &data_set_name : data_set.names)
-          Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+      // also make sure that no name is
+      // used twice
+      for (const auto &name : names)
+        {
+          for (const auto &data_set : dof_data)
+            for (const auto &data_set_name : data_set.names)
+              Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+
+          for (const auto &data_set : cell_data)
+            for (const auto &data_set_name : data_set.names)
+              Assert(name != data_set_name, ExcNameAlreadyUsed(name));
+        }
     }
-#endif
 
   switch (vector_type)
     {

@@ -1634,28 +1634,30 @@ MappingQ<3, 3>::add_quad_support_points(
     {
       const Triangulation<3>::face_iterator face = cell->face(face_no);
 
-#ifdef DEBUG
-      const bool face_orientation          = cell->face_orientation(face_no),
-                 face_flip                 = cell->face_flip(face_no),
-                 face_rotation             = cell->face_rotation(face_no);
-      const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face,
-                         lines_per_face    = GeometryInfo<3>::lines_per_face;
+      if constexpr (running_in_debug_mode())
+        {
+          const bool face_orientation = cell->face_orientation(face_no),
+                     face_flip        = cell->face_flip(face_no),
+                     face_rotation    = cell->face_rotation(face_no);
+          const unsigned int vertices_per_face =
+                               GeometryInfo<3>::vertices_per_face,
+                             lines_per_face = GeometryInfo<3>::lines_per_face;
 
-      // some sanity checks up front
-      for (unsigned int i = 0; i < vertices_per_face; ++i)
-        Assert(face->vertex_index(i) ==
-                 cell->vertex_index(GeometryInfo<3>::face_to_cell_vertices(
-                   face_no, i, face_orientation, face_flip, face_rotation)),
-               ExcInternalError());
+          // some sanity checks up front
+          for (unsigned int i = 0; i < vertices_per_face; ++i)
+            Assert(face->vertex_index(i) ==
+                     cell->vertex_index(GeometryInfo<3>::face_to_cell_vertices(
+                       face_no, i, face_orientation, face_flip, face_rotation)),
+                   ExcInternalError());
 
-      // indices of the lines that bound a face are given by GeometryInfo<3>::
-      // face_to_cell_lines
-      for (unsigned int i = 0; i < lines_per_face; ++i)
-        Assert(face->line(i) ==
-                 cell->line(GeometryInfo<3>::face_to_cell_lines(
-                   face_no, i, face_orientation, face_flip, face_rotation)),
-               ExcInternalError());
-#endif
+          // indices of the lines that bound a face are given by
+          // GeometryInfo<3>:: face_to_cell_lines
+          for (unsigned int i = 0; i < lines_per_face; ++i)
+            Assert(face->line(i) ==
+                     cell->line(GeometryInfo<3>::face_to_cell_lines(
+                       face_no, i, face_orientation, face_flip, face_rotation)),
+                   ExcInternalError());
+        }
       // extract the points surrounding a quad from the points
       // already computed. First get the 4 vertices and then the points on
       // the four lines

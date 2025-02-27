@@ -1623,14 +1623,16 @@ namespace GridGenerator
     Assert(dim > 1, ExcNotImplemented());
     Assert(dim < 4, ExcNotImplemented());
 
-#  ifdef DEBUG
-    Tensor<2, dim> vector_matrix;
-    for (unsigned int d = 0; d < dim; ++d)
-      for (unsigned int c = 1; c <= dim; ++c)
-        vector_matrix[c - 1][d] = vertices[c][d] - vertices[0][d];
-    Assert(determinant(vector_matrix) > 0.,
-           ExcMessage("Vertices of simplex must form a right handed system"));
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        Tensor<2, dim> vector_matrix;
+        for (unsigned int d = 0; d < dim; ++d)
+          for (unsigned int c = 1; c <= dim; ++c)
+            vector_matrix[c - 1][d] = vertices[c][d] - vertices[0][d];
+        Assert(determinant(vector_matrix) > 0.,
+               ExcMessage(
+                 "Vertices of simplex must form a right handed system"));
+      }
 
     // Set up the vertices by first copying into points.
     std::vector<Point<dim>> points = vertices;
@@ -2678,17 +2680,18 @@ namespace GridGenerator
             std::reverse(step_sizes[i].begin(), step_sizes[i].end());
           }
 
-#  ifdef DEBUG
-        double x = 0;
-        for (unsigned int j = 0; j < step_sizes.at(i).size(); ++j)
-          x += step_sizes[i][j];
-        Assert(std::fabs(x - (p2[i] - p1[i])) <= 1e-12 * std::fabs(x),
-               ExcMessage(
-                 "The sequence of step sizes in coordinate direction " +
-                 Utilities::int_to_string(i) +
-                 " must be equal to the distance of the two given "
-                 "points in this coordinate direction."));
-#  endif
+        if constexpr (running_in_debug_mode())
+          {
+            double x = 0;
+            for (unsigned int j = 0; j < step_sizes.at(i).size(); ++j)
+              x += step_sizes[i][j];
+            Assert(std::fabs(x - (p2[i] - p1[i])) <= 1e-12 * std::fabs(x),
+                   ExcMessage(
+                     "The sequence of step sizes in coordinate direction " +
+                     Utilities::int_to_string(i) +
+                     " must be equal to the distance of the two given "
+                     "points in this coordinate direction."));
+          }
       }
 
 
@@ -6850,12 +6853,14 @@ namespace GridGenerator
                           Triangulation<dim, spacedim>       &result)
   {
     AssertDimension(dim, extents.size());
-#  ifdef DEBUG
-    for (const auto &extent : extents)
-      Assert(0 < extent,
-             ExcMessage("The Triangulation must be copied at least one time in "
-                        "each coordinate dimension."));
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        for (const auto &extent : extents)
+          Assert(0 < extent,
+                 ExcMessage(
+                   "The Triangulation must be copied at least one time in "
+                   "each coordinate dimension."));
+      }
     const BoundingBox<spacedim> bbox(input.get_vertices());
     const auto                 &min = bbox.get_boundary_points().first;
     const auto                 &max = bbox.get_boundary_points().second;
@@ -7135,40 +7140,43 @@ namespace GridGenerator
       // mode)
       if (0 < manifold_priorities.size())
         {
-#  ifdef DEBUG
-          // check that the provided manifold_priorities is valid
-          std::vector<types::manifold_id> sorted_manifold_priorities =
-            manifold_priorities;
-          std::sort(sorted_manifold_priorities.begin(),
-                    sorted_manifold_priorities.end());
-          Assert(std::unique(sorted_manifold_priorities.begin(),
-                             sorted_manifold_priorities.end()) ==
-                   sorted_manifold_priorities.end(),
-                 ExcMessage(
-                   "The given vector of manifold ids may not contain any "
-                   "duplicated entries."));
-          std::vector<types::manifold_id> sorted_manifold_ids =
-            input.get_manifold_ids();
-          std::sort(sorted_manifold_ids.begin(), sorted_manifold_ids.end());
-          if (sorted_manifold_priorities != sorted_manifold_ids)
+          if constexpr (running_in_debug_mode())
             {
-              std::ostringstream message;
-              message << "The given triangulation has manifold ids {";
-              for (const types::manifold_id manifold_id : sorted_manifold_ids)
-                if (manifold_id != sorted_manifold_ids.back())
-                  message << manifold_id << ", ";
-              message << sorted_manifold_ids.back() << "}, but \n"
-                      << "    the given vector of manifold ids is {";
-              for (const types::manifold_id manifold_id : manifold_priorities)
-                if (manifold_id != manifold_priorities.back())
-                  message << manifold_id << ", ";
-              message
-                << manifold_priorities.back() << "}.\n"
-                << "    These vectors should contain the same elements.\n";
-              const std::string m = message.str();
-              Assert(false, ExcMessage(m));
+              // check that the provided manifold_priorities is valid
+              std::vector<types::manifold_id> sorted_manifold_priorities =
+                manifold_priorities;
+              std::sort(sorted_manifold_priorities.begin(),
+                        sorted_manifold_priorities.end());
+              Assert(std::unique(sorted_manifold_priorities.begin(),
+                                 sorted_manifold_priorities.end()) ==
+                       sorted_manifold_priorities.end(),
+                     ExcMessage(
+                       "The given vector of manifold ids may not contain any "
+                       "duplicated entries."));
+              std::vector<types::manifold_id> sorted_manifold_ids =
+                input.get_manifold_ids();
+              std::sort(sorted_manifold_ids.begin(), sorted_manifold_ids.end());
+              if (sorted_manifold_priorities != sorted_manifold_ids)
+                {
+                  std::ostringstream message;
+                  message << "The given triangulation has manifold ids {";
+                  for (const types::manifold_id manifold_id :
+                       sorted_manifold_ids)
+                    if (manifold_id != sorted_manifold_ids.back())
+                      message << manifold_id << ", ";
+                  message << sorted_manifold_ids.back() << "}, but \n"
+                          << "    the given vector of manifold ids is {";
+                  for (const types::manifold_id manifold_id :
+                       manifold_priorities)
+                    if (manifold_id != manifold_priorities.back())
+                      message << manifold_id << ", ";
+                  message
+                    << manifold_priorities.back() << "}.\n"
+                    << "    These vectors should contain the same elements.\n";
+                  const std::string m = message.str();
+                  Assert(false, ExcMessage(m));
+                }
             }
-#  endif
           return manifold_priorities;
         }
       // otherwise use the default ranking: ascending order, but TFI manifolds

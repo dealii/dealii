@@ -322,22 +322,24 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
           if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
             interpolation_matrix(i, j) = 0.;
 
-#ifdef DEBUG
-      // make sure that the row sum of
-      // each of the matrices is 1 at
-      // this point. this must be so
-      // since the shape functions sum up
-      // to 1
-      for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
-          for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
-            sum += interpolation_matrix(i, j);
+          // make sure that the row sum of
+          // each of the matrices is 1 at
+          // this point. this must be so
+          // since the shape functions sum up
+          // to 1
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+            {
+              double sum = 0.;
+              for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
+                sum += interpolation_matrix(i, j);
 
-          Assert(std::fabs(sum - 1) < 5e-14 * std::max(this->degree, 1U) * dim,
-                 ExcInternalError());
+              Assert(std::fabs(sum - 1) <
+                       5e-14 * std::max(this->degree, 1U) * dim,
+                     ExcInternalError());
+            }
         }
-#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe))
     {

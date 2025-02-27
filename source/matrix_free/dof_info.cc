@@ -164,10 +164,11 @@ namespace internal
       const unsigned int n_owned  = (vector_partitioner->local_range().second -
                                     vector_partitioner->local_range().first);
       const std::size_t  n_ghosts = ghost_dofs.size();
-#ifdef DEBUG
-      for (const auto dof_index : dof_indices)
-        AssertIndexRange(dof_index, n_owned + n_ghosts);
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (const auto dof_index : dof_indices)
+            AssertIndexRange(dof_index, n_owned + n_ghosts);
+        }
 
       const unsigned int        n_components = start_components.back();
       std::vector<unsigned int> ghost_numbering(n_ghosts);
@@ -474,54 +475,59 @@ namespace internal
       new_rowstart_plain.swap(row_starts_plain_indices);
       new_hanging_node_constraint_masks.swap(hanging_node_constraint_masks);
 
-#ifdef DEBUG
-      // sanity check 1: all indices should be smaller than the number of dofs
-      // locally owned plus the number of ghosts
-      const unsigned int index_range =
-        (vector_partitioner->local_range().second -
-         vector_partitioner->local_range().first) +
-        vector_partitioner->ghost_indices().n_elements();
-      for (const auto dof_index : dof_indices)
-        AssertIndexRange(dof_index, index_range);
-
-      // sanity check 2: for the constraint indicators, the first index should
-      // be smaller than the number of indices in the row, and the second
-      // index should be smaller than the number of constraints in the
-      // constraint pool.
-      for (unsigned int row = 0; row < task_info.cell_partition_data.back();
-           ++row)
+      if constexpr (running_in_debug_mode())
         {
-          const unsigned int row_length_ind =
-            row_starts[(row * vectorization_length + 1) * n_components].first -
-            row_starts[row * vectorization_length * n_components].first;
-          AssertIndexRange(
-            row_starts[(row * vectorization_length + 1) * n_components].second,
-            constraint_indicator.size() + 1);
-          const std::pair<unsigned short, unsigned short> *
-            con_it =
-             constraint_indicator.data() +
-             row_starts[row * vectorization_length * n_components].second,
-           *end_con =
-             constraint_indicator.data() +
-             row_starts[(row * vectorization_length + 1) * n_components].second;
-          for (; con_it != end_con; ++con_it)
-            {
-              AssertIndexRange(con_it->first, row_length_ind + 1);
-              AssertIndexRange(con_it->second,
-                               constraint_pool_row_index.size() - 1);
-            }
-        }
+          // sanity check 1: all indices should be smaller than the number of
+          // dofs locally owned plus the number of ghosts
+          const unsigned int index_range =
+            (vector_partitioner->local_range().second -
+             vector_partitioner->local_range().first) +
+            vector_partitioner->ghost_indices().n_elements();
+          for (const auto dof_index : dof_indices)
+            AssertIndexRange(dof_index, index_range);
 
-      // sanity check 3: check the number of cells once again
-      unsigned int n_active_cells = 0;
-      for (unsigned int c = 0; c < *(task_info.cell_partition_data.end() - 2);
-           ++c)
-        if (irregular_cells[c] > 0)
-          n_active_cells += irregular_cells[c];
-        else
-          n_active_cells += vectorization_length;
-      AssertDimension(n_active_cells, task_info.n_active_cells);
-#endif
+          // sanity check 2: for the constraint indicators, the first index
+          // should be smaller than the number of indices in the row, and the
+          // second index should be smaller than the number of constraints in
+          // the constraint pool.
+          for (unsigned int row = 0; row < task_info.cell_partition_data.back();
+               ++row)
+            {
+              const unsigned int row_length_ind =
+                row_starts[(row * vectorization_length + 1) * n_components]
+                  .first -
+                row_starts[row * vectorization_length * n_components].first;
+              AssertIndexRange(
+                row_starts[(row * vectorization_length + 1) * n_components]
+                  .second,
+                constraint_indicator.size() + 1);
+              const std::pair<unsigned short, unsigned short>
+                *con_it =
+                  constraint_indicator.data() +
+                  row_starts[row * vectorization_length * n_components].second,
+                *end_con =
+                  constraint_indicator.data() +
+                  row_starts[(row * vectorization_length + 1) * n_components]
+                    .second;
+              for (; con_it != end_con; ++con_it)
+                {
+                  AssertIndexRange(con_it->first, row_length_ind + 1);
+                  AssertIndexRange(con_it->second,
+                                   constraint_pool_row_index.size() - 1);
+                }
+            }
+
+          // sanity check 3: check the number of cells once again
+          unsigned int n_active_cells = 0;
+          for (unsigned int c = 0;
+               c < *(task_info.cell_partition_data.end() - 2);
+               ++c)
+            if (irregular_cells[c] > 0)
+              n_active_cells += irregular_cells[c];
+            else
+              n_active_cells += vectorization_length;
+          AssertDimension(n_active_cells, task_info.n_active_cells);
+        }
 
       compute_cell_index_compression(irregular_cells);
     }

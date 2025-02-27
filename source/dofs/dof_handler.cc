@@ -708,24 +708,25 @@ namespace internal
                 vertex_fe_association[cell->active_fe_index()]
                                      [cell->vertex_index(v)] = true;
 
-                // in debug mode, make sure that each vertex is associated
-                // with at least one FE (note that except for unused
-                // vertices, all vertices are actually active). this is of
-                // course only true for vertices that are part of either
-                // ghost or locally owned cells
-#ifdef DEBUG
-          for (unsigned int v = 0; v < dof_handler.tria->n_vertices(); ++v)
-            if (locally_used_vertices[v] == true)
-              if (dof_handler.tria->vertex_used(v) == true)
-                {
-                  unsigned int fe = 0;
-                  for (; fe < dof_handler.fe_collection.size(); ++fe)
-                    if (vertex_fe_association[fe][v] == true)
-                      break;
-                  Assert(fe != dof_handler.fe_collection.size(),
-                         ExcInternalError());
-                }
-#endif
+          // in debug mode, make sure that each vertex is associated
+          // with at least one FE (note that except for unused
+          // vertices, all vertices are actually active). this is of
+          // course only true for vertices that are part of either
+          // ghost or locally owned cells
+          if constexpr (running_in_debug_mode())
+            {
+              for (unsigned int v = 0; v < dof_handler.tria->n_vertices(); ++v)
+                if (locally_used_vertices[v] == true)
+                  if (dof_handler.tria->vertex_used(v) == true)
+                    {
+                      unsigned int fe = 0;
+                      for (; fe < dof_handler.fe_collection.size(); ++fe)
+                        if (vertex_fe_association[fe][v] == true)
+                          break;
+                      Assert(fe != dof_handler.fe_collection.size(),
+                             ExcInternalError());
+                    }
+            }
 
           const unsigned int d = 0;
           const unsigned int l = 0;
@@ -1499,13 +1500,15 @@ namespace internal
                         // based on the 'least dominant finite element' of its
                         // children. Consider the childrens' hypothetical future
                         // index when they have been flagged for p-refinement.
-#ifdef DEBUG
-                        for (const auto &child : parent->child_iterators())
-                          Assert(child->is_active() &&
-                                   child->coarsen_flag_set(),
-                                 typename dealii::Triangulation<
-                                   dim>::ExcInconsistentCoarseningFlags());
-#endif
+                        if constexpr (library_build_mode ==
+                                      LibraryBuildMode::debug)
+                          {
+                            for (const auto &child : parent->child_iterators())
+                              Assert(child->is_active() &&
+                                       child->coarsen_flag_set(),
+                                     typename dealii::Triangulation<
+                                       dim>::ExcInconsistentCoarseningFlags());
+                          }
 
                         const types::fe_index fe_index = dealii::internal::hp::
                           DoFHandlerImplementation::Implementation::
@@ -2159,24 +2162,25 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
          ExcMessage("The given hp::FECollection contains more finite elements "
                     "than the DoFHandler can cover with active FE indices."));
 
-#  ifdef DEBUG
-  // make sure that the provided FE collection is large enough to
-  // cover all FE indices presently in use on the mesh
-  if ((hp_cell_active_fe_indices.size() > 0) &&
-      (hp_cell_future_fe_indices.size() > 0))
+  if constexpr (running_in_debug_mode())
     {
-      Assert(hp_capability_enabled, ExcInternalError());
-
-      for (const auto &cell :
-           this->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+      // make sure that the provided FE collection is large enough to
+      // cover all FE indices presently in use on the mesh
+      if ((hp_cell_active_fe_indices.size() > 0) &&
+          (hp_cell_future_fe_indices.size() > 0))
         {
-          Assert(cell->active_fe_index() < ff.size(),
-                 ExcInvalidFEIndex(cell->active_fe_index(), ff.size()));
-          Assert(cell->future_fe_index() < ff.size(),
-                 ExcInvalidFEIndex(cell->future_fe_index(), ff.size()));
+          Assert(hp_capability_enabled, ExcInternalError());
+
+          for (const auto &cell : this->active_cell_iterators() |
+                                    IteratorFilters::LocallyOwnedCell())
+            {
+              Assert(cell->active_fe_index() < ff.size(),
+                     ExcInvalidFEIndex(cell->active_fe_index(), ff.size()));
+              Assert(cell->future_fe_index() < ff.size(),
+                     ExcInvalidFEIndex(cell->future_fe_index(), ff.size()));
+            }
         }
     }
-#  endif
 
   //
   // register the new finite element collection
@@ -2401,26 +2405,29 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
 
       AssertDimension(new_numbers.size(), this->n_locally_owned_dofs());
 
-#  ifdef DEBUG
-      // assert that the new indices are consecutively numbered if we are
-      // working on a single processor. this doesn't need to
-      // hold in the case of a parallel mesh since we map the interval
-      // [0...n_dofs()) into itself but only globally, not on each processor
-      if (this->n_locally_owned_dofs() == this->n_dofs())
+      if constexpr (running_in_debug_mode())
         {
-          std::vector<types::global_dof_index> tmp(new_numbers);
-          std::sort(tmp.begin(), tmp.end());
-          std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
-          types::global_dof_index                              i = 0;
-          for (; p != tmp.end(); ++p, ++i)
-            Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+          // assert that the new indices are consecutively numbered if we are
+          // working on a single processor. this doesn't need to
+          // hold in the case of a parallel mesh since we map the interval
+          // [0...n_dofs()) into itself but only globally, not on each processor
+          if (this->n_locally_owned_dofs() == this->n_dofs())
+            {
+              std::vector<types::global_dof_index> tmp(new_numbers);
+              std::sort(tmp.begin(), tmp.end());
+              std::vector<types::global_dof_index>::const_iterator p =
+                tmp.begin();
+              types::global_dof_index i = 0;
+              for (; p != tmp.end(); ++p, ++i)
+                Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+            }
+          else
+            for (const auto new_number : new_numbers)
+              Assert(
+                new_number < this->n_dofs(),
+                ExcMessage(
+                  "New DoF index is not less than the total number of dofs."));
         }
-      else
-        for (const auto new_number : new_numbers)
-          Assert(new_number < this->n_dofs(),
-                 ExcMessage(
-                   "New DoF index is not less than the total number of dofs."));
-#  endif
 
       // uncompress the internal storage scheme of dofs on cells so that
       // we can access dofs in turns. uncompress in parallel, starting
@@ -2455,44 +2462,47 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
              ExcMessage(
                "You need to distribute DoFs before you can renumber them."));
 
-#  ifdef DEBUG
-      if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-            &*this->tria) != nullptr)
+      if constexpr (running_in_debug_mode())
         {
-          Assert(new_numbers.size() == this->n_dofs() ||
-                   new_numbers.size() == this->n_locally_owned_dofs(),
-                 ExcMessage("Incorrect size of the input array."));
-        }
-      else if (dynamic_cast<
-                 const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-                 &*this->tria) != nullptr)
-        {
-          AssertDimension(new_numbers.size(), this->n_locally_owned_dofs());
-        }
-      else
-        {
-          AssertDimension(new_numbers.size(), this->n_dofs());
-        }
+          if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
+                             *>(&*this->tria) != nullptr)
+            {
+              Assert(new_numbers.size() == this->n_dofs() ||
+                       new_numbers.size() == this->n_locally_owned_dofs(),
+                     ExcMessage("Incorrect size of the input array."));
+            }
+          else if (dynamic_cast<
+                     const parallel::DistributedTriangulationBase<dim, spacedim>
+                       *>(&*this->tria) != nullptr)
+            {
+              AssertDimension(new_numbers.size(), this->n_locally_owned_dofs());
+            }
+          else
+            {
+              AssertDimension(new_numbers.size(), this->n_dofs());
+            }
 
-      // assert that the new indices are consecutively numbered if we are
-      // working on a single processor. this doesn't need to
-      // hold in the case of a parallel mesh since we map the interval
-      // [0...n_dofs()) into itself but only globally, not on each processor
-      if (this->n_locally_owned_dofs() == this->n_dofs())
-        {
-          std::vector<types::global_dof_index> tmp(new_numbers);
-          std::sort(tmp.begin(), tmp.end());
-          std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
-          types::global_dof_index                              i = 0;
-          for (; p != tmp.end(); ++p, ++i)
-            Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+          // assert that the new indices are consecutively numbered if we are
+          // working on a single processor. this doesn't need to
+          // hold in the case of a parallel mesh since we map the interval
+          // [0...n_dofs()) into itself but only globally, not on each processor
+          if (this->n_locally_owned_dofs() == this->n_dofs())
+            {
+              std::vector<types::global_dof_index> tmp(new_numbers);
+              std::sort(tmp.begin(), tmp.end());
+              std::vector<types::global_dof_index>::const_iterator p =
+                tmp.begin();
+              types::global_dof_index i = 0;
+              for (; p != tmp.end(); ++p, ++i)
+                Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+            }
+          else
+            for (const auto new_number : new_numbers)
+              Assert(
+                new_number < this->n_dofs(),
+                ExcMessage(
+                  "New DoF index is not less than the total number of dofs."));
         }
-      else
-        for (const auto new_number : new_numbers)
-          Assert(new_number < this->n_dofs(),
-                 ExcMessage(
-                   "New DoF index is not less than the total number of dofs."));
-#  endif
 
       this->number_cache = this->policy->renumber_dofs(new_numbers);
     }
@@ -2516,26 +2526,27 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
   AssertDimension(new_numbers.size(),
                   this->locally_owned_mg_dofs(level).n_elements());
 
-#  ifdef DEBUG
-  // assert that the new indices are consecutively numbered if we are working
-  // on a single processor. this doesn't need to hold in the case of a
-  // parallel mesh since we map the interval [0...n_dofs(level)) into itself
-  // but only globally, not on each processor
-  if (this->n_locally_owned_dofs() == this->n_dofs())
+  if constexpr (running_in_debug_mode())
     {
-      std::vector<types::global_dof_index> tmp(new_numbers);
-      std::sort(tmp.begin(), tmp.end());
-      std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
-      types::global_dof_index                              i = 0;
-      for (; p != tmp.end(); ++p, ++i)
-        Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+      // assert that the new indices are consecutively numbered if we are
+      // working on a single processor. this doesn't need to hold in the case of
+      // a parallel mesh since we map the interval [0...n_dofs(level)) into
+      // itself but only globally, not on each processor
+      if (this->n_locally_owned_dofs() == this->n_dofs())
+        {
+          std::vector<types::global_dof_index> tmp(new_numbers);
+          std::sort(tmp.begin(), tmp.end());
+          std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
+          types::global_dof_index                              i = 0;
+          for (; p != tmp.end(); ++p, ++i)
+            Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+        }
+      else
+        for (const auto new_number : new_numbers)
+          Assert(new_number < this->n_dofs(level),
+                 ExcMessage(
+                   "New DoF index is not less than the total number of dofs."));
     }
-  else
-    for (const auto new_number : new_numbers)
-      Assert(new_number < this->n_dofs(level),
-             ExcMessage(
-               "New DoF index is not less than the total number of dofs."));
-#  endif
 
   this->mg_number_cache[level] =
     this->policy->renumber_mg_dofs(level, new_numbers);

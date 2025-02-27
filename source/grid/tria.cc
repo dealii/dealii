@@ -1663,21 +1663,22 @@ namespace
     const auto inverse_orientation =
       face_1->reference_cell().get_inverse_combined_orientation(orientation);
 
-#ifdef DEBUG
-    const auto [face_orientation, face_rotation, face_flip] =
-      internal::split_face_orientation(orientation);
+    if constexpr (running_in_debug_mode())
+      {
+        const auto [face_orientation, face_rotation, face_flip] =
+          internal::split_face_orientation(orientation);
 
-    Assert((dim != 1) || (face_orientation == true && face_flip == false &&
-                          face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 1d"));
+        Assert((dim != 1) || (face_orientation == true && face_flip == false &&
+                              face_rotation == false),
+               ExcMessage("The supplied orientation "
+                          "(face_orientation, face_flip, face_rotation) "
+                          "is invalid for 1d"));
 
-    Assert((dim != 2) || (face_flip == false && face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 2d"));
-#endif
+        Assert((dim != 2) || (face_flip == false && face_rotation == false),
+               ExcMessage("The supplied orientation "
+                          "(face_orientation, face_flip, face_rotation) "
+                          "is invalid for 2d"));
+      }
 
     Assert(face_1 != face_2, ExcMessage("face_1 and face_2 are equal!"));
 
@@ -6131,25 +6132,28 @@ namespace internal
             triangulation.vertices_used.resize(needed_vertices, false);
           }
 
-          //-----------------------------------------
-          // Before we start with the actual refinement, we do some
-          // sanity checks if in debug mode. especially, we try to catch
-          // the notorious problem with lines being twice refined,
-          // i.e. there are cells adjacent at one line ("around the
-          // edge", but not at a face), with two cells differing by more
-          // than one refinement level
-          //
-          // this check is very simple to implement here, since we have
-          // all lines flagged if they shall be refined
-#ifdef DEBUG
-        for (const auto &cell : triangulation.active_cell_iterators())
-          if (!cell->refine_flag_set())
-            for (unsigned int line_n = 0; line_n < cell->n_lines(); ++line_n)
-              if (cell->line(line_n)->has_children())
-                for (unsigned int c = 0; c < 2; ++c)
-                  Assert(cell->line(line_n)->child(c)->user_flag_set() == false,
-                         ExcInternalError());
-#endif
+        //-----------------------------------------
+        // Before we start with the actual refinement, we do some
+        // sanity checks if in debug mode. especially, we try to catch
+        // the notorious problem with lines being twice refined,
+        // i.e. there are cells adjacent at one line ("around the
+        // edge", but not at a face), with two cells differing by more
+        // than one refinement level
+        //
+        // this check is very simple to implement here, since we have
+        // all lines flagged if they shall be refined
+        if constexpr (running_in_debug_mode())
+          {
+            for (const auto &cell : triangulation.active_cell_iterators())
+              if (!cell->refine_flag_set())
+                for (unsigned int line_n = 0; line_n < cell->n_lines();
+                     ++line_n)
+                  if (cell->line(line_n)->has_children())
+                    for (unsigned int c = 0; c < 2; ++c)
+                      Assert(cell->line(line_n)->child(c)->user_flag_set() ==
+                               false,
+                             ExcInternalError());
+          }
 
         unsigned int current_vertex = 0;
 
@@ -6261,10 +6265,11 @@ namespace internal
                   DEAL_II_NOT_IMPLEMENTED();
                 }
 
-#ifdef DEBUG
-              for (const unsigned int line : quad->line_indices())
-                AssertIsNotUsed(new_lines[line]);
-#endif
+              if constexpr (running_in_debug_mode())
+                {
+                  for (const unsigned int line : quad->line_indices())
+                    AssertIsNotUsed(new_lines[line]);
+                }
 
               // 2) create new quads (properties are set below). Both triangles
               // and quads are divided in four.
@@ -6282,10 +6287,11 @@ namespace internal
                 }
               quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
-#ifdef DEBUG
-              for (const auto &quad : new_quads)
-                AssertIsNotUsed(quad);
-#endif
+              if constexpr (running_in_debug_mode())
+                {
+                  for (const auto &quad : new_quads)
+                    AssertIsNotUsed(quad);
+                }
 
               // 3) set vertex indices and set new vertex
 
@@ -6428,9 +6434,7 @@ namespace internal
                   new_quad->set_boundary_id_internal(quad->boundary_id());
                   new_quad->set_manifold_id(quad->manifold_id());
 
-#ifdef DEBUG
-                  std::set<unsigned int> s;
-#endif
+                  [[maybe_unused]] std::set<unsigned int> s;
 
                   // ... and fix orientation of lines of face for triangles,
                   // using an expensive algorithm, quadrilaterals are treated
@@ -6452,18 +6456,22 @@ namespace internal
                               make_array_view(vertices_0),
                               make_array_view(vertices_1));
 
-#ifdef DEBUG
-                          for (const auto i : vertices_0)
-                            s.insert(i);
-                          for (const auto i : vertices_1)
-                            s.insert(i);
-#endif
+                          if constexpr (library_build_mode ==
+                                        LibraryBuildMode::debug)
+                            {
+                              for (const auto i : vertices_0)
+                                s.insert(i);
+                              for (const auto i : vertices_1)
+                                s.insert(i);
+                            }
 
                           new_quad->set_line_orientation(f, orientation);
                         }
-#ifdef DEBUG
-                      AssertDimension(s.size(), 3);
-#endif
+                      if constexpr (library_build_mode ==
+                                    LibraryBuildMode::debug)
+                        {
+                          AssertDimension(s.size(), 3);
+                        }
                     }
                 }
 
@@ -7418,27 +7426,29 @@ namespace internal
           }
 
 
-          //-----------------------------------------
-          // Before we start with the actual refinement, we do some
-          // sanity checks if in debug mode. especially, we try to catch
-          // the notorious problem with lines being twice refined,
-          // i.e. there are cells adjacent at one line ("around the
-          // edge", but not at a face), with two cells differing by more
-          // than one refinement level
-          //
-          // this check is very simple to implement here, since we have
-          // all lines flagged if they shall be refined
-#ifdef DEBUG
-        for (const auto &cell : triangulation.active_cell_iterators())
-          if (!cell->refine_flag_set())
-            for (unsigned int line = 0;
-                 line < GeometryInfo<dim>::lines_per_cell;
-                 ++line)
-              if (cell->line(line)->has_children())
-                for (unsigned int c = 0; c < 2; ++c)
-                  Assert(cell->line(line)->child(c)->user_flag_set() == false,
-                         ExcInternalError());
-#endif
+        //-----------------------------------------
+        // Before we start with the actual refinement, we do some
+        // sanity checks if in debug mode. especially, we try to catch
+        // the notorious problem with lines being twice refined,
+        // i.e. there are cells adjacent at one line ("around the
+        // edge", but not at a face), with two cells differing by more
+        // than one refinement level
+        //
+        // this check is very simple to implement here, since we have
+        // all lines flagged if they shall be refined
+        if constexpr (running_in_debug_mode())
+          {
+            for (const auto &cell : triangulation.active_cell_iterators())
+              if (!cell->refine_flag_set())
+                for (unsigned int line = 0;
+                     line < GeometryInfo<dim>::lines_per_cell;
+                     ++line)
+                  if (cell->line(line)->has_children())
+                    for (unsigned int c = 0; c < 2; ++c)
+                      Assert(cell->line(line)->child(c)->user_flag_set() ==
+                               false,
+                             ExcInternalError());
+          }
 
         //-----------------------------------------
         // Do refinement on every level
@@ -15875,50 +15885,50 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   if (this->cell_attached_data.n_attached_data_sets == 0)
     this->update_cell_relations();
 
-#  ifdef DEBUG
-
-  // In debug mode, we want to check for some consistency of the
-  // result of this function. Because there are multiple exit
-  // paths, put this check into a ScopeExit object that is
-  // executed on each of the exit paths.
-  //
-  // Specifically, check on exit of this function that if a quad
-  // cell has been refined, all of its children have neighbors
-  // in all directions in which the parent cell has neighbors as
-  // well. The children's neighbors are either the parent
-  // neighbor or the parent neighbor's children, or simply one of
-  // the other children of the current cell. This check is
-  // useful because if one creates a triangulation with an
-  // inconsistently ordered set of cells (e.g., because one has
-  // forgotten to call GridTools::consistently_order_cells()),
-  // then this relatively simple invariant is violated -- so the
-  // check here can be used to catch that case, at least
-  // sometimes.
-  //
-  // In 1d, this situation cannot happen. In 3d, we have explicit
-  // orientation flags to ensure that it is not necessary to re-orient
-  // cells at the beginning. But in both cases, the invariant should
-  // still hold as long as the cell is a hypercube.
-  for (const auto &cell : cell_iterators())
+  if constexpr (running_in_debug_mode())
     {
-      if (cell->has_children() && cell->reference_cell().is_hyper_cube())
-        for (const unsigned int f : cell->face_indices())
-          if (cell->at_boundary(f) == false)
-            {
-              for (const auto &child : cell->child_iterators())
+      // In debug mode, we want to check for some consistency of the
+      // result of this function. Because there are multiple exit
+      // paths, put this check into a ScopeExit object that is
+      // executed on each of the exit paths.
+      //
+      // Specifically, check on exit of this function that if a quad
+      // cell has been refined, all of its children have neighbors
+      // in all directions in which the parent cell has neighbors as
+      // well. The children's neighbors are either the parent
+      // neighbor or the parent neighbor's children, or simply one of
+      // the other children of the current cell. This check is
+      // useful because if one creates a triangulation with an
+      // inconsistently ordered set of cells (e.g., because one has
+      // forgotten to call GridTools::consistently_order_cells()),
+      // then this relatively simple invariant is violated -- so the
+      // check here can be used to catch that case, at least
+      // sometimes.
+      //
+      // In 1d, this situation cannot happen. In 3d, we have explicit
+      // orientation flags to ensure that it is not necessary to re-orient
+      // cells at the beginning. But in both cases, the invariant should
+      // still hold as long as the cell is a hypercube.
+      for (const auto &cell : cell_iterators())
+        {
+          if (cell->has_children() && cell->reference_cell().is_hyper_cube())
+            for (const unsigned int f : cell->face_indices())
+              if (cell->at_boundary(f) == false)
                 {
-                  Assert(
-                    child->at_boundary(f) == false,
-                    ExcMessage(
-                      "We ended up with a triangulation whose child cells "
-                      "are not connected to their neighbors as expected. "
-                      "When you created the triangulation, did you forget "
-                      "to call GridTools::consistently_order_cells() "
-                      "before calling Triangulation::create_triangulation()?"));
+                  for (const auto &child : cell->child_iterators())
+                    {
+                      Assert(
+                        child->at_boundary(f) == false,
+                        ExcMessage(
+                          "We ended up with a triangulation whose child cells "
+                          "are not connected to their neighbors as expected. "
+                          "When you created the triangulation, did you forget "
+                          "to call GridTools::consistently_order_cells() "
+                          "before calling Triangulation::create_triangulation()?"));
+                    }
                 }
-            }
+        }
     }
-#  endif
 }
 
 
@@ -16327,16 +16337,17 @@ void Triangulation<dim, spacedim>::load_attached_data(
 
       this->data_serializer.unpack_cell_status(this->local_cell_relations);
 
-#  ifdef DEBUG
-      // the CellStatus of all stored cells should always be
-      // CellStatus::cell_will_persist.
-      for (const auto &cell_rel : this->local_cell_relations)
+      if constexpr (running_in_debug_mode())
         {
-          Assert((cell_rel.second == // cell_status
-                  ::dealii::CellStatus::cell_will_persist),
-                 ExcInternalError());
+          // the CellStatus of all stored cells should always be
+          // CellStatus::cell_will_persist.
+          for (const auto &cell_rel : this->local_cell_relations)
+            {
+              Assert((cell_rel.second == // cell_status
+                      ::dealii::CellStatus::cell_will_persist),
+                     ExcInternalError());
+            }
         }
-#  endif
     }
 }
 
@@ -16389,17 +16400,18 @@ typename Triangulation<dim, spacedim>::DistortedCellList
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
 
-#  ifdef DEBUG
-  for (const auto &level : levels)
-    monitor_memory(level->cells, dim);
+  if constexpr (running_in_debug_mode())
+    {
+      for (const auto &level : levels)
+        monitor_memory(level->cells, dim);
 
-  // check whether really all refinement flags are reset (also of
-  // previously non-active cells which we may not have touched. If the
-  // refinement flag of a non-active cell is set, something went wrong
-  // since the cell-accessors should have caught this)
-  for (const auto &cell : this->cell_iterators())
-    Assert(!cell->refine_flag_set(), ExcInternalError());
-#  endif
+      // check whether really all refinement flags are reset (also of
+      // previously non-active cells which we may not have touched. If the
+      // refinement flag of a non-active cell is set, something went wrong
+      // since the cell-accessors should have caught this)
+      for (const auto &cell : this->cell_iterators())
+        Assert(!cell->refine_flag_set(), ExcInternalError());
+    }
 
   return cells_with_distorted_children;
 }
@@ -16768,31 +16780,34 @@ namespace
   {
     Assert(cell->is_active(), ExcInternalError());
 
-#ifdef DEBUG
-    // If this is not a parallel::distributed::Triangulation, then we really
-    // should only get here if the cell is marked for refinement:
-    if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                       *>(&cell->get_triangulation()) == nullptr)
-      Assert(cell->refine_flag_set() == false, ExcInternalError());
-    else
-      // But if this is a p::d::Triangulation, then we don't have that
-      // much control and we can get here because mesh smoothing is
-      // requested but can not be honored because p4est controls
-      // what gets refined. In that case, we can at least provide
-      // a better error message.
-      Assert(cell->refine_flag_set() == false,
-             ExcMessage(
-               "The triangulation is trying to avoid unrefined islands "
-               "during mesh refinement/coarsening, as you had requested "
-               " by passing the appropriate 'smoothing flags' to the "
-               "constructor of the triangulation. However, for objects "
-               "of type parallel::distributed::Triangulation, control "
-               "over which cells get refined rests with p4est, not the "
-               "deal.II triangulation, and consequently it is not "
-               "always possible to avoid unrefined islands in the mesh. "
-               "Please remove the constructor argument to the triangulation "
-               "object that requests mesh smoothing."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        // If this is not a parallel::distributed::Triangulation, then we really
+        // should only get here if the cell is marked for refinement:
+        if (dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
+              &cell->get_triangulation()) == nullptr)
+          Assert(cell->refine_flag_set() == false, ExcInternalError());
+        else
+          // But if this is a p::d::Triangulation, then we don't have that
+          // much control and we can get here because mesh smoothing is
+          // requested but can not be honored because p4est controls
+          // what gets refined. In that case, we can at least provide
+          // a better error message.
+          Assert(
+            cell->refine_flag_set() == false,
+            ExcMessage(
+              "The triangulation is trying to avoid unrefined islands "
+              "during mesh refinement/coarsening, as you had requested "
+              " by passing the appropriate 'smoothing flags' to the "
+              "constructor of the triangulation. However, for objects "
+              "of type parallel::distributed::Triangulation, control "
+              "over which cells get refined rests with p4est, not the "
+              "deal.II triangulation, and consequently it is not "
+              "always possible to avoid unrefined islands in the mesh. "
+              "Please remove the constructor argument to the triangulation "
+              "object that requests mesh smoothing."));
+      }
 
     // now we provide two algorithms. the first one is the standard
     // one, coming from the time, where only isotropic refinement was

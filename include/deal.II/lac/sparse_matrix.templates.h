@@ -521,12 +521,13 @@ SparseMatrix<number>::add(const size_type  row,
     {
       // check whether the given indices are
       // really sorted
-#ifdef DEBUG
-      for (size_type i = 1; i < n_cols; ++i)
-        Assert(col_indices[i] > col_indices[i - 1],
-               ExcMessage(
-                 "List of indices is unsorted or contains duplicates."));
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (size_type i = 1; i < n_cols; ++i)
+            Assert(col_indices[i] > col_indices[i - 1],
+                   ExcMessage(
+                     "List of indices is unsorted or contains duplicates."));
+        }
 
       const size_type *this_cols    = &cols->colnums[cols->rowstart[row]];
       const size_type  row_length_1 = cols->row_length(row) - 1;
@@ -621,13 +622,16 @@ SparseMatrix<number>::add(const size_type  row,
       const number value = number(values[j]);
       AssertIsFinite(value);
 
-#ifdef DEBUG
-      if (elide_zero_values == true && value == number())
-        continue;
-#else
-      if (value == number())
-        continue;
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          if (elide_zero_values == true && value == number())
+            continue;
+        }
+      else
+        {
+          if (value == number())
+            continue;
+        }
 
       // check whether the next index to add is
       // the next present index in the sparsity
@@ -1344,26 +1348,30 @@ namespace internal
     void
     AssertNoZerosOnDiagonal(const SparseMatrix<number> &matrix)
     {
-#ifdef DEBUG
-      for (typename SparseMatrix<number>::size_type row = 0; row < matrix.m();
-           ++row)
-        Assert(matrix.diag_element(row) != number(),
-               ExcMessage(
-                 "There is a zero on the diagonal of this matrix "
-                 "in row " +
-                 std::to_string(row) +
-                 ". The preconditioner you selected cannot work if that "
-                 "is the case because one of its steps requires "
-                 "division by the diagonal elements of the matrix."
-                 "\n\n"
-                 "You should check whether you have correctly "
-                 "assembled the matrix that you use for this "
-                 "preconditioner. If it is correct that there are "
-                 "zeros on the diagonal, then you will have to chose "
-                 "a different preconditioner."));
-#else
-      (void)matrix;
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (typename SparseMatrix<number>::size_type row = 0;
+               row < matrix.m();
+               ++row)
+            Assert(matrix.diag_element(row) != number(),
+                   ExcMessage(
+                     "There is a zero on the diagonal of this matrix "
+                     "in row " +
+                     std::to_string(row) +
+                     ". The preconditioner you selected cannot work if that "
+                     "is the case because one of its steps requires "
+                     "division by the diagonal elements of the matrix."
+                     "\n\n"
+                     "You should check whether you have correctly "
+                     "assembled the matrix that you use for this "
+                     "preconditioner. If it is correct that there are "
+                     "zeros on the diagonal, then you will have to chose "
+                     "a different preconditioner."));
+        }
+      else
+        {
+          (void)matrix;
+        }
     }
   } // namespace SparseMatrixImplementation
 } // namespace internal

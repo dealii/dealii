@@ -193,9 +193,8 @@ DEAL_II_NAMESPACE_OPEN
  * The following code can be used to query the I/O method.
  * @code
  * auto dataset = group.create_dataset<double>("name", dimensions);
- * #ifdef DEBUG
- * dataset.set_query_io_mode(true);
- * #endif
+ * if constexpr (running_in_debug_mode())
+ *   dataset.set_query_io_mode(true);
  *
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
  *   {

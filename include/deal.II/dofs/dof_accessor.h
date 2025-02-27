@@ -4451,10 +4451,11 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::neighbor(
       this->neighbor_index(i),
       this->dof_handler);
 
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert(q->used(), ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      if (q.state() != IteratorState::past_the_end)
+        Assert(q->used(), ExcInternalError());
+    }
   return q;
 }
 
@@ -4469,10 +4470,11 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::child(
   TriaIterator<DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
     q(this->tria, this->level() + 1, this->child_index(i), this->dof_handler);
 
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert(q->used(), ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      if (q.state() != IteratorState::past_the_end)
+        Assert(q->used(), ExcInternalError());
+    }
   return q;
 }
 

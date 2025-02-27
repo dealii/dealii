@@ -70,21 +70,6 @@ namespace internal
     return a;
   }
 
-  /**
-   * Check if a vector is a deal.II vector.
-   */
-  template <typename VectorType>
-  constexpr bool is_dealii_vector =
-    std::is_same_v<VectorType,
-                   dealii::Vector<typename VectorType::value_type>> ||
-    std::is_same_v<VectorType,
-                   dealii::BlockVector<typename VectorType::value_type>> ||
-    std::is_same_v<VectorType,
-                   dealii::LinearAlgebra::distributed::Vector<
-                     typename VectorType::value_type>> ||
-    std::is_same_v<VectorType,
-                   dealii::LinearAlgebra::distributed::BlockVector<
-                     typename VectorType::value_type>>;
 
   /**
    * Helper functions that call set_ghost_state() if the vector supports this
@@ -117,6 +102,24 @@ namespace internal
   }
 #endif
 
+  namespace
+  {
+    // Test whether a vector is a deal.II vector
+    template <typename VectorType>
+    constexpr bool is_dealii_vector =
+      std::is_same_v<VectorType,
+                     dealii::Vector<typename VectorType::value_type>> ||
+      std::is_same_v<VectorType,
+                     dealii::BlockVector<typename VectorType::value_type>> ||
+      std::is_same_v<VectorType,
+                     dealii::LinearAlgebra::distributed::Vector<
+                       typename VectorType::value_type>> ||
+      std::is_same_v<VectorType,
+                     dealii::LinearAlgebra::distributed::BlockVector<
+                       typename VectorType::value_type>>;
+  } // namespace
+
+
   /**
    * Helper function that sets the values on a cell, but also checks if the
    * new values are similar to the old values.
@@ -134,32 +137,33 @@ namespace internal
   {
     (void)perform_check;
 
-#ifdef DEBUG
-    if (perform_check && is_dealii_vector<OutputVector>)
+    if constexpr (running_in_debug_mode())
       {
-        const bool old_ghost_state = values.has_ghost_elements();
-        set_ghost_state(values, true);
-
-        Vector<number> local_values_old(cell.get_fe().n_dofs_per_cell());
-        cell.get_dof_values(values, local_values_old);
-
-        for (unsigned int i = 0; i < cell.get_fe().n_dofs_per_cell(); ++i)
+        if (perform_check && is_dealii_vector<OutputVector>)
           {
-            // a check consistent with the one in
-            // Utilities::MPI::Partitioner::import_from_ghosted_array_finish()
-            Assert(local_values_old[i] == number() ||
-                     get_abs(local_values_old[i] - local_values[i]) <=
-                       get_abs(local_values_old[i] + local_values[i]) *
-                         100000. *
-                         std::numeric_limits<typename numbers::NumberTraits<
-                           number>::real_type>::epsilon(),
-                   ExcNonMatchingElementsSetDofValuesByInterpolation<number>(
-                     local_values[i], local_values_old[i]));
-          }
+            const bool old_ghost_state = values.has_ghost_elements();
+            set_ghost_state(values, true);
 
-        set_ghost_state(values, old_ghost_state);
+            Vector<number> local_values_old(cell.get_fe().n_dofs_per_cell());
+            cell.get_dof_values(values, local_values_old);
+
+            for (unsigned int i = 0; i < cell.get_fe().n_dofs_per_cell(); ++i)
+              {
+                // a check consistent with the one in
+                // Utilities::MPI::Partitioner::import_from_ghosted_array_finish()
+                Assert(
+                  local_values_old[i] == number() ||
+                    get_abs(local_values_old[i] - local_values[i]) <=
+                      get_abs(local_values_old[i] + local_values[i]) * 100000. *
+                        std::numeric_limits<typename numbers::NumberTraits<
+                          number>::real_type>::epsilon(),
+                  ExcNonMatchingElementsSetDofValuesByInterpolation<number>(
+                    local_values[i], local_values_old[i]));
+              }
+
+            set_ghost_state(values, old_ghost_state);
+          }
       }
-#endif
 
     cell.set_dof_values(local_values, values);
   }

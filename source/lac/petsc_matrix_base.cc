@@ -59,13 +59,14 @@ namespace PETScWrappers
       // iterator for an empty line (what
       // would it point to?)
       Assert(ncols != 0, ExcInternalError());
-#    ifdef DEBUG
-      for (PetscInt j = 0; j < ncols; ++j)
+      if constexpr (running_in_debug_mode())
         {
-          const auto column = static_cast<PetscInt>(colnums[j]);
-          AssertIntegerConversion(column, colnums[j]);
+          for (PetscInt j = 0; j < ncols; ++j)
+            {
+              const auto column = static_cast<PetscInt>(colnums[j]);
+              AssertIntegerConversion(column, colnums[j]);
+            }
         }
-#    endif
       colnum_cache =
         std::make_shared<std::vector<size_type>>(colnums, colnums + ncols);
       value_cache =
@@ -165,10 +166,11 @@ namespace PETScWrappers
     assert_is_compressed();
 
     // now set all the entries of these rows to zero
-#  ifdef DEBUG
-    for (const auto &row : rows)
-      AssertIntegerConversion(static_cast<PetscInt>(row), row);
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        for (const auto &row : rows)
+          AssertIntegerConversion(static_cast<PetscInt>(row), row);
+      }
     const std::vector<PetscInt> petsc_rows(rows.begin(), rows.end());
 
     // call the functions. note that we have
@@ -197,10 +199,11 @@ namespace PETScWrappers
     assert_is_compressed();
 
     // now set all the entries of these rows to zero
-#  ifdef DEBUG
-    for (const auto &row : rows)
-      AssertIntegerConversion(static_cast<PetscInt>(row), row);
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        for (const auto &row : rows)
+          AssertIntegerConversion(static_cast<PetscInt>(row), row);
+      }
     const std::vector<PetscInt> petsc_rows(rows.begin(), rows.end());
 
     // call the functions. note that we have
@@ -260,25 +263,28 @@ namespace PETScWrappers
   MatrixBase::compress(const VectorOperation::values operation)
   {
     {
-#  ifdef DEBUG
-      // Check that all processors agree that last_action is the same (or none!)
+      if constexpr (running_in_debug_mode())
+        {
+          // Check that all processors agree that last_action is the same (or
+          // none!)
 
-      int my_int_last_action = last_action;
-      int all_int_last_action;
+          int my_int_last_action = last_action;
+          int all_int_last_action;
 
-      const int ierr = MPI_Allreduce(&my_int_last_action,
-                                     &all_int_last_action,
-                                     1,
-                                     MPI_INT,
-                                     MPI_BOR,
-                                     get_mpi_communicator());
-      AssertThrowMPI(ierr);
+          const int ierr = MPI_Allreduce(&my_int_last_action,
+                                         &all_int_last_action,
+                                         1,
+                                         MPI_INT,
+                                         MPI_BOR,
+                                         get_mpi_communicator());
+          AssertThrowMPI(ierr);
 
-      AssertThrow(all_int_last_action !=
-                    (VectorOperation::add | VectorOperation::insert),
-                  ExcMessage("Error: not all processors agree on the last "
-                             "VectorOperation before this compress() call."));
-#  endif
+          AssertThrow(all_int_last_action !=
+                        (VectorOperation::add | VectorOperation::insert),
+                      ExcMessage(
+                        "Error: not all processors agree on the last "
+                        "VectorOperation before this compress() call."));
+        }
     }
 
     AssertThrow(

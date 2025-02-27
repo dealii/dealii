@@ -1725,31 +1725,35 @@ namespace MatrixCreator
                 copy_data.cell->face(face)->boundary_id()) !=
               boundary_functions.end())
             {
-#ifdef DEBUG
-              // in debug mode: compute an element in the matrix which is
-              // guaranteed to belong to a boundary dof. We do this to check
-              // that the entries in the cell matrix are guaranteed to be zero
-              // if the respective dof is not on the boundary. Since because of
-              // round-off, the actual value of the matrix entry may be
-              // only close to zero, we assert that it is small relative to an
-              // element which is guaranteed to be nonzero. (absolute smallness
-              // does not suffice since the size of the domain scales in here)
-              //
-              // for this purpose we seek the diagonal of the matrix, where
-              // there must be an element belonging to the boundary. we take the
-              // maximum diagonal entry.
-              types::global_dof_index max_element = 0;
-              for (const auto index : dof_to_boundary_mapping)
-                if ((index != numbers::invalid_dof_index) &&
-                    (index > max_element))
-                  max_element = index;
-              Assert(max_element == matrix.n() - 1, ExcInternalError());
+              if constexpr (running_in_debug_mode())
+                {
+                  // in debug mode: compute an element in the matrix which is
+                  // guaranteed to belong to a boundary dof. We do this to check
+                  // that the entries in the cell matrix are guaranteed to be
+                  // zero if the respective dof is not on the boundary. Since
+                  // because of round-off, the actual value of the matrix entry
+                  // may be only close to zero, we assert that it is small
+                  // relative to an element which is guaranteed to be nonzero.
+                  // (absolute smallness does not suffice since the size of the
+                  // domain scales in here)
+                  //
+                  // for this purpose we seek the diagonal of the matrix, where
+                  // there must be an element belonging to the boundary. we take
+                  // the maximum diagonal entry.
+                  types::global_dof_index max_element = 0;
+                  for (const auto index : dof_to_boundary_mapping)
+                    if ((index != numbers::invalid_dof_index) &&
+                        (index > max_element))
+                      max_element = index;
+                  Assert(max_element == matrix.n() - 1, ExcInternalError());
 
-              double max_diag_entry = 0;
-              for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
-                if (std::abs(copy_data.cell_matrix[pos](i, i)) > max_diag_entry)
-                  max_diag_entry = std::abs(copy_data.cell_matrix[pos](i, i));
-#endif
+                  double max_diag_entry = 0;
+                  for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
+                    if (std::abs(copy_data.cell_matrix[pos](i, i)) >
+                        max_diag_entry)
+                      max_diag_entry =
+                        std::abs(copy_data.cell_matrix[pos](i, i));
+                }
 
               for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
                 {

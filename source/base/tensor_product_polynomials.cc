@@ -710,12 +710,13 @@ AnisotropicPolynomials<dim>::compute_index(
     }
   else
     {
-#ifdef DEBUG
-      unsigned int n_poly = 1;
-      for (unsigned int d = 0; d < dim; ++d)
-        n_poly *= polynomials[d].size();
-      Assert(i < n_poly, ExcInternalError());
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          unsigned int n_poly = 1;
+          for (unsigned int d = 0; d < dim; ++d)
+            n_poly *= polynomials[d].size();
+          Assert(i < n_poly, ExcInternalError());
+        }
 
       if (dim == 0)
         {

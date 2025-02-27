@@ -584,15 +584,16 @@ namespace LinearAlgebra
       IndexSet nonlocal_partitioner = writable_rows;
       AssertDimension(nonlocal_partitioner.size(),
                       row_parallel_partitioning.size());
-#  ifdef DEBUG
-      {
-        IndexSet tmp = writable_rows & row_parallel_partitioning;
-        Assert(tmp == row_parallel_partitioning,
-               ExcMessage(
-                 "The set of writable rows passed to this method does not "
-                 "contain the locally owned rows, which is not allowed."));
-      }
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            IndexSet tmp = writable_rows & row_parallel_partitioning;
+            Assert(tmp == row_parallel_partitioning,
+                   ExcMessage(
+                     "The set of writable rows passed to this method does not "
+                     "contain the locally owned rows, which is not allowed."));
+          }
+        }
       nonlocal_partitioner.subtract_set(row_parallel_partitioning);
       if (Utilities::MPI::n_mpi_processes(communicator) > 1)
         {
