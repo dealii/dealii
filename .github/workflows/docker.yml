@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy]
+        ubuntu_version: [jammy, noble]
         platform: [linux/amd64]
         # Use only 2 jobs to build, as more jobs
         # would starve the github machine for memory.
@@ -101,7 +101,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy]
+        ubuntu_version: [jammy, noble]
 
     steps:
       - name: Download digests
