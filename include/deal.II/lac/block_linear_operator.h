@@ -599,12 +599,13 @@ block_operator(const BlockMatrixType &block_matrix)
 
   return_op.block = [&block_matrix](unsigned int i,
                                     unsigned int j) -> BlockType {
-#ifdef DEBUG
-    const unsigned int m = block_matrix.n_block_rows();
-    const unsigned int n = block_matrix.n_block_cols();
-    AssertIndexRange(i, m);
-    AssertIndexRange(j, n);
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const unsigned int m = block_matrix.n_block_rows();
+        const unsigned int n = block_matrix.n_block_cols();
+        AssertIndexRange(i, m);
+        AssertIndexRange(j, n);
+      }
 
     return BlockType(block_matrix.block(i, j));
   };
@@ -720,13 +721,14 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
 
   return_op.block = [&block_matrix](unsigned int i,
                                     unsigned int j) -> BlockType {
-#ifdef DEBUG
-    const unsigned int m = block_matrix.n_block_rows();
-    const unsigned int n = block_matrix.n_block_cols();
-    Assert(m == n, ExcDimensionMismatch(m, n));
-    AssertIndexRange(i, m);
-    AssertIndexRange(j, n);
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const unsigned int m = block_matrix.n_block_rows();
+        const unsigned int n = block_matrix.n_block_cols();
+        Assert(m == n, ExcDimensionMismatch(m, n));
+        AssertIndexRange(i, m);
+        AssertIndexRange(j, n);
+      }
     if (i == j)
       return BlockType(block_matrix.block(i, j));
     else

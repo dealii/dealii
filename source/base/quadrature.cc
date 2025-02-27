@@ -186,17 +186,18 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
         ++present_index;
       }
 
-#ifdef DEBUG
-  if (size() > 0)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0;
-      for (unsigned int i = 0; i < size(); ++i)
-        sum += weights[i];
-      // we cannot guarantee the sum of weights to be exactly one, but it should
-      // be near that.
-      Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+      if (size() > 0)
+        {
+          double sum = 0;
+          for (unsigned int i = 0; i < size(); ++i)
+            sum += weights[i];
+          // we cannot guarantee the sum of weights to be exactly one, but it
+          // should be near that.
+          Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+        }
     }
-#endif
 
   if (is_tensor_product_flag)
     {
@@ -227,17 +228,18 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
       ++present_index;
     }
 
-#  ifdef DEBUG
-  if (size() > 0)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0;
-      for (unsigned int i = 0; i < size(); ++i)
-        sum += weights[i];
-      // we cannot guarantee the sum of weights to be exactly one, but it should
-      // be near that.
-      Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+      if (size() > 0)
+        {
+          double sum = 0;
+          for (unsigned int i = 0; i < size(); ++i)
+            sum += weights[i];
+          // we cannot guarantee the sum of weights to be exactly one, but it
+          // should be near that.
+          Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+        }
     }
-#  endif
 }
 
 
@@ -623,12 +625,13 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
     else if (std::abs(i[0] - 1.0) < 1e-12)
       i[0] = 1.0;
 
-#ifdef DEBUG
-  double sum_of_weights = 0;
-  for (unsigned int i = 0; i < this->size(); ++i)
-    sum_of_weights += this->weight(i);
-  Assert(std::fabs(sum_of_weights - 1) < 1e-13, ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      double sum_of_weights = 0;
+      for (unsigned int i = 0; i < this->size(); ++i)
+        sum_of_weights += this->weight(i);
+      Assert(std::fabs(sum_of_weights - 1) < 1e-13, ExcInternalError());
+    }
 }
 
 

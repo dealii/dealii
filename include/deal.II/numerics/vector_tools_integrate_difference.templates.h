@@ -653,21 +653,22 @@ namespace VectorTools
   {
     Assert(cellwise_error.size() == tria.n_active_cells(),
            ExcMessage("input vector cell_error has invalid size!"));
-#ifdef DEBUG
-    {
-      // check that off-processor entries are zero. Otherwise we will compute
-      // wrong results below!
-      typename InVector::size_type                                i = 0;
-      typename Triangulation<dim, spacedim>::active_cell_iterator it =
-        tria.begin_active();
-      for (; i < cellwise_error.size(); ++i, ++it)
-        if (!it->is_locally_owned())
-          Assert(
-            std::fabs(cellwise_error[i]) < 1e-20,
-            ExcMessage(
-              "cellwise_error of cells that are not locally owned need to be zero!"));
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          // check that off-processor entries are zero. Otherwise we will
+          // compute wrong results below!
+          typename InVector::size_type                                i = 0;
+          typename Triangulation<dim, spacedim>::active_cell_iterator it =
+            tria.begin_active();
+          for (; i < cellwise_error.size(); ++i, ++it)
+            if (!it->is_locally_owned())
+              Assert(
+                std::fabs(cellwise_error[i]) < 1e-20,
+                ExcMessage(
+                  "cellwise_error of cells that are not locally owned need to be zero!"));
+        }
+      }
 
     const MPI_Comm comm = tria.get_mpi_communicator();
 

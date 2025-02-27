@@ -337,31 +337,33 @@ namespace Particles
              owned_particles_end->particles.empty(),
            ExcInternalError());
 
-#ifdef DEBUG
-    // check that no cache element hits the three anchor states in the list of
-    // particles
-    for (const auto &it : cells_to_particle_cache)
-      Assert(it != particles.begin() && it != owned_particles_end &&
-               it != --(particles.end()),
-             ExcInternalError());
+    if constexpr (running_in_debug_mode())
+      {
+        // check that no cache element hits the three anchor states in the list
+        // of particles
+        for (const auto &it : cells_to_particle_cache)
+          Assert(it != particles.begin() && it != owned_particles_end &&
+                   it != --(particles.end()),
+                 ExcInternalError());
 
-    // check that we only have locally owned particles in the first region of
-    // cells; note that we skip the very first anchor element
-    for (auto it = particle_container_owned_begin();
-         it != particle_container_owned_end();
-         ++it)
-      Assert(it->cell->is_locally_owned(), ExcInternalError());
+        // check that we only have locally owned particles in the first region
+        // of cells; note that we skip the very first anchor element
+        for (auto it = particle_container_owned_begin();
+             it != particle_container_owned_end();
+             ++it)
+          Assert(it->cell->is_locally_owned(), ExcInternalError());
 
-    // check that the cache is consistent with the iterators
-    std::vector<typename particle_container::iterator> verify_cache(
-      triangulation->n_active_cells(), particles.end());
-    for (auto it = particles.begin(); it != particles.end(); ++it)
-      if (!it->particles.empty())
-        verify_cache[it->cell->active_cell_index()] = it;
+        // check that the cache is consistent with the iterators
+        std::vector<typename particle_container::iterator> verify_cache(
+          triangulation->n_active_cells(), particles.end());
+        for (auto it = particles.begin(); it != particles.end(); ++it)
+          if (!it->particles.empty())
+            verify_cache[it->cell->active_cell_index()] = it;
 
-    for (unsigned int i = 0; i < verify_cache.size(); ++i)
-      Assert(verify_cache[i] == cells_to_particle_cache[i], ExcInternalError());
-#endif
+        for (unsigned int i = 0; i < verify_cache.size(); ++i)
+          Assert(verify_cache[i] == cells_to_particle_cache[i],
+                 ExcInternalError());
+      }
 
     // now compute local result with the function above and then compute the
     // collective results
@@ -775,10 +777,11 @@ namespace Particles
     if (!properties.empty())
       {
         AssertDimension(properties.size(), positions.size());
-#ifdef DEBUG
-        for (const auto &p : properties)
-          AssertDimension(p.size(), n_properties_per_particle());
-#endif
+        if constexpr (running_in_debug_mode())
+          {
+            for (const auto &p : properties)
+              AssertDimension(p.size(), n_properties_per_particle());
+          }
       }
 
     if (!ids.empty())

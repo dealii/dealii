@@ -188,12 +188,13 @@ namespace TrilinosWrappers
       else
         owned_elements = parallel_partitioner;
 
-#  ifdef DEBUG
-      const size_type n_elements_global =
-        Utilities::MPI::sum(owned_elements.n_elements(), communicator);
+      if constexpr (running_in_debug_mode())
+        {
+          const size_type n_elements_global =
+            Utilities::MPI::sum(owned_elements.n_elements(), communicator);
 
-      Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
-#  endif
+          Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
+        }
 
       last_action = Zero;
     }
@@ -269,14 +270,15 @@ namespace TrilinosWrappers
 
           last_action = Insert;
         }
-#  ifdef DEBUG
-      const Epetra_MpiComm *comm_ptr =
-        dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
-      Assert(comm_ptr != nullptr, ExcInternalError());
-      const size_type n_elements_global =
-        Utilities::MPI::sum(owned_elements.n_elements(), comm_ptr->Comm());
-      Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          const Epetra_MpiComm *comm_ptr =
+            dynamic_cast<const Epetra_MpiComm *>(&(v.vector->Comm()));
+          Assert(comm_ptr != nullptr, ExcInternalError());
+          const size_type n_elements_global =
+            Utilities::MPI::sum(owned_elements.n_elements(), comm_ptr->Comm());
+          Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
+        }
     }
 
 
@@ -346,15 +348,16 @@ namespace TrilinosWrappers
         }
       else
         vector = std::move(actual_vec);
-#  ifdef DEBUG
-      const Epetra_MpiComm *comm_ptr =
-        dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
-      Assert(comm_ptr != nullptr, ExcInternalError());
-      const size_type n_elements_global =
-        Utilities::MPI::sum(owned_elements.n_elements(), comm_ptr->Comm());
+      if constexpr (running_in_debug_mode())
+        {
+          const Epetra_MpiComm *comm_ptr =
+            dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
+          Assert(comm_ptr != nullptr, ExcInternalError());
+          const size_type n_elements_global =
+            Utilities::MPI::sum(owned_elements.n_elements(), comm_ptr->Comm());
 
-      Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
-#  endif
+          Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
+        }
     }
 
 
@@ -407,12 +410,13 @@ namespace TrilinosWrappers
 
       last_action = Zero;
 
-#  ifdef DEBUG
-      const size_type n_elements_global =
-        Utilities::MPI::sum(owned_elements.n_elements(), communicator);
+      if constexpr (running_in_debug_mode())
+        {
+          const size_type n_elements_global =
+            Utilities::MPI::sum(owned_elements.n_elements(), communicator);
 
-      Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
-#  endif
+          Assert(has_ghosts || n_elements_global == size(), ExcInternalError());
+        }
     }
 
 
@@ -646,24 +650,24 @@ namespace TrilinosWrappers
         }
 
 
-#  ifdef DEBUG
-      // check that every process has decided to use the same mode. This will
-      // otherwise result in undefined behavior in the call to
-      // GlobalAssemble().
-      const double          double_mode = mode;
-      const Epetra_MpiComm *comm_ptr =
-        dynamic_cast<const Epetra_MpiComm *>(&(trilinos_partitioner().Comm()));
-      Assert(comm_ptr != nullptr, ExcInternalError());
+      if constexpr (running_in_debug_mode())
+        {
+          // check that every process has decided to use the same mode. This
+          // will otherwise result in undefined behavior in the call to
+          // GlobalAssemble().
+          const double          double_mode = mode;
+          const Epetra_MpiComm *comm_ptr = dynamic_cast<const Epetra_MpiComm *>(
+            &(trilinos_partitioner().Comm()));
+          Assert(comm_ptr != nullptr, ExcInternalError());
 
-      const Utilities::MPI::MinMaxAvg result =
-        Utilities::MPI::min_max_avg(double_mode, comm_ptr->GetMpiComm());
-      Assert(result.max == result.min,
-             ExcMessage(
-               "Not all processors agree whether the last operation on "
-               "this vector was an addition or a set operation. This will "
-               "prevent the compress() operation from succeeding."));
-
-#  endif
+          const Utilities::MPI::MinMaxAvg result =
+            Utilities::MPI::min_max_avg(double_mode, comm_ptr->GetMpiComm());
+          Assert(result.max == result.min,
+                 ExcMessage(
+                   "Not all processors agree whether the last operation on "
+                   "this vector was an addition or a set operation. This will "
+                   "prevent the compress() operation from succeeding."));
+        }
 
       // Now pass over the information about what we did last to the vector.
       if (nonlocal_vector.get() == nullptr || mode != Add)
