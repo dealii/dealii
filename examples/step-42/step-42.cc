@@ -492,11 +492,11 @@ namespace Step42
     template <int dim>
     double BitmapFile<dim>::get_value(const double x, const double y) const
     {
-      const int ix = std::min(std::max(static_cast<int>(x / hx), 0), nx - 2);
-      const int iy = std::min(std::max(static_cast<int>(y / hy), 0), ny - 2);
+      const int ix = std::clamp(static_cast<int>(x / hx), 0, nx - 2);
+      const int iy = std::clamp(static_cast<int>(y / hy), 0, ny - 2);
 
-      const double xi  = std::min(std::max((x - ix * hx) / hx, 1.), 0.);
-      const double eta = std::min(std::max((y - iy * hy) / hy, 1.), 0.);
+      const double xi  = std::clamp((x - ix * hx) / hx, 0., 1.);
+      const double eta = std::clamp((y - iy * hy) / hy, 0., 1.);
 
       return ((1 - xi) * (1 - eta) * get_pixel_value(ix, iy) +
               xi * (1 - eta) * get_pixel_value(ix + 1, iy) +
