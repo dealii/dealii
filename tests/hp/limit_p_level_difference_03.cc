@@ -98,18 +98,19 @@ test(const unsigned int fes_size, const unsigned int max_difference)
   (void)fe_indices_changed;
   Assert(fe_indices_changed, ExcInternalError());
 
-#ifdef DEBUG
-  // check each cell's active FE by its h-level
-  for (unsigned int l = 0; l < tria.n_levels(); ++l)
-    for (const auto &cell : dofh.cell_iterators_on_level(l))
-      if (cell->is_active())
-        {
-          const unsigned int expected_level = std::max(
-            0, static_cast<int>(sequence.size() - 1 - l * max_difference));
-          Assert(cell->active_fe_index() == sequence[expected_level],
-                 ExcInternalError());
-        }
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      // check each cell's active FE by its h-level
+      for (unsigned int l = 0; l < tria.n_levels(); ++l)
+        for (const auto &cell : dofh.cell_iterators_on_level(l))
+          if (cell->is_active())
+            {
+              const unsigned int expected_level = std::max(
+                0, static_cast<int>(sequence.size() - 1 - l * max_difference));
+              Assert(cell->active_fe_index() == sequence[expected_level],
+                     ExcInternalError());
+            }
+    }
 
   deallog << "OK" << std::endl;
 }

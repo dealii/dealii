@@ -90,27 +90,30 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
-#ifdef DEBUG
-  parallel::distributed::Triangulation<dim> other_tria(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube(other_tria);
-  other_tria.refine_global(2);
-
-  dh.reinit(other_tria);
-  dh.distribute_dofs(fe_collection);
-
-  try
+  if constexpr (running_in_debug_mode())
     {
-      tria.repartition();
+      parallel::distributed::Triangulation<dim> other_tria(MPI_COMM_WORLD);
+      GridGenerator::hyper_cube(other_tria);
+      other_tria.refine_global(2);
+
+      dh.reinit(other_tria);
+      dh.distribute_dofs(fe_collection);
+
+      try
+        {
+          tria.repartition();
+        }
+      catch (const ExceptionBase &e)
+        {
+          deallog << e.get_exc_name() << std::endl;
+        }
     }
-  catch (const ExceptionBase &e)
+  else
     {
-      deallog << e.get_exc_name() << std::endl;
+      deallog
+        << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
+        << std::endl;
     }
-#else
-  deallog
-    << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
-    << std::endl;
-#endif
 
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);

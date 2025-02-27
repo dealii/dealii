@@ -468,11 +468,14 @@ LaplaceProblem<dim>::run()
         {
           GridGenerator::hyper_shell(
             triangulation, Point<dim>(), 0.5, 1., (dim == 3) ? 96 : 12, false);
-#ifdef DEBUG
-          triangulation.refine_global(3);
-#else
-          triangulation.refine_global(5);
-#endif
+          if constexpr (running_in_debug_mode())
+            {
+              triangulation.refine_global(3);
+            }
+          else
+            {
+              triangulation.refine_global(5);
+            }
         }
 
       setup_system();
