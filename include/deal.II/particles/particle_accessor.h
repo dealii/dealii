@@ -25,6 +25,7 @@
 #include <deal.II/particles/particle.h>
 #include <deal.II/particles/property_pool.h>
 
+#include <boost/geometry/index/indexable.hpp>
 #include <boost/serialization/array_wrapper.hpp>
 
 #include <list>
@@ -958,10 +959,6 @@ namespace boost
   {
     namespace index
     {
-      // Forward declaration of bgi::indexable
-      template <class T>
-      struct indexable;
-
       /**
        * Make sure we can construct an RTree from Particles::ParticleAccessor
        * objects.
