@@ -2454,44 +2454,54 @@ namespace internal
         internal::set_initial_guess(temp_vector1);
         data.constraints.set_zero(temp_vector1);
 
-        if (data.eigenvalue_algorithm == internal::EigenvalueAlgorithm::lanczos)
+        /// We want to run the power iteration starting with temp_vector1, but
+        /// for that it needs to be a nonzero vector. However, there are
+        // situations where it only contains zeroes (e.g., if all dofs are
+        // constrained). If that is the case, there is nothing to do.
+        if (temp_vector1.l2_norm() != 0.0)
           {
-            // set a very strict tolerance to force at least two iterations
-            IterationNumberControl control(data.eig_cg_n_iterations,
-                                           1e-10,
-                                           false,
-                                           false);
+            if (data.eigenvalue_algorithm ==
+                internal::EigenvalueAlgorithm::lanczos)
+              {
+                // set a very strict tolerance to force at least two iterations
+                IterationNumberControl control(data.eig_cg_n_iterations,
+                                               1e-10,
+                                               false,
+                                               false);
 
-            dealii::SolverCG<VectorType> solver(control);
-            solver.connect_eigenvalues_slot(
-              [&eigenvalue_tracker](const std::vector<double> &eigenvalues) {
-                eigenvalue_tracker.slot(eigenvalues);
-              });
+                dealii::SolverCG<VectorType> solver(control);
+                solver.connect_eigenvalues_slot(
+                  [&eigenvalue_tracker](
+                    const std::vector<double> &eigenvalues) {
+                    eigenvalue_tracker.slot(eigenvalues);
+                  });
 
-            solver.solve(*matrix_ptr,
-                         solution_old,
-                         temp_vector1,
-                         *data.preconditioner);
+                solver.solve(*matrix_ptr,
+                             solution_old,
+                             temp_vector1,
+                             *data.preconditioner);
 
-            info.cg_iterations = control.last_step();
+                info.cg_iterations = control.last_step();
+              }
+            else if (data.eigenvalue_algorithm ==
+                     internal::EigenvalueAlgorithm::power_iteration)
+              {
+                (void)degree;
+
+                Assert(degree != numbers::invalid_unsigned_int,
+                       ExcMessage(
+                         "Cannot estimate the minimal eigenvalue with the "
+                         "power iteration"));
+
+                eigenvalue_tracker.values.push_back(
+                  internal::power_iteration(*matrix_ptr,
+                                            temp_vector1,
+                                            *data.preconditioner,
+                                            data.eig_cg_n_iterations));
+              }
+            else
+              DEAL_II_NOT_IMPLEMENTED();
           }
-        else if (data.eigenvalue_algorithm ==
-                 internal::EigenvalueAlgorithm::power_iteration)
-          {
-            (void)degree;
-
-            Assert(degree != numbers::invalid_unsigned_int,
-                   ExcMessage("Cannot estimate the minimal eigenvalue with the "
-                              "power iteration"));
-
-            eigenvalue_tracker.values.push_back(
-              internal::power_iteration(*matrix_ptr,
-                                        temp_vector1,
-                                        *data.preconditioner,
-                                        data.eig_cg_n_iterations));
-          }
-        else
-          DEAL_II_NOT_IMPLEMENTED();
 
         // read the eigenvalues from the attached eigenvalue tracker
         if (eigenvalue_tracker.values.empty())
