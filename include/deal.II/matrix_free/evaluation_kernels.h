@@ -22,6 +22,7 @@
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
+#include <deal.II/matrix_free/evaluation_kernels_common.h>
 #include <deal.II/matrix_free/fe_evaluation_data.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
@@ -242,36 +243,19 @@ namespace internal
       (type == MatrixFreeFunctions::truncated_tensor) ?
         Utilities::pow(shape_data.front().fe_degree + 1, dim) :
         fe_eval.get_shape_info().dofs_per_component_on_cell;
-    const Number *values_dofs = values_dofs_actual;
+    const Number *values_dofs =
+      (type == MatrixFreeFunctions::truncated_tensor) ?
+        temp1 + 2 * (std::max<std::size_t>(
+                      fe_eval.get_shape_info().dofs_per_component_on_cell,
+                      n_q_points)) :
+        values_dofs_actual;
+
     if (type == MatrixFreeFunctions::truncated_tensor)
-      {
-        const std::size_t n_dofs_per_comp =
-          fe_eval.get_shape_info().dofs_per_component_on_cell;
-        Number *values_dofs_tmp =
-          temp1 + 2 * (std::max(n_dofs_per_comp, n_q_points));
-        const int degree =
-          fe_degree != -1 ? fe_degree : shape_data.front().fe_degree;
-        for (unsigned int c = 0; c < n_components; ++c)
-          for (int i = 0, count_p = 0, count_q = 0;
-               i < (dim > 2 ? degree + 1 : 1);
-               ++i)
-            {
-              for (int j = 0; j < (dim > 1 ? degree + 1 - i : 1); ++j)
-                {
-                  for (int k = 0; k < degree + 1 - j - i;
-                       ++k, ++count_p, ++count_q)
-                    values_dofs_tmp[c * dofs_per_comp + count_q] =
-                      values_dofs_actual[c * n_dofs_per_comp + count_p];
-                  for (int k = degree + 1 - j - i; k < degree + 1;
-                       ++k, ++count_q)
-                    values_dofs_tmp[c * dofs_per_comp + count_q] = Number();
-                }
-              for (int j = degree + 1 - i; j < degree + 1; ++j)
-                for (int k = 0; k < degree + 1; ++k, ++count_q)
-                  values_dofs_tmp[c * dofs_per_comp + count_q] = Number();
-            }
-        values_dofs = values_dofs_tmp;
-      }
+      embed_truncated_into_full_tensor_product<dim, fe_degree>(
+        n_components,
+        const_cast<Number *>(values_dofs),
+        values_dofs_actual,
+        fe_eval);
 
     Number *values_quad    = fe_eval.begin_values();
     Number *gradients_quad = fe_eval.begin_gradients();
@@ -436,6 +420,7 @@ namespace internal
       (type == MatrixFreeFunctions::truncated_tensor) ?
         Utilities::fixed_power<dim>(shape_data.front().fe_degree + 1) :
         fe_eval.get_shape_info().dofs_per_component_on_cell;
+
     // expand dof_values to tensor product for truncated tensor products
     Number *values_dofs =
       (type == MatrixFreeFunctions::truncated_tensor) ?
@@ -582,28 +567,11 @@ namespace internal
       }
 
     if (type == MatrixFreeFunctions::truncated_tensor)
-      {
-        const std::size_t n_dofs_per_comp =
-          fe_eval.get_shape_info().dofs_per_component_on_cell;
-        values_dofs -= dofs_per_comp * n_components;
-        const int degree =
-          fe_degree != -1 ? fe_degree : shape_data.front().fe_degree;
-        for (unsigned int c = 0; c < n_components; ++c)
-          for (int i = 0, count_p = 0, count_q = 0;
-               i < (dim > 2 ? degree + 1 : 1);
-               ++i)
-            {
-              for (int j = 0; j < (dim > 1 ? degree + 1 - i : 1); ++j)
-                {
-                  for (int k = 0; k < degree + 1 - j - i;
-                       ++k, ++count_p, ++count_q)
-                    values_dofs_actual[c * n_dofs_per_comp + count_p] =
-                      values_dofs[c * dofs_per_comp + count_q];
-                  count_q += j + i;
-                }
-              count_q += i * (degree + 1);
-            }
-      }
+      truncate_tensor_product_to_complete_degrees<dim, fe_degree>(
+        n_components,
+        values_dofs_actual,
+        values_dofs - dofs_per_comp * n_components,
+        fe_eval);
   }
 
 

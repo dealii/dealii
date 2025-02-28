@@ -1201,7 +1201,7 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
 
   const unsigned int size_scratch_data =
     std::max(tensor_dofs_per_component + 1, dofs_per_component) * n_components *
-      3 +
+      4 +
     2 * n_quadrature_points;
   const unsigned int size_data_arrays =
     n_components * dofs_per_component +
