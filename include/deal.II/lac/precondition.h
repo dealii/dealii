@@ -2397,7 +2397,14 @@ namespace internal
                   const unsigned int        n_iterations)
   {
     typename VectorType::value_type eigenvalue_estimate = 0.;
-    eigenvector /= eigenvector.l2_norm();
+
+    const auto norm = eigenvector.l2_norm();
+
+    if (norm == 0.0)
+      return 1.0;
+
+    eigenvector /= norm;
+
     VectorType vector1, vector2;
     vector1.reinit(eigenvector, true);
     if (!std::is_same_v<PreconditionerType, PreconditionIdentity>)
