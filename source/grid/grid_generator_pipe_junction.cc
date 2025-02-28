@@ -290,15 +290,17 @@ namespace GridGenerator
     constexpr unsigned int n_pipes   = 3;
     constexpr double       tolerance = 1.e-12;
 
-#  ifdef DEBUG
-    // Verify user input.
-    Assert(bifurcation.second > 0,
-           ExcMessage("Invalid input: negative radius."));
-    Assert(openings.size() == n_pipes,
-           ExcMessage("Invalid input: only 3 openings allowed."));
-    for (const auto &opening : openings)
-      Assert(opening.second > 0, ExcMessage("Invalid input: negative radius."));
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        // Verify user input.
+        Assert(bifurcation.second > 0,
+               ExcMessage("Invalid input: negative radius."));
+        Assert(openings.size() == n_pipes,
+               ExcMessage("Invalid input: only 3 openings allowed."));
+        for (const auto &opening : openings)
+          Assert(opening.second > 0,
+                 ExcMessage("Invalid input: negative radius."));
+      }
 
     // Each pipe segment will be identified by the index of its opening in the
     // parameter array. To determine the next and previous entry in the array

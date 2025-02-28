@@ -2345,19 +2345,20 @@ namespace internal
                              fe.n_dofs_per_vertex() > 0;
                     });
 
-#ifdef DEBUG
-      const bool fine_element_is_discontinuous =
-        std::all_of(dof_handler_fine.get_fe_collection().begin(),
-                    dof_handler_fine.get_fe_collection().end(),
-                    [](const auto &fe) {
-                      return fe.n_dofs_per_cell() == 0 ||
-                             fe.n_dofs_per_vertex() == 0;
-                    });
+      if constexpr (running_in_debug_mode())
+        {
+          const bool fine_element_is_discontinuous =
+            std::all_of(dof_handler_fine.get_fe_collection().begin(),
+                        dof_handler_fine.get_fe_collection().end(),
+                        [](const auto &fe) {
+                          return fe.n_dofs_per_cell() == 0 ||
+                                 fe.n_dofs_per_vertex() == 0;
+                        });
 
-      Assert(transfer.fine_element_is_continuous !=
-               fine_element_is_discontinuous,
-             ExcNotImplemented());
-#endif
+          Assert(transfer.fine_element_is_continuous !=
+                   fine_element_is_discontinuous,
+                 ExcNotImplemented());
+        }
       const bool is_feq =
         std::all_of(dof_handler_fine.get_fe_collection().begin(),
                     dof_handler_fine.get_fe_collection().end(),

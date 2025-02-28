@@ -1786,14 +1786,15 @@ BlockMatrixBase<MatrixType>::set(const size_type  row,
       temporary_data.column_values[col_index.first][local_index] = value;
     }
 
-#  ifdef DEBUG
-  // If in debug mode, do a check whether
-  // the right length has been obtained.
-  size_type length = 0;
-  for (unsigned int i = 0; i < this->n_block_cols(); ++i)
-    length += temporary_data.counter_within_block[i];
-  Assert(length <= n_cols, ExcInternalError());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      // If in debug mode, do a check whether
+      // the right length has been obtained.
+      size_type length = 0;
+      for (unsigned int i = 0; i < this->n_block_cols(); ++i)
+        length += temporary_data.counter_within_block[i];
+      Assert(length <= n_cols, ExcInternalError());
+    }
 
   // Now we found out about where the
   // individual columns should start and
@@ -1929,20 +1930,21 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
   // efficiently.
   if (col_indices_are_sorted == true)
     {
-#  ifdef DEBUG
-      // check whether indices really are
-      // sorted.
-      size_type before = col_indices[0];
-      for (size_type i = 1; i < n_cols; ++i)
-        if (col_indices[i] <= before)
-          {
-            Assert(false,
-                   ExcMessage("Flag col_indices_are_sorted is set, but "
-                              "indices appear to not be sorted."));
-          }
-        else
-          before = col_indices[i];
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          // check whether indices really are
+          // sorted.
+          size_type before = col_indices[0];
+          for (size_type i = 1; i < n_cols; ++i)
+            if (col_indices[i] <= before)
+              {
+                Assert(false,
+                       ExcMessage("Flag col_indices_are_sorted is set, but "
+                                  "indices appear to not be sorted."));
+              }
+            else
+              before = col_indices[i];
+        }
       const std::pair<unsigned int, size_type> row_index =
         this->row_block_indices.global_to_local(row);
 
@@ -2045,14 +2047,15 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
       temporary_data.column_values[col_index.first][local_index] = value;
     }
 
-#  ifdef DEBUG
-  // If in debug mode, do a check whether
-  // the right length has been obtained.
-  size_type length = 0;
-  for (unsigned int i = 0; i < this->n_block_cols(); ++i)
-    length += temporary_data.counter_within_block[i];
-  Assert(length <= n_cols, ExcInternalError());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      // If in debug mode, do a check whether
+      // the right length has been obtained.
+      size_type length = 0;
+      for (unsigned int i = 0; i < this->n_block_cols(); ++i)
+        length += temporary_data.counter_within_block[i];
+      Assert(length <= n_cols, ExcInternalError());
+    }
 
   // Now we found out about where the
   // individual columns should start and

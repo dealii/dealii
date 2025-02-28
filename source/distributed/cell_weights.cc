@@ -191,12 +191,13 @@ namespace parallel
           break;
 
         case CellStatus::children_will_be_coarsened:
-#ifdef DEBUG
-          for (const auto &child : cell->child_iterators())
-            Assert(child->is_active() && child->coarsen_flag_set(),
-                   typename dealii::Triangulation<
-                     dim>::ExcInconsistentCoarseningFlags());
-#endif
+          if constexpr (running_in_debug_mode())
+            {
+              for (const auto &child : cell->child_iterators())
+                Assert(child->is_active() && child->coarsen_flag_set(),
+                       typename dealii::Triangulation<
+                         dim>::ExcInconsistentCoarseningFlags());
+            }
 
           fe_index = dealii::internal::hp::DoFHandlerImplementation::
             dominated_future_fe_on_children<dim, spacedim>(cell);

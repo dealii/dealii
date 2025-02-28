@@ -1372,40 +1372,41 @@ namespace LinearAlgebra
     {
 #ifdef DEAL_II_WITH_MPI
 
-#  ifdef DEBUG
-      Assert(Utilities::MPI::job_supports_mpi() ||
-               (update_ghost_values_requests.empty() &&
-                compress_requests.empty()),
-             ExcInternalError());
+      if constexpr (running_in_debug_mode())
+        {
+          Assert(Utilities::MPI::job_supports_mpi() ||
+                   (update_ghost_values_requests.empty() &&
+                    compress_requests.empty()),
+                 ExcInternalError());
 
-      // make sure that there are not outstanding requests from updating
-      // ghost values or compress
-      if (update_ghost_values_requests.size() > 0)
-        {
-          int       flag = 1;
-          const int ierr = MPI_Testall(update_ghost_values_requests.size(),
-                                       update_ghost_values_requests.data(),
-                                       &flag,
-                                       MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-          Assert(flag == 1,
-                 ExcMessage(
-                   "MPI found unfinished update_ghost_values() requests "
-                   "when calling swap, which is not allowed."));
+          // make sure that there are not outstanding requests from updating
+          // ghost values or compress
+          if (update_ghost_values_requests.size() > 0)
+            {
+              int       flag = 1;
+              const int ierr = MPI_Testall(update_ghost_values_requests.size(),
+                                           update_ghost_values_requests.data(),
+                                           &flag,
+                                           MPI_STATUSES_IGNORE);
+              AssertThrowMPI(ierr);
+              Assert(flag == 1,
+                     ExcMessage(
+                       "MPI found unfinished update_ghost_values() requests "
+                       "when calling swap, which is not allowed."));
+            }
+          if (compress_requests.size() > 0)
+            {
+              int       flag = 1;
+              const int ierr = MPI_Testall(compress_requests.size(),
+                                           compress_requests.data(),
+                                           &flag,
+                                           MPI_STATUSES_IGNORE);
+              AssertThrowMPI(ierr);
+              Assert(flag == 1,
+                     ExcMessage("MPI found unfinished compress() requests "
+                                "when calling swap, which is not allowed."));
+            }
         }
-      if (compress_requests.size() > 0)
-        {
-          int       flag = 1;
-          const int ierr = MPI_Testall(compress_requests.size(),
-                                       compress_requests.data(),
-                                       &flag,
-                                       MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-          Assert(flag == 1,
-                 ExcMessage("MPI found unfinished compress() requests "
-                            "when calling swap, which is not allowed."));
-        }
-#  endif
 
       std::swap(compress_requests, v.compress_requests);
       std::swap(update_ghost_values_requests, v.update_ghost_values_requests);
@@ -1756,32 +1757,34 @@ namespace LinearAlgebra
     Vector<Number,
            MemorySpaceType>::assert_no_residual_content_in_ghost_region() const
     {
-#ifdef DEBUG
-      // This should only be called for non-ghosted vectors
-      Assert(!vector_is_ghosted, ExcInternalError());
+      if constexpr (running_in_debug_mode())
+        {
+          // This should only be called for non-ghosted vectors
+          Assert(!vector_is_ghosted, ExcInternalError());
 
-      // Run a reduction over the ghost range only to find out whether some
-      // entries are non-zero
-      real_type sum = real_type();
-      dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::norm_1(
-          thread_loop_partitioner,
-          partitioner->n_ghost_indices(),
-          sum,
-          data,
-          partitioner->locally_owned_size());
+          // Run a reduction over the ghost range only to find out whether some
+          // entries are non-zero
+          real_type sum = real_type();
+          dealii::internal::VectorOperations::
+            functions<Number, Number, MemorySpaceType>::norm_1(
+              thread_loop_partitioner,
+              partitioner->n_ghost_indices(),
+              sum,
+              data,
+              partitioner->locally_owned_size());
 
-      Assert(sum == real_type(),
-             ExcMessage("You called a vector space operation like add(), "
-                        "scale(), operator* for a non-ghosted vector, which "
-                        "will not update the content in the memory locations "
-                        "reserved for ghost values. However, a non-zero "
-                        "content was detected for some of those entries, which "
-                        "can lead to an invalid state of the vector. Please "
-                        "call Vector::compress(VectorOperation::add) or "
-                        "Vector::zero_out_ghost_values() before calling a "
-                        "vector space operation to avoid this problem."));
-#endif
+          Assert(sum == real_type(),
+                 ExcMessage(
+                   "You called a vector space operation like add(), "
+                   "scale(), operator* for a non-ghosted vector, which "
+                   "will not update the content in the memory locations "
+                   "reserved for ghost values. However, a non-zero "
+                   "content was detected for some of those entries, which "
+                   "can lead to an invalid state of the vector. Please "
+                   "call Vector::compress(VectorOperation::add) or "
+                   "Vector::zero_out_ghost_values() before calling a "
+                   "vector space operation to avoid this problem."));
+        }
     }
 
 

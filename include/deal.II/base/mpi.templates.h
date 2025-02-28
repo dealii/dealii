@@ -47,35 +47,37 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
-#  ifdef DEBUG
-            {
-              const unsigned int rank     = this_mpi_process(mpi_communicator);
-              unsigned int       size     = values.size();
-              unsigned int       size_min = 0;
-              unsigned int       size_max = 0;
-              int                ierr2    = 0;
-              ierr2                       = MPI_Reduce(&size,
-                                 &size_min,
-                                 1,
-                                 MPI_UNSIGNED,
-                                 MPI_MIN,
-                                 0,
-                                 mpi_communicator);
-              AssertThrowMPI(ierr2);
-              ierr2 = MPI_Reduce(&size,
-                                 &size_max,
-                                 1,
-                                 MPI_UNSIGNED,
-                                 MPI_MAX,
-                                 0,
-                                 mpi_communicator);
-              AssertThrowMPI(ierr2);
-              if (rank == 0)
-                Assert(size_min == size_max,
-                       ExcMessage(
-                         "values has different size across MPI processes."));
-            }
-#  endif
+            if constexpr (running_in_debug_mode())
+              {
+                {
+                  const unsigned int rank = this_mpi_process(mpi_communicator);
+                  unsigned int       size = values.size();
+                  unsigned int       size_min = 0;
+                  unsigned int       size_max = 0;
+                  int                ierr2    = 0;
+                  ierr2                       = MPI_Reduce(&size,
+                                     &size_min,
+                                     1,
+                                     MPI_UNSIGNED,
+                                     MPI_MIN,
+                                     0,
+                                     mpi_communicator);
+                  AssertThrowMPI(ierr2);
+                  ierr2 = MPI_Reduce(&size,
+                                     &size_max,
+                                     1,
+                                     MPI_UNSIGNED,
+                                     MPI_MAX,
+                                     0,
+                                     mpi_communicator);
+                  AssertThrowMPI(ierr2);
+                  if (rank == 0)
+                    Assert(
+                      size_min == size_max,
+                      ExcMessage(
+                        "values has different size across MPI processes."));
+                }
+              }
             const int ierr =
               MPI_Allreduce(values != output ? values.data() : MPI_IN_PLACE,
                             static_cast<void *>(output.data()),

@@ -1253,26 +1253,29 @@ namespace internal
 
                     const VectorizedDouble jac_det = determinant(jac);
 
-#ifdef DEBUG
-                    for (unsigned int v = 0; v < n_lanes_d; ++v)
+                    if constexpr (running_in_debug_mode())
                       {
-                        const typename Triangulation<dim>::cell_iterator
-                          cell_iterator(
-                            &tria,
-                            cell_array[cell * n_lanes + vv + v].first,
-                            cell_array[cell * n_lanes + vv + v].second);
+                        for (unsigned int v = 0; v < n_lanes_d; ++v)
+                          {
+                            const typename Triangulation<dim>::cell_iterator
+                              cell_iterator(
+                                &tria,
+                                cell_array[cell * n_lanes + vv + v].first,
+                                cell_array[cell * n_lanes + vv + v].second);
 
-                        Assert(jac_det[v] >
-                                 1e-12 * Utilities::fixed_power<dim>(
-                                           cell_iterator->diameter() /
-                                           std::sqrt(double(dim))),
-                               (typename Mapping<dim>::ExcDistortedMappedCell(
-                                 cell_iterator->center(), jac_det[v], q)));
+                            Assert(
+                              jac_det[v] > 1e-12 * Utilities::fixed_power<dim>(
+                                                     cell_iterator->diameter() /
+                                                     std::sqrt(double(dim))),
+                              (typename Mapping<dim>::ExcDistortedMappedCell(
+                                cell_iterator->center(), jac_det[v], q)));
+                          }
                       }
-#else
-                    (void)tria;
-                    (void)cell_array;
-#endif
+                    else
+                      {
+                        (void)tria;
+                        (void)cell_array;
+                      }
 
                     const Tensor<2, dim, VectorizedDouble> inv_jac =
                       transpose(invert(jac));
@@ -2352,10 +2355,11 @@ namespace internal
                        1. :
                        my_data.descriptor[0].quadrature.weight(q));
 
-#ifdef DEBUG
-                  for (unsigned int v = 0; v < n_lanes_d; ++v)
-                    Assert(JxW[v] > 0.0, ExcInternalError());
-#endif
+                  if constexpr (running_in_debug_mode())
+                    {
+                      for (unsigned int v = 0; v < n_lanes_d; ++v)
+                        Assert(JxW[v] > 0.0, ExcInternalError());
+                    }
 
                   store_vectorized_array(JxW,
                                          vv,

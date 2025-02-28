@@ -519,24 +519,25 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
               restriction_mat[i][j] =
                 this->shape_value(j, transformed_point[0]);
         }
-#ifdef DEBUG
-      for (unsigned int i = 0; i < this->n_dofs_per_cell(); i++)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); i++)
+            {
+              double sum = 0.;
 
-          for (unsigned int j = 0; j < this->n_dofs_per_cell(); j++)
-            sum += restriction_mat[i][j];
+              for (unsigned int j = 0; j < this->n_dofs_per_cell(); j++)
+                sum += restriction_mat[i][j];
 
-          Assert(std::fabs(sum - 1) < eps || std::fabs(sum) < eps,
-                 ExcInternalError(
-                   "The entries in a row of the local "
-                   "restriction matrix do not add to zero or one. "
-                   "This typically indicates that the "
-                   "polynomial interpolation is "
-                   "ill-conditioned such that round-off "
-                   "prevents the sum to be one."));
+              Assert(std::fabs(sum - 1) < eps || std::fabs(sum) < eps,
+                     ExcInternalError(
+                       "The entries in a row of the local "
+                       "restriction matrix do not add to zero or one. "
+                       "This typically indicates that the "
+                       "polynomial interpolation is "
+                       "ill-conditioned such that round-off "
+                       "prevents the sum to be one."));
+            }
         }
-#endif
 
       // Remove small entries from the matrix
       for (unsigned int i = 0; i < restriction_mat.m(); ++i)
@@ -605,17 +606,18 @@ FE_SimplexPoly<dim, spacedim>::get_face_interpolation_matrix(
             interpolation_matrix(i, j) = matrix_entry;
           }
 
-#ifdef DEBUG
-      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+            {
+              double sum = 0.;
 
-          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            sum += interpolation_matrix(j, i);
+              for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+                sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+              Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+            }
         }
-#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
     {
@@ -679,17 +681,18 @@ FE_SimplexPoly<dim, spacedim>::get_subface_interpolation_matrix(
             interpolation_matrix(i, j) = matrix_entry;
           }
 
-#ifdef DEBUG
-      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+      if constexpr (running_in_debug_mode())
         {
-          double sum = 0.;
+          for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+            {
+              double sum = 0.;
 
-          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-            sum += interpolation_matrix(j, i);
+              for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+                sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+              Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+            }
         }
-#endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
     {

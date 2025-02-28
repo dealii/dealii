@@ -127,25 +127,26 @@ namespace internal
                     DEAL_II_NOT_IMPLEMENTED();
                 }
 
-#ifdef DEBUG
-              // Each entry of 'complete_identities' contains a set of
-              // pairs (fe_index,dof_index). Because we put in exactly
-              // two fe indices, we know that each entry of the outer
-              // vector needs to contain a set of exactly two such
-              // pairs. Check this. While there, also check that
-              // the two entries actually reference fe_index_1 and
-              // fe_index_2:
-              for (const auto &complete_identity : complete_identities)
+              if constexpr (running_in_debug_mode())
                 {
-                  Assert(complete_identity.size() == 2, ExcInternalError());
-                  Assert(complete_identity.find(fe_index_1) !=
-                           complete_identity.end(),
-                         ExcInternalError());
-                  Assert(complete_identity.find(fe_index_2) !=
-                           complete_identity.end(),
-                         ExcInternalError());
+                  // Each entry of 'complete_identities' contains a set of
+                  // pairs (fe_index,dof_index). Because we put in exactly
+                  // two fe indices, we know that each entry of the outer
+                  // vector needs to contain a set of exactly two such
+                  // pairs. Check this. While there, also check that
+                  // the two entries actually reference fe_index_1 and
+                  // fe_index_2:
+                  for (const auto &complete_identity : complete_identities)
+                    {
+                      Assert(complete_identity.size() == 2, ExcInternalError());
+                      Assert(complete_identity.find(fe_index_1) !=
+                               complete_identity.end(),
+                             ExcInternalError());
+                      Assert(complete_identity.find(fe_index_2) !=
+                               complete_identity.end(),
+                             ExcInternalError());
+                    }
                 }
-#endif
 
               // Next reduce these sets of two pairs by removing the
               // fe_index parts: We know which indices we have. But we
@@ -165,21 +166,24 @@ namespace internal
                   reduced_identities.emplace_back(dof_index_1, dof_index_2);
                 }
 
-#ifdef DEBUG
-              // double check whether the newly created entries make
-              // any sense at all
-              for (const auto &identity : reduced_identities)
+              if constexpr (running_in_debug_mode())
                 {
-                  Assert(identity.first <
-                           fes[fe_index_1]
-                             .template n_dofs_per_object<structdim>(face_no),
-                         ExcInternalError());
-                  Assert(identity.second <
-                           fes[fe_index_2]
-                             .template n_dofs_per_object<structdim>(face_no),
-                         ExcInternalError());
+                  // double check whether the newly created entries make
+                  // any sense at all
+                  for (const auto &identity : reduced_identities)
+                    {
+                      Assert(
+                        identity.first <
+                          fes[fe_index_1].template n_dofs_per_object<structdim>(
+                            face_no),
+                        ExcInternalError());
+                      Assert(
+                        identity.second <
+                          fes[fe_index_2].template n_dofs_per_object<structdim>(
+                            face_no),
+                        ExcInternalError());
+                    }
                 }
-#endif
 
               identities =
                 std::make_unique<DoFIdentities>(std::move(reduced_identities));
@@ -3759,51 +3763,53 @@ namespace internal
 
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
-#  ifdef DEBUG
-          for (const auto &cell : dof_handler->active_cell_iterators())
-            Assert(cell_marked[cell->active_cell_index()] == false,
-                   ExcInternalError());
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              for (const auto &cell : dof_handler->active_cell_iterators())
+                Assert(cell_marked[cell->active_cell_index()] == false,
+                       ExcInternalError());
+            }
         }
 
-#  ifdef DEBUG
-        // check that we are really done
-        {
-          std::vector<dealii::types::global_dof_index> local_dof_indices;
+        if constexpr (running_in_debug_mode())
+          {
+            // check that we are really done
+            {
+              std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          for (const auto &cell : dof_handler->active_cell_iterators())
-            if (!cell->is_artificial())
-              {
-                local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-                cell->get_dof_indices(local_dof_indices);
-                if (local_dof_indices.end() !=
-                    std::find(local_dof_indices.begin(),
-                              local_dof_indices.end(),
-                              numbers::invalid_dof_index))
+              for (const auto &cell : dof_handler->active_cell_iterators())
+                if (!cell->is_artificial())
                   {
-                    if (cell->is_ghost())
+                    local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+                    cell->get_dof_indices(local_dof_indices);
+                    if (local_dof_indices.end() !=
+                        std::find(local_dof_indices.begin(),
+                                  local_dof_indices.end(),
+                                  numbers::invalid_dof_index))
                       {
-                        Assert(false,
-                               ExcMessage(
-                                 "A ghost cell ended up with incomplete "
-                                 "DoF index information. This should not "
-                                 "have happened!"));
-                      }
-                    else
-                      {
-                        Assert(
-                          false,
-                          ExcMessage(
-                            "A locally owned cell ended up with incomplete "
-                            "DoF index information. This should not "
-                            "have happened!"));
+                        if (cell->is_ghost())
+                          {
+                            Assert(false,
+                                   ExcMessage(
+                                     "A ghost cell ended up with incomplete "
+                                     "DoF index information. This should not "
+                                     "have happened!"));
+                          }
+                        else
+                          {
+                            Assert(
+                              false,
+                              ExcMessage(
+                                "A locally owned cell ended up with incomplete "
+                                "DoF index information. This should not "
+                                "have happened!"));
+                          }
                       }
                   }
-              }
-        }
-#  endif // DEBUG
+            }
+          } // DEBUG
         return number_cache;
-#endif   // DEAL_II_WITH_MPI
+#endif // DEAL_II_WITH_MPI
       }
 
 
@@ -3947,36 +3953,39 @@ namespace internal
           // in Phase 1.
           communicate_mg_ghost_cells(*dof_handler, cell_marked);
 
-#  ifdef DEBUG
-          // make sure we have finished all cells:
-          for (const auto &cell : dof_handler->cell_iterators())
-            Assert(cell_marked[cell->level()][cell->index()] == false,
-                   ExcInternalError());
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              // make sure we have finished all cells:
+              for (const auto &cell : dof_handler->cell_iterators())
+                Assert(cell_marked[cell->level()][cell->index()] == false,
+                       ExcInternalError());
+            }
         }
 
 
 
-#  ifdef DEBUG
-        // check that we are really done
-        {
-          std::vector<dealii::types::global_dof_index> local_dof_indices;
-          for (const auto &cell : dof_handler->cell_iterators())
-            if (cell->level_subdomain_id() !=
-                dealii::numbers::artificial_subdomain_id)
-              {
-                local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-                cell->get_mg_dof_indices(local_dof_indices);
-                if (local_dof_indices.end() !=
-                    std::find(local_dof_indices.begin(),
-                              local_dof_indices.end(),
-                              numbers::invalid_dof_index))
+        if constexpr (running_in_debug_mode())
+          {
+            // check that we are really done
+            {
+              std::vector<dealii::types::global_dof_index> local_dof_indices;
+              for (const auto &cell : dof_handler->cell_iterators())
+                if (cell->level_subdomain_id() !=
+                    dealii::numbers::artificial_subdomain_id)
                   {
-                    Assert(false, ExcMessage("not all DoFs got distributed!"));
+                    local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+                    cell->get_mg_dof_indices(local_dof_indices);
+                    if (local_dof_indices.end() !=
+                        std::find(local_dof_indices.begin(),
+                                  local_dof_indices.end(),
+                                  numbers::invalid_dof_index))
+                      {
+                        Assert(false,
+                               ExcMessage("not all DoFs got distributed!"));
+                      }
                   }
-              }
-        }
-#  endif // DEBUG
+            }
+          } // DEBUG
 
         return number_caches;
 

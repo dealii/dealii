@@ -619,10 +619,12 @@ namespace PETScWrappers
     BlockVector::has_ghost_elements() const
     {
       bool ghosted = block(0).has_ghost_elements();
-#  ifdef DEBUG
-      for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        Assert(block(i).has_ghost_elements() == ghosted, ExcInternalError());
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (unsigned int i = 0; i < this->n_blocks(); ++i)
+            Assert(block(i).has_ghost_elements() == ghosted,
+                   ExcInternalError());
+        }
       return ghosted;
     }
 

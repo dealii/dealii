@@ -1316,18 +1316,21 @@ namespace TrilinosWrappers
   {
     Assert(m() == n(), ExcNotQuadratic());
 
-#  ifdef DEBUG
-    // use operator() in debug mode because
-    // it checks if this is a valid element
-    // (in parallel)
-    return operator()(i, i);
-#  else
-    // Trilinos doesn't seem to have a
-    // more efficient way to access the
-    // diagonal than by just using the
-    // standard el(i,j) function.
-    return el(i, i);
-#  endif
+    if constexpr (running_in_debug_mode())
+      {
+        // use operator() in debug mode because
+        // it checks if this is a valid element
+        // (in parallel)
+        return operator()(i, i);
+      }
+    else
+      {
+        // Trilinos doesn't seem to have a
+        // more efficient way to access the
+        // diagonal than by just using the
+        // standard el(i,j) function.
+        return el(i, i);
+      }
   }
 
 
@@ -1635,10 +1638,11 @@ namespace TrilinosWrappers
             col_indices);
         col_value_ptr = values;
         n_columns     = n_cols;
-#  ifdef DEBUG
-        for (size_type j = 0; j < n_cols; ++j)
-          AssertIsFinite(values[j]);
-#  endif
+        if constexpr (running_in_debug_mode())
+          {
+            for (size_type j = 0; j < n_cols; ++j)
+              AssertIsFinite(values[j]);
+          }
       }
     else
       {
@@ -1717,45 +1721,49 @@ namespace TrilinosWrappers
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
-#  ifdef DEBUG
-    if (ierr > 0)
+    if constexpr (running_in_debug_mode())
       {
-        std::cout << "------------------------------------------" << std::endl;
-        std::cout << "Got error " << ierr << " in row " << row << " of proc "
-                  << matrix->RowMap().Comm().MyPID()
-                  << " when trying to add the columns:" << std::endl;
-        for (TrilinosWrappers::types::int_type i = 0; i < n_columns; ++i)
-          std::cout << col_index_ptr[i] << " ";
-        std::cout << std::endl << std::endl;
-        std::cout << "Matrix row "
-                  << (matrix->RowMap().MyGID(
-                        static_cast<TrilinosWrappers::types::int_type>(row)) ==
-                          false ?
-                        "(nonlocal part)" :
-                        "")
-                  << " has the following indices:" << std::endl;
-        std::vector<TrilinosWrappers::types::int_type> indices;
-        const Epetra_CrsGraph                         *graph =
-          (nonlocal_matrix.get() != nullptr &&
-           matrix->RowMap().MyGID(
-             static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
-                                    &nonlocal_matrix->Graph() :
-                                    &matrix->Graph();
+        if (ierr > 0)
+          {
+            std::cout << "------------------------------------------"
+                      << std::endl;
+            std::cout << "Got error " << ierr << " in row " << row
+                      << " of proc " << matrix->RowMap().Comm().MyPID()
+                      << " when trying to add the columns:" << std::endl;
+            for (TrilinosWrappers::types::int_type i = 0; i < n_columns; ++i)
+              std::cout << col_index_ptr[i] << " ";
+            std::cout << std::endl << std::endl;
+            std::cout << "Matrix row "
+                      << (matrix->RowMap().MyGID(
+                            static_cast<TrilinosWrappers::types::int_type>(
+                              row)) == false ?
+                            "(nonlocal part)" :
+                            "")
+                      << " has the following indices:" << std::endl;
+            std::vector<TrilinosWrappers::types::int_type> indices;
+            const Epetra_CrsGraph                         *graph =
+              (nonlocal_matrix.get() != nullptr &&
+               matrix->RowMap().MyGID(
+                 static_cast<TrilinosWrappers::types::int_type>(row)) ==
+                 false) ?
+                                        &nonlocal_matrix->Graph() :
+                                        &matrix->Graph();
 
-        indices.resize(graph->NumGlobalIndices(row));
-        int n_indices = 0;
-        graph->ExtractGlobalRowCopy(row,
-                                    indices.size(),
-                                    n_indices,
-                                    indices.data());
-        AssertDimension(n_indices, indices.size());
+            indices.resize(graph->NumGlobalIndices(row));
+            int n_indices = 0;
+            graph->ExtractGlobalRowCopy(row,
+                                        indices.size(),
+                                        n_indices,
+                                        indices.data());
+            AssertDimension(n_indices, indices.size());
 
-        for (TrilinosWrappers::types::int_type i = 0; i < n_indices; ++i)
-          std::cout << indices[i] << " ";
-        std::cout << std::endl << std::endl;
-        Assert(ierr <= 0, ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+            for (TrilinosWrappers::types::int_type i = 0; i < n_indices; ++i)
+              std::cout << indices[i] << " ";
+            std::cout << std::endl << std::endl;
+            Assert(ierr <= 0,
+                   ExcAccessToNonPresentElement(row, col_index_ptr[0]));
+          }
       }
-#  endif
     Assert(ierr >= 0, ExcTrilinosError(ierr));
   }
 

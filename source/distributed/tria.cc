@@ -2630,18 +2630,21 @@ namespace parallel
               }
           }
 
-#  ifdef DEBUG
-        // There must not be any chains!
-        for (unsigned int i = 0; i < topological_vertex_numbering.size(); ++i)
+        if constexpr (running_in_debug_mode())
           {
-            const unsigned int j = topological_vertex_numbering[i];
-            Assert(j == i || topological_vertex_numbering[j] == j,
-                   ExcMessage("Got inconclusive constraints with chain: " +
-                              std::to_string(i) + " vs " + std::to_string(j) +
-                              " which should be equal to " +
-                              std::to_string(topological_vertex_numbering[j])));
+            // There must not be any chains!
+            for (unsigned int i = 0; i < topological_vertex_numbering.size();
+                 ++i)
+              {
+                const unsigned int j = topological_vertex_numbering[i];
+                Assert(j == i || topological_vertex_numbering[j] == j,
+                       ExcMessage(
+                         "Got inconclusive constraints with chain: " +
+                         std::to_string(i) + " vs " + std::to_string(j) +
+                         " which should be equal to " +
+                         std::to_string(topological_vertex_numbering[j])));
+              }
           }
-#  endif
 
 
         // this code is replicated from grid/tria.cc but using an indirection
@@ -3012,20 +3015,21 @@ namespace parallel
         }
       while (mesh_changed);
 
-#  ifdef DEBUG
-      // check if correct number of ghosts is created
-      unsigned int num_ghosts = 0;
-
-      for (const auto &cell : this->active_cell_iterators())
+      if constexpr (running_in_debug_mode())
         {
-          if (cell->subdomain_id() != this->my_subdomain &&
-              cell->subdomain_id() != numbers::artificial_subdomain_id)
-            ++num_ghosts;
-        }
+          // check if correct number of ghosts is created
+          unsigned int num_ghosts = 0;
 
-      Assert(num_ghosts == parallel_ghost->ghosts.elem_count,
-             ExcInternalError());
-#  endif
+          for (const auto &cell : this->active_cell_iterators())
+            {
+              if (cell->subdomain_id() != this->my_subdomain &&
+                  cell->subdomain_id() != numbers::artificial_subdomain_id)
+                ++num_ghosts;
+            }
+
+          Assert(num_ghosts == parallel_ghost->ghosts.elem_count,
+                 ExcInternalError());
+        }
 
 
 
@@ -3121,42 +3125,46 @@ namespace parallel
 
 
 
-#  ifdef DEBUG
-      // check that our local copy has exactly as many cells as the p4est
-      // original (at least if we are on only one processor); for parallel
-      // computations, we want to check that we have at least as many as p4est
-      // stores locally (in the future we should check that we have exactly as
-      // many non-artificial cells as parallel_forest->local_num_quadrants)
-      {
-        const unsigned int total_local_cells = this->n_active_cells();
-
-
-        if (Utilities::MPI::n_mpi_processes(this->mpi_communicator) == 1)
+      if constexpr (running_in_debug_mode())
+        {
+          // check that our local copy has exactly as many cells as the p4est
+          // original (at least if we are on only one processor); for parallel
+          // computations, we want to check that we have at least as many as
+          // p4est stores locally (in the future we should check that we have
+          // exactly as many non-artificial cells as
+          // parallel_forest->local_num_quadrants)
           {
+            const unsigned int total_local_cells = this->n_active_cells();
+
+
+            if (Utilities::MPI::n_mpi_processes(this->mpi_communicator) == 1)
+              {
+                Assert(static_cast<unsigned int>(
+                         parallel_forest->local_num_quadrants) ==
+                         total_local_cells,
+                       ExcInternalError());
+              }
+            else
+              {
+                Assert(static_cast<unsigned int>(
+                         parallel_forest->local_num_quadrants) <=
+                         total_local_cells,
+                       ExcInternalError());
+              }
+
+            // count the number of owned, active cells and compare with p4est.
+            unsigned int n_owned = 0;
+            for (const auto &cell : this->active_cell_iterators())
+              {
+                if (cell->subdomain_id() == this->my_subdomain)
+                  ++n_owned;
+              }
+
             Assert(static_cast<unsigned int>(
-                     parallel_forest->local_num_quadrants) == total_local_cells,
+                     parallel_forest->local_num_quadrants) == n_owned,
                    ExcInternalError());
           }
-        else
-          {
-            Assert(static_cast<unsigned int>(
-                     parallel_forest->local_num_quadrants) <= total_local_cells,
-                   ExcInternalError());
-          }
-
-        // count the number of owned, active cells and compare with p4est.
-        unsigned int n_owned = 0;
-        for (const auto &cell : this->active_cell_iterators())
-          {
-            if (cell->subdomain_id() == this->my_subdomain)
-              ++n_owned;
-          }
-
-        Assert(static_cast<unsigned int>(
-                 parallel_forest->local_num_quadrants) == n_owned,
-               ExcInternalError());
-      }
-#  endif
+        }
 
       this->smooth_grid = save_smooth;
 
@@ -3283,14 +3291,15 @@ namespace parallel
     void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
     {
       // do not allow anisotropic refinement
-#  ifdef DEBUG
-      for (const auto &cell : this->active_cell_iterators())
-        if (cell->is_locally_owned() && cell->refine_flag_set())
-          Assert(cell->refine_flag_set() ==
-                   RefinementPossibilities<dim>::isotropic_refinement,
-                 ExcMessage(
-                   "This class does not support anisotropic refinement"));
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (const auto &cell : this->active_cell_iterators())
+            if (cell->is_locally_owned() && cell->refine_flag_set())
+              Assert(cell->refine_flag_set() ==
+                       RefinementPossibilities<dim>::isotropic_refinement,
+                     ExcMessage(
+                       "This class does not support anisotropic refinement"));
+        }
 
 
       // safety check: p4est has an upper limit on the level of a cell
@@ -3480,59 +3489,63 @@ namespace parallel
           this->data_serializer.unpack_cell_status(this->local_cell_relations);
         }
 
-#  ifdef DEBUG
-      // Check that we know the level subdomain ids of all our neighbors. This
-      // also involves coarser cells that share a vertex if they are active.
-      //
-      // Example (M= my, O=other):
-      //         *------*
-      //         |      |
-      //         |  O   |
-      //         |      |
-      // *---*---*------*
-      // | M | M |
-      // *---*---*
-      // |   | M |
-      // *---*---*
-      //  ^- the parent can be owned by somebody else, so O is not a neighbor
-      // one level coarser
-      if (settings & construct_multigrid_hierarchy)
+      if constexpr (running_in_debug_mode())
         {
-          for (unsigned int lvl = 0; lvl < this->n_global_levels(); ++lvl)
+          // Check that we know the level subdomain ids of all our neighbors.
+          // This also involves coarser cells that share a vertex if they are
+          // active.
+          //
+          // Example (M= my, O=other):
+          //         *------*
+          //         |      |
+          //         |  O   |
+          //         |      |
+          // *---*---*------*
+          // | M | M |
+          // *---*---*
+          // |   | M |
+          // *---*---*
+          //  ^- the parent can be owned by somebody else, so O is not a
+          //  neighbor
+          // one level coarser
+          if (settings & construct_multigrid_hierarchy)
             {
-              std::vector<bool> active_verts =
-                this->mark_locally_active_vertices_on_level(lvl);
+              for (unsigned int lvl = 0; lvl < this->n_global_levels(); ++lvl)
+                {
+                  std::vector<bool> active_verts =
+                    this->mark_locally_active_vertices_on_level(lvl);
 
-              const unsigned int maybe_coarser_lvl =
-                (lvl > 0) ? (lvl - 1) : lvl;
-              typename Triangulation<dim, spacedim>::cell_iterator
-                cell = this->begin(maybe_coarser_lvl),
-                endc = this->end(lvl);
-              for (; cell != endc; ++cell)
-                if (cell->level() == static_cast<int>(lvl) || cell->is_active())
-                  {
-                    const bool is_level_artificial =
-                      (cell->level_subdomain_id() ==
-                       numbers::artificial_subdomain_id);
-                    bool need_to_know = false;
-                    for (const unsigned int vertex :
-                         GeometryInfo<dim>::vertex_indices())
-                      if (active_verts[cell->vertex_index(vertex)])
-                        {
-                          need_to_know = true;
-                          break;
-                        }
+                  const unsigned int maybe_coarser_lvl =
+                    (lvl > 0) ? (lvl - 1) : lvl;
+                  typename Triangulation<dim, spacedim>::cell_iterator
+                    cell = this->begin(maybe_coarser_lvl),
+                    endc = this->end(lvl);
+                  for (; cell != endc; ++cell)
+                    if (cell->level() == static_cast<int>(lvl) ||
+                        cell->is_active())
+                      {
+                        const bool is_level_artificial =
+                          (cell->level_subdomain_id() ==
+                           numbers::artificial_subdomain_id);
+                        bool need_to_know = false;
+                        for (const unsigned int vertex :
+                             GeometryInfo<dim>::vertex_indices())
+                          if (active_verts[cell->vertex_index(vertex)])
+                            {
+                              need_to_know = true;
+                              break;
+                            }
 
-                    Assert(
-                      !need_to_know || !is_level_artificial,
-                      ExcMessage(
-                        "Internal error: the owner of cell" +
-                        cell->id().to_string() +
-                        " is unknown even though it is needed for geometric multigrid."));
-                  }
+                        Assert(
+                          !need_to_know || !is_level_artificial,
+                          ExcMessage(
+                            "Internal error: the owner of cell" +
+                            cell->id().to_string() +
+                            " is unknown even though it is needed for geometric multigrid."));
+                      }
+                }
             }
         }
-#  endif
 
       this->update_periodic_face_map();
       this->update_number_cache();
@@ -3547,14 +3560,15 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::repartition()
     {
-#  ifdef DEBUG
-      for (const auto &cell : this->active_cell_iterators())
-        if (cell->is_locally_owned())
-          Assert(
-            !cell->refine_flag_set() && !cell->coarsen_flag_set(),
-            ExcMessage(
-              "Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (const auto &cell : this->active_cell_iterators())
+            if (cell->is_locally_owned())
+              Assert(
+                !cell->refine_flag_set() && !cell->coarsen_flag_set(),
+                ExcMessage(
+                  "Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
+        }
 
       // signal that repartitioning is going to happen
       this->signals.pre_distributed_repartition();

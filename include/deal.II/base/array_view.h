@@ -505,12 +505,14 @@ template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   value_type       *starting_element,
   const std::size_t n_elements)
-  :
-#ifdef DEBUG
-  starting_element(n_elements > 0 ? starting_element : nullptr)
-#else
-  starting_element(starting_element)
-#endif
+  : // In debug mode, make sure that n_elements>0 and if it is not, set
+    // the pointer to a nullptr to trigger segfaults if anyone ever wanted
+    // to access elements of the array. In release mode, just take the
+    // pointer as given.
+  starting_element((library_build_mode == LibraryBuildMode::release) ||
+                       (n_elements > 0) ?
+                     starting_element :
+                     nullptr)
   , n_elements(n_elements)
 {}
 
@@ -521,14 +523,17 @@ inline void
 ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
                                                 const std::size_t n_elements)
 {
-#ifdef DEBUG
-  if (n_elements > 0)
-    this->starting_element = starting_element;
+  if constexpr (running_in_debug_mode())
+    {
+      if (n_elements > 0)
+        this->starting_element = starting_element;
+      else
+        this->starting_element = nullptr;
+    }
   else
-    this->starting_element = nullptr;
-#else
-  this->starting_element = starting_element;
-#endif
+    {
+      this->starting_element = starting_element;
+    }
   this->n_elements = n_elements;
 }
 

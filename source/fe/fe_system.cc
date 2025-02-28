@@ -1936,23 +1936,24 @@ FESystem<dim, spacedim>::initialize(
           }
       }
 
-#  ifdef DEBUG
-    // check generalized_support_points_index_table for consistency
-    for (unsigned int i = 0; i < base_elements.size(); ++i)
+    if constexpr (running_in_debug_mode())
       {
-        if (!base_element(i).has_generalized_support_points())
-          continue;
-
-        const auto &points =
-          base_elements[i].first->get_generalized_support_points();
-        for (unsigned int j = 0; j < points.size(); ++j)
+        // check generalized_support_points_index_table for consistency
+        for (unsigned int i = 0; i < base_elements.size(); ++i)
           {
-            const auto n = generalized_support_points_index_table[i][j];
-            Assert(this->generalized_support_points[n] == points[j],
-                   ExcInternalError());
+            if (!base_element(i).has_generalized_support_points())
+              continue;
+
+            const auto &points =
+              base_elements[i].first->get_generalized_support_points();
+            for (unsigned int j = 0; j < points.size(); ++j)
+              {
+                const auto n = generalized_support_points_index_table[i][j];
+                Assert(this->generalized_support_points[n] == points[j],
+                       ExcInternalError());
+              }
           }
-      }
-#  endif /* DEBUG */
+      } /* DEBUG */
   });
 
   // initialize quad dof index permutation in 3d and higher

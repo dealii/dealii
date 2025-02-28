@@ -94,15 +94,20 @@ main()
   initlog();
 
   deal_II_exceptions::disable_abort_on_exception();
-#ifdef DEBUG
-  // Asserts should be triggered
-  const bool expected_result_taped    = false;
-  const bool expected_result_tapeless = false;
-#else
-  // User beware: Asserts ignored
-  const bool expected_result_taped    = true;
-  const bool expected_result_tapeless = false;
-#endif
+  bool expected_result_taped;
+  bool expected_result_tapeless;
+  if constexpr (running_in_debug_mode())
+    {
+      // Asserts should be triggered
+      expected_result_taped    = false;
+      expected_result_tapeless = false;
+    }
+  else
+    {
+      // User beware: Asserts ignored
+      expected_result_taped    = true;
+      expected_result_tapeless = false;
+    }
 
   const unsigned int dim = 2;
   AssertThrow((test_incorrect_no_of_ind_vars<dim,

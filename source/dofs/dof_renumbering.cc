@@ -2295,14 +2295,15 @@ namespace DoFRenumbering
                                           std::vector<unsigned int>(),
                                           false);
 
-#ifdef DEBUG
-    {
-      const std::vector<types::global_dof_index> dofs_per_component =
-        DoFTools::count_dofs_per_fe_component(dof_handler, true);
-      for (const auto &dpc : dofs_per_component)
-        Assert(dofs_per_component[0] == dpc, ExcNotImplemented());
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          const std::vector<types::global_dof_index> dofs_per_component =
+            DoFTools::count_dofs_per_fe_component(dof_handler, true);
+          for (const auto &dpc : dofs_per_component)
+            Assert(dofs_per_component[0] == dpc, ExcNotImplemented());
+        }
+      }
     const unsigned int n_components =
       dof_handler.get_fe_collection().n_components();
     Assert(dof_handler.n_dofs() % n_components == 0, ExcInternalError());
@@ -2338,15 +2339,16 @@ namespace DoFRenumbering
                                               component_dofs.end());
       }
     component_renumbered_dofs.compress();
-#ifdef DEBUG
-    {
-      IndexSet component_renumbered_dofs2(dof_handler.n_dofs());
-      component_renumbered_dofs2.add_indices(component_renumbering.begin(),
-                                             component_renumbering.end());
-      Assert(component_renumbered_dofs2 == component_renumbered_dofs,
-             ExcInternalError());
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          IndexSet component_renumbered_dofs2(dof_handler.n_dofs());
+          component_renumbered_dofs2.add_indices(component_renumbering.begin(),
+                                                 component_renumbering.end());
+          Assert(component_renumbered_dofs2 == component_renumbered_dofs,
+                 ExcInternalError());
+        }
+      }
     for (const FiniteElement<dim, spacedim> &fe :
          dof_handler.get_fe_collection())
       {

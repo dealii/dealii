@@ -269,12 +269,13 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
             }
           // Apply inverse diagonal
           this->inverse_vmult(block, x_cell, b_cell);
-#ifdef DEBUG
-          for (unsigned int i = 0; i < x_cell.size(); ++i)
+          if constexpr (running_in_debug_mode())
             {
-              AssertIsFinite(x_cell(i));
+              for (unsigned int i = 0; i < x_cell.size(); ++i)
+                {
+                  AssertIsFinite(x_cell(i));
+                }
             }
-#endif
           // Store in result vector
           row = additional_data->block_list.begin(block);
           for (size_type row_cell = 0; row_cell < bs; ++row_cell, ++row)

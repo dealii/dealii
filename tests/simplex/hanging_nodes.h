@@ -68,14 +68,15 @@ refine(const std::vector<unsigned int> &n_refinements, Triangulation<dim> &tria)
       tria.execute_coarsening_and_refinement();
     }
 
-#ifdef DEBUG
-  for (const auto &cell : tria.active_cell_iterators())
+  if constexpr (running_in_debug_mode())
     {
-      const unsigned int coarse_cell_id = cell->id().get_coarse_cell_id();
+      for (const auto &cell : tria.active_cell_iterators())
+        {
+          const unsigned int coarse_cell_id = cell->id().get_coarse_cell_id();
 
-      AssertDimension(cell->level(), n_refinements[coarse_cell_id]);
+          AssertDimension(cell->level(), n_refinements[coarse_cell_id]);
+        }
     }
-#endif
 }
 
 
