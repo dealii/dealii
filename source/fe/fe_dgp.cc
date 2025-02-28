@@ -25,21 +25,30 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_DGP<dim, spacedim>::FE_DGP(const unsigned int degree)
+  : FE_DGP<dim, spacedim>(
+      Polynomials::Legendre::generate_complete_basis(degree))
+{}
+
+template <int dim, int spacedim>
+FE_DGP<dim, spacedim>::FE_DGP(
+  const std::vector<Polynomials::Polynomial<double>> &poly)
   : FE_Poly<dim, spacedim>(
-      PolynomialSpace<dim>(
-        Polynomials::Legendre::generate_complete_basis(degree)),
-      FiniteElementData<dim>(get_dpo_vector(degree),
+      PolynomialSpace<dim>(poly),
+      FiniteElementData<dim>(get_dpo_vector(poly.size() - 1),
                              1,
-                             degree,
+                             poly.size() - 1,
                              FiniteElementData<dim>::L2),
-      std::vector<bool>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
-          .n_dofs_per_cell(),
-        true),
-      std::vector<ComponentMask>(
-        FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
-          .n_dofs_per_cell(),
-        ComponentMask(std::vector<bool>(1, true))))
+      std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(poly.size() - 1),
+                                               1,
+                                               poly.size() - 1)
+                          .n_dofs_per_cell(),
+                        true),
+      std::vector<ComponentMask>(FiniteElementData<dim>(get_dpo_vector(
+                                                          poly.size() - 1),
+                                                        1,
+                                                        poly.size() - 1)
+                                   .n_dofs_per_cell(),
+                                 ComponentMask(std::vector<bool>(1, true))))
 {
   // Reinit the vectors of restriction and prolongation matrices to the right
   // sizes

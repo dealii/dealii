@@ -1011,8 +1011,16 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 
 template <int dim, int spacedim>
 FE_DGQLegendre<dim, spacedim>::FE_DGQLegendre(const unsigned int degree)
-  : FE_DGQ<dim, spacedim>(
+  : FE_DGQLegendre<dim, spacedim>(
       Polynomials::Legendre::generate_complete_basis(degree))
+{}
+
+
+
+template <int dim, int spacedim>
+FE_DGQLegendre<dim, spacedim>::FE_DGQLegendre(
+  const std::vector<Polynomials::Polynomial<double>> &poly)
+  : FE_DGQ<dim, spacedim>(poly)
 {}
 
 

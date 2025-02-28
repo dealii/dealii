@@ -461,6 +461,12 @@ public:
   FE_DGQLegendre(const unsigned int degree);
 
   /**
+   * Constructor for tensor product polynomials based on the
+   * given polynomials @p poly.
+   */
+  FE_DGQLegendre(const std::vector<Polynomials::Polynomial<double>> &poly);
+
+  /**
    * Return a list of constant modes of the element. For the Legendre basis,
    * it returns one row where the first element (corresponding to the constant
    * mode) is set to true and all other elements are set to false.
