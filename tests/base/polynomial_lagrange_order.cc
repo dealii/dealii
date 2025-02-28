@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-// Similar to polyomial_lagrange, but test Lagrange interpolation for high
+// Similar to polynomial_lagrange, but test Lagrange interpolation for high
 // order with tighter tolerances, in particular the effect of stability of the
 // polynomial evaluation at random points
 
