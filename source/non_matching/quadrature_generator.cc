@@ -14,8 +14,8 @@
 
 #include <deal.II/base/function_tools.h>
 
-#include "deal.II/fe/fe_q.h"
-#include "deal.II/fe/fe_q_iso_q1.h"
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 
 #include <deal.II/grid/reference_cell.h>
 
