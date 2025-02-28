@@ -4628,86 +4628,87 @@ void
 MGTransferMF<dim, Number, MemorySpace>::assert_dof_handler(
   const DoFHandler<dim> &dof_handler_out) const
 {
-#ifndef DEBUG
   (void)dof_handler_out;
-#else
-
-  const auto dof_handler_and_level_in = get_dof_handler_fine();
-  const auto dof_handler_in           = dof_handler_and_level_in.first;
-  const auto level_in                 = dof_handler_and_level_in.second;
-
-  if ((dof_handler_out.n_dofs() == 0) ||  // dummy DoFHandler
-      (dof_handler_in == nullptr) ||      // single level
-      (dof_handler_in == &dof_handler_out // same DoFHandler
-       ))
-    return; // nothing to do
-
-  if (this->perform_plain_copy)
+  if constexpr (running_in_debug_mode())
     {
-      // global-coarsening path: compare indices of cells
+      const auto dof_handler_and_level_in = get_dof_handler_fine();
+      const auto dof_handler_in           = dof_handler_and_level_in.first;
+      const auto level_in                 = dof_handler_and_level_in.second;
 
-      std::vector<types::global_dof_index> dof_indices_in;
-      std::vector<types::global_dof_index> dof_indices_out;
+      if ((dof_handler_out.n_dofs() == 0) ||  // dummy DoFHandler
+          (dof_handler_in == nullptr) ||      // single level
+          (dof_handler_in == &dof_handler_out // same DoFHandler
+           ))
+        return; // nothing to do
 
-      internal::loop_over_active_or_level_cells(
-        dof_handler_in->get_triangulation(), level_in, [&](const auto &cell) {
-          const auto cell_id = cell->id();
+      if (this->perform_plain_copy)
+        {
+          // global-coarsening path: compare indices of cells
 
-          Assert(
-            dof_handler_out.get_triangulation().contains_cell(cell_id),
-            ExcMessage(
-              "DoFHandler instances used for set up of MGTransferMF and copy_to_mg(), "
-              "copy_from_mg(), or interpolate_to_mg() are not compatible."));
+          std::vector<types::global_dof_index> dof_indices_in;
+          std::vector<types::global_dof_index> dof_indices_out;
 
-          if (level_in == numbers::invalid_unsigned_int)
-            {
-              const auto cell_in =
-                cell->as_dof_handler_iterator(*dof_handler_in);
-              const auto cell_out =
-                dof_handler_out.get_triangulation()
-                  .create_cell_iterator(cell_id)
-                  ->as_dof_handler_iterator(dof_handler_out);
+          internal::loop_over_active_or_level_cells(
+            dof_handler_in->get_triangulation(),
+            level_in,
+            [&](const auto &cell) {
+              const auto cell_id = cell->id();
 
-              AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
-                              cell_out->get_fe().n_dofs_per_cell());
+              Assert(
+                dof_handler_out.get_triangulation().contains_cell(cell_id),
+                ExcMessage(
+                  "DoFHandler instances used for set up of MGTransferMF and copy_to_mg(), "
+                  "copy_from_mg(), or interpolate_to_mg() are not compatible."));
 
-              dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
-              dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
+              if (level_in == numbers::invalid_unsigned_int)
+                {
+                  const auto cell_in =
+                    cell->as_dof_handler_iterator(*dof_handler_in);
+                  const auto cell_out =
+                    dof_handler_out.get_triangulation()
+                      .create_cell_iterator(cell_id)
+                      ->as_dof_handler_iterator(dof_handler_out);
 
-              cell_in->get_dof_indices(dof_indices_in);
-              cell_out->get_dof_indices(dof_indices_out);
-            }
-          else
-            {
-              const auto cell_in =
-                cell->as_dof_handler_level_iterator(*dof_handler_in);
-              const auto cell_out =
-                dof_handler_out.get_triangulation()
-                  .create_cell_iterator(cell_id)
-                  ->as_dof_handler_level_iterator(dof_handler_out);
+                  AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
+                                  cell_out->get_fe().n_dofs_per_cell());
 
-              AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
-                              cell_out->get_fe().n_dofs_per_cell());
+                  dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
+                  dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
 
-              dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
-              dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
+                  cell_in->get_dof_indices(dof_indices_in);
+                  cell_out->get_dof_indices(dof_indices_out);
+                }
+              else
+                {
+                  const auto cell_in =
+                    cell->as_dof_handler_level_iterator(*dof_handler_in);
+                  const auto cell_out =
+                    dof_handler_out.get_triangulation()
+                      .create_cell_iterator(cell_id)
+                      ->as_dof_handler_level_iterator(dof_handler_out);
 
-              cell_in->get_mg_dof_indices(dof_indices_in);
-              cell_out->get_mg_dof_indices(dof_indices_out);
-            }
+                  AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
+                                  cell_out->get_fe().n_dofs_per_cell());
 
-          Assert(
-            dof_indices_in == dof_indices_out,
-            ExcMessage(
-              "DoFHandler instances used for set up of MGTransferMF and copy_to_mg(), "
-              "copy_from_mg(), or interpolate_to_mg() are not compatible."));
-        });
+                  dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
+                  dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
+
+                  cell_in->get_mg_dof_indices(dof_indices_in);
+                  cell_out->get_mg_dof_indices(dof_indices_out);
+                }
+
+              Assert(
+                dof_indices_in == dof_indices_out,
+                ExcMessage(
+                  "DoFHandler instances used for set up of MGTransferMF and copy_to_mg(), "
+                  "copy_from_mg(), or interpolate_to_mg() are not compatible."));
+            });
+        }
+      else if (this->perform_renumbered_plain_copy)
+        {
+          // nothing to do
+        }
     }
-  else if (this->perform_renumbered_plain_copy)
-    {
-      // nothing to do
-    }
-#endif
 }
 
 
