@@ -31,8 +31,8 @@ jobs:
   linux-release-serial:
     # simple serial release build using g++
 
-    name: linux release serial
-    runs-on: [ubuntu-22.04]
+    name: ${{ matrix.ubuntu_version }} release serial
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -42,8 +42,13 @@ jobs:
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [jammy, noble]
+
     container:
-      image: dealii/dependencies:jammy
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}
       options: --user root
 
     steps:
@@ -86,8 +91,8 @@ jobs:
   linux-debug-parallel:
     # simple parallel debug build using g++
 
-    name: linux debug parallel
-    runs-on: [ubuntu-22.04]
+    name: ${{ matrix.ubuntu_version }} debug parallel
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -97,8 +102,13 @@ jobs:
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [jammy, noble]
+
     container:
-      image: dealii/dependencies:jammy
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
@@ -149,8 +159,8 @@ jobs:
   linux-debug-parallel-tpetra:
     # simple parallel debug build using g++ and trilinos+tpetra
 
-    name: linux debug parallel tpetra
-    runs-on: [ubuntu-22.04]
+    name: ${{ matrix.ubuntu_version }} debug parallel tpetra
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -160,8 +170,13 @@ jobs:
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [jammy, noble]
+
     container:
-      image: dealii/dependencies:jammy
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
