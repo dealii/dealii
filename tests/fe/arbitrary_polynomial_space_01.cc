@@ -105,5 +105,5 @@ main()
   const auto polynomials = create_orthonormal_basis(fe_degree);
 
   test(FE_DGP<dim>(polynomials));
-  test(FE_DGQLegendre<dim>(polynomials));
+  test(FE_DGQArbitraryPolynomialSpace<dim>(polynomials));
 }
