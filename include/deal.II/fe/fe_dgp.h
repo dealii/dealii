@@ -317,6 +317,8 @@ public:
 
   /**
    * Constructor for tensor product polynomials of given polynomials @p poly.
+   * The polynomials should be independent and span a polynomial space of
+   * degree `poly.size()-1`.
    */
   FE_DGP(const std::vector<Polynomials::Polynomial<double>> &poly);
 
