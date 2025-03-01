@@ -50,6 +50,9 @@ FE_DGP<dim, spacedim>::FE_DGP(
                                    .n_dofs_per_cell(),
                                  ComponentMask(std::vector<bool>(1, true))))
 {
+  for (const auto &p : poly)
+    AssertIndexRange(p.degree(), poly.size());
+
   // Reinit the vectors of restriction and prolongation matrices to the right
   // sizes
   this->reinit_restriction_and_prolongation_matrices();
