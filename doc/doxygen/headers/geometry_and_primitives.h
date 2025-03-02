@@ -31,20 +31,21 @@
  * arbitrary tensors points have the special connotation of points in
  * space, and therefore have some additional properties.
  *
- * In deal.II, meshes are built from line segments, quadrilaterals, or
- * hexahedra (depending on the space dimension). The GeometryInfo
- * class is used to describe properties of these basic objects in unit
- * space (i.e. for the unit line, unit square, and unit cube). It
- * offers static data members denoting the number of vertices per
- * cell, lines per face, or where which vertex is located. This
- * abstraction allows to write applications mostly independently of
- * the actual space dimension: loops over all vertices would simply
- * run from zero to GeometryInfo<dim>::vertices_per_cell instead of
- * from 0 to 4 (in 2d) or 0 to 8 (in 3d). In this way, the program
- * will be correct in 2d as well as 3d, and one can run a program in a
- * different space dimension simply by recompilation instead of having
- * to change a significant portion of the code. These
- * dimension-independent programming techniques are extensively
- * discussed in the first few tutorial programs and are used
- * throughout deal.II.
+ * In deal.II, Triangulation objects are built from line segments, triangles or
+ * quadrilaterals, or tetrahedra, pyramids, wedges, or hexahedra (depending on
+ * the space dimension). The ReferenceCell class encodes all properties of these
+ * basic objects in (as the name implies) reference coordinates, such as number
+ * of vertices per cell, lines per face, and the coordinates of each vertex.
+ * This abstraction enables writing applications mostly independently of the
+ * actual space dimension as well as the ReferenceCell types of a Triangulation:
+ * i.e., if you consistently use ReferenceCell's data members, then the same
+ * program should work with both quadrilateral and triangular cells. For
+ * example, loops over all cell vertices would simply run from zero to
+ * `cell->reference_cell().n_vertices()` instead of hard-coding values which
+ * only work with a particular type of reference cell in a particular dimension.
+ * In this way, the program will be correct for all reference cell types, and
+ * one can run a program in a different space dimension simply by recompilation
+ * instead of having to change a significant portion of the code. These
+ * dimension-independent programming techniques are extensively discussed in the
+ * first few tutorial programs and are used throughout deal.II.
  */
