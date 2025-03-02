@@ -1,0 +1,73 @@
+
+DEAL:0::is: {[0,3]}
+DEAL:0::is_ghosted: {[2,5]}
+DEAL:0::trilinos vec:
+size:8 locally_owned_size:4 :
+[0]: 0.000e+00
+[1]: 1.000e+00
+[2]: 2.000e+00
+[3]: 3.000e+00
+DEAL:0::trilinos vec ghosted:
+size:8 locally_owned_size:6 :
+[0]: 0.000e+00
+[1]: 1.000e+00
+[2]: 2.000e+00
+[3]: 3.000e+00
+[4]: 4.000e+00
+[5]: 5.000e+00
+DEAL:0::ghosted IS: {[0,5]}
+DEAL:0::tril_vector_ghosted.owned_elements() {[0,3]}
+DEAL:0::RWVector contents from tril_vector:
+IndexSet: {[0,3]}
+
+[0]: 0.000e+00
+[1]: 1.000e+00
+[2]: 2.000e+00
+[3]: 3.000e+00
+DEAL:0::RWVector contents from tril_vector_ghosted:
+IndexSet: {[0,5]}
+
+[0]: 0.000e+00
+[1]: 1.000e+00
+[2]: 2.000e+00
+[3]: 3.000e+00
+[4]: 4.000e+00
+[5]: 5.000e+00
+DEAL:0::OK
+
+DEAL:1::is: {[4,7]}
+DEAL:1::is_ghosted: {[2,5]}
+DEAL:1::trilinos vec:
+size:8 locally_owned_size:4 :
+[4]: 4.000e+00
+[5]: 5.000e+00
+[6]: 6.000e+00
+[7]: 7.000e+00
+DEAL:1::trilinos vec ghosted:
+size:8 locally_owned_size:6 :
+[2]: 2.000e+00
+[3]: 3.000e+00
+[4]: 4.000e+00
+[5]: 5.000e+00
+[6]: 6.000e+00
+[7]: 7.000e+00
+DEAL:1::ghosted IS: {[2,7]}
+DEAL:1::tril_vector_ghosted.owned_elements() {[4,7]}
+DEAL:1::RWVector contents from tril_vector:
+IndexSet: {[4,7]}
+
+[4]: 4.000e+00
+[5]: 5.000e+00
+[6]: 6.000e+00
+[7]: 7.000e+00
+DEAL:1::RWVector contents from tril_vector_ghosted:
+IndexSet: {[2,7]}
+
+[2]: 2.000e+00
+[3]: 3.000e+00
+[4]: 4.000e+00
+[5]: 5.000e+00
+[6]: 6.000e+00
+[7]: 7.000e+00
+DEAL:1::OK
+
