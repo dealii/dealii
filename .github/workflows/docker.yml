@@ -16,19 +16,25 @@ env:
 
 jobs:
   build-master-docker-ubuntu:
+    # Build images for different ubuntu versions on different platforms
+
     if: (github.event_name == 'schedule' && github.repository == 'dealii/dealii') || github.event_name != 'schedule'
 
     name: build master docker ${{ matrix.ubuntu_version }} ${{ matrix.platform }}
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
         ubuntu_version: [jammy, noble]
-        platform: [linux/amd64]
-        # Use only 2 jobs to build, as more jobs
-        # would starve the github machine for memory.
+        platform: [amd64, arm64]
         include:
+          - platform: amd64
+            os: ubuntu-24.04
+          - platform: arm64
+            os: ubuntu-24.04-arm
+          # Use only 2 jobs to build, as more jobs
+          # would starve the github machine for memory.
           - n_jobs: 2
 
     steps:
@@ -40,9 +46,6 @@ jobs:
           
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -71,7 +74,7 @@ jobs:
             IMG=${{ matrix.ubuntu_version }}
             NJOBS=${{ matrix.n_jobs }}
             VER=master
-          platforms: ${{ matrix.platform }}
+          platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name == 'schedule' }}
           outputs: type=image,name=ghcr.io/${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
@@ -85,19 +88,20 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.ubuntu_version }}
+          name: digests-${{ matrix.ubuntu_version }}-${{ matrix.platform }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
   
   merge:
+    # Merge all images for a specific ubuntu version
+
     if: (github.event_name == 'schedule' && github.repository == 'dealii/dealii') || github.event_name != 'schedule'
 
     runs-on: ubuntu-24.04
     needs:
       - build-master-docker-ubuntu
 
-# Merge all images for a specific ubuntu version
     strategy:
       fail-fast: false
       matrix:
@@ -108,7 +112,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: /tmp/digests
-          pattern: digests-${{ matrix.ubuntu_version }}
+          pattern: digests-${{ matrix.ubuntu_version }}-*
           merge-multiple: true
 
       - name: Set up Docker Buildx
