@@ -30,4 +30,14 @@
  */
 #define DEAL_II_GIT_SHORTREV "@DEAL_II_GIT_SHORTREV@"
 
+/**
+ * Tag of the current git HEAD.
+ */
+#define DEAL_II_GIT_TAG "@DEAL_II_GIT_TAG@"
+
+/**
+ * Fancy tag of the current git HEAD.
+ */
+#define DEAL_II_GIT_FANCY_TAG "@DEAL_II_GIT_FANCY_TAG@"
+
 #endif
