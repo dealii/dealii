@@ -1431,6 +1431,16 @@ public:
   static constexpr unsigned int n_lanes = VectorizedArrayType::size();
 
   /**
+   * The static polynomial degree of the finite element.
+   */
+  static constexpr unsigned int static_fe_degree = fe_degree;
+
+  /**
+   * The static number of 1D quadrature points `n_q_points_1d`.
+   */
+  static constexpr unsigned int static_n_q_points_1d = n_q_points_1d;
+
+  /**
    * The static number of quadrature points determined from the given template
    * argument `n_q_points_1d`.
    *
@@ -1892,6 +1902,16 @@ public:
    * The number of lanes of the template argument VectorizedArrayType.
    */
   static constexpr unsigned int n_lanes = VectorizedArrayType::size();
+
+  /**
+   * The static polynomial degree of the finite element.
+   */
+  static constexpr unsigned int static_fe_degree = fe_degree;
+
+  /**
+   * The static number of 1D quadrature points `n_q_points_1d`.
+   */
+  static constexpr unsigned int static_n_q_points_1d = n_q_points_1d;
 
   /**
    * The static number of quadrature points determined from the given template
