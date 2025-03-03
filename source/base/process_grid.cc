@@ -73,7 +73,7 @@ namespace
     // 2x5.
 
     // limit our estimate to be in [2, Np]
-    int n_process_columns = std::min(Np, std::max(2, Pc));
+    int n_process_columns = std::clamp(Pc, 2, Np);
     // finally, get the rows:
     int n_process_rows = Np / n_process_columns;
 
