@@ -15,6 +15,8 @@
 #ifndef dealii_distributed_repartitioning_policy_tools_h
 #define dealii_distributed_repartitioning_policy_tools_h
 
+#include <deal.II/fe/mapping.h>
+
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
@@ -175,6 +177,107 @@ namespace RepartitioningPolicyTools
       unsigned int(const typename Triangulation<dim, spacedim>::cell_iterator &,
                    const CellStatus)>
       weighting_function;
+  };
+
+
+  /**
+   * A policy that partitions an immersed grids based on a background
+   * triangulation. This policy is in particular useful in a non-matching case,
+   * e.g., non-nested multigrid.
+   *
+   * @note At the moment, only working for meshes only consisting
+   * of hypercubes.
+   */
+  template <int dim, int spacedim = dim>
+  class ImmersedMeshPolicy : public Base<dim, spacedim>
+  {
+  public:
+    /**
+     * This enum specifies if cell multiple possible owners have
+     * been identified.
+     */
+    enum class ReductionType
+    {
+      /**
+       * Use smallest rank.
+       */
+      smallest_rank,
+
+      /**
+       * Use smallest rank with most counts.
+       */
+      highest_count
+    };
+
+    struct AdditionalData
+    {
+      /**
+       * Default constructor.
+       */
+      AdditionalData();
+
+      /**
+       * Type of reduction.
+       */
+      ReductionType reduction_type;
+
+      /**
+       * Generate sample point on immersed mesh.
+       *
+       * @note Ignored when the constructor taking the DoFHandler is used.
+       */
+      bool immersed_identification;
+
+      /**
+       * Number of sample points (in each direction).
+       *
+       * @note Ignored when the constructor taking the DoFHandler is used.
+       */
+      unsigned int n_samples;
+
+      /**
+       * Mapping of the background mesh. If not set, MappingQ1 is used.
+       */
+      ObserverPointer<const Mapping<dim, spacedim>> mapping_background;
+
+      /**
+       * Mapping of the immersed mesh. If not set, MappingQ1 is used.
+       */
+      ObserverPointer<const Mapping<dim, spacedim>> mapping_immersed;
+    };
+
+    /**
+     * Constructor takint a background Triangulation.
+     */
+    ImmersedMeshPolicy(const Triangulation<dim, spacedim> &tria_background,
+                       const AdditionalData               &data = {});
+
+    /**
+     * Constructor takint a background DoFHandler.
+     */
+    ImmersedMeshPolicy(const DoFHandler<dim, spacedim> &dof_handler_background,
+                       const AdditionalData            &data = {});
+
+    virtual LinearAlgebra::distributed::Vector<double>
+    partition(const Triangulation<dim, spacedim> &tria_immersed) const override;
+
+  private:
+    /**
+     * Background Triangulation.
+     */
+    const ObserverPointer<const Triangulation<dim, spacedim>> tria_background;
+
+    /**
+     * Background DoFHandler. The support points of the background mesh are
+     * used for sampling.
+     */
+    const ObserverPointer<const DoFHandler<dim, spacedim>>
+      dof_handler_background;
+
+    /**
+     * Settings.
+     */
+    const AdditionalData data;
   };
 
 } // namespace RepartitioningPolicyTools
