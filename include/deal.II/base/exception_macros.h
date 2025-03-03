@@ -641,7 +641,8 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
         {                      \
           if constexpr (false) \
             if (!(cond))       \
-              ;                \
+              {                \
+              }                \
         }                      \
       while (false)
 #  endif
