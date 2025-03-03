@@ -636,10 +636,13 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
         }                                                      \
       while (false)
 #  else
-#    define Assert(cond, exc) \
-      do                      \
-        {                     \
-        }                     \
+#    define Assert(cond, exc)  \
+      do                       \
+        {                      \
+          if constexpr (false) \
+            if (!(cond))       \
+              ;                \
+        }                      \
       while (false)
 #  endif
 #endif /*ifdef DEBUG*/
