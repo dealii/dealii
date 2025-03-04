@@ -255,7 +255,8 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
         const X::active_face_iterator &,
         const unsigned int,
         const Tensor<1, deal_II_space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
 
       template std::optional<types::geometric_orientation>
       orthogonal_equality<X::face_iterator>(
@@ -263,7 +264,8 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
         const X::face_iterator &,
         const unsigned int,
         const Tensor<1, deal_II_space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
     \}
 #endif
   }
@@ -283,7 +285,8 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
         const unsigned int,
         std::vector<PeriodicFacePair<X::cell_iterator>> &,
         const Tensor<1, X::space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
 
       template void
       collect_periodic_faces<X>(
@@ -292,7 +295,8 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS;
         const unsigned int,
         std::vector<PeriodicFacePair<X::cell_iterator>> &,
         const Tensor<1, X::space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
 
     \}
 #endif
@@ -323,7 +327,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                      parallel::distributed::Triangulation<
                        deal_II_dimension,
                        deal_II_space_dimension>::space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
 
       template void
       collect_periodic_faces<
@@ -340,7 +345,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                      parallel::distributed::Triangulation<
                        deal_II_dimension,
                        deal_II_space_dimension>::space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
     \}
 #  endif
 #endif
@@ -369,7 +375,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                      parallel::shared::Triangulation<
                        deal_II_dimension,
                        deal_II_space_dimension>::space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
       template void
       collect_periodic_faces<
         parallel::shared::Triangulation<deal_II_dimension,
@@ -385,7 +392,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                      parallel::shared::Triangulation<
                        deal_II_dimension,
                        deal_II_space_dimension>::space_dimension> &,
-        const FullMatrix<double> &);
+        const FullMatrix<double> &,
+        const double);
     \}
 #endif
   }
