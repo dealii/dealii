@@ -44,13 +44,23 @@ evaluate_tensor_product(
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> src)
 {
+  Kokkos::View<
+    double *,
+    MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+    Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+    dummy_scratch(team_member.team_shmem(), 0);
+
   Portable::internal::EvaluatorTensorProduct<
     Portable::internal::evaluate_general,
     1,
-    M - 1,
+    M,
     N,
     double>
-    evaluator(team_member, shape_values, shape_gradients, co_shape_gradients);
+    evaluator(team_member,
+              shape_values,
+              shape_gradients,
+              co_shape_gradients,
+              dummy_scratch);
 
   if (type == 0)
     evaluator.template values<0, dof_to_quad, add, false>(src, dst);
@@ -197,19 +207,19 @@ main()
   deallog.push("values");
   test<4, 4, 0, false>();
   test<3, 3, 0, false>();
+  test<3, 4, 0, false>();
+  test<3, 5, 0, false>();
   // Not supported right now
   // test<4,3,0,false>();
-  // test<3,4,0,false>();
-  // test<3,5,0,false>();
   deallog.pop();
 
   deallog.push("gradients");
   test<4, 4, 1, false>();
   test<3, 3, 1, false>();
+  test<3, 4, 1, false>();
+  test<3, 5, 1, false>();
   // Not supported right now
   // test<4,3,1,false>();
-  // test<3,4,1,false>();
-  // test<3,5,1,false>();
   deallog.pop();
 
   deallog.push("add");
@@ -217,19 +227,19 @@ main()
   deallog.push("values");
   test<4, 4, 0, true>();
   test<3, 3, 0, true>();
+  test<3, 4, 0, true>();
+  test<3, 5, 0, true>();
   // Not supported right now
   // test<4,3,0,true>();
-  // test<3,4,0,true>();
-  // test<3,5,0,true>();
   deallog.pop();
 
   deallog.push("gradients");
   test<4, 4, 1, true>();
   test<3, 3, 1, true>();
+  test<3, 4, 1, true>();
+  test<3, 5, 1, true>();
   // Not supported right now
   // test<4,3,1,true>();
-  // test<3,4,1,true>();
-  // test<3,5,1,true>();
   deallog.pop();
 
   deallog.pop();
