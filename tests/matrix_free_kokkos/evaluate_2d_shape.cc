@@ -33,51 +33,55 @@
 using TeamHandle = Kokkos::TeamPolicy<
   MemorySpace::Default::kokkos_space::execution_space>::member_type;
 
+// FIXME Inlining the functor creates "invalid device code" errors
 template <int M, int N, int type, bool add, bool dof_to_quad>
-DEAL_II_HOST_DEVICE void
-evaluate_tensor_product(
-  const TeamHandle                                          &team_member,
-  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values,
-  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients,
-  Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients,
-  Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst,
-  Kokkos::View<double *, MemorySpace::Default::kokkos_space> src,
-  Kokkos::View<double *, MemorySpace::Default::kokkos_space> tmp)
+struct EvaluateTensorProduct
 {
-  Kokkos::View<
-    double *,
-    MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
-    Kokkos::MemoryTraits<Kokkos::Unmanaged>>
-    dummy_scratch(team_member.team_shmem(), 0);
+  DEAL_II_HOST_DEVICE void
+  operator()(const TeamHandle &team_member) const
+  {
+    Kokkos::View<
+      double *,
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+      dummy_scratch(team_member.team_shmem(), 0);
 
-  Portable::internal::EvaluatorTensorProduct<
-    Portable::internal::evaluate_general,
-    2,
-    M,
-    N,
-    double>
-    evaluator(team_member,
-              shape_values,
-              shape_gradients,
-              co_shape_gradients,
-              dummy_scratch);
+    Portable::internal::EvaluatorTensorProduct<
+      Portable::internal::evaluate_general,
+      2,
+      M,
+      N,
+      double>
+      evaluator(team_member,
+                shape_values,
+                shape_gradients,
+                co_shape_gradients,
+                dummy_scratch);
 
-  constexpr int d0 = dof_to_quad ? 0 : 1;
-  constexpr int d1 = dof_to_quad ? 1 : 0;
+    constexpr int d0 = dof_to_quad ? 0 : 1;
+    constexpr int d1 = dof_to_quad ? 1 : 0;
 
-  if (type == 0)
-    {
-      evaluator.template values<d0, dof_to_quad, false, false>(src, tmp);
-      team_member.team_barrier();
-      evaluator.template values<d1, dof_to_quad, add, false>(tmp, dst);
-    }
-  if (type == 1)
-    {
-      evaluator.template gradients<d0, dof_to_quad, false, false>(src, tmp);
-      team_member.team_barrier();
-      evaluator.template gradients<d1, dof_to_quad, add, false>(tmp, dst);
-    }
-}
+    if (type == 0)
+      {
+        evaluator.template values<d0, dof_to_quad, false, false>(src, tmp);
+        team_member.team_barrier();
+        evaluator.template values<d1, dof_to_quad, add, false>(tmp, dst);
+      }
+    if (type == 1)
+      {
+        evaluator.template gradients<d0, dof_to_quad, false, false>(src, tmp);
+        team_member.team_barrier();
+        evaluator.template gradients<d1, dof_to_quad, add, false>(tmp, dst);
+      }
+  }
+
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> src;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> tmp;
+};
 
 template <int M, int N, int type, bool add>
 void
@@ -170,16 +174,9 @@ test()
   MemorySpace::Default::kokkos_space::execution_space exec;
   Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>
     team_policy(exec, 1, Kokkos::AUTO);
-  Kokkos::parallel_for(
-    team_policy, KOKKOS_LAMBDA(const TeamHandle &team_member) {
-      evaluate_tensor_product<M, N, type, add, false>(team_member,
-                                                      shape_values,
-                                                      shape_gradients,
-                                                      co_shape_gradients,
-                                                      y_dev,
-                                                      x_dev,
-                                                      tmp_dev);
-    });
+  EvaluateTensorProduct<M, N, type, add, false> functor_to_dof{
+    shape_values, shape_gradients, co_shape_gradients, y_dev, x_dev, tmp_dev};
+  Kokkos::parallel_for(team_policy, functor_to_dof);
 
   // Check the results on the host
   Kokkos::deep_copy(y_host, y_dev);
@@ -208,16 +205,9 @@ test()
   Kokkos::deep_copy(x_dev, x_host);
 
   // Launch the kernel
-  Kokkos::parallel_for(
-    team_policy, KOKKOS_LAMBDA(const TeamHandle &team_member) {
-      evaluate_tensor_product<M, N, type, add, true>(team_member,
-                                                     shape_values,
-                                                     shape_gradients,
-                                                     co_shape_gradients,
-                                                     x_dev,
-                                                     y_dev,
-                                                     tmp_dev);
-    });
+  EvaluateTensorProduct<M, N, type, add, true> functor_to_quad{
+    shape_values, shape_gradients, co_shape_gradients, x_dev, y_dev, tmp_dev};
+  Kokkos::parallel_for(team_policy, functor_to_quad);
 
   // Check the results on the host
   Kokkos::deep_copy(x_host, x_dev);
