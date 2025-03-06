@@ -117,15 +117,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::create_cell_subrange_hp_by_index(
     {
       // the range over which we are searching must be ordered, otherwise we
       // got a range that spans over too many cells
-#ifdef DEBUG
-      for (unsigned int i = range.first + 1; i < range.second; ++i)
-        Assert(
-          fe_indices[i] >= fe_indices[i - 1],
-          ExcMessage(
-            "Cell range must be over sorted range of FE indices in hp-case!"));
-      AssertIndexRange(range.first, fe_indices.size() + 1);
-      AssertIndexRange(range.second, fe_indices.size() + 1);
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (unsigned int i = range.first + 1; i < range.second; ++i)
+            Assert(
+              fe_indices[i] >= fe_indices[i - 1],
+              ExcMessage(
+                "Cell range must be over sorted range of FE indices in hp-case!"));
+          AssertIndexRange(range.first, fe_indices.size() + 1);
+          AssertIndexRange(range.second, fe_indices.size() + 1);
+        }
       std::pair<unsigned int, unsigned int> return_range;
       return_range.first = std::lower_bound(fe_indices.begin() + range.first,
                                             fe_indices.begin() + range.second,
@@ -468,15 +469,16 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       task_info.n_procs =
         Utilities::MPI::n_mpi_processes(task_info.communicator);
 
-#ifdef DEBUG
-      for (const auto &constraint : constraints)
-        Assert(
-          constraint->is_closed(task_info.communicator),
-          ExcMessage(
-            "You have provided a non-empty AffineConstraints object that has not "
-            "been closed. Please call AffineConstraints::close() before "
-            "calling MatrixFree::reinit()!"));
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (const auto &constraint : constraints)
+            Assert(
+              constraint->is_closed(task_info.communicator),
+              ExcMessage(
+                "You have provided a non-empty AffineConstraints object that has not "
+                "been closed. Please call AffineConstraints::close() before "
+                "calling MatrixFree::reinit()!"));
+        }
 
       initialize_dof_handlers(dof_handler, additional_data);
       for (unsigned int no = 0; no < dof_handler.size(); ++no)
@@ -925,16 +927,23 @@ namespace internal
     // steps through all children and adds the active cells recursively
     template <typename InIterator>
     void
-    resolve_cell(const InIterator                                   &cell,
-                 std::vector<std::pair<unsigned int, unsigned int>> &cell_its)
+    resolve_cell(
+      const InIterator                                   &cell,
+      std::vector<std::pair<unsigned int, unsigned int>> &cell_its,
+      std::vector<std::pair<unsigned int, unsigned int>> &ghost_cell_its)
     {
       if (cell->has_children())
         for (unsigned int child = 0; child < cell->n_children(); ++child)
-          resolve_cell(cell->child(child), cell_its);
+          resolve_cell(cell->child(child), cell_its, ghost_cell_its);
       else if (cell->is_locally_owned())
         {
           Assert(cell->is_active(), ExcInternalError());
           cell_its.emplace_back(cell->level(), cell->index());
+        }
+      else if (cell->is_ghost())
+        {
+          Assert(cell->is_active(), ExcInternalError());
+          ghost_cell_its.emplace_back(cell->level(), cell->index());
         }
     }
   } // namespace MatrixFreeFunctions
@@ -969,11 +978,10 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
       // when setting up neighboring relations between cells for thread
       // parallelization
       for (const auto &cell : tria.cell_iterators_on_level(0))
-        internal::MatrixFreeFunctions::resolve_cell(cell, cell_level_index);
+        internal::MatrixFreeFunctions::resolve_cell(cell,
+                                                    cell_level_index,
+                                                    ghosted_cell_index);
 
-      Assert(additional_data.store_ghost_cells == false,
-             ExcMessage(
-               "Storing ghost cells is only supported for level operator."));
       Assert(task_info.n_procs > 1 ||
                cell_level_index.size() == tria.n_active_cells(),
              ExcInternalError());
@@ -997,13 +1005,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   // cell_level_index_end_local to the size of cell_level_index.
   cell_level_index_end_local = cell_level_index.size();
 
-  Assert(ghosted_cell_index.size() == 0 || additional_data.store_ghost_cells,
-         ExcInternalError());
-
   // If ghost cells are stored, add them to the end of the cell_level_index
-  cell_level_index.insert(cell_level_index.end(),
-                          ghosted_cell_index.begin(),
-                          ghosted_cell_index.end());
+  if (additional_data.store_ghost_cells == true)
+    cell_level_index.insert(cell_level_index.end(),
+                            ghosted_cell_index.begin(),
+                            ghosted_cell_index.end());
 }
 
 
@@ -1799,40 +1805,44 @@ namespace internal
             irregular_cells.back() = task_info.n_ghost_cells % n_lanes;
           }
 
-#ifdef DEBUG
-        {
-          unsigned int n_cells = 0;
-          for (unsigned int i = 0; i < task_info.cell_partition_data.back();
-               ++i)
-            n_cells += irregular_cells[i] > 0 ? irregular_cells[i] : n_lanes;
-          AssertDimension(n_cells, task_info.n_active_cells);
-          n_cells = 0;
-          for (unsigned int i = task_info.cell_partition_data.back();
-               i < n_ghost_slots + task_info.cell_partition_data.back();
-               ++i)
-            n_cells += irregular_cells[i] > 0 ? irregular_cells[i] : n_lanes;
-          AssertDimension(n_cells, task_info.n_ghost_cells);
-        }
-#endif
+        if constexpr (running_in_debug_mode())
+          {
+            {
+              unsigned int n_cells = 0;
+              for (unsigned int i = 0; i < task_info.cell_partition_data.back();
+                   ++i)
+                n_cells +=
+                  irregular_cells[i] > 0 ? irregular_cells[i] : n_lanes;
+              AssertDimension(n_cells, task_info.n_active_cells);
+              n_cells = 0;
+              for (unsigned int i = task_info.cell_partition_data.back();
+                   i < n_ghost_slots + task_info.cell_partition_data.back();
+                   ++i)
+                n_cells +=
+                  irregular_cells[i] > 0 ? irregular_cells[i] : n_lanes;
+              AssertDimension(n_cells, task_info.n_ghost_cells);
+            }
+          }
 
         task_info.cell_partition_data.push_back(
           task_info.cell_partition_data.back() + n_ghost_slots);
       }
 
-      // Finally perform the renumbering. We also want to group several cells
-      // together to a batch of cells for SIMD (vectorized) execution (where the
-      // arithmetic operations of several cells will then be done
-      // simultaneously).
-#ifdef DEBUG
-    {
-      AssertDimension(renumbering.size(),
-                      task_info.n_active_cells + task_info.n_ghost_cells);
-      std::vector<unsigned int> sorted_renumbering(renumbering);
-      std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
-      for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-        Assert(sorted_renumbering[i] == i, ExcInternalError());
-    }
-#endif
+    // Finally perform the renumbering. We also want to group several cells
+    // together to a batch of cells for SIMD (vectorized) execution (where the
+    // arithmetic operations of several cells will then be done
+    // simultaneously).
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          AssertDimension(renumbering.size(),
+                          task_info.n_active_cells + task_info.n_ghost_cells);
+          std::vector<unsigned int> sorted_renumbering(renumbering);
+          std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
+          for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
+            Assert(sorted_renumbering[i] == i, ExcInternalError());
+        }
+      }
     {
       std::vector<std::pair<unsigned int, unsigned int>> cell_level_index_old;
       cell_level_index.swap(cell_level_index_old);

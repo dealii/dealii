@@ -82,8 +82,7 @@ test(const unsigned int refs,
   VectorTools::get_position_vector(map_dh, euler_vec);
 
   MappingFEField<dim, spacedim> mapping(map_dh, euler_vec);
-  ;
-  DataOut<dim, spacedim> data_out_scal;
+  DataOut<dim, spacedim>        data_out_scal;
   data_out_scal.attach_dof_handler(dof_handler);
 
   data_out_scal.add_data_vector(scal_sol,

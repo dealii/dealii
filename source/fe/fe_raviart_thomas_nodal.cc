@@ -558,20 +558,21 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix(
         }
     }
 
-#ifdef DEBUG
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0.;
+      // make sure that the row sum of each of the matrices is 1 at this
+      // point. this must be so since the shape functions sum up to 1
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+        {
+          double sum = 0.;
 
-      for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-        sum += interpolation_matrix(j, i);
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+            sum += interpolation_matrix(j, i);
 
-      Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
-             ExcInternalError());
+          Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
+                 ExcInternalError());
+        }
     }
-#endif
 }
 
 
@@ -623,10 +624,13 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
   // compute the interpolation matrix by simply taking the value at the
   // support points.
   const Quadrature<dim> subface_projection =
-    QProjector<dim>::project_to_subface(this->reference_cell(),
-                                        quad_face_support,
-                                        0,
-                                        subface);
+    QProjector<dim>::project_to_subface(
+      this->reference_cell(),
+      quad_face_support,
+      0,
+      subface,
+      numbers::default_geometric_orientation,
+      RefinementCase<dim - 1>::isotropic_refinement);
 
   for (unsigned int i = 0; i < source_fe.n_dofs_per_face(face_no); ++i)
     {
@@ -649,20 +653,21 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix(
         }
     }
 
-#ifdef DEBUG
-  // make sure that the row sum of each of the matrices is 1 at this
-  // point. this must be so since the shape functions sum up to 1
-  for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+  if constexpr (running_in_debug_mode())
     {
-      double sum = 0.;
+      // make sure that the row sum of each of the matrices is 1 at this
+      // point. this must be so since the shape functions sum up to 1
+      for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
+        {
+          double sum = 0.;
 
-      for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
-        sum += interpolation_matrix(j, i);
+          for (unsigned int i = 0; i < this->n_dofs_per_face(face_no); ++i)
+            sum += interpolation_matrix(j, i);
 
-      Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
-             ExcInternalError());
+          Assert(std::fabs(sum - 1) < 2e-13 * this->degree * (dim - 1),
+                 ExcInternalError());
+        }
     }
-#endif
 }
 
 

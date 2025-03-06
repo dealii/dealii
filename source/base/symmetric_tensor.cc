@@ -21,7 +21,14 @@
 #include <deal.II/differentiation/ad/adolc_product_types.h>
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
+#ifdef DEAL_II_WITH_ADOLC
+#  include <adolc/adouble.h>
+#  include <adolc/adtl.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
+
 #ifdef DEAL_II_WITH_ADOLC
 #  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
 

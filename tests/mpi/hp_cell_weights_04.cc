@@ -99,34 +99,37 @@ test()
     deallog << "  Cumulative dofs per cell: " << dof_counter << std::endl;
   }
 
-#ifdef DEBUG
-  parallel::shared::Triangulation<dim> other_tria(
-    MPI_COMM_WORLD,
-    ::Triangulation<dim>::none,
-    false,
-    parallel::shared::Triangulation<dim>::Settings::partition_metis);
-  GridGenerator::hyper_cube(other_tria);
-  other_tria.refine_global(3);
-
-  dh.reinit(other_tria);
-  dh.distribute_dofs(fe_collection);
-
-  try
+  if constexpr (running_in_debug_mode())
     {
-      tria.execute_coarsening_and_refinement();
-      deallog << "Error: we did not throw an exception when we should have"
-              << std::endl;
-      std::abort();
+      parallel::shared::Triangulation<dim> other_tria(
+        MPI_COMM_WORLD,
+        ::Triangulation<dim>::none,
+        false,
+        parallel::shared::Triangulation<dim>::Settings::partition_metis);
+      GridGenerator::hyper_cube(other_tria);
+      other_tria.refine_global(3);
+
+      dh.reinit(other_tria);
+      dh.distribute_dofs(fe_collection);
+
+      try
+        {
+          tria.execute_coarsening_and_refinement();
+          deallog << "Error: we did not throw an exception when we should have"
+                  << std::endl;
+          std::abort();
+        }
+      catch (const ExceptionBase &e)
+        {
+          deallog << e.get_exc_name() << std::endl;
+        }
     }
-  catch (const ExceptionBase &e)
+  else
     {
-      deallog << e.get_exc_name() << std::endl;
+      deallog
+        << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
+        << std::endl;
     }
-#else
-  deallog
-    << "ExcMessage(\"Triangulation associated with the DoFHandler has changed!\")"
-    << std::endl;
-#endif
 
   // make sure no processor is hanging
   MPI_Barrier(MPI_COMM_WORLD);

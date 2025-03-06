@@ -775,30 +775,31 @@ namespace VectorTools
       // but it needs to be implemented
       if (dim >= 3)
         {
-#ifdef DEBUG
-          // Assert that there are no hanging nodes at the boundary
-          int level = -1;
-          for (const auto &cell : dof.active_cell_iterators())
-            for (auto f : cell->face_indices())
-              {
-                if (cell->at_boundary(f))
+          if constexpr (running_in_debug_mode())
+            {
+              // Assert that there are no hanging nodes at the boundary
+              int level = -1;
+              for (const auto &cell : dof.active_cell_iterators())
+                for (auto f : cell->face_indices())
                   {
-                    if (level == -1)
-                      level = cell->level();
-                    else
+                    if (cell->at_boundary(f))
                       {
-                        Assert(
-                          level == cell->level(),
-                          ExcMessage(
-                            "The mesh you use in projecting boundary values "
-                            "has hanging nodes at the boundary. This would require "
-                            "dealing with hanging node constraints when solving "
-                            "the linear system on the boundary, but this is not "
-                            "currently implemented."));
+                        if (level == -1)
+                          level = cell->level();
+                        else
+                          {
+                            Assert(
+                              level == cell->level(),
+                              ExcMessage(
+                                "The mesh you use in projecting boundary values "
+                                "has hanging nodes at the boundary. This would require "
+                                "dealing with hanging node constraints when solving "
+                                "the linear system on the boundary, but this is not "
+                                "currently implemented."));
+                          }
                       }
                   }
-              }
-#endif
+            }
         }
       sparsity.compress();
 

@@ -1934,7 +1934,8 @@ ReferenceCell::n_faces() const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::face_indices() const
 {
-  return {0U, n_faces()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_faces());
 }
 
 
@@ -2050,7 +2051,8 @@ ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::isotropic_child_indices() const
 {
-  return {0U, n_isotropic_children()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_isotropic_children());
 }
 
 
@@ -2058,7 +2060,8 @@ ReferenceCell::isotropic_child_indices() const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -2066,7 +2069,8 @@ ReferenceCell::vertex_indices() const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 

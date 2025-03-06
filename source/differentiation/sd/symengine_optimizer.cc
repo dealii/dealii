@@ -169,16 +169,17 @@ namespace Differentiation
              ExcMessage(
                "Cannot register symbols once the optimizer is finalized."));
 
-#  ifdef DEBUG
-      // Ensure that all of the keys in the map are actually symbolic
-      // in nature
-      for (const auto &entry : substitution_map)
+      if constexpr (running_in_debug_mode())
         {
-          const SD::Expression &symbol = entry.first;
-          Assert(SymEngine::is_a<SymEngine::Symbol>(*(symbol.get_RCP())),
-                 ExcMessage("Key entry in map is not a symbol."));
+          // Ensure that all of the keys in the map are actually symbolic
+          // in nature
+          for (const auto &entry : substitution_map)
+            {
+              const SD::Expression &symbol = entry.first;
+              Assert(SymEngine::is_a<SymEngine::Symbol>(*(symbol.get_RCP())),
+                     ExcMessage("Key entry in map is not a symbol."));
+            }
         }
-#  endif
       // Merge the two maps, in the process ensuring that there is no
       // duplication of symbols
       independent_variables_symbols.insert(substitution_map.begin(),
@@ -403,21 +404,24 @@ namespace Differentiation
 
       // Check that the registered symbol map and the input map are compatible
       // with one another
-#  ifdef DEBUG
-      const SD::types::symbol_vector symbol_sub_vec =
-        Utilities::extract_symbols(substitution_map);
-      const SD::types::symbol_vector symbol_vec =
-        Utilities::extract_symbols(independent_variables_symbols);
-      Assert(symbol_sub_vec.size() == symbol_vec.size(),
-             ExcDimensionMismatch(symbol_sub_vec.size(), symbol_vec.size()));
-      for (unsigned int i = 0; i < symbol_sub_vec.size(); ++i)
+      if constexpr (running_in_debug_mode())
         {
-          Assert(numbers::values_are_equal(symbol_sub_vec[i], symbol_vec[i]),
-                 ExcMessage(
-                   "The input substitution map is either incomplete, or does "
-                   "not match that used in the register_symbols() call."));
+          const SD::types::symbol_vector symbol_sub_vec =
+            Utilities::extract_symbols(substitution_map);
+          const SD::types::symbol_vector symbol_vec =
+            Utilities::extract_symbols(independent_variables_symbols);
+          Assert(symbol_sub_vec.size() == symbol_vec.size(),
+                 ExcDimensionMismatch(symbol_sub_vec.size(),
+                                      symbol_vec.size()));
+          for (unsigned int i = 0; i < symbol_sub_vec.size(); ++i)
+            {
+              Assert(
+                numbers::values_are_equal(symbol_sub_vec[i], symbol_vec[i]),
+                ExcMessage(
+                  "The input substitution map is either incomplete, or does "
+                  "not match that used in the register_symbols() call."));
+            }
         }
-#  endif
 
       // Extract the values from the substitution map, and use the other
       // function
@@ -733,12 +737,13 @@ namespace Differentiation
       dependent_variables_output.reserve(n_dependent_variables() + 1);
       const bool entry_registered =
         (map_dep_expr_vec_entry.find(func) != map_dep_expr_vec_entry.end());
-#  ifdef DEBUG
-      if (entry_registered == true &&
-          is_valid_nonunique_dependent_variable(func) == false)
-        Assert(entry_registered,
-               ExcMessage("Function has already been registered."));
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          if (entry_registered == true &&
+              is_valid_nonunique_dependent_variable(func) == false)
+            Assert(entry_registered,
+                   ExcMessage("Function has already been registered."));
+        }
       if (entry_registered == false)
         {
           dependent_variables_functions.push_back(func);
@@ -766,12 +771,13 @@ namespace Differentiation
         {
           const bool entry_registered =
             (map_dep_expr_vec_entry.find(func) != map_dep_expr_vec_entry.end());
-#  ifdef DEBUG
-          if (entry_registered == true &&
-              is_valid_nonunique_dependent_variable(func) == false)
-            Assert(entry_registered,
-                   ExcMessage("Function has already been registered."));
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              if (entry_registered == true &&
+                  is_valid_nonunique_dependent_variable(func) == false)
+                Assert(entry_registered,
+                       ExcMessage("Function has already been registered."));
+            }
           if (entry_registered == false)
             {
               dependent_variables_functions.push_back(func);

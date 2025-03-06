@@ -600,12 +600,13 @@ namespace hp
               if (future_fe_indices_on_coarsened_cells.find(parent) ==
                   future_fe_indices_on_coarsened_cells.end())
                 {
-#ifdef DEBUG
-                  for (const auto &child : parent->child_iterators())
-                    Assert(child->is_active() && child->coarsen_flag_set(),
-                           typename Triangulation<
-                             dim>::ExcInconsistentCoarseningFlags());
-#endif
+                  if constexpr (running_in_debug_mode())
+                    {
+                      for (const auto &child : parent->child_iterators())
+                        Assert(child->is_active() && child->coarsen_flag_set(),
+                               typename Triangulation<
+                                 dim>::ExcInconsistentCoarseningFlags());
+                    }
 
                   parent_future_fe_index =
                     internal::hp::DoFHandlerImplementation::

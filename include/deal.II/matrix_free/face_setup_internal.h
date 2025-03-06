@@ -172,16 +172,17 @@ namespace internal
     {
       use_active_cells = mg_level == numbers::invalid_unsigned_int;
 
-#  ifdef DEBUG
-      // safety check
-      if (use_active_cells)
-        for (const auto &cell_level : cell_levels)
-          {
-            typename dealii::Triangulation<dim>::cell_iterator dcell(
-              &triangulation, cell_level.first, cell_level.second);
-            Assert(dcell->is_active(), ExcInternalError());
-          }
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          // safety check
+          if (use_active_cells)
+            for (const auto &cell_level : cell_levels)
+              {
+                typename dealii::Triangulation<dim>::cell_iterator dcell(
+                  &triangulation, cell_level.first, cell_level.second);
+                Assert(dcell->is_active(), ExcInternalError());
+              }
+        }
 
       // step 1: add ghost cells for those cells that we identify as
       // interesting
@@ -544,22 +545,23 @@ namespace internal
                       inner_face.second.shared_faces[i]);
                   }
 
-#  ifdef DEBUG
-              // check consistency of faces on both sides
-              std::vector<std::pair<CellId, CellId>> check_faces;
-              check_faces.insert(check_faces.end(),
-                                 owned_faces_lower.begin(),
-                                 owned_faces_lower.end());
-              check_faces.insert(check_faces.end(),
-                                 owned_faces_higher.begin(),
-                                 owned_faces_higher.end());
-              std::sort(check_faces.begin(), check_faces.end());
-              AssertDimension(check_faces.size(),
-                              inner_face.second.shared_faces.size());
-              for (unsigned int i = 0; i < check_faces.size(); ++i)
-                Assert(check_faces[i] == inner_face.second.shared_faces[i],
-                       ExcInternalError());
-#  endif
+              if constexpr (running_in_debug_mode())
+                {
+                  // check consistency of faces on both sides
+                  std::vector<std::pair<CellId, CellId>> check_faces;
+                  check_faces.insert(check_faces.end(),
+                                     owned_faces_lower.begin(),
+                                     owned_faces_lower.end());
+                  check_faces.insert(check_faces.end(),
+                                     owned_faces_higher.begin(),
+                                     owned_faces_higher.end());
+                  std::sort(check_faces.begin(), check_faces.end());
+                  AssertDimension(check_faces.size(),
+                                  inner_face.second.shared_faces.size());
+                  for (unsigned int i = 0; i < check_faces.size(); ++i)
+                    Assert(check_faces[i] == inner_face.second.shared_faces[i],
+                           ExcInternalError());
+                }
 
               // now only set half of the faces as the ones to keep
               if (my_domain < inner_face.first)
@@ -1398,43 +1400,45 @@ namespace internal
           faces_type = std::move(new_faces_type);
         }
 
-#  ifdef DEBUG
-      // final safety checks
-      for (const auto &face_type : faces_type)
-        AssertDimension(face_type.size(), 0U);
-
-      AssertDimension(faces_out.size(), face_partition_data.back());
-      unsigned int nfaces = 0;
-      for (unsigned int i = face_partition_data[0];
-           i < face_partition_data.back();
-           ++i)
-        for (unsigned int v = 0; v < vectorization_width; ++v)
-          nfaces +=
-            (faces_out[i].cells_interior[v] != numbers::invalid_unsigned_int);
-      AssertDimension(nfaces, faces_in.size());
-
-      std::vector<std::pair<unsigned int, unsigned int>> in_faces, out_faces;
-      for (const auto &face_in : faces_in)
-        in_faces.emplace_back(face_in.cells_interior[0],
-                              face_in.cells_exterior[0]);
-      for (unsigned int i = face_partition_data[0];
-           i < face_partition_data.back();
-           ++i)
-        for (unsigned int v = 0;
-             v < vectorization_width &&
-             faces_out[i].cells_interior[v] != numbers::invalid_unsigned_int;
-             ++v)
-          out_faces.emplace_back(faces_out[i].cells_interior[v],
-                                 faces_out[i].cells_exterior[v]);
-      std::sort(in_faces.begin(), in_faces.end());
-      std::sort(out_faces.begin(), out_faces.end());
-      AssertDimension(in_faces.size(), out_faces.size());
-      for (unsigned int i = 0; i < in_faces.size(); ++i)
+      if constexpr (running_in_debug_mode())
         {
-          AssertDimension(in_faces[i].first, out_faces[i].first);
-          AssertDimension(in_faces[i].second, out_faces[i].second);
+          // final safety checks
+          for (const auto &face_type : faces_type)
+            AssertDimension(face_type.size(), 0U);
+
+          AssertDimension(faces_out.size(), face_partition_data.back());
+          unsigned int nfaces = 0;
+          for (unsigned int i = face_partition_data[0];
+               i < face_partition_data.back();
+               ++i)
+            for (unsigned int v = 0; v < vectorization_width; ++v)
+              nfaces += (faces_out[i].cells_interior[v] !=
+                         numbers::invalid_unsigned_int);
+          AssertDimension(nfaces, faces_in.size());
+
+          std::vector<std::pair<unsigned int, unsigned int>> in_faces,
+            out_faces;
+          for (const auto &face_in : faces_in)
+            in_faces.emplace_back(face_in.cells_interior[0],
+                                  face_in.cells_exterior[0]);
+          for (unsigned int i = face_partition_data[0];
+               i < face_partition_data.back();
+               ++i)
+            for (unsigned int v = 0;
+                 v < vectorization_width && faces_out[i].cells_interior[v] !=
+                                              numbers::invalid_unsigned_int;
+                 ++v)
+              out_faces.emplace_back(faces_out[i].cells_interior[v],
+                                     faces_out[i].cells_exterior[v]);
+          std::sort(in_faces.begin(), in_faces.end());
+          std::sort(out_faces.begin(), out_faces.end());
+          AssertDimension(in_faces.size(), out_faces.size());
+          for (unsigned int i = 0; i < in_faces.size(); ++i)
+            {
+              AssertDimension(in_faces[i].first, out_faces[i].first);
+              AssertDimension(in_faces[i].second, out_faces[i].second);
+            }
         }
-#  endif
     }
 
 #endif // ifndef DOXYGEN

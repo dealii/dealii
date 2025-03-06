@@ -12,15 +12,22 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  utilities.cc
-  manifold_lib.cc
-  )
+set(_src)
+set(_inst)
 
-set(_inst
-  manifold_lib.inst.in
-  utilities.inst.in
-  )
+if (DEAL_II_WITH_OPENCASCADE)
+  set(_src
+    ${_src}
+    manifold_lib.cc
+    utilities.cc
+    )
+
+  set(_inst
+    ${_inst}
+    manifold_lib.inst.in
+    utilities.inst.in
+    )
+endif()
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/opencascade/*.h

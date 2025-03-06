@@ -16,9 +16,9 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 
-#include "deal.II/fe/fe_q_iso_q1.h"
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/lac/block_vector.h>

@@ -81,30 +81,30 @@ TensorProductPolynomialsConst<dim>::compute_value(const unsigned int i,
 
 
 
-template <>
-double
-TensorProductPolynomialsConst<0>::compute_value(const unsigned int,
-                                                const Point<0> &) const
-{
-  DEAL_II_NOT_IMPLEMENTED();
-  return 0.;
-}
-
-
 template <int dim>
 Tensor<1, dim>
 TensorProductPolynomialsConst<dim>::compute_grad(const unsigned int i,
                                                  const Point<dim>  &p) const
 {
-  const unsigned int max_indices = tensor_polys.n();
-  Assert(i <= max_indices, ExcInternalError());
-
-  // treat the regular basis functions
-  if (i < max_indices)
-    return tensor_polys.compute_grad(i, p);
+  if constexpr (dim == 0)
+    {
+      (void)i;
+      (void)p;
+      DEAL_II_NOT_IMPLEMENTED();
+      return {};
+    }
   else
-    // this is for the constant function
-    return Tensor<1, dim>();
+    {
+      const unsigned int max_indices = tensor_polys.n();
+      Assert(i <= max_indices, ExcInternalError());
+
+      // treat the regular basis functions
+      if (i < max_indices)
+        return tensor_polys.compute_grad(i, p);
+      else
+        // this is for the constant function
+        return Tensor<1, dim>();
+    }
 }
 
 template <int dim>

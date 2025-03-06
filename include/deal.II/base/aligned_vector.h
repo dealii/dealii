@@ -1499,10 +1499,11 @@ template <class T>
 inline void
 AlignedVector<T>::shrink_to_fit()
 {
-#  ifdef DEBUG
-  Assert(replicated_across_communicator == false,
-         ExcAlignedVectorChangeAfterReplication());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(replicated_across_communicator == false,
+             ExcAlignedVectorChangeAfterReplication());
+    }
   const size_type used_size      = used_elements_end - elements.get();
   const size_type allocated_size = allocated_elements_end - elements.get();
   if (allocated_size > used_size)
@@ -2015,13 +2016,15 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // **** Consistency check ****
   // At this point, each process should have a copy of the data.
   // Verify this in some sort of round-about way
-#    ifdef DEBUG
-  replicated_across_communicator      = true;
-  const std::vector<char> packed_data = Utilities::pack(*this);
-  const int               hash =
-    std::accumulate(packed_data.begin(), packed_data.end(), int(0));
-  Assert(Utilities::MPI::max(hash, communicator) == hash, ExcInternalError());
-#    endif
+  if constexpr (running_in_debug_mode())
+    {
+      replicated_across_communicator      = true;
+      const std::vector<char> packed_data = Utilities::pack(*this);
+      const int               hash =
+        std::accumulate(packed_data.begin(), packed_data.end(), int(0));
+      Assert(Utilities::MPI::max(hash, communicator) == hash,
+             ExcInternalError());
+    }
 
 #  else
   // No MPI -> nothing to replicate

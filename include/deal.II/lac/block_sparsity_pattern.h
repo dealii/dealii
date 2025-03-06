@@ -897,15 +897,16 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
           block_column_indices[0].push_back(local_index);
 
           // Check that calculation:
-#ifdef DEBUG
-          {
-            auto check_block_and_col = column_indices.global_to_local(*it);
-            Assert(current_block == check_block_and_col.first,
-                   ExcInternalError());
-            Assert(local_index == check_block_and_col.second,
-                   ExcInternalError());
-          }
-#endif
+          if constexpr (running_in_debug_mode())
+            {
+              {
+                auto check_block_and_col = column_indices.global_to_local(*it);
+                Assert(current_block == check_block_and_col.first,
+                       ExcInternalError());
+                Assert(local_index == check_block_and_col.second,
+                       ExcInternalError());
+              }
+            }
         }
       // add whatever is left over:
       sub_objects[row_index.first][current_block]->add_entries(

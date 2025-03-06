@@ -2962,7 +2962,8 @@ template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::face_indices()
 {
-  return {0U, faces_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, faces_per_cell);
 }
 
 
@@ -2971,7 +2972,8 @@ template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::vertex_indices()
 {
-  return {0U, vertices_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, vertices_per_cell);
 }
 
 

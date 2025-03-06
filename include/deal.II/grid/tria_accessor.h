@@ -6473,21 +6473,22 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
             // outside the old ball.
           }
       }
-#  ifdef DEBUG
-  bool all_vertices_within_ball = true;
+  if constexpr (running_in_debug_mode())
+    {
+      bool all_vertices_within_ball = true;
 
-  // Set all_vertices_within_ball false if any of the vertices of the object
-  // are geometrically outside the ball
-  for (const unsigned int v : this->vertex_indices())
-    if (center.distance(this->vertex(v)) >
-        radius + 100. * std::numeric_limits<double>::epsilon())
-      {
-        all_vertices_within_ball = false;
-        break;
-      }
-  // If all the vertices are not within the ball throw error
-  Assert(all_vertices_within_ball, ExcInternalError());
-#  endif
+      // Set all_vertices_within_ball false if any of the vertices of the object
+      // are geometrically outside the ball
+      for (const unsigned int v : this->vertex_indices())
+        if (center.distance(this->vertex(v)) >
+            radius + 100. * std::numeric_limits<double>::epsilon())
+          {
+            all_vertices_within_ball = false;
+            break;
+          }
+      // If all the vertices are not within the ball throw error
+      Assert(all_vertices_within_ball, ExcInternalError());
+    }
   return std::make_pair(center, radius);
 }
 
@@ -6592,7 +6593,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -6601,7 +6603,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 
@@ -6610,7 +6613,8 @@ template <int structdim, int dim, int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<structdim, dim, spacedim>::face_indices() const
 {
-  return {0U, n_faces()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_faces());
 }
 
 
@@ -7530,7 +7534,8 @@ template <int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<0, 1, spacedim>::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -7539,7 +7544,8 @@ template <int spacedim>
 std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 TriaAccessor<0, 1, spacedim>::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 /*------------------ Functions: CellAccessor<dim,spacedim> ------------------*/

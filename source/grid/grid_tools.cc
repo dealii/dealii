@@ -959,13 +959,14 @@ namespace GridTools
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
 
-#ifdef DEBUG
-        {
-          // Double-check if found index is at marked cell
-          Assert(any_cell_marked(vertex_to_cells[closest_vertex_index]),
-                 dealii::ExcMessage("Found non-marked vertex"));
-        }
-#endif
+        if constexpr (running_in_debug_mode())
+          {
+            {
+              // Double-check if found index is at marked cell
+              Assert(any_cell_marked(vertex_to_cells[closest_vertex_index]),
+                     dealii::ExcMessage("Found non-marked vertex"));
+            }
+          }
 
         const double vertex_point_norm = vertex_to_point.norm();
         if (vertex_point_norm > 0)
@@ -3474,23 +3475,24 @@ namespace GridTools
     AssertDimension(cells_out.size(), maps_out.size());
     AssertDimension(cells_out.size(), qpoints_out.size());
 
-#ifdef DEBUG
-    unsigned int c   = cells_out.size();
-    unsigned int qps = 0;
-    // The number of points in all
-    // the cells must be the same as
-    // the number of points we
-    // started off from,
-    // plus the points which were ignored
-    for (unsigned int n = 0; n < c; ++n)
+    if constexpr (running_in_debug_mode())
       {
-        AssertDimension(qpoints_out[n].size(), maps_out[n].size());
-        qps += qpoints_out[n].size();
-      }
+        unsigned int c   = cells_out.size();
+        unsigned int qps = 0;
+        // The number of points in all
+        // the cells must be the same as
+        // the number of points we
+        // started off from,
+        // plus the points which were ignored
+        for (unsigned int n = 0; n < c; ++n)
+          {
+            AssertDimension(qpoints_out[n].size(), maps_out[n].size());
+            qps += qpoints_out[n].size();
+          }
 
-    Assert(qps + missing_points_out.size() == np,
-           ExcDimensionMismatch(qps + missing_points_out.size(), np));
-#endif
+        Assert(qps + missing_points_out.size() == np,
+               ExcDimensionMismatch(qps + missing_points_out.size(), np));
+      }
 
     return std::make_tuple(std::move(cells_out),
                            std::move(qpoints_out),

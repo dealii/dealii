@@ -307,7 +307,7 @@ All entries are signed with the names of the author.
        New: The new <code>Polynomial</code> class can
        be used as base class for all 1d polynomials. It stores the
        coefficients of the polynomial and uses the Horner scheme to
-       evaluate values and all derivates.
+       evaluate values and all derivatives.
        <br>
        (RH 2001/03/14)
        </p>
