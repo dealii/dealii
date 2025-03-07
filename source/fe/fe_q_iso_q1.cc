@@ -30,6 +30,49 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+namespace internal
+{
+  template <int dim>
+  Table<2, bool>
+  make_local_sparsity_pattern(unsigned int n_points_1d)
+  {
+    const unsigned int n_per_cell = Utilities::pow(n_points_1d, dim);
+
+    const std::vector<unsigned int> R =
+      FETools::lexicographic_to_hierarchic_numbering<dim>(n_points_1d - 1);
+
+    Table<2, bool> table;
+    table.reinit(n_per_cell, n_per_cell);
+    table.fill(false);
+
+    const int N1d = n_points_1d;
+    for (unsigned int i = 0; i < n_per_cell; ++i)
+      for (unsigned int j = 0; j < n_per_cell; ++j)
+        {
+          // compute l1 distance:
+          int distance = 0;
+
+          int xi = i;
+          int xj = j;
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              int current_distance = std::abs((xi % N1d) - (xj % N1d));
+              xi /= N1d;
+              xj /= N1d;
+              distance = std::max(distance, current_distance);
+              if (distance > 1)
+                break;
+            }
+
+          if (distance <= 1)
+            table(R[i], R[j]) = true;
+        }
+
+    return table;
+  }
+} // namespace internal
+
+
 
 template <int dim, int spacedim>
 FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
@@ -52,42 +95,8 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
   const QIterated<1>  points(trapez, subdivisions);
 
   this->initialize(points.get_points());
-
-  {
-    const std::vector<unsigned int> R =
-      FETools::lexicographic_to_hierarchic_numbering<dim>(subdivisions);
-
-    this->local_dof_sparsity_pattern.reinit(this->n_dofs_per_cell(),
-                                            this->n_dofs_per_cell());
-
-    {
-      this->local_dof_sparsity_pattern.fill(false);
-
-      const unsigned int N   = Utilities::pow(points.size(), dim);
-      const int          N1d = points.size();
-      for (unsigned int i = 0; i < N; ++i)
-        for (unsigned int j = 0; j < N; ++j)
-          {
-            // compute l1 distance:
-            int distance = 0;
-
-            int xi = i;
-            int xj = j;
-            for (unsigned int d = 0; d < dim; ++d)
-              {
-                int current_distance = std::abs((xi % N1d) - (xj % N1d));
-                xi /= N1d;
-                xj /= N1d;
-                distance = std::max(distance, current_distance);
-                if (distance > 1)
-                  break;
-              }
-
-            if (distance <= 1)
-              this->local_dof_sparsity_pattern(R[i], R[j]) = true;
-          }
-    }
-  }
+  this->local_dof_sparsity_pattern =
+    internal::make_local_sparsity_pattern<dim>(subdivisions + 1);
 }
 
 
@@ -110,6 +119,8 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(
                     "subelements"));
 
   this->initialize(support_points);
+  this->local_dof_sparsity_pattern =
+    internal::make_local_sparsity_pattern<dim>(support_points.size());
 }
 
 
