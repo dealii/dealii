@@ -35,47 +35,34 @@ class ReferenceCell;
  */
 
 /**
- * This class is a helper class to facilitate the usage of quadrature formulae
- * on faces or subfaces of cells. It computes the locations of quadrature
- * points on the unit cell from a quadrature object for a manifold of one
- * dimension less than that of the cell and the number of the face. For
- * example, giving the Simpson rule in one dimension and using the
- * project_to_face() function with face number 1, the returned points will be
- * (1,0), (1,0.5) and (1,1). Note that faces have an orientation, so when
- * projecting to face 3, you will get (0,0), (0,0.5) and (0,1), which is in
- * clockwise sense, while for face 1 the points were in counterclockwise
- * sense.
+ * @brief Class which transforms `dim - 1`-dimensional quadrature rules to
+ * `dim`-dimensional face quadratures.
  *
- * For the projection to subfaces (i.e. to the children of a face of the unit
- * cell), the same applies as above. Note the order in which the children of a
- * face are numbered, which in two dimensions coincides with the orientation
- * of the face.
+ * The majority of the finite element infrastructure, such as FE_Q and
+ * FE_SimplexP, uses polynomials defined on a reference cell: for example,
+ * FE_Q<3> defines a polynomial space whose domain is the unit hexahedron (i.e.,
+ * ReferenceCells::Hexahedron). Hence, computing quadratures using shape
+ * functions on a face of a reference cell requires converting a
+ * lower-dimensional Quadrature into one defined on the boundary of the
+ * higher-dimensional object, e.g., converting a Quadrature defined on a
+ * quadrilateral into one defined on one face of a hexahedron.
  *
- * The second set of functions generates a quadrature formula by projecting a
- * given quadrature rule on <b>all</b> faces and subfaces. This is used in the
- * FEFaceValues and FESubfaceValues classes. Since we now have the quadrature
- * points of all faces and subfaces in one array, we need to have a way to
- * find the starting index of the points and weights corresponding to one face
- * or subface within this array. This is done through the DataSetDescriptor
- * member class.
+ * QProjector computes the locations of quadrature points on faces or subfaces
+ * of reference cells from a Quadrature of one dimension less than that of the
+ * cell, face (and possibly also subface) number, and orientation. For example,
+ * calling QProjector::project_to_face() with QSimpson<1>, face number 1, and
+ * numbers::default_geometric_orientation returns a Quadrature with points
+ * (1,0), (1,0.5), and (1,1) with weights equal to the 1d case. Similarly, if we
+ * instead use face 3 and numbers::reverse_line_orientation we obtain points
+ * (1,1), (0.5,1) and (0,1). Projection to subfaces works in the same way.
  *
- * The different functions are grouped into a common class to avoid putting
- * them into global namespace. However, since they have no local data, all
- * functions are declared <tt>static</tt> and can be called without creating
- * an object of this class.
- *
- * For the 3d case, you should note that the orientation of faces is even more
- * intricate than for two dimensions. Quadrature formulae are projected upon
- * the faces in their standard orientation, not to the inside or outside of
- * the hexahedron. To make things more complicated, in 3d we allow faces in
- * two orientations (which can be identified using
- * <tt>cell->face_orientation(face)</tt>), so we have to project quadrature
- * formula onto faces and subfaces in two orientations. (Refer to the
- * documentation of the Triangulation class for a description of the
- * orientation of the different faces, as well as to
- * @ref GlossFaceOrientation "the glossary entry on face orientation"
- * for more information on this.) The DataSetDescriptor member class is used
- * to identify where each dataset starts.
+ * In practice, computing face integrals (e.g., via FEFaceValues or
+ * FESubfaceValues) requires quadrature rules for all possible permutations of
+ * face number, subface number, and orientation. This class provides several
+ * functions for doing just that, such as QProjector::project_to_all_faces().
+ * Furthermore, the DataSetDescriptor class implements indexing for converting
+ * between face number, subface number, and orientation to the index of the
+ * associated Quadrature rule.
  */
 template <int dim>
 class QProjector
@@ -263,8 +250,9 @@ public:
    * to a single face and use it as a quadrature on this face, as is done in
    * FEFaceValues.
    *
-   * @note In 3d, this function produces eight sets of quadrature points for
-   * each face, in order to cope possibly different orientations of the mesh.
+   * @note This function creates ReferenceCell::n_face_orientations() sets of
+   * quadrature points for each face which are indexed (by orientation and face
+   * number) by a DataSetDescriptor.
    */
   static Quadrature<dim>
   project_to_all_faces(const ReferenceCell            &reference_cell,
@@ -304,6 +292,8 @@ public:
    * As integration using this quadrature formula now only extends over a
    * fraction of the cell, the weights of the resulting object are divided by
    * GeometryInfo<dim>::children_per_cell.
+   *
+   * @warning This function is only implemented for hypercube elements.
    */
   static Quadrature<dim>
   project_to_child(const ReferenceCell   &reference_cell,
@@ -318,6 +308,8 @@ public:
    *
    * The child numbering is the same as the children would be numbered upon
    * refinement of the cell.
+   *
+   * @warning This function is only implemented for hypercube elements.
    */
   static Quadrature<dim>
   project_to_all_children(const ReferenceCell   &reference_cell,
@@ -334,14 +326,15 @@ public:
                   const Point<dim>    &p2);
 
   /**
-   * Since the project_to_all_faces() and project_to_all_subfaces() functions
-   * chain together the quadrature points and weights of all projections of a
-   * face quadrature formula to the faces or subfaces of a cell, we need a way
-   * to identify where the starting index of the points and weights for a
-   * particular face or subface is. This class provides this: there are static
-   * member functions that generate objects of this type, given face or
-   * subface indices, and you can then use the generated object in place of an
-   * integer that denotes the offset of a given dataset.
+   * @brief Class storing the offset index into a Quadrature rule created by
+   * project_to_all_faces() or project_to_all_subfaces().
+   *
+   * The functions QProjector::project_to_all_faces() and
+   * QProjector::project_to_all_subfaces() each combine all quadrature rules
+   * (i.e., all possible combinations of face, subface, and orientation) into a
+   * single Quadrature object. DataSetDescriptor implements the correct indexing
+   * for extracting from that Quadrature rule the correct index for those
+   * values.
    */
   class DataSetDescriptor
   {
@@ -388,9 +381,7 @@ public:
 
     /**
      * Static function to generate an offset object for a given face of a cell
-     * with the given combined face orientation. This function of course is only
-     * allowed if <tt>dim>=2</tt>, and @p combined_orientation is ignored if the
-     * space dimension equals 2.
+     * with the given combined face orientation.
      *
      * @p n_quadrature_points is the number of quadrature points the
      * lower-dimensional face quadrature formula (the one that has been
