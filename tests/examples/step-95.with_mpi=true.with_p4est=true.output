@@ -1,0 +1,114 @@
+Run CG convergence study with degree 2
+Creating background mesh
+Refinement cycle 0
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Computing L2 error
+
+Cycle Mesh size   L2-Error   
+    0    0.3025 7.5708e-05 - 
+
+Refinement cycle 1
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 7.5708e-05    - 
+    1    0.1513 5.7502e-06 3.72 
+
+Refinement cycle 2
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 7.5708e-05    - 
+    1    0.1513 5.7502e-06 3.72 
+    2    0.0756 4.2204e-07 3.77 
+
+Refinement cycle 3
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Writing vtu file
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 7.5708e-05    - 
+    1    0.1513 5.7502e-06 3.72 
+    2    0.0756 4.2204e-07 3.77 
+    3    0.0378 3.5284e-08 3.58 
+
+Run DG convergence study with degree 2
+Creating background mesh
+Refinement cycle 0
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Computing L2 error
+
+Cycle Mesh size   L2-Error   
+    0    0.3025 1.4659e-04 - 
+
+Refinement cycle 1
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 1.4659e-04    - 
+    1    0.1513 8.4858e-06 4.11 
+
+Refinement cycle 2
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 1.4659e-04    - 
+    1    0.1513 8.4858e-06 4.11 
+    2    0.0756 8.6715e-07 3.29 
+
+Refinement cycle 3
+Setting up discrete level set function
+Classifying cells
+Distributing degrees of freedom
+Setting up matrix-free
+Setting up non matching mapping info
+Solving system
+Writing vtu file
+Computing L2 error
+
+Cycle Mesh size    L2-Error     
+    0    0.3025 1.4659e-04    - 
+    1    0.1513 8.4858e-06 4.11 
+    2    0.0756 8.6715e-07 3.29 
+    3    0.0378 6.4098e-08 3.76 
+
