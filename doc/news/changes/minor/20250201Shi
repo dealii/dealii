@@ -1,0 +1,5 @@
+Fix: Replace GeometryInfo<dim>::face_indices() with
+cell->reference_cell().face_indices() in GridGenerator::extract_boundary_mesh()
+to correctly handle simplex meshes and prevent invalid face index access.
+<br>
+(Qingyuan Shi, 2025/02/01)
