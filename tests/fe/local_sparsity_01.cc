@@ -33,7 +33,7 @@
 
 template <int dim>
 void
-test(const FiniteElement<dim> &fe, const unsigned int n_subdivisions = 1)
+test(const FiniteElement<dim> &fe)
 {
   const auto &pattern = fe.get_local_dof_sparsity_pattern();
   deallog << fe.get_name() << ":\n";
@@ -56,12 +56,24 @@ main()
   initlog();
 
   // The simplest case is a single iso Q1:
-  test<1>(FE_Q_iso_Q1<1>(2), 1);
+  test<1>(FE_Q_iso_Q1<1>(2));
+  test<1>(FE_Q_iso_Q1<1>(3));
+
+  // It also works with custom support points:
+  std::vector<Point<1>> points = {Point<1>(0.0), Point<1>(0.1), Point<1>(1.0)};
+  test<1>(FE_Q_iso_Q1<1>(points));
+
+  std::vector<Point<1>> points2 = {Point<1>(0.0),
+                                   Point<1>(0.1),
+                                   Point<1>(0.2),
+                                   Point<1>(1.0)};
+  test<1>(FE_Q_iso_Q1<1>(points2));
+
   // The 2 iso Q1 elements couple using their pattern:
-  test<1>(FESystem<1, 1>(FE_DGQ<1>(1), 1, FE_Q_iso_Q1<1>(2), 2), 1);
+  test<1>(FESystem<1, 1>(FE_DGQ<1>(1), 1, FE_Q_iso_Q1<1>(2), 2));
   // The coupling between the first two to the third copy is a full coupling
   // currently, because we don't detect this yet:
-  test<1>(FESystem<1, 1>(FE_Q_iso_Q1<1>(2), 2, FE_Q_iso_Q1<1>(2), 1), 1);
+  test<1>(FESystem<1, 1>(FE_Q_iso_Q1<1>(2), 2, FE_Q_iso_Q1<1>(2), 1));
   // Different iso_Q1 degrees always couple fully (off diagonal blocks):
-  test<1>(FESystem<1, 1>(FE_Q_iso_Q1<1>(2), 1, FE_Q_iso_Q1<1>(3), 1), 1);
+  test<1>(FESystem<1, 1>(FE_Q_iso_Q1<1>(2), 1, FE_Q_iso_Q1<1>(3), 1));
 }
