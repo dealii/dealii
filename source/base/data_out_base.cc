@@ -832,7 +832,7 @@ namespace
       // The patch does not store node locations, so we have to interpolate
       // between its vertices:
       {
-        if (dim == 0)
+        if constexpr (dim == 0)
           return patch.vertices[0];
         else
           {
@@ -3349,11 +3349,11 @@ namespace DataOutBase
 
 
     out << "attribute \"element type\" string \"";
-    if (dim == 1)
+    if constexpr (dim == 1)
       out << "lines";
-    if (dim == 2)
+    else if constexpr (dim == 2)
       out << "quads";
-    if (dim == 3)
+    else if constexpr (dim == 3)
       out << "cubes";
     out << "\"" << '\n' << "attribute \"ref\" string \"positions\"" << '\n';
 

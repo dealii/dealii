@@ -58,14 +58,18 @@ namespace Portable
     {
       Assert(dst.size() >= N, ExcInternalError());
       Assert(src.size() >= N, ExcInternalError());
-
-      Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member, N),
-                           [&](const int i) {
-                             if constexpr (add)
-                               Kokkos::atomic_add(&dst(i), src(i));
-                             else
-                               dst(i) = src(i);
-                           });
+      Kokkos::parallel_for(
+#if KOKKOS_VERSION >= 20900
+        Kokkos::TeamVectorRange(team_member, N),
+#else
+        Kokkos::TeamThreadRange(team_member, N),
+#endif
+        [&](const int i) {
+          if constexpr (add)
+            Kokkos::atomic_add(&dst(i), src(i));
+          else
+            dst(i) = src(i);
+        });
 
       team_member.team_barrier();
     }
