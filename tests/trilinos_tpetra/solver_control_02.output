@@ -1,0 +1,5 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL:Rel tol::Solver stopped within 49 - 51 iterations
+DEAL:Abs tol::Solver stopped within 42 - 44 iterations
+DEAL:Iterations::Solver stopped after 20 iterations
