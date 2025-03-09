@@ -515,14 +515,18 @@ namespace internal
                   unsigned int d = 0;
                   for (; d < dim; ++d)
                     face_to_cell_index_nodal[face][d] =
-                      reference_cell.face_to_cell_vertices(face, d, 1);
+                      reference_cell.face_to_cell_vertices(
+                        face, d, numbers::default_geometric_orientation);
 
                   // now fill the rest of the indices, start with the lines
                   if (fe.degree == 2)
                     for (; d < dofs_per_component_on_face; ++d)
                       face_to_cell_index_nodal[face][d] =
                         reference_cell.n_vertices() +
-                        reference_cell.face_to_cell_lines(face, d - dim, 1);
+                        reference_cell.face_to_cell_lines(
+                          face,
+                          d - dim,
+                          numbers::default_geometric_orientation);
 
                   // in the cubic case it is more complicated as more DoFs are
                   // on the lines
@@ -533,15 +537,19 @@ namespace internal
                            ++line, d += 2)
                         {
                           const unsigned int face_to_cell_lines =
-                            reference_cell.face_to_cell_lines(face, line, 1);
+                            reference_cell.face_to_cell_lines(
+                              face,
+                              line,
+                              numbers::default_geometric_orientation);
                           // check the direction of the line
                           // is it 0 -> 1 or 1 -> 0
                           // as DoFs on the line are ordered differently
                           if (reference_cell.line_to_cell_vertices(
                                 face_to_cell_lines, 0) ==
-                              reference_cell.face_to_cell_vertices(face,
-                                                                   line,
-                                                                   1))
+                              reference_cell.face_to_cell_vertices(
+                                face,
+                                line,
+                                numbers::default_geometric_orientation))
                             {
                               face_to_cell_index_nodal[face][d] =
                                 reference_cell.n_vertices() +

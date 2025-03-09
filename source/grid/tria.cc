@@ -7003,9 +7003,10 @@ namespace internal
                          c < GeometryInfo<dim>::max_children_per_cell;
                          ++c)
                       {
-                        auto &new_hex = new_hexes[c];
+                        auto      &new_hex        = new_hexes[c];
+                        const auto reference_cell = new_hex->reference_cell();
 
-                        if (new_hex->n_faces() == 4)
+                        if (reference_cell == ReferenceCells::Tetrahedron)
                           {
                             new_hex->set_bounding_object_indices(
                               {quad_indices[cell_quads[c][0]],
@@ -7042,27 +7043,24 @@ namespace internal
 
                                 // arrange after vertices of the faces of the
                                 // unit cell
-                                const std::array<unsigned int, 3> vertices_1 = {
+                                std::array<unsigned int, 3> vertices_1;
+                                for (unsigned int face_vertex_no :
+                                     face->vertex_indices())
                                   {
-                                    vertex_indices
-                                      [new_hex_vertices
-                                         [ReferenceCells::Tetrahedron
-                                            .face_to_cell_vertices(f, 0, 1)]],
-                                    vertex_indices
-                                      [new_hex_vertices
-                                         [ReferenceCells::Tetrahedron
-                                            .face_to_cell_vertices(f, 1, 1)]],
-                                    vertex_indices
-                                      [new_hex_vertices
-                                         [ReferenceCells::Tetrahedron
-                                            .face_to_cell_vertices(f, 2, 1)]],
-                                  }};
+                                    const auto cell_vertex_no =
+                                      reference_cell.face_to_cell_vertices(
+                                        f,
+                                        face_vertex_no,
+                                        numbers::default_geometric_orientation);
+                                    vertices_1[face_vertex_no] = vertex_indices
+                                      [new_hex_vertices[cell_vertex_no]];
+                                  }
 
                                 new_hex->set_combined_face_orientation(
                                   f,
                                   face->reference_cell()
                                     .get_combined_orientation(
-                                      make_array_view(vertices_1),
+                                      make_const_array_view(vertices_1),
                                       make_array_view(vertices_0)));
                               }
                           }

@@ -7326,7 +7326,7 @@ inline types::geometric_orientation
 TriaAccessor<0, 1, spacedim>::combined_face_orientation(
   const unsigned int /*face*/)
 {
-  return 0;
+  return numbers::reverse_line_orientation;
 }
 
 
