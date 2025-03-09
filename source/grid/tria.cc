@@ -15999,16 +15999,21 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                 const std::array<types::geometric_orientation, 2>
                   line_orientations{{face_iter->line_orientation(0),
                                      face_iter->line_orientation(1)}};
-                std::array<unsigned int, 4> raw_vertex_indices{
-                  {face_iter->line(0)->vertex_index(1 - line_orientations[0]),
-                   face_iter->line(1)->vertex_index(1 - line_orientations[1]),
-                   face_iter->line(0)->vertex_index(line_orientations[0]),
-                   face_iter->line(1)->vertex_index(line_orientations[1])}};
+                const std::array<unsigned int, 2> line_vertex_indices{
+                  {line_orientations[0] ==
+                     numbers::default_geometric_orientation,
+                   line_orientations[1] ==
+                     numbers::default_geometric_orientation}};
+                const std::array<unsigned int, 4> raw_vertex_indices{
+                  {face_iter->line(0)->vertex_index(1 - line_vertex_indices[0]),
+                   face_iter->line(1)->vertex_index(1 - line_vertex_indices[1]),
+                   face_iter->line(0)->vertex_index(line_vertex_indices[0]),
+                   face_iter->line(1)->vertex_index(line_vertex_indices[1])}};
 
                 const auto combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
                     cell->index() * ReferenceCells::max_n_faces<dim>() + face);
-                std::array<unsigned int, 4> vertex_order{
+                const std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,
                                                          combined_orientation),
@@ -16030,11 +16035,15 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
               const std::array<types::geometric_orientation, 2>
                 line_orientations{
                   {cell->line_orientation(0), cell->line_orientation(1)}};
-              std::array<unsigned int, 4> raw_vertex_indices{
-                {cell->line(0)->vertex_index(1 - line_orientations[0]),
-                 cell->line(1)->vertex_index(1 - line_orientations[1]),
-                 cell->line(0)->vertex_index(line_orientations[0]),
-                 cell->line(1)->vertex_index(line_orientations[1])}};
+              const std::array<unsigned int, 2> line_vertex_indices{
+                {line_orientations[0] == numbers::default_geometric_orientation,
+                 line_orientations[1] ==
+                   numbers::default_geometric_orientation}};
+              const std::array<unsigned int, 4> raw_vertex_indices{
+                {cell->line(0)->vertex_index(1 - line_vertex_indices[0]),
+                 cell->line(1)->vertex_index(1 - line_vertex_indices[1]),
+                 cell->line(0)->vertex_index(line_vertex_indices[0]),
+                 cell->line(1)->vertex_index(line_vertex_indices[1])}};
               for (unsigned int i = 0; i < 4; ++i)
                 cache[my_index + i] = raw_vertex_indices[i];
             }
