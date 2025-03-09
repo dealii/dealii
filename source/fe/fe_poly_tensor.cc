@@ -166,7 +166,8 @@ namespace internal
         const unsigned int k = fe.tensor_degree() - 1;
 
         for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
+          if (cell->line_orientation(l) !=
+                numbers::default_geometric_orientation &&
               mapping_kind[0] == mapping_nedelec)
             {
               if (k == 0)
@@ -236,7 +237,8 @@ namespace internal
         // Here we adjust only the line (edge) dofs. The line dofs need only
         // sign adjustment. That is, no permutation of the line dofs is needed.
         for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
+          if (cell->line_orientation(l) !=
+                numbers::default_geometric_orientation &&
               mapping_kind[0] == mapping_nedelec)
             {
               if (k == 0)
