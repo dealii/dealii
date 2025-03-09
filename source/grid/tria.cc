@@ -6819,12 +6819,12 @@ namespace internal
                               // TODO: add comment
                               static const std::
                                 array<std::array<unsigned int, 3>, 6>
-                                  table = {{{{1, 0, 2}}, // 0
-                                            {{0, 1, 2}},
-                                            {{0, 2, 1}}, // 2
-                                            {{1, 2, 0}},
-                                            {{2, 1, 0}}, // 4
-                                            {{2, 0, 1}}}};
+                                  table = {{{{0, 1, 2}}, // 0
+                                            {{1, 0, 2}},
+                                            {{1, 2, 0}}, // 2
+                                            {{0, 2, 1}},
+                                            {{2, 0, 1}}, // 4
+                                            {{2, 1, 0}}}};
 
                               const auto combined_orientation =
                                 hex->combined_face_orientation(f);

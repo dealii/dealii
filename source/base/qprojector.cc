@@ -164,21 +164,21 @@ namespace internal
         // counter-clockwise.
         switch (combined_orientation)
           {
-            case 0:
-              return reflect(points);
-            case 2:
-              return rotate(reflect(points), 3);
-            case 4:
-              return rotate(reflect(points), 2);
-            case 6:
-              return rotate(reflect(points), 1);
             case 1:
-              return points;
+              return reflect(points);
             case 3:
-              return rotate(points, 1);
+              return rotate(reflect(points), 3);
             case 5:
-              return rotate(points, 2);
+              return rotate(reflect(points), 2);
             case 7:
+              return rotate(reflect(points), 1);
+            case 0:
+              return points;
+            case 2:
+              return rotate(points, 1);
+            case 4:
+              return rotate(points, 2);
+            case 6:
               return rotate(points, 3);
             default:
               DEAL_II_ASSERT_UNREACHABLE();
@@ -425,9 +425,7 @@ QProjector<dim>::project_to_face(const ReferenceCell       &reference_cell,
                                  const types::geometric_orientation orientation)
 {
   AssertIndexRange(face_no, reference_cell.n_faces());
-  // TODO once the default orientation is zero we can remove this special case
-  AssertIndexRange(dim == 1 ? 1 - orientation : orientation,
-                   reference_cell.n_face_orientations(face_no));
+  AssertIndexRange(orientation, reference_cell.n_face_orientations(face_no));
   AssertDimension(reference_cell.get_dimension(), dim);
 
   std::vector<Point<dim>> q_points;
@@ -595,9 +593,7 @@ QProjector<dim>::project_to_subface(
   const RefinementCase<dim - 1>     &ref_case)
 {
   AssertIndexRange(face_no, reference_cell.n_faces());
-  // TODO once the default orientation is zero we can remove this special case
-  AssertIndexRange(dim == 1 ? 1 - orientation : orientation,
-                   reference_cell.n_face_orientations(face_no));
+  AssertIndexRange(orientation, reference_cell.n_face_orientations(face_no));
   AssertDimension(reference_cell.get_dimension(), dim);
   AssertIndexRange(subface_no,
                    reference_cell.face_reference_cell(face_no)
