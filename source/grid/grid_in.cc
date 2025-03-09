@@ -3844,7 +3844,7 @@ namespace
                      ++j)
                   boundary_line.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, 0)];
+                      deal_face_n, j, numbers::default_geometric_orientation)];
 
                 subcelldata.boundary_lines.push_back(std::move(boundary_line));
               }
@@ -3859,7 +3859,7 @@ namespace
                      ++j)
                   boundary_quad.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, 0)];
+                      deal_face_n, j, numbers::default_geometric_orientation)];
 
                 subcelldata.boundary_quads.push_back(std::move(boundary_quad));
               }
