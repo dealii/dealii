@@ -20,6 +20,20 @@
 #include <deal.II/base/exception_macros.h>
 #include <deal.II/base/numbers.h>
 
+// The exception machinery (including the macros defined in
+// exception_macros.h) references Kokkos functions. The places that
+// use exceptions must know about these functions, and to avoid them
+// all having to include Kokkos headers, we have to do it here:
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <Kokkos_Macros.hpp>
+#if KOKKOS_VERSION >= 40200
+#  include <Kokkos_Abort.hpp>
+#else
+#  include <Kokkos_Core.hpp>
+#endif
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+
 #include <exception>
 #include <ostream>
 #include <string>
