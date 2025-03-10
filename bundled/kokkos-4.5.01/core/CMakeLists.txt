@@ -2,7 +2,7 @@ if(NOT Kokkos_INSTALL_TESTING)
   add_subdirectory(src)
 endif()
 
-function(KOKKOS_ADD_BENCHMARK_DIRECTORY DIR_NAME)
+function(kokkos_add_benchmark_directory DIR_NAME)
   if(NOT Kokkos_ENABLE_BENCHMARKS)
     return()
   endif()
