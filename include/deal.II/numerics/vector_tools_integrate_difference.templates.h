@@ -431,7 +431,7 @@ namespace VectorTools
 
     template <int dim, int spacedim, typename Number, class OutVector>
     DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
-    static void do_integrate_difference(
+    void do_integrate_difference(
       const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const DoFHandler<dim, spacedim>                    &dof,
       const ReadVector<Number>                           &fe_function,
