@@ -22,7 +22,9 @@
 // e.g., MPI_Comm in the API.
 
 #if defined(DEAL_II_WITH_MPI)
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #else
 
 // Without MPI, we would still like to use some constructs with MPI
