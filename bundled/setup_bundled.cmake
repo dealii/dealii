@@ -89,6 +89,7 @@ macro(feature_kokkos_configure_bundled)
     ${KOKKOS_FOLDER}/containers/src
     ${KOKKOS_FOLDER}/core/src
     ${KOKKOS_FOLDER}/simd/src
+    ${KOKKOS_FOLDER}/tpls/mdspan/include
     ${KOKKOS_FOLDER}/tpls/desul/include
     )
 endmacro()
