@@ -50,7 +50,7 @@ if(Kokkos_FOUND)
   if (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP)
     # In version older than 3.7.0, Kokkos::Array::operator[] is not constexpr,
     # so we use std::array instead.
-    if (KOKKOS_VERSION VERSION_LESS 3.7.0)
+    if (Kokkos_VERSION VERSION_LESS 3.7.0)
       # We are using std::array in device code which calls the host-only function
       # __glibcxx_requires_subscript when defining _GLIBCXX_ASSERTIONS 
       list(REMOVE_ITEM DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
