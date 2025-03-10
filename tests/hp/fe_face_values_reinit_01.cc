@@ -76,7 +76,7 @@ test()
 
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (const auto face : cell->face_iterators())
+      for (const auto &face : cell->face_iterators())
         {
           hp_fe_face_values.reinit(cell, face);
 
@@ -90,7 +90,7 @@ test()
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      for (const auto face : cell->face_indices())
+      for (const auto &face : cell->face_indices())
         {
           hp_fe_face_values.reinit(cell, face);
 
@@ -104,7 +104,7 @@ test()
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      for (const auto face : cell->face_iterators())
+      for (const auto &face : cell->face_iterators())
         {
           hp_fe_face_values.reinit(cell, face);
 
