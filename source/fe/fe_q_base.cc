@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 
+#include "deal.II/base/geometry_info.h"
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
@@ -33,6 +34,8 @@
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_wedge_p.h>
+
+#include <deal.II/grid/reference_cell.h>
 
 #include <memory>
 #include <sstream>
