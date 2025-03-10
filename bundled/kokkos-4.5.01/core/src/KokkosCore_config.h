@@ -61,7 +61,7 @@
 
 /* TPL Settings */
 /* #undef KOKKOS_ENABLE_HWLOC */
-#define KOKKOS_ENABLE_LIBDL
+/* #undef KOKKOS_ENABLE_LIBDL */
 /* #undef KOKKOS_ENABLE_LIBQUADMATH */
 /* #undef KOKKOS_ENABLE_ONEDPL */
 /* #undef KOKKOS_ENABLE_ROCTHRUST */
