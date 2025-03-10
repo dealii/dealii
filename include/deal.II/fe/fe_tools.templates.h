@@ -2905,7 +2905,7 @@ namespace FETools
       // FETools::convert_generalized_support_point_values_to_dof_values
 
       template <int dim, int spacedim, typename number>
-      static void
+      void
       convert_helper(const FiniteElement<dim, spacedim> &finite_element,
                      const std::vector<Vector<number>>  &support_point_values,
                      std::vector<number>                &dof_values)
@@ -2937,7 +2937,7 @@ namespace FETools
 
 
       template <int dim, int spacedim, typename number>
-      static void
+      void
       convert_helper(
         const FiniteElement<dim, spacedim>              &finite_element,
         const std::vector<Vector<std::complex<number>>> &support_point_values,
@@ -2995,7 +2995,7 @@ namespace FETools
 
 
       template <int dim, int spacedim>
-      static void
+      void
       convert_helper(const FiniteElement<dim, spacedim> &finite_element,
                      const std::vector<Vector<double>>  &support_point_values,
                      std::vector<double>                &dof_values)

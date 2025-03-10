@@ -983,7 +983,7 @@ namespace MatrixCreator
   namespace internal
   {
     template <int dim, int spacedim, typename number>
-    void static inline create_boundary_mass_matrix_1(
+    void inline create_boundary_mass_matrix_1(
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       const MatrixCreator::internal::AssemblerBoundary::Scratch &,
       MatrixCreator::internal::AssemblerBoundary::
@@ -1310,6 +1310,7 @@ namespace MatrixCreator
     {
       DEAL_II_NOT_IMPLEMENTED();
     }
+
 
     template <>
     void inline create_boundary_mass_matrix_1<1, 3, double>(

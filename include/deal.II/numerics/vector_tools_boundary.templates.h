@@ -55,7 +55,7 @@ namespace VectorTools
               typename number,
               template <int, int>
               class M_or_MC>
-    static inline void
+    inline void
     do_interpolate_boundary_values(
       const M_or_MC<dim, spacedim>    &mapping,
       const DoFHandler<dim, spacedim> &dof,
