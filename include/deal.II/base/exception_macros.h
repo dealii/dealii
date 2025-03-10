@@ -17,26 +17,6 @@
 
 #include <deal.II/base/config.h>
 
-// The #defines of the Assert* macros below reference functions and
-// classes that are declared in exceptions.h. This is ok -- places
-// that use the Assert macro (for example) simply have to #include
-// <deal.II/base/exceptions.h> or, in the case of C++20 modules, use
-// the fact that we let exceptions.h export this stuff into the dealii
-// module. But the exception machinery also references Kokkos
-// functions, which exceptions.h cannot export into the module. The
-// places that use exceptions must know about these functions, and to
-// avoid them all having to include Kokkos headers, we have to do it
-// here:
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#include <Kokkos_Macros.hpp>
-#if KOKKOS_VERSION >= 40200
-#  include <Kokkos_Abort.hpp>
-#else
-#  include <Kokkos_Core.hpp>
-#endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
-
 
 /**********************************************************************
  * Preprocessor definitions in support of declaring exception classes.
