@@ -60,6 +60,7 @@ if(DEAL_II_FEATURE_KOKKOS_BUNDLED_CONFIGURED)
     ${KOKKOS_FOLDER}/core/src/
     ${KOKKOS_FOLDER}/simd/src/
     ${KOKKOS_FOLDER}/tpls/desul/include/
+    ${KOKKOS_FOLDER}/tpls/mdspan/include/
     DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
     COMPONENT library
     FILES_MATCHING
