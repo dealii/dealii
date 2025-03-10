@@ -20,6 +20,9 @@
 #   KOKKOS_INCLUDE_DIRS
 #   KOKKOS_INTERFACE_LINK_FLAGS
 #   KOKKOS_VERSION
+#   KOKKOS_VERSION_MAJOR
+#   KOKKOS_VERSION_MINOR
+#   KOKKOS_VERSION_SUBMINOR
 #
 
 set(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
@@ -162,4 +165,34 @@ if(KOKKOS_FOUND)
     # warning #940-D: missing return statement at end of non-void function
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
   endif()
+
+  #
+  # Extract version numbers:
+  #
+  if(NOT KOKKOS_VERSION)
+    if(Kokkos_VERSION)
+      set(KOKKOS_VERSION "${Kokkos_VERSION}")
+    else()
+      message(FATAL_ERROR "FindPackage(Kokkos) did not set KOKKOS_VERSION!")
+    endif()
+  endif()
+
+  string(REGEX REPLACE
+    "^([0-9]+).*$" "\\1"
+    KOKKOS_VERSION_MAJOR "${KOKKOS_VERSION}")
+
+  string(REGEX REPLACE
+    "^[0-9]+\\.([0-9]+).*$" "\\1"
+    KOKKOS_VERSION_MINOR "${KOKKOS_VERSION}")
+
+  # If there is no subminor number, KOKKOS_VERSION_SUBMINOR is set to an
+  # empty string. If that is the case, set the subminor number to zero
+  string(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.?(([0-9]+)?).*$" "\\1"
+    KOKKOS_VERSION_SUBMINOR "${KOKKOS_VERSION}")
+  if("${KOKKOS_VERSION_SUBMINOR}" STREQUAL "")
+    set(KOKKOS_VERSION_SUBMINOR "0")
+  endif()
+
+
 endif()
