@@ -14,13 +14,6 @@
 
 #include <deal.II/base/config.h>
 
-// It's necessary to include winsock2.h before thread_local_storage.h,
-// because Intel implementation of TBB includes winsock.h,
-// and we'll get a conflict between winsock.h and winsock2.h otherwise.
-#ifdef DEAL_II_MSVC
-#  include <winsock2.h>
-#endif
-
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
@@ -62,6 +55,19 @@
 #ifndef DEAL_II_MSVC
 #  include <cstdlib>
 #endif
+
+// It's necessary to include winsock2.h before thread_local_storage.h,
+// because Intel implementation of TBB includes winsock.h,
+// and we'll get a conflict between winsock.h and winsock2.h otherwise.
+#ifdef DEAL_II_MSVC
+#  include <winsock2.h>
+#endif
+
+#ifndef DEAL_II_MSVC
+// On Unix-type systems, we use posix-memalign:
+#  include <mm_malloc.h>
+#endif
+
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1091,7 +1097,7 @@ namespace Utilities
 #else
           // Windows does not appear to have posix_memalign. just use the
           // regular malloc in that case
-          *memptr = malloc(size);
+          *memptr = std::malloc(size);
           (void)alignment;
           AssertThrow(*memptr != nullptr, ExcOutOfMemory(size));
 #endif
