@@ -15,6 +15,9 @@
 
 #include <deal.II/numerics/vector_tools_point_value.templates.h>
 
+#include <vector>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------

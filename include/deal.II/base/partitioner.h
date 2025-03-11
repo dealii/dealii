@@ -29,6 +29,8 @@
 
 #include <limits>
 #include <memory>
+#include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
