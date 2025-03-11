@@ -95,11 +95,11 @@ namespace hp
      * clang-tidy).
      */
     MappingCollection(MappingCollection<dim, spacedim> &&) noexcept(
-      std::is_nothrow_move_constructible<
-        std::vector<std::shared_ptr<const Mapping<dim, spacedim>>>>::value
-        &&std::is_nothrow_move_constructible<std::function<
+      std::is_nothrow_move_constructible_v<
+        std::vector<std::shared_ptr<const Mapping<dim, spacedim>>>>
+        &&std::is_nothrow_move_constructible_v<std::function<
           unsigned int(const typename hp::MappingCollection<dim, spacedim> &,
-                       const unsigned int)>>::value) = default;
+                       const unsigned int)>>) = default;
 
     /**
      * Move assignment operator.
