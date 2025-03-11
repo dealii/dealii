@@ -369,7 +369,7 @@ namespace Portable
 
       // Provide the shared memory capacity. This function takes the team_size
       // as an argument, which allows team_size dependent allocations.
-      size_t
+      std::size_t
       team_shmem_size(int /*team_size*/) const
       {
         return SharedViewValues::shmem_size(Functor::n_q_points,

@@ -5455,7 +5455,7 @@ namespace DataOutBase
       o << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
         << ascii_or_binary << "\">\n";
 
-      std::vector<int32_t> cells;
+      std::vector<std::int32_t> cells;
       Assert(dim <= 3, ExcNotImplemented());
 
       unsigned int first_vertex_of_patch = 0;
@@ -5782,7 +5782,7 @@ namespace DataOutBase
         o << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\""
           << ascii_or_binary << "\">\n";
 
-        std::vector<int32_t> offsets;
+        std::vector<std::int32_t> offsets;
         offsets.reserve(n_cells);
 
         // std::uint8_t might be an alias to unsigned char which is then not
@@ -5817,7 +5817,7 @@ namespace DataOutBase
         if (deal_ii_with_zlib &&
             (flags.compression_level != CompressionLevel::plain_text))
           {
-            std::vector<uint8_t> cell_types_uint8_t(cell_types.size());
+            std::vector<std::uint8_t> cell_types_uint8_t(cell_types.size());
             for (unsigned int i = 0; i < cell_types.size(); ++i)
               cell_types_uint8_t[i] = static_cast<std::uint8_t>(cell_types[i]);
 

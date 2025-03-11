@@ -277,7 +277,7 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
       // flag.
       std::vector<char *> argv_new;
       for (auto *const arg : make_array_view(&argv[0], &argv[0] + argc))
-        if (strcmp(arg, "--help") != 0)
+        if (std::strcmp(arg, "--help") != 0)
           argv_new.push_back(arg);
 
       std::stringstream threads_flag;
