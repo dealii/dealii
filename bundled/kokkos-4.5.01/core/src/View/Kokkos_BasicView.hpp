@@ -523,7 +523,7 @@ class BasicView {
 
   // Some weird unexplained issue in compiling the SFINAE version with CUDA/MSVC
   // So we just use post factor check here with static_assert
-#if defined(KOKKOS_ENABLE_CUDA) && defined(_WIN32)
+#if defined(KOKKOS_ENABLE_CUDA) || defined(_WIN32)
   template <class... OtherIndexTypes>
   KOKKOS_FUNCTION constexpr reference operator()(
       OtherIndexTypes... indices) const {
