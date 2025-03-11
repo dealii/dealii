@@ -17,8 +17,7 @@
 // exception messages to the screen.
 
 #include <deal.II/base/exceptions.h>
-
-#include <mpi.h>
+#include <deal.II/base/mpi.h>
 
 #include <vector>
 
