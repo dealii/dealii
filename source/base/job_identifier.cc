@@ -36,8 +36,8 @@ JobIdentifier::get_dealjobid()
 
 JobIdentifier::JobIdentifier()
 {
-  time_t t = std::time(nullptr);
-  id       = "JobId ";
+  std::time_t t = std::time(nullptr);
+  id            = "JobId ";
 
 #if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
   char name[100];

@@ -41,7 +41,7 @@ namespace LinearAlgebra
       {
         // if we are asked to visit the past-the-end line, then simply
         // release all our caches and go on with life
-        if (static_cast<size_t>(this->a_row) == sparsity_pattern->n_rows())
+        if (static_cast<std::size_t>(this->a_row) == sparsity_pattern->n_rows())
           {
             colnum_cache.reset();
             return;
@@ -850,7 +850,7 @@ namespace LinearAlgebra
                   trilinos_j) -
         col_indices.data();
 
-      return static_cast<size_t>(local_col_index) != col_indices.size();
+      return static_cast<std::size_t>(local_col_index) != col_indices.size();
 #  else
       (void)i;
       (void)j;

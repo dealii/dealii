@@ -349,7 +349,7 @@ GridRefinement::refine_and_coarsen_fixed_number(
       Vector<Number> tmp(criteria);
       if (refine_cells)
         {
-          if (static_cast<size_t>(refine_cells) == criteria.size())
+          if (static_cast<std::size_t>(refine_cells) == criteria.size())
             refine(tria, criteria, std::numeric_limits<double>::lowest());
           else
             {
@@ -363,7 +363,7 @@ GridRefinement::refine_and_coarsen_fixed_number(
 
       if (coarsen_cells)
         {
-          if (static_cast<size_t>(coarsen_cells) == criteria.size())
+          if (static_cast<std::size_t>(coarsen_cells) == criteria.size())
             coarsen(tria, criteria, std::numeric_limits<double>::max());
           else
             {

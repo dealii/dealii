@@ -197,7 +197,7 @@ namespace hp
     operator-(const CollectionIterator<T> &other) const
     {
       return static_cast<std::ptrdiff_t>(index) -
-             static_cast<ptrdiff_t>(other.index);
+             static_cast<std::ptrdiff_t>(other.index);
     }
 
   private:

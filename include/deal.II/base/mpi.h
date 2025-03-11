@@ -1261,7 +1261,7 @@ namespace Utilities
     template <typename T>
     void
     broadcast(T                 *buffer,
-              const size_t       count,
+              const std::size_t  count,
               const unsigned int root,
               const MPI_Comm     comm);
 
@@ -2134,7 +2134,7 @@ namespace Utilities
     template <typename T>
     void
     broadcast(T                 *buffer,
-              const size_t       count,
+              const std::size_t  count,
               const unsigned int root,
               const MPI_Comm     comm)
     {
