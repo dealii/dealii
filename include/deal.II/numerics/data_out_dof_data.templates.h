@@ -790,7 +790,7 @@ namespace internal
 
 
 
-    namespace
+    namespace CreateVectors
     {
       /**
        * Copy the data from an arbitrary non-block vector to a
@@ -1017,7 +1017,7 @@ namespace internal
 
         dst.update_ghost_values();
       }
-    } // namespace
+    } // namespace CreateVectors
 
 
 
@@ -1168,9 +1168,9 @@ namespace internal
       : DataEntryBase<dim, spacedim>(dofs, names, data_component_interpretation)
     {
       if (actual_type == DataVectorType::type_dof_data)
-        create_dof_vector(*dofs, *data, vector);
+        CreateVectors::create_dof_vector(*dofs, *data, vector);
       else if (actual_type == DataVectorType::type_cell_data)
-        create_cell_vector(*data, vector);
+        CreateVectors::create_cell_vector(*data, vector);
       else
         DEAL_II_ASSERT_UNREACHABLE();
     }
@@ -1185,7 +1185,7 @@ namespace internal
       const DataPostprocessor<spacedim> *data_postprocessor)
       : DataEntryBase<dim, spacedim>(dofs, data_postprocessor)
     {
-      create_dof_vector(*dofs, *data, vector);
+      CreateVectors::create_dof_vector(*dofs, *data, vector);
     }
 
 
@@ -1497,7 +1497,10 @@ namespace internal
 
         for (unsigned int l = vectors->min_level(); l <= vectors->max_level();
              ++l)
-          create_dof_vector(*dofs, (*vectors)[l], this->vectors[l], l);
+          CreateVectors::create_dof_vector(*dofs,
+                                           (*vectors)[l],
+                                           this->vectors[l],
+                                           l);
       }
 
       virtual double
