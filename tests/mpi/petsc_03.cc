@@ -17,6 +17,7 @@
 // PETScWrappers: document bug when using GrowingVectorMemory
 // at the end of a run.
 
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/petsc_block_vector.h>
@@ -25,7 +26,6 @@
 
 #include "../tests.h"
 
-// #include <mpi.h>
 
 template <class v>
 void

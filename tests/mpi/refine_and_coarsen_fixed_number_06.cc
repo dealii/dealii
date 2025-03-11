@@ -40,7 +40,7 @@
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
-// #include <mpi.h>
+
 
 template <int dim>
 void

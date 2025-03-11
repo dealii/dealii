@@ -15,9 +15,10 @@
 // test that MPI is working correctly. Note that this test expects to
 // be executed with exactly two threads.
 
+#include <deal.II/base/mpi.h>
+
 #include <deal.II/grid/tria.h>
 
-#include <mpi.h>
 #include <sched.h>
 
 #include <iostream>
