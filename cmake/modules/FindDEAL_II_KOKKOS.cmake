@@ -26,7 +26,7 @@ set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 
 # silence a warning when including FindKOKKOS.cmake
 set(CMAKE_CXX_EXTENSIONS OFF)
-find_package(Kokkos 3.7.0 QUIET
+find_package(Kokkos 3.4.0 QUIET
   HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR} ${TRILINOS_DIR} ${PETSC_DIR}
   )
 
