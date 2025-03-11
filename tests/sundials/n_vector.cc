@@ -16,6 +16,7 @@
 // are created by calling NVectorView on one of the internal vector types.
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/mpi.h>
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -25,10 +26,6 @@
 
 #include <deal.II/sundials/n_vector.h>
 #include <deal.II/sundials/n_vector.templates.h>
-
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
 
 #include "../tests.h"
 
