@@ -18,6 +18,8 @@
 
 #include <deal.II/particles/utilities.h>
 
+#include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
