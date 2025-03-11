@@ -3060,7 +3060,10 @@ GridIn<dim, spacedim>::parse_tecplot_header(
   blocked    = false;
 
   // convert the string to upper case
-  std::transform(header.begin(), header.end(), header.begin(), ::toupper);
+  std::transform(header.begin(),
+                 header.end(),
+                 header.begin(),
+                 static_cast<int (*)(int)>(std::toupper));
 
   // replace all tabs, commas, newlines by
   // whitespaces
@@ -3672,7 +3675,7 @@ namespace
     std::transform(type_name_2.begin(),
                    type_name_2.end(),
                    type_name_2.begin(),
-                   [](unsigned char c) { return std::toupper(c); });
+                   static_cast<int (*)(int)>(std::toupper));
     const std::string numbers = "0123456789";
     type_name_2.erase(std::find_first_of(type_name_2.begin(),
                                          type_name_2.end(),
@@ -4473,7 +4476,7 @@ namespace
     std::string tmp;
     for (const char c : s)
       {
-        if (isdigit(c) != 0)
+        if (std::isdigit(c) != 0)
           {
             tmp += c;
           }
@@ -4500,7 +4503,10 @@ namespace
     while (std::getline(input_stream, line))
       {
       cont:
-        std::transform(line.begin(), line.end(), line.begin(), ::toupper);
+        std::transform(line.begin(),
+                       line.end(),
+                       line.begin(),
+                       static_cast<int (*)(int)>(std::toupper));
 
         if (line.compare("*HEADING") == 0 || line.compare(0, 2, "**") == 0 ||
             line.compare(0, 5, "*PART") == 0)
@@ -4620,7 +4626,7 @@ namespace
                 std::transform(line.begin(),
                                line.end(),
                                line.begin(),
-                               ::toupper);
+                               static_cast<int (*)(int)>(std::toupper));
 
                 // Surface can be created from ELSET, or directly from cells
                 // If elsets_list contains a key with specific name - refers

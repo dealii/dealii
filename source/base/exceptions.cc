@@ -319,7 +319,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       else
         demangled_stacktrace_entry += functionname;
 
-      free(p);
+      std::free(p);
 
 #else
 
@@ -334,7 +334,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
         break;
     }
 
-  free(stacktrace); // free(nullptr) is allowed
+  std::free(stacktrace); // free(nullptr) is allowed
   stacktrace = nullptr;
 }
 

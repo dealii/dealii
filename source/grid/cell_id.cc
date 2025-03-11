@@ -53,7 +53,7 @@ CellId::CellId(const types::coarse_cell_id coarse_cell_id,
   , n_child_indices(n_child_indices)
 {
   Assert(n_child_indices < child_indices.size(), ExcInternalError());
-  memcpy(child_indices.data(), id, n_child_indices);
+  std::memcpy(child_indices.data(), id, n_child_indices);
 }
 
 
