@@ -14,6 +14,10 @@
 
 #include <deal.II/lac/matrix_out.h>
 
+#include <string>
+#include <vector>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 

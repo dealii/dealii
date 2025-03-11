@@ -21,6 +21,9 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
 
+#include <vector>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
