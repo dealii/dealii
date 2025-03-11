@@ -100,7 +100,7 @@ namespace Exceptions
     DeclException2(
       ExcInvalidCharacter,
       std::string,
-      size_t,
+      std::size_t,
       << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
       << "description strings since some graphics formats will only accept these."
       << std::endl

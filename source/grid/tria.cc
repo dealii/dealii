@@ -960,7 +960,7 @@ namespace internal
 
           // Allocate sufficient memory.
           const unsigned int bytes_per_cell = sizes_fixed_cumulative.back();
-          dest_data_fixed.resize(static_cast<size_t>(local_num_cells) *
+          dest_data_fixed.resize(static_cast<std::size_t>(local_num_cells) *
                                  bytes_per_cell);
 
           // Read packed data from file simultaneously.
@@ -1085,7 +1085,7 @@ namespace internal
                     sizes_fixed_cumulative.size() * sizeof(unsigned int));
 
           const unsigned int bytes_per_cell = sizes_fixed_cumulative.back();
-          dest_data_fixed.resize(static_cast<size_t>(local_num_cells) *
+          dest_data_fixed.resize(static_cast<std::size_t>(local_num_cells) *
                                  bytes_per_cell);
 
           // Read packed data.

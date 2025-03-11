@@ -286,7 +286,7 @@ namespace MemoryConsumption
       }
     else
       {
-        return sizeof(char) * (strlen(string) /*Remember the NUL*/ + 1);
+        return sizeof(char) * (std::strlen(string) /*Remember the NUL*/ + 1);
       }
   }
 

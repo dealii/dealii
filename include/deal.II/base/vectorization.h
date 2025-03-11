@@ -218,7 +218,7 @@ public:
   operator-(const VectorizedArrayIterator<T> &other) const
   {
     return static_cast<std::ptrdiff_t>(lane) -
-           static_cast<ptrdiff_t>(other.lane);
+           static_cast<std::ptrdiff_t>(other.lane);
   }
 
 private:

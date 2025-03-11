@@ -165,8 +165,8 @@ namespace internal
       using iterator       = typename Types<N, T, C>::iterator;
       using const_iterator = typename Types<N, T, C>::const_iterator;
 
-      using size_type       = size_t;
-      using difference_type = ptrdiff_t;
+      using size_type       = std::size_t;
+      using difference_type = std::ptrdiff_t;
 
     private:
       /**
@@ -251,8 +251,8 @@ namespace internal
       using reference       = typename Types<N, T, C>::reference;
       using const_reference = typename Types<N, T, C>::const_reference;
 
-      using size_type       = size_t;
-      using difference_type = ptrdiff_t;
+      using size_type       = std::size_t;
+      using difference_type = std::ptrdiff_t;
 
       /**
        * Import an alias from the switch class above.
