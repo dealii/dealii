@@ -575,7 +575,7 @@ namespace Utilities
    * most common use cases for this function).
    */
   template <typename T>
-  size_t
+  std::size_t
   pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression = true);
@@ -1378,7 +1378,7 @@ namespace Utilities
 
 
   template <typename T>
-  size_t
+  std::size_t
   pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression)

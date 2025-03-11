@@ -514,9 +514,9 @@ private:
    * region, and release the old memory.
    */
   void
-  allocate_and_move(const size_t old_size,
-                    const size_t new_size,
-                    const size_t new_allocated_size);
+  allocate_and_move(const std::size_t old_size,
+                    const std::size_t new_size,
+                    const std::size_t new_allocated_size);
 
   /**
    * A class that is used as the "deleter" for a `std::unique_ptr` object that
@@ -1431,9 +1431,9 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
 
 template <class T>
 inline void
-AlignedVector<T>::allocate_and_move(const size_t old_size,
-                                    const size_t new_size,
-                                    const size_t new_allocated_size)
+AlignedVector<T>::allocate_and_move(const std::size_t old_size,
+                                    const std::size_t new_size,
+                                    const std::size_t new_allocated_size)
 {
   // allocate and align along 64-byte boundaries (this is enough for all
   // levels of vectorization currently supported by deal.II)

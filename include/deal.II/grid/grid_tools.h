@@ -3159,7 +3159,8 @@ namespace GridTools
             if (cell->face(face)->has_children() &&
                 !cell->face(face)->at_boundary())
               {
-                if (static_cast<uint8_t>(cell->face(face)->refinement_case()) ==
+                if (static_cast<std::uint8_t>(
+                      cell->face(face)->refinement_case()) ==
                     RefinementCase<dim - 1>::isotropic_refinement)
                   {
                     Assert(cell->reference_cell() ==

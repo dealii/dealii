@@ -381,12 +381,12 @@ struct ExtractLevelVisitor
   /**
    * Store the level we are currently visiting.
    */
-  size_t level;
+  std::size_t level;
 
   /**
    * The level we want to extract from the RTree object.
    */
-  const size_t target_level;
+  const std::size_t target_level;
 
   /**
    * A reference to the input vector of BoundingBox objects.
@@ -571,7 +571,7 @@ ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::operator()(
       return;
     }
 
-  const size_t level_backup = level;
+  const std::size_t level_backup = level;
   ++level;
 
   for (typename ElementsType::const_iterator it = elements.begin();
@@ -708,19 +708,19 @@ struct NodeVisitor : public boost::geometry::index::detail::rtree::visitor<
   /**
    * Store the level we are currently visiting.
    */
-  size_t level;
+  std::size_t level;
 
   /**
    * Index used to keep track of the number of different visited nodes during
    * recursion/
    */
-  size_t node_counter;
+  std::size_t node_counter;
 
   /**
    * The level where children are living.
    * Before: "we want to extract from the RTree object."
    */
-  const size_t target_level;
+  const std::size_t target_level;
 
   /**
    * A reference to the input vector of vector of BoundingBox objects. This
@@ -791,7 +791,7 @@ NodeVisitor<Value, Options, Translator, Box, Allocators>::operator()(
       return;
     }
 
-  size_t level_backup = level;
+  std::size_t level_backup = level;
   ++level;
 
   for (typename elements_type::const_iterator it = elements.begin();
