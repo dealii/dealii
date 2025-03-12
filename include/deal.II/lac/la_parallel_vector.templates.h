@@ -27,6 +27,8 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
 
+#include <Kokkos_View.hpp>
+
 #include <memory>
 
 
