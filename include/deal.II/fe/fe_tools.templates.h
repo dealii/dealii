@@ -1050,11 +1050,50 @@ namespace FETools
 
 
 
-  // Not implemented in the general case.
   template <class FE>
   std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension>>
-  FEFactory<FE>::get(const Quadrature<1> &) const
+  FEFactory<FE>::get(const Quadrature<1> &quad) const
   {
+    // Specializations for FE_Q.
+    if constexpr (std::is_same_v<FE, FE_Q<1, 1>>)
+      return std::make_unique<FE_Q<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q<2, 2>>)
+      return std::make_unique<FE_Q<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q<3, 3>>)
+      return std::make_unique<FE_Q<3>>(quad);
+
+    // Specializations for FE_Q_DG0.
+    if constexpr (std::is_same_v<FE, FE_Q_DG0<1, 1>>)
+      return std::make_unique<FE_Q_DG0<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_DG0<2, 2>>)
+      return std::make_unique<FE_Q_DG0<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_DG0<3, 3>>)
+      return std::make_unique<FE_Q_DG0<3>>(quad);
+
+    // Specializations for FE_Q_Bubbles.
+    if constexpr (std::is_same_v<FE, FE_Q_Bubbles<1, 1>>)
+      return std::make_unique<FE_Q_Bubbles<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_Bubbles<2, 2>>)
+      return std::make_unique<FE_Q_Bubbles<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_Bubbles<3, 3>>)
+      return std::make_unique<FE_Q_Bubbles<3>>(quad);
+
+    // Specializations for FE_DGQArbitraryNodes.
+    if constexpr (std::is_same_v<FE, FE_DGQ<1>>)
+      return std::make_unique<FE_DGQArbitraryNodes<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<1, 2>>)
+      return std::make_unique<FE_DGQArbitraryNodes<1, 2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<1, 3>>)
+      return std::make_unique<FE_DGQArbitraryNodes<1, 3>>(quad);
+
+    // Specializations for FE_DG.
+    if constexpr (std::is_same_v<FE, FE_DGQ<2>>)
+      return std::make_unique<FE_DGQArbitraryNodes<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<2, 3>>)
+      return std::make_unique<FE_DGQArbitraryNodes<2, 3>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<3>>)
+      return std::make_unique<FE_DGQArbitraryNodes<3>>(quad);
+
     DEAL_II_NOT_IMPLEMENTED();
     return nullptr;
   }
