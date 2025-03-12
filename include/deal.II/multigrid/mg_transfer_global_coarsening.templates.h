@@ -57,7 +57,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
+namespace internal
 {
   /**
    * Helper class to select the right templated implementation.
@@ -245,230 +245,226 @@ namespace
     {}
   };
 
-} // namespace
+} // namespace internal
 
 
 
 namespace internal
 {
-  namespace
+  template <typename MeshType, typename OPType>
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  void loop_over_active_or_level_cells(const MeshType    &tria,
+                                       const unsigned int level,
+                                       const OPType      &op)
   {
-    template <typename MeshType, typename OPType>
-    DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
-    void loop_over_active_or_level_cells(const MeshType    &tria,
-                                         const unsigned int level,
-                                         const OPType      &op)
-    {
-      if (level == numbers::invalid_unsigned_int)
-        {
-          for (const auto &cell : tria.active_cell_iterators())
-            if (cell->is_locally_owned())
-              op(cell);
-        }
-      else
-        {
-          for (const auto &cell : tria.cell_iterators_on_level(level))
-            if (cell->is_locally_owned_on_level())
-              op(cell);
-        }
-    }
-
-    template <int dim>
-    unsigned int
-    compute_shift_within_children(const unsigned int child,
-                                  const unsigned int fe_shift_1d,
-                                  const unsigned int fe_degree)
-    {
-      // we put the degrees of freedom of all child cells in lexicographic
-      // ordering
-      unsigned int c_tensor_index[dim];
-      unsigned int tmp = child;
-      for (unsigned int d = 0; d < dim; ++d)
-        {
-          c_tensor_index[d] = tmp % 2;
-          tmp /= 2;
-        }
-      const unsigned int n_child_dofs_1d = fe_degree + 1 + fe_shift_1d;
-      unsigned int       factor          = 1;
-      unsigned int       shift           = fe_shift_1d * c_tensor_index[0];
-      for (unsigned int d = 1; d < dim; ++d)
-        {
-          factor *= n_child_dofs_1d;
-          shift = shift + factor * fe_shift_1d * c_tensor_index[d];
-        }
-      return shift;
-    }
-
-    template <int dim>
-    void
-    get_child_offset(const unsigned int         child,
-                     const unsigned int         fe_shift_1d,
-                     const unsigned int         fe_degree,
-                     std::vector<unsigned int> &local_dof_indices)
-    {
-      const unsigned int n_child_dofs_1d = fe_degree + 1 + fe_shift_1d;
-      const unsigned int shift =
-        compute_shift_within_children<dim>(child, fe_shift_1d, fe_degree);
-      const unsigned int n_components =
-        local_dof_indices.size() / Utilities::fixed_power<dim>(fe_degree + 1);
-      const unsigned int n_scalar_cell_dofs =
-        Utilities::fixed_power<dim>(n_child_dofs_1d);
-      for (unsigned int c = 0, m = 0; c < n_components; ++c)
-        for (unsigned int k = 0; k < (dim > 2 ? (fe_degree + 1) : 1); ++k)
-          for (unsigned int j = 0; j < (dim > 1 ? (fe_degree + 1) : 1); ++j)
-            for (unsigned int i = 0; i < (fe_degree + 1); ++i, ++m)
-              local_dof_indices[m] = c * n_scalar_cell_dofs +
-                                     k * n_child_dofs_1d * n_child_dofs_1d +
-                                     j * n_child_dofs_1d + i + shift;
-    }
-
-    template <int dim>
-    std::vector<std::vector<unsigned int>>
-    get_child_offsets(const unsigned int n_dofs_per_cell_coarse,
-                      const unsigned int fe_shift_1d,
-                      const unsigned int fe_degree)
-    {
-      std::vector<std::vector<unsigned int>> cell_local_children_indices(
-        GeometryInfo<dim>::max_children_per_cell,
-        std::vector<unsigned int>(n_dofs_per_cell_coarse));
-      for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-           c++)
-        get_child_offset<dim>(c,
-                              fe_shift_1d,
-                              fe_degree,
-                              cell_local_children_indices[c]);
-      return cell_local_children_indices;
-    }
-
-    template <int dim>
-    std::vector<std::vector<unsigned int>>
-    get_child_offsets_general(const unsigned int n_dofs_per_cell_coarse)
-    {
-      std::vector<std::vector<unsigned int>> cell_local_children_indices(
-        GeometryInfo<dim>::max_children_per_cell,
-        std::vector<unsigned int>(n_dofs_per_cell_coarse));
-      for (unsigned int c = 0, k = 0;
-           c < GeometryInfo<dim>::max_children_per_cell;
-           c++)
-        for (unsigned int d = 0; d < n_dofs_per_cell_coarse; ++d, ++k)
-          cell_local_children_indices[c][d] = k;
-      return cell_local_children_indices;
-    }
-
-    template <int dim, int spacedim>
-    std::unique_ptr<FiniteElement<1>>
-    create_1D_fe(const FiniteElement<dim, spacedim> &fe)
-    {
-      std::string fe_name = fe.get_name();
+    if (level == numbers::invalid_unsigned_int)
       {
-        const std::size_t template_starts = fe_name.find_first_of('<');
-        Assert(fe_name[template_starts + 1] ==
-                 (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
-               ExcInternalError());
-        fe_name[template_starts + 1] = '1';
+        for (const auto &cell : tria.active_cell_iterators())
+          if (cell->is_locally_owned())
+            op(cell);
       }
-      return FETools::get_fe_by_name<1, 1>(fe_name);
-    }
+    else
+      {
+        for (const auto &cell : tria.cell_iterators_on_level(level))
+          if (cell->is_locally_owned_on_level())
+            op(cell);
+      }
+  }
 
-    template <int dim, int spacedim>
-    FullMatrix<double>
-    get_restriction_matrix(
-      const FiniteElement<dim, spacedim> &fe,
-      const unsigned int                  child,
-      RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement)
+  template <int dim>
+  unsigned int
+  compute_shift_within_children(const unsigned int child,
+                                const unsigned int fe_shift_1d,
+                                const unsigned int fe_degree)
+  {
+    // we put the degrees of freedom of all child cells in lexicographic
+    // ordering
+    unsigned int c_tensor_index[dim];
+    unsigned int tmp = child;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        c_tensor_index[d] = tmp % 2;
+        tmp /= 2;
+      }
+    const unsigned int n_child_dofs_1d = fe_degree + 1 + fe_shift_1d;
+    unsigned int       factor          = 1;
+    unsigned int       shift           = fe_shift_1d * c_tensor_index[0];
+    for (unsigned int d = 1; d < dim; ++d)
+      {
+        factor *= n_child_dofs_1d;
+        shift = shift + factor * fe_shift_1d * c_tensor_index[d];
+      }
+    return shift;
+  }
+
+  template <int dim>
+  void
+  get_child_offset(const unsigned int         child,
+                   const unsigned int         fe_shift_1d,
+                   const unsigned int         fe_degree,
+                   std::vector<unsigned int> &local_dof_indices)
+  {
+    const unsigned int n_child_dofs_1d = fe_degree + 1 + fe_shift_1d;
+    const unsigned int shift =
+      compute_shift_within_children<dim>(child, fe_shift_1d, fe_degree);
+    const unsigned int n_components =
+      local_dof_indices.size() / Utilities::fixed_power<dim>(fe_degree + 1);
+    const unsigned int n_scalar_cell_dofs =
+      Utilities::fixed_power<dim>(n_child_dofs_1d);
+    for (unsigned int c = 0, m = 0; c < n_components; ++c)
+      for (unsigned int k = 0; k < (dim > 2 ? (fe_degree + 1) : 1); ++k)
+        for (unsigned int j = 0; j < (dim > 1 ? (fe_degree + 1) : 1); ++j)
+          for (unsigned int i = 0; i < (fe_degree + 1); ++i, ++m)
+            local_dof_indices[m] = c * n_scalar_cell_dofs +
+                                   k * n_child_dofs_1d * n_child_dofs_1d +
+                                   j * n_child_dofs_1d + i + shift;
+  }
+
+  template <int dim>
+  std::vector<std::vector<unsigned int>>
+  get_child_offsets(const unsigned int n_dofs_per_cell_coarse,
+                    const unsigned int fe_shift_1d,
+                    const unsigned int fe_degree)
+  {
+    std::vector<std::vector<unsigned int>> cell_local_children_indices(
+      GeometryInfo<dim>::max_children_per_cell,
+      std::vector<unsigned int>(n_dofs_per_cell_coarse));
+    for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; c++)
+      get_child_offset<dim>(c,
+                            fe_shift_1d,
+                            fe_degree,
+                            cell_local_children_indices[c]);
+    return cell_local_children_indices;
+  }
+
+  template <int dim>
+  std::vector<std::vector<unsigned int>>
+  get_child_offsets_general(const unsigned int n_dofs_per_cell_coarse)
+  {
+    std::vector<std::vector<unsigned int>> cell_local_children_indices(
+      GeometryInfo<dim>::max_children_per_cell,
+      std::vector<unsigned int>(n_dofs_per_cell_coarse));
+    for (unsigned int c = 0, k = 0;
+         c < GeometryInfo<dim>::max_children_per_cell;
+         c++)
+      for (unsigned int d = 0; d < n_dofs_per_cell_coarse; ++d, ++k)
+        cell_local_children_indices[c][d] = k;
+    return cell_local_children_indices;
+  }
+
+  template <int dim, int spacedim>
+  std::unique_ptr<FiniteElement<1>>
+  create_1D_fe(const FiniteElement<dim, spacedim> &fe)
+  {
+    std::string fe_name = fe.get_name();
     {
-      auto matrix = fe.get_restriction_matrix(child, ref_case);
+      const std::size_t template_starts = fe_name.find_first_of('<');
+      Assert(fe_name[template_starts + 1] ==
+               (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
+             ExcInternalError());
+      fe_name[template_starts + 1] = '1';
+    }
+    return FETools::get_fe_by_name<1, 1>(fe_name);
+  }
 
-      for (unsigned int c_other = 0; c_other < child; ++c_other)
-        {
-          auto matrix_other = fe.get_restriction_matrix(c_other, ref_case);
-          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-            {
-              if (fe.restriction_is_additive(i) == true)
-                continue;
+  template <int dim, int spacedim>
+  FullMatrix<double>
+  get_restriction_matrix(
+    const FiniteElement<dim, spacedim> &fe,
+    const unsigned int                  child,
+    RefinementCase<dim> ref_case = RefinementCase<dim>::isotropic_refinement)
+  {
+    auto matrix = fe.get_restriction_matrix(child, ref_case);
 
-              bool do_zero = false;
+    for (unsigned int c_other = 0; c_other < child; ++c_other)
+      {
+        auto matrix_other = fe.get_restriction_matrix(c_other, ref_case);
+        for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+          {
+            if (fe.restriction_is_additive(i) == true)
+              continue;
+
+            bool do_zero = false;
+            for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
+              if (std::fabs(matrix_other(i, j)) > 1e-12)
+                do_zero = true;
+
+            if (do_zero)
               for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
-                if (std::fabs(matrix_other(i, j)) > 1e-12)
-                  do_zero = true;
+                matrix(i, j) = 0.0;
+          }
+      }
+    return matrix;
+  }
 
-              if (do_zero)
-                for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
-                  matrix(i, j) = 0.0;
-            }
-        }
-      return matrix;
-    }
+  template <int dim>
+  bool
+  use_fast_hanging_node_algorithm(const DoFHandler<dim> &dof_handler_coarse,
+                                  const unsigned int     mg_level_coarse)
+  {
+    // algorithm is only needed on active levels
+    bool use_fast_hanging_node_algorithm =
+      mg_level_coarse == numbers::invalid_unsigned_int;
 
-    template <int dim>
-    bool
-    use_fast_hanging_node_algorithm(const DoFHandler<dim> &dof_handler_coarse,
-                                    const unsigned int     mg_level_coarse)
-    {
-      // algorithm is only needed on active levels
-      bool use_fast_hanging_node_algorithm =
-        mg_level_coarse == numbers::invalid_unsigned_int;
+    // algorithm can be only used on meshes consisting of hypercube and
+    // simplices
+    if (use_fast_hanging_node_algorithm)
+      {
+        const auto &reference_cells =
+          dof_handler_coarse.get_triangulation().get_reference_cells();
+        use_fast_hanging_node_algorithm =
+          std::all_of(reference_cells.begin(),
+                      reference_cells.end(),
+                      [](const auto &r) {
+                        return r.is_hyper_cube() || r.is_simplex();
+                      });
+      }
 
-      // algorithm can be only used on meshes consisting of hypercube and
-      // simplices
-      if (use_fast_hanging_node_algorithm)
-        {
-          const auto &reference_cells =
-            dof_handler_coarse.get_triangulation().get_reference_cells();
-          use_fast_hanging_node_algorithm =
-            std::all_of(reference_cells.begin(),
-                        reference_cells.end(),
-                        [](const auto &r) {
-                          return r.is_hyper_cube() || r.is_simplex();
-                        });
-        }
+    // local p-refinement is not supported
+    if (use_fast_hanging_node_algorithm)
+      {
+        const auto &fes = dof_handler_coarse.get_fe_collection();
 
-      // local p-refinement is not supported
-      if (use_fast_hanging_node_algorithm)
-        {
-          const auto &fes = dof_handler_coarse.get_fe_collection();
+        use_fast_hanging_node_algorithm &=
+          std::all_of(fes.begin(), fes.end(), [&fes](const auto &fe) {
+            return fes[0].compare_for_domination(fe) ==
+                   FiniteElementDomination::Domination::
+                     either_element_can_dominate;
+          });
+      }
 
-          use_fast_hanging_node_algorithm &=
-            std::all_of(fes.begin(), fes.end(), [&fes](const auto &fe) {
-              return fes[0].compare_for_domination(fe) ==
-                     FiniteElementDomination::Domination::
-                       either_element_can_dominate;
-            });
-        }
+    // check that all components are either supported or not
+    if (use_fast_hanging_node_algorithm)
+      {
+        const std::vector<std::vector<bool>> supported_components = internal::
+          MatrixFreeFunctions::HangingNodes<dim>::compute_supported_components(
+            dof_handler_coarse.get_fe_collection());
 
-      // check that all components are either supported or not
-      if (use_fast_hanging_node_algorithm)
-        {
-          const std::vector<std::vector<bool>> supported_components =
-            internal::MatrixFreeFunctions::HangingNodes<
-              dim>::compute_supported_components(dof_handler_coarse
-                                                   .get_fe_collection());
+        use_fast_hanging_node_algorithm &=
+          std::any_of(supported_components.begin(),
+                      supported_components.end(),
+                      [](const auto &supported_components_per_fe) {
+                        return std::all_of(supported_components_per_fe.begin(),
+                                           supported_components_per_fe.end(),
+                                           [](const auto &a) {
+                                             return a == true;
+                                           });
+                      });
 
-          use_fast_hanging_node_algorithm &= std::any_of(
-            supported_components.begin(),
-            supported_components.end(),
-            [](const auto &supported_components_per_fe) {
-              return std::all_of(supported_components_per_fe.begin(),
-                                 supported_components_per_fe.end(),
-                                 [](const auto &a) { return a == true; });
-            });
+        use_fast_hanging_node_algorithm &= std::all_of(
+          supported_components.begin(),
+          supported_components.end(),
+          [](const auto &supported_components_per_fe) {
+            return std::all_of(supported_components_per_fe.begin(),
+                               supported_components_per_fe.end(),
+                               [&supported_components_per_fe](const auto &a) {
+                                 return a == supported_components_per_fe[0];
+                               });
+          });
+      }
 
-          use_fast_hanging_node_algorithm &= std::all_of(
-            supported_components.begin(),
-            supported_components.end(),
-            [](const auto &supported_components_per_fe) {
-              return std::all_of(supported_components_per_fe.begin(),
-                                 supported_components_per_fe.end(),
-                                 [&supported_components_per_fe](const auto &a) {
-                                   return a == supported_components_per_fe[0];
-                                 });
-            });
-        }
-
-      return use_fast_hanging_node_algorithm;
-    }
-
-  } // namespace
+    return use_fast_hanging_node_algorithm;
+  }
 
 
 
@@ -3034,53 +3030,48 @@ MGTwoLevelTransferBase<VectorType>::prolongate_and_add(
 
 namespace internal
 {
-  namespace
+  // Helper class to compute correct weights, which works by simply using
+  // the degrees of freedom stored in MatrixFree, bypassing the hanging node
+  // interpolation matrices.
+  template <int dim, typename Number>
+  class FEEvaluationNoConstraints : public FEEvaluation<dim, -1, 0, 1, Number>
   {
+  public:
+    FEEvaluationNoConstraints(const MatrixFree<dim, Number> &data,
+                              const unsigned int             dof_index,
+                              const unsigned int             component = 0)
+      : FEEvaluation<dim, -1, 0, 1, Number>(data, dof_index, 0, component)
+    {}
 
-    // Helper class to compute correct weights, which works by simply using
-    // the degrees of freedom stored in MatrixFree, bypassing the hanging node
-    // interpolation matrices.
-    template <int dim, typename Number>
-    class FEEvaluationNoConstraints : public FEEvaluation<dim, -1, 0, 1, Number>
+    template <typename VectorType>
+    void
+    read_dof_values_unconstrained(VectorType &src)
     {
-    public:
-      FEEvaluationNoConstraints(const MatrixFree<dim, Number> &data,
-                                const unsigned int             dof_index,
-                                const unsigned int             component = 0)
-        : FEEvaluation<dim, -1, 0, 1, Number>(data, dof_index, 0, component)
-      {}
+      std::array<VectorType *, 1> src_vector{{&src}};
+      internal::VectorReader<Number, VectorizedArray<Number>> reader;
+      this->template read_write_operation<VectorType>(
+        reader,
+        src_vector,
+        {},
+        std::bitset<VectorizedArray<Number>::size()>().flip(),
+        false);
+    }
 
-      template <typename VectorType>
-      void
-      read_dof_values_unconstrained(VectorType &src)
-      {
-        std::array<VectorType *, 1> src_vector{{&src}};
-        internal::VectorReader<Number, VectorizedArray<Number>> reader;
-        this->template read_write_operation<VectorType>(
-          reader,
-          src_vector,
-          {},
-          std::bitset<VectorizedArray<Number>::size()>().flip(),
-          false);
-      }
-
-      template <typename VectorType>
-      void
-      distribute_local_to_global_unconstrained(VectorType &dst)
-      {
-        std::array<VectorType *, 1> dst_vector{{&dst}};
-        internal::VectorDistributorLocalToGlobal<Number,
-                                                 VectorizedArray<Number>>
-          writer;
-        this->template read_write_operation<VectorType>(
-          writer,
-          dst_vector,
-          {},
-          std::bitset<VectorizedArray<Number>::size()>().flip(),
-          false);
-      }
-    };
-  } // namespace
+    template <typename VectorType>
+    void
+    distribute_local_to_global_unconstrained(VectorType &dst)
+    {
+      std::array<VectorType *, 1> dst_vector{{&dst}};
+      internal::VectorDistributorLocalToGlobal<Number, VectorizedArray<Number>>
+        writer;
+      this->template read_write_operation<VectorType>(
+        writer,
+        dst_vector,
+        {},
+        std::bitset<VectorizedArray<Number>::size()>().flip(),
+        false);
+    }
+  };
 } // namespace internal
 
 template <int dim, typename VectorType>
@@ -3106,7 +3097,7 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
                 0,
                 comp);
 
-              CellTransferFactory cell_transfer(
+              internal::CellTransferFactory cell_transfer(
                 eval_fine.get_shape_info().data[0].fe_degree,
                 eval_coarse.get_shape_info().data[0].fe_degree);
               for (unsigned int cell = range.first; cell < range.second; ++cell)
@@ -3118,10 +3109,11 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
                   eval_coarse.read_dof_values(src);
                   if (schemes[0].prolongation_matrix.empty() == false)
                     {
-                      CellProlongator<dim, double, VectorizedArrayType>
-                        cell_prolongator(schemes[0].prolongation_matrix,
-                                         eval_coarse.begin_dof_values(),
-                                         eval_fine.begin_dof_values());
+                      internal::
+                        CellProlongator<dim, double, VectorizedArrayType>
+                          cell_prolongator(schemes[0].prolongation_matrix,
+                                           eval_coarse.begin_dof_values(),
+                                           eval_fine.begin_dof_values());
 
                       if (schemes[0].prolongation_matrix.size() <
                           eval_fine.dofs_per_cell * eval_coarse.dofs_per_cell)
@@ -3187,8 +3179,8 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
           evaluation_data_fine.resize(max_n_dofs_per_cell);
           evaluation_data_coarse.resize(max_n_dofs_per_cell);
 
-          CellTransferFactory cell_transfer(scheme.degree_fine,
-                                            scheme.degree_coarse);
+          internal::CellTransferFactory cell_transfer(scheme.degree_fine,
+                                                      scheme.degree_coarse);
 
           const unsigned int n_scalar_dofs_fine =
             scheme.n_dofs_per_cell_fine / n_components;
@@ -3221,7 +3213,7 @@ MGTwoLevelTransfer<dim, VectorType>::prolongate_and_add_internal(
               if (needs_interpolation)
                 for (int c = n_components - 1; c >= 0; --c)
                   {
-                    CellProlongator<dim, double, VectorizedArrayType>
+                    internal::CellProlongator<dim, double, VectorizedArrayType>
                       cell_prolongator(scheme.prolongation_matrix,
                                        evaluation_data_coarse.begin() +
                                          c * n_scalar_dofs_coarse,
@@ -3352,7 +3344,7 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
                 0,
                 comp);
 
-              CellTransferFactory cell_transfer(
+              internal::CellTransferFactory cell_transfer(
                 eval_fine.get_shape_info().data[0].fe_degree,
                 eval_coarse.get_shape_info().data[0].fe_degree);
               for (unsigned int cell = range.first; cell < range.second; ++cell)
@@ -3383,7 +3375,7 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
 
                   if (schemes[0].prolongation_matrix.empty() == false)
                     {
-                      CellRestrictor<dim, double, VectorizedArrayType>
+                      internal::CellRestrictor<dim, double, VectorizedArrayType>
                         cell_restrictor(schemes[0].prolongation_matrix,
                                         eval_fine.begin_dof_values(),
                                         eval_coarse.begin_dof_values());
@@ -3434,8 +3426,8 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
           evaluation_data_fine.resize(max_n_dofs_per_cell);
           evaluation_data_coarse.resize(max_n_dofs_per_cell);
 
-          CellTransferFactory cell_transfer(scheme.degree_fine,
-                                            scheme.degree_coarse);
+          internal::CellTransferFactory cell_transfer(scheme.degree_fine,
+                                                      scheme.degree_coarse);
 
           const unsigned int n_scalar_dofs_fine =
             scheme.n_dofs_per_cell_fine / n_components;
@@ -3483,7 +3475,7 @@ MGTwoLevelTransfer<dim, VectorType>::restrict_and_add_internal(
               if (needs_interpolation)
                 for (int c = n_components - 1; c >= 0; --c)
                   {
-                    CellRestrictor<dim, double, VectorizedArrayType>
+                    internal::CellRestrictor<dim, double, VectorizedArrayType>
                       cell_restrictor(scheme.prolongation_matrix,
                                       evaluation_data_fine.begin() +
                                         c * n_scalar_dofs_fine,
@@ -3545,7 +3537,7 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
             0,
             comp);
 
-          CellTransferFactory cell_transfer(
+          internal::CellTransferFactory cell_transfer(
             eval_fine.get_shape_info().data[0].fe_degree,
             eval_coarse.get_shape_info().data[0].fe_degree);
           for (unsigned int cell = 0;
@@ -3560,7 +3552,7 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
 
               if (schemes[0].restriction_matrix.empty() == false)
                 {
-                  CellRestrictor<dim, double, VectorizedArrayType>
+                  internal::CellRestrictor<dim, double, VectorizedArrayType>
                     cell_restrictor(schemes[0].restriction_matrix,
                                     eval_fine.begin_dof_values(),
                                     eval_coarse.begin_dof_values());
@@ -3635,8 +3627,8 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
           evaluation_data_fine.resize(scheme.n_dofs_per_cell_fine);
           evaluation_data_coarse.resize(scheme.n_dofs_per_cell_fine);
 
-          CellTransferFactory cell_transfer(scheme.degree_fine,
-                                            scheme.degree_coarse);
+          internal::CellTransferFactory cell_transfer(scheme.degree_fine,
+                                                      scheme.degree_coarse);
 
           const unsigned int n_scalar_dofs_fine =
             scheme.n_dofs_per_cell_fine / n_components;
@@ -3666,7 +3658,7 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
               if (needs_interpolation)
                 for (int c = n_components - 1; c >= 0; --c)
                   {
-                    CellRestrictor<dim, double, VectorizedArrayType>
+                    internal::CellRestrictor<dim, double, VectorizedArrayType>
                       cell_restrictor(scheme.restriction_matrix,
                                       evaluation_data_fine.begin() +
                                         c * n_scalar_dofs_fine,
@@ -3715,53 +3707,50 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
 
 namespace internal
 {
-  namespace
+  bool
+  is_partitioner_contained(
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &external_partitioner)
   {
-    bool
-    is_partitioner_contained(
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-      const std::shared_ptr<const Utilities::MPI::Partitioner>
-        &external_partitioner)
-    {
-      // no external partitioner has been given
-      if (external_partitioner.get() == nullptr)
-        return false;
+    // no external partitioner has been given
+    if (external_partitioner.get() == nullptr)
+      return false;
 
-      // check if locally owned ranges are the same
-      if (external_partitioner->size() != partitioner->size())
-        return false;
+    // check if locally owned ranges are the same
+    if (external_partitioner->size() != partitioner->size())
+      return false;
 
-      if (external_partitioner->locally_owned_range() !=
-          partitioner->locally_owned_range())
-        return false;
+    if (external_partitioner->locally_owned_range() !=
+        partitioner->locally_owned_range())
+      return false;
 
-      const int ghosts_locally_contained =
-        ((external_partitioner->ghost_indices() &
-          partitioner->ghost_indices()) == partitioner->ghost_indices()) ?
-          1 :
-          0;
+    const int ghosts_locally_contained =
+      ((external_partitioner->ghost_indices() & partitioner->ghost_indices()) ==
+       partitioner->ghost_indices()) ?
+        1 :
+        0;
 
-      // check if ghost values are contained in external partititioner
-      return Utilities::MPI::min(ghosts_locally_contained,
-                                 partitioner->get_mpi_communicator()) == 1;
-    }
+    // check if ghost values are contained in external partititioner
+    return Utilities::MPI::min(ghosts_locally_contained,
+                               partitioner->get_mpi_communicator()) == 1;
+  }
 
-    std::shared_ptr<Utilities::MPI::Partitioner>
-    create_embedded_partitioner(
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-      const std::shared_ptr<const Utilities::MPI::Partitioner>
-        &larger_partitioner)
-    {
-      auto embedded_partitioner = std::make_shared<Utilities::MPI::Partitioner>(
-        larger_partitioner->locally_owned_range(),
-        larger_partitioner->get_mpi_communicator());
+  std::shared_ptr<Utilities::MPI::Partitioner>
+  create_embedded_partitioner(
+    const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+    const std::shared_ptr<const Utilities::MPI::Partitioner>
+      &larger_partitioner)
+  {
+    auto embedded_partitioner = std::make_shared<Utilities::MPI::Partitioner>(
+      larger_partitioner->locally_owned_range(),
+      larger_partitioner->get_mpi_communicator());
 
-      embedded_partitioner->set_ghost_indices(
-        partitioner->ghost_indices(), larger_partitioner->ghost_indices());
+    embedded_partitioner->set_ghost_indices(
+      partitioner->ghost_indices(), larger_partitioner->ghost_indices());
 
-      return embedded_partitioner;
-    }
-  } // namespace
+    return embedded_partitioner;
+  }
 } // namespace internal
 
 
@@ -4153,8 +4142,8 @@ MGTwoLevelTransfer<dim, VectorType>::fast_polynomial_transfer_supported(
   const unsigned int fe_degree_fine,
   const unsigned int fe_degree_coarse)
 {
-  CellTransferFactory cell_transfer(fe_degree_fine, fe_degree_coarse);
-  CellProlongatorTest cell_transfer_test;
+  internal::CellTransferFactory cell_transfer(fe_degree_fine, fe_degree_coarse);
+  internal::CellProlongatorTest cell_transfer_test;
 
   return cell_transfer.run(cell_transfer_test);
 }
@@ -4877,394 +4866,382 @@ MGTransferBlockMF<dim, Number>::get_matrix_free_transfer(
 
 namespace internal
 {
-  namespace
+  template <int dim, typename Number>
+  std::shared_ptr<NonMatching::MappingInfo<dim, dim, Number>>
+  fill_mapping_info(const Utilities::MPI::RemotePointEvaluation<dim> &rpe)
   {
-    template <int dim, typename Number>
-    std::shared_ptr<NonMatching::MappingInfo<dim, dim, Number>>
-    fill_mapping_info(const Utilities::MPI::RemotePointEvaluation<dim> &rpe)
-    {
-      const auto &cell_data = rpe.get_cell_data();
+    const auto &cell_data = rpe.get_cell_data();
 
-      std::vector<typename Triangulation<dim>::active_cell_iterator>
-                                           cell_iterators;
-      std::vector<std::vector<Point<dim>>> unit_points_vector;
+    std::vector<typename Triangulation<dim>::active_cell_iterator>
+                                         cell_iterators;
+    std::vector<std::vector<Point<dim>>> unit_points_vector;
 
-      for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
-        {
-          typename Triangulation<dim>::active_cell_iterator cell(
-            &rpe.get_triangulation(),
-            cell_data.cells[i].first,
-            cell_data.cells[i].second);
-
-          const ArrayView<const Point<dim>> unit_points(
-            cell_data.reference_point_values.data() +
-              cell_data.reference_point_ptrs[i],
-            cell_data.reference_point_ptrs[i + 1] -
-              cell_data.reference_point_ptrs[i]);
-
-          cell_iterators.emplace_back(cell);
-          unit_points_vector.emplace_back(unit_points.begin(),
-                                          unit_points.end());
-        }
-
-      typename NonMatching::MappingInfo<dim, dim, Number>::AdditionalData ad;
-      ad.store_cells = true;
-
-      auto mapping_info =
-        std::make_shared<NonMatching::MappingInfo<dim, dim, Number>>(
-          rpe.get_mapping(), update_values, ad);
-      mapping_info->reinit_cells(cell_iterators, unit_points_vector);
-
-      return mapping_info;
-    }
-
-    /**
-     * This function provides information which DoF index is associated with
-     * a support point.
-     *
-     * @param[in] dof_handler DoFHandler with @c FE_DGQ or @c FE_Q elements
-     * providing DoF indices which are collected at support points.
-     * @param[in] dof_handler_support_points DoFHandler with one component used
-     * to determine support point indices (the underlying finite element is @c
-     * FE_Q or @c FE_DGQ in case of polynomial degree 0).
-     * @param[in] constraint AffineConstrains associated with @p dof_handler.
-     *   Only unconstrained DoFs are considered
-     * @return a tuple containing 0) local support point indices,
-     *   1) pointers to global DoF indices, and 2) global DoF indices.
-     */
-    template <int dim, int spacedim, typename Number>
-    std::tuple<std::vector<unsigned int>,
-               std::vector<unsigned int>,
-               std::vector<types::global_dof_index>>
-    support_point_indices_to_dof_indices(
-      const DoFHandler<dim, spacedim>         &dof_handler,
-      const DoFHandler<dim, spacedim>         &dof_handler_support_points,
-      const dealii::AffineConstraints<Number> &constraint)
-    {
-      // in case a FE_DGQ space of order 0 is provided, DoFs indices are always
-      // uniquely assigned to support points (they are always defined in the
-      // center of the element) and are never shared at vertices or faces.
-      Assert((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
-                &dof_handler.get_fe().base_element(0)) != nullptr) ||
-               (dynamic_cast<const FE_Q<dim, spacedim> *>(
-                  &dof_handler.get_fe().base_element(0)) != nullptr) ||
-               (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
-                  &dof_handler.get_fe().base_element(0)) != nullptr) ||
-               (dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
-                  &dof_handler.get_fe().base_element(0)) != nullptr),
-             ExcMessage("Function expects FE_DGQ, FE_Q, FE_SimplexP, or "
-                        "FE_SimplexDGP in dof_handler."));
-
-      Assert(
-        (dynamic_cast<const FE_Q<dim, spacedim> *>(
-           &dof_handler_support_points.get_fe().base_element(0)) != nullptr ||
-         dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
-           &dof_handler_support_points.get_fe().base_element(0)) != nullptr) ||
-          ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
-              &dof_handler_support_points.get_fe().base_element(0)) !=
-              nullptr ||
-            dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
-              &dof_handler_support_points.get_fe().base_element(0)) !=
-              nullptr) &&
-           dof_handler_support_points.get_fe().degree == 0),
-        ExcMessage("Function expects (FE_DGQ||FE_SimplexDGP)&&degree==0 or "
-                   "(FE_Q||FE_SimplexP) in dof_handler_support_points."));
-
-      Assert(
-        dof_handler_support_points.get_fe().n_components() == 1,
-        ExcMessage(
-          "dof_handler_support_points needs element with exactly one component."));
-
-      Assert(&dof_handler.get_triangulation() ==
-               &dof_handler_support_points.get_triangulation(),
-             ExcMessage("DoFHandlers need the same underlying triangulation."));
-
-      Assert(dof_handler.get_fe().degree ==
-               dof_handler_support_points.get_fe().degree,
-             ExcMessage("DoFHandlers need the same degree."));
-
-      Assert(dof_handler.get_fe().is_primitive(),
-             ExcMessage("Only primitive elements are allowed."));
-
-      const auto degree        = dof_handler.get_fe().degree;
-      const auto dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
-      const auto support_points_per_cell =
-        dof_handler_support_points.get_fe().n_dofs_per_cell();
-
-      std::vector<std::pair<unsigned int, types::global_dof_index>>
-        support_point_dofs;
-      support_point_dofs.reserve(dof_handler.n_locally_owned_dofs());
-
-      const unsigned int n_components = dof_handler.get_fe().n_components();
-
-      // fill support_point_dofs
+    for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
       {
-        // Support points have a hierarchic numbering, L2 DoFs have
-        // lexicographic numbering. Therefore, we need to convert the DoF
-        // indices if DoFHandler is L2 conforming and has degree > 0.
-        const bool needs_conversion =
-          dof_handler.get_fe().conforming_space ==
-            FiniteElementData<dim>::Conformity::L2 &&
-          (dof_handler.get_fe().degree > 0) &&
-          dof_handler.get_fe().reference_cell().is_hyper_cube();
-        std::vector<unsigned int> lexicographic_to_hierarchic;
-        if (needs_conversion)
-          lexicographic_to_hierarchic =
-            FETools::lexicographic_to_hierarchic_numbering<dim>(degree);
+        typename Triangulation<dim>::active_cell_iterator cell(
+          &rpe.get_triangulation(),
+          cell_data.cells[i].first,
+          cell_data.cells[i].second);
 
-        const Utilities::MPI::Partitioner partitioner_support_points(
-          dof_handler_support_points.locally_owned_dofs(),
-          dof_handler_support_points.get_mpi_communicator());
+        const ArrayView<const Point<dim>> unit_points(
+          cell_data.reference_point_values.data() +
+            cell_data.reference_point_ptrs[i],
+          cell_data.reference_point_ptrs[i + 1] -
+            cell_data.reference_point_ptrs[i]);
 
-        const Utilities::MPI::Partitioner partitioner_dof(
-          dof_handler.locally_owned_dofs(),
-          DoFTools::extract_locally_relevant_dofs(dof_handler),
-          dof_handler.get_mpi_communicator());
-
-        std::vector<bool> dof_processed(partitioner_dof.locally_owned_size() +
-                                          partitioner_dof.n_ghost_indices(),
-                                        false);
-
-
-        std::vector<types::global_dof_index> support_point_indices(
-          support_points_per_cell);
-        std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
-        std::vector<std::pair<unsigned int, types::global_dof_index>>
-          support_point_dofs_comp;
-        support_point_dofs_comp.reserve(n_components);
-
-        for (const auto &cell : dof_handler.active_cell_iterators())
-          {
-            if (cell->is_locally_owned() || cell->is_ghost())
-              {
-                const auto cell_support_point =
-                  cell->as_dof_handler_iterator(dof_handler_support_points);
-
-                cell_support_point->get_dof_indices(support_point_indices);
-                cell->get_dof_indices(dof_indices);
-
-                // collect unconstrained DoFs for support point. In case of DG
-                // elements with polynomial degree > 0 or continuous elements
-                // with multiple components, more DoFs are associated to the
-                // same support point.
-                for (unsigned int i = 0; i < support_point_indices.size(); ++i)
-                  if (partitioner_support_points.in_local_range(
-                        support_point_indices[i]))
-                    {
-                      for (unsigned int c = 0; c < n_components; ++c)
-                        {
-                          const auto global_dof_idx =
-                            needs_conversion ?
-                              dof_indices
-                                [dof_handler.get_fe().component_to_system_index(
-                                  c, lexicographic_to_hierarchic[i])] :
-                              dof_indices[dof_handler.get_fe()
-                                            .component_to_system_index(c, i)];
-
-                          const auto local_dof_idx =
-                            partitioner_dof.global_to_local(global_dof_idx);
-
-                          AssertIndexRange(local_dof_idx, dof_processed.size());
-
-                          if (dof_processed[local_dof_idx] == false)
-                            {
-                              if (!constraint.is_constrained(global_dof_idx))
-                                support_point_dofs_comp.emplace_back(
-                                  partitioner_support_points.global_to_local(
-                                    support_point_indices[i]),
-                                  global_dof_idx);
-
-                              dof_processed[local_dof_idx] = true;
-                            }
-                        }
-
-                      Assert(support_point_dofs_comp.size() == 0 ||
-                               support_point_dofs_comp.size() == n_components,
-                             ExcNotImplemented());
-
-                      if (support_point_dofs_comp.empty() == false)
-                        support_point_dofs.insert(
-                          support_point_dofs.end(),
-                          support_point_dofs_comp.begin(),
-                          support_point_dofs_comp.end());
-
-                      support_point_dofs_comp.clear();
-                    }
-              }
-          }
+        cell_iterators.emplace_back(cell);
+        unit_points_vector.emplace_back(unit_points.begin(), unit_points.end());
       }
 
-      // sort for support points (stable sort needed for multiple components)
-      std::stable_sort(support_point_dofs.begin(),
-                       support_point_dofs.end(),
-                       [](const auto &a, const auto &b) {
-                         return a.first < b.first;
-                       });
+    typename NonMatching::MappingInfo<dim, dim, Number>::AdditionalData ad;
+    ad.store_cells = true;
 
-      // convert to CRS format
-      std::vector<types::global_dof_index> dof_indices;
-      dof_indices.reserve(support_point_dofs.size());
-      std::vector<unsigned int> dof_ptrs;
-      dof_ptrs.reserve(dof_handler_support_points.n_locally_owned_dofs() + 1);
-      dof_ptrs.push_back(0);
-      std::vector<unsigned int> support_point_indices;
-      support_point_indices.reserve(
-        dof_handler_support_points.n_locally_owned_dofs());
+    auto mapping_info =
+      std::make_shared<NonMatching::MappingInfo<dim, dim, Number>>(
+        rpe.get_mapping(), update_values, ad);
+    mapping_info->reinit_cells(cell_iterators, unit_points_vector);
 
-      auto it = support_point_dofs.begin();
-      while (it != support_point_dofs.end())
+    return mapping_info;
+  }
+
+  /**
+   * This function provides information which DoF index is associated with
+   * a support point.
+   *
+   * @param[in] dof_handler DoFHandler with @c FE_DGQ or @c FE_Q elements
+   * providing DoF indices which are collected at support points.
+   * @param[in] dof_handler_support_points DoFHandler with one component used
+   * to determine support point indices (the underlying finite element is @c
+   * FE_Q or @c FE_DGQ in case of polynomial degree 0).
+   * @param[in] constraint AffineConstrains associated with @p dof_handler.
+   *   Only unconstrained DoFs are considered
+   * @return a tuple containing 0) local support point indices,
+   *   1) pointers to global DoF indices, and 2) global DoF indices.
+   */
+  template <int dim, int spacedim, typename Number>
+  std::tuple<std::vector<unsigned int>,
+             std::vector<unsigned int>,
+             std::vector<types::global_dof_index>>
+  support_point_indices_to_dof_indices(
+    const DoFHandler<dim, spacedim>         &dof_handler,
+    const DoFHandler<dim, spacedim>         &dof_handler_support_points,
+    const dealii::AffineConstraints<Number> &constraint)
+  {
+    // in case a FE_DGQ space of order 0 is provided, DoFs indices are always
+    // uniquely assigned to support points (they are always defined in the
+    // center of the element) and are never shared at vertices or faces.
+    Assert((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
+              &dof_handler.get_fe().base_element(0)) != nullptr) ||
+             (dynamic_cast<const FE_Q<dim, spacedim> *>(
+                &dof_handler.get_fe().base_element(0)) != nullptr) ||
+             (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
+                &dof_handler.get_fe().base_element(0)) != nullptr) ||
+             (dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
+                &dof_handler.get_fe().base_element(0)) != nullptr),
+           ExcMessage("Function expects FE_DGQ, FE_Q, FE_SimplexP, or "
+                      "FE_SimplexDGP in dof_handler."));
+
+    Assert(
+      (dynamic_cast<const FE_Q<dim, spacedim> *>(
+         &dof_handler_support_points.get_fe().base_element(0)) != nullptr ||
+       dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
+         &dof_handler_support_points.get_fe().base_element(0)) != nullptr) ||
+        ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
+            &dof_handler_support_points.get_fe().base_element(0)) != nullptr ||
+          dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
+            &dof_handler_support_points.get_fe().base_element(0)) != nullptr) &&
+         dof_handler_support_points.get_fe().degree == 0),
+      ExcMessage("Function expects (FE_DGQ||FE_SimplexDGP)&&degree==0 or "
+                 "(FE_Q||FE_SimplexP) in dof_handler_support_points."));
+
+    Assert(
+      dof_handler_support_points.get_fe().n_components() == 1,
+      ExcMessage(
+        "dof_handler_support_points needs element with exactly one component."));
+
+    Assert(&dof_handler.get_triangulation() ==
+             &dof_handler_support_points.get_triangulation(),
+           ExcMessage("DoFHandlers need the same underlying triangulation."));
+
+    Assert(dof_handler.get_fe().degree ==
+             dof_handler_support_points.get_fe().degree,
+           ExcMessage("DoFHandlers need the same degree."));
+
+    Assert(dof_handler.get_fe().is_primitive(),
+           ExcMessage("Only primitive elements are allowed."));
+
+    const auto degree        = dof_handler.get_fe().degree;
+    const auto dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
+    const auto support_points_per_cell =
+      dof_handler_support_points.get_fe().n_dofs_per_cell();
+
+    std::vector<std::pair<unsigned int, types::global_dof_index>>
+      support_point_dofs;
+    support_point_dofs.reserve(dof_handler.n_locally_owned_dofs());
+
+    const unsigned int n_components = dof_handler.get_fe().n_components();
+
+    // fill support_point_dofs
+    {
+      // Support points have a hierarchic numbering, L2 DoFs have
+      // lexicographic numbering. Therefore, we need to convert the DoF
+      // indices if DoFHandler is L2 conforming and has degree > 0.
+      const bool needs_conversion =
+        dof_handler.get_fe().conforming_space ==
+          FiniteElementData<dim>::Conformity::L2 &&
+        (dof_handler.get_fe().degree > 0) &&
+        dof_handler.get_fe().reference_cell().is_hyper_cube();
+      std::vector<unsigned int> lexicographic_to_hierarchic;
+      if (needs_conversion)
+        lexicographic_to_hierarchic =
+          FETools::lexicographic_to_hierarchic_numbering<dim>(degree);
+
+      const Utilities::MPI::Partitioner partitioner_support_points(
+        dof_handler_support_points.locally_owned_dofs(),
+        dof_handler_support_points.get_mpi_communicator());
+
+      const Utilities::MPI::Partitioner partitioner_dof(
+        dof_handler.locally_owned_dofs(),
+        DoFTools::extract_locally_relevant_dofs(dof_handler),
+        dof_handler.get_mpi_communicator());
+
+      std::vector<bool> dof_processed(partitioner_dof.locally_owned_size() +
+                                        partitioner_dof.n_ghost_indices(),
+                                      false);
+
+
+      std::vector<types::global_dof_index> support_point_indices(
+        support_points_per_cell);
+      std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
+      std::vector<std::pair<unsigned int, types::global_dof_index>>
+        support_point_dofs_comp;
+      support_point_dofs_comp.reserve(n_components);
+
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
-          const unsigned int index = std::get<0>(*it);
-          while (it != support_point_dofs.end() && it->first == index)
+          if (cell->is_locally_owned() || cell->is_ghost())
             {
-              dof_indices.push_back(it->second);
-              ++it;
-            }
-          support_point_indices.push_back(index);
-          dof_ptrs.push_back(dof_indices.size() / n_components);
-        }
+              const auto cell_support_point =
+                cell->as_dof_handler_iterator(dof_handler_support_points);
 
-      return std::make_tuple(std::move(support_point_indices),
-                             std::move(dof_ptrs),
-                             std::move(dof_indices));
-    }
+              cell_support_point->get_dof_indices(support_point_indices);
+              cell->get_dof_indices(dof_indices);
 
-
-    /**
-     * Create DoFHandler with unique support points.
-     */
-    template <int dim, int spacedim>
-    std::shared_ptr<const DoFHandler<dim, spacedim>>
-    create_support_point_dof_handler(
-      const DoFHandler<dim, spacedim> &dof_handler)
-    {
-      const auto &fe           = dof_handler.get_fe();
-      const auto &tria         = dof_handler.get_triangulation();
-      const auto  degree       = fe.degree;
-      const auto  n_components = fe.n_components();
-
-      if (n_components == 1 &&
-          ((fe.reference_cell().is_hyper_cube() ||
-            fe.reference_cell().is_simplex()) &&
-           (fe.conforming_space == FiniteElementData<dim>::Conformity::H1 ||
-            degree == 0)))
-        {
-          // in case a DG space of order 0 is provided, DoFs indices are always
-          // uniquely assigned to support points (they are always defined in the
-          // center of the element) and are never shared at vertices or faces.
-          return std::shared_ptr<const DoFHandler<dim, spacedim>>(&dof_handler,
-                                                                  [](auto *) {
-                                                                  });
-        }
-      else
-        {
-          // Create dummy dof handler for support point numbering.
-          // Unique support points are generally numbered according to FE_Q with
-          // n_components==1. If degree==0 we use FE_DGQ which ensures a unique
-          // support point numbering since the support point is located in the
-          // center of the cell.
-          auto dof_handler_support_points =
-            std::make_shared<DoFHandler<dim, spacedim>>(tria);
-
-          if (fe.reference_cell().is_simplex() && (degree == 0))
-            dof_handler_support_points->distribute_dofs(
-              FE_SimplexDGP<dim, spacedim>(degree));
-          else if (fe.reference_cell().is_simplex())
-            dof_handler_support_points->distribute_dofs(
-              FE_SimplexP<dim, spacedim>(degree));
-          else if (degree == 0)
-            dof_handler_support_points->distribute_dofs(
-              FE_DGQ<dim, spacedim>(degree));
-          else
-            dof_handler_support_points->distribute_dofs(
-              FE_Q<dim, spacedim>(degree));
-
-          return dof_handler_support_points;
-        }
-    }
-
-    // Loop over cells and collect unique set of points
-    template <int dim, typename Number>
-    std::tuple<std::vector<Point<dim>>,
-               std::vector<unsigned int>,
-               std::vector<types::global_dof_index>>
-    collect_unconstrained_unique_support_points(
-      const DoFHandler<dim>                   &dof_handler,
-      const Mapping<dim>                      &mapping,
-      const dealii::AffineConstraints<Number> &constraint)
-    {
-      AssertThrow(dof_handler.get_fe().has_support_points(),
-                  ExcNotImplemented());
-
-      // create DoFHandler for support points
-      const auto dof_handler_support_points =
-        create_support_point_dof_handler(dof_handler);
-
-      // compute mapping: index of locally owned support points to (global) DoF
-      // indices
-      const auto support_point_dofs_crs =
-        support_point_indices_to_dof_indices(dof_handler,
-                                             *dof_handler_support_points,
-                                             constraint);
-
-      const std::vector<unsigned int> &local_support_point_indices =
-        std::get<0>(support_point_dofs_crs);
-
-      // compute locally owned support points
-      std::vector<Point<dim>> points;
-      points.resize(local_support_point_indices.size());
-
-      const auto locally_owned_support_point =
-        dof_handler_support_points->locally_owned_dofs();
-      std::vector<unsigned int> indices_state(
-        locally_owned_support_point.n_elements(),
-        numbers::invalid_unsigned_int);
-
-      AssertIndexRange(local_support_point_indices.size(),
-                       indices_state.size() + 1);
-
-      for (unsigned int i = 0; i < local_support_point_indices.size(); ++i)
-        indices_state[local_support_point_indices[i]] = i;
-
-      const auto   &fe_support_point = dof_handler_support_points->get_fe();
-      FEValues<dim> fe_values(mapping,
-                              fe_support_point,
-                              Quadrature<dim>(
-                                fe_support_point.get_unit_support_points()),
-                              update_quadrature_points);
-
-      std::vector<types::global_dof_index> dof_indices(
-        fe_support_point.n_dofs_per_cell());
-
-      for (const auto &cell :
-           dof_handler_support_points->active_cell_iterators() |
-             IteratorFilters::LocallyOwnedCell())
-        {
-          fe_values.reinit(cell);
-          cell->get_dof_indices(dof_indices);
-
-          for (const unsigned int q : fe_values.quadrature_point_indices())
-            if (locally_owned_support_point.is_element(dof_indices[q]))
-              {
-                const auto index =
-                  locally_owned_support_point.index_within_set(dof_indices[q]);
-
-                if (indices_state[index] != numbers::invalid_unsigned_int)
+              // collect unconstrained DoFs for support point. In case of DG
+              // elements with polynomial degree > 0 or continuous elements
+              // with multiple components, more DoFs are associated to the
+              // same support point.
+              for (unsigned int i = 0; i < support_point_indices.size(); ++i)
+                if (partitioner_support_points.in_local_range(
+                      support_point_indices[i]))
                   {
-                    points[indices_state[index]] =
-                      fe_values.quadrature_point(q);
-                    indices_state[index] = numbers::invalid_unsigned_int;
-                  }
-              }
-        }
+                    for (unsigned int c = 0; c < n_components; ++c)
+                      {
+                        const auto global_dof_idx =
+                          needs_conversion ?
+                            dof_indices
+                              [dof_handler.get_fe().component_to_system_index(
+                                c, lexicographic_to_hierarchic[i])] :
+                            dof_indices[dof_handler.get_fe()
+                                          .component_to_system_index(c, i)];
 
-      return std::make_tuple(
-        std::move(points),
-        std::move(std::get<1>(support_point_dofs_crs)),  // global_dofs_ptrs
-        std::move(std::get<2>(support_point_dofs_crs))); // global_dofs_indices
+                        const auto local_dof_idx =
+                          partitioner_dof.global_to_local(global_dof_idx);
+
+                        AssertIndexRange(local_dof_idx, dof_processed.size());
+
+                        if (dof_processed[local_dof_idx] == false)
+                          {
+                            if (!constraint.is_constrained(global_dof_idx))
+                              support_point_dofs_comp.emplace_back(
+                                partitioner_support_points.global_to_local(
+                                  support_point_indices[i]),
+                                global_dof_idx);
+
+                            dof_processed[local_dof_idx] = true;
+                          }
+                      }
+
+                    Assert(support_point_dofs_comp.size() == 0 ||
+                             support_point_dofs_comp.size() == n_components,
+                           ExcNotImplemented());
+
+                    if (support_point_dofs_comp.empty() == false)
+                      support_point_dofs.insert(support_point_dofs.end(),
+                                                support_point_dofs_comp.begin(),
+                                                support_point_dofs_comp.end());
+
+                    support_point_dofs_comp.clear();
+                  }
+            }
+        }
     }
 
-  } // namespace
+    // sort for support points (stable sort needed for multiple components)
+    std::stable_sort(support_point_dofs.begin(),
+                     support_point_dofs.end(),
+                     [](const auto &a, const auto &b) {
+                       return a.first < b.first;
+                     });
+
+    // convert to CRS format
+    std::vector<types::global_dof_index> dof_indices;
+    dof_indices.reserve(support_point_dofs.size());
+    std::vector<unsigned int> dof_ptrs;
+    dof_ptrs.reserve(dof_handler_support_points.n_locally_owned_dofs() + 1);
+    dof_ptrs.push_back(0);
+    std::vector<unsigned int> support_point_indices;
+    support_point_indices.reserve(
+      dof_handler_support_points.n_locally_owned_dofs());
+
+    auto it = support_point_dofs.begin();
+    while (it != support_point_dofs.end())
+      {
+        const unsigned int index = std::get<0>(*it);
+        while (it != support_point_dofs.end() && it->first == index)
+          {
+            dof_indices.push_back(it->second);
+            ++it;
+          }
+        support_point_indices.push_back(index);
+        dof_ptrs.push_back(dof_indices.size() / n_components);
+      }
+
+    return std::make_tuple(std::move(support_point_indices),
+                           std::move(dof_ptrs),
+                           std::move(dof_indices));
+  }
+
+
+  /**
+   * Create DoFHandler with unique support points.
+   */
+  template <int dim, int spacedim>
+  std::shared_ptr<const DoFHandler<dim, spacedim>>
+  create_support_point_dof_handler(const DoFHandler<dim, spacedim> &dof_handler)
+  {
+    const auto &fe           = dof_handler.get_fe();
+    const auto &tria         = dof_handler.get_triangulation();
+    const auto  degree       = fe.degree;
+    const auto  n_components = fe.n_components();
+
+    if (n_components == 1 &&
+        ((fe.reference_cell().is_hyper_cube() ||
+          fe.reference_cell().is_simplex()) &&
+         (fe.conforming_space == FiniteElementData<dim>::Conformity::H1 ||
+          degree == 0)))
+      {
+        // in case a DG space of order 0 is provided, DoFs indices are always
+        // uniquely assigned to support points (they are always defined in the
+        // center of the element) and are never shared at vertices or faces.
+        return std::shared_ptr<const DoFHandler<dim, spacedim>>(&dof_handler,
+                                                                [](auto *) {});
+      }
+    else
+      {
+        // Create dummy dof handler for support point numbering.
+        // Unique support points are generally numbered according to FE_Q with
+        // n_components==1. If degree==0 we use FE_DGQ which ensures a unique
+        // support point numbering since the support point is located in the
+        // center of the cell.
+        auto dof_handler_support_points =
+          std::make_shared<DoFHandler<dim, spacedim>>(tria);
+
+        if (fe.reference_cell().is_simplex() && (degree == 0))
+          dof_handler_support_points->distribute_dofs(
+            FE_SimplexDGP<dim, spacedim>(degree));
+        else if (fe.reference_cell().is_simplex())
+          dof_handler_support_points->distribute_dofs(
+            FE_SimplexP<dim, spacedim>(degree));
+        else if (degree == 0)
+          dof_handler_support_points->distribute_dofs(
+            FE_DGQ<dim, spacedim>(degree));
+        else
+          dof_handler_support_points->distribute_dofs(
+            FE_Q<dim, spacedim>(degree));
+
+        return dof_handler_support_points;
+      }
+  }
+
+  // Loop over cells and collect unique set of points
+  template <int dim, typename Number>
+  std::tuple<std::vector<Point<dim>>,
+             std::vector<unsigned int>,
+             std::vector<types::global_dof_index>>
+  collect_unconstrained_unique_support_points(
+    const DoFHandler<dim>                   &dof_handler,
+    const Mapping<dim>                      &mapping,
+    const dealii::AffineConstraints<Number> &constraint)
+  {
+    AssertThrow(dof_handler.get_fe().has_support_points(), ExcNotImplemented());
+
+    // create DoFHandler for support points
+    const auto dof_handler_support_points =
+      create_support_point_dof_handler(dof_handler);
+
+    // compute mapping: index of locally owned support points to (global) DoF
+    // indices
+    const auto support_point_dofs_crs =
+      support_point_indices_to_dof_indices(dof_handler,
+                                           *dof_handler_support_points,
+                                           constraint);
+
+    const std::vector<unsigned int> &local_support_point_indices =
+      std::get<0>(support_point_dofs_crs);
+
+    // compute locally owned support points
+    std::vector<Point<dim>> points;
+    points.resize(local_support_point_indices.size());
+
+    const auto locally_owned_support_point =
+      dof_handler_support_points->locally_owned_dofs();
+    std::vector<unsigned int> indices_state(
+      locally_owned_support_point.n_elements(), numbers::invalid_unsigned_int);
+
+    AssertIndexRange(local_support_point_indices.size(),
+                     indices_state.size() + 1);
+
+    for (unsigned int i = 0; i < local_support_point_indices.size(); ++i)
+      indices_state[local_support_point_indices[i]] = i;
+
+    const auto   &fe_support_point = dof_handler_support_points->get_fe();
+    FEValues<dim> fe_values(mapping,
+                            fe_support_point,
+                            Quadrature<dim>(
+                              fe_support_point.get_unit_support_points()),
+                            update_quadrature_points);
+
+    std::vector<types::global_dof_index> dof_indices(
+      fe_support_point.n_dofs_per_cell());
+
+    for (const auto &cell :
+         dof_handler_support_points->active_cell_iterators() |
+           IteratorFilters::LocallyOwnedCell())
+      {
+        fe_values.reinit(cell);
+        cell->get_dof_indices(dof_indices);
+
+        for (const unsigned int q : fe_values.quadrature_point_indices())
+          if (locally_owned_support_point.is_element(dof_indices[q]))
+            {
+              const auto index =
+                locally_owned_support_point.index_within_set(dof_indices[q]);
+
+              if (indices_state[index] != numbers::invalid_unsigned_int)
+                {
+                  points[indices_state[index]] = fe_values.quadrature_point(q);
+                  indices_state[index]         = numbers::invalid_unsigned_int;
+                }
+            }
+      }
+
+    return std::make_tuple(
+      std::move(points),
+      std::move(std::get<1>(support_point_dofs_crs)),  // global_dofs_ptrs
+      std::move(std::get<2>(support_point_dofs_crs))); // global_dofs_indices
+  }
+
 } // namespace internal
 
 
