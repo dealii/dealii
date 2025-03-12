@@ -24,6 +24,8 @@
 #include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/portable_tensor_product_kernels.h>
 
+#include <Kokkos_View.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 

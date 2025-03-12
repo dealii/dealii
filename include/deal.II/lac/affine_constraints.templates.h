@@ -57,6 +57,8 @@
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/utility.hpp>
 
+#include <Kokkos_View.hpp>
+
 #include <algorithm>
 #include <complex>
 #include <iomanip>
