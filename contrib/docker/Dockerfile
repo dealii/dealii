@@ -1,11 +1,10 @@
-ARG IMG=focal    # Ubuntu image that contains all corresponding dependencies.
+ARG IMG=noble    # Ubuntu image that contains all corresponding dependencies.
 
 FROM dealii/dependencies:$IMG
 
 ARG NJOBS=0      # Jobs used for building. Default: Use all available jobs.
 ARG VER=master   # deal.II branch that gets checked out.
-
-LABEL maintainer="luca.heltai@gmail.com"
+ARG FLAGS=""     # Additional flags for the build.
 
 USER root
 
@@ -18,7 +17,7 @@ RUN cd /usr/src && \
     -DCMAKE_PREFIX_PATH="/usr/lib/x86_64-linux-gnu/hdf5/openmpi;/usr/include/hdf5/openmpi" \
     -DDEAL_II_ALLOW_AUTODETECTION=OFF \
     -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON \
-    -DCMAKE_CXX_FLAGS="-std=c++17" \
+    -DCMAKE_CXX_FLAGS="-std=c++20 $FLAGS" \
     -DDEAL_II_WITH_64BIT_INDICES=OFF \
     -DDEAL_II_WITH_ADOLC=ON \
     -DDEAL_II_WITH_ARBORX=OFF \
