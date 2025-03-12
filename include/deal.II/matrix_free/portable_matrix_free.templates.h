@@ -670,7 +670,7 @@ namespace Portable
 
 
 
-  namespace
+  namespace internal
   {
     /**
      * Helper function for determining the scratch pad size.
@@ -709,7 +709,7 @@ namespace Portable
 
       return numbers::invalid_unsigned_int;
     }
-  } // namespace
+  } // namespace internal
 
 
 
@@ -763,10 +763,8 @@ namespace Portable
                                                                           fe);
 
     this->element_type     = shape_info.element_type;
-    this->scratch_pad_size = compute_scratch_pad_size(shape_info.element_type,
-                                                      dim,
-                                                      fe_degree,
-                                                      n_q_points_1d);
+    this->scratch_pad_size = internal::compute_scratch_pad_size(
+      shape_info.element_type, dim, fe_degree, n_q_points_1d);
 
     unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
