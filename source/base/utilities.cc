@@ -24,6 +24,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
@@ -43,7 +44,6 @@
 #include <algorithm>
 #include <bitset>
 #include <cctype>
-#include <cerrno>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
@@ -604,27 +604,28 @@ namespace Utilities
     while ((s.size() > 0) && (s.back() == ' '))
       s.erase(s.end() - 1);
 
-    // Now convert and see whether we succeed. Note that strtol only
-    // touches errno if an error occurred, so if we want to check
-    // whether an error happened, we need to make sure that errno==0
-    // before calling strtol since otherwise it may be that the
-    // conversion succeeds and that errno remains at the value it
-    // was before, whatever that was.
-    char *p;
-    errno       = 0;
-    const int i = std::strtol(s.c_str(), &p, 10);
+    // Now convert and see whether we succeed:
+    std::size_t pos;
+    int         i = std::numeric_limits<int>::max();
+    try
+      {
+        i = std::stoi(s, &pos);
 
-    // We have an error if one of the following conditions is true:
-    // - strtol sets errno != 0
-    // - The original string was empty (we could have checked that
-    //   earlier already)
-    // - The string has non-zero length and strtol converted the
-    //   first part to something useful, but stopped converting short
-    //   of the terminating '\0' character. This happens, for example,
-    //   if the given string is "1234 abc".
-    AssertThrow(!((errno != 0) || (s.empty()) ||
-                  ((s.size() > 0) && (*p != '\0'))),
-                ExcMessage("Can't convert <" + s + "> to an integer."));
+        // If we got here, std::stod() has succeeded (rather than throwing an
+        // exception) but it is entirely possible that it only succeeded
+        // in reading a number from the first part of the string. In that
+        // case, it will have set 'pos' to a number of characters
+        // processed that is less than the length of the string. If that is
+        // the case, throw an (arbitrary) exception that gets us into the
+        // 'catch' clause below so that we can issue a proper exception:
+        if (pos < s.size())
+          throw 1;
+      }
+    catch (...)
+      {
+        AssertThrow(false,
+                    ExcMessage("Can't convert <" + s + "> to a double."));
+      }
 
     return i;
   }
@@ -652,27 +653,28 @@ namespace Utilities
     while ((s.size() > 0) && (s.back() == ' '))
       s.erase(s.end() - 1);
 
-    // Now convert and see whether we succeed. Note that strtol only
-    // touches errno if an error occurred, so if we want to check
-    // whether an error happened, we need to make sure that errno==0
-    // before calling strtol since otherwise it may be that the
-    // conversion succeeds and that errno remains at the value it
-    // was before, whatever that was.
-    char *p;
-    errno          = 0;
-    const double d = std::strtod(s.c_str(), &p);
+    // Now convert and see whether we succeed:
+    std::size_t pos;
+    double      d = numbers::signaling_nan<double>();
+    try
+      {
+        d = std::stod(s, &pos);
 
-    // We have an error if one of the following conditions is true:
-    // - strtod sets errno != 0
-    // - The original string was empty (we could have checked that
-    //   earlier already)
-    // - The string has non-zero length and strtod converted the
-    //   first part to something useful, but stopped converting short
-    //   of the terminating '\0' character. This happens, for example,
-    //   if the given string is "1.234 abc".
-    AssertThrow(!((errno != 0) || (s.empty()) ||
-                  ((s.size() > 0) && (*p != '\0'))),
-                ExcMessage("Can't convert <" + s + "> to a double."));
+        // If we got here, std::stod() has succeeded (rather than throwing an
+        // exception) but it is entirely possible that it only succeeded
+        // in reading a number from the first part of the string. In that
+        // case, it will have set 'pos' to a number of characters
+        // processed that is less than the length of the string. If that is
+        // the case, throw an (arbitrary) exception that gets us into the
+        // 'catch' clause below so that we can issue a proper exception:
+        if (pos < s.size())
+          throw 1;
+      }
+    catch (...)
+      {
+        AssertThrow(false,
+                    ExcMessage("Can't convert <" + s + "> to a double."));
+      }
 
     return d;
   }
