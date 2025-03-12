@@ -33,9 +33,10 @@ jobs:
             os: ubuntu-24.04
           - platform: arm64
             os: ubuntu-24.04-arm
-          # Use only 2 jobs to build, as more jobs
-          # would starve the github machine for memory.
-          - n_jobs: 2
+          # Use all available processors to build.
+          # Specify the number of jobs explicitly since the default '0'
+          # causes the github workers to disconnect (potential crash).
+          - n_jobs: 4
 
     steps:
       - name: Docker meta
