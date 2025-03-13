@@ -55,6 +55,7 @@
 #endif
 
 #ifndef DEAL_II_MSVC
+// On Unix-type systems, we use posix_memalign:
 #  include <cstdlib>
 #endif
 
@@ -63,11 +64,6 @@
 // and we'll get a conflict between winsock.h and winsock2.h otherwise.
 #ifdef DEAL_II_MSVC
 #  include <winsock2.h>
-#endif
-
-#ifndef DEAL_II_MSVC
-// On Unix-type systems, we use posix-memalign:
-#  include <mm_malloc.h>
 #endif
 
 
