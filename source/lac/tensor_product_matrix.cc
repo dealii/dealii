@@ -14,6 +14,9 @@
 
 #include <deal.II/lac/tensor_product_matrix.templates.h>
 
+#include <array>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
