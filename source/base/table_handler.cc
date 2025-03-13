@@ -12,6 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_handler.h>
 
 #include <boost/io/ios_state.hpp>
@@ -20,6 +21,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <variant>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -751,13 +753,16 @@ TableHandler::n_rows() const
   std::map<std::string, Column>::const_iterator col_iter = columns.begin();
   unsigned int n = col_iter->second.entries.size();
 
-#ifdef DEBUG
-  std::string first_name = col_iter->first;
-  for (++col_iter; col_iter != columns.end(); ++col_iter)
-    Assert(col_iter->second.entries.size() == n,
-           ExcWrongNumberOfDataEntries(
-             col_iter->first, col_iter->second.entries.size(), first_name, n));
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      std::string first_name = col_iter->first;
+      for (++col_iter; col_iter != columns.end(); ++col_iter)
+        Assert(col_iter->second.entries.size() == n,
+               ExcWrongNumberOfDataEntries(col_iter->first,
+                                           col_iter->second.entries.size(),
+                                           first_name,
+                                           n));
+    }
 
   return n;
 }

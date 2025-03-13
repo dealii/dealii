@@ -19,6 +19,7 @@
 
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/types.h>
 
 #include <boost/signals2.hpp>
 

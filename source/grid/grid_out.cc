@@ -4164,7 +4164,7 @@ namespace internal
      */
     template <int spacedim>
     void
-    remove_colinear_points(std::vector<Point<spacedim>> &points)
+    remove_collinear_points(std::vector<Point<spacedim>> &points)
     {
       while (points.size() > 2)
         {
@@ -4172,7 +4172,7 @@ namespace internal
           first_difference /= first_difference.norm();
           Tensor<1, spacedim> second_difference = points[2] - points[1];
           second_difference /= second_difference.norm();
-          // If the three points are colinear then remove the middle one.
+          // If the three points are collinear then remove the middle one.
           if ((first_difference - second_difference).norm() < 1e-10)
             points.erase(points.begin() + 1);
           else
@@ -4288,7 +4288,7 @@ namespace internal
                       gnuplot_flags.curved_inner_cells)
                     {
                       // Save the points on each face to a vector and then try
-                      // to remove colinear points that won't show up in the
+                      // to remove collinear points that won't show up in the
                       // generated plot.
                       std::vector<Point<spacedim>> line_points;
                       // compute offset of quadrature points within set of
@@ -4303,7 +4303,7 @@ namespace internal
                         line_points.push_back(
                           mapping->transform_unit_to_real_cell(
                             cell, q_projector.point(offset + i)));
-                      internal::remove_colinear_points(line_points);
+                      internal::remove_collinear_points(line_points);
 
                       for (const Point<spacedim> &point : line_points)
                         out << point << ' ' << cell->level() << ' '
@@ -4562,7 +4562,7 @@ namespace internal
                               gnuplot_flags.curved_inner_cells)
                             {
                               // Save the points on each face to a vector and
-                              // then try to remove colinear points that won't
+                              // then try to remove collinear points that won't
                               // show up in the generated plot.
                               std::vector<Point<spacedim>> line_points;
                               // transform_real_to_unit_cell could be replaced
@@ -4579,7 +4579,7 @@ namespace internal
                                     cell,
                                     (1 - boundary_points[i][0]) * u0 +
                                       boundary_points[i][0] * u1));
-                              internal::remove_colinear_points(line_points);
+                              internal::remove_collinear_points(line_points);
                               for (const Point<spacedim> &point : line_points)
                                 out << point << ' ' << cell->level() << ' '
                                     << static_cast<unsigned int>(
@@ -5203,7 +5203,7 @@ GridOut::write(const Triangulation<dim, spacedim> &tria,
 
 
 // explicit instantiations
-#include "grid_out.inst"
+#include "grid/grid_out.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

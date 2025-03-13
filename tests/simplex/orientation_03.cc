@@ -39,10 +39,10 @@ test_face(const std::vector<Point<3>>    &vertices_,
   Point<3> extra_vertex;
   for (unsigned int i = 0; i < 3; ++i)
     extra_vertex += ref_cell.template vertex<3>(ref_cell.face_to_cell_vertices(
-      face_n, i, ReferenceCell::default_combined_face_orientation()));
+      face_n, i, numbers::default_geometric_orientation));
 
   extra_vertex /= 3.0;
-  extra_vertex += ref_cell.template unit_normal_vectors<3>(face_n);
+  extra_vertex += ref_cell.template face_normal_vector<3>(face_n);
 
   vertices.push_back(extra_vertex);
 
@@ -50,7 +50,7 @@ test_face(const std::vector<Point<3>>    &vertices_,
   cell_data.back().vertices.resize(0);
   for (unsigned int i = 0; i < 3; ++i)
     cell_data.back().vertices.push_back(ref_cell.face_to_cell_vertices(
-      face_n, i, ref_cell.default_combined_face_orientation()));
+      face_n, i, numbers::default_geometric_orientation));
   cell_data.back().vertices.push_back(ref_cell.n_vertices());
   std::sort(cell_data.back().vertices.begin(), cell_data.back().vertices.end());
 

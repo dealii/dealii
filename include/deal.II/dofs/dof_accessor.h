@@ -21,7 +21,6 @@
 #include <deal.II/base/types.h>
 
 #include <deal.II/dofs/dof_faces.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/dof_levels.h>
 
@@ -3168,8 +3167,8 @@ namespace internal
 
             for (const auto line : accessor.line_indices())
               {
-                const bool line_orientation = line_orientations[line];
-                if (line_orientation)
+                const auto line_orientation = line_orientations[line];
+                if (line_orientation == numbers::default_geometric_orientation)
                   dof_operation.process_dofs(
                     accessor.get_dof_handler(),
                     0,
@@ -3210,7 +3209,7 @@ namespace internal
                 accessor.combined_face_orientation(face_no);
               const unsigned int quad_index = accessor.quad_index(face_no);
               if (combined_orientation ==
-                  ReferenceCell::default_combined_face_orientation())
+                  numbers::default_geometric_orientation)
                 dof_operation.process_dofs(
                   accessor.get_dof_handler(),
                   0,
@@ -4452,10 +4451,11 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::neighbor(
       this->neighbor_index(i),
       this->dof_handler);
 
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert(q->used(), ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      if (q.state() != IteratorState::past_the_end)
+        Assert(q->used(), ExcInternalError());
+    }
   return q;
 }
 
@@ -4470,10 +4470,11 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::child(
   TriaIterator<DoFCellAccessor<dimension_, space_dimension_, level_dof_access>>
     q(this->tria, this->level() + 1, this->child_index(i), this->dof_handler);
 
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert(q->used(), ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      if (q.state() != IteratorState::past_the_end)
+        Assert(q->used(), ExcInternalError());
+    }
   return q;
 }
 

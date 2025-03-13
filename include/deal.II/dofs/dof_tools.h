@@ -960,7 +960,7 @@ namespace DoFTools
     AffineConstraints<number>                      &constraints,
     const ComponentMask                            &component_mask = {},
     const types::geometric_orientation              combined_orientation =
-      ReferenceCell::default_combined_face_orientation(),
+      numbers::default_geometric_orientation,
     const FullMatrix<double>        &matrix = FullMatrix<double>(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),

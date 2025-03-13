@@ -2848,17 +2848,19 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
         AssertDimension(node_tags[i], i + 1);
         for (unsigned int d = 0; d < spacedim; ++d)
           vertices[i][d] = coord[i * 3 + d];
-#  ifdef DEBUG
-        // Make sure the embedded dimension is right
-        for (unsigned int d = spacedim; d < 3; ++d)
-          Assert(std::abs(coord[i * 3 + d]) < 1e-10,
-                 ExcMessage("The grid you are reading contains nodes that are "
-                            "nonzero in the coordinate with index " +
-                            std::to_string(d) +
-                            ", but you are trying to save "
-                            "it on a grid embedded in a " +
-                            std::to_string(spacedim) + " dimensional space."));
-#  endif
+        if constexpr (running_in_debug_mode())
+          {
+            // Make sure the embedded dimension is right
+            for (unsigned int d = spacedim; d < 3; ++d)
+              Assert(std::abs(coord[i * 3 + d]) < 1e-10,
+                     ExcMessage(
+                       "The grid you are reading contains nodes that are "
+                       "nonzero in the coordinate with index " +
+                       std::to_string(d) +
+                       ", but you are trying to save "
+                       "it on a grid embedded in a " +
+                       std::to_string(spacedim) + " dimensional space."));
+          }
       }
   }
 
@@ -3842,7 +3844,7 @@ namespace
                      ++j)
                   boundary_line.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, 0)];
+                      deal_face_n, j, numbers::default_geometric_orientation)];
 
                 subcelldata.boundary_lines.push_back(std::move(boundary_line));
               }
@@ -3857,7 +3859,7 @@ namespace
                      ++j)
                   boundary_quad.vertices[j] =
                     cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, 0)];
+                      deal_face_n, j, numbers::default_geometric_orientation)];
 
                 subcelldata.boundary_quads.push_back(std::move(boundary_quad));
               }
@@ -5016,6 +5018,6 @@ namespace
 
 
 // explicit instantiations
-#include "grid_in.inst"
+#include "grid/grid_in.inst"
 
 DEAL_II_NAMESPACE_CLOSE

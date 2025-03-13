@@ -31,7 +31,7 @@
 #include <deal.II/multigrid/mg_base.h>
 
 #include <memory>
-
+#include <set>
 
 
 DEAL_II_NAMESPACE_OPEN

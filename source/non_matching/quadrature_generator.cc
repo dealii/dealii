@@ -14,8 +14,8 @@
 
 #include <deal.II/base/function_tools.h>
 
-#include "deal.II/fe/fe_q.h"
-#include "deal.II/fe/fe_q_iso_q1.h"
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 
 #include <deal.II/grid/reference_cell.h>
 
@@ -2308,5 +2308,5 @@ namespace NonMatching
                                              face_index);
   }
 } // namespace NonMatching
-#include "quadrature_generator.inst"
+#include "non_matching/quadrature_generator.inst"
 DEAL_II_NAMESPACE_CLOSE

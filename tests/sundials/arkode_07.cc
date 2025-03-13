@@ -112,7 +112,7 @@ main()
         VectorType                                   &x,
         const VectorType                             &b,
         double                                        tol) {
-      ReductionControl     control;
+      ReductionControl     control(100, 1e-10, 1e-2, false, true);
       SolverCG<VectorType> solver_cg(control);
       solver_cg.solve(op, x, b, prec);
     };

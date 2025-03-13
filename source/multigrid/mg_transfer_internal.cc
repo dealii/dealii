@@ -365,13 +365,14 @@ namespace internal
               AssertThrowMPI(ierr);
               requests.clear();
             }
-#  ifdef DEBUG
-          // Make sure in debug mode, that everybody sent/received all packages
-          // on this level. If a deadlock occurs here, the list of expected
-          // senders is not computed correctly.
-          const int ierr = MPI_Barrier(tria->get_mpi_communicator());
-          AssertThrowMPI(ierr);
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              // Make sure in debug mode, that everybody sent/received all
+              // packages on this level. If a deadlock occurs here, the list of
+              // expected senders is not computed correctly.
+              const int ierr = MPI_Barrier(tria->get_mpi_communicator());
+              AssertThrowMPI(ierr);
+            }
         }
 #endif
 
@@ -634,38 +635,39 @@ namespace internal
       dirichlet_indices.clear();
       weights_on_refined.clear();
 
-#ifdef DEBUG
-      if (mg_constrained_dofs)
+      if constexpr (running_in_debug_mode())
         {
-          const unsigned int n_levels =
-            dof_handler.get_triangulation().n_global_levels();
-
-          for (unsigned int l = 0; l < n_levels; ++l)
+          if (mg_constrained_dofs)
             {
-              const auto &constraints =
-                mg_constrained_dofs->get_user_constraint_matrix(l);
+              const unsigned int n_levels =
+                dof_handler.get_triangulation().n_global_levels();
 
-              // no inhomogeneities are supported
-              AssertDimension(constraints.n_inhomogeneities(), 0);
-
-              for (const auto dof : constraints.get_local_lines())
+              for (unsigned int l = 0; l < n_levels; ++l)
                 {
-                  const auto *entries_ptr =
-                    constraints.get_constraint_entries(dof);
+                  const auto &constraints =
+                    mg_constrained_dofs->get_user_constraint_matrix(l);
 
-                  if (entries_ptr == nullptr)
-                    continue;
+                  // no inhomogeneities are supported
+                  AssertDimension(constraints.n_inhomogeneities(), 0);
 
-                  // only homogeneous or identity constraints are supported
-                  Assert((entries_ptr->size() == 0) ||
-                           ((entries_ptr->size() == 1) &&
-                            (std::abs((*entries_ptr)[0].second - 1.) <
-                             100 * std::numeric_limits<double>::epsilon())),
-                         ExcNotImplemented());
+                  for (const auto dof : constraints.get_local_lines())
+                    {
+                      const auto *entries_ptr =
+                        constraints.get_constraint_entries(dof);
+
+                      if (entries_ptr == nullptr)
+                        continue;
+
+                      // only homogeneous or identity constraints are supported
+                      Assert((entries_ptr->size() == 0) ||
+                               ((entries_ptr->size() == 1) &&
+                                (std::abs((*entries_ptr)[0].second - 1.) <
+                                 100 * std::numeric_limits<double>::epsilon())),
+                             ExcNotImplemented());
+                    }
                 }
             }
         }
-#endif
 
       // we collect all child DoFs of a mother cell together. For faster
       // tensorized operations, we align the degrees of freedom
@@ -1030,6 +1032,6 @@ namespace internal
 
 // Explicit instantiations
 
-#include "mg_transfer_internal.inst"
+#include "multigrid/mg_transfer_internal.inst"
 
 DEAL_II_NAMESPACE_CLOSE

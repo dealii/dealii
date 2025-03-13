@@ -20,6 +20,7 @@
 
 #include <deal.II/algorithms/any_data.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/event.h>
 
 #include <fstream>

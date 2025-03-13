@@ -20,6 +20,8 @@
 #include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/mg_level_object.h>
 
+#include <deal.II/fe/component_mask.h>
+
 #include <deal.II/lac/affine_constraints.h>
 
 #include <set>

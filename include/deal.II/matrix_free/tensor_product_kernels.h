@@ -906,7 +906,6 @@ namespace internal
                   {
                     const Number2 val0 = matrix[n_cols * n_columns + ind];
                     res0 += val0 * (x[ind] + x[mm - 1 - ind]);
-                    ;
                   }
                 if (mm % 2)
                   res0 += x[mid];
@@ -2335,7 +2334,7 @@ namespace internal
    *             the computed values overwrite the content in the output.
    * @tparam max_derivative Sets the number of derivatives that should be
    *             computed. 0 means only values, 1 means values and first
-   *             derivatives, 2 up to second derivates. Note that all the
+   *             derivatives, 2 up to second derivatives. Note that all the
    *             derivatives access the data in @p shape_values passed to
    *             the constructor of the class.
    *

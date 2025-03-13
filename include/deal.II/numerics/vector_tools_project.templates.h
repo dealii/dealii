@@ -311,12 +311,13 @@ namespace VectorTools
       const DiagonalMatrix<decltype(rhs)> &preconditioner =
         use_lumped ? *mass_matrix.get_matrix_lumped_diagonal_inverse() :
                      *mass_matrix.get_matrix_diagonal_inverse();
-#ifdef DEBUG
-      // Make sure we picked a valid preconditioner
-      const auto &diagonal = preconditioner.get_vector();
-      for (const Number &v : diagonal)
-        Assert(v > 0.0, ExcInternalError());
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          // Make sure we picked a valid preconditioner
+          const auto &diagonal = preconditioner.get_vector();
+          for (const Number &v : diagonal)
+            Assert(v > 0.0, ExcInternalError());
+        }
       cg.solve(mass_matrix, work_result, rhs, preconditioner);
       work_result += inhomogeneities;
 

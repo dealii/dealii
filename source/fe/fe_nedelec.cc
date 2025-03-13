@@ -215,11 +215,361 @@ template <int dim>
 void
 FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // for 1d and 2d, do nothing
-  if (dim < 3)
+  // The order of the Nedelec elements equals the tensor degree minus one,
+  // k = n - 1. In the three-dimensional space the Nedelec elements of the
+  // lowermost order, k = 0, have only 12 line (edge) dofs. The Nedelec
+  // elements of the higher orders, k > 0, have 3*(k+1)*(k+2)^2 dofs in
+  // total if dim=3. The dofs in a cell are distributed between lines
+  // (edges), quads (faces), and the hex (the interior of the cell) as the
+  // following:
+  //
+  // 12*(k+1) line dofs; (k+1) dofs per line.
+  // 2*6*k*(k+1) quad dofs; 2*k*(k+1) dofs per quad.
+  // 3*(k+2)^2*(k+1) hex dofs;
+  //
+  // The dofs are indexed in the following order: first all line dofs,
+  // then all quad dofs, and then all hex dofs.
+  //
+  // The line dofs need only sign adjustments. No permutation of line
+  // dofs is needed. The line dofs are treated by
+  // internal::FE_PolyTensor::get_dof_sign_change_nedelec(...)
+  // in fe_poly_tensor.cc.
+  //
+  // The hex dofs need no adjustments: they are not shared between
+  // neighbouring mesh cells.
+  //
+  // The two-dimensional Nedelec finite elements share no quad dofs between
+  // neighbouring mesh cells. The zero-order three-dimensional Nedelec
+  // finite elements have no quad dofs. Consequently, here we treat only
+  // quad dofs of the three-dimensional Nedelec finite elements of the
+  // higher orders, k>0. The questions how the curl looks like in the
+  // higher-dimensional spaces and what does it mean to be curl-conforming
+  // if dim>3 we leave unanswered.
+  //
+  // In this function we need to change some entries in the following two
+  // vectors of tables:
+  // adjust_quad_dof_index_for_face_orientation_table
+  // and
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  // These tables specify the permutations and sign adjustments of the quad
+  // dofs only. The tables are already filled with zeros meaning no
+  // permutations or sign change are required. We need to change some
+  // entries of the tables such that the shape functions that correspond to
+  // the quad dofs and are shared between neighbouring cells have consistent
+  // orientations.
+  //
+  // The swap tables below describe the dof permutations and sign changes
+  // that need to be done. The function
+  // FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+  // simply reads the information in the swap tables below and puts it into
+  // tables
+  // adjust_quad_dof_index_for_face_orientation_table
+  // and
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  // A good question is: why don't we put the information into the tables of
+  // deal.II right away? The answer is the following. The information on the
+  // necessary dof permutations and sign changes is derived by plotting the
+  // shape functions and observing them on faces of different orientations.
+  // It is convenient to put the observations first in the format of the
+  // swap tables below and then convert the swap tables into the format used
+  // by deal.II.
+  //
+  // The dofs on a quad are indexed as the following:
+  //
+  // | x0, x1, x2, x3, ..., xk  | y0, y1, y2, y3 ..., yk  |
+  // |                          |                         |
+  // |<------ k*(k+1) --------->|<------ k*(k+1) -------->|
+  // |                                                    |
+  // |<------------------- 2*k*(k+1) -------------------->|
+  //
+  // Only one type of dof permutation is needed: swap between two dofs; one
+  // dof being xi, another yj. That is, if x4 is replaced with y7,
+  // then y7 must be replaced with x4. Such swaps can be ordered as
+  // illustrated by the following example:
+  //
+  //                *
+  //        y0, y9, y1, y2, ..., yk
+  //      ---------------------------                     (swap)
+  //        x0, x1, x2, x3, ..., xk
+  //        *
+  //
+  // An x-dof below the line is swapped with the corresponding y-dof above
+  // the line. A dof marked by the asterisk must change its sign before the
+  // swap.
+  //
+  // The x-dofs are assumed to have the normal order. There is no need to
+  // encode it. Therefore, the swap tables need to encode the following
+  // information: indices of the y-dofs, the sign change of the x-dofs, and
+  // sign change of the y-dofs. The swap above is encoded as the following:
+  //
+  // swap = { 0, 9, 1, 2, ...., yk,  // indices of the y-dofs
+  //          1, 0, 0, 0, ...., 0,   // sign change of the x-dofs,
+  //          0, 1, 0, 0, ...., 0};  // sign change of the y-dofs.
+  //
+  // If no swap is needed, -1 is placed instead of the y-dof index.
+  //
+  // Such swaps are assembled into the swap table:
+  //
+  // swap_table = {swap_0, swap_1, ... swap_7};
+  //
+  // Each swap table contains eight swaps - one swap for each possible quad
+  // orientation. The deal.II encodes the orientation of a quad using
+  // three boolean parameters:
+  // face_orientation - true if face is in standard orientation
+  // and false otherwise;
+  // face_rotation - rotation by 90 deg counterclockwise if true;
+  // face_flip - rotation by 180 deg counterclockwise if true.
+  // See the documentation of GeometryInfo<dim>.
+  //
+  // The combined face orientation is computes as
+  // orientation_no = face_flip*4 + face_rotation*2 + face_orientation*1;
+  // See tria_orientation.h.
+  //
+  // The parameter orientation_no (0...7) indexes the swaps in a swap table.
+  //
+  // Nedelec elements of order k have their own swap table, swap_table_k.
+  // Recall, the swap_table_0 is empty as the Nedelec finite elements of the
+  // lowermost order have no quad dofs.
+
+  static const int c_swap_table_0 = 0;
+
+  static const int c_swap_table_1[8][3][2] = {         // 0   1
+                                              {{0, 1}, // 0
+                                               {0, 0},
+                                               {0, 0}},
+                                              {{-1, -1}, // 1
+                                               {0, 0},
+                                               {0, 0}},
+                                              {{-1, -1}, // 2
+                                               {0, 0},
+                                               {1, 0}},
+                                              {{0, 1}, // 3
+                                               {1, 0},
+                                               {0, 0}},
+                                              {{0, 1}, // 4
+                                               {1, 0},
+                                               {1, 0}},
+                                              {{-1, -1}, // 5
+                                               {1, 0},
+                                               {1, 0}},
+                                              {{-1, -1}, // 6
+                                               {1, 0},
+                                               {0, 0}},
+                                              {{0, 1}, // 7
+                                               {0, 0},
+                                               {1, 0}}};
+
+  static const int c_swap_table_2[8][3][6] = {// 0   1   2   3   4   5
+                                              {{0, 3, 1, 4, 2, 5}, // 0
+                                               {0, 0, 0, 0, 0, 0},
+                                               {0, 0, 0, 0, 0, 0}},
+                                              {{-1, -1, -1, -1, -1, -1}, // 1
+                                               {0, 0, 0, 0, 0, 0},
+                                               {0, 0, 0, 0, 0, 0}},
+                                              {{-1, -1, -1, -1, -1, -1}, // 2
+                                               {0, 1, 0, 1, 0, 1},
+                                               {1, 0, 1, 1, 0, 1}},
+                                              {{0, 3, 1, 4, 2, 5}, // 3
+                                               {1, 1, 0, 0, 1, 1},
+                                               {0, 0, 0, 1, 1, 1}},
+                                              {{0, 3, 1, 4, 2, 5}, // 4
+                                               {1, 0, 0, 1, 1, 0},
+                                               {1, 0, 1, 0, 1, 0}},
+                                              {{-1, -1, -1, -1, -1, -1}, // 5
+                                               {1, 0, 0, 1, 1, 0},
+                                               {1, 0, 1, 0, 1, 0}},
+                                              {{-1, -1, -1, -1, -1, -1}, // 6
+                                               {1, 1, 0, 0, 1, 1},
+                                               {0, 0, 0, 1, 1, 1}},
+                                              {{0, 3, 1, 4, 2, 5}, // 7
+                                               {0, 1, 0, 1, 0, 1},
+                                               {1, 0, 1, 1, 0, 1}}};
+
+  static const int c_swap_table_3[8][3][12] = {
+    // 0   1   2   3   4   5   6   7   8   9  10  11
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 0
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 1
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 2
+     {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0},
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}},
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 3
+     {1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0},
+     {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0}},
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 4
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 5
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 6
+     {1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0},
+     {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0}},
+    {{0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11}, // 7
+     {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0},
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}}};
+
+  static const int c_swap_table_4[8][3][20] = {
+    // Swap sign_X and sign_Y rows if k=4. Why?...
+    // 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+    // 19
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 0
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 1
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 2
+     {1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+     {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1}},
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 3
+     {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
+     {1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1}},
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 4
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 5
+     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+     {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0}},
+    {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, // 6
+     {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
+     {1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1}},
+    {{0,  5,  10, 15, 1,  6,  11, 16, 2,  7,
+      12, 17, 3,  8,  13, 18, 4,  9,  14, 19}, // 7
+     {1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+     {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1}}};
+
+  static const int *swap_table_array[5] = {&c_swap_table_0,
+                                           &c_swap_table_1[0][0][0],
+                                           &c_swap_table_2[0][0][0],
+                                           &c_swap_table_3[0][0][0],
+                                           &c_swap_table_4[0][0][0]};
+
+  static const int row_length[5] = {0, 2, 6, 12, 20};
+  static const int table_size[5] = {
+    0, 8 * 3 * 2, 8 * 3 * 6, 8 * 3 * 12, 8 * 3 * 20};
+
+  // Only three-dimensional Nedelec finite elements are treated. The
+  // two-dimensional Nedelec finite elements only need sign adjustments of the
+  // line dofs. These adjustments are done by
+  // internal::FE_PolyTensor::get_dof_sign_change_nedelec(...)
+  // in fe_poly_tensor.cc. The notions of curl and curl-conforming finite
+  // elements in higher-dimensional spaces, dim >3, are somewhat unclear as
+  // curl, strictly peaking, exists only in the three-dimensional space.
+  if (dim != 3)
     return;
 
-  // TODO: Implement this for this class
+  const unsigned int k = this->tensor_degree() - 1;
+
+  // The Nedelec finite elements of the lowermost order have no quad dofs.
+  if (k == 0)
+    return;
+
+  // The finite element orders > 4 are not implemented.
+  AssertThrow(k < 5, ExcNotImplemented());
+
+  // TODO: the implementation makes the assumption that all quads have the
+  // same number of dofs
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
+  Assert(
+    this->adjust_quad_dof_index_for_face_orientation_table[0].n_elements() ==
+      this->reference_cell().n_face_orientations(face_no) *
+        this->n_dofs_per_quad(face_no),
+    ExcInternalError());
+
+  Assert(
+    this->adjust_quad_dof_sign_for_face_orientation_table[0].n_elements() ==
+      this->reference_cell().n_face_orientations(face_no) *
+        this->n_dofs_per_quad(face_no),
+    ExcInternalError());
+
+  // The 3D Nedelec finite elements have 2*k*(k+1) dofs per each quad.
+  Assert(2 * k * (k + 1) == this->n_dofs_per_quad(face_no), ExcInternalError());
+
+  const int *swap_table = swap_table_array[k];
+
+  const unsigned int half_dofs = k * (k + 1); // see below;
+
+  const int rl = row_length[k];
+
+  int offset = table_size[0];
+  // The assignment above is to prevent the compiler from complaining about the
+  // unused table_size.
+
+  int value = 0;
+
+  for (const bool face_orientation : {false, true})
+    for (const bool face_rotation : {false, true})
+      for (const bool face_flip : {false, true})
+        {
+          const auto case_no =
+            internal::combined_face_orientation(face_orientation,
+                                                face_rotation,
+                                                face_flip);
+
+          // The dofs on a quad are indexed as the following:
+          //
+          // | x0, x1, x2, x3, ..., xk  | y0, y1, y2, y3 ..., yk  |
+          // |                          |                         |
+          // |-- half_ dofs = k*(k+1) --|-- half_dofs = k*(k+1) --|
+          // |                                                    |
+          // |-------------------- 2*k*(k+1) ---------------------|
+
+          for (unsigned int indx_x = 0; indx_x < half_dofs; indx_x++)
+            {
+              offset = 3 * rl * case_no + 0 * rl + indx_x;
+              Assert(offset < table_size[k], ExcInternalError());
+              value = *(swap_table + offset);
+              Assert(value < table_size[k], ExcInternalError());
+              Assert(value > -2, ExcInternalError());
+
+              if (value != -1)
+                {
+                  const unsigned int indx_y =
+                    half_dofs + static_cast<unsigned int>(value);
+
+                  // dofs swap
+                  this
+                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                      indx_x, case_no) = indx_y - indx_x;
+
+                  this
+                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                      indx_y, case_no) = indx_x - indx_y;
+                }
+
+              // dof sign change
+              offset = 3 * rl * case_no + 1 * rl + indx_x;
+              Assert(offset < table_size[k], ExcInternalError());
+              value = *(swap_table + offset);
+              Assert((value == 0) || (value == 1), ExcInternalError());
+
+              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                indx_x, case_no) = static_cast<bool>(value);
+
+
+              offset = 3 * rl * case_no + 2 * rl + indx_x;
+              Assert(offset < table_size[k], ExcInternalError());
+              value = *(swap_table + offset);
+              Assert((value == 0) || (value == 1), ExcInternalError());
+
+              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                indx_x + half_dofs, case_no) = static_cast<bool>(value);
+            }
+        }
+
   return;
 }
 
@@ -324,13 +674,12 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
           for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
                ++line)
             this->generalized_support_points[line * n_edge_points + q_point] =
-              edge_quadrature.point(
-                QProjector<dim>::DataSetDescriptor::face(
-                  this->reference_cell(),
-                  line,
-                  ReferenceCell::default_combined_face_orientation(),
-                  n_edge_points) +
-                q_point);
+              edge_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
+                                      this->reference_cell(),
+                                      line,
+                                      numbers::default_geometric_orientation,
+                                      n_edge_points) +
+                                    q_point);
 
           for (unsigned int i = 0; i < order; ++i)
             boundary_weights(q_point, i) =
@@ -354,13 +703,12 @@ FE_Nedelec<2>::initialize_support_points(const unsigned int order)
            ++line)
         for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
           this->generalized_support_points[line * n_edge_points + q_point] =
-            edge_quadrature.point(
-              QProjector<dim>::DataSetDescriptor::face(
-                this->reference_cell(),
-                line,
-                ReferenceCell::default_combined_face_orientation(),
-                n_edge_points) +
-              q_point);
+            edge_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
+                                    this->reference_cell(),
+                                    line,
+                                    numbers::default_geometric_orientation,
+                                    n_edge_points) +
+                                  q_point);
     }
 }
 
@@ -427,7 +775,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
                 QProjector<dim - 1>::DataSetDescriptor::face(
                   ReferenceCells::get_hypercube<dim - 1>(),
                   line,
-                  ReferenceCell::default_combined_face_orientation(),
+                  numbers::default_geometric_orientation,
                   n_edge_points) +
                 q_point);
 
@@ -492,13 +840,12 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
             this->generalized_support_points[face * n_face_points + q_point +
                                              GeometryInfo<dim>::lines_per_cell *
                                                n_edge_points] =
-              face_quadrature.point(
-                QProjector<dim>::DataSetDescriptor::face(
-                  this->reference_cell(),
-                  face,
-                  ReferenceCell::default_combined_face_orientation(),
-                  n_face_points) +
-                q_point);
+              face_quadrature.point(QProjector<dim>::DataSetDescriptor::face(
+                                      this->reference_cell(),
+                                      face,
+                                      numbers::default_geometric_orientation,
+                                      n_face_points) +
+                                    q_point);
           }
 
       // Create support points in the interior.
@@ -525,7 +872,7 @@ FE_Nedelec<3>::initialize_support_points(const unsigned int order)
                 QProjector<dim - 1>::DataSetDescriptor::face(
                   ReferenceCells::get_hypercube<dim - 1>(),
                   line,
-                  ReferenceCell::default_combined_face_orientation(),
+                  numbers::default_geometric_orientation,
                   n_edge_points) +
                 q_point);
 
@@ -3028,7 +3375,8 @@ FE_Nedelec<dim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
+  AssertIndexRange(
+    child, this->reference_cell().template n_children<dim>(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -3083,8 +3431,9 @@ FE_Nedelec<dim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
+  AssertIndexRange(child,
+                   this->reference_cell().template n_children<dim>(
+                     RefinementCase<dim>(refinement_case)));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -4173,7 +4522,7 @@ FE_Nedelec<dim>::get_embedding_dofs(const unsigned int sub_degree) const
 
 
 // explicit instantiations
-#include "fe_nedelec.inst"
+#include "fe/fe_nedelec.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

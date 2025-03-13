@@ -19,7 +19,17 @@ project(testsuite CXX)
 #
 # Set up test environment (does not pick up anything):
 #
+
 deal_ii_pickup_tests()
+
+#
+# Include deal.II targets:
+#
+
+if(NOT DEAL_II_TARGET_CONFIG_INCLUDED)
+  include(${DEAL_II_TARGET_CONFIG})
+  set(DEAL_II_TARGET_CONFIG_INCLUDED TRUE)
+endif()
 
 #
 # Header tests are special:
@@ -31,27 +41,45 @@ deal_ii_pickup_tests()
 
 set(_category all-headers)
 
-#
-# Glob together all header files and strip SOURCE_DIR/include/deal.II to
-# get a correct relative path:
-#
-if(DEAL_II_BUILD_DIR)
-  list(GET DEAL_II_INCLUDE_DIRS 1 _include_dir)
-else()
-  list(GET DEAL_II_INCLUDE_DIRS 0 _include_dir)
-endif()
-file(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
-  ${_include_dir}/deal.II/*.h
-  )
-
-
 # Do not test bundled headers to avoid issues when tests are run
 # for an already installed library
 string(REGEX REPLACE "bundled/[^;]+;?" "" _headers "${_headers}")
 
-foreach(_header ${_headers})
-  foreach(_build ${DEAL_II_BUILD_TYPES})
-    string(TOLOWER ${_build} _build_lowercase)
+foreach(_build ${DEAL_II_BUILD_TYPES})
+  string(TOLOWER ${_build} _build_lowercase)
+
+  #
+  # Extract all include directories from the imported deal.II target.
+  #
+
+  get_target_property(_include_dirs ${DEAL_II_TARGET_${_build}}
+    INTERFACE_INCLUDE_DIRECTORIES
+    )
+
+  #
+  # Glob together all header files and strip ".../include/deal.II" to get a
+  # correct relative path. By convention the first (and in case of a binary
+  # directory also second) directory is ours:
+  #
+
+  list(GET _include_dirs 0 _include_dir)
+  file(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
+    ${_include_dir}/deal.II/*.h
+    )
+
+  if(DEAL_II_BUILD_DIR)
+    list(GET _include_dirs 1 _include_dir)
+    file(GLOB_RECURSE _source_headers RELATIVE ${_include_dir}/deal.II
+      ${_include_dir}/deal.II/*.h
+      )
+    list(APPEND _headers ${_source_headers})
+  endif()
+
+  #
+  # Set up a test for each header file:
+  #
+
+  foreach(_header ${_headers})
 
     set(_test ${_category}/${_header}.${_build_lowercase})
     string(REGEX REPLACE "\\/" "-" _target ${_header}.${_build_lowercase})

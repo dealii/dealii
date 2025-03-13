@@ -265,7 +265,7 @@ macro(feature_trilinos_find_external var)
         if(NOT _tpetra_int_long_long AND DEAL_II_WITH_64BIT_INDICES)
           message( STATUS
             "  Tpetra was configured *without* support for 64-bit global indices"
-            "but deal.II is configured to use 64-bit global indices."
+            " but deal.II is configured to use 64-bit global indices."
             )
           message(STATUS
             "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF"
@@ -275,7 +275,7 @@ macro(feature_trilinos_find_external var)
         elseif(NOT _tpetra_int_int AND NOT DEAL_II_WITH_64BIT_INDICES)
           message( STATUS
             "  Tpetra was configured *without* support for 32-bit global indices"
-            "but deal.II is configured to use 32-bit global indices."
+            " but deal.II is configured to use 32-bit global indices."
             )
           message(STATUS
             "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON"

@@ -311,10 +311,9 @@ namespace Utilities
       // inserted data, therefore the communication is still initialized.
       // Having different code in debug and optimized mode is somewhat
       // dangerous, but it really saves communication so do it anyway
-#    ifndef DEBUG
-      if (vector_operation == VectorOperation::insert)
-        return;
-#    endif
+      if constexpr (running_in_debug_mode() == false)
+        if (vector_operation == VectorOperation::insert)
+          return;
 
       // nothing to do when we neither have import
       // nor ghost indices.
@@ -545,24 +544,23 @@ namespace Utilities
 
       // in optimized mode, no communication was started, so leave the
       // function directly (and only clear ghosts)
-#    ifndef DEBUG
-      if (vector_operation == VectorOperation::insert)
-        {
-          Assert(requests.empty(),
-                 ExcInternalError(
-                   "Did not expect a non-empty communication "
-                   "request when inserting. Check that the same "
-                   "vector_operation argument was passed to "
-                   "import_from_ghosted_array_start as is passed "
-                   "to import_from_ghosted_array_finish."));
+      if constexpr (running_in_debug_mode() == false)
+        if (vector_operation == VectorOperation::insert)
+          {
+            Assert(requests.empty(),
+                   ExcInternalError(
+                     "Did not expect a non-empty communication "
+                     "request when inserting. Check that the same "
+                     "vector_operation argument was passed to "
+                     "import_from_ghosted_array_start as is passed "
+                     "to import_from_ghosted_array_finish."));
 
-          Kokkos::deep_copy(
-            Kokkos::View<Number *, typename MemorySpaceType::kokkos_space>(
-              ghost_array.data(), ghost_array.size()),
-            0);
-          return;
-        }
-#    endif
+            Kokkos::deep_copy(
+              Kokkos::View<Number *, typename MemorySpaceType::kokkos_space>(
+                ghost_array.data(), ghost_array.size()),
+              0);
+            return;
+          }
 
       // nothing to do when we neither have import nor ghost indices.
       if (n_ghost_indices() == 0 && n_import_indices() == 0)

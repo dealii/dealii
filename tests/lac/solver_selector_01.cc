@@ -35,8 +35,8 @@ check(const MatrixType &A, const VectorType &f)
   names.push_back("gmres");
   names.push_back("fgmres");
 
-  ReductionControl                       cont1(100, 0., 1.e-4);
-  SolverControl                          cont2(100, 1.e-7);
+  ReductionControl                       cont1(100, 0., 1.e-4, false, true);
+  SolverControl                          cont2(100, 1.e-7, false, true);
   SolverSelector<VectorType>             solver;
   PreconditionSSOR<SparseMatrix<double>> pre;
   pre.initialize(A);

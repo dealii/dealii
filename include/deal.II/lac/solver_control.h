@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
 
 #include <vector>
 
@@ -145,12 +146,12 @@ public:
    * checked and the number of the iteration step) shall be printed to @p
    * deallog stream.  Default is: do not print. Similarly, @p log_result
    * specifies the whether the final result is logged to @p deallog. Default
-   * is yes.
+   * is: do not print.
    */
   explicit SolverControl(const unsigned int n           = 100,
                          const double       tol         = 1.e-10,
                          const bool         log_history = false,
-                         const bool         log_result  = true);
+                         const bool         log_result  = false);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
@@ -432,7 +433,7 @@ public:
                             const double       tolerance   = 1.e-10,
                             const double       reduce      = 1.e-2,
                             const bool         log_history = false,
-                            const bool         log_result  = true);
+                            const bool         log_result  = false);
 
   /**
    * Initialize with a SolverControl object. The result will emulate
@@ -518,7 +519,7 @@ public:
   explicit IterationNumberControl(const unsigned int maxiter     = 100,
                                   const double       tolerance   = 1e-12,
                                   const bool         log_history = false,
-                                  const bool         log_result  = true);
+                                  const bool         log_result  = false);
 
   /**
    * Initialize with a SolverControl object. The result will emulate

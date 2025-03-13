@@ -18,6 +18,8 @@
 
 #include <deal.II/particles/utilities.h>
 
+#include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -206,7 +208,7 @@ namespace Particles
       matrix.compress(VectorOperation::add);
     }
 
-#include "utilities.inst"
+#include "particles/utilities.inst"
 
   } // namespace Utilities
 } // namespace Particles

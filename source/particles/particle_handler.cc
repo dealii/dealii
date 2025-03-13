@@ -337,31 +337,33 @@ namespace Particles
              owned_particles_end->particles.empty(),
            ExcInternalError());
 
-#ifdef DEBUG
-    // check that no cache element hits the three anchor states in the list of
-    // particles
-    for (const auto &it : cells_to_particle_cache)
-      Assert(it != particles.begin() && it != owned_particles_end &&
-               it != --(particles.end()),
-             ExcInternalError());
+    if constexpr (running_in_debug_mode())
+      {
+        // check that no cache element hits the three anchor states in the list
+        // of particles
+        for (const auto &it : cells_to_particle_cache)
+          Assert(it != particles.begin() && it != owned_particles_end &&
+                   it != --(particles.end()),
+                 ExcInternalError());
 
-    // check that we only have locally owned particles in the first region of
-    // cells; note that we skip the very first anchor element
-    for (auto it = particle_container_owned_begin();
-         it != particle_container_owned_end();
-         ++it)
-      Assert(it->cell->is_locally_owned(), ExcInternalError());
+        // check that we only have locally owned particles in the first region
+        // of cells; note that we skip the very first anchor element
+        for (auto it = particle_container_owned_begin();
+             it != particle_container_owned_end();
+             ++it)
+          Assert(it->cell->is_locally_owned(), ExcInternalError());
 
-    // check that the cache is consistent with the iterators
-    std::vector<typename particle_container::iterator> verify_cache(
-      triangulation->n_active_cells(), particles.end());
-    for (auto it = particles.begin(); it != particles.end(); ++it)
-      if (!it->particles.empty())
-        verify_cache[it->cell->active_cell_index()] = it;
+        // check that the cache is consistent with the iterators
+        std::vector<typename particle_container::iterator> verify_cache(
+          triangulation->n_active_cells(), particles.end());
+        for (auto it = particles.begin(); it != particles.end(); ++it)
+          if (!it->particles.empty())
+            verify_cache[it->cell->active_cell_index()] = it;
 
-    for (unsigned int i = 0; i < verify_cache.size(); ++i)
-      Assert(verify_cache[i] == cells_to_particle_cache[i], ExcInternalError());
-#endif
+        for (unsigned int i = 0; i < verify_cache.size(); ++i)
+          Assert(verify_cache[i] == cells_to_particle_cache[i],
+                 ExcInternalError());
+      }
 
     // now compute local result with the function above and then compute the
     // collective results
@@ -775,10 +777,11 @@ namespace Particles
     if (!properties.empty())
       {
         AssertDimension(properties.size(), positions.size());
-#ifdef DEBUG
-        for (const auto &p : properties)
-          AssertDimension(p.size(), n_properties_per_particle());
-#endif
+        if constexpr (running_in_debug_mode())
+          {
+            for (const auto &p : properties)
+              AssertDimension(p.size(), n_properties_per_particle());
+          }
       }
 
     if (!ids.empty())
@@ -1266,8 +1269,8 @@ namespace Particles
         for (const auto &p_unit : reference_locations)
           {
             if (numbers::is_finite(p_unit[0]) &&
-                GeometryInfo<dim>::is_inside_unit_cell(p_unit,
-                                                       tolerance_inside_cell))
+                cell->reference_cell().contains_point(p_unit,
+                                                      tolerance_inside_cell))
               particle->set_reference_location(p_unit);
             else
               particles_out_of_cell.push_back(particle);
@@ -1399,8 +1402,10 @@ namespace Particles
                                                           real_locations,
                                                           reference_locations);
 
-              if (GeometryInfo<dim>::is_inside_unit_cell(reference_locations[0],
-                                                         tolerance_inside_cell))
+              if ((*candidate_cell)
+                    ->reference_cell()
+                    .contains_point(reference_locations[0],
+                                    tolerance_inside_cell))
                 {
                   current_cell = *candidate_cell;
                   found_cell   = true;
@@ -1448,7 +1453,7 @@ namespace Particles
                   mapping->transform_points_real_to_unit_cell(
                     cell, real_locations, reference_locations);
 
-                  if (GeometryInfo<dim>::is_inside_unit_cell(
+                  if (cell->reference_cell().contains_point(
                         reference_locations[0], tolerance_inside_cell))
                     {
                       current_cell = cell;
@@ -2410,7 +2415,7 @@ namespace Particles
                         const Point<dim> p_unit =
                           mapping->transform_real_to_unit_cell(
                             child, particle->get_location());
-                        if (GeometryInfo<dim>::is_inside_unit_cell(
+                        if (cell->reference_cell().contains_point(
                               p_unit, tolerance_inside_cell))
                           {
                             found_new_cell = true;
@@ -2446,7 +2451,7 @@ namespace Particles
                     // If we get here, we did not find the particle in any
                     // child. This case may happen for particles that are at the
                     // boundary for strongly curved cells. We apply a tolerance
-                    // in the call to GeometryInfo<dim>::is_inside_unit_cell to
+                    // in the call to ReferenceCell::contains_point() to
                     // account for this, but if that is not enough, we still
                     // need to prevent an endless loop here. Delete the particle
                     // and move on.
@@ -2475,6 +2480,6 @@ namespace Particles
   }
 } // namespace Particles
 
-#include "particle_handler.inst"
+#include "particles/particle_handler.inst"
 
 DEAL_II_NAMESPACE_CLOSE

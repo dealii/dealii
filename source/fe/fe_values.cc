@@ -997,6 +997,6 @@ FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
 
 /*------------------------- Explicit Instantiations --------------------------*/
 
-#include "fe_values.inst"
+#include "fe/fe_values.inst"
 
 DEAL_II_NAMESPACE_CLOSE

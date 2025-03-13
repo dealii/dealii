@@ -76,7 +76,7 @@ DEAL_II_NAMESPACE_OPEN
  * quadrature dimension the same as the space dimension) or for a face
  * integrator (with quadrature dimension one less)
  *
- * @tparam VectorizedArrayType Type of array to be woked on in a vectorized
+ * @tparam VectorizedArrayType Type of array to be worked on in a vectorized
  *                             fashion, defaults to VectorizedArray<Number>
  *
  * @note Currently only VectorizedArray<Number, width> is supported as
@@ -1829,7 +1829,7 @@ private:
  *
  * @tparam Number Number format, usually @p double or @p float
  *
- * @tparam VectorizedArrayType Type of array to be woked on in a vectorized
+ * @tparam VectorizedArrayType Type of array to be worked on in a vectorized
  *                             fashion, defaults to VectorizedArray<Number>
  *
  * @note Currently only VectorizedArray<Number, width> is supported as
@@ -3923,9 +3923,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   apply_hanging_node_constraints(false);
 
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->dof_values_initialized = true;
+    }
 }
 
 
@@ -3953,9 +3954,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   internal::VectorReader<Number, VectorizedArrayType> reader;
   read_write_operation(reader, src_data.first, src_data.second, mask, false);
 
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->dof_values_initialized = true;
+    }
 }
 
 
@@ -3972,10 +3974,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                              const unsigned int          first_index,
                              const std::bitset<n_lanes> &mask) const
 {
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->dof_values_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
 
   apply_hanging_node_constraints(true);
 
@@ -4006,10 +4009,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                  const unsigned int          first_index,
                  const std::bitset<n_lanes> &mask) const
 {
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->dof_values_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
 
   const auto dst_data = internal::get_vector_data<n_components_>(
     dst,
@@ -4037,10 +4041,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                        const unsigned int          first_index,
                        const std::bitset<n_lanes> &mask) const
 {
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->dof_values_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
 
   const auto dst_data = internal::get_vector_data<n_components_>(
     dst,
@@ -4103,10 +4108,11 @@ inline DEAL_II_ALWAYS_INLINE
   FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     get_value(const unsigned int q_point) const
 {
-#  ifdef DEBUG
-  Assert(this->values_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->values_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
 
   AssertIndexRange(q_point, this->n_quadrature_points);
   if constexpr (n_components == 1)
@@ -4118,10 +4124,11 @@ inline DEAL_II_ALWAYS_INLINE
             internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
         {
           // Piola transform is required
-#  ifdef DEBUG
-          Assert(this->values_quad_initialized == true,
-                 internal::ExcAccessToUninitializedField());
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              Assert(this->values_quad_initialized == true,
+                     internal::ExcAccessToUninitializedField());
+            }
 
           AssertIndexRange(q_point, this->n_quadrature_points);
           Assert(this->J_value != nullptr,
@@ -4202,10 +4209,11 @@ inline DEAL_II_ALWAYS_INLINE
   FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     get_gradient(const unsigned int q_point) const
 {
-#  ifdef DEBUG
-  Assert(this->gradients_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->gradients_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
 
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->jacobian != nullptr,
@@ -4219,10 +4227,11 @@ inline DEAL_II_ALWAYS_INLINE
           internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
         {
           // Piola transform is required
-#  ifdef DEBUG
-          Assert(this->gradients_quad_initialized == true,
-                 internal::ExcAccessToUninitializedField());
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              Assert(this->gradients_quad_initialized == true,
+                     internal::ExcAccessToUninitializedField());
+            }
 
           AssertIndexRange(q_point, this->n_quadrature_points);
           Assert(this->jacobian != nullptr,
@@ -4450,10 +4459,11 @@ inline DEAL_II_ALWAYS_INLINE
     get_normal_derivative(const unsigned int q_point) const
 {
   AssertIndexRange(q_point, this->n_quadrature_points);
-#  ifdef DEBUG
-  Assert(this->gradients_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->gradients_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
 
   Assert(this->normal_x_jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -4555,10 +4565,11 @@ inline typename FEEvaluationBase<dim,
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_hessian(const unsigned int q_point) const
 {
-#  ifdef DEBUG
-  Assert(this->hessians_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->hessians_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Assert(this->jacobian != nullptr,
@@ -4700,10 +4711,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_hessian_diagonal(const unsigned int q_point) const
 {
   Assert(!is_face, ExcNotImplemented());
-#  ifdef DEBUG
-  Assert(this->hessians_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->hessians_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Assert(this->jacobian != nullptr, ExcNotImplemented());
@@ -4797,10 +4809,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_laplacian(const unsigned int q_point) const
 {
   Assert(is_face == false, ExcNotImplemented());
-#  ifdef DEBUG
-  Assert(this->hessians_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->hessians_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   const gradient_type hess_diag = get_hessian_diagonal(q_point);
@@ -4839,10 +4852,11 @@ inline typename FEEvaluationBase<dim,
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   get_normal_hessian(const unsigned int q_point) const
 {
-#  ifdef DEBUG
-  Assert(this->hessians_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->hessians_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
 
   Assert(this->normal_x_jacobian != nullptr,
@@ -4919,9 +4933,10 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_dof_value(const value_type val_in, const unsigned int dof)
 {
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->dof_values_initialized = true;
+    }
   const std::size_t dofs = this->data->dofs_per_component_on_cell;
   AssertIndexRange(dof, this->data->dofs_per_component_on_cell);
   for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -4942,16 +4957,18 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_value(const value_type val_in, const unsigned int q_point)
 {
-#  ifdef DEBUG
-  Assert(this->is_reinitialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->is_reinitialized, ExcNotInitialized());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_values"));
-#  ifdef DEBUG
-  this->values_quad_submitted = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->values_quad_submitted = true;
+    }
 
   const std::size_t    nqp    = this->n_quadrature_points;
   VectorizedArrayType *values = this->values_quad + q_point;
@@ -4973,10 +4990,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           Assert(this->J_value != nullptr,
                  internal::ExcMatrixFreeAccessToUninitializedMappingField(
                    "update_value"));
-#  ifdef DEBUG
-          Assert(this->is_reinitialized, ExcNotInitialized());
-          this->values_quad_submitted = true;
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              Assert(this->is_reinitialized, ExcNotInitialized());
+              this->values_quad_submitted = true;
+            }
 
           VectorizedArrayType *values = this->values_quad + q_point;
           const std::size_t    nqp    = this->n_quadrature_points;
@@ -5061,9 +5079,10 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_gradient(const gradient_type grad_in, const unsigned int q_point)
 {
-#  ifdef DEBUG
-  Assert(this->is_reinitialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->is_reinitialized, ExcNotInitialized());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -5071,9 +5090,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-#  ifdef DEBUG
-  this->gradients_quad_submitted = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->gradients_quad_submitted = true;
+    }
 
   if constexpr (dim > 1 && n_components == dim)
     {
@@ -5082,9 +5102,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           // Piola transform is required
 
-#  ifdef DEBUG
-          Assert(this->is_reinitialized, ExcNotInitialized());
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              Assert(this->is_reinitialized, ExcNotInitialized());
+            }
           AssertIndexRange(q_point, this->n_quadrature_points);
           Assert(this->J_value != nullptr,
                  internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -5092,9 +5113,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           Assert(this->jacobian != nullptr,
                  internal::ExcMatrixFreeAccessToUninitializedMappingField(
                    "update_gradients"));
-#  ifdef DEBUG
-          this->gradients_quad_submitted = true;
-#  endif
+          if constexpr (running_in_debug_mode())
+            {
+              this->gradients_quad_submitted = true;
+            }
 
           VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
           VectorizedArrayType *values =
@@ -5348,9 +5370,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->normal_x_jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-#  ifdef DEBUG
-  this->gradients_quad_submitted = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->gradients_quad_submitted = true;
+    }
 
   const std::size_t    nqp_d     = this->n_quadrature_points * dim;
   VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
@@ -5400,9 +5423,10 @@ inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_hessian(const hessian_type hessian_in, const unsigned int q_point)
 {
-#  ifdef DEBUG
-  Assert(this->is_reinitialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->is_reinitialized, ExcNotInitialized());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -5410,9 +5434,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_hessians"));
-#  ifdef DEBUG
-  this->hessians_quad_submitted = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->hessians_quad_submitted = true;
+    }
 
   // compute hessian_unit = J^T * hessian_in(u) * J
   const std::size_t      nqp  = this->n_quadrature_points;
@@ -5571,9 +5596,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   submit_normal_hessian(const value_type   normal_hessian_in,
                         const unsigned int q_point)
 {
-#  ifdef DEBUG
-  Assert(this->is_reinitialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->is_reinitialized, ExcNotInitialized());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -5581,9 +5607,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_hessians"));
-#  ifdef DEBUG
-  this->hessians_quad_submitted = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->hessians_quad_submitted = true;
+    }
 
   // compute hessian_unit = J^T * hessian_in(u) * J
   const std::size_t      nqp  = this->n_quadrature_points;
@@ -5656,11 +5683,12 @@ inline typename FEEvaluationBase<dim,
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   integrate_value() const
 {
-#  ifdef DEBUG
-  Assert(this->is_reinitialized, ExcNotInitialized());
-  Assert(this->values_quad_submitted == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->is_reinitialized, ExcNotInitialized());
+      Assert(this->values_quad_submitted == true,
+             internal::ExcAccessToUninitializedField());
+    }
 
   Tensor<1, n_components, VectorizedArrayType> return_value;
   const std::size_t                            nqp = this->n_quadrature_points;
@@ -5689,10 +5717,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 "Do not try to modify the default template parameters used for"
                 " selectively enabling this function via std::enable_if!");
 
-#  ifdef DEBUG
-  Assert(this->gradients_quad_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->gradients_quad_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -5855,9 +5884,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 "Do not try to modify the default template parameters used for"
                 " selectively enabling this function via std::enable_if!");
 
-#  ifdef DEBUG
-  Assert(this->is_reinitialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->is_reinitialized, ExcNotInitialized());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -5865,9 +5895,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-#  ifdef DEBUG
-  this->gradients_quad_submitted = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->gradients_quad_submitted = true;
+    }
 
   const std::size_t    nqp_d     = this->n_quadrature_points * dim;
   VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
@@ -5960,9 +5991,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // could have used base class operator, but that involves some overhead
   // which is inefficient. it is nice to have the symmetric tensor because
   // that saves some operations
-#  ifdef DEBUG
-  Assert(this->is_reinitialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->is_reinitialized, ExcNotInitialized());
+    }
   AssertIndexRange(q_point, this->n_quadrature_points);
   Assert(this->J_value != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
@@ -5970,9 +6002,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   Assert(this->jacobian != nullptr,
          internal::ExcMatrixFreeAccessToUninitializedMappingField(
            "update_gradients"));
-#  ifdef DEBUG
-  this->gradients_quad_submitted = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->gradients_quad_submitted = true;
+    }
 
   const std::size_t    nqp_d     = this->n_quadrature_points * dim;
   VectorizedArrayType *gradients = this->gradients_quad + dim * q_point;
@@ -6306,151 +6339,159 @@ FEEvaluation<dim,
       "is the index of the active FE, which you can use to exclude "
       "FE_Nothing."));
 
-#  ifdef DEBUG
-  // print error message when the dimensions do not match. Propose a possible
-  // fix
-  if ((static_cast<unsigned int>(fe_degree) != numbers::invalid_unsigned_int &&
-       static_cast<unsigned int>(fe_degree) !=
-         this->data->data.front().fe_degree) ||
-      n_q_points != this->n_quadrature_points)
+  if constexpr (running_in_debug_mode())
     {
-      std::string message =
-        "-------------------------------------------------------\n";
-      message += "Illegal arguments in constructor/wrong template arguments!\n";
-      message += "    Called -->   FEEvaluation<dim,";
-      message += Utilities::int_to_string(fe_degree) + ",";
-      message += Utilities::int_to_string(n_q_points_1d);
-      message += "," + Utilities::int_to_string(n_components);
-      message += ",Number>(data";
-      if (first_selected_component != numbers::invalid_unsigned_int)
+      // print error message when the dimensions do not match. Propose a
+      // possible fix
+      if ((static_cast<unsigned int>(fe_degree) !=
+             numbers::invalid_unsigned_int &&
+           static_cast<unsigned int>(fe_degree) !=
+             this->data->data.front().fe_degree) ||
+          n_q_points != this->n_quadrature_points)
         {
-          message += ", " + Utilities::int_to_string(dof_no) + ", ";
-          message += Utilities::int_to_string(this->quad_no) + ", ";
-          message += Utilities::int_to_string(first_selected_component);
-        }
-      message += ")\n";
-
-      // check whether some other vector component has the correct number of
-      // points
-      unsigned int proposed_dof_comp  = numbers::invalid_unsigned_int,
-                   proposed_fe_comp   = numbers::invalid_unsigned_int,
-                   proposed_quad_comp = numbers::invalid_unsigned_int;
-      if (dof_no != numbers::invalid_unsigned_int)
-        {
-          if (static_cast<unsigned int>(fe_degree) ==
-              this->data->data.front().fe_degree)
-            {
-              proposed_dof_comp = dof_no;
-              proposed_fe_comp  = first_selected_component;
-            }
-          else
-            for (unsigned int no = 0; no < this->matrix_free->n_components();
-                 ++no)
-              for (unsigned int nf = 0;
-                   nf < this->matrix_free->n_base_elements(no);
-                   ++nf)
-                if (this->matrix_free
-                      ->get_shape_info(no, 0, nf, this->active_fe_index, 0)
-                      .data.front()
-                      .fe_degree == static_cast<unsigned int>(fe_degree))
-                  {
-                    proposed_dof_comp = no;
-                    proposed_fe_comp  = nf;
-                    break;
-                  }
-          if (n_q_points ==
-              this->mapping_data->descriptor[this->active_quad_index]
-                .n_q_points)
-            proposed_quad_comp = this->quad_no;
-          else
-            for (unsigned int no = 0;
-                 no < this->matrix_free->get_mapping_info().cell_data.size();
-                 ++no)
-              if (this->matrix_free->get_mapping_info()
-                    .cell_data[no]
-                    .descriptor[this->active_quad_index]
-                    .n_q_points == n_q_points)
-                {
-                  proposed_quad_comp = no;
-                  break;
-                }
-        }
-      if (proposed_dof_comp != numbers::invalid_unsigned_int &&
-          proposed_quad_comp != numbers::invalid_unsigned_int)
-        {
-          if (proposed_dof_comp != first_selected_component)
-            message += "Wrong vector component selection:\n";
-          else
-            message += "Wrong quadrature formula selection:\n";
-          message += "    Did you mean FEEvaluation<dim,";
+          std::string message =
+            "-------------------------------------------------------\n";
+          message +=
+            "Illegal arguments in constructor/wrong template arguments!\n";
+          message += "    Called -->   FEEvaluation<dim,";
           message += Utilities::int_to_string(fe_degree) + ",";
           message += Utilities::int_to_string(n_q_points_1d);
           message += "," + Utilities::int_to_string(n_components);
           message += ",Number>(data";
+          if (first_selected_component != numbers::invalid_unsigned_int)
+            {
+              message += ", " + Utilities::int_to_string(dof_no) + ", ";
+              message += Utilities::int_to_string(this->quad_no) + ", ";
+              message += Utilities::int_to_string(first_selected_component);
+            }
+          message += ")\n";
+
+          // check whether some other vector component has the correct number of
+          // points
+          unsigned int proposed_dof_comp  = numbers::invalid_unsigned_int,
+                       proposed_fe_comp   = numbers::invalid_unsigned_int,
+                       proposed_quad_comp = numbers::invalid_unsigned_int;
           if (dof_no != numbers::invalid_unsigned_int)
             {
+              if (static_cast<unsigned int>(fe_degree) ==
+                  this->data->data.front().fe_degree)
+                {
+                  proposed_dof_comp = dof_no;
+                  proposed_fe_comp  = first_selected_component;
+                }
+              else
+                for (unsigned int no = 0;
+                     no < this->matrix_free->n_components();
+                     ++no)
+                  for (unsigned int nf = 0;
+                       nf < this->matrix_free->n_base_elements(no);
+                       ++nf)
+                    if (this->matrix_free
+                          ->get_shape_info(no, 0, nf, this->active_fe_index, 0)
+                          .data.front()
+                          .fe_degree == static_cast<unsigned int>(fe_degree))
+                      {
+                        proposed_dof_comp = no;
+                        proposed_fe_comp  = nf;
+                        break;
+                      }
+              if (n_q_points ==
+                  this->mapping_data->descriptor[this->active_quad_index]
+                    .n_q_points)
+                proposed_quad_comp = this->quad_no;
+              else
+                for (unsigned int no = 0;
+                     no <
+                     this->matrix_free->get_mapping_info().cell_data.size();
+                     ++no)
+                  if (this->matrix_free->get_mapping_info()
+                        .cell_data[no]
+                        .descriptor[this->active_quad_index]
+                        .n_q_points == n_q_points)
+                    {
+                      proposed_quad_comp = no;
+                      break;
+                    }
+            }
+          if (proposed_dof_comp != numbers::invalid_unsigned_int &&
+              proposed_quad_comp != numbers::invalid_unsigned_int)
+            {
+              if (proposed_dof_comp != first_selected_component)
+                message += "Wrong vector component selection:\n";
+              else
+                message += "Wrong quadrature formula selection:\n";
+              message += "    Did you mean FEEvaluation<dim,";
+              message += Utilities::int_to_string(fe_degree) + ",";
+              message += Utilities::int_to_string(n_q_points_1d);
+              message += "," + Utilities::int_to_string(n_components);
+              message += ",Number>(data";
+              if (dof_no != numbers::invalid_unsigned_int)
+                {
+                  message +=
+                    ", " + Utilities::int_to_string(proposed_dof_comp) + ", ";
+                  message +=
+                    Utilities::int_to_string(proposed_quad_comp) + ", ";
+                  message += Utilities::int_to_string(proposed_fe_comp);
+                }
+              message += ")?\n";
+              std::string correct_pos;
+              if (proposed_dof_comp != dof_no)
+                correct_pos = " ^ ";
+              else
+                correct_pos = "   ";
+              if (proposed_quad_comp != this->quad_no)
+                correct_pos += " ^ ";
+              else
+                correct_pos += "   ";
+              if (proposed_fe_comp != first_selected_component)
+                correct_pos += " ^\n";
+              else
+                correct_pos += "  \n";
               message +=
-                ", " + Utilities::int_to_string(proposed_dof_comp) + ", ";
-              message += Utilities::int_to_string(proposed_quad_comp) + ", ";
-              message += Utilities::int_to_string(proposed_fe_comp);
+                "                                                     " +
+                correct_pos;
+            }
+          // ok, did not find the numbers specified by the template arguments in
+          // the given list. Suggest correct template arguments
+          const unsigned int proposed_n_q_points_1d = static_cast<unsigned int>(
+            std::pow(1.001 * this->n_quadrature_points, 1. / dim));
+          message += "Wrong template arguments:\n";
+          message += "    Did you mean FEEvaluation<dim,";
+          message +=
+            Utilities::int_to_string(this->data->data.front().fe_degree) + ",";
+          message += Utilities::int_to_string(proposed_n_q_points_1d);
+          message += "," + Utilities::int_to_string(n_components);
+          message += ",Number>(data";
+          if (dof_no != numbers::invalid_unsigned_int)
+            {
+              message += ", " + Utilities::int_to_string(dof_no) + ", ";
+              message += Utilities::int_to_string(this->quad_no);
+              message +=
+                ", " + Utilities::int_to_string(first_selected_component);
             }
           message += ")?\n";
           std::string correct_pos;
-          if (proposed_dof_comp != dof_no)
-            correct_pos = " ^ ";
+          if (this->data->data.front().fe_degree !=
+              static_cast<unsigned int>(fe_degree))
+            correct_pos = " ^";
           else
-            correct_pos = "   ";
-          if (proposed_quad_comp != this->quad_no)
-            correct_pos += " ^ ";
-          else
-            correct_pos += "   ";
-          if (proposed_fe_comp != first_selected_component)
+            correct_pos = "  ";
+          if (proposed_n_q_points_1d != n_q_points_1d)
             correct_pos += " ^\n";
           else
             correct_pos += "  \n";
-          message += "                                                     " +
-                     correct_pos;
-        }
-      // ok, did not find the numbers specified by the template arguments in
-      // the given list. Suggest correct template arguments
-      const unsigned int proposed_n_q_points_1d = static_cast<unsigned int>(
-        std::pow(1.001 * this->n_quadrature_points, 1. / dim));
-      message += "Wrong template arguments:\n";
-      message += "    Did you mean FEEvaluation<dim,";
-      message +=
-        Utilities::int_to_string(this->data->data.front().fe_degree) + ",";
-      message += Utilities::int_to_string(proposed_n_q_points_1d);
-      message += "," + Utilities::int_to_string(n_components);
-      message += ",Number>(data";
-      if (dof_no != numbers::invalid_unsigned_int)
-        {
-          message += ", " + Utilities::int_to_string(dof_no) + ", ";
-          message += Utilities::int_to_string(this->quad_no);
-          message += ", " + Utilities::int_to_string(first_selected_component);
-        }
-      message += ")?\n";
-      std::string correct_pos;
-      if (this->data->data.front().fe_degree !=
-          static_cast<unsigned int>(fe_degree))
-        correct_pos = " ^";
-      else
-        correct_pos = "  ";
-      if (proposed_n_q_points_1d != n_q_points_1d)
-        correct_pos += " ^\n";
-      else
-        correct_pos += "  \n";
-      message += "                                 " + correct_pos;
+          message += "                                 " + correct_pos;
 
-      Assert(static_cast<unsigned int>(fe_degree) ==
-                 this->data->data.front().fe_degree &&
-               n_q_points == this->n_quadrature_points,
-             ExcMessage(message));
+          Assert(static_cast<unsigned int>(fe_degree) ==
+                     this->data->data.front().fe_degree &&
+                   n_q_points == this->n_quadrature_points,
+                 ExcMessage(message));
+        }
+      if (dof_no != numbers::invalid_unsigned_int)
+        AssertDimension(
+          n_q_points,
+          this->mapping_data->descriptor[this->active_quad_index].n_q_points);
     }
-  if (dof_no != numbers::invalid_unsigned_int)
-    AssertDimension(
-      n_q_points,
-      this->mapping_data->descriptor[this->active_quad_index].n_q_points);
-#  endif
 }
 
 
@@ -6512,13 +6553,14 @@ FEEvaluation<dim,
       &this->mapping_data->quadrature_points
          [this->mapping_data->quadrature_point_offsets[this->cell]];
 
-#  ifdef DEBUG
-  this->is_reinitialized           = true;
-  this->dof_values_initialized     = false;
-  this->values_quad_initialized    = false;
-  this->gradients_quad_initialized = false;
-  this->hessians_quad_initialized  = false;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->is_reinitialized           = true;
+      this->dof_values_initialized     = false;
+      this->values_quad_initialized    = false;
+      this->gradients_quad_initialized = false;
+      this->hessians_quad_initialized  = false;
+    }
 }
 
 
@@ -6775,13 +6817,14 @@ FEEvaluation<dim,
         }
     }
 
-#  ifdef DEBUG
-  this->is_reinitialized           = true;
-  this->dof_values_initialized     = false;
-  this->values_quad_initialized    = false;
-  this->gradients_quad_initialized = false;
-  this->hessians_quad_initialized  = false;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->is_reinitialized           = true;
+      this->dof_values_initialized     = false;
+      this->values_quad_initialized    = false;
+      this->gradients_quad_initialized = false;
+      this->hessians_quad_initialized  = false;
+    }
 }
 
 
@@ -6816,9 +6859,10 @@ FEEvaluation<dim,
   else
     cell->get_dof_indices(this->local_dof_indices);
 
-#  ifdef DEBUG
-  this->is_reinitialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->is_reinitialized = true;
+    }
 }
 
 
@@ -6846,9 +6890,10 @@ FEEvaluation<dim,
   Assert(this->mapped_geometry.get() != 0, ExcNotInitialized());
   this->mapped_geometry->reinit(cell);
 
-#  ifdef DEBUG
-  this->is_reinitialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->is_reinitialized = true;
+    }
 }
 
 
@@ -6868,10 +6913,11 @@ FEEvaluation<dim,
              VectorizedArrayType>::
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flags)
 {
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->dof_values_initialized == true,
+             internal::ExcAccessToUninitializedField());
+    }
   evaluate(this->values_dofs, evaluation_flags);
 }
 
@@ -6923,14 +6969,15 @@ FEEvaluation<dim,
         *this);
     }
 
-#  ifdef DEBUG
-  this->values_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::values;
-  this->gradients_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::gradients;
-  this->hessians_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::hessians;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->values_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::values;
+      this->gradients_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::gradients;
+      this->hessians_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::hessians;
+    }
 }
 
 
@@ -7055,9 +7102,10 @@ FEEvaluation<dim,
 {
   integrate(integration_flag, this->values_dofs);
 
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->dof_values_initialized = true;
+    }
 }
 
 
@@ -7079,17 +7127,18 @@ FEEvaluation<dim,
             VectorizedArrayType                   *values_array,
             const bool                             sum_into_values_array)
 {
-#  ifdef DEBUG
-  if (integration_flag & EvaluationFlags::values)
-    Assert(this->values_quad_submitted == true,
-           internal::ExcAccessToUninitializedField());
-  if (integration_flag & EvaluationFlags::gradients)
-    Assert(this->gradients_quad_submitted == true,
-           internal::ExcAccessToUninitializedField());
-  if ((integration_flag & EvaluationFlags::hessians) != 0u)
-    Assert(this->hessians_quad_submitted == true,
-           internal::ExcAccessToUninitializedField());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      if (integration_flag & EvaluationFlags::values)
+        Assert(this->values_quad_submitted == true,
+               internal::ExcAccessToUninitializedField());
+      if (integration_flag & EvaluationFlags::gradients)
+        Assert(this->gradients_quad_submitted == true,
+               internal::ExcAccessToUninitializedField());
+      if ((integration_flag & EvaluationFlags::hessians) != 0u)
+        Assert(this->hessians_quad_submitted == true,
+               internal::ExcAccessToUninitializedField());
+    }
   Assert(this->matrix_free != nullptr ||
            this->mapped_geometry->is_initialized(),
          ExcNotInitialized());
@@ -7158,9 +7207,10 @@ FEEvaluation<dim,
         sum_into_values_array);
     }
 
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->dof_values_initialized = true;
+    }
 }
 
 
@@ -7210,7 +7260,8 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::dof_indices() const
 {
-  return {0U, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, dofs_per_cell);
 }
 
 
@@ -7363,13 +7414,14 @@ FEFaceEvaluation<dim,
         this->mapping_data->quadrature_point_offsets[this->cell];
     }
 
-#  ifdef DEBUG
-  this->is_reinitialized           = true;
-  this->dof_values_initialized     = false;
-  this->values_quad_initialized    = false;
-  this->gradients_quad_initialized = false;
-  this->hessians_quad_initialized  = false;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->is_reinitialized           = true;
+      this->dof_values_initialized     = false;
+      this->values_quad_initialized    = false;
+      this->gradients_quad_initialized = false;
+      this->hessians_quad_initialized  = false;
+    }
 }
 
 
@@ -7464,7 +7516,7 @@ FEFaceEvaluation<dim,
           if (face_identifies_as_interior != orientation_interior_face)
             {
               constexpr std::array<std::uint8_t, 8> table{
-                {0, 1, 2, 3, 6, 5, 4, 7}};
+                {0, 1, 6, 3, 4, 5, 2, 7}};
               face_orientation = table[face_orientation];
             }
           this->face_orientations[i] = face_orientation;
@@ -7547,13 +7599,14 @@ FEFaceEvaluation<dim,
                                   .quadrature_point_offsets[index];
     }
 
-#  ifdef DEBUG
-  this->is_reinitialized           = true;
-  this->dof_values_initialized     = false;
-  this->values_quad_initialized    = false;
-  this->gradients_quad_initialized = false;
-  this->hessians_quad_initialized  = false;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->is_reinitialized           = true;
+      this->dof_values_initialized     = false;
+      this->values_quad_initialized    = false;
+      this->gradients_quad_initialized = false;
+      this->hessians_quad_initialized  = false;
+    }
 }
 
 
@@ -7573,9 +7626,10 @@ FEFaceEvaluation<dim,
                  VectorizedArrayType>::
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->dof_values_initialized, ExcNotInitialized());
+    }
 
   evaluate(this->values_dofs, evaluation_flag);
 }
@@ -7627,14 +7681,15 @@ FEFaceEvaluation<dim,
     internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::evaluate(
       n_components, evaluation_flag_actual, values_array, *this);
 
-#  ifdef DEBUG
-  this->values_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::values;
-  this->gradients_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::gradients;
-  this->hessians_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::hessians;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->values_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::values;
+      this->gradients_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::gradients;
+      this->hessians_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::hessians;
+    }
 }
 
 
@@ -7654,9 +7709,10 @@ FEFaceEvaluation<dim,
                  VectorizedArrayType>::
   project_to_face(const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized, ExcNotInitialized());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(this->dof_values_initialized, ExcNotInitialized());
+    }
 
   project_to_face(this->values_dofs, evaluation_flag);
 }
@@ -7761,14 +7817,15 @@ FEFaceEvaluation<dim,
     internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::
       evaluate_in_face(n_components, evaluation_flag_actual, *this);
 
-#  ifdef DEBUG
-  this->values_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::values;
-  this->gradients_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::gradients;
-  this->hessians_quad_initialized =
-    evaluation_flag_actual & EvaluationFlags::hessians;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->values_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::values;
+      this->gradients_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::gradients;
+      this->hessians_quad_initialized =
+        evaluation_flag_actual & EvaluationFlags::hessians;
+    }
 }
 
 
@@ -7791,9 +7848,10 @@ FEFaceEvaluation<dim,
 {
   integrate(integration_flag, this->values_dofs, sum_into_values);
 
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->dof_values_initialized = true;
+    }
 }
 
 
@@ -7969,9 +8027,10 @@ FEFaceEvaluation<dim,
 {
   collect_from_face(integration_flag, this->values_dofs, sum_into_values);
 
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->dof_values_initialized = true;
+    }
 }
 
 
@@ -8108,12 +8167,14 @@ FEFaceEvaluation<dim,
       this->evaluate(evaluation_flag);
     }
 
-#  ifdef DEBUG
-  this->values_quad_initialized = evaluation_flag & EvaluationFlags::values;
-  this->gradients_quad_initialized =
-    evaluation_flag & EvaluationFlags::gradients;
-  this->hessians_quad_initialized = evaluation_flag & EvaluationFlags::hessians;
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      this->values_quad_initialized = evaluation_flag & EvaluationFlags::values;
+      this->gradients_quad_initialized =
+        evaluation_flag & EvaluationFlags::gradients;
+      this->hessians_quad_initialized =
+        evaluation_flag & EvaluationFlags::hessians;
+    }
 }
 
 
@@ -8240,7 +8301,8 @@ FEFaceEvaluation<dim,
                  Number,
                  VectorizedArrayType>::dof_indices() const
 {
-  return {0U, dofs_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, dofs_per_cell);
 }
 
 

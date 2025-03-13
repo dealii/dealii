@@ -458,6 +458,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number, MemorySpace>>::
 
 
 // explicit instantiation
-#include "mg_level_global_transfer.inst"
+#include "multigrid/mg_level_global_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

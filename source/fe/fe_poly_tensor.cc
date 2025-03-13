@@ -134,40 +134,143 @@ namespace internal
         // nothing to do in 1d
       }
 
-
-
       template <int spacedim>
       void
       get_dof_sign_change_nedelec(
         const typename dealii::Triangulation<2, spacedim>::cell_iterator &cell,
-        const FiniteElement<2, spacedim> & /*fe*/,
+        const FiniteElement<2, spacedim>                                 &fe,
         const std::vector<MappingKind> &mapping_kind,
         std::vector<double>            &line_dof_sign)
       {
-        const unsigned int dim = 2;
-        // TODO: This fixes only lowest order
-        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
-              mapping_kind[0] == mapping_nedelec)
-            line_dof_sign[l] = -1.0;
-      }
+        // The Nedelec finite elements in two spacial dimensions have two types
+        // of dofs: the line dofs and the quad dofs. The line dofs are
+        // associated with the edges. They are shared between the neighbouring
+        // cells and, consequently, need to be adjusted to compensate for a
+        // possible mismatch in the edge orientation. The quad dofs, they are
+        // associated with the interiors of the cells, are not shared between
+        // the cells in two spacial dimensions and need no adjustments.
+        //
+        // The Nedelec finite elements in two spacial dimensions have
+        // 2*(k+1)*(k+2) dofs per cell. All dofs are distributed between the
+        // line and quad dofs as the following:
+        //
+        // 4*(k+1) line dofs; (k+1) dofs per line.
+        // 2*k*(k+1) quad dofs.
+        //
+        // The dofs are indexed in the following order: first all line dofs,
+        // then all quad dofs.
+        //
+        // Here we adjust the line dofs. The sign of a line dof needs to be
+        // changed if the edge on which the dof resides points in the opposite
+        // direction.
+        const unsigned int k = fe.tensor_degree() - 1;
 
+        for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell; ++l)
+          if (cell->line_orientation(l) !=
+                numbers::default_geometric_orientation &&
+              mapping_kind[0] == mapping_nedelec)
+            {
+              if (k == 0)
+                {
+                  // The lowest order element (k=0) is straightforward, because
+                  // there is a single dof per edge, which needs to be flipped:
+                  line_dof_sign[l] = -1.0;
+                }
+              else
+                {
+                  // The case k > 0 is a bit more complicated. As we adjust
+                  // only edge dofs in this function, we need to concern
+                  // ourselves with the first 4*(k+1) entries in line_dof_sign
+                  // vector ignoring the rest. There are (k+1) dofs per edge.
+                  // Let us consider the local dof indices on one edge,
+                  // local_line_dof = 0...k. The shape functions with even
+                  // indices are asymmetric. The corresponding dofs need sign
+                  // adjustment if the edge points in the opposite direction.
+                  // The shape functions with odd indices are symmetric. The
+                  // corresponding dofs need no sign adjustment even if the edge
+                  // points in the opposite direction. In the current context
+                  // the notion of symmetry of a shape function means that a
+                  // shape function looks exactly the same if it is looked upon
+                  // from the centers of the two neighbouring cells that share
+                  // it.
+                  for (unsigned int local_line_dof = 0;
+                       local_line_dof < (k + 1);
+                       local_line_dof++)
+                    if (local_line_dof % 2 == 0)
+                      line_dof_sign[local_line_dof + l * (k + 1)] = -1.0;
+                }
+            }
+      }
 
       template <int spacedim>
       void
       get_dof_sign_change_nedelec(
         const typename dealii::Triangulation<3, spacedim>::cell_iterator &cell,
-        const FiniteElement<3, spacedim> & /*fe*/,
+        const FiniteElement<3, spacedim>                                 &fe,
         const std::vector<MappingKind> &mapping_kind,
         std::vector<double>            &line_dof_sign)
       {
-        const unsigned int dim = 3;
-        // TODO: This is probably only going to work for those elements for
-        // which all dofs are face dofs
-        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-          if (!(cell->line_orientation(l)) &&
+        // This function does half of the job - it adjusts the sign of the
+        // line (edge) dofs. In the three-dimensional space the quad (face) dofs
+        // need to be adjusted as well. The quad dofs are treated by
+        // FE_Nedelec<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+        // in fe_nedelec.cc. The dofs associated with the interior of the cells,
+        // the hex dofs, need no adjustments as they are not shared between the
+        // neighboring cells.
+
+        const unsigned int k = fe.tensor_degree() - 1;
+        // The order of the Nedelec elements equals the tensor degree minus one,
+        // k = n - 1. In the three-dimensional space the Nedelec elements of the
+        // lowermost order, k = 0, have only 12 line (edge) dofs. The Nedelec
+        // elements of the higher orders, k > 0, have 3*(k+1)*(k+2)^2 dofs in
+        // total if dim=3. The dofs in a cell are distributed between lines
+        // (edges), quads (faces), and the hex (the interior of the cell) as the
+        // following:
+        //
+        // 12*(k+1) line dofs; (k+1) dofs per line.
+        // 2*6*k*(k+1) quad dofs; 2*k*(k+1) dofs per quad.
+        // 3*(k+2)^2*(k+1) hex dofs.
+        //
+        // The dofs are indexed in the following order: first all line dofs,
+        // then all quad dofs, and then all hex dofs.
+        //
+        // Here we adjust only the line (edge) dofs. The line dofs need only
+        // sign adjustment. That is, no permutation of the line dofs is needed.
+        for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
+          if (cell->line_orientation(l) !=
+                numbers::default_geometric_orientation &&
               mapping_kind[0] == mapping_nedelec)
-            line_dof_sign[l] = -1.0;
+            {
+              if (k == 0)
+                {
+                  // The lowest order element (k=0) is straightforward, because
+                  // there is a single dof per edge, which needs to be flipped:
+                  line_dof_sign[l] = -1.0;
+                }
+              else
+                {
+                  // The case k > 0 is a bit more complicated. As we adjust
+                  // only edge dofs in this function, we need to concern
+                  // ourselves with the first 12*(k+1) entries in line_dof_sign
+                  // vector ignoring the rest. There are (k+1) dofs per edge.
+                  // Let us consider the local dof indices on one edge,
+                  // local_line_dof = 0...k. The shape functions with even
+                  // indices are asymmetric. The corresponding dofs need sign
+                  // adjustment if the edge points in the opposite direction.
+                  // The shape functions with odd indices are symmetric. The
+                  // corresponding dofs need no sign adjustment even if the edge
+                  // points in the opposite direction. In the current context
+                  // the notion of symmetry of a shape function means that a
+                  // shape function looks exactly the same if it is looked upon
+                  // from the centers of the two neighbouring cells that share
+                  // it.
+                  for (unsigned int local_line_dof = 0;
+                       local_line_dof < (k + 1);
+                       local_line_dof++)
+                    if (local_line_dof % 2 == 0)
+                      line_dof_sign[local_line_dof + l * (k + 1)] = -1.0;
+                }
+            }
       }
     } // namespace
   }   // namespace FE_PolyTensor
@@ -2504,7 +2607,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
 
 #endif
 // explicit instantiations
-#include "fe_poly_tensor.inst"
+#include "fe/fe_poly_tensor.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -19,6 +19,8 @@
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/trilinos_tpetra_types.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -200,22 +202,24 @@ IndexSet::do_compress() const
     Assert(next_index == n_elements(), ExcInternalError());
   }
 
-#ifdef DEBUG
-  // A consistency check: We should only ever have added indices
-  // that are within the range of the index set. Instead of doing
-  // this in every one of the many functions that add indices,
-  // do this in the current, central location
-  for (const auto &range : ranges)
-    Assert((range.begin < index_space_size) && (range.end <= index_space_size),
-           ExcMessage("In the process of creating the current IndexSet "
-                      "object, you added indices beyond the size of the index "
-                      "space. Specifically, you added elements that form the "
-                      "range [" +
-                      std::to_string(range.begin) + "," +
-                      std::to_string(range.end) +
-                      "), but the size of the index space is only " +
-                      std::to_string(index_space_size) + "."));
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      // A consistency check: We should only ever have added indices
+      // that are within the range of the index set. Instead of doing
+      // this in every one of the many functions that add indices,
+      // do this in the current, central location
+      for (const auto &range : ranges)
+        Assert((range.begin < index_space_size) &&
+                 (range.end <= index_space_size),
+               ExcMessage(
+                 "In the process of creating the current IndexSet "
+                 "object, you added indices beyond the size of the index "
+                 "space. Specifically, you added elements that form the "
+                 "range [" +
+                 std::to_string(range.begin) + "," + std::to_string(range.end) +
+                 "), but the size of the index space is only " +
+                 std::to_string(index_space_size) + "."));
+    }
 }
 
 
@@ -455,14 +459,15 @@ IndexSet::split_by_block(
       start += n_block_indices;
     }
 
-#ifdef DEBUG
-  types::global_dof_index sum = 0;
-  for (const auto &partition : partitioned)
+  if constexpr (running_in_debug_mode())
     {
-      sum += partition.size();
+      types::global_dof_index sum = 0;
+      for (const auto &partition : partitioned)
+        {
+          sum += partition.size();
+        }
+      AssertDimension(sum, this->size());
     }
-  AssertDimension(sum, this->size());
-#endif
 
   return partitioned;
 }
@@ -970,29 +975,30 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
   compress();
   (void)communicator;
 
-#    ifdef DEBUG
-  if (!overlapping)
+  if constexpr (running_in_debug_mode())
     {
-      const size_type n_global_elements =
-        Utilities::MPI::sum(n_elements(), communicator);
-      Assert(n_global_elements == size(),
-             ExcMessage("You are trying to create an Tpetra::Map object "
-                        "that partitions elements of an index set "
-                        "between processors. However, the union of the "
-                        "index sets on different processors does not "
-                        "contain all indices exactly once: the sum of "
-                        "the number of entries the various processors "
-                        "want to store locally is " +
-                        std::to_string(n_global_elements) +
-                        " whereas the total size of the object to be "
-                        "allocated is " +
-                        std::to_string(size()) +
-                        ". In other words, there are "
-                        "either indices that are not spoken for "
-                        "by any processor, or there are indices that are "
-                        "claimed by multiple processors."));
+      if (!overlapping)
+        {
+          const size_type n_global_elements =
+            Utilities::MPI::sum(n_elements(), communicator);
+          Assert(n_global_elements == size(),
+                 ExcMessage("You are trying to create an Tpetra::Map object "
+                            "that partitions elements of an index set "
+                            "between processors. However, the union of the "
+                            "index sets on different processors does not "
+                            "contain all indices exactly once: the sum of "
+                            "the number of entries the various processors "
+                            "want to store locally is " +
+                            std::to_string(n_global_elements) +
+                            " whereas the total size of the object to be "
+                            "allocated is " +
+                            std::to_string(size()) +
+                            ". In other words, there are "
+                            "either indices that are not spoken for "
+                            "by any processor, or there are indices that are "
+                            "claimed by multiple processors."));
+        }
     }
-#    endif
 
   // Find out if the IndexSet is ascending and 1:1. This corresponds to a
   // linear Tpetra::Map. Overlapping IndexSets are never 1:1.
@@ -1044,29 +1050,30 @@ IndexSet::make_trilinos_map(const MPI_Comm communicator,
   compress();
   (void)communicator;
 
-#  ifdef DEBUG
-  if (!overlapping)
+  if constexpr (running_in_debug_mode())
     {
-      const size_type n_global_elements =
-        Utilities::MPI::sum(n_elements(), communicator);
-      Assert(n_global_elements == size(),
-             ExcMessage("You are trying to create an Epetra_Map object "
-                        "that partitions elements of an index set "
-                        "between processors. However, the union of the "
-                        "index sets on different processors does not "
-                        "contain all indices exactly once: the sum of "
-                        "the number of entries the various processors "
-                        "want to store locally is " +
-                        std::to_string(n_global_elements) +
-                        " whereas the total size of the object to be "
-                        "allocated is " +
-                        std::to_string(size()) +
-                        ". In other words, there are "
-                        "either indices that are not spoken for "
-                        "by any processor, or there are indices that are "
-                        "claimed by multiple processors."));
+      if (!overlapping)
+        {
+          const size_type n_global_elements =
+            Utilities::MPI::sum(n_elements(), communicator);
+          Assert(n_global_elements == size(),
+                 ExcMessage("You are trying to create an Epetra_Map object "
+                            "that partitions elements of an index set "
+                            "between processors. However, the union of the "
+                            "index sets on different processors does not "
+                            "contain all indices exactly once: the sum of "
+                            "the number of entries the various processors "
+                            "want to store locally is " +
+                            std::to_string(n_global_elements) +
+                            " whereas the total size of the object to be "
+                            "allocated is " +
+                            std::to_string(size()) +
+                            ". In other words, there are "
+                            "either indices that are not spoken for "
+                            "by any processor, or there are indices that are "
+                            "claimed by multiple processors."));
+        }
     }
-#  endif
 
   // Find out if the IndexSet is ascending and 1:1. This corresponds to a
   // linear EpetraMap. Overlapping IndexSets are never 1:1.

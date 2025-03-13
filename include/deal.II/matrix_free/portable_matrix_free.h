@@ -35,6 +35,8 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <deal.II/matrix_free/shape_info.h>
+
 #include <Kokkos_Core.hpp>
 
 
@@ -235,6 +237,18 @@ namespace Portable
       bool use_coloring;
 
       /**
+       * Encodes the type of element detected at construction. FEEvaluation
+       * will select the most efficient algorithm based on the given element
+       * type.
+       */
+      ::dealii::internal::MatrixFreeFunctions::ElementType element_type;
+
+      /**
+       * Size of the scratch pad for temporary storage in shared memory.
+       */
+      unsigned int scratch_pad_size;
+
+      /**
        * Return the quadrature point index local. The index is
        * only unique for a given MPI process.
        */
@@ -327,7 +341,6 @@ namespace Portable
      *   Portable::SharedData<dim, Number> *                     shared_data,
      *   const Number *                                              src,
      *   Number *                                                    dst) const;
-     *   static const unsigned int n_dofs_1d;
      *   static const unsigned int n_local_dofs;
      *   static const unsigned int n_q_points;
      * \endcode
@@ -349,7 +362,6 @@ namespace Portable
      *  DEAL_II_HOST_DEVICE void operator()(
      *    const unsigned int                                          cell,
      *    const typename Portable::MatrixFree<dim, Number>::Data *gpu_data);
-     * static const unsigned int n_dofs_1d;
      * static const unsigned int n_local_dofs;
      * static const unsigned int n_q_points;
      * \endcode
@@ -475,6 +487,18 @@ namespace Portable
      * Total number of degrees of freedom.
      */
     types::global_dof_index n_dofs;
+
+    /**
+     * Encodes the type of element detected at construction. FEEvaluation
+     * will select the most efficient algorithm based on the given element
+     * type.
+     */
+    ::dealii::internal::MatrixFreeFunctions::ElementType element_type;
+
+    /**
+     * Size of the scratch pad for temporary storage in shared memory.
+     */
+    unsigned int scratch_pad_size;
 
     /**
      * Degree of the finite element used.
@@ -629,14 +653,20 @@ namespace Portable
       Number ***,
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    using SharedViewScratchPad = Kokkos::View<
+      Number *,
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
     DEAL_II_HOST_DEVICE
-    SharedData(const TeamHandle          &team_member,
-               const SharedViewValues    &values,
-               const SharedViewGradients &gradients)
+    SharedData(const TeamHandle           &team_member,
+               const SharedViewValues     &values,
+               const SharedViewGradients  &gradients,
+               const SharedViewScratchPad &scratch_pad)
       : team_member(team_member)
       , values(values)
       , gradients(gradients)
+      , scratch_pad(scratch_pad)
     {}
 
     /**
@@ -653,6 +683,11 @@ namespace Portable
      * Memory for computed gradients in reference coordinate system.
      */
     SharedViewGradients gradients;
+
+    /**
+     * Memory for temporary arrays required by evaluation and integration.
+     */
+    SharedViewScratchPad scratch_pad;
   };
 
 

@@ -219,7 +219,7 @@ LaplaceEigenspectrumProblem::run()
   output_table.add_value("lambda", 2.);
   output_table.add_value("error", "-");
 
-  // finialise output
+  // finalise output
   output_table.write_text(std::cout);
   deallog << std::endl;
 }

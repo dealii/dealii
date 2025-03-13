@@ -30,6 +30,7 @@
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_faces.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
@@ -959,7 +960,7 @@ namespace internal
 
           // Allocate sufficient memory.
           const unsigned int bytes_per_cell = sizes_fixed_cumulative.back();
-          dest_data_fixed.resize(static_cast<size_t>(local_num_cells) *
+          dest_data_fixed.resize(static_cast<std::size_t>(local_num_cells) *
                                  bytes_per_cell);
 
           // Read packed data from file simultaneously.
@@ -1084,7 +1085,7 @@ namespace internal
                     sizes_fixed_cumulative.size() * sizeof(unsigned int));
 
           const unsigned int bytes_per_cell = sizes_fixed_cumulative.back();
-          dest_data_fixed.resize(static_cast<size_t>(local_num_cells) *
+          dest_data_fixed.resize(static_cast<std::size_t>(local_num_cells) *
                                  bytes_per_cell);
 
           // Read packed data.
@@ -1662,21 +1663,22 @@ namespace
     const auto inverse_orientation =
       face_1->reference_cell().get_inverse_combined_orientation(orientation);
 
-#ifdef DEBUG
-    const auto [face_orientation, face_rotation, face_flip] =
-      internal::split_face_orientation(orientation);
+    if constexpr (running_in_debug_mode())
+      {
+        const auto [face_orientation, face_rotation, face_flip] =
+          internal::split_face_orientation(orientation);
 
-    Assert((dim != 1) || (face_orientation == true && face_flip == false &&
-                          face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 1d"));
+        Assert((dim != 1) || (face_orientation == true && face_flip == false &&
+                              face_rotation == false),
+               ExcMessage("The supplied orientation "
+                          "(face_orientation, face_flip, face_rotation) "
+                          "is invalid for 1d"));
 
-    Assert((dim != 2) || (face_flip == false && face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 2d"));
-#endif
+        Assert((dim != 2) || (face_flip == false && face_rotation == false),
+               ExcMessage("The supplied orientation "
+                          "(face_orientation, face_flip, face_rotation) "
+                          "is invalid for 2d"));
+      }
 
     Assert(face_1 != face_2, ExcMessage("face_1 and face_2 are equal!"));
 
@@ -1826,6 +1828,23 @@ namespace
               }
           }
       }
+  }
+
+  // Given the child number and parent's line orientation, return the child face
+  // number.
+  unsigned int
+  child_line_index(const unsigned int                 child_no,
+                   const types::geometric_orientation line_orientation)
+  {
+    AssertIndexRange(child_no, ReferenceCells::Line.template n_children<1>());
+    Assert(line_orientation == numbers::default_geometric_orientation ||
+             line_orientation == numbers::reverse_line_orientation,
+           ExcInternalError());
+    constexpr auto D = numbers::default_geometric_orientation;
+    if (child_no == 0)
+      return line_orientation == D ? 0 : 1;
+    else
+      return line_orientation == D ? 1 : 0;
   }
 
   // Several parts of Triangulation (e.g., TriaLevel) are not templated on the
@@ -3307,16 +3326,18 @@ namespace internal
                         .get_combined_orientation(k);
                     // it doesn't make sense to set any flags except
                     // orientation for a line
-                    Assert(
-                      combined_orientation ==
-                          ReferenceCell::default_combined_face_orientation() ||
-                        combined_orientation ==
-                          ReferenceCell::reversed_combined_line_orientation(),
-                      ExcInternalError());
+                    Assert(combined_orientation ==
+                               numbers::default_geometric_orientation ||
+                             combined_orientation ==
+                               numbers::reverse_line_orientation,
+                           ExcInternalError());
+                    // Same convention as TriaAccessor::set_line_orientation():
+                    // store true for the default orientation and false for
+                    // reversed.
                     faces.quads_line_orientations
                       [q * ReferenceCells::max_n_lines<2>() + j] =
                       combined_orientation ==
-                      ReferenceCell::default_combined_face_orientation();
+                      numbers::default_geometric_orientation;
                   }
               }
           }
@@ -3340,7 +3361,7 @@ namespace internal
               const auto &orientations = connectivity.entity_orientations(1);
               for (unsigned int i = 0; i < orientations.n_objects(); ++i)
                 if (orientations.get_combined_orientation(i) !=
-                    ReferenceCell::default_combined_face_orientation())
+                    numbers::default_geometric_orientation)
                   {
                     orientation_needed = true;
                     break;
@@ -4061,7 +4082,7 @@ namespace internal
               // set flags denoting deviations from standard orientation of
               // faces back to initialization values
               cell->child(child)->set_combined_face_orientation(
-                f, ReferenceCell::default_combined_face_orientation());
+                f, numbers::default_geometric_orientation);
 
             cell->child(child)->clear_used_flag();
           }
@@ -4303,11 +4324,12 @@ namespace internal
                                   switch_1->line_index(2)),
                                 static_cast<signed int>(
                                   switch_1->line_index(3))};
-                              const bool switch_1_line_orientations[4] = {
-                                switch_1->line_orientation(0),
-                                switch_1->line_orientation(1),
-                                switch_1->line_orientation(2),
-                                switch_1->line_orientation(3)};
+                              const types::geometric_orientation
+                                switch_1_line_orientations[4] = {
+                                  switch_1->line_orientation(0),
+                                  switch_1->line_orientation(1),
+                                  switch_1->line_orientation(2),
+                                  switch_1->line_orientation(3)};
                               const types::boundary_id switch_1_boundary_id =
                                 switch_1->boundary_id();
                               const unsigned int switch_1_user_index =
@@ -5153,8 +5175,7 @@ namespace internal
                      12>
                                                        new_lines;
           std::array<types::geometric_orientation, 12> inherited_orientations;
-          inherited_orientations.fill(
-            ReferenceCell::default_combined_face_orientation());
+          inherited_orientations.fill(numbers::default_geometric_orientation);
           unsigned int lmin = 0;
           unsigned int lmax = 0;
 
@@ -5167,7 +5188,7 @@ namespace internal
               // the last one.
               std::fill(inherited_orientations.begin() + lmin,
                         inherited_orientations.begin() + lmax,
-                        ReferenceCell::reversed_combined_line_orientation());
+                        numbers::reverse_line_orientation);
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -5200,9 +5221,9 @@ namespace internal
               const auto combined_orientation =
                 cell->combined_face_orientation(face_no);
               Assert(combined_orientation ==
-                         ReferenceCell::default_combined_face_orientation() ||
+                         numbers::default_geometric_orientation ||
                        combined_orientation ==
-                         ReferenceCell::reversed_combined_line_orientation(),
+                         numbers::reverse_line_orientation,
                      ExcInternalError());
               for (unsigned int c = 0; c < 2; ++c)
                 {
@@ -5210,8 +5231,7 @@ namespace internal
                   inherited_orientations[2 * face_no + c] =
                     cell->combined_face_orientation(face_no);
                 }
-              if (combined_orientation ==
-                  ReferenceCell::reversed_combined_line_orientation())
+              if (combined_orientation == numbers::reverse_line_orientation)
                 std::swap(new_lines[2 * face_no], new_lines[2 * face_no + 1]);
             }
 
@@ -5333,7 +5353,7 @@ namespace internal
           if (cell->reference_cell() == ReferenceCells::Triangle)
             for (unsigned int face_no : cell->face_indices())
               subcells[3]->set_combined_face_orientation(
-                face_no, ReferenceCell::default_combined_face_orientation());
+                face_no, numbers::default_geometric_orientation);
 
           for (unsigned int i = 0; i < n_children / 2; ++i)
             cell->set_children(2 * i, subcells[2 * i]->index());
@@ -6112,25 +6132,28 @@ namespace internal
             triangulation.vertices_used.resize(needed_vertices, false);
           }
 
-          //-----------------------------------------
-          // Before we start with the actual refinement, we do some
-          // sanity checks if in debug mode. especially, we try to catch
-          // the notorious problem with lines being twice refined,
-          // i.e. there are cells adjacent at one line ("around the
-          // edge", but not at a face), with two cells differing by more
-          // than one refinement level
-          //
-          // this check is very simple to implement here, since we have
-          // all lines flagged if they shall be refined
-#ifdef DEBUG
-        for (const auto &cell : triangulation.active_cell_iterators())
-          if (!cell->refine_flag_set())
-            for (unsigned int line_n = 0; line_n < cell->n_lines(); ++line_n)
-              if (cell->line(line_n)->has_children())
-                for (unsigned int c = 0; c < 2; ++c)
-                  Assert(cell->line(line_n)->child(c)->user_flag_set() == false,
-                         ExcInternalError());
-#endif
+        //-----------------------------------------
+        // Before we start with the actual refinement, we do some
+        // sanity checks if in debug mode. especially, we try to catch
+        // the notorious problem with lines being twice refined,
+        // i.e. there are cells adjacent at one line ("around the
+        // edge", but not at a face), with two cells differing by more
+        // than one refinement level
+        //
+        // this check is very simple to implement here, since we have
+        // all lines flagged if they shall be refined
+        if constexpr (running_in_debug_mode())
+          {
+            for (const auto &cell : triangulation.active_cell_iterators())
+              if (!cell->refine_flag_set())
+                for (unsigned int line_n = 0; line_n < cell->n_lines();
+                     ++line_n)
+                  if (cell->line(line_n)->has_children())
+                    for (unsigned int c = 0; c < 2; ++c)
+                      Assert(cell->line(line_n)->child(c)->user_flag_set() ==
+                               false,
+                             ExcInternalError());
+          }
 
         unsigned int current_vertex = 0;
 
@@ -6242,10 +6265,11 @@ namespace internal
                   DEAL_II_NOT_IMPLEMENTED();
                 }
 
-#ifdef DEBUG
-              for (const unsigned int line : quad->line_indices())
-                AssertIsNotUsed(new_lines[line]);
-#endif
+              if constexpr (running_in_debug_mode())
+                {
+                  for (const unsigned int line : quad->line_indices())
+                    AssertIsNotUsed(new_lines[line]);
+                }
 
               // 2) create new quads (properties are set below). Both triangles
               // and quads are divided in four.
@@ -6263,10 +6287,11 @@ namespace internal
                 }
               quad->set_refinement_case(RefinementCase<2>::cut_xy);
 
-#ifdef DEBUG
-              for (const auto &quad : new_quads)
-                AssertIsNotUsed(quad);
-#endif
+              if constexpr (running_in_debug_mode())
+                {
+                  for (const auto &quad : new_quads)
+                    AssertIsNotUsed(quad);
+                }
 
               // 3) set vertex indices and set new vertex
 
@@ -6296,16 +6321,8 @@ namespace internal
               unsigned int                      n_lines = 0;
               for (unsigned int l = 0; l < quad->n_lines(); ++l)
                 for (unsigned int c = 0; c < 2; ++c)
-                  {
-                    static constexpr dealii::ndarray<unsigned int, 2, 2> index =
-                      {{// child 0, line_orientation=false and true
-                        {{1, 0}},
-                        // child 1, line_orientation=false and true
-                        {{0, 1}}}};
-
-                    lines[n_lines++] =
-                      quad->line(l)->child(index[c][quad->line_orientation(l)]);
-                  }
+                  lines[n_lines++] = quad->line(l)->child(
+                    child_line_index(c, quad->line_orientation(l)));
 
               for (unsigned int l = 0; l < quad->n_lines(); ++l)
                 lines[n_lines++] = new_lines[l];
@@ -6417,9 +6434,7 @@ namespace internal
                   new_quad->set_boundary_id_internal(quad->boundary_id());
                   new_quad->set_manifold_id(quad->manifold_id());
 
-#ifdef DEBUG
-                  std::set<unsigned int> s;
-#endif
+                  [[maybe_unused]] std::set<unsigned int> s;
 
                   // ... and fix orientation of lines of face for triangles,
                   // using an expensive algorithm, quadrilaterals are treated
@@ -6441,22 +6456,22 @@ namespace internal
                               make_array_view(vertices_0),
                               make_array_view(vertices_1));
 
-#ifdef DEBUG
-                          for (const auto i : vertices_0)
-                            s.insert(i);
-                          for (const auto i : vertices_1)
-                            s.insert(i);
-#endif
+                          if constexpr (library_build_mode ==
+                                        LibraryBuildMode::debug)
+                            {
+                              for (const auto i : vertices_0)
+                                s.insert(i);
+                              for (const auto i : vertices_1)
+                                s.insert(i);
+                            }
 
-                          new_quad->set_line_orientation(
-                            f,
-                            orientation ==
-                              ReferenceCell::
-                                default_combined_face_orientation());
+                          new_quad->set_line_orientation(f, orientation);
                         }
-#ifdef DEBUG
-                      AssertDimension(s.size(), 3);
-#endif
+                      if constexpr (library_build_mode ==
+                                    LibraryBuildMode::debug)
+                        {
+                          AssertDimension(s.size(), 3);
+                        }
                     }
                 }
 
@@ -6566,7 +6581,8 @@ namespace internal
                       numbers::internal_face_boundary_id);
                     new_quad->set_manifold_id(hex->manifold_id());
                     for (const auto j : new_quads[i]->line_indices())
-                      new_quad->set_line_orientation(j, true);
+                      new_quad->set_line_orientation(
+                        j, numbers::default_geometric_orientation);
                   }
 
                 // we always get 8 children per refined cell
@@ -6610,8 +6626,7 @@ namespace internal
                       // reset faces that are at the boundary of the mother cube
                       for (const auto f : new_hex->face_indices())
                         new_hex->set_combined_face_orientation(
-                          f,
-                          ReferenceCell::default_combined_face_orientation());
+                          f, numbers::default_geometric_orientation);
                     }
                   for (unsigned int i = 0; i < n_new_hexes / 2; ++i)
                     hex->set_children(2 * i, new_hexes[2 * i]->index());
@@ -6911,11 +6926,7 @@ namespace internal
                                 make_array_view(vertices_0),
                                 make_array_view(vertices_1));
 
-                            new_quad->set_line_orientation(
-                              l,
-                              orientation ==
-                                ReferenceCell::
-                                  default_combined_face_orientation());
+                            new_quad->set_line_orientation(l, orientation);
 
                             // on a hex, inject the status of the current line
                             // also to the line on the other quad along the
@@ -6924,11 +6935,7 @@ namespace internal
                                 ReferenceCells::Hexahedron)
                               new_quads[representative_lines[q % 4][1] + q -
                                         (q % 4)]
-                                ->set_line_orientation(
-                                  l,
-                                  orientation ==
-                                    ReferenceCell::
-                                      default_combined_face_orientation());
+                                ->set_line_orientation(l, orientation);
                           }
                       }
                   }
@@ -6996,9 +7003,10 @@ namespace internal
                          c < GeometryInfo<dim>::max_children_per_cell;
                          ++c)
                       {
-                        auto &new_hex = new_hexes[c];
+                        auto      &new_hex        = new_hexes[c];
+                        const auto reference_cell = new_hex->reference_cell();
 
-                        if (new_hex->n_faces() == 4)
+                        if (reference_cell == ReferenceCells::Tetrahedron)
                           {
                             new_hex->set_bounding_object_indices(
                               {quad_indices[cell_quads[c][0]],
@@ -7035,27 +7043,24 @@ namespace internal
 
                                 // arrange after vertices of the faces of the
                                 // unit cell
-                                const std::array<unsigned int, 3> vertices_1 = {
+                                std::array<unsigned int, 3> vertices_1;
+                                for (unsigned int face_vertex_no :
+                                     face->vertex_indices())
                                   {
-                                    vertex_indices
-                                      [new_hex_vertices
-                                         [ReferenceCells::Tetrahedron
-                                            .face_to_cell_vertices(f, 0, 1)]],
-                                    vertex_indices
-                                      [new_hex_vertices
-                                         [ReferenceCells::Tetrahedron
-                                            .face_to_cell_vertices(f, 1, 1)]],
-                                    vertex_indices
-                                      [new_hex_vertices
-                                         [ReferenceCells::Tetrahedron
-                                            .face_to_cell_vertices(f, 2, 1)]],
-                                  }};
+                                    const auto cell_vertex_no =
+                                      reference_cell.face_to_cell_vertices(
+                                        f,
+                                        face_vertex_no,
+                                        numbers::default_geometric_orientation);
+                                    vertices_1[face_vertex_no] = vertex_indices
+                                      [new_hex_vertices[cell_vertex_no]];
+                                  }
 
                                 new_hex->set_combined_face_orientation(
                                   f,
                                   face->reference_cell()
                                     .get_combined_orientation(
-                                      make_array_view(vertices_1),
+                                      make_const_array_view(vertices_1),
                                       make_array_view(vertices_0)));
                               }
                           }
@@ -7419,27 +7424,29 @@ namespace internal
           }
 
 
-          //-----------------------------------------
-          // Before we start with the actual refinement, we do some
-          // sanity checks if in debug mode. especially, we try to catch
-          // the notorious problem with lines being twice refined,
-          // i.e. there are cells adjacent at one line ("around the
-          // edge", but not at a face), with two cells differing by more
-          // than one refinement level
-          //
-          // this check is very simple to implement here, since we have
-          // all lines flagged if they shall be refined
-#ifdef DEBUG
-        for (const auto &cell : triangulation.active_cell_iterators())
-          if (!cell->refine_flag_set())
-            for (unsigned int line = 0;
-                 line < GeometryInfo<dim>::lines_per_cell;
-                 ++line)
-              if (cell->line(line)->has_children())
-                for (unsigned int c = 0; c < 2; ++c)
-                  Assert(cell->line(line)->child(c)->user_flag_set() == false,
-                         ExcInternalError());
-#endif
+        //-----------------------------------------
+        // Before we start with the actual refinement, we do some
+        // sanity checks if in debug mode. especially, we try to catch
+        // the notorious problem with lines being twice refined,
+        // i.e. there are cells adjacent at one line ("around the
+        // edge", but not at a face), with two cells differing by more
+        // than one refinement level
+        //
+        // this check is very simple to implement here, since we have
+        // all lines flagged if they shall be refined
+        if constexpr (running_in_debug_mode())
+          {
+            for (const auto &cell : triangulation.active_cell_iterators())
+              if (!cell->refine_flag_set())
+                for (unsigned int line = 0;
+                     line < GeometryInfo<dim>::lines_per_cell;
+                     ++line)
+                  if (cell->line(line)->has_children())
+                    for (unsigned int c = 0; c < 2; ++c)
+                      Assert(cell->line(line)->child(c)->user_flag_set() ==
+                               false,
+                             ExcInternalError());
+          }
 
         //-----------------------------------------
         // Do refinement on every level
@@ -7643,16 +7650,6 @@ namespace internal
                     new_line->set_boundary_id_internal(quad->boundary_id());
                     new_line->set_manifold_id(quad->manifold_id());
 
-                    // child 0 and 1 of a line are switched if the
-                    // line orientation is false. set up a miniature
-                    // table, indicating which child to take for line
-                    // orientations false and true. first index: child
-                    // index in standard orientation, second index:
-                    // line orientation
-                    const unsigned int index[2][2] = {
-                      {1, 0},  // child 0, line_orientation=false and true
-                      {0, 1}}; // child 1, line_orientation=false and true
-
                     // find some space (consecutive) for the two newly
                     // to be created quads.
                     typename Triangulation<dim, spacedim>::raw_quad_iterator
@@ -7674,38 +7671,46 @@ namespace internal
                           {static_cast<int>(quad->line_index(0)),
                            new_line->index(),
                            quad->line(2)
-                             ->child(index[0][quad->line_orientation(2)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(2)))
                              ->index(),
                            quad->line(3)
-                             ->child(index[0][quad->line_orientation(3)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(3)))
                              ->index()});
                         new_quads[1]->set_bounding_object_indices(
                           {new_line->index(),
                            static_cast<int>(quad->line_index(1)),
                            quad->line(2)
-                             ->child(index[1][quad->line_orientation(2)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(2)))
                              ->index(),
                            quad->line(3)
-                             ->child(index[1][quad->line_orientation(3)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(3)))
                              ->index()});
                       }
                     else
                       {
                         new_quads[0]->set_bounding_object_indices(
                           {quad->line(0)
-                             ->child(index[0][quad->line_orientation(0)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(0)))
                              ->index(),
                            quad->line(1)
-                             ->child(index[0][quad->line_orientation(1)])
+                             ->child(
+                               child_line_index(0, quad->line_orientation(1)))
                              ->index(),
                            static_cast<int>(quad->line_index(2)),
                            new_line->index()});
                         new_quads[1]->set_bounding_object_indices(
                           {quad->line(0)
-                             ->child(index[1][quad->line_orientation(0)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(0)))
                              ->index(),
                            quad->line(1)
-                             ->child(index[1][quad->line_orientation(1)])
+                             ->child(
+                               child_line_index(1, quad->line_orientation(1)))
                              ->index(),
                            new_line->index(),
                            static_cast<int>(quad->line_index(3))});
@@ -7725,7 +7730,8 @@ namespace internal
                         for (unsigned int j = 0;
                              j < GeometryInfo<dim>::lines_per_face;
                              ++j)
-                          new_quad->set_line_orientation(j, true);
+                          new_quad->set_line_orientation(
+                            j, numbers::default_geometric_orientation);
                       }
                     // now set the line orientation of children of
                     // outer lines correctly, the lines in the
@@ -7948,11 +7954,12 @@ namespace internal
                               switch_1->line_index(1),
                               switch_1->line_index(2),
                               switch_1->line_index(3)};
-                            const bool switch_1_line_orientations[4] = {
-                              switch_1->line_orientation(0),
-                              switch_1->line_orientation(1),
-                              switch_1->line_orientation(2),
-                              switch_1->line_orientation(3)};
+                            const types::geometric_orientation
+                              switch_1_line_orientations[4] = {
+                                switch_1->line_orientation(0),
+                                switch_1->line_orientation(1),
+                                switch_1->line_orientation(2),
+                                switch_1->line_orientation(3)};
                             const types::boundary_id switch_1_boundary_id =
                               switch_1->boundary_id();
                             const unsigned int switch_1_user_index =
@@ -8292,40 +8299,30 @@ namespace internal
                     //   0   8   2
                     //   .-4-.-5-.
 
-                    // child 0 and 1 of a line are switched if the
-                    // line orientation is false. set up a miniature
-                    // table, indicating which child to take for line
-                    // orientations false and true. first index: child
-                    // index in standard orientation, second index:
-                    // line orientation
-                    const unsigned int index[2][2] = {
-                      {1, 0},  // child 0, line_orientation=false and true
-                      {0, 1}}; // child 1, line_orientation=false and true
-
                     const int line_indices[12] = {
                       quad->line(0)
-                        ->child(index[0][quad->line_orientation(0)])
+                        ->child(child_line_index(0, quad->line_orientation(0)))
                         ->index(),
                       quad->line(0)
-                        ->child(index[1][quad->line_orientation(0)])
+                        ->child(child_line_index(1, quad->line_orientation(0)))
                         ->index(),
                       quad->line(1)
-                        ->child(index[0][quad->line_orientation(1)])
+                        ->child(child_line_index(0, quad->line_orientation(1)))
                         ->index(),
                       quad->line(1)
-                        ->child(index[1][quad->line_orientation(1)])
+                        ->child(child_line_index(1, quad->line_orientation(1)))
                         ->index(),
                       quad->line(2)
-                        ->child(index[0][quad->line_orientation(2)])
+                        ->child(child_line_index(0, quad->line_orientation(2)))
                         ->index(),
                       quad->line(2)
-                        ->child(index[1][quad->line_orientation(2)])
+                        ->child(child_line_index(1, quad->line_orientation(2)))
                         ->index(),
                       quad->line(3)
-                        ->child(index[0][quad->line_orientation(3)])
+                        ->child(child_line_index(0, quad->line_orientation(3)))
                         ->index(),
                       quad->line(3)
-                        ->child(index[1][quad->line_orientation(3)])
+                        ->child(child_line_index(1, quad->line_orientation(3)))
                         ->index(),
                       new_lines[0]->index(),
                       new_lines[1]->index(),
@@ -8398,7 +8395,8 @@ namespace internal
                         for (unsigned int j = 0;
                              j < GeometryInfo<dim>::lines_per_face;
                              ++j)
-                          new_quad->set_line_orientation(j, true);
+                          new_quad->set_line_orientation(
+                            j, numbers::default_geometric_orientation);
                       }
                     // now set the line orientation of children of
                     // outer lines correctly, the lines in the
@@ -8549,7 +8547,8 @@ namespace internal
                       for (unsigned int j = 0;
                            j < GeometryInfo<dim>::lines_per_face;
                            ++j)
-                        new_quads[i]->set_line_orientation(j, true);
+                        new_quads[i]->set_line_orientation(
+                          j, numbers::default_geometric_orientation);
                     }
 
                   types::subdomain_id subdomainid = hex->subdomain_id();
@@ -8597,8 +8596,7 @@ namespace internal
                       for (const unsigned int f :
                            GeometryInfo<dim>::face_indices())
                         new_hexes[i]->set_combined_face_orientation(
-                          f,
-                          ReferenceCell::default_combined_face_orientation());
+                          f, numbers::default_geometric_orientation);
                     }
                   // note these hexes as children to the present cell
                   for (unsigned int i = 0; i < n_new_hexes / 2; ++i)
@@ -8768,7 +8766,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[4];
+                          types::geometric_orientation line_orientation[4]{};
 
                           // the middle vertex marked as m0 above is the
                           // start vertex for lines 0 and 2 in standard
@@ -8781,15 +8779,16 @@ namespace internal
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(i % 2) ==
                                 middle_vertices[i % 2])
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
-                                // it must be the other
-                                // way round then
+                                // it must be the other way round then
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // set up the new quad, line numbering is as
@@ -8995,7 +8994,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[4];
+                          types::geometric_orientation line_orientation[4]{};
 
                           // the middle vertex marked as m0 above is the
                           // start vertex for lines 0 and 2 in standard
@@ -9008,14 +9007,16 @@ namespace internal
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(i % 2) ==
                                 middle_vertices[i % 2])
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // set up the new quad, line numbering is as
@@ -9223,7 +9224,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[4];
+                          types::geometric_orientation line_orientation[4]{};
 
                           // the middle vertex marked as m0 above is the
                           // start vertex for lines 0 and 2 in standard
@@ -9236,14 +9237,16 @@ namespace internal
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(i % 2) ==
                                 middle_vertices[i % 2])
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index((i + 1) % 2) ==
                                          middle_vertices[i % 2],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // set up the new quad, line numbering is as
@@ -9536,7 +9539,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[13];
+                          types::geometric_orientation line_orientation[13]{};
 
                           // the middle vertices of the lines of our
                           // bottom face
@@ -9552,14 +9555,16 @@ namespace internal
                           // face
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(0) == middle_vertices[i])
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -9572,21 +9577,23 @@ namespace internal
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 middle_vertex_index<dim, spacedim>(
                                   hex->face(3 + i / 4)))
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
-                                // it must be the other way
-                                // round then
+                                // it must be the other way round then
                                 Assert(lines[i]->vertex_index(i % 2) ==
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(3 + i / 4))),
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
                           // for the last line the line orientation is
                           // always true, since it was just constructed
                           // that way
-                          line_orientation[12] = true;
+                          line_orientation[12] =
+                            numbers::default_geometric_orientation;
 
                           // set up the 4 quads, numbered as follows (left
                           // quad numbering, right line numbering
@@ -9970,7 +9977,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[13];
+                          types::geometric_orientation line_orientation[13]{};
 
                           // the middle vertices of the
                           // lines of our front face
@@ -9985,14 +9992,16 @@ namespace internal
                           // line is 'true', if vertex 0 is on the front
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(0) == middle_vertices[i])
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -10005,7 +10014,8 @@ namespace internal
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 middle_vertex_index<dim, spacedim>(
                                   hex->face(1 + i / 4)))
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
                                 // it must be the other way
@@ -10014,12 +10024,14 @@ namespace internal
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(1 + i / 4))),
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
                           // for the last line the line orientation is
                           // always true, since it was just constructed
                           // that way
-                          line_orientation[12] = true;
+                          line_orientation[12] =
+                            numbers::default_geometric_orientation;
 
                           // set up the 4 quads, numbered as follows (left
                           // quad numbering, right line numbering
@@ -10418,7 +10430,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[13];
+                          types::geometric_orientation line_orientation[13]{};
 
                           // the middle vertices of the lines of our front
                           // face
@@ -10433,14 +10445,16 @@ namespace internal
                           // line is 'true', if vertex 0 is on the front
                           for (unsigned int i = 0; i < 4; ++i)
                             if (lines[i]->vertex_index(0) == middle_vertices[i])
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
                                 // it must be the other way round then
                                 Assert(lines[i]->vertex_index(1) ==
                                          middle_vertices[i],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
 
                           // note: for lines 4 to 11 (inner lines of the
@@ -10453,21 +10467,22 @@ namespace internal
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 middle_vertex_index<dim, spacedim>(
                                   hex->face(i / 4 - 1)))
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
-                                // it must be the other way
-                                // round then
+                                // it must be the other way round then
                                 Assert(lines[i]->vertex_index(i % 2) ==
                                          (middle_vertex_index<dim, spacedim>(
                                            hex->face(i / 4 - 1))),
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
-                          // for the last line the line orientation is
-                          // always true, since it was just constructed
-                          // that way
-                          line_orientation[12] = true;
+                          // for the last line the line orientation is always
+                          // the default, since it was just constructed that way
+                          line_orientation[12] =
+                            numbers::default_geometric_orientation;
 
                           // set up the 4 quads, numbered as follows (left
                           // quad numbering, right line numbering
@@ -11008,7 +11023,7 @@ namespace internal
                           // created ones and thus have no parents, they
                           // cannot inherit this property. set up an array
                           // and fill it with the respective values
-                          bool line_orientation[30];
+                          types::geometric_orientation line_orientation[30]{};
 
                           // note: for the first 24 lines (inner lines of
                           // the outer quads) the following holds: the
@@ -11019,7 +11034,8 @@ namespace internal
                           for (unsigned int i = 0; i < 24; ++i)
                             if (lines[i]->vertex_index((i + 1) % 2) ==
                                 vertex_indices[i / 4])
-                              line_orientation[i] = true;
+                              line_orientation[i] =
+                                numbers::default_geometric_orientation;
                             else
                               {
                                 // it must be the other way
@@ -11027,13 +11043,15 @@ namespace internal
                                 Assert(lines[i]->vertex_index(i % 2) ==
                                          vertex_indices[i / 4],
                                        ExcInternalError());
-                                line_orientation[i] = false;
+                                line_orientation[i] =
+                                  numbers::reverse_line_orientation;
                               }
                           // for the last 6 lines the line orientation is
                           // always true, since they were just constructed
                           // that way
                           for (unsigned int i = 24; i < 30; ++i)
-                            line_orientation[i] = true;
+                            line_orientation[i] =
+                              numbers::default_geometric_orientation;
 
                           // set up the 12 quads, numbered as follows
                           // (left quad numbering, right line numbering
@@ -13718,6 +13736,11 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::load(const std::string &file_basename)
 {
+  // It's probably prudent to first get rid of any all content of the
+  // triangulation, rather than hope that the deserialization below
+  // overwrites everything:
+  clear();
+
   // Load triangulation information.
   {
     std::ifstream ifs_tria(file_basename + "_triangulation.data");
@@ -15860,50 +15883,50 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   if (this->cell_attached_data.n_attached_data_sets == 0)
     this->update_cell_relations();
 
-#  ifdef DEBUG
-
-  // In debug mode, we want to check for some consistency of the
-  // result of this function. Because there are multiple exit
-  // paths, put this check into a ScopeExit object that is
-  // executed on each of the exit paths.
-  //
-  // Specifically, check on exit of this function that if a quad
-  // cell has been refined, all of its children have neighbors
-  // in all directions in which the parent cell has neighbors as
-  // well. The children's neighbors are either the parent
-  // neighbor or the parent neighbor's children, or simply one of
-  // the other children of the current cell. This check is
-  // useful because if one creates a triangulation with an
-  // inconsistently ordered set of cells (e.g., because one has
-  // forgotten to call GridTools::consistently_order_cells()),
-  // then this relatively simple invariant is violated -- so the
-  // check here can be used to catch that case, at least
-  // sometimes.
-  //
-  // In 1d, this situation cannot happen. In 3d, we have explicit
-  // orientation flags to ensure that it is not necessary to re-orient
-  // cells at the beginning. But in both cases, the invariant should
-  // still hold as long as the cell is a hypercube.
-  for (const auto &cell : cell_iterators())
+  if constexpr (running_in_debug_mode())
     {
-      if (cell->has_children() && cell->reference_cell().is_hyper_cube())
-        for (const unsigned int f : cell->face_indices())
-          if (cell->at_boundary(f) == false)
-            {
-              for (const auto &child : cell->child_iterators())
+      // In debug mode, we want to check for some consistency of the
+      // result of this function. Because there are multiple exit
+      // paths, put this check into a ScopeExit object that is
+      // executed on each of the exit paths.
+      //
+      // Specifically, check on exit of this function that if a quad
+      // cell has been refined, all of its children have neighbors
+      // in all directions in which the parent cell has neighbors as
+      // well. The children's neighbors are either the parent
+      // neighbor or the parent neighbor's children, or simply one of
+      // the other children of the current cell. This check is
+      // useful because if one creates a triangulation with an
+      // inconsistently ordered set of cells (e.g., because one has
+      // forgotten to call GridTools::consistently_order_cells()),
+      // then this relatively simple invariant is violated -- so the
+      // check here can be used to catch that case, at least
+      // sometimes.
+      //
+      // In 1d, this situation cannot happen. In 3d, we have explicit
+      // orientation flags to ensure that it is not necessary to re-orient
+      // cells at the beginning. But in both cases, the invariant should
+      // still hold as long as the cell is a hypercube.
+      for (const auto &cell : cell_iterators())
+        {
+          if (cell->has_children() && cell->reference_cell().is_hyper_cube())
+            for (const unsigned int f : cell->face_indices())
+              if (cell->at_boundary(f) == false)
                 {
-                  Assert(
-                    child->at_boundary(f) == false,
-                    ExcMessage(
-                      "We ended up with a triangulation whose child cells "
-                      "are not connected to their neighbors as expected. "
-                      "When you created the triangulation, did you forget "
-                      "to call GridTools::consistently_order_cells() "
-                      "before calling Triangulation::create_triangulation()?"));
+                  for (const auto &child : cell->child_iterators())
+                    {
+                      Assert(
+                        child->at_boundary(f) == false,
+                        ExcMessage(
+                          "We ended up with a triangulation whose child cells "
+                          "are not connected to their neighbors as expected. "
+                          "When you created the triangulation, did you forget "
+                          "to call GridTools::consistently_order_cells() "
+                          "before calling Triangulation::create_triangulation()?"));
+                    }
                 }
-            }
+        }
     }
-#  endif
 }
 
 
@@ -15970,20 +15993,25 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
           if (ref_cell == ReferenceCells::Hexahedron)
             for (unsigned int face = 4; face < 6; ++face)
               {
-                const auto                face_iter = cell->face(face);
-                const std::array<bool, 2> line_orientations{
-                  {face_iter->line_orientation(0),
-                   face_iter->line_orientation(1)}};
-                std::array<unsigned int, 4> raw_vertex_indices{
-                  {face_iter->line(0)->vertex_index(1 - line_orientations[0]),
-                   face_iter->line(1)->vertex_index(1 - line_orientations[1]),
-                   face_iter->line(0)->vertex_index(line_orientations[0]),
-                   face_iter->line(1)->vertex_index(line_orientations[1])}};
+                const auto face_iter = cell->face(face);
+                const std::array<types::geometric_orientation, 2>
+                  line_orientations{{face_iter->line_orientation(0),
+                                     face_iter->line_orientation(1)}};
+                const std::array<unsigned int, 2> line_vertex_indices{
+                  {line_orientations[0] ==
+                     numbers::default_geometric_orientation,
+                   line_orientations[1] ==
+                     numbers::default_geometric_orientation}};
+                const std::array<unsigned int, 4> raw_vertex_indices{
+                  {face_iter->line(0)->vertex_index(1 - line_vertex_indices[0]),
+                   face_iter->line(1)->vertex_index(1 - line_vertex_indices[1]),
+                   face_iter->line(0)->vertex_index(line_vertex_indices[0]),
+                   face_iter->line(1)->vertex_index(line_vertex_indices[1])}};
 
                 const auto combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
                     cell->index() * ReferenceCells::max_n_faces<dim>() + face);
-                std::array<unsigned int, 4> vertex_order{
+                const std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,
                                                          combined_orientation),
@@ -16002,13 +16030,18 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
               }
           else if (ref_cell == ReferenceCells::Quadrilateral)
             {
-              const std::array<bool, 2> line_orientations{
-                {cell->line_orientation(0), cell->line_orientation(1)}};
-              std::array<unsigned int, 4> raw_vertex_indices{
-                {cell->line(0)->vertex_index(1 - line_orientations[0]),
-                 cell->line(1)->vertex_index(1 - line_orientations[1]),
-                 cell->line(0)->vertex_index(line_orientations[0]),
-                 cell->line(1)->vertex_index(line_orientations[1])}};
+              const std::array<types::geometric_orientation, 2>
+                line_orientations{
+                  {cell->line_orientation(0), cell->line_orientation(1)}};
+              const std::array<unsigned int, 2> line_vertex_indices{
+                {line_orientations[0] == numbers::default_geometric_orientation,
+                 line_orientations[1] ==
+                   numbers::default_geometric_orientation}};
+              const std::array<unsigned int, 4> raw_vertex_indices{
+                {cell->line(0)->vertex_index(1 - line_vertex_indices[0]),
+                 cell->line(1)->vertex_index(1 - line_vertex_indices[1]),
+                 cell->line(0)->vertex_index(line_vertex_indices[0]),
+                 cell->line(1)->vertex_index(line_vertex_indices[1])}};
               for (unsigned int i = 0; i < 4; ++i)
                 cache[my_index + i] = raw_vertex_indices[i];
             }
@@ -16311,16 +16344,17 @@ void Triangulation<dim, spacedim>::load_attached_data(
 
       this->data_serializer.unpack_cell_status(this->local_cell_relations);
 
-#  ifdef DEBUG
-      // the CellStatus of all stored cells should always be
-      // CellStatus::cell_will_persist.
-      for (const auto &cell_rel : this->local_cell_relations)
+      if constexpr (running_in_debug_mode())
         {
-          Assert((cell_rel.second == // cell_status
-                  ::dealii::CellStatus::cell_will_persist),
-                 ExcInternalError());
+          // the CellStatus of all stored cells should always be
+          // CellStatus::cell_will_persist.
+          for (const auto &cell_rel : this->local_cell_relations)
+            {
+              Assert((cell_rel.second == // cell_status
+                      ::dealii::CellStatus::cell_will_persist),
+                     ExcInternalError());
+            }
         }
-#  endif
     }
 }
 
@@ -16373,17 +16407,18 @@ typename Triangulation<dim, spacedim>::DistortedCellList
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
 
-#  ifdef DEBUG
-  for (const auto &level : levels)
-    monitor_memory(level->cells, dim);
+  if constexpr (running_in_debug_mode())
+    {
+      for (const auto &level : levels)
+        monitor_memory(level->cells, dim);
 
-  // check whether really all refinement flags are reset (also of
-  // previously non-active cells which we may not have touched. If the
-  // refinement flag of a non-active cell is set, something went wrong
-  // since the cell-accessors should have caught this)
-  for (const auto &cell : this->cell_iterators())
-    Assert(!cell->refine_flag_set(), ExcInternalError());
-#  endif
+      // check whether really all refinement flags are reset (also of
+      // previously non-active cells which we may not have touched. If the
+      // refinement flag of a non-active cell is set, something went wrong
+      // since the cell-accessors should have caught this)
+      for (const auto &cell : this->cell_iterators())
+        Assert(!cell->refine_flag_set(), ExcInternalError());
+    }
 
   return cells_with_distorted_children;
 }
@@ -16752,31 +16787,34 @@ namespace
   {
     Assert(cell->is_active(), ExcInternalError());
 
-#ifdef DEBUG
-    // If this is not a parallel::distributed::Triangulation, then we really
-    // should only get here if the cell is marked for refinement:
-    if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                       *>(&cell->get_triangulation()) == nullptr)
-      Assert(cell->refine_flag_set() == false, ExcInternalError());
-    else
-      // But if this is a p::d::Triangulation, then we don't have that
-      // much control and we can get here because mesh smoothing is
-      // requested but can not be honored because p4est controls
-      // what gets refined. In that case, we can at least provide
-      // a better error message.
-      Assert(cell->refine_flag_set() == false,
-             ExcMessage(
-               "The triangulation is trying to avoid unrefined islands "
-               "during mesh refinement/coarsening, as you had requested "
-               " by passing the appropriate 'smoothing flags' to the "
-               "constructor of the triangulation. However, for objects "
-               "of type parallel::distributed::Triangulation, control "
-               "over which cells get refined rests with p4est, not the "
-               "deal.II triangulation, and consequently it is not "
-               "always possible to avoid unrefined islands in the mesh. "
-               "Please remove the constructor argument to the triangulation "
-               "object that requests mesh smoothing."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        // If this is not a parallel::distributed::Triangulation, then we really
+        // should only get here if the cell is marked for refinement:
+        if (dynamic_cast<
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
+              &cell->get_triangulation()) == nullptr)
+          Assert(cell->refine_flag_set() == false, ExcInternalError());
+        else
+          // But if this is a p::d::Triangulation, then we don't have that
+          // much control and we can get here because mesh smoothing is
+          // requested but can not be honored because p4est controls
+          // what gets refined. In that case, we can at least provide
+          // a better error message.
+          Assert(
+            cell->refine_flag_set() == false,
+            ExcMessage(
+              "The triangulation is trying to avoid unrefined islands "
+              "during mesh refinement/coarsening, as you had requested "
+              " by passing the appropriate 'smoothing flags' to the "
+              "constructor of the triangulation. However, for objects "
+              "of type parallel::distributed::Triangulation, control "
+              "over which cells get refined rests with p4est, not the "
+              "deal.II triangulation, and consequently it is not "
+              "always possible to avoid unrefined islands in the mesh. "
+              "Please remove the constructor argument to the triangulation "
+              "object that requests mesh smoothing."));
+      }
 
     // now we provide two algorithms. the first one is the standard
     // one, coming from the time, where only isotropic refinement was
@@ -18005,6 +18043,6 @@ Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList() noexcept =
 #endif
 
 // explicit instantiations
-#include "tria.inst"
+#include "grid/tria.inst"
 
 DEAL_II_NAMESPACE_CLOSE

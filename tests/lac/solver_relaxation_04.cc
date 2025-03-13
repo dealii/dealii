@@ -48,6 +48,8 @@ check_solve(SolverType         &solver,
     }
   catch (SolverControl::NoConvergence &e)
     {
+      deallog << "Failure step " << e.last_step << " value " << e.last_residual
+              << std::endl;
       result = e.last_residual;
     }
   return result;

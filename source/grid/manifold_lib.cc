@@ -1471,17 +1471,19 @@ FunctionManifold<dim, spacedim, chartdim>::push_forward(
   for (unsigned int i = 0; i < spacedim; ++i)
     result[i] = pf[i];
 
-#ifdef DEBUG
-  Vector<double> pb(chartdim);
-  pull_back_function->vector_value(result, pb);
-  for (unsigned int i = 0; i < chartdim; ++i)
-    Assert(
-      (chart_point.norm() > tolerance &&
-       (std::abs(pb[i] - chart_point[i]) < tolerance * chart_point.norm())) ||
-        (std::abs(pb[i] - chart_point[i]) < tolerance),
-      ExcMessage(
-        "The push forward is not the inverse of the pull back! Bailing out."));
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      Vector<double> pb(chartdim);
+      pull_back_function->vector_value(result, pb);
+      for (unsigned int i = 0; i < chartdim; ++i)
+        Assert(
+          (chart_point.norm() > tolerance &&
+           (std::abs(pb[i] - chart_point[i]) <
+            tolerance * chart_point.norm())) ||
+            (std::abs(pb[i] - chart_point[i]) < tolerance),
+          ExcMessage(
+            "The push forward is not the inverse of the pull back! Bailing out."));
+    }
 
   return result;
 }
@@ -2609,6 +2611,6 @@ TransfiniteInterpolationManifold<dim, spacedim>::get_new_points(
 
 
 // explicit instantiations
-#include "manifold_lib.inst"
+#include "grid/manifold_lib.inst"
 
 DEAL_II_NAMESPACE_CLOSE

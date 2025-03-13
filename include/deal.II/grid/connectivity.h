@@ -24,6 +24,8 @@
 #include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_objects_orientations.h>
 
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1306,7 +1308,7 @@ namespace internal
 
               // only faces with default orientation have to do something
               if (ori_cq.get_combined_orientation(f_) !=
-                  ReferenceCell::default_combined_face_orientation())
+                  numbers::default_geometric_orientation)
                 continue;
 
               // determine entity type of face
@@ -1340,8 +1342,8 @@ namespace internal
                   // ... comparison gives orientation
                   ori_ql.set_combined_orientation(
                     con_ql.ptr[f] + l,
-                    same ? ReferenceCell::default_combined_face_orientation() :
-                           ReferenceCell::reversed_combined_line_orientation());
+                    same ? numbers::default_geometric_orientation :
+                           numbers::reverse_line_orientation);
                 }
             }
         }
@@ -1487,22 +1489,24 @@ namespace internal
       // loop over cells and create CRS
       for (const auto &cell : cells)
         {
-#ifdef DEBUG
-          auto vertices_unique = cell.vertices;
-          std::sort(vertices_unique.begin(), vertices_unique.end());
-          vertices_unique.erase(std::unique(vertices_unique.begin(),
-                                            vertices_unique.end()),
-                                vertices_unique.end());
+          if constexpr (running_in_debug_mode())
+            {
+              auto vertices_unique = cell.vertices;
+              std::sort(vertices_unique.begin(), vertices_unique.end());
+              vertices_unique.erase(std::unique(vertices_unique.begin(),
+                                                vertices_unique.end()),
+                                    vertices_unique.end());
 
-          Assert(vertices_unique.size() == cell.vertices.size(),
-                 ExcMessage(
-                   "The definition of a cell refers to the same vertex several "
-                   "times. This is not possible. A common reason is that "
-                   "CellData::vertices has a size that does not match the "
-                   "size expected from the reference cell. Please resize "
-                   "CellData::vertices or use the appropriate constructor of "
-                   "CellData."));
-#endif
+              Assert(
+                vertices_unique.size() == cell.vertices.size(),
+                ExcMessage(
+                  "The definition of a cell refers to the same vertex several "
+                  "times. This is not possible. A common reason is that "
+                  "CellData::vertices has a size that does not match the "
+                  "size expected from the reference cell. Please resize "
+                  "CellData::vertices or use the appropriate constructor of "
+                  "CellData."));
+            }
 
           const ReferenceCell reference_cell =
             ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());

@@ -514,9 +514,9 @@ private:
    * region, and release the old memory.
    */
   void
-  allocate_and_move(const size_t old_size,
-                    const size_t new_size,
-                    const size_t new_allocated_size);
+  allocate_and_move(const std::size_t old_size,
+                    const std::size_t new_size,
+                    const std::size_t new_allocated_size);
 
   /**
    * A class that is used as the "deleter" for a `std::unique_ptr` object that
@@ -1208,9 +1208,7 @@ inline AlignedVector<T>::AlignedVector()
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
-#  ifdef DEBUG
   , replicated_across_communicator(false)
-#  endif
 {}
 
 
@@ -1237,9 +1235,7 @@ inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
-#  ifdef DEBUG
   , replicated_across_communicator(false)
-#  endif
 {
   if (size > 0)
     resize(size, init);
@@ -1252,9 +1248,7 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
-#  ifdef DEBUG
   , replicated_across_communicator(false)
-#  endif
 {
   // copy the data from vec
   reserve(vec.size());
@@ -1437,9 +1431,9 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
 
 template <class T>
 inline void
-AlignedVector<T>::allocate_and_move(const size_t old_size,
-                                    const size_t new_size,
-                                    const size_t new_allocated_size)
+AlignedVector<T>::allocate_and_move(const std::size_t old_size,
+                                    const std::size_t new_size,
+                                    const std::size_t new_allocated_size)
 {
   // allocate and align along 64-byte boundaries (this is enough for all
   // levels of vectorization currently supported by deal.II)
@@ -1505,10 +1499,11 @@ template <class T>
 inline void
 AlignedVector<T>::shrink_to_fit()
 {
-#  ifdef DEBUG
-  Assert(replicated_across_communicator == false,
-         ExcAlignedVectorChangeAfterReplication());
-#  endif
+  if constexpr (running_in_debug_mode())
+    {
+      Assert(replicated_across_communicator == false,
+             ExcAlignedVectorChangeAfterReplication());
+    }
   const size_type used_size      = used_elements_end - elements.get();
   const size_type allocated_size = allocated_elements_end - elements.get();
   if (allocated_size > used_size)
@@ -2021,13 +2016,15 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // **** Consistency check ****
   // At this point, each process should have a copy of the data.
   // Verify this in some sort of round-about way
-#    ifdef DEBUG
-  replicated_across_communicator      = true;
-  const std::vector<char> packed_data = Utilities::pack(*this);
-  const int               hash =
-    std::accumulate(packed_data.begin(), packed_data.end(), int(0));
-  Assert(Utilities::MPI::max(hash, communicator) == hash, ExcInternalError());
-#    endif
+  if constexpr (running_in_debug_mode())
+    {
+      replicated_across_communicator      = true;
+      const std::vector<char> packed_data = Utilities::pack(*this);
+      const int               hash =
+        std::accumulate(packed_data.begin(), packed_data.end(), int(0));
+      Assert(Utilities::MPI::max(hash, communicator) == hash,
+             ExcInternalError());
+    }
 
 #  else
   // No MPI -> nothing to replicate

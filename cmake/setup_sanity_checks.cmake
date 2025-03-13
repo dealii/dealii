@@ -46,10 +46,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       "Unable to compile a simple test program. "
       "Trying to drop \"${_linker_flag}\" from the linker flags."
       )
-    foreach(_flags
-        DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build}
-        BASE_LINKER_FLAGS BASE_LINKER_FLAGS_${build}
-        )
+    foreach(_flags DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build})
       string(REPLACE "${_linker_flag}" "${_replacement_flag}"
         ${_flags} "${${_flags}}"
         )
@@ -63,8 +60,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     set(_replacement "")
     if(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
       set(_replacement "-fuse-ld=lld")
-    elseif(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-      set(_replacement "-fuse-ld=gold")
     endif()
     _drop_linker_flag(
       "-fuse-ld=mold" ${_replacement}
@@ -75,20 +70,9 @@ foreach(build ${DEAL_II_BUILD_TYPES})
 
   if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
     set(_replacement "")
-    if(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-      set(_replacement "-fuse-ld=gold")
-    endif()
     _drop_linker_flag(
       "-fuse-ld=lld" ${_replacement}
       DEAL_II_COMPILER_HAS_FUSE_LD_LLD
-      )
-    _check_linker_flags()
-  endif()
-
-  if(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-    _drop_linker_flag(
-      "-fuse-ld=gold" ""
-      DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
       )
     _check_linker_flags()
   endif()

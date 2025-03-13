@@ -392,7 +392,7 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
       const auto offset = QProjector<dim>::DataSetDescriptor::face(
         this->reference_cell(),
         f,
-        ReferenceCell::default_combined_face_orientation(),
+        numbers::default_geometric_orientation,
         face_points.size());
       for (unsigned int k = 0; k < face_points.size(); ++k)
         this->generalized_support_points[face_points.size() * f + k] =
@@ -429,6 +429,6 @@ FE_BDM<dim>::initialize_support_points(const unsigned int deg)
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "fe_bdm.inst"
+#include "fe/fe_bdm.inst"
 
 DEAL_II_NAMESPACE_CLOSE

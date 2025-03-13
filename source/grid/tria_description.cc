@@ -734,24 +734,26 @@ namespace TriangulationDescription
                    "in the given communicator."));
         }
 
-      // If we are dealing with a sequential triangulation, then someone
-      // will have needed to set the subdomain_ids by hand. Make sure that
-      // all ids we see are less than the number of processes we are
-      // supposed to split the triangulation into.
-      if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &tria) == nullptr)
+      if constexpr (running_in_debug_mode())
         {
-#if DEBUG
-          const unsigned int n_mpi_processes =
-            dealii::Utilities::MPI::n_mpi_processes(comm);
-          for (const auto &cell : tria.active_cell_iterators())
-            Assert(cell->subdomain_id() < n_mpi_processes,
-                   ExcMessage("You can't have a cell with subdomain_id of " +
-                              std::to_string(cell->subdomain_id()) +
-                              " when splitting the triangulation using an MPI "
-                              " communicator with only " +
-                              std::to_string(n_mpi_processes) + " processes."));
-#endif
+          // If we are dealing with a sequential triangulation, then someone
+          // will have needed to set the subdomain_ids by hand. Make sure that
+          // all ids we see are less than the number of processes we are
+          // supposed to split the triangulation into.
+          if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+                &tria) == nullptr)
+            {
+              const unsigned int n_mpi_processes =
+                dealii::Utilities::MPI::n_mpi_processes(comm);
+              for (const auto &cell : tria.active_cell_iterators())
+                Assert(cell->subdomain_id() < n_mpi_processes,
+                       ExcMessage(
+                         "You can't have a cell with subdomain_id of " +
+                         std::to_string(cell->subdomain_id()) +
+                         " when splitting the triangulation using an MPI "
+                         " communicator with only " +
+                         std::to_string(n_mpi_processes) + " processes."));
+            }
         }
 
       // First, figure out for what rank we are supposed to build the
@@ -1170,7 +1172,7 @@ namespace TriangulationDescription
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-#include "tria_description.inst"
+#include "grid/tria_description.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

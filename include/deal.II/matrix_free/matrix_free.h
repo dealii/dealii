@@ -249,6 +249,7 @@ public:
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(allow_ghosted_vectors_in_loops)
+      , store_ghost_cells(false)
       , communicator_sm(MPI_COMM_SELF)
     {}
 
@@ -275,6 +276,7 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(other.allow_ghosted_vectors_in_loops)
+      , store_ghost_cells(other.store_ghost_cells)
       , communicator_sm(other.communicator_sm)
     {}
 
@@ -303,6 +305,7 @@ public:
       cell_vectorization_categories_strict =
         other.cell_vectorization_categories_strict;
       allow_ghosted_vectors_in_loops = other.allow_ghosted_vectors_in_loops;
+      store_ghost_cells              = other.store_ghost_cells;
       communicator_sm                = other.communicator_sm;
 
       return *this;
@@ -546,6 +549,13 @@ public:
      * difference is only in whether the initial non-ghosted state is restored.
      */
     bool allow_ghosted_vectors_in_loops;
+
+    /**
+     * Option to control whether data should be generated on ghost cells.
+     * If set to true, the data on ghost cells will be generated.
+     * The default value is false.
+     */
+    bool store_ghost_cells;
 
     /**
      * Shared-memory MPI communicator. Default: MPI_COMM_SELF.
@@ -2705,7 +2715,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_active_fe_index(
     dof_info[first_hp_dof_handler_index].cell_active_fe_index;
 
   if (fe_indices.empty() == true ||
-      dof_handlers[0]->get_fe_collection().size() == 1)
+      dof_handlers[first_hp_dof_handler_index]->get_fe_collection().size() == 1)
     return 0;
 
   const auto index = fe_indices[range.first];
@@ -3940,8 +3950,9 @@ namespace internal
      */
     template <typename VectorType,
               std::enable_if_t<!has_exchange_on_subset<VectorType>, VectorType>
-                                              * = nullptr,
-              typename VectorType::value_type * = nullptr>
+                * = nullptr,
+              std::enable_if_t<has_assignment_operator<VectorType>, VectorType>
+                * = nullptr>
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
@@ -3963,14 +3974,15 @@ namespace internal
 
     /**
      * Zero out vector region for non-vector types, i.e., classes that do not
-     * have VectorType::value_type
+     * have operator=(const VectorType::value_type)
      */
     void
     zero_vector_region(const unsigned int, ...) const
     {
       Assert(false,
-             ExcNotImplemented("Zeroing is only implemented for vector types "
-                               "which provide VectorType::value_type"));
+             ExcNotImplemented(
+               "Zeroing is only implemented for vector types "
+               "which provide operator=(const VectorType::value_type)"));
     }
 
 

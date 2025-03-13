@@ -15,6 +15,7 @@
 // Test that dof renumbering is also reflected in TrilinosWrappers::SparseMatrix
 
 #include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/shared_tria.h>
@@ -37,8 +38,6 @@
 
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
-
-#include <mpi.h>
 
 #include <iostream>
 #include <vector>

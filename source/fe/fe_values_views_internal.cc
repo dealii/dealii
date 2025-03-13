@@ -19,6 +19,11 @@
 
 #include <deal.II/fe/fe_values_views_internal.h>
 
+#ifdef DEAL_II_WITH_ADOLC
+#  include <adolc/adouble.h>
+#  include <adolc/adtl.h>
+#endif
+
 #include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1166,6 +1171,6 @@ namespace FEValuesViews
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-#include "fe_values_views_internal.inst"
+#include "fe/fe_values_views_internal.inst"
 
 DEAL_II_NAMESPACE_CLOSE

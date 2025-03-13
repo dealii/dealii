@@ -52,6 +52,8 @@
 #include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <boost/container/small_vector.hpp>
+#include <boost/range/iterator_range_core.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/utility.hpp>
 
@@ -96,21 +98,23 @@ AffineConstraints<number>::add_constraint(
   // of Q4 elements in 3d, and so should cover the vast majority of
   // cases. If we have a constraint with more dependencies, then
   // that's just going to require a heap allocation.
-#ifdef DEBUG
-  {
-    boost::container::small_vector<size_type, 25> column_indices;
-    column_indices.reserve(dependencies.size());
-    for (const auto &d : dependencies)
-      column_indices.emplace_back(d.first);
-    std::sort(column_indices.begin(), column_indices.end());
-    Assert(std::adjacent_find(column_indices.begin(), column_indices.end()) ==
-             column_indices.end(),
-           ExcMessage(
-             "You are trying to insert a constraint that lists the same "
-             "degree of freedom more than once on the right hand side. This is "
-             "not allowed."));
-  }
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      {
+        boost::container::small_vector<size_type, 25> column_indices;
+        column_indices.reserve(dependencies.size());
+        for (const auto &d : dependencies)
+          column_indices.emplace_back(d.first);
+        std::sort(column_indices.begin(), column_indices.end());
+        Assert(
+          std::adjacent_find(column_indices.begin(), column_indices.end()) ==
+            column_indices.end(),
+          ExcMessage(
+            "You are trying to insert a constraint that lists the same "
+            "degree of freedom more than once on the right hand side. This is "
+            "not allowed."));
+      }
+    }
 
 
   // The following can happen when we compute with distributed meshes and dof
@@ -790,7 +794,6 @@ AffineConstraints<number>::close()
 
 
 
-#ifdef DEBUG
   // In debug mode we are computing an estimate for the maximum number
   // of constraints so that we can bail out if there is a cycle in the
   // constraints (which is easier than searching for cycles in the graph).
@@ -798,29 +801,29 @@ AffineConstraints<number>::close()
   // Let us figure out the largest dof index. This is an upper bound for the
   // number of constraints because it is an approximation for the number of dofs
   // in our system.
-  size_type largest_idx = 0;
-  for (const ConstraintLine &line : lines)
-    for (const std::pair<size_type, number> &entry : line.entries)
-      largest_idx = std::max(largest_idx, entry.first);
-#endif
+  [[maybe_unused]] size_type largest_idx = 0;
+  if constexpr (running_in_debug_mode())
+    {
+      for (const ConstraintLine &line : lines)
+        for (const std::pair<size_type, number> &entry : line.entries)
+          largest_idx = std::max(largest_idx, entry.first);
+    }
 
-      // replace references to dofs that are themselves constrained. note that
-      // because we may replace references to other dofs that may themselves be
-      // constrained to third ones, we have to iterate over all this until we
-      // replace no chains of constraints any more
-      //
-      // the iteration replaces references to constrained degrees of freedom by
-      // second-order references. for example if x3=x0/2+x2/2 and x2=x0/2+x1/2,
-      // then the new list will be x3=x0/2+x0/4+x1/4. note that x0 appear
-      // twice. we will throw this duplicate out in the following step, where
-      // we sort the list so that throwing out duplicates becomes much more
-      // efficient. also, we have to do it only once, rather than in each
-      // iteration
-#ifdef DEBUG
-  size_type iteration = 0;
-#endif
-  bool              chained_constraint_replaced = false;
-  std::vector<bool> line_finalized(lines.size(), false);
+  // replace references to dofs that are themselves constrained. note that
+  // because we may replace references to other dofs that may themselves be
+  // constrained to third ones, we have to iterate over all this until we
+  // replace no chains of constraints any more
+  //
+  // the iteration replaces references to constrained degrees of freedom by
+  // second-order references. for example if x3=x0/2+x2/2 and x2=x0/2+x1/2,
+  // then the new list will be x3=x0/2+x0/4+x1/4. note that x0 appear
+  // twice. we will throw this duplicate out in the following step, where
+  // we sort the list so that throwing out duplicates becomes much more
+  // efficient. also, we have to do it only once, rather than in each
+  // iteration
+  [[maybe_unused]] size_type iteration                   = 0;
+  bool                       chained_constraint_replaced = false;
+  std::vector<bool>          line_finalized(lines.size(), false);
   do
     {
       chained_constraint_replaced = false;
@@ -829,12 +832,10 @@ AffineConstraints<number>::close()
           {
             ConstraintLine &line = lines[line_index];
 
-#ifdef DEBUG
             // we need to keep track of how many replacements we do in this
             // line, because we can end up in a cycle A->B->C->A without the
             // number of entries growing.
-            size_type n_replacements = 0;
-#endif
+            [[maybe_unused]] size_type n_replacements = 0;
 
             // loop over all entries of this line (including ones that we
             // have appended in this go around) and see whether they are
@@ -900,14 +901,17 @@ AffineConstraints<number>::close()
                             constrained_line.entries[i].first,
                             constrained_line.entries[i].second * weight);
 
-#ifdef DEBUG
-                        // keep track of how many entries we replace in this
-                        // line. If we do more than there are constraints or
-                        // dofs in our system, we must have a cycle.
-                        ++n_replacements;
-                        Assert(n_replacements / 2 < largest_idx,
-                               ExcMessage("Cycle in constraints detected!"));
-#endif
+                        if constexpr (library_build_mode ==
+                                      LibraryBuildMode::debug)
+                          {
+                            // keep track of how many entries we replace in this
+                            // line. If we do more than there are constraints or
+                            // dofs in our system, we must have a cycle.
+                            ++n_replacements;
+                            Assert(n_replacements / 2 < largest_idx,
+                                   ExcMessage(
+                                     "Cycle in constraints detected!"));
+                          }
                       }
                     else
                       // the DoF that we encountered is not constrained by a
@@ -948,13 +952,14 @@ AffineConstraints<number>::close()
               }
           }
 
-#ifdef DEBUG
-      // increase iteration count. note that we should not iterate more
-      // times than there are constraints, since this puts a natural upper
-      // bound on the length of constraint chains
-      ++iteration;
-      Assert(iteration <= lines.size() + 1, ExcInternalError());
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          // increase iteration count. note that we should not iterate more
+          // times than there are constraints, since this puts a natural upper
+          // bound on the length of constraint chains
+          ++iteration;
+          Assert(iteration <= lines.size() + 1, ExcInternalError());
+        }
     }
   while (chained_constraint_replaced == true);
 
@@ -1168,14 +1173,15 @@ AffineConstraints<number>::shift(const size_type offset)
         entry.first += offset;
     }
 
-#ifdef DEBUG
-  // make sure that lines, lines_cache and local_lines
-  // are still linked correctly
-  for (size_type index = 0; index < lines_cache.size(); ++index)
-    Assert(lines_cache[index] == numbers::invalid_size_type ||
-             calculate_line_index(lines[lines_cache[index]].index) == index,
-           ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      // make sure that lines, lines_cache and local_lines
+      // are still linked correctly
+      for (size_type index = 0; index < lines_cache.size(); ++index)
+        Assert(lines_cache[index] == numbers::invalid_size_type ||
+                 calculate_line_index(lines[lines_cache[index]].index) == index,
+               ExcInternalError());
+    }
 }
 
 
@@ -1212,24 +1218,25 @@ AffineConstraints<number>::get_view(const IndexSet &mask) const
   for (const ConstraintLine &line : lines)
     if (mask.is_element(line.index))
       {
-#ifdef DEBUG
-        for (const std::pair<size_type, number> &entry : line.entries)
+        if constexpr (running_in_debug_mode())
           {
-            Assert(
-              mask.is_element(entry.first),
-              ExcMessage(
-                "In creating a view of an AffineConstraints "
-                "object, the constraint on degree of freedom " +
-                std::to_string(line.index) + " (which corresponds to the " +
-                std::to_string(mask.index_within_set(line.index)) +
-                "th degree of freedom selected in the mask) "
-                "is constrained against degree of freedom " +
-                std::to_string(entry.first) +
-                ", but this degree of freedom is not listed in the mask and "
-                "consequently cannot be transcribed into the index space "
-                "of the output object."));
+            for (const std::pair<size_type, number> &entry : line.entries)
+              {
+                Assert(
+                  mask.is_element(entry.first),
+                  ExcMessage(
+                    "In creating a view of an AffineConstraints "
+                    "object, the constraint on degree of freedom " +
+                    std::to_string(line.index) + " (which corresponds to the " +
+                    std::to_string(mask.index_within_set(line.index)) +
+                    "th degree of freedom selected in the mask) "
+                    "is constrained against degree of freedom " +
+                    std::to_string(entry.first) +
+                    ", but this degree of freedom is not listed in the mask and "
+                    "consequently cannot be transcribed into the index space "
+                    "of the output object."));
+              }
           }
-#endif
 
         std::vector<std::pair<size_type, number>> translated_entries =
           line.entries;
@@ -2854,32 +2861,33 @@ AffineConstraints<number>::distribute(VectorType &vec) const
             }
 
 
-            // Check that the set of indices we will import is a superset of
-            // the locally-owned ones. This *should* be the case if, as one
-            // would expect, the AffineConstraint object was initialized
-            // with a locally-relevant index set that is indeed a superset
-            // of the locally-owned indices. But you never know what people
-            // pass as arguments...
-#ifdef DEBUG
-          if (needed_elements_for_distribute != IndexSet())
+          // Check that the set of indices we will import is a superset of
+          // the locally-owned ones. This *should* be the case if, as one
+          // would expect, the AffineConstraint object was initialized
+          // with a locally-relevant index set that is indeed a superset
+          // of the locally-owned indices. But you never know what people
+          // pass as arguments...
+          if constexpr (running_in_debug_mode())
             {
-              Assert(vec_owned_elements.size() ==
-                       needed_elements_for_distribute.size(),
-                     ExcMessage("You have previously initialized this "
-                                "AffineConstraints object with an index set "
-                                "that stated that vectors have size " +
-                                std::to_string(locally_owned_dofs.size()) +
-                                " entries, but you are now calling "
-                                "AffineConstraints::distribute() with a vector "
-                                "of size " +
-                                std::to_string(vec_owned_elements.size()) +
-                                "."));
+              if (needed_elements_for_distribute != IndexSet())
+                {
+                  Assert(vec_owned_elements.size() ==
+                           needed_elements_for_distribute.size(),
+                         ExcMessage(
+                           "You have previously initialized this "
+                           "AffineConstraints object with an index set "
+                           "that stated that vectors have size " +
+                           std::to_string(locally_owned_dofs.size()) +
+                           " entries, but you are now calling "
+                           "AffineConstraints::distribute() with a vector "
+                           "of size " +
+                           std::to_string(vec_owned_elements.size()) + "."));
 
-              for (const auto i : vec_owned_elements)
-                Assert(needed_elements_for_distribute.is_element(i),
-                       ExcInternalError());
+                  for (const auto i : vec_owned_elements)
+                    Assert(needed_elements_for_distribute.is_element(i),
+                           ExcInternalError());
+                }
             }
-#endif
 
           VectorType ghosted_vector;
 
@@ -3524,7 +3532,7 @@ namespace internal
     // the origin of each global entry and finds out which data we need to
     // collect.
     template <typename number>
-    static inline number
+    inline number
     resolve_matrix_entry(const GlobalRowsFromLocal<number> &global_rows,
                          const GlobalRowsFromLocal<number> &global_cols,
                          const size_type                    i,
@@ -3638,7 +3646,7 @@ namespace internal
     namespace dealiiSparseMatrix
     {
       template <typename SparseMatrixIterator, typename LocalType>
-      static inline void
+      inline void
       add_value(const LocalType       value,
                 const size_type       row,
                 const size_type       column,

@@ -22,6 +22,7 @@
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/tria_orientation.h>
@@ -430,7 +431,11 @@ public:
   /**
    * Return the default combined face orientation flag (i.e., the default set of
    * orientations, defined by orientation, rotate, and flip for a face in 3d).
+   *
+   * @deprecated Use numbers::default_geometric_orientation instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use numbers::default_geometric_orientation instead.")
   static constexpr types::geometric_orientation
   default_combined_face_orientation();
 
@@ -440,12 +445,25 @@ public:
    * ReferenceCell::default_combined_face_orientation() encode all of its
    * possible orientation states.
    *
-   * @note Line orientations are typically stored as booleans, but to better
-   * enable dimension-independent programming relevant functions typically
-   * present these values as the standard orientation type.
+   * @deprecated Use numbers::reverse_line_orientation instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use numbers::reverse_line_orientation instead.")
   static constexpr types::geometric_orientation
   reversed_combined_line_orientation();
+
+  /**
+   * Return which child cells are adjacent to a certain face of the
+   * parent cell.
+   *
+   * @deprecated Use the version of this function which takes the orientation as
+   * the third parameter instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes the orientation as the third "
+    "parameter instead.")
+  unsigned int
+  child_cell_on_face(const unsigned int face, const unsigned int subface) const;
 
   /**
    * Return which child cells are adjacent to a certain face of the
@@ -491,8 +509,7 @@ public:
   unsigned int
   child_cell_on_face(const unsigned int                 face,
                      const unsigned int                 subface,
-                     const types::geometric_orientation face_orientation =
-                       default_combined_face_orientation()) const;
+                     const types::geometric_orientation face_orientation) const;
 
   /**
    * For a given vertex in a cell, return a pair of a face index and a
@@ -568,7 +585,7 @@ public:
    *   is identical to calling
    *   `reference_cell.vertex<dim>(
    *       reference_cell.face_to_cell_vertices(
-                   f, v, ReferenceCell::default_combined_face_orientation()))`.
+                   f, v, numbers::default_geometric_orientation))`.
    */
   template <int dim>
   Point<dim>
@@ -594,21 +611,49 @@ public:
     const types::geometric_orientation face_orientation) const;
 
   /**
-   * Return whether the line with index @p line is oriented in
-   * standard direction within a cell, given the @p face_orientation of
-   * the face within the current cell, and @p line_orientation flag
-   * for the line within that face. @p true indicates that the line is
-   * oriented from vertex 0 to vertex 1, whereas it is the other way
-   * around otherwise. In 1d and 2d, this is always @p true, but in 3d
-   * it may be different, see the respective discussion in the
-   * documentation of the GeometryInfo class.
+   * Return whether the line with index @p line is oriented in standard
+   * direction within a cell, given the @p face_orientation of the face within
+   * the current cell, and @p line_orientation for the line within that face.
+   *
+   * @deprecated Use face_to_cell_line_orientation() instead.
    */
-  bool
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use face_to_cell_line_orientation() instead.")
+  types::geometric_orientation
   standard_vs_true_line_orientation(
     const unsigned int                 line,
     const unsigned int                 face,
     const types::geometric_orientation face_orientation,
-    const bool                         line_orientation) const;
+    const types::geometric_orientation line_orientation) const;
+
+  /**
+   * @brief Convert a line orientation defined relative to a face to the
+   * canonical per-cell line orientation.
+   *
+   * Line orientations are used in both face and line contexts. Since a line is
+   * always shared by two faces, it may need to be reversed (relative to the
+   * first face) on the second face to guarantee that the per-face lines always
+   * point in their canonical directions (e.g., so that lines 0 and 1 of a
+   * quadrilateral point up and lines 2 and 3 point right) and that the vertex
+   * ordering on that line remains correct.
+   *
+   * To achieve this, this function computes the per-cell line orientation based
+   * on the face's number, orientation and line number.
+   *
+   * @param[in] face_line_no The index of the line on the face.
+   *
+   * @param[in] face_no The number of the face.
+   *
+   * @param[in] face_orientation The orientation of the face.
+   *
+   * @param[in] line_orientation The orientation of the line on the given face.
+   */
+  types::geometric_orientation
+  face_to_cell_line_orientation(
+    const unsigned int                 face_line_no,
+    const unsigned int                 face_no,
+    const types::geometric_orientation face_orientation,
+    const types::geometric_orientation line_orientation) const;
 
   /**
    * @}
@@ -696,9 +741,9 @@ public:
   closest_point(const Point<dim> &p) const;
 
   /**
-   * Return $i$-th unit tangential vector of a face of the reference cell.
-   * The vectors are arranged such that the
-   * cross product between the two vectors returns the unit normal vector.
+   * Return $i$-th unit tangent vector to a face of the reference cell.
+   * The vectors are arranged in such an order that the
+   * cross product between the two vectors returns the face normal vector.
    *
    * @pre $i$ must be between zero and `dim-1`.
    *
@@ -708,8 +753,25 @@ public:
    */
   template <int dim>
   Tensor<1, dim>
-  unit_tangential_vectors(const unsigned int face_no,
-                          const unsigned int i) const;
+  face_tangent_vector(const unsigned int face_no, const unsigned int i) const;
+
+  /**
+   * Return $i$-th unit tangent vector to a face of the reference cell.
+   * The vectors are arranged in such an order that the
+   * cross product between the two vectors returns the face normal vector.
+   *
+   * @pre $i$ must be between zero and `dim-1`.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
+   *
+   * @deprecated Use face_tangent_vector() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use face_tangent_vector() instead.")
+  Tensor<1, dim> unit_tangential_vectors(const unsigned int face_no,
+                                         const unsigned int i) const;
 
   /**
    * Return the unit normal vector of a face of the reference cell.
@@ -720,7 +782,20 @@ public:
    */
   template <int dim>
   Tensor<1, dim>
-  unit_normal_vectors(const unsigned int face_no) const;
+  face_normal_vector(const unsigned int face_no) const;
+
+  /**
+   * Return the unit normal vector of a face of the reference cell.
+   *
+   * @pre The template argument `dim` must equal the dimension
+   *   of the space in which the reference cell you are querying
+   *   lives (i.e., it must equal the result of get_dimension()).
+   *
+   * @deprecated Use face_normal_vector() instead.
+   */
+  template <int dim>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use face_normal_vector() instead.")
+  Tensor<1, dim> unit_normal_vectors(const unsigned int face_no) const;
 
   /**
    * Return the number of orientations for a face in the ReferenceCell. For
@@ -1859,7 +1934,8 @@ ReferenceCell::n_faces() const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::face_indices() const
 {
-  return {0U, n_faces()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_faces());
 }
 
 
@@ -1975,7 +2051,8 @@ ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::isotropic_child_indices() const
 {
-  return {0U, n_isotropic_children()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, n_isotropic_children());
 }
 
 
@@ -1983,7 +2060,8 @@ ReferenceCell::isotropic_child_indices() const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::vertex_indices() const
 {
-  return {0U, n_vertices()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_vertices());
 }
 
 
@@ -1991,7 +2069,8 @@ ReferenceCell::vertex_indices() const
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell::line_indices() const
 {
-  return {0U, n_lines()};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_lines());
 }
 
 
@@ -2036,10 +2115,7 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
 inline constexpr types::geometric_orientation
 ReferenceCell::default_combined_face_orientation()
 {
-  // Our convention is that 'orientation' has a default value of true and
-  // occupies the least-significant bit while rotate and flip have default
-  // values of 'false' and occupy the second and third bits.
-  return 0b001;
+  return numbers::default_geometric_orientation;
 }
 
 
@@ -2049,7 +2125,18 @@ ReferenceCell::reversed_combined_line_orientation()
 {
   // For a reversed line 'orientation' is false and neither flip nor rotate are
   // defined.
-  return 0b000;
+  return numbers::reverse_line_orientation;
+}
+
+
+
+inline unsigned int
+ReferenceCell::child_cell_on_face(const unsigned int face,
+                                  const unsigned int subface) const
+{
+  return child_cell_on_face(face,
+                            subface,
+                            numbers::default_geometric_orientation);
 }
 
 
@@ -2076,7 +2163,15 @@ ReferenceCell::child_cell_on_face(
           static constexpr ndarray<unsigned int, 3, 2> subcells = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
-          return subcells[face][subface];
+          Assert(combined_face_orientation ==
+                     numbers::default_geometric_orientation ||
+                   combined_face_orientation ==
+                     numbers::reverse_line_orientation,
+                 ExcInternalError());
+          return subcells[face][combined_face_orientation ==
+                                    numbers::default_geometric_orientation ?
+                                  subface :
+                                  1 - subface];
         }
       case ReferenceCells::Quadrilateral:
         {
@@ -2424,8 +2519,7 @@ ReferenceCell::face_to_cell_vertices(
   // TODO: once the default orientation is switched to 0 then we can remove this
   // special case for 1D.
   if (get_dimension() == 1)
-    Assert(combined_face_orientation ==
-             ReferenceCell::default_combined_face_orientation(),
+    Assert(combined_face_orientation == numbers::default_geometric_orientation,
            ExcMessage("In 1D, all faces must have the default orientation."));
   else
     AssertIndexRange(combined_face_orientation, n_face_orientations(face));
@@ -2451,7 +2545,7 @@ ReferenceCell::face_to_cell_vertices(
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
           return table[face][combined_face_orientation ==
-                                 default_combined_face_orientation() ?
+                                 numbers::default_geometric_orientation ?
                                vertex :
                                (1 - vertex)];
         }
@@ -2525,8 +2619,8 @@ ReferenceCell::face_vertex_location(const unsigned int face,
                     "the current reference cell lives. You have dim=" +
                     std::to_string(dim) + " but the reference cell is " +
                     std::to_string(get_dimension()) + " dimensional."));
-  return this->template vertex<dim>(
-    face_to_cell_vertices(face, vertex, default_combined_face_orientation()));
+  return this->template vertex<dim>(face_to_cell_vertices(
+    face, vertex, numbers::default_geometric_orientation));
 }
 
 
@@ -2546,7 +2640,7 @@ ReferenceCell::standard_to_real_face_vertex(
         DEAL_II_NOT_IMPLEMENTED();
         break;
       case ReferenceCells::Line:
-        Assert(face_orientation == default_combined_face_orientation(),
+        Assert(face_orientation == numbers::default_geometric_orientation,
                ExcMessage(
                  "In 1D, all faces must have the default orientation."));
         return vertex;
@@ -3091,6 +3185,16 @@ inline Tensor<1, dim>
 ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
                                        const unsigned int i) const
 {
+  return face_tangent_vector<dim>(face_no, i);
+}
+
+
+
+template <int dim>
+inline Tensor<1, dim>
+ReferenceCell::face_tangent_vector(const unsigned int face_no,
+                                   const unsigned int i) const
+{
   Assert(dim == get_dimension(),
          ExcMessage("You can only call this function with arguments for "
                     "which 'dim' equals the dimension of the space in which "
@@ -3138,14 +3242,14 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
           AssertIndexRange(face_no, 5);
           static const ndarray<Tensor<1, dim>, 5, 2> table = {
             {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
-             {{Point<dim>(+1.0 / sqrt(2.0), 0, +1.0 / sqrt(2.0)),
+             {{Point<dim>(+1.0 / std::sqrt(2.0), 0, +1.0 / std::sqrt(2.0)),
                Point<dim>(0, 1, 0)}},
-             {{Point<dim>(+1.0 / sqrt(2.0), 0, -1.0 / sqrt(2.0)),
+             {{Point<dim>(+1.0 / std::sqrt(2.0), 0, -1.0 / std::sqrt(2.0)),
                Point<dim>(0, 1, 0)}},
              {{Point<dim>(1, 0, 0),
-               Point<dim>(0, +1.0 / sqrt(2.0), +1.0 / sqrt(2.0))}},
+               Point<dim>(0, +1.0 / std::sqrt(2.0), +1.0 / std::sqrt(2.0))}},
              {{Point<dim>(1, 0, 0),
-               Point<dim>(0, +1.0 / sqrt(2.0), -1.0 / sqrt(2.0))}}}};
+               Point<dim>(0, +1.0 / std::sqrt(2.0), -1.0 / std::sqrt(2.0))}}}};
 
           return table[face_no][i];
         }
@@ -3176,6 +3280,15 @@ template <int dim>
 inline Tensor<1, dim>
 ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
 {
+  return face_normal_vector<dim>(face_no);
+}
+
+
+
+template <int dim>
+inline Tensor<1, dim>
+ReferenceCell::face_normal_vector(const unsigned int face_no) const
+{
   Assert(dim == get_dimension(),
          ExcMessage("You can only call this function with arguments for "
                     "which 'dim' equals the dimension of the space in which "
@@ -3193,12 +3306,12 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
       Assert(*this == ReferenceCells::Triangle, ExcInternalError());
 
       // Return the rotated vector
-      return cross_product_2d(unit_tangential_vectors<dim>(face_no, 0));
+      return cross_product_2d(face_tangent_vector<dim>(face_no, 0));
     }
   else if (dim == 3)
     {
-      return cross_product_3d(unit_tangential_vectors<dim>(face_no, 0),
-                              unit_tangential_vectors<dim>(face_no, 1));
+      return cross_product_3d(face_tangent_vector<dim>(face_no, 0),
+                              face_tangent_vector<dim>(face_no, 1));
     }
 
   DEAL_II_NOT_IMPLEMENTED();
@@ -3227,21 +3340,40 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
 
 
 
-inline bool
+inline types::geometric_orientation
 ReferenceCell::standard_vs_true_line_orientation(
   const unsigned int                 line,
   const unsigned int                 face,
   const types::geometric_orientation combined_face_orientation,
-  const bool                         line_orientation) const
+  const types::geometric_orientation line_orientation) const
 {
+  return face_to_cell_line_orientation(line,
+                                       face,
+                                       combined_face_orientation,
+                                       line_orientation);
+}
+
+
+inline types::geometric_orientation
+ReferenceCell::face_to_cell_line_orientation(
+  const unsigned int                 face_line_no,
+  const unsigned int                 face_no,
+  const types::geometric_orientation combined_face_orientation,
+  const types::geometric_orientation line_orientation) const
+{
+  constexpr auto D = numbers::default_geometric_orientation;
+  constexpr auto R = numbers::reverse_line_orientation;
   if (*this == ReferenceCells::Hexahedron)
     {
-      static constexpr dealii::ndarray<bool, 2, 8> bool_table{
-        {{{true, true, false, true, false, false, true, false}},
-         {{true, true, true, false, false, false, false, true}}}};
+      static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
+        table{{{{D, D, R, D, R, R, D, R}}, {{D, D, D, R, R, R, R, D}}}};
+      // We use face_line_no / 2 here since lines i and i + 1 are parallel and,
+      // on a given face, have the same relative orientations.
+      const bool match =
+        line_orientation == table[face_line_no / 2][combined_face_orientation];
 
-      return (line_orientation ==
-              bool_table[line / 2][combined_face_orientation]);
+      return match ? numbers::default_geometric_orientation :
+                     numbers::reverse_line_orientation;
     }
   else if (*this == ReferenceCells::Tetrahedron)
     {
@@ -3249,24 +3381,26 @@ ReferenceCell::standard_vs_true_line_orientation(
       static constexpr dealii::ndarray<unsigned int, 4, 3> combined_lines{
         {{{0, 0, 0}}, {{X, 0, 1}}, {{X, 0, X}}, {{X, X, X}}}};
 
-      const auto combined_line = combined_lines[face][line];
+      const auto combined_line = combined_lines[face_no][face_line_no];
 
       Assert(combined_line != X,
              ExcMessage(
                "This function can only be called for following face-line "
                "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1),"));
 
-      static constexpr dealii::ndarray<bool, 2, 6> bool_table{
-        {{{false, true, false, true, false, true}},
-         {{true, false, true, false, true, false}}}};
+      static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
+        table{{{{R, D, R, D, R, D}}, {{D, R, D, R, D, R}}}};
 
-      return (line_orientation ==
-              bool_table[combined_line][combined_face_orientation]);
+      const bool match =
+        line_orientation == table[combined_line][combined_face_orientation];
+
+      return match ? numbers::default_geometric_orientation :
+                     numbers::reverse_line_orientation;
     }
   else
     // TODO: This might actually be wrong for some of the other
     // kinds of objects. We should check this
-    return true;
+    return numbers::default_geometric_orientation;
 }
 
 
@@ -3410,7 +3544,12 @@ ReferenceCell::get_combined_orientation(
           return o;
       }
 
-    Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
+    // Do not use `this` in Assert because nvcc when using C++20 assumes that
+    // `this` is an integer and we get the following error: invalid type
+    // argument of unary '*' (have 'int')
+    [[maybe_unused]] const auto &ref_cell = *this;
+    Assert(false,
+           (internal::NoPermutation<T>(ref_cell, vertices_0, vertices_1)));
     return std::numeric_limits<types::geometric_orientation>::max();
   };
 
@@ -3421,7 +3560,7 @@ ReferenceCell::get_combined_orientation(
         // vertex_vertex_permutations once we make 0 the default orientation.
         (void)vertex_vertex_permutations;
         if (vertices_0[0] == vertices_1[0])
-          return default_combined_face_orientation();
+          return numbers::default_geometric_orientation;
         break;
       case ReferenceCells::Line:
         return compute_orientation(line_vertex_permutations);

@@ -18,6 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
+
+
 #ifdef DEAL_II_WITH_SUNDIALS
 #  include <exception>
 

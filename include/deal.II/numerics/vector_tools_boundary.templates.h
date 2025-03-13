@@ -55,7 +55,7 @@ namespace VectorTools
               typename number,
               template <int, int>
               class M_or_MC>
-    static inline void
+    inline void
     do_interpolate_boundary_values(
       const M_or_MC<dim, spacedim>    &mapping,
       const DoFHandler<dim, spacedim> &dof,
@@ -775,30 +775,31 @@ namespace VectorTools
       // but it needs to be implemented
       if (dim >= 3)
         {
-#ifdef DEBUG
-          // Assert that there are no hanging nodes at the boundary
-          int level = -1;
-          for (const auto &cell : dof.active_cell_iterators())
-            for (auto f : cell->face_indices())
-              {
-                if (cell->at_boundary(f))
+          if constexpr (running_in_debug_mode())
+            {
+              // Assert that there are no hanging nodes at the boundary
+              int level = -1;
+              for (const auto &cell : dof.active_cell_iterators())
+                for (auto f : cell->face_indices())
                   {
-                    if (level == -1)
-                      level = cell->level();
-                    else
+                    if (cell->at_boundary(f))
                       {
-                        Assert(
-                          level == cell->level(),
-                          ExcMessage(
-                            "The mesh you use in projecting boundary values "
-                            "has hanging nodes at the boundary. This would require "
-                            "dealing with hanging node constraints when solving "
-                            "the linear system on the boundary, but this is not "
-                            "currently implemented."));
+                        if (level == -1)
+                          level = cell->level();
+                        else
+                          {
+                            Assert(
+                              level == cell->level(),
+                              ExcMessage(
+                                "The mesh you use in projecting boundary values "
+                                "has hanging nodes at the boundary. This would require "
+                                "dealing with hanging node constraints when solving "
+                                "the linear system on the boundary, but this is not "
+                                "currently implemented."));
+                          }
                       }
                   }
-              }
-#endif
+            }
         }
       sparsity.compress();
 
@@ -1122,14 +1123,14 @@ namespace VectorTools
             GeometryInfo<dim>::vertices_per_face * fe.n_dofs_per_vertex() +
             line * fe.n_dofs_per_line() + line_dof_idx;
 
-          // Note, assuming that the edge orientations are "standard"
-          //       i.e. cell->line_orientation(line) = true.
-          Assert(cell->line_orientation(line),
+          // Note, assuming that the edge orientations are "standard", i.e.,
+          //       cell->line_orientation(line) =
+          //       numbers::default_geometric_orientation
+          Assert(cell->line_orientation(line) ==
+                   numbers::default_geometric_orientation,
                  ExcMessage("Edge orientation does not meet expectation."));
           // Next, translate from face to cell. Note, this might be assuming
-          // that the edge orientations are "standard" (not sure any more at
-          // this time), i.e.
-          //       cell->line_orientation(line) = true.
+          // that the edge orientations are "standard"
           const unsigned int cell_dof_idx =
             fe.face_to_cell_index(face_dof_idx, face);
 
@@ -1558,9 +1559,7 @@ namespace VectorTools
                         line * fe.n_dofs_per_line() + line_dof_idx;
 
                       // Next, translate from face to cell. Note, this might be
-                      // assuming that the edge orientations are "standard" (not
-                      // sure any more at this time), i.e.
-                      //       cell->line_orientation(line) = true.
+                      // assuming that the edge orientations are "standard"
                       const unsigned int cell_dof_idx =
                         fe.face_to_cell_index(face_dof_idx, face);
 
@@ -1962,8 +1961,10 @@ namespace VectorTools
                               QProjector<dim - 1>::project_to_face(
                                 ReferenceCells::get_hypercube<dim - 1>(),
                                 reference_edge_quadrature,
-                                line),
-                              face));
+                                line,
+                                numbers::default_geometric_orientation),
+                              face,
+                              numbers::default_geometric_orientation));
                         }
                     }
                 }
@@ -2379,7 +2380,10 @@ namespace VectorTools
 
     for (const unsigned int face : GeometryInfo<dim>::face_indices())
       quadrature_collection.push_back(QProjector<dim>::project_to_face(
-        ReferenceCells::get_hypercube<dim>(), face_quadrature, face));
+        ReferenceCells::get_hypercube<dim>(),
+        face_quadrature,
+        face,
+        numbers::default_geometric_orientation));
 
     hp::FEValues<dim> fe_values(mapping_collection,
                                 fe_collection,
@@ -2540,7 +2544,10 @@ namespace VectorTools
 
         for (const unsigned int face : GeometryInfo<dim>::face_indices())
           quadrature_collection.push_back(QProjector<dim>::project_to_face(
-            ReferenceCells::get_hypercube<dim>(), quadrature, face));
+            ReferenceCells::get_hypercube<dim>(),
+            quadrature,
+            face,
+            numbers::default_geometric_orientation));
       }
 
     hp::FEFaceValues<dim> fe_face_values(mapping_collection,

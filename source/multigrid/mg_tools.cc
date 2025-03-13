@@ -43,7 +43,9 @@
 
 #include <algorithm>
 #include <numeric>
+#include <set>
 #include <vector>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -200,7 +202,7 @@ namespace MGTools
 
         // At this point, we have
         // counted all dofs
-        // contributiong from cells
+        // contributing from cells
         // coupled topologically to the
         // adjacent cells, but we
         // subtracted some faces.
@@ -457,7 +459,7 @@ namespace MGTools
 
         // At this point, we have
         // counted all dofs
-        // contributiong from cells
+        // contributing from cells
         // coupled topologically to the
         // adjacent cells, but we
         // subtracted some faces.
@@ -1813,6 +1815,6 @@ namespace MGTools
 
 
 // explicit instantiations
-#include "mg_tools.inst"
+#include "multigrid/mg_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

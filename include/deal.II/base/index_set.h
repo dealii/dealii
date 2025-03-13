@@ -22,6 +22,7 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/trilinos_utilities.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/trilinos_tpetra_types.h>
 
@@ -484,14 +485,24 @@ public:
   /**
    * Remove and return the last element of the last range.
    * This function throws an exception if the IndexSet is empty.
+   *
+   * @deprecated This function is deprecated. Conceptually, an index set is a
+   *   set; it should not be seen as a sorted container in which it is clear
+   *   what element is stored "last".
    */
+  DEAL_II_DEPRECATED_EARLY
   size_type
   pop_back();
 
   /**
    * Remove and return the first element of the first range.
    * This function throws an exception if the IndexSet is empty.
+   *
+   * @deprecated This function is deprecated. Conceptually, an index set is a
+   *   set; it should not be seen as a sorted container in which it is clear
+   *   what element is stored "first".
    */
+  DEAL_II_DEPRECATED_EARLY
   size_type
   pop_front();
 
@@ -1943,12 +1954,13 @@ IndexSet::n_elements() const
       v              = r.nth_index_in_set + r.end - r.begin;
     }
 
-#ifdef DEBUG
-  size_type s = 0;
-  for (const auto &range : ranges)
-    s += (range.end - range.begin);
-  Assert(s == v, ExcInternalError());
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      size_type s = 0;
+      for (const auto &range : ranges)
+        s += (range.end - range.begin);
+      Assert(s == v, ExcInternalError());
+    }
 
   return v;
 }

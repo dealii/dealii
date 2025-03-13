@@ -82,7 +82,6 @@ main()
         for (unsigned int i = 0; i < 3; ++i)
           {
             u.block(i)[0] = 0;
-            ;
             v.block(i)[0] = 0;
           }
         u.block(j)[0] = 1;
@@ -103,7 +102,6 @@ main()
             v.block(i)[0] = 0;
           }
         u.block(j)[0] = 1;
-        ;
 
         inverse_op_a.vmult(v, u);
 
@@ -118,11 +116,9 @@ main()
         for (unsigned int i = 0; i < 3; ++i)
           {
             u.block(i)[0] = 0;
-            ;
             v.block(i)[0] = 0;
           }
         u.block(j)[0] = 1;
-        ;
 
         identity.vmult(v, u);
 
@@ -175,7 +171,6 @@ main()
         for (unsigned int i = 0; i < 3; ++i)
           {
             u.block(i)[0] = 0;
-            ;
             v.block(i)[0] = 0;
           }
         u.block(j)[0] = 1;
@@ -196,7 +191,6 @@ main()
             v.block(i)[0] = 0;
           }
         u.block(j)[0] = 1;
-        ;
 
         inverse_op_a.vmult(v, u);
 
@@ -211,11 +205,9 @@ main()
         for (unsigned int i = 0; i < 3; ++i)
           {
             u.block(i)[0] = 0;
-            ;
             v.block(i)[0] = 0;
           }
         u.block(j)[0] = 1;
-        ;
 
         identity.vmult(v, u);
 

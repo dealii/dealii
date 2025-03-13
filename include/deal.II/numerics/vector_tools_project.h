@@ -18,6 +18,9 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/vectorization.h>
+
 #include <functional>
 #include <memory>
 

@@ -15,6 +15,8 @@
 
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
 
+#include <vector>
+
 DEAL_II_NAMESPACE_OPEN
 
 IntegratedLegendreSZ::IntegratedLegendreSZ(const unsigned int k)

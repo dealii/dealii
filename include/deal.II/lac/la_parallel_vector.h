@@ -33,6 +33,13 @@
 #include <iomanip>
 #include <memory>
 
+#if defined(DEAL_II_WITH_MPI)
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  include <mpi.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
@@ -1363,6 +1370,16 @@ namespace LinearAlgebra
       add_and_dot_local(const Number                       a,
                         const Vector<Number, MemorySpace> &V,
                         const Vector<Number, MemorySpace> &W);
+
+      /**
+       * Assert that there are no spurious non-zero entries in the ghost
+       * region of the vector caused by some forgotten compress() or
+       * zero_out_ghost_values() calls, which is an invariant of the vector
+       * space operations such as the addition of vectors, scaling a vector,
+       * and similar.
+       */
+      void
+      assert_no_residual_content_in_ghost_region() const;
 
       /**
        * Shared pointer to store the parallel partitioning information. This

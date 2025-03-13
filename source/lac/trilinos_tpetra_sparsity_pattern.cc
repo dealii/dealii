@@ -41,7 +41,7 @@ namespace LinearAlgebra
       {
         // if we are asked to visit the past-the-end line, then simply
         // release all our caches and go on with life
-        if (static_cast<size_t>(this->a_row) == sparsity_pattern->n_rows())
+        if (static_cast<std::size_t>(this->a_row) == sparsity_pattern->n_rows())
           {
             colnum_cache.reset();
             return;
@@ -584,15 +584,16 @@ namespace LinearAlgebra
       IndexSet nonlocal_partitioner = writable_rows;
       AssertDimension(nonlocal_partitioner.size(),
                       row_parallel_partitioning.size());
-#  ifdef DEBUG
-      {
-        IndexSet tmp = writable_rows & row_parallel_partitioning;
-        Assert(tmp == row_parallel_partitioning,
-               ExcMessage(
-                 "The set of writable rows passed to this method does not "
-                 "contain the locally owned rows, which is not allowed."));
-      }
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            IndexSet tmp = writable_rows & row_parallel_partitioning;
+            Assert(tmp == row_parallel_partitioning,
+                   ExcMessage(
+                     "The set of writable rows passed to this method does not "
+                     "contain the locally owned rows, which is not allowed."));
+          }
+        }
       nonlocal_partitioner.subtract_set(row_parallel_partitioning);
       if (Utilities::MPI::n_mpi_processes(communicator) > 1)
         {
@@ -849,7 +850,7 @@ namespace LinearAlgebra
                   trilinos_j) -
         col_indices.data();
 
-      return static_cast<size_t>(local_col_index) != col_indices.size();
+      return static_cast<std::size_t>(local_col_index) != col_indices.size();
 #  else
       (void)i;
       (void)j;

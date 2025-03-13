@@ -108,6 +108,6 @@ namespace internal
   } // namespace FEValuesImplementation
 } // namespace internal
 
-#include "mapping_related_data.inst"
+#include "fe/mapping_related_data.inst"
 
 DEAL_II_NAMESPACE_CLOSE

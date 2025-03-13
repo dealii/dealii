@@ -19,6 +19,8 @@
 #include <deal.II/hp/fe_values.h>
 
 #include <memory>
+#include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -639,7 +641,7 @@ namespace hp
 
 
 // explicit instantiations
-#include "fe_values.inst"
+#include "hp/fe_values.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

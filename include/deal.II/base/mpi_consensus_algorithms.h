@@ -21,6 +21,9 @@
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_tags.h>
 
+#include <set>
+#include <vector>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -1279,7 +1282,7 @@ namespace Utilities
   {
     namespace ConsensusAlgorithms
     {
-      namespace
+      namespace internal
       {
         /**
          * Return whether a vector of targets (MPI ranks) has only unique
@@ -1373,7 +1376,7 @@ namespace Utilities
           std::rethrow_exception(exception);
 #  endif
         }
-      } // namespace
+      } // namespace internal
 
 
 
@@ -1450,7 +1453,7 @@ namespace Utilities
                       &process_answer,
         const MPI_Comm comm)
       {
-        Assert(has_unique_elements(targets),
+        Assert(internal::has_unique_elements(targets),
                ExcMessage("The consensus algorithms expect that each process "
                           "only sends a single message to another process, "
                           "but the targets provided include duplicates."));
@@ -1497,7 +1500,7 @@ namespace Utilities
           }
         catch (...)
           {
-            handle_exception(std::current_exception(), comm);
+            internal::handle_exception(std::current_exception(), comm);
           }
 
         return std::vector<unsigned int>(requesting_processes.begin(),
@@ -1798,12 +1801,13 @@ namespace Utilities
               AssertThrowMPI(ierr);
             }
 
-#    ifdef DEBUG
-          // note: IBarrier seems to make problem during testing, this
-          // additional Barrier seems to help
-          ierr = MPI_Barrier(comm);
-          AssertThrowMPI(ierr);
-#    endif
+          if constexpr (running_in_debug_mode())
+            {
+              // note: IBarrier seems to make problem during testing, this
+              // additional Barrier seems to help
+              ierr = MPI_Barrier(comm);
+              AssertThrowMPI(ierr);
+            }
         }
 #  endif
       }
@@ -1821,7 +1825,7 @@ namespace Utilities
                       &process_answer,
         const MPI_Comm comm)
       {
-        Assert(has_unique_elements(targets),
+        Assert(internal::has_unique_elements(targets),
                ExcMessage("The consensus algorithms expect that each process "
                           "only sends a single message to another process, "
                           "but the targets provided include duplicates."));
@@ -1849,7 +1853,7 @@ namespace Utilities
           }
         catch (...)
           {
-            handle_exception(std::current_exception(), comm);
+            internal::handle_exception(std::current_exception(), comm);
           }
 
         return std::vector<unsigned int>(requesting_processes.begin(),

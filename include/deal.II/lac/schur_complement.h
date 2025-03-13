@@ -128,7 +128,7 @@ DEAL_II_NAMESPACE_OPEN
  * An illustration of typical usage of this operator for a fully coupled
  * system is given below.
  * @code
- * #include<deal.II/lac/schur_complement.h>
+ * #include <deal.II/lac/schur_complement.h>
  *
  * // Given BlockMatrix K and BlockVectors d,F
  *

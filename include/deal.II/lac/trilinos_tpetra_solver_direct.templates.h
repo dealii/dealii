@@ -17,8 +17,8 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/lac/solver_control.h"
-#include "deal.II/lac/trilinos_tpetra_types.h"
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/trilinos_tpetra_types.h>
 
 #include <string>
 
@@ -26,8 +26,8 @@
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #  ifdef DEAL_II_TRILINOS_WITH_AMESOS2
 
-#    include "deal.II/base/template_constraints.h"
 #    include <deal.II/base/conditional_ostream.h>
+#    include <deal.II/base/template_constraints.h>
 
 #    include <deal.II/lac/trilinos_tpetra_solver_direct.h>
 

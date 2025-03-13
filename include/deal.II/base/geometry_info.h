@@ -22,6 +22,7 @@
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
+#include <deal.II/base/tensor.h>
 
 #include <array>
 #include <cstdint>
@@ -2960,7 +2961,8 @@ template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::face_indices()
 {
-  return {0U, faces_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, faces_per_cell);
 }
 
 
@@ -2969,7 +2971,8 @@ template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 GeometryInfo<dim>::vertex_indices()
 {
-  return {0U, vertices_per_cell};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+    0U, vertices_per_cell);
 }
 
 

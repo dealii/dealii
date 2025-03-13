@@ -20,22 +20,18 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <cerrno>
 #include <complex>
 #include <iostream>
 #include <list>
 #include <typeinfo>
 #include <vector>
 
-
-DEAL_II_NAMESPACE_OPEN
-
-
-// include UMFPACK file.
 #ifdef DEAL_II_WITH_UMFPACK
 #  include <umfpack.h>
 #endif
 
+
+DEAL_II_NAMESPACE_OPEN
 
 namespace
 {

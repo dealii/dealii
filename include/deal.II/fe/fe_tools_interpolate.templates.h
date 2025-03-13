@@ -87,17 +87,20 @@ namespace FETools
 
 
     const IndexSet u2_elements = u2.locally_owned_elements();
-#ifdef DEBUG
-    const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
-    const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
-    const IndexSet  u1_elements     = u1.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u2_elements == dof2_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
+        const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
+        const IndexSet  u1_elements     = u1.locally_owned_elements();
+        Assert(u1_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+        Assert(u2_elements == dof2_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+      }
 
     // allocate vectors at maximal
     // size. will be reinited in inner
@@ -148,20 +151,21 @@ namespace FETools
                  ExcDimensionMismatch(cell1->get_fe().n_components(),
                                       cell2->get_fe().n_components()));
 
-#ifdef DEBUG
-          // For continuous elements on grids with hanging nodes we need
-          // hanging node constraints. Consequently, when the elements are
-          // continuous no hanging node constraints are allowed.
-          const bool hanging_nodes_not_allowed =
-            ((cell2->get_fe().n_dofs_per_vertex() != 0) &&
-             (constraints.n_constraints() == 0));
+          if constexpr (running_in_debug_mode())
+            {
+              // For continuous elements on grids with hanging nodes we need
+              // hanging node constraints. Consequently, when the elements are
+              // continuous no hanging node constraints are allowed.
+              const bool hanging_nodes_not_allowed =
+                ((cell2->get_fe().n_dofs_per_vertex() != 0) &&
+                 (constraints.n_constraints() == 0));
 
-          if (hanging_nodes_not_allowed)
-            for (const unsigned int face : cell1->face_indices())
-              Assert(cell1->at_boundary(face) ||
-                       cell1->neighbor(face)->level() == cell1->level(),
-                     ExcHangingNodesNotAllowed());
-#endif
+              if (hanging_nodes_not_allowed)
+                for (const unsigned int face : cell1->face_indices())
+                  Assert(cell1->at_boundary(face) ||
+                           cell1->neighbor(face)->level() == cell1->level(),
+                         ExcHangingNodesNotAllowed());
+            }
 
           const unsigned int dofs_per_cell1 = cell1->get_fe().n_dofs_per_cell();
           const unsigned int dofs_per_cell2 = cell2->get_fe().n_dofs_per_cell();
@@ -267,18 +271,21 @@ namespace FETools
     Assert(u1_interpolated.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
-#ifdef DEBUG
-    const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
-    const IndexSet  u1_elements     = u1.locally_owned_elements();
-    const IndexSet  u1_interpolated_elements =
-      u1_interpolated.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u1_interpolated_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
+        const IndexSet  u1_elements     = u1.locally_owned_elements();
+        const IndexSet  u1_interpolated_elements =
+          u1_interpolated.locally_owned_elements();
+        Assert(u1_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+        Assert(u1_interpolated_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+      }
 
     Vector<typename OutVector::value_type> u1_local(
       dof1.get_fe_collection().max_dofs_per_cell());
@@ -302,20 +309,21 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-#ifdef DEBUG
-          // For continuous elements on grids with hanging nodes we need
-          // hanging node constraints. Consequently, when the elements are
-          // continuous no hanging node constraints are allowed.
-          const bool hanging_nodes_not_allowed =
-            (cell->get_fe().n_dofs_per_vertex() != 0) ||
-            (fe2.n_dofs_per_vertex() != 0);
+          if constexpr (running_in_debug_mode())
+            {
+              // For continuous elements on grids with hanging nodes we need
+              // hanging node constraints. Consequently, when the elements are
+              // continuous no hanging node constraints are allowed.
+              const bool hanging_nodes_not_allowed =
+                (cell->get_fe().n_dofs_per_vertex() != 0) ||
+                (fe2.n_dofs_per_vertex() != 0);
 
-          if (hanging_nodes_not_allowed)
-            for (const unsigned int face : cell->face_indices())
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed());
-#endif
+              if (hanging_nodes_not_allowed)
+                for (const unsigned int face : cell->face_indices())
+                  Assert(cell->at_boundary(face) ||
+                           cell->neighbor(face)->level() == cell->level(),
+                         ExcHangingNodesNotAllowed());
+            }
 
           const unsigned int dofs_per_cell1 = cell->get_fe().n_dofs_per_cell();
 
@@ -604,18 +612,21 @@ namespace FETools
     Assert(u1_difference.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
 
-#ifdef DEBUG
-    const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
-    const IndexSet  u1_elements     = u1.locally_owned_elements();
-    const IndexSet  u1_difference_elements =
-      u1_difference.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u1_difference_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
+        const IndexSet  u1_elements     = u1.locally_owned_elements();
+        const IndexSet  u1_difference_elements =
+          u1_difference.locally_owned_elements();
+        Assert(u1_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+        Assert(u1_difference_elements == dof1_local_dofs,
+               ExcMessage(
+                 "The provided vector and DoF handler should have the same"
+                 " index sets."));
+      }
 
     const unsigned int dofs_per_cell = dof1.get_fe().n_dofs_per_cell();
 
@@ -636,20 +647,21 @@ namespace FETools
       if ((cell->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-#ifdef DEBUG
-          // For continuous elements on grids with hanging nodes we need
-          // hanging node constraints. Consequently, when the elements are
-          // continuous no hanging node constraints are allowed.
-          const bool hanging_nodes_not_allowed =
-            (dof1.get_fe().n_dofs_per_vertex() != 0) ||
-            (fe2.n_dofs_per_vertex() != 0);
+          if constexpr (running_in_debug_mode())
+            {
+              // For continuous elements on grids with hanging nodes we need
+              // hanging node constraints. Consequently, when the elements are
+              // continuous no hanging node constraints are allowed.
+              const bool hanging_nodes_not_allowed =
+                (dof1.get_fe().n_dofs_per_vertex() != 0) ||
+                (fe2.n_dofs_per_vertex() != 0);
 
-          if (hanging_nodes_not_allowed)
-            for (const unsigned int face : cell->face_indices())
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed());
-#endif
+              if (hanging_nodes_not_allowed)
+                for (const unsigned int face : cell->face_indices())
+                  Assert(cell->at_boundary(face) ||
+                           cell->neighbor(face)->level() == cell->level(),
+                         ExcHangingNodesNotAllowed());
+            }
 
           cell->get_dof_values(u1, u1_local);
           difference_matrix.vmult(u1_diff_local, u1_local);
