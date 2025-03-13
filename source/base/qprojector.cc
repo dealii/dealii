@@ -1330,7 +1330,9 @@ QProjector<dim>::DataSetDescriptor::face(
 
   switch (dim)
     {
-      if (dim == 2)
+      case 1:
+        return face_no * n_quadrature_points;
+      case 2:
         return {(2 * face_no + (combined_orientation ==
                                     numbers::default_geometric_orientation ?
                                   1 :
