@@ -350,7 +350,7 @@ namespace internal
         constexpr unsigned int dim = 2;
 
         const unsigned int n_faces = reference_cell.n_faces();
-        const unsigned int subfaces_per_face =
+        const unsigned int num_subfaces_or_face =
           project_to_subface ?
             reference_cell.face_reference_cell(0).n_isotropic_children() :
             1;
@@ -367,16 +367,16 @@ namespace internal
 
         // new (projected) quadrature points and weights
         std::vector<Point<2>> q_points;
-        q_points.reserve(2 * n_points * subfaces_per_face);
+        q_points.reserve(2 * n_points * num_subfaces_or_face);
         std::vector<double> weights;
-        weights.reserve(2 * n_points * subfaces_per_face);
+        weights.reserve(2 * n_points * num_subfaces_or_face);
 
         // loop over all faces ...
         for (unsigned int face = 0; face < n_faces; ++face)
           // ... and over all possible orientations ...
           for (unsigned int orientation = 0; orientation < 2; ++orientation)
             // ... and over all subfaces
-            for (unsigned int subface = 0; subface < subfaces_per_face;
+            for (unsigned int subface = 0; subface < num_subfaces_or_face;
                  ++subface)
               {
                 const unsigned int quadrature_index =
@@ -387,13 +387,15 @@ namespace internal
                 // handle the points
                 std::vector<Point<dim>> points(n_q_points);
 
-                // orientation 1 is the standard orientation
-                // so invert lines for orientation 0
+                // orientation numbers::default_geometric_orientation is the
+                // standard orientation so invert lines for orientation
+                // numbers::reverse_line_orientation
                 if (project_to_subface)
                   {
                     const unsigned int local_subface =
-                      orientation == 0 ? subfaces_per_face - 1 - subface :
-                                         subface;
+                      orientation == numbers::reverse_line_orientation ?
+                        num_subfaces_or_face - 1 - subface :
+                        subface;
 
                     dealii::QProjector<dim>::project_to_subface(
                       reference_cell,
@@ -411,7 +413,7 @@ namespace internal
                       points);
                   }
 
-                if (orientation == 0)
+                if (orientation == numbers::reverse_line_orientation)
                   std::reverse(points.begin(), points.end());
 
                 std::copy(points.begin(),
@@ -429,7 +431,7 @@ namespace internal
                   for (auto &w : scaled_weights)
                     w *= std::sqrt(2);
 
-                if (orientation == 0)
+                if (orientation == numbers::reverse_line_orientation)
                   std::reverse(scaled_weights.begin(), scaled_weights.end());
 
                 std::copy(scaled_weights.begin(),
@@ -437,9 +439,9 @@ namespace internal
                           std::back_inserter(weights));
               }
 
-        Assert(q_points.size() == 2 * n_points * subfaces_per_face,
+        Assert(q_points.size() == 2 * n_points * num_subfaces_or_face,
                ExcInternalError());
-        Assert(weights.size() == 2 * n_points * subfaces_per_face,
+        Assert(weights.size() == 2 * n_points * num_subfaces_or_face,
                ExcInternalError());
 
         // construct new quadrature rule
@@ -1524,11 +1526,11 @@ QProjector<1>::DataSetDescriptor::subface(
 template <>
 QProjector<2>::DataSetDescriptor
 QProjector<2>::DataSetDescriptor::subface(
-  const ReferenceCell &reference_cell,
-  const unsigned int   face_no,
-  const unsigned int   subface_no,
+  const ReferenceCell               &reference_cell,
+  const unsigned int                 face_no,
+  const unsigned int                 subface_no,
   const types::geometric_orientation combined_orientation,
-  const unsigned int n_quadrature_points,
+  const unsigned int                 n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
   Assert(face_no < reference_cell.n_faces(), ExcInternalError());
