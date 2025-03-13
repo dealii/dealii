@@ -15,6 +15,8 @@
 
 #include <deal.II/numerics/vector_tools_project.templates.h>
 
+#include <functional>
+
 
 DEAL_II_NAMESPACE_OPEN
 
