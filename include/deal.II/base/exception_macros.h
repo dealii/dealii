@@ -604,16 +604,16 @@
  * We accomplish this by using decltype(...) and create a dummy pointer
  * with these signatures. Notably, this approach works with C++20 onwards.
  */
-#    define Assert(cond, exc)                                  \
-      do                                                       \
-        {                                                      \
-          typename std::remove_reference<decltype(cond)>::type \
-            *dealii_assert_variable_a = nullptr;               \
-          typename std::remove_reference<decltype(exc)>::type  \
-            *dealii_assert_variable_b = nullptr;               \
-          (void)dealii_assert_variable_a;                      \
-          (void)dealii_assert_variable_b;                      \
-        }                                                      \
+#    define Assert(cond, exc)                                                 \
+      do                                                                      \
+        {                                                                     \
+          std::remove_reference_t<decltype(cond)> *dealii_assert_variable_a = \
+            nullptr;                                                          \
+          std::remove_reference_t<decltype(exc)> *dealii_assert_variable_b =  \
+            nullptr;                                                          \
+          (void)dealii_assert_variable_a;                                     \
+          (void)dealii_assert_variable_b;                                     \
+        }                                                                     \
       while (false)
 #  else
 #    define Assert(cond, exc)  \
