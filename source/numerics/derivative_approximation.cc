@@ -46,6 +46,7 @@
 
 #include <deal.II/numerics/derivative_approximation.h>
 
+#include <algorithm>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -479,8 +480,7 @@ namespace DerivativeApproximation
             }
         }
 
-      return std::max(std::fabs(EE[0]),
-                      std::max(std::fabs(EE[1]), std::fabs(EE[2])));
+      return std::max({std::fabs(EE[0]), std::fabs(EE[1]), std::fabs(EE[2])});
     }
 
 
@@ -829,7 +829,7 @@ namespace DerivativeApproximation
       auto neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr != active_neighbors.end(); ++neighbor_ptr)
         {
-          const auto neighbor = *neighbor_ptr;
+          const auto &neighbor = *neighbor_ptr;
 
           // reinit FE values object...
           x_fe_midpoint_value.reinit(neighbor);

@@ -402,7 +402,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
   std::vector<unsigned int>   column_widths(n_cols, 0);
   for (unsigned int j = 0; j < n_cols; ++j)
     {
-      std::string                                         key = sel_columns[j];
+      const std::string                                  &key = sel_columns[j];
       const std::map<std::string, Column>::const_iterator col_iter =
         columns.find(key);
       Assert(col_iter != columns.end(), ExcInternalError());
@@ -480,7 +480,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
           // header for each column. enumerate columns starting with 1
           for (unsigned int j = 0; j < n_cols; ++j)
             {
-              std::string key = sel_columns[j];
+              const std::string &key = sel_columns[j];
               out << "# " << j + 1 << ": " << key << '\n';
             }
           break;
@@ -691,7 +691,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
 
       for (unsigned int j = 0; j < n_cols; ++j)
         {
-          std::string key = sel_columns[j];
+          const std::string &key = sel_columns[j];
           // avoid `column[key]'
           const std::map<std::string, Column>::const_iterator col_iter =
             columns.find(key);

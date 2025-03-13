@@ -28,6 +28,8 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
+
+#include <algorithm>
 #undef BOOST_BIND_GLOBAL_PLACEHOLDERS
 
 #ifdef DEAL_II_WITH_ZLIB
@@ -172,10 +174,9 @@ namespace Utilities
 
     // make sure our conversion from fractional coordinates to
     // Integers work as expected, namely our cast (LongDouble)max_int
-    const int min_bits =
-      std::min(bits_per_dim,
-               std::min(std::numeric_limits<Integer>::digits,
-                        std::numeric_limits<LongDouble>::digits));
+    const int min_bits = std::min({bits_per_dim,
+                                   std::numeric_limits<Integer>::digits,
+                                   std::numeric_limits<LongDouble>::digits});
 
     // based on that get the maximum integer:
     const Integer max_int = (min_bits == std::numeric_limits<Integer>::digits ?

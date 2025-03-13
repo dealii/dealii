@@ -28,6 +28,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <limits>
@@ -1624,8 +1625,7 @@ TriaAccessor<3, 3, 3>::extent_in_direction(const unsigned int axis) const
                        this->line(lines[axis][2])->diameter(),
                        this->line(lines[axis][3])->diameter()};
 
-  return std::max(std::max(lengths[0], lengths[1]),
-                  std::max(lengths[2], lengths[3]));
+  return std::max({lengths[0], lengths[1], lengths[2], lengths[3]});
 }
 
 

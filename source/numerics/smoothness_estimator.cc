@@ -294,6 +294,7 @@ namespace SmoothnessEstimator
       // finite element, the smoothness estimation algorithm tends to produce
       // stable results.
       std::vector<unsigned int> n_coefficients_per_direction;
+      n_coefficients_per_direction.reserve(fe_collection.size());
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 
@@ -583,6 +584,7 @@ namespace SmoothnessEstimator
       // element, the smoothness estimation algorithm tends to produce stable
       // results.
       std::vector<unsigned int> n_coefficients_per_direction;
+      n_coefficients_per_direction.reserve(fe_collection.size());
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 

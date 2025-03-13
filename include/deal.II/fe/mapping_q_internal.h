@@ -39,6 +39,7 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_point_kernels.h>
 
+#include <algorithm>
 #include <array>
 #include <limits>
 #include <numeric>
@@ -147,8 +148,8 @@ namespace internal
        */
       const long double subexpr0        = -eta * x2 + x0 * (eta - 1);
       const long double xi_denominator0 = eta * x3 - x1 * (eta - 1) + subexpr0;
-      const long double max_x = std::max(std::max(std::abs(x0), std::abs(x1)),
-                                         std::max(std::abs(x2), std::abs(x3)));
+      const long double max_x =
+        std::max({std::abs(x0), std::abs(x1), std::abs(x2), std::abs(x3)});
 
       if (std::abs(xi_denominator0) > 1e-10 * max_x)
         {
@@ -158,8 +159,7 @@ namespace internal
       else
         {
           const long double max_y =
-            std::max(std::max(std::abs(y0), std::abs(y1)),
-                     std::max(std::abs(y2), std::abs(y3)));
+            std::max({std::abs(y0), std::abs(y1), std::abs(y2), std::abs(y3)});
           const long double subexpr1 = -eta * y2 + y0 * (eta - 1);
           const long double xi_denominator1 =
             eta * y3 - y1 * (eta - 1) + subexpr1;

@@ -12435,10 +12435,10 @@ void Triangulation<dim, spacedim>::copy_triangulation(
 
 
   levels.reserve(other_tria.levels.size());
-  for (unsigned int level = 0; level < other_tria.levels.size(); ++level)
+  for (const auto &level : other_tria.levels)
     levels.push_back(
       std::make_unique<internal::TriangulationImplementation::TriaLevel>(
-        *other_tria.levels[level]));
+        *level));
 
   number_cache = other_tria.number_cache;
 

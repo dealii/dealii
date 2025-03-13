@@ -275,6 +275,7 @@ FE_Q_Hierarchical<dim>::hp_line_dof_identities(
       // increasingly. Thus we return a vector of pairs for the first N-1, where
       // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
+      res.reserve(std::min(this_dpl, other_dpl));
       for (unsigned int i = 0; i < std::min(this_dpl, other_dpl); ++i)
         res.emplace_back(i, i);
 
@@ -319,6 +320,7 @@ FE_Q_Hierarchical<dim>::hp_quad_dof_identities(
       // increasingly. Thus we return a vector of pairs for the first N-1, where
       // N is minimum number of dofs_per_line for each FE_Q_Hierarchical.
       std::vector<std::pair<unsigned int, unsigned int>> res;
+      res.reserve(std::min(this_dpq, other_dpq));
       for (unsigned int i = 0; i < std::min(this_dpq, other_dpq); ++i)
         res.emplace_back(i, i);
 

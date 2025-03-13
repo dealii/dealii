@@ -1046,17 +1046,8 @@ namespace internal
 
     template <typename BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness> &
-    Iterator<BlockVectorType, Constness>::operator=(const Iterator &c)
-    {
-      parent              = c.parent;
-      global_index        = c.global_index;
-      index_within_block  = c.index_within_block;
-      current_block       = c.current_block;
-      next_break_forward  = c.next_break_forward;
-      next_break_backward = c.next_break_backward;
-
-      return *this;
-    }
+    Iterator<BlockVectorType, Constness>::operator=(const Iterator &c) =
+      default;
 
 
 

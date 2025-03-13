@@ -38,6 +38,7 @@ namespace hp
     {
       std::vector<QCollection<q_dim>> q_collections;
 
+      q_collections.reserve(q_collection.size());
       for (unsigned int q = 0; q < q_collection.size(); ++q)
         q_collections.emplace_back(q_collection[q]);
 

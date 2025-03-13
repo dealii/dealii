@@ -3336,7 +3336,7 @@ namespace internal
                 this->dof_handler->locally_owned_dofs());
             for (unsigned int i = 0; i < n_cpu; ++i)
               {
-                const IndexSet iset = locally_owned_dofs_per_processor[i];
+                const IndexSet &iset = locally_owned_dofs_per_processor[i];
                 for (types::global_dof_index ind = 0; ind < iset.n_elements();
                      ind++)
                   {

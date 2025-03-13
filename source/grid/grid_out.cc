@@ -3608,7 +3608,7 @@ GridOut::write_mesh_per_processor_as_vtu(
   data_names.emplace_back("level_subdomain");
   data_names.emplace_back("proc_writing");
 
-  const auto reference_cells = tria.get_reference_cells();
+  const auto &reference_cells = tria.get_reference_cells();
 
   AssertDimension(reference_cells.size(), 1);
 
@@ -3690,6 +3690,7 @@ GridOut::write_mesh_per_processor_as_vtu(
             pos += 1;
           const unsigned int n_procs =
             Utilities::MPI::n_mpi_processes(tr->get_mpi_communicator());
+          filenames.reserve(n_procs);
           for (unsigned int i = 0; i < n_procs; ++i)
             filenames.push_back(filename_without_extension.substr(pos) +
                                 ".proc" + Utilities::int_to_string(i, 4) +
@@ -4299,6 +4300,7 @@ namespace internal
                           face_no,
                           cell->combined_face_orientation(face_no),
                           n_points);
+                      line_points.reserve(n_points);
                       for (unsigned int i = 0; i < n_points; ++i)
                         line_points.push_back(
                           mapping->transform_unit_to_real_cell(
@@ -4573,6 +4575,7 @@ namespace internal
                                                                           v0),
                                 u1 = mapping->transform_real_to_unit_cell(cell,
                                                                           v1);
+                              line_points.reserve(n_points);
                               for (unsigned int i = 0; i < n_points; ++i)
                                 line_points.push_back(
                                   mapping->transform_unit_to_real_cell(

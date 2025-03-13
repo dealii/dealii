@@ -378,7 +378,7 @@ namespace internal
 
     for (unsigned int c_other = 0; c_other < child; ++c_other)
       {
-        auto matrix_other = fe.get_restriction_matrix(c_other, ref_case);
+        const auto &matrix_other = fe.get_restriction_matrix(c_other, ref_case);
         for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
           {
             if (fe.restriction_is_additive(i) == true)
