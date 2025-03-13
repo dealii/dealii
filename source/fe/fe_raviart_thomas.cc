@@ -632,6 +632,7 @@ FE_RaviartThomas<dim>::get_constant_modes() const
     for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
       constant_modes(d, i) = true;
   std::vector<unsigned int> components;
+  components.reserve(dim);
   for (unsigned int d = 0; d < dim; ++d)
     components.push_back(d);
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(constant_modes,

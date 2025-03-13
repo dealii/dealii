@@ -1255,6 +1255,7 @@ namespace GridTools
         if ((merged_b_boxes.size() > max_boxes) && (spacedim > 1))
           {
             std::vector<double> volumes;
+            volumes.reserve(merged_b_boxes.size());
             for (unsigned int i = 0; i < merged_b_boxes.size(); ++i)
               volumes.push_back(merged_b_boxes[i].volume());
 

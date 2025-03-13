@@ -1701,8 +1701,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
   Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 {
-  if constexpr (std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value ||
+  if constexpr (std::is_integral_v<
+                  typename ProductType<Number, OtherNumber>::type> ||
                 std::is_same_v<Number, Differentiation::SD::Expression>)
     {
       // recurse over the base objects

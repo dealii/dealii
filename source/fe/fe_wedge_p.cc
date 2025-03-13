@@ -291,6 +291,7 @@ FE_WedgeP<dim, spacedim>::hp_line_dof_identities(
 
   std::vector<std::pair<unsigned int, unsigned int>> result;
 
+  result.reserve(this->degree - 1);
   for (unsigned int i = 0; i < this->degree - 1; ++i)
     result.emplace_back(i, i);
 
@@ -322,6 +323,7 @@ FE_WedgeP<dim, spacedim>::hp_quad_dof_identities(
 
   std::vector<std::pair<unsigned int, unsigned int>> result;
 
+  result.reserve(this->n_dofs_per_quad(face_no));
   for (unsigned int i = 0; i < this->n_dofs_per_quad(face_no); ++i)
     result.emplace_back(i, i);
 
