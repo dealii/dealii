@@ -537,8 +537,9 @@ namespace GridGenerator
           const double theta = 2 * numbers::PI / number_points;
           // first point is leading edge then counterclockwise
           for (unsigned int i = 0; i < number_points; ++i)
-            circle_points.emplace_back(center[0] - radius * cos(i * theta),
-                                       center[1] - radius * sin(i * theta));
+            circle_points.emplace_back(center[0] - radius * std::cos(i * theta),
+                                       center[1] -
+                                         radius * std::sin(i * theta));
 
           return circle_points;
         }
@@ -564,7 +565,7 @@ namespace GridGenerator
               const std::complex<double> zeta(chi, eta);
               const std::complex<double> z = zeta + 1. / zeta;
 
-              joukowski_points[i] = {real(z), imag(z)};
+              joukowski_points[i] = {std::real(z), std::imag(z)};
             }
           return joukowski_points;
         }
