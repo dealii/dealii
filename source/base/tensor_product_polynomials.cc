@@ -578,9 +578,8 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
       const unsigned int n_polynomials = polynomials.size();
       boost::container::small_vector<ndarray<double, 5, dim>, 10> values_1d(
         n_polynomials);
-      if constexpr (std::is_same<
-                      PolynomialType,
-                      dealii::Polynomials::Polynomial<double>>::value)
+      if constexpr (std::is_same_v<PolynomialType,
+                                   dealii::Polynomials::Polynomial<double>>)
         {
           std::array<double, dim> point_array;
           for (unsigned int d = 0; d < dim; ++d)

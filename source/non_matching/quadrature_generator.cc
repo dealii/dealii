@@ -603,14 +603,14 @@ namespace NonMatching
             // Since we already know the function values at the interval ends we
             // might as well check these for min/max too.
             const double function_min =
-              std::min(std::min(left_value, right_value), value_bounds.first);
+              std::min({left_value, right_value, value_bounds.first});
 
             // If the functions is positive there are no roots.
             if (function_min > 0)
               return;
 
             const double function_max =
-              std::max(std::max(left_value, right_value), value_bounds.second);
+              std::max({left_value, right_value, value_bounds.second});
 
             // If the function is negative there are no roots.
             if (function_max < 0)

@@ -56,6 +56,7 @@ TensorProductPolynomialsConst<dim>::set_numbering(
     index_map_inverse[index_map[i]] = i;
 
   std::vector<unsigned int> renumber_base;
+  renumber_base.reserve(tensor_polys.n());
   for (unsigned int i = 0; i < tensor_polys.n(); ++i)
     renumber_base.push_back(renumber[i]);
 

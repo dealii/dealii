@@ -242,6 +242,7 @@ namespace TriangulationDescription
                                    unsigned int>>
               temp;
 
+            temp.reserve(this->coarse_cells.size());
             for (unsigned int i = 0; i < this->coarse_cells.size(); ++i)
               temp.emplace_back(this->coarse_cell_index_to_coarse_cell_id[i],
                                 this->coarse_cells[i],

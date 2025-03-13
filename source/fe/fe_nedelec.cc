@@ -2740,6 +2740,7 @@ FE_Nedelec<dim>::hp_line_dof_identities(
       // same polynomial degree.
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
+      identities.reserve(std::min(fe_nedelec_other->degree, this->degree));
       for (unsigned int i = 0;
            i < std::min(fe_nedelec_other->degree, this->degree);
            ++i)
@@ -4446,6 +4447,7 @@ FE_Nedelec<dim>::get_constant_modes() const
     for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
       constant_modes(d, i) = true;
   std::vector<unsigned int> components;
+  components.reserve(dim);
   for (unsigned int d = 0; d < dim; ++d)
     components.push_back(d);
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(constant_modes,

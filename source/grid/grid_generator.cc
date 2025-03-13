@@ -536,6 +536,7 @@ namespace GridGenerator
           // (number_points) equidistant points.
           const double theta = 2 * numbers::PI / number_points;
           // first point is leading edge then counterclockwise
+          circle_points.reserve(number_points);
           for (unsigned int i = 0; i < number_points; ++i)
             circle_points.emplace_back(center[0] - radius * cos(i * theta),
                                        center[1] - radius * sin(i * theta));
@@ -5995,6 +5996,7 @@ namespace GridGenerator
                                                             {+1, +1, +1}}};
 
         // Start with the shell bounded by two nested cubes
+        vertices.reserve(8);
         for (unsigned int i = 0; i < 8; ++i)
           vertices.push_back(p + hexahedron[i] * irad);
         for (unsigned int i = 0; i < 8; ++i)
@@ -6056,6 +6058,7 @@ namespace GridGenerator
                                                             {-1, +1, +1}, //
                                                             {+1, +1, +1}}};
 
+        vertices.reserve(8);
         for (unsigned int i = 0; i < 8; ++i)
           vertices.push_back(p + hexahedron[i] * irad);
         for (unsigned int i = 0; i < 6; ++i)
@@ -7080,6 +7083,7 @@ namespace GridGenerator
 
     const double        delta_h = height / (n_slices - 1);
     std::vector<double> slices_z_values;
+    slices_z_values.reserve(n_slices);
     for (unsigned int i = 0; i < n_slices; ++i)
       slices_z_values.push_back(i * delta_h);
     extrude_triangulation(

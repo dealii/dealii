@@ -339,7 +339,7 @@ namespace DoFTools
             for (unsigned int i = 0; i < child_cells.size(); ++i)
               {
                 const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                                   cell_col_child = child_cells[i];
+                                  &cell_col_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
                   cell_row->get_fe().n_dofs_per_cell();
                 const unsigned int dofs_per_cell_col =
