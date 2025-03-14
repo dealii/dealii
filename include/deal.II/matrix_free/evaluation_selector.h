@@ -22,6 +22,9 @@
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/shape_info.h>
 
+#include <type_traits>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
