@@ -83,7 +83,7 @@ test<2>()
                         i = QProjector<dim>::DataSetDescriptor::face(
                           ReferenceCells::Quadrilateral,
                           face_no,
-                          false,
+                          true,
                           false,
                           false,
                           quad_ref);

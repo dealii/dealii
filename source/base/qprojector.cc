@@ -371,73 +371,90 @@ namespace internal
         std::vector<double> weights;
         weights.reserve(2 * n_points * num_subfaces_or_face);
 
-        // loop over all faces ...
-        for (unsigned int face = 0; face < n_faces; ++face)
-          // ... and over all possible orientations ...
-          for (unsigned int orientation = 0; orientation < 2; ++orientation)
-            // ... and over all subfaces
-            for (unsigned int subface = 0; subface < num_subfaces_or_face;
-                 ++subface)
+        auto process_face_or_subface =
+          [&](const unsigned int                 face,
+              const types::geometric_orientation orientation,
+              const unsigned int                 subface) {
+            const unsigned int quadrature_index =
+              quadrature.size() == 1 ? 0 : face;
+            const unsigned int n_q_points = quadrature[quadrature_index].size();
+
+            // handle the points
+            std::vector<Point<dim>> points(n_q_points);
+
+            // orientation numbers::default_geometric_orientation is the
+            // standard orientation so invert lines for orientation
+            // numbers::reverse_line_orientation
+            if (project_to_subface)
               {
-                const unsigned int quadrature_index =
-                  quadrature.size() == 1 ? 0 : face;
-                const unsigned int n_q_points =
-                  quadrature[quadrature_index].size();
+                const unsigned int local_subface =
+                  orientation == numbers::reverse_line_orientation ?
+                    num_subfaces_or_face - 1 - subface :
+                    subface;
 
-                // handle the points
-                std::vector<Point<dim>> points(n_q_points);
-
-                // orientation numbers::default_geometric_orientation is the
-                // standard orientation so invert lines for orientation
-                // numbers::reverse_line_orientation
-                if (project_to_subface)
-                  {
-                    const unsigned int local_subface =
-                      orientation == numbers::reverse_line_orientation ?
-                        num_subfaces_or_face - 1 - subface :
-                        subface;
-
-                    dealii::QProjector<dim>::project_to_subface(
-                      reference_cell,
-                      quadrature[quadrature_index],
-                      face,
-                      local_subface,
-                      points);
-                  }
-                else
-                  {
-                    dealii::QProjector<dim>::project_to_face(
-                      reference_cell,
-                      quadrature[quadrature_index],
-                      face,
-                      points);
-                  }
-
-                if (orientation == numbers::reverse_line_orientation)
-                  std::reverse(points.begin(), points.end());
-
-                std::copy(points.begin(),
-                          points.end(),
-                          std::back_inserter(q_points));
-
-
-                // handle the weights
-                std::vector<double> scaled_weights =
-                  quadrature[quadrature_index].get_weights();
-
-                // triangular face 1 is given by (1,0) (0,1) so scale the
-                // weights by the length
-                if (reference_cell == ReferenceCells::Triangle && face == 1)
-                  for (auto &w : scaled_weights)
-                    w *= std::sqrt(2);
-
-                if (orientation == numbers::reverse_line_orientation)
-                  std::reverse(scaled_weights.begin(), scaled_weights.end());
-
-                std::copy(scaled_weights.begin(),
-                          scaled_weights.end(),
-                          std::back_inserter(weights));
+                dealii::QProjector<dim>::project_to_subface(
+                  reference_cell,
+                  quadrature[quadrature_index],
+                  face,
+                  local_subface,
+                  points);
               }
+            else
+              {
+                dealii::QProjector<dim>::project_to_face(
+                  reference_cell, quadrature[quadrature_index], face, points);
+              }
+
+            if (orientation == numbers::reverse_line_orientation)
+              std::reverse(points.begin(), points.end());
+
+            std::copy(points.begin(),
+                      points.end(),
+                      std::back_inserter(q_points));
+
+
+            // handle the weights
+            std::vector<double> scaled_weights =
+              quadrature[quadrature_index].get_weights();
+
+            // triangular face 1 is given by (1,0) (0,1) so scale the
+            // weights by the length
+            if (reference_cell == ReferenceCells::Triangle && face == 1)
+              for (auto &w : scaled_weights)
+                w *= std::sqrt(2);
+
+            if (orientation == numbers::reverse_line_orientation)
+              std::reverse(scaled_weights.begin(), scaled_weights.end());
+
+            std::copy(scaled_weights.begin(),
+                      scaled_weights.end(),
+                      std::back_inserter(weights));
+          };
+
+        if (reference_cell == ReferenceCells::Triangle)
+          // loop over all faces ...
+          for (unsigned int face = 0; face < n_faces; ++face)
+            // ... and over all possible orientations ...
+            for (const auto &orientation :
+                 {numbers::reverse_line_orientation,
+                  numbers::default_geometric_orientation})
+              // ... and over all subfaces
+              for (unsigned int subface = 0; subface < num_subfaces_or_face;
+                   ++subface)
+                process_face_or_subface(face, orientation, subface);
+        else
+          // loop over all orientations
+          for (const auto &orientation :
+               {numbers::default_geometric_orientation,
+                numbers::reverse_line_orientation})
+            // ... and over all faces
+            for (unsigned int face = 0; face < n_faces; ++face)
+              // ... and over all subfaces
+              for (unsigned int subface = 0; subface < num_subfaces_or_face;
+                   ++subface)
+                process_face_or_subface(face, orientation, subface);
+
+
 
         Assert(q_points.size() == 2 * n_points * num_subfaces_or_face,
                ExcInternalError());
@@ -1333,11 +1350,19 @@ QProjector<dim>::DataSetDescriptor::face(
       case 1:
         return face_no * n_quadrature_points;
       case 2:
-        return {(2 * face_no + (combined_orientation ==
-                                    numbers::default_geometric_orientation ?
-                                  1 :
-                                  0)) *
-                n_quadrature_points};
+        if (reference_cell == ReferenceCells::Triangle)
+          return {(2 * face_no + (combined_orientation ==
+                                      numbers::default_geometric_orientation ?
+                                    1 :
+                                    0)) *
+                  n_quadrature_points};
+        return {
+          ((combined_orientation == numbers::default_geometric_orientation ?
+              0 :
+              1) *
+             reference_cell.n_faces() +
+           face_no) *
+          n_quadrature_points};
       case 3:
         if (reference_cell == ReferenceCells::Tetrahedron)
           return {(reference_cell.n_face_orientations(face_no) * face_no +
@@ -1382,11 +1407,21 @@ QProjector<dim>::DataSetDescriptor::face(
   const types::geometric_orientation combined_orientation,
   const hp::QCollection<dim - 1>    &quadrature)
 {
+  // if the quadrature size is one call the other function as single source of
+  // truth
+  if ((reference_cell == ReferenceCells::get_hypercube<dim>() ||
+       reference_cell == ReferenceCells::get_simplex<dim>()) &&
+      quadrature.size() == 1)
+    return QProjector<dim>::DataSetDescriptor::face(reference_cell,
+                                                    face_no,
+                                                    combined_orientation,
+                                                    quadrature[0].size());
+
+
   if (reference_cell == ReferenceCells::Triangle ||
       reference_cell == ReferenceCells::Tetrahedron ||
       reference_cell == ReferenceCells::Wedge ||
-      reference_cell == ReferenceCells::Pyramid ||
-      reference_cell == ReferenceCells::Quadrilateral)
+      reference_cell == ReferenceCells::Pyramid)
     {
       unsigned int offset = 0;
       Assert(combined_orientation < reference_cell.n_face_orientations(face_no),
@@ -1394,22 +1429,20 @@ QProjector<dim>::DataSetDescriptor::face(
 
       static const unsigned int X = numbers::invalid_unsigned_int;
       static const std::array<unsigned int, 5> scale_tri   = {{2, 2, 2, X, X}};
-      static const std::array<unsigned int, 5> scale_quad  = {{2, 2, 2, 2, X}};
       static const std::array<unsigned int, 5> scale_tet   = {{6, 6, 6, 6, X}};
       static const std::array<unsigned int, 5> scale_wedge = {{6, 6, 8, 8, 8}};
       static const std::array<unsigned int, 5> scale_pyramid = {
         {8, 6, 6, 6, 6}};
 
       const auto &scale =
-        (reference_cell == ReferenceCells::Quadrilateral) ?
-          scale_quad :
-          ((reference_cell == ReferenceCells::Triangle) ?
-             scale_tri :
-             ((reference_cell == ReferenceCells::Tetrahedron) ?
-                scale_tet :
-                ((reference_cell == ReferenceCells::Wedge) ? scale_wedge :
-                                                             scale_pyramid)));
+        (reference_cell == ReferenceCells::Triangle) ?
+          scale_tri :
+          ((reference_cell == ReferenceCells::Tetrahedron) ?
+             scale_tet :
+             ((reference_cell == ReferenceCells::Wedge) ? scale_wedge :
+                                                          scale_pyramid));
 
+      // Wedge and Pyramid is still possible with one quadrature
       if (quadrature.size() == 1)
         offset = scale[0] * quadrature[0].size() * face_no;
       else
@@ -1438,35 +1471,33 @@ QProjector<dim>::DataSetDescriptor::face(
     {
       case 1:
         {
-          if (quadrature.size() == 1)
-            return quadrature[0].size() * face_no;
-          else
-            {
-              unsigned int result = 0;
-              for (unsigned int i = 0; i < face_no; ++i)
-                result += quadrature[i].size();
-              return result;
-            }
+          unsigned int result = 0;
+          for (unsigned int i = 0; i < face_no; ++i)
+            result += quadrature[i].size();
+          return result;
+        }
+      case 2:
+        {
+          unsigned int result = 0;
+          if (combined_orientation == numbers::reverse_line_orientation)
+            for (unsigned int i = 0; i < reference_cell.n_faces(); ++i)
+              result += quadrature[i].size();
+
+          for (unsigned int i = 0; i < face_no; ++i)
+            result += quadrature[i].size();
+          return result;
         }
       case 3:
         {
-          if (quadrature.size() == 1)
-            return (face_no +
-                    combined_orientation * GeometryInfo<dim>::faces_per_cell) *
-                   quadrature[0].size();
-          else
-            {
-              unsigned int n_points_i = 0;
-              for (unsigned int i = 0; i < face_no; ++i)
-                n_points_i += quadrature[i].size();
+          unsigned int n_points_i = 0;
+          for (unsigned int i = 0; i < face_no; ++i)
+            n_points_i += quadrature[i].size();
 
-              unsigned int n_points = 0;
-              for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
-                   ++i)
-                n_points += quadrature[i].size();
+          unsigned int n_points = 0;
+          for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+            n_points += quadrature[i].size();
 
-              return n_points_i + combined_orientation * n_points;
-            }
+          return n_points_i + combined_orientation * n_points;
         }
 
       default:
@@ -1540,19 +1571,25 @@ QProjector<2>::DataSetDescriptor::subface(
            reference_cell.face_reference_cell(0).n_isotropic_children(),
          ExcInternalError());
 
-  Assert(reference_cell == ReferenceCells::Triangle ||
-           reference_cell == ReferenceCells::Quadrilateral,
-         ExcInternalError());
+  const unsigned int n_subfaces =
+    reference_cell.face_reference_cell(0).n_isotropic_children();
 
   const unsigned int orientation_offset =
     combined_orientation == ReferenceCell::default_combined_face_orientation() ?
       1 :
       0;
-  const unsigned int n_subfaces =
-    reference_cell.face_reference_cell(0).n_isotropic_children();
-  return (2 * face_no * n_subfaces + n_subfaces * orientation_offset +
-          subface_no) *
-         n_quadrature_points;
+
+  if (reference_cell == ReferenceCells::Triangle)
+    return (2 * face_no * n_subfaces + n_subfaces * orientation_offset +
+            subface_no) *
+           n_quadrature_points;
+  else if (reference_cell == ReferenceCells::Quadrilateral)
+    return ((1 - orientation_offset) * reference_cell.n_faces() * n_subfaces +
+            (face_no * n_subfaces + subface_no)) *
+           n_quadrature_points;
+  else
+    DEAL_II_ASSERT_UNREACHABLE();
+  return numbers::invalid_unsigned_int;
 }
 
 
