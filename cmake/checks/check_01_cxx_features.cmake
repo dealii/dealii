@@ -36,7 +36,6 @@
 #                                                                      #
 ########################################################################
 
-
 #
 # We need compiler flags specified in ${DEAL_II_CXX_FLAGS} for all the
 # tests. Create a small macro to easily set CMAKE_REQUIRED_FLAGS
@@ -413,6 +412,12 @@ else()
   enable_if_supported(_werror_flag "-Werror")
   enable_if_supported(_werror_flag "-Wno-unused-command-line-argument")
 endif()
+
+#
+# We need to reset CMAKE_REQUIRED_* variables again after the above call to
+# enable_if_supported()
+#
+_set_up_cmake_required()
 add_flags(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
 
 unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
