@@ -76,11 +76,13 @@ struct AUTO_t {
   constexpr const AUTO_t &operator()() const { return *this; }
 };
 
-namespace {
+namespace Constants {
 /**\brief Token to indicate that a parameter's value is to be automatically
  * selected */
-constexpr AUTO_t AUTO = Kokkos::AUTO_t();
+inline const AUTO_t AUTO = Kokkos::AUTO_t();
 }  // namespace
+
+using Constants::AUTO;
 
 struct InvalidType {};
 
