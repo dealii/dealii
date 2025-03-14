@@ -27,7 +27,7 @@
 
 #include <deal.II/lac/vector_operation.h>
 
-#include <Kokkos_Core_fwd.hpp>
+#include <Kokkos_Core.hpp>
 
 #include <limits>
 #include <memory>

@@ -19,7 +19,7 @@
 
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
 
-#include <Kokkos_ExecPolicy.hpp>
+#include <Kokkos_Core.hpp>
 
 
 DEAL_II_NAMESPACE_OPEN
