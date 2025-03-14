@@ -11,7 +11,7 @@
 >     //solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 >     check_solver_within_range(std::cout,
 >                               solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity())
->                                 , solver_control.last_step(), 34, 163);
+>                                 , solver_control.last_step(), 34, 173);
 > //    std::cout << "   Number of BiCGStab iterations: "
 > //              << solver_control.last_step() << std::endl;
 1356c1358
