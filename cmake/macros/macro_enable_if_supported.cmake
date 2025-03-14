@@ -13,21 +13,24 @@
 ## ------------------------------------------------------------------------
 
 #
-# Tests whether the cxx compiler understands a flag.
-# If so, add it to 'variable'.
+# Tests whether the cxx compiler understands a flag. If so, add it to
+# 'variable'.
+#
+# Note: This macro will reset the CMAKE_REQUIRED_* variables.
 #
 # Usage:
 #     enable_if_supported(variable flag)
 #
 
 macro(enable_if_supported _variable _flag)
-  # First check if we can use -Werror
+  reset_cmake_required()
+
+  #
+  # Add -Werror if available:
+  #
   CHECK_CXX_COMPILER_FLAG("-Werror" DEAL_II_HAVE_FLAG_Werror)
-
-  string(STRIP "${_flag}" _flag_stripped)
-
   if(DEAL_II_HAVE_FLAG_Werror)
-    set(CMAKE_REQUIRED_FLAGS "-Werror")
+    string(STRIP "${CMAKE_REQUIRED_FLAGS} -Werror" CMAKE_REQUIRED_FLAGS)
   endif()
 
   #
@@ -37,6 +40,7 @@ macro(enable_if_supported _variable _flag)
   # compilation unit.
   # Therefore we invert the test for -Wno-... flags:
   #
+  string(STRIP "${_flag}" _flag_stripped)
   set(_flag_sanitized "${_flag_stripped}")
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     string(REPLACE "-Wno-" "-W" _flag_sanitized "${_flag_stripped}")
@@ -54,5 +58,5 @@ macro(enable_if_supported _variable _flag)
     endif()
   endif()
 
-  unset(CMAKE_REQUIRED_FLAGS)
+  reset_cmake_required()
 endmacro()
