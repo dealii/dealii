@@ -160,6 +160,8 @@ function(deal_ii_add_test _category _test_name _comparison_file)
   # limit has been specified, i.e., TEST_MPI_RANK_LIMIT is 0, skip defining
   # the test.
   #
+  # This mechanism is specifically used in the performance test suite.
+  #
   if("${_n_cpu}" STREQUAL "max")
     if(TEST_MPI_RANK_LIMIT EQUAL 0)
       return()
