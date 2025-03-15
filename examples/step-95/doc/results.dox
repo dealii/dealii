@@ -1,0 +1,27 @@
+<h1>Results</h1>
+
+The results of the convergence studies are shown in the tables below.
+
+For $p=1$ we get (for CG):
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  8.0657e-02 |  -   |
+|   1   |  0.1513   |  1.8711e-02 | 2.11 |
+|   2   |  0.0756   |  4.1624e-03 | 2.17 |
+|   3   |  0.0378   |  9.3979e-04 | 2.15 |
+
+We see that the $L^2$ error decreases as we refine and that the estimated
+order of convergence, EOC, is close to 2.
+
+For $p=2$ we get (for CG):
+
+| Cycle | Mesh size | $L^2$-Error | EOC  |
+|:-----:|:---------:|:-----------:|:----:|
+|   0   |  0.3025   |  7.5708e-05 |  -   |
+|   1   |  0.1513   |  5.7502e-06 | 3.72 |
+|   2   |  0.0756   |  4.2204e-07 | 3.77 |
+|   3   |  0.0378   |  3.5284e-08 | 3.58 |
+
+If we increase the degree of the finite element for both the level-set and
+the solution we observe EOC close to 3.
