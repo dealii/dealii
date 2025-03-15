@@ -14,15 +14,16 @@
 
 #
 # Tests whether it is possible to compile and link a dummy program with a
-# given flag.
-# If so, add it to variable.
+# given flag. If so, add it to variable.
+#
+# Note: This macro will reset the CMAKE_REQUIRED_* variables.
 #
 # Usage:
 #     enable_if_links(variable flag)
 #
 
 macro(enable_if_links _variable _flag)
-  # keep on top to avoid cluttering the _flag and _flag_stripped variables
+  reset_cmake_required()
   enable_if_supported(CMAKE_REQUIRED_FLAGS "-Werror")
 
   string(STRIP "${_flag}" _flag_stripped)
@@ -32,11 +33,12 @@ macro(enable_if_links _variable _flag)
 
     list(APPEND CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
     CHECK_CXX_SOURCE_COMPILES("int main(){}" DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
-    reset_cmake_required()
 
     if(DEAL_II_HAVE_LINKER_FLAG_${_flag_name})
       set(${_variable} "${${_variable}} ${_flag_stripped}")
       string(STRIP "${${_variable}}" ${_variable})
     endif()
   endif()
+
+  reset_cmake_required()
 endmacro()
