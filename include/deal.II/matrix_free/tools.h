@@ -25,6 +25,8 @@
 #include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/vector_access_internal.h>
 
+#include <Kokkos_Core.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
