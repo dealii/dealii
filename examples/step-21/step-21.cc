@@ -343,7 +343,7 @@ namespace Step21
                                        (0.05 * 0.05));
 
             const double normalized_permeability =
-              std::min(std::max(permeability, 0.01), 4.);
+              std::clamp(permeability, 0.01, 4.);
 
             for (unsigned int d = 0; d < dim; ++d)
               values[p][d][d] = 1. / normalized_permeability;
