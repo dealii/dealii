@@ -56,10 +56,19 @@ macro(deal_ii_setup_target _target)
   # Parse the optional arguments passed to this macro. These
   # may only contain the build type (DEBUG or RELEASE).
   #
-  set(_argn_build_type)
+  set(_build)
   foreach (_arg ${ARGN})
     if("${_arg}" MATCHES "^(DEBUG|RELEASE)$")
-      set(_argn_build_type ${_arg})
+      if("${_build}" STREQUAL "")
+        set(_build ${_arg})
+      else()
+        message(FATAL_ERROR
+          "\nThe deal_ii_setup_target() macro can take optional arguments, "
+          "but the debug or release configuration can only be specified "
+          "once. The arguments you passed are <${ARGN}>."
+          "\n\n"
+          )
+      endif()
     else()
       message(FATAL_ERROR
         "\nThe deal_ii_setup_target() macro was called with an invalid argument. "
@@ -71,14 +80,12 @@ macro(deal_ii_setup_target _target)
   endforeach()
 
   #
-  # Set build type. It can either be specified explicitly as an
-  # additional macro argument that must be either DEBUG or RELEASE
-  # (parsed above); alternatively, failing a specific optional
+  # Set build type if not already set above by explicitly specifying
+  # it as an additional macro argument that must be either DEBUG or
+  # RELEASE (parsed above); alternatively, failing a specific optional
   # argument, it is set based on CMAKE_BUILD_TYPE:
   #
-  if(_argn_build_type)
-    set(_build "${_argn_build_type}")
-  else()
+  if("${_build}" STREQUAL "")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       set(_build "DEBUG")
     elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
