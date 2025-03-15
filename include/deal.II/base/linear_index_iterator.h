@@ -19,6 +19,8 @@
 
 #include <deal.II/base/exceptions.h>
 
+#include <iterator>
+
 
 DEAL_II_NAMESPACE_OPEN
 /**
