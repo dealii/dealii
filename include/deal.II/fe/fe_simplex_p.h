@@ -19,6 +19,7 @@
 
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/polynomials_barycentric.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/fe/fe_poly.h>
 
@@ -64,6 +65,51 @@ public:
     const unsigned int         child,
     const RefinementCase<dim> &refinement_case =
       RefinementCase<dim>::isotropic_refinement) const override;
+
+  /**
+   * Given an index in the natural ordering of indices on a face, return the
+   * index of the same degree of freedom on the cell.
+   *
+   * To explain the concept, consider the case where we would like to know
+   * whether a degree of freedom on a face, for example as part of an FESystem
+   * element, is primitive. Unfortunately, the is_primitive() function in the
+   * FiniteElement class takes a cell index, so we would need to find the cell
+   * index of the shape function that corresponds to the present face index.
+   * This function does that.
+   *
+   * Code implementing this would then look like this:
+   * @code
+   * for (i=0; i<dofs_per_face; ++i)
+   *  if (fe.is_primitive(fe.face_to_cell_index(i, some_face_no)))
+   *   ... do whatever
+   * @endcode
+   * The function takes additional arguments that account for the fact that
+   * actual faces can be in their standard ordering with respect to the cell
+   * under consideration, or can be flipped, oriented, etc.
+   *
+   * @param face_dof_index The index of the degree of freedom on a face. This
+   * index must be between zero and dofs_per_face.
+   * @param face The number of the face this degree of freedom lives on. This
+   * number must be between zero and GeometryInfo::faces_per_cell.
+   * @param combined_orientation The combined orientation flag containing the
+   * orientation, rotation, and flip of the face. See @ref GlossFaceOrientation.
+   * @return The index of this degree of freedom within the set of degrees of
+   * freedom on the entire cell. The returned value will be between zero and
+   * dofs_per_cell.
+   *
+   * @note This function has some limitations in 3D. If @p dim is 3, this
+   * function works if either:
+   * 1. @p combined_orientation is the default orientation.
+   * 2. @p combined_orientation is `(false, false, false)` and the triangular
+   * face has no more than one degree of freedom in its interior.
+   * Otherwise this function throws an error.
+   */
+  virtual unsigned int
+  face_to_cell_index(
+    const unsigned int                 face_dof_index,
+    const unsigned int                 face,
+    const types::geometric_orientation combined_orientation =
+      ReferenceCell::default_combined_face_orientation()) const override;
 
   /**
    * @copydoc dealii::FiniteElement::get_restriction_matrix()
