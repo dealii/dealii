@@ -21,6 +21,9 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 
+#include <vector>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
