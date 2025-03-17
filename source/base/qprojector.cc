@@ -347,8 +347,6 @@ namespace internal
                  reference_cell == ReferenceCells::Quadrilateral,
                ExcInternalError());
 
-        constexpr unsigned int dim = 2;
-
         const unsigned int n_faces = reference_cell.n_faces();
         const unsigned int num_subfaces_or_face =
           project_to_subface ?
@@ -380,7 +378,7 @@ namespace internal
             const unsigned int n_q_points = quadrature[quadrature_index].size();
 
             // handle the points
-            std::vector<Point<dim>> points(n_q_points);
+            std::vector<Point<2>> points(n_q_points);
 
             // orientation numbers::default_geometric_orientation is the
             // standard orientation so invert lines for orientation
@@ -392,7 +390,7 @@ namespace internal
                     num_subfaces_or_face - 1 - subface :
                     subface;
 
-                dealii::QProjector<dim>::project_to_subface(
+                dealii::QProjector<2>::project_to_subface(
                   reference_cell,
                   quadrature[quadrature_index],
                   face,
@@ -401,7 +399,7 @@ namespace internal
               }
             else
               {
-                dealii::QProjector<dim>::project_to_face(
+                dealii::QProjector<2>::project_to_face(
                   reference_cell, quadrature[quadrature_index], face, points);
               }
 

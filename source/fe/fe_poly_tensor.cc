@@ -1180,12 +1180,12 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   // to take (all data sets for all
   // faces are stored contiguously)
 
-  const auto offset =
-    QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                             face_no,
-                                             cell->combined_face_orientation(
-                                               face_no),
-                                             n_q_points);
+  const auto offset = QProjector<dim>::DataSetDescriptor::face(
+    this->reference_cell(),
+    face_no,
+    dim == 2 ? numbers::default_geometric_orientation :
+               cell->combined_face_orientation(face_no),
+    n_q_points);
 
   // TODO: Size assertions
 
@@ -1862,14 +1862,14 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
   // offset determines which data set
   // to take (all data sets for all
   // sub-faces are stored contiguously)
-  const auto offset =
-    QProjector<dim>::DataSetDescriptor::subface(this->reference_cell(),
-                                                face_no,
-                                                sub_no,
-                                                cell->combined_face_orientation(
-                                                  face_no),
-                                                n_q_points,
-                                                cell->subface_case(face_no));
+  const auto offset = QProjector<dim>::DataSetDescriptor::subface(
+    this->reference_cell(),
+    face_no,
+    sub_no,
+    dim == 2 ? numbers::default_geometric_orientation :
+               cell->combined_face_orientation(face_no),
+    n_q_points,
+    cell->subface_case(face_no));
 
   // TODO: Size assertions
 
