@@ -877,7 +877,8 @@ FE_Hermite<dim, spacedim>::fill_fe_face_values(
     QProjector<dim>::DataSetDescriptor::face(
       ReferenceCells::get_hypercube<dim>(),
       face_no,
-      cell->combined_face_orientation(face_no),
+      dim == 2 ? numbers::default_geometric_orientation :
+                 cell->combined_face_orientation(face_no),
       quadrature[0].size());
 
   const UpdateFlags flags(fe_data.update_each);
