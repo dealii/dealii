@@ -24,6 +24,7 @@ thr = "thr"
 yhat = "yhat"
 noy2tics = "noy2tics"
 bck = "bck"
+DMUMPS_STRUC_C = "DMUMPS_STRUC_C"
 
 [default.extend-words]
 # Don't correct these word (parts)
