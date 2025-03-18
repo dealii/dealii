@@ -3,19 +3,19 @@ Solving with Q1 elements, adaptive refinement
 
 Cycle 0:
    Number of degrees of freedom: 80
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 1:
    Number of degrees of freedom: 148
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 2:
    Number of degrees of freedom: 248
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 3:
    Number of degrees of freedom: 516
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 4:
    Number of degrees of freedom: 992
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 cells dofs  val L2    grad L2  val L2-post 
    16   80 1.804e+01 2.207e+01   1.798e+01 
    28  148 1.151e+01 1.484e+01   1.144e+01 
@@ -28,19 +28,19 @@ Solving with Q1 elements, global refinement
 
 Cycle 0:
    Number of degrees of freedom: 80
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 1:
    Number of degrees of freedom: 168
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 2:
    Number of degrees of freedom: 288
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 3:
    Number of degrees of freedom: 624
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 4:
    Number of degrees of freedom: 1088
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 cells dofs     val L2        grad L2      val L2-post   
    16   80 1.804e+01    - 2.207e+01    - 1.798e+01    - 
    36  168 6.125e+00 2.66 9.472e+00 2.09 6.084e+00 2.67 
@@ -53,19 +53,19 @@ Solving with Q3 elements, global refinement
 
 Cycle 0:
    Number of degrees of freedom: 160
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 1:
    Number of degrees of freedom: 336
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 2:
    Number of degrees of freedom: 576
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 3:
    Number of degrees of freedom: 1248
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 Cycle 4:
    Number of degrees of freedom: 2176
-Solver stopped within 34 - 163 iterations
+Solver stopped within 34 - 173 iterations
 cells dofs     val L2        grad L2      val L2-post   
    16  160 3.613e-01    - 1.891e+00    - 3.020e-01    - 
    36  336 6.411e-02 4.26 5.081e-01 3.24 3.238e-02 5.51 
