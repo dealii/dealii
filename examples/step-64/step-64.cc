@@ -122,29 +122,15 @@ namespace Step64
   class HelmholtzOperatorQuad
   {
   public:
-    DEAL_II_HOST_DEVICE HelmholtzOperatorQuad(
-      const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
-      double                                                 *coef,
-      int                                                     cell)
-      : gpu_data(gpu_data)
-      , coef(coef)
-      , cell(cell)
+    DEAL_II_HOST_DEVICE HelmholtzOperatorQuad(double *coef)
+      : coef(coef)
     {}
 
     DEAL_II_HOST_DEVICE void operator()(
       Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
       const int q_point) const;
 
-    DEAL_II_HOST_DEVICE void set_matrix_free_data(
-      const typename Portable::MatrixFree<dim, double>::Data &data)
-    {
-      gpu_data = &data;
-    }
 
-    DEAL_II_HOST_DEVICE void set_cell(int new_cell)
-    {
-      cell = new_cell;
-    }
 
     static const unsigned int n_q_points =
       dealii::Utilities::pow(fe_degree + 1, dim);
@@ -152,9 +138,7 @@ namespace Step64
     static const unsigned int n_local_dofs = n_q_points;
 
   private:
-    const typename Portable::MatrixFree<dim, double>::Data *gpu_data;
-    double                                                 *coef;
-    int                                                     cell;
+    double *coef;
   };
 
 
@@ -170,10 +154,17 @@ namespace Step64
     Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> *fe_eval,
     const int q_point) const
   {
-    const unsigned int pos =
-      gpu_data->local_q_point_id(cell, n_q_points, q_point);
+    const int cell_index = fe_eval->get_current_cell_index();
+    const typename Portable::MatrixFree<dim, double>::Data *gpu_data =
+      fe_eval->get_matrix_free_data();
 
-    fe_eval->submit_value(coef[pos] * fe_eval->get_value(q_point), q_point);
+    const unsigned int position =
+      gpu_data->local_q_point_id(cell_index, n_q_points, q_point);
+    auto coeff = coef[position];
+
+    auto value = fe_eval->get_value(q_point);
+
+    fe_eval->submit_value(coeff * value, q_point);
     fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
   }
 
@@ -218,7 +209,7 @@ namespace Step64
   // vector.
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void LocalHelmholtzOperator<dim, fe_degree>::operator()(
-    const unsigned int                                      cell,
+    const unsigned int /*cell*/,
     const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
     Portable::SharedData<dim, double>                      *shared_data,
     const double                                           *src,
@@ -229,7 +220,7 @@ namespace Step64
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(
-      HelmholtzOperatorQuad<dim, fe_degree>(gpu_data, coef, cell));
+      HelmholtzOperatorQuad<dim, fe_degree>(coef));
     fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
@@ -363,7 +354,7 @@ namespace Step64
     initialize_dof_vector(inverse_diagonal);
 
     HelmholtzOperatorQuad<dim, fe_degree> helmholtz_operator_quad(
-      nullptr, coef.get_values(), -1);
+      coef.get_values());
 
     MatrixFreeTools::compute_diagonal<dim, fe_degree, fe_degree + 1, 1, double>(
       mf_data,

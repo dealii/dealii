@@ -127,6 +127,22 @@ namespace Portable
     FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata);
 
     /**
+     * Return the index of the current cell.
+     */
+    DEAL_II_HOST_DEVICE
+    int
+    get_current_cell_index();
+
+    /**
+     * Return a pointer to the MatrixFree<dim, Number>::Data object on device
+     * that contains necessary constraint, dof index, and shape function
+     * information for evaluation used in the matrix-free kernels.
+     */
+    DEAL_II_HOST_DEVICE
+    const data_type *
+    get_matrix_free_data();
+
+    /**
      * For the vector @p src, read out the values on the degrees of freedom of
      * the current cell, and store them internally. Similar functionality as
      * the function DoFAccessor::get_interpolated_dof_values when no
@@ -267,6 +283,38 @@ namespace Portable
     , shared_data(shdata)
     , cell_id(shared_data->team_member.league_rank())
   {}
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE int
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    get_current_cell_index()
+  {
+    return cell_id;
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE const typename FEEvaluation<dim,
+                                                  fe_degree,
+                                                  n_q_points_1d,
+                                                  n_components_,
+                                                  Number>::data_type *
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    get_matrix_free_data()
+  {
+    return data;
+  }
 
 
 

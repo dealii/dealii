@@ -1407,8 +1407,7 @@ namespace MatrixFreeTools
         Portable::
           FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
             fe_eval(gpu_data, shared_data);
-        m_quad_operation.set_matrix_free_data(*gpu_data);
-        m_quad_operation.set_cell(cell);
+
         constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
         typename decltype(fe_eval)::value_type
           diagonal[dofs_per_cell / n_components] = {};
@@ -1503,7 +1502,7 @@ namespace MatrixFreeTools
         dealii::Utilities::pow(n_q_points_1d, dim);
 
     private:
-      mutable QuadOperation                  m_quad_operation;
+      const QuadOperation                    m_quad_operation;
       const EvaluationFlags::EvaluationFlags m_evaluation_flags;
       const EvaluationFlags::EvaluationFlags m_integration_flags;
     };
