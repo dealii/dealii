@@ -814,7 +814,8 @@ public:
    * mapping from the symbolic flags defined in the RefinementPossibilities
    * base class to actual numerical values (the array indices).
    */
-  DEAL_II_HOST_DEVICE operator std::uint8_t() const;
+  DEAL_II_HOST_DEVICE
+  operator std::uint8_t() const;
 
   /**
    * Return the union of the refinement flags represented by the current

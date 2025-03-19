@@ -71,7 +71,6 @@ namespace
     //  ++Pc;
     // but this affects the grid shape dramatically, i.e. 10 cores 3x3 becomes
     // 2x5.
-
     // limit our estimate to be in [2, Np]
     int n_process_columns = std::min(Np, std::max(2, Pc));
     // finally, get the rows:

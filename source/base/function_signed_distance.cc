@@ -265,7 +265,7 @@ namespace Functions
           delta_t = delta_c / std::sqrt(a * a + b * b - x * x - y * y);
           t += delta_t;
           // make sure the angle stays in first quadrant
-          t = std::min(numbers::PI_2, std::max(0.0, t));
+          t = std::clamp(t, 0.0, numbers::PI_2);
           x = a * std::cos(t);
           y = b * std::sin(t);
           ++iter;

@@ -2420,9 +2420,9 @@ namespace SAND
         const double barrier_size_exponent   = 1.2;
 
         barrier_size =
-          std::max(std::min(barrier_size * barrier_size_multiplier,
-                            std::pow(barrier_size, barrier_size_exponent)),
-                   min_barrier_size);
+          std::clamp(barrier_size * barrier_size_multiplier,
+                     min_barrier_size,
+                     std::pow(barrier_size, barrier_size_exponent));
 
         std::cout << std::endl;
       }
