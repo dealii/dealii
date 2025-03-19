@@ -3707,7 +3707,7 @@ MGTwoLevelTransfer<dim, VectorType>::interpolate(VectorType       &dst,
 
 namespace internal
 {
-  bool
+  inline bool
   is_partitioner_contained(
     const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
     const std::shared_ptr<const Utilities::MPI::Partitioner>
@@ -3736,7 +3736,7 @@ namespace internal
                                partitioner->get_mpi_communicator()) == 1;
   }
 
-  std::shared_ptr<Utilities::MPI::Partitioner>
+  inline std::shared_ptr<Utilities::MPI::Partitioner>
   create_embedded_partitioner(
     const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
     const std::shared_ptr<const Utilities::MPI::Partitioner>
