@@ -1373,136 +1373,143 @@ namespace MatrixFreeTools
       return init_data.shape_info->dofs_per_component_on_cell == 0;
     }
 
-  } // namespace internal
 
 
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components,
-            typename Number,
-            typename QuadOperation>
-  class CellAction
-  {
-  public:
-    CellAction(const QuadOperation                   &quad_operation,
-               const EvaluationFlags::EvaluationFlags evaluation_flags,
-               const EvaluationFlags::EvaluationFlags integration_flags)
-      : m_quad_operation(quad_operation)
-      , m_evaluation_flags(evaluation_flags)
-      , m_integration_flags(integration_flags)
-    {}
-
-    KOKKOS_FUNCTION void
-    operator()(const unsigned int                                      cell,
-               const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-               Portable::SharedData<dim, Number> *shared_data,
-               const Number *,
-               Number *dst) const
+    /**
+     * Portable compute kernel for MatrixFreeTools::compute_diagonal().
+     */
+    template <int dim,
+              int fe_degree,
+              int n_q_points_1d,
+              int n_components,
+              typename Number,
+              typename QuadOperation>
+    class ComputeDiagonalCellAction
     {
-      Portable::
-        FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
-          fe_eval(gpu_data, shared_data);
-      m_quad_operation.set_matrix_free_data(*gpu_data);
-      m_quad_operation.set_cell(cell);
-      constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
-      typename decltype(fe_eval)::value_type
-        diagonal[dofs_per_cell / n_components] = {};
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        {
-          const auto c = i % n_components;
+    public:
+      ComputeDiagonalCellAction(
+        const QuadOperation                   &quad_operation,
+        const EvaluationFlags::EvaluationFlags evaluation_flags,
+        const EvaluationFlags::EvaluationFlags integration_flags)
+        : m_quad_operation(quad_operation)
+        , m_evaluation_flags(evaluation_flags)
+        , m_integration_flags(integration_flags)
+      {}
 
-          Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(shared_data->team_member,
-                                    dofs_per_cell / n_components),
-            [&](int j) {
-              typename decltype(fe_eval)::value_type val = {};
+      KOKKOS_FUNCTION void
+      operator()(
+        const unsigned int                                      cell,
+        const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+        Portable::SharedData<dim, Number>                      *shared_data,
+        const Number *,
+        Number *dst) const
+      {
+        Portable::
+          FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
+            fe_eval(gpu_data, shared_data);
+        m_quad_operation.set_matrix_free_data(*gpu_data);
+        m_quad_operation.set_cell(cell);
+        constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
+        typename decltype(fe_eval)::value_type
+          diagonal[dofs_per_cell / n_components] = {};
+        for (unsigned int i = 0; i < dofs_per_cell; ++i)
+          {
+            const auto c = i % n_components;
 
+            Kokkos::parallel_for(
+              Kokkos::TeamThreadRange(shared_data->team_member,
+                                      dofs_per_cell / n_components),
+              [&](int j) {
+                typename decltype(fe_eval)::value_type val = {};
+
+                if constexpr (n_components == 1)
+                  {
+                    val = (i == j) ? 1 : 0;
+                  }
+                else
+                  {
+                    val[c] = (i / n_components == j) ? 1 : 0;
+                  }
+
+                fe_eval.submit_dof_value(val, j);
+              });
+
+            shared_data->team_member.team_barrier();
+
+            Portable::internal::
+              resolve_hanging_nodes<dim, fe_degree, false, Number>(
+                shared_data->team_member,
+                gpu_data->constraint_weights,
+                gpu_data->constraint_mask(cell * n_components + c),
+                Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+
+            fe_eval.evaluate(m_evaluation_flags);
+            fe_eval.apply_for_each_quad_point(m_quad_operation);
+            fe_eval.integrate(m_integration_flags);
+
+            Portable::internal::
+              resolve_hanging_nodes<dim, fe_degree, true, Number>(
+                shared_data->team_member,
+                gpu_data->constraint_weights,
+                gpu_data->constraint_mask(cell * n_components + c),
+                Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+
+            Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
               if constexpr (n_components == 1)
-                {
-                  val = (i == j) ? 1 : 0;
-                }
+                diagonal[i] = fe_eval.get_dof_value(i);
               else
-                {
-                  val[c] = (i / n_components == j) ? 1 : 0;
-                }
-
-              fe_eval.submit_dof_value(val, j);
+                diagonal[i / n_components][i % n_components] =
+                  fe_eval.get_dof_value(i / n_components)[i % n_components];
             });
 
-          shared_data->team_member.team_barrier();
+            shared_data->team_member.team_barrier();
+          }
 
-          Portable::internal::
-            resolve_hanging_nodes<dim, fe_degree, false, Number>(
-              shared_data->team_member,
-              gpu_data->constraint_weights,
-              gpu_data->constraint_mask(cell * n_components + c),
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
+          for (unsigned int i = 0; i < dofs_per_cell / n_components; ++i)
+            fe_eval.submit_dof_value(diagonal[i], i);
+        });
 
-          fe_eval.evaluate(m_evaluation_flags);
-          fe_eval.apply_for_each_quad_point(m_quad_operation);
-          fe_eval.integrate(m_integration_flags);
+        shared_data->team_member.team_barrier();
 
-          Portable::internal::
-            resolve_hanging_nodes<dim, fe_degree, true, Number>(
-              shared_data->team_member,
-              gpu_data->constraint_weights,
-              gpu_data->constraint_mask(cell * n_components + c),
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        // We need to do the same as distribute_local_to_global but without
+        // constraints since we have already taken care of them earlier
+        if (gpu_data->use_coloring)
+          {
+            Kokkos::parallel_for(
+              Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
+              [&](const int &i) {
+                dst[gpu_data->local_to_global(cell, i)] +=
+                  shared_data->values(i % (dofs_per_cell / n_components),
+                                      i / (dofs_per_cell / n_components));
+              });
+          }
+        else
+          {
+            Kokkos::parallel_for(
+              Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
+              [&](const int &i) {
+                Kokkos::atomic_add(
+                  &dst[gpu_data->local_to_global(cell, i)],
+                  shared_data->values(i % (dofs_per_cell / n_components),
+                                      i / (dofs_per_cell / n_components)));
+              });
+          }
+      };
 
-          Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
-            if constexpr (n_components == 1)
-              diagonal[i] = fe_eval.get_dof_value(i);
-            else
-              diagonal[i / n_components][i % n_components] =
-                fe_eval.get_dof_value(i / n_components)[i % n_components];
-          });
+      static constexpr unsigned int n_local_dofs =
+        dealii::Utilities::pow(fe_degree + 1, dim) * n_components;
+      static constexpr unsigned int n_q_points =
+        dealii::Utilities::pow(n_q_points_1d, dim);
 
-          shared_data->team_member.team_barrier();
-        }
-
-      Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
-        for (unsigned int i = 0; i < dofs_per_cell / n_components; ++i)
-          fe_eval.submit_dof_value(diagonal[i], i);
-      });
-
-      shared_data->team_member.team_barrier();
-
-      // We need to do the same as distribute_local_to_global but without
-      // constraints since we have already taken care of them earlier
-      if (gpu_data->use_coloring)
-        {
-          Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
-            [&](const int &i) {
-              dst[gpu_data->local_to_global(cell, i)] +=
-                shared_data->values(i % (dofs_per_cell / n_components),
-                                    i / (dofs_per_cell / n_components));
-            });
-        }
-      else
-        {
-          Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
-            [&](const int &i) {
-              Kokkos::atomic_add(
-                &dst[gpu_data->local_to_global(cell, i)],
-                shared_data->values(i % (dofs_per_cell / n_components),
-                                    i / (dofs_per_cell / n_components)));
-            });
-        }
+    private:
+      mutable QuadOperation                  m_quad_operation;
+      const EvaluationFlags::EvaluationFlags m_evaluation_flags;
+      const EvaluationFlags::EvaluationFlags m_integration_flags;
     };
 
-    static constexpr unsigned int n_local_dofs =
-      dealii::Utilities::pow(fe_degree + 1, dim) * n_components;
-    static constexpr unsigned int n_q_points =
-      dealii::Utilities::pow(n_q_points_1d, dim);
+  } // namespace internal
 
-  private:
-    mutable QuadOperation                  m_quad_operation;
-    const EvaluationFlags::EvaluationFlags m_evaluation_flags;
-    const EvaluationFlags::EvaluationFlags m_integration_flags;
-  };
 
 
   template <int dim,
@@ -1532,12 +1539,12 @@ namespace MatrixFreeTools
     matrix_free.initialize_dof_vector(diagonal_global);
 
 
-    CellAction<dim,
-               fe_degree,
-               n_q_points_1d,
-               n_components,
-               Number,
-               QuadOperation>
+    internal::ComputeDiagonalCellAction<dim,
+                                        fe_degree,
+                                        n_q_points_1d,
+                                        n_components,
+                                        Number,
+                                        QuadOperation>
       cell_action(quad_operation, evaluation_flags, integration_flags);
     LinearAlgebra::distributed::Vector<Number, MemorySpace> dummy;
     matrix_free.cell_loop(cell_action, dummy, diagonal_global);
