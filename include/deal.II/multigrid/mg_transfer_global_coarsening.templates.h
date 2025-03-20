@@ -1697,7 +1697,7 @@ namespace internal
       // set up mg-schemes
       //   (0) no refinement -> identity
       //   (1) h-refinement
-      //   (2) h-refinement chocie II <- e.g. for Tets
+      //   (2) h-refinement choice II <- e.g. for Tets
       //    .
       //    .
       //    .
