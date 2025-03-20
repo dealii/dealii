@@ -40,12 +40,14 @@ plot(const PolynomialsNedelecNodal<dim> &poly)
   for (unsigned int k = 0; k < quadrature.size(); ++k)
     {
       if (k % (poly.degree() + 4) == 0)
-        deallog << "NedelecNodal" << poly.degree() << '<' << dim << '>' << std::endl;
+        deallog << "NedelecNodal" << poly.degree() << '<' << dim << '>'
+                << std::endl;
 
       deallog << "NedelecNodal" << poly.degree() << '<' << dim << '>' << '\t'
               << quadrature.point(k);
-      
-      poly.evaluate(quadrature.point(k), values, grads, grads2, thirds, fourths);
+
+      poly.evaluate(
+        quadrature.point(k), values, grads, grads2, thirds, fourths);
 
       for (unsigned int i = 0; i < poly.n(); ++i)
         for (unsigned int d = 0; d < dim; ++d)

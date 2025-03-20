@@ -60,25 +60,25 @@ public:
   PolynomialsNedelecNodal(const unsigned int degree);
 
 
-    /**
-     * Compute the value and the first and second derivatives of each Nedelec
-     * polynomial at @p unit_point.
-     *
-     * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
-     * the first case, the function will not compute these values.
-     *
-     * If you need values or derivatives of all tensor product polynomials then
-     * use this function, rather than using any of the <tt>compute_value</tt>,
-     * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
-     * in a loop over all tensor product polynomials.
-     */
-    void
-    evaluate(const Point<dim>            &unit_point,
-             std::vector<Tensor<1, dim>> &values,
-             std::vector<Tensor<2, dim>> &grads,
-             std::vector<Tensor<3, dim>> &grad_grads,
-             std::vector<Tensor<4, dim>> &third_derivatives,
-             std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
+  /**
+   * Compute the value and the first and second derivatives of each Nedelec
+   * polynomial at @p unit_point.
+   *
+   * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
+   * the first case, the function will not compute these values.
+   *
+   * If you need values or derivatives of all tensor product polynomials then
+   * use this function, rather than using any of the <tt>compute_value</tt>,
+   * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
+   * in a loop over all tensor product polynomials.
+   */
+  void
+  evaluate(const Point<dim>            &unit_point,
+           std::vector<Tensor<1, dim>> &values,
+           std::vector<Tensor<2, dim>> &grads,
+           std::vector<Tensor<3, dim>> &grad_grads,
+           std::vector<Tensor<4, dim>> &third_derivatives,
+           std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
    * Return the name of the space, which is <tt>Nedelec</tt>.
@@ -94,7 +94,7 @@ public:
   static unsigned int
   n_polynomials(const unsigned int degree);
 
-    /**
+  /**
    * Compute the lexicographic to hierarchic numbering underlying this class,
    * computed as a free function.
    */
@@ -118,39 +118,39 @@ public:
   get_polynomial_support_points() const;
 
 private:
-    /**
-     * An object representing the polynomial space for a single component. We
-     * can re-use it by rotating the coordinates of the evaluation point.
-     */
-    const AnisotropicPolynomials<dim> polynomial_space;
+  /**
+   * An object representing the polynomial space for a single component. We
+   * can re-use it by rotating the coordinates of the evaluation point.
+   */
+  const AnisotropicPolynomials<dim> polynomial_space;
 
-    /**
+  /**
    * The given degree
    */
-    const unsigned int deg;
+  const unsigned int deg;
 
-    /**
-     * Renumbering from lexicographic to hierarchic order.
-     */
-    std::vector<unsigned int> renumber_lexicographic_to_hierarchic;
+  /**
+   * Renumbering from lexicographic to hierarchic order.
+   */
+  std::vector<unsigned int> renumber_lexicographic_to_hierarchic;
 
-    /**
-     * Renumbering from hierarchic to lexicographic order. Inverse of
-     * renumber_lexicographic_to_hierarchic.
-     */
-    std::vector<unsigned int> renumber_hierarchic_to_lexicographic;
+  /**
+   * Renumbering from hierarchic to lexicographic order. Inverse of
+   * renumber_lexicographic_to_hierarchic.
+   */
+  std::vector<unsigned int> renumber_hierarchic_to_lexicographic;
 
-    /**
-     * Renumbering from shifted polynomial spaces to lexicographic one
-     */
-    std::array<std::vector<unsigned int>, dim> renumber_aniso;
+  /**
+   * Renumbering from shifted polynomial spaces to lexicographic one
+   */
+  std::array<std::vector<unsigned int>, dim> renumber_aniso;
 
-    /**
-     * A static member function that creates the polynomial space we use to
-     * initialize the #polynomial_space member variable.
-     */
-    static std::vector<std::vector<Polynomials::Polynomial<double>>>
-    create_polynomials(const unsigned int degree);
+  /**
+   * A static member function that creates the polynomial space we use to
+   * initialize the #polynomial_space member variable.
+   */
+  static std::vector<std::vector<Polynomials::Polynomial<double>>>
+  create_polynomials(const unsigned int degree);
 };
 
 DEAL_II_NAMESPACE_CLOSE
