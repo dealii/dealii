@@ -29,13 +29,8 @@ class HelmholtzOperatorQuad
 {
 public:
   DEAL_II_HOST_DEVICE
-  HelmholtzOperatorQuad(
-    const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-    Number                                                 *coef,
-    int                                                     cell)
-    : gpu_data(gpu_data)
-    , coef(coef)
-    , cell(cell)
+  HelmholtzOperatorQuad(Number *coef)
+    : coef(coef)
   {}
 
   DEAL_II_HOST_DEVICE void
@@ -60,7 +55,8 @@ HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::operator()(
   Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval,
   int q_point) const
 {
-  unsigned int pos = gpu_data->local_q_point_id(cell, n_q_points, q_point);
+  unsigned int pos = fe_eval->get_matrix_free_data()->local_q_point_id(
+    fe_eval->get_current_cell_index(), n_q_points, q_point);
   fe_eval->submit_value(coef[pos] * fe_eval->get_value(q_point), q_point);
   fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
 }
@@ -81,11 +77,9 @@ public:
   {}
 
   DEAL_II_HOST_DEVICE void
-  operator()(const unsigned int                                      cell,
-             const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-             Portable::SharedData<dim, Number> *shared_data,
-             const Number                      *src,
-             Number                            *dst) const;
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
+             const Number                                           *src,
+             Number                                                 *dst) const;
 
   Number *coef;
 };
@@ -95,20 +89,16 @@ public:
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 DEAL_II_HOST_DEVICE void
 HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
-  const unsigned int                                      cell,
-  const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-  Portable::SharedData<dim, Number>                      *shared_data,
+  const typename Portable::MatrixFree<dim, Number>::Data *data,
   const Number                                           *src,
   Number                                                 *dst) const
 {
   Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
-    gpu_data, shared_data);
+    data);
   fe_eval.read_dof_values(src);
   fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
   fe_eval.apply_for_each_quad_point(
-    HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>(gpu_data,
-                                                                 coef,
-                                                                 cell));
+    HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>(coef));
   fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
   fe_eval.distribute_local_to_global(dst);
 }

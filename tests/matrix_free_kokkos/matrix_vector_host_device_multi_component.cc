@@ -166,17 +166,12 @@ public:
   {}
 
   DEAL_II_HOST_DEVICE void
-  operator()(const unsigned int                                      cell,
-             const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-             Portable::SharedData<dim, Number> *shared_data,
-             const Number                      *src,
-             Number                            *dst) const
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
+             const Number                                           *src,
+             Number                                                 *dst) const
   {
-    (void)cell; // TODO?
-
     Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number>
-      phi(
-        /*cell,*/ gpu_data, shared_data);
+      phi(data);
     phi.read_dof_values(src);
 
     if (version == 0)
