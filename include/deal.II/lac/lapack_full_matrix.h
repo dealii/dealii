@@ -766,7 +766,7 @@ public:
    * to just have this function compute the eigenvalues and have a separate
    * function that returns whatever eigenvalue is requested. Eigenvalues can
    * be retrieved using the eigenvalue() function.  The number of computed
-   * eigenvectors is equal to eigenvectors.size()
+   * eigenvectors is equal to `eigenvectors.size()`.
    *
    * @note Calls the LAPACK function Xsygv.
    */
