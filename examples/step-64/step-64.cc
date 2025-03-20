@@ -155,11 +155,11 @@ namespace Step64
     const int q_point) const
   {
     const int cell_index = fe_eval->get_current_cell_index();
-    const typename Portable::MatrixFree<dim, double>::Data *gpu_data =
+    const typename Portable::MatrixFree<dim, double>::Data *data =
       fe_eval->get_matrix_free_data();
 
     const unsigned int position =
-      gpu_data->local_q_point_id(cell_index, n_q_points, q_point);
+      data->local_q_point_id(cell_index, n_q_points, q_point);
     auto coeff = coef[position];
 
     auto value = fe_eval->get_value(q_point);
@@ -191,11 +191,9 @@ namespace Step64
     {}
 
     DEAL_II_HOST_DEVICE void
-    operator()(const unsigned int                                      cell,
-               const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
-               Portable::SharedData<dim, double> *shared_data,
-               const double                      *src,
-               double                            *dst) const;
+    operator()(const typename Portable::MatrixFree<dim, double>::Data *data,
+               const double                                           *src,
+               double *dst) const;
 
   private:
     double *coef;
@@ -209,14 +207,12 @@ namespace Step64
   // vector.
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void LocalHelmholtzOperator<dim, fe_degree>::operator()(
-    const unsigned int /*cell*/,
-    const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
-    Portable::SharedData<dim, double>                      *shared_data,
+    const typename Portable::MatrixFree<dim, double>::Data *data,
     const double                                           *src,
     double                                                 *dst) const
   {
     Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> fe_eval(
-      gpu_data, shared_data);
+      data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(

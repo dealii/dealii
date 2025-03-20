@@ -351,20 +351,21 @@ namespace Portable
                        scratch_memory_space,
                      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
-      ApplyKernel(Functor                                      func,
-                  const typename MatrixFree<dim, Number>::Data gpu_data,
-                  Number *const                                src,
-                  Number                                      *dst)
+      ApplyKernel(
+        Functor                                                 func,
+        const typename MatrixFree<dim, Number>::PrecomputedData gpu_data,
+        Number *const                                           src,
+        Number                                                 *dst)
         : func(func)
         , gpu_data(gpu_data)
         , src(src)
         , dst(dst)
       {}
 
-      Functor                                      func;
-      const typename MatrixFree<dim, Number>::Data gpu_data;
-      Number *const                                src;
-      Number                                      *dst;
+      Functor                                                 func;
+      const typename MatrixFree<dim, Number>::PrecomputedData gpu_data;
+      Number *const                                           src;
+      Number                                                 *dst;
 
 
       // Provide the shared memory capacity. This function takes the team_size
@@ -396,11 +397,14 @@ namespace Portable
         SharedViewScratchPad scratch_pad(team_member.team_shmem(),
                                          gpu_data.scratch_pad_size);
 
-        SharedData<dim, Number> shared_data(team_member,
-                                            values,
-                                            gradients,
-                                            scratch_pad);
-        func(team_member.league_rank(), &gpu_data, &shared_data, src, dst);
+        SharedData<dim, Number> shared_data(values, gradients, scratch_pad);
+
+        typename MatrixFree<dim, Number>::Data data{team_member,
+                                                    team_member.league_rank(),
+                                                    &gpu_data,
+                                                    &shared_data};
+
+        func(&data, src, dst);
       }
     };
   } // namespace internal
@@ -487,10 +491,10 @@ namespace Portable
 
 
   template <int dim, typename Number>
-  typename MatrixFree<dim, Number>::Data
+  typename MatrixFree<dim, Number>::PrecomputedData
   MatrixFree<dim, Number>::get_data(unsigned int color) const
   {
-    Data data_copy;
+    PrecomputedData data_copy;
     if (q_points.size() > 0)
       data_copy.q_points = q_points[color];
     if (inv_jacobian.size() > 0)
@@ -622,23 +626,45 @@ namespace Portable
   void
   MatrixFree<dim, Number>::evaluate_coefficients(Functor func) const
   {
+    const unsigned int n_q_points = Functor::n_q_points;
+
     for (unsigned int i = 0; i < n_colors; ++i)
       if (n_cells[i] > 0)
         {
-          MemorySpace::Default::kokkos_space::execution_space exec;
           auto color_data = get_data(i);
-          Kokkos::parallel_for(
-            "dealii::MatrixFree::evaluate_coeff",
-            Kokkos::MDRangePolicy<
-              MemorySpace::Default::kokkos_space::execution_space,
-              Kokkos::Rank<2>>(
+
+          MemorySpace::Default::kokkos_space::execution_space exec;
+          Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>
+            team_policy(
 #if KOKKOS_VERSION >= 20900
               exec,
 #endif
-              {0, 0},
-              {n_cells[i], Functor::n_q_points}),
-            KOKKOS_LAMBDA(const int cell, const int q) {
-              func(&color_data, cell, q);
+              n_cells[i],
+              Kokkos::AUTO);
+
+          Kokkos::parallel_for(
+            "dealii::MatrixFree::evaluate_coeff_cell_loop",
+            team_policy,
+            KOKKOS_LAMBDA(const Kokkos::TeamPolicy<
+                          MemorySpace::Default::kokkos_space::execution_space>::
+                            member_type &team_member) {
+              Kokkos::parallel_for(
+#if KOKKOS_VERSION >= 20900
+                Kokkos::TeamVectorRange(team_member, n_q_points),
+#else
+                Kokkos::TeamThreadRange(team_member, n_q_points),
+#endif
+                [&](const int q_point) {
+                  const int cell = team_member.league_rank();
+
+                  Data data{team_member,
+                            cell,
+                            &color_data,
+                            /*shared_data*/ nullptr};
+
+                  func(&data, cell, q_point);
+                });
             });
         }
   }

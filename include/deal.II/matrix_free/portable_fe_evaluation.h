@@ -124,7 +124,7 @@ namespace Portable
      * Constructor.
      */
     DEAL_II_HOST_DEVICE
-    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata);
+    explicit FEEvaluation(const data_type *data);
 
     /**
      * Return the index of the current cell.
@@ -264,9 +264,10 @@ namespace Portable
     apply_for_each_quad_point(const Functor &func);
 
   private:
-    const data_type         *data;
-    SharedData<dim, Number> *shared_data;
-    int                      cell_id;
+    const typename MatrixFree<dim, Number>::Data            *data;
+    const typename MatrixFree<dim, Number>::PrecomputedData *precomputed_data;
+    SharedData<dim, Number>                                 *shared_data;
+    int                                                      cell_id;
   };
 
 
@@ -278,10 +279,11 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata)
+    FEEvaluation(const data_type *data)
     : data(data)
-    , shared_data(shdata)
-    , cell_id(shared_data->team_member.league_rank())
+    , precomputed_data(data->precomputed_data)
+    , shared_data(data->shared_data)
+    , cell_id(data->team_member.league_rank())
   {}
 
 
@@ -328,22 +330,22 @@ namespace Portable
     read_dof_values(const Number *src)
   {
     // Populate the scratch memory
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
                                                  tensor_dofs_per_component),
                          [&](const int &i) {
                            for (unsigned int c = 0; c < n_components_; ++c)
                              shared_data->values(i, c) =
-                               src[data->local_to_global(
+                               src[precomputed_data->local_to_global(
                                  cell_id, i + tensor_dofs_per_component * c)];
                          });
-    shared_data->team_member.team_barrier();
+    data->team_member.team_barrier();
 
     for (unsigned int c = 0; c < n_components_; ++c)
       {
         internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
-          shared_data->team_member,
-          data->constraint_weights,
-          data->constraint_mask(cell_id * n_components + c),
+          data->team_member,
+          precomputed_data->constraint_weights,
+          precomputed_data->constraint_mask(cell_id * n_components + c),
           Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
   }
@@ -362,32 +364,30 @@ namespace Portable
     for (unsigned int c = 0; c < n_components_; ++c)
       {
         internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
-          shared_data->team_member,
-          data->constraint_weights,
-          data->constraint_mask(cell_id * n_components + c),
+          data->team_member,
+          precomputed_data->constraint_weights,
+          precomputed_data->constraint_mask(cell_id * n_components + c),
           Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
 
-    if (data->use_coloring)
+    if (precomputed_data->use_coloring)
       {
         Kokkos::parallel_for(
-          Kokkos::TeamThreadRange(shared_data->team_member,
-                                  tensor_dofs_per_component),
+          Kokkos::TeamThreadRange(data->team_member, tensor_dofs_per_component),
           [&](const int &i) {
             for (unsigned int c = 0; c < n_components_; ++c)
-              dst[data->local_to_global(cell_id,
-                                        i + tensor_dofs_per_component * c)] +=
+              dst[precomputed_data->local_to_global(
+                cell_id, i + tensor_dofs_per_component * c)] +=
                 shared_data->values(i, c);
           });
       }
     else
       {
         Kokkos::parallel_for(
-          Kokkos::TeamThreadRange(shared_data->team_member,
-                                  tensor_dofs_per_component),
+          Kokkos::TeamThreadRange(data->team_member, tensor_dofs_per_component),
           [&](const int &i) {
             for (unsigned int c = 0; c < n_components_; ++c)
-              Kokkos::atomic_add(&dst[data->local_to_global(
+              Kokkos::atomic_add(&dst[precomputed_data->local_to_global(
                                    cell_id, i + (tensor_dofs_per_component)*c)],
                                  shared_data->values(i, c));
           });
@@ -408,28 +408,29 @@ namespace Portable
     using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
 
     if (fe_degree >= 0 && fe_degree + 1 == n_q_points_1d &&
-        data->element_type == ElementType::tensor_symmetric_collocation)
+        precomputed_data->element_type ==
+          ElementType::tensor_symmetric_collocation)
       {
         internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
-          n_components, evaluation_flag, data, shared_data);
+          n_components, evaluation_flag, data);
       }
     // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
     // shape_info.h for more details
     else if (fe_degree >= 0 &&
              internal::use_collocation_evaluation(fe_degree, n_q_points_1d) &&
-             data->element_type <= ElementType::tensor_symmetric)
+             precomputed_data->element_type <= ElementType::tensor_symmetric)
       {
         internal::FEEvaluationImplTransformToCollocation<
           dim,
           fe_degree,
           n_q_points_1d,
-          Number>::evaluate(n_components, evaluation_flag, data, shared_data);
+          Number>::evaluate(n_components, evaluation_flag, data);
       }
-    else if (fe_degree >= 0 &&
-             data->element_type <= ElementType::tensor_symmetric_no_collocation)
+    else if (fe_degree >= 0 && precomputed_data->element_type <=
+                                 ElementType::tensor_symmetric_no_collocation)
       {
         internal::FEEvaluationImpl<dim, fe_degree, n_q_points_1d, Number>::
-          evaluate(n_components, evaluation_flag, data, shared_data);
+          evaluate(n_components, evaluation_flag, data);
       }
     else
       {
@@ -469,28 +470,29 @@ namespace Portable
     using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
 
     if (fe_degree >= 0 && fe_degree + 1 == n_q_points_1d &&
-        data->element_type == ElementType::tensor_symmetric_collocation)
+        precomputed_data->element_type ==
+          ElementType::tensor_symmetric_collocation)
       {
         internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::
-          integrate(n_components, integration_flag, data, shared_data);
+          integrate(n_components, integration_flag, data);
       }
     // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
     // shape_info.h for more details
     else if (fe_degree >= 0 &&
              internal::use_collocation_evaluation(fe_degree, n_q_points_1d) &&
-             data->element_type <= ElementType::tensor_symmetric)
+             precomputed_data->element_type <= ElementType::tensor_symmetric)
       {
         internal::FEEvaluationImplTransformToCollocation<
           dim,
           fe_degree,
           n_q_points_1d,
-          Number>::integrate(n_components, integration_flag, data, shared_data);
+          Number>::integrate(n_components, integration_flag, data);
       }
-    else if (fe_degree >= 0 &&
-             data->element_type <= ElementType::tensor_symmetric_no_collocation)
+    else if (fe_degree >= 0 && precomputed_data->element_type <=
+                                 ElementType::tensor_symmetric_no_collocation)
       {
         internal::FEEvaluationImpl<dim, fe_degree, n_q_points_1d, Number>::
-          integrate(n_components, integration_flag, data, shared_data);
+          integrate(n_components, integration_flag, data);
       }
     else
       {
@@ -588,13 +590,14 @@ namespace Portable
     Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     if constexpr (n_components_ == 1)
       {
-        shared_data->values(q_point, 0) = val_in * data->JxW(cell_id, q_point);
+        shared_data->values(q_point, 0) =
+          val_in * precomputed_data->JxW(cell_id, q_point);
       }
     else
       {
         for (unsigned int c = 0; c < n_components; ++c)
           shared_data->values(q_point, c) =
-            val_in[c] * data->JxW(cell_id, q_point);
+            val_in[c] * precomputed_data->JxW(cell_id, q_point);
       }
   }
 
@@ -645,8 +648,9 @@ namespace Portable
           {
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-              tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
-                     shared_data->gradients(q_point, d_2, 0);
+              tmp +=
+                precomputed_data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                shared_data->gradients(q_point, d_2, 0);
             grad[d_1] = tmp;
           }
       }
@@ -657,8 +661,9 @@ namespace Portable
             {
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-                tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
-                       shared_data->gradients(q_point, d_2, c);
+                tmp +=
+                  precomputed_data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                  shared_data->gradients(q_point, d_2, c);
               grad[c][d_1] = tmp;
             }
       }
@@ -685,9 +690,10 @@ namespace Portable
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
               tmp +=
-                data->inv_jacobian(cell_id, q_point, d_1, d_2) * grad_in[d_2];
+                precomputed_data->inv_jacobian(cell_id, q_point, d_1, d_2) *
+                grad_in[d_2];
             shared_data->gradients(q_point, d_1, 0) =
-              tmp * data->JxW(cell_id, q_point);
+              tmp * precomputed_data->JxW(cell_id, q_point);
           }
       }
     else
@@ -697,10 +703,11 @@ namespace Portable
             {
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-                tmp += data->inv_jacobian(cell_id, q_point, d_1, d_2) *
-                       grad_in[c][d_2];
+                tmp +=
+                  precomputed_data->inv_jacobian(cell_id, q_point, d_1, d_2) *
+                  grad_in[c][d_2];
               shared_data->gradients(q_point, d_1, c) =
-                tmp * data->JxW(cell_id, q_point);
+                tmp * precomputed_data->JxW(cell_id, q_point);
             }
       }
   }
@@ -717,10 +724,9 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     apply_for_each_quad_point(const Functor &func)
   {
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
-                                                 n_q_points),
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member, n_q_points),
                          [&](const int &i) { func(this, i); });
-    shared_data->team_member.team_barrier();
+    data->team_member.team_barrier();
   }
 
 
