@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2019 - 2023 by the deal.II authors
+// Copyright (C) 2019 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,4 +61,7 @@ main()
              "2, 2 : 0.0, 0.0 : 1.0, 2.0 : false");
   test<3, 3>("subdivided_hyper_rectangle_with_simplices",
              "2, 2, 3 : 0.0, 0.0, 1.0 : 1.0, 2.0, 3.0 : false");
+
+  test<2, 2>("subdivided_hyper_L", "5, 5 : 0, 0 : 1, 1 : 2, 3");
+  test<3, 3>("subdivided_hyper_L", "5, 5, 5 : 0, 0, 0 : 1, 1, 1 : 2, 2, 3");
 }
