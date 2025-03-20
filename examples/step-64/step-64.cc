@@ -710,23 +710,16 @@ namespace Step64
 
 
 // @sect3{The <code>main()</code> function}
-
-// Finally for the `main()` function.  By default, all the MPI ranks
-// will try to access the device with number 0, which we assume to be
-// the GPU device associated with the CPU on which a particular MPI
-// rank runs. This works, but if we are running with MPI support it
-// may be that multiple MPI processes are running on the same machine
-// (for example, one per CPU core) and then they would all want to
-// access the same GPU on that machine. If there is only one GPU in
-// the machine, there is nothing we can do about it: All MPI ranks on
-// that machine need to share it. But if there are more than one GPU,
-// then it is better to address different graphic cards for different
-// processes. The choice below is based on the MPI process id by
-// assigning GPUs round robin to GPU ranks. (To work correctly, this
-// scheme assumes that the MPI ranks on one machine are
-// consecutive. If that were not the case, then the rank-GPU
-// association may just not be optimal.) To make this work, MPI needs
-// to be initialized before using this function.
+//
+// Finally for the `main()` function.
+// Kokkos needs to be initialized before being used, just as MPI does.
+// Utilities::MPI::MPI_InitFinalize takes care of first initializing MPI and
+// then Kokkos. This implies that Kokkos can take advantage of environment
+// variables set by MPI such as OMPI_COMM_WORLD_LOCAL_RANK or
+// OMPI_COMM_WORLD_LOCAL_SIZE to assign GPUs to MPI processes in a round-robin
+// fashion. If such environment variables are not present, Kokkos uses the first
+// visible GPU on every process. This might be suboptimal if that implies that
+// multiple processes use the same GPU.
 int main(int argc, char *argv[])
 {
   try
