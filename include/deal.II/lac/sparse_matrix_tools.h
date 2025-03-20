@@ -504,12 +504,26 @@ namespace SparseMatrixTools
               if (locally_owned_dofs.is_element(
                     local_dof_indices[i])) // row is local
                 {
-                  cell_matrix(i, j) =
-                    sparsity_pattern.exists(local_dof_indices[i],
-                                            local_dof_indices[j]) ?
-                      system_matrix(local_dof_indices[i],
-                                    local_dof_indices[j]) :
-                      0;
+                  if constexpr (std::is_same_v<SparseMatrixType,
+                                               dealii::SparseMatrix<Number>>)
+                    {
+                      const types::global_dof_index ind =
+                        system_matrix.get_sparsity_pattern()(
+                          local_dof_indices[i], local_dof_indices[j]);
+                      if (ind != numbers::invalid_dof_index)
+                        {
+                          SparseMatrixIterators::Accessor<Number, true>
+                            accessor(&system_matrix, ind);
+                          cell_matrix(i, j) = accessor.value();
+                        }
+                    }
+                  else
+                    cell_matrix(i, j) =
+                      sparsity_pattern.exists(local_dof_indices[i],
+                                              local_dof_indices[j]) ?
+                        system_matrix(local_dof_indices[i],
+                                      local_dof_indices[j]) :
+                        0.0;
                 }
               else // row is ghost
                 {
