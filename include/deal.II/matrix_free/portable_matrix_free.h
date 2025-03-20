@@ -205,7 +205,7 @@ namespace Portable
         co_shape_gradients;
 
       /**
-       * Weights used when resolving hanginf nodes.
+       * Weights used when resolving hanging nodes.
        */
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights;
@@ -601,7 +601,7 @@ namespace Portable
       co_shape_gradients;
 
     /**
-     * Weights used when resolving hanginf nodes.
+     * Weights used when resolving hanging nodes.
      */
     Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
       constraint_weights;
