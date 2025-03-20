@@ -1815,6 +1815,7 @@ SparseMatrix<number>::m() const
 }
 
 
+
 template <typename number>
 inline typename SparseMatrix<number>::size_type
 SparseMatrix<number>::n() const
@@ -1822,6 +1823,17 @@ SparseMatrix<number>::n() const
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   return cols->cols;
 }
+
+
+
+template <typename number>
+inline const SparsityPattern &
+SparseMatrix<number>::get_sparsity_pattern() const
+{
+  Assert(cols != nullptr, ExcNeedsSparsityPattern());
+  return *cols;
+}
+
 
 
 // Inline the set() and add() functions, since they will be called frequently.

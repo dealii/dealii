@@ -1876,16 +1876,6 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number omega) const
 
 
 template <typename number>
-const SparsityPattern &
-SparseMatrix<number>::get_sparsity_pattern() const
-{
-  Assert(cols != nullptr, ExcNeedsSparsityPattern());
-  return *cols;
-}
-
-
-
-template <typename number>
 void
 SparseMatrix<number>::print_formatted(std::ostream      &out,
                                       const unsigned int precision,
