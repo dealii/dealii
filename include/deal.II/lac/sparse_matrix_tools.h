@@ -516,6 +516,8 @@ namespace SparseMatrixTools
                             accessor(&system_matrix, ind);
                           cell_matrix(i, j) = accessor.value();
                         }
+                      else
+                        cell_matrix(i, j) = 0.0;
                     }
                   else
                     cell_matrix(i, j) =
