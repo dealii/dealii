@@ -117,7 +117,7 @@ if(TRILINOS_VERSION VERSION_GREATER_EQUAL 14)
   # run find_package to populate variables like Kokkos_VERSION not
   # set by the find_package call to Trilinos:
   set(CMAKE_CXX_EXTENSIONS OFF)
-  find_package(Kokkos 3.7.0 QUIET
+  find_package(Kokkos 3.4.0 QUIET
     PATHS ${TRILINOS_DIR} NO_DEFAULT_PATH
   )
 
