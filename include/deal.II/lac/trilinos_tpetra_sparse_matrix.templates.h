@@ -222,24 +222,17 @@ namespace LinearAlgebra
         for (size_type row = first_row; row < last_row; ++row)
           n_entries_per_row[row - first_row] = sparsity_pattern.row_length(row);
 
-          // The deal.II notation of a Sparsity pattern corresponds to the
-          // Tpetra concept of a Graph. Hence, we generate a graph by copying
-          // the sparsity pattern into it, and then build up the matrix from the
-          // graph. This is considerable faster than directly filling elements
-          // into the matrix. Moreover, it consumes less memory, since the
-          // internal reordering is done on ints only, and we can leave the
-          // doubles aside.
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
+        // The deal.II notation of a Sparsity pattern corresponds to the
+        // Tpetra concept of a Graph. Hence, we generate a graph by copying
+        // the sparsity pattern into it, and then build up the matrix from the
+        // graph. This is considerable faster than directly filling elements
+        // into the matrix. Moreover, it consumes less memory, since the
+        // internal reordering is done on ints only, and we can leave the
+        // doubles aside.
         Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
           Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::GraphType<MemorySpace>>(row_space_map,
                                                  n_entries_per_row);
-#  else
-        Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
-          Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(
-            row_space_map, Teuchos::arcpFromArray(n_entries_per_row));
-#  endif
 
         // This functions assumes that the sparsity pattern sits on all
         // processors (completely). The parallel version uses a Tpetra graph
@@ -366,17 +359,10 @@ namespace LinearAlgebra
         // into the matrix. Moreover, it consumes less memory, since the
         // internal reordering is done on ints only, and we can leave the
         // doubles aside.
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
         Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
           Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::GraphType<MemorySpace>>(row_space_map,
                                                  n_entries_per_row);
-#  else
-        Teuchos::RCP<TpetraTypes::GraphType<MemorySpace>> graph =
-          Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(
-            row_space_map, Teuchos::arcpFromArray(n_entries_per_row));
-#  endif
 
         // This functions assumes that the sparsity pattern sits on all
         // processors (completely). The parallel version uses a Tpetra graph
@@ -509,15 +495,7 @@ namespace LinearAlgebra
           TpetraTypes::MapType<MemorySpace>>(
           m, 0, Utilities::Trilinos::tpetra_comm_self()),
         column_space_map,
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 0, 0)
-        Teuchos::ArrayView<size_t>{entries_per_row_size_type}
-#  else
-        Teuchos::ArrayRCP<size_t>(entries_per_row_size_type.data(),
-                                  0,
-                                  entries_per_row_size_type.size(),
-                                  false)
-#  endif
-      );
+        Teuchos::ArrayView<size_t>{entries_per_row_size_type});
     }
 
 
@@ -622,15 +600,9 @@ namespace LinearAlgebra
     {
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
                                                      n_entries_per_row.end());
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
       matrix = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::MatrixType<Number, MemorySpace>>(column_space_map,
                                                       n_entries_per_row_array);
-#  else
-      matrix = Utilities::Trilinos::internal::make_rcp<
-        TpetraTypes::MatrixType<Number, MemorySpace>>(
-        column_space_map, Teuchos::arcpFromArray(n_entries_per_row_array));
-#  endif
     }
 
 
@@ -667,21 +639,13 @@ namespace LinearAlgebra
     {
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
                                                      n_entries_per_row.end());
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
+
       matrix = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::MatrixType<Number, MemorySpace>>(
         row_parallel_partitioning
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
             communicator, false),
         n_entries_per_row_array);
-#  else
-      matrix = Utilities::Trilinos::internal::make_rcp<
-        TpetraTypes::MatrixType<Number, MemorySpace>>(
-        row_parallel_partitioning
-          .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
-            communicator, false),
-        Teuchos::arcpFromArray(n_entries_per_row_array));
-#  endif
     }
 
 
@@ -1287,17 +1251,14 @@ namespace LinearAlgebra
               size_t nnz = matrix->getNumEntriesInLocalRow(local_row);
               col_indices_vector.resize(nnz);
               values_vector.resize(nnz);
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+
               typename TpetraTypes::MatrixType<Number, MemorySpace>::
                 nonconst_local_inds_host_view_type col_indices(
                   col_indices_vector.data(), nnz);
               typename TpetraTypes::MatrixType<Number, MemorySpace>::
                 nonconst_values_host_view_type values(values_vector.data(),
                                                       nnz);
-#  else
-              Teuchos::ArrayView<int>    col_indices(col_indices_vector);
-              Teuchos::ArrayView<Number> values(values_vector);
-#  endif
+
               matrix->getLocalRowCopy(local_row, col_indices, values, nnz);
 
               const size_t diag_index = std::find(col_indices_vector.begin(),
@@ -1339,14 +1300,10 @@ namespace LinearAlgebra
       // not need to perform a deep copy.
 
       // Perform a deep copy
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 18, 1)
       matrix = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::MatrixType<Number, MemorySpace>>(*source.matrix,
                                                       Teuchos::Copy);
-#  else
-      matrix = source.matrix->clone(Utilities::Trilinos::internal::make_rcp<
-                                    TpetraTypes::NodeType<MemorySpace>>());
-#  endif
+
       column_space_map =
         Teuchos::rcp_const_cast<TpetraTypes::MapType<MemorySpace>>(
           matrix->getColMap());
@@ -1453,16 +1410,11 @@ namespace LinearAlgebra
         }
       else
         {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename TpetraTypes::MatrixType<Number,
                                            MemorySpace>::values_host_view_type
             values;
           typename TpetraTypes::MatrixType<Number, MemorySpace>::
             local_inds_host_view_type indices;
-#  else
-          Teuchos::ArrayView<const Number> values;
-          Teuchos::ArrayView<const int>    indices;
-#  endif
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           for (size_t i = 0; i < matrix->getLocalNumRows(); ++i)
@@ -1536,18 +1488,12 @@ namespace LinearAlgebra
 
           // Prepare pointers for extraction of a view of the row.
           size_t nnz_present = matrix->getNumEntriesInLocalRow(trilinos_i);
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+
           typename TpetraTypes::MatrixType<Number, MemorySpace>::
             nonconst_local_inds_host_view_type col_indices("indices",
                                                            nnz_present);
           typename TpetraTypes::MatrixType<Number, MemorySpace>::
             nonconst_values_host_view_type values("values", nnz_present);
-#  else
-          std::vector<int>           col_indices_vector(nnz_present);
-          Teuchos::ArrayView<int>    col_indices(col_indices_vector);
-          std::vector<Number>        values_vector(nnz_present);
-          Teuchos::ArrayView<Number> values(values_vector);
-#  endif
 
           matrix->getLocalRowCopy(trilinos_i, col_indices, values, nnz_present);
 

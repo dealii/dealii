@@ -294,22 +294,8 @@ namespace LinearAlgebra
     {
       AssertDimension(indices.size(), elements.size());
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadOnly);
-#  else
-      /*
-       * For Trilinos older than 13.2 we would normally have to call
-       * vector.template sync<Kokkos::HostSpace>() at this place in order
-       * to sync between memory spaces. This is necessary for GPU support.
-       * Unfortunately, we are in a const context here and cannot call to
-       * sync() (which is a non-const member function).
-       *
-       * Let us choose to simply ignore this problem for such an old
-       * Trilinos version.
-       */
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
       auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       for (unsigned int i = 0; i < indices.size(); ++i)
@@ -355,42 +341,22 @@ namespace LinearAlgebra
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
           // Create a read-only Kokkos view from the source vector
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           auto source_vector_2d =
             V.vector->template getLocalView<Kokkos::HostSpace>(
               Tpetra::Access::ReadOnly);
-#  else
-          auto source_vector_2d =
-            V.vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
+
           auto source_vector_1d =
             Kokkos::subview(source_vector_2d, Kokkos::ALL(), 0);
 
           // Create a read/write Kokkos view from the target vector
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           auto target_vector_2d =
             vector->template getLocalView<Kokkos::HostSpace>(
               Tpetra::Access::ReadWrite);
-#  else
-          vector->template sync<Kokkos::HostSpace>();
-          auto target_vector_2d =
-            vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
           auto target_vector_1d =
             Kokkos::subview(target_vector_2d, Kokkos::ALL(), 0);
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-          vector->template modify<Kokkos::HostSpace>();
-#  endif
 
           // Copy the data
           Kokkos::deep_copy(target_vector_1d, source_vector_1d);
-
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-          vector->template sync<typename Tpetra::Vector<
-            Number,
-            int,
-            types::signed_global_dof_index>::device_type::memory_space>();
-#  endif
         }
       else if (size() == V.size())
         {
@@ -540,24 +506,14 @@ namespace LinearAlgebra
         tpetra_export->getSourceMap());
 
       {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
         auto x_2d = source_vector.template getLocalView<Kokkos::HostSpace>(
           Tpetra::Access::ReadWrite);
-#  else
-        source_vector.template sync<Kokkos::HostSpace>();
-        auto x_2d = source_vector.template getLocalView<Kokkos::HostSpace>();
-#  endif
         auto x_1d = Kokkos::subview(x_2d, Kokkos::ALL(), 0);
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-        source_vector.template modify<Kokkos::HostSpace>();
-#  endif
+
         const size_t localLength = source_vector.getLocalLength();
         auto         values_it   = V.begin();
         for (size_t k = 0; k < localLength; ++k)
           x_1d(k) = *values_it++;
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-        source_vector.template sync<typename MemorySpace::kokkos_space>();
-#  endif
       }
       Tpetra::CombineMode tpetra_operation = Tpetra::ZERO;
       if (operation == VectorOperation::insert)
@@ -735,25 +691,15 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadWrite);
-#  else
-      vector->template sync<Kokkos::HostSpace>();
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
       auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      vector->template modify<Kokkos::HostSpace>();
-#  endif
+
       const size_t localLength = vector->getLocalLength();
       for (size_t k = 0; k < localLength; ++k)
         {
           vector_1d(k) += a;
         }
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      vector->template sync<typename MemorySpace::kokkos_space>();
-#  endif
     }
 
 
@@ -1010,19 +956,11 @@ namespace LinearAlgebra
       if (this_local_length != other_local_length)
         return false;
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto this_vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadOnly);
       auto other_vector_2d = v.vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadOnly);
 
-#  else
-      vector->template sync<Kokkos::HostSpace>();
-      v.vector->template sync<Kokkos::HostSpace>();
-      auto this_vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
-      auto other_vector_2d =
-        v.vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
       auto this_vector_1d  = Kokkos::subview(this_vector_2d, Kokkos::ALL(), 0);
       auto other_vector_1d = Kokkos::subview(other_vector_2d, Kokkos::ALL(), 0);
 
@@ -1207,13 +1145,9 @@ namespace LinearAlgebra
       else
         out.setf(std::ios::fixed, std::ios::floatfield);
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadOnly);
-#  else
-      vector->template sync<Kokkos::HostSpace>();
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
+
       auto         vector_1d    = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = vector->getLocalLength();
 
