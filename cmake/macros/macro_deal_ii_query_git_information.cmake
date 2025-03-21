@@ -149,6 +149,30 @@ macro(deal_ii_query_git_information)
        message(STATUS "Could not locate get_latest_tag.sh. " ${_prefix}GIT_TAG " will not be set.")
     endif()
 
+    #
+    # Query for fancy tag:
+    #
+    set(_script "")
+    if(EXISTS     ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+      set(_script ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+    elseif(EXISTS ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+      set(_script ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/get_fancy_tag.sh)
+    endif()
+    if(NOT "${_script}" STREQUAL "")
+       execute_process(
+          COMMAND ${_script}
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+          OUTPUT_VARIABLE _fancy_tag
+          RESULT_VARIABLE _result
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+          )
+       if(${_result} EQUAL 0)
+         set(${_prefix}GIT_FANCY_TAG ${_fancy_tag})
+       endif()
+    else()
+       message(STATUS "Could not locate get_fancy_tag.sh. " ${_prefix}GIT_FANCY_TAG " will not be set.")
+    endif()
+
   endif()
 
 endmacro()
