@@ -1059,9 +1059,9 @@ namespace Portable
   template <typename Functor>
   void
   MatrixFree<dim, Number>::distributed_cell_loop(
-    const Functor                                         &func,
-    const LinearAlgebra::distributed::BlockVector<Number> &src,
-    LinearAlgebra::distributed::BlockVector<Number>       &dst) const
+    const Functor &,
+    const LinearAlgebra::distributed::BlockVector<Number> &,
+    LinearAlgebra::distributed::BlockVector<Number> &) const
   {
     Assert(false, ExcNotImplemented());
   }
