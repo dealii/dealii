@@ -52,7 +52,6 @@ if(Kokkos_FOUND)
   endif()
 
   if (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP)
-    message(STATUS "Found Kokkos with device support.")
     # In version older than 3.7.0, Kokkos::Array::operator[] is not constexpr,
     # so we use std::array instead.
     if (Kokkos_VERSION VERSION_LESS 3.7.0)
