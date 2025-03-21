@@ -40,8 +40,8 @@ public:
 
   DEAL_II_HOST_DEVICE void
   operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
-             const Number                                           *src,
-             Number                                                 *dst) const
+             const Portable::DeviceVector<Number>                   &src,
+             Portable::DeviceVector<Number>                         &dst) const
   {
     Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
       data);
