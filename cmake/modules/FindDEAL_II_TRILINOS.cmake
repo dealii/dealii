@@ -48,6 +48,16 @@ find_package(TRILINOS_CONFIG
   )
 
 if(Trilinos_FOUND)
+  # run find_package to populate variables like Kokkos_VERSION not
+  # set by the find_package call to Trilinos:
+  set(CMAKE_CXX_EXTENSIONS OFF)
+  find_package(Kokkos 3.4.0 QUIET
+    PATHS ${TRILINOS_DIR} NO_DEFAULT_PATH
+  )
+
+  set(KOKKOS_FOUND ${Kokkos_FOUND})
+
+
   #
   # Extract version numbers:
   #
@@ -113,15 +123,6 @@ if(TRILINOS_VERSION VERSION_GREATER_EQUAL 14)
   if(TARGET Kokkos::kokkos)
     list(APPEND _targets Kokkos::kokkos)
   endif()
-
-  # run find_package to populate variables like Kokkos_VERSION not
-  # set by the find_package call to Trilinos:
-  set(CMAKE_CXX_EXTENSIONS OFF)
-  find_package(Kokkos 3.4.0 QUIET
-    PATHS ${TRILINOS_DIR} NO_DEFAULT_PATH
-  )
-
-  set(KOKKOS_FOUND ${Kokkos_FOUND})
 
   process_feature(TRILINOS
     TARGETS REQUIRED _targets
