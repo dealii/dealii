@@ -173,18 +173,6 @@ namespace Portable
     evaluate(const EvaluationFlags::EvaluationFlags evaluate_flag);
 
     /**
-     * Evaluate the function values and the gradients of the FE function given
-     * at the DoF values in the input vector at the quadrature points on the
-     * unit cell. The function arguments specify which parts shall actually be
-     * computed. This function needs to be called before the functions
-     * @p get_value() or @p get_gradient() give useful information.
-     */
-    DEAL_II_DEPRECATED_WITH_COMMENT("Use the version taking EvaluationFlags.")
-    DEAL_II_HOST_DEVICE
-    void
-    evaluate(const bool evaluate_val, const bool evaluate_grad);
-
-    /**
      * This function takes the values and/or gradients that are stored on
      * quadrature points, tests them by all the basis functions/gradients on
      * the cell and performs the cell integration as specified by the
@@ -192,18 +180,6 @@ namespace Portable
      */
     DEAL_II_HOST_DEVICE void
     integrate(const EvaluationFlags::EvaluationFlags integration_flag);
-
-    /**
-     * This function takes the values and/or gradients that are stored on
-     * quadrature points, tests them by all the basis functions/gradients on
-     * the cell and performs the cell integration. The two function arguments
-     * @p integrate_val and @p integrate_grad are used to enable/disable some
-     * of the values or the gradients.
-     */
-    DEAL_II_DEPRECATED_WITH_COMMENT("Use the version taking EvaluationFlags.")
-    DEAL_II_HOST_DEVICE
-    void
-    integrate(const bool integrate_val, const bool integrate_grad);
 
     /**
      * Same as above, except that the quadrature point is computed from thread
@@ -447,23 +423,6 @@ namespace Portable
             int n_components_,
             typename Number>
   DEAL_II_HOST_DEVICE void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::evaluate(
-    const bool evaluate_val,
-    const bool evaluate_grad)
-  {
-    evaluate(
-      (evaluate_val ? EvaluationFlags::values : EvaluationFlags::nothing) |
-      (evaluate_grad ? EvaluationFlags::gradients : EvaluationFlags::nothing));
-  }
-
-
-
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
-  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::integrate(
     const EvaluationFlags::EvaluationFlags integration_flag)
   {
@@ -499,23 +458,6 @@ namespace Portable
         Kokkos::abort("The element type is not yet supported by the portable "
                       "matrix-free module.");
       }
-  }
-
-
-
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
-  DEAL_II_HOST_DEVICE void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::integrate(
-    const bool integrate_val,
-    const bool integrate_grad)
-  {
-    integrate(
-      (integrate_val ? EvaluationFlags::values : EvaluationFlags::nothing) |
-      (integrate_grad ? EvaluationFlags::gradients : EvaluationFlags::nothing));
   }
 
 
