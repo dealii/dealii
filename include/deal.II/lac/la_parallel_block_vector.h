@@ -80,8 +80,8 @@ namespace LinearAlgebra
      * @see
      * @ref GlossBlockLA "Block (linear algebra)"
      */
-    template <typename Number>
-    class BlockVector : public BlockVectorBase<Vector<Number>>
+    template <typename Number, typename MemorySpace = MemorySpace::Host>
+    class BlockVector : public BlockVectorBase<Vector<Number, MemorySpace>>
     {
     public:
       /**
@@ -101,7 +101,7 @@ namespace LinearAlgebra
       /**
        * Typedef the base class for simpler access to its own alias.
        */
-      using BaseClass = BlockVectorBase<Vector<Number>>;
+      using BaseClass = BlockVectorBase<Vector<Number, MemorySpace>>;
 
       /**
        * Typedef the type of the underlying vector.
@@ -143,7 +143,7 @@ namespace LinearAlgebra
        * Copy-Constructor. Dimension set to that of V, all components are
        * copied from V
        */
-      BlockVector(const BlockVector<Number> &V);
+      BlockVector(const BlockVector<Number, MemorySpace> &V);
 
       /**
        * Copy constructor taking a BlockVector of another data type. This will
@@ -152,7 +152,7 @@ namespace LinearAlgebra
        * BlockVector with data elements with less accuracy.
        */
       template <typename OtherNumber>
-      explicit BlockVector(const BlockVector<OtherNumber> &v);
+      explicit BlockVector(const BlockVector<OtherNumber, MemorySpace> &v);
 
       /**
        * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>
@@ -232,13 +232,13 @@ namespace LinearAlgebra
        */
       template <class Number2>
       BlockVector &
-      operator=(const BlockVector<Number2> &V);
+      operator=(const BlockVector<Number2, MemorySpace> &V);
 
       /**
        * Copy a regular vector into a block vector.
        */
       BlockVector &
-      operator=(const Vector<Number> &V);
+      operator=(const Vector<Number, MemorySpace> &V);
 
 #ifdef DEAL_II_WITH_PETSC
       /**
@@ -248,7 +248,7 @@ namespace LinearAlgebra
        *
        * This operator is only available if deal.II was configured with PETSc.
        */
-      BlockVector<Number> &
+      BlockVector<Number, MemorySpace> &
       operator=(const PETScWrappers::MPI::BlockVector &petsc_vec);
 #endif
 
@@ -261,7 +261,7 @@ namespace LinearAlgebra
        * This operator is only available if deal.II was configured with
        * Trilinos.
        */
-      BlockVector<Number> &
+      BlockVector<Number, MemorySpace> &
       operator=(const TrilinosWrappers::MPI::BlockVector &trilinos_vec);
 #endif
 
@@ -322,8 +322,8 @@ namespace LinearAlgebra
        */
       template <typename Number2>
       void
-      reinit(const BlockVector<Number2> &V,
-             const bool                  omit_zeroing_entries = false);
+      reinit(const BlockVector<Number2, MemorySpace> &V,
+             const bool omit_zeroing_entries = false);
 
       /**
        * Initialize the block vector. For each block, the local range is
@@ -336,8 +336,8 @@ namespace LinearAlgebra
        *
        * This function involves global communication, so it should only be
        * called once for a given layout. Use the @p reinit function with
-       * BlockVector<Number> argument to create additional vectors with the same
-       * parallel layout.
+       * BlockVector<Number, MemorySpace> argument to create additional vectors
+       * with the same parallel layout.
        *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
@@ -462,7 +462,8 @@ namespace LinearAlgebra
        */
       template <typename Number2>
       void
-      copy_locally_owned_data_from(const BlockVector<Number2> &src);
+      copy_locally_owned_data_from(
+        const BlockVector<Number2, MemorySpace> &src);
 
       /**
        * This is a collective add operation that adds a whole set of values
@@ -478,7 +479,7 @@ namespace LinearAlgebra
        * s*(*this)+V</tt>.
        */
       void
-      sadd(const Number s, const BlockVector<Number> &V);
+      sadd(const Number s, const BlockVector<Number, MemorySpace> &V);
 
       /**
        * Return whether the vector contains only elements with value zero.
@@ -519,7 +520,7 @@ namespace LinearAlgebra
        * functions.
        */
       void
-      swap(BlockVector<Number> &v) noexcept;
+      swap(BlockVector<Number, MemorySpace> &v) noexcept;
       /** @} */
 
       /**
@@ -530,26 +531,26 @@ namespace LinearAlgebra
       /**
        * Multiply the entire vector by a fixed factor.
        */
-      BlockVector<Number> &
+      BlockVector<Number, MemorySpace> &
       operator*=(const Number factor);
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      BlockVector<Number> &
+      BlockVector<Number, MemorySpace> &
       operator/=(const Number factor);
 
       /**
        * Add the vector @p V to the present one.
        */
-      BlockVector<Number> &
-      operator+=(const BlockVector<Number> &V);
+      BlockVector<Number, MemorySpace> &
+      operator+=(const BlockVector<Number, MemorySpace> &V);
 
       /**
        * Subtract the vector @p V from the present one.
        */
-      BlockVector<Number> &
-      operator-=(const BlockVector<Number> &V);
+      BlockVector<Number, MemorySpace> &
+      operator-=(const BlockVector<Number, MemorySpace> &V);
 
       /**
        * Import all the elements present in the vector's IndexSet from the input
@@ -582,7 +583,7 @@ namespace LinearAlgebra
        * Return the scalar product of two vectors.
        */
       Number
-      operator*(const BlockVector<Number> &V) const;
+      operator*(const BlockVector<Number, MemorySpace> &V) const;
 
       /**
        * Calculate the scalar product between each block of this vector and @p V
@@ -602,8 +603,8 @@ namespace LinearAlgebra
        */
       template <typename FullMatrixType>
       void
-      multivector_inner_product(FullMatrixType            &matrix,
-                                const BlockVector<Number> &V,
+      multivector_inner_product(FullMatrixType                         &matrix,
+                                const BlockVector<Number, MemorySpace> &V,
                                 const bool symmetric = false) const;
 
       /**
@@ -624,9 +625,10 @@ namespace LinearAlgebra
        */
       template <typename FullMatrixType>
       Number
-      multivector_inner_product_with_metric(const FullMatrixType      &matrix,
-                                            const BlockVector<Number> &V,
-                                            const bool symmetric = false) const;
+      multivector_inner_product_with_metric(
+        const FullMatrixType                   &matrix,
+        const BlockVector<Number, MemorySpace> &V,
+        const bool                              symmetric = false) const;
 
       /**
        * Set each block of this vector as follows:
@@ -639,10 +641,10 @@ namespace LinearAlgebra
        */
       template <typename FullMatrixType>
       void
-      mmult(BlockVector<Number>  &V,
-            const FullMatrixType &matrix,
-            const Number          s = Number(0.),
-            const Number          b = Number(1.)) const;
+      mmult(BlockVector<Number, MemorySpace> &V,
+            const FullMatrixType             &matrix,
+            const Number                      s = Number(0.),
+            const Number                      b = Number(1.)) const;
 
       /**
        * Add @p a to all components. Note that @p a is a scalar not a vector.
@@ -654,16 +656,16 @@ namespace LinearAlgebra
        * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
        */
       void
-      add(const Number a, const BlockVector<Number> &V);
+      add(const Number a, const BlockVector<Number, MemorySpace> &V);
 
       /**
        * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
        */
       void
-      add(const Number               a,
-          const BlockVector<Number> &V,
-          const Number               b,
-          const BlockVector<Number> &W);
+      add(const Number                            a,
+          const BlockVector<Number, MemorySpace> &V,
+          const Number                            b,
+          const BlockVector<Number, MemorySpace> &W);
 
       /**
        * A collective add operation: This function adds a whole set of values
@@ -678,7 +680,9 @@ namespace LinearAlgebra
        * s*(*this)+a*V</tt>.
        */
       void
-      sadd(const Number s, const Number a, const BlockVector<Number> &V);
+      sadd(const Number                            s,
+           const Number                            a,
+           const BlockVector<Number, MemorySpace> &V);
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -686,13 +690,13 @@ namespace LinearAlgebra
        * immediate re-assignment) by a diagonal scaling matrix.
        */
       void
-      scale(const BlockVector<Number> &scaling_factors);
+      scale(const BlockVector<Number, MemorySpace> &scaling_factors);
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
       void
-      equ(const Number a, const BlockVector<Number> &V);
+      equ(const Number a, const BlockVector<Number, MemorySpace> &V);
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
@@ -742,9 +746,9 @@ namespace LinearAlgebra
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
       Number
-      add_and_dot(const Number               a,
-                  const BlockVector<Number> &V,
-                  const BlockVector<Number> &W);
+      add_and_dot(const Number                            a,
+                  const BlockVector<Number, MemorySpace> &V,
+                  const BlockVector<Number, MemorySpace> &W);
 
       /**
        * Return the global size of the vector, equal to the sum of the number of
@@ -816,10 +820,10 @@ namespace LinearAlgebra
  *
  * @relatesalso BlockVector
  */
-template <typename Number>
+template <typename Number, typename MemorySpace>
 inline void
-swap(LinearAlgebra::distributed::BlockVector<Number> &u,
-     LinearAlgebra::distributed::BlockVector<Number> &v) noexcept
+swap(LinearAlgebra::distributed::BlockVector<Number, MemorySpace> &u,
+     LinearAlgebra::distributed::BlockVector<Number, MemorySpace> &v) noexcept
 {
   u.swap(v);
 }
@@ -829,8 +833,9 @@ swap(LinearAlgebra::distributed::BlockVector<Number> &u,
  * Declare dealii::LinearAlgebra::distributed::BlockVector as distributed
  * vector.
  */
-template <typename Number>
-struct is_serial_vector<LinearAlgebra::distributed::BlockVector<Number>>
+template <typename Number, typename MemorySpace>
+struct is_serial_vector<
+  LinearAlgebra::distributed::BlockVector<Number, MemorySpace>>
   : std::false_type
 {};
 

@@ -51,7 +51,7 @@ namespace LinearAlgebra
    */
   namespace distributed
   {
-    template <typename>
+    template <typename, typename>
     class BlockVector;
   }
 
@@ -1472,7 +1472,7 @@ namespace LinearAlgebra
       friend class Vector;
 
       // Make BlockVector type friends.
-      template <typename Number2>
+      template <typename Number2, typename MemorySpace2>
       friend class BlockVector;
     };
     /** @} */

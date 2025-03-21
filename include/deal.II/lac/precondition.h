@@ -46,7 +46,7 @@ namespace LinearAlgebra
   {
     template <typename, typename>
     class Vector;
-    template <typename>
+    template <typename, typename>
     class BlockVector;
   } // namespace distributed
 } // namespace LinearAlgebra
@@ -2334,10 +2334,11 @@ namespace internal
     vector.add(-mean_value);
   }
 
-  template <typename Number>
+  template <typename Number, typename MemorySpace>
   void
   set_initial_guess(
-    ::dealii::LinearAlgebra::distributed::BlockVector<Number> &vector)
+    ::dealii::LinearAlgebra::distributed::BlockVector<Number, MemorySpace>
+      &vector)
   {
     for (unsigned int block = 0; block < vector.n_blocks(); ++block)
       set_initial_guess(vector.block(block));
