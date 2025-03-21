@@ -52,7 +52,7 @@ if(Trilinos_FOUND)
   # set by the find_package call to Trilinos:
   set(CMAKE_CXX_EXTENSIONS OFF)
   find_package(Kokkos 3.4.0 REQUIRED QUIET
-    PATHS ${TRILINOS_DIR} NO_DEFAULT_PATH
+    PATHS ${TRILINOS_CONFIG_DIR}/.. NO_DEFAULT_PATH
   )
 
   set(KOKKOS_FOUND ${Kokkos_FOUND})
