@@ -37,8 +37,8 @@ public:
 
   DEAL_II_HOST_DEVICE void
   operator()(const typename Portable::MatrixFree<dim, double>::Data *data,
-             const double                                           *src,
-             double                                                 *dst) const;
+             const Portable::DeviceVector<double>                   &src,
+             Portable::DeviceVector<double>                         &dst) const;
 
   static const unsigned int n_local_dofs =
     dealii::Utilities::pow(fe_degree + 1, dim);
@@ -52,8 +52,8 @@ template <int dim, int fe_degree>
 DEAL_II_HOST_DEVICE void
 DummyOperator<dim, fe_degree>::operator()(
   const typename Portable::MatrixFree<dim, double>::Data *data,
-  const double *,
-  double *dst) const
+  const Portable::DeviceVector<double>                   &src,
+  Portable::DeviceVector<double>                         &dst) const
 {
   Kokkos::parallel_for(
     Kokkos::TeamThreadRange(data->team_member, n_q_points),

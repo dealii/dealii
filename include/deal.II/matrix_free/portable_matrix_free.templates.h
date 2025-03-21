@@ -354,18 +354,19 @@ namespace Portable
       ApplyKernel(
         Functor                                                 func,
         const typename MatrixFree<dim, Number>::PrecomputedData gpu_data,
-        Number *const                                           src,
-        Number                                                 *dst)
+        const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+                                                                         &src,
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
         : func(func)
         , gpu_data(gpu_data)
-        , src(src)
-        , dst(dst)
+        , src(src.get_values(), src.locally_owned_size())
+        , dst(dst.get_values(), dst.locally_owned_size())
       {}
 
       Functor                                                 func;
       const typename MatrixFree<dim, Number>::PrecomputedData gpu_data;
-      Number *const                                           src;
-      Number                                                 *dst;
+      const DeviceVector<Number>                              src;
+      DeviceVector<Number>                                    dst;
 
 
       // Provide the shared memory capacity. This function takes the team_size
@@ -404,7 +405,8 @@ namespace Portable
                                                     &gpu_data,
                                                     &shared_data};
 
-        func(&data, src, dst);
+        DeviceVector<Number> nonconstdst = dst;
+        func(&data, src, nonconstdst);
       }
     };
   } // namespace internal
@@ -1017,7 +1019,7 @@ namespace Portable
               Kokkos::AUTO);
 
           internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-            func, get_data(color), src.get_values(), dst.get_values());
+            func, get_data(color), src, dst);
 
           Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop",
                                team_policy,
@@ -1062,7 +1064,7 @@ namespace Portable
                     Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                  func, get_data(0), src.get_values(), dst.get_values());
+                  func, get_data(0), src, dst);
 
                 Kokkos::parallel_for(
                   "dealii::MatrixFree::distributed_cell_loop_0",
@@ -1085,7 +1087,7 @@ namespace Portable
                     Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                  func, get_data(1), src.get_values(), dst.get_values());
+                  func, get_data(1), src, dst);
 
                 Kokkos::parallel_for(
                   "dealii::MatrixFree::distributed_cell_loop_1",
@@ -1113,7 +1115,7 @@ namespace Portable
                     Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                  func, get_data(2), src.get_values(), dst.get_values());
+                  func, get_data(2), src, dst);
 
                 Kokkos::parallel_for(
                   "dealii::MatrixFree::distributed_cell_loop_2",
@@ -1146,7 +1148,7 @@ namespace Portable
                       Kokkos::AUTO);
 
                   internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                    func, get_data(i), src.get_values(), dst.get_values());
+                    func, get_data(i), src, dst);
 
                   Kokkos::parallel_for(
                     "dealii::MatrixFree::distributed_cell_loop_" +
@@ -1183,10 +1185,7 @@ namespace Portable
                   Kokkos::AUTO);
 
               internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                func,
-                get_data(i),
-                ghosted_src.get_values(),
-                ghosted_dst.get_values());
+                func, get_data(i), ghosted_src, ghosted_dst);
 
               Kokkos::parallel_for(
                 "dealii::MatrixFree::distributed_cell_loop_" +

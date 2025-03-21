@@ -151,7 +151,7 @@ namespace Portable
      * AffineConstraints::read_dof_values() as well.
      */
     DEAL_II_HOST_DEVICE void
-    read_dof_values(const Number *src);
+    read_dof_values(const DeviceVector<Number> &src);
 
     /**
      * Take the value stored internally on dof values of the current cell and
@@ -160,7 +160,7 @@ namespace Portable
      * function AffineConstraints::distribute_local_to_global.
      */
     DEAL_II_HOST_DEVICE void
-    distribute_local_to_global(Number *dst) const;
+    distribute_local_to_global(DeviceVector<Number> &dst) const;
 
     /**
      * Evaluate the function values and the gradients of the FE function given
@@ -303,7 +303,7 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    read_dof_values(const Number *src)
+    read_dof_values(const DeviceVector<Number> &src)
   {
     // Populate the scratch memory
     Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
@@ -335,7 +335,7 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    distribute_local_to_global(Number *dst) const
+    distribute_local_to_global(DeviceVector<Number> &dst) const
   {
     for (unsigned int c = 0; c < n_components_; ++c)
       {
