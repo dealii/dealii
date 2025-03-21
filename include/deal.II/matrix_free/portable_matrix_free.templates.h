@@ -18,6 +18,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/base/memory_space.h>
 
@@ -26,6 +28,8 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/lac/block_vector_base.h>
 
 #include <deal.II/matrix_free/portable_hanging_nodes_internal.h>
 #include <deal.II/matrix_free/portable_matrix_free.h>
@@ -330,7 +334,7 @@ namespace Portable
 
 
 
-    template <int dim, typename Number, typename Functor>
+    template <int dim, typename Number, typename Functor, bool IsBlock>
     struct ApplyKernel
     {
       using TeamHandle = Kokkos::TeamPolicy<
@@ -359,14 +363,28 @@ namespace Portable
         LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
         : func(func)
         , gpu_data(gpu_data)
-        , src(src.get_values(), src.locally_owned_size())
-        , dst(dst.get_values(), dst.locally_owned_size())
+        , src(DeviceVector<Number>(src.get_values(), src.locally_owned_size()))
+        , dst(DeviceVector<Number>(dst.get_values(), dst.locally_owned_size()))
+      {}
+
+      ApplyKernel(
+        Functor                                                 func,
+        const typename MatrixFree<dim, Number>::PrecomputedData gpu_data,
+        const LinearAlgebra::distributed::BlockVector<Number,
+                                                      MemorySpace::Default>
+          &src,
+        LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+          &dst)
+        : func(func)
+        , gpu_data(gpu_data)
+        , src(src)
+        , dst(dst)
       {}
 
       Functor                                                 func;
       const typename MatrixFree<dim, Number>::PrecomputedData gpu_data;
-      const DeviceVector<Number>                              src;
-      DeviceVector<Number>                                    dst;
+      const DeviceBlockVector<Number>                         src;
+      DeviceBlockVector<Number>                               dst;
 
 
       // Provide the shared memory capacity. This function takes the team_size
@@ -405,8 +423,16 @@ namespace Portable
                                                     &gpu_data,
                                                     &shared_data};
 
-        DeviceVector<Number> nonconstdst = dst;
-        func(&data, src, nonconstdst);
+        if constexpr (IsBlock)
+          {
+            DeviceBlockVector<Number> nonconstdst = dst;
+            func(&data, src, nonconstdst);
+          }
+        else
+          {
+            DeviceVector<Number> nonconstdst = dst.block(0);
+            func(&data, src.block(0), nonconstdst);
+          }
       }
     };
   } // namespace internal
@@ -1018,14 +1044,31 @@ namespace Portable
               n_cells[color],
               Kokkos::AUTO);
 
-          internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-            func, get_data(color), src, dst);
+
+          internal::
+            ApplyKernel<dim, Number, Functor, IsBlockVector<VectorType>::value>
+              apply_kernel(func, get_data(color), src, dst);
 
           Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop",
                                team_policy,
                                apply_kernel);
         }
     Kokkos::fence();
+  }
+
+
+
+  template <int dim, typename Number>
+  template <typename Functor>
+  void
+  MatrixFree<dim, Number>::distributed_cell_loop(
+    const Functor &,
+    const LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+      &,
+    LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> &)
+    const
+  {
+    Assert(false, ExcNotImplemented());
   }
 
 
@@ -1063,7 +1106,7 @@ namespace Portable
                     n_cells[0],
                     Kokkos::AUTO);
 
-                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                   func, get_data(0), src, dst);
 
                 Kokkos::parallel_for(
@@ -1086,7 +1129,7 @@ namespace Portable
                     n_cells[1],
                     Kokkos::AUTO);
 
-                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                   func, get_data(1), src, dst);
 
                 Kokkos::parallel_for(
@@ -1114,7 +1157,7 @@ namespace Portable
                     n_cells[2],
                     Kokkos::AUTO);
 
-                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                   func, get_data(2), src, dst);
 
                 Kokkos::parallel_for(
@@ -1147,8 +1190,8 @@ namespace Portable
                       n_cells[i],
                       Kokkos::AUTO);
 
-                  internal::ApplyKernel<dim, Number, Functor> apply_kernel(
-                    func, get_data(i), src, dst);
+                  internal::ApplyKernel<dim, Number, Functor, false>
+                    apply_kernel(func, get_data(i), src, dst);
 
                   Kokkos::parallel_for(
                     "dealii::MatrixFree::distributed_cell_loop_" +
@@ -1184,7 +1227,7 @@ namespace Portable
                   n_cells[i],
                   Kokkos::AUTO);
 
-              internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+              internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                 func, get_data(i), ghosted_src, ghosted_dst);
 
               Kokkos::parallel_for(
