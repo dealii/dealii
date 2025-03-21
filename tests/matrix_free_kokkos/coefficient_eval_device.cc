@@ -36,11 +36,9 @@ public:
   DummyOperator() = default;
 
   DEAL_II_HOST_DEVICE void
-  operator()(const unsigned int                                      cell,
-             const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
-             Portable::SharedData<dim, double> *shared_data,
-             const double                      *src,
-             double                            *dst) const;
+  operator()(const typename Portable::MatrixFree<dim, double>::Data *data,
+             const double                                           *src,
+             double                                                 *dst) const;
 
   static const unsigned int n_local_dofs =
     dealii::Utilities::pow(fe_degree + 1, dim);
@@ -53,19 +51,17 @@ public:
 template <int dim, int fe_degree>
 DEAL_II_HOST_DEVICE void
 DummyOperator<dim, fe_degree>::operator()(
-  const unsigned int                                      cell,
-  const typename Portable::MatrixFree<dim, double>::Data *gpu_data,
-  Portable::SharedData<dim, double>                      *shared_data,
+  const typename Portable::MatrixFree<dim, double>::Data *data,
   const double *,
   double *dst) const
 {
   Kokkos::parallel_for(
-    Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+    Kokkos::TeamThreadRange(data->team_member, n_q_points),
     [&](const int q_point) {
       const unsigned int pos =
-        gpu_data->local_q_point_id(cell, n_q_points, q_point);
+        data->local_q_point_id(data->cell_index, n_q_points, q_point);
 
-      auto point = gpu_data->get_quadrature_point(cell, q_point);
+      auto point = data->get_quadrature_point(data->cell_index, q_point);
       dst[pos] =
         dim == 2 ? point[0] + point[1] : point[0] + point[1] + point[2];
     });
@@ -149,7 +145,7 @@ test()
   const unsigned int n_colors = graph.size();
   for (unsigned int color = 0; color < n_colors; ++color)
     {
-      typename Portable::MatrixFree<dim, double>::Data gpu_data =
+      typename Portable::MatrixFree<dim, double>::PrecomputedData gpu_data =
         mf_data.get_data(color);
       const unsigned int n_cells = gpu_data.n_cells;
       auto gpu_data_host         = Portable::copy_mf_data_to_host<dim, double>(

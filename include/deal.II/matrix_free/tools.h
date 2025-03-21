@@ -1397,16 +1397,16 @@ namespace MatrixFreeTools
       {}
 
       KOKKOS_FUNCTION void
-      operator()(
-        const unsigned int                                      cell,
-        const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-        Portable::SharedData<dim, Number>                      *shared_data,
-        const Number *,
-        Number *dst) const
+      operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
+                 const Number *,
+                 Number *dst) const
       {
         Portable::
           FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
-            fe_eval(gpu_data, shared_data);
+            fe_eval(data);
+        const typename Portable::MatrixFree<dim, Number>::PrecomputedData
+                 *gpu_data = data->precomputed_data;
+        const int cell     = data->cell_index;
 
         constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
         typename decltype(fe_eval)::value_type
@@ -1416,7 +1416,7 @@ namespace MatrixFreeTools
             const auto c = i % n_components;
 
             Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(shared_data->team_member,
+              Kokkos::TeamThreadRange(data->team_member,
                                       dofs_per_cell / n_components),
               [&](int j) {
                 typename decltype(fe_eval)::value_type val = {};
@@ -1433,14 +1433,14 @@ namespace MatrixFreeTools
                 fe_eval.submit_dof_value(val, j);
               });
 
-            shared_data->team_member.team_barrier();
+            data->team_member.team_barrier();
 
             Portable::internal::
               resolve_hanging_nodes<dim, fe_degree, false, Number>(
-                shared_data->team_member,
+                data->team_member,
                 gpu_data->constraint_weights,
                 gpu_data->constraint_mask(cell * n_components + c),
-                Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+                Kokkos::subview(data->shared_data->values, Kokkos::ALL, c));
 
             fe_eval.evaluate(m_evaluation_flags);
             fe_eval.apply_for_each_quad_point(m_quad_operation);
@@ -1448,12 +1448,12 @@ namespace MatrixFreeTools
 
             Portable::internal::
               resolve_hanging_nodes<dim, fe_degree, true, Number>(
-                shared_data->team_member,
+                data->team_member,
                 gpu_data->constraint_weights,
                 gpu_data->constraint_mask(cell * n_components + c),
-                Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+                Kokkos::subview(data->shared_data->values, Kokkos::ALL, c));
 
-            Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
+            Kokkos::single(Kokkos::PerTeam(data->team_member), [&] {
               if constexpr (n_components == 1)
                 diagonal[i] = fe_eval.get_dof_value(i);
               else
@@ -1461,37 +1461,37 @@ namespace MatrixFreeTools
                   fe_eval.get_dof_value(i / n_components)[i % n_components];
             });
 
-            shared_data->team_member.team_barrier();
+            data->team_member.team_barrier();
           }
 
-        Kokkos::single(Kokkos::PerTeam(shared_data->team_member), [&] {
+        Kokkos::single(Kokkos::PerTeam(data->team_member), [&] {
           for (unsigned int i = 0; i < dofs_per_cell / n_components; ++i)
             fe_eval.submit_dof_value(diagonal[i], i);
         });
 
-        shared_data->team_member.team_barrier();
+        data->team_member.team_barrier();
 
         // We need to do the same as distribute_local_to_global but without
         // constraints since we have already taken care of them earlier
         if (gpu_data->use_coloring)
           {
             Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
+              Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
                 dst[gpu_data->local_to_global(cell, i)] +=
-                  shared_data->values(i % (dofs_per_cell / n_components),
-                                      i / (dofs_per_cell / n_components));
+                  data->shared_data->values(i % (dofs_per_cell / n_components),
+                                            i / (dofs_per_cell / n_components));
               });
           }
         else
           {
             Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(shared_data->team_member, dofs_per_cell),
+              Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
-                Kokkos::atomic_add(
-                  &dst[gpu_data->local_to_global(cell, i)],
-                  shared_data->values(i % (dofs_per_cell / n_components),
-                                      i / (dofs_per_cell / n_components)));
+                Kokkos::atomic_add(&dst[gpu_data->local_to_global(cell, i)],
+                                   data->shared_data->values(
+                                     i % (dofs_per_cell / n_components),
+                                     i / (dofs_per_cell / n_components)));
               });
           }
       };

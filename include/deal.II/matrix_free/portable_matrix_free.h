@@ -61,6 +61,8 @@ namespace Portable
     template <int dim, typename Number>
     class ReinitHelper;
   }
+  template <int dim, typename Number>
+  struct SharedData;
 #endif
 
   /**
@@ -152,9 +154,10 @@ namespace Portable
 
     /**
      * Structure which is passed to the kernel. It is used to pass all the
-     * necessary information from the CPU to the GPU.
+     * necessary information from the CPU to the GPU and is precomputed
+     * on the CPU. This data is read-only once we run on the GPU.
      */
-    struct Data
+    struct PrecomputedData
     {
       /**
        * Kokkos::View of the quadrature points.
@@ -247,6 +250,29 @@ namespace Portable
        * Size of the scratch pad for temporary storage in shared memory.
        */
       unsigned int scratch_pad_size;
+    };
+
+
+    /**
+     * A pointer to this data structure is passed to the user code in
+     * device code that computes operations in quadrature points. It
+     * can be used to construct Portable::FEEvaluation objects and contains
+     * necessary precomputed data and scratch memory space to perform
+     * matrix-free evaluations.
+     */
+    struct Data
+    {
+      using TeamHandle = Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
+      /**
+       * TeamPolicy handle.
+       */
+      TeamHandle team_member;
+
+      const int                cell_index;
+      const PrecomputedData   *precomputed_data;
+      SharedData<dim, Number> *shared_data;
 
       /**
        * Return the quadrature point index local. The index is
@@ -257,7 +283,10 @@ namespace Portable
                        const unsigned int n_q_points,
                        const unsigned int q_point) const
       {
-        return (row_start / padding_length + cell) * n_q_points + q_point;
+        return (precomputed_data->row_start / precomputed_data->padding_length +
+                cell) *
+                 n_q_points +
+               q_point;
       }
 
 
@@ -269,7 +298,7 @@ namespace Portable
       get_quadrature_point(const unsigned int cell,
                            const unsigned int q_point) const
       {
-        return q_points(cell, q_point);
+        return precomputed_data->q_points(cell, q_point);
       }
     };
 
@@ -325,7 +354,7 @@ namespace Portable
     /**
      * Return the Data structure associated with @p color.
      */
-    Data
+    PrecomputedData
     get_data(unsigned int color) const;
 
     // clang-format off
@@ -336,11 +365,9 @@ namespace Portable
      * @p func needs to define
      * \code
      * DEAL_II_HOST_DEVICE void operator()(
-     *   const unsigned int                                          cell,
-     *   const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-     *   Portable::SharedData<dim, Number> *                     shared_data,
-     *   const Number *                                              src,
-     *   Number *                                                    dst) const;
+     *   const typename Portable::MatrixFree<dim, Number>::Data *data,
+     *   const Number *                                          src,
+     *   Number *                                                dst) const;
      *   static const unsigned int n_local_dofs;
      *   static const unsigned int n_q_points;
      * \endcode
@@ -360,8 +387,7 @@ namespace Portable
      * @p func needs to define
      * \code
      *  DEAL_II_HOST_DEVICE void operator()(
-     *    const unsigned int                                          cell,
-     *    const typename Portable::MatrixFree<dim, Number>::Data *gpu_data);
+     *    const typename Portable::MatrixFree<dim, Number>::Data *data);
      * static const unsigned int n_local_dofs;
      * static const unsigned int n_q_points;
      * \endcode
@@ -642,9 +668,6 @@ namespace Portable
   template <int dim, typename Number>
   struct SharedData
   {
-    using TeamHandle = Kokkos::TeamPolicy<
-      MemorySpace::Default::kokkos_space::execution_space>::member_type;
-
     using SharedViewValues = Kokkos::View<
       Number **,
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
@@ -659,20 +682,13 @@ namespace Portable
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
     DEAL_II_HOST_DEVICE
-    SharedData(const TeamHandle           &team_member,
-               const SharedViewValues     &values,
+    SharedData(const SharedViewValues     &values,
                const SharedViewGradients  &gradients,
                const SharedViewScratchPad &scratch_pad)
-      : team_member(team_member)
-      , values(values)
+      : values(values)
       , gradients(gradients)
       , scratch_pad(scratch_pad)
     {}
-
-    /**
-     * TeamPolicy handle.
-     */
-    TeamHandle team_member;
 
     /**
      * Memory for dof and quad values.
@@ -792,7 +808,8 @@ namespace Portable
   template <int dim, typename Number>
   DataHost<dim, Number>
   copy_mf_data_to_host(
-    const typename dealii::Portable::MatrixFree<dim, Number>::Data &data,
+    const typename dealii::Portable::MatrixFree<dim, Number>::PrecomputedData
+                      &data,
     const UpdateFlags &update_flags)
   {
     DataHost<dim, Number> data_host;
