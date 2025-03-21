@@ -76,6 +76,7 @@ option(DEAL_II_FORCE_BUNDLED_KOKKOS
 set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
 
 macro(feature_kokkos_configure_bundled)
+  set(Kokkos_VERSION "3.7.0")
   set(KOKKOS_VERSION "3.7.0")
   set(Kokkos_DEVICES "Serial")
   set(Kokkos_ARCH " ")
