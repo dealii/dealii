@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/partitioner.h>
@@ -37,6 +38,7 @@
 
 #include <deal.II/matrix_free/shape_info.h>
 
+#include <Kokkos_Array.hpp>
 #include <Kokkos_Core.hpp>
 
 
@@ -66,6 +68,14 @@ namespace Portable
 #endif
 
   /**
+   * Maximum number of DofHandler supported at the same time in
+   * Portable::MatrixFree computations. This limit also applies for the number
+   * of blocks in a BlockVector and the number of FEEvaluation objects that can
+   * be active in a single cell_loop().
+   */
+  static constexpr const unsigned int n_max_dof_handlers = 5;
+
+  /**
    * Type for source and destination vectors in device functions like
    * MatrixFree::cell_loop().
    *
@@ -76,7 +86,89 @@ namespace Portable
   using DeviceVector =
     Kokkos::View<Number *, MemorySpace::Default::kokkos_space>;
 
+  /**
+   * A block vector used for source and destination vectors in device functions
+   * like MatrixFree::cell_loop().
+   *
+   * The maximum number of block is limited by the constant @p n_max_dof_handlers.
+   */
+  template <typename Number>
+  class DeviceBlockVector
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    DeviceBlockVector()
+      : n_blocks(0)
+    {}
 
+    /**
+     * Constructor.
+     */
+    DeviceBlockVector(const DeviceBlockVector &other) = default;
+
+    /**
+     * Constructor from a DeviceVector. Creates a DeviceBlockVector
+     * with a single block.
+     */
+    explicit DeviceBlockVector(const DeviceVector<Number> &src)
+      : n_blocks(1)
+      , blocks{src}
+    {}
+
+    /**
+     * Constructor from a LinearAlgebra::distributed::BlockVector. Creates
+     * a DeviceVector from each block and stores it.
+     */
+    template <typename MemorySpace>
+    DeviceBlockVector(
+      const LinearAlgebra::distributed::BlockVector<Number, MemorySpace> &src)
+      : n_blocks(src.n_blocks())
+    {
+      Assert(src.n_blocks() <= n_max_dof_handlers,
+             ExcMessage("Portable::MatrixFree is configured with " +
+                        Utilities::to_string(n_max_dof_handlers) +
+                        " but you are passing a BlockVector with " +
+                        Utilities::to_string(src.n_blocks()) + " blocks."));
+
+      for (int b = 0; b < src.n_blocks(); ++b)
+        blocks[b] = DeviceVector<Number>(src.block(b).get_values(),
+                                         src.block(b).locally_owned_size());
+    }
+
+    /**
+     * Access block @p index.
+     */
+    DEAL_II_HOST_DEVICE
+    DeviceVector<Number> &
+    block(unsigned int index)
+    {
+      AssertIndexRange(index, n_blocks);
+      return blocks[index];
+    }
+
+    /**
+     * Access block @p index.
+     */
+    DEAL_II_HOST_DEVICE const DeviceVector<Number>                           &
+    block(unsigned int index) const
+    {
+      AssertIndexRange(index, n_blocks);
+      return blocks[index];
+    }
+
+  private:
+    /**
+     * The number of components / blocks
+     */
+    unsigned int n_blocks;
+
+    /**
+     * Storage for the blocks
+     */
+    Kokkos::Array<DeviceVector<Number>, n_max_dof_handlers> blocks;
+  };
 
   /**
    * This class collects all the data that is stored for the matrix free
@@ -503,6 +595,19 @@ namespace Portable
                                                                        &src,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
       const;
+
+    /**
+     * Same as above but for BlockVector.
+     */
+    template <typename Functor>
+    void
+    distributed_cell_loop(
+      const Functor                                                       &func,
+      const LinearAlgebra::distributed::BlockVector<Number,
+                                                    MemorySpace::Default> &src,
+      LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+        &dst) const;
+
 
     /**
      * Unique ID associated with the object.
