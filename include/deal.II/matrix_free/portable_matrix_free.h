@@ -68,6 +68,10 @@ namespace Portable
 #endif
 
   /**
+   * Maximum number of DofHandler supported at the same time in
+   * Portable::MatrixFree computations. This limit also applies for the number
+   * of blocks in a BlockVector and the number of FEEvaluation objects that can
+   * be active in a single cell_loop().
    */
   static constexpr const unsigned int n_max_dof_handlers = 5;
 
@@ -83,21 +87,37 @@ namespace Portable
     Kokkos::View<Number *, MemorySpace::Default::kokkos_space>;
 
   /**
+   * A block vector used for source and destination vectors in device functions
+   * like MatrixFree::cell_loop().
    *
+   * The maximum number of block is limited by the constant @p n_max_dof_handlers.
    */
   template <typename Number>
   class DeviceBlockVector
   {
-    // unsigned int n_blocks;
+    /**
+     * Storage for the blocks
+     */
     Kokkos::Array<DeviceVector<Number>, n_max_dof_handlers> components;
 
   public:
+    /**
+     * Constructor.
+     */
     DeviceBlockVector(const DeviceBlockVector &other) = default;
 
+    /**
+     * Constructor from a DeviceVector. Creates a DeviceBlockVector
+     * with a single block.
+     */
     explicit DeviceBlockVector(const DeviceVector<Number> &src)
       : components{src}
     {}
 
+    /**
+     * Constructor from a LinearAlgebra::distributed::BlockVector. Creates
+     * a DeviceVector from each block and stores it.
+     */
     DeviceBlockVector(
       const LinearAlgebra::distributed::BlockVector<Number> &src)
     {
@@ -112,13 +132,19 @@ namespace Portable
                                              src.block(b).locally_owned_size());
     }
 
-
-    DeviceVector<Number> &
+    /**
+     * Access block @p index.
+     */
+    DEAL_II_HOST_DEVICE DeviceVector<Number>                     &
     block(unsigned int index)
     {
       return components[index];
     }
-    const DeviceVector<Number> &
+
+    /**
+     * Access block @p index.
+     */
+    DEAL_II_HOST_DEVICE const DeviceVector<Number>                           &
     block(unsigned int index) const
     {
       return components[index];
@@ -552,6 +578,7 @@ namespace Portable
       const;
 
     /**
+     * Same as above but for BlockVector.
      */
     template <typename Functor>
     void
