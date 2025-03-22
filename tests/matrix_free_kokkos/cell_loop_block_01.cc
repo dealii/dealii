@@ -19,7 +19,10 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 
+#include "deal.II/lac/la_parallel_block_vector.h"
+
 #include <deal.II/matrix_free/portable_fe_evaluation.h>
+#include <deal.II/matrix_free/portable_matrix_free.h>
 
 #include "../tests.h"
 
@@ -46,46 +49,73 @@ public:
     Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
       data);
 
-    // set to unit vector
-    auto fe_eval_ptr = &fe_eval;
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
-                                                 n_local_dofs),
-                         [&](int i) { fe_eval_ptr->submit_dof_value(1., i); });
-    data->team_member.team_barrier();
-    fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
-
-#ifndef __APPLE__
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
-                                                 n_local_dofs),
-                         [&](int i) {
-                           // values should evaluate to one, derivatives to zero
-                           assert(fe_eval_ptr->get_value(i) == 1.);
-                           for (unsigned int e = 0; e < dim; ++e)
-                             assert(fe_eval_ptr->get_gradient(i)[e] == 0.);
-                         });
-
-    fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
-
-    Kokkos::parallel_for(
-      Kokkos::TeamThreadRange(data->team_member, n_local_dofs),
-      KOKKOS_LAMBDA(int i) { assert(fe_eval_ptr->get_dof_value(i) == 1.); });
-#endif
+    fe_eval.read_dof_values(src);
+    fe_eval.distribute_local_to_global(dst);
   }
-
-
 
   void
   test() const
   {
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> dst_dummy;
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> src_dummy;
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> dst;
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> src;
 
-    data.cell_loop(*this, src_dummy, dst_dummy);
+    data.initialize_dof_vector(dst);
+    data.initialize_dof_vector(src);
+    src.add(1.0);
+
+    data.cell_loop(*this, src, dst);
 
     Kokkos::fence();
 
-    deallog << "OK" << std::endl;
-  };
+    deallog << "OK:" << dst.linfty_norm() << std::endl;
+  }
+
+protected:
+  const Portable::MatrixFree<dim, Number> &data;
+};
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d = fe_degree + 1,
+          typename Number   = double>
+class MatrixFreeTestBlock
+{
+public:
+  static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
+  static const unsigned int n_q_points   = Utilities::pow(n_q_points_1d, dim);
+
+  MatrixFreeTestBlock(const Portable::MatrixFree<dim, Number> &data_in)
+    : data(data_in){};
+
+  DEAL_II_HOST_DEVICE void
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
+             const Portable::DeviceBlockVector<Number>              &src,
+             Portable::DeviceBlockVector<Number>                    &dst) const
+  {
+    Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
+      data);
+
+    fe_eval.read_dof_values(src.block(0));
+    fe_eval.distribute_local_to_global(dst.block(0));
+  }
+
+  void
+  test() const
+  {
+    LinearAlgebra::distributed::BlockVector<Number> dst(1);
+    LinearAlgebra::distributed::BlockVector<Number> src(1);
+
+    data.initialize_dof_vector(dst.block(0));
+    data.initialize_dof_vector(src.block(0));
+    src.add(1.0);
+
+    data.cell_loop(*this, src, dst);
+
+    Kokkos::fence();
+
+    deallog << "OK:" << dst.block(0).linfty_norm() << std::endl;
+  }
 
 protected:
   const Portable::MatrixFree<dim, Number> &data;
@@ -99,6 +129,13 @@ template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 const unsigned int
   MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::n_q_points;
 
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+const unsigned int
+  MatrixFreeTestBlock<dim, fe_degree, n_q_points_1d, Number>::n_local_dofs;
+
+template <int dim, int fe_degree, int n_q_points_1d, typename Number>
+const unsigned int
+  MatrixFreeTestBlock<dim, fe_degree, n_q_points_1d, Number>::n_q_points;
 
 
 template <int dim, int fe_degree, typename number>
@@ -118,6 +155,8 @@ do_test(const DoFHandler<dim>           &dof,
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   MatrixFreeTest<dim, fe_degree, fe_degree + 1, number> mf(mf_data);
   mf.test();
+  MatrixFreeTestBlock<dim, fe_degree, fe_degree + 1, number> mfb(mf_data);
+  mfb.test();
 }
 
 
@@ -125,20 +164,13 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  const SphericalManifold<dim> manifold;
-  Triangulation<dim>           tria;
-  GridGenerator::hyper_ball(tria);
-  for (const auto &cell : tria.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
-      if (cell->at_boundary(f))
-        cell->face(f)->set_all_manifold_ids(0);
-  tria.set_manifold(0, manifold);
+  Triangulation<dim> tria;
+  GridGenerator::hyper_cube(tria);
 
   // refine first and last cell
   tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  tria.refine_global(4 - dim);
 
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
