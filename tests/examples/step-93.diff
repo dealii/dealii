@@ -1,0 +1,33 @@
+diff --git a/examples/step-93/step-93.cc b/examples/step-93/step-93.cc
+index 2e7944c2b7..a0aac6263b 100644
+--- a/examples/step-93/step-93.cc
++++ b/examples/step-93/step-93.cc
+@@ -374,7 +374,7 @@ namespace Step93
+   void Step93<dim>::make_grid()
+   {
+     GridGenerator::hyper_cube(triangulation, -1, 1);
+-    triangulation.refine_global(7);
++    triangulation.refine_global(3);
+ 
+     std::cout << "Number of active cells: " << triangulation.n_active_cells()
+               << std::endl;
+@@ -655,7 +655,7 @@ namespace Step93
+   {
+     // Notice that we also time how long this process takes.
+     std::cout << "Beginning solve" << std::endl;
+-    Timer timer;
++    //Timer timer;
+ 
+     SolverControl solver_control(5000000, 1e-6 * system_rhs.l2_norm());
+     SolverCG<Vector<double>> solver(solver_control);
+@@ -665,8 +665,8 @@ namespace Step93
+     /* SparseDirectUMFPACK direct_solver;
+     direct_solver.initialize(system_matrix);
+     direct_solver.vmult(solution, system_rhs); */
+-    timer.stop();
+-    std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
++    //timer.stop();
++    //std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
+   }
+ 
+   // The output_results() function is a bit more robust for this program than
