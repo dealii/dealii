@@ -59,14 +59,10 @@ namespace LinearAlgebra
           {
             // get a representation of the present row
             std::size_t ncols;
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
             typename TpetraTypes::GraphType<
               MemorySpace>::nonconst_global_inds_host_view_type
               column_indices_view(colnum_cache->data(), colnum_cache->size());
-#  else
-            Teuchos::ArrayView<dealii::types::signed_global_dof_index>
-              column_indices_view(colnum_cache->data(), colnum_cache->size());
-#  endif
+
             sparsity_pattern->graph->getGlobalRowCopy(this->a_row,
                                                       column_indices_view,
                                                       ncols);
@@ -409,7 +405,6 @@ namespace LinearAlgebra
             "that. Either use more MPI processes or recompile Trilinos "
             "with 'local ordinate = long long' "));
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
         if (row_map->getComm()->getSize() > 1)
           graph = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::GraphType<MemorySpace>>(row_map, n_entries_per_row);
@@ -418,17 +413,6 @@ namespace LinearAlgebra
             TpetraTypes::GraphType<MemorySpace>>(row_map,
                                                  col_map,
                                                  n_entries_per_row);
-#  else
-        if (row_map->getComm()->getSize() > 1)
-          graph = Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(
-            row_map, Teuchos::arcpFromArray(n_entries_per_row));
-        else
-          graph = Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(
-            row_map, col_map, Teuchos::arcpFromArray(n_entries_per_row));
-
-#  endif
 
         AssertDimension(sp.n_rows(), graph->getGlobalNumRows());
         AssertDimension(sp.n_cols(), graph->getGlobalNumEntries());
@@ -829,7 +813,6 @@ namespace LinearAlgebra
     SparsityPattern<MemorySpace>::exists(const size_type i,
                                          const size_type j) const
     {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       if (!row_is_stored_locally(i))
         return false;
 
@@ -851,12 +834,6 @@ namespace LinearAlgebra
         col_indices.data();
 
       return static_cast<std::size_t>(local_col_index) != col_indices.size();
-#  else
-      (void)i;
-      (void)j;
-      DEAL_II_NOT_IMPLEMENTED();
-      return false;
-#  endif
     }
 
 

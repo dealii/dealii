@@ -1129,14 +1129,8 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadWrite);
-#  else
-      vector->template sync<Kokkos::HostSpace>();
-
-      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
 
       // Having extracted a view into the multivectors above, now also
       // extract a view into the one vector we actually store. We can
