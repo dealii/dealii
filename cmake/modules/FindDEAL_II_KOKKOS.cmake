@@ -47,6 +47,10 @@ endif()
 
 
 if(Kokkos_FOUND)
+  if(NOT Kokkos_VERSION)
+    message(FATAL_ERROR "FindPackage(Kokkos) did not set Kokkos_VERSION!")
+  endif()
+
   if (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP)
     # In version older than 3.7.0, Kokkos::Array::operator[] is not constexpr,
     # so we use std::array instead.
