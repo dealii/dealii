@@ -1,5 +1,5 @@
 
-DEAL::n_q_face=6, n_q_proj=24
+DEAL::n_q_face=6, n_q_proj=48
 DEAL::Testing face with center at 0.24866160 0.03044371
 DEAL::  QP=0, error=0.00000000, u.n=-8.30976642, u_neighbor.n=-8.30976642
 DEAL::  QP=1, error=0.00000000, u.n=-2.15456843, u_neighbor.n=-2.15456843
