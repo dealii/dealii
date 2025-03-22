@@ -66,6 +66,19 @@ namespace Portable
 #endif
 
   /**
+   * Type for source and destination vectors in device functions like
+   * MatrixFree::cell_loop().
+   *
+   * This is a type alias to a Kokkos::View to a chunk of memory, typically
+   * pointing to the local elements in the LinearAlgebra::distributed::Vector.
+   */
+  template <typename Number>
+  using DeviceVector =
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>;
+
+
+
+  /**
    * This class collects all the data that is stored for the matrix free
    * implementation. The storage scheme is tailored towards several loops
    * performed with the same data, i.e., typically doing many matrix-vector
@@ -366,8 +379,8 @@ namespace Portable
      * \code
      * DEAL_II_HOST_DEVICE void operator()(
      *   const typename Portable::MatrixFree<dim, Number>::Data *data,
-     *   const Number *                                          src,
-     *   Number *                                                dst) const;
+     *   const DeviceVector<Number>                             &src,
+     *   DeviceVector<Number>                                   &dst) const;
      *   static const unsigned int n_local_dofs;
      *   static const unsigned int n_q_points;
      * \endcode

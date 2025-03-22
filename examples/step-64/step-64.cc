@@ -192,8 +192,8 @@ namespace Step64
 
     DEAL_II_HOST_DEVICE void
     operator()(const typename Portable::MatrixFree<dim, double>::Data *data,
-               const double                                           *src,
-               double *dst) const;
+               const Portable::DeviceVector<double>                   &src,
+               Portable::DeviceVector<double> &dst) const;
 
   private:
     double *coef;
@@ -208,8 +208,8 @@ namespace Step64
   template <int dim, int fe_degree>
   DEAL_II_HOST_DEVICE void LocalHelmholtzOperator<dim, fe_degree>::operator()(
     const typename Portable::MatrixFree<dim, double>::Data *data,
-    const double                                           *src,
-    double                                                 *dst) const
+    const Portable::DeviceVector<double>                   &src,
+    Portable::DeviceVector<double>                         &dst) const
   {
     Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> fe_eval(
       data);
