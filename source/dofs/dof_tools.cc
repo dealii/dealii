@@ -2497,8 +2497,13 @@ namespace DoFTools
 
         std::vector<types::global_dof_index> local_dof_indices;
         for (const auto &cell : dof_handler.active_cell_iterators())
-          // only work on locally relevant cells
-          if (cell->is_artificial() == false)
+          // Only work on locally relevant cells. Exclude cells
+          // without DoFs (e.g., if a cell has FE_Nothing associated
+          // with it) because that trips up internal assertions about
+          // using FEValues with quadrature formulas without
+          // quadrature points.
+          if ((cell->is_artificial() == false) &&
+              (cell->get_fe().n_dofs_per_cell() > 0))
             {
               hp_fe_values.reinit(cell);
               const FEValues<dim, spacedim> &fe_values =
