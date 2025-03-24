@@ -222,8 +222,8 @@ namespace LinearAlgebra
         for (size_type row = first_row; row < last_row; ++row)
           n_entries_per_row[row - first_row] = sparsity_pattern.row_length(row);
 
-        // The deal.II notation of a Sparsity pattern corresponds to the
-        // Tpetra concept of a Graph. Hence, we generate a graph by copying
+        // The deal.II notion of a 'sparsity pattern' corresponds to the
+        // Tpetra concept of a 'graph'. Hence, we generate a graph by copying
         // the sparsity pattern into it, and then build up the matrix from the
         // graph. This is considerable faster than directly filling elements
         // into the matrix. Moreover, it consumes less memory, since the
