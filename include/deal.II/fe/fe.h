@@ -2125,7 +2125,7 @@ public:
    * The result may be false if a finite element defines itself not by
    * interpolating shape functions, but by other means. A typical example are
    * discontinuous $P$-type elements on quadrilaterals (rather than the common
-   * $Q$-type elements on quadrilaterals). Elements will generally only
+   * $Q$-type elements on quadrilaterals). Elements will generally only return
    * `true` if they construct their shape functions by the
    * requirement that they be nonzero at a certain point and zero at all the
    * points associated with the other shape functions. In other words,

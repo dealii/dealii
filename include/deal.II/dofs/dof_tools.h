@@ -2257,11 +2257,14 @@ namespace DoFTools
    * @ref GlossSupport "glossary entry")
    * for all the degrees of freedom handled by this DoF handler object. This
    * function, of course, only works if the finite element object used by the
-   * DoF handler object actually provides support points, i.e. no edge
-   * elements or the like. Otherwise, an exception is thrown.
+   * DoF handler object actually provides support points; this rules out
+   * "modal" elements in which the shape functions are not defined via point
+   * evaluation at individual node points, but by integrals. In practice, this
+   * function checks the requirement by requiring that the element in question
+   * returns `true` from the FiniteElement::has_support_points().
    *
-   * @pre The given array must have a length of as many elements as there are
-   * degrees of freedom.
+   * @pre The given array `support_points` must have a length of as many
+   * elements as there are degrees of freedom.
    *
    * @note The precondition to this function that the output argument needs to
    * have size equal to the total number of degrees of freedom makes this
