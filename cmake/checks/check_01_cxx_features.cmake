@@ -385,9 +385,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "${_cxx_standard}")
   message(FATAL_ERROR
     "\nThe current version of deal.II was configured with CMAKE_CXX_STANDARD "
-    "set to »${CMAKE_CXX_STANDARD}«, but we detected only support for standard "
-    "version »${_cxx_standard}«. Either unset the CMake variable "
-    "CMAKE_CXX_STANDARD, or ensure that it is at most set to »${_cxx_standard}«.\n\n"
+    "set to \"${CMAKE_CXX_STANDARD}\", but we detected only support for standard "
+    "version \"${_cxx_standard}\". Either unset the CMake variable "
+    "CMAKE_CXX_STANDARD, or ensure that it is at most set to \"${_cxx_standard}\".\n\n"
     )
 endif()
 
