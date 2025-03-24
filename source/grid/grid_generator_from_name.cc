@@ -245,6 +245,16 @@ namespace GridGenerator
                                arguments,
                                tria);
 
+      else if (name == "subdivided_hyper_L")
+        parse_and_create<dim,
+                         dim,
+                         const std::vector<unsigned int> &,
+                         const Point<dim> &,
+                         const Point<dim> &,
+                         const std::vector<int> &>(subdivided_hyper_L,
+                                                   arguments,
+                                                   tria);
+
       else
         return false;
 
