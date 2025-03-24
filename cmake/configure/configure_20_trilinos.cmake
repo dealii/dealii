@@ -194,6 +194,15 @@ macro(feature_trilinos_find_external var)
           "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
         set(${var} FALSE)
       endif()
+
+      #
+      # When configuring Kokkos we have to ensure that we actually pick up the
+      # correct Kokkos installation coming from Trilinos.
+      #
+      # FIXME: this logic should probably be refactored into
+      # FindDEAL_II_TRILINOS.cmake...
+      #
+      set(TRILINOS_KOKKOS_DIR "${TRILINOS_CONFIG_DIR}/..")
     endif()
 
     if(TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)

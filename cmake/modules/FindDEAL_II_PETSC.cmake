@@ -18,13 +18,14 @@
 # This module exports:
 #
 #     PETSC_FOUND
-#     PETSC_LIBRARIES
 #     PETSC_INCLUDE_DIRS
+#     PETSC_KOKKOS_DIR
+#     PETSC_LIBRARIES
 #     PETSC_VERSION
 #     PETSC_VERSION_MAJOR
 #     PETSC_VERSION_MINOR
-#     PETSC_VERSION_SUBMINOR
 #     PETSC_VERSION_PATCH
+#     PETSC_VERSION_SUBMINOR
 #     PETSC_WITH_64BIT_INDICES
 #     PETSC_WITH_COMPLEX
 #     PETSC_WITH_HYPRE
@@ -194,18 +195,15 @@ if(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
     endif()
   endforeach()
 
-  # PETSc does not expose Kokkos version, so we need to search for Kokkos
-  # ourselves.
+  #
+  # When configuring Kokkos we have to ensure that we actually pick up the
+  # correct Kokkos installation coming from PETSc.
+  #
   if(PETSC_WITH_KOKKOS)
     file(STRINGS "${PETSC_PETSCVARIABLES}" KOKKOS_INCLUDE
       REGEX "^KOKKOS_INCLUDE =.*")
     string(REGEX REPLACE "^KOKKOS_INCLUDE = -I" "" KOKKOS_INCLUDE "${KOKKOS_INCLUDE}")
-    find_package(Kokkos 3.7.0 QUIET
-      PATHS ${KOKKOS_INCLUDE}/.. NO_DEFAULT_PATH
-      )
-    if(NOT Kokkos_FOUND)
-      set(PETSC_FOUND FALSE)
-    endif()
+    set(PETSC_KOKKOS_DIR "${KOKKOS_INCLUDE}/..")
   endif()
 endif()
 
