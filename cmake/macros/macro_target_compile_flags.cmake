@@ -28,7 +28,7 @@
 #
 function(target_compile_flags _target _keyword _string)
   if(NOT TARGET ${_target})
-    message(FATAL_ERROR "»${_target}« is not a valid target")
+    message(FATAL_ERROR "\"${_target}\" is not a valid target")
   endif()
   if(NOT ${_keyword} MATCHES "(INTERFACE|PUBLIC|PRIVATE)")
     message(FATAL_ERROR
