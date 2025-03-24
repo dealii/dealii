@@ -65,7 +65,7 @@ macro(deal_ii_setup_target _target)
         message(FATAL_ERROR
           "\nThe deal_ii_setup_target() macro can take optional arguments, "
           "but the debug or release configuration can only be specified "
-          "once. The arguments you passed are <${ARGN}>."
+          "once. The arguments you passed are \"${ARGN}\"."
           "\n\n"
           )
       endif()
@@ -73,7 +73,7 @@ macro(deal_ii_setup_target _target)
       message(FATAL_ERROR
         "\nThe deal_ii_setup_target() macro was called with an invalid argument. "
         "Valid arguments are (none), DEBUG, or RELEASE. "
-        "The argument given is <${_arg}>."
+        "The argument given is \"${_arg}\"."
         "\n\n"
         )
     endif()
