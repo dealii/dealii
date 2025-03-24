@@ -78,8 +78,8 @@ public:
 
   DEAL_II_HOST_DEVICE void
   operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
-             const Number                                           *src,
-             Number                                                 *dst) const;
+             const Portable::DeviceVector<Number>                   &src,
+             Portable::DeviceVector<Number>                         &dst) const;
 
   Number *coef;
 };
@@ -90,8 +90,8 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 DEAL_II_HOST_DEVICE void
 HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const typename Portable::MatrixFree<dim, Number>::Data *data,
-  const Number                                           *src,
-  Number                                                 *dst) const
+  const Portable::DeviceVector<Number>                   &src,
+  Portable::DeviceVector<Number>                         &dst) const
 {
   Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
     data);

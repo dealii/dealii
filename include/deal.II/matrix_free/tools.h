@@ -1398,8 +1398,8 @@ namespace MatrixFreeTools
 
       KOKKOS_FUNCTION void
       operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
-                 const Number *,
-                 Number *dst) const
+                 const Portable::DeviceVector<Number> &,
+                 Portable::DeviceVector<Number> &dst) const
       {
         Portable::
           FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
