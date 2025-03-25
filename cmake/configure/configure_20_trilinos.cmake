@@ -194,16 +194,15 @@ macro(feature_trilinos_find_external var)
           "includes Kokkos, but DEAL_II_FORCE_BUNDLED_KOKKOS=ON!\n")
         set(${var} FALSE)
       endif()
-    endif()
 
-    if(TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)
-      # We need to disable SIMD vectorization for CUDA device code.
-      # Otherwise, nvcc compilers from version 9 on will emit an error message like:
-      # "[...] contains a vector, which is not supported in device code". We
-      # would like to set the variable in check_01_cpu_feature but at that point
-      # we don't know if CUDA support is enabled in Kokkos
-      set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
-      KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
+      #
+      # When configuring Kokkos we have to ensure that we actually pick up the
+      # correct Kokkos installation coming from Trilinos.
+      #
+      # FIXME: this logic should probably be refactored into
+      # FindDEAL_II_TRILINOS.cmake...
+      #
+      set(TRILINOS_KOKKOS_DIR "${TRILINOS_CONFIG_DIR}/..")
     endif()
 
     if(TRILINOS_WITH_TPETRA)
