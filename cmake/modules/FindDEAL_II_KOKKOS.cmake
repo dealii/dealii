@@ -82,15 +82,30 @@ endif()
 
 find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET HINTS ${KOKKOS_DIR})
 
-set(_target)
-if(Kokkos_FOUND)
-  set(_target Kokkos::kokkos)
-endif()
+if (DEAL_II_WITH_TRILINOS AND TRILINOS_VERSION VERSION_LESS 14
+    AND DEAL_II_TRILINOS_WITH_KOKKOS)
+  #
+  # Workaround: Trilinos prior to version 14 needs extensive cleanup of the
+  # exported CMake configuration, which we do in
+  # FindDEAL_II_TRILINOS.cmake. This also applies to the bundled Kokkos
+  # library, which prevents us from simply importing the Kokkos::kokkos
+  # target. We work around this issue by simply not calling
+  # process_feature().
+  #
+  set(KOKKOS_FOUND TRUE)
 
-process_feature(KOKKOS
-  TARGETS REQUIRED _target
-  CLEAR Kokkos_DIR
-  )
+else()
+
+  set(_target)
+  if(Kokkos_FOUND)
+    set(_target Kokkos::kokkos)
+  endif()
+
+  process_feature(KOKKOS
+    TARGETS REQUIRED _target
+    CLEAR Kokkos_DIR
+    )
+endif()
 
 if(KOKKOS_FOUND)
   #
