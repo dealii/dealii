@@ -19,37 +19,90 @@
 #
 #   KOKKOS_INCLUDE_DIRS
 #   KOKKOS_INTERFACE_LINK_FLAGS
+#   KOKKOS_VERSION
 #
 
 set(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
 set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 
+# silence a warning when including FindKOKKOS.cmake
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(DEAL_II_TRILINOS_WITH_KOKKOS OR DEAL_II_PETSC_WITH_KOKKOS)
-  # Let ArborX know that we have found Kokkos
-  set(Kokkos_FOUND ON)
-  # Let deal.II know that we have found Kokkos
-  set(KOKKOS_FOUND ON)
-else()
-  # silence a warning when including FindKOKKOS.cmake
-  set(CMAKE_CXX_EXTENSIONS OFF)
-  find_package(Kokkos 3.7.0 QUIET
-    HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
-    )
+# The minimal Kokkos version we support
+set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.7.0)
 
-  set(KOKKOS_FOUND ${Kokkos_FOUND})
+#
+# Make sure that we prioritize Kokkos bundled with Trilinos or PETSc.
+#
+# We do this by searching for the Kokkos installation first at the
+# restrictive path locations we deduced from both configurations.
+#
 
-  set(_target Kokkos::kokkos)
-  process_feature(KOKKOS
-    TARGETS REQUIRED _target
+if(Kokkos_FOUND)
+  message(WARNING "\n"
+    "find_package(Kokkos [...]) already called. The deal.II CMake "
+    "configuration might be inconsistent.\n\n"
     )
 endif()
 
+if(DEAL_II_WITH_TRILINOS AND TRILINOS_WITH_KOKKOS)
+  message(STATUS "Found Trilinos with bundled Kokkos library. Overriding search path.")
+  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
+  find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
+    PATHS ${TRILINOS_KOKKOS_DIR} NO_DEFAULT_PATH
+    )
 
-if(Kokkos_FOUND)
-  if(NOT Kokkos_VERSION)
-    message(FATAL_ERROR "FindPackage(Kokkos) did not set Kokkos_VERSION!")
+  if(NOT Kokkos_FOUND)
+    message(WARNING "\n"
+      "The find_package(Kokkos [...]) call failed with the path deduced from "
+      "the Trilinos configuration. The deal.II CMake configuration might be "
+      "inconsistent.\n\n"
+      )
   endif()
+
+elseif(DEAL_II_WITH_PETSC AND PETSC_WITH_KOKKOS)
+  message(STATUS "Found PETSc with bundled Kokkos library. Overriding search path.")
+  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
+  find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
+    PATHS ${PETSC_KOKKOS_DIR} NO_DEFAULT_PATH
+    )
+
+  if(NOT Kokkos_FOUND)
+    message(WARNING "\n"
+      "The find_package(Kokkos [...]) call failed with the path deduced from "
+      "the PETSc configuration. The deal.II CMake configuration might be "
+      "inconsistent.\n\n"
+      )
+  endif()
+endif()
+
+#
+# Find the Kokkos CMake configuration:
+#
+
+find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET HINTS ${KOKKOS_DIR})
+
+set(_target)
+if(Kokkos_FOUND)
+  set(_target Kokkos::kokkos)
+endif()
+
+process_feature(KOKKOS
+  TARGETS REQUIRED _target
+  CLEAR Kokkos_DIR
+  )
+
+if(KOKKOS_FOUND)
+  #
+  # Set version number:
+  #
+  if(NOT Kokkos_VERSION)
+    message(WARNING "\n"
+      "find_package(Kokkos [...]) did not set Kokkos_VERSION!"
+      )
+    set(Kokkos_VERSION ${KOKKOS_MINIMUM_REQUIRED_VERSION})
+  endif()
+  set(KOKKOS_VERSION ${Kokkos_VERSION})
 
   if (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP)
     # In version older than 3.7.0, Kokkos::Array::operator[] is not constexpr,
@@ -60,6 +113,7 @@ if(Kokkos_FOUND)
       list(REMOVE_ITEM DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
     endif()
   endif()
+
   if(Kokkos_ENABLE_CUDA)
     # We need to disable SIMD vectorization for CUDA device code.
     # Otherwise, nvcc compilers from version 9 on will emit an error message like:
