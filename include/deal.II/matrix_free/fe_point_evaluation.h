@@ -3200,7 +3200,17 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::get_normal_derivative(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, this->gradients.size());
-  return this->gradients[point_index] * normal_vector(point_index);
+
+  value_type normal_derivative;
+  if constexpr (n_components == 1)
+    normal_derivative =
+      this->gradients[point_index] * normal_vector(point_index);
+  else
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      normal_derivative[comp] =
+        this->gradients[point_index][comp] * normal_vector(point_index);
+
+  return normal_derivative;
 }
 
 
@@ -3215,8 +3225,9 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::
   if constexpr (n_components == 1)
     this->gradients[point_index] = value * normal_vector(point_index);
   else
-    this->gradients[point_index] =
-      outer_product(value, normal_vector(point_index));
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      this->gradients[point_index][comp] =
+        value[comp] * normal_vector(point_index);
 }
 
 
@@ -3958,7 +3969,17 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
   get_normal_derivative(const unsigned int point_index) const
 {
   AssertIndexRange(point_index, this->gradients.size());
-  return this->gradients[point_index] * normal_vector(point_index);
+
+  value_type normal_derivative;
+  if constexpr (n_components == 1)
+    normal_derivative =
+      this->gradients[point_index] * normal_vector(point_index);
+  else
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      normal_derivative[comp] =
+        this->gradients[point_index][comp] * normal_vector(point_index);
+
+  return normal_derivative;
 }
 
 
@@ -3973,8 +3994,9 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
   if constexpr (n_components == 1)
     this->gradients[point_index] = value * normal_vector(point_index);
   else
-    this->gradients[point_index] =
-      outer_product(value, normal_vector(point_index));
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      this->gradients[point_index][comp] =
+        value[comp] * normal_vector(point_index);
 }
 
 DEAL_II_NAMESPACE_CLOSE
