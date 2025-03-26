@@ -664,12 +664,7 @@ namespace Portable
           MemorySpace::Default::kokkos_space::execution_space exec;
           Kokkos::TeamPolicy<
             MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(
-#if KOKKOS_VERSION >= 20900
-              exec,
-#endif
-              n_cells[i],
-              Kokkos::AUTO);
+            team_policy(exec, n_cells[i], Kokkos::AUTO);
 
           Kokkos::parallel_for(
             "dealii::MatrixFree::evaluate_coeff_cell_loop",
@@ -677,22 +672,18 @@ namespace Portable
             KOKKOS_LAMBDA(const Kokkos::TeamPolicy<
                           MemorySpace::Default::kokkos_space::execution_space>::
                             member_type &team_member) {
-              Kokkos::parallel_for(
-#if KOKKOS_VERSION >= 20900
-                Kokkos::TeamVectorRange(team_member, n_q_points),
-#else
-                Kokkos::TeamThreadRange(team_member, n_q_points),
-#endif
-                [&](const int q_point) {
-                  const int cell = team_member.league_rank();
+              Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member,
+                                                           n_q_points),
+                                   [&](const int q_point) {
+                                     const int cell = team_member.league_rank();
 
-                  Data data{team_member,
-                            cell,
-                            &color_data,
-                            /*shared_data*/ nullptr};
+                                     Data data{team_member,
+                                               cell,
+                                               &color_data,
+                                               /*shared_data*/ nullptr};
 
-                  func(&data, cell, q_point);
-                });
+                                     func(&data, cell, q_point);
+                                   });
             });
         }
   }
@@ -1037,12 +1028,7 @@ namespace Portable
           MemorySpace::Default::kokkos_space::execution_space exec;
           Kokkos::TeamPolicy<
             MemorySpace::Default::kokkos_space::execution_space>
-            team_policy(
-#if KOKKOS_VERSION >= 20900
-              exec,
-#endif
-              n_cells[color],
-              Kokkos::AUTO);
+            team_policy(exec, n_cells[color], Kokkos::AUTO);
 
 
           internal::
@@ -1099,12 +1085,7 @@ namespace Portable
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(
-#if KOKKOS_VERSION >= 20900
-                    exec,
-#endif
-                    n_cells[0],
-                    Kokkos::AUTO);
+                  team_policy(exec, n_cells[0], Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                   func, get_data(0), src, dst);
@@ -1122,12 +1103,7 @@ namespace Portable
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(
-#if KOKKOS_VERSION >= 20900
-                    exec,
-#endif
-                    n_cells[1],
-                    Kokkos::AUTO);
+                  team_policy(exec, n_cells[1], Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                   func, get_data(1), src, dst);
@@ -1150,12 +1126,7 @@ namespace Portable
               {
                 Kokkos::TeamPolicy<
                   MemorySpace::Default::kokkos_space::execution_space>
-                  team_policy(
-#if KOKKOS_VERSION >= 20900
-                    exec,
-#endif
-                    n_cells[2],
-                    Kokkos::AUTO);
+                  team_policy(exec, n_cells[2], Kokkos::AUTO);
 
                 internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                   func, get_data(2), src, dst);
@@ -1183,12 +1154,7 @@ namespace Portable
                 {
                   Kokkos::TeamPolicy<
                     MemorySpace::Default::kokkos_space::execution_space>
-                    team_policy(
-#if KOKKOS_VERSION >= 20900
-                      exec,
-#endif
-                      n_cells[i],
-                      Kokkos::AUTO);
+                    team_policy(exec, n_cells[i], Kokkos::AUTO);
 
                   internal::ApplyKernel<dim, Number, Functor, false>
                     apply_kernel(func, get_data(i), src, dst);
@@ -1220,12 +1186,7 @@ namespace Portable
             {
               Kokkos::TeamPolicy<
                 MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(
-#if KOKKOS_VERSION >= 20900
-                  exec,
-#endif
-                  n_cells[i],
-                  Kokkos::AUTO);
+                team_policy(exec, n_cells[i], Kokkos::AUTO);
 
               internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
                 func, get_data(i), ghosted_src, ghosted_dst);
