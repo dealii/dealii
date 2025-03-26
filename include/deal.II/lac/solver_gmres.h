@@ -697,11 +697,13 @@ public:
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename... PreconditionerTypes>
-  void
-  solve(const MatrixType &A,
-        VectorType       &x,
-        const VectorType &b,
-        const PreconditionerTypes &...preconditioners);
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+  void solve(const MatrixType &A,
+             VectorType       &x,
+             const VectorType &b,
+             const PreconditionerTypes &...preconditioners);
 
 protected:
   /**
@@ -2052,12 +2054,16 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename... PreconditionerTypes>
-void
-SolverMPGMRES<VectorType>::solve(const MatrixType &A,
-                                 VectorType       &x,
-                                 const VectorType &b,
-                                 const PreconditionerTypes &...preconditioners)
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+void SolverMPGMRES<VectorType>::solve(
+  const MatrixType &A,
+  VectorType       &x,
+  const VectorType &b,
+  const PreconditionerTypes &...preconditioners)
 {
   LogStream::Prefix prefix("MPGMRES");
   SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioners...);
@@ -2066,6 +2072,7 @@ SolverMPGMRES<VectorType>::solve(const MatrixType &A,
 
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename... PreconditionerTypes>
 void
 SolverMPGMRES<VectorType>::solve_internal(
