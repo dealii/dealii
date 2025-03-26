@@ -37,6 +37,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <utility>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -695,25 +696,23 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template <typename MatrixType, typename PreconditionerType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
-     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
-  void solve(const MatrixType         &A,
-             VectorType               &x,
-             const VectorType         &b,
-             const PreconditionerType &preconditioner);
+  template <typename MatrixType, typename... PreconditionerTypes>
+  void
+  solve(const MatrixType &A,
+        VectorType       &x,
+        const VectorType &b,
+        const PreconditionerTypes &...preconditioners);
 
 protected:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template <typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename... PreconditionerTypes>
   void
-  solve_internal(const MatrixType         &A,
-                 VectorType               &x,
-                 const VectorType         &b,
-                 const PreconditionerType &preconditioner);
+  solve_internal(const MatrixType &A,
+                 VectorType       &x,
+                 const VectorType &b,
+                 const PreconditionerTypes &...preconditioners);
 
 private:
   /**
@@ -2053,31 +2052,66 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
 
 
 template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-template <typename MatrixType, typename PreconditionerType>
-DEAL_II_CXX20_REQUIRES(
-  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
-   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
-void SolverMPGMRES<VectorType>::solve(const MatrixType         &A,
-                                      VectorType               &x,
-                                      const VectorType         &b,
-                                      const PreconditionerType &preconditioner)
+template <typename MatrixType, typename... PreconditionerTypes>
+void
+SolverMPGMRES<VectorType>::solve(const MatrixType &A,
+                                 VectorType       &x,
+                                 const VectorType &b,
+                                 const PreconditionerTypes &...preconditioners)
 {
   LogStream::Prefix prefix("MPGMRES");
-  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioner);
+  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioners...);
 }
 
 
 
 template <typename VectorType>
-template <typename MatrixType, typename PreconditionerType>
+template <typename MatrixType, typename... PreconditionerTypes>
 void
 SolverMPGMRES<VectorType>::solve_internal(
-  const MatrixType         &A,
-  VectorType               &x,
-  const VectorType         &b,
-  const PreconditionerType &preconditioner)
+  const MatrixType &A,
+  VectorType       &x,
+  const VectorType &b,
+  const PreconditionerTypes &...preconditioners)
 {
+  constexpr std::size_t n_preconditioners = sizeof...(PreconditionerTypes);
+
+  //
+  // With each invocation of preconditioner_vmult we increase the
+  // variable current_index by one modulo n_preconditioners.
+  //
+  std::size_t current_index = 0;
+
+  //
+  // A lambda that cycles through all preconditioners in sequence applying
+  // one to the vector src and storing the result in dst:
+  //
+  const auto preconditioner_vmult = [&](auto &dst, const auto &src) {
+    // We have no preconditioner that we could apply
+    if (n_preconditioners == 0)
+      {
+        dst = src;
+        return;
+      }
+
+    //
+    // We cycle through all preconditioners and call the one with a
+    // matching index:
+    //
+    std::size_t n = 0;
+
+    const auto call_current_preconditioner = [&](const auto &preconditioner) {
+      if (n++ == current_index)
+        preconditioner.vmult(dst, src);
+    };
+
+    // https://en.cppreference.com/w/cpp/language/fold
+    (call_current_preconditioner(preconditioners), ...);
+
+    current_index = (current_index + 1) % n_preconditioners;
+  };
+
+
   SolverControl::State iteration_state = SolverControl::iterate;
 
   const unsigned int basis_size = additional_data.max_basis_size;
@@ -2126,7 +2160,7 @@ SolverMPGMRES<VectorType>::solve_internal(
               iteration_state == SolverControl::iterate);
            ++inner_iteration)
         {
-          preconditioner.vmult(z(inner_iteration, x), v[inner_iteration]);
+          preconditioner_vmult(z(inner_iteration, x), v[inner_iteration]);
           A.vmult(v(inner_iteration + 1, x), z[inner_iteration]);
 
           res =
