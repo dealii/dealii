@@ -2524,9 +2524,7 @@ namespace internal
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, optional_offset, optional_offset + size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-#if KOKKOS_VERSION < 30400
-            update += std::abs(data.values(i));
-#elif KOKKOS_VERSION < 30700
+#if KOKKOS_VERSION < 30700
             update += Kokkos::Experimental::fabs(data.values(i));
 #else
             update += Kokkos::abs(data.values(i));
@@ -2554,9 +2552,7 @@ namespace internal
             ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
             exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-#if KOKKOS_VERSION < 30400
-            update += std::pow(fabs(data.values(i)), exp);
-#elif KOKKOS_VERSION < 30700
+#if KOKKOS_VERSION < 30700
             update += Kokkos::Experimental::pow(
               Kokkos::Experimental::fabs(data.values(i)), exp);
 #else
