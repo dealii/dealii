@@ -131,16 +131,12 @@ class LaplaceOperatorLocal
 {
 public:
   DEAL_II_HOST_DEVICE void
-  operator()(const unsigned int                                      cell,
-             const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-             Portable::SharedData<dim, Number> *shared_data,
-             const Number                      *src,
-             Number                            *dst) const
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
+             const Portable::DeviceVector<double>                   &src,
+             Portable::DeviceVector<double>                         &dst) const
   {
-    (void)cell; // TODO?
-
     Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(
-      /*cell,*/ gpu_data, shared_data);
+      gpu_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(
