@@ -510,9 +510,15 @@ namespace SparseMatrixTools
                       const types::global_dof_index ind =
                         system_matrix.get_sparsity_pattern()(
                           local_dof_indices[i], local_dof_indices[j]);
-                      if (ind != numbers::invalid_dof_index)
+
+                      // If SparsityPattern::operator()` found the entry, then
+                      // we can access the corresponding value without a
+                      // second search in the sparse matrix, otherwise the
+                      // matrix entry at that index is zero because it does
+                      // not exist in the sparsity pattern
+                      if (ind != SparsityPattern::invalid_entry)
                         {
-                          SparseMatrixIterators::Accessor<Number, true>
+                          const SparseMatrixIterators::Accessor<Number, true>
                             accessor(&system_matrix, ind);
                           cell_matrix(i, j) = accessor.value();
                         }
