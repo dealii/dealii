@@ -22,7 +22,7 @@ DEAL:0::type: dealii::TrilinosWrappers::MPI::Vector
 DEAL:0::index set size: 4
 DEAL:0::local size: 4
 DEAL:0::size: 16
-DEAL:0::type: dealii::LinearAlgebra::distributed::BlockVector<double>
+DEAL:0::type: dealii::LinearAlgebra::distributed::BlockVector<double, dealii::MemorySpace::Host>
 DEAL:0::local size: 8
 DEAL:0::size: 32
 DEAL:0::type: dealii::PETScWrappers::MPI::BlockVector
@@ -55,7 +55,7 @@ DEAL:1::type: dealii::TrilinosWrappers::MPI::Vector
 DEAL:1::index set size: 4
 DEAL:1::local size: 4
 DEAL:1::size: 16
-DEAL:1::type: dealii::LinearAlgebra::distributed::BlockVector<double>
+DEAL:1::type: dealii::LinearAlgebra::distributed::BlockVector<double, dealii::MemorySpace::Host>
 DEAL:1::local size: 8
 DEAL:1::size: 32
 DEAL:1::type: dealii::PETScWrappers::MPI::BlockVector
@@ -89,7 +89,7 @@ DEAL:2::type: dealii::TrilinosWrappers::MPI::Vector
 DEAL:2::index set size: 4
 DEAL:2::local size: 4
 DEAL:2::size: 16
-DEAL:2::type: dealii::LinearAlgebra::distributed::BlockVector<double>
+DEAL:2::type: dealii::LinearAlgebra::distributed::BlockVector<double, dealii::MemorySpace::Host>
 DEAL:2::local size: 8
 DEAL:2::size: 32
 DEAL:2::type: dealii::PETScWrappers::MPI::BlockVector
@@ -123,7 +123,7 @@ DEAL:3::type: dealii::TrilinosWrappers::MPI::Vector
 DEAL:3::index set size: 4
 DEAL:3::local size: 4
 DEAL:3::size: 16
-DEAL:3::type: dealii::LinearAlgebra::distributed::BlockVector<double>
+DEAL:3::type: dealii::LinearAlgebra::distributed::BlockVector<double, dealii::MemorySpace::Host>
 DEAL:3::local size: 8
 DEAL:3::size: 32
 DEAL:3::type: dealii::PETScWrappers::MPI::BlockVector
