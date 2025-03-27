@@ -375,6 +375,7 @@ namespace Portable
        */
       TeamHandle team_member;
 
+      const unsigned int       n_dofhandler;
       const int                cell_index;
       const PrecomputedData   *precomputed_data;
       SharedData<dim, Number> *shared_data;
