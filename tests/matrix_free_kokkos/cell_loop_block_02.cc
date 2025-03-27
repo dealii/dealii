@@ -97,25 +97,31 @@ public:
 
     fe_eval.read_dof_values(src.block(0));
     fe_eval.distribute_local_to_global(dst.block(0));
+    fe_eval.read_dof_values(src.block(1));
+    fe_eval.distribute_local_to_global(dst.block(1));
   }
 
   void
   test() const
   {
     LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> dst(
-      1);
+      2);
     LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default> src(
-      1);
+      2);
 
     data.initialize_dof_vector(dst.block(0));
+    data.initialize_dof_vector(dst.block(1));
     data.initialize_dof_vector(src.block(0));
-    src.add(1.0);
+    data.initialize_dof_vector(src.block(1));
+    src.block(0).add(1.0);
+    src.block(1).add(2.0);
 
     data.cell_loop(*this, src, dst);
 
     Kokkos::fence();
 
-    deallog << "OK:" << dst.block(0).linfty_norm() << std::endl;
+    deallog << "OK:" << dst.block(0).linfty_norm() << " "
+            << dst.block(1).linfty_norm() << std::endl;
   }
 
 protected:
