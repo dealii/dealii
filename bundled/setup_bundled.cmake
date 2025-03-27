@@ -73,11 +73,11 @@ option(DEAL_II_FORCE_BUNDLED_KOKKOS
   "Always use the bundled Kokkos library instead of an external one."
   OFF)
 
-set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
+set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-4.5.01")
 
 macro(feature_kokkos_configure_bundled)
-  set(Kokkos_VERSION "3.7.0")
-  set(KOKKOS_VERSION "3.7.0")
+  set(Kokkos_VERSION "4.5.0")
+  set(KOKKOS_VERSION "4.5.1")
   set(Kokkos_DEVICES "Serial")
   set(Kokkos_ARCH " ")
 
@@ -86,6 +86,7 @@ macro(feature_kokkos_configure_bundled)
     ${KOKKOS_FOLDER}/containers/src
     ${KOKKOS_FOLDER}/core/src
     ${KOKKOS_FOLDER}/simd/src
+    ${KOKKOS_FOLDER}/tpls/mdspan/include
     ${KOKKOS_FOLDER}/tpls/desul/include
     )
 endmacro()
