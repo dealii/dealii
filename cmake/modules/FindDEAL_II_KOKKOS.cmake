@@ -169,13 +169,6 @@ if(KOKKOS_FOUND)
   #
   # Extract version numbers:
   #
-  if(NOT KOKKOS_VERSION)
-    if(Kokkos_VERSION)
-      set(KOKKOS_VERSION "${Kokkos_VERSION}")
-    else()
-      message(FATAL_ERROR "FindPackage(Kokkos) did not set KOKKOS_VERSION!")
-    endif()
-  endif()
 
   string(REGEX REPLACE
     "^([0-9]+).*$" "\\1"
