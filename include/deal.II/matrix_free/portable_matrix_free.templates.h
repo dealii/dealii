@@ -418,8 +418,11 @@ namespace Portable
 
         SharedData<dim, Number> shared_data(values, gradients, scratch_pad);
 
+        const unsigned int cell_index = team_member.league_rank();
+
         typename MatrixFree<dim, Number>::Data data{team_member,
-                                                    team_member.league_rank(),
+                                                    /* n_dofhandler */ 1,
+                                                    cell_index,
                                                     &gpu_data,
                                                     &shared_data};
 
@@ -675,14 +678,16 @@ namespace Portable
               Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member,
                                                            n_q_points),
                                    [&](const int q_point) {
-                                     const int cell = team_member.league_rank();
+                                     const int cell_index =
+                                       team_member.league_rank();
 
                                      Data data{team_member,
-                                               cell,
+                                               /* n_dofhandler */ 1,
+                                               cell_index,
                                                &color_data,
-                                               /*shared_data*/ nullptr};
+                                               /* shared_data */ nullptr};
 
-                                     func(&data, cell, q_point);
+                                     func(&data, cell_index, q_point);
                                    });
             });
         }
