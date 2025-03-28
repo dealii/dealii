@@ -700,12 +700,14 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
-    explicit AdditionalData(const unsigned int max_basis_size = 30,
+    explicit AdditionalData(const unsigned int max_basis_size         = 30,
+                            const bool use_truncated_mpgmres_strategy = true,
                             const LinearAlgebra::OrthogonalizationStrategy
                               orthogonalization_strategy =
                                 LinearAlgebra::OrthogonalizationStrategy::
                                   delayed_classical_gram_schmidt)
       : max_basis_size(max_basis_size)
+      , use_truncated_mpgmres_strategy(use_truncated_mpgmres_strategy)
       , orthogonalization_strategy(orthogonalization_strategy)
     {}
 
@@ -713,6 +715,17 @@ public:
      * Maximum basis size.
      */
     unsigned int max_basis_size;
+
+    /**
+     * If set to true (the default) a "truncated" search space is
+     * constructed consisting of the span of independent Krylov space
+     * associated with each preconditioner. If set to false, the full
+     * MPGMRES strategy for constructing the search space is used. This
+     * space consists of all possible combinations of iterative
+     * preconditioner applications; see the documentation of SolverMPGMRES
+     * for details.
+     */
+    bool use_truncated_mpgmres_strategy;
 
     /**
      * Strategy to orthogonalize vectors.
@@ -750,7 +763,7 @@ protected:
   /**
    * Indexing strategy to construct the search space.
    *
-   * This enum class is internally used in the impelmentation of the
+   * This enum class is internally used in the implementation of the
    * MPGMRES algorithm to switch between the strategies.
    */
   enum class IndexingStrategy
@@ -820,7 +833,34 @@ DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverFGMRES : public SolverMPGMRES<VectorType>
 {
 public:
-  using AdditionalData = typename SolverMPGMRES<VectorType>::AdditionalData;
+  /**
+   * Standardized data struct to pipe additional data to the solver.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Constructor. By default, set the maximum basis size to 30.
+     */
+    explicit AdditionalData( //
+      const unsigned int max_basis_size = 30,
+      const LinearAlgebra::OrthogonalizationStrategy
+        orthogonalization_strategy = LinearAlgebra::OrthogonalizationStrategy::
+          delayed_classical_gram_schmidt)
+      : max_basis_size(max_basis_size)
+      , orthogonalization_strategy(orthogonalization_strategy)
+    {}
+
+    /**
+     * Maximum basis size.
+     */
+    unsigned int max_basis_size;
+
+    /**
+     * Strategy to orthogonalize vectors.
+     */
+    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
+  };
+
 
   /**
    * Constructor.
@@ -2102,7 +2142,10 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl            &cn,
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {
-  indexing_strategy = IndexingStrategy::truncated_mpgmres;
+  if (data.use_truncated_mpgmres_strategy)
+    indexing_strategy = IndexingStrategy::truncated_mpgmres;
+  else
+    indexing_strategy = IndexingStrategy::full_mpgmres;
 }
 
 
@@ -2114,7 +2157,10 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
   : SolverBase<VectorType>(cn)
   , additional_data(data)
 {
-  indexing_strategy = IndexingStrategy::truncated_mpgmres;
+  if (data.use_truncated_mpgmres_strategy)
+    indexing_strategy = IndexingStrategy::truncated_mpgmres;
+  else
+    indexing_strategy = IndexingStrategy::full_mpgmres;
 }
 
 
@@ -2296,7 +2342,10 @@ DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData     &data)
-  : SolverMPGMRES<VectorType>(cn, mem, data)
+  : SolverMPGMRES<VectorType>(cn,
+                              mem,
+                              {data.max_basis_size,
+                               data.orthogonalization_strategy})
 {
   this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
@@ -2307,7 +2356,9 @@ template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
                                        const AdditionalData &data)
-  : SolverMPGMRES<VectorType>(cn, data)
+  : SolverMPGMRES<VectorType>(cn,
+                              {data.max_basis_size,
+                               data.orthogonalization_strategy})
 {
   this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
