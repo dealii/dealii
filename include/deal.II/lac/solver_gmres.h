@@ -878,19 +878,15 @@ public:
 
   /**
    * Solve the linear system $Ax=b$ for x.
-   *
-   * @note If you want to use more than one preconditioner, then you will
-   * need to supply a @p preconditioner object that switches
-   * preconditioners for each vmult() invocation.
    */
-  template <typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename... PreconditionerTypes>
   DEAL_II_CXX20_REQUIRES(
     (concepts::is_linear_operator_on<MatrixType, VectorType> &&
-     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
-  void solve(const MatrixType         &A,
-             VectorType               &x,
-             const VectorType         &b,
-             const PreconditionerType &preconditioner);
+     (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+  void solve(const MatrixType &A,
+             VectorType       &x,
+             const VectorType &b,
+             const PreconditionerTypes &...preconditioners);
 };
 
 /** @} */
@@ -2378,17 +2374,18 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
 
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-template <typename MatrixType, typename PreconditionerType>
+template <typename MatrixType, typename... PreconditionerTypes>
 DEAL_II_CXX20_REQUIRES(
   (concepts::is_linear_operator_on<MatrixType, VectorType> &&
-   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
-void SolverFGMRES<VectorType>::solve(const MatrixType         &A,
-                                     VectorType               &x,
-                                     const VectorType         &b,
-                                     const PreconditionerType &preconditioner)
+   (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+void SolverFGMRES<VectorType>::solve(
+  const MatrixType &A,
+  VectorType       &x,
+  const VectorType &b,
+  const PreconditionerTypes &...preconditioners)
 {
   LogStream::Prefix prefix("FGMRES");
-  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioner);
+  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioners...);
 }
 
 
