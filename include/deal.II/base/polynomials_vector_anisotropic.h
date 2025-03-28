@@ -35,7 +35,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * This class implements vector-valued anisotropic polynomials and can be
  * used further for the generation of vector-valued polynomials with
- * degrees being different in tangential and normal directions. The known
+ * degrees being different in the `dim - 1` tangential directions and the
+ * normal direction, respectively. The known
  * examples include Raviart-Thomas and Nédélec polynomials.
  * @ingroup Polynomials
  */
@@ -92,13 +93,13 @@ public:
                 const unsigned int tangential_degree);
 
   /**
-   * Return degree of polynomials in tangential direction
+   * Return degree of polynomials in tangential direction.
    */
   unsigned int
   get_tangential_degree() const;
 
   /**
-   * Return degree of polynomials in normal direction
+   * Return degree of polynomials in normal direction.
    */
   unsigned int
   get_normal_degree() const;
@@ -132,11 +133,15 @@ private:
 
   /**
    * An object representing the polynomial space for a single component.
+   * We can re-use it for all components by rotating the coordinates of the
+   * evaluation point.
    */
   const AnisotropicPolynomials<dim> polynomial_space;
 
   /**
-   * Renumbering from lexicographic to hierarchic order.
+   * Renumbering from lexicographic order that is used in the underlying
+   * scalar anisotropic tensor-product polynomial space to the numbering
+   * used by the finite element.
    */
   std::vector<unsigned int> lexicographic_to_hierarchic;
 
