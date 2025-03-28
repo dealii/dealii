@@ -634,20 +634,59 @@ protected:
 };
 
 
-
 /**
  * Implementation of the multiply preconditioned generalized minimal
  * residual method (MPGMRES).
  *
- * This is a variant of the flexible GMRES method that uses multiple
- * preconditioners to construct independent Krylov subspaces, one for each
- * preconditioner. In contrast, the flexible GMRES  method implemented in
- * SolverFGMRES constructs only one "Krylov subspace."
+ * This method is a variant of the flexible GMRES, utilizing N
+ * preconditioners to search for a solution within a multi-Krylov space.
+ * These spaces are characterized by by all possible N-variate,
+ * non-commuting polynomials of the preconditioners and system matrix
+ * applied to a residual up to some fixed degree. In contrast, the flexible
+ * GMRES method implemented in SolverFGMRES constructs only one "Krylov"
+ * subspace, which is formed by univariate polynomials in one
+ * preconditioner that may change at each iteration.
  *
- * TODO add longer description
+ * We implement two strategies, a "full" and a "truncated" MPGMRES version
+ * that differ in how they construct Krylov subspaces. The full MPGMRES
+ * version constructs a Krylov subspace for every possible combination of
+ * preconditioner application to the initial residual. For two
+ * preconditioners $P_1$, $P_2$ this looks as follows:
+ * @f{align*}{
+ *   r, P_1r, P_2r, P_1AP_1r, P_2AP_1r, P_1AP_2r, P_2AP_2r, P_1AP_1AP_1r,
+ *   P_2AP_1AP_1r, P_1AP_2AP_1r, P_2AP_2AP_1r, P_1AP_1AP_2r, P_2AP_1AP_2r,
+ *   P_1AP_2AP_2r, P_2AP_2AP_2r, \ldots
+ * @f}
+ * The truncated version constructs independent Krylov subspaces as
+ * follows:
+ * @f{align*}{
+ *   r, P_1r, P_2r, P_1AP_1r, P_2AP_2r, P_1AP_1AP_1r, P_2AP_2AP_2r, \ldots
+ * @f}
+ * For reference, FGMRES uses the following construction:
+ * @f{align*}{
+ *   r, P_1r, P_2P_1r, P_1P_2P_1r, \ldots
+ * @f}
  *
  * For more details see @cite Greif2017.
+ *
+ * @note The present implementation of MPGMRES differs from the one
+ * outlined in @cite Greif2017 in how one iteration is defined. Our
+ * implementation constructs the search space one vector at a time,
+ * producing a new iterate with each addition. In contrast, the routine
+ * prescribed in @cite Greif2017 uses blocking to construct an iterate
+ * corresponding to the total polynomial degree of each multi-Krylov space.
+ *
+ * @note This method always uses right preconditioning, as opposed to
+ * SolverGMRES, which allows the user to choose between left and right
+ * preconditioning.
+ *
+ * @note FGMRES needs two vectors in each iteration steps yielding a total
+ * of <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
+ * vectors. Otherwise, FGMRES requires roughly the same number of
+ * operations per iteration compared to GMRES, except one application of
+ * the preconditioner less at each restart and at the end of solve().
  */
+
 template <typename VectorType = Vector<double>>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverMPGMRES : public SolverBase<VectorType>
@@ -710,20 +749,14 @@ public:
 protected:
   /**
    * Indexing strategy to construct the search space.
+   *
+   * This enum class is internally used in the impelmentation of the
+   * MPGMRES algorithm to switch between the strategies.
    */
   enum class IndexingStrategy
   {
-    /**
-     * FGMRES
-     */
     fgmres,
-    /**
-     * Truncated MPGMRES
-     */
     truncated_mpgmres,
-    /**
-     * Full MPGMRES
-     */
     full_mpgmres,
   };
 
@@ -764,21 +797,23 @@ private:
  * Implementation of the generalized minimal residual method with flexible
  * preconditioning (flexible GMRES or FGMRES).
  *
- * This flexible version of the GMRES method allows for the use of a different
- * preconditioner in each iteration step. Therefore, it is also more robust
- * with respect to inaccurate evaluation of the preconditioner. An important
- * application is the use of a Krylov space method inside the
- * preconditioner. As opposed to SolverGMRES which allows one to choose
- * between left and right preconditioning, this solver always applies the
- * preconditioner from the right.
- *
- * FGMRES needs two vectors in each iteration steps yielding a total of
- * <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
- * vectors. Otherwise, FGMRES requires roughly the same number of operations
- * per iteration compared to GMRES, except one application of the
- * preconditioner less at each restart and at the end of solve().
+ * This flexible version of the GMRES method allows for the use of a
+ * different preconditioner in each iteration step. Therefore, it is also
+ * more robust with respect to inaccurate evaluation of the preconditioner.
+ * An important application is the use of a Krylov space method inside the
+ * preconditioner with low solver tolerance.
  *
  * For more details see @cite Saad1991.
+ *
+ * @note This method always uses right preconditioning, as opposed to
+ * SolverGMRES, which allows the user to choose between left and right
+ * preconditioning.
+ *
+ * @note FGMRES needs two vectors in each iteration steps yielding a total
+ * of <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
+ * vectors. Otherwise, FGMRES requires roughly the same number of
+ * operations per iteration compared to GMRES, except one application of
+ * the preconditioner less at each restart and at the end of solve().
  */
 template <typename VectorType = Vector<double>>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
@@ -2105,8 +2140,7 @@ void SolverMPGMRES<VectorType>::solve(
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename... PreconditionerTypes>
-void
-SolverMPGMRES<VectorType>::solve_internal(
+void SolverMPGMRES<VectorType>::solve_internal(
   const MatrixType &A,
   VectorType       &x,
   const VectorType &b,
