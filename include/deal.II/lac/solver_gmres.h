@@ -2342,10 +2342,13 @@ DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData     &data)
-  : SolverMPGMRES<VectorType>(cn,
-                              mem,
-                              {data.max_basis_size,
-                               data.orthogonalization_strategy})
+  : SolverMPGMRES<VectorType>(
+      cn,
+      mem,
+      typename SolverMPGMRES<VectorType>::AdditionalData{
+        data.max_basis_size,
+        true,
+        data.orthogonalization_strategy})
 {
   this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
@@ -2356,9 +2359,12 @@ template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
                                        const AdditionalData &data)
-  : SolverMPGMRES<VectorType>(cn,
-                              {data.max_basis_size,
-                               data.orthogonalization_strategy})
+  : SolverMPGMRES<VectorType>(
+      cn,
+      typename SolverMPGMRES<VectorType>::AdditionalData{
+        data.max_basis_size,
+        true,
+        data.orthogonalization_strategy})
 {
   this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
