@@ -73,7 +73,7 @@ namespace Portable
    * of blocks in a BlockVector and the number of FEEvaluation objects that can
    * be active in a single cell_loop().
    */
-  static constexpr const unsigned int n_max_dof_handlers = 5;
+  inline constexpr const unsigned int n_max_dof_handlers = 5;
 
   /**
    * Type for source and destination vectors in device functions like
