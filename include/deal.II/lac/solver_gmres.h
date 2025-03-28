@@ -2204,7 +2204,8 @@ void SolverMPGMRES<VectorType>::solve_internal(
   // A lambda that cycles through all preconditioners in sequence applying
   // one to the vector src and storing the result in dst:
   //
-  const auto preconditioner_vmult = [&](auto &dst, const auto &src) {
+  const auto preconditioner_vmult = [&, n_preconditioners](auto       &dst,
+                                                           const auto &src) {
     // We have no preconditioner that we could apply
     if (n_preconditioners == 0)
       {
@@ -2233,7 +2234,8 @@ void SolverMPGMRES<VectorType>::solve_internal(
   // Return the correct index for constructing the next vector in the
   // Krylov space sequence according to the chosen indexing strategy
   //
-  const auto previous_vector_index = [this](unsigned int i) -> unsigned int {
+  const auto previous_vector_index =
+    [this, n_preconditioners](unsigned int i) -> unsigned int {
     switch (indexing_strategy)
       {
         case IndexingStrategy::fgmres:
@@ -2245,6 +2247,9 @@ void SolverMPGMRES<VectorType>::solve_internal(
         case IndexingStrategy::truncated_mpgmres:
           // 0, 0, ..., 1, 2, 3, ...
           return (1 + i >= n_preconditioners) ? (1 + i - n_preconditioners) : 0;
+        default:
+          DEAL_II_ASSERT_UNREACHABLE();
+          return 0;
       }
   };
 
@@ -2342,10 +2347,13 @@ DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData     &data)
-  : SolverMPGMRES<VectorType>(cn,
-                              mem,
-                              {data.max_basis_size,
-                               data.orthogonalization_strategy})
+  : SolverMPGMRES<VectorType>(
+      cn,
+      mem,
+      typename SolverMPGMRES<VectorType>::AdditionalData{
+        data.max_basis_size,
+        true,
+        data.orthogonalization_strategy})
 {
   this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
@@ -2356,9 +2364,12 @@ template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
                                        const AdditionalData &data)
-  : SolverMPGMRES<VectorType>(cn,
-                              {data.max_basis_size,
-                               data.orthogonalization_strategy})
+  : SolverMPGMRES<VectorType>(
+      cn,
+      typename SolverMPGMRES<VectorType>::AdditionalData{
+        data.max_basis_size,
+        true,
+        data.orthogonalization_strategy})
 {
   this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
