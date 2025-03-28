@@ -71,7 +71,6 @@ set(_unity_include_src
   polynomials_bernardi_raugel.cc
   polynomials_hermite.cc
   polynomials_nedelec.cc
-  polynomials_nedelec_nodal.cc
   polynomials_integrated_legendre_sz.cc
   polynomial_space.cc
   polynomials_p.cc
@@ -80,6 +79,7 @@ set(_unity_include_src
   polynomials_rannacher_turek.cc
   polynomials_raviart_thomas.cc
   polynomials_rt_bubbles.cc
+  polynomials_vector_anisotropic.cc
   polynomials_wedge.cc
   qprojector.cc
   quadrature.cc
