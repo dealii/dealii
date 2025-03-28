@@ -289,6 +289,8 @@ namespace internal
   } // namespace SolverGMRESImplementation
 } // namespace internal
 
+
+
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized Minimal
  * Residual Method. The stopping criterion is the norm of the residual.
@@ -706,6 +708,31 @@ public:
              const PreconditionerTypes &...preconditioners);
 
 protected:
+  /**
+   * Indexing strategy to construct the search space.
+   */
+  enum class IndexingStrategy
+  {
+    /**
+     * FGMRES
+     */
+    fgmres,
+    /**
+     * Truncated MPGMRES
+     */
+    truncated_mpgmres,
+    /**
+     * Full MPGMRES
+     */
+    full_mpgmres,
+  };
+
+  /**
+   * The indexing strategy chosen for MPGMRES. This internal variable gets
+   * set by the constructor of SolverFGMRES and SolverMPGMRES.
+   */
+  IndexingStrategy indexing_strategy;
+
   /**
    * Solve the linear system $Ax=b$ for x.
    */
@@ -2039,7 +2066,9 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl            &cn,
                                          const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
-{}
+{
+  indexing_strategy = IndexingStrategy::truncated_mpgmres;
+}
 
 
 
@@ -2049,7 +2078,9 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
                                          const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
-{}
+{
+  indexing_strategy = IndexingStrategy::truncated_mpgmres;
+}
 
 
 
@@ -2118,6 +2149,24 @@ SolverMPGMRES<VectorType>::solve_internal(
     current_index = (current_index + 1) % n_preconditioners;
   };
 
+  //
+  // Return the correct index for constructing the next vector in the
+  // Krylov space sequence according to the chosen indexing strategy
+  //
+  const auto previous_vector_index = [this](unsigned int i) -> unsigned int {
+    switch (indexing_strategy)
+      {
+        case IndexingStrategy::fgmres:
+          // 0, 1, 2, 3, ...
+          return i;
+        case IndexingStrategy::full_mpgmres:
+          // 0, 0, ..., 1, 1, ..., 2, 2, ..., 3, 3, ...
+          return i / n_preconditioners;
+        case IndexingStrategy::truncated_mpgmres:
+          // 0, 0, ..., 1, 2, 3, ...
+          return (1 + i >= n_preconditioners) ? (1 + i - n_preconditioners) : 0;
+      }
+  };
 
   SolverControl::State iteration_state = SolverControl::iterate;
 
@@ -2167,7 +2216,8 @@ SolverMPGMRES<VectorType>::solve_internal(
               iteration_state == SolverControl::iterate);
            ++inner_iteration)
         {
-          preconditioner_vmult(z(inner_iteration, x), v[inner_iteration]);
+          preconditioner_vmult(z(inner_iteration, x),
+                               v[previous_vector_index(inner_iteration)]);
           A.vmult(v(inner_iteration + 1, x), z[inner_iteration]);
 
           res =
@@ -2213,7 +2263,9 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData     &data)
   : SolverMPGMRES<VectorType>(cn, mem, data)
-{}
+{
+  this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
+}
 
 
 
@@ -2222,7 +2274,9 @@ DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
                                        const AdditionalData &data)
   : SolverMPGMRES<VectorType>(cn, data)
-{}
+{
+  this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
+}
 
 
 
