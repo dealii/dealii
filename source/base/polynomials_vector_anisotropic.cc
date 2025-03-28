@@ -34,8 +34,8 @@ namespace
   // in classes).
   std::vector<std::vector<Polynomials::Polynomial<double>>>
   create_aniso_polynomials(const unsigned int dim,
-                        const unsigned int normal_degree,
-                        const unsigned int tangential_degree)
+                           const unsigned int normal_degree,
+                           const unsigned int tangential_degree)
   {
     std::vector<std::vector<Polynomials::Polynomial<double>>> pols(dim);
     if (normal_degree > 0)
@@ -61,22 +61,22 @@ namespace
 
 template <int dim>
 PolynomialsVectorAnisotropic<dim>::PolynomialsVectorAnisotropic(
-  const unsigned int normal_degree,
-  const unsigned int tangential_degree,
+  const unsigned int               normal_degree,
+  const unsigned int               tangential_degree,
   const std::vector<unsigned int> &polynomial_ordering)
   : TensorPolynomialsBase<dim>(std::min(normal_degree, tangential_degree),
                                n_polynomials(normal_degree, tangential_degree))
   , normal_degree(normal_degree)
   , tangential_degree(tangential_degree)
   , polynomial_space(
-    create_aniso_polynomials(dim, normal_degree, tangential_degree))
+      create_aniso_polynomials(dim, normal_degree, tangential_degree))
   , lexicographic_to_hierarchic(polynomial_ordering)
 {
   // create renumbering of the unknowns from the lexicographic order to the
   // actual order required by the finite element class with unknowns on
   // faces placed first
   const unsigned int n_pols = polynomial_space.n();
-  
+
   hierarchic_to_lexicographic =
     Utilities::invert_permutation(lexicographic_to_hierarchic);
 

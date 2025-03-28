@@ -28,14 +28,12 @@
 
 template <int dim>
 std::vector<unsigned int>
-get_lexicographic_numbering_RT(
-  const unsigned int normal_degree,
-  const unsigned int tangential_degree);
+get_lexicographic_numbering_RT(const unsigned int normal_degree,
+                               const unsigned int tangential_degree);
 
 template <int dim>
 std::vector<unsigned int>
-  get_lexicographic_numbering_Nedelec(
-  const unsigned int degree);
+get_lexicographic_numbering_Nedelec(const unsigned int degree);
 
 template <int dim>
 void
@@ -54,14 +52,16 @@ plot(const PolynomialsVectorAnisotropic<dim> &poly)
   for (unsigned int k = 0; k < quadrature.size(); ++k)
     {
       if (k % (poly.degree() + 4) == 0)
-        deallog << "VectorAnisotropic" << poly.get_normal_degree() << poly.get_tangential_degree()
-        << '<' << dim << '>' << std::endl;
+        deallog << "VectorAnisotropic" << poly.get_normal_degree()
+                << poly.get_tangential_degree() << '<' << dim << '>'
+                << std::endl;
 
-      deallog << "VectorAnisotropic" << poly.get_normal_degree() << poly.get_tangential_degree()
-       << '<' << dim << '>' << '\t'
+      deallog << "VectorAnisotropic" << poly.get_normal_degree()
+              << poly.get_tangential_degree() << '<' << dim << '>' << '\t'
               << quadrature.point(k);
-      
-      poly.evaluate(quadrature.point(k), values, grads, grads2, thirds, fourths);
+
+      poly.evaluate(
+        quadrature.point(k), values, grads, grads2, thirds, fourths);
 
       for (unsigned int i = 0; i < poly.n(); ++i)
         for (unsigned int d = 0; d < dim; ++d)
@@ -77,37 +77,55 @@ main()
   initlog();
   deallog << std::setprecision(3);
 
-  //Generating Nedelec polynomials in 2D
-  PolynomialsVectorAnisotropic<2> p201(0, 1, get_lexicographic_numbering_Nedelec<2>(0));
-  PolynomialsVectorAnisotropic<2> p212(1, 2, get_lexicographic_numbering_Nedelec<2>(1));
-  PolynomialsVectorAnisotropic<2> p223(2, 3, get_lexicographic_numbering_Nedelec<2>(2));
+  // Generating Nedelec polynomials in 2D
+  PolynomialsVectorAnisotropic<2> p201(
+    0, 1, get_lexicographic_numbering_Nedelec<2>(0));
+  PolynomialsVectorAnisotropic<2> p212(
+    1, 2, get_lexicographic_numbering_Nedelec<2>(1));
+  PolynomialsVectorAnisotropic<2> p223(
+    2, 3, get_lexicographic_numbering_Nedelec<2>(2));
 
   plot(p201);
   plot(p212);
   plot(p223);
 
-  //Generating Nedelec polynomials in 3D
-  PolynomialsVectorAnisotropic<3> p301(0, 1, get_lexicographic_numbering_Nedelec<3>(0));
-  PolynomialsVectorAnisotropic<3> p312(1, 2, get_lexicographic_numbering_Nedelec<3>(1));
-  PolynomialsVectorAnisotropic<3> p323(2, 3, get_lexicographic_numbering_Nedelec<3>(2));
+  // Generating Nedelec polynomials in 3D
+  PolynomialsVectorAnisotropic<3> p301(
+    0, 1, get_lexicographic_numbering_Nedelec<3>(0));
+  PolynomialsVectorAnisotropic<3> p312(
+    1, 2, get_lexicographic_numbering_Nedelec<3>(1));
+  PolynomialsVectorAnisotropic<3> p323(
+    2, 3, get_lexicographic_numbering_Nedelec<3>(2));
 
   plot(p301);
   plot(p312);
   plot(p323);
 
-  //Generating Raviart-Thomas polynomials in 2D
-  PolynomialsVectorAnisotropic<2> p210(1, 0, get_lexicographic_numbering_RT<2>(1, 0));
-  PolynomialsVectorAnisotropic<2> p221(2, 1, get_lexicographic_numbering_RT<2>(2, 1));
-  PolynomialsVectorAnisotropic<2> p232(3, 2, get_lexicographic_numbering_RT<2>(3, 2));
+  // Generating Raviart-Thomas polynomials in 2D
+  PolynomialsVectorAnisotropic<2> p210(1,
+                                       0,
+                                       get_lexicographic_numbering_RT<2>(1, 0));
+  PolynomialsVectorAnisotropic<2> p221(2,
+                                       1,
+                                       get_lexicographic_numbering_RT<2>(2, 1));
+  PolynomialsVectorAnisotropic<2> p232(3,
+                                       2,
+                                       get_lexicographic_numbering_RT<2>(3, 2));
 
   plot(p210);
   plot(p221);
   plot(p232);
 
-  //Generating Nedelec polynomials in 3D
-  PolynomialsVectorAnisotropic<3> p310(1, 0, get_lexicographic_numbering_RT<3>(1, 0));
-  PolynomialsVectorAnisotropic<3> p321(2, 1, get_lexicographic_numbering_RT<3>(2, 1));
-  PolynomialsVectorAnisotropic<3> p332(3, 2, get_lexicographic_numbering_RT<3>(3, 2));
+  // Generating Nedelec polynomials in 3D
+  PolynomialsVectorAnisotropic<3> p310(1,
+                                       0,
+                                       get_lexicographic_numbering_RT<3>(1, 0));
+  PolynomialsVectorAnisotropic<3> p321(2,
+                                       1,
+                                       get_lexicographic_numbering_RT<3>(2, 1));
+  PolynomialsVectorAnisotropic<3> p332(3,
+                                       2,
+                                       get_lexicographic_numbering_RT<3>(3, 2));
 
   plot(p310);
   plot(p321);
@@ -118,9 +136,8 @@ main()
 
 template <int dim>
 std::vector<unsigned int>
-get_lexicographic_numbering_RT(
-  const unsigned int normal_degree,
-  const unsigned int tangential_degree)
+get_lexicographic_numbering_RT(const unsigned int normal_degree,
+                               const unsigned int tangential_degree)
 {
   const unsigned int n_dofs_face =
     Utilities::pow(tangential_degree + 1, dim - 1);
@@ -182,45 +199,41 @@ get_lexicographic_numbering_RT(
 
 
 template <int dim>
- std::vector<unsigned int>
-  get_lexicographic_numbering_Nedelec(
-  const unsigned int degree)
+std::vector<unsigned int>
+get_lexicographic_numbering_Nedelec(const unsigned int degree)
 {
+  const unsigned int n_pols = (dim == 2) ?
+                                (degree + 1) * (degree + 2) :
+                                (degree + 1) * (degree + 2) * (degree + 2);
 
-  const unsigned int          n_pols   = (dim == 2) ? (degree + 1) * (degree + 2) : 
-                                      (degree + 1) * (degree + 2) *(degree + 2);
-  
   std::vector<unsigned int> renumber_hierarchic_to_lexicographic;
 
   // edges 0-3
   for (unsigned int i = 0; i < degree + 1; ++i)
-    renumber_hierarchic_to_lexicographic.push_back(n_pols +
-                                                    i * (degree + 2));
+    renumber_hierarchic_to_lexicographic.push_back(n_pols + i * (degree + 2));
   for (unsigned int i = 0; i < degree + 1; ++i)
     renumber_hierarchic_to_lexicographic.push_back(n_pols + degree + 1 +
-                                                    i * (degree + 2));
+                                                   i * (degree + 2));
   for (unsigned int i = 0; i < degree + 1; ++i)
     renumber_hierarchic_to_lexicographic.push_back(i);
   for (unsigned int i = 0; i < degree + 1; ++i)
-    renumber_hierarchic_to_lexicographic.push_back(
-      (degree + 1) * (degree + 1) + i);
+    renumber_hierarchic_to_lexicographic.push_back((degree + 1) * (degree + 1) +
+                                                   i);
   if (dim == 2)
     {
       // quads for 2D
       for (unsigned int j = 1; j < degree + 1; ++j)
         for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(j * (degree + 1) +
-                                                          i);
+          renumber_hierarchic_to_lexicographic.push_back(j * (degree + 1) + i);
       for (unsigned int j = 0; j < degree + 1; ++j)
         for (unsigned int i = 1; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(n_pols + j * (degree + 2) +
-                                                          i);
+          renumber_hierarchic_to_lexicographic.push_back(n_pols +
+                                                         j * (degree + 2) + i);
     }
   else if (dim == 3)
     {
       // edges 4-7
-      const unsigned int offset_z =
-        (degree + 1) * (degree + 1) * (degree + 2);
+      const unsigned int offset_z = (degree + 1) * (degree + 1) * (degree + 2);
       for (unsigned int i = 0; i < degree + 1; ++i)
         renumber_hierarchic_to_lexicographic.push_back(
           n_pols + i * (degree + 2) + offset_z);
@@ -257,8 +270,7 @@ template <int dim>
       for (unsigned int j = 0; j < degree + 1; ++j)
         for (unsigned int i = 1; i < degree + 1; ++i)
           renumber_hierarchic_to_lexicographic.push_back(
-            2 * n_pols + i * (degree + 2) +
-            j * (degree + 2) * (degree + 2));
+            2 * n_pols + i * (degree + 2) + j * (degree + 2) * (degree + 2));
       // quad 1
       for (unsigned int j = 1; j < degree + 1; ++j)
         for (unsigned int i = 0; i < degree + 1; ++i)
@@ -273,8 +285,8 @@ template <int dim>
       // quad 2
       for (unsigned int j = 1; j < degree + 1; ++j)
         for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(
-            i + j * (degree + 2) * (degree + 1));
+          renumber_hierarchic_to_lexicographic.push_back(i + j * (degree + 2) *
+                                                               (degree + 1));
       for (unsigned int j = 0; j < degree + 1; ++j)
         for (unsigned int i = 1; i < degree + 1; ++i)
           renumber_hierarchic_to_lexicographic.push_back(
@@ -283,8 +295,7 @@ template <int dim>
       for (unsigned int j = 1; j < degree + 1; ++j)
         for (unsigned int i = 0; i < degree + 1; ++i)
           renumber_hierarchic_to_lexicographic.push_back(
-            (degree + 1) * (degree + 1) + i +
-            j * (degree + 2) * (degree + 1));
+            (degree + 1) * (degree + 1) + i + j * (degree + 2) * (degree + 1));
       for (unsigned int j = 0; j < degree + 1; ++j)
         for (unsigned int i = 1; i < degree + 1; ++i)
           renumber_hierarchic_to_lexicographic.push_back(
@@ -293,18 +304,16 @@ template <int dim>
       // quad 4
       for (unsigned int j = 1; j < degree + 1; ++j)
         for (unsigned int i = 0; i < degree + 1; ++i)
-          renumber_hierarchic_to_lexicographic.push_back(i +
-                                                          j * (degree + 1));
+          renumber_hierarchic_to_lexicographic.push_back(i + j * (degree + 1));
       for (unsigned int j = 0; j < degree + 1; ++j)
         for (unsigned int i = 1; i < degree + 1; ++i)
           renumber_hierarchic_to_lexicographic.push_back(n_pols + i +
-                                                          j * (degree + 2));
+                                                         j * (degree + 2));
       // quad 5
       for (unsigned int j = 1; j < degree + 1; ++j)
         for (unsigned int i = 0; i < degree + 1; ++i)
           renumber_hierarchic_to_lexicographic.push_back(
-            (degree + 1) * (degree + 1) * (degree + 2) + i +
-            j * (degree + 1));
+            (degree + 1) * (degree + 1) * (degree + 2) + i + j * (degree + 1));
       for (unsigned int j = 0; j < degree + 1; ++j)
         for (unsigned int i = 1; i < degree + 1; ++i)
           renumber_hierarchic_to_lexicographic.push_back(
@@ -321,15 +330,14 @@ template <int dim>
         for (unsigned int j = 0; j < degree + 1; ++j)
           for (unsigned int i = 1; i < degree + 1; ++i)
             renumber_hierarchic_to_lexicographic.push_back(
-              n_pols + k * (degree + 2) * (degree + 1) + j * (degree + 2) +
-              i);
+              n_pols + k * (degree + 2) * (degree + 1) + j * (degree + 2) + i);
       for (unsigned int k = 0; k < degree + 1; ++k)
         for (unsigned int j = 1; j < degree + 1; ++j)
           for (unsigned int i = 1; i < degree + 1; ++i)
             renumber_hierarchic_to_lexicographic.push_back(
-              2 * n_pols + k * (degree + 2) * (degree + 2) +
-              j * (degree + 2) + i);
+              2 * n_pols + k * (degree + 2) * (degree + 2) + j * (degree + 2) +
+              i);
     }
-  
-  return  Utilities::invert_permutation(renumber_hierarchic_to_lexicographic);
+
+  return Utilities::invert_permutation(renumber_hierarchic_to_lexicographic);
 }

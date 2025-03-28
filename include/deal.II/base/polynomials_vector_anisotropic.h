@@ -34,9 +34,9 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements vector-valued anisotropic polynomials and can be
- * used further for the generation of vector-valued polynomials with 
+ * used further for the generation of vector-valued polynomials with
  * degrees being different in tangential and normal directions. The known
- * examples include Raviart-Thomas and Nédélec polynomials. 
+ * examples include Raviart-Thomas and Nédélec polynomials.
  * @ingroup Polynomials
  */
 template <int dim>
@@ -45,19 +45,23 @@ class PolynomialsVectorAnisotropic : public TensorPolynomialsBase<dim>
 public:
   /**
    * Constructor. Creates all basis functions for anisotropic vector-valued
-   * polynomials of given degrees in normal and tangential directions, respectively.
+   * polynomials of given degrees in normal and tangential directions,
+   * respectively.
    */
-  PolynomialsVectorAnisotropic(const unsigned int degree_normal,
-                           const unsigned int degree_tangential,
-                           const std::vector<unsigned int> &polynomial_ordering);
+  PolynomialsVectorAnisotropic(
+    const unsigned int               degree_normal,
+    const unsigned int               degree_tangential,
+    const std::vector<unsigned int> &polynomial_ordering);
 
   /**
    * Copy constructor.
    */
-  PolynomialsVectorAnisotropic(const PolynomialsVectorAnisotropic &other) = default;
+  PolynomialsVectorAnisotropic(const PolynomialsVectorAnisotropic &other) =
+    default;
 
   /**
-   *  Compute the value and certain derivatives of each anisotropic polynomial at
+   *  Compute the value and certain derivatives of each anisotropic polynomial
+   * at
    * @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>. In
@@ -72,7 +76,8 @@ public:
            std::vector<Tensor<5, dim>> &fourth_derivatives) const override;
 
   /**
-   * Return the name of the space, which is <tt>PolynomialsVectorAnisotropic</tt>.
+   * Return the name of the space, which is
+   * <tt>PolynomialsVectorAnisotropic</tt>.
    */
   std::string
   name() const override;
@@ -88,13 +93,15 @@ public:
 
   /**
    * Return degree of polynomials in tangential direction
-  */
-  unsigned int get_tangential_degree() const;
+   */
+  unsigned int
+  get_tangential_degree() const;
 
   /**
    * Return degree of polynomials in normal direction
-  */
-  unsigned int get_normal_degree() const;
+   */
+  unsigned int
+  get_normal_degree() const;
 
   /**
    * @copydoc TensorPolynomialsBase::clone()
