@@ -1,12 +1,9 @@
 /*
     Generate the example mesh by calling
-    gmsh THIS_FILE_NAME -3
+    gmsh example-2.geo -3
     
     A finer grid can be created by e.g.
     - decreasing the parameter Mesh.MeshSizeMax in this file, or
-    - set a lower mesh size maximum size using the 
-      command line option -clmax (and removing the parameter
-      Mesh.MeshSizeMax in this file)
     - set parameter Mesh.RefineSteps
     - ....for further possibilities, refer to gmsh online documentation
     
@@ -16,9 +13,11 @@
         have to be stated in mm as well in this case!
 */
 
-/* Mesh.MeshSizeMax = 300; */
 General.Axes = 3;
-Mesh.Binary = 1;
+
+/* following parameters are actually not used here, but passed via command line */
+/* Mesh.MeshSizeMax = 300; *//* Lower numbers will lead to a finer mesh. (command line parameter: -clmax 0.3) */
+/* Mesh.Binary = 0; *//* 1: Create binary mesh-file, 0: create text mesh file (command line parameter: -bin) */
 
 Mesh.SubdivisionAlgorithm = 2;
 

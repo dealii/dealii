@@ -1,30 +1,5 @@
 /* ---------------------------------------------------------------------
  *
- * This example can be compiled for usage with parallel::distributed or
- * parallel::fullydistributed triangulations
- *
- * In order to force usage of parallel::fullydistributed triangulations
- * define
- * #define USE_FULLY_DISTRIBUTED_TRIA
- *
- * otherwise (if not defined), parallel::distributed triangulation
- * will be used
- * ---------------------------------------------------------------------
- */
-#define USE_FULLY_DISTRIBUTED_TRIA
-
-/* ---------------------------------------------------------------------
- *
- * 2024-11, Stephan Voss, Neunkirchen am Brand, Germany, stvoss@gmx.de
- *
- * This solver is derived from several deal.II examples and tutorials.
- * Thank You to all deal.II contributors.
- *
- * ---------------------------------------------------------------------
- */
-
-/* ---------------------------------------------------------------------
- *
  * deal.II: Copyright (C) 2021 - 2023 by the deal.II authors
  *
  * The deal.II library is free software; you can use it, redistribute
@@ -37,9 +12,35 @@
  * ---------------------------------------------------------------------
  */
 
+/* ---------------------------------------------------------------------
+ *
+ * deal.II tutorial step-92
+ * 
+ * 2024-11, Stephan Voss, Neunkirchen am Brand, Germany, stvoss@gmx.de
+ *
+ * This solver is derived from several deal.II examples and tutorials.
+ * Thank You to all deal.II contributors.
+ * 
+ * ---------------------------------------------------------------------
+ */
+
+
+// @sect4{distributed vs. fullydistributed triangulation}
+//
+// A small mesh import performance test will be done at the
+// end of this tutorial for comparing duration for
+// importing meshes when using parallel::distributed
+// vs. parallel::fullydistributed triangulation.
+// 
+// If the option USE_FULLY_DISTRIBUTED_TRIA is defined,
+// the solver will be compiled for using
+// parallel::fullydistributed triangulation
+// otherwise, parallel::distributed triangulation will be used.
+#define USE_FULLY_DISTRIBUTED_TRIA
+
+
 // @sect3{Include files}
 
-#include <deal.II/base/function.h>
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -47,108 +48,32 @@
 #include <deal.II/base/timer.h>
 
 #include <deal.II/lac/generic_linear_algebra.h>
-
-
-// This program can use either PETSc or Trilinos for its parallel
-// algebra needs. By default, if deal.II has been configured with
-// PETSc, it will use PETSc. Otherwise, the following few lines will
-// check that deal.II has been configured with Trilinos and take that.
-//
-// To compare the performance of PETSc and Trilinos
-// add the following \#define to the source code:
-// @code
-// #define FORCE_USE_OF_TRILINOS
-// @endcode
-//
-// Using this logic, the following lines will then import either the
-// PETSc or Trilinos wrappers into the namespace `LA` (for linear
-// algebra). In the former case, we are also defining the macro
-// `USE_PETSC_LA` so that we can detect if we are using PETSc (see
-// solve() for an example where this is necessary).
-namespace LA
-{
-#if defined(DEAL_II_WITH_PETSC) && !defined(DEAL_II_PETSC_WITH_COMPLEX) && \
-  !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
-  using namespace dealii::LinearAlgebraPETSc;
-#  define USE_PETSC_LA
-#elif defined(DEAL_II_WITH_TRILINOS)
-  using namespace dealii::LinearAlgebraTrilinos;
-#else
-#  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
-#endif
-} // namespace LA
+#include <deal.II/lac/sparsity_tools.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
-
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 
-
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
-
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-
 
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/data_out_faces.h>
-#include <deal.II/numerics/error_estimator.h>
 
-
-// Utilities::System namespace will be used to query things like the
-// number of processors associated with the current MPI universe, or the
-// number within this universe the processor this job runs on is:
-#include <deal.II/base/utilities.h>
-
-// class ConditionOStream allows to write
-// code that would output things to a stream (such as <code>std::cout</code>)
-// on every processor but throws the text away on all but one of them.
-#include <deal.II/base/conditional_ostream.h>
-
-// Indicate which elements a particular
-// processor owns or need to know of. This is the realm of the IndexSet class:
-// if there are a total of $N$ cells, degrees of freedom, or vector elements,
-// associated with (non-negative) integral indices $[0,N)$, then both the set
-// of elements the current processor owns as well as the (possibly larger) set
-// of indices it needs to know about are subsets of the set $[0,N)$. IndexSet
-// is a class that stores subsets of this set in an efficient format:
-#include <deal.II/base/index_set.h>
-
-// The next header file is necessary for a single function,
-// SparsityTools::distribute_sparsity_pattern:
-#include <deal.II/lac/sparsity_tools.h>
-
-// parallel::distributed::Triangulation provide meshes distributed
-// across a potentially very large number of processors, while the second
-// provides the namespace parallel::distributed::GridRefinement that offers
-// functions that can adaptively refine such distributed meshes:
 #ifdef USE_FULLY_DISTRIBUTED_TRIA
 #  include <deal.II/distributed/fully_distributed_tria.h>
 #else
 #  include <deal.II/distributed/tria.h>
 #endif
-#include <deal.II/distributed/grid_refinement.h>
 
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/conditional_ostream.h>
 
-#include <fstream>
-#include <iostream>
-#include <memory>
 
 
 // @sect3{Class Template Declarations}
@@ -157,17 +82,10 @@ namespace LA
 
 namespace Step92
 {
-  template <typename T>
-  T sum(const T &, const T &);
-
-  template <typename T>
-  double sum(const double &a, const double &b)
-  {
-    return a + b;
-  };
 
   using namespace dealii;
-  using namespace std::complex_literals;
+
+  constexpr double epsilon_vacuum = 8.8541878176204199e-12; // vacuum permittivity  [ A s / (V m) ]
 
   // @sect4{Parameters Class}
 
@@ -176,211 +94,214 @@ namespace Step92
   // These coefficients are passed through ParameterAcceptor and are editable
   // through a .prm file.
 
-
-  template <int dim>
   class ProblemParameters : public ParameterAcceptor
   {
   public:
     ProblemParameters();
-    ~ProblemParameters();
+    ~ProblemParameters() = default;
     void finalize();
-
-    using fieldvector_type = Tensor<1, dim, double>;
 
     using physical_ID = unsigned int;
 
-    using Material_tuple = std::tuple<std::string, physical_ID, double, double>;
+    using DomainProperties_tuple = std::tuple<std::string, physical_ID, double, double>;
 
-    using BoundaryPotential_tuple =
-      std::tuple<std::string, physical_ID, double>;
-
-    class material_definition
+    class domain_properties
     {
     public:
-      types::material_id material_id;
-      std::string        name;
-      double epsilon; // absolute electric permittivity epsilon (not relative !!
-                      // --> eps_r * eps_0)
-      double kappa;   // absolute electric conductivity
+      double get_domain_parameter_a();
+      
+      types::material_id    domain_id;      // domain ID number
+      std::string           name;           // clear-text name for this domain
+      double                epsilon;        // absolute electric permittivity epsilon [ A s / (V m) ]
+      double                kappa;          // absolute electric conductivity
     };
+
+    using BoundaryPotential_tuple = std::tuple<std::string, physical_ID, double>;
 
     class boundary_potential
     {
     public:
-      types::material_id material_id;
-      std::string        name;
-      double             potential; // [V] electric potential
+      types::material_id boundary_id;   // boundary ID number
+      std::string        name;          // clear-text name for this boundary
+      double             phi_e;         // [V] electric potential used as dirichlet boundary value
     };
 
 
   public:
-    material_definition get_physical(types::material_id material);
 
-    boundary_potential get_boundary_value(types::material_id material);
+    domain_properties get_domain_properties(types::material_id domain_id);
 
-    std::string get_mesh_filename();
-    std::string get_cells_solution_filename();
+    boundary_potential * get_boundary_value(types::material_id boundary_id);
 
-    // double mu_vacuum;      // vacuum permeability: 4 pi 10e-7 V s / (A m)
-    double epsilon_vacuum; // vacuum permittivity: 8.8541878188(14)×10^−12 A s /
-                           // (V m)
-
-    std::string mesh_filename, cells_solution_filename;
+    std::string mesh_filename, cells_output_data_filename;
 
   private:
-    int default_physical_ix = -1;
+    int default_domain_index;
 
-    std::list<Material_tuple>          materials_list;
+    std::list<DomainProperties_tuple>          domains_list;
     std::list<BoundaryPotential_tuple> boundary_values_list;
 
   public:
-    unsigned long        N_physicals = 0;
-    material_definition *p_physicals = NULL;
+    unsigned long       N_domains;
+    domain_properties  *p_domains;
 
-    unsigned long       N_boundary_values = 0;
-    boundary_potential *p_boundary_values = NULL;
+    unsigned long       N_boundary_values;
+    boundary_potential *p_boundary_values;
   };
 
 
-  template <int dim>
-  ProblemParameters<dim>::ProblemParameters()
-    : ParameterAcceptor("Problem")
+  double ProblemParameters::domain_properties::get_domain_parameter_a()
   {
-    // mu_vacuum      = 4.0e-7 * dealii::numbers::PI; // [ V s / (A m) ]
-    epsilon_vacuum = 8.8541878176204199e-12; // [ A s / (V m) ]
-
-
-    mesh_filename = "";
-    add_parameter("mesh filename", mesh_filename, "mesh file name");
-    cells_solution_filename = "";
-    add_parameter("cells solution filename",
-                  cells_solution_filename,
-                  "filename for exporting cells solution");
-
-    add_parameter(
-      "materials",
-      materials_list,
-      "list of material definitions: \"name : ID : eps_r : kappa\"");
-    add_parameter("potentials",
-                  boundary_values_list,
-                  "list of potential definitions: \"name : ID : epot [V]\"");
+    return (kappa>0 ? kappa : epsilon);
   }
 
-  template <int dim>
-  void ProblemParameters<dim>::finalize()
+
+  // @sect5{ProblemParameters class constructor}
+  // In the constructor ProblemParameters::ProblemParameters(), all parameters are defined,
+  // which shall be read when parsing the input parameter file:
+  //
+  // - "mesh filename" is a string specifying a gmsh file (without suffix ".msh") containing the triangulation
+  // - "cells solution filename" is sepcifying filename (without suffix) for exporting output from cells solution data.
+  //   This filename will automatically be extended with a suffix ".vtu"
+  // - "domains" is a list of physical domains
+  // .  
+  // Each comma-separated entry is formatted as "name : ID : epsilon_r : kappa", with
+  //     -# "name" : clear-text name of a domain
+  //     -# "ID" is a unique positive ID number (or zero for default domain)
+  //     -# "epsilon_r" is the relative electric permittivity
+  //     -# "kappa" is the electric conductivity [A/Vm]
+  // - "potentials" is a list of boundary values.\  Each comma-separated entry is formatted as "name : ID : phi_e", with
+  //     -# "name" is a clear-text name of a boundary
+  //     -# "ID" is a unique positive ID number (or zero for default boundary)
+  //     -# "phi"_e is the electrostatic potential [V] used for dirichlet boundary condition
+  
+  ProblemParameters::ProblemParameters()
+    : ParameterAcceptor("Problem")
   {
-    N_physicals = materials_list.size() + 1;
+    ParameterAcceptor::parse_parameters_call_back.connect(
+      [&]() { finalize(); });
 
-    p_physicals = new material_definition[N_physicals];
 
-    int ix              = 0;
-    default_physical_ix = -1;
-    for (const auto &item : materials_list)
+    add_parameter("mesh filename", mesh_filename, "mesh file name");
+
+    Assert(mesh_filename.size() > 0, ExcInternalError());
+
+    add_parameter("cells output data filename",
+                  cells_output_data_filename,
+                  "filename for exporting cells solution");
+
+    Assert(cells_output_data_filename.size() > 0, ExcInternalError());
+
+    add_parameter(
+      "domains",
+      domains_list,
+      "list of domain definitions and its material properties: \"name : ID : epsilon_r : kappa [A/Vm]\"");
+
+    add_parameter("potentials",
+                  boundary_values_list,
+                  "list of potential definitions for dirichlet boundaries: \"name : ID : phi_e [V]\"");
+  }
+
+
+  // @sect5{ProblemParameters::finalize()}
+  // After parsing all parameters, some processing of the domains data and the boundary values is done:
+  void ProblemParameters::finalize()
+  {
+    // 1. count and copy the domain properties entries into an array
+    // Most domain properties are directly copied into memory.
+    // Only the electric permittivity is converted into an absolute value [As/Vm]
+    // by multiplying the relative permittivity number from parameter file with vacuum permittivity
+    // If a domain ID 0 is assigned, its properties will be defined as default values
+    
+    N_domains = domains_list.size() + 1; // reserve an array entry for a default domain
+
+    p_domains = new domain_properties[N_domains];
+
+    int domain_index  = 0;
+    default_domain_index = -1;
+    
+    for (const auto &item : domains_list)
       {
-        std::string  name  = std::get<0>(item);
-        unsigned int id    = std::get<1>(item);
-        double       eps_r = std::get<2>(item);
-        double       kappa = std::get<3>(item);
+        p_domains[domain_index].name      = std::get<0>(item);
+        p_domains[domain_index].domain_id = std::get<1>(item);
+        p_domains[domain_index].epsilon   = epsilon_vacuum * std::get<2>(item);;
+        p_domains[domain_index].kappa     = std::get<3>(item);
 
-        p_physicals[ix].name = name;
+        if (p_domains[domain_index].domain_id == 0) default_domain_index = domain_index;
 
-        p_physicals[ix].material_id = id;
-        if (id == 0)
-          default_physical_ix = ix;
-
-        p_physicals[ix].epsilon = eps_r * epsilon_vacuum;
-        p_physicals[ix].kappa   = kappa;
-
-        ix++;
+        domain_index++;
       }
 
-    N_physicals = ix;
-
-    if (default_physical_ix < 0)
+    // if no default domain properties have been defined in the parameter file,
+    // following values will be taken as default properties
+    if (default_domain_index < 0)
       {
-        N_physicals++;
-        p_physicals[ix].name = "default";
+        domain_index++;
+        default_domain_index                = domain_index;
 
-        default_physical_ix         = ix;
-        p_physicals[ix].material_id = 0;
-
-        p_physicals[ix].epsilon = epsilon_vacuum;
-        p_physicals[ix].kappa   = 0.0;
+        p_domains[domain_index].name        = "default";
+        p_domains[domain_index].domain_id   = 0;
+        p_domains[domain_index].epsilon     = epsilon_vacuum;
+        p_domains[domain_index].kappa       = 0.0;
       }
 
+    // 2. count and copy the boundary potentials entries into an array
     N_boundary_values = boundary_values_list.size();
     p_boundary_values = new boundary_potential[N_boundary_values];
 
-    unsigned int        ipot = 0;
-    boundary_potential *t_p_opdata;
+    unsigned int        boundary_index = 0;
     for (const auto &item : boundary_values_list)
       {
-        std::string name      = std::get<0>(item);
-        auto        id        = std::get<1>(item);
-        double      potential = std::get<2>(item);
+        p_boundary_values[boundary_index].name        = std::get<0>(item);
+        p_boundary_values[boundary_index].boundary_id = std::get<1>(item);
+        p_boundary_values[boundary_index].phi_e       = std::get<2>(item);
 
-        t_p_opdata              = &p_boundary_values[ipot];
-        t_p_opdata->material_id = id;
-        t_p_opdata->name        = name;
-        t_p_opdata->potential   = potential;
-
-        ipot++;
+        boundary_index++;
       }
   }
 
-  template <int dim>
-  ProblemParameters<dim>::~ProblemParameters()
-  {}
 
-  template <int dim>
-  std::string ProblemParameters<dim>::get_mesh_filename()
+  // Function <code>ProblemParameters::get_domain_properties</code> 
+  // will be used to retrieve the domain properties by providing a domain ID number.
+  typename ProblemParameters::domain_properties
+  ProblemParameters::get_domain_properties(types::material_id domain_id)
   {
-    return mesh_filename;
-  }
-
-  template <int dim>
-  std::string ProblemParameters<dim>::get_cells_solution_filename()
-  {
-    return cells_solution_filename;
-  }
-
-  template <int dim>
-  typename ProblemParameters<dim>::material_definition
-  ProblemParameters<dim>::get_physical(types::material_id material)
-  {
-    for (unsigned int ix = 0; ix < N_physicals; ix++)
+    for (unsigned int domain_index = 0; domain_index < N_domains; domain_index++)
       {
-        if (material == (p_physicals[ix].material_id))
+        if (domain_id == (p_domains[domain_index].domain_id))
           {
-            return p_physicals[ix];
+            return p_domains[domain_index];
           }
       }
 
-    return p_physicals[default_physical_ix];
+    return p_domains[default_domain_index];
   }
+  
 
-  template <int dim>
-  typename ProblemParameters<dim>::boundary_potential
-  ProblemParameters<dim>::get_boundary_value(types::material_id material)
+  // Function <code>ProblemParameters::get_boundary_value</code> 
+  // will be used to retrieve the boundary value by providing a boundary ID number.
+  typename ProblemParameters::boundary_potential *
+  ProblemParameters::get_boundary_value(types::material_id boundary_id)
   {
-    for (unsigned int ix = 0; ix < N_boundary_values; ix++)
+    for (unsigned int boundary_index = 0; boundary_index < N_boundary_values; boundary_index++)
       {
-        if (material == (p_boundary_values[ix].material_id))
+        if (boundary_id == (p_boundary_values[boundary_index].boundary_id))
           {
-            return p_boundary_values[ix];
+            return &p_boundary_values[boundary_index];
           }
       }
 
-    return *p_boundary_values[0];
+    return nullptr;
   }
+
 
   // @sect4{Laplace Class}
-  // Declaration of all major building blocks of
-  // finite element program which consists of the usual setup and
-  // assembly routines.
+  // Declaration of all major building blocks for the finite element program
+  // using a direct solver on a Laplace problem for electristatic field computation
+  // consisting of conductive and dielectric domains.
 
   template <int dim>
-  class Laplace : public ParameterAcceptor
+  class Laplace
   {
   public:
     Laplace();
@@ -388,17 +309,11 @@ namespace Step92
 
     using fieldvector_type = Tensor<1, dim, double>;
 
-    ProblemParameters<dim> problem_parameters;
+    ProblemParameters problem_parameters;
 
   private:
     MPI_Comm mpi_communicator;
 
-    /* run time parameters */
-    unsigned int N_materials;
-    unsigned int fe_order;
-    unsigned int quadrature_order;
-
-    void parse_parameters_callback();
     void make_grid();
     void setup_system();
     void assemble_system();
@@ -414,8 +329,8 @@ namespace Step92
     parallel::distributed::Triangulation<dim> triangulation;
 #endif
 
-    std::unique_ptr<FiniteElement<dim>> fe;
-    DoFHandler<dim>                     dof_handler;
+    FE_Q<dim>           fe;
+    DoFHandler<dim>     dof_handler;
 
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
@@ -423,27 +338,27 @@ namespace Step92
     AffineConstraints<double> constraints;
 
     SparsityPattern       sparsity_pattern;
-    LA::MPI::SparseMatrix system_matrix;
-    LA::MPI::Vector       locally_relevant_solution;
-    LA::MPI::Vector       system_rhs;
+    dealii::LinearAlgebraPETSc::MPI::SparseMatrix system_matrix;
+    dealii::LinearAlgebraPETSc::MPI::Vector       locally_relevant_solution;
+    dealii::LinearAlgebraPETSc::MPI::Vector       system_rhs;
 
     class CellsPostprocessor;
-    class FacesPostprocessor;
   };
+
 
   // @sect3{Class Template Definitions and Implementation}
   //
   // @sect4{The Constructor}
-  // The Constructor simply consists of default initialization a number of
-  // discretization parameters (such as the domain size, mesh refinement,
-  // and the order of finite elements and quadrature) and declaring a
-  // corresponding entry via ParameterAcceptor::add_parameter(). All of
-  // these can be modified by editing the .prm file.
+  // The Constructor simply consists of default initialization of
+  // - the MPI communicator
+  // - a timer the performance of several routines
+  // - the triangulation
+  // - the finite element space
+  // - the handler of degrees of freedom
 
   template <int dim>
   Laplace<dim>::Laplace()
-    : ParameterAcceptor("Solver")
-    , mpi_communicator(MPI_COMM_WORLD)
+    : mpi_communicator(MPI_COMM_WORLD)
     , pcout(std::cout,
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
     , computing_timer(mpi_communicator,
@@ -451,59 +366,32 @@ namespace Step92
                       TimerOutput::never,
                       TimerOutput::wall_times)
     , triangulation(mpi_communicator)
+    , fe(/*polinomial degree = */ 1)
     , dof_handler(triangulation)
   {
-    ParameterAcceptor::parse_parameters_call_back.connect(
-      [&]() { parse_parameters_callback(); });
-
-    N_materials = 0;
-    add_parameter("materials", N_materials, "number of materials");
-
-    fe_order = 0;
-    add_parameter(
-      "fe order",
-      fe_order,
-      "order of the finite element space for scalar electric potential");
-
-    quadrature_order = 1;
-    add_parameter("quadrature order",
-                  quadrature_order,
-                  "order of the quadrature");
   }
 
-
-  template <int dim>
-  void Laplace<dim>::parse_parameters_callback()
-  {
-    problem_parameters.finalize();
-
-    fe = std::make_unique<FESystem<dim>>(FE_Q<dim>(fe_order));
-  }
 
   // The Laplace::make_grid() routine
-  // reads the mesh-file for the computational domain.
-  // A block decomposition into real and imaginary matrices
-  // for the solution matrices is used.
+  // imports the mesh from a file as specified in the parameter-file.
 
   template <int dim>
   void Laplace<dim>::make_grid()
   {
     TimerOutput::Scope t(computing_timer, "01. make grid");
 
-    std::string infilename = problem_parameters.get_mesh_filename();
-    infilename += ".msh";
+    std::string infilename = problem_parameters.mesh_filename + ".msh";
 
     GridIn<dim> gi;
 
 #ifdef USE_FULLY_DISTRIBUTED_TRIA
     const unsigned int mpi_size =
       Utilities::MPI::n_mpi_processes(mpi_communicator);
+      
     auto construction_data = TriangulationDescription::Utilities::
       create_description_from_triangulation_in_groups<dim, dim>(
         [&](Triangulation<dim> &tria) {
-          pcout << "MPI-comm: "
-                << Utilities::MPI::this_mpi_process(mpi_communicator)
-                << ", file: \"" << infilename << "\"" << std::endl;
+          pcout << "mesh-file: \"" << infilename << "\"" << std::endl;
           gi.attach_triangulation(tria);
           gi.read_msh(infilename);
         },
@@ -514,9 +402,11 @@ namespace Step92
         },
         mpi_communicator,
         1);
+        
     triangulation.create_triangulation(construction_data);
 #else //  #ifdef USE_FULLY_DISTRIBUTED_TRIA
     Triangulation<dim>                        tria;
+    pcout << "mesh-file: \"" << infilename << "\"" << std::endl;
     gi.attach_triangulation(tria);
     gi.read_msh(infilename);
 
@@ -534,9 +424,8 @@ namespace Step92
   {
     TimerOutput::Scope t(computing_timer, "02. setup");
 
-    dof_handler.distribute_dofs(*fe);
-    pcout << "  number of fe_systems: " << fe->n_components() << std::endl
-          << "  setup: number of degrees of freedom: " << dof_handler.n_dofs()
+    dof_handler.distribute_dofs(fe);
+    pcout << "setup: number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 
 
@@ -548,12 +437,6 @@ namespace Step92
       DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     // Initialize the solution and right hand side vectors.
-    // Solution vector we seek does not only store
-    // elements locally owned, but also ghost entries;
-    // Right hand side vector only needs to have the entries the current
-    // processor owns (It will only be written locally- never read.) (Linear
-    // solvers will read from it, but they do not care about the geometric
-    // location of degrees of freedom).
     locally_relevant_solution.reinit(locally_owned_dofs,
                                      locally_relevant_dofs,
                                      mpi_communicator);
@@ -564,44 +447,29 @@ namespace Step92
     // constraints, which are combined into a single object storing all
     // constraints.
     //
-    // As with all other things in %parallel, the mantra must be that no
-    // processor can store all information about the entire universe. As a
-    // consequence, the AffineConstraints object needs information for which
-    // degrees of freedom it can store constraints and for which it may not
-    // expect any information to store.
-    // The degrees of freedom it needs to care about on
-    // each processor are the locally relevant ones, so this is passed to the
-    // AffineConstraints::reinit function.
-
-    // As a side note, if it's forgotten to
-    // pass this argument, the AffineConstraints class will allocate an array
-    // with length equal to the largest DoF index it has seen so far. For
-    // processors with high MPI process number, this may be very large --
-    // maybe on the order of billions. The program would then allocate more
-    // memory than for likely all other operations combined for this single
-    // array.
     constraints.clear();
-    // seen in tutorial step-41: constraints.reinit(locally_relevant_dofs);
 
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
-    const FEValuesExtractors::Scalar phi_E(0);
 
-    for (unsigned int ix = 0; ix < problem_parameters.N_boundary_values; ix++)
+    // Assign electrostatic potential values on the Dirichlet boundaries.
+    const FEValuesExtractors::Scalar phi_e(0);
+
+    for (unsigned int boundary_index = 0; boundary_index < problem_parameters.N_boundary_values; boundary_index++)
       {
-        pcout << "set " << problem_parameters.p_boundary_values[ix].name
+        pcout << "set " << problem_parameters.p_boundary_values[boundary_index].name
               << " boundary (ID "
-              << problem_parameters.p_boundary_values[ix].material_id
+              << problem_parameters.p_boundary_values[boundary_index].boundary_id
               << ") potential: "
-              << problem_parameters.p_boundary_values[ix].potential << " V";
+              << problem_parameters.p_boundary_values[boundary_index].phi_e << " V";
 
         VectorTools::interpolate_boundary_values(
           dof_handler,
-          problem_parameters.p_boundary_values[ix].material_id,
+          problem_parameters.p_boundary_values[boundary_index].boundary_id,
           Functions::ConstantFunction<dim, double>(
-            problem_parameters.p_boundary_values[ix].potential),
+            problem_parameters.p_boundary_values[boundary_index].phi_e),
           constraints,
-          fe->component_mask(phi_E));
+          fe.component_mask(phi_e));
 
         pcout << std::endl;
       }
@@ -625,32 +493,35 @@ namespace Step92
     pcout << "  system set up." << std::endl;
   }
 
+
   // Assemble the stiffness matrix and the right-hand side:
   template <int dim>
   void Laplace<dim>::assemble_system()
   {
     TimerOutput::Scope t(computing_timer, "03. assemble");
 
-    QGauss<dim>     quadrature_formula(quadrature_order);
-    QGauss<dim - 1> face_quadrature_formula(quadrature_order);
+    QGauss<dim>     quadrature_formula(fe.degree + 1);
+    QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
-    FEValues<dim> fe_values(*fe,
+    FEValues<dim> fe_values(fe,
                             quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                            update_gradients |
+                            update_quadrature_points | 
+                            update_JxW_values);
 
-    FEFaceValues<dim> fe_face_values(*fe,
+
+    FEFaceValues<dim> fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_gradients |
                                        update_quadrature_points |
                                        update_normal_vectors |
                                        update_JxW_values);
 
-    const auto dofs_per_cell = fe->dofs_per_cell;
 
-    const unsigned int                  n_q_points = quadrature_formula.size();
-    [[maybe_unused]] const unsigned int n_face_q_points =
-      face_quadrature_formula.size();
+    const auto dofs_per_cell = fe.dofs_per_cell;
+
+    const unsigned int n_q_points      = quadrature_formula.size();
+    const unsigned int n_face_q_points      = face_quadrature_formula.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
@@ -658,98 +529,71 @@ namespace Step92
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // This is assembling the interior of the domain on the left hand side.
-    // In doing so, test functions $\varphi_i$ and $\varphi_j$ are needed, and
-    // the curl of these test variables.
-
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
         if (cell->is_locally_owned())
           {
             fe_values.reinit(cell);
 
-            const FEValuesExtractors::Scalar phi_E(0);
+            const FEValuesExtractors::Scalar phi_e(0);
 
             cell_matrix = 0.;
             cell_rhs    = 0.;
 
             cell->get_dof_indices(local_dof_indices);
-            const auto material_id = cell->material_id();
+            const auto domain_id = cell->material_id();
 
-            const auto material = problem_parameters.get_physical(material_id);
+            auto domain = problem_parameters.get_domain_properties(domain_id);
 
-            double psi_E =
-              (material.kappa <= 0 ? material.epsilon : material.kappa);
+            const double a = domain.get_domain_parameter_a();
 
             for (unsigned int q_point = 0; q_point < n_q_points; q_point++)
               {
                 for (const auto i : fe_values.dof_indices())
                   {
-                    const auto grad_phi_E_i =
-                      fe_values[phi_E].gradient(i, q_point);
+                    const auto grad_phi_e_i = fe_values[phi_e].gradient(i, q_point);
 
                     for (const auto j : fe_values.dof_indices())
                       {
-                        const auto grad_phi_E_j =
-                          fe_values[phi_E].gradient(j, q_point);
+                        const auto grad_phi_e_j = fe_values[phi_e].gradient(j, q_point);
 
-                        const auto temp =
-                          psi_E * scalar_product(grad_phi_E_j, grad_phi_E_i) *
-                          fe_values.JxW(q_point);
+                        cell_matrix(i, j) += a * grad_phi_e_j * grad_phi_e_i * fe_values.JxW(q_point);
+                      } /* END:  for j */
+                  } /* END:  for i */
 
-                        cell_matrix(i, j) += temp;
-                      } // for j
-                  }     // for i
+              } /* END:  for q_point */
 
-              } // for qpoint
-
-
-
-            /*------------------------------------------------------------------------------------------
-             *
-             * FACES integral
-             *
-             *------------------------------------------------------------------------------------------*/
-
-            // Assemble the face and the boundary.
-
+            
+            // Assemble only the boundary faces without Dirichlet boundary condition
             for (const auto &face : cell->face_iterators())
               {
                 if (face->at_boundary())
                   {
+                    const auto boundary_id = face->boundary_id();
+
+                    auto boundary_value = problem_parameters.get_boundary_value(boundary_id);
+                    if (boundary_value!=nullptr) continue;
+                    
                     fe_face_values.reinit(cell, face);
 
-                    const FEValuesExtractors::Scalar phi_E(0);
-                    for (unsigned int q_point = 0; q_point < n_face_q_points;
-                         q_point++)
+                    for (unsigned int q_point = 0; q_point < n_face_q_points; q_point++)
                       {
-                        const auto normal =
-                          fe_face_values.normal_vector(q_point);
-
                         for (const auto i : fe_face_values.dof_indices())
                           {
-                            const auto phi_E_i =
-                              fe_face_values[phi_E].value(i, q_point);
+                            const auto phi_e_i = fe_face_values[phi_e].value(i, q_point);
 
                             for (const auto j : fe_face_values.dof_indices())
                               {
-                                const auto grad_phi_E_j =
-                                  fe_face_values[phi_E].gradient(j, q_point);
+                                const auto grad_phi_e_j = fe_face_values[phi_e].gradient(j, q_point);
 
-                                const auto temp =
-                                  -psi_E * phi_E_i *
-                                  scalar_product(grad_phi_E_j, normal) *
-                                  fe_face_values.JxW(q_point);
+                                cell_matrix(i, j) += -a * phi_e_i * grad_phi_e_j * fe_face_values.normal_vector(q_point) * fe_face_values.JxW(q_point);
+                              } /* END:  for j */
 
-                                cell_matrix(i, j) += temp;
-                              } /* for(j) */
+                          } /* END:  for i */
 
-                          } /* for(i) */
-
-                      } /* for(q_point) */
-                  }     // if (face->at_boundary())
-              }         // END: for (const auto &face : cell->face_iterators())
-
-
+                      } /* END:  for q_point */
+                  } /* END:  if (face->at_boundary()) */
+              } /* END:  for (const auto &face : cell->face_iterators()) */
 
             constraints.distribute_local_to_global(cell_matrix,
                                                    cell_rhs,
@@ -758,32 +602,16 @@ namespace Step92
                                                    system_rhs);
 
 
-          } // END: if (cell->is_locally_owned())
+          } /* END: if (cell->is_locally_owned()) */
 
-      } // END: for (const auto &cell : dof_handler.active_cell_iterators())
+      } /* END: for (const auto &cell : dof_handler.active_cell_iterators()) */
 
-
-    // In the operations above, specifically the call to
-    // `distribute_local_to_global()` in the last line, every MPI
-    // process was only working on its local data. If the operation
-    // required adding something to a matrix or vector entry that is
-    // not actually stored on the current process, then the matrix or
-    // vector object keeps track of this for a later data exchange,
-    // but for efficiency reasons, this part of the operation is only
-    // queued up, rather than executed right away. But now that we got
-    // here, it is time to send these queued-up additions to those
-    // processes that actually own these matrix or vector entries.
-
-    // In other words: This is "finalization" of the global data
-    // structures. This is done by invoking the function `compress()`
-    // on both the matrix and vector objects. See
-    // @ref GlossCompress "Compressing distributed objects"
-    // for more information on what `compress()` actually does.
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
     pcout << "  system assembled." << std::endl;
   }
+
 
   // Use a direct solver to solve the system:
   // SparseDirectMUMPS for MPI parallel implementation
@@ -792,7 +620,7 @@ namespace Step92
   {
     TimerOutput::Scope t(computing_timer, "04. solve");
 
-    LA::MPI::Vector completely_distributed_solution(locally_owned_dofs,
+    dealii::LinearAlgebraPETSc::MPI::Vector completely_distributed_solution(locally_owned_dofs,
                                                     mpi_communicator);
 
     SolverControl                            solver_control;
@@ -800,9 +628,7 @@ namespace Step92
     solver.set_symmetric_mode(true);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
 
-    auto nsteps = solver_control.last_step();
-    pcout << "  solved in " << nsteps << " iteration"
-          << (nsteps > 1 ? "s." : ".") << std::endl;
+    pcout << "  solved"  << std::endl;
 
     constraints.distribute(completely_distributed_solution);
 
@@ -810,16 +636,21 @@ namespace Step92
   }
 
 
-  // @sect4{Cells Postprocessor for Data Output}
+  // @sect4{Data Output}
+  // After solving the problem, some output data shall be written into a vtk-file.
+  // The output-filename has been specified in the parameter file and shall contain
+  // not only the solution of the Laplace PDE, but also electric field strengths,
+  // current densities and domain properties for each evaluation point.
+  // For this purpose a Cells Postprocessor is used.
+  
+  // @sect5{Cells Postprocessor for Data Output}
 
   // Generate output - using a class PostProcessor that
   // inherits from the class DataPostprocessor, which can be attached to
   // DataOut. This allows to output derived quantities from the solution,
-  // It overloads the
-  // virtual function DataPostprocessor::evaluate_vector_field(),
+  // For the solved Laplace-PDE, it overloads the
+  // virtual function DataPostprocessor::evaluate_scalar_field(),
   // which is then internally called from DataOut::build_patches().
-  // It's given values of the numerical solution, its derivatives, normals to
-  // the cell, the actual evaluation points and any additional quantities.
 
   template <int dim>
   class Laplace<dim>::CellsPostprocessor : public DataPostprocessor<dim>
@@ -851,74 +682,75 @@ namespace Step92
 
 
   // Define the names for the variables in the output.
+  // The output data file shall contain following values at the evaluation point locations:
+  // - "phi_e",        the scalar electrostatic potential [V]
+  // - "Ex",           the electric field strength, cartesian x-component [V/m]
+  // - "Ey",           the electric field strength, cartesian y-component [V/m]
+  // - "Ez",           the electric field strength, cartesian z-component [V/m]
+  // - "Jx",           the electric current density, cartesian x-component [A/m^2]
+  // - "Jy",           the electric current density, cartesian y-component [A/m^2]
+  // - "Jz",           the electric current density, cartesian z-component [A/m^2]
+  // - "domain_ID",    the domain ID number 
+  // - "epsilon_r",    the relative electric permittivity number
+  // - "kappa"         the electric conductivity [A/Vm]
   template <int dim>
   std::vector<std::string> Laplace<dim>::CellsPostprocessor::get_names() const
   {
-    std::vector<std::string> solution_names = {};
-
-    solution_names.emplace_back("phi_e"); // electric potential [V]
-
-    solution_names.emplace_back("Ex"); // electric field strength [V/m]
-    solution_names.emplace_back("Ey");
-    solution_names.emplace_back("Ez");
-
-    solution_names.emplace_back("Jx"); // electric current density [A/m^2]
-    solution_names.emplace_back("Jy");
-    solution_names.emplace_back("Jz");
-
-    solution_names.emplace_back("material_ID");
-    solution_names.emplace_back("epsilon_r");
-    solution_names.emplace_back("kappa");
-
-    return solution_names;
+    return { 
+            "phi_e",        // scalar electrostatic potential
+            "Ex",           // electric field strength, cartesian x-component
+            "Ey",           // electric field strength, cartesian y-component
+            "Ez",           // electric field strength, cartesian z-component
+            "Jx",           // electric current density, cartesian x-component
+            "Jy",           // electric current density, cartesian y-component
+            "Jz",           // electric current density, cartesian z-component
+            "domain_ID",    // domain ID number 
+            "epsilon_r",    // relative electric permittivity
+            "kappa"         // electric conductivity
+            };
   }
 
 
+  // Define the interpretation of the variables in the output
+  // - The electrostatic potential is a scalar value
+  // - Electric field strength and current density are vectors
+  // - ID numbers and material parameters ar scalar values
+  //   (such as relative electric permittivity or electric conductivity)
   template <int dim>
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
   Laplace<dim>::CellsPostprocessor::get_data_component_interpretation() const
   {
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      interpretation;
-
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // phi_e
-
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector); // E x,y,z
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
-
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector); // J x,y,z
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_part_of_vector);
-
-
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // mat_ID
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // epsilon_r
-    interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar); // kappa
-
-    return interpretation;
+    return { 
+            DataComponentInterpretation::component_is_scalar,           // phi_e [V]
+            DataComponentInterpretation::component_is_part_of_vector,   // Ex [V/m]
+            DataComponentInterpretation::component_is_part_of_vector,   // Ey [V/m]
+            DataComponentInterpretation::component_is_part_of_vector,   // Ez [V/m]
+            DataComponentInterpretation::component_is_part_of_vector,   // Jx [A/m^2]
+            DataComponentInterpretation::component_is_part_of_vector,   // Jy [A/m^2]
+            DataComponentInterpretation::component_is_part_of_vector,   // Jz [A/m^2]
+            DataComponentInterpretation::component_is_scalar,           // domain_ID  []
+            DataComponentInterpretation::component_is_scalar,           // epsilon_r  []
+            DataComponentInterpretation::component_is_scalar            // kappa      [A/(V m)]
+            };
   }
 
 
-
+  // The solution itself is the electrostatic potential.
+  // In order to export it, the <code>update_values</code> flag is needed.
+  // For plotting electric streamlines or currents, the gradients of the solution 
+  // will be neded and hence, the <code>update_gradients</code> has to be set.
   template <int dim>
   UpdateFlags Laplace<dim>::CellsPostprocessor::get_needed_update_flags() const
   {
-    return update_values | update_gradients | update_quadrature_points;
+    return update_values | update_gradients;
   }
 
 
-  // This is the function that computes the derived quantities.
+  // <code>Laplace<dim>::CellsPostprocessor::evaluate_scalar_field</code>
+  // is the function that takes the solution values and its gradients from <code>inputs</code>,
+  // calculates electrostatic potential, electric field strengths, electric current density,
+  // and domain properties (such as ID number, relative electric permittivity and electric conductivity)
+  // and arranges it into <code>computed_quantities</code> for each evaluation point
   template <int dim>
   void Laplace<dim>::CellsPostprocessor::evaluate_scalar_field(
     const DataPostprocessorInputs::Scalar<dim> &inputs,
@@ -935,97 +767,91 @@ namespace Step92
     const typename DoFHandler<dim>::cell_iterator current_cell =
       inputs.template get_cell<dim>();
 
-    const auto material_id = current_cell->material_id();
+    const auto domain_id = current_cell->material_id();
 
-    const auto material = problem->problem_parameters.get_physical(material_id);
+    const auto domain = problem->problem_parameters.get_domain_properties(domain_id);
 
     for (unsigned int p = 0; p < n_evaluation_points; p++)
       {
-        Laplace::fieldvector_type sE, sJ;
-        double                    Phi;
+        Laplace::fieldvector_type solution_E_field, solution_current_density_J;
 
-
-        const auto t_sol_val   = inputs.solution_values[p];
-        const auto t_sol_grads = inputs.solution_gradients[p];
-
-        Phi = t_sol_val;
-
-        for (unsigned int d = 0; d < dim; d++)
-          {
-            sE[d] = -t_sol_grads[d];
-          } // for (unsigned int d = 0; d < dim; d++)
-
-        sJ = sE * material.kappa;
-
-        const unsigned int off_E_ePot = 0, off_E_vE = 1,
-                           off_E_vJ  = off_E_vE + dim,
-                           off_E_mat = off_E_vJ + dim;
-
-
-        computed_quantities[p](off_E_ePot) = Phi;
+        // The <code>solution_values</code> can be directly taken as the electrostatic potential $\varphi_e$ 
+        // (<code>solution_phi_e</code> resp.)
+        // as the electric field strength $\mathbf{E}$ is calculated using the <code>solution_gradients</code>.
+        // The current density $\mathbf{J}$ is derived from electric field strength under terms of Ohm's law $\mathbf{J}=\kappa\mathbf{E}$.
+        const auto solution_phi_e    = inputs.solution_values[p];
+        const auto solution_gradient = inputs.solution_gradients[p];
 
         for (unsigned int d = 0; d < dim; d++)
           {
-            computed_quantities[p](off_E_vE + d) = sE[d];
-            computed_quantities[p](off_E_vJ + d) = sJ[d];
+            solution_E_field[d] = -solution_gradient[d];
           }
 
-        computed_quantities[p](off_E_mat + 0) = material_id;
-        computed_quantities[p](off_E_mat + 1) =
-          material.epsilon / problem->problem_parameters.epsilon_vacuum;
-        computed_quantities[p](off_E_mat + 2) = material.kappa;
-
-      } // for (unsigned int p = 0; p < n_evaluation_points; p++)
-
-  } // Laplace<dim>::CellsPostprocessor::evaluate_field
+        solution_current_density_J = solution_E_field * domain.kappa; // Ohm's law
 
 
-  // @sect4{Data Output}
+        // For arranging the output data in the sequence as defined in function 
+        // <code>Laplace<dim>::CellsPostprocessor::get_names()</code>
+        // the following offset-values are used to indicate the correct positions
+        constexpr unsigned int  offset_phi_e                = 0,    // position index for electrostatic potential
+                                offset_E_field              = 1,    // position index for first electric field component (Ex)
+                                offset_current_density_J    = offset_E_field           + dim, // position index for first current density component (Jx)
+                                offset_material_properties  = offset_current_density_J + dim; // position index for domain ID number
 
-  // Write field outputs into files (for cells and faces)
+
+        computed_quantities[p](offset_phi_e) = solution_phi_e;
+
+        for (unsigned int d = 0; d < dim; d++)
+          {
+            computed_quantities[p](offset_E_field           + d) = solution_E_field          [d];
+            computed_quantities[p](offset_current_density_J + d) = solution_current_density_J[d];
+          }
+
+        computed_quantities[p](offset_material_properties + 0) = domain_id;
+        computed_quantities[p](offset_material_properties + 1) = domain.epsilon / epsilon_vacuum;
+        computed_quantities[p](offset_material_properties + 2) = domain.kappa;
+
+      } /* END: for (unsigned int p = 0; p < n_evaluation_points; p++) */
+
+  } /* END: Laplace<dim>::CellsPostprocessor::evaluate_field */
+
+
+
+  // Initialize the Cells Postprocessor 
+  // and write field output data for cells into a file.
   template <int dim>
   void Laplace<dim>::output_results()
   {
     TimerOutput::Scope t(computing_timer, "05. post-process");
 
-    std::string cells_solution_filename =
-      problem_parameters.get_cells_solution_filename();
+    std::string cells_output_data_filename = problem_parameters.cells_output_data_filename + ".vtu";
 
-    if (cells_solution_filename.size() > 0)
-      {
-        CellsPostprocessor cell_postprocessor(this);
+    CellsPostprocessor cell_postprocessor(this);
 
-        cells_solution_filename += ".vtu";
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(locally_relevant_solution, cell_postprocessor);
 
-        DataOut<dim> data_out;
-        data_out.attach_dof_handler(dof_handler);
-        data_out.add_data_vector(locally_relevant_solution, cell_postprocessor);
+    data_out.build_patches();
+    data_out.write_vtu_in_parallel(cells_output_data_filename,
+                                   mpi_communicator);
 
-        data_out.build_patches();
-        data_out.write_vtu_in_parallel(cells_solution_filename,
-                                       mpi_communicator);
-
-        pcout << "exported cells solution into file \""
-              << cells_solution_filename << "\"" << std::endl;
-      }
+    pcout << "exported cells solution and output data into file \""
+          << cells_output_data_filename << "\"" << std::endl;
   }
 
 
 
   // @sect4{Main algorithm}
 
-  // the central starting-point to run all simulation steps
+  // This is the central starting-point to run all simulation steps
   template <int dim>
   void Laplace<dim>::run()
   {
-    pcout << "Running with "
-#ifdef USE_PETSC_LA
-          << "PETSc"
-#else
-          << "Trilinos"
-#endif
-          << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
-          << " MPI rank(s)..." << std::endl;
+    pcout << "Running with PETSc on "
+          << Utilities::MPI::n_mpi_processes(mpi_communicator)
+          << " MPI rank(s)..."
+          << std::endl;
 
     make_grid();
 
@@ -1044,8 +870,16 @@ namespace Step92
 } // namespace Step92
 
 
-// main function call: set up MPI, Laplace classes,
-// ParameterAcceptor, and call the run() function.
+
+// @sect4{Program entry function}
+// An optional parameter can be passed via the command line call: a parameter filename
+// If this optional parameter filename is not provided, parameter file "example-1.prm" will be taken per default.
+// In the main function
+// - MPI is initialized
+// - Laplace class object for dim=3 is instantiated,
+// - the ParameterAcceptor is initialized and
+// finally the main algorithm <code>run()</code> is called.
+
 
 int main(int argc, char *argv[])
 {

@@ -1,19 +1,18 @@
 /*
     Generate the example mesh by calling
-    gmsh THIS_FILE_NAME -3
+    gmsh example-1.geo -clmax 0.3 -bin -3
     
     A finer grid can be created by e.g.
     - decreasing the parameter Mesh.MeshSizeMax in this file, or
-    - set a lower mesh size maximum size using the 
-      command line option -clmax (and removing the parameter
-      Mesh.MeshSizeMax in this file)
     - set parameter Mesh.RefineSteps
     - ....for further possibilities, refer to gmsh online documentation
 */
 
-/* Mesh.MeshSizeMax = 300e-3; */
 General.Axes = 3;
-Mesh.Binary = 1;
+
+/* following parameters are actually not used here, but passed via command line */
+/* Mesh.MeshSizeMax = 300e-3; *//* Lower numbers will lead to a finer mesh. (command line parameter: -clmax 0.3) */
+/* Mesh.Binary = 1; *//* 1: Create binary mesh-file, 0: create text mesh file (command line parameter: -bin) */
 
 Mesh.SubdivisionAlgorithm = 2;
 
@@ -299,9 +298,9 @@ Volume(3) = { 3 };
 Volume(4) = { 4 };
 Physical Volume(0) = { 1 };
 Physical Volume("conductor_1", 10) = { 2 };
-Physical Surface("conductor_1_terminal_1", 11) = { 21, 19, 16, 18, 20, 22 };
-Physical Surface("conductor_1_terminal_2", 12) = { 27, 25, 12, 24, 26, 28 };
+Physical Surface("terminal_11", 11) = { 21, 19, 16, 18, 20, 22 };
+Physical Surface("terminal_12", 12) = { 27, 25, 12, 24, 26, 28 };
 Physical Volume("conductor_2", 20) = { 3 };
-Physical Surface("conductor_2_terminal_1", 21) = { 40, 42, 44, 43, 41, 38 };
-Physical Surface("conductor_2_terminal_2", 22) = { 46, 49, 48, 47, 50, 34 };
-Physical Volume("solid_1", 30) = { 4 };
+Physical Surface("terminal_21", 21) = { 40, 42, 44, 43, 41, 38 };
+Physical Surface("terminal_22", 22) = { 46, 49, 48, 47, 50, 34 };
+Physical Volume("barrier", 30) = { 4 };
