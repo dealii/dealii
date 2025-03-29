@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "https://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+  <title>The deal.II Readme on interfacing to PSBLAS</title>
+  <link href="../screen.css" rel="StyleSheet">
+  <meta name="copyright" content="Copyright (C) 2025 by the deal.II authors">
+  <meta name="keywords" content="deal.II">
+</head>
+
+<body>
+
+  <h1>Interfacing <acronym>deal.II</acronym> to PSBLAS</h1>
+
+  <p>
+    <a href="https://psctoolkit.github.io/products/psblas/" target="_top">PSBLAS</a> is
+    The PSBLAS library, developed with the aim to facilitate the parallelization of computationally intensive scientific
+    applications, is designed to address parallel implementation of iterative solvers for sparse linear systems through
+    the distributed memory paradigm. It includes routines for multiplying sparse matrices by dense matrices, solving
+    block diagonal systems with triangular diagonal entries, preprocessing sparse matrices, and contains additional
+    routines for dense matrix operations. The current implementation of PSBLAS addresses a distributed memory execution
+    model operating with message passing, and supports GPU and Multithread acceleration. PSBLAS is part of <a
+      href="https://psctoolkit.github.io/">PSCToolkit: Parallel Sparse Computation Toolkit</a>.
+
+    The PSBLAS library version 3 is implemented in the Fortran 2003 programming language, with reuse and/or adaptation
+    of existing Fortran 77 and Fortran 95 software, plus a handful of C routines. See the <a
+      href="https://psctoolkit.github.io/products/psblas/" target="_top">PSBLAS documentation</a> for more details.
+  </p>
+
+  <p>
+    <acronym>deal.II</acronym> has wrapper classes to the linear algebra
+    parts of PSBLAS that provide almost the
+    same interfaces as the built-in <acronym>deal.II</acronym> linear algebra operations.
+  </p>
+
+  <h2>Installing <acronym>deal.II</acronym> with PSBLAS</h2>
+
+  <p>
+    During the CMake configuration, the following flags should be specified:
+  <ul>
+    <li> <code>-DDEAL_II_WITH_PSBLAS=ON</code>, to enable the PSBLAS library.
+    <li> <code>-DPSBLAS_DIR=<path_to_psblas></code>, to specify the path where PSBLAS has been installed.
+  </ul>
+  </p>
+
+  <hr />
+  <div class="right">
+    <a href="https://validator.w3.org/check?uri=referer" target="_top">
+      <img style="border:0" src="https://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"></a>
+    <a href="https://jigsaw.w3.org/css-validator/check/referer" target="_top">
+      <img style="border:0;width:88px;height:31px" src="https://jigsaw.w3.org/css-validator/images/vcss"
+        alt="Valid CSS!"></a>
+  </div>
+</body>
+
+</html>
