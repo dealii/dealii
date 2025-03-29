@@ -1632,14 +1632,14 @@ namespace Patterns
     template <typename T>
     struct is_list_compatible
     {
-      static constexpr const bool value =
+      static constexpr bool value =
         internal::is_list_compatible<std::decay_t<T>>::value;
     };
 
     template <typename T>
     struct is_map_compatible
     {
-      static constexpr const bool value =
+      static constexpr bool value =
         internal::is_map_compatible<std::decay_t<T>>::value;
     };
 

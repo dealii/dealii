@@ -1216,25 +1216,19 @@ namespace internal
  */
 namespace ReferenceCells
 {
-  constexpr const ReferenceCell Vertex =
-    internal::make_reference_cell_from_int(0);
-  constexpr const ReferenceCell Line =
-    internal::make_reference_cell_from_int(1);
-  constexpr const ReferenceCell Triangle =
-    internal::make_reference_cell_from_int(2);
-  constexpr const ReferenceCell Quadrilateral =
+  constexpr ReferenceCell Vertex   = internal::make_reference_cell_from_int(0);
+  constexpr ReferenceCell Line     = internal::make_reference_cell_from_int(1);
+  constexpr ReferenceCell Triangle = internal::make_reference_cell_from_int(2);
+  constexpr ReferenceCell Quadrilateral =
     internal::make_reference_cell_from_int(3);
-  constexpr const ReferenceCell Tetrahedron =
+  constexpr ReferenceCell Tetrahedron =
     internal::make_reference_cell_from_int(4);
-  constexpr const ReferenceCell Pyramid =
-    internal::make_reference_cell_from_int(5);
-  constexpr const ReferenceCell Wedge =
-    internal::make_reference_cell_from_int(6);
-  constexpr const ReferenceCell Hexahedron =
+  constexpr ReferenceCell Pyramid = internal::make_reference_cell_from_int(5);
+  constexpr ReferenceCell Wedge   = internal::make_reference_cell_from_int(6);
+  constexpr ReferenceCell Hexahedron =
     internal::make_reference_cell_from_int(7);
-  constexpr const ReferenceCell Invalid =
-    internal::make_reference_cell_from_int(
-      std::numeric_limits<std::uint8_t>::max());
+  constexpr ReferenceCell Invalid = internal::make_reference_cell_from_int(
+    std::numeric_limits<std::uint8_t>::max());
 
   /**
    * Return the correct simplex reference cell type for the given dimension
