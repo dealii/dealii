@@ -1,38 +1,28 @@
 # Listing of Parameters
 # ---------------------
-subsection Solver
-
-  # order of the finite element space
-  set fe order                     = 1
-
-  # order of the quadrature
-  set quadrature order             = 2
-
-end
-
 
 subsection Problem
   
-  # materials / physicals 
-  # each as "Name : ID : epsilon_rel : kappa"
-  set materials = default    :  0 : 1.0 :  0.0 , \
-                  conductor1 : 10 : 1.0 : 56.0e+6 , \
-                  conductor2 : 20 : 1.0 : 56.0e+6 , \
-                  barrier    : 30 : 4.0 :  0.0
-
-  # Dirichlet boundaries (and its potentials)
-  # each as "Name : ID : potential [V]"
-  set potentials = default     :  0 :   0.0 , \
-                   terminal11  : 11 :   1.0 , \
-                   terminal12  : 12 :   0.5 , \
-                   terminal21  : 21 :   0.5 , \
-                   terminal22  : 22 :  -1.0
-
   # mesh file name
   set mesh filename = example-1
 
-  # cells solution export filename
-  set cells solution filename = example-1_solution_cells
+  # physical domains
+  # each as       Name        : ID : epsilon_rel : kappa [A/Vm]
+  set domains   = default     :  0 :         1.0 :   0.0         , \
+                  conductor_1 : 10 :         1.0 :  56.0e+6      , \
+                  conductor_2 : 20 :         1.0 :  56.0e+6      , \
+                  barrier     : 30 :         4.0 :   0.0
+
+  # Dirichlet boundaries (and its electrostatic potentials)
+  # each as        Name         : ID : el. potential [V]
+  set potentials = default      :  0 :           0.0     , \
+                   terminal_11  : 11 :           1.0     , \
+                   terminal_12  : 12 :           0.5     , \
+                   terminal_21  : 21 :           0.5     , \
+                   terminal_22  : 22 :          -1.0
+
+  # cells output data filename
+  set cells output data filename = example-1_cells_output_data
 
 end
   
