@@ -3045,12 +3045,12 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
 
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature[0].size();
-  const auto         offset =
-    QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                             face_no,
-                                             cell->combined_face_orientation(
-                                               face_no),
-                                             n_q_points);
+  const auto         offset     = QProjector<dim>::DataSetDescriptor::face(
+    this->reference_cell(),
+    face_no,
+    dim == 2 ? numbers::default_geometric_orientation :
+                           cell->combined_face_orientation(face_no),
+    n_q_points);
 
   if (flags & update_values)
     {
