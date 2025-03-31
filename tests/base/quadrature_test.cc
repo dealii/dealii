@@ -176,7 +176,7 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
           switch (dim)
             {
               case 2:
-                exact_int = 2 * (sub ? 2 : 1) / (double)(i + 1);
+                exact_int = 4 * (sub ? 2 : 1) / (double)(i + 1);
                 break;
               case 3:
                 exact_int =
