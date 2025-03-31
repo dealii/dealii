@@ -1,0 +1,88 @@
+
+DEAL:1D::ReferenceCell: Line
+DEAL:1D::  computed face measure = 1.00000
+DEAL:1D::  self-reported face measure = 1.00000
+DEAL:1D::ReferenceCell: Line
+DEAL:1D::  computed face measure = 1.00000
+DEAL:1D::  self-reported face measure = 1.00000
+DEAL:2D::ReferenceCell: Quad
+DEAL:2D::  computed face measure = 1.00000
+DEAL:2D::  self-reported face measure = 1.00000
+DEAL:2D::ReferenceCell: Quad
+DEAL:2D::  computed face measure = 1.00000
+DEAL:2D::  self-reported face measure = 1.00000
+DEAL:2D::ReferenceCell: Quad
+DEAL:2D::  computed face measure = 1.00000
+DEAL:2D::  self-reported face measure = 1.00000
+DEAL:2D::ReferenceCell: Quad
+DEAL:2D::  computed face measure = 1.00000
+DEAL:2D::  self-reported face measure = 1.00000
+DEAL:2D::ReferenceCell: Tri
+DEAL:2D::  computed face measure = 1.00000
+DEAL:2D::  self-reported face measure = 1.00000
+DEAL:2D::ReferenceCell: Tri
+DEAL:2D::  computed face measure = 1.41421
+DEAL:2D::  self-reported face measure = 1.41421
+DEAL:2D::ReferenceCell: Tri
+DEAL:2D::  computed face measure = 1.00000
+DEAL:2D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Tet
+DEAL:3D::  computed face measure = 0.500000
+DEAL:3D::  self-reported face measure = 0.500000
+DEAL:3D::ReferenceCell: Tet
+DEAL:3D::  computed face measure = 0.500000
+DEAL:3D::  self-reported face measure = 0.500000
+DEAL:3D::ReferenceCell: Tet
+DEAL:3D::  computed face measure = 0.500000
+DEAL:3D::  self-reported face measure = 0.500000
+DEAL:3D::ReferenceCell: Tet
+DEAL:3D::  computed face measure = 0.866025
+DEAL:3D::  self-reported face measure = 0.866025
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::  computed face measure = 4.00000
+DEAL:3D::  self-reported face measure = 4.00000
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::  computed face measure = 1.41421
+DEAL:3D::  self-reported face measure = 1.41421
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::  computed face measure = 1.41421
+DEAL:3D::  self-reported face measure = 1.41421
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::  computed face measure = 1.41421
+DEAL:3D::  self-reported face measure = 1.41421
+DEAL:3D::ReferenceCell: Pyramid
+DEAL:3D::  computed face measure = 1.41421
+DEAL:3D::  self-reported face measure = 1.41421
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::  computed face measure = 0.500000
+DEAL:3D::  self-reported face measure = 0.500000
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::  computed face measure = 0.500000
+DEAL:3D::  self-reported face measure = 0.500000
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::  computed face measure = 1.41421
+DEAL:3D::  self-reported face measure = 1.41421
+DEAL:3D::ReferenceCell: Wedge
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000
+DEAL:3D::ReferenceCell: Hex
+DEAL:3D::  computed face measure = 1.00000
+DEAL:3D::  self-reported face measure = 1.00000

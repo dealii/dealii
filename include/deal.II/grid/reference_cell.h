@@ -682,6 +682,24 @@ public:
   volume() const;
 
   /**
+   * Return the $d - 1$-dimensional measure of the face of a reference cell that
+   * corresponds to the current object, where $d$ is the dimension of the space
+   * it lives in.
+   *
+   * In this context the measure of a face depends on both the type of reference
+   * cell as well as the face number (i.e., `*this` and @p face_no). For
+   * example, the measures of the sides of a ReferenceCells::Triangle are $1$,
+   * $\sqrt{2}$, and $1$, respectively, whereas the measures of the sides of a
+   * ReferenceCells::Quadrilateral are all $1$.
+   *
+   * @note Like ReferenceCell::volume(), this function defines vertices to have
+   * a measure of $1$ to enable the definition of one-dimensional face
+   * quadratures.
+   */
+  double
+  face_measure(const unsigned int face_no) const;
+
+  /**
    * Return the barycenter (i.e., the center of mass) of the reference
    * cell that corresponds to the current object. The function is not
    * called `center()` because one can define the center of an object
@@ -3018,6 +3036,43 @@ ReferenceCell::volume() const
     }
 
   return 0.0;
+}
+
+
+
+inline double
+ReferenceCell::face_measure(const unsigned int face_no) const
+{
+  AssertIndexRange(face_no, n_faces());
+  constexpr double X = std::numeric_limits<double>::signaling_NaN();
+
+  static const std::array<double, 5> tri_faces{
+    {1.0, std::sqrt(2.0), 1.0, X, X}};
+  static const std::array<double, 5> tet_faces{
+    {0.5, 0.5, 0.5, std::sqrt(3.0) / 2.0, X}};
+  static const std::array<double, 5> pyramid_faces{
+    {4, std::sqrt(2.0), std::sqrt(2.0), std::sqrt(2.0), std::sqrt(2.0)}};
+  static const std::array<double, 5> wedge_faces{
+    {0.5, 0.5, 1.0, std::sqrt(2.0), 1.0}};
+
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+      case ReferenceCells::Line:
+      case ReferenceCells::Quadrilateral:
+      case ReferenceCells::Hexahedron:
+        return 1.0;
+      case ReferenceCells::Triangle:
+        return tri_faces[face_no];
+      case ReferenceCells::Tetrahedron:
+        return tet_faces[face_no];
+      case ReferenceCells::Pyramid:
+        return pyramid_faces[face_no];
+      case ReferenceCells::Wedge:
+        return wedge_faces[face_no];
+    }
+  DEAL_II_ASSERT_UNREACHABLE();
+  return X;
 }
 
 
