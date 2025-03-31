@@ -30,6 +30,8 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/vector_memory.h>
 
+#include <Kokkos_Core.hpp>
+
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN

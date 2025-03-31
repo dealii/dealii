@@ -19,6 +19,8 @@
 
 #include <boost/serialization/utility.hpp>
 
+#include <Kokkos_Core.hpp>
+
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN

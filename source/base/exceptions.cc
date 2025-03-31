@@ -17,6 +17,8 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
 
+#include <Kokkos_Core.hpp>
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
