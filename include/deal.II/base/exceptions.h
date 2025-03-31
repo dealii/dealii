@@ -26,7 +26,7 @@
 // all having to include Kokkos headers, we have to do it here:
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <Kokkos_Macros.hpp>
-#if KOKKOS_VERSION >= 40200
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 2, 0)
 #  include <Kokkos_Abort.hpp>
 #else
 #  include <Kokkos_Core.hpp>

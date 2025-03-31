@@ -969,7 +969,7 @@ namespace Utilities
 #if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
     KOKKOS_IF_ON_HOST(({
       if (!(iexp >= 0))
         ::dealii::deal_II_exceptions::internals::issue_error_noreturn(

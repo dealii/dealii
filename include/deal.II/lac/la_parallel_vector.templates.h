@@ -134,7 +134,7 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
-#if KOKKOS_VERSION >= 30600
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
               Kokkos::resize(Kokkos::WithoutInitializing,
                              data.values,
                              new_alloc_size);
@@ -349,7 +349,7 @@ namespace LinearAlgebra
                       data.values.size() == 0),
                      ExcInternalError());
 
-#if KOKKOS_VERSION >= 30600
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
               Kokkos::resize(Kokkos::WithoutInitializing,
                              data.values,
                              new_alloc_size);
@@ -492,11 +492,11 @@ namespace LinearAlgebra
               ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
               exec, 0, size),
             KOKKOS_LAMBDA(size_type i, RealType & update) {
-#if KOKKOS_VERSION < 30700
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
+              update = Kokkos::fmax(update, Kokkos::abs(data.values(i)));
+#else
               update = Kokkos::Experimental::fmax(
                 update, Kokkos::Experimental::fabs(data.values(i)));
-#else
-              update = Kokkos::fmax(update, Kokkos::abs(data.values(i)));
 #endif
             },
             Kokkos::Max<RealType, Kokkos::HostSpace>(result));
@@ -992,7 +992,7 @@ namespace LinearAlgebra
           if (std::is_same_v<MemorySpaceType, dealii::MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
-#    if KOKKOS_VERSION >= 30600
+#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values_host_buffer,
                                partitioner->n_import_indices());
@@ -1005,7 +1005,7 @@ namespace LinearAlgebra
 #  endif
             {
               if (import_data.values.size() == 0)
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values,
                                partitioner->n_import_indices());
@@ -1024,11 +1024,11 @@ namespace LinearAlgebra
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
           data.values_host_buffer =
-#    if KOKKOS_VERSION < 40000
-            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
+#    if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
                                                 data.values);
 #    else
-            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
+            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
                                                 data.values);
 #    endif
           partitioner->import_from_ghosted_array_start(
@@ -1152,7 +1152,7 @@ namespace LinearAlgebra
           if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
-#    if KOKKOS_VERSION >= 30600
+#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values_host_buffer,
                                partitioner->n_import_indices());
@@ -1165,7 +1165,7 @@ namespace LinearAlgebra
 #  endif
             {
               if (import_data.values.size() == 0)
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values,
                                partitioner->n_import_indices());
@@ -1184,11 +1184,11 @@ namespace LinearAlgebra
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
           data.values_host_buffer =
-#    if KOKKOS_VERSION < 40000
-            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
+#    if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
                                                 data.values);
 #    else
-            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
+            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
                                                 data.values);
 #    endif
 

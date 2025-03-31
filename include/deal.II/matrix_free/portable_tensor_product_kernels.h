@@ -71,7 +71,7 @@ namespace Portable
 
 
 
-#if KOKKOS_VERSION >= 40000
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
     /**
      * Helper function for apply() in 1D
      */
@@ -303,7 +303,7 @@ namespace Portable
           const ViewTypeIn in,
           ViewTypeOut      out)
     {
-#if KOKKOS_VERSION >= 40000
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
       if constexpr (dim == 1)
         apply_1d<n_rows, n_columns, direction, Number, contract_over_rows, add>(
           team_member, shape_data, in, out);

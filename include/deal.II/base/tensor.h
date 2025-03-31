@@ -839,7 +839,7 @@ private:
    * a rank-1 tensor, then we simply need an array of scalars.
    * Otherwise, it is an array of tensors one rank lower.
    */
-#if KOKKOS_VERSION >= 30700
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
   std::conditional_t<rank_ == 1,
                      Kokkos::Array<Number, dim>,
                      Kokkos::Array<Tensor<rank_ - 1, dim, Number>, dim>>
@@ -1104,7 +1104,7 @@ namespace internal
     constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE void
     multiply_assign_scalar(std::complex<Number> &val, const OtherNumber &s)
     {
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       KOKKOS_IF_ON_HOST((val *= s;))
       KOKKOS_IF_ON_DEVICE(({
         (void)val;
@@ -1329,7 +1329,7 @@ namespace internal
   namespace TensorInitialization
   {
     template <int rank, int dim, typename Number, std::size_t... I>
-#    if KOKKOS_VERSION >= 30700
+#    if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
     constexpr Kokkos::Array<typename Tensor<rank, dim, Number>::value_type, dim>
 #    else
     constexpr std::array<typename Tensor<rank, dim, Number>::value_type, dim>
