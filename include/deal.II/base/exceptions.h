@@ -17,9 +17,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/exception_macros.h>
-#include <deal.II/base/numbers.h>
-
 // The exception machinery (including the macros defined in
 // exception_macros.h) references Kokkos functions. The places that
 // use exceptions must know about these functions, and to avoid them
@@ -33,6 +30,8 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+
+#include <deal.II/base/exception_macros.h>
 
 #include <exception>
 #include <ostream>
