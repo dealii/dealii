@@ -22,6 +22,7 @@
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/types.h>
 
+#include <ostream>
 #include <string>
 
 

@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <atomic>
+#include <string>
 #include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN

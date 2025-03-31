@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <any>
+#include <ostream>
 #include <typeinfo>
 #include <vector>
 
