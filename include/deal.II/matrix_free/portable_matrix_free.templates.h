@@ -212,7 +212,7 @@ namespace Portable
         JxW_host;
       typename std::remove_reference_t<
         decltype(data->inv_jacobian[color])>::HostMirror inv_jacobian_host;
-#if KOKKOS_VERSION >= 30600
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       auto local_to_global_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                    data->local_to_global[color]);

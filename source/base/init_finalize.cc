@@ -281,7 +281,7 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
           argv_new.push_back(arg);
 
       std::stringstream threads_flag;
-#if KOKKOS_VERSION >= 30700
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
       threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
 #else
       threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();

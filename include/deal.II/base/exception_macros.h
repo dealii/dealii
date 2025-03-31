@@ -505,7 +505,7 @@
  * @ingroup Exceptions
  */
 #ifdef DEBUG
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
 #    ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #      define Assert(cond, exc)                                                \
         do                                                                     \
@@ -551,7 +551,7 @@
           }                                                                    \
         while (false)
 #    endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#  else    /*if KOKKOS_VERSION >= 30600*/
+#  else    /*if DEAL_II_KOKKOS_VERSION_GTE(3,6,0)*/
 #    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
 #      ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #        define Assert(cond, exc)                                              \
