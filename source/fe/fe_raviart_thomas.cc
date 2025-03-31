@@ -208,16 +208,23 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
         QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               face_points);
 
-      for (; current < this->reference_cell().n_faces() * n_face_points;
-           ++current)
+      for (unsigned int face_no = 0;
+           face_no < GeometryInfo<dim>::faces_per_cell;
+           ++face_no)
         {
-          // Enter the support point into the vector
-          this->generalized_support_points[current] =
-            faces.point(current + QProjector<dim>::DataSetDescriptor::face(
-                                    this->reference_cell(),
-                                    0,
-                                    numbers::default_geometric_orientation,
-                                    n_face_points));
+          const auto offset = QProjector<dim>::DataSetDescriptor::face(
+            this->reference_cell(),
+            face_no,
+            numbers::default_geometric_orientation,
+            n_face_points);
+          for (unsigned int face_point = 0; face_point < n_face_points;
+               ++face_point)
+            {
+              // Enter the support point into the vector
+              this->generalized_support_points[current] =
+                faces.point(offset + face_point);
+              ++current;
+            }
         }
     }
 

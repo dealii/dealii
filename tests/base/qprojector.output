@@ -1,8 +1,8 @@
 
 DEAL::
-DEAL:line::length: 0
-DEAL:line::length: 0
-DEAL:line::length: 0
+DEAL:line::length: 0.0
+DEAL:line::length: 0.0
+DEAL:line::length: 0.0
 DEAL:face::Checking dim 1 1d-points 0
 DEAL:face::Face 0
 DEAL:face::0.0
@@ -431,26 +431,26 @@ DEAL:face::0.0 1.0 1.0
 DEAL:face::1.0 1.0 1.0
 DEAL:all::Checking dim 2 1d-points 2
 DEAL:all::Face 0 orientation false
-DEAL:all::0.0 0.0
 DEAL:all::0.0 1.0
+DEAL:all::0.0 0.0
 DEAL:all::Face 0 orientation true
 DEAL:all::0.0 0.0
 DEAL:all::0.0 1.0
 DEAL:all::Face 1 orientation false
-DEAL:all::1.0 0.0
 DEAL:all::1.0 1.0
+DEAL:all::1.0 0.0
 DEAL:all::Face 1 orientation true
 DEAL:all::1.0 0.0
 DEAL:all::1.0 1.0
 DEAL:all::Face 2 orientation false
-DEAL:all::0.0 0.0
 DEAL:all::1.0 0.0
+DEAL:all::0.0 0.0
 DEAL:all::Face 2 orientation true
 DEAL:all::0.0 0.0
 DEAL:all::1.0 0.0
 DEAL:all::Face 3 orientation false
-DEAL:all::0.0 1.0
 DEAL:all::1.0 1.0
+DEAL:all::0.0 1.0
 DEAL:all::Face 3 orientation true
 DEAL:all::0.0 1.0
 DEAL:all::1.0 1.0
@@ -889,33 +889,33 @@ DEAL:face::0.50 1.0 1.0
 DEAL:face::1.0 1.0 1.0
 DEAL:all::Checking dim 2 1d-points 3
 DEAL:all::Face 0 orientation false
-DEAL:all::0.0 0.0
-DEAL:all::0.0 0.50
 DEAL:all::0.0 1.0
+DEAL:all::0.0 0.50
+DEAL:all::0.0 0.0
 DEAL:all::Face 0 orientation true
 DEAL:all::0.0 0.0
 DEAL:all::0.0 0.50
 DEAL:all::0.0 1.0
 DEAL:all::Face 1 orientation false
-DEAL:all::1.0 0.0
-DEAL:all::1.0 0.50
 DEAL:all::1.0 1.0
+DEAL:all::1.0 0.50
+DEAL:all::1.0 0.0
 DEAL:all::Face 1 orientation true
 DEAL:all::1.0 0.0
 DEAL:all::1.0 0.50
 DEAL:all::1.0 1.0
 DEAL:all::Face 2 orientation false
-DEAL:all::0.0 0.0
-DEAL:all::0.50 0.0
 DEAL:all::1.0 0.0
+DEAL:all::0.50 0.0
+DEAL:all::0.0 0.0
 DEAL:all::Face 2 orientation true
 DEAL:all::0.0 0.0
 DEAL:all::0.50 0.0
 DEAL:all::1.0 0.0
 DEAL:all::Face 3 orientation false
-DEAL:all::0.0 1.0
-DEAL:all::0.50 1.0
 DEAL:all::1.0 1.0
+DEAL:all::0.50 1.0
+DEAL:all::0.0 1.0
 DEAL:all::Face 3 orientation true
 DEAL:all::0.0 1.0
 DEAL:all::0.50 1.0
@@ -1925,11 +1925,11 @@ DEAL:face::0.75 1.0 1.0
 DEAL:face::1.0 1.0 1.0
 DEAL:all::Checking dim 2 1d-points 5
 DEAL:all::Face 0 orientation false
-DEAL:all::0.0 0.0
-DEAL:all::0.0 0.25
-DEAL:all::0.0 0.50
-DEAL:all::0.0 0.75
 DEAL:all::0.0 1.0
+DEAL:all::0.0 0.75
+DEAL:all::0.0 0.50
+DEAL:all::0.0 0.25
+DEAL:all::0.0 0.0
 DEAL:all::Face 0 orientation true
 DEAL:all::0.0 0.0
 DEAL:all::0.0 0.25
@@ -1937,11 +1937,11 @@ DEAL:all::0.0 0.50
 DEAL:all::0.0 0.75
 DEAL:all::0.0 1.0
 DEAL:all::Face 1 orientation false
-DEAL:all::1.0 0.0
-DEAL:all::1.0 0.25
-DEAL:all::1.0 0.50
-DEAL:all::1.0 0.75
 DEAL:all::1.0 1.0
+DEAL:all::1.0 0.75
+DEAL:all::1.0 0.50
+DEAL:all::1.0 0.25
+DEAL:all::1.0 0.0
 DEAL:all::Face 1 orientation true
 DEAL:all::1.0 0.0
 DEAL:all::1.0 0.25
@@ -1949,11 +1949,11 @@ DEAL:all::1.0 0.50
 DEAL:all::1.0 0.75
 DEAL:all::1.0 1.0
 DEAL:all::Face 2 orientation false
-DEAL:all::0.0 0.0
-DEAL:all::0.25 0.0
-DEAL:all::0.50 0.0
-DEAL:all::0.75 0.0
 DEAL:all::1.0 0.0
+DEAL:all::0.75 0.0
+DEAL:all::0.50 0.0
+DEAL:all::0.25 0.0
+DEAL:all::0.0 0.0
 DEAL:all::Face 2 orientation true
 DEAL:all::0.0 0.0
 DEAL:all::0.25 0.0
@@ -1961,11 +1961,11 @@ DEAL:all::0.50 0.0
 DEAL:all::0.75 0.0
 DEAL:all::1.0 0.0
 DEAL:all::Face 3 orientation false
-DEAL:all::0.0 1.0
-DEAL:all::0.25 1.0
-DEAL:all::0.50 1.0
-DEAL:all::0.75 1.0
 DEAL:all::1.0 1.0
+DEAL:all::0.75 1.0
+DEAL:all::0.50 1.0
+DEAL:all::0.25 1.0
+DEAL:all::0.0 1.0
 DEAL:all::Face 3 orientation true
 DEAL:all::0.0 1.0
 DEAL:all::0.25 1.0
