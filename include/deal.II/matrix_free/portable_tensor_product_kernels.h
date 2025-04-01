@@ -21,6 +21,9 @@
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/utilities.h>
 
+#include <Kokkos_Core.hpp>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
