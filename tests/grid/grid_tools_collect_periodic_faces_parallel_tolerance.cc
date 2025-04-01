@@ -50,18 +50,6 @@ test(MPI_Comm comm)
     }
   GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2, true);
   
-  //We have to match periodic faces by looking at equal position componants 
-  //other than the periodic direction, in which the nodes lie in the same
-  //boundary Id.
-  //Thus, here we put the faces in the high xi-direction in the same boundary 
-  //Id than the low x-direction.
-  typename Triangulation<dim>::face_iterator face = tria.begin_face()
-  ,endface = tria.end_face();
-  for (; face != endface; ++face)
-    if (face->at_boundary())
-      if (face->boundary_id() == 1)
-        face->set_boundary_id(0);
-
   //Here we are only interested in using the tolerance parameter of the 
   //collect_periodic_faces function, the other default parameter stay as
   //default one.
@@ -70,9 +58,14 @@ test(MPI_Comm comm)
   const double tolerance=1e-7;
   const unsigned int direction = 0; //x-direction
 
+  //We distort the mesh to test the tolerance parameter
+  GridTools::distort_random(tolerance*10, tria, /* keep boundary */ false);
+
   // Collect periodic faces in the x-direction
+  // activate debug to see it fail
   GridTools::collect_periodic_faces(tria, 
-                                    0, //boundary Id
+                                    0, //boundary Id 1
+                                    1, //boundary Id 2
                                     direction, 
                                     periodicity_vector,
                                     defaultOffset,
