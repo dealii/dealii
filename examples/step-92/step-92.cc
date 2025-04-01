@@ -18,7 +18,8 @@
  * 
  * 2024-11, Stephan Voss, Neunkirchen am Brand, Germany, stvoss@gmx.de
  *
- * This solver is derived from several deal.II examples and tutorials.
+ * This solver is derived from several deal.II examples
+ * and tutorial steps 1, 3, 49 and 81.
  * Thank You to all deal.II contributors.
  * 
  * ---------------------------------------------------------------------
@@ -123,7 +124,7 @@ namespace Step92
     public:
       types::material_id boundary_id;   // boundary ID number
       std::string        name;          // clear-text name for this boundary
-      double             phi_e;         // [V] electric potential used as dirichlet boundary value
+      double             potential;     // [V] electric potential used as dirichlet boundary value
     };
 
 
@@ -131,22 +132,22 @@ namespace Step92
 
     domain_properties get_domain_properties(types::material_id domain_id);
 
-    boundary_potential * get_boundary_value(types::material_id boundary_id);
+    boundary_potential get_boundary_value(types::material_id boundary_id);
 
     std::string mesh_filename, cells_output_data_filename;
 
   private:
-    int default_domain_index;
 
     std::list<DomainProperties_tuple>          domains_list;
     std::list<BoundaryPotential_tuple> boundary_values_list;
 
   public:
-    unsigned long       N_domains;
-    domain_properties  *p_domains;
+    int default_domain_index;
+    std::vector<domain_properties> domains_vector;
 
-    unsigned long       N_boundary_values;
-    boundary_potential *p_boundary_values;
+    const types::material_id ID_NO_BOUNDARY_VALUE = -1;
+    const boundary_potential no_boundary_value = { ID_NO_BOUNDARY_VALUE, "none", 0 };
+    std::vector<boundary_potential> boundaries_vector;
   };
 
 
@@ -159,21 +160,36 @@ namespace Step92
   // @sect5{ProblemParameters class constructor}
   // In the constructor ProblemParameters::ProblemParameters(), all parameters are defined,
   // which shall be read when parsing the input parameter file:
+  // <ul>
+  //   <li>
+  //     "mesh filename" is a string specifying a gmsh file (without suffix ".msh") containing the triangulation
+  //   </li>
+  //   <li>
+  //     "cells solution filename" is sepcifying filename (without suffix) for exporting output from cells solution data.
+  //     This filename will automatically be extended with a suffix ".vtu"
+  //   </li>
+  //   <li>
+  //     "domains" is a list of physical domains.
+  // 
+  //     Each comma-separated entry is formatted as "name : ID : epsilon_r : kappa", with
+  //     <ol>
+  //       <li> "name" : clear-text name of a domain </li>
+  //       <li> "ID" is a unique positive ID number (or zero for default domain) </li>
+  //       <li> "epsilon_r" is the relative electric permittivity </li>
+  //       <li> "kappa" is the electric conductivity [A/Vm] </li>
+  //     </ol>
+  //   </li>
+  //   <li>
+  //     "potentials" is a list of boundary values.
   //
-  // - "mesh filename" is a string specifying a gmsh file (without suffix ".msh") containing the triangulation
-  // - "cells solution filename" is sepcifying filename (without suffix) for exporting output from cells solution data.
-  //   This filename will automatically be extended with a suffix ".vtu"
-  // - "domains" is a list of physical domains
-  // .  
-  // Each comma-separated entry is formatted as "name : ID : epsilon_r : kappa", with
-  //     -# "name" : clear-text name of a domain
-  //     -# "ID" is a unique positive ID number (or zero for default domain)
-  //     -# "epsilon_r" is the relative electric permittivity
-  //     -# "kappa" is the electric conductivity [A/Vm]
-  // - "potentials" is a list of boundary values.\  Each comma-separated entry is formatted as "name : ID : phi_e", with
-  //     -# "name" is a clear-text name of a boundary
-  //     -# "ID" is a unique positive ID number (or zero for default boundary)
-  //     -# "phi"_e is the electrostatic potential [V] used for dirichlet boundary condition
+  //     Each comma-separated entry is formatted as "name : ID : el. potential", with
+  //     <ol>
+  //       <li> "name" is a clear-text name of a boundary </li>
+  //       <li> "ID" is a unique positive ID number (or zero for default boundary) </li>
+  //       <li> "el. potential" is the electrostatic potential [V] used for dirichlet boundary condition </li>
+  //     </ol>
+  //   </li>
+  // </ul>
   
   ProblemParameters::ProblemParameters()
     : ParameterAcceptor("Problem")
@@ -207,27 +223,27 @@ namespace Step92
   // After parsing all parameters, some processing of the domains data and the boundary values is done:
   void ProblemParameters::finalize()
   {
-    // 1. count and copy the domain properties entries into an array
+    // 1. copy the domain properties entries into a std::vector
     // Most domain properties are directly copied into memory.
     // Only the electric permittivity is converted into an absolute value [As/Vm]
     // by multiplying the relative permittivity number from parameter file with vacuum permittivity
     // If a domain ID 0 is assigned, its properties will be defined as default values
     
-    N_domains = domains_list.size() + 1; // reserve an array entry for a default domain
-
-    p_domains = new domain_properties[N_domains];
-
+    domain_properties tmp_domain;
+    
     int domain_index  = 0;
     default_domain_index = -1;
     
     for (const auto &item : domains_list)
       {
-        p_domains[domain_index].name      = std::get<0>(item);
-        p_domains[domain_index].domain_id = std::get<1>(item);
-        p_domains[domain_index].epsilon   = epsilon_vacuum * std::get<2>(item);;
-        p_domains[domain_index].kappa     = std::get<3>(item);
+        tmp_domain.name      = std::get<0>(item);
+        tmp_domain.domain_id = std::get<1>(item);
+        tmp_domain.epsilon   = epsilon_vacuum * std::get<2>(item);;
+        tmp_domain.kappa     = std::get<3>(item);
+        
+        domains_vector.push_back(tmp_domain);
 
-        if (p_domains[domain_index].domain_id == 0) default_domain_index = domain_index;
+        if (tmp_domain.domain_id == 0) default_domain_index = domain_index;
 
         domain_index++;
       }
@@ -239,24 +255,24 @@ namespace Step92
         domain_index++;
         default_domain_index                = domain_index;
 
-        p_domains[domain_index].name        = "default";
-        p_domains[domain_index].domain_id   = 0;
-        p_domains[domain_index].epsilon     = epsilon_vacuum;
-        p_domains[domain_index].kappa       = 0.0;
+        tmp_domain.name        = "default";
+        tmp_domain.domain_id   = 0;
+        tmp_domain.epsilon     = epsilon_vacuum;
+        tmp_domain.kappa       = 0.0;
+
+        domains_vector.push_back(tmp_domain);
       }
 
-    // 2. count and copy the boundary potentials entries into an array
-    N_boundary_values = boundary_values_list.size();
-    p_boundary_values = new boundary_potential[N_boundary_values];
+    // 2. copy the boundary potentials entries into a std::vector
+    boundary_potential tmp_boundary;
 
-    unsigned int        boundary_index = 0;
     for (const auto &item : boundary_values_list)
       {
-        p_boundary_values[boundary_index].name        = std::get<0>(item);
-        p_boundary_values[boundary_index].boundary_id = std::get<1>(item);
-        p_boundary_values[boundary_index].phi_e       = std::get<2>(item);
-
-        boundary_index++;
+        tmp_boundary.name        = std::get<0>(item);
+        tmp_boundary.boundary_id = std::get<1>(item);
+        tmp_boundary.potential   = std::get<2>(item);
+        
+        boundaries_vector.push_back(tmp_boundary);
       }
   }
 
@@ -266,32 +282,32 @@ namespace Step92
   typename ProblemParameters::domain_properties
   ProblemParameters::get_domain_properties(types::material_id domain_id)
   {
-    for (unsigned int domain_index = 0; domain_index < N_domains; domain_index++)
+    for (const auto & domain : domains_vector)
       {
-        if (domain_id == (p_domains[domain_index].domain_id))
+        if (domain_id == domain.domain_id)
           {
-            return p_domains[domain_index];
+            return domain;
           }
       }
-
-    return p_domains[default_domain_index];
+      
+    return domains_vector[default_domain_index];
   }
   
 
   // Function <code>ProblemParameters::get_boundary_value</code> 
   // will be used to retrieve the boundary value by providing a boundary ID number.
-  typename ProblemParameters::boundary_potential *
+  typename ProblemParameters::boundary_potential
   ProblemParameters::get_boundary_value(types::material_id boundary_id)
   {
-    for (unsigned int boundary_index = 0; boundary_index < N_boundary_values; boundary_index++)
+    for (const auto & boundary : boundaries_vector)
       {
-        if (boundary_id == (p_boundary_values[boundary_index].boundary_id))
+        if (boundary_id == boundary.boundary_id)
           {
-            return &p_boundary_values[boundary_index];
+            return boundary;
           }
       }
-
-    return nullptr;
+      
+    return no_boundary_value;
   }
 
 
@@ -455,19 +471,19 @@ namespace Step92
     // Assign electrostatic potential values on the Dirichlet boundaries.
     const FEValuesExtractors::Scalar phi_e(0);
 
-    for (unsigned int boundary_index = 0; boundary_index < problem_parameters.N_boundary_values; boundary_index++)
+    for (const auto & boundary : problem_parameters.boundaries_vector)
       {
-        pcout << "set " << problem_parameters.p_boundary_values[boundary_index].name
-              << " boundary (ID "
-              << problem_parameters.p_boundary_values[boundary_index].boundary_id
-              << ") potential: "
-              << problem_parameters.p_boundary_values[boundary_index].phi_e << " V";
+        pcout << "set " << boundary.name
+              << " boundary potential: phi_e_"
+              << boundary.boundary_id
+              << " = "
+              << boundary.potential << " V";
 
         VectorTools::interpolate_boundary_values(
           dof_handler,
-          problem_parameters.p_boundary_values[boundary_index].boundary_id,
+          boundary.boundary_id,
           Functions::ConstantFunction<dim, double>(
-            problem_parameters.p_boundary_values[boundary_index].phi_e),
+            boundary.potential),
           constraints,
           fe.component_mask(phi_e));
 
@@ -572,7 +588,7 @@ namespace Step92
                     const auto boundary_id = face->boundary_id();
 
                     auto boundary_value = problem_parameters.get_boundary_value(boundary_id);
-                    if (boundary_value!=nullptr) continue;
+                    if (boundary_value.boundary_id!=problem_parameters.ID_NO_BOUNDARY_VALUE) continue;
                     
                     fe_face_values.reinit(cell, face);
 
@@ -628,7 +644,7 @@ namespace Step92
     solver.set_symmetric_mode(true);
     solver.solve(system_matrix, completely_distributed_solution, system_rhs);
 
-    pcout << "  solved"  << std::endl;
+    pcout << "  solved."  << std::endl;
 
     constraints.distribute(completely_distributed_solution);
 

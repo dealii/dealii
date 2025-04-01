@@ -1,5 +1,5 @@
 
-<i>WORKING DRAFT 2025-03-29 !! Preparation of this tutorial is ongoing. B.R. Stephan Voss. Special Thank You to Jean-Paul Pelteret for his support.</i>
+<i>This tutorial was contributed by Stephan Voss. Special Thank You to Jean-Paul Pelteret for review, discussions and support.</i>
 
 <a name="step-92-Intro"></a>
 
@@ -120,11 +120,16 @@
 The idea of this tutorial is to show a few aspects of electrical
 engineering of high voltage components in the energy industry.
 
-A parallelized direct solver (based on MUMPS) is implemented
-to calculate electrical field distributions.
+A parallelized direct solver (based on MUMPS) for Laplace-equation
+and a DataPostprocessor on cell-data is implemented
+to derive and export electrical field
+distributions for visualization or further evaluation.
+Visualizations in this tutorial have been prepared using
+<a href="https://www.paraview.org/">ParaView</a>, 
+but this choice is not binding to any reader.
 
 Two simple and abstrahized examples are provided for generating
-hexahedral meshes using gmsh. 
+hexahedral meshes using <a href="https://gmsh.info/">Gmsh</a>.
 
 Performance of the mesh-import and the solver can be tested
 be either generating finer meshes.
@@ -177,7 +182,7 @@ any capacitive or inductive components.
   <tr>
       <td align="center">
       <img src="../../../examples/step-92/doc/power_transmission.jpg" alt="power transmission example"/>
-      <p> Fig 1: power transmission example </p>
+      <p> Fig 1: simplified power transmission example </p>
       </td>
   </tr>
 </table>
@@ -188,7 +193,7 @@ On the other (left hand) side of the transmission line, a generator
 is providing power $P_1 = U_1 I$.
 
 Due to Ohm's law, the transmission line itself will have a voltage drop
-$U_R = R I$ and hence the voltage $U_2$ on customer side is lower
+$U_R = R I$ and hence the voltage $U_2$ on consumer side is lower
 than the generator voltage $U_1 = U_2 + U_R > U_2$ and the generator
 has to provide more power than the consumer receives $P_1 > P_2$.
 
@@ -279,7 +284,7 @@ showing two simple aspects of high voltage engineering.
       
       Instead of the barrier(s), a realistic iron core is considered
       in this example.
-      Such core in practice shall be grounded (to $0 \text{V}$).
+      Such core in practice shall be grounded (to $0\,\text{V}$).
       Once again, a Dirichlet boundary condition will serve this purpose
       in the model as the core volume will be removed from the
       simulation domain and only its surface will be part of the model
@@ -322,7 +327,7 @@ some simplifications are common practice in most high voltage engineering applic
   </li>
 </ul>
 
-The corresponding field equation of interest for the high voltage engineer in frequency domain is
+The corresponding field equation of interest for the high voltage engineer in frequency domain is a Laplace equation
 @f{align*}{
   \div \left[ \left( \conductivity +\imj \omega \permittivity \right) \grad {\cEpot} \right] &= 0 \qquad\qquad & \text{in}\ \Omega,
   \\
@@ -394,7 +399,7 @@ $\partial\Omega=\bigcup \left\{\Gamma_k | k \in \left\{1,\dots,K\right\} \right\
 
 This definition can be used to set a reference shell 
 $\Gamma_{k_0}$ surrounding the entire arrangement, 
-where a reference potential can be set, e.g. ${{\Epot}_{k_0}} = 0 \text{V}$.
+where a reference potential can be set, e.g. ${{\Epot}_{k_0}} = 0\,\text{V}$.
 
 Furthermore, holes can be cut into the simulation domain and their boundaries 
 can be set to an arbitrary potential $\varphi_{e k}\in\mathbb{R}$.

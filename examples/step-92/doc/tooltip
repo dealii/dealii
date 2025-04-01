@@ -1,1 +1,3 @@
-Import of complex meshes (e.g. created using gmsh)
+An example from high-voltage engineering solving Laplace-equation; 
+mesh-generation using Gmsh; mesh-import using GridIn class; 
+using a DataPostprocessor for exporting solution (el. potential) and electrical field distribution

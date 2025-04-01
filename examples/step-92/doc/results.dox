@@ -4,8 +4,8 @@
 
 <h4> geometry and parameters </h4>
 
-The reader may open the model geometry file <code>example-1.geo</code> with any text-editor
-or visualize it using gmsh
+The model geometry file <code>example-1.geo</code> can be read with any text-editor
+or visualized using gmsh
 @code
 > /usr/bin/gmsh example-1.geo
 @endcode
@@ -22,7 +22,7 @@ or visualize it using gmsh
 The geometry does not contain any material properties nor boundary value definitions.
 For understanding how this will be done in this tutorial, a look at a list of the models physical groups in the gmsh GUI is useful.
 
-Therefore, in the <code>Tools</code> menu select menu item <code>Visibility</code>.
+Therefore, in <a href="https://gmsh.info/">Gmsh's</a> <code>Tools</code> menu select menu item <code>Visibility</code>.
 A window will open. Select the <code>List</code> show <code>Physical groups</code> (This can be selected in a dropdown selector besides the <code>search</code>-field.)
 
 The list of physical groups shall show <code>Type</code>, <code>Number</code> (ID resp.) and <code>Name</code> as in the following table.
@@ -40,6 +40,9 @@ It is summarized in the <code>Properties</code> here but the assignment is not d
         Name
     </th>
     <th>
+        representing
+    </th>
+    <th>
         Properties (in .prm-file only, not in .geo-file for gmsh)
     </th>
 </tr>
@@ -47,52 +50,63 @@ It is summarized in the <code>Properties</code> here but the assignment is not d
     <td>Volume</td>
     <td>0</td>
     <td></td>
-    <td>$\conductivity=0$, $\permittivity_r=1$</td>
+    <td>insulator, default sub-domain $\Omega \setminus \left\{ \Omega_{10}, \Omega_{20}, \Omega_{30} \right\}$</td>
+    <td>conductivity $\conductivity=0$, rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
     <td>Volume</td>
     <td>10</td>
     <td>conductor_1</td>
-    <td>$\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, $\permittivity_r=1$</td>
+    <td>copper conductor, sub-domain $\Omega_{10}$</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+        rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
     <td>Volume</td>
     <td>20</td>
     <td>conductor_2</td>
-    <td>$\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, $\permittivity_r=1$</td>
+    <td>copper conductor, sub-domain $\Omega_{20}$</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+        rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
     <td>Volume</td>
     <td>30</td>
     <td>barrier</td>
-    <td>$\conductivity=0$, $\permittivity_r=4$</td>
+    <td>insulator, sub-domain $\Omega_{30}$</td>
+    <td>conductivity $\conductivity=0$, rel. permittivity $\permittivity_r=4$</td>
 </tr>
 <tr>
     <td>Surface</td>
     <td>11</td>
     <td>terminal_11</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{11} = 1 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{11}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{11} = 1\,\text{V}$</td>
 </tr>
 <tr>
     <td>Surface</td>
     <td>12</td>
     <td>terminal_12</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{12} = 0.5 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{12}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{12} = 0.5\,\text{V}$</td>
 </tr>
 <tr>
     <td>Surface</td>
     <td>21</td>
     <td>terminal_21</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{21} = 0.5 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{21}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{21} = 0.5\,\text{V}$</td>
 </tr>
 <tr>
     <td>Surface</td>
     <td>22</td>
     <td>terminal_22</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{22} = -1 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{22}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{22} = -1\,\text{V}$</td>
 </tr>
 </table>
 
+Default boundary $\Gamma_0$ value will be set to ${\Epot}_{0}=0\,\text{V}$.
 The assignment of the properties is done in the parameter file <code>example-1.prm</code>.
 First parameter is the <code>mesh filename</code> (without <code>.msh</code>-suffix.
 
@@ -145,18 +159,18 @@ how to start the simulation and a graphical visualization of the output data.
 Generate a coarse mesh in binary file format, run the program and see the output
 @code
 > /usr/bin/gmsh example-1.geo -clmax 0.3 -bin -3
-> mpirun -n 32 ./step-92 example-1.prm
+> mpirun -n 32 -bind-to hwthread ./step-92 example-1.prm
 Running with PETSc on 32 MPI rank(s)...
 mesh-file: "example-1.msh"
 setup: number of degrees of freedom: 15015
-set default boundary (ID 0) potential: 0 V
-set terminal_11 boundary (ID 11) potential: 1 V
-set terminal_12 boundary (ID 12) potential: 0.5 V
-set terminal_21 boundary (ID 21) potential: 0.5 V
-set terminal_22 boundary (ID 22) potential: -1 V
+set default boundary potential: phi_e_0 = 0 V
+set terminal_11 boundary potential: phi_e_11 = 1 V
+set terminal_12 boundary potential: phi_e_12 = 0.5 V
+set terminal_21 boundary potential: phi_e_21 = 0.5 V
+set terminal_22 boundary potential: phi_e_22 = -1 V
   system set up.
   system assembled.
-  solved
+  solved.
 exported cells solution and output data into file "example-1_cells_output_data.vtu"
 
 
@@ -172,17 +186,23 @@ exported cells solution and output data into file "example-1_cells_output_data.v
 | 05. post-process                |         1 |    0.0395s |       6.2% |
 +---------------------------------+-----------+------------+------------+
 @endcode
+note: The mpirun-parameters <code>-n 32 -bind-to hwthread</code>
+are essential on the PC used for preparing this tutorial,
+featuring an AMD 7950X CPU with 16 cores and 32 hardware-threads. 
+The number of hardware-threads has to be adopted to the number of 
+CPUs hardware-threads on the PC of the reader.
 
-The author used Paraview to visualize the solver output.
-Light blue lines show electric field lines ($vEfield$). Colorization of conductor and barrier surfaces
-indicate the electric potential $Epot$ on those surfaces.
+
+In this tutorial, ParaView was used to visualize the solver output.
+Light blue lines show electric field lines ($\vEfield$). Colorization of conductor and barrier surfaces
+indicate the electric potential $\Epot$ on those surfaces.
 Yellow lines show electric current density $\vJelfield$.
 
 <table width="100%" align="center">
   <tr>
       <td align="center">
       <img src="../../../examples/step-92/doc/example-1_field_plot_1.jpg" alt="example-1: 3D visualization of electric field lines and current density" height="800"/>
-      <p> example-1: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using Paraview)</p>
+      <p> example-1: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using ParaView)</p>
       </td>
   </tr>
 </table>
@@ -228,6 +248,9 @@ Following properties shall be assigned to volumes and boundary values to surface
         Name
     </th>
     <th>
+        representing
+    </th>
+    <th>
         Properties (in .prm-file only, not in .geo-file for gmsh)
     </th>
 </tr>
@@ -235,54 +258,65 @@ Following properties shall be assigned to volumes and boundary values to surface
     <td>Volume</td>
     <td>0</td>
     <td></td>
-    <td>$\conductivity=0$, $\permittivity_r=1$</td>
+    <td>insulator, default sub-domain $\Omega \setminus \left\{ \Omega_{10}, \Omega_{20} \right\}$</td>
+    <td>conductivity $\conductivity=0$, rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
     <td>Volume</td>
     <td>20</td>
     <td>winding_1</td>
-    <td>$\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, $\permittivity_r=1$</td>
+    <td>copper conductor, sub-domain $ \Omega_{10} $</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+        rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
     <td>Volume</td>
     <td>30</td>
     <td>winding_2</td>
-    <td>$\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, $\permittivity_r=1$</td>
+    <td>copper conductor, sub-domain $ \Omega_{20} $</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+        rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
     <td>Surface</td>
-    <td>10</td>
+    <td>1</td>
     <td>core</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{10} = 0 \text{V}$<</td>
+    <td>core-surface, boundary $\Gamma_{1}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{1} = 0\,\text{V}$</td>
 </tr>
 <tr>
     <td>Surface</td>
     <td>11</td>
     <td>winding_1_terminal_1</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{11} = 1 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{11}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{11} = 1\,\text{V}$</td>
 </tr>
 <tr>
     <td>Surface</td>
     <td>12</td>
     <td>winding_1_terminal_2</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{12} = 0.5 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{12}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{12} = 0\,\text{V}$</td>
 </tr>
 <tr>
     <td>Surface</td>
     <td>21</td>
     <td>winding_2_terminal_1</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{21} = 0.5 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{21}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{21} = 0.5\,\text{V}$</td>
 </tr>
 <tr>
     <td>Volume</td>
     <td>22</td>
     <td>winding_2_terminal_2</td>
-    <td>Dirichlet boundary condition: ${\Epot}_{22} = -1 \text{V}$</td>
+    <td>terminal/electrode, boundary $\Gamma_{22}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{22} = -0.5\,\text{V}$</td>
 </tr>
 </table>
 
 
-The parameter file has the same structure as for previous example, 
+Default boundary $\Gamma_0$ value is set to ${\Epot}_{0}=0\,\text{V}$.
+The parameter file has the same structure as for previous example,
 but in this case there is a core (as a surface with a boundary value)
 instead of the barrier (as a volume with material properties):
 @code
@@ -303,11 +337,11 @@ subsection Problem
   # Dirichlet boundaries (and its electrostatic potentials)
   # each as        Name                  : ID : el. potential [V]
   set potentials = default               :  0 :           0.0     , \
-                   core                  : 10 :           0.0     , \
-                   winding_1_terminal_1  : 21 :           1.0     , \
-                   winding_1_terminal_2  : 22 :           0.0     , \
-                   winding_2_terminal_1  : 31 :           0.5     , \
-                   winding_2_terminal_2  : 32 :          -0.5
+                   core                  :  1 :           0.0     , \
+                   winding_1_terminal_1  : 11 :           1.0     , \
+                   winding_1_terminal_2  : 12 :           0.0     , \
+                   winding_2_terminal_1  : 21 :           0.5     , \
+                   winding_2_terminal_2  : 22 :          -0.5
 
   # cells output data filename
   set cells output data filename = example-2_cells_output_data
@@ -323,19 +357,19 @@ The example can now be simulated and evaluated in next section.
 Generate a coarse mesh in binary file format, run the program and see the output
 @code
 > /usr/bin/gmsh example-2.geo -clmax 300 -bin -3
-> mpirun -n 32 ./step-92 example-2.prm
+> mpirun -n 32 -bind-to hwthread ./step-92 example-2.prm
 Running with PETSc on 32 MPI rank(s)...
 mesh-file: "example-2.msh"
 setup: number of degrees of freedom: 200590
-set default boundary (ID 0) potential: 0 V
-set core boundary (ID 10) potential: 0 V
-set winding_1_terminal_1 boundary (ID 21) potential: 1 V
-set winding_1_terminal_2 boundary (ID 22) potential: 0 V
-set winding_2_terminal_1 boundary (ID 31) potential: 0.5 V
-set winding_2_terminal_2 boundary (ID 32) potential: -0.5 V
+set default boundary potential: phi_e_0 = 0 V
+set core boundary potential: phi_e_1 = 0 V
+set winding_1_terminal_1 boundary potential: phi_e_11 = 1 V
+set winding_1_terminal_2 boundary potential: phi_e_12 = 0 V
+set winding_2_terminal_1 boundary potential: phi_e_21 = 0.5 V
+set winding_2_terminal_2 boundary potential: phi_e_22 = -0.5 V
   system set up.
   system assembled.
-  solved
+  solved.
 exported cells solution and output data into file "example-2_cells_output_data.vtu"
 
 
@@ -352,16 +386,16 @@ exported cells solution and output data into file "example-2_cells_output_data.v
 +---------------------------------+-----------+------------+------------+
 @endcode
 
-Again, Paraview is used for visualization of the solvers output.
-Light blue lines show electric field lines ($vEfield$). Colorization of conductor and barrier surfaces
-indicate the electric potential $Epot$ on those surfaces.
+Again, ParaView is used for visualization of the solvers output.
+Light blue lines show electric field lines ($\vEfield$). Colorization of conductor surfaces
+indicate the electric potential $\Epot$ on those surfaces.
 Yellow lines show electric current density $\vJelfield$.
 
 <table width="100%" align="center">
   <tr>
       <td align="center">
       <img src="../../../examples/step-92/doc/example-2_field_plot_1.jpg" alt="example-2: 3D visualization of electric field lines and current density" height="800"/>
-      <p> example-2: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using Paraview)</p>
+      <p> example-2: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using ParaView)</p>
       </td>
   </tr>
 </table>
@@ -374,7 +408,7 @@ Last example (2) will be used for a test of mesh-import performance.
 First, a finer mesh can be generated using gmsh and start the solver
 @code
 > /usr/bin/gmsh example-2.geo -clmax 100 -bin -3
-> mpirun -n 32 ./step-92 example-2.prm
+> mpirun -n 32 -bind-to hwthread ./step-92 example-2.prm
 @endcode
 Note: Usually refinement shall be done within the solver and not
 for the initial mesh. Only, the example-2 is still to small for seeing
@@ -400,7 +434,7 @@ make that definition ineffective, e.g. by commenting it
 and finally re-compile and run the solver without modifying
 neither mesh nor parameter-file.
 @code
-> mpirun -n 32 ./step-92 example-2.prm
+> mpirun -n 32 -bind-to hwthread ./step-92 example-2.prm
 @endcode
 
 
