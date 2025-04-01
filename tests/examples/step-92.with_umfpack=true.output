@@ -1,0 +1,27 @@
+Running with PETSc on 1 MPI rank(s)...
+mesh-file: "example-1.msh"
+setup: number of degrees of freedom: 11495
+set default boundary potential: phi_e_0 = 0 V
+set terminal_11 boundary potential: phi_e_11 = 1 V
+set terminal_12 boundary potential: phi_e_12 = 0.5 V
+set terminal_21 boundary potential: phi_e_21 = 0.5 V
+set terminal_22 boundary potential: phi_e_22 = -1 V
+  system set up.
+  system assembled.
+  solved.
+exported cells solution and output data into file "example-1_cells_output_data.vtu"
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.346s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| 01. make grid                   |         1 |     0.123s |        36% |
+| 02. setup                       |         1 |    0.0156s |       4.5% |
+| 03. assemble                    |         1 |    0.0322s |       9.3% |
+| 04. solve                       |         1 |     0.101s |        29% |
+| 05. post-process                |         1 |    0.0716s |        21% |
++---------------------------------+-----------+------------+------------+
+
+

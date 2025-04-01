@@ -1,8 +1,6 @@
-<h1>Examples and Results</h1>
+<h1>Results</h1>
 
-<h3> example-1 </h3>
-
-<h4> geometry and parameters </h4>
+<h3> example-1: geometry and parameters </h3>
 
 The model geometry file <code>example-1.geo</code> can be read with any text-editor
 or visualized using gmsh
@@ -131,19 +129,19 @@ subsection Problem
   set mesh filename = example-1
 
   # physical domains
-  # each as       Name        : ID : epsilon_rel : kappa [A/Vm]
-  set domains   = default     :  0 :         1.0 :   0.0         , \
-                  conductor_1 : 10 :         1.0 :  56.0e+6      , \
-                  conductor_2 : 20 :         1.0 :  56.0e+6      , \
-                  barrier     : 30 :         4.0 :   0.0
+  # each as       ID : Name         : kappa [A/Vm] : epsilon_r
+  set domains   =  0 : default      :   0.0        :       1.0  , \
+                  10 : conductor_1  :  56.0e+6     :       1.0  , \
+                  20 : conductor_2  :  56.0e+6     :       1.0  , \
+                  30 : barrier      :   0.0        :       4.0
 
-  # Dirichlet boundaries (and its electrostatic potentials)
-  # each as        Name         : ID : el. potential [V]
-  set potentials = default      :  0 :           0.0     , \
-                   terminal_11  : 11 :           1.0     , \
-                   terminal_12  : 12 :           0.5     , \
-                   terminal_21  : 21 :           0.5     , \
-                   terminal_22  : 22 :          -1.0
+  # Dirichlet boundaries (and its electrostatic potentials "phi_e")
+  # each as        ID : Name         : phi_e [V]
+  set potentials =  0 : default      :   0.0     , \
+                   11 : terminal_11  :   1.0     , \
+                   12 : terminal_12  :   0.5     , \
+                   21 : terminal_21  :   0.5     , \
+                   22 : terminal_22  :  -1.0
 
   # cells output data filename
   set cells output data filename = example-1_cells_output_data
@@ -154,12 +152,12 @@ end
 Next section shows how to generate the mesh without opening the gmsh GUI,
 how to start the simulation and a graphical visualization of the output data.
 
-<h4> results </h4>
+<h3> example-1: results </h4>
 
 Generate a coarse mesh in binary file format, run the program and see the output
 @code
 > /usr/bin/gmsh example-1.geo -clmax 0.3 -bin -3
-> mpirun -n 32 -bind-to hwthread ./step-92 example-1.prm
+> mpirun -bind-to hwthread ./step-92 example-1.prm
 Running with PETSc on 32 MPI rank(s)...
 mesh-file: "example-1.msh"
 setup: number of degrees of freedom: 15015
@@ -186,11 +184,9 @@ exported cells solution and output data into file "example-1_cells_output_data.v
 | 05. post-process                |         1 |    0.0395s |       6.2% |
 +---------------------------------+-----------+------------+------------+
 @endcode
-note: The mpirun-parameters <code>-n 32 -bind-to hwthread</code>
-are essential on the PC used for preparing this tutorial,
-featuring an AMD 7950X CPU with 16 cores and 32 hardware-threads.
-The number of hardware-threads has to be adopted to the number of
-CPUs hardware-threads on the PC of the reader.
+@note
+The mpirun-parameter <code>-bind-to hwthread</code>
+is essential to start the solver on all hardware-threads of the CPU.
 
 
 In this tutorial, ParaView was used to visualize the solver output.
@@ -208,9 +204,7 @@ Yellow lines show electric current density $\vJelfield$.
 </table>
 
 
-<h3> example-2 </h3>
-
-<h4> geometry and parameters </h4>
+<h3> example-2: geometry and parameters </h3>
 
 Similar as for previous example, the model geometry file <code>example-2.geo</code>
 can be read using any text-editor or visualized using gmsh
@@ -329,19 +323,19 @@ subsection Problem
   set mesh filename = example-2
 
   # physical domains
-  # each as       Name       : ID : epsilon_rel : kappa [A/Vm]
-  set domains   = default    :  0 :         1.0 :   0.0        , \
-                  winding_1  : 20 :         1.0 :  56.0e+6     , \
-                  winding_2  : 30 :         1.0 :  56.0e+6
+  # each as       ID : Name       : kappa [A/Vm] : epsilon_r
+  set domains   =  0 : default    :   0.0        :       1.0 , \
+                  10 : winding_1  :  56.0e+6     :       1.0 , \
+                  20 : winding_2  :  56.0e+6     :       1.0
 
-  # Dirichlet boundaries (and its electrostatic potentials)
-  # each as        Name                  : ID : el. potential [V]
-  set potentials = default               :  0 :           0.0     , \
-                   core                  :  1 :           0.0     , \
-                   winding_1_terminal_1  : 11 :           1.0     , \
-                   winding_1_terminal_2  : 12 :           0.0     , \
-                   winding_2_terminal_1  : 21 :           0.5     , \
-                   winding_2_terminal_2  : 22 :          -0.5
+  # Dirichlet boundaries (and its electrostatic potentials "phi_e")
+  # each as        ID : Name                  : phi_e [V]
+  set potentials =  0 : default               :   0.0     , \
+                    1 : core                  :   0.0     , \
+                   11 : winding_1_terminal_1  :   1.0     , \
+                   12 : winding_1_terminal_2  :   0.0     , \
+                   21 : winding_2_terminal_1  :   0.5     , \
+                   22 : winding_2_terminal_2  :  -0.5
 
   # cells output data filename
   set cells output data filename = example-2_cells_output_data
@@ -352,12 +346,12 @@ end
 The example can now be simulated and evaluated in next section.
 
 
-<h4> Results </h4>
+<h3> example-2: results </h3>
 
 Generate a coarse mesh in binary file format, run the program and see the output
 @code
 > /usr/bin/gmsh example-2.geo -clmax 300 -bin -3
-> mpirun -n 32 -bind-to hwthread ./step-92 example-2.prm
+> mpirun -bind-to hwthread ./step-92 example-2.prm
 Running with PETSc on 32 MPI rank(s)...
 mesh-file: "example-2.msh"
 setup: number of degrees of freedom: 200590
@@ -401,21 +395,23 @@ Yellow lines show electric current density $\vJelfield$.
 </table>
 
 
-<h4> mesh import performance </h4>
+<h3> example-2: mesh import performance test </h3>
 
 Last example (2) will be used for a test of mesh-import performance.
 
 First, a finer mesh can be generated using gmsh and start the solver
 @code
 > /usr/bin/gmsh example-2.geo -clmax 100 -bin -3
-> mpirun -n 32 -bind-to hwthread ./step-92 example-2.prm
+> mpirun -bind-to hwthread ./step-92 example-2.prm
 @endcode
-Note: Usually refinement shall be done within the solver and not
+@note
+Usually refinement shall be done within the solver and not
 for the initial mesh. Only, the example-2 is still to small for seeing
 the expected effect and therefore
 the size of the grid file is artificially increased
 in order to create conditions closer to initial meshes
 out of real engineering practice.
+
 
 Run the solver and take a look at the output - especially the wall time
 for <code>01. make grid</code> (and <code>02. setup</code>).
@@ -434,7 +430,7 @@ make that definition ineffective, e.g. by commenting it
 and finally re-compile and run the solver without modifying
 neither mesh nor parameter-file.
 @code
-> mpirun -n 32 -bind-to hwthread ./step-92 example-2.prm
+> mpirun -bind-to hwthread ./step-92 example-2.prm
 @endcode
 
 

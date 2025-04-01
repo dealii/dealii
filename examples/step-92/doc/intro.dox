@@ -245,7 +245,6 @@ showing two simple aspects of high voltage engineering.
     <td>
       <img src="../../../examples/step-92/doc/example-1_model_key.jpg" width="50%" alt="example-1, 3D model"/>
       <p> example-1, 3D model: ohmic conductors (green), terminals (light blue), barrier (blue)</p>
-
       Two ohmic conductors, each connected with two terminals.
       Current flow inside the conductors can be enforced by defining
       different electric potential at each terminal.
@@ -340,7 +339,7 @@ some practical assumptions are significant:
 <ol>
     <li>
         Inside conductors, current density is much higher than dielectric displacement current:
-        $ \left\| \cvJelfield \right\| \gg \omega\varepsilon || \cvEfield || $
+        $ \left\| \cvJelfield \right\| \gg \omega\permittivity || \cvEfield || $
 
         Example for copper conductivity
                 $\conductivity_\text{Cu} \approx 56 \cdot 10^{6} \frac{\text{A}}{\text{V m}}$
@@ -353,11 +352,18 @@ some practical assumptions are significant:
                   \omega \permittivity_\text{insulation} \approx 2 \cdot 10^{-8} \frac{\text{A}}{\text{V m}}
                 @f}
 
-        Note: Even the conductivity of oil-impregnated cellulose insulation barriers is still much higher
+        Even the conductivity of oil-impregnated cellulose insulation barriers is still much higher
         than $\omega\permittivity_\text{insulation}$.
 
-        The current distribution inside conductors is basically only needed
-        for retrieving a voltage distribution along conductors.
+        This assumption is a neglection of the phase-angle of
+        the electric potentials frequency-domain pointer
+        @f{align*}{
+          \text{Arg}\left(\cEpot\right) \to 0
+          \,\,\,\, \Rightarrow \,\,\,\,
+          \cEpot \approx \Epot
+        @f}
+        However, the interpretation of the solution $\Epot$ is still not an electrostatic potential
+        but the absolute value of the electric potentials pointer for very low frequencies (LF).
     </li>
     <li>
         For higher frequencies, Laplace equation will not serve to solve the problem anyhow as
@@ -365,8 +371,8 @@ some practical assumptions are significant:
     </li>
 </ol>
 
-It is feasible to even reduce the above mentioned complex-valued PDE
-into a real-valued (static) problem
+With this assumption, it is feasible to even reduce the above mentioned complex-valued PDE
+into a real-valued (LF but not necessarily static) problem
 @f{align*}{
   \div \left( a \grad \Epot \right) &= 0 \qquad\qquad & \text{in}\ \Omega,
   \\
@@ -375,18 +381,18 @@ into a real-valued (static) problem
 with a real-valued parameter $a$ for consideration of material properties (either conductor or insulator).
 
 Furthermore, the domain is a union
-$\Omega=\bigcup \left\{\Omega_{\kappa},\Omega_{\varepsilon}\right\}$
+$\Omega=\bigcup \left\{\Omega_{\conductivity},\Omega_{\permittivity}\right\}$
 of purely ohmic sub-domains
-$\Omega_\kappa=\bigcup\left\{\Omega_{\kappa m} | m \in \left\{1,\dots,M\right\} \right\}$ with $\kappa_m>0$
+$\Omega_\conductivity=\bigcup\left\{\Omega_{\conductivity m} | m \in \left\{1,\dots,M\right\} \right\}$ with $\conductivity_m>0$
 and purely dielectric sub-domains
-$\Omega_\varepsilon=\bigcup\left\{\Omega_{\varepsilon n} | n \in \left\{1,\dots,N\right\} \right\}$
-with permittivity $\varepsilon_n$:
+$\Omega_\permittivity=\bigcup\left\{\Omega_{\permittivity n} | n \in \left\{1,\dots,N\right\} \right\}$
+with permittivity $\permittivity_n$:
 @f{align*}{
     a = \left\{
         \begin{array}{cc}
-            \kappa_m \qquad\qquad & \text{in any ohmic sub-domain}\ \Omega_{\kappa m}
+            \conductivity_m \qquad\qquad & \text{in any ohmic sub-domain}\ \Omega_{\conductivity m}
             \\
-            \varepsilon_n \qquad\qquad & \text{in any dielectric sub-domain}\ \Omega_{\varepsilon n}
+            \permittivity_n \qquad\qquad & \text{in any dielectric sub-domain}\ \Omega_{\permittivity n}
         \end{array}
         \right.
 @f}
@@ -397,13 +403,14 @@ $\partial\Omega=\bigcup \left\{\Gamma_k | k \in \left\{1,\dots,K\right\} \right\
     g = {\Epot}_k \qquad\qquad & \text{on}\ \Gamma_{k}
 @f}
 
-This definition can be used to set a reference shell
-$\Gamma_{k_0}$ surrounding the entire arrangement,
-where a reference potential can be set, e.g. ${{\Epot}_{k_0}} = 0\,\text{V}$.
-
-Furthermore, holes can be cut into the simulation domain and their boundaries
-can be set to an arbitrary potential $\varphi_{e k}\in\mathbb{R}$.
-
-Boundaries of such holes may even touch an ohmic sub-domain $\Omega_{\kappa m}$.
-This way, contacting terminals to ohmic conductors can be modeled and terminals
-potentials can be defined.
+Such definitions will be used for two purposes:
+<ol>
+    <li>
+        On a reference shell $\Gamma_{k_0}$ surrounding the entire arrangement $\Omega$,
+        a reference potential will be set, e.g. ${{\Epot}_{k_0}} = 0\,\text{V}$.
+    </li>
+    <li>
+        Terminals will be modeled as cavities and on its surfaces $\Gamma_{k}$
+        Dirichlet boundary conditions will be used for assigning electric potential values ${\Epot}_{k}$.
+    </li>
+</ol>

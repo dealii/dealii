@@ -39,7 +39,6 @@
 // otherwise, parallel::distributed triangulation will be used.
 #define USE_FULLY_DISTRIBUTED_TRIA
 
-
 // @sect3{Include files}
 
 #include <deal.II/base/parameter_acceptor.h>
@@ -106,7 +105,7 @@ namespace Step92
     using physical_ID = unsigned int;
 
     using DomainProperties_tuple =
-      std::tuple<std::string, physical_ID, double, double>;
+      std::tuple<physical_ID, std::string, double, double>;
 
     class domain_properties
     {
@@ -115,20 +114,19 @@ namespace Step92
 
       types::material_id domain_id; // domain ID number
       std::string        name;      // clear-text name for this domain
+      double             kappa;     // absolute electric conductivity
       double epsilon; // absolute electric permittivity epsilon [ A s / (V m) ]
-      double kappa;   // absolute electric conductivity
     };
 
     using BoundaryPotential_tuple =
-      std::tuple<std::string, physical_ID, double>;
+      std::tuple<physical_ID, std::string, double>;
 
     class boundary_potential
     {
     public:
       types::material_id boundary_id; // boundary ID number
       std::string        name;        // clear-text name for this boundary
-      double
-        potential; // [V] electric potential used as dirichlet boundary value
+      double phi_e; // [V] electric potential used as dirichlet boundary value
     };
 
 
@@ -170,7 +168,7 @@ namespace Step92
   //     ".msh") containing the triangulation
   //   </li>
   //   <li>
-  //     "cells solution filename" is sepcifying filename (without suffix) for
+  //     "cells solution filename" is specifying filename (without suffix) for
   //     exporting output from cells solution data. This filename will
   //     automatically be extended with a suffix ".vtu"
   //   </li>
@@ -179,20 +177,20 @@ namespace Step92
   //
   //     Each comma-separated entry is formatted as "name : ID : epsilon_r :
   //     kappa", with <ol>
-  //       <li> "name" : clear-text name of a domain </li>
   //       <li> "ID" is a unique positive ID number (or zero for default domain) </li>
-  //       <li> "epsilon_r" is the relative electric permittivity </li>
+  //       <li> "name" : clear-text name of a domain </li>
   //       <li> "kappa" is the electric conductivity [A/Vm] </li>
+  //       <li> "epsilon_r" is the relative electric permittivity </li>
   //     </ol>
   //   </li>
   //   <li>
   //     "potentials" is a list of boundary values.
   //
-  //     Each comma-separated entry is formatted as "name : ID : el. potential",
+  //     Each comma-separated entry is formatted as "name : ID : phi_e [V]",
   //     with <ol>
-  //       <li> "name" is a clear-text name of a boundary </li>
   //       <li> "ID" is a unique positive ID number (or zero for default boundary) </li>
-  //       <li> "el. potential" is the electrostatic potential [V] used for dirichlet boundary condition </li>
+  //       <li> "name" is a clear-text name of a boundary </li>
+  //       <li> "phi_e" is the electrostatic potential [V] used for dirichlet boundary condition </li>
   //     </ol>
   //   </li>
   // </ul>
@@ -217,12 +215,12 @@ namespace Step92
     add_parameter(
       "domains",
       domains_list,
-      "list of domain definitions and its material properties: \"name : ID : epsilon_r : kappa [A/Vm]\"");
+      "list of domain definitions and its material properties: \"ID : Name : kappa [A/Vm] : epsilon_r\"");
 
     add_parameter(
       "potentials",
       boundary_values_list,
-      "list of potential definitions for dirichlet boundaries: \"name : ID : phi_e [V]\"");
+      "list of potential definitions for dirichlet boundaries: \"ID : Name : phi_e [V]\"");
   }
 
 
@@ -245,11 +243,10 @@ namespace Step92
 
     for (const auto &item : domains_list)
       {
-        tmp_domain.name      = std::get<0>(item);
-        tmp_domain.domain_id = std::get<1>(item);
-        tmp_domain.epsilon   = epsilon_vacuum * std::get<2>(item);
-        ;
-        tmp_domain.kappa = std::get<3>(item);
+        tmp_domain.domain_id = std::get<0>(item);
+        tmp_domain.name      = std::get<1>(item);
+        tmp_domain.kappa     = std::get<2>(item);
+        tmp_domain.epsilon   = epsilon_vacuum * std::get<3>(item);
 
         domains_vector.push_back(tmp_domain);
 
@@ -266,10 +263,10 @@ namespace Step92
         domain_index++;
         default_domain_index = domain_index;
 
-        tmp_domain.name      = "default";
         tmp_domain.domain_id = 0;
-        tmp_domain.epsilon   = epsilon_vacuum;
+        tmp_domain.name      = "default";
         tmp_domain.kappa     = 0.0;
+        tmp_domain.epsilon   = epsilon_vacuum;
 
         domains_vector.push_back(tmp_domain);
       }
@@ -279,9 +276,9 @@ namespace Step92
 
     for (const auto &item : boundary_values_list)
       {
-        tmp_boundary.name        = std::get<0>(item);
-        tmp_boundary.boundary_id = std::get<1>(item);
-        tmp_boundary.potential   = std::get<2>(item);
+        tmp_boundary.boundary_id = std::get<0>(item);
+        tmp_boundary.name        = std::get<1>(item);
+        tmp_boundary.phi_e       = std::get<2>(item);
 
         boundaries_vector.push_back(tmp_boundary);
       }
@@ -486,12 +483,12 @@ namespace Step92
     for (const auto &boundary : problem_parameters.boundaries_vector)
       {
         pcout << "set " << boundary.name << " boundary potential: phi_e_"
-              << boundary.boundary_id << " = " << boundary.potential << " V";
+              << boundary.boundary_id << " = " << boundary.phi_e << " V";
 
         VectorTools::interpolate_boundary_values(
           dof_handler,
           boundary.boundary_id,
-          Functions::ConstantFunction<dim, double>(boundary.potential),
+          Functions::ConstantFunction<dim, double>(boundary.phi_e),
           constraints,
           fe.component_mask(phi_e));
 
@@ -720,33 +717,30 @@ namespace Step92
   // Define the names for the variables in the output.
   // The output data file shall contain following values at the evaluation point
   // locations:
-  // - "phi_e",        the scalar electrostatic potential [V]
-  // - "Ex",           the electric field strength, cartesian x-component [V/m]
-  // - "Ey",           the electric field strength, cartesian y-component [V/m]
-  // - "Ez",           the electric field strength, cartesian z-component [V/m]
-  // - "Jx",           the electric current density, cartesian x-component
-  // [A/m^2]
-  // - "Jy",           the electric current density, cartesian y-component
-  // [A/m^2]
-  // - "Jz",           the electric current density, cartesian z-component
-  // [A/m^2]
-  // - "domain_ID",    the domain ID number
-  // - "epsilon_r",    the relative electric permittivity number
-  // - "kappa"         the electric conductivity [A/Vm]
+  // - "phi_e",        scalar electrostatic potential [V]
+  // - "Ex",           electric field strength, cartesian x-component [V/m]
+  // - "Ey",           electric field strength, cartesian y-component [V/m]
+  // - "Ez",           electric field strength, cartesian z-component [V/m]
+  // - "Jx",           electric current density, cartesian x-component [A/m^2]
+  // - "Jy",           electric current density, cartesian y-component [A/m^2]
+  // - "Jz",           electric current density, cartesian z-component [A/m^2]
+  // - "domain_ID",    domain ID number
+  // - "epsilon_r",    relative electric permittivity number
+  // - "kappa"         electric conductivity [A/Vm]
   template <int dim>
   std::vector<std::string> Laplace<dim>::CellsPostprocessor::get_names() const
   {
     return {
-      "phi_e",     // scalar electrostatic potential
-      "Ex",        // electric field strength, cartesian x-component
-      "Ey",        // electric field strength, cartesian y-component
-      "Ez",        // electric field strength, cartesian z-component
-      "Jx",        // electric current density, cartesian x-component
-      "Jy",        // electric current density, cartesian y-component
-      "Jz",        // electric current density, cartesian z-component
+      "phi_e",     // scalar electrostatic potential [V]
+      "Ex",        // electric field strength, cartesian x-component [V/m]
+      "Ey",        // electric field strength, cartesian y-component [V/m]
+      "Ez",        // electric field strength, cartesian z-component [V/m]
+      "Jx",        // electric current density, cartesian x-component [A/m^2]
+      "Jy",        // electric current density, cartesian y-component [A/m^2]
+      "Jz",        // electric current density, cartesian z-component [A/m^2]
       "domain_ID", // domain ID number
       "epsilon_r", // relative electric permittivity
-      "kappa"      // electric conductivity
+      "kappa"      // electric conductivity [A/Vm]
     };
   }
 
@@ -778,7 +772,7 @@ namespace Step92
   // The solution itself is the electrostatic potential.
   // In order to export it, the <code>update_values</code> flag is needed.
   // For plotting electric streamlines or currents, the gradients of the
-  // solution will be neded and hence, the <code>update_gradients</code> has to
+  // solution will be needed and hence, the <code>update_gradients</code> has to
   // be set.
   template <int dim>
   UpdateFlags Laplace<dim>::CellsPostprocessor::get_needed_update_flags() const

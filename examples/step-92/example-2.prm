@@ -7,22 +7,21 @@ subsection Problem
   set mesh filename = example-2
 
   # physical domains
-  # each as       Name       : ID : epsilon_rel : kappa [A/Vm]
-  set domains   = default    :  0 :         1.0 :   0.0        , \
-                  winding_1  : 10 :         1.0 :  56.0e+6     , \
-                  winding_2  : 20 :         1.0 :  56.0e+6
+  # each as       ID : Name       : kappa [A/Vm] : epsilon_r
+  set domains   =  0 : default    :   0.0        :       1.0 , \
+                  10 : winding_1  :  56.0e+6     :       1.0 , \
+                  20 : winding_2  :  56.0e+6     :       1.0
 
-  # Dirichlet boundaries (and its electrostatic potentials)
-  # each as        Name                  : ID : el. potential [V]
-  set potentials = default               :  0 :           0.0     , \
-                   core                  :  1 :           0.0     , \
-                   winding_1_terminal_1  : 11 :           1.0     , \
-                   winding_1_terminal_2  : 12 :           0.0     , \
-                   winding_2_terminal_1  : 21 :           0.5     , \
-                   winding_2_terminal_2  : 22 :          -0.5
+  # Dirichlet boundaries (and its electrostatic potentials "phi_e")
+  # each as        ID : Name                  : phi_e [V]
+  set potentials =  0 : default               :   0.0     , \
+                    1 : core                  :   0.0     , \
+                   11 : winding_1_terminal_1  :   1.0     , \
+                   12 : winding_1_terminal_2  :   0.0     , \
+                   21 : winding_2_terminal_1  :   0.5     , \
+                   22 : winding_2_terminal_2  :  -0.5
 
   # cells output data filename
   set cells output data filename = example-2_cells_output_data
 
 end
-  
