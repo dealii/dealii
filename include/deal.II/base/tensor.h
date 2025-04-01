@@ -31,6 +31,7 @@
 #endif
 
 #include <cmath>
+#include <complex>
 #include <ostream>
 #include <type_traits>
 

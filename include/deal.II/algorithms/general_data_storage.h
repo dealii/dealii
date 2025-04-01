@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <any>
 #include <map>
+#include <ostream>
 #include <string>
 #include <typeinfo>
 
