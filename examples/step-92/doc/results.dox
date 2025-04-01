@@ -58,7 +58,7 @@ It is summarized in the <code>Properties</code> here but the assignment is not d
     <td>10</td>
     <td>conductor_1</td>
     <td>copper conductor, sub-domain $\Omega_{10}$</td>
-    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
         rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
@@ -66,7 +66,7 @@ It is summarized in the <code>Properties</code> here but the assignment is not d
     <td>20</td>
     <td>conductor_2</td>
     <td>copper conductor, sub-domain $\Omega_{20}$</td>
-    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
         rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
@@ -126,7 +126,7 @@ Finally, the parameter file is complete:
 # ---------------------
 
 subsection Problem
-  
+
   # mesh file name
   set mesh filename = example-1
 
@@ -151,7 +151,7 @@ subsection Problem
 end
 @endcode
 
-Next section shows how to generate the mesh without opening the gmsh GUI, 
+Next section shows how to generate the mesh without opening the gmsh GUI,
 how to start the simulation and a graphical visualization of the output data.
 
 <h4> results </h4>
@@ -188,8 +188,8 @@ exported cells solution and output data into file "example-1_cells_output_data.v
 @endcode
 note: The mpirun-parameters <code>-n 32 -bind-to hwthread</code>
 are essential on the PC used for preparing this tutorial,
-featuring an AMD 7950X CPU with 16 cores and 32 hardware-threads. 
-The number of hardware-threads has to be adopted to the number of 
+featuring an AMD 7950X CPU with 16 cores and 32 hardware-threads.
+The number of hardware-threads has to be adopted to the number of
 CPUs hardware-threads on the PC of the reader.
 
 
@@ -230,7 +230,7 @@ Be aware, that for this example all dimensions are given in mm.
 </table>
 
 Inside of the file <code>example-2.geo</code>, following line is
-forcing gmsh to scale the dimensions in the mesh output to m: 
+forcing gmsh to scale the dimensions in the mesh output to m:
 @code
 Mesh.ScalingFactor = 1.0e-3;
 @endcode
@@ -266,7 +266,7 @@ Following properties shall be assigned to volumes and boundary values to surface
     <td>20</td>
     <td>winding_1</td>
     <td>copper conductor, sub-domain $ \Omega_{10} $</td>
-    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
         rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
@@ -274,7 +274,7 @@ Following properties shall be assigned to volumes and boundary values to surface
     <td>30</td>
     <td>winding_2</td>
     <td>copper conductor, sub-domain $ \Omega_{20} $</td>
-    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$, 
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
         rel. permittivity $\permittivity_r=1$</td>
 </tr>
 <tr>
@@ -324,7 +324,7 @@ instead of the barrier (as a volume with material properties):
 # ---------------------
 
 subsection Problem
-  
+
   # mesh file name
   set mesh filename = example-2
 
@@ -413,7 +413,7 @@ First, a finer mesh can be generated using gmsh and start the solver
 Note: Usually refinement shall be done within the solver and not
 for the initial mesh. Only, the example-2 is still to small for seeing
 the expected effect and therefore
-the size of the grid file is artificially increased 
+the size of the grid file is artificially increased
 in order to create conditions closer to initial meshes
 out of real engineering practice.
 
@@ -491,7 +491,7 @@ triangulation.
     </li>
     <li>
         Make usage of the manifolds concept for handling curved shapes from CAD-import (e.g. step-files) and implement AMR.
-        
+
         E.g.: example-2 contains simplified windings. A more realistic CAD-model could contain spirals, cylinders or discs.
     </li>
 </ul>

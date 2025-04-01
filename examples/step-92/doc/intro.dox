@@ -125,7 +125,7 @@ and a DataPostprocessor on cell-data is implemented
 to derive and export electrical field
 distributions for visualization or further evaluation.
 Visualizations in this tutorial have been prepared using
-<a href="https://www.paraview.org/">ParaView</a>, 
+<a href="https://www.paraview.org/">ParaView</a>,
 but this choice is not binding to any reader.
 
 Two simple and abstrahized examples are provided for generating
@@ -217,7 +217,7 @@ two major options may be considered:
 
 In large (national or international) power transmission systems,
 this optimization usually leads to systems with high and ultra-high voltages
-and many more aspects have to be considered, i.e. reactive power, 
+and many more aspects have to be considered, i.e. reactive power,
 failure modes, or dc vs. ac transmission.
 Hence, real generation, transmission and distribution systems are
 much more complex and even interconnected. Much more equipment
@@ -230,8 +230,8 @@ has to be designed for safe and economic operation at those voltages.
 
 In design of high voltage equipment, it is common
 practice to utilize numerical software for electrical field computation.
-A high voltage component manufacturer has reasonable interest in 
-continuously improving and developing smart arrangements, 
+A high voltage component manufacturer has reasonable interest in
+continuously improving and developing smart arrangements,
 efficient materials and engineering know-how.
 
 The two provided examples show abstrahized arrangenements for
@@ -257,7 +257,7 @@ showing two simple aspects of high voltage engineering.
       Placing such barrier(s) is common practice in designing insulation
       systems of oil-immersed high-voltage components as it reduces the
       overall dimension of a component in comparison to a design without
-      such barrier(s).     
+      such barrier(s).
       For real products, arrangement, material and safety margins
       are manufacturer know-how.
     </td>
@@ -269,19 +269,19 @@ showing two simple aspects of high voltage engineering.
     <td>
       <img src="../../../examples/step-92/doc/example-2_model_key.jpg" width="50%" alt="example-2, 3D model"/>
       <p> example-2, 3D model: two simple windings (green), terminals (light blue), core (grey)</p>
-      
+
       This example already looks like a single-phase power transformer
       with two very simple windings with connecting terminals.
       Similar as in first example, current flow inside the windings
-      can be enforced by defining different electric potential at 
+      can be enforced by defining different electric potential at
       each terminal.
-      
-      In practice, barrier(s) should be located at least in between 
-      those two windings. 
+
+      In practice, barrier(s) should be located at least in between
+      those two windings.
       They have not been placed in this model for keeping the visibility
-      of the two windings. The reader may think in expanding the model 
+      of the two windings. The reader may think in expanding the model
       by some barriers and bring the model closer to a real design.
-      
+
       Instead of the barrier(s), a realistic iron core is considered
       in this example.
       Such core in practice shall be grounded (to $0\,\text{V}$).
@@ -300,7 +300,7 @@ electric potential $\Epot$
     \vEfield = -\grad \Epot .
 @f}
 
-The current density may be of interest in some cases an can be calculated 
+The current density may be of interest in some cases an can be calculated
 under terms of Ohm's law
 @f{align*}{
     \vJelfield = \conductivity \vEfield .
@@ -321,7 +321,7 @@ some simplifications are common practice in most high voltage engineering applic
   (In this tutorial, dielectric permittivity is assumed to be lossless $\permittivity\in\mathbb{R}$.)
   </li>
   <li>
-  Thus, a time-harmonic analysis can be performed in frequency-domain 
+  Thus, a time-harmonic analysis can be performed in frequency-domain
   using pointers (further indicated by an underscore below the symbol
   until even this will become obsolete for this tutorial in a few steps.).
   </li>
@@ -341,7 +341,7 @@ some practical assumptions are significant:
     <li>
         Inside conductors, current density is much higher than dielectric displacement current:
         $ \left\| \cvJelfield \right\| \gg \omega\varepsilon || \cvEfield || $
-        
+
         Example for copper conductivity
                 $\conductivity_\text{Cu} \approx 56 \cdot 10^{6} \frac{\text{A}}{\text{V m}}$
                 and cellulose/oil insulation with dielectric permittivity
@@ -349,14 +349,14 @@ some practical assumptions are significant:
                 at $\frequency = 60 \text{Hz}$:
                 @f{align*}{
                   \conductivity_\text{Cu} \approx 56 \cdot 10^{6} \frac{\text{A}}{\text{V m}}
-                  \gg 
+                  \gg
                   \omega \permittivity_\text{insulation} \approx 2 \cdot 10^{-8} \frac{\text{A}}{\text{V m}}
                 @f}
-                
+
         Note: Even the conductivity of oil-impregnated cellulose insulation barriers is still much higher
         than $\omega\permittivity_\text{insulation}$.
 
-        The current distribution inside conductors is basically only needed 
+        The current distribution inside conductors is basically only needed
         for retrieving a voltage distribution along conductors.
     </li>
     <li>
@@ -374,7 +374,7 @@ into a real-valued (static) problem
 @f}
 with a real-valued parameter $a$ for consideration of material properties (either conductor or insulator).
 
-Furthermore, the domain is a union 
+Furthermore, the domain is a union
 $\Omega=\bigcup \left\{\Omega_{\kappa},\Omega_{\varepsilon}\right\}$
 of purely ohmic sub-domains
 $\Omega_\kappa=\bigcup\left\{\Omega_{\kappa m} | m \in \left\{1,\dots,M\right\} \right\}$ with $\kappa_m>0$
@@ -397,13 +397,13 @@ $\partial\Omega=\bigcup \left\{\Gamma_k | k \in \left\{1,\dots,K\right\} \right\
     g = {\Epot}_k \qquad\qquad & \text{on}\ \Gamma_{k}
 @f}
 
-This definition can be used to set a reference shell 
-$\Gamma_{k_0}$ surrounding the entire arrangement, 
+This definition can be used to set a reference shell
+$\Gamma_{k_0}$ surrounding the entire arrangement,
 where a reference potential can be set, e.g. ${{\Epot}_{k_0}} = 0\,\text{V}$.
 
-Furthermore, holes can be cut into the simulation domain and their boundaries 
+Furthermore, holes can be cut into the simulation domain and their boundaries
 can be set to an arbitrary potential $\varphi_{e k}\in\mathbb{R}$.
 
-Boundaries of such holes may even touch an ohmic sub-domain $\Omega_{\kappa m}$. 
-This way, contacting terminals to ohmic conductors can be modeled and terminals 
+Boundaries of such holes may even touch an ohmic sub-domain $\Omega_{\kappa m}$.
+This way, contacting terminals to ohmic conductors can be modeled and terminals
 potentials can be defined.
