@@ -14,9 +14,7 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/geometry_info.h>
-#include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/qprojector.h>
-#include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_orientation.h>
@@ -819,26 +817,11 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
     std::vector<Point<3>> points;
     std::vector<double>   weights;
 
-    const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
-    const TensorProductPolynomials<2> poly_quad(
-      Polynomials::generate_complete_Lagrange_basis(
-        {Point<1>(0.0), Point<1>(1.0)}));
-
     // loop over all faces (triangles) ...
     for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
       {
         const ReferenceCell face_reference_cell =
           reference_cell.face_reference_cell(face_no);
-        // We will use linear polynomials to map the reference quadrature
-        // points correctly to on faces. There are as many linear shape
-        // functions as there are vertices in the face.
-        const unsigned int n_linear_shape_functions = faces[face_no].size();
-        std::vector<Tensor<1, 2>> shape_derivatives;
-
-        const auto &poly =
-          (n_linear_shape_functions == 3 ?
-             static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
-             static_cast<const ScalarPolynomialsBase<2> &>(poly_quad));
 
         // ... and over all possible orientations
         for (types::geometric_orientation orientation = 0;
@@ -884,10 +867,11 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
                 Point<3> mapped_point;
 
                 // map reference quadrature point
-                for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
-                  mapped_point +=
-                    support_points[i] *
-                    poly.compute_value(i, sub_quadrature_points[j]);
+                for (const unsigned int i :
+                     face_reference_cell.vertex_indices())
+                  mapped_point += support_points[i] *
+                                  face_reference_cell.d_linear_shape_function(
+                                    sub_quadrature_points[j], i);
 
                 points.push_back(mapped_point);
 
