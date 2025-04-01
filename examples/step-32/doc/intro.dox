@@ -217,7 +217,7 @@ certain tolerance, i.e., until
   \left(\begin{array}{c}
     F_U - A U^{(k)} - B^TP^{(k)}
     \\
-    B U^{(k)}
+    -B U^{(k)}
   \end{array}\right)
   \right\|
   < \text{Tol}.
