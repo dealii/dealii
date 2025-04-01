@@ -1180,12 +1180,21 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   // to take (all data sets for all
   // faces are stored contiguously)
 
-  const auto offset =
-    QProjector<dim>::DataSetDescriptor::face(this->reference_cell(),
-                                             face_no,
-                                             cell->combined_face_orientation(
-                                               face_no),
-                                             n_q_points);
+  // TODO: The same 'legacy' comments for 2d apply here as well: these classes
+  // do not handle non-standard orientations in 2d in a way consistent with the
+  // rest of the library, but are consistent with themselves (see, e.g., the
+  // fe_conformity_dim_2 tests).
+  //
+  // In this case: all of this code was written assuming that QProjector assumed
+  // that all faces were in the default orientation in 2d, but contains special
+  // workarounds in case that isn't the case. Hence, to keep those workarounds
+  // working, we still assume that all faces are in the default orientation.
+  const auto offset = QProjector<dim>::DataSetDescriptor::face(
+    this->reference_cell(),
+    face_no,
+    dim == 2 ? numbers::default_geometric_orientation :
+               cell->combined_face_orientation(face_no),
+    n_q_points);
 
   // TODO: Size assertions
 
