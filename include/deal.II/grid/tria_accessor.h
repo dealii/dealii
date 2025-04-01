@@ -5428,7 +5428,7 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
         return numbers::default_geometric_orientation;
       else
         return this->tria->levels[this->present_level]
-          ->face_orientations.get_orientation(
+          ->face_orientations.get_combined_orientation(
             this->present_index * ReferenceCells::max_n_faces<dim>() + face);
     }
   else
@@ -5591,7 +5591,7 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
   Assert(dim != 2,
          ExcMessage("In 2d lines are faces, and, for compatibility with other "
                     "dimensions, their orientations should be set via "
-                    "set_combined_orientation()."));
+                    "set_combined_face_orientation()."));
   // work around a bogus GCC-9 warning which considers line and value unused
   // except in 3d
   (void)line;
