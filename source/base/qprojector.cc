@@ -891,33 +891,10 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
 
                 points.push_back(mapped_point);
 
-                // scale quadrature weight
-                const double scaling = [&]() {
-                  const unsigned int dim_     = 2;
-                  const unsigned int spacedim = 3;
-
-                  Tensor<1, dim_, Tensor<1, spacedim>> DX_t;
-
-                  shape_derivatives.resize(n_linear_shape_functions);
-
-                  for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
-                    shape_derivatives[i] =
-                      poly.compute_1st_derivative(i, sub_quadrature_points[j]);
-
-                  for (unsigned int k = 0; k < n_linear_shape_functions; ++k)
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        DX_t[j][i] +=
-                          shape_derivatives[k][j] * support_points[k][i];
-
-                  Tensor<2, dim_> G;
-                  for (unsigned int i = 0; i < dim_; ++i)
-                    for (unsigned int j = 0; j < dim_; ++j)
-                      G[i][j] = DX_t[i] * DX_t[j];
-
-                  return std::sqrt(determinant(G));
-                }();
-
+                // rescale quadrature weights so that the sum of the weights on
+                // each face equals the measure of that face.
+                const double scaling = reference_cell.face_measure(face_no) /
+                                       face_reference_cell.volume();
                 weights.push_back(sub_quadrature_weights[j] * scaling);
               }
           }
