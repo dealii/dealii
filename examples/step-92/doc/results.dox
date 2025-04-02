@@ -152,7 +152,7 @@ end
 Next section shows how to generate the mesh without opening the gmsh GUI,
 how to start the simulation and a graphical visualization of the output data.
 
-<h3> example-1: results </h4>
+<h3> example-1: results </h3>
 
 Generate a coarse mesh in binary file format, run the program and see the output
 @code

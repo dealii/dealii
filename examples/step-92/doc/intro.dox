@@ -132,7 +132,7 @@ Two simple and abstrahized examples are provided for generating
 hexahedral meshes using <a href="https://gmsh.info/">Gmsh</a>.
 
 Performance of the mesh-import and the solver can be tested
-be either generating finer meshes.
+by generating finer meshes.
 
 
 <h3> References </h3>
@@ -245,20 +245,23 @@ showing two simple aspects of high voltage engineering.
     <td>
       <img src="../../../examples/step-92/doc/example-1_model_key.jpg" width="50%" alt="example-1, 3D model"/>
       <p> example-1, 3D model: ohmic conductors (green), terminals (light blue), barrier (blue)</p>
-      Two ohmic conductors, each connected with two terminals.
-      Current flow inside the conductors can be enforced by defining
-      different electric potential at each terminal.
-      Dirichlet boundary conditions will be used later in this example.
-
-      Even though the example is not a realistic component, it shows an
-      aspect of high voltage engineering:
-      A barrier is placed in between those conductors.
-      Placing such barrier(s) is common practice in designing insulation
-      systems of oil-immersed high-voltage components as it reduces the
-      overall dimension of a component in comparison to a design without
-      such barrier(s).
-      For real products, arrangement, material and safety margins
-      are manufacturer know-how.
+      <p>
+          Two ohmic conductors, each connected with two terminals.
+          Current flow inside the conductors can be enforced by defining
+          different electric potential at each terminal.
+          Dirichlet boundary conditions will be used later in this example.
+      </p>
+      <p>
+          Even though the example is not a realistic component, it shows an
+          aspect of high voltage engineering:
+          A barrier is placed in between those conductors.
+          Placing such barrier(s) is common practice in designing insulation
+          systems of oil-immersed high-voltage components as it reduces the
+          overall dimension of a component in comparison to a design without
+          such barrier(s).
+          For real products, arrangement, material and safety margins
+          are manufacturer know-how.
+      </p>
     </td>
 </tr>
 <tr style="vertical-align:top">
@@ -268,26 +271,29 @@ showing two simple aspects of high voltage engineering.
     <td>
       <img src="../../../examples/step-92/doc/example-2_model_key.jpg" width="50%" alt="example-2, 3D model"/>
       <p> example-2, 3D model: two simple windings (green), terminals (light blue), core (grey)</p>
-
-      This example already looks like a single-phase power transformer
-      with two very simple windings with connecting terminals.
-      Similar as in first example, current flow inside the windings
-      can be enforced by defining different electric potential at
-      each terminal.
-
-      In practice, barrier(s) should be located at least in between
-      those two windings.
-      They have not been placed in this model for keeping the visibility
-      of the two windings. The reader may think in expanding the model
-      by some barriers and bring the model closer to a real design.
-
-      Instead of the barrier(s), a realistic iron core is considered
-      in this example.
-      Such core in practice shall be grounded (to $0\,\text{V}$).
-      Once again, a Dirichlet boundary condition will serve this purpose
-      in the model as the core volume will be removed from the
-      simulation domain and only its surface will be part of the model
-      as a boundary.
+      <p>
+        This example already looks like a single-phase power transformer
+        with two very simple windings with connecting terminals.
+        Similar as in first example, current flow inside the windings
+        can be enforced by defining different electric potential at
+        each terminal.
+      </p>
+      <p>
+        In practice, barrier(s) should be located at least in between
+        those two windings.
+        They have not been placed in this model for keeping the visibility
+        of the two windings. The reader may think in expanding the model
+        by some barriers and bring the model closer to a real design.
+      </p>
+      <p>
+        Instead of the barrier(s), a realistic iron core is considered
+        in this example.
+        Such core in practice shall be grounded (to $0\,\text{V}$).
+        Once again, a Dirichlet boundary condition will serve this purpose
+        in the model as the core volume will be removed from the
+        simulation domain and only its surface will be part of the model
+        as a boundary.
+      </p>
     </td>
 </tr>
 </table>
