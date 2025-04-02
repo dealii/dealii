@@ -33,6 +33,7 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <deal.II/base/exception_macros.h>
 
+#include <complex>
 #include <exception>
 #include <ostream>
 #include <string>
