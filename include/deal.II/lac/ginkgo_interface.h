@@ -34,7 +34,6 @@
 #  include <ginkgo/extensions/kokkos.hpp>
 
 
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace GinkgoWrappers
@@ -43,64 +42,29 @@ namespace GinkgoWrappers
   template <typename ValueType, typename MemorySpace>
   std::unique_ptr<gko::matrix::Dense<ValueType>>
   create_vector(std::shared_ptr<const gko::Executor> exec,
-                ArrayView<ValueType, MemorySpace>   &array)
+                ArrayView<ValueType, MemorySpace>    array)
   {
-    std::shared_ptr<const gko::Executor> array_exec =
-      gko::ext::kokkos::get_executor(
-        typename MemorySpace::kokkos_space::execution_space{});
+    Assert(gko::ext::kokkos::detail::check_compatibility<
+             typename MemorySpace::kokkos_space>(exec),
+           ExcMessage("Incompatible Ginkgo executor"));
 
     gko::dim<2> size = {static_cast<gko::size_type>(array.size()), 1};
-
     return gko::matrix::Dense<ValueType>::create(
-      exec, size, gko::make_array_view(array_exec, size[0], array.data()), 1);
-  }
-
-  template <typename ValueType, typename MemorySpace>
-  std::unique_ptr<gko::matrix::Dense<ValueType>>
-  create_vector(ArrayView<ValueType, MemorySpace> &array)
-  {
-    std::shared_ptr<const gko::Executor> exec = gko::ext::kokkos::get_executor(
-      typename MemorySpace::kokkos_space::execution_space{});
-
-    return create_vector(std::move(exec), array);
-  }
-
-  template <typename ValueType, typename MemorySpace, typename = std::enable_if_t<!std::is_const_v<ValueType>>>
-  std::unique_ptr<gko::matrix::Dense<ValueType>>
-  create_vector(ArrayView<ValueType, MemorySpace> &&array)
-  {
-    std::shared_ptr<const gko::Executor> exec = gko::ext::kokkos::get_executor(
-      typename MemorySpace::kokkos_space::execution_space{});
-
-    return create_vector(std::move(exec), array);
+      exec, size, gko::make_array_view(exec, size[0], array.data()), 1);
   }
 
   template <typename ValueType, typename MemorySpace>
   std::unique_ptr<const gko::matrix::Dense<std::decay_t<ValueType>>>
-  create_vector(std::shared_ptr<const gko::Executor>           exec,
-                const ArrayView<ValueType, MemorySpace> &array)
+  create_vector(std::shared_ptr<const gko::Executor>    exec,
+                ArrayView<const ValueType, MemorySpace> array)
   {
-    std::shared_ptr<const gko::Executor> array_exec =
-      gko::ext::kokkos::get_executor(
-        typename MemorySpace::kokkos_space::execution_space{});
+    Assert(gko::ext::kokkos::detail::check_compatibility<
+             typename MemorySpace::kokkos_space>(exec),
+           ExcMessage("Incompatible Ginkgo executor"));
 
     gko::dim<2> size = {static_cast<gko::size_type>(array.size()), 1};
-
     return gko::matrix::Dense<std::decay_t<ValueType>>::create_const(
-      exec,
-      size,
-      gko::make_const_array_view(array_exec, size[0], array.data()),
-      1);
-  }
-
-  template <typename ValueType, typename MemorySpace>
-  std::unique_ptr<const gko::matrix::Dense<std::decay_t<ValueType>>>
-  create_vector(const ArrayView<ValueType, MemorySpace> &array)
-  {
-    std::shared_ptr<const gko::Executor> exec = gko::ext::kokkos::get_executor(
-      typename MemorySpace::kokkos_space::execution_space{});
-
-    return create_vector(std::move(exec), array);
+      exec, size, gko::make_const_array_view(exec, size[0], array.data()), 1);
   }
 
 
@@ -144,7 +108,7 @@ namespace GinkgoWrappers
                           Matrix>);
 
       gko::dim<2> size = {static_cast<gko::size_type>(deal_csr.m()),
-                                                       static_cast<gko::size_type>(deal_csr.n())};
+                          static_cast<gko::size_type>(deal_csr.n())};
       gko::matrix_data<value_type, index_type> md{size};
       md.nonzeros.reserve(deal_csr.n_nonzero_elements());
 
@@ -240,7 +204,7 @@ namespace GinkgoWrappers
   namespace detail
   {
     class GinkgoPayload
-      : public dealii::internal::LinearOperatorImplementation::EmptyPayload
+      : public internal::LinearOperatorImplementation::EmptyPayload
     {};
 
     template <typename ValueType, typename MemorySpace>
@@ -269,25 +233,23 @@ namespace GinkgoWrappers
             typename RangeValueType    = double,
             typename DomainMemorySpace = MemorySpace::Host,
             typename RangeMemorySpace  = MemorySpace::Host>
-  dealii::LinearOperator<
-    dealii::LinearAlgebra::distributed::Vector<DomainValueType,
-                                               DomainMemorySpace>,
-    dealii::LinearAlgebra::distributed::Vector<RangeValueType,
-                                               RangeMemorySpace>,
+  LinearOperator<
+    LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>,
+    LinearAlgebra::distributed::Vector<RangeValueType, RangeMemorySpace>,
     detail::GinkgoPayload>
-  linear_operator(const std::shared_ptr<gko::LinOp> &gko_op)
+  linear_operator(std::shared_ptr<const gko::Executor> domain_exec,
+                  std::shared_ptr<const gko::Executor> range_exec,
+                  const std::shared_ptr<gko::LinOp>   &gko_op)
   {
     using Domain =
-      dealii::LinearAlgebra::distributed::Vector<DomainValueType,
-                                                 DomainMemorySpace>;
-    using Range = dealii::LinearAlgebra::distributed::Vector<RangeValueType,
-                                                             RangeMemorySpace>;
+      LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>;
+    using Range =
+      LinearAlgebra::distributed::Vector<RangeValueType, RangeMemorySpace>;
     using domain_value_type = DomainValueType;
     using range_value_type  = RangeValueType;
     using value_type = std::common_type_t<domain_value_type, range_value_type>;
 
-    using LinearOperator =
-      dealii::LinearOperator<Domain, Range, detail::GinkgoPayload>;
+    using LinearOperator = LinearOperator<Domain, Range, detail::GinkgoPayload>;
     LinearOperator return_op{detail::GinkgoPayload{}};
 
     auto exec = gko_op->get_executor();
@@ -305,38 +267,42 @@ namespace GinkgoWrappers
       v.reinit(gko_op->get_size()[0], omit_zeroing_entries);
     };
 
-    return_op.vmult = [gko_op](Range &v, const Domain &u) {
-      auto gko_u = create_vector(detail::create_array_view(u));
-      auto gko_v = create_vector(detail::create_array_view(v));
+    return_op.vmult = [gko_op, domain_exec, range_exec](Range        &v,
+                                                        const Domain &u) {
+      auto gko_u = create_vector(domain_exec, detail::create_array_view(u));
+      auto gko_v = create_vector(range_exec, detail::create_array_view(v));
 
       gko_op->apply(gko_u, gko_v);
     };
 
-    return_op.vmult_add = [gko_op, one](Range &v, const Domain &u) {
-      auto gko_u = create_vector(detail::create_array_view(u));
-      auto gko_v = create_vector(detail::create_array_view(v));
+    return_op.vmult_add =
+      [gko_op, one, domain_exec, range_exec](Range &v, const Domain &u) {
+        auto gko_u = create_vector(domain_exec, detail::create_array_view(u));
+        auto gko_v = create_vector(range_exec, detail::create_array_view(v));
 
-      gko_op->apply(one, gko_u, one, gko_v);
-    };
+        gko_op->apply(one, gko_u, one, gko_v);
+      };
 
-    return_op.Tvmult = [gko_op](Range &v, const Domain &u) {
-      auto gko_u = create_vector(detail::create_array_view(u));
-      auto gko_v = create_vector(detail::create_array_view(v));
+    return_op.Tvmult = [gko_op, domain_exec, range_exec](Range        &v,
+                                                         const Domain &u) {
+      auto gko_u = create_vector(domain_exec, detail::create_array_view(u));
+      auto gko_v = create_vector(range_exec, detail::create_array_view(v));
 
       // @todo: this creates a temporary transposed matrix
       gko::as<gko::Transposable>(gko_op)->transpose()->apply(gko_u, gko_v);
     };
 
-    return_op.Tvmult_add = [gko_op, one](Range &v, const Domain &u) {
-      auto gko_u = create_vector(detail::create_array_view(u));
-      auto gko_v = create_vector(detail::create_array_view(v));
+    return_op.Tvmult_add =
+      [gko_op, one, domain_exec, range_exec](Range &v, const Domain &u) {
+        auto gko_u = create_vector(domain_exec, detail::create_array_view(u));
+        auto gko_v = create_vector(range_exec, detail::create_array_view(v));
 
-      // @todo: this creates a temporary transposed matrix
-      gko::as<gko::Transposable>(gko_op)->transpose()->apply(one,
-                                                             gko_u,
-                                                             one,
-                                                             gko_v);
-    };
+        // @todo: this creates a temporary transposed matrix
+        gko::as<gko::Transposable>(gko_op)->transpose()->apply(one,
+                                                               gko_u,
+                                                               one,
+                                                               gko_v);
+      };
 
     return return_op;
   }
@@ -345,20 +311,60 @@ namespace GinkgoWrappers
             typename RangeValueType    = double,
             typename DomainMemorySpace = MemorySpace::Host,
             typename RangeMemorySpace  = MemorySpace::Host>
-  dealii::LinearOperator<
-    dealii::LinearAlgebra::distributed::Vector<DomainValueType,
-                                               DomainMemorySpace>,
-    dealii::LinearAlgebra::distributed::Vector<RangeValueType,
-                                               RangeMemorySpace>,
+  LinearOperator<
+    LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>,
+    LinearAlgebra::distributed::Vector<RangeValueType, RangeMemorySpace>,
+    detail::GinkgoPayload>
+  linear_operator(const std::shared_ptr<gko::LinOp> &gko_op)
+  {
+    return linear_operator<DomainValueType,
+                           RangeValueType,
+                           DomainMemorySpace,
+                           RangeMemorySpace>(gko_op->get_executor(),
+                                             gko_op->get_executor(),
+                                             gko_op);
+  }
+
+  template <typename DomainValueType   = double,
+            typename RangeValueType    = double,
+            typename DomainMemorySpace = MemorySpace::Host,
+            typename RangeMemorySpace  = MemorySpace::Host>
+  LinearOperator<
+    LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>,
+    LinearAlgebra::distributed::Vector<RangeValueType, RangeMemorySpace>,
+    detail::GinkgoPayload>
+  inverse_operator(std::shared_ptr<const gko::Executor>      domain_exec,
+                   std::shared_ptr<const gko::Executor>      range_exec,
+                   const std::shared_ptr<gko::LinOp>        &gko_op,
+                   const std::shared_ptr<gko::LinOpFactory> &solver)
+  {
+    auto solver_op = gko::share(solver->generate(gko_op));
+    return linear_operator<RangeValueType,
+                           DomainValueType,
+                           RangeMemorySpace,
+                           DomainMemorySpace>(std::move(domain_exec),
+                                              std::move(range_exec),
+                                              std::move(solver_op));
+  }
+
+  template <typename DomainValueType   = double,
+            typename RangeValueType    = double,
+            typename DomainMemorySpace = MemorySpace::Host,
+            typename RangeMemorySpace  = MemorySpace::Host>
+  LinearOperator<
+    LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>,
+    LinearAlgebra::distributed::Vector<RangeValueType, RangeMemorySpace>,
     detail::GinkgoPayload>
   inverse_operator(const std::shared_ptr<gko::LinOp>        &gko_op,
                    const std::shared_ptr<gko::LinOpFactory> &solver)
   {
-    auto solver_op = solver->generate(gko_op);
+    auto solver_op = gko::share(solver->generate(gko_op));
     return linear_operator<RangeValueType,
                            DomainValueType,
                            RangeMemorySpace,
-                           DomainMemorySpace>(std::move(solver_op));
+                           DomainMemorySpace>(solver_op->get_executor(),
+                                              solver_op->get_executor(),
+                                              solver_op);
   }
 
 

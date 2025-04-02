@@ -31,18 +31,22 @@
 
 using namespace dealii;
 
+std::shared_ptr<gko::Executor> default_exec;
+std::shared_ptr<gko::Executor> host_exec;
 
-template <typename View, typename ValueType>
+template <typename ValueType, typename MemorySpaceType>
 bool
-check_equality(View view, gko::matrix::Dense<ValueType> *vector)
+check_equality(ArrayView<ValueType, MemorySpaceType> view,
+               gko::matrix::Dense<ValueType>        *vector)
 {
-  using exec_space = typename View::execution_space;
-  auto data        = vector->get_values();
+  using exec_space = typename MemorySpaceType::kokkos_space::execution_space;
+  auto view_data   = view.data();
+  auto vector_data = vector->get_values();
   bool success     = true;
   Kokkos::parallel_reduce(
     Kokkos::RangePolicy<exec_space>(0, view.size()),
     KOKKOS_LAMBDA(const int i, bool &lsuccess) {
-      lsuccess = lsuccess && (view(i) == data[i]);
+      lsuccess = lsuccess && (view_data[i] == vector_data[i]);
     },
     Kokkos::LAnd<bool, exec_space>{success});
   return success;
@@ -65,31 +69,31 @@ fill_view(View view)
 }
 
 
-
 TEST(can_create_vector_host)
 {
   Kokkos::View<double[5], MemorySpace::Host::kokkos_space> view{"name"};
   ArrayView<double, MemorySpace::Host> array_view(view.data(), view.size());
   fill_view(view);
 
-  auto vector = GinkgoWrappers::create_vector(array_view);
+  auto vector = GinkgoWrappers::create_vector(host_exec, array_view);
 
   TEST_ASSERT(vector->get_values() == view.data());
+  check_equality(array_view, vector.get());
 }
 
 
 TEST(can_create_vector_host_const)
 {
-  using array_view_type = ArrayView<double, MemorySpace::Host>;
+  using array_view_type = ArrayView<const double, MemorySpace::Host>;
   Kokkos::View<double[5], MemorySpace::Host::kokkos_space> view{"name"};
   array_view_type array_view(view.data(), view.size());
   fill_view(view);
 
-  auto vector = GinkgoWrappers::create_vector(
-    const_cast<const array_view_type &>(array_view));
+  auto vector = GinkgoWrappers::create_vector(host_exec, array_view);
 
   using gko_type = typename decltype(vector)::element_type;
   TEST_ASSERT(std::is_const_v<gko_type>);
+  TEST_ASSERT(vector->get_const_values() == view.data());
 }
 
 
@@ -99,13 +103,14 @@ TEST(can_create_vector_default)
   ArrayView<double, MemorySpace::Default> array_view(view.data(), view.size());
   fill_view(view);
 
-  auto vector = GinkgoWrappers::create_vector(array_view);
+  auto vector = GinkgoWrappers::create_vector(default_exec, array_view);
 
   TEST_ASSERT(vector->get_values() == array_view.begin());
+  check_equality(array_view, vector.get());
 }
 
 
-TEST(can_create_vector_with_executor)
+TEST(throws_on_incompatible_executor)
 {
   if (!std::is_same_v<MemorySpace::Host::kokkos_space,
                       MemorySpace::Default::kokkos_space>)
@@ -113,15 +118,13 @@ TEST(can_create_vector_with_executor)
       Kokkos::View<double[5], MemorySpace::Default::kokkos_space> view{"name"};
       ArrayView<double, MemorySpace::Default> array_view(view.data(),
                                                          view.size());
-      fill_view(view);
 
-      auto ref    = gko::ReferenceExecutor::create();
-      auto vector = GinkgoWrappers::create_vector(ref, array_view);
-
-      auto mirror = Kokkos::create_mirror(view);
-      Kokkos::deep_copy(mirror, view);
-      TEST_ASSERT(vector->get_values() != array_view.begin());
-      TEST_ASSERT(check_equality(mirror, vector.get()));
+      TEST_ASSERT_THROW(GinkgoWrappers::create_vector(host_exec, array_view),
+                        ExcMessage);
+    }
+  else
+    {
+      TEST_ASSERT(true);
     }
 }
 
@@ -129,17 +132,16 @@ TEST(can_create_vector_with_executor)
 TEST(can_create_csr)
 {
   std::vector<std::vector<unsigned int>> col_idxs{{0, 3}, {1}, {0, 2}};
-  dealii::SparsityPattern                pattern;
+  SparsityPattern                        pattern;
   pattern.copy_from(3, 4, col_idxs.begin(), col_idxs.end());
-  dealii::SparseMatrix<double> dealii_obj(pattern);
+  SparseMatrix<double> dealii_obj(pattern);
   dealii_obj.set(0, 0, 1);
   dealii_obj.set(0, 3, 2);
   dealii_obj.set(1, 1, 3);
   dealii_obj.set(2, 0, 4);
   dealii_obj.set(2, 2, 5);
-  auto exec = gko::ext::kokkos::get_default_executor();
 
-  auto obj = GinkgoWrappers::create_csr_matrix(exec, dealii_obj);
+  auto obj = GinkgoWrappers::create_csr_matrix(host_exec, dealii_obj);
   TEST_ASSERT(obj->get_num_stored_elements() == 5);
   TEST_ASSERT(obj->get_const_col_idxs()[0] == 0);
   TEST_ASSERT(obj->get_const_col_idxs()[1] == 3);
@@ -161,18 +163,17 @@ TEST(can_create_csr)
 TEST(can_create_csr_with_strategy)
 {
   std::vector<std::vector<unsigned int>> col_idxs{{0, 3}, {1}, {0, 2}};
-  dealii::SparsityPattern                pattern;
+  SparsityPattern                        pattern;
   pattern.copy_from(3, 4, col_idxs.begin(), col_idxs.end());
-  dealii::SparseMatrix<double> dealii_obj(pattern);
+  SparseMatrix<double> dealii_obj(pattern);
   dealii_obj.set(0, 0, 1);
   dealii_obj.set(0, 3, 2);
   dealii_obj.set(1, 1, 3);
   dealii_obj.set(2, 0, 4);
   dealii_obj.set(2, 2, 5);
-  auto exec = gko::ext::kokkos::get_default_executor();
 
   auto obj =
-    GinkgoWrappers::create_csr_matrix(exec,
+    GinkgoWrappers::create_csr_matrix(host_exec,
                                       dealii_obj,
                                       GinkgoWrappers::csr_strategy::merge_path);
 
@@ -186,18 +187,17 @@ TEST(can_create_csr_with_strategy)
 TEST(can_create_csr_with_index_type)
 {
   std::vector<std::vector<unsigned int>> col_idxs{{0, 3}, {1}, {0, 2}};
-  dealii::SparsityPattern                pattern;
+  SparsityPattern                        pattern;
   pattern.copy_from(3, 4, col_idxs.begin(), col_idxs.end());
-  dealii::SparseMatrix<double> dealii_obj(pattern);
+  SparseMatrix<double> dealii_obj(pattern);
   dealii_obj.set(0, 0, 1);
   dealii_obj.set(0, 3, 2);
   dealii_obj.set(1, 1, 3);
   dealii_obj.set(2, 0, 4);
   dealii_obj.set(2, 2, 5);
-  auto exec = gko::ext::kokkos::get_default_executor();
 
   auto obj = GinkgoWrappers::create_csr_matrix<gko::int64>(
-    exec, dealii_obj, GinkgoWrappers::csr_strategy::merge_path);
+    host_exec, dealii_obj, GinkgoWrappers::csr_strategy::merge_path);
 
   using csr_type =
     std::remove_cv_t<std::remove_reference_t<decltype(obj)>>::element_type;
@@ -210,18 +210,17 @@ TEST(can_create_csr_with_index_type)
 TEST(can_create_csr_with_value_index_type)
 {
   std::vector<std::vector<unsigned int>> col_idxs{{0, 3}, {1}, {0, 2}};
-  dealii::SparsityPattern                pattern;
+  SparsityPattern                        pattern;
   pattern.copy_from(3, 4, col_idxs.begin(), col_idxs.end());
-  dealii::SparseMatrix<double> dealii_obj(pattern);
+  SparseMatrix<double> dealii_obj(pattern);
   dealii_obj.set(0, 0, 1);
   dealii_obj.set(0, 3, 2);
   dealii_obj.set(1, 1, 3);
   dealii_obj.set(2, 0, 4);
   dealii_obj.set(2, 2, 5);
-  auto exec = gko::ext::kokkos::get_default_executor();
 
   auto obj = GinkgoWrappers::create_csr_matrix<float, gko::int64>(
-    exec, dealii_obj, GinkgoWrappers::csr_strategy::merge_path);
+    host_exec, dealii_obj, GinkgoWrappers::csr_strategy::merge_path);
 
   using csr_type =
     std::remove_cv_t<std::remove_reference_t<decltype(obj)>>::element_type;
@@ -241,20 +240,20 @@ struct linop_data
     std::vector<std::vector<unsigned int>> col_idxs{{0, 3}, {1}, {0, 2}};
     pattern.copy_from(3, 4, col_idxs.begin(), col_idxs.end());
 
-    dealii_obj = dealii::SparseMatrix<double>(pattern);
+    dealii_obj = SparseMatrix<double>(pattern);
     dealii_obj.set(0, 0, 1);
     dealii_obj.set(0, 3, 2);
     dealii_obj.set(1, 1, 3);
     dealii_obj.set(2, 0, 4);
     dealii_obj.set(2, 2, 5);
 
-    exec = gko::ext::kokkos::get_executor(
+    exec = gko::ext::kokkos::create_executor(
       typename MemorySpace::kokkos_space::execution_space{});
     gko_obj = gko::share(GinkgoWrappers::create_csr_matrix(exec, dealii_obj));
   }
 
-  dealii::SparsityPattern      pattern;
-  dealii::SparseMatrix<double> dealii_obj;
+  SparsityPattern      pattern;
+  SparseMatrix<double> dealii_obj;
 
   std::shared_ptr<gko::Executor> exec;
   std::shared_ptr<gko::LinOp>    gko_obj;
@@ -265,7 +264,7 @@ struct linop_vectors
 {
   using Vector = LinearAlgebra::distributed::Vector<double, MemorySpace>;
   using VectorHost =
-    LinearAlgebra::distributed::Vector<double, ::dealii::MemorySpace::Host>;
+    LinearAlgebra::distributed::Vector<double, ::MemorySpace::Host>;
 
   linop_vectors(size_t n, size_t m)
   {
@@ -360,9 +359,6 @@ TEST(can_create_linop_default)
     LinearAlgebra::distributed::Vector<double, MemorySpace::Default> mirror(
       u_ref.size());
 
-    auto default_exec = gko::ext::kokkos::get_default_executor();
-    auto host_exec    = gko::ext::kokkos::get_default_host_executor();
-
     default_exec->copy_from(host_exec,
                             mirror.size(),
                             u_ref.begin(),
@@ -412,9 +408,9 @@ TEST(can_create_linop_default)
 
 TEST(can_create_inverse_linop)
 {
-  auto exec            = gko::ext::kokkos::get_default_executor();
   auto gko_obj         = gko::share(gko::initialize<gko::matrix::Csr<>>(
-    {{2, -1, 0, 0}, {-1, 2, -1, 0}, {0, -1, 2, -1}, {0, 0, -1, 2}}, exec));
+    {{2, -1, 0, 0}, {-1, 2, -1, 0}, {0, -1, 2, -1}, {0, 0, -1, 2}},
+    default_exec));
   auto linear_operator = GinkgoWrappers::
     linear_operator<double, double, MemorySpace::Default, MemorySpace::Default>(
       gko_obj);
@@ -422,8 +418,8 @@ TEST(can_create_inverse_linop)
     gko_obj->get_size()[0]);
   LinearAlgebra::distributed::Vector<double, MemorySpace::Default> v(
     gko_obj->get_size()[0]);
-  u             = 1.0;
-  v             = 0.0;
+  u = 1.0;
+  v = 0.0;
   linear_operator.vmult(v, u);
 
   auto inverse_operator =
@@ -433,11 +429,10 @@ TEST(can_create_inverse_linop)
                                      MemorySpace::Default>(
       gko_obj,
       gko::solver::Cg<>::build()
-        .with_criteria(
-          gko::stop::Iteration::build().with_max_iters(4u).on(exec))
-        .on(exec));
+        .with_criteria(gko::stop::Iteration::build().with_max_iters(4u))
+        .on(default_exec));
   auto solution = u;
-  u = 0.0;
+  u             = 0.0;
   inverse_operator.vmult(u, v);
 
   solution -= u;
@@ -454,10 +449,13 @@ main(int argc, char **argv)
   // This also reroutes deallog output to a file "output".
   initlog();
 
+  default_exec = gko::ext::kokkos::create_default_executor();
+  host_exec    = gko::ext::kokkos::create_default_host_executor();
+
   can_create_vector_host();
   can_create_vector_host_const();
   can_create_vector_default();
-  can_create_vector_with_executor();
+  throws_on_incompatible_executor();
   can_create_csr();
   can_create_csr_with_index_type();
   can_create_csr_with_value_index_type();
