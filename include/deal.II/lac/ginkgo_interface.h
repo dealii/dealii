@@ -41,8 +41,8 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename MemorySpace>
   std::unique_ptr<gko::matrix::Dense<ValueType>>
-  create_vector(std::shared_ptr<const gko::Executor> exec,
-                ArrayView<ValueType, MemorySpace>    array)
+  create_vector(const std::shared_ptr<const gko::Executor> &exec,
+                ArrayView<ValueType, MemorySpace>           array)
   {
     Assert(gko::ext::kokkos::detail::check_compatibility<
              typename MemorySpace::kokkos_space>(exec),
@@ -55,8 +55,8 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename MemorySpace>
   std::unique_ptr<const gko::matrix::Dense<std::decay_t<ValueType>>>
-  create_vector(std::shared_ptr<const gko::Executor>    exec,
-                ArrayView<const ValueType, MemorySpace> array)
+  create_vector(const std::shared_ptr<const gko::Executor> &exec,
+                ArrayView<const ValueType, MemorySpace>     array)
   {
     Assert(gko::ext::kokkos::detail::check_compatibility<
              typename MemorySpace::kokkos_space>(exec),
@@ -237,9 +237,9 @@ namespace GinkgoWrappers
     LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>,
     LinearAlgebra::distributed::Vector<RangeValueType, RangeMemorySpace>,
     detail::GinkgoPayload>
-  linear_operator(std::shared_ptr<const gko::Executor> domain_exec,
-                  std::shared_ptr<const gko::Executor> range_exec,
-                  const std::shared_ptr<gko::LinOp>   &gko_op)
+  linear_operator(const std::shared_ptr<const gko::Executor> &domain_exec,
+                  const std::shared_ptr<const gko::Executor> &range_exec,
+                  const std::shared_ptr<gko::LinOp>          &gko_op)
   {
     using Domain =
       LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>;
@@ -333,10 +333,10 @@ namespace GinkgoWrappers
     LinearAlgebra::distributed::Vector<DomainValueType, DomainMemorySpace>,
     LinearAlgebra::distributed::Vector<RangeValueType, RangeMemorySpace>,
     detail::GinkgoPayload>
-  inverse_operator(std::shared_ptr<const gko::Executor>      domain_exec,
-                   std::shared_ptr<const gko::Executor>      range_exec,
-                   const std::shared_ptr<gko::LinOp>        &gko_op,
-                   const std::shared_ptr<gko::LinOpFactory> &solver)
+  inverse_operator(const std::shared_ptr<const gko::Executor> &domain_exec,
+                   const std::shared_ptr<const gko::Executor> &range_exec,
+                   const std::shared_ptr<gko::LinOp>          &gko_op,
+                   const std::shared_ptr<gko::LinOpFactory>   &solver)
   {
     auto solver_op = gko::share(solver->generate(gko_op));
     return linear_operator<RangeValueType,
@@ -358,13 +358,13 @@ namespace GinkgoWrappers
   inverse_operator(const std::shared_ptr<gko::LinOp>        &gko_op,
                    const std::shared_ptr<gko::LinOpFactory> &solver)
   {
-    auto solver_op = gko::share(solver->generate(gko_op));
-    return linear_operator<RangeValueType,
-                           DomainValueType,
-                           RangeMemorySpace,
-                           DomainMemorySpace>(solver_op->get_executor(),
-                                              solver_op->get_executor(),
-                                              solver_op);
+    return inverse_operator<DomainValueType,
+                            RangeValueType,
+                            DomainMemorySpace,
+                            RangeMemorySpace>(gko_op->get_executor(),
+                                              gko_op->get_executor(),
+                                              gko_op,
+                                              solver);
   }
 
 
