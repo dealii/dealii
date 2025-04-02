@@ -374,6 +374,7 @@ jobs:
               -D Kokkos_ENABLE_CUDA=ON \
               -D Kokkos_ENABLE_CUDA_LAMBDA=ON \
               -D Kokkos_ENABLE_CUDA_CONSTEXPR=ON \
+              -D Kokkos_ARCH_NATIVE=ON \
               -D Kokkos_ARCH_VOLTA70=ON \
               ..
         make install
@@ -466,6 +467,7 @@ jobs:
               -D CMAKE_CXX_COMPILER=clang++-18 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               -D Kokkos_ENABLE_CUDA=ON \
+              -D Kokkos_ARCH_NATIVE=ON \
               -D Kokkos_ARCH_VOLTA70=ON \
               ..
         make install
