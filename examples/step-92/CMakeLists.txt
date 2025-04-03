@@ -37,12 +37,14 @@ endif()
 #
 # Are all dependencies fulfilled?
 #
-if(NOT DEAL_II_WITH_UMFPACK)
+if(NOT DEAL_II_WITH_GMSH OR NOT DEAL_II_WITH_PETSC)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
-    DEAL_II_WITH_UMFPACK        = ON
+    DEAL_II_WITH_GMSH           = ON
+    DEAL_II_WITH_PETSC          = ON
 However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
-    DEAL_II_WITH_UMFPACK        = ${DEAL_II_WITH_UMFPACK}
+    DEAL_II_WITH_GMSH           = ${DEAL_II_WITH_GMSH}
+    DEAL_II_WITH_PETSC          = ${DEAL_II_WITH_PETSC}
 This conflicts with the requirements."
     )
 endif()
