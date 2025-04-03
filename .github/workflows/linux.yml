@@ -374,7 +374,6 @@ jobs:
               -D Kokkos_ENABLE_CUDA=ON \
               -D Kokkos_ENABLE_CUDA_LAMBDA=ON \
               -D Kokkos_ENABLE_CUDA_CONSTEXPR=ON \
-              -D Kokkos_ARCH_NATIVE=ON \
               -D Kokkos_ARCH_VOLTA70=ON \
               ..
         make install
