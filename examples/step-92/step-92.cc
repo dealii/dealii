@@ -74,8 +74,9 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
 
-
 #include <gmsh.h>
+
+#include <filesystem>
 
 // @sect3{Class Template Declarations}
 //
@@ -396,6 +397,10 @@ namespace Step92
 
   // The Laplace::make_grid() routine
   // imports the mesh from a file as specified in the parameter-file.
+  // In case the mesh file does not exist, we call gmsh to generate it from the
+  // corresponding geometry file. We do this only on the very first MPI process,
+  // thus we need to ensure that all other processes wait until the mesh file is
+  // generated.
 
   template <int dim>
   void Laplace<dim>::make_grid()
@@ -408,9 +413,7 @@ namespace Step92
 
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
-        std::ifstream mshfile(mshfilename);
-
-        if (!mshfile.good())
+        if (!std::filesystem::exists(mshfilename))
           {
             std::string geofilename = problem_parameters.mesh_filename + ".geo";
             gmsh::initialize();
@@ -420,14 +423,7 @@ namespace Step92
             gmsh::finalize();
           }
       }
-
-    /*
-     * Usage of Utilities::MPI::sum() is only a trick
-     * to wait for the process that calls gmsh
-     * The value of tmp is not needed.
-     */
-    int tmp = 0;
-    Utilities::MPI::sum(tmp, mpi_communicator);
+    MPI_Barrier(mpi_communicator);
 
     GridIn<dim> gi;
 
