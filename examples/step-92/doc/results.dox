@@ -106,7 +106,7 @@ It is summarized in the <code>Properties</code> here but the assignment is not d
 
 Default boundary $\Gamma_0$ value will be set to ${\Epot}_{0}=0\,\text{V}$.
 The assignment of the properties is done in the parameter file <code>example-1.prm</code>.
-First parameter is the <code>mesh filename</code> (without <code>.msh</code>-suffix.
+First parameter is the <code>mesh filename</code> (without <code>.msh</code>-suffix.)
 
 The parameter <code>domains</code> is a comma-separated list of entries for the assignment of material properties to volumes.
 and the parameter <code>potentials</code> is a comma-separated list of entries for assigning the electrostatic potential values
@@ -430,6 +430,7 @@ make that definition ineffective, e.g. by commenting it
 and finally re-compile and run the solver without modifying
 neither mesh nor parameter-file.
 @code
+> make
 > mpirun -bind-to hwthread ./step-92 example-2.prm
 @endcode
 

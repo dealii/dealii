@@ -75,6 +75,7 @@
 #include <deal.II/base/conditional_ostream.h>
 
 
+#include <gmsh.h>
 
 // @sect3{Class Template Declarations}
 //
@@ -204,13 +205,9 @@ namespace Step92
 
     add_parameter("mesh filename", mesh_filename, "mesh file name");
 
-    Assert(mesh_filename.size() > 0, ExcInternalError());
-
     add_parameter("cells output data filename",
                   cells_output_data_filename,
                   "filename for exporting cells solution");
-
-    Assert(cells_output_data_filename.size() > 0, ExcInternalError());
 
     add_parameter(
       "domains",
@@ -405,7 +402,32 @@ namespace Step92
   {
     TimerOutput::Scope t(computing_timer, "01. make grid");
 
-    std::string infilename = problem_parameters.mesh_filename + ".msh";
+    Assert(problem_parameters.mesh_filename.size() > 0, ExcInternalError());
+
+    std::string mshfilename = problem_parameters.mesh_filename + ".msh";
+
+    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+      {
+        std::ifstream mshfile(mshfilename);
+
+        if (!mshfile.good())
+          {
+            std::string geofilename = problem_parameters.mesh_filename + ".geo";
+            gmsh::initialize();
+            gmsh::open(geofilename);
+            gmsh::model::mesh::generate(dim);
+            gmsh::write(mshfilename);
+            gmsh::finalize();
+          }
+      }
+
+    /*
+     * Usage of Utilities::MPI::sum() is only a trick
+     * to wait for the process that calls gmsh
+     * The value of tmp is not needed.
+     */
+    int tmp = 0;
+    Utilities::MPI::sum(tmp, mpi_communicator);
 
     GridIn<dim> gi;
 
@@ -416,9 +438,9 @@ namespace Step92
     auto construction_data = TriangulationDescription::Utilities::
       create_description_from_triangulation_in_groups<dim, dim>(
         [&](Triangulation<dim> &tria) {
-          pcout << "mesh-file: \"" << infilename << "\"" << std::endl;
+          pcout << "mesh-file: \"" << mshfilename << "\"" << std::endl;
           gi.attach_triangulation(tria);
-          gi.read_msh(infilename);
+          gi.read_msh(mshfilename);
         },
         [&](Triangulation<dim> &tria_serial,
             const MPI_Comm /*mpi_comm*/,
@@ -431,9 +453,9 @@ namespace Step92
     triangulation.create_triangulation(construction_data);
 #else //  #ifdef USE_FULLY_DISTRIBUTED_TRIA
     Triangulation<dim>                        tria;
-    pcout << "mesh-file: \"" << infilename << "\"" << std::endl;
+    pcout << "mesh-file: \"" << mshfilename << "\"" << std::endl;
     gi.attach_triangulation(tria);
-    gi.read_msh(infilename);
+    gi.read_msh(mshfilename);
 
     triangulation.copy_triangulation(tria);
 #endif
@@ -473,7 +495,7 @@ namespace Step92
     // constraints.
     //
     constraints.clear();
-
+    constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
 
@@ -494,7 +516,6 @@ namespace Step92
 
         pcout << std::endl;
       }
-
 
     constraints.close();
 
@@ -873,6 +894,9 @@ namespace Step92
   void Laplace<dim>::output_results()
   {
     TimerOutput::Scope t(computing_timer, "05. post-process");
+
+    Assert(problem_parameters.cells_output_data_filename.size() > 0,
+           ExcInternalError());
 
     std::string cells_output_data_filename =
       problem_parameters.cells_output_data_filename + ".vtu";

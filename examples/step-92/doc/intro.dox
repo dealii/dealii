@@ -305,7 +305,7 @@ electric potential $\Epot$
     \vEfield = -\grad \Epot .
 @f}
 
-The current density may be of interest in some cases an can be calculated
+The current density may be of interest in some cases and can be calculated
 under terms of Ohm's law
 @f{align*}{
     \vJelfield = \conductivity \vEfield .

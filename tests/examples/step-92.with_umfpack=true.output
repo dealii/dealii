@@ -1,4 +1,457 @@
 Running with PETSc on 1 MPI rank(s)...
+Info    : Reading 'example-1.geo'...
+Info    : Done reading 'example-1.geo'
+Info    : Meshing 1D...
+Info    : [  0%] Meshing curve 1 (Line)
+Info    : [ 10%] Meshing curve 2 (Line)
+Info    : [ 10%] Meshing curve 3 (Line)
+Info    : [ 10%] Meshing curve 4 (Line)
+Info    : [ 10%] Meshing curve 5 (Line)
+Info    : [ 10%] Meshing curve 6 (Line)
+Info    : [ 10%] Meshing curve 7 (Line)
+Info    : [ 10%] Meshing curve 8 (Line)
+Info    : [ 10%] Meshing curve 9 (Line)
+Info    : [ 10%] Meshing curve 10 (Line)
+Info    : [ 10%] Meshing curve 11 (Line)
+Info    : [ 20%] Meshing curve 12 (Line)
+Info    : [ 20%] Meshing curve 13 (Line)
+Info    : [ 20%] Meshing curve 14 (Line)
+Info    : [ 20%] Meshing curve 15 (Line)
+Info    : [ 20%] Meshing curve 16 (Line)
+Info    : [ 20%] Meshing curve 17 (Line)
+Info    : [ 20%] Meshing curve 18 (Line)
+Info    : [ 20%] Meshing curve 19 (Line)
+Info    : [ 20%] Meshing curve 20 (Line)
+Info    : [ 20%] Meshing curve 21 (Line)
+Info    : [ 30%] Meshing curve 22 (Line)
+Info    : [ 30%] Meshing curve 23 (Line)
+Info    : [ 30%] Meshing curve 24 (Line)
+Info    : [ 30%] Meshing curve 25 (Line)
+Info    : [ 30%] Meshing curve 26 (Line)
+Info    : [ 30%] Meshing curve 27 (Line)
+Info    : [ 30%] Meshing curve 28 (Line)
+Info    : [ 30%] Meshing curve 29 (Line)
+Info    : [ 30%] Meshing curve 30 (Line)
+Info    : [ 30%] Meshing curve 31 (Line)
+Info    : [ 30%] Meshing curve 32 (Line)
+Info    : [ 40%] Meshing curve 33 (Line)
+Info    : [ 40%] Meshing curve 34 (Line)
+Info    : [ 40%] Meshing curve 35 (Line)
+Info    : [ 40%] Meshing curve 36 (Line)
+Info    : [ 40%] Meshing curve 41 (Line)
+Info    : [ 40%] Meshing curve 42 (Line)
+Info    : [ 40%] Meshing curve 43 (Line)
+Info    : [ 40%] Meshing curve 44 (Line)
+Info    : [ 40%] Meshing curve 45 (Line)
+Info    : [ 40%] Meshing curve 46 (Line)
+Info    : [ 50%] Meshing curve 47 (Line)
+Info    : [ 50%] Meshing curve 48 (Line)
+Info    : [ 50%] Meshing curve 53 (Line)
+Info    : [ 50%] Meshing curve 54 (Line)
+Info    : [ 50%] Meshing curve 55 (Line)
+Info    : [ 50%] Meshing curve 56 (Line)
+Info    : [ 50%] Meshing curve 57 (Line)
+Info    : [ 50%] Meshing curve 58 (Line)
+Info    : [ 50%] Meshing curve 59 (Line)
+Info    : [ 50%] Meshing curve 60 (Line)
+Info    : [ 50%] Meshing curve 61 (Line)
+Info    : [ 60%] Meshing curve 62 (Line)
+Info    : [ 60%] Meshing curve 63 (Line)
+Info    : [ 60%] Meshing curve 64 (Line)
+Info    : [ 60%] Meshing curve 65 (Line)
+Info    : [ 60%] Meshing curve 66 (Line)
+Info    : [ 60%] Meshing curve 67 (Line)
+Info    : [ 60%] Meshing curve 68 (Line)
+Info    : [ 60%] Meshing curve 69 (Line)
+Info    : [ 60%] Meshing curve 70 (Line)
+Info    : [ 60%] Meshing curve 71 (Line)
+Info    : [ 70%] Meshing curve 72 (Line)
+Info    : [ 70%] Meshing curve 73 (Line)
+Info    : [ 70%] Meshing curve 74 (Line)
+Info    : [ 70%] Meshing curve 75 (Line)
+Info    : [ 70%] Meshing curve 76 (Line)
+Info    : [ 70%] Meshing curve 77 (Line)
+Info    : [ 70%] Meshing curve 78 (Line)
+Info    : [ 70%] Meshing curve 79 (Line)
+Info    : [ 70%] Meshing curve 80 (Line)
+Info    : [ 70%] Meshing curve 81 (Line)
+Info    : [ 80%] Meshing curve 82 (Line)
+Info    : [ 80%] Meshing curve 83 (Line)
+Info    : [ 80%] Meshing curve 84 (Line)
+Info    : [ 80%] Meshing curve 89 (Line)
+Info    : [ 80%] Meshing curve 90 (Line)
+Info    : [ 80%] Meshing curve 91 (Line)
+Info    : [ 80%] Meshing curve 92 (Line)
+Info    : [ 80%] Meshing curve 93 (Line)
+Info    : [ 80%] Meshing curve 94 (Line)
+Info    : [ 80%] Meshing curve 95 (Line)
+Info    : [ 80%] Meshing curve 96 (Line)
+Info    : [ 90%] Meshing curve 101 (Line)
+Info    : [ 90%] Meshing curve 102 (Line)
+Info    : [ 90%] Meshing curve 103 (Line)
+Info    : [ 90%] Meshing curve 104 (Line)
+Info    : [ 90%] Meshing curve 105 (Line)
+Info    : [ 90%] Meshing curve 106 (Line)
+Info    : [ 90%] Meshing curve 107 (Line)
+Info    : [ 90%] Meshing curve 108 (Line)
+Info    : [ 90%] Meshing curve 109 (Line)
+Info    : [ 90%] Meshing curve 110 (Line)
+Info    : [100%] Meshing curve 111 (Line)
+Info    : [100%] Meshing curve 112 (Line)
+Info    : [100%] Meshing curve 113 (Line)
+Info    : [100%] Meshing curve 114 (Line)
+Info    : [100%] Meshing curve 115 (Line)
+Info    : [100%] Meshing curve 116 (Line)
+Info    : [100%] Meshing curve 117 (Line)
+Info    : [100%] Meshing curve 118 (Line)
+Info    : [100%] Meshing curve 119 (Line)
+Info    : [100%] Meshing curve 120 (Line)
+Info    : Done meshing 1D (Wall 0.0038195s, CPU 0.00382s)
+Info    : Meshing 2D...
+Info    : [  0%] Meshing surface 1 (Plane, Frontal-Delaunay)
+Info    : [ 10%] Meshing surface 2 (Plane, Frontal-Delaunay)
+Info    : [ 10%] Meshing surface 3 (Plane, Frontal-Delaunay)
+Info    : [ 10%] Meshing surface 4 (Plane, Frontal-Delaunay)
+Info    : [ 10%] Meshing surface 5 (Plane, Frontal-Delaunay)
+Info    : [ 10%] Meshing surface 6 (Plane, Frontal-Delaunay)
+Info    : [ 20%] Meshing surface 7 (Plane, Frontal-Delaunay)
+Info    : [ 20%] Meshing surface 8 (Plane, Frontal-Delaunay)
+Info    : [ 20%] Meshing surface 9 (Plane, Frontal-Delaunay)
+Info    : [ 20%] Meshing surface 10 (Plane, Frontal-Delaunay)
+Info    : [ 20%] Meshing surface 11 (Plane, Frontal-Delaunay)
+Info    : [ 30%] Meshing surface 12 (Plane, Frontal-Delaunay)
+Info    : [ 30%] Meshing surface 13 (Plane, Frontal-Delaunay)
+Info    : [ 30%] Meshing surface 14 (Plane, Frontal-Delaunay)
+Info    : [ 30%] Meshing surface 15 (Plane, Frontal-Delaunay)
+Info    : [ 30%] Meshing surface 16 (Plane, Frontal-Delaunay)
+Info    : [ 40%] Meshing surface 18 (Plane, Frontal-Delaunay)
+Info    : [ 40%] Meshing surface 19 (Plane, Frontal-Delaunay)
+Info    : [ 40%] Meshing surface 20 (Plane, Frontal-Delaunay)
+Info    : [ 40%] Meshing surface 21 (Plane, Frontal-Delaunay)
+Info    : [ 40%] Meshing surface 22 (Plane, Frontal-Delaunay)
+Info    : [ 50%] Meshing surface 24 (Plane, Frontal-Delaunay)
+Info    : [ 50%] Meshing surface 25 (Plane, Frontal-Delaunay)
+Info    : [ 50%] Meshing surface 26 (Plane, Frontal-Delaunay)
+Info    : [ 50%] Meshing surface 27 (Plane, Frontal-Delaunay)
+Info    : [ 50%] Meshing surface 28 (Plane, Frontal-Delaunay)
+Info    : [ 50%] Meshing surface 29 (Plane, Frontal-Delaunay)
+Info    : [ 60%] Meshing surface 30 (Plane, Frontal-Delaunay)
+Info    : [ 60%] Meshing surface 31 (Plane, Frontal-Delaunay)
+Info    : [ 60%] Meshing surface 32 (Plane, Frontal-Delaunay)
+Info    : [ 60%] Meshing surface 33 (Plane, Frontal-Delaunay)
+Info    : [ 60%] Meshing surface 34 (Plane, Frontal-Delaunay)
+Info    : [ 70%] Meshing surface 35 (Plane, Frontal-Delaunay)
+Info    : [ 70%] Meshing surface 36 (Plane, Frontal-Delaunay)
+Info    : [ 70%] Meshing surface 37 (Plane, Frontal-Delaunay)
+Info    : [ 70%] Meshing surface 38 (Plane, Frontal-Delaunay)
+Info    : [ 70%] Meshing surface 40 (Plane, Frontal-Delaunay)
+Info    : [ 80%] Meshing surface 41 (Plane, Frontal-Delaunay)
+Info    : [ 80%] Meshing surface 42 (Plane, Frontal-Delaunay)
+Info    : [ 80%] Meshing surface 43 (Plane, Frontal-Delaunay)
+Info    : [ 80%] Meshing surface 44 (Plane, Frontal-Delaunay)
+Info    : [ 80%] Meshing surface 46 (Plane, Frontal-Delaunay)
+Info    : [ 90%] Meshing surface 47 (Plane, Frontal-Delaunay)
+Info    : [ 90%] Meshing surface 48 (Plane, Frontal-Delaunay)
+Info    : [ 90%] Meshing surface 49 (Plane, Frontal-Delaunay)
+Info    : [ 90%] Meshing surface 50 (Plane, Frontal-Delaunay)
+Info    : [ 90%] Meshing surface 51 (Plane, Frontal-Delaunay)
+Info    : [100%] Meshing surface 52 (Plane, Frontal-Delaunay)
+Info    : [100%] Meshing surface 53 (Plane, Frontal-Delaunay)
+Info    : [100%] Meshing surface 54 (Plane, Frontal-Delaunay)
+Info    : [100%] Meshing surface 55 (Plane, Frontal-Delaunay)
+Info    : [100%] Meshing surface 56 (Plane, Frontal-Delaunay)
+Info    : Done meshing 2D (Wall 0.00612159s, CPU 0.006122s)
+Info    : Meshing 3D...
+Info    : 3D Meshing 4 volumes with 1 connected component
+Info    : Tetrahedrizing 502 nodes...
+Info    : Done tetrahedrizing 510 nodes (Wall 0.00297813s, CPU 0.002973s)
+Info    : Reconstructing mesh...
+Info    :  - Creating surface mesh
+Info    :  - Identifying boundary edges
+Info    :  - Recovering boundary
+Info    :  - Added 2 Steiner points
+Info    : Done reconstructing mesh (Wall 0.00865493s, CPU 0.00847s)
+Info    : Found volume 1
+Info    : Found volume 4
+Info    : Found volume 3
+Info    : Found volume 2
+Info    : Found void region
+Info    : Found void region
+Info    : Found void region
+Info    : Found void region
+Info    : It. 0 - 0 nodes created - worst tet radius 7.10067 (nodes removed 0 0)
+Info    : 3D refinement terminated (560 nodes total):
+Info    :  - 0 Delaunay cavities modified for star shapeness
+Info    :  - 6 nodes could not be inserted
+Info    :  - 2527 tetrahedra created in 0.00168367 sec. (1500886 tets/s)
+Info    : 3 node relocations
+Info    : Done meshing 3D (Wall 0.0180779s, CPU 0.016807s)
+Info    : Optimizing mesh...
+Info    : Optimizing volume 1
+Info    : Optimization starts (volume = 7.536) with worst = 0.00124539 / average = 0.670725:
+Info    : 0.00 < quality < 0.10 :        13 elements
+Info    : 0.10 < quality < 0.20 :        53 elements
+Info    : 0.20 < quality < 0.30 :        77 elements
+Info    : 0.30 < quality < 0.40 :       134 elements
+Info    : 0.40 < quality < 0.50 :       160 elements
+Info    : 0.50 < quality < 0.60 :       250 elements
+Info    : 0.60 < quality < 0.70 :       349 elements
+Info    : 0.70 < quality < 0.80 :       330 elements
+Info    : 0.80 < quality < 0.90 :       449 elements
+Info    : 0.90 < quality < 1.00 :       255 elements
+Info    : 98 edge swaps, 0 node relocations (volume = 7.536): worst = 0.192875 / average = 0.693305 (Wall 0.000977203s, CPU 0.000977s)
+Info    : 100 edge swaps, 0 node relocations (volume = 7.536): worst = 0.192875 / average = 0.693688 (Wall 0.00143649s, CPU 0.001437s)
+Info    : No ill-shaped tets in the mesh :-)
+Info    : 0.00 < quality < 0.10 :         0 elements
+Info    : 0.10 < quality < 0.20 :         3 elements
+Info    : 0.20 < quality < 0.30 :        37 elements
+Info    : 0.30 < quality < 0.40 :       146 elements
+Info    : 0.40 < quality < 0.50 :       167 elements
+Info    : 0.50 < quality < 0.60 :       241 elements
+Info    : 0.60 < quality < 0.70 :       354 elements
+Info    : 0.70 < quality < 0.80 :       344 elements
+Info    : 0.80 < quality < 0.90 :       443 elements
+Info    : 0.90 < quality < 1.00 :       250 elements
+Info    : Optimizing volume 2
+Info    : Optimization starts (volume = 0.1) with worst = 0.407314 / average = 0.763666:
+Info    : 0.00 < quality < 0.10 :         0 elements
+Info    : 0.10 < quality < 0.20 :         0 elements
+Info    : 0.20 < quality < 0.30 :         0 elements
+Info    : 0.30 < quality < 0.40 :         0 elements
+Info    : 0.40 < quality < 0.50 :         6 elements
+Info    : 0.50 < quality < 0.60 :        20 elements
+Info    : 0.60 < quality < 0.70 :        12 elements
+Info    : 0.70 < quality < 0.80 :        14 elements
+Info    : 0.80 < quality < 0.90 :        48 elements
+Info    : 0.90 < quality < 1.00 :        22 elements
+Info    : No ill-shaped tets in the mesh :-)
+Info    : 0.00 < quality < 0.10 :         0 elements
+Info    : 0.10 < quality < 0.20 :         0 elements
+Info    : 0.20 < quality < 0.30 :         0 elements
+Info    : 0.30 < quality < 0.40 :         0 elements
+Info    : 0.40 < quality < 0.50 :         6 elements
+Info    : 0.50 < quality < 0.60 :        20 elements
+Info    : 0.60 < quality < 0.70 :        12 elements
+Info    : 0.70 < quality < 0.80 :        14 elements
+Info    : 0.80 < quality < 0.90 :        48 elements
+Info    : 0.90 < quality < 1.00 :        22 elements
+Info    : Optimizing volume 3
+Info    : Optimization starts (volume = 0.1) with worst = 0.407314 / average = 0.763666:
+Info    : 0.00 < quality < 0.10 :         0 elements
+Info    : 0.10 < quality < 0.20 :         0 elements
+Info    : 0.20 < quality < 0.30 :         0 elements
+Info    : 0.30 < quality < 0.40 :         0 elements
+Info    : 0.40 < quality < 0.50 :         6 elements
+Info    : 0.50 < quality < 0.60 :        20 elements
+Info    : 0.60 < quality < 0.70 :        12 elements
+Info    : 0.70 < quality < 0.80 :        14 elements
+Info    : 0.80 < quality < 0.90 :        48 elements
+Info    : 0.90 < quality < 1.00 :        22 elements
+Info    : No ill-shaped tets in the mesh :-)
+Info    : 0.00 < quality < 0.10 :         0 elements
+Info    : 0.10 < quality < 0.20 :         0 elements
+Info    : 0.20 < quality < 0.30 :         0 elements
+Info    : 0.30 < quality < 0.40 :         0 elements
+Info    : 0.40 < quality < 0.50 :         6 elements
+Info    : 0.50 < quality < 0.60 :        20 elements
+Info    : 0.60 < quality < 0.70 :        12 elements
+Info    : 0.70 < quality < 0.80 :        14 elements
+Info    : 0.80 < quality < 0.90 :        48 elements
+Info    : 0.90 < quality < 1.00 :        22 elements
+Info    : Optimizing volume 4
+Info    : Optimization starts (volume = 0.256) with worst = 0.152725 / average = 0.550869:
+Info    : 0.00 < quality < 0.10 :         0 elements
+Info    : 0.10 < quality < 0.20 :         2 elements
+Info    : 0.20 < quality < 0.30 :         6 elements
+Info    : 0.30 < quality < 0.40 :         1 elements
+Info    : 0.40 < quality < 0.50 :         5 elements
+Info    : 0.50 < quality < 0.60 :       183 elements
+Info    : 0.60 < quality < 0.70 :        11 elements
+Info    : 0.70 < quality < 0.80 :         0 elements
+Info    : 0.80 < quality < 0.90 :         0 elements
+Info    : 0.90 < quality < 1.00 :         0 elements
+Info    : 1 edge swaps, 4 node relocations (volume = 0.256): worst = 0.152725 / average = 0.55191 (Wall 6.2356e-05s, CPU 6.2e-05s)
+Info    : No ill-shaped tets in the mesh :-)
+Info    : 0.00 < quality < 0.10 :         0 elements
+Info    : 0.10 < quality < 0.20 :         2 elements
+Info    : 0.20 < quality < 0.30 :         5 elements
+Info    : 0.30 < quality < 0.40 :         2 elements
+Info    : 0.40 < quality < 0.50 :         5 elements
+Info    : 0.50 < quality < 0.60 :       183 elements
+Info    : 0.60 < quality < 0.70 :        11 elements
+Info    : 0.70 < quality < 0.80 :         0 elements
+Info    : 0.80 < quality < 0.90 :         0 elements
+Info    : 0.90 < quality < 1.00 :         0 elements
+Info    : Done optimizing mesh (Wall 0.00271332s, CPU 0.002027s)
+Info    : Refining mesh...
+Info    : Meshing order 2 (curvilinear on)...
+Info    : [  0%] Meshing curve 1 order 2
+Info    : [ 10%] Meshing curve 2 order 2
+Info    : [ 10%] Meshing curve 3 order 2
+Info    : [ 10%] Meshing curve 4 order 2
+Info    : [ 10%] Meshing curve 5 order 2
+Info    : [ 10%] Meshing curve 6 order 2
+Info    : [ 10%] Meshing curve 7 order 2
+Info    : [ 10%] Meshing curve 8 order 2
+Info    : [ 10%] Meshing curve 9 order 2
+Info    : [ 10%] Meshing curve 10 order 2
+Info    : [ 10%] Meshing curve 11 order 2
+Info    : [ 10%] Meshing curve 12 order 2
+Info    : [ 10%] Meshing curve 13 order 2
+Info    : [ 10%] Meshing curve 14 order 2
+Info    : [ 10%] Meshing curve 15 order 2
+Info    : [ 10%] Meshing curve 16 order 2
+Info    : [ 10%] Meshing curve 17 order 2
+Info    : [ 20%] Meshing curve 18 order 2
+Info    : [ 20%] Meshing curve 19 order 2
+Info    : [ 20%] Meshing curve 20 order 2
+Info    : [ 20%] Meshing curve 21 order 2
+Info    : [ 20%] Meshing curve 22 order 2
+Info    : [ 20%] Meshing curve 23 order 2
+Info    : [ 20%] Meshing curve 24 order 2
+Info    : [ 20%] Meshing curve 25 order 2
+Info    : [ 20%] Meshing curve 26 order 2
+Info    : [ 20%] Meshing curve 27 order 2
+Info    : [ 20%] Meshing curve 28 order 2
+Info    : [ 20%] Meshing curve 29 order 2
+Info    : [ 20%] Meshing curve 30 order 2
+Info    : [ 20%] Meshing curve 31 order 2
+Info    : [ 20%] Meshing curve 32 order 2
+Info    : [ 20%] Meshing curve 33 order 2
+Info    : [ 30%] Meshing curve 34 order 2
+Info    : [ 30%] Meshing curve 35 order 2
+Info    : [ 30%] Meshing curve 36 order 2
+Info    : [ 30%] Meshing curve 41 order 2
+Info    : [ 30%] Meshing curve 42 order 2
+Info    : [ 30%] Meshing curve 43 order 2
+Info    : [ 30%] Meshing curve 44 order 2
+Info    : [ 30%] Meshing curve 45 order 2
+Info    : [ 30%] Meshing curve 46 order 2
+Info    : [ 30%] Meshing curve 47 order 2
+Info    : [ 30%] Meshing curve 48 order 2
+Info    : [ 30%] Meshing curve 53 order 2
+Info    : [ 30%] Meshing curve 54 order 2
+Info    : [ 30%] Meshing curve 55 order 2
+Info    : [ 30%] Meshing curve 56 order 2
+Info    : [ 30%] Meshing curve 57 order 2
+Info    : [ 40%] Meshing curve 58 order 2
+Info    : [ 40%] Meshing curve 59 order 2
+Info    : [ 40%] Meshing curve 60 order 2
+Info    : [ 40%] Meshing curve 61 order 2
+Info    : [ 40%] Meshing curve 62 order 2
+Info    : [ 40%] Meshing curve 63 order 2
+Info    : [ 40%] Meshing curve 64 order 2
+Info    : [ 40%] Meshing curve 65 order 2
+Info    : [ 40%] Meshing curve 66 order 2
+Info    : [ 40%] Meshing curve 67 order 2
+Info    : [ 40%] Meshing curve 68 order 2
+Info    : [ 40%] Meshing curve 69 order 2
+Info    : [ 40%] Meshing curve 70 order 2
+Info    : [ 40%] Meshing curve 71 order 2
+Info    : [ 40%] Meshing curve 72 order 2
+Info    : [ 40%] Meshing curve 73 order 2
+Info    : [ 50%] Meshing curve 74 order 2
+Info    : [ 50%] Meshing curve 75 order 2
+Info    : [ 50%] Meshing curve 76 order 2
+Info    : [ 50%] Meshing curve 77 order 2
+Info    : [ 50%] Meshing curve 78 order 2
+Info    : [ 50%] Meshing curve 79 order 2
+Info    : [ 50%] Meshing curve 80 order 2
+Info    : [ 50%] Meshing curve 81 order 2
+Info    : [ 50%] Meshing curve 82 order 2
+Info    : [ 50%] Meshing curve 83 order 2
+Info    : [ 50%] Meshing curve 84 order 2
+Info    : [ 50%] Meshing curve 89 order 2
+Info    : [ 50%] Meshing curve 90 order 2
+Info    : [ 50%] Meshing curve 91 order 2
+Info    : [ 50%] Meshing curve 92 order 2
+Info    : [ 50%] Meshing curve 93 order 2
+Info    : [ 60%] Meshing curve 94 order 2
+Info    : [ 60%] Meshing curve 95 order 2
+Info    : [ 60%] Meshing curve 96 order 2
+Info    : [ 60%] Meshing curve 101 order 2
+Info    : [ 60%] Meshing curve 102 order 2
+Info    : [ 60%] Meshing curve 103 order 2
+Info    : [ 60%] Meshing curve 104 order 2
+Info    : [ 60%] Meshing curve 105 order 2
+Info    : [ 60%] Meshing curve 106 order 2
+Info    : [ 60%] Meshing curve 107 order 2
+Info    : [ 60%] Meshing curve 108 order 2
+Info    : [ 60%] Meshing curve 109 order 2
+Info    : [ 60%] Meshing curve 110 order 2
+Info    : [ 60%] Meshing curve 111 order 2
+Info    : [ 60%] Meshing curve 112 order 2
+Info    : [ 60%] Meshing curve 113 order 2
+Info    : [ 70%] Meshing curve 114 order 2
+Info    : [ 70%] Meshing curve 115 order 2
+Info    : [ 70%] Meshing curve 116 order 2
+Info    : [ 70%] Meshing curve 117 order 2
+Info    : [ 70%] Meshing curve 118 order 2
+Info    : [ 70%] Meshing curve 119 order 2
+Info    : [ 70%] Meshing curve 120 order 2
+Info    : [ 70%] Meshing surface 1 order 2
+Info    : [ 70%] Meshing surface 2 order 2
+Info    : [ 70%] Meshing surface 3 order 2
+Info    : [ 70%] Meshing surface 4 order 2
+Info    : [ 70%] Meshing surface 5 order 2
+Info    : [ 70%] Meshing surface 6 order 2
+Info    : [ 70%] Meshing surface 7 order 2
+Info    : [ 70%] Meshing surface 8 order 2
+Info    : [ 70%] Meshing surface 9 order 2
+Info    : [ 80%] Meshing surface 10 order 2
+Info    : [ 80%] Meshing surface 11 order 2
+Info    : [ 80%] Meshing surface 12 order 2
+Info    : [ 80%] Meshing surface 13 order 2
+Info    : [ 80%] Meshing surface 14 order 2
+Info    : [ 80%] Meshing surface 15 order 2
+Info    : [ 80%] Meshing surface 16 order 2
+Info    : [ 80%] Meshing surface 18 order 2
+Info    : [ 80%] Meshing surface 19 order 2
+Info    : [ 80%] Meshing surface 20 order 2
+Info    : [ 80%] Meshing surface 21 order 2
+Info    : [ 80%] Meshing surface 22 order 2
+Info    : [ 80%] Meshing surface 24 order 2
+Info    : [ 80%] Meshing surface 25 order 2
+Info    : [ 80%] Meshing surface 26 order 2
+Info    : [ 80%] Meshing surface 27 order 2
+Info    : [ 90%] Meshing surface 28 order 2
+Info    : [ 90%] Meshing surface 29 order 2
+Info    : [ 90%] Meshing surface 30 order 2
+Info    : [ 90%] Meshing surface 31 order 2
+Info    : [ 90%] Meshing surface 32 order 2
+Info    : [ 90%] Meshing surface 33 order 2
+Info    : [ 90%] Meshing surface 34 order 2
+Info    : [ 90%] Meshing surface 35 order 2
+Info    : [ 90%] Meshing surface 36 order 2
+Info    : [ 90%] Meshing surface 37 order 2
+Info    : [ 90%] Meshing surface 38 order 2
+Info    : [ 90%] Meshing surface 40 order 2
+Info    : [ 90%] Meshing surface 41 order 2
+Info    : [ 90%] Meshing surface 42 order 2
+Info    : [ 90%] Meshing surface 43 order 2
+Info    : [ 90%] Meshing surface 44 order 2
+Info    : [100%] Meshing surface 46 order 2
+Info    : [100%] Meshing surface 47 order 2
+Info    : [100%] Meshing surface 48 order 2
+Info    : [100%] Meshing surface 49 order 2
+Info    : [100%] Meshing surface 50 order 2
+Info    : [100%] Meshing surface 51 order 2
+Info    : [100%] Meshing surface 52 order 2
+Info    : [100%] Meshing surface 53 order 2
+Info    : [100%] Meshing surface 54 order 2
+Info    : [100%] Meshing surface 55 order 2
+Info    : [100%] Meshing surface 56 order 2
+Info    : [100%] Meshing volume 1 order 2
+Info    : [100%] Meshing volume 2 order 2
+Info    : [100%] Meshing volume 3 order 2
+Info    : [100%] Meshing volume 4 order 2
+Info    : Surface mesh: worst distortion = 1 (0 elements in ]0, 0.2]); worst gamma = 0.425356
+Info    : Volume mesh: worst distortion = 1 (0 elements in ]0, 0.2])
+Info    : Done meshing order 2 (Wall 0.00653587s, CPU 0.006268s)
+Info    : Done refining mesh (Wall 0.017672s, CPU 0.017404s)
+Info    : 11495 nodes 13308 elements
+Info    : Writing 'example-1.msh'...
+Info    : Done writing 'example-1.msh'
 mesh-file: "example-1.msh"
 setup: number of degrees of freedom: 11495
 set default boundary potential: phi_e_0 = 0 V
@@ -13,15 +466,15 @@ exported cells solution and output data into file "example-1_cells_output_data.v
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |     0.346s |            |
+| Total wallclock time elapsed since start    |      6.28s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| 01. make grid                   |         1 |     0.123s |        36% |
-| 02. setup                       |         1 |    0.0156s |       4.5% |
-| 03. assemble                    |         1 |    0.0322s |       9.3% |
-| 04. solve                       |         1 |     0.101s |        29% |
-| 05. post-process                |         1 |    0.0716s |        21% |
+| 01. make grid                   |         1 |      2.36s |        38% |
+| 02. setup                       |         1 |      0.98s |        16% |
+| 03. assemble                    |         1 |      1.68s |        27% |
+| 04. solve                       |         1 |    0.0945s |       1.5% |
+| 05. post-process                |         1 |      1.17s |        19% |
 +---------------------------------+-----------+------------+------------+
 
 
