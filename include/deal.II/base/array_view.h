@@ -431,7 +431,15 @@ public:
    * Return a pointer to the underlying array serving as element storage.
    * In case the container is empty a nullptr is returned.
    */
-  DEAL_II_HOST_DEVICE value_type *
+  template <typename Dummy = MemorySpaceType>
+  DEAL_II_HOST_DEVICE
+    std::enable_if_t<std::is_same_v<Dummy, dealii::MemorySpace::Default>,
+                     value_type *>
+    data() const noexcept;
+
+  template <typename Dummy = MemorySpaceType>
+  std::enable_if_t<std::is_same_v<Dummy, dealii::MemorySpace::Host>,
+                   value_type *>
   data() const noexcept;
 
   /**
@@ -661,9 +669,26 @@ ArrayView<ElementType, MemorySpaceType>::operator!=(
 
 
 template <typename ElementType, typename MemorySpaceType>
-inline DEAL_II_HOST_DEVICE
-  typename ArrayView<ElementType, MemorySpaceType>::value_type *
-  ArrayView<ElementType, MemorySpaceType>::data() const noexcept
+template <typename Dummy>
+inline DEAL_II_HOST_DEVICE std::enable_if_t<
+  std::is_same_v<Dummy, dealii::MemorySpace::Default>,
+  typename ArrayView<ElementType, MemorySpaceType>::value_type *>
+ArrayView<ElementType, MemorySpaceType>::data() const noexcept
+{
+  if (n_elements == 0)
+    return nullptr;
+  else
+    return starting_element;
+}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <typename Dummy>
+inline std::enable_if_t<
+  std::is_same_v<Dummy, dealii::MemorySpace::Host>,
+  typename ArrayView<ElementType, MemorySpaceType>::value_type *>
+ArrayView<ElementType, MemorySpaceType>::data() const noexcept
 {
   if (n_elements == 0)
     return nullptr;
