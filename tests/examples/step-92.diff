@@ -1,0 +1,15 @@
+418c418,419
+<             std::string geofilename = problem_parameters.mesh_filename + ".geo";
+---
+>             std::string geofilename = "../../../source/step-92/" +
+>                                       problem_parameters.mesh_filename + ".geo";
+419a421
+>             gmsh::option::setNumber("General.Terminal", 0);
+934c936
+<     computing_timer.print_summary();
+---
+>     // computing_timer.print_summary();
+965c967
+<       ParameterAcceptor::initialize(argc < 2 ? "example-1.prm" : argv[1]);
+---
+>       ParameterAcceptor::initialize("../../../source/step-92/example-1.prm");
