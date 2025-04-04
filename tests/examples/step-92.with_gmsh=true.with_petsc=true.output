@@ -10,17 +10,3 @@ set terminal_22 boundary potential: phi_e_22 = -1 V
   solved.
 exported cells solution and output data into file "example-1_cells_output_data.vtu"
 
-
-+---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |      6.21s |            |
-|                                             |            |            |
-| Section                         | no. calls |  wall time | % of total |
-+---------------------------------+-----------+------------+------------+
-| 01. make grid                   |         1 |      2.31s |        37% |
-| 02. setup                       |         1 |     0.968s |        16% |
-| 03. assemble                    |         1 |      1.65s |        27% |
-| 04. solve                       |         1 |    0.0947s |       1.5% |
-| 05. post-process                |         1 |      1.17s |        19% |
-+---------------------------------+-----------+------------+------------+
-
-
