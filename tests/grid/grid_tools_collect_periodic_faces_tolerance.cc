@@ -11,18 +11,17 @@
 // LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 //
 // ------------------------------------------------------------------------
-// 
+//
 // Test a tolerance parameter to find the periodic nodes of a triangulation
-// using the collect_periodic_faces function. 
-// Useful in case of CAD geometry that is not precise enough. The default 
-// value is at 1e-10 (absolute value). Parallel version.
-
+// using the collect_periodic_faces function.
+// Useful in case of CAD geometry that is not precise enough. The default
+// value is at 1e-10 (absolute value). Sequential version.
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
 
-#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/tria.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -34,13 +33,13 @@
 
 template <int dim>
 void
-test(MPI_Comm comm)
+test()
 {
   deallog << "dim = " << dim << std::endl;
-  parallel::distributed::Triangulation<dim> tria(comm);
+  Triangulation<dim> tria;
 
   std::vector<typename GridTools::PeriodicFacePair<
-    typename parallel::distributed::Triangulation<dim>::cell_iterator>>
+    typename Triangulation<dim>::cell_iterator>>
     periodicity_vector;
 
   unsigned int              num_refinements = 1 << 4;
@@ -65,7 +64,7 @@ test(MPI_Comm comm)
   const unsigned int direction = 0; //x-direction
 
   //We distort the mesh to test the tolerance parameter
-  GridTools::distort_random(tolerance*10, tria, /* keep boundary */ false);
+  GridTools::distort_random(tolerance/10, tria, /* keep boundary */ false);
 
   // Collect periodic faces in the x-direction
   // activate debug to see it fail
@@ -84,11 +83,10 @@ test(MPI_Comm comm)
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-  mpi_initlog();
-  MPI_Comm comm = MPI_COMM_WORLD;
-  test<2>(comm);
-  test<3>(comm);
+  initlog();
+
+  test<2>();
+  test<3>();
 
   return 0;
 }
