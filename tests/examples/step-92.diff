@@ -16,8 +16,8 @@
 >     /* removed:
 >      * pcout << "setup: number of degrees of freedom: " << dof_handler.n_dofs()
 >      *       << std::endl;
->      *  for the testsuit as it seems that gmsh generates
 >      * 
+>      * for the testsuite,
 >      * as it seems that gmsh generates slightly different number 
 >      * of degrees of freedom on different systems.
 >      */
