@@ -404,7 +404,7 @@ namespace Portable
       get_quadrature_point(const unsigned int cell,
                            const unsigned int q_point) const
       {
-        return precomputed_data->q_points(cell, q_point);
+        return precomputed_data->q_points(q_point, cell);
       }
     };
 
@@ -912,7 +912,7 @@ namespace Portable
     get_quadrature_point(const unsigned int cell,
                          const unsigned int q_point) const
     {
-      return q_points(cell, q_point);
+      return q_points(q_point, cell);
     }
   };
 
