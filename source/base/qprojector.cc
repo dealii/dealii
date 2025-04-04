@@ -1314,37 +1314,17 @@ QProjector<dim>::DataSetDescriptor::face(
       Assert(combined_orientation < reference_cell.n_face_orientations(face_no),
              ExcInternalError());
 
-      static const unsigned int X = numbers::invalid_unsigned_int;
-      static const std::array<unsigned int, 5> scale_tri   = {{2, 2, 2, X, X}};
-      static const std::array<unsigned int, 5> scale_tet   = {{6, 6, 6, 6, X}};
-      static const std::array<unsigned int, 5> scale_wedge = {{6, 6, 8, 8, 8}};
-      static const std::array<unsigned int, 5> scale_pyramid = {
-        {8, 6, 6, 6, 6}};
-
-      const auto &scale =
-        (reference_cell == ReferenceCells::Triangle) ?
-          scale_tri :
-          ((reference_cell == ReferenceCells::Tetrahedron) ?
-             scale_tet :
-             ((reference_cell == ReferenceCells::Wedge) ? scale_wedge :
-                                                          scale_pyramid));
-
       if (quadrature.size() == 1)
-        offset = scale[0] * quadrature[0].size() * face_no;
+        offset = reference_cell.n_face_orientations(0) * quadrature[0].size() *
+                 face_no;
       else
         for (unsigned int i = 0; i < face_no; ++i)
-          offset += scale[i] * quadrature[i].size();
+          offset +=
+            reference_cell.n_face_orientations(i) * quadrature[i].size();
 
-      if (dim == 2)
-        return {offset +
-                combined_orientation *
-                  quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
-      else if (dim == 3)
-        {
-          return {offset +
-                  combined_orientation *
-                    quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
-        }
+      return {offset +
+              combined_orientation *
+                quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
     }
 
   Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
