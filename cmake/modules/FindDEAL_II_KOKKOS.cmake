@@ -133,12 +133,14 @@ if(KOKKOS_FOUND)
   endif()
 
   if(Kokkos_ENABLE_CUDA)
-    # We need to disable SIMD vectorization for CUDA device code.
-    # Otherwise, nvcc compilers from version 9 on will emit an error message like:
-    # "[...] contains a vector, which is not supported in device code". We
-    # would like to set the variable in check_01_cpu_feature but at that point
-    # we don't know if CUDA support is enabled in Kokkos
-    set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES Clang)
+      # We need to disable SIMD vectorization for CUDA device code with nvcc.
+      # Otherwise, nvcc compilers from version 9 on will emit an error message like:
+      # "[...] contains a vector, which is not supported in device code". We
+      # would like to set the variable in check_01_cpu_feature but at that point
+      # we don't know if CUDA support is enabled in Kokkos
+      set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+    endif()
 
     # Require lambda support and expt-relaxed-constexpr for Cuda
     # so that we can use std::array and other interfaces with
