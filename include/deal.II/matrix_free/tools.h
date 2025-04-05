@@ -1478,7 +1478,7 @@ namespace MatrixFreeTools
             Kokkos::parallel_for(
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
-                dst[gpu_data->local_to_global(cell, i)] +=
+                dst[gpu_data->local_to_global(i, cell)] +=
                   data->shared_data->values(i % (dofs_per_cell / n_components),
                                             i / (dofs_per_cell / n_components));
               });
@@ -1488,7 +1488,7 @@ namespace MatrixFreeTools
             Kokkos::parallel_for(
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
-                Kokkos::atomic_add(&dst[gpu_data->local_to_global(cell, i)],
+                Kokkos::atomic_add(&dst[gpu_data->local_to_global(i, cell)],
                                    data->shared_data->values(
                                      i % (dofs_per_cell / n_components),
                                      i / (dofs_per_cell / n_components)));
