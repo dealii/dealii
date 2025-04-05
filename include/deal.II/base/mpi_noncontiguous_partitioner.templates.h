@@ -206,12 +206,21 @@ namespace Utilities
           AssertThrowMPI(ierr);
 
           AssertIndexRange(i + 1, recv_ptr.size());
-          for (types::global_dof_index j = recv_ptr[i], c = 0;
-               j < recv_ptr[i + 1];
-               ++j, ++c)
+          for (types::global_dof_index j = recv_ptr[i]; j < recv_ptr[i + 1];
+               ++j)
             for (unsigned int comp = 0; comp < n_components_to_be_used; ++comp)
-              dst[recv_indices[j] * n_components_to_be_used + comp] =
-                buffers[(recv_ptr[i] + c) * n_components_to_be_used + comp];
+              {
+                const auto &value = buffers[j * n_components_to_be_used + comp];
+
+                if (recv_indices_duplicates_ptr.empty())
+                  dst[recv_indices[j] * n_components_to_be_used + comp] = value;
+                else
+                  for (auto k = recv_indices_duplicates_ptr[recv_indices[j]];
+                       k < recv_indices_duplicates_ptr[recv_indices[j] + 1];
+                       ++k)
+                    dst[recv_indices_duplicates[k] * n_components_to_be_used +
+                        comp] = value;
+              }
         }
 
       // wait that all data packages have been sent
