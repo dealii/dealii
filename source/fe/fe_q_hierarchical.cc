@@ -509,6 +509,13 @@ void
 FE_Q_Hierarchical<dim>::initialize_constraints(
   const std::vector<FullMatrix<double>> &dofs_subcell)
 {
+  if (this->degree > 1)
+    {
+      // constraints are incorrect for degree>1
+      this->interface_constraints.reinit (0, 0);
+      return;
+    }
+
   const unsigned int dofs_1d =
     2 * this->n_dofs_per_vertex() + this->n_dofs_per_line();
 
