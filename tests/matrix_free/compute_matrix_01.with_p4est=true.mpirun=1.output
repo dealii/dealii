@@ -1,0 +1,20 @@
+
+DEAL:0::
+DEAL:0::Test with doubles
+DEAL:0::
+DEAL:0:2d::Verification FESystem<2>[FE_Q<2>(2)^2]-FESystem<2>[FE_Q<2>(1)]: 9.47369e-16
+DEAL:0:2d::
+DEAL:0:2d::Verification FESystem<2>[FE_Q<2>(3)^2]-FESystem<2>[FE_Q<2>(2)]: 1.04874e-15
+DEAL:0:2d::
+DEAL:0:2d::Verification FESystem<2>[FE_Q<2>(4)^2]-FESystem<2>[FE_Q<2>(3)]: 8.07714e-16
+DEAL:0:2d::
+DEAL:0:2d::Verification FESystem<2>[FE_DGQ<2>(2)^2]-FESystem<2>[FE_DGQ<2>(1)]: 3.62171e-16
+DEAL:0:2d::
+DEAL:0:2d::Verification FESystem<2>[FE_DGQ<2>(1)^2]-FESystem<2>[FE_DGQ<2>(0)]: 4.91307e-16
+DEAL:0:2d::
+DEAL:0:2d::Verification FESystem<2>[FE_DGQ<2>(4)^2]-FESystem<2>[FE_DGQ<2>(3)]: 5.98676e-16
+DEAL:0:2d::
+DEAL:0:3d::Verification FESystem<3>[FE_Q<3>(2)^3]-FESystem<3>[FE_Q<3>(1)]: 6.65713e-16
+DEAL:0:3d::
+DEAL:0:3d::Verification FESystem<3>[FE_DGQ<3>(2)^3]-FESystem<3>[FE_DGQ<3>(1)]: 1.04059e-15
+DEAL:0:3d::
