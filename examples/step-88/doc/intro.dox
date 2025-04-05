@@ -1,0 +1,135 @@
+<br>
+
+<i>
+This program was contributed by
+Marco Feder (SISSA)
+and Peter Munch (Technical University of Berlin). Many ideas presented
+here are the result of common code development with  Maximilian Bergbauer,
+Niklas Fehn, Magdalena Schreter-Fleischhacker, Johannes Heinz, Luca Heltai,
+and Martin Kronbichler.
+
+This tutorial is loosely based on the publication
+"Matrix-free implementation of the non-nested multigrid method"
+by Marco Feder, Luca Heltai, Martin Kronbichler, and Peter Munch @cite feder2024high.
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.8411345,https://zenodo.org/badge/DOI/10.5281/zenodo.8411345.svg}
+
+<h1>Introduction</h1>
+
+This tutorial presents the non-nested multigrid capabilities of
+deal.II. In previous tutorials, we presented its geometric-multigrid (step-37,
+step-75, and several others), polynomial-multigrid (step-75), and
+algebraic-multigrid capabilities (short AMG; step-31, step-40, and several others).
+The motivation for non-nested multigrid is similar to that of AMG:
+given a very fine unstructured mesh and low-order FE, it is
+difficult to construct multigrid levels explicitly by using the refinement
+levels or by reducing the polynomial degree. While AMG generally creates
+levels algebraicly via (smoothed) aggregation, non-nested multigrid
+@cite bramble1990parallel @cite bittencourt2001nonnested uses
+explicitly coarser mesh instances on the coarser levels, which might be
+non-nested. Such a mesh sequence can be created, e.g., by an external
+mesh-generation tool.
+
+<h3>%Non-nested multigrid</h3>
+
+Let's assume that we have nodal continuous finite elements and
+the following mesh sequence:
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+        @image html piston_0.png "" width=100%
+    </td>
+    <td>
+        @image html piston_1.png "" width=100%
+    </td>
+    <td>
+        @image html piston_2.png "" width=100%
+    </td>
+    <td>
+        @image html piston_3.png "" width=100%
+    </td>
+  </tr>
+  <tr>
+    <td>
+        @image html piston_4.png "" width=100%
+    </td>
+    <td>
+        @image html piston_5.png "" width=100%
+    </td>
+    <td>
+        @image html piston_6.png "" width=100%
+    </td>
+    <td>
+        @image html piston_7.png "" width=100%
+    </td>
+  </tr>
+</table>
+
+The prolongation operation (for interpolation from coarse grid to fine
+grid) is given by the evaluation of finite element solutions at support points
+of the fine mesh within a coarse mesh. How this can be accomplished with
+Utilities::MPI::RemotePointEvaluation and VectorTools::point_values() is
+shown in step-87. The restriction operation is naturally given by the
+transposed of the prolongation operation.
+
+The class MGTwoLevelTransferNonNested implements the prolongation and
+restriction operation between two meshes:
+
+@code
+void
+prolongate_and_add (VectorType &dst, const VectorType &src) const override;
+
+void
+restrict_and_add (VectorType &dst, const VectorType &src) const override;
+@endcode
+
+It can be set up just like MGTwoLevelTransfer, which is limited to
+nested meshes. Once the two-level transfer operators between each
+level are set up, MGTransferMF can be filled with them (see step-75).
+
+<h3>The test case</h3>
+
+For demonstration purposes only, we will solve a classical Poisson problem with
+Dirichlet boundary conditions:
+@f{align*}{
+  -\Delta u &= 1 \qquad && \text{in }\, \Omega,
+  \\
+  u &= u_D       \qquad && \text{on }\, \Gamma = \partial \Omega,
+@f}
+on a given domain $\Omega$.
+
+
+<h3>%Mesh sequence</h3>
+
+In this tutorial, we consider two types of mesh sequences:
+- We generate $\Omega$ out of a CAD model of a <i> piston </i> with the
+external mesh generator software Coreform CUBIT. The required hierarchy is
+generated during a pre-processing step inside the mesh generator by varying
+iteratively the mesh-size for each grid and finally exporting it in a format that
+can be read by the GridIn class. Such mesh files are given in the grid/ folder of
+the tutorial program.
+- We create the meshes by globally refining a coarse mesh. This results in
+  a nested mesh and therefore does not require MGTwoLevelTransferNonNested.
+  However, this gives a good comparison to MGTwoLevelTransfer in terms of
+  convergence rate and performance.
+
+
+<h3>%Simplex meshes</h3>
+
+This tutorial works for hyper-cube and simplex meshes. In the case
+of simplex meshes, different mapping, finite elment, and quadrature classes
+need to be selected:
+
+@code
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/mapping_fe.h>
+
+const MappingFE<2>     mapping(FE_SimplexP<2>(mapping_degree));
+const FE_SimplexP<2>   fe(fe_degree);
+const QGaussSimplex<2> quadrature_formula(fe_degree + 1);
+@endcode
+
+For more details on working on simplex and mixed meshes, see
+@ref simplex "simplex documentation module".
