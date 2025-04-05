@@ -327,11 +327,14 @@ namespace Portable
 
     for (unsigned int c = 0; c < n_components_; ++c)
       {
-        internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
-          data->team_member,
-          precomputed_data->constraint_weights,
-          precomputed_data->constraint_mask(cell_id * n_components + c),
-          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        if (precomputed_data->constraint_mask(cell_id * n_components + c) !=
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+              unconstrained)
+          internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
+            data->team_member,
+            precomputed_data->constraint_weights,
+            precomputed_data->constraint_mask(cell_id * n_components + c),
+            Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
   }
 
@@ -348,11 +351,14 @@ namespace Portable
   {
     for (unsigned int c = 0; c < n_components_; ++c)
       {
-        internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
-          data->team_member,
-          precomputed_data->constraint_weights,
-          precomputed_data->constraint_mask(cell_id * n_components + c),
-          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        if (precomputed_data->constraint_mask(cell_id * n_components + c) !=
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+              unconstrained)
+          internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
+            data->team_member,
+            precomputed_data->constraint_weights,
+            precomputed_data->constraint_mask(cell_id * n_components + c),
+            Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
 
     if (precomputed_data->use_coloring)
