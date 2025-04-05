@@ -700,6 +700,14 @@
  *       <td> Solving the Laplace-Beltrami equation on a surface using the trace finite element method.
  *       <br/> Keywords: MeshWorker::mesh_loop(), NonMatching::FEImmersedSurfaceValues
  *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-97</td>
+ *       <td> Illustrates application of the Nedelec and Raviart-Thomas finite elements to a magnetic
+ *       <br/> problem formulated in terms of the magnetic vector potential and current vector potential.
+ *       <br/> Solves the curl-curl equation.
+ *       <br/> Keywords: FE_Nedelec, FE_RaviartThomas, WorkStream::run()
+ *       </td></tr>
  * </table>
  *
  *
@@ -1370,7 +1378,13 @@
  *     </td>
  *     <td>step-46</td>
  *   </tr>
- *
+
+ *   <tr valign="top">
+ *     <td> The curl-curl equation
+ *     </td>
+ *     <td>step-97</td>
+ *   </tr>
+
  * </table>
  *
  *
@@ -1435,6 +1449,12 @@
  *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
  *     <td>step-46</td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> The magnetic vector potential and current vector potential
+ *     </td>
+ *     <td>step-97</td>
  *   </tr>
  *
  * </table>
