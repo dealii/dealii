@@ -37,6 +37,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <utility>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -127,11 +128,12 @@ namespace internal
 
     /**
      * Class that performs the Arnoldi orthogonalization process within the
-     * SolverGMRES and SolverFGMRES classes. It uses one of the algorithms in
-     * LinearAlgebra::OrthogonalizationStrategy for the work on the global
-     * vectors, transforms the resulting Hessenberg matrix into an upper
-     * triangular matrix by Givens rotations, and eventually solves the
-     * minimization problem in the projected Krylov space.
+     * SolverGMRES, SolverFGMRES, and SolverMPGMRES classes. It uses one of
+     * the algorithms in LinearAlgebra::OrthogonalizationStrategy for the
+     * work on the global vectors, transforms the resulting Hessenberg
+     * matrix into an upper triangular matrix by Givens rotations, and
+     * eventually solves the minimization problem in the projected Krylov
+     * space.
      */
     template <typename Number>
     class ArnoldiProcess
@@ -286,6 +288,8 @@ namespace internal
     };
   } // namespace SolverGMRESImplementation
 } // namespace internal
+
+
 
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized Minimal
@@ -630,30 +634,62 @@ protected:
 };
 
 
-
 /**
- * Implementation of the Generalized minimal residual method with flexible
- * preconditioning (flexible GMRES or FGMRES).
+ * Implementation of the multiply preconditioned generalized minimal
+ * residual method (MPGMRES).
  *
- * This flexible version of the GMRES method allows for the use of a different
- * preconditioner in each iteration step. Therefore, it is also more robust
- * with respect to inaccurate evaluation of the preconditioner. An important
- * application is the use of a Krylov space method inside the
- * preconditioner. As opposed to SolverGMRES which allows one to choose
- * between left and right preconditioning, this solver always applies the
- * preconditioner from the right.
+ * This method is a variant of the flexible GMRES, utilizing N
+ * preconditioners to search for a solution within a multi-Krylov space.
+ * These spaces are characterized by by all possible N-variate,
+ * non-commuting polynomials of the preconditioners and system matrix
+ * applied to a residual up to some fixed degree. In contrast, the flexible
+ * GMRES method implemented in SolverFGMRES constructs only one "Krylov"
+ * subspace, which is formed by univariate polynomials in one
+ * preconditioner that may change at each iteration.
  *
- * FGMRES needs two vectors in each iteration steps yielding a total of
- * <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
- * vectors. Otherwise, FGMRES requires roughly the same number of operations
- * per iteration compared to GMRES, except one application of the
- * preconditioner less at each restart and at the end of solve().
+ * We implement two strategies, a "full" and a "truncated" MPGMRES version
+ * that differ in how they construct Krylov subspaces. The full MPGMRES
+ * version constructs a Krylov subspace for every possible combination of
+ * preconditioner application to the initial residual. For two
+ * preconditioners $P_1$, $P_2$ this looks as follows:
+ * @f{align*}{
+ *   r, P_1r, P_2r, P_1AP_1r, P_2AP_1r, P_1AP_2r, P_2AP_2r, P_1AP_1AP_1r,
+ *   P_2AP_1AP_1r, P_1AP_2AP_1r, P_2AP_2AP_1r, P_1AP_1AP_2r, P_2AP_1AP_2r,
+ *   P_1AP_2AP_2r, P_2AP_2AP_2r, \ldots
+ * @f}
+ * The truncated version constructs independent Krylov subspaces as
+ * follows:
+ * @f{align*}{
+ *   r, P_1r, P_2r, P_1AP_1r, P_2AP_2r, P_1AP_1AP_1r, P_2AP_2AP_2r, \ldots
+ * @f}
+ * For reference, FGMRES uses the following construction:
+ * @f{align*}{
+ *   r, P_1r, P_2P_1r, P_1P_2P_1r, \ldots
+ * @f}
  *
- * For more details see @cite Saad1991.
+ * For more details see @cite Greif2017.
+ *
+ * @note The present implementation of MPGMRES differs from the one
+ * outlined in @cite Greif2017 in how one iteration is defined. Our
+ * implementation constructs the search space one vector at a time,
+ * producing a new iterate with each addition. In contrast, the routine
+ * prescribed in @cite Greif2017 uses blocking to construct an iterate
+ * corresponding to the total polynomial degree of each multi-Krylov space.
+ *
+ * @note This method always uses right preconditioning, as opposed to
+ * SolverGMRES, which allows the user to choose between left and right
+ * preconditioning.
+ *
+ * @note FGMRES needs two vectors in each iteration steps yielding a total
+ * of <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
+ * vectors. Otherwise, FGMRES requires roughly the same number of
+ * operations per iteration compared to GMRES, except one application of
+ * the preconditioner less at each restart and at the end of solve().
  */
+
 template <typename VectorType = Vector<double>>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-class SolverFGMRES : public SolverBase<VectorType>
+class SolverMPGMRES : public SolverBase<VectorType>
 {
 public:
   /**
@@ -664,11 +700,152 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
-    explicit AdditionalData(const unsigned int max_basis_size = 30,
+    explicit AdditionalData(const unsigned int max_basis_size         = 30,
+                            const bool use_truncated_mpgmres_strategy = true,
                             const LinearAlgebra::OrthogonalizationStrategy
                               orthogonalization_strategy =
                                 LinearAlgebra::OrthogonalizationStrategy::
                                   delayed_classical_gram_schmidt)
+      : max_basis_size(max_basis_size)
+      , use_truncated_mpgmres_strategy(use_truncated_mpgmres_strategy)
+      , orthogonalization_strategy(orthogonalization_strategy)
+    {}
+
+    /**
+     * Maximum basis size.
+     */
+    unsigned int max_basis_size;
+
+    /**
+     * If set to true (the default) a "truncated" search space is
+     * constructed consisting of the span of independent Krylov space
+     * associated with each preconditioner. If set to false, the full
+     * MPGMRES strategy for constructing the search space is used. This
+     * space consists of all possible combinations of iterative
+     * preconditioner applications; see the documentation of SolverMPGMRES
+     * for details.
+     */
+    bool use_truncated_mpgmres_strategy;
+
+    /**
+     * Strategy to orthogonalize vectors.
+     */
+    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
+  };
+
+  /**
+   * Constructor.
+   */
+  SolverMPGMRES(SolverControl            &cn,
+                VectorMemory<VectorType> &mem,
+                const AdditionalData     &data = AdditionalData());
+
+  /**
+   * Constructor. Use an object of type GrowingVectorMemory as a default to
+   * allocate memory.
+   */
+  SolverMPGMRES(SolverControl        &cn,
+                const AdditionalData &data = AdditionalData());
+
+  /**
+   * Solve the linear system $Ax=b$ for x.
+   */
+  template <typename MatrixType, typename... PreconditionerTypes>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+     (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+  void solve(const MatrixType &A,
+             VectorType       &x,
+             const VectorType &b,
+             const PreconditionerTypes &...preconditioners);
+
+protected:
+  /**
+   * Indexing strategy to construct the search space.
+   *
+   * This enum class is internally used in the implementation of the
+   * MPGMRES algorithm to switch between the strategies.
+   */
+  enum class IndexingStrategy
+  {
+    fgmres,
+    truncated_mpgmres,
+    full_mpgmres,
+  };
+
+  /**
+   * The indexing strategy chosen for MPGMRES. This internal variable gets
+   * set by the constructor of SolverFGMRES and SolverMPGMRES.
+   */
+  IndexingStrategy indexing_strategy;
+
+  /**
+   * Solve the linear system $Ax=b$ for x.
+   */
+  template <typename MatrixType, typename... PreconditionerTypes>
+  void
+  solve_internal(const MatrixType &A,
+                 VectorType       &x,
+                 const VectorType &b,
+                 const PreconditionerTypes &...preconditioners);
+
+private:
+  /**
+   * Additional flags.
+   */
+  AdditionalData additional_data;
+
+  /**
+   * Class that performs the actual orthogonalization process and solves the
+   * projected linear system.
+   */
+  internal::SolverGMRESImplementation::ArnoldiProcess<
+    typename VectorType::value_type>
+    arnoldi_process;
+};
+
+
+
+/**
+ * Implementation of the generalized minimal residual method with flexible
+ * preconditioning (flexible GMRES or FGMRES).
+ *
+ * This flexible version of the GMRES method allows for the use of a
+ * different preconditioner in each iteration step. Therefore, it is also
+ * more robust with respect to inaccurate evaluation of the preconditioner.
+ * An important application is the use of a Krylov space method inside the
+ * preconditioner with low solver tolerance.
+ *
+ * For more details see @cite Saad1991.
+ *
+ * @note This method always uses right preconditioning, as opposed to
+ * SolverGMRES, which allows the user to choose between left and right
+ * preconditioning.
+ *
+ * @note FGMRES needs two vectors in each iteration steps yielding a total
+ * of <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
+ * vectors. Otherwise, FGMRES requires roughly the same number of
+ * operations per iteration compared to GMRES, except one application of
+ * the preconditioner less at each restart and at the end of solve().
+ */
+template <typename VectorType = Vector<double>>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+class SolverFGMRES : public SolverMPGMRES<VectorType>
+{
+public:
+  /**
+   * Standardized data struct to pipe additional data to the solver.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Constructor. By default, set the maximum basis size to 30.
+     */
+    explicit AdditionalData( //
+      const unsigned int max_basis_size = 30,
+      const LinearAlgebra::OrthogonalizationStrategy
+        orthogonalization_strategy = LinearAlgebra::OrthogonalizationStrategy::
+          delayed_classical_gram_schmidt)
       : max_basis_size(max_basis_size)
       , orthogonalization_strategy(orthogonalization_strategy)
     {}
@@ -683,6 +860,7 @@ public:
      */
     LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
   };
+
 
   /**
    * Constructor.
@@ -701,33 +879,20 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template <typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename... PreconditionerTypes>
   DEAL_II_CXX20_REQUIRES(
     (concepts::is_linear_operator_on<MatrixType, VectorType> &&
-     concepts::is_linear_operator_on<PreconditionerType, VectorType>))
-  void solve(const MatrixType         &A,
-             VectorType               &x,
-             const VectorType         &b,
-             const PreconditionerType &preconditioner);
-
-private:
-  /**
-   * Additional flags.
-   */
-  AdditionalData additional_data;
-
-  /**
-   * Class that performs the actual orthogonalization process and solves the
-   * projected linear system.
-   */
-  internal::SolverGMRESImplementation::ArnoldiProcess<
-    typename VectorType::value_type>
-    arnoldi_process;
+     (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+  void solve(const MatrixType &A,
+             VectorType       &x,
+             const VectorType &b,
+             const PreconditionerTypes &...preconditioners);
 };
 
 /** @} */
-/* --------------------- Inline and template functions ------------------- */
 
+
+/* --------------------- Inline and template functions ------------------- */
 
 #ifndef DOXYGEN
 
@@ -1963,39 +2128,126 @@ double SolverGMRES<VectorType>::criterion()
 
 //----------------------------------------------------------------------//
 
+
+
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
-                                       VectorMemory<VectorType> &mem,
-                                       const AdditionalData     &data)
+SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl            &cn,
+                                         VectorMemory<VectorType> &mem,
+                                         const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
-{}
+{
+  if (data.use_truncated_mpgmres_strategy)
+    indexing_strategy = IndexingStrategy::truncated_mpgmres;
+  else
+    indexing_strategy = IndexingStrategy::full_mpgmres;
+}
 
 
 
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
-                                       const AdditionalData &data)
+SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
+                                         const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
-{}
+{
+  if (data.use_truncated_mpgmres_strategy)
+    indexing_strategy = IndexingStrategy::truncated_mpgmres;
+  else
+    indexing_strategy = IndexingStrategy::full_mpgmres;
+}
 
 
 
 template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-template <typename MatrixType, typename PreconditionerType>
+template <typename MatrixType, typename... PreconditionerTypes>
 DEAL_II_CXX20_REQUIRES(
   (concepts::is_linear_operator_on<MatrixType, VectorType> &&
-   concepts::is_linear_operator_on<PreconditionerType, VectorType>))
-void SolverFGMRES<VectorType>::solve(const MatrixType         &A,
-                                     VectorType               &x,
-                                     const VectorType         &b,
-                                     const PreconditionerType &preconditioner)
+   (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+void SolverMPGMRES<VectorType>::solve(
+  const MatrixType &A,
+  VectorType       &x,
+  const VectorType &b,
+  const PreconditionerTypes &...preconditioners)
 {
-  LogStream::Prefix prefix("FGMRES");
+  LogStream::Prefix prefix("MPGMRES");
+  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioners...);
+}
+
+
+
+template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename MatrixType, typename... PreconditionerTypes>
+void SolverMPGMRES<VectorType>::solve_internal(
+  const MatrixType &A,
+  VectorType       &x,
+  const VectorType &b,
+  const PreconditionerTypes &...preconditioners)
+{
+  constexpr std::size_t n_preconditioners = sizeof...(PreconditionerTypes);
+
+  //
+  // With each invocation of preconditioner_vmult we increase the
+  // variable current_index by one modulo n_preconditioners.
+  //
+  std::size_t current_index = 0;
+
+  //
+  // A lambda that cycles through all preconditioners in sequence applying
+  // one to the vector src and storing the result in dst:
+  //
+  const auto preconditioner_vmult = [&, n_preconditioners](auto       &dst,
+                                                           const auto &src) {
+    // We have no preconditioner that we could apply
+    if (n_preconditioners == 0)
+      {
+        dst = src;
+        return;
+      }
+
+    //
+    // We cycle through all preconditioners and call the one with a
+    // matching index:
+    //
+    std::size_t n = 0;
+
+    const auto call_current_preconditioner = [&](const auto &preconditioner) {
+      if (n++ == current_index)
+        preconditioner.vmult(dst, src);
+    };
+
+    // https://en.cppreference.com/w/cpp/language/fold
+    (call_current_preconditioner(preconditioners), ...);
+
+    current_index = (current_index + 1) % n_preconditioners;
+  };
+
+  //
+  // Return the correct index for constructing the next vector in the
+  // Krylov space sequence according to the chosen indexing strategy
+  //
+  const auto previous_vector_index =
+    [this, n_preconditioners](unsigned int i) -> unsigned int {
+    switch (indexing_strategy)
+      {
+        case IndexingStrategy::fgmres:
+          // 0, 1, 2, 3, ...
+          return i;
+        case IndexingStrategy::full_mpgmres:
+          // 0, 0, ..., 1, 1, ..., 2, 2, ..., 3, 3, ...
+          return i / n_preconditioners;
+        case IndexingStrategy::truncated_mpgmres:
+          // 0, 0, ..., 1, 2, 3, ...
+          return (1 + i >= n_preconditioners) ? (1 + i - n_preconditioners) : 0;
+        default:
+          DEAL_II_ASSERT_UNREACHABLE();
+          return 0;
+      }
+  };
 
   SolverControl::State iteration_state = SolverControl::iterate;
 
@@ -2045,7 +2297,8 @@ void SolverFGMRES<VectorType>::solve(const MatrixType         &A,
               iteration_state == SolverControl::iterate);
            ++inner_iteration)
         {
-          preconditioner.vmult(z(inner_iteration, x), v[inner_iteration]);
+          preconditioner_vmult(z(inner_iteration, x),
+                               v[previous_vector_index(inner_iteration)]);
           A.vmult(v(inner_iteration + 1, x), z[inner_iteration]);
 
           res =
@@ -2078,6 +2331,63 @@ void SolverFGMRES<VectorType>::solve(const MatrixType         &A,
     AssertThrow(false,
                 SolverControl::NoConvergence(accumulated_iterations, res));
 }
+
+
+
+//----------------------------------------------------------------------//
+
+
+
+template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
+                                       VectorMemory<VectorType> &mem,
+                                       const AdditionalData     &data)
+  : SolverMPGMRES<VectorType>(
+      cn,
+      mem,
+      typename SolverMPGMRES<VectorType>::AdditionalData{
+        data.max_basis_size,
+        true,
+        data.orthogonalization_strategy})
+{
+  this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
+}
+
+
+
+template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
+                                       const AdditionalData &data)
+  : SolverMPGMRES<VectorType>(
+      cn,
+      typename SolverMPGMRES<VectorType>::AdditionalData{
+        data.max_basis_size,
+        true,
+        data.orthogonalization_strategy})
+{
+  this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
+}
+
+
+
+template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename MatrixType, typename... PreconditionerTypes>
+DEAL_II_CXX20_REQUIRES(
+  (concepts::is_linear_operator_on<MatrixType, VectorType> &&
+   (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
+void SolverFGMRES<VectorType>::solve(
+  const MatrixType &A,
+  VectorType       &x,
+  const VectorType &b,
+  const PreconditionerTypes &...preconditioners)
+{
+  LogStream::Prefix prefix("FGMRES");
+  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioners...);
+}
+
 
 #endif // DOXYGEN
 
