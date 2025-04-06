@@ -369,7 +369,7 @@ some practical assumptions are significant:
           \cEpot \approx \Epot
         @f}
         However, the interpretation of the solution $\Epot$ is still not an electrostatic potential
-        but the absolute value of the electric potentials pointer for very low frequencies (LF).
+        but the real-valued electric potential for very low frequencies (LF).
     </li>
     <li>
         For higher frequencies, Laplace equation will not serve to solve the problem anyhow as

@@ -257,7 +257,7 @@ Following properties shall be assigned to volumes and boundary values to surface
 </tr>
 <tr>
     <td>Volume</td>
-    <td>20</td>
+    <td>10</td>
     <td>winding_1</td>
     <td>copper conductor, sub-domain $ \Omega_{10} $</td>
     <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
@@ -265,7 +265,7 @@ Following properties shall be assigned to volumes and boundary values to surface
 </tr>
 <tr>
     <td>Volume</td>
-    <td>30</td>
+    <td>20</td>
     <td>winding_2</td>
     <td>copper conductor, sub-domain $ \Omega_{20} $</td>
     <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
@@ -300,7 +300,7 @@ Following properties shall be assigned to volumes and boundary values to surface
     <td>Dirichlet boundary condition: el. potential ${\Epot}_{21} = 0.5\,\text{V}$</td>
 </tr>
 <tr>
-    <td>Volume</td>
+    <td>Surface</td>
     <td>22</td>
     <td>winding_2_terminal_2</td>
     <td>terminal/electrode, boundary $\Gamma_{22}$</td>
