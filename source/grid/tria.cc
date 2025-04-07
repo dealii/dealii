@@ -5985,152 +5985,154 @@ namespace internal
         // - there are, but prepare_refinement added another empty
         //   level which then is the highest level
 
-        // variables to hold the number of newly to be created
-        // vertices, lines and quads. as these are stored globally,
-        // declare them outside the loop over al levels. we need lines
-        // and quads in pairs for refinement of old ones and lines and
-        // quads, that can be stored as single ones, as they are newly
-        // created in the inside of an existing cell
-        unsigned int needed_vertices     = 0;
-        unsigned int needed_lines_single = 0;
-        unsigned int needed_quads_single = 0;
-        unsigned int needed_lines_pair   = 0;
-        unsigned int needed_quads_pair   = 0;
-        for (int level = triangulation.levels.size() - 2; level >= 0; --level)
-          {
-            unsigned int new_cells = 0;
+        // Variables to hold the number of newly to be created
+        // vertices, lines, and faces. As these are stored globally,
+        // declare them outside the loop over all levels. We need lines
+        // and faces in pairs for refinement of old lines/face. And lines and
+        // faces stored individually for the ones created in the interior
+        // of an existing cell
+        {
+          unsigned int needed_vertices     = 0;
+          unsigned int needed_lines_single = 0;
+          unsigned int needed_faces_single = 0;
+          unsigned int needed_lines_pair   = 0;
+          unsigned int needed_faces_pair   = 0;
+          for (int level = triangulation.levels.size() - 2; level >= 0; --level)
+            {
+              unsigned int new_cells = 0;
 
-            for (const auto &cell :
-                 triangulation.active_cell_iterators_on_level(level))
-              if (cell->refine_flag_set())
+              for (const auto &cell :
+                   triangulation.active_cell_iterators_on_level(level))
+                if (cell->refine_flag_set())
+                  {
+                    // Only support isotropic refinement
+                    Assert(cell->refine_flag_set() ==
+                             RefinementCase<dim>::cut_xyz,
+                           ExcInternalError());
+
+                    // Now count up how many new cells, faces, edges, and
+                    // vertices we will need to allocate to do this refinement.
+                    new_cells += cell->reference_cell().n_isotropic_children();
+
+                    if (cell->reference_cell() == ReferenceCells::Hexahedron)
+                      {
+                        ++needed_vertices;
+                        needed_lines_single += 6;
+                        needed_faces_single += 12;
+                      }
+                    else if (cell->reference_cell() ==
+                             ReferenceCells::Tetrahedron)
+                      {
+                        needed_lines_single += 1;
+                        needed_faces_single += 8;
+                      }
+                    else
+                      {
+                        DEAL_II_ASSERT_UNREACHABLE();
+                      }
+
+                    // Also check whether we have to refine any of the faces and
+                    // edges that bound this cell. They may of course already be
+                    // refined, so we only *mark* them for refinement by setting
+                    // the user flags
+                    for (const auto face : cell->face_indices())
+                      if (cell->face(face)->n_children() == 0)
+                        cell->face(face)->set_user_flag();
+                      else
+                        Assert(cell->face(face)->n_children() ==
+                                 cell->reference_cell()
+                                   .face_reference_cell(face)
+                                   .n_isotropic_children(),
+                               ExcInternalError());
+
+                    for (const auto line : cell->line_indices())
+                      if (cell->line(line)->has_children() == false)
+                        cell->line(line)->set_user_flag();
+                      else
+                        Assert(cell->line(line)->n_children() == 2,
+                               ExcInternalError());
+                  }
+
+              const unsigned int used_cells =
+                std::count(triangulation.levels[level + 1]->cells.used.begin(),
+                           triangulation.levels[level + 1]->cells.used.end(),
+                           true);
+
+              if (triangulation.all_reference_cells_are_hyper_cube())
+                reserve_space(*triangulation.levels[level + 1],
+                              used_cells + new_cells,
+                              spacedim,
+                              false);
+              else
+                reserve_space(*triangulation.levels[level + 1],
+                              used_cells + new_cells,
+                              spacedim,
+                              true);
+
+              reserve_space(triangulation.levels[level + 1]->cells, new_cells);
+            }
+
+          // now count the faces and lines which were flagged for
+          // refinement
+          for (typename Triangulation<dim, spacedim>::quad_iterator quad =
+                 triangulation.begin_quad();
+               quad != triangulation.end_quad();
+               ++quad)
+            {
+              if (quad->user_flag_set() == false)
+                continue;
+
+              if (quad->reference_cell() == ReferenceCells::Quadrilateral)
                 {
-                  // Only support isotropic refinement
-                  Assert(cell->refine_flag_set() ==
-                           RefinementCase<dim>::cut_xyz,
-                         ExcInternalError());
-
-                  // Now count up how many new cells, faces, edges, and vertices
-                  // we will need to allocate to do this refinement.
-                  new_cells += cell->reference_cell().n_isotropic_children();
-
-                  if (cell->reference_cell() == ReferenceCells::Hexahedron)
-                    {
-                      ++needed_vertices;
-                      needed_lines_single += 6;
-                      needed_quads_single += 12;
-                    }
-                  else if (cell->reference_cell() ==
-                           ReferenceCells::Tetrahedron)
-                    {
-                      needed_lines_single += 1;
-                      needed_quads_single += 8;
-                    }
-                  else
-                    {
-                      DEAL_II_ASSERT_UNREACHABLE();
-                    }
-
-                  // Also check whether we have to refine any of the faces and
-                  // edges that bound this cell. They may of course already be
-                  // refined, so we only *mark* them for refinement by setting
-                  // the user flags
-                  for (const auto face : cell->face_indices())
-                    if (cell->face(face)->n_children() == 0)
-                      cell->face(face)->set_user_flag();
-                    else
-                      Assert(cell->face(face)->n_children() ==
-                               cell->reference_cell()
-                                 .face_reference_cell(face)
-                                 .n_isotropic_children(),
-                             ExcInternalError());
-
-                  for (const auto line : cell->line_indices())
-                    if (cell->line(line)->has_children() == false)
-                      cell->line(line)->set_user_flag();
-                    else
-                      Assert(cell->line(line)->n_children() == 2,
-                             ExcInternalError());
+                  needed_faces_pair += 4;
+                  needed_lines_pair += 4;
+                  needed_vertices += 1;
                 }
+              else if (quad->reference_cell() == ReferenceCells::Triangle)
+                {
+                  needed_faces_pair += 4;
+                  needed_lines_single += 3;
+                }
+              else
+                {
+                  DEAL_II_ASSERT_UNREACHABLE();
+                }
+            }
 
-            const unsigned int used_cells =
-              std::count(triangulation.levels[level + 1]->cells.used.begin(),
-                         triangulation.levels[level + 1]->cells.used.end(),
-                         true);
+          for (typename Triangulation<dim, spacedim>::line_iterator line =
+                 triangulation.begin_line();
+               line != triangulation.end_line();
+               ++line)
+            {
+              if (line->user_flag_set() == false)
+                continue;
 
-            if (triangulation.all_reference_cells_are_hyper_cube())
-              reserve_space(*triangulation.levels[level + 1],
-                            used_cells + new_cells,
-                            spacedim,
-                            false);
-            else
-              reserve_space(*triangulation.levels[level + 1],
-                            used_cells + new_cells,
-                            spacedim,
-                            true);
+              needed_lines_pair += 2;
+              needed_vertices += 1;
+            }
 
-            reserve_space(triangulation.levels[level + 1]->cells, new_cells);
-          }
-
-        // now count the quads and lines which were flagged for
-        // refinement
-        for (typename Triangulation<dim, spacedim>::quad_iterator quad =
-               triangulation.begin_quad();
-             quad != triangulation.end_quad();
-             ++quad)
-          {
-            if (quad->user_flag_set() == false)
-              continue;
-
-            if (quad->reference_cell() == ReferenceCells::Quadrilateral)
-              {
-                needed_quads_pair += 4;
-                needed_lines_pair += 4;
-                needed_vertices += 1;
-              }
-            else if (quad->reference_cell() == ReferenceCells::Triangle)
-              {
-                needed_quads_pair += 4;
-                needed_lines_single += 3;
-              }
-            else
-              {
-                DEAL_II_ASSERT_UNREACHABLE();
-              }
-          }
-
-        for (typename Triangulation<dim, spacedim>::line_iterator line =
-               triangulation.begin_line();
-             line != triangulation.end_line();
-             ++line)
-          {
-            if (line->user_flag_set() == false)
-              continue;
-
-            needed_lines_pair += 2;
-            needed_vertices += 1;
-          }
-
-        reserve_space(triangulation.faces->lines,
-                      needed_lines_pair,
-                      needed_lines_single);
-        reserve_space(*triangulation.faces,
-                      needed_quads_pair,
-                      needed_quads_single);
-        reserve_space(triangulation.faces->quads,
-                      needed_quads_pair,
-                      needed_quads_single);
+          reserve_space(triangulation.faces->lines,
+                        needed_lines_pair,
+                        needed_lines_single);
+          reserve_space(*triangulation.faces,
+                        needed_faces_pair,
+                        needed_faces_single);
+          reserve_space(triangulation.faces->quads,
+                        needed_faces_pair,
+                        needed_faces_single);
 
 
-        // add to needed vertices how many vertices are already in use
-        needed_vertices += std::count(triangulation.vertices_used.begin(),
-                                      triangulation.vertices_used.end(),
-                                      true);
+          // add to needed vertices how many vertices are already in use
+          needed_vertices += std::count(triangulation.vertices_used.begin(),
+                                        triangulation.vertices_used.end(),
+                                        true);
 
-        if (needed_vertices > triangulation.vertices.size())
-          {
-            triangulation.vertices.resize(needed_vertices, Point<spacedim>());
-            triangulation.vertices_used.resize(needed_vertices, false);
-          }
+          if (needed_vertices > triangulation.vertices.size())
+            {
+              triangulation.vertices.resize(needed_vertices, Point<spacedim>());
+              triangulation.vertices_used.resize(needed_vertices, false);
+            }
+        }
 
         //-----------------------------------------
         // Before we start with the actual refinement, we do some
