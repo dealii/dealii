@@ -442,10 +442,7 @@ namespace internal
                          orientation < n_face_orientations;
                          ++orientation)
                       {
-                        // like elsewhere, the default in the matrix-free code
-                        // is 0, not 1, so flip the first bit
-                        const unsigned char mf_orientation = orientation ^ 1;
-                        const auto          offset =
+                        const auto offset =
                           QProjector<dim>::DataSetDescriptor::face(
                             reference_cell, f, orientation, quad_face);
 
@@ -456,7 +453,7 @@ namespace internal
                                 projected_quad_face.point(q + offset);
 
                               shape_values_face(f,
-                                                mf_orientation,
+                                                orientation,
                                                 i * n_q_points_face + q) =
                                 fe.shape_value(i, point);
 
@@ -464,7 +461,7 @@ namespace internal
 
                               for (unsigned int d = 0; d < dim; ++d)
                                 shape_gradients_face(f,
-                                                     mf_orientation,
+                                                     orientation,
                                                      i * dim * n_q_points_face +
                                                        q * dim + d) = grad[d];
                             }

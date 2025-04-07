@@ -344,7 +344,7 @@ namespace numbers
    * for more information.
    */
   constexpr types::geometric_orientation default_geometric_orientation =
-    static_cast<types::geometric_orientation>(0b001);
+    static_cast<types::geometric_orientation>(0b000);
 
   /**
    * Value indicating that a line is in the reverse orientation. Since lines can
@@ -357,7 +357,7 @@ namespace numbers
    * for more information.
    */
   constexpr types::geometric_orientation reverse_line_orientation =
-    static_cast<types::geometric_orientation>(0b000);
+    static_cast<types::geometric_orientation>(0b001);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a
