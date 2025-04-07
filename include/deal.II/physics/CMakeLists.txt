@@ -16,6 +16,3 @@
 # Recurse into the sub-directories:
 #
 add_subdirectory(elasticity)
-
-
-

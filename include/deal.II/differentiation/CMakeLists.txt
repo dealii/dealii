@@ -19,5 +19,3 @@
 #
 add_subdirectory(ad)
 add_subdirectory(sd)
-
-
