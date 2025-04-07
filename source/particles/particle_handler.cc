@@ -728,7 +728,7 @@ namespace Particles
           MPI_Scan(&particles_to_add_locally,
                    &local_start_index,
                    1,
-                   DEAL_II_PARTICLE_INDEX_MPI_TYPE,
+                   Utilities::MPI::mpi_type_id_for_type<types::particle_index>,
                    MPI_SUM,
                    parallel_triangulation->get_mpi_communicator());
         AssertThrowMPI(ierr);

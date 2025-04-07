@@ -3311,14 +3311,15 @@ namespace internal
                          rcounts[Utilities::MPI::this_mpi_process(
                            tr->get_mpi_communicator())]),
                      ExcInternalError());
-              ierr = MPI_Allgatherv(new_numbers_copy.data(),
-                                    new_numbers_copy.size(),
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    gathered_new_numbers.data(),
-                                    rcounts.data(),
-                                    displacements.data(),
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    tr->get_mpi_communicator());
+              ierr = MPI_Allgatherv(
+                new_numbers_copy.data(),
+                new_numbers_copy.size(),
+                Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+                gathered_new_numbers.data(),
+                rcounts.data(),
+                displacements.data(),
+                Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+                tr->get_mpi_communicator());
               AssertThrowMPI(ierr);
             }
 
