@@ -214,9 +214,7 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 
-// this part of the namespace numbers got moved to the bottom types.h file,
-// because otherwise we get a circular inclusion of config.h, types.h, and
-// numbers.h
+
 namespace numbers
 {
   /**
