@@ -1539,12 +1539,13 @@ namespace GridTools
     // Make indices global by getting the number of vertices owned by each
     // processors and shifting the indices accordingly
     types::global_vertex_index shift = 0;
-    int                        ierr  = MPI_Exscan(&next_index,
-                          &shift,
-                          1,
-                          DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                          MPI_SUM,
-                          triangulation.get_mpi_communicator());
+    int                        ierr  = MPI_Exscan(
+      &next_index,
+      &shift,
+      1,
+      Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>,
+      MPI_SUM,
+      triangulation.get_mpi_communicator());
     AssertThrowMPI(ierr);
 
     for (auto &global_index_it : local_to_global_vertex_index)
@@ -1590,13 +1591,14 @@ namespace GridTools
           }
 
         // Send the message
-        ierr = MPI_Isend(vertices_send_buffers[i].data(),
-                         buffer_size,
-                         DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                         destination,
-                         mpi_tag,
-                         triangulation.get_mpi_communicator(),
-                         &first_requests[i]);
+        ierr = MPI_Isend(
+          vertices_send_buffers[i].data(),
+          buffer_size,
+          Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>,
+          destination,
+          mpi_tag,
+          triangulation.get_mpi_communicator(),
+          &first_requests[i]);
         AssertThrowMPI(ierr);
       }
 
@@ -1615,13 +1617,14 @@ namespace GridTools
         vertices_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        ierr = MPI_Recv(vertices_recv_buffers[i].data(),
-                        buffer_size,
-                        DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                        source,
-                        mpi_tag,
-                        triangulation.get_mpi_communicator(),
-                        MPI_STATUS_IGNORE);
+        ierr = MPI_Recv(
+          vertices_recv_buffers[i].data(),
+          buffer_size,
+          Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>,
+          source,
+          mpi_tag,
+          triangulation.get_mpi_communicator(),
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
 

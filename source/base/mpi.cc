@@ -1316,13 +1316,15 @@ namespace Utilities
               for (const auto &rank_pair : buffers)
                 {
                   request.push_back(MPI_Request());
-                  const int ierr = MPI_Isend(rank_pair.second.data(),
-                                             rank_pair.second.size() * 2,
-                                             DEAL_II_DOF_INDEX_MPI_TYPE,
-                                             rank_pair.first,
-                                             mpi_tag,
-                                             comm,
-                                             &request.back());
+                  const int ierr =
+                    MPI_Isend(rank_pair.second.data(),
+                              rank_pair.second.size() * 2,
+                              Utilities::MPI::mpi_type_id_for_type<
+                                types::global_dof_index>,
+                              rank_pair.first,
+                              mpi_tag,
+                              comm,
+                              &request.back());
                   AssertThrowMPI(ierr);
                 }
 
@@ -1337,7 +1339,8 @@ namespace Utilities
                   // retrieve size of incoming message
                   int number_amount;
                   ierr = MPI_Get_count(&status,
-                                       DEAL_II_DOF_INDEX_MPI_TYPE,
+                                       Utilities::MPI::mpi_type_id_for_type<
+                                         types::global_dof_index>,
                                        &number_amount);
                   AssertThrowMPI(ierr);
 
@@ -1351,7 +1354,8 @@ namespace Utilities
                     buffer(number_amount / 2);
                   ierr = MPI_Recv(buffer.data(),
                                   number_amount,
-                                  DEAL_II_DOF_INDEX_MPI_TYPE,
+                                  Utilities::MPI::mpi_type_id_for_type<
+                                    types::global_dof_index>,
                                   status.MPI_SOURCE,
                                   status.MPI_TAG,
                                   comm,

@@ -199,12 +199,13 @@ namespace Particles
 
           // The local particle start index is the number of all particles
           // generated on lower MPI ranks.
-          const int ierr = MPI_Exscan(&n_particles_to_generate,
-                                      &particle_index,
-                                      1,
-                                      DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                                      MPI_SUM,
-                                      tria->get_mpi_communicator());
+          const int ierr = MPI_Exscan(
+            &n_particles_to_generate,
+            &particle_index,
+            1,
+            Utilities::MPI::mpi_type_id_for_type<types::particle_index>,
+            MPI_SUM,
+            tria->get_mpi_communicator());
           AssertThrowMPI(ierr);
         }
 #endif
