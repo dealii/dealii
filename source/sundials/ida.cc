@@ -356,10 +356,10 @@ namespace SUNDIALS
         }
       if (LS->ops)
         {
-          free(LS->ops);
+          std::free(LS->ops);
           LS->ops = nullptr;
         }
-      free(LS);
+      std::free(LS);
       LS = nullptr;
       return 0;
     };
@@ -420,10 +420,10 @@ namespace SUNDIALS
         }
       if (A->ops)
         {
-          free(A->ops);
+          std::free(A->ops);
           A->ops = nullptr;
         }
-      free(A);
+      std::free(A);
       A = nullptr;
     };
 
