@@ -1291,7 +1291,7 @@ namespace Utilities
 
       // Get the size of the vector
       typename std::vector<T>::size_type vector_size;
-      memcpy(&vector_size, &*cbegin, sizeof(vector_size));
+      std::memcpy(&vector_size, &*cbegin, sizeof(vector_size));
 
       Assert(static_cast<std::ptrdiff_t>(cend - cbegin) ==
                static_cast<std::ptrdiff_t>(sizeof(vector_size) +
@@ -1339,7 +1339,7 @@ namespace Utilities
       using size_type = typename std::vector<T>::size_type;
       std::vector<char>::const_iterator iterator = cbegin;
       size_type                         vector_size;
-      memcpy(&vector_size, &*iterator, sizeof(vector_size));
+      std::memcpy(&vector_size, &*iterator, sizeof(vector_size));
       object.clear();
       object.resize(vector_size);
       std::vector<size_type> sizes(vector_size);
