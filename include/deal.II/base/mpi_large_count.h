@@ -60,7 +60,7 @@ namespace Utilities
        * This is the largest @p count supported when it is represented
        * with a signed integer (old MPI routines).
        */
-      static constexpr MPI_Count mpi_max_int_count =
+      inline constexpr MPI_Count mpi_max_int_count =
         std::numeric_limits<int>::max();
 
       /**
