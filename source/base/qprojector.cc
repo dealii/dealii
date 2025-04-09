@@ -1244,11 +1244,8 @@ QProjector<dim>::DataSetDescriptor::face(
   const types::geometric_orientation combined_orientation,
   const unsigned int                 n_quadrature_points)
 {
-  // TODO: once we move to representing the default orientation as 0 (instead of
-  // 1) we can get rid of the dim = 1 check
-  Assert(dim == 1 ||
-           (combined_orientation < reference_cell.n_face_orientations(face_no)),
-         ExcInternalError());
+  AssertIndexRange(combined_orientation,
+                   reference_cell.n_face_orientations(face_no));
 
   // TODO: once the default orientation is 0 we can combine this with the
   // general branch
