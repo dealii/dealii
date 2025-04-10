@@ -3602,12 +3602,7 @@ ReferenceCell::get_combined_orientation(
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        // TODO: we can get rid of this special-case and use
-        // vertex_vertex_permutations once we make 0 the default orientation.
-        (void)vertex_vertex_permutations;
-        if (vertices_0[0] == vertices_1[0])
-          return numbers::default_geometric_orientation;
-        break;
+        return compute_orientation(vertex_vertex_permutations);
       case ReferenceCells::Line:
         return compute_orientation(line_vertex_permutations);
       case ReferenceCells::Triangle:
@@ -3669,9 +3664,7 @@ ReferenceCell::permute_by_combined_orientation(
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        // TODO: we can get rid of this special-case and use
-        // vertex_vertex_permutations once we make 0 the default orientation.
-        std::copy(vertices.begin(), vertices.end(), result.begin());
+        permute(vertex_vertex_permutations);
         break;
       case ReferenceCells::Line:
         permute(line_vertex_permutations);
