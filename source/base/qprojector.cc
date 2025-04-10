@@ -929,20 +929,18 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
       std::vector<double> weights;
       weights.reserve(n_points_total);
 
-      for (unsigned char offset = 0; offset < 8; ++offset)
+      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+           ++face)
         {
-          const auto mutation = internal::QProjector::mutate_points_with_offset(
-            quadrature[0].get_points(), offset);
           // project to each face and append results
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (types::geometric_orientation combined_orientation = 0;
+               combined_orientation < 8;
+               ++combined_orientation)
             {
               const unsigned int q_index = quadrature.size() == 1 ? 0 : face;
-
               internal::QProjector::project_to_hex_face_and_append(
-                q_index > 0 ? internal::QProjector::mutate_points_with_offset(
-                                quadrature[face].get_points(), offset) :
-                              mutation,
+                internal::QProjector::mutate_points_with_offset(
+                  quadrature[q_index].get_points(), combined_orientation),
                 face,
                 q_points);
 
@@ -1244,22 +1242,15 @@ QProjector<dim>::DataSetDescriptor::face(
   const types::geometric_orientation combined_orientation,
   const unsigned int                 n_quadrature_points)
 {
+  AssertIndexRange(face_no, reference_cell.n_faces());
   AssertIndexRange(combined_orientation,
                    reference_cell.n_face_orientations(face_no));
+  AssertDimension(reference_cell.get_dimension(), dim);
 
-  // TODO: once the default orientation is 0 we can combine this with the
-  // general branch
-  if (reference_cell == ReferenceCells::Line)
-    return {face_no};
-  // TODO: index Hexahedra in the same way as everything else
-  else if (reference_cell == ReferenceCells::Hexahedron)
-    return (face_no +
-            GeometryInfo<dim>::faces_per_cell * combined_orientation) *
-           n_quadrature_points;
-  else
-    return {(reference_cell.n_face_orientations(face_no) * face_no +
-             combined_orientation) *
-            n_quadrature_points};
+
+  return {(reference_cell.n_face_orientations(face_no) * face_no +
+           combined_orientation) *
+          n_quadrature_points};
 }
 
 
@@ -1292,84 +1283,21 @@ QProjector<dim>::DataSetDescriptor::face(
   const types::geometric_orientation combined_orientation,
   const hp::QCollection<dim - 1>    &quadrature)
 {
-  // TODO: once we move to representing the default orientation as 0 (instead of
-  // 1) we can get rid of the dim = 1 check
-  Assert(dim == 1 ||
-           (combined_orientation < reference_cell.n_face_orientations(face_no)),
-         ExcInternalError());
+  AssertIndexRange(face_no, reference_cell.n_faces());
+  AssertIndexRange(combined_orientation,
+                   reference_cell.n_face_orientations(face_no));
+  AssertDimension(reference_cell.get_dimension(), dim);
 
-  if (reference_cell == ReferenceCells::Triangle ||
-      reference_cell == ReferenceCells::Tetrahedron ||
-      reference_cell == ReferenceCells::Wedge ||
-      reference_cell == ReferenceCells::Pyramid)
-    {
-      unsigned int offset = 0;
-      Assert(combined_orientation < reference_cell.n_face_orientations(face_no),
-             ExcInternalError());
+  unsigned int offset = 0;
+  if (quadrature.size() == 1)
+    offset =
+      reference_cell.n_face_orientations(0) * quadrature[0].size() * face_no;
+  else
+    for (unsigned int i = 0; i < face_no; ++i)
+      offset += reference_cell.n_face_orientations(i) * quadrature[i].size();
 
-      if (quadrature.size() == 1)
-        offset = reference_cell.n_face_orientations(0) * quadrature[0].size() *
-                 face_no;
-      else
-        for (unsigned int i = 0; i < face_no; ++i)
-          offset +=
-            reference_cell.n_face_orientations(i) * quadrature[i].size();
-
-      return {offset +
-              combined_orientation *
-                quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
-    }
-
-  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
-         ExcNotImplemented());
-
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
-
-  switch (dim)
-    {
-      case 1:
-        return face_no;
-      case 2:
-        {
-          unsigned int offset = 0;
-
-          if (quadrature.size() == 1)
-            offset = reference_cell.n_face_orientations(0) *
-                     quadrature[0].size() * face_no;
-          else
-            for (unsigned int i = 0; i < face_no; ++i)
-              offset += reference_cell.n_face_orientations(face_no) *
-                        quadrature[i].size();
-
-          return {offset +
-                  combined_orientation *
-                    quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
-        }
-      case 3:
-        {
-          if (quadrature.size() == 1)
-            return (face_no +
-                    combined_orientation * GeometryInfo<dim>::faces_per_cell) *
-                   quadrature[0].size();
-          else
-            {
-              unsigned int n_points_i = 0;
-              for (unsigned int i = 0; i < face_no; ++i)
-                n_points_i += quadrature[i].size();
-
-              unsigned int n_points = 0;
-              for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
-                   ++i)
-                n_points += quadrature[i].size();
-
-              return n_points_i + combined_orientation * n_points;
-            }
-        }
-
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
-    }
-  return numbers::invalid_unsigned_int;
+  return {offset + combined_orientation *
+                     quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
 }
 
 
