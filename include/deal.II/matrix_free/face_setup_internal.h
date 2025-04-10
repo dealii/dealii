@@ -1065,37 +1065,27 @@ namespace internal
         }
 
       // special treatment of periodic boundaries
-      if (dim == 3 && cell->has_periodic_neighbor(face_no))
+      if (cell->has_periodic_neighbor(face_no))
         {
-          const types::geometric_orientation exterior_face_orientation =
-            cell->get_triangulation()
-              .get_periodic_face_map()
-              .at({cell, face_no})
-              .second;
-          const auto [orientation, rotation, flip] =
-            ::dealii::internal::split_face_orientation(
-              exterior_face_orientation);
-
-          info.face_orientation =
-            (orientation ? 0u : 1u) + 2 * rotation + 4 * flip;
+          info.face_orientation = cell->get_triangulation()
+                                    .get_periodic_face_map()
+                                    .at({cell, face_no})
+                                    .second;
 
           return info;
         }
 
       info.face_orientation = 0;
-      const unsigned int interior_face_orientation =
-        !cell->face_orientation(face_no) + 2 * cell->face_rotation(face_no) +
-        4 * cell->face_flip(face_no);
-      const unsigned int exterior_face_orientation =
-        !neighbor->face_orientation(info.exterior_face_no) +
-        2 * neighbor->face_rotation(info.exterior_face_no) +
-        4 * neighbor->face_flip(info.exterior_face_no);
-      if (interior_face_orientation != 0)
+      const auto interior_face_orientation =
+        cell->combined_face_orientation(face_no);
+      const auto exterior_face_orientation =
+        neighbor->combined_face_orientation(info.exterior_face_no);
+      if (interior_face_orientation != numbers::default_geometric_orientation)
         {
           info.face_orientation = 8 + interior_face_orientation;
-          Assert(exterior_face_orientation == 0,
-                 ExcMessage(
-                   "Face seems to be wrongly oriented from both sides"));
+          Assert(
+            exterior_face_orientation == numbers::default_geometric_orientation,
+            ExcMessage("Face seems to be wrongly oriented from both sides"));
         }
       else
         info.face_orientation = exterior_face_orientation;
