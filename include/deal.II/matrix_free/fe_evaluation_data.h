@@ -1086,7 +1086,9 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , subface_index(0)
   , cell_type(internal::MatrixFreeFunctions::general)
   , divergence_is_requested(false)
-{}
+{
+  Assert(!data->data.empty(), ExcInternalError());
+}
 
 
 
@@ -1199,6 +1201,9 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
   const unsigned int     n_components)
 {
   Assert(scratch_data_array != nullptr, ExcInternalError());
+  Assert(data != nullptr, ExcInternalError());
+  Assert(!data->data.empty(), ExcInternalError());
+
 
   const unsigned int tensor_dofs_per_component =
     Utilities::fixed_power<dim>(data->data.front().fe_degree + 1);
