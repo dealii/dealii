@@ -1,0 +1,5 @@
+New: Added a new class SolverMPGMRES that implements a variant of
+the GMRES algorithm allowing for the use of multiple preconditioners
+at once. For more details, see @cite Greif2017.
+<br>
+(Wyatt Smith, Matthias Maier, 2025/04/10)
