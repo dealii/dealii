@@ -1,0 +1,9 @@
+New: FE_Simplex_Poly now implements FiniteElement::face_to_cell_index(),
+enabling periodicity for derived classes, with restrictions similar to the
+implementation in FE_Q_Base. Additionally,
+GridGenerator::hyper_rectangle_with_simplicies() now accepts an additional
+boolean argument which, in 3D, breaks each cubical cell into six tetrahedra
+instead of five.  This mesh meets the restrictions of
+FE_Simplex_Poly::face_to_cell_index().
+<br>
+(Kyle Schwiebert, 2025/04/04)

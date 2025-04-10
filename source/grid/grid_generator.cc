@@ -22,6 +22,7 @@
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_topology.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
@@ -8940,6 +8941,319 @@ namespace GridGenerator
 
 
 
+  // Hide the implementation for two cases of
+  // subdivided_hyper_rectangle_with_simplices in an anonymous namespace.
+  namespace
+  {
+    template <int dim, int spacedim>
+    void
+    subdivided_hyper_rectangle_with_simplices_no_periodic(
+      Triangulation<dim, spacedim>    &tria,
+      const std::vector<unsigned int> &repetitions,
+      const Point<dim>                &p1,
+      const Point<dim>                &p2,
+      const bool                       colorize)
+    {
+      AssertDimension(dim, spacedim);
+
+      std::vector<Point<spacedim>> vertices;
+      std::vector<CellData<dim>>   cells;
+
+      if (dim == 2)
+        {
+          // determine cell sizes
+          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                              (p2[1] - p1[1]) / repetitions[1]);
+
+          // create vertices
+          for (unsigned int j = 0; j <= repetitions[1]; ++j)
+            for (unsigned int i = 0; i <= repetitions[0]; ++i)
+              vertices.push_back(
+                Point<spacedim>(p1[0] + dx[0] * i, p1[1] + dx[1] * j));
+
+          // create cells
+          for (unsigned int j = 0; j < repetitions[1]; ++j)
+            for (unsigned int i = 0; i < repetitions[0]; ++i)
+              {
+                // create reference QUAD cell
+                std::array<unsigned int, 4> quad{{
+                  (j + 0) * (repetitions[0] + 1) + i + 0, //
+                  (j + 0) * (repetitions[0] + 1) + i + 1, //
+                  (j + 1) * (repetitions[0] + 1) + i + 0, //
+                  (j + 1) * (repetitions[0] + 1) + i + 1  //
+                }};                                       //
+
+                // TRI cell 0
+                {
+                  CellData<dim> tri;
+                  tri.vertices = {quad[0], quad[1], quad[2]};
+                  cells.push_back(tri);
+                }
+
+                // TRI cell 1
+                {
+                  CellData<dim> tri;
+                  tri.vertices = {quad[3], quad[2], quad[1]};
+                  cells.push_back(tri);
+                }
+              }
+        }
+      else if (dim == 3)
+        {
+          // determine cell sizes
+          const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                              (p2[1] - p1[1]) / repetitions[1],
+                              (p2[2] - p1[2]) / repetitions[2]);
+
+          // create vertices
+          for (unsigned int k = 0; k <= repetitions[2]; ++k)
+            for (unsigned int j = 0; j <= repetitions[1]; ++j)
+              for (unsigned int i = 0; i <= repetitions[0]; ++i)
+                vertices.push_back(Point<spacedim>(p1[0] + dx[0] * i,
+                                                   p1[1] + dx[1] * j,
+                                                   p1[2] + dx[2] * k));
+
+          // create cells
+          for (unsigned int k = 0; k < repetitions[2]; ++k)
+            for (unsigned int j = 0; j < repetitions[1]; ++j)
+              for (unsigned int i = 0; i < repetitions[0]; ++i)
+                {
+                  // create reference HEX cell
+                  std::array<unsigned int, 8> quad{
+                    {(k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 0,
+                     (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 1,
+                     (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 0,
+                     (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 1,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 0,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 0) * (repetitions[0] + 1) + i + 1,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 0,
+                     (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                       (j + 1) * (repetitions[0] + 1) + i + 1}};
+
+                  // TET cell 0
+                  {
+                    CellData<dim> cell;
+                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                      cell.vertices = {{quad[0], quad[1], quad[2], quad[4]}};
+                    else
+                      cell.vertices = {{quad[0], quad[1], quad[3], quad[5]}};
+
+                    cells.push_back(cell);
+                  }
+
+                  // TET cell 1
+                  {
+                    CellData<dim> cell;
+                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                      cell.vertices = {{quad[2], quad[1], quad[3], quad[7]}};
+                    else
+                      cell.vertices = {{quad[0], quad[3], quad[2], quad[6]}};
+                    cells.push_back(cell);
+                  }
+
+                  // TET cell 2
+                  {
+                    CellData<dim> cell;
+                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                      cell.vertices = {{quad[1], quad[4], quad[5], quad[7]}};
+                    else
+                      cell.vertices = {{quad[0], quad[4], quad[5], quad[6]}};
+                    cells.push_back(cell);
+                  }
+
+                  // TET cell 3
+                  {
+                    CellData<dim> cell;
+                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                      cell.vertices = {{quad[2], quad[4], quad[7], quad[6]}};
+                    else
+                      cell.vertices = {{quad[3], quad[5], quad[7], quad[6]}};
+                    cells.push_back(cell);
+                  }
+
+                  // TET cell 4
+                  {
+                    CellData<dim> cell;
+                    if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
+                      cell.vertices = {{quad[1], quad[2], quad[4], quad[7]}};
+                    else
+                      cell.vertices = {{quad[0], quad[3], quad[6], quad[5]}};
+                    cells.push_back(cell);
+                  }
+                }
+        }
+      else
+        {
+          AssertThrow(false, ExcNotImplemented());
+        }
+
+      // actually create triangulation
+      tria.create_triangulation(vertices, cells, SubCellData());
+
+      if (colorize)
+        {
+          // to colorize, run through all
+          // faces of all cells and set
+          // boundary indicator to the
+          // correct value if it was 0.
+
+          // use a large epsilon to
+          // compare numbers to avoid
+          // roundoff problems.
+          double epsilon = std::numeric_limits<double>::max();
+          for (unsigned int i = 0; i < dim; ++i)
+            epsilon =
+              std::min(epsilon,
+                       0.01 * (std::abs(p2[i] - p1[i]) / repetitions[i]));
+          Assert(epsilon > 0,
+                 ExcMessage(
+                   "The distance between corner points must be positive."));
+
+          // actual code is external since
+          // 1-D is different from 2/3d.
+          colorize_subdivided_hyper_rectangle(tria, p1, p2, epsilon);
+        }
+    }
+
+
+
+    // This function is only needed in 3D.
+    template <int dim, int spacedim>
+    void
+    subdivided_hyper_rectangle_with_simplices_periodic(
+      Triangulation<dim, spacedim>    &tria,
+      const std::vector<unsigned int> &repetitions,
+      const Point<dim>                &p1,
+      const Point<dim>                &p2,
+      const bool                       colorize)
+    {
+      // This function is only needed in 3D (and hypothetically in higher
+      // dimension), so library internals should ensure it is never called
+      // unless dim == 3.
+      Assert(dim == 3, ExcInternalError());
+      AssertDimension(dim, spacedim);
+
+      std::vector<Point<spacedim>> vertices;
+      std::vector<CellData<dim>>   cells;
+
+      // determine cell sizes
+      const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
+                          (p2[1] - p1[1]) / repetitions[1],
+                          (p2[2] - p1[2]) / repetitions[2]);
+
+      // create vertices
+      for (unsigned int k = 0; k <= repetitions[2]; ++k)
+        for (unsigned int j = 0; j <= repetitions[1]; ++j)
+          for (unsigned int i = 0; i <= repetitions[0]; ++i)
+            vertices.push_back(Point<spacedim>(p1[0] + dx[0] * i,
+                                               p1[1] + dx[1] * j,
+                                               p1[2] + dx[2] * k));
+
+      // create cells
+      for (unsigned int k = 0; k < repetitions[2]; ++k)
+        for (unsigned int j = 0; j < repetitions[1]; ++j)
+          for (unsigned int i = 0; i < repetitions[0]; ++i)
+            {
+              // create reference HEX cell
+              std::array<unsigned int, 8> quad{
+                {(k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 0) * (repetitions[0] + 1) + i + 0,
+                 (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 0) * (repetitions[0] + 1) + i + 1,
+                 (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 1) * (repetitions[0] + 1) + i + 0,
+                 (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 1) * (repetitions[0] + 1) + i + 1,
+                 (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 0) * (repetitions[0] + 1) + i + 0,
+                 (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 0) * (repetitions[0] + 1) + i + 1,
+                 (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 1) * (repetitions[0] + 1) + i + 0,
+                 (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
+                   (j + 1) * (repetitions[0] + 1) + i + 1}};
+
+              // TET cell 0
+              {
+                CellData<dim> cell;
+                cell.vertices = {{quad[0], quad[1], quad[3], quad[7]}};
+                cells.push_back(cell);
+              }
+
+              // TET cell 1
+              {
+                CellData<dim> cell;
+                cell.vertices = {{quad[0], quad[1], quad[7], quad[5]}};
+                cells.push_back(cell);
+              }
+
+              // TET cell 2
+              {
+                CellData<dim> cell;
+                cell.vertices = {{quad[0], quad[7], quad[3], quad[2]}};
+                cells.push_back(cell);
+              }
+
+              // TET cell 3
+              {
+                CellData<dim> cell;
+                cell.vertices = {{quad[2], quad[6], quad[0], quad[7]}};
+                cells.push_back(cell);
+              }
+
+              // TET cell 4
+              {
+                CellData<dim> cell;
+                cell.vertices = {{quad[4], quad[7], quad[5], quad[0]}};
+                cells.push_back(cell);
+              }
+
+              // TET cell 5
+              {
+                CellData<dim> cell;
+                cell.vertices = {{quad[4], quad[6], quad[7], quad[0]}};
+                cells.push_back(cell);
+              }
+            }
+
+      // actually create triangulation
+      tria.create_triangulation(vertices, cells, SubCellData());
+
+      if (colorize)
+        {
+          // to colorize, run through all
+          // faces of all cells and set
+          // boundary indicator to the
+          // correct value if it was 0.
+
+          // use a large epsilon to
+          // compare numbers to avoid
+          // roundoff problems.
+          double epsilon = std::numeric_limits<double>::max();
+          for (unsigned int i = 0; i < dim; ++i)
+            epsilon =
+              std::min(epsilon,
+                       0.01 * (std::abs(p2[i] - p1[i]) / repetitions[i]));
+          Assert(epsilon > 0,
+                 ExcMessage(
+                   "The distance between corner points must be positive."));
+
+          // actual code is external since
+          // 1-D is different from 2/3d.
+          colorize_subdivided_hyper_rectangle(tria, p1, p2, epsilon);
+        }
+    }
+  } // namespace
+
+
+
   template <int dim, int spacedim>
   void
   subdivided_hyper_rectangle_with_simplices(
@@ -8947,172 +9261,28 @@ namespace GridGenerator
     const std::vector<unsigned int> &repetitions,
     const Point<dim>                &p1,
     const Point<dim>                &p2,
-    const bool                       colorize)
+    const bool                       colorize,
+    const bool                       periodic)
   {
-    AssertDimension(dim, spacedim);
-
-    std::vector<Point<spacedim>> vertices;
-    std::vector<CellData<dim>>   cells;
-
-    if (dim == 2)
+    // We only need to call the "periodic" variant if it was requested and we
+    // are in 3D.
+    if (dim != 3)
       {
-        // determine cell sizes
-        const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
-                            (p2[1] - p1[1]) / repetitions[1]);
-
-        // create vertices
-        for (unsigned int j = 0; j <= repetitions[1]; ++j)
-          for (unsigned int i = 0; i <= repetitions[0]; ++i)
-            vertices.push_back(
-              Point<spacedim>(p1[0] + dx[0] * i, p1[1] + dx[1] * j));
-
-        // create cells
-        for (unsigned int j = 0; j < repetitions[1]; ++j)
-          for (unsigned int i = 0; i < repetitions[0]; ++i)
-            {
-              // create reference QUAD cell
-              std::array<unsigned int, 4> quad{{
-                (j + 0) * (repetitions[0] + 1) + i + 0, //
-                (j + 0) * (repetitions[0] + 1) + i + 1, //
-                (j + 1) * (repetitions[0] + 1) + i + 0, //
-                (j + 1) * (repetitions[0] + 1) + i + 1  //
-              }};                                       //
-
-              // TRI cell 0
-              {
-                CellData<dim> tri;
-                tri.vertices = {quad[0], quad[1], quad[2]};
-                cells.push_back(tri);
-              }
-
-              // TRI cell 1
-              {
-                CellData<dim> tri;
-                tri.vertices = {quad[3], quad[2], quad[1]};
-                cells.push_back(tri);
-              }
-            }
+        subdivided_hyper_rectangle_with_simplices_no_periodic(
+          tria, repetitions, p1, p2, colorize);
+        return;
       }
-    else if (dim == 3)
+    else if (!periodic)
       {
-        // determine cell sizes
-        const Point<dim> dx((p2[0] - p1[0]) / repetitions[0],
-                            (p2[1] - p1[1]) / repetitions[1],
-                            (p2[2] - p1[2]) / repetitions[2]);
-
-        // create vertices
-        for (unsigned int k = 0; k <= repetitions[2]; ++k)
-          for (unsigned int j = 0; j <= repetitions[1]; ++j)
-            for (unsigned int i = 0; i <= repetitions[0]; ++i)
-              vertices.push_back(Point<spacedim>(p1[0] + dx[0] * i,
-                                                 p1[1] + dx[1] * j,
-                                                 p1[2] + dx[2] * k));
-
-        // create cells
-        for (unsigned int k = 0; k < repetitions[2]; ++k)
-          for (unsigned int j = 0; j < repetitions[1]; ++j)
-            for (unsigned int i = 0; i < repetitions[0]; ++i)
-              {
-                // create reference HEX cell
-                std::array<unsigned int, 8> quad{
-                  {(k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 0) * (repetitions[0] + 1) + i + 0,
-                   (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 0) * (repetitions[0] + 1) + i + 1,
-                   (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 1) * (repetitions[0] + 1) + i + 0,
-                   (k + 0) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 1) * (repetitions[0] + 1) + i + 1,
-                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 0) * (repetitions[0] + 1) + i + 0,
-                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 0) * (repetitions[0] + 1) + i + 1,
-                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 1) * (repetitions[0] + 1) + i + 0,
-                   (k + 1) * (repetitions[0] + 1) * (repetitions[1] + 1) +
-                     (j + 1) * (repetitions[0] + 1) + i + 1}};
-
-                // TET cell 0
-                {
-                  CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                    cell.vertices = {{quad[0], quad[1], quad[2], quad[4]}};
-                  else
-                    cell.vertices = {{quad[0], quad[1], quad[3], quad[5]}};
-
-                  cells.push_back(cell);
-                }
-
-                // TET cell 1
-                {
-                  CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                    cell.vertices = {{quad[2], quad[1], quad[3], quad[7]}};
-                  else
-                    cell.vertices = {{quad[0], quad[3], quad[2], quad[6]}};
-                  cells.push_back(cell);
-                }
-
-                // TET cell 2
-                {
-                  CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                    cell.vertices = {{quad[1], quad[4], quad[5], quad[7]}};
-                  else
-                    cell.vertices = {{quad[0], quad[4], quad[5], quad[6]}};
-                  cells.push_back(cell);
-                }
-
-                // TET cell 3
-                {
-                  CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                    cell.vertices = {{quad[2], quad[4], quad[7], quad[6]}};
-                  else
-                    cell.vertices = {{quad[3], quad[5], quad[7], quad[6]}};
-                  cells.push_back(cell);
-                }
-
-                // TET cell 4
-                {
-                  CellData<dim> cell;
-                  if (((i % 2) + (j % 2) + (k % 2)) % 2 == 0)
-                    cell.vertices = {{quad[1], quad[2], quad[4], quad[7]}};
-                  else
-                    cell.vertices = {{quad[0], quad[3], quad[6], quad[5]}};
-                  cells.push_back(cell);
-                }
-              }
+        subdivided_hyper_rectangle_with_simplices_no_periodic(
+          tria, repetitions, p1, p2, colorize);
+        return;
       }
     else
       {
-        AssertThrow(false, ExcNotImplemented());
-      }
-
-    // actually create triangulation
-    tria.create_triangulation(vertices, cells, SubCellData());
-
-    if (colorize)
-      {
-        // to colorize, run through all
-        // faces of all cells and set
-        // boundary indicator to the
-        // correct value if it was 0.
-
-        // use a large epsilon to
-        // compare numbers to avoid
-        // roundoff problems.
-        double epsilon = std::numeric_limits<double>::max();
-        for (unsigned int i = 0; i < dim; ++i)
-          epsilon = std::min(epsilon,
-                             0.01 * (std::abs(p2[i] - p1[i]) / repetitions[i]));
-        Assert(epsilon > 0,
-               ExcMessage(
-                 "The distance between corner points must be positive."));
-
-        // actual code is external since
-        // 1-D is different from 2/3d.
-        colorize_subdivided_hyper_rectangle(tria, p1, p2, epsilon);
+        subdivided_hyper_rectangle_with_simplices_periodic(
+          tria, repetitions, p1, p2, colorize);
+        return;
       }
   }
 
@@ -9124,12 +9294,17 @@ namespace GridGenerator
                                        const unsigned int repetitions,
                                        const double       p1,
                                        const double       p2,
-                                       const bool         colorize)
+                                       const bool         colorize,
+                                       const bool         periodic)
   {
     if (dim == 2)
       {
-        subdivided_hyper_rectangle_with_simplices(
-          tria, {{repetitions, repetitions}}, {p1, p1}, {p2, p2}, colorize);
+        subdivided_hyper_rectangle_with_simplices(tria,
+                                                  {{repetitions, repetitions}},
+                                                  {p1, p1},
+                                                  {p2, p2},
+                                                  colorize,
+                                                  periodic);
       }
     else if (dim == 3)
       {
@@ -9138,7 +9313,8 @@ namespace GridGenerator
           {{repetitions, repetitions, repetitions}},
           {p1, p1, p1},
           {p2, p2, p2},
-          colorize);
+          colorize,
+          periodic);
       }
     else
       {
