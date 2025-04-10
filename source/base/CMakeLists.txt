@@ -79,6 +79,7 @@ set(_unity_include_src
   polynomials_rannacher_turek.cc
   polynomials_raviart_thomas.cc
   polynomials_rt_bubbles.cc
+  polynomials_vector_anisotropic.cc
   polynomials_wedge.cc
   qprojector.cc
   quadrature.cc
