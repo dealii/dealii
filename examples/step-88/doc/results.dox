@@ -1,0 +1,76 @@
+<h1>Results</h1>
+
+The directory in which this program is run contains a sample parameter file
+that you can use to reproduce the results presented in this
+section. Its default values are listed as follows:
+
+@code
+{
+  "MeshType": "mesh_file",
+  "MeshFileFormat": "./grids/piston_%d.inp",
+  "Dimension": 3,
+  "NGlobalRefinements": 3,
+  "Degree": 2,
+  "SolverMaxIterations": 100,
+  "SolverAbsTolerance": 1e-20,
+  "SolverRelTolerance": 1e-4,
+  "MGSmoothingRange": 20,
+  "MGSmootherDegree": 5,
+  "MGSmootherEigNIterations": 20,
+  "MGNonNested": true
+}
+@endcode
+
+
+Running the program via
+@code
+  mpirun -np 4 ./step-88 parameters.json
+@endcode
+will produce the following output to your terminal:
+@code
+Running with 4 MPI ranks.
+Creating hierarchy of grids:
+ - read ./grids/piston_0.inp
+ - read ./grids/piston_1.inp
+ - read ./grids/piston_2.inp
+ - read ./grids/piston_3.inp
+
+Define operators on levels:
+ - number of DoFs: 10257
+ - number of DoFs: 26611
+ - number of DoFs: 62635
+ - number of DoFs: 237389
+
+Built transfer operators between levels.
+Solved in 3 iterations.
+@endcode
+
+
+The output to Paraview is as follows:
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+        @image html piston_contour.png
+    </td>
+  </tr>
+</table>
+
+<h3>Possibilities for extensions</h3>
+
+This program highlights some of the main capabilities
+of the non-nested-multigrid routines in deal.II. However, there are many
+related topics worth mentioning:
+- Compare the results with MGTwoLevelTransferNonNested with the ones
+  of MGTwoLevelTransfer. For this purpose, set `mg_non_nested = false` and
+  `mesh_type = "hyper_cube"` or `mesh_type = "hyper_cube_with_simplices"`.
+- It is possible to run the program with other, user-generated meshes by
+  adjusting the parameter "mesh_file_format". Feel free to experiments with
+  meshes with curvature. Here, it is critical that all points of the fine
+  mesh are found on the coarse mesh. For this purpose, one might need
+  to adjust the parameters in MGTwoLevelTransferNonNested::AdditionalData.
+- The tutorial could be extend so that it works for mixed meshes.
+- In this tutorial, we read external meshes to create a sequence of
+  meshes. However, there are other means to create such a mesh sequence.
+  For instance, one could use the GMESH API (see GridIn::read_msh())
+  to generate meshes with different mesh sizes.
