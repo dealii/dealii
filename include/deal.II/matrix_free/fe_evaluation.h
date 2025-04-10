@@ -6160,7 +6160,9 @@ inline FEEvaluation<dim,
                  dof_no,
                  quad_no,
                  first_selected_component,
-                 matrix_free.get_cell_active_fe_index(range))
+                 (matrix_free.first_hp_dof_handler_index == dof_no) ?
+                   matrix_free.get_cell_active_fe_index(range) :
+                   0)
 {}
 
 

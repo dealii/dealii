@@ -2353,6 +2353,7 @@ private:
    * Stores the index of the first DoFHandler that is in hp-mode. If no
    * DoFHandler is in hp-mode, the value is 0.
    */
+public:
   unsigned int first_hp_dof_handler_index;
 };
 

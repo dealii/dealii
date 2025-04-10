@@ -1352,7 +1352,9 @@ namespace MatrixFreeTools
 
       unsigned int active_fe_index = 0;
       if (!is_face)
-        active_fe_index = matrix_free.get_cell_active_fe_index(range);
+        active_fe_index = (matrix_free.first_hp_dof_handler_index == dof_no) ?
+                            matrix_free.get_cell_active_fe_index(range) :
+                            0;
       else if (is_interior_face)
         active_fe_index = matrix_free.get_face_range_category(range).first;
       else
