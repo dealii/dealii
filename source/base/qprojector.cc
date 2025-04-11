@@ -884,77 +884,19 @@ QProjector<3>::project_to_all_faces(const ReferenceCell      &reference_cell,
     return Quadrature<3>(std::move(points), std::move(weights));
   };
 
-  if ((reference_cell == ReferenceCells::Tetrahedron) ||
-      (reference_cell == ReferenceCells::Wedge) ||
-      (reference_cell == ReferenceCells::Pyramid))
+  std::vector<std::vector<Point<3>>> face_vertex_locations(
+    reference_cell.n_faces());
+  for (const unsigned int f : reference_cell.face_indices())
     {
-      std::vector<std::vector<Point<3>>> face_vertex_locations(
-        reference_cell.n_faces());
-      for (const unsigned int f : reference_cell.face_indices())
-        {
-          face_vertex_locations[f].resize(
-            reference_cell.face_reference_cell(f).n_vertices());
-          for (const unsigned int v :
-               reference_cell.face_reference_cell(f).vertex_indices())
-            face_vertex_locations[f][v] =
-              reference_cell.face_vertex_location<3>(f, v);
-        }
-
-      return process(face_vertex_locations);
+      face_vertex_locations[f].resize(
+        reference_cell.face_reference_cell(f).n_vertices());
+      for (const unsigned int v :
+           reference_cell.face_reference_cell(f).vertex_indices())
+        face_vertex_locations[f][v] =
+          reference_cell.face_vertex_location<3>(f, v);
     }
-  else
-    {
-      Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
-      const unsigned int dim = 3;
-
-      unsigned int n_points_total = 0;
-
-      if (quadrature.size() == 1)
-        n_points_total =
-          quadrature[0].size() * GeometryInfo<dim>::faces_per_cell;
-      else
-        {
-          AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
-          for (const auto &q : quadrature)
-            n_points_total += q.size();
-        }
-
-      n_points_total *= 8;
-
-      // first fix quadrature points
-      std::vector<Point<dim>> q_points;
-      q_points.reserve(n_points_total);
-
-      std::vector<double> weights;
-      weights.reserve(n_points_total);
-
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
-        {
-          // project to each face and append results
-          for (types::geometric_orientation combined_orientation = 0;
-               combined_orientation < 8;
-               ++combined_orientation)
-            {
-              const unsigned int q_index = quadrature.size() == 1 ? 0 : face;
-              internal::QProjector::project_to_hex_face_and_append(
-                internal::QProjector::mutate_points_with_offset(
-                  quadrature[q_index].get_points(), combined_orientation),
-                face,
-                q_points);
-
-              std::copy(quadrature[q_index].get_weights().begin(),
-                        quadrature[q_index].get_weights().end(),
-                        std::back_inserter(weights));
-            }
-        }
-
-      Assert(q_points.size() == n_points_total, ExcInternalError());
-      Assert(weights.size() == n_points_total, ExcInternalError());
-
-      return Quadrature<dim>(std::move(q_points), std::move(weights));
-    }
+  return process(face_vertex_locations);
 }
 
 
