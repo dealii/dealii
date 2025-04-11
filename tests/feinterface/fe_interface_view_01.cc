@@ -69,28 +69,34 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
         for (unsigned int c = 0; c < fe.n_components(); ++c)
           {
             const FEValuesExtractors::Scalar single_component(c);
+            constexpr double                 tolerance = 1e-10;
             for (unsigned int i = 0; i < n_dofs_face; ++i)
               for (unsigned int q = 0; q < n_q_points; ++q)
                 {
-                  if (fe_iv[single_component].value(true, i, q) != 0)
+                  if (std::abs(fe_iv[single_component].value(true, i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].value(true, i, q)
                             << "  ";
-                  if (fe_iv[single_component].value(false, i, q) != 0)
+                  if (std::abs(fe_iv[single_component].value(false, i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].value(false, i, q)
                             << "  ";
-                  if (fe_iv[single_component].jump_in_values(i, q) != 0)
+                  if (std::abs(fe_iv[single_component].jump_in_values(i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].jump_in_values(i, q)
                             << "  ";
-                  if (fe_iv[single_component].average_of_values(i, q) != 0)
+                  if (std::abs(
+                        fe_iv[single_component].average_of_values(i, q)) >
+                      tolerance)
                     deallog << fe_iv[single_component].average_of_values(i, q)
                             << "  ";
-                  if (fe_iv[single_component].jump_in_gradients(i, q).norm() !=
-                      0)
+                  if (fe_iv[single_component].jump_in_gradients(i, q).norm() >
+                      tolerance)
                     deallog << fe_iv[single_component].jump_in_gradients(i, q)
                             << "  ";
                   if (fe_iv[single_component]
                         .average_of_gradients(i, q)
-                        .norm() != 0)
+                        .norm() > tolerance)
                     deallog
                       << fe_iv[single_component].average_of_gradients(i, q)
                       << std::endl;
