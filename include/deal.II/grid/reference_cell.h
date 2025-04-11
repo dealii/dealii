@@ -189,6 +189,12 @@ public:
    * @pre The template argument `dim` must equal the dimension
    *   of the space in which the reference cell you are querying
    *   lives (i.e., it must equal the result of get_dimension()).
+   *
+   * For ReferenceCells::Vertex, the reference cell is a zero-dimensional point
+   * in a zero-dimensional space: i.e., asking about the value of a polynomial
+   * doesn't make sense since there cannot be any independent variables. To
+   * enable dimension-independent programming we define the zero-dimensional
+   * value to be 1.
    */
   template <int dim>
   double
@@ -2888,10 +2894,16 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
+        return 1.0;
       case ReferenceCells::Line:
+        if constexpr (dim == 1)
+          return GeometryInfo<1>::d_linear_shape_function(xi, i);
       case ReferenceCells::Quadrilateral:
+        if constexpr (dim == 2)
+          return GeometryInfo<2>::d_linear_shape_function(xi, i);
       case ReferenceCells::Hexahedron:
-        return GeometryInfo<dim>::d_linear_shape_function(xi, i);
+        if constexpr (dim == 3)
+          return GeometryInfo<3>::d_linear_shape_function(xi, i);
       // see also BarycentricPolynomials<2>::compute_value
       case ReferenceCells::Triangle:
         {
@@ -2962,6 +2974,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
         DEAL_II_NOT_IMPLEMENTED();
     }
 
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0.0;
 }
 
@@ -3013,7 +3026,7 @@ ReferenceCell::volume() const
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        return 0;
+        return 1;
       case ReferenceCells::Line:
         return 1;
       case ReferenceCells::Triangle:
