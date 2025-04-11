@@ -569,12 +569,6 @@ QProjector<3>::project_to_face(const ReferenceCell   &reference_cell,
                                std::vector<Point<3>> &q_points);
 
 template <>
-Quadrature<1>
-QProjector<1>::project_to_all_faces(const ReferenceCell      &reference_cell,
-                                    const hp::QCollection<0> &quadrature);
-
-
-template <>
 void
 QProjector<1>::project_to_subface(const ReferenceCell &reference_cell,
                                   const Quadrature<0> &,
