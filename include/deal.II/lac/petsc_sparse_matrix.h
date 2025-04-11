@@ -27,6 +27,7 @@
 #  include <petscis.h>
 #  include <petscistypes.h>
 
+#  include <cstddef>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -221,13 +222,13 @@ namespace PETScWrappers
     /**
      * Return the number of rows of this matrix.
      */
-    size_t
+    std::size_t
     m() const;
 
     /**
      * Return the number of columns of this matrix.
      */
-    size_t
+    std::size_t
     n() const;
 
     /**
