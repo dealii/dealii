@@ -20,6 +20,7 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
+#  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/observer_pointer.h>
 
 #  include <deal.II/lac/exceptions.h>
