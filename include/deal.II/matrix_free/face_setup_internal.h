@@ -1096,11 +1096,12 @@ namespace internal
         {
           const Table<2, unsigned int> orientation =
             ShapeInfo<double>::compute_orientation_table(2);
-          const std::array<unsigned int, 8> inverted_orientations{
-            {0, 1, 6, 3, 4, 5, 2, 7}};
+          const auto face_reference_cell =
+            cell->face(face_no)->reference_cell();
           info.subface_index =
-            orientation[inverted_orientations[exterior_face_orientation]]
-                       [info.subface_index];
+            orientation(face_reference_cell.get_inverse_combined_orientation(
+                          exterior_face_orientation),
+                        info.subface_index);
         }
 
       return info;

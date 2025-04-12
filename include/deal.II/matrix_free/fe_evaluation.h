@@ -7511,13 +7511,17 @@ FEFaceEvaluation<dim,
               this->face_numbers[i] = faces.exterior_face_no;
             }
 
-          const bool   orientation_interior_face = faces.face_orientation >= 8;
-          unsigned int face_orientation          = faces.face_orientation % 8;
+          const bool orientation_interior_face = faces.face_orientation >= 8;
+          auto       face_orientation          = faces.face_orientation % 8;
           if (face_identifies_as_interior != orientation_interior_face)
             {
-              constexpr std::array<std::uint8_t, 8> table{
-                {0, 1, 6, 3, 4, 5, 2, 7}};
-              face_orientation = table[face_orientation];
+              Assert(this->matrix_free->get_cell_iterator(cell_index, i)
+                         ->reference_cell() ==
+                       ReferenceCells::get_hypercube<dim>(),
+                     ExcNotImplemented());
+              face_orientation =
+                ReferenceCells::get_hypercube<dim - 1>()
+                  .get_inverse_combined_orientation(face_orientation);
             }
           this->face_orientations[i] = face_orientation;
         }
