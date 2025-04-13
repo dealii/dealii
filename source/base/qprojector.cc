@@ -186,14 +186,7 @@ namespace internal
         return {};
       }
 
-      Quadrature<2>
-      mutate_quadrature(const Quadrature<2>               &quadrature,
-                        const types::geometric_orientation combined_orientation)
-      {
-        return Quadrature<2>(mutate_points_with_offset(quadrature.get_points(),
-                                                       combined_orientation),
-                             quadrature.get_weights());
-      }
+
 
       std::pair<unsigned int, RefinementCase<2>>
       select_subface_no_and_refinement_case(
@@ -492,67 +485,25 @@ QProjector<dim>::project_to_face(const ReferenceCell       &reference_cell,
   AssertIndexRange(orientation, reference_cell.n_face_orientations(face_no));
   AssertDimension(reference_cell.get_dimension(), dim);
 
-  std::vector<Point<dim>> q_points;
-  std::vector<double>     q_weights = quadrature.get_weights();
-  q_points.reserve(quadrature.size());
-  if constexpr (dim == 1)
-    {
-      AssertDimension(quadrature.size(), 1);
-      q_points.emplace_back(static_cast<double>(face_no));
-    }
-  else if constexpr (dim == 2)
-    {
-      if (reference_cell == ReferenceCells::Triangle)
-        // use linear polynomial to map the reference quadrature points
-        // correctly on faces, i.e., BarycentricPolynomials<1>(1)
-        for (unsigned int p = 0; p < quadrature.size(); ++p)
-          {
-            if (face_no == 0)
-              q_points.emplace_back(quadrature.point(p)[0], 0);
-            else if (face_no == 1)
-              q_points.emplace_back(1.0 - quadrature.point(p)[0],
-                                    quadrature.point(p)[0]);
-            else if (face_no == 2)
-              q_points.emplace_back(0, 1.0 - quadrature.point(p)[0]);
-            else
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
-      else if (reference_cell == ReferenceCells::Quadrilateral)
-        for (unsigned int p = 0; p < quadrature.size(); ++p)
-          {
-            if (face_no == 0)
-              q_points.emplace_back(0, quadrature.point(p)[0]);
-            else if (face_no == 1)
-              q_points.emplace_back(1, quadrature.point(p)[0]);
-            else if (face_no == 2)
-              q_points.emplace_back(quadrature.point(p)[0], 0);
-            else if (face_no == 3)
-              q_points.emplace_back(quadrature.point(p)[0], 1);
-            else
-              DEAL_II_ASSERT_UNREACHABLE();
-          }
-      else
-        DEAL_II_ASSERT_UNREACHABLE();
+  std::vector<Point<dim>> points;
+  std::vector<double>     weights;
 
-      if (orientation == numbers::reverse_line_orientation)
-        {
-          std::reverse(q_points.begin(), q_points.end());
-          std::reverse(q_weights.begin(), q_weights.end());
-        }
-    }
-  else if constexpr (dim == 3)
-    {
-      Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
-      const Quadrature<2> mutation =
-        internal::QProjector::mutate_quadrature(quadrature, orientation);
-      return QProjector<3>::project_to_face(reference_cell, mutation, face_no);
-    }
-  else
-    {
-      DEAL_II_ASSERT_UNREACHABLE();
-    }
+  const ReferenceCell face_reference_cell =
+    reference_cell.face_reference_cell(face_no);
+  std::vector<Point<dim>> face_vertices(face_reference_cell.n_vertices());
+  for (const unsigned int vertex_no : face_reference_cell.vertex_indices())
+    face_vertices[vertex_no] =
+      reference_cell.face_vertex_location<dim>(face_no, vertex_no);
+  internal::QProjector::append_subobject_rule(face_reference_cell,
+                                              quadrature,
+                                              face_vertices,
+                                              reference_cell.face_measure(
+                                                face_no),
+                                              orientation,
+                                              points,
+                                              weights);
 
-  return Quadrature<dim>(std::move(q_points), std::move(q_weights));
+  return Quadrature<dim>(std::move(points), std::move(weights));
 }
 
 
