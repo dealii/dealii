@@ -770,95 +770,32 @@ QProjector<dim>::project_to_all_faces(
   const ReferenceCell            &reference_cell,
   const hp::QCollection<dim - 1> &quadrature)
 {
-  const auto process = [&](const std::vector<std::vector<Point<dim>>> &faces) {
-    // new (projected) quadrature points and weights
-    std::vector<Point<dim>> points;
-    std::vector<double>     weights;
+  std::vector<Point<dim>> points;
+  std::vector<double>     weights;
 
-    // loop over all faces (triangles) ...
-    for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
-      {
-        const ReferenceCell face_reference_cell =
-          reference_cell.face_reference_cell(face_no);
-
-        // ... and over all possible orientations
-        for (types::geometric_orientation orientation = 0;
-             orientation < reference_cell.n_face_orientations(face_no);
-             ++orientation)
-          {
-            const auto &face = faces[face_no];
-
-            // The goal of this function is to compute identical sets of
-            // quadrature points on the common face of two abutting cells. Our
-            // orientation convention is that, given such a pair of abutting
-            // cells:
-            //
-            // 1. The shared face, from the perspective of the first cell, is
-            //    in the default orientation.
-            // 2. The shared face, from the perspective of the second cell, has
-            //    its orientation computed relative to the first cell: i.e.,
-            //    'orientation' is the vertex permutation applied to the first
-            //    cell's face to get the second cell's face.
-            //
-            // The first case is trivial since points do not need to be
-            // oriented. However, in the second case, we need to use the
-            // *reverse* of the stored orientation (i.e., the permutation
-            // applied to the second cell's face which yields the first cell's
-            // face) so that we get identical quadrature points.
-            //
-            // For more information see connectivity.h.
-            const boost::container::small_vector<Point<dim>, 8> support_points =
-              face_reference_cell.permute_by_combined_orientation<Point<dim>>(
-                face,
-                face_reference_cell.get_inverse_combined_orientation(
-                  orientation));
-
-            // the quadrature rule to be projected ...
-            const auto &sub_quadrature_points =
-              quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
-            const auto &sub_quadrature_weights =
-              quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
-
-            // loop over all quadrature points
-            for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
-              {
-                Point<dim> mapped_point;
-
-                // map reference quadrature point
-                for (const unsigned int i :
-                     face_reference_cell.vertex_indices())
-                  mapped_point += support_points[i] *
-                                  face_reference_cell.d_linear_shape_function(
-                                    sub_quadrature_points[j], i);
-
-                points.push_back(mapped_point);
-
-                // rescale quadrature weights so that the sum of the weights on
-                // each face equals the measure of that face.
-                const double scaling = reference_cell.face_measure(face_no) /
-                                       face_reference_cell.volume();
-                weights.push_back(sub_quadrature_weights[j] * scaling);
-              }
-          }
-      }
-
-    // construct new quadrature rule
-    return Quadrature<dim>(std::move(points), std::move(weights));
-  };
-
-  std::vector<std::vector<Point<dim>>> face_vertex_locations(
-    reference_cell.n_faces());
-  for (const unsigned int f : reference_cell.face_indices())
+  for (const unsigned int face_no : reference_cell.face_indices())
     {
-      face_vertex_locations[f].resize(
-        reference_cell.face_reference_cell(f).n_vertices());
-      for (const unsigned int v :
-           reference_cell.face_reference_cell(f).vertex_indices())
-        face_vertex_locations[f][v] =
-          reference_cell.face_vertex_location<dim>(f, v);
+      const ReferenceCell face_reference_cell =
+        reference_cell.face_reference_cell(face_no);
+      std::vector<Point<dim>> face_vertices(face_reference_cell.n_vertices());
+      for (const unsigned int vertex_no : face_reference_cell.vertex_indices())
+        face_vertices[vertex_no] =
+          reference_cell.face_vertex_location<dim>(face_no, vertex_no);
+
+      for (types::geometric_orientation combined_orientation = 0;
+           combined_orientation < reference_cell.n_face_orientations(face_no);
+           ++combined_orientation)
+        internal::QProjector::append_subobject_rule(
+          face_reference_cell,
+          quadrature[quadrature.size() == 1 ? 0 : face_no],
+          face_vertices,
+          reference_cell.face_measure(face_no),
+          combined_orientation,
+          points,
+          weights);
     }
 
-  return process(face_vertex_locations);
+  return Quadrature<dim>(std::move(points), std::move(weights));
 }
 
 
