@@ -334,6 +334,70 @@ namespace internal
 
         return std::make_pair(final_subface_no, final_ref_case);
       }
+
+      /**
+       * Append the points and weights of a quadrature rule projected onto a
+       * subobject (either face or subface) to the end of two vectors. These
+       * vectors should ultimately be indexed with a
+       * QProjector::DataSetDescriptor.
+       *
+       * The goal of this function (as used by QProjector and then FEFaceValues)
+       * is to compute identical sets of quadrature points on the common face of
+       * two abutting cells. Our orientation convention is that, given such a
+       * pair of abutting cells:
+       *
+       * 1. The shared face, from the perspective of the first cell, is
+       *    in the default orientation.
+       * 2. The shared face, from the perspective of the second cell, has
+       *    its orientation computed relative to the first cell: i.e.,
+       *    'orientation' is the vertex permutation applied to the first
+       *    cell's face to get the second cell's face.
+       *
+       * The first case is trivial since points do not need to be
+       * oriented. However, in the second case, we need to use the
+       * *reverse* of the stored orientation (i.e., the permutation
+       * applied to the second cell's face which yields the first cell's
+       * face) so that we get identical quadrature points.
+       *
+       * For more information see connectivity.h.
+       */
+      template <int dim>
+      void
+      append_subobject_rule(
+        const ReferenceCell               &face_reference_cell,
+        const Quadrature<dim - 1>         &quadrature,
+        const std::vector<Point<dim>>     &vertices,
+        const double                       measure,
+        const types::geometric_orientation combined_orientation,
+        std::vector<Point<dim>>           &points,
+        std::vector<double>               &weights)
+      {
+        const auto support_points =
+          face_reference_cell.permute_by_combined_orientation(
+            make_const_array_view(vertices),
+            face_reference_cell.get_inverse_combined_orientation(
+              combined_orientation));
+
+        for (unsigned int j = 0; j < quadrature.size(); ++j)
+          {
+            Point<dim> mapped_point;
+
+            // map reference quadrature point
+            for (const unsigned int vertex_no :
+                 face_reference_cell.vertex_indices())
+              mapped_point +=
+                support_points[vertex_no] *
+                face_reference_cell.d_linear_shape_function(quadrature.point(j),
+                                                            vertex_no);
+
+            points.push_back(mapped_point);
+
+            // rescale quadrature weights so that the sum of the weights on
+            // each face equals the measure of that face.
+            weights.push_back(quadrature.weight(j) * measure /
+                              face_reference_cell.volume());
+          }
+      }
     } // namespace
   }   // namespace QProjector
 } // namespace internal
