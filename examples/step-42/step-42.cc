@@ -492,11 +492,11 @@ namespace Step42
     template <int dim>
     double BitmapFile<dim>::get_value(const double x, const double y) const
     {
-      const int ix = std::min(std::max(static_cast<int>(x / hx), 0), nx - 2);
-      const int iy = std::min(std::max(static_cast<int>(y / hy), 0), ny - 2);
+      const int ix = std::clamp(static_cast<int>(x / hx), 0, nx - 2);
+      const int iy = std::clamp(static_cast<int>(y / hy), 0, ny - 2);
 
-      const double xi  = std::min(std::max((x - ix * hx) / hx, 1.), 0.);
-      const double eta = std::min(std::max((y - iy * hy) / hy, 1.), 0.);
+      const double xi  = std::clamp((x - ix * hx) / hx, 0., 1.);
+      const double eta = std::clamp((y - iy * hy) / hy, 0., 1.);
 
       return ((1 - xi) * (1 - eta) * get_pixel_value(ix, iy) +
               xi * (1 - eta) * get_pixel_value(ix + 1, iy) +
@@ -1237,7 +1237,7 @@ namespace Step42
                 {
                   // At each quadrature point (i.e., at each support point of a
                   // degree of freedom located on the contact boundary), we then
-                  // ask whether it is part of the z-displacement degrees of
+                  // ask whether it is part of the $z$-displacement degrees of
                   // freedom and if we haven't encountered this degree of
                   // freedom yet (which can happen for those on the edges
                   // between faces), we need to evaluate the gap between the
@@ -1248,12 +1248,12 @@ namespace Step42
                   // to the correct value, and add the index to the IndexSet
                   // object that stores which degree of freedom is part of the
                   // contact:
-                  const unsigned int component =
-                    fe.face_system_to_component_index(q_point).first;
+                  const FEValuesExtractors::Scalar z_displacement(2);
 
                   const unsigned int index_z = dof_indices[q_point];
 
-                  if ((component == 2) && (dof_touched[index_z] == false))
+                  if (fe.shape_function_belongs_to(q_point, z_displacement) &&
+                      (dof_touched[index_z] == false))
                     {
                       dof_touched[index_z] = true;
 

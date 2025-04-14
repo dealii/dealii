@@ -528,17 +528,13 @@ constexpr bool is_assignable(const Kokkos::View<ViewTDst...>& dst,
 
 namespace Kokkos {
 
-namespace {
+inline constexpr Kokkos::Impl::ALL_t ALL = Kokkos::Impl::ALL_t();
 
-constexpr Kokkos::Impl::ALL_t ALL = Kokkos::Impl::ALL_t();
-
-constexpr Kokkos::Impl::WithoutInitializing_t WithoutInitializing =
+inline constexpr Kokkos::Impl::WithoutInitializing_t WithoutInitializing =
     Kokkos::Impl::WithoutInitializing_t();
 
-constexpr Kokkos::Impl::AllowPadding_t AllowPadding =
+inline constexpr Kokkos::Impl::AllowPadding_t AllowPadding =
     Kokkos::Impl::AllowPadding_t();
-
-}  // namespace
 
 /** \brief  Create View allocation parameter bundle from argument list.
  *

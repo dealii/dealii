@@ -83,8 +83,8 @@ function(copy_target_properties _destination_target)
         #
         if("${_lib}" MATCHES "::")
           message(FATAL_ERROR
-            "Undefined imported target name »${_lib}« present in interface "
-            "of target »${_entry}«."
+            "Undefined imported target name \"${_lib}\" present in interface "
+            "of target \"${_entry}\"."
             )
         endif()
         list(APPEND _libraries ${_lib})
@@ -154,4 +154,3 @@ function(copy_target_properties _destination_target)
     target_link_options(${_destination_target} INTERFACE ${_link_options})
   endif()
 endfunction()
-

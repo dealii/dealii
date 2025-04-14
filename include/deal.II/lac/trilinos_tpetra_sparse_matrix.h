@@ -2045,17 +2045,12 @@ namespace LinearAlgebra
             colnum_cache->resize(colnums);
           }
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
         typename TpetraTypes::MatrixType<Number, MemorySpace>::
           nonconst_global_inds_host_view_type col_indices(colnum_cache->data(),
                                                           colnums);
         typename TpetraTypes::MatrixType<Number, MemorySpace>::
           nonconst_values_host_view_type values(value_cache->data(), colnums);
-#  else
-        Teuchos::ArrayView<dealii::types::signed_global_dof_index> col_indices(
-          *colnum_cache);
-        Teuchos::ArrayView<Number> values(*value_cache);
-#  endif
+
         matrix->trilinos_matrix().getGlobalRowCopy(this->a_row,
                                                    col_indices,
                                                    values,

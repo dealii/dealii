@@ -13,7 +13,24 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/parallel.h>
+
+#ifdef DEAL_II_WITH_TASKFLOW
+#  include <deal.II/base/multithread_info.h>
+
+#  include <taskflow/algorithm/for_each.hpp>
+#  include <taskflow/taskflow.hpp>
+#endif
+
+#ifdef DEAL_II_WITH_TBB
+#  include <tbb/blocked_range.h>
+#  include <tbb/parallel_for.h>
+#  include <tbb/parallel_reduce.h>
+#  include <tbb/partitioner.h>
+#else
+#  include <boost/range/iterator_range.hpp>
+#endif
 
 
 DEAL_II_NAMESPACE_OPEN

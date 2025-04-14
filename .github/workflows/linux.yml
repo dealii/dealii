@@ -1,4 +1,4 @@
-name: github-linux
+name: linux
 
 on:
   push:
@@ -24,15 +24,15 @@ env:
 
 jobs:
 
-  ########################
-  # linux-release-serial #
-  ########################
+  ##################
+  # release-serial #
+  ##################
 
-  linux-release-serial:
+  release-serial:
     # simple serial release build using g++
 
-    name: linux release serial
-    runs-on: [ubuntu-22.04]
+    name: ${{ matrix.ubuntu_version }} release serial
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -42,8 +42,13 @@ jobs:
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [jammy, noble]
+
     container:
-      image: dealii/dependencies:jammy
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}
       options: --user root
 
     steps:
@@ -79,15 +84,15 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  ########################
-  # linux-debug-parallel #
-  ########################
+  ##################
+  # debug-parallel #
+  ##################
 
-  linux-debug-parallel:
+  debug-parallel:
     # simple parallel debug build using g++
 
-    name: linux debug parallel
-    runs-on: [ubuntu-22.04]
+    name: ${{ matrix.ubuntu_version }} ${{ matrix.architecture }} debug parallel
+    runs-on: ${{ matrix.os }}
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -97,8 +102,21 @@ jobs:
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [jammy, noble]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        include:
+          - os: ubuntu-24.04
+            architecture: amd64
+            flags:
+          - os: ubuntu-24.04-arm
+            architecture: arm64
+            flags: -mno-outline-atomics
+
     container:
-      image: dealii/dependencies:jammy
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
@@ -112,7 +130,7 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++20 ${{ matrix.flags }}' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_CGAL="ON" \
@@ -142,15 +160,15 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  ###############################
-  # linux-debug-parallel-tpetra #
-  ###############################
+  #########################
+  # debug-parallel-tpetra #
+  #########################
 
-  linux-debug-parallel-tpetra:
+  debug-parallel-tpetra:
     # simple parallel debug build using g++ and trilinos+tpetra
 
-    name: linux debug parallel tpetra
-    runs-on: [ubuntu-22.04]
+    name: ${{ matrix.ubuntu_version }} debug parallel tpetra
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -160,8 +178,13 @@ jobs:
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [jammy, noble]
+
     container:
-      image: dealii/dependencies:jammy
+      image: dealii/dependencies:${{ matrix.ubuntu_version }}
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
@@ -199,17 +222,17 @@ jobs:
         make setup_tests_trilinos_tpetra
         ctest -VV
 
-  ############################
-  # linux-debug-intel-oneapi #
-  ############################
+  ######################
+  # debug-intel-oneapi #
+  ######################
 
-  linux-debug-intel-oneapi:
+  debug-intel-oneapi:
     # parallel debug build with Intel oneAPI including MPI and MKL
     #
     # Based on https://github.com/oneapi-src/oneapi-ci
     # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
 
-    name: linux debug intel oneapi
+    name: jammy debug intel oneapi
     runs-on: [ubuntu-22.04]
 
     #
@@ -269,15 +292,15 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  #######################
-  # linux-debug-cuda-11 #
-  #######################
+  #################
+  # debug-cuda-11 #
+  #################
 
-  linux-debug-cuda-11:
+  debug-cuda-11:
     # simple parallel debug build using cuda-11
 
-    name: linux debug cuda-11
-    runs-on: [ubuntu-20.04]
+    name: jammy debug cuda-11
+    runs-on: [ubuntu-22.04]
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -294,10 +317,10 @@ jobs:
     - uses: actions/checkout@v4
     - name: modules
       run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
-        sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
-        sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+        sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
+        sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
         sudo apt-get install -y software-properties-common
         sudo add-apt-repository ppa:ginggs/deal.ii-9.4.0-backports
         sudo apt-get update
@@ -322,7 +345,7 @@ jobs:
         sudo apt-get remove -y '^dotnet-.*'
         sudo apt-get remove -y '^llvm-.*'
         sudo apt-get remove -y 'php.*'
-        sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel
+        sudo apt-get remove -y azure-cli google-cloud-sdk google-chrome-stable firefox powershell mono-devel
         sudo apt-get autoremove -y
         sudo apt-get clean
         df -h
@@ -381,14 +404,14 @@ jobs:
         cd tests/matrix_free_kokkos
         make compile_test_executables
 
-  #############################
-  # linux-debug-cuda-11-clang #
-  #############################
+  #######################
+  # debug-cuda-11-clang #
+  #######################
 
-  linux-debug-cuda-11-clang:
+  debug-cuda-11-clang:
     # simple parallel debug build using cuda-11 and clang
 
-    name: linux debug cuda-11 clang
+    name: jammy debug cuda-11 clang
     runs-on: [ubuntu-22.04]
 
     #
@@ -443,6 +466,7 @@ jobs:
               -D CMAKE_CXX_COMPILER=clang++-18 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               -D Kokkos_ENABLE_CUDA=ON \
+              -D Kokkos_ARCH_NATIVE=ON \
               -D Kokkos_ARCH_VOLTA70=ON \
               ..
         make install

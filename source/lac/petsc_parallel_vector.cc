@@ -317,33 +317,32 @@ namespace PETScWrappers
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
 
-#  ifdef DEBUG
-      {
-        // test ghost allocation in debug mode
-        PetscInt begin, end;
+      if constexpr (running_in_debug_mode())
+        {
+          // test ghost allocation in debug mode
+          PetscInt begin, end;
 
-        ierr = VecGetOwnershipRange(vector, &begin, &end);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+          ierr = VecGetOwnershipRange(vector, &begin, &end);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        AssertDimension(locally_owned_size,
-                        static_cast<size_type>(end - begin));
+          AssertDimension(locally_owned_size,
+                          static_cast<size_type>(end - begin));
 
-        Vec l;
-        ierr = VecGhostGetLocalForm(vector, &l);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+          Vec l;
+          ierr = VecGhostGetLocalForm(vector, &l);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        PetscInt lsize;
-        ierr = VecGetSize(l, &lsize);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+          PetscInt lsize;
+          ierr = VecGetSize(l, &lsize);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        ierr = VecGhostRestoreLocalForm(vector, &l);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+          ierr = VecGhostRestoreLocalForm(vector, &l);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-        AssertDimension(lsize,
-                        end - begin +
-                          static_cast<PetscInt>(ghost_indices.n_elements()));
-      }
-#  endif
+          AssertDimension(lsize,
+                          end - begin +
+                            static_cast<PetscInt>(ghost_indices.n_elements()));
+        }
     }
 
 

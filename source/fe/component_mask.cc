@@ -13,6 +13,8 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/base/memory_consumption.h>
+
 #include <deal.II/fe/component_mask.h>
 
 #include <iostream>

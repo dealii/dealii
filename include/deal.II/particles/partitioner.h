@@ -19,6 +19,9 @@
 
 #include <deal.II/particles/particle_iterator.h>
 
+#include <vector>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Particles

@@ -66,4 +66,3 @@ macro(check_mpi_interface _feature _var)
     endif()
   endif()
 endmacro()
-

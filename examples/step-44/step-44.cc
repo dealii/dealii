@@ -524,7 +524,9 @@ namespace Step44
       , J_tilde(1.0)
       , b_bar(Physics::Elasticity::StandardTensors<dim>::I)
     {
-      Assert(kappa > 0, ExcInternalError());
+      Assert(kappa > 0,
+             ExcMessage("The parameters mu and nu need to be so that kappa "
+                        "has a positive value."));
     }
 
     // We update the material model with various deformation dependent data
@@ -535,13 +537,14 @@ namespace Step44
                               const double          p_tilde_in,
                               const double          J_tilde_in)
     {
-      det_F                      = determinant(F);
+      det_F = determinant(F);
+      Assert(det_F > 0,
+             ExcMessage("The tensor F must have a positive determinant."));
+
       const Tensor<2, dim> F_bar = Physics::Elasticity::Kinematics::F_iso(F);
       b_bar                      = Physics::Elasticity::Kinematics::b(F_bar);
       p_tilde                    = p_tilde_in;
       J_tilde                    = J_tilde_in;
-
-      Assert(det_F > 0, ExcInternalError());
     }
 
     // The second function determines the Kirchhoff stress $\boldsymbol{\tau}
@@ -837,10 +840,8 @@ namespace Step44
     // Set up the finite element system to be solved:
     void system_setup();
 
-    void determine_component_extractors();
-
     // Create Dirichlet constraints for the incremental displacement field:
-    void make_constraints(const int it_nr);
+    void make_constraints(const unsigned int it_nr);
 
     // Several functions to assemble the system and right hand side matrices
     // using multithreading. Each of them comes as a wrapper function, one
@@ -919,22 +920,26 @@ namespace Step44
     // polynomial degree, the degree-of-freedom handler, number of DoFs per
     // cell and the extractor objects used to retrieve information from the
     // solution vectors:
-    const unsigned int               degree;
-    const FESystem<dim>              fe;
-    DoFHandler<dim>                  dof_handler;
-    const unsigned int               dofs_per_cell;
-    const FEValuesExtractors::Vector u_fe;
-    const FEValuesExtractors::Scalar p_fe;
-    const FEValuesExtractors::Scalar J_fe;
+    const unsigned int  degree;
+    const FESystem<dim> fe;
+    DoFHandler<dim>     dof_handler;
+    const unsigned int  dofs_per_cell;
 
     // Description of how the block-system is arranged. There are 3 blocks,
     // the first contains a vector DOF $\mathbf{u}$ while the other two
     // describe scalar DOFs, $\widetilde{p}$ and $\widetilde{J}$.
-    static const unsigned int n_blocks          = 3;
-    static const unsigned int n_components      = dim + 2;
-    static const unsigned int first_u_component = 0;
-    static const unsigned int p_component       = dim;
-    static const unsigned int J_component       = dim + 1;
+    static constexpr unsigned int n_blocks          = 3;
+    static constexpr unsigned int n_components      = dim + 2;
+    static constexpr unsigned int first_u_component = 0;
+    static constexpr unsigned int p_component       = dim;
+    static constexpr unsigned int J_component       = dim + 1;
+
+    static constexpr FEValuesExtractors::Vector u_fe =
+      FEValuesExtractors::Vector(first_u_component);
+    static constexpr FEValuesExtractors::Scalar p_fe =
+      FEValuesExtractors::Scalar(p_component);
+    static constexpr FEValuesExtractors::Scalar J_fe =
+      FEValuesExtractors::Scalar(J_component);
 
     enum
     {
@@ -1045,9 +1050,6 @@ namespace Step44
        FE_DGP<dim>(parameters.poly_degree - 1)) // dilatation
     , dof_handler(triangulation)
     , dofs_per_cell(fe.n_dofs_per_cell())
-    , u_fe(first_u_component)
-    , p_fe(p_component)
-    , J_fe(J_component)
     , dofs_per_block(n_blocks)
     , qf_cell(parameters.quad_order)
     , qf_face(parameters.quad_order)
@@ -1056,7 +1058,25 @@ namespace Step44
   {
     Assert(dim == 2 || dim == 3,
            ExcMessage("This problem only works in 2 or 3 space dimensions."));
-    determine_component_extractors();
+
+    // Next we compute some information from the FE system that describes which
+    // local element DOFs are attached to which block component.  This is used
+    // later to extract sub-blocks from the global matrix.
+    //
+    // In essence, all we need is for the FESystem object to indicate to which
+    // block component a DOF is attached. We can do that via the
+    // FiniteElement::shape_function_belongs_to() function.
+    for (unsigned int k = 0; k < fe.n_dofs_per_cell(); ++k)
+      {
+        if (fe.shape_function_belongs_to(k, u_fe))
+          element_indices_u.push_back(k);
+        else if (fe.shape_function_belongs_to(k, p_fe))
+          element_indices_p.push_back(k);
+        else if (fe.shape_function_belongs_to(k, J_fe))
+          element_indices_J.push_back(k);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+      }
   }
 
 
@@ -1212,11 +1232,10 @@ namespace Step44
       const unsigned int n_dofs_per_cell = Nx[0].size();
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         {
-          Assert(Nx[q_point].size() == n_dofs_per_cell, ExcInternalError());
-          Assert(grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
-          Assert(symm_grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
+          AssertDimension(Nx[q_point].size(), n_dofs_per_cell);
+          AssertDimension(grad_Nx[q_point].size(), n_dofs_per_cell);
+          AssertDimension(symm_grad_Nx[q_point].size(), n_dofs_per_cell);
+
           for (unsigned int k = 0; k < n_dofs_per_cell; ++k)
             {
               Nx[q_point][k]           = 0.0;
@@ -1499,38 +1518,6 @@ namespace Step44
   }
 
 
-  // @sect4{Solid::determine_component_extractors}
-  // Next we compute some information from the FE system that describes which
-  // local element DOFs are attached to which block component.  This is used
-  // later to extract sub-blocks from the global matrix.
-  //
-  // In essence, all we need is for the FESystem object to indicate to which
-  // block component a DOF on the reference cell is attached to.  Currently, the
-  // interpolation fields are setup such that 0 indicates a displacement DOF, 1
-  // a pressure DOF and 2 a dilatation DOF.
-  template <int dim>
-  void Solid<dim>::determine_component_extractors()
-  {
-    element_indices_u.clear();
-    element_indices_p.clear();
-    element_indices_J.clear();
-
-    for (unsigned int k = 0; k < fe.n_dofs_per_cell(); ++k)
-      {
-        const unsigned int k_group = fe.system_to_base_index(k).first.first;
-        if (k_group == u_dof)
-          element_indices_u.push_back(k);
-        else if (k_group == p_dof)
-          element_indices_p.push_back(k);
-        else if (k_group == J_dof)
-          element_indices_J.push_back(k);
-        else
-          {
-            Assert(k_group <= J_dof, ExcInternalError());
-          }
-      }
-  }
-
   // @sect4{Solid::setup_qph}
   // The method used to store quadrature information is already described in
   // step-18. Here we implement a similar setup for a SMP machine.
@@ -1553,7 +1540,7 @@ namespace Step44
       {
         const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        AssertDimension(lqph.size(), n_q_points);
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           lqph[q_point]->setup_lqp(parameters);
@@ -1605,14 +1592,11 @@ namespace Step44
   {
     const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
+    AssertDimension(lqph.size(), n_q_points);
 
-    Assert(scratch.solution_grads_u_total.size() == n_q_points,
-           ExcInternalError());
-    Assert(scratch.solution_values_p_total.size() == n_q_points,
-           ExcInternalError());
-    Assert(scratch.solution_values_J_total.size() == n_q_points,
-           ExcInternalError());
+    AssertDimension(scratch.solution_grads_u_total.size(), n_q_points);
+    AssertDimension(scratch.solution_values_p_total.size(), n_q_points);
+    AssertDimension(scratch.solution_values_J_total.size(), n_q_points);
 
     scratch.reset();
 
@@ -1820,7 +1804,7 @@ namespace Step44
         // marking this update function as constant.
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        AssertDimension(lqph.size(), n_q_points);
 
         for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
@@ -1854,7 +1838,7 @@ namespace Step44
 
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        AssertDimension(lqph.size(), n_q_points);
 
         for (const unsigned int q_point : fe_values.quadrature_point_indices())
           {
@@ -1999,7 +1983,7 @@ namespace Step44
 
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
+    AssertDimension(lqph.size(), n_q_points);
 
     for (const unsigned int q_point :
          scratch.fe_values.quadrature_point_indices())
@@ -2023,7 +2007,7 @@ namespace Step44
               scratch.Nx[q_point][k] =
                 scratch.fe_values[J_fe].value(k, q_point);
             else
-              Assert(k_group <= J_dof, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
           }
       }
 
@@ -2085,7 +2069,7 @@ namespace Step44
             else if (i_group == J_dof)
               data.cell_rhs(i) -= N[i] * (dPsi_vol_dJ - p_tilde) * JxW;
             else
-              Assert(i_group <= J_dof, ExcInternalError());
+              DEAL_II_ASSERT_UNREACHABLE();
 
             // Before we go into the inner loop, we have one final chance to
             // introduce some optimizations. We've already taken into account
@@ -2128,7 +2112,7 @@ namespace Step44
                 // contribution. It comprises a material contribution, and a
                 // geometrical stress contribution which is only added along
                 // the local matrix diagonals:
-                if ((i_group == j_group) && (i_group == u_dof))
+                if ((i_group == u_dof) && (j_group == u_dof)) // UU block
                   {
                     // The material contribution:
                     data.cell_matrix(i, j) += symm_grad_Nx_i_x_Jc *  //
@@ -2141,7 +2125,7 @@ namespace Step44
                   }
                 // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} u}$
                 // contribution
-                else if ((i_group == p_dof) && (j_group == u_dof))
+                else if ((i_group == p_dof) && (j_group == u_dof)) // PU block
                   {
                     data.cell_matrix(i, j) += N[i] * det_F *               //
                                               (symm_grad_Nx[j] * I) * JxW; //
@@ -2149,13 +2133,16 @@ namespace Step44
                 // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J}
                 // \widetilde{p}}$ and $\mathsf{\mathbf{k}}_{ \widetilde{J}
                 // \widetilde{J}}$ contributions:
-                else if ((i_group == J_dof) && (j_group == p_dof))
+                else if ((i_group == J_dof) && (j_group == p_dof)) // JP block
                   data.cell_matrix(i, j) -= N[i] * N[j] * JxW;
-                else if ((i_group == j_group) && (i_group == J_dof))
+                else if ((i_group == J_dof) && (j_group == J_dof)) // JJ block
                   data.cell_matrix(i, j) += N[i] * d2Psi_vol_dJ2 * N[j] * JxW;
+                else if ((i_group <= J_dof) && (j_group <= J_dof))
+                  {
+                    /* Nothing to do for the remaining blocks. */
+                  }
                 else
-                  Assert((i_group <= J_dof) && (j_group <= J_dof),
-                         ExcInternalError());
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
           }
       }
@@ -2235,7 +2222,7 @@ namespace Step44
   // are hard to debug. In this spirit, we choose to make the code more verbose
   // in terms of what operations are performed at each Newton step.
   template <int dim>
-  void Solid<dim>::make_constraints(const int it_nr)
+  void Solid<dim>::make_constraints(const unsigned int it_nr)
   {
     // Since we (a) are dealing with an iterative Newton method, (b) are using
     // an incremental formulation for the displacement, and (c) apply the

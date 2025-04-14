@@ -19,14 +19,13 @@
 // rows that are emptied with clear_rows(). This results in errors
 // when reusing the matrix later.
 
+#include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
 #include "../tests.h"
-
-// #include <mpi.h>
 
 
 void

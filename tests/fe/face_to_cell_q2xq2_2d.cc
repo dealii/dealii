@@ -35,7 +35,8 @@ test()
     {
       deallog << "Face=" << face << std::endl;
 
-      for (unsigned char orientation = 0; orientation < 2; ++orientation)
+      for (types::geometric_orientation orientation = 0; orientation < 2;
+           ++orientation)
         {
           deallog << "  orientation=" << (orientation == 0 ? "false" : "true")
                   << std::endl

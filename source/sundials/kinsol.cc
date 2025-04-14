@@ -46,6 +46,7 @@
 #  else
 #    include <kinsol/kinsol_direct.h>
 #  endif
+#  include <kinsol/kinsol.h>
 #  include <sunlinsol/sunlinsol_dense.h>
 #  include <sunmatrix/sunmatrix_dense.h>
 
@@ -413,10 +414,10 @@ namespace SUNDIALS
             }
           if (LS->ops)
             {
-              free(LS->ops);
+              std::free(LS->ops);
               LS->ops = nullptr;
             }
-          free(LS);
+          std::free(LS);
           LS = nullptr;
           return 0;
         };
@@ -470,10 +471,10 @@ namespace SUNDIALS
             }
           if (A->ops)
             {
-              free(A->ops);
+              std::free(A->ops);
               A->ops = nullptr;
             }
-          free(A);
+          std::free(A);
           A = nullptr;
         };
 

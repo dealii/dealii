@@ -1,4 +1,4 @@
-name: github-OSX
+name: osx
 
 on:
   push:
@@ -23,11 +23,11 @@ env:
   MAKEFLAGS: "--jobs=3"
 
 jobs:
-  osx-serial:
+  serial:
     # simple serial build using apple clang
 
-    name: OSX serial
-    runs-on: [macos-latest]
+    name: ${{ matrix.os }} serial
+    runs-on: ${{ matrix.os }}
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -36,6 +36,11 @@ jobs:
     # requests.
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14]
 
     steps:
     - uses: actions/checkout@v4
@@ -65,11 +70,11 @@ jobs:
           setup_tests_quick_tests
         ctest -VV
 
-  osx-parallel64:
+  parallel64:
     # MPI build using apple clang and 64 bit indices
 
-    name: OSX parallel 64bit
-    runs-on: [macos-latest]
+    name: ${{ matrix.os }} parallel 64bit
+    runs-on: ${{ matrix.os }}
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -78,6 +83,11 @@ jobs:
     # requests.
     #
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14]
 
     steps:
     - uses: actions/checkout@v4

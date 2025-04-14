@@ -537,7 +537,6 @@ Step4<dim>::solve(int cycle)
   //     deallog.pop();
   //   }
 
-#if DEAL_II_TRILINOS_VERSION_GTE(13, 0, 0)
   {
     // Make sure the general Ifpack preconditioner throws an Exception for an
     // unsupported solver.
@@ -558,7 +557,6 @@ Step4<dim>::solve(int cycle)
       }
     deallog.pop();
   }
-#endif
 
   deallog.pop();
 }

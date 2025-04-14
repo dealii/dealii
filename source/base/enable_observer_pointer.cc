@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 #include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 
 #include <algorithm>
@@ -57,60 +58,60 @@ EnableObserverPointer::check_no_subscribers() const noexcept
   // derived class. Note that the name may be mangled, so it need not be the
   // clear-text class name. However, you can obtain the latter by running the
   // c++filt program over the output.
-#ifdef DEBUG
-
-  // If there are still active pointers, show a message and kill the program.
-  // However, under some circumstances, this is not so desirable. For example,
-  // in code like this:
-  //
-  //     Triangulation tria;
-  //     DoFHandler *dh = new DoFHandler(tria);
-  //     ...some function that throws an exception
-  //
-  // the exception will lead to the destruction of the triangulation, but since
-  // the dof_handler is on the heap it will not be destroyed. This will trigger
-  // an assertion in the triangulation. If we kill the program at this point, we
-  // will never be able to learn what caused the problem. In this situation,
-  // just display a message and continue the program.
-  if (counter != 0)
+  if constexpr (running_in_debug_mode())
     {
-      if (std::uncaught_exceptions() == 0)
+      // If there are still active pointers, show a message and kill the
+      // program. However, under some circumstances, this is not so desirable.
+      // For example, in code like this:
+      //
+      //     Triangulation tria;
+      //     DoFHandler *dh = new DoFHandler(tria);
+      //     ...some function that throws an exception
+      //
+      // the exception will lead to the destruction of the triangulation, but
+      // since the dof_handler is on the heap it will not be destroyed. This
+      // will trigger an assertion in the triangulation. If we kill the program
+      // at this point, we will never be able to learn what caused the problem.
+      // In this situation, just display a message and continue the program.
+      if (counter != 0)
         {
-          std::string infostring;
-          for (const auto &map_entry : counter_map)
+          if (std::uncaught_exceptions() == 0)
             {
-              if (map_entry.second > 0)
-                infostring +=
-                  "\n  from Subscriber " + std::string(map_entry.first);
+              std::string infostring;
+              for (const auto &map_entry : counter_map)
+                {
+                  if (map_entry.second > 0)
+                    infostring +=
+                      "\n  from Subscriber " + std::string(map_entry.first);
+                }
+
+              if (infostring.empty())
+                infostring = "<none>";
+
+              AssertNothrow(counter == 0,
+                            ExcInUse(counter.load(),
+                                     object_info->name(),
+                                     infostring));
             }
-
-          if (infostring.empty())
-            infostring = "<none>";
-
-          AssertNothrow(counter == 0,
-                        ExcInUse(counter.load(),
-                                 object_info->name(),
-                                 infostring));
-        }
-      else
-        {
-          std::cerr
-            << "---------------------------------------------------------"
-            << std::endl
-            << "An object pointed to by a ObserverPointer is being destroyed."
-            << std::endl
-            << "Under normal circumstances, this would abort the program."
-            << std::endl
-            << "However, another exception is being processed at the"
-            << std::endl
-            << "moment, so the program will continue to run to allow"
-            << std::endl
-            << "this exception to be processed." << std::endl
-            << "---------------------------------------------------------"
-            << std::endl;
+          else
+            {
+              std::cerr
+                << "---------------------------------------------------------"
+                << std::endl
+                << "An object pointed to by a ObserverPointer is being destroyed."
+                << std::endl
+                << "Under normal circumstances, this would abort the program."
+                << std::endl
+                << "However, another exception is being processed at the"
+                << std::endl
+                << "moment, so the program will continue to run to allow"
+                << std::endl
+                << "this exception to be processed." << std::endl
+                << "---------------------------------------------------------"
+                << std::endl;
+            }
         }
     }
-#endif
 }
 
 

@@ -28,11 +28,8 @@ template <int dim, int fe_degree>
 void
 test()
 {
-  const SphericalManifold<dim> manifold;
-  Triangulation<dim>           tria;
+  Triangulation<dim> tria;
   GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1., 96, true);
-  tria.set_all_manifold_ids(0);
-  tria.set_manifold(0, manifold);
   if (dim == 2)
     tria.refine_global(2);
 

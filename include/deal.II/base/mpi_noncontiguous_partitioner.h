@@ -17,8 +17,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/vector_operation.h>
 
@@ -318,9 +320,28 @@ namespace Utilities
        * Local index of each entry in recv_buffer within the destination
        * vector.
        *
+       * In the case that an entry is more than once requested by the
+       * same rank, local index of each entry in recv_buffer within
+       * recv_indices_duplicates_ptr.
+       *
        * @note Together with `recv_ptr` this forms a CRS data structure.
        */
       std::vector<types::global_dof_index> recv_indices;
+
+      /**
+       * In the case that an entry is more than once requested by the
+       * same rank, offset of each index in recv_indices_duplicates.
+       */
+      std::vector<unsigned int> recv_indices_duplicates_ptr;
+
+      /**
+       * Local index of each entry within the destination vector in the
+       * case that an entry is more than once requested by the same rank.
+       *
+       * @note Together with `recv_indices_duplicates_ptr`
+       * this forms a CRS data structure.
+       */
+      std::vector<unsigned int> recv_indices_duplicates;
 
       /**
        * Buffer containing the values sorted by rank for sending and receiving.

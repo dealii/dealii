@@ -20,8 +20,11 @@
 #include <deal.II/grid/grid_tools_geometry.h>
 #include <deal.II/grid/grid_tools_topology.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <algorithm>
 #include <map>
+#include <numeric>
 #include <set>
 #include <vector>
 
@@ -63,22 +66,23 @@ namespace GridTools
                                          std::begin(b.vertices),
                                          std::end(b.vertices)))
           return true;
-          // it should never be necessary to check the material or manifold
-          // ids as a 'tiebreaker' (since they must be equal if the vertex
-          // indices are equal). Assert it anyway:
-#ifdef DEBUG
-        if (std::equal(std::begin(a.vertices),
-                       std::end(a.vertices),
-                       std::begin(b.vertices)))
+        // it should never be necessary to check the material or manifold
+        // ids as a 'tiebreaker' (since they must be equal if the vertex
+        // indices are equal). Assert it anyway:
+        if constexpr (running_in_debug_mode())
           {
-            Assert(a.material_id == b.material_id &&
-                     a.manifold_id == b.manifold_id,
-                   ExcMessage(
-                     "Two CellData objects with equal vertices must "
-                     "have the same material/boundary ids and manifold "
-                     "ids."));
+            if (std::equal(std::begin(a.vertices),
+                           std::end(a.vertices),
+                           std::begin(b.vertices)))
+              {
+                Assert(a.material_id == b.material_id &&
+                         a.manifold_id == b.manifold_id,
+                       ExcMessage(
+                         "Two CellData objects with equal vertices must "
+                         "have the same material/boundary ids and manifold "
+                         "ids."));
+              }
           }
-#endif
         return false;
       }
     };
@@ -1957,6 +1961,6 @@ namespace GridTools
 } /* namespace GridTools */
 
 // explicit instantiations
-#include "grid_tools_topology.inst"
+#include "grid/grid_tools_topology.inst"
 
 DEAL_II_NAMESPACE_CLOSE

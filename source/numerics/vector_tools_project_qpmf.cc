@@ -15,9 +15,12 @@
 
 #include <deal.II/numerics/vector_tools_project.templates.h>
 
+#include <functional>
+#include <memory>
+
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------
-#include "vector_tools_project_qpmf.inst"
+#include "numerics/vector_tools_project_qpmf.inst"
 
 DEAL_II_NAMESPACE_CLOSE

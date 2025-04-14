@@ -32,7 +32,6 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     SparsityPattern bl(tr.n_cells(level - 1),
                        dof.n_dofs(level),
                        (1 << dim) * fe.dofs_per_cell);
-    ;
     DoFTools::make_child_patches(bl, dof, level, false, false);
     bl.compress();
     print_patches(bl);
@@ -44,7 +43,6 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     SparsityPattern bl(tr.n_cells(level - 1),
                        dof.n_dofs(level),
                        (1 << dim) * fe.dofs_per_cell);
-    ;
     DoFTools::make_child_patches(bl, dof, level, true, false);
     bl.compress();
     print_patches(bl);
@@ -56,7 +54,6 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     SparsityPattern bl(tr.n_cells(level - 1),
                        dof.n_dofs(level),
                        (1 << dim) * fe.dofs_per_cell);
-    ;
     DoFTools::make_child_patches(bl, dof, level, true, true);
     bl.compress();
     print_patches(bl);

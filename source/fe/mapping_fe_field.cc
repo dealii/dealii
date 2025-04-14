@@ -447,7 +447,12 @@ MappingFEField<dim, spacedim, VectorType>::is_compatible_with(
 
 template <int dim, int spacedim, typename VectorType>
 boost::container::small_vector<Point<spacedim>,
-                               GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
 MappingFEField<dim, spacedim, VectorType>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
@@ -485,7 +490,12 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
     uses_level_dofs ? *euler_vector[cell->level()] : *euler_vector[0];
 
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
     vertices(cell->n_vertices());
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {
@@ -594,10 +604,9 @@ MappingFEField<dim, spacedim, VectorType>::compute_face_data(
           for (unsigned int i = 0; i < n_faces; ++i)
             {
               data.unit_tangentials[i].resize(n_original_q_points);
-              std::fill(
-                data.unit_tangentials[i].begin(),
-                data.unit_tangentials[i].end(),
-                reference_cell.template unit_tangential_vectors<dim>(i, 0));
+              std::fill(data.unit_tangentials[i].begin(),
+                        data.unit_tangentials[i].end(),
+                        reference_cell.template face_tangent_vector<dim>(i, 0));
               if (dim > 2)
                 {
                   data.unit_tangentials[n_faces + i].resize(
@@ -605,7 +614,7 @@ MappingFEField<dim, spacedim, VectorType>::compute_face_data(
                   std::fill(
                     data.unit_tangentials[n_faces + i].begin(),
                     data.unit_tangentials[n_faces + i].end(),
-                    reference_cell.template unit_tangential_vectors<dim>(i, 1));
+                    reference_cell.template face_tangent_vector<dim>(i, 1));
                 }
             }
         }
@@ -2451,7 +2460,7 @@ MappingFEField<dim, spacedim, VectorType>::update_internal_dofs(
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-#include "mapping_fe_field.inst"
+#include "fe/mapping_fe_field.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

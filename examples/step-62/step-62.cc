@@ -1317,11 +1317,10 @@ namespace step62
   template <int dim>
   void ElasticWave<dim>::run()
   {
-#ifdef DEBUG
-    pcout << "Debug mode" << std::endl;
-#else
-    pcout << "Release mode" << std::endl;
-#endif
+    if constexpr (running_in_debug_mode())
+      pcout << "Debug mode" << std::endl;
+    else
+      pcout << "Release mode" << std::endl;
 
     {
       Point<dim> p1;

@@ -20,6 +20,9 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/mg_tools.h>
 
+#include <set>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -296,7 +299,7 @@ MGConstrainedDoFs::merge_constraints(AffineConstraints<Number> &constraints,
   constraints.close();
 }
 
-#include "mg_constrained_dofs.inst"
+#include "multigrid/mg_constrained_dofs.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

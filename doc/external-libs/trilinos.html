@@ -49,9 +49,8 @@
     <h5>Installing Trilinos</h5>
 
     <p style="color: red">
-      Note: The current version of deal.II requires at least Trilinos 12.4
-      (12.14.1 if Trilinos includes Kokkos).
-      Deal.II is known to work with Trilinos up to 13.4. Other versions of
+      Note: The current version of deal.II requires at least Trilinos 13.2.
+      Deal.II is known to work with Trilinos up to 16.0.0. Other versions of
       Trilinos should work too but have not been tested prior to the
       release.
     </p>
@@ -131,29 +130,6 @@
 
 
     <h5>BLAS and LAPACK</h5>
-
-    <p style="color: red">
-      Note: At the time of writing (November 2016) Trilinos (at least up to
-      v12.8.1) cannot link against LAPACK 3.6.0 or later, due to two symbols
-      that were deprecated (and removed by default) in LAPACK 3.6.0 (see the
-      <a href="https://www.netlib.org/lapack/lapack-3.6.0.html">
-      release notes</a>). To fix this, edit the Trilinos file
-      <code>packages/epetra/src/Epetra_LAPACK_wrappers.h</code> and change the
-      lines
-      <pre>
-
-    #define DGGSVD_F77  F77_BLAS_MANGLE(dggsvd,DGGSVD)
-    #define SGGSVD_F77  F77_BLAS_MANGLE(sggsvd,SGGSVD)
-      </pre>
-      to
-      <pre>
-
-    #define DGGSVD_F77  F77_BLAS_MANGLE(dggsvd3,DGGSVD3)
-    #define SGGSVD_F77  F77_BLAS_MANGLE(sggsvd3,SGGSVD3)
-      </pre>
-      before installing Trilinos. (Credit for this fix goes to
-      <a href="https://github.com/gahansen/Albany/wiki/ALCF-Vesta">this page</a>.)
-    </p>
 
     <p>
       Trilinos sometimes searches for other libraries but can't find

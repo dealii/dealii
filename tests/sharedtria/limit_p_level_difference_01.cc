@@ -96,20 +96,21 @@ test(const unsigned int fes_size,
   Utilities::MPI::sum(count, tria.get_mpi_communicator(), count);
   deallog << "fe count:" << count << std::endl;
 
-#ifdef DEBUG
-  // check each cell's active FE index by its distance from the center
-  for (const auto &cell :
-       dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+  if constexpr (running_in_debug_mode())
     {
-      const double       distance = cell->center().distance(Point<dim>());
-      const unsigned int expected_level =
-        (sequence.size() - 1) -
-        max_difference * static_cast<unsigned int>(std::round(distance));
+      // check each cell's active FE index by its distance from the center
+      for (const auto &cell :
+           dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+        {
+          const double       distance = cell->center().distance(Point<dim>());
+          const unsigned int expected_level =
+            (sequence.size() - 1) -
+            max_difference * static_cast<unsigned int>(std::round(distance));
 
-      Assert(cell->active_fe_index() == sequence[expected_level],
-             ExcInternalError());
+          Assert(cell->active_fe_index() == sequence[expected_level],
+                 ExcInternalError());
+        }
     }
-#endif
 
   deallog << "OK" << std::endl;
 }

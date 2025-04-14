@@ -33,6 +33,13 @@
 #include <iomanip>
 #include <memory>
 
+#if defined(DEAL_II_WITH_MPI)
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  include <mpi.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
@@ -44,7 +51,7 @@ namespace LinearAlgebra
    */
   namespace distributed
   {
-    template <typename>
+    template <typename, typename>
     class BlockVector;
   }
 
@@ -1365,6 +1372,16 @@ namespace LinearAlgebra
                         const Vector<Number, MemorySpace> &W);
 
       /**
+       * Assert that there are no spurious non-zero entries in the ghost
+       * region of the vector caused by some forgotten compress() or
+       * zero_out_ghost_values() calls, which is an invariant of the vector
+       * space operations such as the addition of vectors, scaling a vector,
+       * and similar.
+       */
+      void
+      assert_no_residual_content_in_ghost_region() const;
+
+      /**
        * Shared pointer to store the parallel partitioning information. This
        * information can be shared between several vectors that have the same
        * partitioning.
@@ -1455,7 +1472,7 @@ namespace LinearAlgebra
       friend class Vector;
 
       // Make BlockVector type friends.
-      template <typename Number2>
+      template <typename Number2, typename MemorySpace2>
       friend class BlockVector;
     };
     /** @} */

@@ -12,7 +12,6 @@
 //
 // ------------------------------------------------------------------------
 
-
 #ifndef dealii_occ_boundary_lib_h
 #define dealii_occ_boundary_lib_h
 
@@ -20,7 +19,7 @@
 
 #include <deal.II/opencascade/manifold_lib.h>
 
-DEAL_II_WARNING(
-  "This file is deprecated. Use deal.II/opencascade/manifold_lib.h and the classes therein instead.")
+DEAL_II_WARNING("This file is deprecated."
+                "Use deal.II/opencascade/manifold_lib.h instead.")
 
-#endif // dealii_occ_boundary_lib_h
+#endif

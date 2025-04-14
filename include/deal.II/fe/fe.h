@@ -1482,9 +1482,9 @@ public:
    */
   unsigned int
   adjust_quad_dof_index_for_face_orientation(
-    const unsigned int  index,
-    const unsigned int  face_no,
-    const unsigned char combined_orientation) const;
+    const unsigned int                 index,
+    const unsigned int                 face_no,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
@@ -1534,11 +1534,10 @@ public:
    * freedom actually represent.
    */
   virtual unsigned int
-  face_to_cell_index(
-    const unsigned int  face_dof_index,
-    const unsigned int  face,
-    const unsigned char combined_orientation =
-      ReferenceCell::default_combined_face_orientation()) const;
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const;
 
   /**
    * Given a local dof @p index on a line and the orientation @p
@@ -1551,8 +1550,8 @@ public:
    */
   unsigned int
   adjust_line_dof_index_for_line_orientation(
-    const unsigned int  index,
-    const unsigned char combined_orientation) const;
+    const unsigned int                 index,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * Return in which of the vector components of this finite element the @p
@@ -1825,10 +1824,84 @@ public:
   unsigned int
   component_to_block_index(const unsigned int component) const;
 
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the scalar
+   * vector component indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function includes the one vector component
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero in the given vector
+   * component.
+   *
+   * A typical example would be in a program like step-22, where we
+   * might want to know whether a shape function of the combined,
+   * vector-valued element, corresponds to the pressure part of the
+   * solution.
+   */
+  bool
+  shape_function_belongs_to(const unsigned int                shape_function,
+                            const FEValuesExtractors::Scalar &component) const;
+
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the `dim`
+   * vector components indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function overlaps the vector components
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero any of the given vector
+   * components.
+   *
+   * A typical example would be in a program like step-22, where we
+   * might want to know whether a shape function of the combined,
+   * vector-valued element, corresponds to the velocity part of the
+   * solution.
+   */
+  bool
+  shape_function_belongs_to(const unsigned int                shape_function,
+                            const FEValuesExtractors::Vector &components) const;
+
+
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the `dim*(dim+1)/2`
+   * vector components indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function overlaps the vector components
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero any of the given
+   * components that represent a symmetric tensor.
+   *
+   * An example would be in a program like step-71, where we
+   * might want to know whether a shape function of the combined,
+   * vector-valued element, corresponds to the $H$ or $C$ part of the
+   * solution, where $H$ is a vector and $C$ is a symmetric tensor.
+   */
+  bool
+  shape_function_belongs_to(
+    const unsigned int                            shape_function,
+    const FEValuesExtractors::SymmetricTensor<2> &components) const;
+
+
+  /**
+   * For vector-valued finite elements, return whether the shape
+   * function indicated by the first argument is part of the `dim*dim`
+   * vector components indicated by the second argument. In practice,
+   * what this means is that the set of nonzero vector components of
+   * the indicated shape function overlaps the vector components
+   * represented by the second argument; in other words, whether the
+   * shape function is (potentially) nonzero any of the given
+   * components that represent a tensor.
+   */
+  bool
+  shape_function_belongs_to(
+    const unsigned int                   shape_function,
+    const FEValuesExtractors::Tensor<2> &components) const;
   /** @} */
 
   /**
-   * @name Component and block matrices
+   * @name Component and block masks
    * @{
    */
 
@@ -2052,7 +2125,7 @@ public:
    * The result may be false if a finite element defines itself not by
    * interpolating shape functions, but by other means. A typical example are
    * discontinuous $P$-type elements on quadrilaterals (rather than the common
-   * $Q$-type elements on quadrilaterals). Elements will generally only
+   * $Q$-type elements on quadrilaterals). Elements will generally only return
    * `true` if they construct their shape functions by the
    * requirement that they be nonzero at a certain point and zero at all the
    * points associated with the other shape functions. In other words,
@@ -3305,6 +3378,124 @@ FiniteElement<dim, spacedim>::system_to_block_index(
     first_block_of_base(system_to_base_table[index].first.first) +
       system_to_base_table[index].first.second,
     system_to_base_table[index].second);
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                shape_function,
+  const FEValuesExtractors::Scalar &component) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(component.component, this->n_components());
+
+  if (is_primitive(shape_function))
+    return (system_to_component_table[shape_function].first ==
+            component.component);
+  else
+    return nonzero_components[shape_function][component.component];
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                shape_function,
+  const FEValuesExtractors::Vector &components) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(components.first_vector_component, this->n_components());
+  AssertIndexRange(components.first_vector_component + dim,
+                   this->n_components() + 1);
+
+  if (is_primitive(shape_function))
+    return ((system_to_component_table[shape_function].first >=
+             components.first_vector_component) &&
+            (system_to_component_table[shape_function].first <
+             components.first_vector_component + dim));
+  else
+    // Return whether there is overlap between the nonzero components
+    // of the current shape function and the selected components of
+    // the extractor:
+    {
+      for (unsigned int i = components.first_vector_component;
+           i < components.first_vector_component + dim;
+           ++i)
+        if (nonzero_components[shape_function][i])
+          return true;
+      return false;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                            shape_function,
+  const FEValuesExtractors::SymmetricTensor<2> &components) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(components.first_tensor_component, this->n_components());
+  AssertIndexRange(components.first_tensor_component + dim,
+                   this->n_components() + 1);
+
+  if (is_primitive(shape_function))
+    return ((system_to_component_table[shape_function].first >=
+             components.first_tensor_component) &&
+            (system_to_component_table[shape_function].first <
+             components.first_tensor_component +
+               SymmetricTensor<2, dim>::n_independent_components));
+  else
+    // Return whether there is overlap between the nonzero components
+    // of the current shape function and the selected components of
+    // the extractor:
+    {
+      for (unsigned int i = components.first_tensor_component;
+           i < components.first_tensor_component +
+                 SymmetricTensor<2, dim>::n_independent_components;
+           ++i)
+        if (nonzero_components[shape_function][i])
+          return true;
+      return false;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+FiniteElement<dim, spacedim>::shape_function_belongs_to(
+  const unsigned int                   shape_function,
+  const FEValuesExtractors::Tensor<2> &components) const
+{
+  AssertIndexRange(shape_function, this->n_dofs_per_cell());
+  AssertIndexRange(components.first_tensor_component, this->n_components());
+  AssertIndexRange(components.first_tensor_component + dim,
+                   this->n_components() + 1);
+
+  if (is_primitive(shape_function))
+    return ((system_to_component_table[shape_function].first >=
+             components.first_tensor_component) &&
+            (system_to_component_table[shape_function].first <
+             components.first_tensor_component +
+               Tensor<2, dim>::n_independent_components));
+  else
+    // Return whether there is overlap between the nonzero components
+    // of the current shape function and the selected components of
+    // the extractor:
+    {
+      for (unsigned int i = components.first_tensor_component;
+           i < components.first_tensor_component +
+                 Tensor<2, dim>::n_independent_components;
+           ++i)
+        if (nonzero_components[shape_function][i])
+          return true;
+      return false;
+    }
 }
 
 

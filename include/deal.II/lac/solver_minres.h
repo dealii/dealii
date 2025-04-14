@@ -117,7 +117,12 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcPreconditionerNotDefinite);
+  DeclExceptionMsg(ExcPreconditionerNotDefinite,
+                   "The preconditioner for MinRes must be a symmetric and "
+                   "definite operator, even though MinRes can solve linear "
+                   "systems with symmetric and *indefinite* operators. "
+                   "During iterations, MinRes has detected that the "
+                   "preconditioner is apparently not definite.");
   /** @} */
 
 protected:

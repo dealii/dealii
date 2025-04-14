@@ -9,15 +9,12 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  MAKEFLAGS: "--jobs=4"
-
 jobs:
   indent:
     # run the indent checks
 
     name: indent
-    runs-on: [ubuntu-24.04]
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
@@ -34,7 +31,10 @@ jobs:
     # build the documentation
 
     name: doxygen
-    runs-on: [ubuntu-24.04]
+    runs-on: ubuntu-24.04
+
+    env:
+      MAKEFLAGS: "--jobs=4"
 
     steps:
     - name: setup
@@ -69,15 +69,16 @@ jobs:
         name: doxygen_documentation
         path: build/doc/doxygen
 
-  typos:
-    # check for typos
+  pre-commit:
+    # run pre-commit checks
 
-    name: typos
-    runs-on: [ubuntu-24.04]
+    name: pre-commit
+    runs-on: ubuntu-24.04
+
+    env:
+      SKIP: clang-format, no-commit-to-branch
 
     steps:
     - uses: actions/checkout@v4
-    - uses: crate-ci/typos@v1.27.3
-      with:
-        files: doc examples include source tests
-        config: ./.typos.toml
+    - run:  python -m pip install networkx
+    - uses: pre-commit/action@v3.0.1

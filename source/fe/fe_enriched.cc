@@ -20,6 +20,8 @@
 #include <deal.II/lac/sparsity_tools.h>
 
 #include <memory>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1526,6 +1528,6 @@ namespace ColorEnriched
 
 
 // explicit instantiations
-#include "fe_enriched.inst"
+#include "fe/fe_enriched.inst"
 
 DEAL_II_NAMESPACE_CLOSE

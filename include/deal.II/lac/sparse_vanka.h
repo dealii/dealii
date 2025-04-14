@@ -19,6 +19,7 @@
 
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/types.h>
 
 #include <vector>
 

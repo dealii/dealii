@@ -15,7 +15,7 @@
 
 
 // Plot some GNUPLOT output to make sure that all of the flags work as
-// intended. This verifies that the new colinear point removal algorithm works
+// intended. This verifies that the new collinear point removal algorithm works
 // and also that we can do output in dim = 2, spacedim = 3.
 
 

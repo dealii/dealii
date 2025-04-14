@@ -27,4 +27,3 @@ macro(strip_flag _variable _flag)
   string(REPLACE "  " " " ${_variable} "${${_variable}}")
   string(STRIP "${${_variable}}" ${_variable})
 endmacro()
-

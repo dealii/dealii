@@ -157,14 +157,13 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
           unit_tangentials[i].resize(n_original_q_points);
           std::fill(unit_tangentials[i].begin(),
                     unit_tangentials[i].end(),
-                    reference_cell.template unit_tangential_vectors<dim>(i, 0));
+                    reference_cell.template face_tangent_vector<dim>(i, 0));
           if (dim > 2)
             {
               unit_tangentials[n_faces + i].resize(n_original_q_points);
-              std::fill(
-                unit_tangentials[n_faces + i].begin(),
-                unit_tangentials[n_faces + i].end(),
-                reference_cell.template unit_tangential_vectors<dim>(i, 1));
+              std::fill(unit_tangentials[n_faces + i].begin(),
+                        unit_tangentials[n_faces + i].end(),
+                        reference_cell.template face_tangent_vector<dim>(i, 1));
             }
         }
     }
@@ -2404,7 +2403,7 @@ MappingFE<dim, spacedim>::is_compatible_with(
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_fe.inst"
+#include "fe/mapping_fe.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -14,8 +14,6 @@ DEAL:2d::  RHS difference norm: 0
 DEAL:2d::  Test matrix 2 nonzeros: 12672, actually: 8480
 DEAL:2d::  Matrix difference norm: 0
 DEAL:2d::  RHS difference norm: 0
-DEAL:2d:cg::Starting value 18.
-DEAL:2d:cg::Convergence step 26 value 2.2e-07
 DEAL:2d::Distribute error: 0
 DEAL:2d::
 DEAL:2d::
@@ -32,8 +30,6 @@ DEAL:2d::  RHS difference norm: 0
 DEAL:2d::  Test matrix 2 nonzeros: 24092, actually: 17520
 DEAL:2d::  Matrix difference norm: 0
 DEAL:2d::  RHS difference norm: 0
-DEAL:2d:cg::Starting value 20.
-DEAL:2d:cg::Convergence step 47 value 2.5e-07
 DEAL:2d::Distribute error: 0
 DEAL:2d::
 DEAL:2d::
@@ -50,8 +46,6 @@ DEAL:2d::  RHS difference norm: 0
 DEAL:2d::  Test matrix 2 nonzeros: 46420, actually: 36248
 DEAL:2d::  Matrix difference norm: 0
 DEAL:2d::  RHS difference norm: 0
-DEAL:2d:cg::Starting value 23.
-DEAL:2d:cg::Convergence step 74 value 2.5e-07
 DEAL:2d::Distribute error: 0
 DEAL:3d::
 DEAL:3d::
@@ -68,8 +62,6 @@ DEAL:3d::  RHS difference norm: 0
 DEAL:3d::  Test matrix 2 nonzeros: 343, actually: 27
 DEAL:3d::  Matrix difference norm: 0
 DEAL:3d::  RHS difference norm: 0
-DEAL:3d:cg::Starting value 1.4
-DEAL:3d:cg::Convergence step 1 value 0
 DEAL:3d::Distribute error: 0
 DEAL:3d::
 DEAL:3d::
@@ -86,8 +78,6 @@ DEAL:3d::  RHS difference norm: 0
 DEAL:3d::  Test matrix 2 nonzeros: 1006, actually: 66
 DEAL:3d::  Matrix difference norm: 0
 DEAL:3d::  RHS difference norm: 0
-DEAL:3d:cg::Starting value 1.9
-DEAL:3d:cg::Convergence step 3 value 0
 DEAL:3d::Distribute error: 0
 DEAL:3d::
 DEAL:3d::
@@ -104,6 +94,4 @@ DEAL:3d::  RHS difference norm: 0
 DEAL:3d::  Test matrix 2 nonzeros: 3767, actually: 415
 DEAL:3d::  Matrix difference norm: 0
 DEAL:3d::  RHS difference norm: 0
-DEAL:3d:cg::Starting value 2.9
-DEAL:3d:cg::Convergence step 6 value 1.1e-08
 DEAL:3d::Distribute error: 0

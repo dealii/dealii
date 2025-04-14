@@ -22,6 +22,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
+#include <deal.II/matrix_free/portable_evaluation_kernels.h>
 #include <deal.II/matrix_free/portable_hanging_nodes_internal.h>
 #include <deal.II/matrix_free/portable_matrix_free.h>
 #include <deal.II/matrix_free/portable_matrix_free.templates.h>
@@ -106,16 +107,46 @@ namespace Portable
       Utilities::pow(n_q_points_1d, dim);
 
     /**
-     * Number of tensor degrees of freedoms per cell.
+     * Number of tensor degrees of freedom of a scalar component determined
+     * from the given template argument `fe_degree`.
      */
-    static constexpr unsigned int tensor_dofs_per_cell =
+    static constexpr unsigned int tensor_dofs_per_component =
       Utilities::pow(fe_degree + 1, dim);
 
     /**
-     * Constructor.
+     * Number of tensor degrees of freedom of all component determined from
+     * the given template argument `fe_degree`.
+     */
+    static constexpr unsigned int tensor_dofs_per_cell =
+      tensor_dofs_per_component * n_components;
+
+    /**
+     * Constructor. You will need to provide a pointer to the
+     * Portable::MatrixFree::Data object, which is typically provided to the
+     * functor inside the
+     * Portable::MatrixFree::cell_loop() and the index @p dof_index of the DoFHandler
+     * if more than one was provided when the Portable::MatrixFree object was
+     * initialized.
      */
     DEAL_II_HOST_DEVICE
-    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata);
+    explicit FEEvaluation(const data_type   *data,
+                          const unsigned int dof_index = 0);
+
+    /**
+     * Return the index of the current cell.
+     */
+    DEAL_II_HOST_DEVICE
+    int
+    get_current_cell_index();
+
+    /**
+     * Return a pointer to the MatrixFree<dim, Number>::Data object on device
+     * that contains necessary constraint, dof index, and shape function
+     * information for evaluation used in the matrix-free kernels.
+     */
+    DEAL_II_HOST_DEVICE
+    const data_type *
+    get_matrix_free_data();
 
     /**
      * For the vector @p src, read out the values on the degrees of freedom of
@@ -126,7 +157,7 @@ namespace Portable
      * AffineConstraints::read_dof_values() as well.
      */
     DEAL_II_HOST_DEVICE void
-    read_dof_values(const Number *src);
+    read_dof_values(const DeviceVector<Number> &src);
 
     /**
      * Take the value stored internally on dof values of the current cell and
@@ -135,7 +166,7 @@ namespace Portable
      * function AffineConstraints::distribute_local_to_global.
      */
     DEAL_II_HOST_DEVICE void
-    distribute_local_to_global(Number *dst) const;
+    distribute_local_to_global(DeviceVector<Number> &dst) const;
 
     /**
      * Evaluate the function values and the gradients of the FE function given
@@ -148,18 +179,6 @@ namespace Portable
     evaluate(const EvaluationFlags::EvaluationFlags evaluate_flag);
 
     /**
-     * Evaluate the function values and the gradients of the FE function given
-     * at the DoF values in the input vector at the quadrature points on the
-     * unit cell. The function arguments specify which parts shall actually be
-     * computed. This function needs to be called before the functions
-     * @p get_value() or @p get_gradient() give useful information.
-     */
-    DEAL_II_DEPRECATED_WITH_COMMENT("Use the version taking EvaluationFlags.")
-    DEAL_II_HOST_DEVICE
-    void
-    evaluate(const bool evaluate_val, const bool evaluate_grad);
-
-    /**
      * This function takes the values and/or gradients that are stored on
      * quadrature points, tests them by all the basis functions/gradients on
      * the cell and performs the cell integration as specified by the
@@ -167,18 +186,6 @@ namespace Portable
      */
     DEAL_II_HOST_DEVICE void
     integrate(const EvaluationFlags::EvaluationFlags integration_flag);
-
-    /**
-     * This function takes the values and/or gradients that are stored on
-     * quadrature points, tests them by all the basis functions/gradients on
-     * the cell and performs the cell integration. The two function arguments
-     * @p integrate_val and @p integrate_grad are used to enable/disable some
-     * of the values or the gradients.
-     */
-    DEAL_II_DEPRECATED_WITH_COMMENT("Use the version taking EvaluationFlags.")
-    DEAL_II_HOST_DEVICE
-    void
-    integrate(const bool integrate_val, const bool integrate_grad);
 
     /**
      * Same as above, except that the quadrature point is computed from thread
@@ -239,9 +246,10 @@ namespace Portable
     apply_for_each_quad_point(const Functor &func);
 
   private:
-    const data_type         *data;
-    SharedData<dim, Number> *shared_data;
-    int                      cell_id;
+    const typename MatrixFree<dim, Number>::Data            *data;
+    const typename MatrixFree<dim, Number>::PrecomputedData *precomputed_data;
+    SharedData<dim, Number>                                 *shared_data;
+    int                                                      cell_id;
   };
 
 
@@ -253,11 +261,47 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata)
+    FEEvaluation(const data_type *data, const unsigned int dof_index)
     : data(data)
-    , shared_data(shdata)
-    , cell_id(shared_data->team_member.league_rank())
-  {}
+    , precomputed_data(data->precomputed_data)
+    , shared_data(data->shared_data)
+    , cell_id(data->team_member.league_rank())
+  {
+    (void)dof_index;
+    AssertIndexRange(dof_index, data->n_dofhandler);
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE int
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    get_current_cell_index()
+  {
+    return cell_id;
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE const typename FEEvaluation<dim,
+                                                  fe_degree,
+                                                  n_q_points_1d,
+                                                  n_components_,
+                                                  Number>::data_type *
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    get_matrix_free_data()
+  {
+    return data;
+  }
 
 
 
@@ -268,25 +312,29 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    read_dof_values(const Number *src)
+    read_dof_values(const DeviceVector<Number> &src)
   {
     // Populate the scratch memory
-    Kokkos::parallel_for(
-      Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
-      [&](const int &i) {
-        for (unsigned int c = 0; c < n_components_; ++c)
-          shared_data->values(i, c) =
-            src[data->local_to_global(cell_id, i + tensor_dofs_per_cell * c)];
-      });
-    shared_data->team_member.team_barrier();
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
+                                                 tensor_dofs_per_component),
+                         [&](const int &i) {
+                           for (unsigned int c = 0; c < n_components_; ++c)
+                             shared_data->values(i, c) =
+                               src[precomputed_data->local_to_global(
+                                 i + tensor_dofs_per_component * c, cell_id)];
+                         });
+    data->team_member.team_barrier();
 
     for (unsigned int c = 0; c < n_components_; ++c)
       {
-        internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
-          shared_data->team_member,
-          data->constraint_weights,
-          data->constraint_mask(cell_id),
-          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        if (precomputed_data->constraint_mask(cell_id * n_components + c) !=
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+              unconstrained)
+          internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
+            data->team_member,
+            precomputed_data->constraint_weights,
+            precomputed_data->constraint_mask(cell_id * n_components + c),
+            Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
   }
 
@@ -299,36 +347,39 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    distribute_local_to_global(Number *dst) const
+    distribute_local_to_global(DeviceVector<Number> &dst) const
   {
     for (unsigned int c = 0; c < n_components_; ++c)
       {
-        internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
-          shared_data->team_member,
-          data->constraint_weights,
-          data->constraint_mask(cell_id),
-          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        if (precomputed_data->constraint_mask(cell_id * n_components + c) !=
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+              unconstrained)
+          internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
+            data->team_member,
+            precomputed_data->constraint_weights,
+            precomputed_data->constraint_mask(cell_id * n_components + c),
+            Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
 
-    if (data->use_coloring)
+    if (precomputed_data->use_coloring)
       {
         Kokkos::parallel_for(
-          Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+          Kokkos::TeamThreadRange(data->team_member, tensor_dofs_per_component),
           [&](const int &i) {
             for (unsigned int c = 0; c < n_components_; ++c)
-              dst[data->local_to_global(cell_id,
-                                        i + tensor_dofs_per_cell * c)] +=
+              dst[precomputed_data->local_to_global(
+                i + tensor_dofs_per_component * c, cell_id)] +=
                 shared_data->values(i, c);
           });
       }
     else
       {
         Kokkos::parallel_for(
-          Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+          Kokkos::TeamThreadRange(data->team_member, tensor_dofs_per_component),
           [&](const int &i) {
             for (unsigned int c = 0; c < n_components_; ++c)
-              Kokkos::atomic_add(&dst[data->local_to_global(
-                                   cell_id, i + tensor_dofs_per_cell * c)],
+              Kokkos::atomic_add(&dst[precomputed_data->local_to_global(
+                                   i + (tensor_dofs_per_component)*c, cell_id)],
                                  shared_data->values(i, c));
           });
       }
@@ -339,68 +390,44 @@ namespace Portable
   template <int dim,
             int fe_degree,
             int n_q_points_1d,
-            int n_components_,
+            int n_components,
             typename Number>
   DEAL_II_HOST_DEVICE void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::evaluate(
-    const EvaluationFlags::EvaluationFlags evaluate_flag)
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
+    const EvaluationFlags::EvaluationFlags evaluation_flag)
   {
-    // First evaluate the gradients because it requires values that will be
-    // changed if evaluate_val is true
-    internal::EvaluatorTensorProduct<
-      internal::EvaluatorVariant::evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>
-      evaluator_tensor_product(shared_data->team_member,
-                               data->shape_values,
-                               data->shape_gradients,
-                               data->co_shape_gradients);
+    using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
 
-    for (unsigned int c = 0; c < n_components_; ++c)
+    if (fe_degree >= 0 && fe_degree + 1 == n_q_points_1d &&
+        precomputed_data->element_type ==
+          ElementType::tensor_symmetric_collocation)
       {
-        if ((evaluate_flag & EvaluationFlags::values) &&
-            (evaluate_flag & EvaluationFlags::gradients))
-          {
-            evaluator_tensor_product.evaluate_values_and_gradients(
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
-              Kokkos::subview(
-                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
-            shared_data->team_member.team_barrier();
-          }
-        else if (evaluate_flag & EvaluationFlags::gradients)
-          {
-            evaluator_tensor_product.evaluate_gradients(
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
-              Kokkos::subview(
-                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
-            shared_data->team_member.team_barrier();
-          }
-        else if (evaluate_flag & EvaluationFlags::values)
-          {
-            evaluator_tensor_product.evaluate_values(
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c));
-            shared_data->team_member.team_barrier();
-          }
+        internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
+          n_components, evaluation_flag, data);
       }
-  }
-
-
-
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
-  DEAL_II_HOST_DEVICE void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::evaluate(
-    const bool evaluate_val,
-    const bool evaluate_grad)
-  {
-    evaluate(
-      (evaluate_val ? EvaluationFlags::values : EvaluationFlags::nothing) |
-      (evaluate_grad ? EvaluationFlags::gradients : EvaluationFlags::nothing));
+    // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
+    // shape_info.h for more details
+    else if (fe_degree >= 0 &&
+             internal::use_collocation_evaluation(fe_degree, n_q_points_1d) &&
+             precomputed_data->element_type <= ElementType::tensor_symmetric)
+      {
+        internal::FEEvaluationImplTransformToCollocation<
+          dim,
+          fe_degree,
+          n_q_points_1d,
+          Number>::evaluate(n_components, evaluation_flag, data);
+      }
+    else if (fe_degree >= 0 && precomputed_data->element_type <=
+                                 ElementType::tensor_symmetric_no_collocation)
+      {
+        internal::FEEvaluationImpl<dim, fe_degree, n_q_points_1d, Number>::
+          evaluate(n_components, evaluation_flag, data);
+      }
+    else
+      {
+        Kokkos::abort("The element type is not yet supported by the portable "
+                      "matrix-free module.");
+      }
   }
 
 
@@ -414,60 +441,38 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::integrate(
     const EvaluationFlags::EvaluationFlags integration_flag)
   {
-    internal::EvaluatorTensorProduct<
-      internal::EvaluatorVariant::evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>
-      evaluator_tensor_product(shared_data->team_member,
-                               data->shape_values,
-                               data->shape_gradients,
-                               data->co_shape_gradients);
+    using ElementType = ::dealii::internal::MatrixFreeFunctions::ElementType;
 
-
-    for (unsigned int c = 0; c < n_components_; ++c)
+    if (fe_degree >= 0 && fe_degree + 1 == n_q_points_1d &&
+        precomputed_data->element_type ==
+          ElementType::tensor_symmetric_collocation)
       {
-        if ((integration_flag & EvaluationFlags::values) &&
-            (integration_flag & EvaluationFlags::gradients))
-          {
-            evaluator_tensor_product.integrate_values_and_gradients(
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
-              Kokkos::subview(
-                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
-          }
-        else if (integration_flag & EvaluationFlags::values)
-          {
-            evaluator_tensor_product.integrate_values(
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c));
-            shared_data->team_member.team_barrier();
-          }
-        else if (integration_flag & EvaluationFlags::gradients)
-          {
-            evaluator_tensor_product.template integrate_gradients<false>(
-              Kokkos::subview(shared_data->values, Kokkos::ALL, c),
-              Kokkos::subview(
-                shared_data->gradients, Kokkos::ALL, Kokkos::ALL, c));
-            shared_data->team_member.team_barrier();
-          }
+        internal::FEEvaluationImplCollocation<dim, fe_degree, Number>::
+          integrate(n_components, integration_flag, data);
       }
-  }
-
-
-
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
-  DEAL_II_HOST_DEVICE void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::integrate(
-    const bool integrate_val,
-    const bool integrate_grad)
-  {
-    integrate(
-      (integrate_val ? EvaluationFlags::values : EvaluationFlags::nothing) |
-      (integrate_grad ? EvaluationFlags::gradients : EvaluationFlags::nothing));
+    // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
+    // shape_info.h for more details
+    else if (fe_degree >= 0 &&
+             internal::use_collocation_evaluation(fe_degree, n_q_points_1d) &&
+             precomputed_data->element_type <= ElementType::tensor_symmetric)
+      {
+        internal::FEEvaluationImplTransformToCollocation<
+          dim,
+          fe_degree,
+          n_q_points_1d,
+          Number>::integrate(n_components, integration_flag, data);
+      }
+    else if (fe_degree >= 0 && precomputed_data->element_type <=
+                                 ElementType::tensor_symmetric_no_collocation)
+      {
+        internal::FEEvaluationImpl<dim, fe_degree, n_q_points_1d, Number>::
+          integrate(n_components, integration_flag, data);
+      }
+    else
+      {
+        Kokkos::abort("The element type is not yet supported by the portable "
+                      "matrix-free module.");
+      }
   }
 
 
@@ -485,6 +490,7 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::get_value(
     int q_point) const
   {
+    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     if constexpr (n_components_ == 1)
       {
         return shared_data->values(q_point, 0);
@@ -511,17 +517,18 @@ namespace Portable
                                             n_components_,
                                             Number>::value_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_dof_value(int q_point) const
+    get_dof_value(int dof) const
   {
+    Assert(dof >= 0 && dof < tensor_dofs_per_component, ExcInternalError());
     if constexpr (n_components_ == 1)
       {
-        return shared_data->values(q_point, 0);
+        return shared_data->values(dof, 0);
       }
     else
       {
         value_type result;
         for (unsigned int c = 0; c < n_components; ++c)
-          result[c] = shared_data->values(q_point, c);
+          result[c] = shared_data->values(dof, c);
         return result;
       }
   }
@@ -537,15 +544,17 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     submit_value(const value_type &val_in, int q_point)
   {
+    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     if constexpr (n_components_ == 1)
       {
-        shared_data->values(q_point, 0) = val_in * data->JxW(cell_id, q_point);
+        shared_data->values(q_point, 0) =
+          val_in * precomputed_data->JxW(q_point, cell_id);
       }
     else
       {
         for (unsigned int c = 0; c < n_components; ++c)
           shared_data->values(q_point, c) =
-            val_in[c] * data->JxW(cell_id, q_point);
+            val_in[c] * precomputed_data->JxW(q_point, cell_id);
       }
   }
 
@@ -558,16 +567,17 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_dof_value(const value_type &val_in, int q_point)
+    submit_dof_value(const value_type &val_in, int dof)
   {
+    Assert(dof >= 0 && dof < tensor_dofs_per_component, ExcInternalError());
     if constexpr (n_components_ == 1)
       {
-        shared_data->values(q_point, 0) = val_in;
+        shared_data->values(dof, 0) = val_in;
       }
     else
       {
         for (unsigned int c = 0; c < n_components; ++c)
-          shared_data->values(q_point, c) = val_in[c];
+          shared_data->values(dof, c) = val_in[c];
       }
   }
 
@@ -586,6 +596,7 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_gradient(int q_point) const
   {
+    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     gradient_type grad;
 
     if constexpr (n_components_ == 1)
@@ -594,8 +605,9 @@ namespace Portable
           {
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-              tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
-                     shared_data->gradients(q_point, d_2, 0);
+              tmp +=
+                precomputed_data->inv_jacobian(q_point, cell_id, d_2, d_1) *
+                shared_data->gradients(q_point, d_2, 0);
             grad[d_1] = tmp;
           }
       }
@@ -606,8 +618,9 @@ namespace Portable
             {
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-                tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
-                       shared_data->gradients(q_point, d_2, c);
+                tmp +=
+                  precomputed_data->inv_jacobian(q_point, cell_id, d_2, d_1) *
+                  shared_data->gradients(q_point, d_2, c);
               grad[c][d_1] = tmp;
             }
       }
@@ -626,6 +639,7 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     submit_gradient(const gradient_type &grad_in, int q_point)
   {
+    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     if constexpr (n_components_ == 1)
       {
         for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
@@ -633,9 +647,10 @@ namespace Portable
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
               tmp +=
-                data->inv_jacobian(cell_id, q_point, d_1, d_2) * grad_in[d_2];
+                precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
+                grad_in[d_2];
             shared_data->gradients(q_point, d_1, 0) =
-              tmp * data->JxW(cell_id, q_point);
+              tmp * precomputed_data->JxW(q_point, cell_id);
           }
       }
     else
@@ -645,10 +660,11 @@ namespace Portable
             {
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-                tmp += data->inv_jacobian(cell_id, q_point, d_1, d_2) *
-                       grad_in[c][d_2];
+                tmp +=
+                  precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
+                  grad_in[c][d_2];
               shared_data->gradients(q_point, d_1, c) =
-                tmp * data->JxW(cell_id, q_point);
+                tmp * precomputed_data->JxW(q_point, cell_id);
             }
       }
   }
@@ -665,10 +681,9 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     apply_for_each_quad_point(const Functor &func)
   {
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
-                                                 n_q_points),
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member, n_q_points),
                          [&](const int &i) { func(this, i); });
-    shared_data->team_member.team_barrier();
+    data->team_member.team_barrier();
   }
 
 

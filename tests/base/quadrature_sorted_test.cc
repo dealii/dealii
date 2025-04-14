@@ -155,7 +155,11 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
           switch (dim)
             {
               case 2:
-                exact_int = 2 * (sub ? 2 : 1) / (double)(i + 1);
+                // TODO: once we support multiple orientations per subface in 2d
+                // we can get rid of the second ternary if here (because we will
+                // always integrate over all orientations: i.e., both of them in
+                // 2d).
+                exact_int = 2 * (sub ? 2 : 1) * (sub ? 1 : 2) / (double)(i + 1);
                 break;
               case 3:
                 exact_int =
@@ -170,7 +174,10 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
       // over the whole surface (all
       // combinations of face_orientation,
       // face_flip and face_rotation)
-      while (err < (dim == 3 ? 8 : 1) * 2e-14);
+      // but 2 in 2d (only two possible
+      // orientations) when we are not using
+      // subfaces (same as the previous comment)
+      while (err < (dim == 3 ? 8 : (sub ? 1 : 2)) * 2e-14);
       // Uncomment here for testing
       //      deallog << " (Int " << quadrature_int << '-' << exact_int << '='
       //      << err << ')';

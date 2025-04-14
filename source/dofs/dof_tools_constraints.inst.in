@@ -23,7 +23,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
                        deal_II_space_dimension>::face_iterator &,
       AffineConstraints<S> &,
       const ComponentMask &,
-      const unsigned char,
+      const types::geometric_orientation,
       const FullMatrix<double> &,
       const std::vector<unsigned int> &,
       const S);
@@ -34,23 +34,23 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       const DoFHandler<deal_II_dimension,
                        deal_II_space_dimension>::face_iterator &face_2,
       const FullMatrix<double>                                 &transformation,
-      AffineConstraints<S> &affine_constraints,
-      const ComponentMask  &component_mask,
-      const unsigned char   combined_orientation,
-      const S               periodicity_factor,
-      const unsigned int    level);
+      AffineConstraints<S>              &affine_constraints,
+      const ComponentMask               &component_mask,
+      const types::geometric_orientation combined_orientation,
+      const S                            periodicity_factor,
+      const unsigned int                 level);
 
     template void DoFTools::internal::set_periodicity_constraints(
       const DoFHandler<deal_II_dimension,
                        deal_II_space_dimension>::level_face_iterator &face_1,
       const DoFHandler<deal_II_dimension,
                        deal_II_space_dimension>::level_face_iterator &face_2,
-      const FullMatrix<double> &transformation,
-      AffineConstraints<S>     &affine_constraints,
-      const ComponentMask      &component_mask,
-      const unsigned char       combined_orientation,
-      const S                   periodicity_factor,
-      const unsigned int        level);
+      const FullMatrix<double>          &transformation,
+      AffineConstraints<S>              &affine_constraints,
+      const ComponentMask               &component_mask,
+      const types::geometric_orientation combined_orientation,
+      const S                            periodicity_factor,
+      const unsigned int                 level);
 #endif
   }
 

@@ -14,13 +14,16 @@
 
 #include <deal.II/lac/tensor_product_matrix.templates.h>
 
+#include <array>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
   namespace TensorProductMatrixSymmetricSum
   {
-#include "tensor_product_matrix.inst"
+#include "lac/tensor_product_matrix.inst"
 
   }
 } // namespace internal

@@ -22,7 +22,12 @@
 
 #include <deal.II/numerics/vector_tools_constraints.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <limits>
+#include <list>
+#include <set>
+
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -37,6 +37,11 @@
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/utilities.h>
 
+#  include <idas/idas.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#    include <sundials/sundials_context.h>
+#  endif
+
 #  include <iomanip>
 #  include <iostream>
 
@@ -351,10 +356,10 @@ namespace SUNDIALS
         }
       if (LS->ops)
         {
-          free(LS->ops);
+          std::free(LS->ops);
           LS->ops = nullptr;
         }
-      free(LS);
+      std::free(LS);
       LS = nullptr;
       return 0;
     };
@@ -415,10 +420,10 @@ namespace SUNDIALS
         }
       if (A->ops)
         {
-          free(A->ops);
+          std::free(A->ops);
           A->ops = nullptr;
         }
-      free(A);
+      std::free(A);
       A = nullptr;
     };
 

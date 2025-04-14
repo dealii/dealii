@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2001 - 2023 by the deal.II authors
+// Copyright (C) 2001 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,22 +20,18 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <cerrno>
 #include <complex>
 #include <iostream>
 #include <list>
 #include <typeinfo>
 #include <vector>
 
-
-DEAL_II_NAMESPACE_OPEN
-
-
-// include UMFPACK file.
 #ifdef DEAL_II_WITH_UMFPACK
 #  include <umfpack.h>
 #endif
 
+
+DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
@@ -842,6 +838,200 @@ SparseDirectUMFPACK::n() const
 }
 
 
+
+#ifdef DEAL_II_WITH_MUMPS
+
+SparseDirectMUMPS::SparseDirectMUMPS()
+  : initialize_called(false)
+{}
+
+SparseDirectMUMPS::~SparseDirectMUMPS()
+{
+  id.job = -2;
+  dmumps_c(&id);
+
+  // Do some cleaning
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    {
+      delete[] a;
+      delete[] irn;
+      delete[] jcn;
+    }
+}
+
+template <class Matrix>
+void
+SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
+{
+  Assert(matrix.n() == matrix.m(), ExcMessage("Matrix needs to be square."));
+
+
+  // Check we haven't been here before:
+  Assert(initialize_called == false, ExcInitializeAlreadyCalled());
+
+  // Initialize MUMPS instance:
+  id.job = -1;
+  id.par = 1;
+  id.sym = 0;
+
+  // Use MPI_COMM_WORLD as communicator
+  id.comm_fortran = -987654;
+  dmumps_c(&id);
+
+  // Hand over matrix and right-hand side
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    {
+      // Objects denoting a MUMPS data structure:
+      //
+      // Set number of unknowns
+      n = matrix.n();
+
+      // number of nonzero elements in matrix
+      nz = matrix.n_actually_nonzero_elements();
+
+      // representation of the matrix
+      a = new double[nz];
+
+      // matrix indices pointing to the row and column dimensions
+      // respectively of the matrix representation above (a): ie. a[k] is
+      // the matrix element (irn[k], jcn[k])
+      irn = new int[nz];
+      jcn = new int[nz];
+
+      size_type index = 0;
+
+      // loop over the elements of the matrix row by row, as suggested in
+      // the documentation of the sparse matrix iterator class
+      for (size_type row = 0; row < matrix.m(); ++row)
+        {
+          for (typename Matrix::const_iterator ptr = matrix.begin(row);
+               ptr != matrix.end(row);
+               ++ptr)
+            if (std::abs(ptr->value()) > 0.0)
+              {
+                a[index]   = ptr->value();
+                irn[index] = row + 1;
+                jcn[index] = ptr->column() + 1;
+                ++index;
+              }
+        }
+
+      id.n   = n;
+      id.nz  = nz;
+      id.irn = irn;
+      id.jcn = jcn;
+      id.a   = a;
+    }
+
+  // No outputs
+  id.icntl[0] = -1;
+  id.icntl[1] = -1;
+  id.icntl[2] = -1;
+  id.icntl[3] = 0;
+
+  // Exit by setting this flag:
+  initialize_called = true;
+}
+
+template <class Matrix>
+void
+SparseDirectMUMPS::initialize(const Matrix         &matrix,
+                              const Vector<double> &vector)
+{
+  // Hand over matrix and right-hand side
+  initialize_matrix(matrix);
+
+  copy_rhs_to_mumps(vector);
+}
+
+void
+SparseDirectMUMPS::copy_rhs_to_mumps(const Vector<double> &new_rhs)
+{
+  Assert(n == new_rhs.size(),
+         ExcMessage("Matrix size and rhs length must be equal."));
+
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    {
+      rhs.resize(n);
+      for (size_type i = 0; i < n; ++i)
+        rhs[i] = new_rhs(i);
+
+      id.rhs = &rhs[0];
+    }
+}
+
+void
+SparseDirectMUMPS::copy_solution(Vector<double> &vector)
+{
+  Assert(n == vector.size(),
+         ExcMessage("Matrix size and solution vector length must be equal."));
+  Assert(n == rhs.size(),
+         ExcMessage("Class not initialized with a rhs vector."));
+
+  // Copy solution into the given vector
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    {
+      for (size_type i = 0; i < n; ++i)
+        vector(i) = rhs[i];
+
+      rhs.resize(0); // remove rhs again
+    }
+}
+
+template <class Matrix>
+void
+SparseDirectMUMPS::initialize(const Matrix &matrix)
+{
+  // Initialize MUMPS instance:
+  initialize_matrix(matrix);
+  // Start factorization
+  id.job = 4;
+  dmumps_c(&id);
+}
+
+void
+SparseDirectMUMPS::solve(Vector<double> &vector)
+{
+  // TODO: this could be implemented similar to SparseDirectUMFPACK where
+  //  the given vector will be used as the RHS. Sadly, there is no easy
+  //  way to do this without breaking the interface.
+
+  // Check that the solver has been initialized by the routine above:
+  Assert(initialize_called == true, ExcNotInitialized());
+
+  // and that the matrix has at least one nonzero element:
+  Assert(nz != 0, ExcNotInitialized());
+
+  // Start solver
+  id.job = 6; // 6 = analysis, factorization, and solve
+  dmumps_c(&id);
+  copy_solution(vector);
+}
+
+void
+SparseDirectMUMPS::vmult(Vector<double> &dst, const Vector<double> &src)
+{
+  // Check that the solver has been initialized by the routine above:
+  Assert(initialize_called == true, ExcNotInitialized());
+
+  // and that the matrix has at least one nonzero element:
+  Assert(nz != 0, ExcNotInitialized());
+
+  Assert(n == dst.size(), ExcMessage("Destination vector has the wrong size."));
+  Assert(n == src.size(), ExcMessage("Source vector has the wrong size."));
+
+  // Hand over right-hand side
+  copy_rhs_to_mumps(src);
+
+  // Start solver
+  id.job = 3;
+  dmumps_c(&id);
+  copy_solution(dst);
+}
+
+#endif // DEAL_II_WITH_MUMPS
+
+
 // explicit instantiations for SparseMatrixUMFPACK
 #define InstantiateUMFPACK(MatrixType)                                     \
   template void SparseDirectUMFPACK::factorize(const MatrixType &);        \
@@ -875,4 +1065,18 @@ InstantiateUMFPACK(BlockSparseMatrix<std::complex<double>>);
 InstantiateUMFPACK(BlockSparseMatrix<std::complex<float>>);
 #endif
 
-DEAL_II_NAMESPACE_CLOSE
+// explicit instantiations for SparseDirectMUMPS
+#ifdef DEAL_II_WITH_MUMPS
+#  define InstantiateMUMPS(MATRIX)                                       \
+    template void SparseDirectMUMPS::initialize(const MATRIX &,          \
+                                                const Vector<double> &); \
+    template void SparseDirectMUMPS::initialize(const MATRIX &);
+
+InstantiateMUMPS(SparseMatrix<double>) InstantiateMUMPS(SparseMatrix<float>)
+  // InstantiateMUMPS(SparseMatrixEZ<double>)
+  // InstantiateMUMPS(SparseMatrixEZ<float>)
+  InstantiateMUMPS(BlockSparseMatrix<double>)
+    InstantiateMUMPS(BlockSparseMatrix<float>)
+#endif
+
+      DEAL_II_NAMESPACE_CLOSE

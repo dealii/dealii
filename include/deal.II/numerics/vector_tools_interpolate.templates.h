@@ -324,7 +324,10 @@ namespace VectorTools
           const auto &fe_i = fe[fe_index];
           // If the finite element has no dofs, we can skip it
           if (fe_i.dofs_per_cell == 0)
-            continue;
+            {
+              support_quadrature.push_back(Quadrature<dim>());
+              continue;
+            }
           Assert(fe_i.has_generalized_support_points(),
                  ExcMessage(
                    "The finite element does not have generalized support "
@@ -441,22 +444,23 @@ namespace VectorTools
 
             if (selected)
               {
-#ifdef DEBUG
-                // make sure that all selected base elements are indeed
-                // interpolatory
-
-                if (const auto fe_system =
-                      dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
+                if constexpr (running_in_debug_mode())
                   {
-                    const auto index =
-                      fe_system->system_to_base_index(i).first.first;
-                    Assert(fe_system->base_element(index)
-                             .has_generalized_support_points(),
-                           ExcMessage("The component mask supplied to "
-                                      "VectorTools::interpolate selects a "
-                                      "non-interpolatory element."));
+                    // make sure that all selected base elements are indeed
+                    // interpolatory
+
+                    if (const auto fe_system =
+                          dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
+                      {
+                        const auto index =
+                          fe_system->system_to_base_index(i).first.first;
+                        Assert(fe_system->base_element(index)
+                                 .has_generalized_support_points(),
+                               ExcMessage("The component mask supplied to "
+                                          "VectorTools::interpolate selects a "
+                                          "non-interpolatory element."));
+                      }
                   }
-#endif
 
                 // Add local values to the global vectors
                 if (needs_expensive_algorithm[fe_index])

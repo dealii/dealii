@@ -53,6 +53,10 @@
 #  include <zoltan_cpp.h>
 #endif
 
+#include <set>
+#include <string>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -273,11 +277,11 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
       // flag.
       std::vector<char *> argv_new;
       for (auto *const arg : make_array_view(&argv[0], &argv[0] + argc))
-        if (strcmp(arg, "--help") != 0)
+        if (std::strcmp(arg, "--help") != 0)
           argv_new.push_back(arg);
 
       std::stringstream threads_flag;
-#if KOKKOS_VERSION >= 30700
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
       threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
 #else
       threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();

@@ -22,7 +22,10 @@
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/point.h>
 
+#include <deal.II/lac/vector.h>
+
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -38,8 +41,8 @@ struct CellData;
 #endif
 
 /**
- * This class implements an input mechanism for grid data. It allows to read a
- * grid structure into a triangulation object. At present, UCD (unstructured
+ * This class implements an input mechanism for mesh data. It allows to read a
+ * mesh structure into a Triangulation object. At present, UCD (unstructured
  * cell data), DB Mesh, XDA, %Gmsh, Tecplot, UNV, VTK, ASSIMP, and Cubit
  * are supported as input format for grid data. Any numerical data other than
  * geometric (vertex locations) and topological (how vertices form cells,
@@ -51,12 +54,14 @@ struct CellData;
  * @ref GlossBoundaryIndicator "this"
  * glossary entry for more information).
  *
- * @note Since deal.II only supports line, quadrilateral and hexahedral
- * meshes, the functions in this class can only read meshes that consist
- * exclusively of such cells. If you absolutely need to work with a mesh that
- * uses triangles or tetrahedra, then your only option is to convert the mesh
- * to quadrilaterals and hexahedra. A tool that can do this is tethex,
- * available <a href="https://github.com/martemyev/tethex">here</a>.
+ * In practice, the list of formats this class supports is of course limited.
+ * However, other people have written tools to convert mesh files from one
+ * format to another, and if you have a mesh you cannot read with the functions
+ * of this class, you may want to convert it into a format that is in fact
+ * supported. One of these tools you may want to look up is
+ * [meshio](https://github.com/nschloe/meshio).
+ * A separate tool that can convert tetrahedral to hexahedral mesges is tethex,
+ * available [here](https://github.com/martemyev/tethex).
  *
  * The mesh you read will form the coarsest level of a @p Triangulation
  * object. As such, it must not contain hanging nodes or other forms of
@@ -768,6 +773,25 @@ public:
   get_format_names();
 
   /**
+   * Return a map containing cell data associated with the elements of an
+   * external vtk format mesh imported using read_vtk().
+   * The format of the returned map is as
+   * follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each cell.
+   * To access the value, use cell_data[name_field][cell->active_cell_index()].
+   *
+   * For example, if the vtk mesh contains field data "Density" defined on
+   * cells, then `cell_data["Density"][0]` provides the density defined at cell
+   * ID '0', which corresponds to index 0 of the vector. The length of the
+   * vector in `cell_data["Density"]` equals the number of elements in the
+   * coarse mesh.
+   */
+  const std::map<std::string, Vector<double>> &
+  get_cell_data() const;
+
+  /**
    * Exception
    */
   DeclException1(ExcUnknownSectionType,
@@ -948,6 +972,17 @@ private:
    * Input format used by read() if no format is given.
    */
   Format default_format;
+
+  /**
+   * Data member that stores field data defined at the cells of the mesh.
+   * The format is as follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each cell id.
+   *
+   * To access the value use cell_data[name_field][cell->active_cell_index()].
+   */
+  std::map<std::string, Vector<double>> cell_data;
 };
 
 /* -------------- declaration of explicit specializations ------------- */

@@ -130,28 +130,26 @@ namespace Rol
 
   private:
     /**
-     * Teuchos smart reference counting pointer to the underlying vector of type
-     * <tt>VectorType</tt>.
+     * ROL pointer to the underlying vector of type <tt>VectorType</tt>.
      */
-    Teuchos::RCP<VectorType> vector_ptr;
+    ROL::Ptr<VectorType> vector_ptr;
 
   public:
     /**
      * Constructor.
      */
-    VectorAdaptor(const Teuchos::RCP<VectorType> &vector_ptr);
+    VectorAdaptor(const ROL::Ptr<VectorType> &vector_ptr);
 
     /**
-     * Return the Teuchos smart reference counting pointer to
-     * the wrapper vector, #vector_ptr.
+     * Return the ROL pointer to the wrapper vector, #vector_ptr.
      */
-    Teuchos::RCP<VectorType>
+    ROL::Ptr<VectorType>
     getVector();
 
     /**
-     * Return the Teuchos smart reference counting pointer to const vector.
+     * Return the ROL pointer to const vector.
      */
-    Teuchos::RCP<const VectorType>
+    ROL::Ptr<const VectorType>
     getVector() const;
 
     /**
@@ -211,15 +209,14 @@ namespace Rol
     /**
      * Return a clone of the wrapped vector.
      */
-    Teuchos::RCP<ROL::Vector<value_type>>
+    ROL::Ptr<ROL::Vector<value_type>>
     clone() const;
 
     /**
-     * Create and return a Teuchos smart reference counting pointer to the basis
-     * vector corresponding to the @p i ${}^{th}$ element of
-     * the wrapper vector.
+     * Create and return a ROL pointer to the basis vector corresponding to the
+     * @p i ${}^{th}$ element of the wrapper vector.
      */
-    Teuchos::RCP<ROL::Vector<value_type>>
+    ROL::Ptr<ROL::Vector<value_type>>
     basis(const int i) const;
 
     /**
@@ -257,14 +254,14 @@ namespace Rol
 
   template <typename VectorType>
   VectorAdaptor<VectorType>::VectorAdaptor(
-    const Teuchos::RCP<VectorType> &vector_ptr)
+    const ROL::Ptr<VectorType> &vector_ptr)
     : vector_ptr(vector_ptr)
   {}
 
 
 
   template <typename VectorType>
-  Teuchos::RCP<VectorType>
+  ROL::Ptr<VectorType>
   VectorAdaptor<VectorType>::getVector()
   {
     return vector_ptr;
@@ -273,7 +270,7 @@ namespace Rol
 
 
   template <typename VectorType>
-  Teuchos::RCP<const VectorType>
+  ROL::Ptr<const VectorType>
   VectorAdaptor<VectorType>::getVector() const
   {
     return vector_ptr;
@@ -286,7 +283,7 @@ namespace Rol
   VectorAdaptor<VectorType>::set(const ROL::Vector<value_type> &rol_vector)
   {
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     (*vector_ptr) = *(vector_adaptor.getVector());
   }
@@ -301,7 +298,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     *vector_ptr += *(vector_adaptor.getVector());
   }
@@ -317,7 +314,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     vector_ptr->add(alpha, *(vector_adaptor.getVector()));
   }
@@ -354,7 +351,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     return (*vector_ptr) * (*vector_adaptor.getVector());
   }
@@ -371,22 +368,21 @@ namespace Rol
 
 
   template <typename VectorType>
-  Teuchos::RCP<ROL::Vector<typename VectorType::value_type>>
+  ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
   VectorAdaptor<VectorType>::clone() const
   {
-    Teuchos::RCP<VectorType> vec_ptr = Teuchos::rcp(new VectorType);
-    (*vec_ptr)                       = (*vector_ptr);
+    ROL::Ptr<VectorType> vec_ptr = ROL::makePtr<VectorType>(*vector_ptr);
 
-    return Teuchos::rcp(new VectorAdaptor(vec_ptr));
+    return ROL::makePtr<VectorAdaptor>(vec_ptr);
   }
 
 
 
   template <typename VectorType>
-  Teuchos::RCP<ROL::Vector<typename VectorType::value_type>>
+  ROL::Ptr<ROL::Vector<typename VectorType::value_type>>
   VectorAdaptor<VectorType>::basis(const int i) const
   {
-    Teuchos::RCP<VectorType> vec_ptr = Teuchos::rcp(new VectorType);
+    ROL::Ptr<VectorType> vec_ptr = ROL::makePtr<VectorType>();
 
     // Zero all the entries in dealii vector.
     vec_ptr->reinit(*vector_ptr, false);
@@ -403,9 +399,7 @@ namespace Rol
         vec_ptr->compress(VectorOperation::insert);
       }
 
-    Teuchos::RCP<VectorAdaptor> e = Teuchos::rcp(new VectorAdaptor(vec_ptr));
-
-    return e;
+    return ROL::makePtr<VectorAdaptor>(vec_ptr);
   }
 
 
@@ -444,7 +438,7 @@ namespace Rol
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
-      Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
+      dynamic_cast<const VectorAdaptor &>(rol_vector);
 
     const VectorType &given_rol_vector = *(vector_adaptor.getVector());
 

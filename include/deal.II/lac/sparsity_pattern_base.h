@@ -21,6 +21,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/types.h>
 
 #include <utility>
 
@@ -167,10 +168,10 @@ SparsityPatternBase::n_cols() const
 
 
 inline void
-SparsityPatternBase::resize(const size_type rows, const size_type cols)
+SparsityPatternBase::resize(const size_type n_rows, const size_type n_cols)
 {
-  this->rows = rows;
-  this->cols = cols;
+  this->rows = n_rows;
+  this->cols = n_cols;
 }
 #endif
 

@@ -43,6 +43,7 @@ namespace LA
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/hp/fe_values.h>
@@ -225,23 +226,25 @@ namespace Step27
                                              0,
                                              Functions::ZeroFunction<dim>(),
                                              constraints);
-#ifdef DEBUG
-    // We did not think about hp-constraints on ghost cells yet.
-    // Thus, we are content with verifying their consistency for now.
-    std::vector<IndexSet> locally_owned_dofs_per_processor =
-      Utilities::MPI::all_gather(dof_handler.get_mpi_communicator(),
-                                 dof_handler.locally_owned_dofs());
+    if constexpr (running_in_debug_mode())
+      {
+        // We did not think about hp-constraints on ghost cells yet.
+        // Thus, we are content with verifying their consistency for now.
+        std::vector<IndexSet> locally_owned_dofs_per_processor =
+          Utilities::MPI::all_gather(dof_handler.get_mpi_communicator(),
+                                     dof_handler.locally_owned_dofs());
 
-    const IndexSet locally_active_dofs =
-      DoFTools::extract_locally_active_dofs(dof_handler);
+        const IndexSet locally_active_dofs =
+          DoFTools::extract_locally_active_dofs(dof_handler);
 
-    AssertThrow(
-      constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,
-                                            locally_active_dofs,
-                                            mpi_communicator,
-                                            /*verbose=*/true),
-      ExcMessage("AffineConstraints object contains inconsistencies!"));
-#endif
+        AssertThrow(constraints.is_consistent_in_parallel(
+                      locally_owned_dofs_per_processor,
+                      locally_active_dofs,
+                      mpi_communicator,
+                      /*verbose=*/true),
+                    ExcMessage(
+                      "AffineConstraints object contains inconsistencies!"));
+      }
     constraints.close();
 
     DynamicSparsityPattern dsp(locally_relevant_dofs);

@@ -627,6 +627,44 @@ SparsityPattern::empty() const
 
 
 
+SparsityPattern::size_type
+SparsityPattern::operator()(const size_type i, const size_type j) const
+{
+  Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
+  AssertIndexRange(i, n_rows());
+  AssertIndexRange(j, n_cols());
+  Assert(compressed, ExcNotCompressed());
+
+  // let's see whether there is something in this line
+  if (rowstart[i] == rowstart[i + 1])
+    return invalid_entry;
+
+  // If special storage of diagonals was requested, we can get the diagonal
+  // element faster by this query.
+  if (store_diagonal_first_in_row && (i == j))
+    return rowstart[i];
+
+  // all other entries are sorted, so we can use a binary search algorithm
+  //
+  // note that the entries are only sorted upon compression, so this would
+  // fail for non-compressed sparsity patterns; however, that is why the
+  // Assertion is at the top of this function, so it may not be called for
+  // noncompressed structures.
+  const size_type *sorted_region_start =
+    (store_diagonal_first_in_row ? &colnums[rowstart[i] + 1] :
+                                   &colnums[rowstart[i]]);
+  const size_type *const p =
+    Utilities::lower_bound<const size_type *>(sorted_region_start,
+                                              &colnums[rowstart[i + 1]],
+                                              j);
+  if ((p != &colnums[rowstart[i + 1]]) && (*p == j))
+    return (p - colnums.get());
+  else
+    return invalid_entry;
+}
+
+
+
 bool
 SparsityPattern::exists(const size_type i, const size_type j) const
 {
@@ -670,6 +708,24 @@ SparsityPattern::matrix_position(const std::size_t global_index) const
 
 
 SparsityPattern::size_type
+SparsityPattern::row_position(const size_type i, const size_type j) const
+{
+  Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
+  AssertIndexRange(i, n_rows());
+  AssertIndexRange(j, n_cols());
+
+  for (size_type k = rowstart[i]; k < rowstart[i + 1]; ++k)
+    {
+      // entry exists
+      if (colnums[k] == j)
+        return k - rowstart[i];
+    }
+  return numbers::invalid_size_type;
+}
+
+
+
+SparsityPattern::size_type
 SparsityPattern::bandwidth() const
 {
   Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
@@ -705,44 +761,6 @@ SparsityPattern::max_entries_per_row() const
     m = std::max(m, static_cast<size_type>(rowstart[i] - rowstart[i - 1]));
 
   return m;
-}
-
-
-
-SparsityPattern::size_type
-SparsityPattern::operator()(const size_type i, const size_type j) const
-{
-  Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
-  AssertIndexRange(i, n_rows());
-  AssertIndexRange(j, n_cols());
-  Assert(compressed, ExcNotCompressed());
-
-  // let's see whether there is something in this line
-  if (rowstart[i] == rowstart[i + 1])
-    return invalid_entry;
-
-  // If special storage of diagonals was requested, we can get the diagonal
-  // element faster by this query.
-  if (store_diagonal_first_in_row && (i == j))
-    return rowstart[i];
-
-  // all other entries are sorted, so we can use a binary search algorithm
-  //
-  // note that the entries are only sorted upon compression, so this would
-  // fail for non-compressed sparsity patterns; however, that is why the
-  // Assertion is at the top of this function, so it may not be called for
-  // noncompressed structures.
-  const size_type *sorted_region_start =
-    (store_diagonal_first_in_row ? &colnums[rowstart[i] + 1] :
-                                   &colnums[rowstart[i]]);
-  const size_type *const p =
-    Utilities::lower_bound<const size_type *>(sorted_region_start,
-                                              &colnums[rowstart[i + 1]],
-                                              j);
-  if ((p != &colnums[rowstart[i + 1]]) && (*p == j))
-    return (p - colnums.get());
-  else
-    return invalid_entry;
 }
 
 
@@ -871,20 +889,31 @@ SparsityPattern::symmetrize()
 
 
 
-SparsityPattern::size_type
-SparsityPattern::row_position(const size_type i, const size_type j) const
+bool
+SparsityPattern::operator==(const SparsityPattern &sp2) const
 {
-  Assert((rowstart != nullptr) && (colnums != nullptr), ExcEmptyObject());
-  AssertIndexRange(i, n_rows());
-  AssertIndexRange(j, n_cols());
+  if (store_diagonal_first_in_row != sp2.store_diagonal_first_in_row)
+    return false;
 
-  for (size_type k = rowstart[i]; k < rowstart[i + 1]; ++k)
+  // it isn't quite necessary to compare *all* member variables. by only
+  // comparing the essential ones, we can say that two sparsity patterns are
+  // equal even if one is compressed and the other is not (in which case some
+  // of the member variables are not yet set correctly)
+  if (rows != sp2.rows || cols != sp2.cols || compressed != sp2.compressed)
+    return false;
+
+  if (rows > 0)
     {
-      // entry exists
-      if (colnums[k] == j)
-        return k - rowstart[i];
+      for (size_type i = 0; i < rows + 1; ++i)
+        if (rowstart[i] != sp2.rowstart[i])
+          return false;
+
+      for (size_type i = 0; i < rowstart[rows]; ++i)
+        if (colnums[i] != sp2.colnums[i])
+          return false;
     }
-  return numbers::invalid_size_type;
+
+  return true;
 }
 
 

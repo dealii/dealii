@@ -14,6 +14,7 @@
 
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_description.h>
 
 namespace dealii
 {
@@ -411,11 +412,13 @@ namespace dealii
 
       // add simplex cell in coordinate direction
       const unsigned int coordinate = face_no / 2;
-#ifdef DEBUG
-      // all vertices should be in a plane
-      for (const auto &vertex : vertices)
-        Assert(midpoint[coordinate] == vertex[coordinate], ExcInternalError());
-#endif
+      if constexpr (running_in_debug_mode())
+        {
+          // all vertices should be in a plane
+          for (const auto &vertex : vertices)
+            Assert(midpoint[coordinate] == vertex[coordinate],
+                   ExcInternalError());
+        }
 
       // add another vertex as tip of triangle/pyramid
       Point<spacedim> tip = midpoint;

@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2004 - 2024 by the deal.II authors
+// Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,11 @@
 #ifndef dealii_tests_h
 #define dealii_tests_h
 
-// common definitions used in all the tests
+
+// ------------------------------------------------------------------------
+//
+// Common includes for tests.
+//
 
 #include <deal.II/base/config.h>
 
@@ -30,12 +34,15 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/grid/cell_data.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
@@ -47,39 +54,33 @@
 #endif
 
 
-// silence extra diagnostics in the testsuite
-#ifdef DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#endif
+// ------------------------------------------------------------------------
 
+DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_MSVC
-// Under windows tests will hang and show a debugging dialog box from the
-// debug CRT if an exception is encountered. Disable this:
-#  include <stdlib.h>
-
-struct DisableWindowsDebugRuntimeDialog
+namespace internal
 {
-  DisableWindowsDebugRuntimeDialog()
+  namespace VectorImplementation
   {
-    _set_abort_behavior(0, _WRITE_ABORT_MSG);
+    extern unsigned int minimum_parallel_grain_size;
   }
-} deal_II_windows_crt_dialog;
-#endif
+  namespace SparseMatrixImplementation
+  {
+    extern unsigned int minimum_parallel_grain_size;
+  }
+} // namespace internal
 
-// Redefine Assert as AssertThrow to make sure that the code is tested similarly
-// in Release mode and in Debug mode. clang-format makes sure that this file is
-// included after all regular header files but before all the other local header
-// files.
-#undef Assert
-#define Assert AssertThrow
+DEAL_II_NAMESPACE_CLOSE
 
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
 using namespace dealii;
 
 
-// ------------------------- Utility functions used in tests ------------------
+// ------------------------------------------------------------------------
+//
+// Utility functions used in tests.
+//
 
 /**
  * Go through the input stream @p in and filter out binary data for the key @p key .
@@ -121,6 +122,7 @@ filter_out_xml_key(std::istream &in, const std::string &key, std::ostream &out)
     }
 }
 
+
 /**
  * A function to return real part of the number and check that
  * its imaginary part is zero.
@@ -135,6 +137,11 @@ get_real_assert_zero_imag(const PETScWrappers::internal::VectorReference &a)
 }
 #endif
 
+
+/**
+ * Return the real part of a complex number and assert the the imaginary
+ * part is zero.
+ */
 template <typename number>
 number
 get_real_assert_zero_imag(const std::complex<number> &a)
@@ -143,6 +150,11 @@ get_real_assert_zero_imag(const std::complex<number> &a)
   return a.real();
 }
 
+
+/**
+ * Return the real part of a complex number and assert the the imaginary
+ * part is zero.
+ */
 template <typename number>
 number
 get_real_assert_zero_imag(const number &a)
@@ -151,10 +163,12 @@ get_real_assert_zero_imag(const number &a)
 }
 
 
-// Cygwin has a different implementation for rand() which causes many tests to
-// fail. This here is a reimplementation that gives the same sequence of numbers
-// as a program that uses rand() on a typical linux machine. we put this into a
-// namespace to not conflict with stdlib
+/*
+ * Cygwin has a different implementation for rand() which causes many tests to
+ * fail. This here is a reimplementation that gives the same sequence of numbers
+ * as a program that uses rand() on a typical linux machine. we put this into a
+ * namespace to not conflict with stdlib
+ */
 namespace Testing
 {
   /**
@@ -244,8 +258,9 @@ namespace Testing
 } // namespace Testing
 
 
-
-// Get a uniformly distributed random value between min and max
+/**
+ * Get a uniformly distributed random value between min and max
+ */
 template <typename T = double>
 T
 random_value(const T &min = static_cast<T>(0), const T &max = static_cast<T>(1))
@@ -255,9 +270,10 @@ random_value(const T &min = static_cast<T>(0), const T &max = static_cast<T>(1))
 }
 
 
-
-// Construct a uniformly distributed random point, with each coordinate
-// between min and max
+/**
+ * Construct a uniformly distributed random point, with each coordinate
+ * between min and max.
+ */
 template <int dim>
 inline Point<dim>
 random_point(const double &min = 0.0, const double &max = 1.0)
@@ -270,9 +286,10 @@ random_point(const double &min = 0.0, const double &max = 1.0)
 }
 
 
-
-// Construct a uniformly distributed random box, with each coordinate
-// between min and max
+/**
+ * Construct a uniformly distributed random box, with each coordinate
+ * between min and max.
+ */
 template <int dim>
 inline BoundingBox<dim>
 random_box(const double &min = 0.0, const double &max = 1.0)
@@ -284,9 +301,9 @@ random_box(const double &min = 0.0, const double &max = 1.0)
 }
 
 
-
-// given the name of a file, copy it to deallog
-// and then delete it
+/**
+ * Given the name of a file, copy it to deallog and then delete it.
+ */
 void
 cat_file(const char *filename)
 {
@@ -300,7 +317,7 @@ cat_file(const char *filename)
 }
 
 
-/*
+/**
  * Some tests (notably base/thread*, base/task*) create output that
  * comes out in random order. To make the output of these tests comparable,
  * we need to sort them.
@@ -317,8 +334,8 @@ sort_file_contents(const std::string &filename)
 }
 
 
-/*
- * simple ADLER32 checksum for a range of chars
+/**
+ * Simple ADLER32 checksum for a range of chars.
  */
 template <class IT>
 unsigned int
@@ -343,8 +360,7 @@ checksum(const IT &begin, const IT &end)
 }
 
 
-
-/*
+/**
  * Replace all occurrences of ' &' by '& ' from the given file to hopefully be
  * more compiler independent with respect to __PRETTY_FUNCTION__
  *
@@ -364,7 +380,7 @@ unify_pretty_function(const std::string &text)
 }
 
 
-/*
+/**
  * Test that a solver converged within a certain range of iteration steps.
  *
  * SolverType_COMMAND is the command to issue, CONTROL_COMMAND a function call
@@ -372,7 +388,6 @@ unify_pretty_function(const std::string &text)
  * MIN_ALLOWED, MAX_ALLOWED is the inclusive range of allowed iteration
  * steps.
  */
-
 #define check_solver_within_range(SolverType_COMMAND,                \
                                   CONTROL_COMMAND,                   \
                                   MIN_ALLOWED,                       \
@@ -399,7 +414,8 @@ unify_pretty_function(const std::string &text)
       }                                                              \
   }
 
-/*
+
+/**
  * Allow a test program to define a number that is very small to a given
  * tolerance to be output as zero. This is used e.g. for the output of float
  * numbers where roundoff difference can make the error larger than what we
@@ -416,15 +432,31 @@ filter_out_small_numbers(const Number number, const double tolerance)
 }
 
 
-// ---------------- Functions used in initializing subsystems -----------------
+/**
+ * A small utility function that prints all (printable) elements of a
+ * vector to deallog:
+ */
+template <class T>
+LogStream &
+operator<<(LogStream &out, const std::vector<T> &v)
+{
+  for (std::size_t i = 0; i < v.size(); ++i)
+    out << v[i] << (i == v.size() - 1 ? "" : " ");
+  return out;
+}
 
 
-/*
- * If we run 64 tests at the same time on a 64-core system, and each of
- * them runs 64 threads, then we get astronomical loads. Limit concurrency
- * to a fixed (small) number of threads, independent of the core count. The
- * limit defaults to 3 and can be overridden by the environment variable
- * TEST_N_THREADS.
+// ------------------------------------------------------------------------
+//
+// Functions and classes used when initializing (library) subsystems and
+// modifying global state for the testing environment.
+//
+
+
+/**
+ * Return the maximal number of threads that should be used when executing
+ * the test. The number defaults to 3 but can be overridden by the
+ * environment variable TEST_N_THREADS.
  */
 inline unsigned int
 testing_max_num_threads()
@@ -445,6 +477,14 @@ testing_max_num_threads()
     return default_n_threads;
 }
 
+
+/**
+ * If we run 64 tests at the same time on a 64-core system, and each of
+ * them runs 64 threads, then we get astronomical loads. Limit concurrency
+ * to a fixed (small) number of threads, independent of the core count. The
+ * limit defaults to 3 and can be overridden by the environment variable
+ * TEST_N_THREADS.
+ */
 struct LimitConcurrency
 {
   LimitConcurrency()
@@ -482,14 +522,12 @@ struct PETScReferenceCountContext
   }
 
 
-
   static PetscErrorCode
   destruct(PetscLogHandler handler)
   {
     delete reinterpret_cast<PETScReferenceCountContext *>(handler->data);
     return PETSC_SUCCESS;
   }
-
 
 
   static PetscErrorCode
@@ -505,7 +543,6 @@ struct PETScReferenceCountContext
   }
 
 
-
   static PetscErrorCode
   log_object_destructor(PetscLogHandler handler, PetscObject obj)
   {
@@ -518,6 +555,7 @@ struct PETScReferenceCountContext
     return PETSC_SUCCESS;
   }
 
+
   // Map between the PETSc class name and the number of constructions /
   // destructions
   std::map<std::string, std::pair<PetscInt, PetscInt>> ctor_dtor_map;
@@ -526,18 +564,20 @@ struct PETScReferenceCountContext
 #  endif
 #endif
 
-
-// Function to initialize deallog. Normally, it should be called at
-// the beginning of main() like
-//
-// initlog();
-//
-// This will open the correct output file, divert log output there and
-// switch off screen output. If screen output is desired, provide the
-// optional first argument as 'true'.
 std::string   deallogname;
 std::ofstream deallogfile;
 
+/*
+ * Function to initialize deallog. Normally, it should be called at
+ * the beginning of main() like
+ * @code
+ * initlog();
+ * @endcode
+ *
+ * This will open the correct output file, divert log output there and
+ * switch off screen output. If screen output is desired, provide the
+ * optional first argument as 'true'.
+ */
 void
 initlog(const bool                    console = false,
         const std::ios_base::fmtflags flags   = std::ios::showpoint |
@@ -550,6 +590,17 @@ initlog(const bool                    console = false,
 }
 
 
+/*
+ * Function to initialize deallog. Normally, it should be called at
+ * the beginning of main() like
+ * @code
+ * initlog();
+ * @endcode
+ *
+ * This will open the correct output file, divert log output there and
+ * switch off screen output. If screen output is desired, provide the
+ * optional first argument as 'true'.
+ */
 inline void
 mpi_initlog(const bool                    console = false,
             const std::ios_base::fmtflags flags   = std::ios::showpoint |
@@ -571,7 +622,6 @@ mpi_initlog(const bool                    console = false,
   Assert(false, ExcInternalError());
 #endif
 }
-
 
 
 /**
@@ -756,6 +806,7 @@ new_tbb_assertion_handler(const char *file,
   Assert(false, ExcMessage("TBB Exception, see above"));
 }
 
+
 struct SetTBBAssertionHandler
 {
   SetTBBAssertionHandler()
@@ -767,7 +818,43 @@ struct SetTBBAssertionHandler
 #endif /*TBB_DO_ASSERT*/
 
 
-// ---------------------- Adjust global variables in deal.II ------------------
+// ------------------------------------------------------------------------
+//
+// Modify global state for the test environment.
+//
+
+
+// silence extra diagnostics in the testsuite
+#ifdef DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#endif
+
+
+#ifdef DEAL_II_MSVC
+// Under windows tests will hang and show a debugging dialog box from the
+// debug CRT if an exception is encountered. Disable this:
+#  include <stdlib.h>
+
+struct DisableWindowsDebugRuntimeDialog
+{
+  DisableWindowsDebugRuntimeDialog()
+  {
+    _set_abort_behavior(0, _WRITE_ABORT_MSG);
+  }
+} deal_II_windows_crt_dialog;
+#endif
+
+
+// Redefine Assert as AssertThrow to make sure that the code is tested similarly
+// in Release mode and in Debug mode. clang-format makes sure that this file is
+// included after all regular header files but before all the other local header
+// files. The redefinition is not applied when Kokkos GPU backend is enabled,
+// because AssertThrow is not defined for device codes.
+#if !defined(KOKKOS_ENABLE_CUDA) && !defined(KOKKOS_ENABLE_HIP) && \
+  !defined(KOKKOS_ENABLE_SYCL)
+#  undef Assert
+#  define Assert AssertThrow
+#endif
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -811,22 +898,10 @@ struct EnableFPE
 } deal_II_enable_fpe;
 
 
-/* Set grainsizes for parallel mode smaller than they would otherwise be.
+/**
+ * Set grainsizes for parallel mode smaller than they would otherwise be.
  * This is used to test that the parallel algorithms in lac/ work alright:
  */
-
-namespace internal
-{
-  namespace VectorImplementation
-  {
-    extern unsigned int minimum_parallel_grain_size;
-  }
-  namespace SparseMatrixImplementation
-  {
-    extern unsigned int minimum_parallel_grain_size;
-  }
-} // namespace internal
-
 struct SetGrainSizes
 {
   SetGrainSizes()
@@ -837,14 +912,5 @@ struct SetGrainSizes
 } set_grain_sizes;
 
 DEAL_II_NAMESPACE_CLOSE
-
-template <class T>
-LogStream &
-operator<<(LogStream &out, const std::vector<T> &v)
-{
-  for (std::size_t i = 0; i < v.size(); ++i)
-    out << v[i] << (i == v.size() - 1 ? "" : " ");
-  return out;
-}
 
 #endif // dealii_tests_h

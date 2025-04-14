@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
@@ -132,13 +133,13 @@ PathSearch::find(const std::string &filename,
         if (debug > 1)
           deallog << "PathSearch[" << cls << "] trying " << real_name
                   << std::endl;
-        FILE *fp = fopen(real_name.c_str(), open_mode);
+        std::FILE *fp = std::fopen(real_name.c_str(), open_mode);
         if (fp != nullptr)
           {
             if (debug > 0)
               deallog << "PathSearch[" << cls << "] opened " << real_name
                       << std::endl;
-            fclose(fp);
+            std::fclose(fp);
             return real_name;
           }
       }
@@ -151,13 +152,13 @@ PathSearch::find(const std::string &filename,
           if (debug > 1)
             deallog << "PathSearch[" << cls << "] trying " << real_name
                     << std::endl;
-          FILE *fp = fopen(real_name.c_str(), open_mode);
+          std::FILE *fp = std::fopen(real_name.c_str(), open_mode);
           if (fp != nullptr)
             {
               if (debug > 0)
                 deallog << "PathSearch[" << cls << "] opened " << real_name
                         << std::endl;
-              fclose(fp);
+              std::fclose(fp);
               return real_name;
             }
         }

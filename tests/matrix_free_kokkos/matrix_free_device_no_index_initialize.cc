@@ -32,33 +32,30 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  static const unsigned int n_dofs_1d    = fe_degree + 1;
-  static const unsigned int n_local_dofs = Utilities::pow(n_dofs_1d, dim);
+  static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points   = Utilities::pow(n_q_points_1d, dim);
 
   MatrixFreeTest(const Portable::MatrixFree<dim, Number> &data_in)
     : data(data_in){};
 
   DEAL_II_HOST_DEVICE void
-  operator()(const unsigned int                                      cell,
-             const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-             Portable::SharedData<dim, Number> *shared_data,
-             const Number                      *src,
-             Number                            *dst) const
+  operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
+             const Portable::DeviceVector<Number>                   &src,
+             Portable::DeviceVector<Number>                         &dst) const
   {
     Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
-      gpu_data, shared_data);
+      data);
 
     // set to unit vector
     auto fe_eval_ptr = &fe_eval;
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
                                                  n_local_dofs),
                          [&](int i) { fe_eval_ptr->submit_dof_value(1., i); });
-    shared_data->team_member.team_barrier();
+    data->team_member.team_barrier();
     fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
 #ifndef __APPLE__
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
                                                  n_local_dofs),
                          [&](int i) {
                            // values should evaluate to one, derivatives to zero
@@ -70,7 +67,7 @@ public:
     fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
 
     Kokkos::parallel_for(
-      Kokkos::TeamThreadRange(shared_data->team_member, n_local_dofs),
+      Kokkos::TeamThreadRange(data->team_member, n_local_dofs),
       KOKKOS_LAMBDA(int i) { assert(fe_eval_ptr->get_dof_value(i) == 1.); });
 #endif
   }
@@ -93,10 +90,6 @@ public:
 protected:
   const Portable::MatrixFree<dim, Number> &data;
 };
-
-template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-const unsigned int
-  MatrixFreeTest<dim, fe_degree, n_q_points_1d, Number>::n_dofs_1d;
 
 template <int dim, int fe_degree, int n_q_points_1d, typename Number>
 const unsigned int

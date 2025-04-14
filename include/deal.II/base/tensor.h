@@ -31,6 +31,7 @@
 #endif
 
 #include <cmath>
+#include <complex>
 #include <ostream>
 #include <type_traits>
 
@@ -839,7 +840,7 @@ private:
    * a rank-1 tensor, then we simply need an array of scalars.
    * Otherwise, it is an array of tensors one rank lower.
    */
-#if KOKKOS_VERSION >= 30700
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
   std::conditional_t<rank_ == 1,
                      Kokkos::Array<Number, dim>,
                      Kokkos::Array<Tensor<rank_ - 1, dim, Number>, dim>>
@@ -1104,7 +1105,7 @@ namespace internal
     constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE void
     multiply_assign_scalar(std::complex<Number> &val, const OtherNumber &s)
     {
-#  if KOKKOS_VERSION >= 30600
+#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       KOKKOS_IF_ON_HOST((val *= s;))
       KOKKOS_IF_ON_DEVICE(({
         (void)val;
@@ -1253,7 +1254,7 @@ Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
 }
 
 
-#  ifdef DEAL_II_HAVE_CXX20
+#  if defined(DEAL_II_HAVE_CXX20) && !defined(__NVCC__)
 
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
@@ -1329,7 +1330,7 @@ namespace internal
   namespace TensorInitialization
   {
     template <int rank, int dim, typename Number, std::size_t... I>
-#    if KOKKOS_VERSION >= 30700
+#    if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
     constexpr Kokkos::Array<typename Tensor<rank, dim, Number>::value_type, dim>
 #    else
     constexpr std::array<typename Tensor<rank, dim, Number>::value_type, dim>
@@ -1701,8 +1702,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
   Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 {
-  if constexpr (std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value ||
+  if constexpr (std::is_integral_v<
+                  typename ProductType<Number, OtherNumber>::type> ||
                 std::is_same_v<Number, Differentiation::SD::Expression>)
     {
       // recurse over the base objects

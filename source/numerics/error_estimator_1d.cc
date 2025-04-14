@@ -558,7 +558,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
 // explicit instantiations
-#include "error_estimator_1d.inst"
+#include "numerics/error_estimator_1d.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

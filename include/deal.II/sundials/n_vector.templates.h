@@ -35,6 +35,8 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/vector_memory.h>
 
+#  include <sundials/sundials_nvector.h>
+
 #  include <limits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -431,53 +433,50 @@ namespace SUNDIALS
 {
   namespace internal
   {
-    namespace
+    template <typename VectorType,
+              std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
+    MPI_Comm
+    get_mpi_communicator_from_vector(const VectorType &)
     {
-      template <typename VectorType,
-                std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
-      MPI_Comm
-      get_mpi_communicator_from_vector(const VectorType &)
-      {
-        return MPI_COMM_SELF;
-      }
+      return MPI_COMM_SELF;
+    }
 
 
 
-      template <typename VectorType,
-                std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                   !IsBlockVector<VectorType>::value,
-                                 int> = 0>
-      MPI_Comm
-      get_mpi_communicator_from_vector(const VectorType &v)
-      {
+    template <typename VectorType,
+              std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                 !IsBlockVector<VectorType>::value,
+                               int> = 0>
+    MPI_Comm
+    get_mpi_communicator_from_vector(const VectorType &v)
+    {
 #  ifndef DEAL_II_WITH_MPI
-        (void)v;
-        return MPI_COMM_SELF;
+      (void)v;
+      return MPI_COMM_SELF;
 #  else
-        return v.get_mpi_communicator();
+      return v.get_mpi_communicator();
 #  endif
-      }
+    }
 
 
 
-      template <typename VectorType,
-                std::enable_if_t<!is_serial_vector<VectorType>::value &&
-                                   IsBlockVector<VectorType>::value,
-                                 int> = 0>
-      MPI_Comm
-      get_mpi_communicator_from_vector(const VectorType &v)
-      {
+    template <typename VectorType,
+              std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                 IsBlockVector<VectorType>::value,
+                               int> = 0>
+    MPI_Comm
+    get_mpi_communicator_from_vector(const VectorType &v)
+    {
 #  ifndef DEAL_II_WITH_MPI
-        (void)v;
-        return MPI_COMM_SELF;
+      (void)v;
+      return MPI_COMM_SELF;
 #  else
-        Assert(v.n_blocks() > 0,
-               ExcMessage("You cannot ask a block vector without blocks "
-                          "for its MPI communicator."));
-        return v.block(0).get_mpi_communicator();
+      Assert(v.n_blocks() > 0,
+             ExcMessage("You cannot ask a block vector without blocks "
+                        "for its MPI communicator."));
+      return v.block(0).get_mpi_communicator();
 #  endif
-      }
-    } // namespace
+    }
 
 
     template <typename VectorType>

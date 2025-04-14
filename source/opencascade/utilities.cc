@@ -22,6 +22,8 @@
 #  include <deal.II/base/point.h>
 #  include <deal.II/base/utilities.h>
 
+#  include <deal.II/grid/tria_description.h>
+
 #  include <IGESControl_Controller.hxx>
 #  include <IGESControl_Reader.hxx>
 #  include <IGESControl_Writer.hxx>
@@ -915,7 +917,13 @@ namespace OpenCASCADE
     tria.create_triangulation(vertices, cells, t);
   }
 
-#  include "utilities.inst"
+// We don't build the .inst file if deal.II isn't configured
+// with GMSH, but doxygen doesn't know that and tries to find that
+// file anyway for parsing -- which then of course it fails on. So
+// exclude the following from doxygen consideration.
+#  ifndef DOXYGEN
+#    include "opencascade/utilities.inst"
+#  endif
 
 } // namespace OpenCASCADE
 

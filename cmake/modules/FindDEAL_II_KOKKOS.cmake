@@ -19,50 +19,128 @@
 #
 #   KOKKOS_INCLUDE_DIRS
 #   KOKKOS_INTERFACE_LINK_FLAGS
+#   KOKKOS_VERSION
+#   KOKKOS_VERSION_MAJOR
+#   KOKKOS_VERSION_MINOR
+#   KOKKOS_VERSION_SUBMINOR
 #
 
 set(KOKKOS_DIR "" CACHE PATH "An optional hint to a Kokkos installation")
 set_if_empty(KOKKOS_DIR "$ENV{KOKKOS_DIR}")
 
+# silence a warning when including FindKOKKOS.cmake
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(DEAL_II_TRILINOS_WITH_KOKKOS OR DEAL_II_PETSC_WITH_KOKKOS)
-  # Let ArborX know that we have found Kokkos
-  set(Kokkos_FOUND ON)
-  # Let deal.II know that we have found Kokkos
-  set(KOKKOS_FOUND ON)
-else()
-  # silence a warning when including FindKOKKOS.cmake
-  set(CMAKE_CXX_EXTENSIONS OFF)
-  find_package(Kokkos 3.7.0 QUIET
-    HINTS ${KOKKOS_DIR} ${Kokkos_DIR} $ENV{Kokkos_DIR}
-    )
+# The minimal Kokkos version we support
+set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.7.0)
 
-  set(KOKKOS_FOUND ${Kokkos_FOUND})
+#
+# Make sure that we prioritize Kokkos bundled with Trilinos or PETSc.
+#
+# We do this by searching for the Kokkos installation first at the
+# restrictive path locations we deduced from both configurations.
+#
 
-  set(_target Kokkos::kokkos)
-  process_feature(KOKKOS
-    TARGETS REQUIRED _target
+if(Kokkos_FOUND)
+  message(WARNING "\n"
+    "find_package(Kokkos [...]) already called. The deal.II CMake "
+    "configuration might be inconsistent.\n\n"
     )
 endif()
 
+if(DEAL_II_WITH_TRILINOS AND TRILINOS_WITH_KOKKOS)
+  message(STATUS "Found Trilinos with bundled Kokkos library. Overriding search path.")
+  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
+  find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
+    PATHS ${TRILINOS_KOKKOS_DIR} NO_DEFAULT_PATH
+    )
 
-if(Kokkos_FOUND)
+  if(NOT Kokkos_FOUND)
+    message(WARNING "\n"
+      "The find_package(Kokkos [...]) call failed with the path deduced from "
+      "the Trilinos configuration. The deal.II CMake configuration might be "
+      "inconsistent.\n\n"
+      )
+  endif()
+
+elseif(DEAL_II_WITH_PETSC AND PETSC_WITH_KOKKOS)
+  message(STATUS "Found PETSc with bundled Kokkos library. Overriding search path.")
+  set(KOKKOS_MINIMUM_REQUIRED_VERSION 3.4.0)
+  find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} QUIET
+    PATHS ${PETSC_KOKKOS_DIR} NO_DEFAULT_PATH
+    )
+
+  if(NOT Kokkos_FOUND)
+    message(WARNING "\n"
+      "The find_package(Kokkos [...]) call failed with the path deduced from "
+      "the PETSc configuration. The deal.II CMake configuration might be "
+      "inconsistent.\n\n"
+      )
+  endif()
+endif()
+
+#
+# Find the Kokkos CMake configuration:
+#
+
+find_package(Kokkos ${KOKKOS_MINIMUM_REQUIRED_VERSION} HINTS ${KOKKOS_DIR})
+
+if (DEAL_II_WITH_TRILINOS AND TRILINOS_VERSION VERSION_LESS 14
+    AND DEAL_II_TRILINOS_WITH_KOKKOS)
+  #
+  # Workaround: Trilinos prior to version 14 needs extensive cleanup of the
+  # exported CMake configuration, which we do in
+  # FindDEAL_II_TRILINOS.cmake. This also applies to the bundled Kokkos
+  # library, which prevents us from simply importing the Kokkos::kokkos
+  # target. We work around this issue by simply not calling
+  # process_feature().
+  #
+  set(KOKKOS_FOUND TRUE)
+
+else()
+
+  set(_target)
+  if(Kokkos_FOUND)
+    set(_target Kokkos::kokkos)
+  endif()
+
+  process_feature(KOKKOS
+    TARGETS REQUIRED _target
+    CLEAR Kokkos_DIR
+    )
+endif()
+
+if(KOKKOS_FOUND)
+  #
+  # Set version number:
+  #
+  if(NOT Kokkos_VERSION)
+    message(WARNING "\n"
+      "find_package(Kokkos [...]) did not set Kokkos_VERSION!"
+      )
+    set(Kokkos_VERSION ${KOKKOS_MINIMUM_REQUIRED_VERSION})
+  endif()
+  set(KOKKOS_VERSION ${Kokkos_VERSION})
+
   if (Kokkos_ENABLE_CUDA OR Kokkos_ENABLE_HIP)
     # In version older than 3.7.0, Kokkos::Array::operator[] is not constexpr,
     # so we use std::array instead.
-    if (KOKKOS_VERSION VERSION_LESS 3.7.0)
+    if (Kokkos_VERSION VERSION_LESS 3.7.0)
       # We are using std::array in device code which calls the host-only function
       # __glibcxx_requires_subscript when defining _GLIBCXX_ASSERTIONS 
       list(REMOVE_ITEM DEAL_II_DEFINITIONS_DEBUG "_GLIBCXX_ASSERTIONS")
     endif()
   endif()
+
   if(Kokkos_ENABLE_CUDA)
-    # We need to disable SIMD vectorization for CUDA device code.
-    # Otherwise, nvcc compilers from version 9 on will emit an error message like:
-    # "[...] contains a vector, which is not supported in device code". We
-    # would like to set the variable in check_01_cpu_feature but at that point
-    # we don't know if CUDA support is enabled in Kokkos
-    set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES Clang)
+      # We need to disable SIMD vectorization for CUDA device code with nvcc.
+      # Otherwise, nvcc compilers from version 9 on will emit an error message like:
+      # "[...] contains a vector, which is not supported in device code". We
+      # would like to set the variable in check_01_cpu_feature but at that point
+      # we don't know if CUDA support is enabled in Kokkos
+      set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
+    endif()
 
     # Require lambda support and expt-relaxed-constexpr for Cuda
     # so that we can use std::array and other interfaces with
@@ -89,4 +167,27 @@ if(Kokkos_FOUND)
     # warning #940-D: missing return statement at end of non-void function
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
   endif()
+
+  #
+  # Extract version numbers:
+  #
+
+  string(REGEX REPLACE
+    "^([0-9]+).*$" "\\1"
+    KOKKOS_VERSION_MAJOR "${KOKKOS_VERSION}")
+
+  string(REGEX REPLACE
+    "^[0-9]+\\.([0-9]+).*$" "\\1"
+    KOKKOS_VERSION_MINOR "${KOKKOS_VERSION}")
+
+  # If there is no subminor number, KOKKOS_VERSION_SUBMINOR is set to an
+  # empty string. If that is the case, set the subminor number to zero
+  string(REGEX REPLACE
+    "^[0-9]+\\.[0-9]+\\.?(([0-9]+)?).*$" "\\1"
+    KOKKOS_VERSION_SUBMINOR "${KOKKOS_VERSION}")
+  if("${KOKKOS_VERSION_SUBMINOR}" STREQUAL "")
+    set(KOKKOS_VERSION_SUBMINOR "0")
+  endif()
+
+
 endif()

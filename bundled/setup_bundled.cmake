@@ -76,7 +76,11 @@ option(DEAL_II_FORCE_BUNDLED_KOKKOS
 set(KOKKOS_FOLDER "${CMAKE_SOURCE_DIR}/bundled/kokkos-3.7.00")
 
 macro(feature_kokkos_configure_bundled)
+  set(Kokkos_VERSION "3.7.0")
   set(KOKKOS_VERSION "3.7.0")
+  set(KOKKOS_VERSION_MAJOR "3")
+  set(KOKKOS_VERSION_MINOR "7")
+  set(KOKKOS_VERSION_SUBMINOR "0")
   set(Kokkos_DEVICES "Serial")
   set(Kokkos_ARCH " ")
 
@@ -100,10 +104,10 @@ option(DEAL_II_FORCE_BUNDLED_TASKFLOW
   "Always use the bundled taskflow header library instead of an external one."
   OFF)
 
-set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-3.7.0")
+set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-3.10.0")
 
 macro(feature_taskflow_configure_bundled)
-  set(TASKFLOW_VERSION "3.7.0")
+  set(TASKFLOW_VERSION "3.10.0")
 
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER})
 endmacro()

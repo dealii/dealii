@@ -21,6 +21,7 @@
 #include <deal.II/base/point.h>
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_description.h>
 
 #include <fstream>
 #include <iostream>

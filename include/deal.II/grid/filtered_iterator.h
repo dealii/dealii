@@ -20,6 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/iterator_range.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/grid/tria_iterator_base.h>
 

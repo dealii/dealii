@@ -22,7 +22,7 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/tria_base.h>
 
-#include <deal.II/dofs/dof_accessor.templates.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/grid/filtered_iterator.h>
@@ -600,12 +600,13 @@ namespace hp
               if (future_fe_indices_on_coarsened_cells.find(parent) ==
                   future_fe_indices_on_coarsened_cells.end())
                 {
-#ifdef DEBUG
-                  for (const auto &child : parent->child_iterators())
-                    Assert(child->is_active() && child->coarsen_flag_set(),
-                           typename Triangulation<
-                             dim>::ExcInconsistentCoarseningFlags());
-#endif
+                  if constexpr (running_in_debug_mode())
+                    {
+                      for (const auto &child : parent->child_iterators())
+                        Assert(child->is_active() && child->coarsen_flag_set(),
+                               typename Triangulation<
+                                 dim>::ExcInconsistentCoarseningFlags());
+                    }
 
                   parent_future_fe_index =
                     internal::hp::DoFHandlerImplementation::
@@ -1069,6 +1070,6 @@ namespace hp
 
 
 // explicit instantiations
-#include "refinement.inst"
+#include "hp/refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE

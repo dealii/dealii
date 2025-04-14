@@ -199,12 +199,13 @@ namespace Particles
 
           // The local particle start index is the number of all particles
           // generated on lower MPI ranks.
-          const int ierr = MPI_Exscan(&n_particles_to_generate,
-                                      &particle_index,
-                                      1,
-                                      DEAL_II_PARTICLE_INDEX_MPI_TYPE,
-                                      MPI_SUM,
-                                      tria->get_mpi_communicator());
+          const int ierr = MPI_Exscan(
+            &n_particles_to_generate,
+            &particle_index,
+            1,
+            Utilities::MPI::mpi_type_id_for_type<types::particle_index>,
+            MPI_SUM,
+            tria->get_mpi_communicator());
           AssertThrowMPI(ierr);
         }
 #endif
@@ -381,26 +382,29 @@ namespace Particles
           }
         else
           {
-            // Compute number of particles per cell according to the ratio
-            // between their weight and the local weight integral
-            types::particle_index particles_created = 0;
-
-            for (const auto &cell : triangulation.active_cell_iterators() |
-                                      IteratorFilters::LocallyOwnedCell())
+            if (local_weight_integral > 0)
               {
-                const types::particle_index cumulative_particles_to_create =
-                  std::llround(
-                    static_cast<double>(n_local_particles) *
-                    cumulative_cell_weights[cell->active_cell_index()] /
-                    local_weight_integral);
+                types::particle_index particles_created = 0;
 
-                // Compute particles for this cell as difference between
-                // number of particles that should be created including this
-                // cell minus the number of particles already created.
-                particles_per_cell[cell->active_cell_index()] =
-                  cumulative_particles_to_create - particles_created;
-                particles_created +=
-                  particles_per_cell[cell->active_cell_index()];
+                // Compute number of particles per cell according to the ratio
+                // between their weight and the local weight integral
+                for (const auto &cell : triangulation.active_cell_iterators() |
+                                          IteratorFilters::LocallyOwnedCell())
+                  {
+                    const types::particle_index cumulative_particles_to_create =
+                      std::llround(
+                        static_cast<double>(n_local_particles) *
+                        cumulative_cell_weights[cell->active_cell_index()] /
+                        local_weight_integral);
+
+                    // Compute particles for this cell as difference between
+                    // number of particles that should be created including this
+                    // cell minus the number of particles already created.
+                    particles_per_cell[cell->active_cell_index()] =
+                      cumulative_particles_to_create - particles_created;
+                    particles_created +=
+                      particles_per_cell[cell->active_cell_index()];
+                  }
               }
           }
       }
@@ -504,6 +508,6 @@ namespace Particles
   } // namespace Generators
 } // namespace Particles
 
-#include "generators.inst"
+#include "particles/generators.inst"
 
 DEAL_II_NAMESPACE_CLOSE

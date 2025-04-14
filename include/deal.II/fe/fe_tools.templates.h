@@ -1050,11 +1050,50 @@ namespace FETools
 
 
 
-  // Not implemented in the general case.
   template <class FE>
   std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension>>
-  FEFactory<FE>::get(const Quadrature<1> &) const
+  FEFactory<FE>::get(const Quadrature<1> &quad) const
   {
+    // Specializations for FE_Q.
+    if constexpr (std::is_same_v<FE, FE_Q<1, 1>>)
+      return std::make_unique<FE_Q<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q<2, 2>>)
+      return std::make_unique<FE_Q<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q<3, 3>>)
+      return std::make_unique<FE_Q<3>>(quad);
+
+    // Specializations for FE_Q_DG0.
+    if constexpr (std::is_same_v<FE, FE_Q_DG0<1, 1>>)
+      return std::make_unique<FE_Q_DG0<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_DG0<2, 2>>)
+      return std::make_unique<FE_Q_DG0<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_DG0<3, 3>>)
+      return std::make_unique<FE_Q_DG0<3>>(quad);
+
+    // Specializations for FE_Q_Bubbles.
+    if constexpr (std::is_same_v<FE, FE_Q_Bubbles<1, 1>>)
+      return std::make_unique<FE_Q_Bubbles<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_Bubbles<2, 2>>)
+      return std::make_unique<FE_Q_Bubbles<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_Q_Bubbles<3, 3>>)
+      return std::make_unique<FE_Q_Bubbles<3>>(quad);
+
+    // Specializations for FE_DGQArbitraryNodes.
+    if constexpr (std::is_same_v<FE, FE_DGQ<1>>)
+      return std::make_unique<FE_DGQArbitraryNodes<1>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<1, 2>>)
+      return std::make_unique<FE_DGQArbitraryNodes<1, 2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<1, 3>>)
+      return std::make_unique<FE_DGQArbitraryNodes<1, 3>>(quad);
+
+    // Specializations for FE_DG.
+    if constexpr (std::is_same_v<FE, FE_DGQ<2>>)
+      return std::make_unique<FE_DGQArbitraryNodes<2>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<2, 3>>)
+      return std::make_unique<FE_DGQArbitraryNodes<2, 3>>(quad);
+    if constexpr (std::is_same_v<FE, FE_DGQ<3>>)
+      return std::make_unique<FE_DGQArbitraryNodes<3>>(quad);
+
     DEAL_II_NOT_IMPLEMENTED();
     return nullptr;
   }
@@ -1811,13 +1850,13 @@ namespace FETools
 
   template <int dim, typename number, int spacedim>
   void
-  compute_face_embedding_matrices(
-    const FiniteElement<dim, spacedim> &fe,
-    FullMatrix<number> (&matrices)[GeometryInfo<dim>::max_children_per_face],
-    const unsigned int face_coarse,
-    const unsigned int face_fine,
-    const double       threshold)
+  compute_face_embedding_matrices(const FiniteElement<dim, spacedim>  &fe,
+                                  const ArrayView<FullMatrix<number>> &matrices,
+                                  const unsigned int face_coarse,
+                                  const unsigned int face_fine,
+                                  const double       threshold)
   {
+    AssertDimension(matrices.size(), GeometryInfo<dim>::max_children_per_face);
     const unsigned int face_no = face_coarse;
 
     Assert(face_coarse == 0, ExcNotImplemented());
@@ -1915,7 +1954,10 @@ namespace FETools
     // hating the anisotropic implementation
     QGauss<dim - 1>       q_gauss(degree + 1);
     const Quadrature<dim> q_fine =
-      QProjector<dim>::project_to_face(fe.reference_cell(), q_gauss, face_fine);
+      QProjector<dim>::project_to_face(fe.reference_cell(),
+                                       q_gauss,
+                                       face_fine,
+                                       numbers::default_geometric_orientation);
     const unsigned int nq = q_fine.size();
 
     FEValues<dim> fine(mapping,
@@ -1965,7 +2007,12 @@ namespace FETools
          ++cell_number)
       {
         const Quadrature<dim> q_coarse = QProjector<dim>::project_to_subface(
-          fe.reference_cell(), q_gauss, face_coarse, cell_number);
+          fe.reference_cell(),
+          q_gauss,
+          face_coarse,
+          cell_number,
+          numbers::default_geometric_orientation,
+          RefinementCase<dim - 1>::isotropic_refinement);
         FEValues<dim> coarse(mapping, fe, q_coarse, update_values);
 
         typename Triangulation<dim, spacedim>::active_cell_iterator fine_cell =
@@ -2230,23 +2277,24 @@ namespace FETools
     if (name_end < name.size())
       name.erase(name_end);
 
-      // Ensure that the element we are looking for isn't in the map
-      // yet. This only requires us to read the map, so it can happen
-      // in a shared locked state
-#if DEBUG
-    {
-      std::shared_lock<std::shared_mutex> lock(
-        internal::FEToolsAddFENameHelper::fe_name_map_lock);
+    // Ensure that the element we are looking for isn't in the map
+    // yet. This only requires us to read the map, so it can happen
+    // in a shared locked state
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          std::shared_lock<std::shared_mutex> lock(
+            internal::FEToolsAddFENameHelper::fe_name_map_lock);
 
-      Assert(
-        internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].find(
-          name) ==
-          internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
-            .end(),
-        ExcMessage(
-          "Cannot change existing element in finite element name list"));
-    }
-#endif
+          Assert(
+            internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+                .find(name) ==
+              internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+                .end(),
+            ExcMessage(
+              "Cannot change existing element in finite element name list"));
+        }
+      }
 
 
     // Insert the normalized name into the map. This changes the map, so it
@@ -2896,7 +2944,7 @@ namespace FETools
       // FETools::convert_generalized_support_point_values_to_dof_values
 
       template <int dim, int spacedim, typename number>
-      static void
+      void
       convert_helper(const FiniteElement<dim, spacedim> &finite_element,
                      const std::vector<Vector<number>>  &support_point_values,
                      std::vector<number>                &dof_values)
@@ -2928,7 +2976,7 @@ namespace FETools
 
 
       template <int dim, int spacedim, typename number>
-      static void
+      void
       convert_helper(
         const FiniteElement<dim, spacedim>              &finite_element,
         const std::vector<Vector<std::complex<number>>> &support_point_values,
@@ -2986,7 +3034,7 @@ namespace FETools
 
 
       template <int dim, int spacedim>
-      static void
+      void
       convert_helper(const FiniteElement<dim, spacedim> &finite_element,
                      const std::vector<Vector<double>>  &support_point_values,
                      std::vector<double>                &dof_values)

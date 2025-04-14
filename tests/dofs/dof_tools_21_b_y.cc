@@ -19,7 +19,7 @@
 //                                const FaceIterator        &,
 //                                AffineConstraints<double> &,
 //                                const ComponentMask       &,
-//                                unsigned char)
+//                                types::geometric_orientation)
 // for correct behavior on non standard oriented meshes.
 //
 // like _21_b_x, but with a once refined mesh
@@ -195,8 +195,11 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler)
     deallog << dofs_2[i] << " is located at " << support_points[dofs_2[i]]
             << std::endl;
 
-  DoFTools::make_periodicity_constraints(
-    face_1, face_2, constraint_matrix, ComponentMask(), 0u);
+  DoFTools::make_periodicity_constraints(face_1,
+                                         face_2,
+                                         constraint_matrix,
+                                         ComponentMask(),
+                                         numbers::reverse_line_orientation);
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
   deallog << "Matching:" << std::endl;

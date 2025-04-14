@@ -146,12 +146,8 @@ namespace parallel
              const typename dealii::Triangulation<dim, spacedim>::cell_iterator
                              &cell,
              const CellStatus status) -> unsigned int {
-      return CellWeights<dim, spacedim>::weighting_callback(cell,
-                                                            status,
-                                                            std::cref(
-                                                              dof_handler),
-                                                            std::cref(*tria),
-                                                            weighting_function);
+      return CellWeights<dim, spacedim>::weighting_callback(
+        cell, status, dof_handler, *tria, weighting_function);
     };
   }
 
@@ -195,12 +191,13 @@ namespace parallel
           break;
 
         case CellStatus::children_will_be_coarsened:
-#ifdef DEBUG
-          for (const auto &child : cell->child_iterators())
-            Assert(child->is_active() && child->coarsen_flag_set(),
-                   typename dealii::Triangulation<
-                     dim>::ExcInconsistentCoarseningFlags());
-#endif
+          if constexpr (running_in_debug_mode())
+            {
+              for (const auto &child : cell->child_iterators())
+                Assert(child->is_active() && child->coarsen_flag_set(),
+                       typename dealii::Triangulation<
+                         dim>::ExcInconsistentCoarseningFlags());
+            }
 
           fe_index = dealii::internal::hp::DoFHandlerImplementation::
             dominated_future_fe_on_children<dim, spacedim>(cell);
@@ -218,6 +215,6 @@ namespace parallel
 
 
 // explicit instantiations
-#include "cell_weights.inst"
+#include "distributed/cell_weights.inst"
 
 DEAL_II_NAMESPACE_CLOSE

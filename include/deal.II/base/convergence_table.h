@@ -18,7 +18,13 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_handler.h>
+#include <deal.II/base/types.h>
+
+#include <ostream>
+#include <string>
+
 
 DEAL_II_NAMESPACE_OPEN
 

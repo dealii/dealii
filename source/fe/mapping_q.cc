@@ -615,7 +615,7 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
   // statement may throw an exception, which we simply pass up to the caller
   const Point<dim> p_unit =
     this->transform_real_to_unit_cell_internal(cell, p, initial_p_unit);
-  AssertThrow(numbers::is_finite(p_unit[0]),
+  AssertThrow(p_unit[0] != std::numeric_limits<double>::lowest(),
               (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
   return p_unit;
 }
@@ -642,7 +642,12 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
   AssertDimension(real_points.size(), unit_points.size());
   std::vector<Point<spacedim>> support_points_higher_order;
   boost::container::small_vector<Point<spacedim>,
-                                 GeometryInfo<dim>::vertices_per_cell>
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
     vertices;
   if (polynomial_degree == 1)
     vertices = this->get_vertices(cell);
@@ -690,7 +695,7 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
         // determinants) from other SIMD lanes. Repeat the computation in this
         // unlikely case with scalar arguments.
         for (unsigned int j = 0; j < n_lanes && i + j < n_points; ++j)
-          if (numbers::is_finite(unit_point[0][j]))
+          if (unit_point[0][j] != std::numeric_limits<double>::lowest())
             for (unsigned int d = 0; d < dim; ++d)
               unit_points[i + j][d] = unit_point[d][j];
           else
@@ -1101,9 +1106,7 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
     QProjector<dim>::DataSetDescriptor::face(
       ReferenceCells::get_hypercube<dim>(),
       face_no,
-      cell->face_orientation(face_no),
-      cell->face_flip(face_no),
-      cell->face_rotation(face_no),
+      cell->combined_face_orientation(face_no),
       quadrature[0].size()),
     quadrature[0],
     data,
@@ -1631,28 +1634,30 @@ MappingQ<3, 3>::add_quad_support_points(
     {
       const Triangulation<3>::face_iterator face = cell->face(face_no);
 
-#ifdef DEBUG
-      const bool face_orientation          = cell->face_orientation(face_no),
-                 face_flip                 = cell->face_flip(face_no),
-                 face_rotation             = cell->face_rotation(face_no);
-      const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face,
-                         lines_per_face    = GeometryInfo<3>::lines_per_face;
+      if constexpr (running_in_debug_mode())
+        {
+          const bool face_orientation = cell->face_orientation(face_no),
+                     face_flip        = cell->face_flip(face_no),
+                     face_rotation    = cell->face_rotation(face_no);
+          const unsigned int vertices_per_face =
+                               GeometryInfo<3>::vertices_per_face,
+                             lines_per_face = GeometryInfo<3>::lines_per_face;
 
-      // some sanity checks up front
-      for (unsigned int i = 0; i < vertices_per_face; ++i)
-        Assert(face->vertex_index(i) ==
-                 cell->vertex_index(GeometryInfo<3>::face_to_cell_vertices(
-                   face_no, i, face_orientation, face_flip, face_rotation)),
-               ExcInternalError());
+          // some sanity checks up front
+          for (unsigned int i = 0; i < vertices_per_face; ++i)
+            Assert(face->vertex_index(i) ==
+                     cell->vertex_index(GeometryInfo<3>::face_to_cell_vertices(
+                       face_no, i, face_orientation, face_flip, face_rotation)),
+                   ExcInternalError());
 
-      // indices of the lines that bound a face are given by GeometryInfo<3>::
-      // face_to_cell_lines
-      for (unsigned int i = 0; i < lines_per_face; ++i)
-        Assert(face->line(i) ==
-                 cell->line(GeometryInfo<3>::face_to_cell_lines(
-                   face_no, i, face_orientation, face_flip, face_rotation)),
-               ExcInternalError());
-#endif
+          // indices of the lines that bound a face are given by
+          // GeometryInfo<3>:: face_to_cell_lines
+          for (unsigned int i = 0; i < lines_per_face; ++i)
+            Assert(face->line(i) ==
+                     cell->line(GeometryInfo<3>::face_to_cell_lines(
+                       face_no, i, face_orientation, face_flip, face_rotation)),
+                   ExcInternalError());
+        }
       // extract the points surrounding a quad from the points
       // already computed. First get the 4 vertices and then the points on
       // the four lines
@@ -1699,8 +1704,8 @@ MappingQ<2, 3>::add_quad_support_points(
   for (unsigned int q = 0, q2 = 0; q2 < polynomial_degree - 1; ++q2)
     for (unsigned int q1 = 0; q1 < polynomial_degree - 1; ++q1, ++q)
       {
-        Point<2> point(line_support_points[q1 + 1][0],
-                       line_support_points[q2 + 1][0]);
+        const Point<2> point(line_support_points[q1 + 1][0],
+                             line_support_points[q2 + 1][0]);
         for (const unsigned int i : GeometryInfo<2>::vertex_indices())
           weights(q, i) = GeometryInfo<2>::d_linear_shape_function(point, i);
       }
@@ -1852,7 +1857,7 @@ MappingQ<dim, spacedim>::is_compatible_with(
 
 
 //--------------------------- Explicit instantiations -----------------------
-#include "mapping_q.inst"
+#include "fe/mapping_q.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

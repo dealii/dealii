@@ -278,7 +278,8 @@ namespace Utilities
     std_cxx20::ranges::iota_view<unsigned int, unsigned int>
     RemotePointEvaluation<dim, spacedim>::CellData::cell_indices() const
     {
-      return {0, static_cast<unsigned int>(cells.size())};
+      return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+        0, static_cast<unsigned int>(cells.size()));
     }
 
 
@@ -403,6 +404,6 @@ namespace Utilities
   } // end of namespace MPI
 } // end of namespace Utilities
 
-#include "mpi_remote_point_evaluation.inst"
+#include "base/mpi_remote_point_evaluation.inst"
 
 DEAL_II_NAMESPACE_CLOSE

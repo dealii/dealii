@@ -36,6 +36,7 @@
 #include <deal.II/hp/fe_collection.h>
 
 #include <boost/serialization/split_member.hpp>
+#include <boost/signals2/connection.hpp>
 
 #include <map>
 #include <memory>
@@ -93,6 +94,13 @@ namespace parallel
     class CellDataTransfer;
   }
 } // namespace parallel
+
+template <int structdim, int dim, int spacedim, bool level_dof_access>
+class DoFAccessor;
+
+template <int dimension_, int space_dimension_, bool level_dof_access>
+class DoFCellAccessor;
+
 #endif
 
 /**

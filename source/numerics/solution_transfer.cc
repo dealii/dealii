@@ -41,8 +41,11 @@
 
 #include <deal.II/numerics/solution_transfer.h>
 
+#include <boost/range/iterator_range_core.hpp>
+
 #include <functional>
 #include <numeric>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -365,12 +368,13 @@ SolutionTransfer<dim, VectorType, spacedim>::pack_callback(
               // In case of coarsening, we need to find a suitable FE index
               // for the parent cell. We choose the 'least dominant fe'
               // on all children from the associated FECollection.
-#ifdef DEBUG
-              for (const auto &child : cell->child_iterators())
-                Assert(child->is_active() && child->coarsen_flag_set(),
-                       typename dealii::Triangulation<
-                         dim>::ExcInconsistentCoarseningFlags());
-#endif
+              if constexpr (running_in_debug_mode())
+                {
+                  for (const auto &child : cell->child_iterators())
+                    Assert(child->is_active() && child->coarsen_flag_set(),
+                           typename dealii::Triangulation<
+                             dim>::ExcInconsistentCoarseningFlags());
+                }
 
               fe_index = dealii::internal::hp::DoFHandlerImplementation::
                 dominated_future_fe_on_children<dim, spacedim>(cell);
@@ -764,16 +768,17 @@ namespace Legacy
     n_dofs_old                 = dof_handler->n_dofs();
     const unsigned int in_size = all_in.size();
 
-#ifdef DEBUG
-    Assert(in_size != 0,
-           ExcMessage("The array of input vectors you pass to this "
-                      "function has no elements. This is not useful."));
-    for (unsigned int i = 0; i < in_size; ++i)
+    if constexpr (running_in_debug_mode())
       {
-        Assert(all_in[i].size() == n_dofs_old,
-               ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
+        Assert(in_size != 0,
+               ExcMessage("The array of input vectors you pass to this "
+                          "function has no elements. This is not useful."));
+        for (unsigned int i = 0; i < in_size; ++i)
+          {
+            Assert(all_in[i].size() == n_dofs_old,
+                   ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
+          }
       }
-#endif
 
     // We need to access dof indices on the entire domain. For
     // parallel::shared::Triangulations, ownership of cells might change. If
@@ -925,21 +930,24 @@ namespace Legacy
     std::vector<VectorType>       &all_out) const
   {
     const unsigned int size = all_in.size();
-#ifdef DEBUG
-    Assert(prepared_for == coarsening_and_refinement, ExcNotPrepared());
-    Assert(all_out.size() == size, ExcDimensionMismatch(all_out.size(), size));
-    for (unsigned int i = 0; i < size; ++i)
-      Assert(all_in[i].size() == n_dofs_old,
-             ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
-    for (unsigned int i = 0; i < all_out.size(); ++i)
-      Assert(all_out[i].size() == dof_handler->n_dofs(),
-             ExcDimensionMismatch(all_out[i].size(), dof_handler->n_dofs()));
-    for (unsigned int i = 0; i < size; ++i)
-      for (unsigned int j = 0; j < size; ++j)
-        Assert(&all_in[i] != &all_out[j],
-               ExcMessage("Vectors cannot be used as input and output"
-                          " at the same time!"));
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        Assert(prepared_for == coarsening_and_refinement, ExcNotPrepared());
+        Assert(all_out.size() == size,
+               ExcDimensionMismatch(all_out.size(), size));
+        for (unsigned int i = 0; i < size; ++i)
+          Assert(all_in[i].size() == n_dofs_old,
+                 ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
+        for (unsigned int i = 0; i < all_out.size(); ++i)
+          Assert(all_out[i].size() == dof_handler->n_dofs(),
+                 ExcDimensionMismatch(all_out[i].size(),
+                                      dof_handler->n_dofs()));
+        for (unsigned int i = 0; i < size; ++i)
+          for (unsigned int j = 0; j < size; ++j)
+            Assert(&all_in[i] != &all_out[j],
+                   ExcMessage("Vectors cannot be used as input and output"
+                              " at the same time!"));
+      }
 
     // We need to access dof indices on the entire domain. For
     // parallel::shared::Triangulations, ownership of cells might change. If
@@ -1124,6 +1132,6 @@ namespace Legacy
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
-#include "solution_transfer.inst"
+#include "numerics/solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

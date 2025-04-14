@@ -46,26 +46,18 @@
 #include "../tests.h"
 
 
-template <int dim, int fe_degree, typename Number>
+template <int dim, int fe_degree, int n_components, typename Number>
 class LaplaceOperatorQuad
 {
 public:
   DEAL_II_HOST_DEVICE void
   operator()(
-    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> *fe_eval,
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number>
+             *fe_eval,
     const int q_point) const
   {
     fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
   }
-
-  DEAL_II_HOST_DEVICE
-  void
-  set_cell(int)
-  {}
-
-  DEAL_II_HOST_DEVICE void
-  set_matrix_free_data(const typename Portable::MatrixFree<dim, Number>::Data &)
-  {}
 
   static const unsigned int n_q_points =
     dealii::Utilities::pow(fe_degree + 1, dim);
@@ -108,7 +100,8 @@ public:
 
     {
       matrix_free.initialize_dof_vector(diagonal_global);
-      LaplaceOperatorQuad<dim, fe_degree, Number> laplace_operator_quad;
+      LaplaceOperatorQuad<dim, fe_degree, n_components, Number>
+        laplace_operator_quad;
       MatrixFreeTools::
         compute_diagonal<dim, fe_degree, n_points, n_components, Number>(
           matrix_free,

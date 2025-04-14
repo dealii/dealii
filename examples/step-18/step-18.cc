@@ -56,7 +56,7 @@
 #include <deal.II/base/symmetric_tensor.h>
 
 // And lastly a header that contains some functions that will help us compute
-// rotaton matrices of the local coordinate systems at specific points in the
+// rotation matrices of the local coordinate systems at specific points in the
 // domain.
 #include <deal.II/physics/transformations.h>
 

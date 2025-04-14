@@ -28,21 +28,18 @@ main()
 
   deallog << "lines" << std::endl;
   {
-    const std::array<unsigned char, 2> inverse_permutations{{0u, 1u}};
-
-    for (unsigned char o = 0; o < 2; ++o)
+    const auto reference_cell = ReferenceCells::Line;
+    for (types::geometric_orientation o = 0; o < 2; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
-        std::array<unsigned int, 2> vs{{0u, 1u}};
+        const std::array<unsigned int, 2> vs{{0u, 1u}};
 
-        const auto result1 =
-          ReferenceCells::Line.permute_by_combined_orientation(
-            make_const_array_view(vs), o);
+        const auto result1 = reference_cell.permute_by_combined_orientation(
+          make_const_array_view(vs), o);
 
         ArrayView<const unsigned int> view1(result1.data(), result1.size());
-        const auto                    result2 =
-          ReferenceCells::Line.permute_by_combined_orientation(
-            view1, inverse_permutations[o]);
+        const auto result2 = reference_cell.permute_by_combined_orientation(
+          view1, reference_cell.get_inverse_combined_orientation(o));
 
         for (const auto &v : result2)
           deallog << "  " << v << std::endl;
@@ -51,22 +48,18 @@ main()
 
   deallog << "triangles" << std::endl;
   {
-    const std::array<unsigned char, 6> inverse_permutations{
-      {0u, 1u, 2u, 5u, 4u, 3u}};
-
-    for (unsigned char o = 0; o < 6; ++o)
+    const auto reference_cell = ReferenceCells::Triangle;
+    for (types::geometric_orientation o = 0; o < 6; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
-        std::array<unsigned int, 3> vs{{0u, 1u, 2u}};
+        const std::array<unsigned int, 3> vs{{0u, 1u, 2u}};
 
-        const auto result1 =
-          ReferenceCells::Triangle.permute_by_combined_orientation(
-            make_const_array_view(vs), o);
+        const auto result1 = reference_cell.permute_by_combined_orientation(
+          make_const_array_view(vs), o);
 
         ArrayView<const unsigned int> view1(result1.data(), result1.size());
-        const auto                    result2 =
-          ReferenceCells::Triangle.permute_by_combined_orientation(
-            view1, inverse_permutations[o]);
+        const auto result2 = reference_cell.permute_by_combined_orientation(
+          view1, reference_cell.get_inverse_combined_orientation(o));
 
         for (const auto &v : result2)
           deallog << "  " << v << std::endl;
@@ -75,22 +68,18 @@ main()
 
   deallog << "quadrilaterals" << std::endl;
   {
-    const std::array<unsigned char, 8> inverse_permutations{
-      {0u, 1u, 2u, 7u, 4u, 5u, 6u, 3u}};
-
-    for (unsigned char o = 0; o < 8; ++o)
+    const auto reference_cell = ReferenceCells::Quadrilateral;
+    for (types::geometric_orientation o = 0; o < 8; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
-        std::array<unsigned int, 4> vs{{0u, 1u, 2u, 3u}};
+        const std::array<unsigned int, 4> vs{{0u, 1u, 2u, 3u}};
 
-        const auto result1 =
-          ReferenceCells::Quadrilateral.permute_by_combined_orientation(
-            make_const_array_view(vs), o);
+        const auto result1 = reference_cell.permute_by_combined_orientation(
+          make_const_array_view(vs), o);
 
         ArrayView<const unsigned int> view1(result1.data(), result1.size());
-        const auto                    result2 =
-          ReferenceCells::Quadrilateral.permute_by_combined_orientation(
-            view1, inverse_permutations[o]);
+        const auto result2 = reference_cell.permute_by_combined_orientation(
+          view1, reference_cell.get_inverse_combined_orientation(o));
 
         for (const auto &v : result2)
           deallog << "  " << v << std::endl;
@@ -100,24 +89,23 @@ main()
   // Verify that the manual version created the same results.
   deallog << "quadrilaterals (manual)" << std::endl;
   {
-    for (unsigned char o = 0; o < 8; ++o)
+    const auto reference_cell = ReferenceCells::Quadrilateral;
+    for (types::geometric_orientation o = 0; o < 8; ++o)
       {
         deallog << "o = " << int(o) << std::endl;
-        std::array<unsigned int, 4> vs{{0u, 1u, 2u, 3u}};
+        const std::array<unsigned int, 4> vs{{0u, 1u, 2u, 3u}};
 
-        const auto result1 =
-          ReferenceCells::Quadrilateral.permute_by_combined_orientation(
-            make_const_array_view(vs), o);
+        const auto result1 = reference_cell.permute_by_combined_orientation(
+          make_const_array_view(vs), o);
 
         ArrayView<const unsigned int> view1(result1.data(), result1.size());
 
         auto [orientation, rotation, flip] =
           internal::split_face_orientation(o);
-        flip = orientation ? rotation ^ flip : flip;
-        const auto result2 =
-          ReferenceCells::Quadrilateral.permute_by_combined_orientation(
-            view1,
-            internal::combined_face_orientation(orientation, rotation, flip));
+        flip               = orientation ? rotation ^ flip : flip;
+        const auto result2 = reference_cell.permute_by_combined_orientation(
+          view1,
+          internal::combined_face_orientation(orientation, rotation, flip));
 
         for (const auto &v : result2)
           deallog << "  " << v << std::endl;

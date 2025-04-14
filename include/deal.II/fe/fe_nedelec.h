@@ -644,9 +644,8 @@ private:
   /**
    * Initialize the permutation pattern and the pattern of sign change.
    *
-   * @note This function is not fully filled with the correct implementation
-   * yet. It needs to be consistently implemented in a future release to work
-   * on meshes that contain cells with flipped faces.
+   * @note Currently this function is implemented for the finite elements of
+   * the order k < 5.
    */
   void
   initialize_quad_dof_index_permutation_and_sign_change();

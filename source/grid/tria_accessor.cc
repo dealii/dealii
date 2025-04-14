@@ -16,6 +16,7 @@
 #include <deal.II/base/quadrature.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping.h>
@@ -24,11 +25,10 @@
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/grid/tria_levels.h>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <limits>
@@ -1412,30 +1412,6 @@ namespace
   }
 
 
-  template <int dim, int spacedim>
-  Point<spacedim>
-  get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
-  {
-    TriaIterator<TriaAccessor<1, dim, spacedim>> it(obj);
-    return obj.get_manifold().get_new_point_on_line(it);
-  }
-
-  template <int dim, int spacedim>
-  Point<spacedim>
-  get_new_point_on_object(const TriaAccessor<2, dim, spacedim> &obj)
-  {
-    TriaIterator<TriaAccessor<2, dim, spacedim>> it(obj);
-    return obj.get_manifold().get_new_point_on_quad(it);
-  }
-
-  template <int dim, int spacedim>
-  Point<spacedim>
-  get_new_point_on_object(const TriaAccessor<3, dim, spacedim> &obj)
-  {
-    TriaIterator<TriaAccessor<3, dim, spacedim>> it(obj);
-    return obj.get_manifold().get_new_point_on_hex(it);
-  }
-
   template <int structdim, int dim, int spacedim>
   Point<spacedim>
   get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
@@ -1443,7 +1419,7 @@ namespace
   {
     if (use_interpolation)
       {
-        TriaRawIterator<TriaAccessor<structdim, dim, spacedim>> it(obj);
+        const TriaRawIterator<TriaAccessor<structdim, dim, spacedim>> it(obj);
         const auto points_and_weights =
           Manifolds::get_default_points_and_weights(it, use_interpolation);
         return obj.get_manifold().get_new_point(
@@ -1454,7 +1430,17 @@ namespace
       }
     else
       {
-        return get_new_point_on_object(obj);
+        const TriaIterator<TriaAccessor<structdim, dim, spacedim>> it(obj);
+        if constexpr (structdim == 1)
+          return obj.get_manifold().get_new_point_on_line(it);
+        else if constexpr (structdim == 2)
+          return obj.get_manifold().get_new_point_on_quad(it);
+        else if constexpr (structdim == 3)
+          return obj.get_manifold().get_new_point_on_hex(it);
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+
+        return {};
       }
   }
 } // namespace
@@ -1639,8 +1625,7 @@ TriaAccessor<3, 3, 3>::extent_in_direction(const unsigned int axis) const
                        this->line(lines[axis][2])->diameter(),
                        this->line(lines[axis][3])->diameter()};
 
-  return std::max(std::max(lengths[0], lengths[1]),
-                  std::max(lengths[2], lengths[3]));
+  return std::max({lengths[0], lengths[1], lengths[2], lengths[3]});
 }
 
 
@@ -2358,23 +2343,18 @@ CellAccessor<dim, spacedim>::set_neighbor(
 {
   AssertIndexRange(i, this->n_faces());
 
+  auto &neighbor =
+    this->tria->levels[this->present_level]
+      ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() + i];
   if (pointer.state() == IteratorState::valid)
     {
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .first = pointer->present_level;
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .second = pointer->present_index;
+      neighbor.first  = pointer->present_level;
+      neighbor.second = pointer->present_index;
     }
   else
     {
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .first = -1;
-      this->tria->levels[this->present_level]
-        ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
-        .second = -1;
+      neighbor.first  = -1;
+      neighbor.second = -1;
     }
 }
 
@@ -3042,40 +3022,27 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
         {
           if (this->reference_cell() == ReferenceCells::Triangle)
             {
-              const auto neighbor_cell = this->neighbor(face);
-
-              // only for isotropic refinement at the moment
-              Assert(neighbor_cell->refinement_case() ==
+              const unsigned int neighbor_neighbor =
+                this->neighbor_of_neighbor(face);
+              const auto neighbor = this->neighbor(face);
+              // Triangles do not support anisotropic refinement
+              Assert(neighbor->refinement_case() ==
                        RefinementCase<2>::isotropic_refinement,
                      ExcNotImplemented());
-
-              // determine indices for this cell's subface from the perspective
-              // of the neighboring cell
-              const unsigned int neighbor_face =
-                this->neighbor_of_neighbor(face);
-              // two neighboring cells have an opposed orientation on their
-              // shared face if both of them follow the same orientation type
-              // (i.e., standard or non-standard).
-              // we verify this with a XOR operation.
-              const unsigned int neighbor_subface =
-                (!(this->line_orientation(face)) !=
-                 !(neighbor_cell->line_orientation(neighbor_face))) ?
-                  (1 - subface) :
-                  subface;
-
+              // Since we are looking at two faces at once, we need to check if
+              // they have the same or opposing orientations rather than one
+              // individual face orientation value.
+              const auto relative_orientation =
+                neighbor->combined_face_orientation(neighbor_neighbor) ==
+                    this->combined_face_orientation(face) ?
+                  numbers::default_geometric_orientation :
+                  numbers::reverse_line_orientation;
               const unsigned int neighbor_child_index =
-                neighbor_cell->reference_cell().child_cell_on_face(
-                  neighbor_face, neighbor_subface);
-              const TriaIterator<CellAccessor<dim, spacedim>> sub_neighbor =
-                neighbor_cell->child(neighbor_child_index);
-
-              // neighbor's child is not allowed to be further refined for the
-              // moment
-              Assert(sub_neighbor->refinement_case() ==
-                       RefinementCase<dim>::no_refinement,
-                     ExcNotImplemented());
-
-              return sub_neighbor;
+                neighbor->reference_cell().child_cell_on_face(
+                  neighbor_neighbor, subface, relative_orientation);
+              auto child = neighbor->child(neighbor_child_index);
+              Assert(!child->has_children(), ExcInternalError());
+              return child;
             }
           else if (this->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -3401,60 +3368,63 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                   neighbor_child->child(GeometryInfo<dim>::child_cell_on_face(
                     neighbor_child->refinement_case(), neighbor_neighbor, 0));
 
-#ifdef DEBUG
-              // check, whether the face neighbor_child matches the requested
-              // subface.
-              typename Triangulation<dim, spacedim>::face_iterator requested;
-              switch (this->subface_case(face))
+              if constexpr (running_in_debug_mode())
                 {
-                  case internal::SubfaceCase<3>::case_x:
-                  case internal::SubfaceCase<3>::case_y:
-                  case internal::SubfaceCase<3>::case_xy:
-                    requested = mother_face->child(subface);
-                    break;
-                  case internal::SubfaceCase<3>::case_x1y2y:
-                  case internal::SubfaceCase<3>::case_y1x2x:
-                    requested =
-                      mother_face->child(subface / 2)->child(subface % 2);
-                    break;
+                  // check, whether the face neighbor_child matches the
+                  // requested subface.
+                  typename Triangulation<dim, spacedim>::face_iterator
+                    requested;
+                  switch (this->subface_case(face))
+                    {
+                      case internal::SubfaceCase<3>::case_x:
+                      case internal::SubfaceCase<3>::case_y:
+                      case internal::SubfaceCase<3>::case_xy:
+                        requested = mother_face->child(subface);
+                        break;
+                      case internal::SubfaceCase<3>::case_x1y2y:
+                      case internal::SubfaceCase<3>::case_y1x2x:
+                        requested =
+                          mother_face->child(subface / 2)->child(subface % 2);
+                        break;
 
-                  case internal::SubfaceCase<3>::case_x1y:
-                  case internal::SubfaceCase<3>::case_y1x:
-                    switch (subface)
-                      {
-                        case 0:
-                        case 1:
-                          requested = mother_face->child(0)->child(subface);
-                          break;
-                        case 2:
-                          requested = mother_face->child(1);
-                          break;
-                        default:
-                          DEAL_II_ASSERT_UNREACHABLE();
-                      }
-                    break;
-                  case internal::SubfaceCase<3>::case_x2y:
-                  case internal::SubfaceCase<3>::case_y2x:
-                    switch (subface)
-                      {
-                        case 0:
-                          requested = mother_face->child(0);
-                          break;
-                        case 1:
-                        case 2:
-                          requested = mother_face->child(1)->child(subface - 1);
-                          break;
-                        default:
-                          DEAL_II_ASSERT_UNREACHABLE();
-                      }
-                    break;
-                  default:
-                    DEAL_II_ASSERT_UNREACHABLE();
-                    break;
+                      case internal::SubfaceCase<3>::case_x1y:
+                      case internal::SubfaceCase<3>::case_y1x:
+                        switch (subface)
+                          {
+                            case 0:
+                            case 1:
+                              requested = mother_face->child(0)->child(subface);
+                              break;
+                            case 2:
+                              requested = mother_face->child(1);
+                              break;
+                            default:
+                              DEAL_II_ASSERT_UNREACHABLE();
+                          }
+                        break;
+                      case internal::SubfaceCase<3>::case_x2y:
+                      case internal::SubfaceCase<3>::case_y2x:
+                        switch (subface)
+                          {
+                            case 0:
+                              requested = mother_face->child(0);
+                              break;
+                            case 1:
+                            case 2:
+                              requested =
+                                mother_face->child(1)->child(subface - 1);
+                              break;
+                            default:
+                              DEAL_II_ASSERT_UNREACHABLE();
+                          }
+                        break;
+                      default:
+                        DEAL_II_ASSERT_UNREACHABLE();
+                        break;
+                    }
+                  Assert(requested == neighbor_child->face(neighbor_neighbor),
+                         ExcInternalError());
                 }
-              Assert(requested == neighbor_child->face(neighbor_neighbor),
-                     ExcInternalError());
-#endif
 
               return neighbor_child;
             }
@@ -3500,6 +3470,6 @@ InvalidAccessor<structdim, dim, spacedim>::index()
 
 
 // explicit instantiations
-#include "tria_accessor.inst"
+#include "grid/tria_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE

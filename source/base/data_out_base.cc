@@ -29,9 +29,11 @@
 #include <cstring>
 #include <ctime>
 #include <fstream>
+#include <future>
 #include <iomanip>
 #include <limits>
 #include <memory>
+#include <numeric>
 #include <set>
 #include <sstream>
 #include <vector>
@@ -830,7 +832,7 @@ namespace
       // The patch does not store node locations, so we have to interpolate
       // between its vertices:
       {
-        if (dim == 0)
+        if constexpr (dim == 0)
           return patch.vertices[0];
         else
           {
@@ -3347,11 +3349,11 @@ namespace DataOutBase
 
 
     out << "attribute \"element type\" string \"";
-    if (dim == 1)
+    if constexpr (dim == 1)
       out << "lines";
-    if (dim == 2)
+    else if constexpr (dim == 2)
       out << "quads";
-    if (dim == 3)
+    else if constexpr (dim == 3)
       out << "cubes";
     out << "\"" << '\n' << "attribute \"ref\" string \"positions\"" << '\n';
 
@@ -5453,7 +5455,7 @@ namespace DataOutBase
       o << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
         << ascii_or_binary << "\">\n";
 
-      std::vector<int32_t> cells;
+      std::vector<std::int32_t> cells;
       Assert(dim <= 3, ExcNotImplemented());
 
       unsigned int first_vertex_of_patch = 0;
@@ -5780,7 +5782,7 @@ namespace DataOutBase
         o << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\""
           << ascii_or_binary << "\">\n";
 
-        std::vector<int32_t> offsets;
+        std::vector<std::int32_t> offsets;
         offsets.reserve(n_cells);
 
         // std::uint8_t might be an alias to unsigned char which is then not
@@ -5815,7 +5817,7 @@ namespace DataOutBase
         if (deal_ii_with_zlib &&
             (flags.compression_level != CompressionLevel::plain_text))
           {
-            std::vector<uint8_t> cell_types_uint8_t(cell_types.size());
+            std::vector<std::uint8_t> cell_types_uint8_t(cell_types.size());
             for (unsigned int i = 0; i < cell_types.size(); ++i)
               cell_types_uint8_t[i] = static_cast<std::uint8_t>(cell_types[i]);
 
@@ -7493,10 +7495,10 @@ namespace DataOutBase
     std::vector<std::uint64_t> chunk_sizes(n_ranks);
     int                        ierr = MPI_Gather(&my_size,
                           1,
-                          MPI_UINT64_T,
+                          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                           static_cast<std::uint64_t *>(chunk_sizes.data()),
                           1,
-                          MPI_UINT64_T,
+                          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                           0,
                           comm);
     AssertThrowMPI(ierr);
@@ -7531,7 +7533,7 @@ namespace DataOutBase
           /* offset = */ sizeof(header),
           chunk_sizes.data(),
           chunk_sizes.size(),
-          MPI_UINT64_T,
+          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
           MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
@@ -7539,7 +7541,12 @@ namespace DataOutBase
     // Write the main part on each rank:
     {
       std::uint64_t prefix_sum = 0;
-      ierr = MPI_Exscan(&my_size, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
+      ierr                     = MPI_Exscan(&my_size,
+                        &prefix_sum,
+                        1,
+                        Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                        MPI_SUM,
+                        comm);
       AssertThrowMPI(ierr);
 
       // Locate specific offset for each processor.
@@ -7790,8 +7797,12 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
     // Use prefix sum to find specific offset to write at.
     const std::uint64_t size_on_proc = ss.str().size();
     std::uint64_t       prefix_sum   = 0;
-    ierr =
-      MPI_Exscan(&size_on_proc, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
+    ierr                             = MPI_Exscan(&size_on_proc,
+                      &prefix_sum,
+                      1,
+                      Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                      MPI_SUM,
+                      comm);
     AssertThrowMPI(ierr);
 
     // Locate specific offset for each processor.
@@ -8019,7 +8030,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   int ierr = MPI_Allreduce(local_node_cell_count,
                            global_node_cell_count,
                            2,
-                           MPI_UINT64_T,
+                           Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                            MPI_SUM,
                            comm);
   AssertThrowMPI(ierr);
@@ -8055,11 +8066,12 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
       Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
 
       // We currently don't support writing mixed meshes:
-#  ifdef DEBUG
-      for (const auto &patch : patches)
-        Assert(patch.reference_cell == patches[0].reference_cell,
-               ExcNotImplemented());
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          for (const auto &patch : patches)
+            Assert(patch.reference_cell == patches[0].reference_cell,
+                   ExcNotImplemented());
+        }
 
       XDMFEntry          entry(h5_mesh_filename,
                       h5_solution_filename,
@@ -8236,17 +8248,18 @@ namespace
     std::uint64_t global_node_cell_offsets[2] = {0, 0};
 
 #  ifdef DEAL_II_WITH_MPI
-    int ierr = MPI_Allreduce(local_node_cell_count,
-                             global_node_cell_count,
-                             2,
-                             MPI_UINT64_T,
-                             MPI_SUM,
-                             comm);
+    int ierr =
+      MPI_Allreduce(local_node_cell_count,
+                    global_node_cell_count,
+                    2,
+                    Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                    MPI_SUM,
+                    comm);
     AssertThrowMPI(ierr);
     ierr = MPI_Exscan(local_node_cell_count,
                       global_node_cell_offsets,
                       2,
-                      MPI_UINT64_T,
+                      Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                       MPI_SUM,
                       comm);
     AssertThrowMPI(ierr);
@@ -9058,52 +9071,54 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::validate_dataset_names() const
 {
-#ifdef DEBUG
-  {
-    // Check that names for datasets are only used once. This is somewhat
-    // complicated, because vector ranges might have a name or not.
-    std::set<std::string> all_names;
-
-    const std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-                                   ranges = this->get_nonscalar_data_ranges();
-    const std::vector<std::string> data_names  = this->get_dataset_names();
-    const unsigned int             n_data_sets = data_names.size();
-    std::vector<bool>              data_set_written(n_data_sets, false);
-
-    for (const auto &range : ranges)
+  if constexpr (running_in_debug_mode())
+    {
       {
-        const std::string &name = std::get<2>(range);
-        if (!name.empty())
-          {
-            Assert(all_names.find(name) == all_names.end(),
-                   ExcMessage(
-                     "Error: names of fields in DataOut need to be unique, "
-                     "but '" +
-                     name + "' is used more than once."));
-            all_names.insert(name);
-            for (unsigned int i = std::get<0>(range); i <= std::get<1>(range);
-                 ++i)
-              data_set_written[i] = true;
-          }
-      }
+        // Check that names for datasets are only used once. This is somewhat
+        // complicated, because vector ranges might have a name or not.
+        std::set<std::string> all_names;
 
-    for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-      if (data_set_written[data_set] == false)
-        {
-          const std::string &name = data_names[data_set];
-          Assert(all_names.find(name) == all_names.end(),
-                 ExcMessage(
-                   "Error: names of fields in DataOut need to be unique, "
-                   "but '" +
-                   name + "' is used more than once."));
-          all_names.insert(name);
-        }
-  }
-#endif
+        const std::vector<
+          std::tuple<unsigned int,
+                     unsigned int,
+                     std::string,
+                     DataComponentInterpretation::DataComponentInterpretation>>
+          ranges = this->get_nonscalar_data_ranges();
+        const std::vector<std::string> data_names  = this->get_dataset_names();
+        const unsigned int             n_data_sets = data_names.size();
+        std::vector<bool>              data_set_written(n_data_sets, false);
+
+        for (const auto &range : ranges)
+          {
+            const std::string &name = std::get<2>(range);
+            if (!name.empty())
+              {
+                Assert(all_names.find(name) == all_names.end(),
+                       ExcMessage(
+                         "Error: names of fields in DataOut need to be unique, "
+                         "but '" +
+                         name + "' is used more than once."));
+                all_names.insert(name);
+                for (unsigned int i = std::get<0>(range);
+                     i <= std::get<1>(range);
+                     ++i)
+                  data_set_written[i] = true;
+              }
+          }
+
+        for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
+          if (data_set_written[data_set] == false)
+            {
+              const std::string &name = data_names[data_set];
+              Assert(all_names.find(name) == all_names.end(),
+                     ExcMessage(
+                       "Error: names of fields in DataOut need to be unique, "
+                       "but '" +
+                       name + "' is used more than once."));
+              all_names.insert(name);
+            }
+      }
+    }
 }
 
 
@@ -9722,6 +9737,6 @@ namespace DataOutBase
 
 
 // explicit instantiations
-#include "data_out_base.inst"
+#include "base/data_out_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

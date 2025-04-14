@@ -15,6 +15,9 @@
 
 #include <deal.II/numerics/vector_tools_rhs.templates.h>
 
+#include <set>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -53,6 +56,6 @@ namespace VectorTools
 } // namespace VectorTools
 
 // ---------------------------- explicit instantiations --------------------
-#include "vector_tools_rhs.inst"
+#include "numerics/vector_tools_rhs.inst"
 
 DEAL_II_NAMESPACE_CLOSE

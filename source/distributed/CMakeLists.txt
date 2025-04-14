@@ -13,20 +13,44 @@
 ## ------------------------------------------------------------------------
 
 set(_unity_include_src
-  grid_refinement.cc
   cell_weights.cc
-  cell_data_transfer.cc
   fully_distributed_tria.cc
   repartitioning_policy_tools.cc
   tria.cc
   tria_base.cc
   shared_tria.cc
   p4est_wrappers.cc
-  field_transfer.cc
   )
 
 set(_separate_src
   )
+
+set(_inst
+  cell_weights.inst.in
+  fully_distributed_tria.inst.in
+  repartitioning_policy_tools.inst.in
+  tria.inst.in
+  shared_tria.inst.in
+  tria_base.inst.in
+  p4est_wrappers.inst.in
+  )
+
+if(DEAL_II_WITH_P4EST)
+  set(_unity_include_src
+    ${_unity_include_src}
+    grid_refinement.cc
+    cell_data_transfer.cc
+    field_transfer.cc
+    )
+
+  set(_inst
+    ${_inst}
+    grid_refinement.inst.in
+    cell_data_transfer.inst.in
+    field_transfer.inst.in
+    )
+endif()
+
 
 # concatenate all unity inclusion files in one file
 set(_n_includes_per_unity_file 15)
@@ -37,18 +61,7 @@ setup_source_list("${_unity_include_src}"
   _src
   )
 
-set(_inst
-  grid_refinement.inst.in
-  cell_weights.inst.in
-  cell_data_transfer.inst.in
-  field_transfer.inst.in
-  fully_distributed_tria.inst.in
-  repartitioning_policy_tools.inst.in
-  tria.inst.in
-  shared_tria.inst.in
-  tria_base.inst.in
-  p4est_wrappers.inst.in
-  )
+
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/distributed/*.h

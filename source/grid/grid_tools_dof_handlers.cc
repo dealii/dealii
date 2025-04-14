@@ -2132,26 +2132,27 @@ namespace GridTools
     (void)space_dim;
     AssertIndexRange(direction, space_dim);
 
-#ifdef DEBUG
-    {
-      constexpr int dim      = CellIterator::AccessorType::dimension;
-      constexpr int spacedim = CellIterator::AccessorType::space_dimension;
-      // For parallel::fullydistributed::Triangulation there might be unmatched
-      // faces on periodic boundaries on the coarse grid. As a result
-      // this assert is not fulfilled (which is not a bug!). See also the
-      // discussion in the method collect_periodic_faces.
-      if (!(((pairs1.size() > 0) &&
-             (dynamic_cast<const parallel::fullydistributed::
-                             Triangulation<dim, spacedim> *>(
-                &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
-            ((pairs2.size() > 0) &&
-             (dynamic_cast<
-                const parallel::fullydistributed::Triangulation<dim, spacedim>
-                  *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
-        Assert(pairs1.size() == pairs2.size(),
-               ExcMessage("Unmatched faces on periodic boundaries"));
-    }
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        {
+          constexpr int dim      = CellIterator::AccessorType::dimension;
+          constexpr int spacedim = CellIterator::AccessorType::space_dimension;
+          // For parallel::fullydistributed::Triangulation there might be
+          // unmatched faces on periodic boundaries on the coarse grid. As a
+          // result this assert is not fulfilled (which is not a bug!). See also
+          // the discussion in the method collect_periodic_faces.
+          if (!(((pairs1.size() > 0) &&
+                 (dynamic_cast<const parallel::fullydistributed::
+                                 Triangulation<dim, spacedim> *>(
+                    &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
+                ((pairs2.size() > 0) &&
+                 (dynamic_cast<const parallel::fullydistributed::
+                                 Triangulation<dim, spacedim> *>(
+                    &pairs2.begin()->first->get_triangulation()) != nullptr))))
+            Assert(pairs1.size() == pairs2.size(),
+                   ExcMessage("Unmatched faces on periodic boundaries"));
+        }
+      }
 
     unsigned int n_matches = 0;
 
@@ -2166,7 +2167,7 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (const std::optional<unsigned char> orientation =
+            if (const std::optional<types::geometric_orientation> orientation =
                   GridTools::orthogonal_equality(cell1->face(face_idx1),
                                                  cell2->face(face_idx2),
                                                  direction,
@@ -2269,27 +2270,26 @@ namespace GridTools
                       "Are you sure that you've selected the correct boundary "
                       "id's and that the coarsest level mesh is colorized?"));
 
-#ifdef DEBUG
-    const unsigned int size_old = matched_pairs.size();
-#endif
+    [[maybe_unused]] const unsigned int size_old = matched_pairs.size();
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
       pairs1, pairs2, direction, matched_pairs, offset, matrix);
 
-#ifdef DEBUG
-    // check for standard orientation
-    const unsigned int size_new = matched_pairs.size();
-    for (unsigned int i = size_old; i < size_new; ++i)
+    if constexpr (running_in_debug_mode())
       {
-        Assert(matched_pairs[i].orientation ==
-                 ReferenceCell::default_combined_face_orientation(),
-               ExcMessage(
-                 "Found a face match with non standard orientation. "
-                 "This function is only suitable for meshes with cells "
-                 "in default orientation"));
+        // check for standard orientation
+        const unsigned int size_new = matched_pairs.size();
+        for (unsigned int i = size_old; i < size_new; ++i)
+          {
+            Assert(matched_pairs[i].orientation ==
+                     numbers::default_geometric_orientation,
+                   ExcMessage(
+                     "Found a face match with non standard orientation. "
+                     "This function is only suitable for meshes with cells "
+                     "in default orientation"));
+          }
       }
-#endif
   }
 
 
@@ -2422,7 +2422,7 @@ namespace GridTools
 
 
   template <typename FaceIterator>
-  std::optional<unsigned char>
+  std::optional<types::geometric_orientation>
   orthogonal_equality(
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
@@ -2498,7 +2498,7 @@ namespace GridTools
 } // namespace GridTools
 
 
-#include "grid_tools_dof_handlers.inst"
+#include "grid/grid_tools_dof_handlers.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

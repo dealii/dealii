@@ -137,13 +137,14 @@ namespace dealii
     else
       this->data = this->shape_info_base;
 
-#ifdef DEBUG
-    this->is_reinitialized           = true;
-    this->dof_values_initialized     = false;
-    this->values_quad_initialized    = false;
-    this->gradients_quad_initialized = false;
-    this->hessians_quad_initialized  = false;
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        this->is_reinitialized           = true;
+        this->dof_values_initialized     = false;
+        this->values_quad_initialized    = false;
+        this->gradients_quad_initialized = false;
+        this->hessians_quad_initialized  = false;
+      }
   }
 
   template <int dim,
@@ -241,13 +242,14 @@ namespace dealii
     else
       this->data = this->shape_info_base;
 
-#ifdef DEBUG
-    this->is_reinitialized           = true;
-    this->dof_values_initialized     = false;
-    this->values_quad_initialized    = false;
-    this->gradients_quad_initialized = false;
-    this->hessians_quad_initialized  = false;
-#endif
+    if constexpr (running_in_debug_mode())
+      {
+        this->is_reinitialized           = true;
+        this->dof_values_initialized     = false;
+        this->values_quad_initialized    = false;
+        this->gradients_quad_initialized = false;
+        this->hessians_quad_initialized  = false;
+      }
   }
 } // namespace dealii
 

@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/partitioner.h>
@@ -35,6 +36,9 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <deal.II/matrix_free/shape_info.h>
+
+#include <Kokkos_Array.hpp>
 #include <Kokkos_Core.hpp>
 
 
@@ -59,7 +63,112 @@ namespace Portable
     template <int dim, typename Number>
     class ReinitHelper;
   }
+  template <int dim, typename Number>
+  struct SharedData;
 #endif
+
+  /**
+   * Maximum number of DofHandler supported at the same time in
+   * Portable::MatrixFree computations. This limit also applies for the number
+   * of blocks in a BlockVector and the number of FEEvaluation objects that can
+   * be active in a single cell_loop().
+   */
+  inline constexpr unsigned int n_max_dof_handlers = 5;
+
+  /**
+   * Type for source and destination vectors in device functions like
+   * MatrixFree::cell_loop().
+   *
+   * This is a type alias to a Kokkos::View to a chunk of memory, typically
+   * pointing to the local elements in the LinearAlgebra::distributed::Vector.
+   */
+  template <typename Number>
+  using DeviceVector =
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>;
+
+  /**
+   * A block vector used for source and destination vectors in device functions
+   * like MatrixFree::cell_loop().
+   *
+   * The maximum number of block is limited by the constant @p n_max_dof_handlers.
+   */
+  template <typename Number>
+  class DeviceBlockVector
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    DeviceBlockVector()
+      : n_blocks(0)
+    {}
+
+    /**
+     * Constructor.
+     */
+    DeviceBlockVector(const DeviceBlockVector &other) = default;
+
+    /**
+     * Constructor from a DeviceVector. Creates a DeviceBlockVector
+     * with a single block.
+     */
+    explicit DeviceBlockVector(const DeviceVector<Number> &src)
+      : n_blocks(1)
+      , blocks{src}
+    {}
+
+    /**
+     * Constructor from a LinearAlgebra::distributed::BlockVector. Creates
+     * a DeviceVector from each block and stores it.
+     */
+    template <typename MemorySpace>
+    DeviceBlockVector(
+      const LinearAlgebra::distributed::BlockVector<Number, MemorySpace> &src)
+      : n_blocks(src.n_blocks())
+    {
+      Assert(src.n_blocks() <= n_max_dof_handlers,
+             ExcMessage("Portable::MatrixFree is configured with " +
+                        Utilities::to_string(n_max_dof_handlers) +
+                        " but you are passing a BlockVector with " +
+                        Utilities::to_string(src.n_blocks()) + " blocks."));
+
+      for (int b = 0; b < src.n_blocks(); ++b)
+        blocks[b] = DeviceVector<Number>(src.block(b).get_values(),
+                                         src.block(b).locally_owned_size());
+    }
+
+    /**
+     * Access block @p index.
+     */
+    DEAL_II_HOST_DEVICE
+    DeviceVector<Number> &
+    block(unsigned int index)
+    {
+      AssertIndexRange(index, n_blocks);
+      return blocks[index];
+    }
+
+    /**
+     * Access block @p index.
+     */
+    DEAL_II_HOST_DEVICE const DeviceVector<Number>                           &
+    block(unsigned int index) const
+    {
+      AssertIndexRange(index, n_blocks);
+      return blocks[index];
+    }
+
+  private:
+    /**
+     * The number of components / blocks
+     */
+    unsigned int n_blocks;
+
+    /**
+     * Storage for the blocks
+     */
+    Kokkos::Array<DeviceVector<Number>, n_max_dof_handlers> blocks;
+  };
 
   /**
    * This class collects all the data that is stored for the matrix free
@@ -150,9 +259,10 @@ namespace Portable
 
     /**
      * Structure which is passed to the kernel. It is used to pass all the
-     * necessary information from the CPU to the GPU.
+     * necessary information from the CPU to the GPU and is precomputed
+     * on the CPU. This data is read-only once we run on the GPU.
      */
-    struct Data
+    struct PrecomputedData
     {
       /**
        * Kokkos::View of the quadrature points.
@@ -203,7 +313,7 @@ namespace Portable
         co_shape_gradients;
 
       /**
-       * Weights used when resolving hanginf nodes.
+       * Weights used when resolving hanging nodes.
        */
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights;
@@ -235,6 +345,42 @@ namespace Portable
       bool use_coloring;
 
       /**
+       * Encodes the type of element detected at construction. FEEvaluation
+       * will select the most efficient algorithm based on the given element
+       * type.
+       */
+      ::dealii::internal::MatrixFreeFunctions::ElementType element_type;
+
+      /**
+       * Size of the scratch pad for temporary storage in shared memory.
+       */
+      unsigned int scratch_pad_size;
+    };
+
+
+    /**
+     * A pointer to this data structure is passed to the user code in
+     * device code that computes operations in quadrature points. It
+     * can be used to construct Portable::FEEvaluation objects and contains
+     * necessary precomputed data and scratch memory space to perform
+     * matrix-free evaluations.
+     */
+    struct Data
+    {
+      using TeamHandle = Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
+      /**
+       * TeamPolicy handle.
+       */
+      TeamHandle team_member;
+
+      const unsigned int       n_dofhandler;
+      const int                cell_index;
+      const PrecomputedData   *precomputed_data;
+      SharedData<dim, Number> *shared_data;
+
+      /**
        * Return the quadrature point index local. The index is
        * only unique for a given MPI process.
        */
@@ -243,7 +389,10 @@ namespace Portable
                        const unsigned int n_q_points,
                        const unsigned int q_point) const
       {
-        return (row_start / padding_length + cell) * n_q_points + q_point;
+        return (precomputed_data->row_start / precomputed_data->padding_length +
+                cell) *
+                 n_q_points +
+               q_point;
       }
 
 
@@ -255,7 +404,7 @@ namespace Portable
       get_quadrature_point(const unsigned int cell,
                            const unsigned int q_point) const
       {
-        return q_points(cell, q_point);
+        return precomputed_data->q_points(q_point, cell);
       }
     };
 
@@ -311,7 +460,7 @@ namespace Portable
     /**
      * Return the Data structure associated with @p color.
      */
-    Data
+    PrecomputedData
     get_data(unsigned int color) const;
 
     // clang-format off
@@ -322,12 +471,9 @@ namespace Portable
      * @p func needs to define
      * \code
      * DEAL_II_HOST_DEVICE void operator()(
-     *   const unsigned int                                          cell,
-     *   const typename Portable::MatrixFree<dim, Number>::Data *gpu_data,
-     *   Portable::SharedData<dim, Number> *                     shared_data,
-     *   const Number *                                              src,
-     *   Number *                                                    dst) const;
-     *   static const unsigned int n_dofs_1d;
+     *   const typename Portable::MatrixFree<dim, Number>::Data *data,
+     *   const DeviceVector<Number>                             &src,
+     *   DeviceVector<Number>                                   &dst) const;
      *   static const unsigned int n_local_dofs;
      *   static const unsigned int n_q_points;
      * \endcode
@@ -347,9 +493,7 @@ namespace Portable
      * @p func needs to define
      * \code
      *  DEAL_II_HOST_DEVICE void operator()(
-     *    const unsigned int                                          cell,
-     *    const typename Portable::MatrixFree<dim, Number>::Data *gpu_data);
-     * static const unsigned int n_dofs_1d;
+     *    const typename Portable::MatrixFree<dim, Number>::Data *data);
      * static const unsigned int n_local_dofs;
      * static const unsigned int n_q_points;
      * \endcode
@@ -454,6 +598,19 @@ namespace Portable
       const;
 
     /**
+     * Same as above but for BlockVector.
+     */
+    template <typename Functor>
+    void
+    distributed_cell_loop(
+      const Functor                                                       &func,
+      const LinearAlgebra::distributed::BlockVector<Number,
+                                                    MemorySpace::Default> &src,
+      LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>
+        &dst) const;
+
+
+    /**
      * Unique ID associated with the object.
      */
     int my_id;
@@ -475,6 +632,18 @@ namespace Portable
      * Total number of degrees of freedom.
      */
     types::global_dof_index n_dofs;
+
+    /**
+     * Encodes the type of element detected at construction. FEEvaluation
+     * will select the most efficient algorithm based on the given element
+     * type.
+     */
+    ::dealii::internal::MatrixFreeFunctions::ElementType element_type;
+
+    /**
+     * Size of the scratch pad for temporary storage in shared memory.
+     */
+    unsigned int scratch_pad_size;
 
     /**
      * Degree of the finite element used.
@@ -577,7 +746,7 @@ namespace Portable
       co_shape_gradients;
 
     /**
-     * Weights used when resolving hanginf nodes.
+     * Weights used when resolving hanging nodes.
      */
     Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
       constraint_weights;
@@ -618,9 +787,6 @@ namespace Portable
   template <int dim, typename Number>
   struct SharedData
   {
-    using TeamHandle = Kokkos::TeamPolicy<
-      MemorySpace::Default::kokkos_space::execution_space>::member_type;
-
     using SharedViewValues = Kokkos::View<
       Number **,
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
@@ -629,20 +795,19 @@ namespace Portable
       Number ***,
       MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    using SharedViewScratchPad = Kokkos::View<
+      Number *,
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
     DEAL_II_HOST_DEVICE
-    SharedData(const TeamHandle          &team_member,
-               const SharedViewValues    &values,
-               const SharedViewGradients &gradients)
-      : team_member(team_member)
-      , values(values)
+    SharedData(const SharedViewValues     &values,
+               const SharedViewGradients  &gradients,
+               const SharedViewScratchPad &scratch_pad)
+      : values(values)
       , gradients(gradients)
+      , scratch_pad(scratch_pad)
     {}
-
-    /**
-     * TeamPolicy handle.
-     */
-    TeamHandle team_member;
 
     /**
      * Memory for dof and quad values.
@@ -653,6 +818,11 @@ namespace Portable
      * Memory for computed gradients in reference coordinate system.
      */
     SharedViewGradients gradients;
+
+    /**
+     * Memory for temporary arrays required by evaluation and integration.
+     */
+    SharedViewScratchPad scratch_pad;
   };
 
 
@@ -742,7 +912,7 @@ namespace Portable
     get_quadrature_point(const unsigned int cell,
                          const unsigned int q_point) const
     {
-      return q_points(cell, q_point);
+      return q_points(q_point, cell);
     }
   };
 
@@ -757,7 +927,8 @@ namespace Portable
   template <int dim, typename Number>
   DataHost<dim, Number>
   copy_mf_data_to_host(
-    const typename dealii::Portable::MatrixFree<dim, Number>::Data &data,
+    const typename dealii::Portable::MatrixFree<dim, Number>::PrecomputedData
+                      &data,
     const UpdateFlags &update_flags)
   {
     DataHost<dim, Number> data_host;

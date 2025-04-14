@@ -959,8 +959,8 @@ namespace DoFTools
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number>                      &constraints,
     const ComponentMask                            &component_mask = {},
-    const unsigned char                             combined_orientation =
-      ReferenceCell::default_combined_face_orientation(),
+    const types::geometric_orientation              combined_orientation =
+      numbers::default_geometric_orientation,
     const FullMatrix<double>        &matrix = FullMatrix<double>(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),
@@ -1110,7 +1110,7 @@ namespace DoFTools
       const FullMatrix<double>                       &transformation,
       AffineConstraints<number>                      &affine_constraints,
       const ComponentMask                            &component_mask,
-      const unsigned char                             combined_orientation,
+      const types::geometric_orientation              combined_orientation,
       const number                                    periodicity_factor,
       const unsigned int level = numbers::invalid_unsigned_int);
   } // namespace internal
@@ -2257,11 +2257,14 @@ namespace DoFTools
    * @ref GlossSupport "glossary entry")
    * for all the degrees of freedom handled by this DoF handler object. This
    * function, of course, only works if the finite element object used by the
-   * DoF handler object actually provides support points, i.e. no edge
-   * elements or the like. Otherwise, an exception is thrown.
+   * DoF handler object actually provides support points; this rules out
+   * "modal" elements in which the shape functions are not defined via point
+   * evaluation at individual node points, but by integrals. In practice, this
+   * function checks the requirement by requiring that the element in question
+   * returns `true` from the FiniteElement::has_support_points().
    *
-   * @pre The given array must have a length of as many elements as there are
-   * degrees of freedom.
+   * @pre The given array `support_points` must have a length of as many
+   * elements as there are degrees of freedom.
    *
    * @note The precondition to this function that the output argument needs to
    * have size equal to the total number of degrees of freedom makes this

@@ -121,7 +121,7 @@ public:
 
 /**
  * Provide a tensor valued function which always returns a constant tensor
- * value. Obviously, all derivates of this function are zero.
+ * value. Obviously, all derivatives of this function are zero.
  *
  * @ingroup functions
  */
@@ -173,7 +173,7 @@ private:
 
 /**
  * Provide a tensor valued function which always returns zero. Obviously, all
- * derivates of this function are zero.
+ * derivatives of this function are zero.
  *
  * @ingroup functions
  */

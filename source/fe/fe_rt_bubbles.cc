@@ -71,8 +71,8 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
        RefinementCase<dim>::all_refinement_cases())
     if (ref_case != RefinementCase<dim>::no_refinement)
       {
-        const unsigned int nc =
-          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+        const unsigned int nc = this->reference_cell().template n_children<dim>(
+          RefinementCase<dim>(ref_case));
 
         for (unsigned int i = 0; i < nc; ++i)
           this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
@@ -184,18 +184,24 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
       Quadrature<dim> faces =
         QProjector<dim>::project_to_all_faces(this->reference_cell(),
                                               face_points);
-      for (unsigned int k = 0; k < this->n_dofs_per_face(face_no) *
-                                     GeometryInfo<dim>::faces_per_cell;
-           ++k)
-        this->generalized_support_points[k] =
-          faces.point(k + QProjector<dim>::DataSetDescriptor::face(
-                            this->reference_cell(),
-                            0,
-                            ReferenceCell::default_combined_face_orientation(),
-                            this->n_dofs_per_face(face_no)));
-
-      current =
-        this->n_dofs_per_face(face_no) * GeometryInfo<dim>::faces_per_cell;
+      for (unsigned int face_no = 0;
+           face_no < GeometryInfo<dim>::faces_per_cell;
+           ++face_no)
+        {
+          const auto offset = QProjector<dim>::DataSetDescriptor::face(
+            this->reference_cell(),
+            face_no,
+            numbers::default_geometric_orientation,
+            face_points.size());
+          for (unsigned int face_point = 0; face_point < face_points.size();
+               ++face_point)
+            {
+              // Enter the support point into the vector
+              this->generalized_support_points[current] =
+                faces.point(offset + face_point);
+              ++current;
+            }
+        }
     }
 
   if (deg == 1)
@@ -349,7 +355,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
 
 
 // explicit instantiations
-#include "fe_rt_bubbles.inst"
+#include "fe/fe_rt_bubbles.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

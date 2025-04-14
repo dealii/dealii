@@ -79,18 +79,17 @@ macro(feature_trilinos_find_external var)
     endif()
 
     #
-    # We require at least Trilinos 12.4
+    # We require at least Trilinos 13.2
     #
-    if(TRILINOS_VERSION VERSION_LESS 12.4)
-
+    if(TRILINOS_VERSION VERSION_LESS 13.2)
       message(STATUS "Could not find a sufficient Trilinos installation: "
-        "deal.II requires at least version 12.4, but version ${TRILINOS_VERSION} was found."
+        "deal.II requires at least version 13.2, but version ${TRILINOS_VERSION} was found."
       )
       set(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "with version ${TRILINOS_VERSION} is too old.\n"
-        "deal.II requires at least version 12.4.\n\n"
+        "deal.II requires at least version 13.2.\n\n"
       )
       set(${var} FALSE)
     endif()
@@ -197,31 +196,13 @@ macro(feature_trilinos_find_external var)
       endif()
 
       #
-      # We require at least Trilinos 12.14.1
+      # When configuring Kokkos we have to ensure that we actually pick up the
+      # correct Kokkos installation coming from Trilinos.
       #
-      if(TRILINOS_VERSION VERSION_LESS 12.14.1)
-        message(STATUS "Could not find a sufficient Trilinos installation: "
-          "deal.II requires at least version 12.14.1 if the Trilinos installation includes Kokkos, "
-          "but version ${TRILINOS_VERSION} was found."
-        )
-        set(TRILINOS_ADDITIONAL_ERROR_STRING
-          ${TRILINOS_ADDITIONAL_ERROR_STRING}
-          "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-          "with version ${TRILINOS_VERSION} is too old.\n"
-          "deal.II requires at least version 12.14.1 if the Trilinos installation includes Kokkos.\n\n"
-        )
-        set(${var} FALSE)
-      endif()
-    endif()
-
-    if(TRILINOS_WITH_KOKKOS AND Kokkos_ENABLE_CUDA)
-      # We need to disable SIMD vectorization for CUDA device code.
-      # Otherwise, nvcc compilers from version 9 on will emit an error message like:
-      # "[...] contains a vector, which is not supported in device code". We
-      # would like to set the variable in check_01_cpu_feature but at that point
-      # we don't know if CUDA support is enabled in Kokkos
-      set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 0)
-      KOKKOS_CHECK(OPTIONS CUDA_LAMBDA)
+      # FIXME: this logic should probably be refactored into
+      # FindDEAL_II_TRILINOS.cmake...
+      #
+      set(TRILINOS_KOKKOS_DIR "${TRILINOS_CONFIG_DIR}/..")
     endif()
 
     if(TRILINOS_WITH_TPETRA)
@@ -283,7 +264,7 @@ macro(feature_trilinos_find_external var)
         if(NOT _tpetra_int_long_long AND DEAL_II_WITH_64BIT_INDICES)
           message( STATUS
             "  Tpetra was configured *without* support for 64-bit global indices"
-            "but deal.II is configured to use 64-bit global indices."
+            " but deal.II is configured to use 64-bit global indices."
             )
           message(STATUS
             "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF"
@@ -293,7 +274,7 @@ macro(feature_trilinos_find_external var)
         elseif(NOT _tpetra_int_int AND NOT DEAL_II_WITH_64BIT_INDICES)
           message( STATUS
             "  Tpetra was configured *without* support for 32-bit global indices"
-            "but deal.II is configured to use 32-bit global indices."
+            " but deal.II is configured to use 32-bit global indices."
             )
           message(STATUS
             "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON"

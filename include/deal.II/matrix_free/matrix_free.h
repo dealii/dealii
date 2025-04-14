@@ -249,6 +249,7 @@ public:
       , cell_vectorization_categories_strict(
           cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(allow_ghosted_vectors_in_loops)
+      , store_ghost_cells(false)
       , communicator_sm(MPI_COMM_SELF)
     {}
 
@@ -275,6 +276,7 @@ public:
       , cell_vectorization_categories_strict(
           other.cell_vectorization_categories_strict)
       , allow_ghosted_vectors_in_loops(other.allow_ghosted_vectors_in_loops)
+      , store_ghost_cells(other.store_ghost_cells)
       , communicator_sm(other.communicator_sm)
     {}
 
@@ -282,31 +284,7 @@ public:
      * Copy assignment.
      */
     AdditionalData &
-    operator=(const AdditionalData &other)
-    {
-      tasks_parallel_scheme = other.tasks_parallel_scheme;
-      tasks_block_size      = other.tasks_block_size;
-      mapping_update_flags  = other.mapping_update_flags;
-      mapping_update_flags_boundary_faces =
-        other.mapping_update_flags_boundary_faces;
-      mapping_update_flags_inner_faces = other.mapping_update_flags_inner_faces;
-      mapping_update_flags_faces_by_cells =
-        other.mapping_update_flags_faces_by_cells;
-      mg_level            = other.mg_level;
-      store_plain_indices = other.store_plain_indices;
-      initialize_indices  = other.initialize_indices;
-      initialize_mapping  = other.initialize_mapping;
-      overlap_communication_computation =
-        other.overlap_communication_computation;
-      hold_all_faces_to_owned_cells = other.hold_all_faces_to_owned_cells;
-      cell_vectorization_category   = other.cell_vectorization_category;
-      cell_vectorization_categories_strict =
-        other.cell_vectorization_categories_strict;
-      allow_ghosted_vectors_in_loops = other.allow_ghosted_vectors_in_loops;
-      communicator_sm                = other.communicator_sm;
-
-      return *this;
-    }
+    operator=(const AdditionalData &other) = default;
 
     /**
      * Set the scheme for task parallelism. There are four options available.
@@ -546,6 +524,13 @@ public:
      * difference is only in whether the initial non-ghosted state is restored.
      */
     bool allow_ghosted_vectors_in_loops;
+
+    /**
+     * Option to control whether data should be generated on ghost cells.
+     * If set to true, the data on ghost cells will be generated.
+     * The default value is false.
+     */
+    bool store_ghost_cells;
 
     /**
      * Shared-memory MPI communicator. Default: MPI_COMM_SELF.
@@ -2571,7 +2556,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_faces_by_cells_boundary_id(
   const unsigned int face_number) const
 {
   AssertIndexRange(cell_batch_index, n_cell_batches());
-  AssertIndexRange(face_number, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(face_number, ReferenceCells::max_n_faces<dim>());
   Assert(face_info.cell_and_face_boundary_id.size(0) >= n_cell_batches(),
          ExcNotInitialized());
   std::array<types::boundary_id, VectorizedArrayType::size()> result;
@@ -2705,7 +2690,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_cell_active_fe_index(
     dof_info[first_hp_dof_handler_index].cell_active_fe_index;
 
   if (fe_indices.empty() == true ||
-      dof_handlers[0]->get_fe_collection().size() == 1)
+      dof_handlers[first_hp_dof_handler_index]->get_fe_collection().size() == 1)
     return 0;
 
   const auto index = fe_indices[range.first];
@@ -3940,8 +3925,9 @@ namespace internal
      */
     template <typename VectorType,
               std::enable_if_t<!has_exchange_on_subset<VectorType>, VectorType>
-                                              * = nullptr,
-              typename VectorType::value_type * = nullptr>
+                * = nullptr,
+              std::enable_if_t<has_assignment_operator<VectorType>, VectorType>
+                * = nullptr>
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
@@ -3963,14 +3949,15 @@ namespace internal
 
     /**
      * Zero out vector region for non-vector types, i.e., classes that do not
-     * have VectorType::value_type
+     * have operator=(const VectorType::value_type)
      */
     void
     zero_vector_region(const unsigned int, ...) const
     {
       Assert(false,
-             ExcNotImplemented("Zeroing is only implemented for vector types "
-                               "which provide VectorType::value_type"));
+             ExcNotImplemented(
+               "Zeroing is only implemented for vector types "
+               "which provide operator=(const VectorType::value_type)"));
     }
 
 

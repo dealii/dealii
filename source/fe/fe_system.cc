@@ -982,9 +982,9 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
 template <int dim, int spacedim>
 unsigned int
 FESystem<dim, spacedim>::face_to_cell_index(
-  const unsigned int  face_dof_index,
-  const unsigned int  face,
-  const unsigned char combined_orientation) const
+  const unsigned int                 face_dof_index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
 {
   // we need to ask the base elements how they want to translate
   // the DoFs within their own numbering. thus, translate to
@@ -1799,7 +1799,13 @@ FESystem<dim, spacedim>::initialize(
       {
         const unsigned int base = this->system_to_base_table[i].first.first,
                            base_index = this->system_to_base_table[i].second;
-        Assert(base < this->n_base_elements(), ExcInternalError());
+        // Do not use `this` in Assert because nvcc when using C++20 assumes
+        // that `this` is an integer and we get the following error: base
+        // operand of
+        // '->' is not a pointer
+        [[maybe_unused]] const unsigned int n_base_elements =
+          this->n_base_elements();
+        Assert(base < n_base_elements, ExcInternalError());
         Assert(base_index < base_element(base).unit_support_points.size(),
                ExcInternalError());
         this->unit_support_points[i] =
@@ -1930,23 +1936,24 @@ FESystem<dim, spacedim>::initialize(
           }
       }
 
-#  ifdef DEBUG
-    // check generalized_support_points_index_table for consistency
-    for (unsigned int i = 0; i < base_elements.size(); ++i)
+    if constexpr (running_in_debug_mode())
       {
-        if (!base_element(i).has_generalized_support_points())
-          continue;
-
-        const auto &points =
-          base_elements[i].first->get_generalized_support_points();
-        for (unsigned int j = 0; j < points.size(); ++j)
+        // check generalized_support_points_index_table for consistency
+        for (unsigned int i = 0; i < base_elements.size(); ++i)
           {
-            const auto n = generalized_support_points_index_table[i][j];
-            Assert(this->generalized_support_points[n] == points[j],
-                   ExcInternalError());
+            if (!base_element(i).has_generalized_support_points())
+              continue;
+
+            const auto &points =
+              base_elements[i].first->get_generalized_support_points();
+            for (unsigned int j = 0; j < points.size(); ++j)
+              {
+                const auto n = generalized_support_points_index_table[i][j];
+                Assert(this->generalized_support_points[n] == points[j],
+                       ExcInternalError());
+              }
           }
-      }
-#  endif /* DEBUG */
+      } /* DEBUG */
   });
 
   // initialize quad dof index permutation in 3d and higher
@@ -1957,10 +1964,17 @@ FESystem<dim, spacedim>::initialize(
         {
           // the array into which we want to write should have the correct size
           // already.
-          Assert(this->adjust_quad_dof_index_for_face_orientation_table[face_no]
-                     .n_elements() ==
-                   this->reference_cell().n_face_orientations(face_no) *
-                     this->n_dofs_per_quad(face_no),
+          // Do not use `this` in Assert because nvcc when using C++20 assumes
+          // that `this` is an integer and we get the following error: base
+          // operand of '->' is not a pointer
+          [[maybe_unused]] const unsigned int n_elements =
+            this->adjust_quad_dof_index_for_face_orientation_table[face_no]
+              .n_elements();
+          [[maybe_unused]] const unsigned int n_face_orientations =
+            this->reference_cell().n_face_orientations(face_no);
+          [[maybe_unused]] const unsigned int n_dofs_per_quad =
+            this->n_dofs_per_quad(face_no);
+          Assert(n_elements == n_face_orientations * n_dofs_per_quad,
                  ExcInternalError());
 
           // to obtain the shifts for this composed element, copy the shift
@@ -1983,13 +1997,18 @@ FESystem<dim, spacedim>::initialize(
                   index += temp.size(0);
                 }
             }
-          Assert(index == this->n_dofs_per_quad(face_no), ExcInternalError());
+          Assert(index == n_dofs_per_quad, ExcInternalError());
         }
 
       // additionally compose the permutation information for lines
-      Assert(this->adjust_line_dof_index_for_line_orientation_table.size() ==
-               this->n_dofs_per_line(),
-             ExcInternalError());
+      // Do not use `this` in Assert because nvcc when using C++20 assumes that
+      // `this` is an integer and we get the following error: base operand of
+      // '->' is not a pointer
+      [[maybe_unused]] const unsigned int table_size =
+        this->adjust_line_dof_index_for_line_orientation_table.size();
+      [[maybe_unused]] const unsigned int n_dofs_per_line =
+        this->n_dofs_per_line();
+      Assert(table_size == n_dofs_per_line, ExcInternalError());
       unsigned int index = 0;
       for (unsigned int b = 0; b < this->n_base_elements(); ++b)
         {
@@ -2006,8 +2025,63 @@ FESystem<dim, spacedim>::initialize(
               index += temp2.size();
             }
         }
-      Assert(index == this->n_dofs_per_line(), ExcInternalError());
+      Assert(index == n_dofs_per_line, ExcInternalError());
     });
+
+
+  // Compute local_dof_sparsity_pattern if any of our base elements contains a
+  // non-empty one (empty denotes the default of all DoFs coupling within a
+  // cell). Note the we currently only handle coupling within a base element and
+  // not between two different base elements. Handling the latter could be
+  // doable if the underlying element happens to be identical, but we currently
+  // have no functionality to compute the coupling between different elements
+  // with a pattern (for example FE_Q_iso_Q1 with different degrees).
+  {
+    // Does any of our base elements not couple all DoFs?
+    const bool have_nonempty = [&]() -> bool {
+      for (unsigned int b = 0; b < this->n_base_elements(); ++b)
+        {
+          if (!this->base_element(b).get_local_dof_sparsity_pattern().empty() &&
+              (this->element_multiplicity(b) > 0))
+            return true;
+        }
+      return false;
+    }();
+
+    if (have_nonempty)
+      {
+        this->local_dof_sparsity_pattern.reinit(this->n_dofs_per_cell(),
+                                                this->n_dofs_per_cell());
+
+        // by default, everything couples:
+        this->local_dof_sparsity_pattern.fill(true);
+
+        // Find shape functions within the same base element. If we do, grab the
+        // coupling from that base element pattern:
+        for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+            {
+              const auto vi = this->system_to_base_index(i);
+              const auto vj = this->system_to_base_index(j);
+
+              const auto base_index_i = vi.first.first;
+              const auto base_index_j = vj.first.first;
+              if (base_index_i == base_index_j)
+                {
+                  const auto shape_index_i = vi.second;
+                  const auto shape_index_j = vj.second;
+
+                  const auto &pattern = this->base_element(base_index_i)
+                                          .get_local_dof_sparsity_pattern();
+
+                  if (!pattern.empty())
+                    this->local_dof_sparsity_pattern(i, j) =
+                      pattern(shape_index_i, shape_index_j);
+                }
+            }
+      }
+  }
+
 
   // wait for all of this to finish
   init_tasks.join_all();
@@ -2760,6 +2834,6 @@ FESystem<dim, spacedim>::memory_consumption() const
 #endif
 
 // explicit instantiations
-#include "fe_system.inst"
+#include "fe/fe_system.inst"
 
 DEAL_II_NAMESPACE_CLOSE

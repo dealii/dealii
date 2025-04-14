@@ -16,6 +16,7 @@ foreach(_step ${_steps})
   if(NOT EXISTS ${_diff_file})
     message(FATAL_ERROR
       "\nMissing ${_step}.diff file for example ${_step}.\n"
+      "Consult tests/examples/README.md for instructions.\n"
       )
   endif()
 

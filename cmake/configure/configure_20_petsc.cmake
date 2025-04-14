@@ -99,6 +99,19 @@ endmacro()
 
 
 macro(feature_petsc_configure_external)
+  #
+  # Propagate some PETSc configuration variables into DEAL_II namespace:
+  #
+
+  set(DEAL_II_PETSC_WITH_COMPLEX ${PETSC_WITH_COMPLEX})
+  set(DEAL_II_PETSC_WITH_HYPRE ${PETSC_WITH_HYPRE})
+  set(DEAL_II_PETSC_WITH_MUMPS ${PETSC_WITH_MUMPS})
+  set(DEAL_II_PETSC_WITH_KOKKOS ${PETSC_WITH_KOKKOS})
+
+  #
+  # Figure out all the possible instantiations we need:
+  #
+
   set(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
   set(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
   set(DEAL_II_EXPAND_PETSC_SPARSE_MATRICES
@@ -138,7 +151,3 @@ endmacro()
 
 
 configure_feature(PETSC)
-set(DEAL_II_PETSC_WITH_COMPLEX ${PETSC_WITH_COMPLEX})
-set(DEAL_II_PETSC_WITH_HYPRE ${PETSC_WITH_HYPRE})
-set(DEAL_II_PETSC_WITH_MUMPS ${PETSC_WITH_MUMPS})
-set(DEAL_II_PETSC_WITH_KOKKOS ${PETSC_WITH_KOKKOS})

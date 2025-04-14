@@ -67,6 +67,7 @@ std::vector<Polynomials::Polynomial<number>>
 generate_complete_bernstein_basis(const unsigned int degree)
 {
   std::vector<Polynomials::Polynomial<number>> v;
+  v.reserve(degree + 1);
   for (unsigned int i = 0; i < degree + 1; ++i)
     v.push_back(PolynomialsBernstein<number>(i, degree));
   return v;

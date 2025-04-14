@@ -236,7 +236,7 @@ namespace SmoothnessEstimator
 
               // choose the smallest decay of coefficients in each direction,
               // i.e. the maximum decay slope k_v as in exp(-k_v)
-              double k_v = std::numeric_limits<double>::infinity();
+              double k_v = std::numeric_limits<double>::max();
               for (unsigned int d = 0; d < dim; ++d)
                 {
                   x.resize(0);
@@ -294,6 +294,7 @@ namespace SmoothnessEstimator
       // finite element, the smoothness estimation algorithm tends to produce
       // stable results.
       std::vector<unsigned int> n_coefficients_per_direction;
+      n_coefficients_per_direction.reserve(fe_collection.size());
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 
@@ -521,7 +522,7 @@ namespace SmoothnessEstimator
 
               // choose the smallest decay of coefficients in each direction,
               // i.e. the maximum decay slope k_v as in exp(-k_v)
-              double k_v = std::numeric_limits<double>::infinity();
+              double k_v = std::numeric_limits<double>::max();
               for (unsigned int d = 0; d < dim; ++d)
                 {
                   x.resize(0);
@@ -583,6 +584,7 @@ namespace SmoothnessEstimator
       // element, the smoothness estimation algorithm tends to produce stable
       // results.
       std::vector<unsigned int> n_coefficients_per_direction;
+      n_coefficients_per_direction.reserve(fe_collection.size());
       for (unsigned int i = 0; i < fe_collection.size(); ++i)
         n_coefficients_per_direction.push_back(fe_collection[i].degree + 2);
 
@@ -620,6 +622,6 @@ namespace SmoothnessEstimator
 
 
 // explicit instantiations
-#include "smoothness_estimator.inst"
+#include "numerics/smoothness_estimator.inst"
 
 DEAL_II_NAMESPACE_CLOSE

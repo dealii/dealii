@@ -1966,33 +1966,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
-  FEPointEvaluationBase(FEPointEvaluationBase &&other) noexcept
-  : n_q_batches(other.n_q_batches)
-  , n_q_points(other.n_q_points)
-  , n_q_points_scalar(other.n_q_points_scalar)
-  , mapping(other.mapping)
-  , fe(other.fe)
-  , poly(other.poly)
-  , use_linear_path(other.use_linear_path)
-  , renumber(other.renumber)
-  , solution_renumbered(other.solution_renumbered)
-  , solution_renumbered_vectorized(other.solution_renumbered_vectorized)
-  , values(other.values)
-  , gradients(other.gradients)
-  , dofs_per_component(other.dofs_per_component)
-  , dofs_per_component_face(other.dofs_per_component_face)
-  , component_in_base_element(other.component_in_base_element)
-  , nonzero_shape_function_component(other.nonzero_shape_function_component)
-  , update_flags(other.update_flags)
-  , fe_values(other.fe_values)
-  , mapping_info_on_the_fly(std::move(other.mapping_info_on_the_fly))
-  , mapping_info(other.mapping_info)
-  , current_cell_index(other.current_cell_index)
-  , current_face_number(other.current_face_number)
-  , fast_path(other.fast_path)
-  , must_reinitialize_pointers(other.must_reinitialize_pointers)
-  , is_interior(other.is_interior)
-{}
+  FEPointEvaluationBase(FEPointEvaluationBase &&other) noexcept = default;
 
 
 
@@ -2131,30 +2105,34 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::do_reinit()
     mapping_info->compute_data_index_offset(geometry_index);
   const unsigned int compressed_data_offset =
     mapping_info->compute_compressed_data_index_offset(geometry_index);
-#ifdef DEBUG
-  const UpdateFlags update_flags_mapping =
-    mapping_info->get_update_flags_mapping();
-  if (update_flags_mapping & UpdateFlags::update_quadrature_points)
-    real_point_ptr = mapping_info->get_real_point(data_offset);
-  if (update_flags_mapping & UpdateFlags::update_jacobians)
-    jacobian_ptr =
-      mapping_info->get_jacobian(compressed_data_offset, is_interior);
-  if (update_flags_mapping & UpdateFlags::update_inverse_jacobians)
-    inverse_jacobian_ptr =
-      mapping_info->get_inverse_jacobian(compressed_data_offset, is_interior);
-  if (update_flags_mapping & UpdateFlags::update_normal_vectors)
-    normal_ptr = mapping_info->get_normal_vector(data_offset);
-  if (update_flags_mapping & UpdateFlags::update_JxW_values)
-    JxW_ptr = mapping_info->get_JxW(data_offset);
-#else
-  real_point_ptr = mapping_info->get_real_point(data_offset);
-  jacobian_ptr =
-    mapping_info->get_jacobian(compressed_data_offset, is_interior);
-  inverse_jacobian_ptr =
-    mapping_info->get_inverse_jacobian(compressed_data_offset, is_interior);
-  normal_ptr = mapping_info->get_normal_vector(data_offset);
-  JxW_ptr    = mapping_info->get_JxW(data_offset);
-#endif
+  if constexpr (running_in_debug_mode())
+    {
+      const UpdateFlags update_flags_mapping =
+        mapping_info->get_update_flags_mapping();
+      if (update_flags_mapping & UpdateFlags::update_quadrature_points)
+        real_point_ptr = mapping_info->get_real_point(data_offset);
+      if (update_flags_mapping & UpdateFlags::update_jacobians)
+        jacobian_ptr =
+          mapping_info->get_jacobian(compressed_data_offset, is_interior);
+      if (update_flags_mapping & UpdateFlags::update_inverse_jacobians)
+        inverse_jacobian_ptr =
+          mapping_info->get_inverse_jacobian(compressed_data_offset,
+                                             is_interior);
+      if (update_flags_mapping & UpdateFlags::update_normal_vectors)
+        normal_ptr = mapping_info->get_normal_vector(data_offset);
+      if (update_flags_mapping & UpdateFlags::update_JxW_values)
+        JxW_ptr = mapping_info->get_JxW(data_offset);
+    }
+  else
+    {
+      real_point_ptr = mapping_info->get_real_point(data_offset);
+      jacobian_ptr =
+        mapping_info->get_jacobian(compressed_data_offset, is_interior);
+      inverse_jacobian_ptr =
+        mapping_info->get_inverse_jacobian(compressed_data_offset, is_interior);
+      normal_ptr = mapping_info->get_normal_vector(data_offset);
+      JxW_ptr    = mapping_info->get_JxW(data_offset);
+    }
 
   if (!is_linear && fast_path)
     {
@@ -2379,7 +2357,6 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::real_point(
   const unsigned int point_index) const
 {
   return quadrature_point(point_index);
-  ;
 }
 
 
@@ -2420,7 +2397,8 @@ inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
   quadrature_point_indices() const
 {
-  return {0U, n_q_points};
+  return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
+                                                                  n_q_points);
 }
 
 
@@ -3309,7 +3287,17 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::get_normal_derivative(
   const unsigned int point_index) const
 {
   AssertIndexRange(point_index, this->gradients.size());
-  return this->gradients[point_index] * normal_vector(point_index);
+
+  value_type normal_derivative;
+  if constexpr (n_components == 1)
+    normal_derivative =
+      this->gradients[point_index] * normal_vector(point_index);
+  else
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      normal_derivative[comp] =
+        this->gradients[point_index][comp] * normal_vector(point_index);
+
+  return normal_derivative;
 }
 
 
@@ -3324,8 +3312,9 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::
   if constexpr (n_components == 1)
     this->gradients[point_index] = value * normal_vector(point_index);
   else
-    this->gradients[point_index] =
-      outer_product(value, normal_vector(point_index));
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      this->gradients[point_index][comp] =
+        value[comp] * normal_vector(point_index);
 }
 
 
@@ -4067,7 +4056,17 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
   get_normal_derivative(const unsigned int point_index) const
 {
   AssertIndexRange(point_index, this->gradients.size());
-  return this->gradients[point_index] * normal_vector(point_index);
+
+  value_type normal_derivative;
+  if constexpr (n_components == 1)
+    normal_derivative =
+      this->gradients[point_index] * normal_vector(point_index);
+  else
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      normal_derivative[comp] =
+        this->gradients[point_index][comp] * normal_vector(point_index);
+
+  return normal_derivative;
 }
 
 
@@ -4082,8 +4081,9 @@ FEFacePointEvaluation<n_components_, dim, spacedim, Number>::
   if constexpr (n_components == 1)
     this->gradients[point_index] = value * normal_vector(point_index);
   else
-    this->gradients[point_index] =
-      outer_product(value, normal_vector(point_index));
+    for (unsigned int comp = 0; comp < n_components; ++comp)
+      this->gradients[point_index][comp] =
+        value[comp] * normal_vector(point_index);
 }
 
 DEAL_II_NAMESPACE_CLOSE

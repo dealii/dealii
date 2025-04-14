@@ -19,7 +19,8 @@
 #include <deal.II/fe/fe.h>
 
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_iterator.templates.h>
+
+#include <boost/container/small_vector.hpp>
 
 #include <vector>
 
@@ -321,6 +322,6 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
 // --------------------------------------------------------------------------
 // explicit instantiations
-#include "dof_accessor.inst"
+#include "dofs/dof_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE

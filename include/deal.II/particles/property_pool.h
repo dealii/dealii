@@ -45,6 +45,10 @@ namespace types
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
+   *
+   * This preprocessor variable is deprecated. Use the variable
+   * `Utilities::MPI::mpi_type_id_for_type<types::particle_index>`
+   * instead.
    */
 #    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UINT64_T
 #  endif

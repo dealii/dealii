@@ -330,7 +330,7 @@ private:
  * @ingroup vector_valued
  */
 template <typename MatrixType>
-class MatrixBlockVector : private AnyData
+class MatrixBlockVector : public AnyData
 {
 public:
   /**
@@ -405,8 +405,6 @@ public:
    */
   using AnyData::name;
   using AnyData::size;
-  using AnyData::subscribe;
-  using AnyData::unsubscribe;
 };
 
 
@@ -718,7 +716,7 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
   // leave it at this. While it may
   // not be the most efficient way,
   // it is at least thread safe.
-  // #ifdef DEBUG
+  // if constexpr (running_in_debug_mode()){
   Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
 
   for (size_type j = 0; j < n_cols; ++j)
@@ -729,7 +727,7 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
 
       matrix.add(bi.second, bj.second, values[j]);
     }
-  // #endif
+  // }
 }
 
 

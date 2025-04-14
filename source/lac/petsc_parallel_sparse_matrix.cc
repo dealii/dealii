@@ -206,30 +206,30 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-#  ifdef DEBUG
-      {
-        // check indexsets
-        types::global_dof_index row_owners =
-          Utilities::MPI::sum(local_rows.n_elements(), communicator);
-        types::global_dof_index col_owners =
-          Utilities::MPI::sum(local_columns.n_elements(), communicator);
-        Assert(row_owners == sparsity_pattern.n_rows(),
-               ExcMessage(
-                 std::string(
-                   "Each row has to be owned by exactly one owner (n_rows()=") +
-                 std::to_string(sparsity_pattern.n_rows()) +
-                 " but sum(local_rows.n_elements())=" +
-                 std::to_string(row_owners) + ")"));
-        Assert(
-          col_owners == sparsity_pattern.n_cols(),
-          ExcMessage(
-            std::string(
-              "Each column has to be owned by exactly one owner (n_cols()=") +
-            std::to_string(sparsity_pattern.n_cols()) +
-            " but sum(local_columns.n_elements())=" +
-            std::to_string(col_owners) + ")"));
-      }
-#  endif
+      if constexpr (running_in_debug_mode())
+        {
+          // check indexsets
+          types::global_dof_index row_owners =
+            Utilities::MPI::sum(local_rows.n_elements(), communicator);
+          types::global_dof_index col_owners =
+            Utilities::MPI::sum(local_columns.n_elements(), communicator);
+          Assert(
+            row_owners == sparsity_pattern.n_rows(),
+            ExcMessage(
+              std::string(
+                "Each row has to be owned by exactly one owner (n_rows()=") +
+              std::to_string(sparsity_pattern.n_rows()) +
+              " but sum(local_rows.n_elements())=" +
+              std::to_string(row_owners) + ")"));
+          Assert(
+            col_owners == sparsity_pattern.n_cols(),
+            ExcMessage(
+              std::string(
+                "Each column has to be owned by exactly one owner (n_cols()=") +
+              std::to_string(sparsity_pattern.n_cols()) +
+              " but sum(local_columns.n_elements())=" +
+              std::to_string(col_owners) + ")"));
+        }
 
 
       // create the matrix. We do not set row length but set the
@@ -517,30 +517,30 @@ namespace PETScWrappers
       Assert(local_rows.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
 
-#    ifdef DEBUG
-      {
-        // check indexsets
-        const types::global_dof_index row_owners =
-          Utilities::MPI::sum(local_rows.n_elements(), communicator);
-        const types::global_dof_index col_owners =
-          Utilities::MPI::sum(local_columns.n_elements(), communicator);
-        Assert(row_owners == sparsity_pattern.n_rows(),
-               ExcMessage(
-                 std::string(
-                   "Each row has to be owned by exactly one owner (n_rows()=") +
-                 std::to_string(sparsity_pattern.n_rows()) +
-                 " but sum(local_rows.n_elements())=" +
-                 std::to_string(row_owners) + ")"));
-        Assert(
-          col_owners == sparsity_pattern.n_cols(),
-          ExcMessage(
-            std::string(
-              "Each column has to be owned by exactly one owner (n_cols()=") +
-            std::to_string(sparsity_pattern.n_cols()) +
-            " but sum(local_columns.n_elements())=" +
-            std::to_string(col_owners) + ")"));
-      }
-#    endif
+      if constexpr (running_in_debug_mode())
+        {
+          // check indexsets
+          const types::global_dof_index row_owners =
+            Utilities::MPI::sum(local_rows.n_elements(), communicator);
+          const types::global_dof_index col_owners =
+            Utilities::MPI::sum(local_columns.n_elements(), communicator);
+          Assert(
+            row_owners == sparsity_pattern.n_rows(),
+            ExcMessage(
+              std::string(
+                "Each row has to be owned by exactly one owner (n_rows()=") +
+              std::to_string(sparsity_pattern.n_rows()) +
+              " but sum(local_rows.n_elements())=" +
+              std::to_string(row_owners) + ")"));
+          Assert(
+            col_owners == sparsity_pattern.n_cols(),
+            ExcMessage(
+              std::string(
+                "Each column has to be owned by exactly one owner (n_cols()=") +
+              std::to_string(sparsity_pattern.n_cols()) +
+              " but sum(local_columns.n_elements())=" +
+              std::to_string(col_owners) + ")"));
+        }
       PetscErrorCode ierr;
 
       // create the local to global mappings as arrays.

@@ -12,22 +12,28 @@
 ##
 ## ------------------------------------------------------------------------
 
-set(_src
-  symengine_math.cc
-  symengine_number_types.cc
-  symengine_number_visitor_internal.cc
-  symengine_optimizer.cc
-  symengine_scalar_operations.cc
-  symengine_tensor_operations.cc
-  symengine_types.cc
-  symengine_utilities.cc
-  )
+set(_src)
+set(_inst)
 
-set(_inst
-  symengine_number_visitor_internal.inst.in
-  symengine_optimizer.inst.in
-  symengine_tensor_operations.inst.in
-  )
+if(DEAL_II_WITH_SYMENGINE)
+  set(_src
+    symengine_math.cc
+    symengine_number_types.cc
+    symengine_number_visitor_internal.cc
+    symengine_optimizer.cc
+    symengine_scalar_operations.cc
+    symengine_tensor_operations.cc
+    symengine_types.cc
+    symengine_utilities.cc
+    )
+
+  set(_inst
+    symengine_number_visitor_internal.inst.in
+    symengine_optimizer.inst.in
+    symengine_tensor_operations.inst.in
+    )
+endif()
+
 
 file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/sd/*.h

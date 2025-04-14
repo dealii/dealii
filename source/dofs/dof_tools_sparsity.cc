@@ -339,7 +339,7 @@ namespace DoFTools
             for (unsigned int i = 0; i < child_cells.size(); ++i)
               {
                 const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                                   cell_col_child = child_cells[i];
+                                  &cell_col_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
                   cell_row->get_fe().n_dofs_per_cell();
                 const unsigned int dofs_per_cell_col =
@@ -388,16 +388,18 @@ namespace DoFTools
     AssertDimension(dof_to_boundary_mapping.size(), n_dofs);
     AssertDimension(sparsity.n_rows(), dof.n_boundary_dofs());
     AssertDimension(sparsity.n_cols(), dof.n_boundary_dofs());
-#ifdef DEBUG
-    if (sparsity.n_rows() != 0)
+    if constexpr (running_in_debug_mode())
       {
-        types::global_dof_index max_element = 0;
-        for (const types::global_dof_index index : dof_to_boundary_mapping)
-          if ((index != numbers::invalid_dof_index) && (index > max_element))
-            max_element = index;
-        AssertDimension(max_element, sparsity.n_rows() - 1);
+        if (sparsity.n_rows() != 0)
+          {
+            types::global_dof_index max_element = 0;
+            for (const types::global_dof_index index : dof_to_boundary_mapping)
+              if ((index != numbers::invalid_dof_index) &&
+                  (index > max_element))
+                max_element = index;
+            AssertDimension(max_element, sparsity.n_rows() - 1);
+          }
       }
-#endif
 
     std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
@@ -502,16 +504,18 @@ namespace DoFTools
                                 dof.n_boundary_dofs(boundary_ids)));
     (void)fe_is_hermite;
 
-#ifdef DEBUG
-    if (sparsity.n_rows() != 0)
+    if constexpr (running_in_debug_mode())
       {
-        types::global_dof_index max_element = 0;
-        for (const types::global_dof_index index : dof_to_boundary_mapping)
-          if ((index != numbers::invalid_dof_index) && (index > max_element))
-            max_element = index;
-        AssertDimension(max_element, sparsity.n_rows() - 1);
+        if (sparsity.n_rows() != 0)
+          {
+            types::global_dof_index max_element = 0;
+            for (const types::global_dof_index index : dof_to_boundary_mapping)
+              if ((index != numbers::invalid_dof_index) &&
+                  (index > max_element))
+                max_element = index;
+            AssertDimension(max_element, sparsity.n_rows() - 1);
+          }
       }
-#endif
 
     std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve(dof.get_fe_collection().max_dofs_per_face());
@@ -1144,7 +1148,7 @@ namespace DoFTools
 
 // --------------------------------------------------- explicit instantiations
 
-#include "dof_tools_sparsity.inst"
+#include "dofs/dof_tools_sparsity.inst"
 
 
 

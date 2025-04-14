@@ -575,7 +575,6 @@ DGMethod<dim>::assemble_system1()
             {
               typename DoFHandler<dim>::cell_iterator neighbor =
                 cell->neighbor(face_no);
-              ;
 
               if (face->has_children())
                 {

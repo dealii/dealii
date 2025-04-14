@@ -22,25 +22,6 @@
 #ifdef DEAL_II_WITH_ARBORX
 #  include <deal.II/arborx/access_traits.h>
 #  include <deal.II/arborx/distributed_tree.h>
-#else
-template <int dim, typename Number>
-class BoundingBox;
-
-namespace ArborXWrappers
-{
-  class DistributedTree
-  {
-  public:
-    template <int dim, typename Number>
-    DistributedTree(const MPI_Comm &,
-                    const std::vector<BoundingBox<dim, Number>> &);
-    template <typename QueryType>
-    std::pair<std::vector<std::pair<int, int>>, std::vector<int>>
-    query(const QueryType &queries);
-  };
-  class BoundingBoxIntersectPredicate
-  {};
-} // namespace ArborXWrappers
 #endif
 
 #ifdef DEAL_II_WITH_CGAL
@@ -101,6 +82,33 @@ namespace ArborXWrappers
 #include <unordered_map>
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DEAL_II_WITH_ARBORX
+
+// If we configured without ArborX, we still need to have a couple of
+// dummy types that we can reference in code below. They do not
+// actually do anything useful.
+template <int dim, typename Number>
+class BoundingBox;
+
+namespace ArborXWrappers
+{
+  class DistributedTree
+  {
+  public:
+    template <int dim, typename Number>
+    DistributedTree(const MPI_Comm &,
+                    const std::vector<BoundingBox<dim, Number>> &);
+
+    template <typename QueryType>
+    std::pair<std::vector<std::pair<int, int>>, std::vector<int>>
+    query(const QueryType &queries);
+  };
+
+  class BoundingBoxIntersectPredicate
+  {};
+} // namespace ArborXWrappers
+#endif
 
 
 namespace GridTools
@@ -951,13 +959,14 @@ namespace GridTools
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
 
-#ifdef DEBUG
-        {
-          // Double-check if found index is at marked cell
-          Assert(any_cell_marked(vertex_to_cells[closest_vertex_index]),
-                 dealii::ExcMessage("Found non-marked vertex"));
-        }
-#endif
+        if constexpr (running_in_debug_mode())
+          {
+            {
+              // Double-check if found index is at marked cell
+              Assert(any_cell_marked(vertex_to_cells[closest_vertex_index]),
+                     dealii::ExcMessage("Found non-marked vertex"));
+            }
+          }
 
         const double vertex_point_norm = vertex_to_point.norm();
         if (vertex_point_norm > 0)
@@ -1246,6 +1255,7 @@ namespace GridTools
         if ((merged_b_boxes.size() > max_boxes) && (spacedim > 1))
           {
             std::vector<double> volumes;
+            volumes.reserve(merged_b_boxes.size());
             for (unsigned int i = 0; i < merged_b_boxes.size(); ++i)
               volumes.push_back(merged_b_boxes[i].volume());
 
@@ -1529,12 +1539,13 @@ namespace GridTools
     // Make indices global by getting the number of vertices owned by each
     // processors and shifting the indices accordingly
     types::global_vertex_index shift = 0;
-    int                        ierr  = MPI_Exscan(&next_index,
-                          &shift,
-                          1,
-                          DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                          MPI_SUM,
-                          triangulation.get_mpi_communicator());
+    int                        ierr  = MPI_Exscan(
+      &next_index,
+      &shift,
+      1,
+      Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>,
+      MPI_SUM,
+      triangulation.get_mpi_communicator());
     AssertThrowMPI(ierr);
 
     for (auto &global_index_it : local_to_global_vertex_index)
@@ -1580,13 +1591,14 @@ namespace GridTools
           }
 
         // Send the message
-        ierr = MPI_Isend(vertices_send_buffers[i].data(),
-                         buffer_size,
-                         DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                         destination,
-                         mpi_tag,
-                         triangulation.get_mpi_communicator(),
-                         &first_requests[i]);
+        ierr = MPI_Isend(
+          vertices_send_buffers[i].data(),
+          buffer_size,
+          Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>,
+          destination,
+          mpi_tag,
+          triangulation.get_mpi_communicator(),
+          &first_requests[i]);
         AssertThrowMPI(ierr);
       }
 
@@ -1605,13 +1617,14 @@ namespace GridTools
         vertices_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        ierr = MPI_Recv(vertices_recv_buffers[i].data(),
-                        buffer_size,
-                        DEAL_II_VERTEX_INDEX_MPI_TYPE,
-                        source,
-                        mpi_tag,
-                        triangulation.get_mpi_communicator(),
-                        MPI_STATUS_IGNORE);
+        ierr = MPI_Recv(
+          vertices_recv_buffers[i].data(),
+          buffer_size,
+          Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>,
+          source,
+          mpi_tag,
+          triangulation.get_mpi_communicator(),
+          MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
 
@@ -1962,7 +1975,7 @@ namespace GridTools
       if (cell->is_active())
         {
           while (current_cell_idx >=
-                 std::floor(static_cast<uint_least64_t>(n_active_cells) *
+                 std::floor(static_cast<std::uint_least64_t>(n_active_cells) *
                             (current_proc_idx + 1) / n_partitions))
             ++current_proc_idx;
           cell->set_subdomain_id(current_proc_idx);
@@ -3466,23 +3479,24 @@ namespace GridTools
     AssertDimension(cells_out.size(), maps_out.size());
     AssertDimension(cells_out.size(), qpoints_out.size());
 
-#ifdef DEBUG
-    unsigned int c   = cells_out.size();
-    unsigned int qps = 0;
-    // The number of points in all
-    // the cells must be the same as
-    // the number of points we
-    // started off from,
-    // plus the points which were ignored
-    for (unsigned int n = 0; n < c; ++n)
+    if constexpr (running_in_debug_mode())
       {
-        AssertDimension(qpoints_out[n].size(), maps_out[n].size());
-        qps += qpoints_out[n].size();
-      }
+        unsigned int c   = cells_out.size();
+        unsigned int qps = 0;
+        // The number of points in all
+        // the cells must be the same as
+        // the number of points we
+        // started off from,
+        // plus the points which were ignored
+        for (unsigned int n = 0; n < c; ++n)
+          {
+            AssertDimension(qpoints_out[n].size(), maps_out[n].size());
+            qps += qpoints_out[n].size();
+          }
 
-    Assert(qps + missing_points_out.size() == np,
-           ExcDimensionMismatch(qps + missing_points_out.size(), np));
-#endif
+        Assert(qps + missing_points_out.size() == np,
+               ExcDimensionMismatch(qps + missing_points_out.size(), np));
+      }
 
     return std::make_tuple(std::move(cells_out),
                            std::move(qpoints_out),
@@ -4773,10 +4787,10 @@ namespace GridTools
           const auto face_a = pair.first.first->face(pair.first.second);
           const auto face_b =
             pair.second.first.first->face(pair.second.first.second);
-          const auto reference_cell      = pair.first.first->reference_cell();
-          const auto face_reference_cell = face_a->reference_cell();
-          const unsigned char combined_orientation = pair.second.second;
-          const unsigned char inverse_combined_orientation =
+          const auto reference_cell       = pair.first.first->reference_cell();
+          const auto face_reference_cell  = face_a->reference_cell();
+          const auto combined_orientation = pair.second.second;
+          const auto inverse_combined_orientation =
             face_reference_cell.get_inverse_combined_orientation(
               combined_orientation);
 
@@ -5656,6 +5670,6 @@ namespace GridTools
 
 
 // explicit instantiations
-#include "grid_tools.inst"
+#include "grid/grid_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE

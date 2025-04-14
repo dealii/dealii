@@ -94,7 +94,7 @@ namespace FE_P_BubblesImplementation
                           reference_cell.face_to_cell_vertices(
                             face_no,
                             face_vertex_no,
-                            ReferenceCell::default_combined_face_orientation());
+                            numbers::default_geometric_orientation);
 
                         midpoint +=
                           reference_cell.template vertex<dim>(vertex_no);
@@ -177,7 +177,7 @@ namespace FE_P_BubblesImplementation
                       vertices.push_back(reference_cell.face_to_cell_vertices(
                         face_no,
                         face_vertex_no,
-                        ReferenceCell::default_combined_face_orientation()));
+                        numbers::default_geometric_orientation));
 
                     Assert(vertices.size() == 3, ExcInternalError());
                     auto b =
@@ -217,18 +217,19 @@ namespace FE_P_BubblesImplementation
             for (auto &p : bubble_functions)
               lump_polys.push_back(std::move(p));
 
-              // Sanity check:
-#ifdef DEBUG
-            BarycentricPolynomial<dim> unity;
-            for (const auto &p : lump_polys)
-              unity = unity + p;
+            // Sanity check:
+            if constexpr (running_in_debug_mode())
+              {
+                BarycentricPolynomial<dim> unity;
+                for (const auto &p : lump_polys)
+                  unity = unity + p;
 
-            Point<dim> test;
-            for (unsigned int d = 0; d < dim; ++d)
-              test[d] = 2.0;
-            Assert(std::abs(unity.value(test) - 1.0) < 1e-10,
-                   ExcInternalError());
-#endif
+                Point<dim> test;
+                for (unsigned int d = 0; d < dim; ++d)
+                  test[d] = 2.0;
+                Assert(std::abs(unity.value(test) - 1.0) < 1e-10,
+                       ExcInternalError());
+              }
 
             return BarycentricPolynomials<dim>(lump_polys);
           }
@@ -295,6 +296,6 @@ FE_SimplexP_Bubbles<dim, spacedim>::clone() const
 }
 
 // explicit instantiations
-#include "fe_simplex_p_bubbles.inst"
+#include "fe/fe_simplex_p_bubbles.inst"
 
 DEAL_II_NAMESPACE_CLOSE
