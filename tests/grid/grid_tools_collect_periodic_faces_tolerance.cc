@@ -21,8 +21,6 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
 
-#include <deal.II/grid/tria.h>
-
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
@@ -54,24 +52,24 @@ test()
       repetitions[i] = num_refinements;
     }
   GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2, true);
-  
-  //Here we are only interested in using the tolerance parameter of the 
-  //collect_periodic_faces function, the other default parameter stay as
-  //default one.
-  const Tensor<1, dim> defaultOffset=dealii::Tensor<1, dim>();
-  const FullMatrix<double> matrix = FullMatrix<double>();
-  const double tolerance=1e-7;
-  const unsigned int direction = 0; //x-direction
 
-  //We distort the mesh to test the tolerance parameter
-  GridTools::distort_random(tolerance/10, tria, /* keep boundary */ false);
+  // Here we are only interested in using the tolerance parameter of the
+  // collect_periodic_faces function, the other default parameter stay as
+  // default one.
+  const Tensor<1, dim>     defaultOffset = dealii::Tensor<1, dim>();
+  const FullMatrix<double> matrix        = FullMatrix<double>();
+  const double             tolerance     = 1e-7;
+  const unsigned int       direction     = 0; // x-direction
+
+  // We distort the mesh to test the tolerance parameter
+  GridTools::distort_random(tolerance / 10, tria, /* keep boundary */ false);
 
   // Collect periodic faces in the x-direction
   // activate debug to see it fail
-  GridTools::collect_periodic_faces(tria, 
-                                    0, //boundary Id 1
-                                    1, //boundary Id 2
-                                    direction, 
+  GridTools::collect_periodic_faces(tria,
+                                    0, // boundary Id 1
+                                    1, // boundary Id 2
+                                    direction,
                                     periodicity_vector,
                                     defaultOffset,
                                     matrix,
