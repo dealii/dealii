@@ -354,11 +354,11 @@ public:
    * efficient assembling of the matrix.
    */
   void
-  reinit(const size_type n_rows,
-         const size_type n_columns,
-         size_type       default_row_length = 0,
-         unsigned int    default_increment  = 1,
-         size_type       reserve            = 0);
+  reinit(const size_type    n_rows,
+         const size_type    n_columns,
+         const size_type    default_row_length = 0,
+         const unsigned int default_increment  = 1,
+         const size_type    reserve            = 0);
 
   /**
    * Release all memory and return to a state just like after having called
