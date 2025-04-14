@@ -50,12 +50,15 @@ DEAL_II_NAMESPACE_OPEN
  *
  *   // now write out M:
  *   MatrixOut matrix_out;
- *   std::ofstream out ("M.gnuplot");
+ *   std::ofstream out ("M.vtu");
  *   matrix_out.build_patches (M, "M");
- *   matrix_out.write_gnuplot (out);
+ *   matrix_out.write_vtu (out);
  * @endcode
- * Of course, you can as well choose a different graphical output format.
- * Also, this class supports any matrix, not only of type FullMatrix, as long
+ * Of course, you can as well choose a different graphical output format:
+ * all of the formats implemented by the DataOutInterface functions are also
+ * supported by this class.
+ *
+ * This class supports any matrix, not only of type FullMatrix, as long
  * as it satisfies a number of requirements, stated with the member functions
  * of this class.
  *
@@ -83,7 +86,11 @@ public:
   {
     /**
      * If @p true, only show the absolute values of the matrix entries, rather
-     * than their true values including the sign. Default value is @p false.
+     * than their true values including the sign. This is useful if you have
+     * matrix entries that span a large range and want to display their
+     * magnitude using a logarithmic scale.
+     *
+     * The default value is @p false.
      */
     bool show_absolute_values;
 
@@ -94,7 +101,7 @@ public:
      * shall be (in rows/columns). For example, if it is two, then always four
      * entries are collated into one.
      *
-     * Default value is one.
+     * The default value is one.
      */
     unsigned int block_size;
 
@@ -340,7 +347,21 @@ MatrixOut::build_patches(const Matrix      &matrix,
 
   // first clear old data and re-set the object to a correctly sized state:
   patches.clear();
-  patches.resize((gridpoints_x) * (gridpoints_y));
+  try
+    {
+      patches.resize(gridpoints_x * gridpoints_y);
+    }
+  catch (const std::bad_alloc &)
+    {
+      AssertThrow(false,
+                  ExcMessage("You are trying to create a graphical "
+                             "representation of a matrix that would "
+                             "requiring outputting " +
+                             std::to_string(gridpoints_x) + "x" +
+                             std::to_string(gridpoints_y) +
+                             " patches. There is not enough memory to output " +
+                             "this many patches."));
+    }
 
   // now build the patches
   size_type index = 0;
