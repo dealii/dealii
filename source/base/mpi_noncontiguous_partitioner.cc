@@ -100,6 +100,8 @@ namespace Utilities
       recv_ranks.clear();
       recv_ptr.clear();
       recv_indices.clear();
+      recv_indices_duplicates.clear();
+      recv_indices_duplicates_ptr.clear();
       buffers.clear();
       requests.clear();
 
