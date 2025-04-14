@@ -60,24 +60,6 @@ namespace EvaluationFlags
 
 
   /**
-   * @brief The DoFNumbering enum
-   *
-   * This enum describes how degrees of freedom (DoF) are ordered in
-   * FEPointEvaluation::evaluate() and FEPointEvaluation::integrate().
-   */
-  enum DoFNumbering
-  {
-    /**
-     * Lexicographic ordering as stored in FEEvaluation.
-     */
-    lexicographic,
-    /**
-     * Hierarchical ordering as in FiniteElement object.
-     */
-    hierarchical
-  };
-
-  /**
    * Global operator which returns an object in which all bits are set which are
    * either set in the first or the second argument. This operator exists since
    * if it did not then the result of the bit-or <tt>operator |</tt> would be an
