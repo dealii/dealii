@@ -124,18 +124,17 @@ public:
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
    * the current cell, and store them internally. Similar functionality as the
-   * function DoFAccessor::get_interpolated_dof_values when no constraints are
-   * present, but it also includes constraints from hanging nodes, so one can
-   * see it as a similar function to AffineConstraints::read_dof_values as
-   * well. Note that if vectorization is enabled, the DoF values for several
-   * cells are set.
+   * function DoFCellAccessor::get_interpolated_dof_values() when no constraints
+   * are present other than constraints from hanging nodes. Additionally, this
+   * function also resolves homogeneous constraints. Note that if vectorization
+   * is enabled, the DoF values for several cells are set.
    *
    * If some constraints on the vector are inhomogeneous, use the function
-   * read_dof_values_plain instead and provide the vector with useful data
-   * also in constrained positions by calling AffineConstraints::distribute.
-   * When accessing vector entries during the solution of linear systems, the
-   * temporary solution should always have homogeneous constraints and this
-   * method is the correct one.
+   * FEEvaluationBase::read_dof_values_plain() instead and provide the vector
+   * with useful data also in constrained positions by calling
+   * AffineConstraints::distribute(). When accessing vector entries during the
+   * solution of linear systems, the temporary solution should always have
+   * homogeneous constraints and this method is the correct one.
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -163,14 +162,14 @@ public:
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
    * the current cell, and store them internally. Similar functionality as the
-   * function DoFAccessor::get_interpolated_dof_values. As opposed to the
-   * read_dof_values function, this function reads out the plain entries from
-   * vectors, without taking stored constraints into account. This way of
-   * access is appropriate when the constraints have been distributed on the
-   * vector by a call to AffineConstraints::distribute previously. This
-   * function is also necessary when inhomogeneous constraints are to be used,
-   * as MatrixFree can only handle homogeneous constraints. Note that if
-   * vectorization is enabled, the DoF values for several cells are set.
+   * function DoFCellAccessor::get_interpolated_dof_values(). As opposed to the
+   * FEEvaluationBase::read_dof_values() function, this function reads out the
+   * plain entries from vectors, without taking stored constraints into account.
+   * This way of access is appropriate when the constraints have been
+   * distributed on the vector by a call to AffineConstraints::distribute()
+   * previously. This function is also necessary when inhomogeneous constraints
+   * are to be used, as MatrixFree can only handle homogeneous constraints. Note
+   * that if vectorization is enabled, the DoF values for several cells are set.
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
