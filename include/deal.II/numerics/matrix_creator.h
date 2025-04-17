@@ -600,8 +600,6 @@ namespace MatrixCreator
     const AffineConstraints<typename MatrixType::value_type> &constraints =
       AffineConstraints<typename MatrixType::value_type>());
 
-
-
   /**
    * Exception
    */
