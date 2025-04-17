@@ -612,11 +612,12 @@ namespace MatrixCreator
    * element size).
    *
    * @param include_endpoints A pair of booleans indicating whether to include
-   * the first and last dof in the matrix. Setting either one to false only
-   * makes sense if the idexing of DoF in the matrix is lexicographic, i.e. for
-   * FE_Q numbering is required while FE_DGQ can be precessed as it is.
+   * the first and last dof in the matrix. By excluding those DoFs, one can set
+   * a Dirichlet BC on either side. Setting either one to false only makes sense
+   * if the indexing of DoFs in the matrix is lexicographic, i.e., for FE_Q
+   * numbering is required, while FE_DGQ can be processed as it is.
    *
-   * @param numbering  A vector of unsigned integers representing the
+   * @param numbering A vector of unsigned integers representing the
    * numbering of the degrees of freedom. If empty, the
    * numbering of the finite element is used.
    *
@@ -634,17 +635,19 @@ namespace MatrixCreator
 
   /**
    * Computes a 1D cell derivative matrix for a given finite element.
+   *
    * @param fe The finite element object defining the shape functions.
    *
-   * @param h  The cell size used to scale the integration (typically the
+   * @param h The cell size used to scale the integration (typically the
    * element size).
    *
    * @param include_endpoints A pair of booleans indicating whether to include
-   * the first and last dof in the matrix. Setting either one to false only
-   * makes sense if the idexing of DoF in the matrix is lexicographic, i.e. for
-   * FE_Q numbering is required while FE_DGQ can be precessed as it is.
+   * the first and last dof in the matrix. By excluding those DoFs, one can set
+   * a Dirichlet BC on either side. Setting either one to false only makes sense
+   * if the indexing of DoFs in the matrix is lexicographic, i.e., for FE_Q
+   * numbering is required, while FE_DGQ can be processed as it is.
    *
-   * @param numbering  A vector of unsigned integers representing the
+   * @param numbering A vector of unsigned integers representing the
    * numbering of the degrees of freedom. If empty, the
    * numbering of the finite element is used.
    */

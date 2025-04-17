@@ -40,7 +40,7 @@ namespace MatrixCreator
         Assert(
           include_endpoints.first == true && include_endpoints.second == true,
           ExcMessage(
-            "You tried to genereate a 1D mass matrix with excluding boundary "
+            "You tried to generate a 1D mass matrix with excluding boundary "
             "dofs for a non-DGQ element without providing a numbering."));
       }
 
@@ -82,6 +82,16 @@ namespace MatrixCreator
     const std::pair<bool, bool> include_endpoints,
     std::vector<unsigned int>   numbering)
   {
+    if (dynamic_cast<const FE_DGQ<1> *>(&fe) == nullptr &&
+        numbering.size() == 0)
+      {
+        Assert(
+          include_endpoints.first == true && include_endpoints.second == true,
+          ExcMessage(
+            "You tried to generate a 1D derivative matrix with excluding boundary "
+            "dofs for a non-DGQ element without providing a numbering."));
+      }
+
     if (numbering.size() == 0)
       {
         numbering.resize(fe.dofs_per_cell);
