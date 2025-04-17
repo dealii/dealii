@@ -1071,37 +1071,39 @@ namespace internal
                                     .get_periodic_face_map()
                                     .at({cell, face_no})
                                     .second;
-
-          return info;
-        }
-
-      info.face_orientation = 0;
-      const auto interior_face_orientation =
-        cell->combined_face_orientation(face_no);
-      const auto exterior_face_orientation =
-        neighbor->combined_face_orientation(info.exterior_face_no);
-      if (interior_face_orientation != numbers::default_geometric_orientation)
-        {
-          info.face_orientation = 8 + interior_face_orientation;
-          Assert(
-            exterior_face_orientation == numbers::default_geometric_orientation,
-            ExcMessage("Face seems to be wrongly oriented from both sides"));
         }
       else
-        info.face_orientation = exterior_face_orientation;
-
-      // make sure to select correct subface index in case of non-standard
-      // orientation of the coarser neighbor face
-      if (cell->level() > neighbor->level() && exterior_face_orientation > 0)
         {
-          const Table<2, unsigned int> orientation =
-            ShapeInfo<double>::compute_orientation_table(2);
-          const auto face_reference_cell =
-            cell->face(face_no)->reference_cell();
-          info.subface_index =
-            orientation(face_reference_cell.get_inverse_combined_orientation(
-                          exterior_face_orientation),
-                        info.subface_index);
+          const auto interior_face_orientation =
+            cell->combined_face_orientation(face_no);
+          const auto exterior_face_orientation =
+            neighbor->combined_face_orientation(info.exterior_face_no);
+          if (interior_face_orientation !=
+              numbers::default_geometric_orientation)
+            {
+              info.face_orientation = 8 + interior_face_orientation;
+              Assert(exterior_face_orientation ==
+                       numbers::default_geometric_orientation,
+                     ExcMessage(
+                       "Face seems to be wrongly oriented from both sides"));
+            }
+          else
+            info.face_orientation = exterior_face_orientation;
+
+          // make sure to select correct subface index in case of non-standard
+          // orientation of the coarser neighbor face
+          if (cell->level() > neighbor->level() &&
+              exterior_face_orientation > 0)
+            {
+              const Table<2, unsigned int> orientation =
+                ShapeInfo<double>::compute_orientation_table(2);
+              const auto face_reference_cell =
+                cell->face(face_no)->reference_cell();
+              info.subface_index = orientation(
+                face_reference_cell.get_inverse_combined_orientation(
+                  exterior_face_orientation),
+                info.subface_index);
+            }
         }
 
       return info;
