@@ -87,6 +87,103 @@ namespace TensorProductMatrixCreator
     const dealii::ndarray<double, dim, 3>            &cell_extent,
     const unsigned int                                n_overlap = 1);
 
+
+
+  /**
+   * Computes a 1D cell mass matrix for a given finite element.This function is
+   * intended to provide a mass matrix for tensor product operators.
+   *
+   * @param fe The finite element object defining the shape functions.
+   *
+   * @param h  The cell size used to scale the integration (typically the
+   * element size).
+   *
+   * @param include_endpoints A pair of booleans indicating whether to include
+   * the first and last dof in the matrix. By excluding those DoFs, one can set
+   * a Dirichlet BC on either side. Setting either one to false only makes sense
+   * if the indexing of DoFs in the matrix is lexicographic, i.e., for FE_Q
+   * numbering is required, while FE_DGQ can be processed as it is.
+   *
+   * @param numbering A vector of unsigned integers representing the
+   * numbering of the degrees of freedom. If empty, the
+   * numbering of the finite element is used.
+   *
+   * @return A FullMatrix<double> representing the assembled mass matrix.
+   *
+   */
+  FullMatrix<double>
+  create_1d_cell_mass_matrix(
+    const FiniteElement<1>     &fe,
+    const double               &h,
+    const std::pair<bool, bool> include_endpoints = {true, true},
+    std::vector<unsigned int>   numbering = std::vector<unsigned int>());
+
+
+
+  /**
+   * Computes a 1D cell derivative matrix for a given finite element.
+   *
+   * @param fe The finite element object defining the shape functions.
+   *
+   * @param h The cell size used to scale the integration (typically the
+   * element size).
+   *
+   * @param include_endpoints A pair of booleans indicating whether to include
+   * the first and last dof in the matrix. By excluding those DoFs, one can set
+   * a Dirichlet BC on either side. Setting either one to false only makes sense
+   * if the indexing of DoFs in the matrix is lexicographic, i.e., for FE_Q
+   * numbering is required, while FE_DGQ can be processed as it is.
+   *
+   * @param numbering A vector of unsigned integers representing the
+   * numbering of the degrees of freedom. If empty, the
+   * numbering of the finite element is used.
+   */
+  FullMatrix<double>
+  create_1d_cell_derivative_matrix(
+    const FiniteElement<1>     &fe,
+    const double               &h,
+    const std::pair<bool, bool> include_endpoints = {true, true},
+    std::vector<unsigned int>   numbering = std::vector<unsigned int>());
+
+
+  /**
+   * This function assembles a global matrix from a given cell matrix, assuming
+   * a 1D discretization with a specified number of cells and overlap between
+   * them.
+   *
+   * @param cell_matrix The local cell matrix to be assembled into the
+   * global matrix.  It is assumed that the cell matrix has a size corresponding
+   * to the number of degrees of freedom per cell. The cell matrix should be
+   * ordered lexicographically, meaning that FE_Q should be renumbered
+   *
+   * @param n_cells The number of cells in the 1D discretization.
+   *
+   * @param overlap The number of degrees of freedom that overlap between
+   * adjacent cells. For discretization with FE_Q elements, the overlap should
+   * be set to 1, while for FE_DGQ elements, it should be set to 0.
+   *
+   * @param include_endpoints A pair of booleans indicating whether to
+   * include the left and right most dofs of the domain in the constructed
+   * matrix. The default value is {true, true}, which includes both endpoints.
+   *
+   * @return The assembled global matrix. The size of the matrix is determined by
+   * the number of cells, the overlap, and whether the endpoints are included.
+   *
+   * @note The size of the cell matrix must be consistent with the overlap
+   * parameter. Specifically, if the cell matrix is $n \times n$, then the
+   * overlap should be less than $n$.
+   *
+   * @warning This function returns a full matrix,
+   * if the number of cells is above 10 an exception will be thrown.
+   *
+   */
+  FullMatrix<double>
+  create_1D_discretization_matrix(
+    FullMatrix<double>         &cell_matrix,
+    const unsigned int         &n_cells,
+    const unsigned int         &overlap,
+    const std::pair<bool, bool> include_endpoints = {true, true});
+
 } // namespace TensorProductMatrixCreator
 
 
@@ -377,6 +474,155 @@ namespace TensorProductMatrixCreator
 
     return create_laplace_tensor_product_matrix<dim, Number>(
       fe, quadrature, boundary_ids, cell_extent, n_overlap);
+  }
+
+
+  FullMatrix<double>
+  create_1d_cell_mass_matrix(const FiniteElement<1>     &fe,
+                             const double               &h,
+                             const std::pair<bool, bool> include_endpoints,
+                             std::vector<unsigned int>   numbering)
+  {
+    if (dynamic_cast<const FE_DGQ<1> *>(&fe) == nullptr &&
+        numbering.size() == 0)
+      {
+        Assert(
+          include_endpoints.first == true && include_endpoints.second == true,
+          ExcMessage(
+            "You tried to generate a 1D mass matrix with excluding boundary "
+            "dofs for a non-DGQ element without providing a numbering."));
+      }
+
+
+    if (numbering.size() == 0)
+      {
+        numbering.resize(fe.dofs_per_cell);
+        std::iota(numbering.begin(), numbering.end(), 0);
+      }
+    const unsigned int degree          = fe.degree;
+    const unsigned int n_dofs_per_cell = fe.dofs_per_cell;
+    const double      &JxW             = h;
+    QGauss<1>          quadrature(degree + 1);
+
+    FullMatrix<double> cell_mass_matrix(n_dofs_per_cell, n_dofs_per_cell);
+    cell_mass_matrix = 0;
+
+    unsigned int start_dof = include_endpoints.first ? 0 : 1;
+    unsigned int end_dof =
+      include_endpoints.second ? n_dofs_per_cell : n_dofs_per_cell - 1;
+    const unsigned int shift = include_endpoints.first ? 0 : 1;
+
+    for (unsigned int i = start_dof; i < end_dof; ++i)
+      for (unsigned int j = start_dof; j < end_dof; ++j)
+        for (unsigned int q = 0; q < quadrature.size(); ++q)
+          cell_mass_matrix(i - shift, j - shift) +=
+            (fe.shape_value(numbering[i], quadrature.point(q)) *
+             fe.shape_value(numbering[j], quadrature.point(q))) *
+            JxW * quadrature.weight(q);
+
+    return cell_mass_matrix;
+  }
+
+
+  FullMatrix<double>
+  create_1d_cell_derivative_matrix(
+    const FiniteElement<1>     &fe,
+    const double               &h,
+    const std::pair<bool, bool> include_endpoints,
+    std::vector<unsigned int>   numbering)
+  {
+    if (dynamic_cast<const FE_DGQ<1> *>(&fe) == nullptr &&
+        numbering.size() == 0)
+      {
+        Assert(
+          include_endpoints.first == true && include_endpoints.second == true,
+          ExcMessage(
+            "You tried to generate a 1D derivative matrix with excluding boundary "
+            "dofs for a non-DGQ element without providing a numbering."));
+      }
+
+    if (numbering.size() == 0)
+      {
+        numbering.resize(fe.dofs_per_cell);
+        std::iota(numbering.begin(), numbering.end(), 0);
+      }
+
+    const unsigned int degree          = fe.degree;
+    const unsigned int n_dofs_per_cell = fe.dofs_per_cell;
+    const double      &JxW             = h;
+    QGauss<1>          quadrature(degree + 1);
+
+    FullMatrix<double> cell_matrix(n_dofs_per_cell, n_dofs_per_cell);
+    cell_matrix = 0;
+
+    unsigned int start_dof = include_endpoints.first ? 0 : 1;
+    unsigned int end_dof =
+      include_endpoints.second ? n_dofs_per_cell : n_dofs_per_cell - 1;
+    const unsigned int shift = include_endpoints.first ? 0 : 1;
+
+    for (unsigned int i = start_dof; i < end_dof; ++i)
+      for (unsigned int j = start_dof; j < end_dof; ++j)
+        for (unsigned int q = 0; q < quadrature.size(); ++q)
+          cell_matrix(i - shift, j - shift) +=
+            (fe.shape_grad(numbering[i], quadrature.point(q)) / h *
+             fe.shape_grad(numbering[j], quadrature.point(q))) /
+            h * JxW * quadrature.weight(q);
+
+    return cell_matrix;
+  }
+
+  FullMatrix<double>
+  create_1D_discretization_matrix(FullMatrix<double>         &cell_matrix,
+                                  const unsigned int         &n_cells,
+                                  const unsigned int         &overlap,
+                                  const std::pair<bool, bool> include_endpoints)
+  {
+    const unsigned int n_dofs_per_cell = cell_matrix.n();
+
+    Assert(cell_matrix.m() == n_dofs_per_cell,
+           ExcMessage(
+             "The provided cell mass matrix must be a square matrix."));
+    AssertThrow(
+      n_cells <= 10,
+      ExcMessage(
+        "create_1D_discretization_matrix() returns a full matrix and is not meant to be used with a larger number of cells. "));
+    Assert(n_cells > 0,
+           ExcMessage("You are trying to get a mass matrix of zero cells."));
+    Assert(overlap < n_dofs_per_cell,
+           ExcMessage("The overlap must be smaller than the number of dofs."));
+
+    unsigned int n_total_dofs =
+      n_cells * n_dofs_per_cell - overlap * (n_cells - 1);
+
+    if (!include_endpoints.first)
+      n_total_dofs -= 1;
+    if (!include_endpoints.second)
+      n_total_dofs -= 1;
+
+    FullMatrix<double> result_matrix(n_total_dofs, n_total_dofs);
+    result_matrix = 0;
+
+    for (unsigned int cell = 0; cell < n_cells; ++cell)
+      {
+        const unsigned int dof_shift =
+          cell * overlap + !include_endpoints.first;
+
+        const unsigned int start_dof =
+          (cell == 0 && !include_endpoints.first) ? 1 : 0;
+
+        const unsigned int end_dof =
+          (cell == n_cells - 1 && !include_endpoints.second) ?
+            n_dofs_per_cell - 1 :
+            n_dofs_per_cell;
+        for (unsigned int i = start_dof; i < end_dof; ++i)
+          for (unsigned int j = start_dof; j < end_dof; ++j)
+            {
+              result_matrix(i + cell * n_dofs_per_cell - dof_shift,
+                            j + cell * n_dofs_per_cell - dof_shift) +=
+                cell_matrix(i, j);
+            }
+      }
+    return result_matrix;
   }
 
 } // namespace TensorProductMatrixCreator
