@@ -184,6 +184,52 @@ namespace TensorProductMatrixCreator
     const unsigned int         &overlap,
     const std::pair<bool, bool> include_endpoints = {true, true});
 
+
+  /**
+   * @brief Create a 1D ghost penalty matrix for a given finite element.
+   * Implemented only for FE_Q.
+   *
+   * @param fe The finite element space used for discretization.
+   *
+   * @param h The mesh size, representing the length of the element.
+   *
+   * @param coefficients A vector of coefficients for the ghost penalty terms.
+   *                     If the vector is empty, default coefficients are used.
+   *                     The size of the coefficient vector should match the
+   *                     polynomial degree of the finite element space.
+   *
+   * @return A full matrix representing the 1D ghost penalty matrix.
+   */
+  FullMatrix<double>
+  create_1d_ghost_penalty_matrix(
+    const FiniteElement<1> &fe,
+    const double            h,
+    std::vector<double>     coefficients = std::vector<double>());
+
+
+
+  /**
+   * @brief Create a 1D ghost penalty matrix.
+   *
+   * This function creates a ghost penalty matrix in 1D. The matrix is created
+   * using the derivatives of the polynomial basis functions.
+   *
+   * @param polynomial_basis_derivative A vector of polynomial basis functions.
+   * These should be the derivatives of the basis functions used to represent
+   * the solution.
+   *
+   * @param overlap The number of overlapping dof to consider when
+   * computing the ghost penalty. For continuous element it is 1,
+   * for DG pick 0.
+   *
+   * @return A full matrix representing the 1D ghost penalty.
+   */
+  FullMatrix<double>
+  create_1d_ghost_penalty_matrix(
+    const std::vector<Polynomials::Polynomial<double>>
+                      &polynomial_basis_derivative,
+    const unsigned int overlap = 1);
+
 } // namespace TensorProductMatrixCreator
 
 
@@ -625,6 +671,119 @@ namespace TensorProductMatrixCreator
     return result_matrix;
   }
 
+
+
+  FullMatrix<double>
+  create_1d_ghost_penalty_matrix(const FiniteElement<1> &fe,
+                                 const double            h,
+                                 std::vector<double>     coefficients)
+  {
+    Assert(dynamic_cast<const FE_Q<1> *>(&fe) != nullptr, ExcNotImplemented());
+    Assert(h > 0, ExcMessage("Provided element size h is negative"));
+
+    const unsigned int degree = fe.degree;
+    Assert(degree > 0,
+           ExcMessage("Provided element degree has to greater than 0"));
+
+
+    Assert(coefficients.size() == 0 || coefficients.size() == degree,
+           ExcMessage(
+             "Provided coefficients vector has to be empty or the same size "
+             "as the number of dofs"));
+
+    if (coefficients.size() == 0)
+      {
+        coefficients.resize(degree);
+
+        double inverse_factorial_square = 1.;
+        coefficients[0]                 = 1.;
+        for (unsigned int k = 2; k <= degree; ++k)
+          {
+            inverse_factorial_square /= (k * k);
+            coefficients[k - 1] = inverse_factorial_square;
+          }
+      }
+
+    std::vector<std::vector<Polynomials::Polynomial<double>>> polynomial_basis;
+
+    polynomial_basis.resize(degree + 1);
+
+    auto support_points = fe.get_unit_support_points();
+    std::sort(support_points.begin(),
+              support_points.end(),
+              [](const Point<1> &p, const Point<1> &q) -> bool {
+                return p(0) < q(0);
+              });
+
+    polynomial_basis[0] =
+      Polynomials::generate_complete_Lagrange_basis(support_points);
+
+    for (unsigned int k = 1; k < degree + 1; ++k)
+      {
+        polynomial_basis[k].reserve(degree + 1);
+        for (unsigned int i = 0; i < degree + 1; ++i)
+          polynomial_basis[k].push_back(
+            polynomial_basis[k - 1][i].derivative());
+      }
+
+
+    FullMatrix<double> penalty_matrix =
+      create_1d_ghost_penalty_matrix(polynomial_basis[1]);
+    penalty_matrix *= coefficients[0];
+
+    for (unsigned int k = 2; k < degree + 1; ++k)
+      {
+        FullMatrix<double> kth_matrix =
+          create_1d_ghost_penalty_matrix(polynomial_basis[k]);
+        penalty_matrix.add(coefficients[k - 1], kth_matrix);
+      }
+
+    penalty_matrix *= (1 / h);
+    return penalty_matrix;
+  }
+
+
+
+  FullMatrix<double>
+  create_1d_ghost_penalty_matrix(
+    const std::vector<Polynomials::Polynomial<double>>
+                      &polynomial_basis_derivative,
+    const unsigned int overlap)
+  {
+    const unsigned int n_dofs_per_cell = polynomial_basis_derivative.size();
+    const unsigned int n_total_dofs    = 2 * n_dofs_per_cell - overlap;
+    const unsigned int shift           = n_dofs_per_cell - overlap;
+
+    FullMatrix<double> penalty_matrix(n_total_dofs, n_total_dofs);
+
+    std::vector<double> values_left(n_dofs_per_cell);
+    std::vector<double> values_right(n_dofs_per_cell);
+
+    for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+      {
+        values_left[i]  = polynomial_basis_derivative[i].value(0);
+        values_right[i] = polynomial_basis_derivative[i].value(1);
+      }
+
+    for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+      for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+        penalty_matrix(i, j) += values_right[i] * values_right[j];
+
+
+    for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+      for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+        penalty_matrix(i + shift, j) -= values_left[i] * values_right[j];
+
+    for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+      for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+        penalty_matrix(i, j + shift) -= values_right[i] * values_left[j];
+
+    for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+      for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
+        penalty_matrix(i + shift, j + shift) += values_left[i] * values_left[j];
+
+    return penalty_matrix;
+  }
 } // namespace TensorProductMatrixCreator
 
 
