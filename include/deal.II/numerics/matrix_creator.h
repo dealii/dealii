@@ -600,6 +600,103 @@ namespace MatrixCreator
     const AffineConstraints<typename MatrixType::value_type> &constraints =
       AffineConstraints<typename MatrixType::value_type>());
 
+
+
+  /**
+   * Computes a 1D cell mass matrix for a given finite element.This function is
+   * intended to provide a mass matrix for tensor product operators.
+   *
+   * @param fe The finite element object defining the shape functions.
+   *
+   * @param h  The cell size used to scale the integration (typically the
+   * element size).
+   *
+   * @param include_endpoints A pair of booleans indicating whether to include
+   * the first and last dof in the matrix. Setting either one to false only
+   * makes sense if the idexing of DoF in the matrix is lexicographic, i.e. for
+   * FE_Q numbering is required while FE_DGQ can be precessed as it is.
+   *
+   * @param numbering  A vector of unsigned integers representing the
+   * numbering of the degrees of freedom. If empty, the
+   * numbering of the finite element is used.
+   *
+   * @return A FullMatrix<double> representing the assembled mass matrix.
+   *
+   */
+  FullMatrix<double>
+  create_1d_cell_mass_matrix(
+    const FiniteElement<1>     &fe,
+    const double               &h,
+    const std::pair<bool, bool> include_endpoints = {true, true},
+    std::vector<unsigned int>   numbering = std::vector<unsigned int>());
+
+
+
+  /**
+   * Computes a 1D cell derivative matrix for a given finite element.
+   * @param fe The finite element object defining the shape functions.
+   *
+   * @param h  The cell size used to scale the integration (typically the
+   * element size).
+   *
+   * @param include_endpoints A pair of booleans indicating whether to include
+   * the first and last dof in the matrix. Setting either one to false only
+   * makes sense if the idexing of DoF in the matrix is lexicographic, i.e. for
+   * FE_Q numbering is required while FE_DGQ can be precessed as it is.
+   *
+   * @param numbering  A vector of unsigned integers representing the
+   * numbering of the degrees of freedom. If empty, the
+   * numbering of the finite element is used.
+   */
+  FullMatrix<double>
+  create_1d_cell_derivative_matrix(
+    const FiniteElement<1>     &fe,
+    const double               &h,
+    const std::pair<bool, bool> include_endpoints = {true, true},
+    std::vector<unsigned int>   numbering = std::vector<unsigned int>());
+
+
+  /**
+   * This function assembles a global matrix from a given cell matrix, assuming
+   * a 1D discretization with a specified number of cells and overlap between
+   * them.
+   *
+   * @param cell_matrix The local cell matrix to be assembled into the
+   * global matrix.  It is assumed that the cell matrix has a size corresponding
+   * to the number of degrees of freedom per cell. The cell matrix should be
+   * ordered lexicographically, meaning that FE_Q should be renumbered
+   *
+   * @param n_cells The number of cells in the 1D discretization.
+   *
+   * @param overlap The number of degrees of freedom that overlap between
+   * adjacent cells. For discretization with FE_Q elements, the overlap should
+   * be set to 1, while for FE_DGQ elements, it should be set to 0.
+   *
+   * @param include_endpoints A pair of booleans indicating whether to
+   * include the left and right most dofs of the domain in the constructed
+   * matrix. The default value is {true, true}, which includes both endpoints.
+   *
+   * @return The assembled global matrix. The size of the matrix is determined by
+   * the number of cells, the overlap, and whether the endpoints are included.
+   *
+   * @note The size of the cell matrix must be consistent with the overlap
+   * parameter. Specifically, if the cell matrix is $n \times n$, then the
+   * overlap should be less than $n$.
+   *
+   * @warning This function returns a full matrix as it is intended to
+   * be used inside local tensor product operators.
+   * If the number of cells is above 10 an exception will be thrown.
+   *
+   */
+  FullMatrix<double>
+  create_1D_discretization_matrix(
+    FullMatrix<double>         &cell_matrix,
+    const unsigned int         &n_cells,
+    const unsigned int         &overlap,
+    const std::pair<bool, bool> include_endpoints = {true, true});
+
+
+
   /**
    * Exception
    */
