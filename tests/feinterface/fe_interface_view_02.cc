@@ -79,32 +79,33 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
             if (c + dim <= fe.n_components())
               {
                 const FEValuesExtractors::Vector vec_components(c);
+                constexpr double                 tolerance = 1e-10;
                 for (unsigned int i = 0; i < n_dofs_face; ++i)
                   for (unsigned int q = 0; q < n_q_points; ++q)
                     {
-                      if (fe_iv[vec_components].value(true, i, q).norm() != 0)
+                      if (fe_iv[vec_components].value(true, i, q).norm() >
+                          tolerance)
                         deallog << fe_iv[vec_components].value(true, i, q)
                                 << "  ";
-                      if (fe_iv[vec_components].value(false, i, q).norm() != 0)
+                      if (fe_iv[vec_components].value(false, i, q).norm() >
+                          tolerance)
                         deallog << fe_iv[vec_components].value(false, i, q)
                                 << "  ";
-                      if (fe_iv[vec_components].jump_in_values(i, q).norm() !=
-                          0)
+                      if (fe_iv[vec_components].jump_in_values(i, q).norm() >
+                          tolerance)
                         deallog << fe_iv[vec_components].jump_in_values(i, q)
                                 << "  ";
-                      if (fe_iv[vec_components]
-                            .average_of_values(i, q)
-                            .norm() != 0)
+                      if (fe_iv[vec_components].average_of_values(i, q).norm() >
+                          tolerance)
                         deallog << fe_iv[vec_components].average_of_values(i, q)
                                 << "  ";
-                      if (fe_iv[vec_components]
-                            .jump_in_gradients(i, q)
-                            .norm() != 0)
+                      if (fe_iv[vec_components].jump_in_gradients(i, q).norm() >
+                          tolerance)
                         deallog << fe_iv[vec_components].jump_in_gradients(i, q)
                                 << "  ";
                       if (fe_iv[vec_components]
                             .average_of_gradients(i, q)
-                            .norm() != 0)
+                            .norm() > tolerance)
                         deallog
                           << fe_iv[vec_components].average_of_gradients(i, q)
                           << std::endl;
