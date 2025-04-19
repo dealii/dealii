@@ -1,0 +1,28 @@
+<i>
+This program was contributed by Maximilian Bergbauer. Many ideas presented here are the result of common code
+development with Martin Kronbichler and Peter Munch.
+
+The material is based upon the work "High-performance matrix-free unfitted finite element operator evaluation"
+by Maximilian Bergbauer, Peter Munch, Wolfgang A. Wall, and Martin Kronbichler supported by the German Research
+Foundation (DFG) under the project
+“High-Performance Cut Discontinuous Galerkin Methods for Flow Problems and Surface-Coupled Multiphysics Problems”
+ Grant Agreement No. 456365667.
+</i>
+
+<a name="step-95-Intro"></a>
+<h1>Introduction</h1>
+
+<h3>Matrix-free Cut Finite Element Method / Discontinuous Galerkin Method</h3>
+
+In this example, we show how to use the matrix-free framework to apply the cut finite element method (CutFEM) and
+the cut discontinuous Galerkin method (CutDG) in deal.II. This tutorial is based on step-85. Please read the
+introduction there for details about the level-set discretization, quadrature generation (with
+NonMatching::QuadratureGenerator) and mesh classification (with NonMatching::MeshClassifier) before starting with this
+tutorial.
+We choose the same problem like step-85, Poisson's equation:
+@f{align*}{
+  -\Delta u &= f \qquad && \text{in }\, \Omega,
+  \\
+  u &= u_D       \qquad && \text{on }\, \Gamma = \partial \Omega,
+@f}
+where we choose $f(x) = 4$ and $u_D(x) = 0$.
