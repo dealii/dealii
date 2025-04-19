@@ -23,10 +23,12 @@ DEAL_II_NAMESPACE_OPEN
 
 MatrixOut::Options::Options(const bool         show_absolute_values,
                             const unsigned int block_size,
-                            const bool         discontinuous)
+                            const bool         discontinuous,
+                            const bool         create_sparse_plot)
   : show_absolute_values(show_absolute_values)
   , block_size(block_size)
   , discontinuous(discontinuous)
+  , create_sparse_plot(create_sparse_plot)
 {}
 
 
