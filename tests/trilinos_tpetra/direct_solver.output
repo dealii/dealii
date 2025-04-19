@@ -1,0 +1,13 @@
+
+DEAL:cg::Starting value 21.8299
+DEAL:cg::Convergence step 86 value 0
+DEAL:DirectKLU::Starting value 0
+DEAL:DirectKLU::Convergence step 0 value 0
+DEAL:DirectKLU::Norm of error in direct solve: 0
+DEAL:DirectLAPACK::Starting value 0
+DEAL:DirectLAPACK::Convergence step 0 value 0
+DEAL:DirectLAPACK::Norm of error in direct solve: 0
+DEAL:DirectDscpack::Error: 
+You tried to select the solver type <Amesos_Dscpack> but this solver is not supported by Trilinos either because it does not exist, or because Trilinos was not configured for its use.
+DEAL:Dummy::Error: 
+You tried to select the solver type <DummySolver> but this solver is not supported by Trilinos either because it does not exist, or because Trilinos was not configured for its use.

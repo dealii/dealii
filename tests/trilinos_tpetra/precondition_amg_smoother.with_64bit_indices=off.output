@@ -1,0 +1,9 @@
+
+DEAL:04225:Chebyshev:cg::Starting value 21.8299
+DEAL:04225:Chebyshev:cg::Convergence step 10 value 0
+DEAL:04225:SGS:cg::Starting value 21.8299
+DEAL:04225:SGS:cg::Convergence step 10 value 0
+DEAL:16641:Chebyshev:cg::Starting value 30.8770
+DEAL:16641:Chebyshev:cg::Convergence step 8 value 0
+DEAL:16641:SGS:cg::Starting value 30.8770
+DEAL:16641:SGS:cg::Convergence step 7 value 0
