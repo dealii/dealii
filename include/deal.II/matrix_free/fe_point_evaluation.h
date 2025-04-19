@@ -1233,32 +1233,46 @@ public:
    * `solution_values`, on the cell and `unit_points` passed to reinit().
    *
    * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element read out by
-   * `FEEvaluation::read_dof_values(global_vector)`.
+   * values on the element.
    *
    * @param[in] evaluation_flags Flags specifying which quantities should be
    * evaluated at the points.
+   *
+   * @param[in] skip_renumbering Flag specifying whether to skip renumbering of
+   * the unknowns. If set to `true`, the unknowns are assumed to be stored as in
+   * FEEvaluation, i.e., as returned by
+   * FEEvaluation::read_dof_values(global_vector). If set to `false`, the
+   * unknowns are assumed to be stored in the order of the FiniteElement object.
    */
   template <std::size_t stride_view>
   void
   evaluate(
     const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+    const bool skip_renumbering = true);
+
 
   /**
    * This function interpolates the finite element solution, represented by
    * `solution_values`, on the cell and `unit_points` passed to reinit().
    *
    * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element as returned by `cell->get_dof_values(global_vector,
-   * solution_values)`.
+   * values.
    *
    * @param[in] evaluation_flags Flags specifying which quantities should be
    * evaluated at the points.
+   *
+   * @param[in] skip_renumbering Flag specifying the order in which the unknowns
+   * are provided. If set to `true`, the unknowns are assumed to be stored as in
+   * FEEvaluation, i.e., as returned by
+   * FEEvaluation::read_dof_values(global_vector). Otherwise the unknowns are
+   * assumed to be stored in the order of the FiniteElement object.
    */
   void
   evaluate(const ArrayView<const ScalarNumber>    &solution_values,
-           const EvaluationFlags::EvaluationFlags &evaluation_flags);
+           const EvaluationFlags::EvaluationFlags &evaluation_flags,
+           const bool                              skip_renumbering = false);
+
 
   /**
    * This function multiplies the quantities passed in by previous
@@ -1267,15 +1281,17 @@ public:
    * the Jacobian determinant times the quadrature weight (JxW).
    *
    * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used during
-   * `FEEvaluation::set_dof_values(global_vector)` or
-   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
+   * integral. Note that for multi-component systems where only some of the
+   * components are selected by the present class, the entries in
+   * `solution_values` not touched by this class will be set to zero.
    *
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
+   *
+   * @param[in] skip_renumbering Flag specifying the order in which the unknowns
+   * are stored in the solution_values array.If set to `true`, the unknowns are
+   * assumed to be stored as in FEEvaluation. If set to `false`, the unknowns
+   * are assumed to be stored in the order of the FiniteElement object.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
@@ -1286,7 +1302,9 @@ public:
   void
   integrate(const StridedArrayView<ScalarNumber, stride_view> &solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags,
-            const bool                              sum_into_values = false);
+            const bool                              sum_into_values  = false,
+            const bool                              skip_renumbering = true);
+
 
   /**
    * This function multiplies the quantities passed in by previous
@@ -1295,15 +1313,17 @@ public:
    * the Jacobian determinant times the quadrature weight (JxW).
    *
    * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used to during
-   * `cell->set_dof_values(solution_values, global_vector)` or
-   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * integral. Note
    * that for multi-component systems where only some of the components are
    * selected by the present class, the entries in `solution_values` not touched
    * by this class will be set to zero.
    *
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
+   *
+   * @param[in] skip_renumbering If set to `true`, the unknowns are assumed to
+   * be stored as in FEEvaluation. If set to `false`, the unknowns are assumed
+   * to be stored in the order of the FiniteElement object.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
@@ -1313,7 +1333,10 @@ public:
   void
   integrate(const ArrayView<ScalarNumber>          &solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags,
-            const bool                              sum_into_values = false);
+            const bool                              sum_into_values  = false,
+            const bool                              skip_renumbering = false);
+
+
 
   /**
    * This function multiplies the quantities passed in by previous
@@ -1335,6 +1358,10 @@ public:
    *
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
+   *
+   * @param[in] skip_renumbering If set to `true`, the unknowns are assumed to
+   * be stored as in FEEvaluation. If set to `false`, the unknowns are assumed
+   * to be stored in the order of the FiniteElement object.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
@@ -1346,7 +1373,10 @@ public:
   test_and_sum(
     const StridedArrayView<ScalarNumber, stride_view> &solution_values,
     const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values = false);
+    const bool                                         sum_into_values  = false,
+    const bool                                         skip_renumbering = true);
+
+
 
   /**
    * This function multiplies the quantities passed in by previous
@@ -1369,6 +1399,10 @@ public:
    * @param[in] integration_flags Flags specifying which quantities should be
    * integrated at the points.
    *
+   * @param[in] skip_renumbering If set to `true`, the unknowns are assumed to
+   * be stored as in FEEvaluation. If set to `false`, the unknowns are assumed
+   * to be stored in the order of the FiniteElement object.
+   *
    * @param[in] sum_into_values Flag specifying if the integrated values
    * should be summed into the solution values. For the default value
    * `sum_into_values=false` every value of @p solution_values is zeroed out.
@@ -1377,7 +1411,10 @@ public:
   void
   test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
                const EvaluationFlags::EvaluationFlags &integration_flags,
-               const bool                              sum_into_values = false);
+               const bool                              sum_into_values = false,
+               const bool skip_renumbering                             = false);
+
+
 
   /**
    * Return the normal vector. This class or the MappingInfo object passed to
@@ -1418,7 +1455,8 @@ private:
   template <bool is_linear, std::size_t stride_view>
   void
   prepare_evaluate_fast(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values);
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const bool                                               skip_renumbering);
 
   /**
    * Evaluates the actual interpolation on the cell or face for a quadrature
@@ -1441,7 +1479,8 @@ private:
   void
   evaluate_fast(
     const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+    const bool                                               skip_renumbering);
 
   /**
    * Slow path of the evaluate function using FEValues.
@@ -1451,6 +1490,13 @@ private:
   evaluate_slow(
     const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
     const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+
+  template <std::size_t stride_view>
+  void
+  do_evaluate(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+    const bool                                               skip_renumbering);
 
   /**
    * Integrates the product of the data passed in by submit_value() and
@@ -1477,7 +1523,8 @@ private:
   finish_integrate_fast(
     const StridedArrayView<ScalarNumber, stride_view> &solution_values,
     vectorized_value_type *solution_values_vectorized_linear,
-    const bool             sum_into_values);
+    const bool             sum_into_values,
+    const bool             skip_renumbering);
 
   /**
    * Fast path of the integrate function.
@@ -1487,7 +1534,8 @@ private:
   integrate_fast(
     const StridedArrayView<ScalarNumber, stride_view> &solution_values,
     const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values);
+    const bool                                         sum_into_values,
+    const bool                                         skip_renumbering);
 
   /**
    * Slow path of the integrate function using FEValues.
@@ -1507,7 +1555,8 @@ private:
   do_integrate(
     const StridedArrayView<ScalarNumber, stride_view> &solution_values,
     const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values);
+    const bool                                         sum_into_values,
+    const bool                                         skip_renumbering);
 
   /**
    * Internal function to initialize the pointers of this class when an
@@ -2480,9 +2529,10 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
 template <int n_components_, int dim, int spacedim, typename Number>
 template <std::size_t stride_view>
 void
-FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
+FEPointEvaluation<n_components_, dim, spacedim, Number>::do_evaluate(
   const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-  const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
+  const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+  const bool                                               skip_renumbering)
 {
   Assert(!(evaluation_flags & EvaluationFlags::hessians), ExcNotImplemented());
 
@@ -2500,9 +2550,13 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   if (this->fast_path)
     {
       if (this->use_linear_path)
-        evaluate_fast<true>(solution_values, evaluation_flags);
+        evaluate_fast<true>(solution_values,
+                            evaluation_flags,
+                            skip_renumbering);
       else
-        evaluate_fast<false>(solution_values, evaluation_flags);
+        evaluate_fast<false>(solution_values,
+                             evaluation_flags,
+                             skip_renumbering);
     }
   else
     evaluate_slow(solution_values, evaluation_flags);
@@ -2511,16 +2565,30 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
+template <std::size_t stride_view>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
+  const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+  const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+  const bool                                               skip_renumbering)
+{
+  do_evaluate(solution_values, evaluation_flags, skip_renumbering);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
   const ArrayView<const ScalarNumber>    &solution_values,
-  const EvaluationFlags::EvaluationFlags &evaluation_flags)
+  const EvaluationFlags::EvaluationFlags &evaluation_flags,
+  const bool                              skip_renumbering)
 {
-  evaluate(StridedArrayView<const ScalarNumber, 1>(solution_values.data(),
-                                                   solution_values.size()),
-           evaluation_flags);
+  do_evaluate(StridedArrayView<const ScalarNumber, 1>(solution_values.data(),
+                                                      solution_values.size()),
+              evaluation_flags,
+              skip_renumbering);
 }
-
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
@@ -2529,9 +2597,13 @@ void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
   const StridedArrayView<ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags            &integration_flags,
-  const bool                                         sum_into_values)
+  const bool                                         sum_into_values,
+  const bool                                         skip_renumbering)
 {
-  do_integrate<true>(solution_values, integration_flags, sum_into_values);
+  do_integrate<true>(solution_values,
+                     integration_flags,
+                     sum_into_values,
+                     skip_renumbering);
 }
 
 
@@ -2541,12 +2613,14 @@ void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
   const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags,
-  const bool                              sum_into_values)
+  const bool                              sum_into_values,
+  const bool                              skip_renumbering)
 {
-  integrate(StridedArrayView<ScalarNumber, 1>(solution_values.data(),
-                                              solution_values.size()),
-            integration_flags,
-            sum_into_values);
+  do_integrate<true>(StridedArrayView<ScalarNumber, 1>(solution_values.data(),
+                                                       solution_values.size()),
+                     integration_flags,
+                     sum_into_values,
+                     skip_renumbering);
 }
 
 
@@ -2589,16 +2663,19 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 }
 
 
-
 template <int n_components_, int dim, int spacedim, typename Number>
 template <std::size_t stride_view>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
   const StridedArrayView<ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags            &integration_flags,
-  const bool                                         sum_into_values)
+  const bool                                         sum_into_values,
+  const bool                                         skip_renumbering)
 {
-  do_integrate<false>(solution_values, integration_flags, sum_into_values);
+  do_integrate<false>(solution_values,
+                      integration_flags,
+                      sum_into_values,
+                      skip_renumbering);
 }
 
 
@@ -2608,12 +2685,14 @@ void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
   const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags,
-  const bool                              sum_into_values)
+  const bool                              sum_into_values,
+  const bool                              skip_renumbering)
 {
-  test_and_sum(StridedArrayView<ScalarNumber, 1>(solution_values.data(),
-                                                 solution_values.size()),
-               integration_flags,
-               sum_into_values);
+  do_integrate<false>(StridedArrayView<ScalarNumber, 1>(solution_values.data(),
+                                                        solution_values.size()),
+                      integration_flags,
+                      sum_into_values,
+                      skip_renumbering);
 }
 
 
@@ -2622,7 +2701,8 @@ template <int n_components_, int dim, int spacedim, typename Number>
 template <bool is_linear, std::size_t stride_view>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
-  const StridedArrayView<const ScalarNumber, stride_view> &solution_values)
+  const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+  const bool                                               skip_renumbering)
 {
   const unsigned int dofs_per_comp =
     is_linear ? Utilities::pow(2, dim) : this->dofs_per_component;
@@ -2632,7 +2712,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
       const std::size_t offset =
         (this->component_in_base_element + comp) * dofs_per_comp;
 
-      if ((is_linear && n_components == 1) || this->renumber.empty())
+      if ((is_linear && n_components == 1) || skip_renumbering)
         {
           for (unsigned int i = 0; i < dofs_per_comp; ++i)
             ETT::read_value(solution_values[i + offset],
@@ -2730,10 +2810,11 @@ template <bool is_linear, std::size_t stride_view>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_fast(
   const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-  const EvaluationFlags::EvaluationFlags                  &evaluation_flags)
+  const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+  const bool                                               skip_renumbering)
 {
   if (!(is_linear && n_components == 1))
-    prepare_evaluate_fast<is_linear>(solution_values);
+    prepare_evaluate_fast<is_linear>(solution_values, skip_renumbering);
 
   // loop over quadrature batches qb
   const unsigned int n_shapes = is_linear ? 2 : this->poly.size();
@@ -2920,7 +3001,8 @@ inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
   const StridedArrayView<ScalarNumber, stride_view> &solution_values,
   vectorized_value_type *solution_values_vectorized_linear,
-  const bool             sum_into_values)
+  const bool             sum_into_values,
+  const bool             skip_renumbering)
 {
   if (!sum_into_values && this->fe->n_components() > n_components)
     for (unsigned int i = 0; i < solution_values.size(); ++i)
@@ -2934,7 +3016,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
       const std::size_t offset =
         (this->component_in_base_element + comp) * dofs_per_comp;
 
-      if (is_linear || this->renumber.empty())
+      if (is_linear || skip_renumbering)
         {
           for (unsigned int i = 0; i < dofs_per_comp; ++i)
             if (sum_into_values)
@@ -2972,7 +3054,8 @@ inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
   const StridedArrayView<ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags            &integration_flags,
-  const bool                                         sum_into_values)
+  const bool                                         sum_into_values,
+  const bool                                         skip_renumbering)
 {
   // zero out lanes of incomplete last quadrature point batch
   if constexpr (stride == 1)
@@ -3043,7 +3126,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
   // add between the lanes and write into the result
   finish_integrate_fast<is_linear>(solution_values,
                                    solution_values_vectorized_linear.data(),
-                                   sum_into_values);
+                                   sum_into_values,
+                                   skip_renumbering);
 }
 
 
@@ -3135,7 +3219,8 @@ void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
   const StridedArrayView<ScalarNumber, stride_view> &solution_values,
   const EvaluationFlags::EvaluationFlags            &integration_flags,
-  const bool                                         sum_into_values)
+  const bool                                         sum_into_values,
+  const bool                                         skip_renumbering)
 {
   if (this->must_reinitialize_pointers)
     internal_reinit_single_cell_state_mapping_info();
@@ -3164,11 +3249,13 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
       if (this->use_linear_path)
         integrate_fast<do_JxW, true>(solution_values,
                                      integration_flags,
-                                     sum_into_values);
+                                     sum_into_values,
+                                     skip_renumbering);
       else
         integrate_fast<do_JxW, false>(solution_values,
                                       integration_flags,
-                                      sum_into_values);
+                                      sum_into_values,
+                                      skip_renumbering);
     }
   else
     integrate_slow<do_JxW>(solution_values, integration_flags, sum_into_values);
