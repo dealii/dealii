@@ -6228,18 +6228,18 @@ namespace internal
             }
         }
 
-        // QUADS
+        // FACES (i.e., quads or triangles, or both)
         {
-          typename Triangulation<dim, spacedim>::quad_iterator
-            quad = triangulation.begin_quad(),
-            endq = triangulation.end_quad();
+          typename Triangulation<dim, spacedim>::face_iterator
+            face = triangulation.begin_face(),
+            endf = triangulation.end_face();
 
-          for (; quad != endq; ++quad)
+          for (; face != endf; ++face)
             {
-              if (quad->user_flag_set() == false)
+              if (face->user_flag_set() == false)
                 continue;
 
-              const auto reference_face_type = quad->reference_cell();
+              const auto reference_face_type = face->reference_cell();
 
               // 1) create new lines (property is set later)
               // maximum of 4 new lines (4 quadrilateral, 3 triangle)
@@ -6269,43 +6269,45 @@ namespace internal
 
               if constexpr (running_in_debug_mode())
                 {
-                  for (const unsigned int line : quad->line_indices())
+                  for (const unsigned int line : face->line_indices())
                     AssertIsNotUsed(new_lines[line]);
                 }
 
-              // 2) create new quads (properties are set below). Both triangles
-              // and quads are divided in four.
-              std::array<raw_quad_iterator, 4> new_quads;
-              for (unsigned int q = 0; q < 2; ++q)
+              // 2) create new face (properties are set below). Both triangles
+              // and quads are divided in four. (For historical reasons, we
+              // only have 'raw_quad_iterator', not 'raw_face_iterator', but the
+              // former also works if a face is actually a triangle.)
+              std::array<raw_quad_iterator, 4> new_faces;
+              for (unsigned int f = 0; f < 2; ++f)
                 {
                   auto next_unused_quad =
                     triangulation.faces->quads
                       .template next_free_pair_object<2>(triangulation);
 
-                  new_quads[2 * q]     = next_unused_quad;
-                  new_quads[2 * q + 1] = ++next_unused_quad;
+                  new_faces[2 * f]     = next_unused_quad;
+                  new_faces[2 * f + 1] = ++next_unused_quad;
 
-                  quad->set_children(2 * q, new_quads[2 * q]->index());
+                  face->set_children(2 * f, new_faces[2 * f]->index());
                 }
-              quad->set_refinement_case(RefinementCase<2>::cut_xy);
+              face->set_refinement_case(RefinementCase<2>::cut_xy);
 
               if constexpr (running_in_debug_mode())
                 {
-                  for (const auto &quad : new_quads)
+                  for (const auto &quad : new_faces)
                     AssertIsNotUsed(quad);
                 }
 
               // 3) set vertex indices and set new vertex
 
-              // Maximum of 9 vertices per refined quad (9 for Quadrilateral, 6
+              // Maximum of 9 vertices per refined face (9 for Quadrilateral, 6
               // for Triangle)
               std::array<unsigned int, 9> vertex_indices = {};
               unsigned int                k              = 0;
-              for (const auto i : quad->vertex_indices())
-                vertex_indices[k++] = quad->vertex_index(i);
+              for (const auto i : face->vertex_indices())
+                vertex_indices[k++] = face->vertex_index(i);
 
-              for (const auto i : quad->line_indices())
-                vertex_indices[k++] = quad->line(i)->child(0)->vertex_index(1);
+              for (const auto i : face->line_indices())
+                vertex_indices[k++] = face->line(i)->child(0)->vertex_index(1);
 
               if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
@@ -6315,18 +6317,18 @@ namespace internal
                   vertex_indices[k++] = current_vertex;
 
                   triangulation.vertices[current_vertex] =
-                    quad->center(true, true);
+                    face->center(true, true);
                 }
 
-              // 4) set new lines on quads and their properties
+              // 4) set new lines on these faces and their properties
               std::array<raw_line_iterator, 12> lines;
               unsigned int                      n_lines = 0;
-              for (unsigned int l = 0; l < quad->n_lines(); ++l)
+              for (unsigned int l = 0; l < face->n_lines(); ++l)
                 for (unsigned int c = 0; c < 2; ++c)
-                  lines[n_lines++] = quad->line(l)->child(
-                    child_line_index(c, quad->line_orientation(l)));
+                  lines[n_lines++] = face->line(l)->child(
+                    child_line_index(c, face->line_orientation(l)));
 
-              for (unsigned int l = 0; l < quad->n_lines(); ++l)
+              for (unsigned int l = 0; l < face->n_lines(); ++l)
                 lines[n_lines++] = new_lines[l];
 
               std::array<int, 12> line_indices;
@@ -6368,13 +6370,13 @@ namespace internal
                                    {{X, X}}}};
 
               static constexpr dealii::ndarray<unsigned int, 4, 4>
-                quad_lines_tri{{{{0, 8, 5, X}},
-                                {{1, 2, 6, X}},
-                                {{7, 3, 4, X}},
-                                {{6, 7, 8, X}}}};
+                tri_lines_tri{{{{0, 8, 5, X}},
+                               {{1, 2, 6, X}},
+                               {{7, 3, 4, X}},
+                               {{6, 7, 8, X}}}};
 
               static constexpr dealii::ndarray<unsigned int, 4, 4, 2>
-                quad_line_vertices_tri{
+                tri_line_vertices_tri{
                   {{{{{0, 3}}, {{3, 5}}, {{5, 0}}, {{X, X}}}},
                    {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
                    {{{{5, 4}}, {{4, 2}}, {{2, 5}}, {{X, X}}}},
@@ -6384,13 +6386,13 @@ namespace internal
                 (reference_face_type == ReferenceCells::Quadrilateral) ?
                   line_vertices_quad :
                   line_vertices_tri;
-              const auto &quad_lines =
+              const auto &face_lines =
                 (reference_face_type == ReferenceCells::Quadrilateral) ?
                   quad_lines_quad :
-                  quad_lines_tri;
+                  tri_lines_tri;
 
-              for (unsigned int i = 0, j = 2 * quad->n_lines();
-                   i < quad->n_lines();
+              for (unsigned int i = 0, j = 2 * face->n_lines();
+                   i < face->n_lines();
                    ++i, ++j)
                 {
                   auto &new_line = new_lines[i];
@@ -6401,40 +6403,40 @@ namespace internal
                   new_line->clear_user_flag();
                   new_line->clear_user_data();
                   new_line->clear_children();
-                  new_line->set_boundary_id_internal(quad->boundary_id());
-                  new_line->set_manifold_id(quad->manifold_id());
+                  new_line->set_boundary_id_internal(face->boundary_id());
+                  new_line->set_manifold_id(face->manifold_id());
                 }
 
-              // 5) set properties of quads
-              for (unsigned int i = 0; i < new_quads.size(); ++i)
+              // 5) set properties of faces
+              for (unsigned int i = 0; i < new_faces.size(); ++i)
                 {
-                  auto &new_quad = new_quads[i];
+                  auto &new_face = new_faces[i];
 
                   // TODO: we assume here that all children have the same type
                   // as the parent
-                  triangulation.faces->set_quad_type(new_quad->index(),
+                  triangulation.faces->set_quad_type(new_face->index(),
                                                      reference_face_type);
 
                   if (reference_face_type == ReferenceCells::Triangle)
-                    new_quad->set_bounding_object_indices(
-                      {line_indices[quad_lines[i][0]],
-                       line_indices[quad_lines[i][1]],
-                       line_indices[quad_lines[i][2]]});
+                    new_face->set_bounding_object_indices(
+                      {line_indices[face_lines[i][0]],
+                       line_indices[face_lines[i][1]],
+                       line_indices[face_lines[i][2]]});
                   else if (reference_face_type == ReferenceCells::Quadrilateral)
-                    new_quad->set_bounding_object_indices(
-                      {line_indices[quad_lines[i][0]],
-                       line_indices[quad_lines[i][1]],
-                       line_indices[quad_lines[i][2]],
-                       line_indices[quad_lines[i][3]]});
+                    new_face->set_bounding_object_indices(
+                      {line_indices[face_lines[i][0]],
+                       line_indices[face_lines[i][1]],
+                       line_indices[face_lines[i][2]],
+                       line_indices[face_lines[i][3]]});
                   else
                     DEAL_II_NOT_IMPLEMENTED();
 
-                  new_quad->set_used_flag();
-                  new_quad->clear_user_flag();
-                  new_quad->clear_user_data();
-                  new_quad->clear_children();
-                  new_quad->set_boundary_id_internal(quad->boundary_id());
-                  new_quad->set_manifold_id(quad->manifold_id());
+                  new_face->set_used_flag();
+                  new_face->clear_user_flag();
+                  new_face->clear_user_data();
+                  new_face->clear_children();
+                  new_face->set_boundary_id_internal(face->boundary_id());
+                  new_face->set_manifold_id(face->manifold_id());
 
                   [[maybe_unused]] std::set<unsigned int> s;
 
@@ -6443,15 +6445,15 @@ namespace internal
                   // a few lines below by a cheaper algorithm
                   if (reference_face_type == ReferenceCells::Triangle)
                     {
-                      for (const auto f : new_quad->line_indices())
+                      for (const auto f : new_face->line_indices())
                         {
                           const std::array<unsigned int, 2> vertices_0 = {
-                            {lines[quad_lines[i][f]]->vertex_index(0),
-                             lines[quad_lines[i][f]]->vertex_index(1)}};
+                            {lines[face_lines[i][f]]->vertex_index(0),
+                             lines[face_lines[i][f]]->vertex_index(1)}};
 
                           const std::array<unsigned int, 2> vertices_1 = {
-                            {vertex_indices[quad_line_vertices_tri[i][f][0]],
-                             vertex_indices[quad_line_vertices_tri[i][f][1]]}};
+                            {vertex_indices[tri_line_vertices_tri[i][f][0]],
+                             vertex_indices[tri_line_vertices_tri[i][f][1]]}};
 
                           const auto orientation =
                             ReferenceCells::Line.get_combined_orientation(
@@ -6467,7 +6469,7 @@ namespace internal
                                 s.insert(i);
                             }
 
-                          new_quad->set_line_orientation(f, orientation);
+                          new_face->set_line_orientation(f, orientation);
                         }
                       if constexpr (library_build_mode ==
                                     LibraryBuildMode::debug)
@@ -6487,11 +6489,11 @@ namespace internal
 
                   for (unsigned int i = 0; i < 4; ++i)
                     for (unsigned int j = 0; j < 2; ++j)
-                      new_quads[quad_child_boundary_lines[i][j]]
-                        ->set_line_orientation(i, quad->line_orientation(i));
+                      new_faces[quad_child_boundary_lines[i][j]]
+                        ->set_line_orientation(i, face->line_orientation(i));
                 }
 
-              quad->clear_user_flag();
+              face->clear_user_flag();
             }
         }
 
