@@ -1308,12 +1308,6 @@ namespace TrilinosWrappers
    * many processors. SSOR, on the other hand, gets more Jacobi-like on many
    * processors.
    *
-   * For proper functionality of this class we recommend using Trilinos v9.0
-   * and higher. Older versions may have problems with generating the
-   * coarse-matrix structure when using matrices with many nonzero entries per
-   * row (i.e., matrices stemming from higher order finite element
-   * discretizations).
-   *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
    */
