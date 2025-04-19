@@ -1308,6 +1308,12 @@ namespace TrilinosWrappers
    * many processors. SSOR, on the other hand, gets more Jacobi-like on many
    * processors.
    *
+   * This class can be used as a preconditioner for linear solvers. It
+   * also provides a `vmult()` function (implemented in the
+   * PreconditionBase base class) that, when called, performs one
+   * multigrid cycle. By default, this is a V-cycle, but the
+   * AdditionalData class allows to also select a W-cycle.
+   *
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
    */
@@ -1692,8 +1698,16 @@ namespace TrilinosWrappers
    * on the Trilinos MueLu implementation, which is a black-box preconditioner
    * that works well for many PDE-based linear problems. The interface of
    * PreconditionerAMGMueLu is the same as the interface of PreconditionerAMG
-   * except for the higher_order_elements parameter which does not exist in
+   * (which, instead of the Trilinos package MueLu is built on the older
+   * Trilinos package ML). The only functional difference between the two
+   * classes is the `higher_order_elements` parameter which does not exist in
    * PreconditionerAMGMueLu.
+   *
+   * This class can be used as a preconditioner for linear solvers. It
+   * also provides a `vmult()` function (implemented in the
+   * PreconditionBase base class) that, when called, performs one
+   * multigrid cycle. By default, this is a V-cycle, but the
+   * AdditionalData class allows to also select a W-cycle.
    *
    * @note You need to configure Trilinos with MueLU support for this
    * preconditioner to work.
