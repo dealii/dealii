@@ -476,13 +476,15 @@ QProjector<dim>::project_to_oriented_face(const ReferenceCell &reference_cell,
 
 template <int dim>
 Quadrature<dim>
-QProjector<dim>::project_to_face(const ReferenceCell       &reference_cell,
-                                 const Quadrature<dim - 1> &quadrature,
-                                 const unsigned int         face_no,
-                                 const types::geometric_orientation orientation)
+QProjector<dim>::project_to_face(
+  const ReferenceCell               &reference_cell,
+  const Quadrature<dim - 1>         &quadrature,
+  const unsigned int                 face_no,
+  const types::geometric_orientation combined_orientation)
 {
   AssertIndexRange(face_no, reference_cell.n_faces());
-  AssertIndexRange(orientation, reference_cell.n_face_orientations(face_no));
+  AssertIndexRange(combined_orientation,
+                   reference_cell.n_face_orientations(face_no));
   AssertDimension(reference_cell.get_dimension(), dim);
 
   std::vector<Point<dim>> points;
@@ -499,7 +501,7 @@ QProjector<dim>::project_to_face(const ReferenceCell       &reference_cell,
                                               face_vertices,
                                               reference_cell.face_measure(
                                                 face_no),
-                                              orientation,
+                                              combined_orientation,
                                               points,
                                               weights);
 
@@ -604,11 +606,12 @@ QProjector<dim>::project_to_subface(
   const SubQuadrature               &quadrature,
   const unsigned int                 face_no,
   const unsigned int                 subface_no,
-  const types::geometric_orientation orientation,
+  const types::geometric_orientation combined_orientation,
   const RefinementCase<dim - 1>     &ref_case)
 {
   AssertIndexRange(face_no, reference_cell.n_faces());
-  AssertIndexRange(orientation, reference_cell.n_face_orientations(face_no));
+  AssertIndexRange(combined_orientation,
+                   reference_cell.n_face_orientations(face_no));
   AssertDimension(reference_cell.get_dimension(), dim);
   AssertIndexRange(subface_no,
                    reference_cell.face_reference_cell(face_no)
@@ -693,7 +696,7 @@ QProjector<dim>::project_to_subface(
       else
         DEAL_II_ASSERT_UNREACHABLE();
 
-      if (orientation == numbers::reverse_line_orientation)
+      if (combined_orientation == numbers::reverse_line_orientation)
         {
           std::reverse(q_points.begin(), q_points.end());
           std::reverse(q_weights.begin(), q_weights.end());
