@@ -774,19 +774,14 @@ protected:
   };
 
   /**
-   * The indexing strategy chosen for MPGMRES. This internal variable gets
-   * set by the constructor of SolverFGMRES and SolverMPGMRES.
-   */
-  IndexingStrategy indexing_strategy;
-
-  /**
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename... PreconditionerTypes>
   void
-  solve_internal(const MatrixType &A,
-                 VectorType       &x,
-                 const VectorType &b,
+  solve_internal(const MatrixType       &A,
+                 VectorType             &x,
+                 const VectorType       &b,
+                 const IndexingStrategy &indexing_strategy,
                  const PreconditionerTypes &...preconditioners);
 
 private:
@@ -2138,10 +2133,6 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl            &cn,
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {
-  if (data.use_truncated_mpgmres_strategy)
-    indexing_strategy = IndexingStrategy::truncated_mpgmres;
-  else
-    indexing_strategy = IndexingStrategy::full_mpgmres;
 }
 
 
@@ -2153,10 +2144,6 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
   : SolverBase<VectorType>(cn)
   , additional_data(data)
 {
-  if (data.use_truncated_mpgmres_strategy)
-    indexing_strategy = IndexingStrategy::truncated_mpgmres;
-  else
-    indexing_strategy = IndexingStrategy::full_mpgmres;
 }
 
 
@@ -2174,7 +2161,13 @@ void SolverMPGMRES<VectorType>::solve(
   const PreconditionerTypes &...preconditioners)
 {
   LogStream::Prefix prefix("MPGMRES");
-  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioners...);
+
+  if (additional_data.use_truncated_mpgmres_strategy)
+    SolverMPGMRES<VectorType>::solve_internal(
+      A, x, b, IndexingStrategy::truncated_mpgmres, preconditioners...);
+  else
+    SolverMPGMRES<VectorType>::solve_internal(
+      A, x, b, IndexingStrategy::full_mpgmres, preconditioners...);
 }
 
 
@@ -2183,9 +2176,10 @@ template <typename VectorType>
 DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 template <typename MatrixType, typename... PreconditionerTypes>
 void SolverMPGMRES<VectorType>::solve_internal(
-  const MatrixType &A,
-  VectorType       &x,
-  const VectorType &b,
+  const MatrixType       &A,
+  VectorType             &x,
+  const VectorType       &b,
+  const IndexingStrategy &indexing_strategy,
   const PreconditionerTypes &...preconditioners)
 {
   constexpr std::size_t n_preconditioners = sizeof...(PreconditionerTypes);
@@ -2231,7 +2225,8 @@ void SolverMPGMRES<VectorType>::solve_internal(
   // Krylov space sequence according to the chosen indexing strategy
   //
   const auto previous_vector_index =
-    [this, n_preconditioners](unsigned int i) -> unsigned int {
+    [this, n_preconditioners, indexing_strategy](
+      unsigned int i) -> unsigned int {
     switch (indexing_strategy)
       {
         case IndexingStrategy::fgmres:
@@ -2351,7 +2346,6 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
         true,
         data.orthogonalization_strategy})
 {
-  this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
 
 
@@ -2367,7 +2361,6 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
         true,
         data.orthogonalization_strategy})
 {
-  this->indexing_strategy = SolverMPGMRES<VectorType>::IndexingStrategy::fgmres;
 }
 
 
@@ -2385,7 +2378,8 @@ void SolverFGMRES<VectorType>::solve(
   const PreconditionerTypes &...preconditioners)
 {
   LogStream::Prefix prefix("FGMRES");
-  SolverMPGMRES<VectorType>::solve_internal(A, x, b, preconditioners...);
+  SolverMPGMRES<VectorType>::solve_internal(
+    A, x, b, SolverFGMRES::IndexingStrategy::fgmres, preconditioners...);
 }
 
 
