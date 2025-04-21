@@ -2240,6 +2240,13 @@ void SolverMPGMRES<VectorType>::solve_internal(
   const auto previous_vector_index =
     [this, n_preconditioners, indexing_strategy](
       unsigned int i) -> unsigned int {
+    // In the special case of no preconditioners we simply fall back to the
+    // FGMRES indexing strategy.
+    if (n_preconditioners == 0)
+      {
+        return i;
+      }
+
     switch (indexing_strategy)
       {
         case IndexingStrategy::fgmres:
