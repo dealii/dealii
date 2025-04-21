@@ -19,10 +19,10 @@ try:
 except ImportError:
     from PyDealII.Release import *
 
-class TestCellAccessorWrapper(unittest.TestCase):
 
+class TestCellAccessorWrapper(unittest.TestCase):
     def setUp(self):
-        self.triangulation = Triangulation('2D')
+        self.triangulation = Triangulation("2D")
         self.triangulation.generate_hyper_cube()
         self.triangulation.refine_global(1)
 
@@ -33,7 +33,7 @@ class TestCellAccessorWrapper(unittest.TestCase):
 
     def test_at_boundary(self):
         for cell in self.triangulation.active_cells():
-            self.assertEqual(cell.at_boundary(), cell.has_boundary_lines()) 
+            self.assertEqual(cell.at_boundary(), cell.has_boundary_lines())
 
     def test_faces(self):
         n_neighbors = 0
@@ -67,7 +67,7 @@ class TestCellAccessorWrapper(unittest.TestCase):
 
     def test_refine_flag(self):
         index = 0
-        refine_flags = ['no_refinement', 'cut_x', 'cut_y', 'cut_xy']
+        refine_flags = ["no_refinement", "cut_x", "cut_y", "cut_xy"]
         for cell in self.triangulation.active_cells():
             cell.refine_flag = refine_flags[index]
             index += 1
@@ -110,5 +110,5 @@ class TestCellAccessorWrapper(unittest.TestCase):
             index += 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

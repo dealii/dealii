@@ -23,13 +23,13 @@ import re
 import argparse
 from argparse import RawTextHelpFormatter
 
-__author__ = 'The authors of deal.II'
-__copyright__ = 'Copyright 2024, deal.II'
-__license__ = 'GNU GPL 2 or later'
+__author__ = "The authors of deal.II"
+__copyright__ = "Copyright 2024, deal.II"
+__license__ = "GNU GPL 2 or later"
 
 
 def get_parameter_value(parameters, name):
-    """ Given a dictionary of parameters with a structure as
+    """Given a dictionary of parameters with a structure as
     the one created by read_parameter_file(), return the value
     of the parameter with the given name. Returns None if the
     parameter is not found.
@@ -47,9 +47,8 @@ def get_parameter_value(parameters, name):
     return None
 
 
-
 def set_parameter_value(parameters, name, value):
-    """ Given a dictionary of parameters with a structure as
+    """Given a dictionary of parameters with a structure as
     the one created by read_parameter_file(), recursively search
     through the subsections and set the value
     of the first parameter with the given name to the given value.
@@ -69,9 +68,9 @@ def set_parameter_value(parameters, name, value):
 
 
 def split_parameter_line(line):
-    """ Read a 'set parameter' line and extract the name, value, and format. """
+    """Read a 'set parameter' line and extract the name, value, and format."""
 
-    equal_index = line.find('=')
+    equal_index = line.find("=")
     # Determine number of additional spaces left of equal sign.
     # We need to store these separately, because there might be two
     # lines setting the same parameter, but different number of spaces. They
@@ -79,25 +78,23 @@ def split_parameter_line(line):
     alignment_spaces = len(line[:equal_index]) - len(line[:equal_index].rstrip())
 
     # skip initial word "set" in parameter name
-    words_left_of_equal_sign = line[:equal_index].replace("\\\n","").split()
+    words_left_of_equal_sign = line[:equal_index].replace("\\\n", "").split()
     param_name = words_left_of_equal_sign[1:]
-    param_name = ' '.join(param_name)
+    param_name = " ".join(param_name)
 
     # strip spaces at end of value string, keep all inline comments
-    param_value = line[equal_index+1:].rstrip()
+    param_value = line[equal_index + 1 :].rstrip()
     # if there is one or more spaces at the start of the string, remove one space.
     # keep additional spaces, because they are part of the formatting.
     # this way we can add one space when writing the file back and keep the formatting
-    if param_value.startswith(' ') and len(param_value) > 1:
+    if param_value.startswith(" ") and len(param_value) > 1:
         param_value = param_value[1:]
 
     return param_name, param_value, alignment_spaces
 
 
-
 def read_value_or_subsection(input_file, parameters):
-    """ Read a value or a subsection from a parameter file into a parameter dictionary.
-    """
+    """Read a value or a subsection from a parameter file into a parameter dictionary."""
 
     # Keep track of the comment lines to
     # add them to the next parameter or subsection
@@ -114,7 +111,7 @@ def read_value_or_subsection(input_file, parameters):
             while line[-1] == "\\":
                 line += "\n" + next(input_file).rstrip()
 
-        words = line.replace("\\\n","").split()
+        words = line.replace("\\\n", "").split()
 
         # Attach empty lines if we are inside a comment
         if line == "" or len(words) == 0:
@@ -125,15 +122,19 @@ def read_value_or_subsection(input_file, parameters):
         elif line[0] == "#":
             if accumulated_comment != "":
                 accumulated_comment += "\n"
-            accumulated_comment += line.replace("\\\n","")
+            accumulated_comment += line.replace("\\\n", "")
 
         # If we encounter a 'subsection' line, store the subsection name
         # and recursively call this function to read the subsection
         elif words[0] == "subsection":
-            subsection_name = ' '.join(words[1:]).replace("\\","")
+            subsection_name = " ".join(words[1:]).replace("\\", "")
 
             if subsection_name not in parameters:
-                parameters[subsection_name] = {"comment": "", "value" : dict({}), "type": "subsection"}
+                parameters[subsection_name] = {
+                    "comment": "",
+                    "value": dict({}),
+                    "type": "subsection",
+                }
 
             if parameters[subsection_name]["comment"] != "":
                 parameters[subsection_name]["comment"] += "\n"
@@ -141,26 +142,45 @@ def read_value_or_subsection(input_file, parameters):
             parameters[subsection_name]["comment"] += accumulated_comment
             accumulated_comment = ""
 
-            parameters[subsection_name]["value"].update(read_value_or_subsection(input_file, parameters[subsection_name]["value"]))
+            parameters[subsection_name]["value"].update(
+                read_value_or_subsection(
+                    input_file, parameters[subsection_name]["value"]
+                )
+            )
 
         # If we encounter a 'set' line, store the parameter name and value
-        elif words[0] == 'set':
+        elif words[0] == "set":
             name, value, alignment_spaces = split_parameter_line(line)
 
-            parameters[name] = {"comment": accumulated_comment, "value": value, "alignment spaces": alignment_spaces, "type": "parameter"}
+            parameters[name] = {
+                "comment": accumulated_comment,
+                "value": value,
+                "alignment spaces": alignment_spaces,
+                "type": "parameter",
+            }
             accumulated_comment = ""
 
         elif words[0] == "include":
-            name = ' '.join(words[1:])
-            value = ''
+            name = " ".join(words[1:])
+            value = ""
             alignment_spaces = 0
-            parameters[name] = {"comment": accumulated_comment, "value": value, "alignment spaces": alignment_spaces, "type": "include"}
+            parameters[name] = {
+                "comment": accumulated_comment,
+                "value": value,
+                "alignment spaces": alignment_spaces,
+                "type": "include",
+            }
             accumulated_comment = ""
 
         elif words[0] == "end":
             # sometimes there are comments at the end of files or subsection. store them in their own parameter
             if accumulated_comment != "":
-                parameters["postcomment"] = {"comment": accumulated_comment, "value": "", "alignment spaces": 0, "type": "comment"}
+                parameters["postcomment"] = {
+                    "comment": accumulated_comment,
+                    "value": "",
+                    "alignment spaces": 0,
+                    "type": "comment",
+                }
                 accumulated_comment = ""
 
             return parameters
@@ -170,15 +190,19 @@ def read_value_or_subsection(input_file, parameters):
 
     # sometimes there are comments at the end of files or subsection. store them in their own parameter
     if accumulated_comment != "":
-        parameters["postcomment"] = {"comment": accumulated_comment, "value": "", "alignment spaces": 0, "type": "comment"}
+        parameters["postcomment"] = {
+            "comment": accumulated_comment,
+            "value": "",
+            "alignment spaces": 0,
+            "type": "comment",
+        }
         accumulated_comment = ""
 
     return parameters
 
 
-
 def read_parameter_file(file):
-    """ Read parameter file, and return a dictionary with all values.
+    """Read parameter file, and return a dictionary with all values.
 
     The returned dictionary contains as keys the name of the subsection,
      include statement or parameter, and as value a dictionary with
@@ -197,16 +221,14 @@ def read_parameter_file(file):
 
     parameters = dict({})
 
-    with open(file, 'r') as f:
+    with open(file, "r") as f:
         read_value_or_subsection(f, parameters)
 
     return parameters
 
 
-
 def write_comment_if_existent(comment, prepend_spaces, file):
-    """ Print the comment lines, take care to use the correct indentation.
-    """
+    """Print the comment lines, take care to use the correct indentation."""
     if comment != "":
         for line in comment.split("\n"):
             if line != "":
@@ -214,9 +236,8 @@ def write_comment_if_existent(comment, prepend_spaces, file):
             file.write(line + "\n")
 
 
-
 def write_value_or_subsection(parameters, prepend_spaces, file):
-    """ Write a parameters dictionary recursively into a given file.
+    """Write a parameters dictionary recursively into a given file.
     prepend_spaces tracks the current indentation level.
     """
 
@@ -230,18 +251,30 @@ def write_value_or_subsection(parameters, prepend_spaces, file):
             # Add empty line before comments
             if first_entry == False and parameters[entry]["comment"] != "":
                 file.write("\n")
-            write_comment_if_existent(parameters[entry]["comment"], prepend_spaces, file)
+            write_comment_if_existent(
+                parameters[entry]["comment"], prepend_spaces, file
+            )
 
             # Only add a space after equal sign if the value is not empty
             space_if_value = " " if parameters[entry]["value"] != "" else ""
-            file.write(" " * prepend_spaces + "set " + entry + " " * parameters[entry]["alignment spaces"] + "=" \
-                        + space_if_value + parameters[entry]["value"] + "\n")
+            file.write(
+                " " * prepend_spaces
+                + "set "
+                + entry
+                + " " * parameters[entry]["alignment spaces"]
+                + "="
+                + space_if_value
+                + parameters[entry]["value"]
+                + "\n"
+            )
 
         elif parameters[entry]["type"] == "include":
             # Add empty line before include
             if first_entry == False:
                 file.write("\n")
-            write_comment_if_existent(parameters[entry]["comment"], prepend_spaces, file)
+            write_comment_if_existent(
+                parameters[entry]["comment"], prepend_spaces, file
+            )
 
             # Write the include
             file.write(" " * prepend_spaces + "include " + entry + "\n")
@@ -252,7 +285,9 @@ def write_value_or_subsection(parameters, prepend_spaces, file):
         elif parameters[entry]["type"] == "subsection":
             if first_entry == False:
                 file.write("\n")
-            write_comment_if_existent(parameters[entry]["comment"], prepend_spaces, file)
+            write_comment_if_existent(
+                parameters[entry]["comment"], prepend_spaces, file
+            )
 
             file.write(" " * prepend_spaces + "subsection " + entry + "\n")
             prepend_spaces += 2
@@ -264,41 +299,39 @@ def write_value_or_subsection(parameters, prepend_spaces, file):
         elif parameters[entry]["type"] == "comment":
             if first_entry == False and parameters[entry]["comment"] != "":
                 file.write("\n")
-            write_comment_if_existent(parameters[entry]["comment"], prepend_spaces, file)
+            write_comment_if_existent(
+                parameters[entry]["comment"], prepend_spaces, file
+            )
 
         first_entry = False
 
     return 0
 
 
-
 def write_parameter_file(parameters, file):
-    """ Given a dictionary of parameters with a structure as
+    """Given a dictionary of parameters with a structure as
     the one created by read_parameter_file(), write the dictionary
     to a file.
     """
 
     prepend_spaces = 0
-    with open(file,'w') as f:
+    with open(file, "w") as f:
         write_value_or_subsection(parameters, prepend_spaces, f)
     return 0
 
 
-
 def main(input_file, output_file):
-    """ This function reformats the given input .prm files to follow our
+    """This function reformats the given input .prm files to follow our
     general formatting guidelines.
     """
     parameters = read_parameter_file(input_file)
     write_parameter_file(parameters, output_file)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-                    prog='deal.II .prm file reformatter',
-                    description=
-"""Reformats deal.II .prm files to follow our general formatting guidelines.
+        prog="deal.II .prm file reformatter",
+        description="""Reformats deal.II .prm files to follow our general formatting guidelines.
 The script expects two arguments, a path to the file to be formatted, and a
 path to which the formatted output should be written. If the two paths are
 identical the given file is overwritten with the formatted output.
@@ -317,10 +350,13 @@ Our formatting guidelines are:
       This is not always perfectly possible.
     - retain broken lines (`\\`) in values of parameters and comments, remove
       them from subsection or parameter names.  """,
-                    formatter_class=RawTextHelpFormatter)
+        formatter_class=RawTextHelpFormatter,
+    )
 
-    parser.add_argument('input_file', type=str, help='The .prm file to reformat.')
-    parser.add_argument('output_file', type=str, help='The .prm file to write the reformatted file to.')
+    parser.add_argument("input_file", type=str, help="The .prm file to reformat.")
+    parser.add_argument(
+        "output_file", type=str, help="The .prm file to write the reformatted file to."
+    )
     args = parser.parse_args()
 
     sys.exit(main(args.input_file, args.output_file))
