@@ -147,7 +147,7 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
-   * @deprecated Use the version of project_to_face() which takes an
+   * @deprecated Use the version of project_to_subface() which takes an
    * orientation argument instead.
    */
   DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
@@ -175,7 +175,7 @@ public:
    * that the cell is a line (1D), a quad (2d), or a hex (3d). Use the other
    * version of this function that takes the reference cell type instead.
    *
-   * @deprecated Use the version of project_to_face() which takes an
+   * @deprecated Use the version of project_to_subface() which takes an
    * orientation argument instead.
    */
   DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
@@ -198,7 +198,7 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
-   * @deprecated Use the version of project_to_face() which takes an
+   * @deprecated Use the version of project_to_subface() which takes an
    * orientation argument instead.
    */
   DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
