@@ -2185,45 +2185,57 @@ void SolverMPGMRES<VectorType>::solve_internal(
   constexpr std::size_t n_preconditioners = sizeof...(PreconditionerTypes);
 
   //
-  // With each invocation of preconditioner_vmult we increase the
-  // variable current_index by one modulo n_preconditioners.
+  // A lambda for applying the nth preconditioner to a vector src storing
+  // the result in dst:
   //
-  std::size_t current_index = 0;
 
-  //
-  // A lambda that cycles through all preconditioners in sequence applying
-  // one to the vector src and storing the result in dst:
-  //
-  const auto preconditioner_vmult = [&, n_preconditioners](auto       &dst,
-                                                           const auto &src) {
-    // We have no preconditioner that we could apply
-    if (n_preconditioners == 0)
-      {
-        dst = src;
-        return;
-      }
+  const auto apply_nth_preconditioner = [&](unsigned int n,
+                                            auto        &dst,
+                                            const auto  &src) {
+    // We cycle through all preconditioners and call the nth one:
+    std::size_t i = 0;
 
-    //
-    // We cycle through all preconditioners and call the one with a
-    // matching index:
-    //
-    std::size_t n = 0;
+    [[maybe_unused]] bool preconditioner_called = false;
 
-    const auto call_current_preconditioner = [&](const auto &preconditioner) {
-      if (n++ == current_index)
-        preconditioner.vmult(dst, src);
+    const auto call_matching_preconditioner = [&](const auto &preconditioner) {
+      if (i++ == n)
+        {
+          Assert(!preconditioner_called, dealii::ExcInternalError());
+          preconditioner_called = true;
+          preconditioner.vmult(dst, src);
+        }
     };
 
     // https://en.cppreference.com/w/cpp/language/fold
-    (call_current_preconditioner(preconditioners), ...);
+    (call_matching_preconditioner(preconditioners), ...);
+    Assert(preconditioner_called, dealii::ExcInternalError());
+  };
 
-    current_index = (current_index + 1) % n_preconditioners;
+  //
+  // A lambda that cycles through all preconditioners in sequence while
+  // applying exactly one preconditioner with each function invocation to
+  // the vector src and storing the result in dst:
+  //
+
+  std::size_t current_index = 0;
+
+  const auto preconditioner_vmult = [&](auto &dst, const auto &src) {
+
+    // We have no preconditioner that we could apply
+    if (n_preconditioners == 0)
+      dst = src;
+    else
+      {
+        apply_nth_preconditioner(current_index, dst, src);
+        current_index = (current_index + 1) % n_preconditioners;
+      }
   };
 
   //
   // Return the correct index for constructing the next vector in the
   // Krylov space sequence according to the chosen indexing strategy
   //
+
   const auto previous_vector_index =
     [this, n_preconditioners, indexing_strategy](
       unsigned int i) -> unsigned int {
