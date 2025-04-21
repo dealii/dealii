@@ -119,14 +119,14 @@
  * For a quadrilateral, these values correspond to
  * - *orientation* : `true` is the default orientation and `false` means
  *   vertices 1 and 2 are swapped.
- * - *rotation* : all vertices are rotated by 90 degrees clockwise.
- * - *flip* : all vertices are rotated by 180 degrees clockwise.
+ * - *rotation* : all vertices are rotated by 90 degrees counterclockwise.
+ * - *flip* : all vertices are rotated by 180 degrees counterclockwise.
  *
  * For a triangle, these values correspond to
  * - *orientation* : `true` is the default orientation and `false` means
  *   vertices 1 and 2 are swapped.
- * - *rotation* : all vertices are rotated by 120 degrees clockwise.
- * - *flip* : all vertices are rotated by 240 degrees clockwise.
+ * - *rotation* : all vertices are rotated by 120 degrees counterclockwise.
+ * - *flip* : all vertices are rotated by 240 degrees counterclockwise.
  *
  * Here, 'clockwise' is relative to the vector defined by the cross product of
  * two lines adjacent to the zeroth vertex in their standard orientation (which,
@@ -157,6 +157,67 @@
  * 2. If we are on the neighbor's face then, to make vertices match, we must
  *    transform the cell-local vertices so that they match the first cell's
  *    vertex ordering: i.e., the inverse orientation.
+ *
+ * <h2>Orientations as Permutations of Vertices</h2>
+ * As discussed above, TriaAccessor::combined_face_orientation() returns a value
+ * less than ReferenceCell::n_face_orientations() which describes how the
+ * bounding object (i.e., a face) should be rotated to match the cell-local
+ * definition of that object. The encoding of triangles is
+ *
+ * <div class="threecolumn" style="width: 600px">
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html triangle-0.svg
+ *       @image html triangle-1.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html triangle-2.svg
+ *       @image html triangle-3.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html triangle-4.svg
+ *       @image html triangle-5.svg
+ *     </div>
+ *   </div>
+ * </div>
+ *
+ * Similarly, quadrilaterals are encoded as
+ *
+ * <div class="fourcolumn" style="width: 800px">
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-0.svg
+ *       @image html quadrilateral-1.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-2.svg
+ *       @image html quadrilateral-3.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-4.svg
+ *       @image html quadrilateral-5.svg
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       @image html quadrilateral-6.svg
+ *       @image html quadrilateral-7.svg
+ *     </div>
+ *   </div>
+ * </div>
+ *
+ * The numbers on each edge are the line numbers with the two bounding vertices
+ * as subscripts: e.g., $0_0^1$ is the first line of a triangle and when it
+ * appears as $0_1^0$ then the line is in the reversed orientation (i.e.,
+ * numbers::reverse_line_orientation).
  *
  * <h2>Orientation of Quadrilateral Meshes</h2>
  *
