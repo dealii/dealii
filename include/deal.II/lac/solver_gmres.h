@@ -635,12 +635,12 @@ protected:
 
 
 /**
- * Implementation of the multiply preconditioned generalized minimal
+ * Implementation of the multiple preconditioned generalized minimal
  * residual method (MPGMRES).
  *
- * This method is a variant of the flexible GMRES, utilizing N
+ * This method is a variant of the flexible GMRES, utilizing $N$
  * preconditioners to search for a solution within a multi-Krylov space.
- * These spaces are characterized by by all possible N-variate,
+ * These spaces are characterized by by all possible $N$-variate,
  * non-commuting polynomials of the preconditioners and system matrix
  * applied to a residual up to some fixed degree. In contrast, the flexible
  * GMRES method implemented in SolverFGMRES constructs only one "Krylov"
@@ -657,8 +657,9 @@ protected:
  *   P_2AP_1AP_1r, P_1AP_2AP_1r, P_2AP_2AP_1r, P_1AP_1AP_2r, P_2AP_1AP_2r,
  *   P_1AP_2AP_2r, P_2AP_2AP_2r, \ldots
  * @f}
- * The truncated version constructs independent Krylov subspaces as
- * follows:
+ * The truncated version constructs independent Krylov subspaces by
+ * dropping all "mixing" terms in the series expansion. For the example
+ * with two preconditioners $P_1$, $P_2$ this looks as follows:
  * @f{align*}{
  *   r, P_1r, P_2r, P_1AP_1r, P_2AP_2r, P_1AP_1AP_1r, P_2AP_2AP_2r, \ldots
  * @f}
@@ -666,6 +667,10 @@ protected:
  * @f{align*}{
  *   r, P_1r, P_2P_1r, P_1P_2P_1r, \ldots
  * @f}
+ * By default the truncated variant is used. You can switch to the full
+ * version by setting the
+ * AdditionalData::use_truncated_mpgmres_strategy option in the
+ * AdditionalData object to false.
  *
  * For more details see @cite Greif2017.
  *
@@ -673,15 +678,20 @@ protected:
  * outlined in @cite Greif2017 in how one iteration is defined. Our
  * implementation constructs the search space one vector at a time,
  * producing a new iterate with each addition. In contrast, the routine
- * prescribed in @cite Greif2017 uses blocking to construct an iterate
- * corresponding to the total polynomial degree of each multi-Krylov space.
+ * described in @cite Greif2017 constructs an iteration step by combining
+ * all possible preconditioner applications corresponding to the total
+ * polynomial degree of each multi-Krylov space. For the full MPGMRES
+ * strategy this results in an exponential increase of possible
+ * preconditioner applications that have to be computed for reach iteration
+ * cycle; see Section 2.4 in @cite Greif2017.
  *
  * @note This method always uses right preconditioning, as opposed to
  * SolverGMRES, which allows the user to choose between left and right
  * preconditioning.
  *
- * @note FGMRES needs two vectors in each iteration steps yielding a total
- * of <tt>2*SolverFGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
+ * @note The MPGMRES implementation needs two vectors in each iteration
+ * steps yielding a total of
+ * <tt>2*SolverMPGMRES::%AdditionalData::%max_basis_size+1</tt> auxiliary
  * vectors. Otherwise, FGMRES requires roughly the same number of
  * operations per iteration compared to GMRES, except one application of
  * the preconditioner less at each restart and at the end of solve().
@@ -2132,8 +2142,7 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl            &cn,
                                          const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
-{
-}
+{}
 
 
 
@@ -2143,8 +2152,7 @@ SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
                                          const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
-{
-}
+{}
 
 
 
@@ -2184,10 +2192,8 @@ void SolverMPGMRES<VectorType>::solve_internal(
 {
   constexpr std::size_t n_preconditioners = sizeof...(PreconditionerTypes);
 
-  //
   // A lambda for applying the nth preconditioner to a vector src storing
   // the result in dst:
-  //
 
   const auto apply_nth_preconditioner = [&](unsigned int n,
                                             auto        &dst,
@@ -2211,16 +2217,13 @@ void SolverMPGMRES<VectorType>::solve_internal(
     Assert(preconditioner_called, dealii::ExcInternalError());
   };
 
-  //
+  std::size_t current_index = 0;
+
   // A lambda that cycles through all preconditioners in sequence while
   // applying exactly one preconditioner with each function invocation to
   // the vector src and storing the result in dst:
-  //
-
-  std::size_t current_index = 0;
 
   const auto preconditioner_vmult = [&](auto &dst, const auto &src) {
-
     // We have no preconditioner that we could apply
     if (n_preconditioners == 0)
       dst = src;
@@ -2231,10 +2234,8 @@ void SolverMPGMRES<VectorType>::solve_internal(
       }
   };
 
-  //
   // Return the correct index for constructing the next vector in the
   // Krylov space sequence according to the chosen indexing strategy
-  //
 
   const auto previous_vector_index =
     [this, n_preconditioners, indexing_strategy](
@@ -2357,8 +2358,7 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
         data.max_basis_size,
         true,
         data.orthogonalization_strategy})
-{
-}
+{}
 
 
 
@@ -2372,8 +2372,7 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
         data.max_basis_size,
         true,
         data.orthogonalization_strategy})
-{
-}
+{}
 
 
 
