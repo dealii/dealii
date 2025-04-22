@@ -134,7 +134,9 @@ public:
    * with useful data also in constrained positions by calling
    * AffineConstraints::distribute(). When accessing vector entries during the
    * solution of linear systems, the temporary solution should always have
-   * homogeneous constraints and this method is the correct one.
+   * homogeneous constraints and this method is the correct one. Further
+   * information on how to apply inhomogeneous constraints with matrix-free
+   * operators can be found in the respective section of step-37.
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -168,8 +170,11 @@ public:
    * This way of access is appropriate when the constraints have been
    * distributed on the vector by a call to AffineConstraints::distribute()
    * previously. This function is also necessary when inhomogeneous constraints
-   * are to be used, as MatrixFree can only handle homogeneous constraints. Note
-   * that if vectorization is enabled, the DoF values for several cells are set.
+   * are to be used, as MatrixFree can only handle homogeneous constraints.
+   * Further information on how to apply inhomogeneous constraints with
+   * matrix-free operators can be found in the respective section of step-37.
+   * Note that if vectorization is enabled, the DoF values for several cells are
+   * set.
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
