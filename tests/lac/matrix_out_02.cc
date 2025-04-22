@@ -54,7 +54,7 @@ main(int argc, char **argv)
       MatrixOut matrix_out;
       matrix_out.build_patches(sparse_matrix,
                                "sparse_matrix",
-                               MatrixOut::Options(true, 1, true));
+                               MatrixOut::Options(true, 1, true, false));
       matrix_out.write_gnuplot(logfile);
     }
 }
