@@ -17,6 +17,7 @@
 #
 # This module exports
 #
+#   DEAL_II_KOKKOS_ENABLE_HIP
 #   KOKKOS_INCLUDE_DIRS
 #   KOKKOS_INTERFACE_LINK_FLAGS
 #   KOKKOS_VERSION
@@ -166,6 +167,11 @@ if(KOKKOS_FOUND)
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
     # warning #940-D: missing return statement at end of non-void function
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
+  endif()
+
+  if(Kokkos_ENABLE_HIP)
+    # Define our own variable to avoid including Kokkos_Macros.hpp in config.h
+    set(DEAL_II_KOKKOS_ENABLE_HIP ON)
   endif()
 
   #
