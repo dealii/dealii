@@ -38,9 +38,9 @@ def decode_and_split(string):
     python 3.
     """
     if sys.version_info.major > 2:
-        return str(string, 'utf8').splitlines()
+        return str(string, "utf8").splitlines()
     else:
-        return unicode(string, errors='replace').splitlines()
+        return unicode(string, errors="replace").splitlines()
 
 
 class DeprecatedDeclaration(object):
@@ -54,41 +54,47 @@ class DeprecatedDeclaration(object):
     for information regarding when the deprecation notice appeared. The line
     itself is printed out later.
     """
+
     def __init__(self, line):
         assert "DEAL_II_DEPRECATED" in line
         # in case the line contains extra ':'s, split input based on where grep
         # puts the line number:
         line_number_re = re.search(":[0-9]+:", line)
         if line_number_re:
-            line_number_range = (line_number_re.regs[0][0] + 1,
-                                 line_number_re.regs[0][1] - 1)
-            self.file_name = line[0:line_number_range[0] - 1]
+            line_number_range = (
+                line_number_re.regs[0][0] + 1,
+                line_number_re.regs[0][1] - 1,
+            )
+            self.file_name = line[0 : line_number_range[0] - 1]
             self.line_n = int(line[slice(*line_number_range)])
-            self.deprecation_line = line[line_number_range[1] + 1:].strip()
+            self.deprecation_line = line[line_number_range[1] + 1 :].strip()
         else:
-            raise ValueError("The given line does not contain a line number of "
-                             "the form, e.g., :42:.")
+            raise ValueError(
+                "The given line does not contain a line number of "
+                "the form, e.g., :42:."
+            )
 
-        git_log_output = subprocess.check_output(["git", "blame", "-p",
-                                                  "-L", "{0},{0}".format(self.line_n),
-                                                  self.file_name])
+        git_log_output = subprocess.check_output(
+            ["git", "blame", "-p", "-L", "{0},{0}".format(self.line_n), self.file_name]
+        )
 
         self.git_log_output = decode_and_split(git_log_output)
-        self.commit_hash = self.git_log_output[0].split(' ')[0]
-        self.commit_summary = self.git_log_output[9][len("summary "):]
-        self.epoch_time = int(self.git_log_output[7][len("commiter-time "):])
-        self.output_time = datetime.datetime.fromtimestamp(self.epoch_time, datetime.UTC)
+        self.commit_hash = self.git_log_output[0].split(" ")[0]
+        self.commit_summary = self.git_log_output[9][len("summary ") :]
+        self.epoch_time = int(self.git_log_output[7][len("commiter-time ") :])
+        self.output_time = datetime.datetime.fromtimestamp(
+            self.epoch_time, datetime.UTC
+        )
 
-        git_tag_output = subprocess.check_output(["git", "tag", "--contains",
-                                                  self.commit_hash,
-                                                  "-l", "v[0-9].[0-9].[0-9]"])
+        git_tag_output = subprocess.check_output(
+            ["git", "tag", "--contains", self.commit_hash, "-l", "v[0-9].[0-9].[0-9]"]
+        )
         git_tag_output = decode_and_split(git_tag_output)
         if git_tag_output:
             # matched tags must start with 'v[0-9]': skip the v
             self.release = git_tag_output[0][1:]
         else:
             self.release = ""
-
 
     def print_record(self):
         """Print a description of the record to stdout. The 'Release' field
@@ -105,18 +111,25 @@ class DeprecatedDeclaration(object):
 
 def main():
     # check that we are in the top directory
-    if not all((os.path.isdir(directory)
-                for directory in ["./include", "./tests", "./examples"])):
-        raise Exception("This script must be called from the top-level directory of deal.II.")
-    result = subprocess.check_output(["grep", "-R", "--line-number", "DEAL_II_DEPRECATED",
-                                      "./include/"])
+    if not all(
+        (
+            os.path.isdir(directory)
+            for directory in ["./include", "./tests", "./examples"]
+        )
+    ):
+        raise Exception(
+            "This script must be called from the top-level directory of deal.II."
+        )
+    result = subprocess.check_output(
+        ["grep", "-R", "--line-number", "DEAL_II_DEPRECATED", "./include/"]
+    )
     result = decode_and_split(result)
 
     deprecated_declarations = list()
     for line in result:
         try:
             deprecated_declarations.append(DeprecatedDeclaration(line))
-        except subprocess.CalledProcessError: # ignore errors coming from git
+        except subprocess.CalledProcessError:  # ignore errors coming from git
             pass
 
     deprecated_declarations.sort(key=lambda u: u.epoch_time)
@@ -136,5 +149,5 @@ def main():
             pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

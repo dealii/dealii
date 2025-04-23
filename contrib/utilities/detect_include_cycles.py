@@ -36,18 +36,16 @@ match_includes = re.compile(r"# *include *<(deal.II/.*.h)>")
 # ones that correspond to #include statements for deal.II header
 # files. For those, add a link from header file to the one it includes
 # to the graph.
-def add_includes_for_file(header_file_name, G) :
+def add_includes_for_file(header_file_name, G):
     f = open(header_file_name)
     lines = f.readlines()
     f.close()
 
-    for line in lines :
+    for line in lines:
         m = match_includes.match(line)
-        if m :
+        if m:
             included_file = m.group(1)
-            G.add_edge(header_file_name.replace("include/", ""),
-                       included_file)
-
+            G.add_edge(header_file_name.replace("include/", ""), included_file)
 
 
 # Create a list of all header files in the include folder.
@@ -56,14 +54,14 @@ assert filelist, "Please call the script from the top-level directory."
 
 # For each header file, add the includes as the edges of a directed graph.
 G = nx.DiGraph()
-for header_file_name in filelist :
+for header_file_name in filelist:
     add_includes_for_file(header_file_name, G)
 
 # Then figure out whether there are cycles and if so, print them:
 cycles = nx.simple_cycles(G)
 cycles_as_list = list(cycles)
-if (len(cycles_as_list) > 0) :
-    print (f"Cycles in the include graph detected!")
-    for cycle in cycles_as_list :
+if len(cycles_as_list) > 0:
+    print(f"Cycles in the include graph detected!")
+    for cycle in cycles_as_list:
         print(cycle)
     exit(1)
