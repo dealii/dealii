@@ -12,10 +12,18 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/base/mpi_stub.h>
+
 #include <deal.II/lac/petsc_block_sparse_matrix.h>
 #include <deal.II/lac/petsc_compatibility.h>
 
+
 #ifdef DEAL_II_WITH_PETSC
+
+#  include <petscmat.h>
+
+
+DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
@@ -53,7 +61,6 @@ namespace
   }
 } // namespace
 
-DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
@@ -209,12 +216,12 @@ namespace PETScWrappers
                       std::to_string(c) +
                       " is completely empty "
                       "and so it is not possible to determine how many columns it should have."));
-                  Mat dummy = ::create_dummy_mat(
-                    comm,
-                    static_cast<PetscInt>(row_local_sizes[r]),
-                    static_cast<PetscInt>(row_sizes[r]),
-                    static_cast<PetscInt>(col_local_sizes[c]),
-                    static_cast<PetscInt>(col_sizes[c]));
+                  Mat dummy =
+                    create_dummy_mat(comm,
+                                     static_cast<PetscInt>(row_local_sizes[r]),
+                                     static_cast<PetscInt>(row_sizes[r]),
+                                     static_cast<PetscInt>(col_local_sizes[c]),
+                                     static_cast<PetscInt>(col_sizes[c]));
                   this->sub_objects[r][c] = new BlockType(dummy);
 
                   // the new object got a reference on dummy, we can safely
