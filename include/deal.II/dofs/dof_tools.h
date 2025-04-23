@@ -1041,10 +1041,6 @@ namespace DoFTools
 
 
   /**
-   * This compatibility version of make_periodicity_constraints only works on
-   * grids with cells in
-   * @ref GlossFaceOrientation "standard orientation".
-   *
    * Instead of defining a 'first' and 'second' boundary with the help of two
    * boundary_ids this function defines a 'left' boundary as all faces with
    * local face index <code>2*dimension</code> and boundary indicator @p b_id
@@ -1052,9 +1048,9 @@ namespace DoFTools
    * index <code>2*dimension+1</code> and boundary indicator @p b_id. Faces with
    * coordinates only differing in the @p direction component are identified.
    *
-   * @note This version of make_periodicity_constraints  will not work on
+   * @warning This version of make_periodicity_constraints will not work on
    * meshes with cells not in
-   * @ref GlossFaceOrientation "standard orientation".
+   * @ref GlossCombinedOrientation "the default orientation".
    *
    * @note This function is a convenience wrapper. It internally calls
    * GridTools::collect_periodic_faces() with the supplied parameters and

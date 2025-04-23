@@ -1816,6 +1816,8 @@ private:
    * Set the combined face orientation (i.e., the integer that uniquely encodes
    * the orientation, flip, and rotation). This function is only implemented for
    * objects which have faces, i.e., for structdim == dim.
+   * For more information see the
+   * @ref GlossCombinedOrientation "combined orientation glossary entry".
    *
    * @ingroup reordering
    */
