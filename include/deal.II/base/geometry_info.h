@@ -1320,7 +1320,7 @@ struct GeometryInfo<0>
    * the standard and non-standard orientation. <tt>face_orientation</tt>
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation). In 2d only
-   * <tt>face_flip</tt> is considered. See this
+   * <tt>face_orientation</tt> is considered. See this
    * @ref GlossCombinedOrientation "glossary"
    * article for more information.
    *
@@ -1747,9 +1747,8 @@ struct GeometryInfo<0>
  * result is @p true, then the face has standard orientation, otherwise its
  * normal vector is pointing the other direction. There are not very many
  * places in application programs where you need this information actually,
- * but a few places in the library make use of this. Note that in 2d, the
- * result is always @p true. More information on the topic can be found in
- * this
+ * but a few places in the library make use of this. More information on the
+ * topic can be found in this
  * @ref GlossCombinedOrientation "glossary"
  * article.
  *
