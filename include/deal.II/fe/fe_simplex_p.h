@@ -19,6 +19,7 @@
 
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/polynomials_barycentric.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/fe/fe_poly.h>
 
@@ -64,6 +65,22 @@ public:
     const unsigned int         child,
     const RefinementCase<dim> &refinement_case =
       RefinementCase<dim>::isotropic_refinement) const override;
+
+  /**
+   * @see FiniteElement::face_to_cell_index()
+   *
+   * @note This function has some limitations in 3D. If @p dim is 3, this
+   * function works if either:
+   * 1. @p combined_orientation is the default orientation.
+   * 2. @p combined_orientation is `(false, false, false)` and the triangular
+   * face has no more than one degree of freedom in its interior.
+   * Otherwise this function throws an error.
+   */
+  virtual unsigned int
+  face_to_cell_index(const unsigned int                 face_dof_index,
+                     const unsigned int                 face,
+                     const types::geometric_orientation combined_orientation =
+                       numbers::default_geometric_orientation) const override;
 
   /**
    * @copydoc dealii::FiniteElement::get_restriction_matrix()
