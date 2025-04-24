@@ -285,11 +285,17 @@ There are a number of obvious extensions for this work:
   include dynamic effects would be necessary to study problems where
   inertial effects are important, e.g. problems involving impact.
 - Load and solution limiting procedures may be necessary for highly
-  nonlinear problems. It is possible to add a linesearch algorithm to
+  nonlinear problems. It is possible to add a line search algorithm to
   limit the step size within a Newton increment to ensure optimum
   convergence. It may also be necessary to use a load limiting method,
   such as the Riks method, to solve unstable problems involving
   geometric instability such as buckling and snap-through.
+- While we're on the topic of nonlinear solvers: As mentioned in the
+  introduction, we should really not have to implement a full-fledged
+  Newton scheme ourselves. There are implementations that have line
+  search and other algorithmic improvements already built in. step-77
+  demonstrates how this can be done, and it would not be terribly
+  difficult to adapt the current program to that as well.
 - Many physical problems involve contact. It is possible to include
   the effect of frictional or frictionless contact between objects
   into this program. This would involve the addition of an extra term
