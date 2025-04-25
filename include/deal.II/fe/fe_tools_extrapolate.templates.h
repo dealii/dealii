@@ -32,9 +32,9 @@
 
 #include <deal.II/grid/tria.h>
 
-#include "deal.II/lac/block_vector_base.h"
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
