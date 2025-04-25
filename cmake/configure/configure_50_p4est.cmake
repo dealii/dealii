@@ -76,7 +76,6 @@ endmacro()
 
 macro(feature_p4est_configure_external)
   set(DEAL_II_P4EST_WITH_VTK_BINARY ${P4EST_WITH_VTK_BINARY})
-  set(DEAL_II_P4EST_WITH_SEARCH_LOCAL ${P4EST_WITH_SEARCH_LOCAL})
 endmacro()
 
 
