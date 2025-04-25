@@ -1602,7 +1602,7 @@ namespace FETools
       // values set by other processors into locally owned DoF, but the deal.II
       // implementation of the LinearAlgebra::distributed vectors and associated
       // compress(insert) operation does not do this. Instead, we use a
-      // compress(max) that mimick this behavior.
+      // compress(max) that mimic this behavior.
       if constexpr (is_la_vector<OutVector>)
         u2.compress(VectorOperation::max);
       else
