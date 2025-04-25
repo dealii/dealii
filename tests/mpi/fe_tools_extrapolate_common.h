@@ -43,7 +43,7 @@
 
 #include "../tests.h"
 
-#define DEBUG_OUTPUT_VTK
+// #define DEBUG_OUTPUT_VTK
 
 template <int dim>
 class TestFunction : public Function<dim>
@@ -79,12 +79,13 @@ make_tria()
   typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell;
   GridGenerator::hyper_cube(*tria, 0., 1.);
   tria->refine_global(2);
-  for(auto &cell : tria->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+  for (auto &cell :
+       tria->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
     {
-      auto p = cell->barycenter();
-      bool refine_cell = p[0]>0.5 && p[1]>0.5;
-      if (dim==3)
-        refine_cell = refine_cell && p[2]>0.75;
+      auto p           = cell->barycenter();
+      bool refine_cell = p[0] > 0.5 && p[1] > 0.5;
+      if (dim == 3)
+        refine_cell = refine_cell && p[2] > 0.75;
       if (refine_cell)
         cell->set_refine_flag();
     }
