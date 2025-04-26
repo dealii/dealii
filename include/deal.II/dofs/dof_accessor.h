@@ -3150,14 +3150,9 @@ namespace internal
                                               dof_indices_ptr,
                                               dof_processor);
 
-        // 2) copy dof numbers from the LINE. for lines with the wrong
-        // orientation (which might occur in 3d), we have already made sure that
-        // we're ok by picking the correct vertices (this happens automatically
-        // in the vertex() function). however, if the line is in wrong
-        // orientation, we look at it in flipped orientation and we will have to
-        // adjust the shape function indices that we see to correspond to the
-        // correct (face/cell-local) ordering.
-        if ((structdim == 2 || structdim == 3) && fe.n_dofs_per_line() > 0)
+        // 2) copy dof numbers from the LINE, accounting for the possibility of
+        // reversed line orientations.
+        if (structdim > 1 && fe.n_dofs_per_line() > 0)
           {
             const auto line_indices = internal::TriaAccessorImplementation::
               Implementation::get_line_indices_of_cell(accessor);
@@ -3179,29 +3174,29 @@ namespace internal
                     dof_indices_ptr,
                     dof_processor);
                 else
-                  dof_operation.process_dofs(
-                    accessor.get_dof_handler(),
-                    0,
-                    line_indices[line],
-                    fe_index,
-                    [&fe, line_orientation](const auto d) {
-                      return fe.adjust_line_dof_index_for_line_orientation(
-                        d, line_orientation);
-                    },
-                    std::integral_constant<int, 1>(),
-                    dof_indices_ptr,
-                    dof_processor);
+                  {
+                    Assert(line_orientation ==
+                             numbers::reverse_line_orientation,
+                           ExcInternalError());
+                    dof_operation.process_dofs(
+                      accessor.get_dof_handler(),
+                      0,
+                      line_indices[line],
+                      fe_index,
+                      [&fe, line_orientation](const auto d) {
+                        return fe.adjust_line_dof_index_for_line_orientation(
+                          d, line_orientation);
+                      },
+                      std::integral_constant<int, 1>(),
+                      dof_indices_ptr,
+                      dof_processor);
+                  }
               }
           }
 
-        // 3) copy dof numbers from the FACE. for faces with the wrong
-        // orientation, we have already made sure that we're ok by picking the
-        // correct lines and vertices (this happens automatically in the line()
-        // and vertex() functions). however, if the face is in wrong
-        // orientation, we look at it in flipped orientation and we will have to
-        // adjust the shape function indices that we see to correspond to the
-        // correct (cell-local) ordering. The same applies, if the face_rotation
-        // or face_orientation is non-standard
+        // 3) copy dof numbers from the QUAD (i.e., 3d faces). Like lines we
+        // only adjust dof indices (which has some cost) if we are not in the
+        // default orientation.
         if (structdim == 3 && fe.max_dofs_per_quad() > 0)
           for (const auto face_no : accessor.face_indices())
             {
@@ -3234,10 +3229,10 @@ namespace internal
                   dof_processor);
             }
 
-        // 4) INNER dofs - here we need to make sure that the shortcut to not
-        // run the function does not miss the faces of wedge and pyramid
-        // elements where n_dofs_per_object might not return the largest
-        // possible value
+        // 4) INNER dofs (i.e., line dofs in 1d, quad dofs in 2d, or hex dofs in
+        // 3d) - here we need to make sure that the shortcut to not run the
+        // function does not miss the faces of wedge and pyramid elements where
+        // n_dofs_per_object might not return the largest possible value
         if (((dim == 3 && structdim == 2) ?
                fe.max_dofs_per_quad() :
                fe.template n_dofs_per_object<structdim>()) > 0)
