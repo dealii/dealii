@@ -3210,6 +3210,9 @@ namespace DoFTools
       std::vector<types::global_dof_index> dofs_1(dofs_per_face);
       std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
+      // Note that, in 3d, these functions take into account the line
+      // orientations on each face: i.e., this function does not need to
+      // consider line orientations.
       if (use_mg)
         face_1->get_mg_dof_indices(level, dofs_1, face_1_index);
       else
