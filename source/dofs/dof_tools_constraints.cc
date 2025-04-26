@@ -3259,29 +3259,19 @@ namespace DoFTools
                 return;
               }
 
-      // Well, this is a hack:
-      //
-      // There is no
-      //   face_to_face_index(face_index,
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // function in FiniteElementData, so we have to use
-      //   face_to_cell_index(face_index, face
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // But this will give us an index on a cell - something we cannot work
-      // with directly. But luckily we can match them back :-]
+      // To match DoFs we need to use combined_orientation to permute the face
+      // DoFs. FiniteElement does not offer a function to do exactly that: i.e.,
+      // adjust_line_dof_index_for_line_orientation() only considers the
+      // orientation of a line and adjust_quad_dof_index_for_face_orientation()
+      // is only for DoFs defined on quads. Hence we compute our own lookup
+      // table with the necessary information:
+      std::vector<unsigned int> cell_to_face_index(
+        fe.dofs_per_cell, numbers::invalid_unsigned_int);
 
-      std::map<unsigned int, unsigned int> cell_to_rotated_face_index;
-
-      // Build up a cell to face index for face_2:
-      for (unsigned int i = 0; i < dofs_per_face; ++i)
-        {
-          const unsigned int cell_index = fe.face_to_cell_index(i, face_no);
-          cell_to_rotated_face_index[cell_index] = i;
-        }
+      for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
+        cell_to_face_index[fe.face_to_cell_index(
+          face_dof, face_no, numbers::default_geometric_orientation)] =
+          face_dof;
 
       // Build constraints in a vector of pairs that can be
       // arbitrarily large, but that holds up to 25 elements without
@@ -3362,8 +3352,10 @@ namespace DoFTools
                   // Get the correct dof index on face_1 respecting the
                   // given orientation:
                   const unsigned int j =
-                    cell_to_rotated_face_index[fe.face_to_cell_index(
+                    cell_to_face_index[fe.face_to_cell_index(
                       jj, face_no, combined_orientation)];
+                  Assert(j != numbers::invalid_unsigned_int,
+                         ExcInternalError());
 
                   if (std::abs(transformation(i, jj)) > eps)
                     constraint_entries.emplace_back(dofs_1[j],
@@ -3384,9 +3376,9 @@ namespace DoFTools
 
           // Get the correct dof index on face_1 respecting the given
           // orientation:
-          const unsigned int j =
-            cell_to_rotated_face_index[fe.face_to_cell_index(
-              target, face_no, combined_orientation)];
+          const unsigned int j = cell_to_face_index[fe.face_to_cell_index(
+            target, face_no, combined_orientation)];
+          Assert(j != numbers::invalid_unsigned_int, ExcInternalError());
 
           auto dof_left  = dofs_1[j];
           auto dof_right = dofs_2[i];
