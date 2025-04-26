@@ -3149,7 +3149,7 @@ namespace DoFTools
       if ((!use_mg) && face_2->has_children())
         {
           Assert(face_2->n_children() ==
-                   GeometryInfo<dim>::max_children_per_face,
+                   face_2->reference_cell().template n_children<dim - 1>(),
                  ExcNotImplemented());
 
           const unsigned int dofs_per_face =
