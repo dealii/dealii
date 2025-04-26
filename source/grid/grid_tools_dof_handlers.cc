@@ -15,6 +15,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/shared_tria.h>
@@ -2432,18 +2433,16 @@ namespace GridTools
   {
     Assert(matrix.m() == matrix.n(),
            ExcMessage("The supplied matrix must be a square matrix"));
-
-    static const int dim = FaceIterator::AccessorType::dimension;
+    Assert(face1->reference_cell() == face2->reference_cell(),
+           ExcMessage(
+             "The faces to be matched must have the same reference cell."));
 
     // Do a full matching of the face vertices:
-
-    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face>
-      face1_vertices, face2_vertices;
-
-    face1_vertices.fill(numbers::invalid_unsigned_int);
-    face2_vertices.fill(numbers::invalid_unsigned_int);
-
     AssertDimension(face1->n_vertices(), face2->n_vertices());
+
+    std::vector<unsigned int> face1_vertices(face1->n_vertices(),
+                                             numbers::invalid_unsigned_int),
+      face2_vertices(face2->n_vertices(), numbers::invalid_unsigned_int);
 
     std::set<unsigned int> face2_vertices_set;
     for (unsigned int i = 0; i < face1->n_vertices(); ++i)

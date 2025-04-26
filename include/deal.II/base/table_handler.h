@@ -25,7 +25,7 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include <fstream>
+#include <cstdint>
 #include <map>
 #include <ostream>
 #include <string>

@@ -1,0 +1,5 @@
+New: MatrixOut now allows to create "sparse" representations of
+matrices by setting the MatrixOut::Options::create_sparse_plot
+variable.
+<br>
+(Wolfgang Bangerth, 2025/04/18)

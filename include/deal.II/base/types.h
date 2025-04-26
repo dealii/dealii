@@ -59,6 +59,10 @@ namespace types
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_vertex_index.
+   *
+   * This preprocessor variable is deprecated. Use the variable
+   * `Utilities::MPI::mpi_type_id_for_type<types::global_vertex_index>`
+   * instead.
    */
 #define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UINT64_T
 
@@ -104,6 +108,10 @@ namespace types
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
+   *
+   * This preprocessor variable is deprecated. Use the variable
+   * `Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>`
+   * instead.
    */
 #ifdef DEAL_II_WITH_64BIT_INDICES
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UINT64_T
@@ -214,9 +222,7 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 
-// this part of the namespace numbers got moved to the bottom types.h file,
-// because otherwise we get a circular inclusion of config.h, types.h, and
-// numbers.h
+
 namespace numbers
 {
   /**
@@ -344,7 +350,7 @@ namespace numbers
    * for more information.
    */
   constexpr types::geometric_orientation default_geometric_orientation =
-    static_cast<types::geometric_orientation>(0b001);
+    static_cast<types::geometric_orientation>(0b000);
 
   /**
    * Value indicating that a line is in the reverse orientation. Since lines can
@@ -357,7 +363,7 @@ namespace numbers
    * for more information.
    */
   constexpr types::geometric_orientation reverse_line_orientation =
-    static_cast<types::geometric_orientation>(0b000);
+    static_cast<types::geometric_orientation>(0b001);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a

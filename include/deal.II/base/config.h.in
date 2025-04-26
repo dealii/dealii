@@ -170,7 +170,8 @@ DEAL_II_NAMESPACE_CLOSE
 // Kokkos was configured with CUDA or HIP support. This is problematic
 // when calling non-constexpr functions in constexpr functions. Hence, we
 // need a way to annotate functions explicitly as host-only.
-#if (defined(__clang__) && defined(__CUDA__)) || defined(KOKKOS_ENABLE_HIP)
+#cmakedefine DEAL_II_KOKKOS_ENABLE_HIP
+#if (defined(__clang__) && defined(__CUDA__)) || defined(DEAL_II_KOKKOS_ENABLE_HIP)
 #  define DEAL_II_HOST __host__
 #else
 #  define DEAL_II_HOST
@@ -509,10 +510,11 @@ DEAL_II_NAMESPACE_CLOSE
  * PETSc:
  *
  * Note: The following macros are defined in petscversion.h
- *       so we don't repeat them here.
+ *       so we simply refer to the ones there.
  */
 
 #ifdef DEAL_II_WITH_PETSC
+#  include <petscversion.h>
 #  define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
     PETSC_VERSION_LT(major,minor,subminor)
 #  define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
@@ -524,6 +526,7 @@ DEAL_II_NAMESPACE_CLOSE
  */
 
 #ifdef DEAL_II_WITH_SLEPC
+#  include <slepcversion.h>
 #  define DEAL_II_SLEPC_VERSION_LT(major,minor,subminor) \
     SLEPC_VERSION_LT(major,minor,subminor)
 #  define DEAL_II_SLEPC_VERSION_GTE(major,minor,subminor) \

@@ -189,6 +189,12 @@ public:
    * @pre The template argument `dim` must equal the dimension
    *   of the space in which the reference cell you are querying
    *   lives (i.e., it must equal the result of get_dimension()).
+   *
+   * For ReferenceCells::Vertex, the reference cell is a zero-dimensional point
+   * in a zero-dimensional space: i.e., asking about the value of a polynomial
+   * doesn't make sense since there cannot be any independent variables. To
+   * enable dimension-independent programming we define the zero-dimensional
+   * value to be 1.
    */
   template <int dim>
   double
@@ -1114,31 +1120,33 @@ private:
    * Table containing all vertex permutations for a line.
    */
   static constexpr ndarray<unsigned int, 2, 2> line_vertex_permutations = {
-    {{{1, 0}}, {{0, 1}}}};
+    {{{0, 1}}, {{1, 0}}}};
 
   /**
    * Table containing all vertex permutations for a triangle.
    */
   static constexpr ndarray<unsigned int, 6, 3> triangle_vertex_permutations = {
-    {{{0, 2, 1}},
-     {{0, 1, 2}},
-     {{2, 1, 0}},
+    {{{0, 1, 2}},
+     {{0, 2, 1}},
      {{2, 0, 1}},
-     {{1, 0, 2}},
-     {{1, 2, 0}}}};
+     {{2, 1, 0}},
+     {{1, 2, 0}},
+     {{1, 0, 2}}}};
 
   /**
    * Table containing all vertex permutations for a quadrilateral.
    */
   static constexpr ndarray<unsigned int, 8, 4>
-    quadrilateral_vertex_permutations = {{{{0, 2, 1, 3}},
-                                          {{0, 1, 2, 3}},
-                                          {{2, 3, 0, 1}},
-                                          {{2, 0, 3, 1}},
-                                          {{3, 1, 2, 0}},
-                                          {{3, 2, 1, 0}},
-                                          {{1, 0, 3, 2}},
-                                          {{1, 3, 0, 2}}}};
+    quadrilateral_vertex_permutations = {{
+      {{0, 1, 2, 3}},
+      {{0, 2, 1, 3}},
+      {{2, 0, 3, 1}},
+      {{2, 3, 0, 1}},
+      {{3, 2, 1, 0}},
+      {{3, 1, 2, 0}},
+      {{1, 3, 0, 2}},
+      {{1, 0, 3, 2}},
+    }};
 
   /**
    * A kind of constructor -- not quite private because it can be
@@ -2528,13 +2536,7 @@ ReferenceCell::face_to_cell_vertices(
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
-  // TODO: once the default orientation is switched to 0 then we can remove this
-  // special case for 1D.
-  if (get_dimension() == 1)
-    Assert(combined_face_orientation == numbers::default_geometric_orientation,
-           ExcMessage("In 1D, all faces must have the default orientation."));
-  else
-    AssertIndexRange(combined_face_orientation, n_face_orientations(face));
+  AssertIndexRange(combined_face_orientation, n_face_orientations(face));
 
   switch (this->kind)
     {
@@ -2694,12 +2696,12 @@ ReferenceCell::standard_to_real_face_line(
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
 
-  static constexpr ndarray<unsigned int, 6, 3> triangle_table = {{{{2, 1, 0}},
-                                                                  {{0, 1, 2}},
-                                                                  {{1, 0, 2}},
+  static constexpr ndarray<unsigned int, 6, 3> triangle_table = {{{{0, 1, 2}},
+                                                                  {{2, 1, 0}},
                                                                   {{2, 0, 1}},
-                                                                  {{0, 2, 1}},
-                                                                  {{1, 2, 0}}}};
+                                                                  {{1, 0, 2}},
+                                                                  {{1, 2, 0}},
+                                                                  {{0, 2, 1}}}};
 
 
   switch (this->kind)
@@ -2742,15 +2744,16 @@ ReferenceCell::standard_to_real_face_line(
           return triangle_table[combined_face_orientation][line];
       case ReferenceCells::Hexahedron:
         {
-          static constexpr ndarray<unsigned int, 8, 4> table = {
-            {{{2, 3, 0, 1}},
-             {{0, 1, 2, 3}},
-             {{0, 1, 3, 2}},
-             {{3, 2, 0, 1}},
-             {{3, 2, 1, 0}},
-             {{1, 0, 3, 2}},
-             {{1, 0, 2, 3}},
-             {{2, 3, 1, 0}}}};
+          static constexpr ndarray<unsigned int, 8, 4> table = {{
+            {{0, 1, 2, 3}},
+            {{2, 3, 0, 1}},
+            {{3, 2, 0, 1}},
+            {{0, 1, 3, 2}},
+            {{1, 0, 3, 2}},
+            {{3, 2, 1, 0}},
+            {{2, 3, 1, 0}},
+            {{1, 0, 2, 3}},
+          }};
           return table[combined_face_orientation][line];
         }
       default:
@@ -2891,10 +2894,13 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
+        return 1.0;
       case ReferenceCells::Line:
       case ReferenceCells::Quadrilateral:
       case ReferenceCells::Hexahedron:
-        return GeometryInfo<dim>::d_linear_shape_function(xi, i);
+        if constexpr (dim > 0)
+          return GeometryInfo<dim>::d_linear_shape_function(xi, i);
+        DEAL_II_ASSERT_UNREACHABLE();
       // see also BarycentricPolynomials<2>::compute_value
       case ReferenceCells::Triangle:
         {
@@ -2965,6 +2971,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
         DEAL_II_NOT_IMPLEMENTED();
     }
 
+  DEAL_II_ASSERT_UNREACHABLE();
   return 0.0;
 }
 
@@ -3016,7 +3023,7 @@ ReferenceCell::volume() const
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        return 0;
+        return 1;
       case ReferenceCells::Line:
         return 1;
       case ReferenceCells::Triangle:
@@ -3415,7 +3422,7 @@ ReferenceCell::face_to_cell_line_orientation(
   if (*this == ReferenceCells::Hexahedron)
     {
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
-        table{{{{D, D, R, D, R, R, D, R}}, {{D, D, D, R, R, R, R, D}}}};
+        table{{{{D, D, D, R, R, R, R, D}}, {{D, D, R, D, R, R, D, R}}}};
       // We use face_line_no / 2 here since lines i and i + 1 are parallel and,
       // on a given face, have the same relative orientations.
       const bool match =
@@ -3438,7 +3445,7 @@ ReferenceCell::face_to_cell_line_orientation(
                "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1),"));
 
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
-        table{{{{R, D, R, D, R, D}}, {{D, R, D, R, D, R}}}};
+        table{{{{D, R, D, R, D, R}}, {{R, D, R, D, R, D}}}};
 
       const bool match =
         line_orientation == table[combined_line][combined_face_orientation];
@@ -3605,12 +3612,7 @@ ReferenceCell::get_combined_orientation(
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        // TODO: we can get rid of this special-case and use
-        // vertex_vertex_permutations once we make 0 the default orientation.
-        (void)vertex_vertex_permutations;
-        if (vertices_0[0] == vertices_1[0])
-          return numbers::default_geometric_orientation;
-        break;
+        return compute_orientation(vertex_vertex_permutations);
       case ReferenceCells::Line:
         return compute_orientation(line_vertex_permutations);
       case ReferenceCells::Triangle:
@@ -3672,9 +3674,7 @@ ReferenceCell::permute_by_combined_orientation(
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        // TODO: we can get rid of this special-case and use
-        // vertex_vertex_permutations once we make 0 the default orientation.
-        std::copy(vertices.begin(), vertices.end(), result.begin());
+        permute(vertex_vertex_permutations);
         break;
       case ReferenceCells::Line:
         permute(line_vertex_permutations);
@@ -3713,14 +3713,14 @@ ReferenceCell::get_inverse_combined_orientation(
         {
           AssertIndexRange(orientation, 6);
           constexpr std::array<types::geometric_orientation, 6> inverses{
-            {0, 1, 2, 5, 4, 3}};
+            {0, 1, 4, 3, 2, 5}};
           return inverses[orientation];
         }
       case ReferenceCells::Quadrilateral:
         {
           AssertIndexRange(orientation, 8);
           constexpr std::array<types::geometric_orientation, 8> inverses{
-            {0, 1, 2, 7, 4, 5, 6, 3}};
+            {0, 1, 6, 3, 4, 5, 2, 7}};
           return inverses[orientation];
         }
       default:

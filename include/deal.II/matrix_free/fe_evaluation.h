@@ -124,18 +124,19 @@ public:
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
    * the current cell, and store them internally. Similar functionality as the
-   * function DoFAccessor::get_interpolated_dof_values when no constraints are
-   * present, but it also includes constraints from hanging nodes, so one can
-   * see it as a similar function to AffineConstraints::read_dof_values as
-   * well. Note that if vectorization is enabled, the DoF values for several
-   * cells are set.
+   * function DoFCellAccessor::get_interpolated_dof_values() when no constraints
+   * are present other than constraints from hanging nodes. Additionally, this
+   * function also resolves homogeneous constraints. Note that if vectorization
+   * is enabled, the DoF values for several cells are set.
    *
    * If some constraints on the vector are inhomogeneous, use the function
-   * read_dof_values_plain instead and provide the vector with useful data
-   * also in constrained positions by calling AffineConstraints::distribute.
-   * When accessing vector entries during the solution of linear systems, the
-   * temporary solution should always have homogeneous constraints and this
-   * method is the correct one.
+   * FEEvaluationBase::read_dof_values_plain() instead and provide the vector
+   * with useful data also in constrained positions by calling
+   * AffineConstraints::distribute(). When accessing vector entries during the
+   * solution of linear systems, the temporary solution should always have
+   * homogeneous constraints and this method is the correct one. Further
+   * information on how to apply inhomogeneous constraints with matrix-free
+   * operators can be found in the respective section of step-37.
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -163,14 +164,17 @@ public:
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
    * the current cell, and store them internally. Similar functionality as the
-   * function DoFAccessor::get_interpolated_dof_values. As opposed to the
-   * read_dof_values function, this function reads out the plain entries from
-   * vectors, without taking stored constraints into account. This way of
-   * access is appropriate when the constraints have been distributed on the
-   * vector by a call to AffineConstraints::distribute previously. This
-   * function is also necessary when inhomogeneous constraints are to be used,
-   * as MatrixFree can only handle homogeneous constraints. Note that if
-   * vectorization is enabled, the DoF values for several cells are set.
+   * function DoFCellAccessor::get_interpolated_dof_values(). As opposed to the
+   * FEEvaluationBase::read_dof_values() function, this function reads out the
+   * plain entries from vectors, without taking stored constraints into account.
+   * This way of access is appropriate when the constraints have been
+   * distributed on the vector by a call to AffineConstraints::distribute()
+   * previously. This function is also necessary when inhomogeneous constraints
+   * are to be used, as MatrixFree can only handle homogeneous constraints.
+   * Further information on how to apply inhomogeneous constraints with
+   * matrix-free operators can be found in the respective section of step-37.
+   * Note that if vectorization is enabled, the DoF values for several cells are
+   * set.
    *
    * If the given vector template class is a block vector (determined through
    * the template function 'IsBlockVector<VectorType>::value', which checks
@@ -6160,7 +6164,7 @@ inline FEEvaluation<dim,
                  dof_no,
                  quad_no,
                  first_selected_component,
-                 matrix_free.get_cell_active_fe_index(range))
+                 matrix_free.get_cell_active_fe_index(range, dof_no))
 {}
 
 
@@ -7511,13 +7515,17 @@ FEFaceEvaluation<dim,
               this->face_numbers[i] = faces.exterior_face_no;
             }
 
-          const bool   orientation_interior_face = faces.face_orientation >= 8;
-          unsigned int face_orientation          = faces.face_orientation % 8;
+          const bool orientation_interior_face = faces.face_orientation >= 8;
+          auto       face_orientation          = faces.face_orientation % 8;
           if (face_identifies_as_interior != orientation_interior_face)
             {
-              constexpr std::array<std::uint8_t, 8> table{
-                {0, 1, 6, 3, 4, 5, 2, 7}};
-              face_orientation = table[face_orientation];
+              Assert(this->matrix_free->get_cell_iterator(cell_index, i)
+                         ->reference_cell() ==
+                       ReferenceCells::get_hypercube<dim>(),
+                     ExcNotImplemented());
+              face_orientation =
+                ReferenceCells::get_hypercube<dim - 1>()
+                  .get_inverse_combined_orientation(face_orientation);
             }
           this->face_orientations[i] = face_orientation;
         }

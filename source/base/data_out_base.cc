@@ -7495,10 +7495,10 @@ namespace DataOutBase
     std::vector<std::uint64_t> chunk_sizes(n_ranks);
     int                        ierr = MPI_Gather(&my_size,
                           1,
-                          MPI_UINT64_T,
+                          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                           static_cast<std::uint64_t *>(chunk_sizes.data()),
                           1,
-                          MPI_UINT64_T,
+                          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                           0,
                           comm);
     AssertThrowMPI(ierr);
@@ -7533,7 +7533,7 @@ namespace DataOutBase
           /* offset = */ sizeof(header),
           chunk_sizes.data(),
           chunk_sizes.size(),
-          MPI_UINT64_T,
+          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
           MPI_STATUS_IGNORE);
         AssertThrowMPI(ierr);
       }
@@ -7541,7 +7541,12 @@ namespace DataOutBase
     // Write the main part on each rank:
     {
       std::uint64_t prefix_sum = 0;
-      ierr = MPI_Exscan(&my_size, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
+      ierr                     = MPI_Exscan(&my_size,
+                        &prefix_sum,
+                        1,
+                        Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                        MPI_SUM,
+                        comm);
       AssertThrowMPI(ierr);
 
       // Locate specific offset for each processor.
@@ -7792,8 +7797,12 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
     // Use prefix sum to find specific offset to write at.
     const std::uint64_t size_on_proc = ss.str().size();
     std::uint64_t       prefix_sum   = 0;
-    ierr =
-      MPI_Exscan(&size_on_proc, &prefix_sum, 1, MPI_UINT64_T, MPI_SUM, comm);
+    ierr                             = MPI_Exscan(&size_on_proc,
+                      &prefix_sum,
+                      1,
+                      Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                      MPI_SUM,
+                      comm);
     AssertThrowMPI(ierr);
 
     // Locate specific offset for each processor.
@@ -8021,7 +8030,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   int ierr = MPI_Allreduce(local_node_cell_count,
                            global_node_cell_count,
                            2,
-                           MPI_UINT64_T,
+                           Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                            MPI_SUM,
                            comm);
   AssertThrowMPI(ierr);
@@ -8239,17 +8248,18 @@ namespace
     std::uint64_t global_node_cell_offsets[2] = {0, 0};
 
 #  ifdef DEAL_II_WITH_MPI
-    int ierr = MPI_Allreduce(local_node_cell_count,
-                             global_node_cell_count,
-                             2,
-                             MPI_UINT64_T,
-                             MPI_SUM,
-                             comm);
+    int ierr =
+      MPI_Allreduce(local_node_cell_count,
+                    global_node_cell_count,
+                    2,
+                    Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                    MPI_SUM,
+                    comm);
     AssertThrowMPI(ierr);
     ierr = MPI_Exscan(local_node_cell_count,
                       global_node_cell_offsets,
                       2,
-                      MPI_UINT64_T,
+                      Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                       MPI_SUM,
                       comm);
     AssertThrowMPI(ierr);

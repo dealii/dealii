@@ -321,17 +321,20 @@ namespace Portable
                            for (unsigned int c = 0; c < n_components_; ++c)
                              shared_data->values(i, c) =
                                src[precomputed_data->local_to_global(
-                                 cell_id, i + tensor_dofs_per_component * c)];
+                                 i + tensor_dofs_per_component * c, cell_id)];
                          });
     data->team_member.team_barrier();
 
     for (unsigned int c = 0; c < n_components_; ++c)
       {
-        internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
-          data->team_member,
-          precomputed_data->constraint_weights,
-          precomputed_data->constraint_mask(cell_id * n_components + c),
-          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        if (precomputed_data->constraint_mask(cell_id * n_components + c) !=
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+              unconstrained)
+          internal::resolve_hanging_nodes<dim, fe_degree, false, Number>(
+            data->team_member,
+            precomputed_data->constraint_weights,
+            precomputed_data->constraint_mask(cell_id * n_components + c),
+            Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
   }
 
@@ -348,11 +351,14 @@ namespace Portable
   {
     for (unsigned int c = 0; c < n_components_; ++c)
       {
-        internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
-          data->team_member,
-          precomputed_data->constraint_weights,
-          precomputed_data->constraint_mask(cell_id * n_components + c),
-          Kokkos::subview(shared_data->values, Kokkos::ALL, c));
+        if (precomputed_data->constraint_mask(cell_id * n_components + c) !=
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds::
+              unconstrained)
+          internal::resolve_hanging_nodes<dim, fe_degree, true, Number>(
+            data->team_member,
+            precomputed_data->constraint_weights,
+            precomputed_data->constraint_mask(cell_id * n_components + c),
+            Kokkos::subview(shared_data->values, Kokkos::ALL, c));
       }
 
     if (precomputed_data->use_coloring)
@@ -362,7 +368,7 @@ namespace Portable
           [&](const int &i) {
             for (unsigned int c = 0; c < n_components_; ++c)
               dst[precomputed_data->local_to_global(
-                cell_id, i + tensor_dofs_per_component * c)] +=
+                i + tensor_dofs_per_component * c, cell_id)] +=
                 shared_data->values(i, c);
           });
       }
@@ -373,7 +379,7 @@ namespace Portable
           [&](const int &i) {
             for (unsigned int c = 0; c < n_components_; ++c)
               Kokkos::atomic_add(&dst[precomputed_data->local_to_global(
-                                   cell_id, i + (tensor_dofs_per_component)*c)],
+                                   i + (tensor_dofs_per_component)*c, cell_id)],
                                  shared_data->values(i, c));
           });
       }
@@ -542,13 +548,13 @@ namespace Portable
     if constexpr (n_components_ == 1)
       {
         shared_data->values(q_point, 0) =
-          val_in * precomputed_data->JxW(cell_id, q_point);
+          val_in * precomputed_data->JxW(q_point, cell_id);
       }
     else
       {
         for (unsigned int c = 0; c < n_components; ++c)
           shared_data->values(q_point, c) =
-            val_in[c] * precomputed_data->JxW(cell_id, q_point);
+            val_in[c] * precomputed_data->JxW(q_point, cell_id);
       }
   }
 
@@ -600,7 +606,7 @@ namespace Portable
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
               tmp +=
-                precomputed_data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                precomputed_data->inv_jacobian(q_point, cell_id, d_2, d_1) *
                 shared_data->gradients(q_point, d_2, 0);
             grad[d_1] = tmp;
           }
@@ -613,7 +619,7 @@ namespace Portable
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
                 tmp +=
-                  precomputed_data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                  precomputed_data->inv_jacobian(q_point, cell_id, d_2, d_1) *
                   shared_data->gradients(q_point, d_2, c);
               grad[c][d_1] = tmp;
             }
@@ -641,10 +647,10 @@ namespace Portable
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
               tmp +=
-                precomputed_data->inv_jacobian(cell_id, q_point, d_1, d_2) *
+                precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
                 grad_in[d_2];
             shared_data->gradients(q_point, d_1, 0) =
-              tmp * precomputed_data->JxW(cell_id, q_point);
+              tmp * precomputed_data->JxW(q_point, cell_id);
           }
       }
     else
@@ -655,10 +661,10 @@ namespace Portable
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
                 tmp +=
-                  precomputed_data->inv_jacobian(cell_id, q_point, d_1, d_2) *
+                  precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
                   grad_in[c][d_2];
               shared_data->gradients(q_point, d_1, c) =
-                tmp * precomputed_data->JxW(cell_id, q_point);
+                tmp * precomputed_data->JxW(q_point, cell_id);
             }
       }
   }

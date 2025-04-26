@@ -238,12 +238,13 @@ namespace Utilities
 
       types::global_dof_index my_shift = 0;
       {
-        const int ierr = MPI_Exscan(&my_size,
-                                    &my_shift,
-                                    1,
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    MPI_SUM,
-                                    communicator);
+        const int ierr = MPI_Exscan(
+          &my_size,
+          &my_shift,
+          1,
+          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
+          MPI_SUM,
+          communicator);
         AssertThrowMPI(ierr);
       }
 

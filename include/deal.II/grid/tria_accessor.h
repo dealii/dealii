@@ -4896,33 +4896,23 @@ namespace internal
       inline static void
       set_combined_face_orientation(
         const TriaAccessor<structdim, dim, spacedim> &accessor,
-        const unsigned int                            face,
+        const unsigned int                            face_no,
         const types::geometric_orientation            combined_orientation)
       {
         Assert(structdim == dim,
                ExcMessage("This function can only be used on objects that are "
                           "cells and not on objects which bound cells."));
-        AssertIndexRange(face, accessor.n_faces());
-
-        if (dim == 1)
-          Assert(combined_orientation == numbers::default_geometric_orientation,
-                 ExcMessage("In 1d, faces do not have an orientation, so the "
-                            "only valid value is the default."));
-        else if (dim == 2)
-          Assert(combined_orientation ==
-                     numbers::default_geometric_orientation ||
-                   combined_orientation == numbers::reverse_line_orientation,
-                 ExcMessage(
-                   "In 2d, the only valid values of the combined orientation "
-                   "are the standard orientation or the reversed line "
-                   "orientation."));
+        AssertIndexRange(face_no, accessor.n_faces());
+        AssertIndexRange(combined_orientation,
+                         accessor.reference_cell().n_face_orientations(
+                           face_no));
 
         // face_orientations is not set up in 1d
         if (dim != 1)
           accessor.tria->levels[accessor.present_level]
             ->face_orientations.set_combined_orientation(
               accessor.present_index * ReferenceCells::max_n_faces<dim>() +
-                face,
+                face_no,
               combined_orientation);
       }
 

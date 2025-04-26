@@ -65,10 +65,14 @@ public:
                                              n_components,
                                              Number,
                                              VectorizedArrayType> &)>
-         &cell_operation)
+                         &cell_operation,
+       const unsigned int dof_no  = 0,
+       const unsigned int quad_no = 0)
     : matrix_free(matrix_free)
     , constraints(constraints)
     , cell_operation(cell_operation)
+    , dof_no(dof_no)
+    , quad_no(quad_no)
   {}
 
   void
@@ -84,12 +88,12 @@ public:
                              (Utilities::MPI::n_mpi_processes(
                                 matrix_free.get_task_info().communicator) == 1);
 
+    const auto &dof_handler = matrix_free.get_dof_handler(dof_no);
+
     if (test_matrix)
       {
-        DynamicSparsityPattern dsp(matrix_free.get_dof_handler().n_dofs());
-        DoFTools::make_sparsity_pattern(matrix_free.get_dof_handler(),
-                                        dsp,
-                                        constraints);
+        DynamicSparsityPattern dsp(dof_handler.n_dofs());
+        DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
         sparsity_pattern.copy_from(dsp);
         A1.reinit(sparsity_pattern);
         A2.reinit(sparsity_pattern);
@@ -99,16 +103,18 @@ public:
     double error_local_1, error_local_2, error_global;
 
     {
-      matrix_free.initialize_dof_vector(diagonal_global);
+      matrix_free.initialize_dof_vector(diagonal_global, dof_no);
       MatrixFreeTools::compute_diagonal<dim,
                                         fe_degree,
                                         n_points,
                                         n_components,
                                         Number,
                                         VectorizedArrayType>(
-        matrix_free, diagonal_global, [&](auto &phi) {
-          this->cell_operation(phi);
-        });
+        matrix_free,
+        diagonal_global,
+        [&](auto &phi) { this->cell_operation(phi); },
+        dof_no,
+        quad_no);
 
       diagonal_global.print(deallog.get_file_stream());
       error_local_1 = diagonal_global.l2_norm();
@@ -117,11 +123,13 @@ public:
 
     {
       VectorType diagonal_global;
-      matrix_free.initialize_dof_vector(diagonal_global);
+      matrix_free.initialize_dof_vector(diagonal_global, dof_no);
       MatrixFreeTools::compute_diagonal(matrix_free,
                                         diagonal_global,
                                         &Test::cell_function,
-                                        this);
+                                        this,
+                                        dof_no,
+                                        quad_no);
 
       diagonal_global.print(deallog.get_file_stream());
       error_local_2 = diagonal_global.l2_norm();
@@ -139,24 +147,32 @@ public:
                                         Number,
                                         VectorizedArrayType,
                                         SparseMatrix<Number>>(
-          matrix_free, constraints, A1, [&](auto &phi) {
-            this->cell_operation(phi);
-          });
+          matrix_free,
+          constraints,
+          A1,
+          [&](auto &phi) { this->cell_operation(phi); },
+          dof_no,
+          quad_no);
       }
 
     if (test_matrix)
       {
-        MatrixFreeTools::compute_matrix(
-          matrix_free, constraints, A2, &Test::cell_function, this);
+        MatrixFreeTools::compute_matrix(matrix_free,
+                                        constraints,
+                                        A2,
+                                        &Test::cell_function,
+                                        this,
+                                        dof_no,
+                                        quad_no);
       }
 
     // compute diagonal globally
     {
       VectorType src, temp;
 
-      matrix_free.initialize_dof_vector(src);
-      matrix_free.initialize_dof_vector(diagonal_global_reference);
-      matrix_free.initialize_dof_vector(temp);
+      matrix_free.initialize_dof_vector(src, dof_no);
+      matrix_free.initialize_dof_vector(diagonal_global_reference, dof_no);
+      matrix_free.initialize_dof_vector(temp, dof_no);
 
       for (unsigned int i = 0; i < src.size(); ++i)
         {
@@ -223,7 +239,7 @@ public:
                  n_components,
                  Number,
                  VectorizedArrayType>
-      phi(data, pair);
+      phi(data, pair, dof_no, quad_no);
     for (auto cell = pair.first; cell < pair.second; ++cell)
       {
         phi.reinit(cell);
@@ -252,5 +268,7 @@ public:
                                         n_components,
                                         Number,
                                         VectorizedArrayType> &)>
-    cell_operation;
+                     cell_operation;
+  const unsigned int dof_no;
+  const unsigned int quad_no;
 };

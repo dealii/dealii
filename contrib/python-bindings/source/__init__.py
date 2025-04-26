@@ -12,6 +12,6 @@
 ##
 ## ------------------------------------------------------------------------
 
-__doc__ = 'PyDealII is just an empty shell. You need to either\n\
+__doc__ = "PyDealII is just an empty shell. You need to either\n\
            import PyDealII.Debug or PyDealII.Release. Do not\n\
-           import both of them.'
+           import both of them."

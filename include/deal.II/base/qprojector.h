@@ -58,11 +58,11 @@ class ReferenceCell;
  *
  * In practice, computing face integrals (e.g., via FEFaceValues or
  * FESubfaceValues) requires quadrature rules for all possible permutations of
- * face number, subface number, and orientation. This class provides several
- * functions for doing just that, such as QProjector::project_to_all_faces().
- * Furthermore, the DataSetDescriptor class implements indexing for converting
- * between face number, subface number, and orientation to the index of the
- * associated Quadrature rule.
+ * face number, subface number, and combined orientation. This class provides
+ * several functions for doing just that, such as
+ * QProjector::project_to_all_faces(). Furthermore, the DataSetDescriptor class
+ * implements indexing for converting between face number, subface number, and
+ * combined orientation to the index of the associated Quadrature rule.
  */
 template <int dim>
 class QProjector
@@ -136,7 +136,7 @@ public:
   project_to_face(const ReferenceCell               &reference_cell,
                   const SubQuadrature               &quadrature,
                   const unsigned int                 face_no,
-                  const types::geometric_orientation orientation);
+                  const types::geometric_orientation combined_orientation);
 
   /**
    * Compute the quadrature points on the cell if the given quadrature formula
@@ -147,12 +147,12 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
-   * @deprecated Use the version of project_to_face() which takes an
-   * orientation argument instead.
+   * @deprecated Use the version of project_to_subface() which takes a
+   * combined_orientation argument instead.
    */
   DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-    "Use the version of project_to_subface() which takes an orientation "
-    "argument instead.")
+    "Use the version of project_to_subface() which takes a "
+    "combined_orientation argument instead.")
   static void
   project_to_subface(const ReferenceCell           &reference_cell,
                      const SubQuadrature           &quadrature,
@@ -175,12 +175,12 @@ public:
    * that the cell is a line (1D), a quad (2d), or a hex (3d). Use the other
    * version of this function that takes the reference cell type instead.
    *
-   * @deprecated Use the version of project_to_face() which takes an
-   * orientation argument instead.
+   * @deprecated Use the version of project_to_subface() which takes a
+   * combined_orientation argument instead.
    */
   DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-    "Use the version of project_to_subface() which takes an orientation "
-    "argument instead.")
+    "Use the version of project_to_subface() which takes a "
+    "combined_orientation argument instead.")
   static Quadrature<dim>
   project_to_subface(const ReferenceCell           &reference_cell,
                      const SubQuadrature           &quadrature,
@@ -198,12 +198,12 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
-   * @deprecated Use the version of project_to_face() which takes an
-   * orientation argument instead.
+   * @deprecated Use the version of project_to_subface() which takes a
+   * combined_orientation argument instead.
    */
   DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-    "Use the version of project_to_subface() which takes an orientation "
-    "argument instead.")
+    "Use the version of project_to_subface() which takes a "
+    "combined_orientation argument instead.")
   static Quadrature<dim>
   project_to_oriented_subface(const ReferenceCell             &reference_cell,
                               const SubQuadrature             &quadrature,
@@ -222,19 +222,13 @@ public:
    *
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
-   *
-   * @deprecated Use the version of project_to_face() which takes an
-   * orientation argument instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
-    "Use the version of project_to_subface() which takes an orientation "
-    "argument instead.")
   static Quadrature<dim>
   project_to_subface(const ReferenceCell               &reference_cell,
                      const SubQuadrature               &quadrature,
                      const unsigned int                 face_no,
                      const unsigned int                 subface_no,
-                     const types::geometric_orientation orientation,
+                     const types::geometric_orientation combined_orientation,
                      const RefinementCase<dim - 1>     &ref_case);
 
   /**
@@ -251,8 +245,8 @@ public:
    * FEFaceValues.
    *
    * @note This function creates ReferenceCell::n_face_orientations() sets of
-   * quadrature points for each face which are indexed (by orientation and face
-   * number) by a DataSetDescriptor.
+   * quadrature points for each face which are indexed (by combined orientation
+   * and face number) by a DataSetDescriptor.
    */
   static Quadrature<dim>
   project_to_all_faces(const ReferenceCell            &reference_cell,
@@ -331,10 +325,10 @@ public:
    *
    * The functions QProjector::project_to_all_faces() and
    * QProjector::project_to_all_subfaces() each combine all quadrature rules
-   * (i.e., all possible combinations of face, subface, and orientation) into a
-   * single Quadrature object. DataSetDescriptor implements the correct indexing
-   * for extracting from that Quadrature rule the correct index for those
-   * values.
+   * (i.e., all possible combinations of face, subface, and combined
+   * orientation) into a single Quadrature object. DataSetDescriptor implements
+   * the correct indexing for extracting from that Quadrature rule the correct
+   * index for those values.
    */
   class DataSetDescriptor
   {
@@ -567,12 +561,6 @@ QProjector<3>::project_to_face(const ReferenceCell   &reference_cell,
                                const Quadrature<2>   &quadrature,
                                const unsigned int     face_no,
                                std::vector<Point<3>> &q_points);
-
-template <>
-Quadrature<1>
-QProjector<1>::project_to_all_faces(const ReferenceCell      &reference_cell,
-                                    const hp::QCollection<0> &quadrature);
-
 
 template <>
 void

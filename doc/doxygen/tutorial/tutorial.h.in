@@ -708,6 +708,12 @@
  *            using a DataPostprocessor for exporting solution and electrical field distribution
  *       <br/> Keywords: ParameterAcceptor, GridIn, DataOut, DataPostprocessor, PETScWrappers::SparseDirectMUMPS
  *       </td></tr>
+ * 
+ *   <tr valign="top">
+ *       <td>step-93</td>
+ *       <td> Using nonlocal dofs to solve a simple optimization problem with the Poisson equation
+ *       <br/> Keywords: nonlocal dofs, optimization, Poisson
+ *       </td></tr>
  * </table>
  *
  *

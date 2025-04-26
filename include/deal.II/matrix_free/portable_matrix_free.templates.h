@@ -168,8 +168,8 @@ namespace Portable
                      MemorySpace::Default::kokkos_space>(
           Kokkos::view_alloc("local_to_global_" + std::to_string(color),
                              Kokkos::WithoutInitializing),
-          n_cells,
-          dofs_per_cell);
+          dofs_per_cell,
+          n_cells);
 
       if (update_flags & update_quadrature_points)
         data->q_points[color] =
@@ -177,24 +177,24 @@ namespace Portable
                        MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("q_points_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            n_cells,
-            q_points_per_cell);
+            q_points_per_cell,
+            n_cells);
 
       if (update_flags & update_JxW_values)
         data->JxW[color] =
           Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("JxW_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            n_cells,
-            q_points_per_cell);
+            q_points_per_cell,
+            n_cells);
 
       if (update_flags & update_gradients)
         data->inv_jacobian[color] =
           Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            n_cells,
-            q_points_per_cell);
+            q_points_per_cell,
+            n_cells);
 
       // Initialize to zero, i.e., unconstrained cell
       data->constraint_mask[color] =
@@ -265,7 +265,7 @@ namespace Portable
                                           cell_id_view);
 
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            local_to_global_host(cell_id, i) = lexicographic_dof_indices[i];
+            local_to_global_host(i, cell_id) = lexicographic_dof_indices[i];
 
           fe_values.reinit(*cell);
 
@@ -273,13 +273,13 @@ namespace Portable
           if (update_flags & update_quadrature_points)
             {
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                q_points_host(cell_id, i) = fe_values.quadrature_point(i);
+                q_points_host(i, cell_id) = fe_values.quadrature_point(i);
             }
 
           if (update_flags & update_JxW_values)
             {
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
-                JxW_host(cell_id, i) = fe_values.JxW(i);
+                JxW_host(i, cell_id) = fe_values.JxW(i);
             }
 
           if (update_flags & update_gradients)
@@ -287,7 +287,7 @@ namespace Portable
               for (unsigned int i = 0; i < q_points_per_cell; ++i)
                 for (unsigned int d = 0; d < dim; ++d)
                   for (unsigned int e = 0; e < dim; ++e)
-                    inv_jacobian_host(cell_id, i, d, e) =
+                    inv_jacobian_host(i, cell_id, d, e) =
                       fe_values.inverse_jacobian(i)[d][e];
             }
         }

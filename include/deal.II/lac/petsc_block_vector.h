@@ -26,6 +26,8 @@
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+#  include <cstddef>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -140,7 +142,7 @@ namespace PETScWrappers
       /**
        * Create a BlockVector with an array of PETSc vectors.
        */
-      template <size_t num_blocks>
+      template <std::size_t num_blocks>
       explicit BlockVector(const std::array<Vec, num_blocks> &);
 
       /**
@@ -452,7 +454,7 @@ namespace PETScWrappers
 
 
 
-    template <size_t num_blocks>
+    template <std::size_t num_blocks>
     inline BlockVector::BlockVector(const std::array<Vec, num_blocks> &arrayV)
       : BlockVector()
     {
