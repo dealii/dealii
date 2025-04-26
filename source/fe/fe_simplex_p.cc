@@ -450,14 +450,8 @@ FE_SimplexPoly<dim, spacedim>::face_to_cell_index(
   AssertIndexRange(face_dof_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, this->reference_cell().n_faces());
 
-  // TODO: once the default orientation is switched to 0 then we can remove this
-  // special case for 1D.
-  if (dim == 1)
-    Assert(combined_orientation == numbers::default_geometric_orientation,
-           ExcMessage("In 1D, all faces must have the default orientation."));
-  else
-    AssertIndexRange(combined_orientation,
-                     this->reference_cell().n_face_orientations(face));
+  AssertIndexRange(combined_orientation,
+                   this->reference_cell().n_face_orientations(face));
 
   // we need to distinguish between DoFs on vertices, lines and in 3d quads.
   // do so in a sequence of if-else statements
