@@ -3802,13 +3802,9 @@ namespace DoFTools
           {
             Assert(!face_1->has_children(), ExcInternalError());
 
-            // Important note:
-            // In 3d we have to take care of the fact that face_rotation gives
-            // the relative rotation of face_1 to face_2, i.e. we have to invert
-            // the rotation when constraining face_2 to face_1. Therefore
-            // face_flip has to be toggled if face_rotation is true: In case of
-            // inverted orientation, nothing has to be done.
-
+            // since the combined_orientation describes how we should rotate
+            // face_1 to match face_2, we invert it to match the convention
+            // expected by set_periodicity_constraints()
             const auto face_reference_cell = face_1->reference_cell();
             internal::set_periodicity_constraints(
               face_1,
