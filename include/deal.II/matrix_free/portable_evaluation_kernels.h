@@ -72,7 +72,8 @@ namespace Portable
                                       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
       DEAL_II_HOST_DEVICE static void
-      evaluate(const unsigned int                            n_components,
+      evaluate(const unsigned int                            dof_handler_index,
+               const unsigned int                            n_components,
                const EvaluationFlags::EvaluationFlags        evaluation_flag,
                const typename MatrixFree<dim, Number>::Data *data)
       {
@@ -81,32 +82,37 @@ namespace Portable
 
         // the evaluator does not need temporary storage since no in-place
         // operation takes place in this function
-        auto scratch_for_eval = Kokkos::subview(data->shared_data->scratch_pad,
-                                                Kokkos::make_pair(0, 0));
+        auto scratch_for_eval =
+          Kokkos::subview(data->shared_data[dof_handler_index].scratch_pad,
+                          Kokkos::make_pair(0, 0));
         EvaluatorTensorProduct<EvaluatorVariant::evaluate_general,
                                dim,
                                fe_degree + 1,
                                n_q_points_1d,
                                Number>
           eval(data->team_member,
-               data->precomputed_data->shape_values,
-               data->precomputed_data->shape_gradients,
-               data->precomputed_data->co_shape_gradients,
+               data->precomputed_data[dof_handler_index].shape_values,
+               data->precomputed_data[dof_handler_index].shape_gradients,
+               data->precomputed_data[dof_handler_index].co_shape_gradients,
                scratch_for_eval);
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
-            auto u = Kokkos::subview(data->shared_data->values, Kokkos::ALL, c);
-            auto grad_u = Kokkos::subview(data->shared_data->gradients,
-                                          Kokkos::ALL,
-                                          Kokkos::ALL,
-                                          c);
+            auto u =
+              Kokkos::subview(data->shared_data[dof_handler_index].values,
+                              Kokkos::ALL,
+                              c);
+            auto grad_u =
+              Kokkos::subview(data->shared_data[dof_handler_index].gradients,
+                              Kokkos::ALL,
+                              Kokkos::ALL,
+                              c);
 
             if constexpr (dim == 1)
               {
-                auto temp =
-                  Kokkos::subview(data->shared_data->scratch_pad,
-                                  Kokkos::make_pair(0, n_q_points_1d));
+                auto temp = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(0, n_q_points_1d));
 
                 if (evaluation_flag & EvaluationFlags::gradients)
                   eval.template gradients<0, true, false, false>(
@@ -123,8 +129,9 @@ namespace Portable
             else if constexpr (dim == 2)
               {
                 constexpr int temp_size = (fe_degree + 1) * n_q_points_1d;
-                auto temp = Kokkos::subview(data->shared_data->scratch_pad,
-                                            Kokkos::make_pair(0, temp_size));
+                auto          temp      = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(0, temp_size));
 
                 // grad x
                 if (evaluation_flag & EvaluationFlags::gradients)
@@ -151,12 +158,12 @@ namespace Portable
                               temp2_size = Utilities::pow(n_q_points_1d, 2) *
                                            (fe_degree + 1);
 
-                auto temp1 = Kokkos::subview(data->shared_data->scratch_pad,
-                                             Kokkos::make_pair(0, temp1_size));
-                auto temp2 =
-                  Kokkos::subview(data->shared_data->scratch_pad,
-                                  Kokkos::make_pair(temp1_size,
-                                                    temp1_size + temp2_size));
+                auto temp1 = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(0, temp1_size));
+                auto temp2 = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(temp1_size, temp1_size + temp2_size));
 
                 if (evaluation_flag & EvaluationFlags::gradients)
                   {
@@ -197,7 +204,8 @@ namespace Portable
 
 
       DEAL_II_HOST_DEVICE static void
-      integrate(const unsigned int                            n_components,
+      integrate(const unsigned int                            dof_handler_index,
+                const unsigned int                            n_components,
                 const EvaluationFlags::EvaluationFlags        integration_flag,
                 const typename MatrixFree<dim, Number>::Data *data)
       {
@@ -206,32 +214,37 @@ namespace Portable
 
         // the evaluator does not need temporary storage since no in-place
         // operation takes place in this function
-        auto scratch_for_eval = Kokkos::subview(data->shared_data->scratch_pad,
-                                                Kokkos::make_pair(0, 0));
+        auto scratch_for_eval =
+          Kokkos::subview(data->shared_data[dof_handler_index].scratch_pad,
+                          Kokkos::make_pair(0, 0));
         EvaluatorTensorProduct<EvaluatorVariant::evaluate_general,
                                dim,
                                fe_degree + 1,
                                n_q_points_1d,
                                Number>
           eval(data->team_member,
-               data->precomputed_data->shape_values,
-               data->precomputed_data->shape_gradients,
-               data->precomputed_data->co_shape_gradients,
+               data->precomputed_data[dof_handler_index].shape_values,
+               data->precomputed_data[dof_handler_index].shape_gradients,
+               data->precomputed_data[dof_handler_index].co_shape_gradients,
                scratch_for_eval);
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
-            auto u = Kokkos::subview(data->shared_data->values, Kokkos::ALL, c);
-            auto grad_u = Kokkos::subview(data->shared_data->gradients,
-                                          Kokkos::ALL,
-                                          Kokkos::ALL,
-                                          c);
+            auto u =
+              Kokkos::subview(data->shared_data[dof_handler_index].values,
+                              Kokkos::ALL,
+                              c);
+            auto grad_u =
+              Kokkos::subview(data->shared_data[dof_handler_index].gradients,
+                              Kokkos::ALL,
+                              Kokkos::ALL,
+                              c);
 
             if constexpr (dim == 1)
               {
-                auto temp =
-                  Kokkos::subview(data->shared_data->scratch_pad,
-                                  Kokkos::make_pair(0, fe_degree + 1));
+                auto temp = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(0, fe_degree + 1));
 
                 if ((integration_flag & EvaluationFlags::values) &&
                     !(integration_flag & EvaluationFlags::gradients))
@@ -262,8 +275,9 @@ namespace Portable
             else if constexpr (dim == 2)
               {
                 constexpr int temp_size = (fe_degree + 1) * n_q_points_1d;
-                auto temp = Kokkos::subview(data->shared_data->scratch_pad,
-                                            Kokkos::make_pair(0, temp_size));
+                auto          temp      = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(0, temp_size));
 
                 if ((integration_flag & EvaluationFlags::values) &&
                     !(integration_flag & EvaluationFlags::gradients))
@@ -290,12 +304,12 @@ namespace Portable
                               temp2_size = Utilities::pow(fe_degree + 1, 2) *
                                            n_q_points_1d;
 
-                auto temp1 = Kokkos::subview(data->shared_data->scratch_pad,
-                                             Kokkos::make_pair(0, temp1_size));
-                auto temp2 =
-                  Kokkos::subview(data->shared_data->scratch_pad,
-                                  Kokkos::make_pair(temp1_size,
-                                                    temp1_size + temp2_size));
+                auto temp1 = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(0, temp1_size));
+                auto temp2 = Kokkos::subview(
+                  data->shared_data[dof_handler_index].scratch_pad,
+                  Kokkos::make_pair(temp1_size, temp1_size + temp2_size));
 
                 if ((integration_flag & EvaluationFlags::values) &&
                     !(integration_flag & EvaluationFlags::gradients))
@@ -346,7 +360,8 @@ namespace Portable
     struct FEEvaluationImplCollocation
     {
       DEAL_II_HOST_DEVICE static void
-      evaluate(const unsigned int                            n_components,
+      evaluate(const unsigned int                            dof_handler_index,
+               const unsigned int                            n_components,
                const EvaluationFlags::EvaluationFlags        evaluation_flag,
                const typename MatrixFree<dim, Number>::Data *data)
       {
@@ -357,8 +372,9 @@ namespace Portable
           return;
 
         constexpr int n_points = Utilities::pow(fe_degree + 1, dim);
-        auto scratch_for_eval  = Kokkos::subview(data->shared_data->scratch_pad,
-                                                Kokkos::make_pair(0, n_points));
+        auto          scratch_for_eval =
+          Kokkos::subview(data->shared_data[dof_handler_index].scratch_pad,
+                          Kokkos::make_pair(0, n_points));
 
         EvaluatorTensorProduct<EvaluatorVariant::evaluate_general,
                                dim,
@@ -366,18 +382,22 @@ namespace Portable
                                fe_degree + 1,
                                Number>
           eval(data->team_member,
-               data->precomputed_data->shape_values,
-               data->precomputed_data->shape_gradients,
-               data->precomputed_data->co_shape_gradients,
+               data->precomputed_data[dof_handler_index].shape_values,
+               data->precomputed_data[dof_handler_index].shape_gradients,
+               data->precomputed_data[dof_handler_index].co_shape_gradients,
                scratch_for_eval);
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
-            auto u = Kokkos::subview(data->shared_data->values, Kokkos::ALL, c);
-            auto grad_u = Kokkos::subview(data->shared_data->gradients,
-                                          Kokkos::ALL,
-                                          Kokkos::ALL,
-                                          c);
+            auto u =
+              Kokkos::subview(data->shared_data[dof_handler_index].values,
+                              Kokkos::ALL,
+                              c);
+            auto grad_u =
+              Kokkos::subview(data->shared_data[dof_handler_index].gradients,
+                              Kokkos::ALL,
+                              Kokkos::ALL,
+                              c);
 
             eval.template co_gradients<0, true, false, false>(
               u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
@@ -392,7 +412,8 @@ namespace Portable
 
 
       DEAL_II_HOST_DEVICE static void
-      integrate(const unsigned int                            n_components,
+      integrate(const unsigned int                            dof_handler_index,
+                const unsigned int                            n_components,
                 const EvaluationFlags::EvaluationFlags        integration_flag,
                 const typename MatrixFree<dim, Number>::Data *data)
       {
@@ -403,8 +424,9 @@ namespace Portable
           return;
 
         constexpr int n_points = Utilities::pow(fe_degree + 1, dim);
-        auto scratch_for_eval  = Kokkos::subview(data->shared_data->scratch_pad,
-                                                Kokkos::make_pair(0, n_points));
+        auto          scratch_for_eval =
+          Kokkos::subview(data->shared_data[dof_handler_index].scratch_pad,
+                          Kokkos::make_pair(0, n_points));
 
         EvaluatorTensorProduct<EvaluatorVariant::evaluate_general,
                                dim,
@@ -412,18 +434,22 @@ namespace Portable
                                fe_degree + 1,
                                Number>
           eval(data->team_member,
-               data->precomputed_data->shape_values,
-               data->precomputed_data->shape_gradients,
-               data->precomputed_data->co_shape_gradients,
+               data->precomputed_data[dof_handler_index].shape_values,
+               data->precomputed_data[dof_handler_index].shape_gradients,
+               data->precomputed_data[dof_handler_index].co_shape_gradients,
                scratch_for_eval);
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
-            auto u = Kokkos::subview(data->shared_data->values, Kokkos::ALL, c);
-            auto grad_u = Kokkos::subview(data->shared_data->gradients,
-                                          Kokkos::ALL,
-                                          Kokkos::ALL,
-                                          c);
+            auto u =
+              Kokkos::subview(data->shared_data[dof_handler_index].values,
+                              Kokkos::ALL,
+                              c);
+            auto grad_u =
+              Kokkos::subview(data->shared_data[dof_handler_index].gradients,
+                              Kokkos::ALL,
+                              Kokkos::ALL,
+                              c);
 
             if constexpr (dim == 1)
               {
@@ -480,13 +506,14 @@ namespace Portable
     struct FEEvaluationImplTransformToCollocation
     {
       DEAL_II_HOST_DEVICE static void
-      evaluate(const unsigned int                            n_components,
+      evaluate(const unsigned int                            dof_handler_index,
+               const unsigned int                            n_components,
                const EvaluationFlags::EvaluationFlags        evaluation_flag,
                const typename MatrixFree<dim, Number>::Data *data)
       {
         constexpr int scratch_size = Utilities::pow(n_q_points_1d, dim);
         auto          scratch_for_eval =
-          Kokkos::subview(data->shared_data->scratch_pad,
+          Kokkos::subview(data->shared_data[dof_handler_index].scratch_pad,
                           Kokkos::make_pair(0, scratch_size));
 
         EvaluatorTensorProduct<EvaluatorVariant::evaluate_general,
@@ -495,18 +522,22 @@ namespace Portable
                                n_q_points_1d,
                                Number>
           eval(data->team_member,
-               data->precomputed_data->shape_values,
-               data->precomputed_data->shape_gradients,
-               data->precomputed_data->co_shape_gradients,
+               data->precomputed_data[dof_handler_index].shape_values,
+               data->precomputed_data[dof_handler_index].shape_gradients,
+               data->precomputed_data[dof_handler_index].co_shape_gradients,
                scratch_for_eval);
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
-            auto u = Kokkos::subview(data->shared_data->values, Kokkos::ALL, c);
-            auto grad_u = Kokkos::subview(data->shared_data->gradients,
-                                          Kokkos::ALL,
-                                          Kokkos::ALL,
-                                          c);
+            auto u =
+              Kokkos::subview(data->shared_data[dof_handler_index].values,
+                              Kokkos::ALL,
+                              c);
+            auto grad_u =
+              Kokkos::subview(data->shared_data[dof_handler_index].gradients,
+                              Kokkos::ALL,
+                              Kokkos::ALL,
+                              c);
 
             eval.template values<0, true, false, true>(u, u);
             if constexpr (dim > 1)
@@ -530,13 +561,14 @@ namespace Portable
 
 
       DEAL_II_HOST_DEVICE static void
-      integrate(const unsigned int                            n_components,
+      integrate(const unsigned int                            dof_handler_index,
+                const unsigned int                            n_components,
                 const EvaluationFlags::EvaluationFlags        integration_flag,
                 const typename MatrixFree<dim, Number>::Data *data)
       {
         constexpr int scratch_size = Utilities::pow(n_q_points_1d, dim);
         auto          scratch_for_eval =
-          Kokkos::subview(data->shared_data->scratch_pad,
+          Kokkos::subview(data->shared_data[dof_handler_index].scratch_pad,
                           Kokkos::make_pair(0, scratch_size));
 
         EvaluatorTensorProduct<EvaluatorVariant::evaluate_general,
@@ -545,18 +577,22 @@ namespace Portable
                                n_q_points_1d,
                                Number>
           eval(data->team_member,
-               data->precomputed_data->shape_values,
-               data->precomputed_data->shape_gradients,
-               data->precomputed_data->co_shape_gradients,
+               data->precomputed_data[dof_handler_index].shape_values,
+               data->precomputed_data[dof_handler_index].shape_gradients,
+               data->precomputed_data[dof_handler_index].co_shape_gradients,
                scratch_for_eval);
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
-            auto u = Kokkos::subview(data->shared_data->values, Kokkos::ALL, c);
-            auto grad_u = Kokkos::subview(data->shared_data->gradients,
-                                          Kokkos::ALL,
-                                          Kokkos::ALL,
-                                          c);
+            auto u =
+              Kokkos::subview(data->shared_data[dof_handler_index].values,
+                              Kokkos::ALL,
+                              c);
+            auto grad_u =
+              Kokkos::subview(data->shared_data[dof_handler_index].gradients,
+                              Kokkos::ALL,
+                              Kokkos::ALL,
+                              c);
 
             // apply derivatives in collocation space
             if (integration_flag & EvaluationFlags::gradients)

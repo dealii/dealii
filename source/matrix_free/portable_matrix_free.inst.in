@@ -19,12 +19,12 @@ for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
     template class Portable::MatrixFree<deal_II_dimension, number>;
 
     template void
-      Portable::MatrixFree<deal_II_dimension, number>::initialize_dof_vector(
-        LinearAlgebra::distributed::Vector<number, MemorySpace::Host> & vec)
-        const;
+    Portable::MatrixFree<deal_II_dimension, number>::initialize_dof_vector(
+      LinearAlgebra::distributed::Vector<number, MemorySpace::Host> & vec,
+      const unsigned int dof_handler_index) const;
     template void
-      Portable::MatrixFree<deal_II_dimension, number>::initialize_dof_vector(
-        LinearAlgebra::distributed::Vector<number, MemorySpace::Default> & vec)
-        const;
+    Portable::MatrixFree<deal_II_dimension, number>::initialize_dof_vector(
+      LinearAlgebra::distributed::Vector<number, MemorySpace::Default> & vec,
+      const unsigned int dof_handler_index) const;
 #endif
   }
