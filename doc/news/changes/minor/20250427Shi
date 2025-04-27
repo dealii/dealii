@@ -1,0 +1,6 @@
+Fix: Add explicit instantiation for TpetraWrappers::BlockSparseMatrix::reinit
+(std::vector<IndexSet>, BlockDynamicSparsityPattern, MPI_Comm, bool) to fix
+missing symbol error when initializing Tpetra block matrices from
+distributed sparsity patterns.
+<br>
+(Qingyuan Shi, 2025/04/27)
