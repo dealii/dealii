@@ -1172,18 +1172,19 @@ public:
    * objects, this parameter allows to select a range of `n_components`
    * components starting from this parameter.
    *
-   * @param lexicographic_numbering If this class is used together with
-   * FEEvaluation this parameter should be set to 'true' because FEEvaluation
-   * stores the DoF values internally always in lexicographic numbering.
-   * Otherwise, the numbering detected from the FiniteElement passed to this
-   * class will be used (which is lexicographic for e.g. FE_DGQ but hierarchic
-   * for FE_Q).
+   * @param force_lexicographic_numbering By default, this class uses the DoF
+   * numbering detected from the FiniteElement passed to this class (which is
+   * lexicographic for e.g. FE_DGQ but hierarchic for FE_Q). However, it is
+   * possible to force a lexicographic numbering of DoFs instead by setting this
+   * parameter to true, which is useful if this class is used together with
+   * FEEvaluation, for instance. This is because DoF values within FEEvaluation
+   * are stored in lexicographic numbering.
    */
   FEPointEvaluation(const Mapping<dim, spacedim>       &mapping,
                     const FiniteElement<dim, spacedim> &fe,
                     const UpdateFlags                   update_flags,
-                    const unsigned int first_selected_component = 0,
-                    const bool         lexicographic_numbering  = false);
+                    const unsigned int first_selected_component      = 0,
+                    const bool         force_lexicographic_numbering = false);
 
   /**
    * Constructor to make the present class able to re-use the geometry
@@ -1201,18 +1202,19 @@ public:
    * objects, this parameter allows to select a range of `n_components`
    * components starting from this parameter.
    *
-   * @param lexicographic_numbering If this class is used together with
-   * FEEvaluation this parameter should be set to 'true' because FEEvaluation
-   * stores the DoF values internally always in lexicographic numbering.
-   * Otherwise, the numbering detected from the FiniteElement passed to this
-   * class will be used (which is lexicographic for e.g. FE_DGQ but hierarchic
-   * for FE_Q).
+   * @param force_lexicographic_numbering By default, this class uses the DoF
+   * numbering detected from the FiniteElement passed to this class (which is
+   * lexicographic for e.g. FE_DGQ but hierarchic for FE_Q). However, it is
+   * possible to force a lexicographic numbering of DoFs instead by setting this
+   * parameter to true, which is useful if this class is used together with
+   * FEEvaluation, for instance. This is because DoF values within FEEvaluation
+   * are stored in lexicographic numbering.
    */
   FEPointEvaluation(
     const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
     const FiniteElement<dim, spacedim>                    &fe,
-    const unsigned int first_selected_component = 0,
-    const bool         lexicographic_numbering  = false);
+    const unsigned int first_selected_component      = 0,
+    const bool         force_lexicographic_numbering = false);
 
   /**
    * Set up the mapping information for the given cell, e.g., by computing the
@@ -2377,12 +2379,13 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
   const FiniteElement<dim, spacedim>                    &fe,
   const unsigned int first_selected_component,
-  const bool         lexicographic_numbering)
+  const bool         force_lexicographic_numbering)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping_info,
       fe,
       first_selected_component)
-  , lexicographic_numbering(lexicographic_numbering || this->renumber.empty())
+  , lexicographic_numbering(force_lexicographic_numbering ||
+                            this->renumber.empty())
 {}
 
 
@@ -2393,13 +2396,14 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   const FiniteElement<dim, spacedim> &fe,
   const UpdateFlags                   update_flags,
   const unsigned int                  first_selected_component,
-  const bool                          lexicographic_numbering)
+  const bool                          force_lexicographic_numbering)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping,
       fe,
       update_flags,
       first_selected_component)
-  , lexicographic_numbering(lexicographic_numbering || this->renumber.empty())
+  , lexicographic_numbering(force_lexicographic_numbering ||
+                            this->renumber.empty())
 {}
 
 
