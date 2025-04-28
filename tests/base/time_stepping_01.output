@@ -7,6 +7,10 @@ DEAL::Strong Stability Preserving Runge-Kutta third order
 DEAL::0
 DEAL::Runge-Kutta fourth order
 DEAL::0
+DEAL::Runge-Kutta fifth order
+DEAL::0
+DEAL::Runge-Kutta sixth order
+DEAL::0
 DEAL::Low-storage Runge-Kutta stage 3 order 3
 DEAL::0
 DEAL::Low-storage Runge-Kutta stage 5 order 4
@@ -65,6 +69,22 @@ DEAL::3.95478
 DEAL::3.98399
 DEAL::3.99389
 DEAL::3.99746
+DEAL::Runge-Kutta fifth order
+DEAL::convergence rate
+DEAL::6.86518
+DEAL::4.45602
+DEAL::3.95502
+DEAL::4.64075
+DEAL::4.84314
+DEAL::4.88753
+DEAL::Runge-Kutta sixth order
+DEAL::convergence rate
+DEAL::5.18177
+DEAL::5.68249
+DEAL::5.87473
+DEAL::5.94764
+DEAL::5.97758
+DEAL::5.44730
 DEAL::Low-storage Runge-Kutta stage 3 order 3
 DEAL::convergence rate
 DEAL::2.65986
