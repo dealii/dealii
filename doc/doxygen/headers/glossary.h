@@ -2451,7 +2451,8 @@
  *     [line search algorithms](https://en.wikipedia.org/wiki/Line_search)
  *     where using a shorter step length might actually succeed.) In such
  *     cases, a user-provided callback function should throw an exception
- *     of type RecoverableUserCallbackError, which will then internally be
+ *     of type StandardExceptions::RecoverableUserCallbackError,
+ *     which will then internally be
  *     translated into an appropriate code understandable by the underlying
  *     library. It is worthwhile pointing out that a user callback throwing
  *     a "recoverable" exception does not actually guarantee that the
