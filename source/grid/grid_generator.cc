@@ -8041,8 +8041,8 @@ namespace GridGenerator
 
     // Boundary-faces 2d:
     // After converting, each of the 4 quadrilateral faces is defined by faces
-    // of 2 different triangles, i.e., lines. Note that lines are defined by 2
-    // vertices.
+    // of 2 different triangles, i.e., lines. The first value in each pair is
+    // the original face index and the second is the new line.
     static const std::
       array<std::pair<unsigned int, std::array<unsigned int, 2>>, 8>
         vertex_ids_for_boundary_faces_2d = {{{0, {{0, 4}}},
