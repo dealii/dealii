@@ -2378,24 +2378,35 @@ namespace GridGenerator
    * (quadrilaterals, hexahedra) to a triangulation only consisting of
    * simplices (triangles, tetrahedra).
    *
+   * The default splitting algorithm creates (in 2d) eight triangles for each
+   * quadrilateral and (in 3d) 24 tetrahedra for each hexahedron. These splits
+   * avoid creating mesh anisotropies by connecting the midpoint of each face to
+   * a vertex of that face. These values are encoded in the default value of @p
+   * n_divisions.
+   *
+   * Alternatively, one may split each quadrilateral into two triangles (by
+   * adding a line between vertex 1 and vertex 2) and each hexahedron into six
+   * tetrahedra (by adding a line between vertex 0 and vertex 7) by setting
+   * @p n_divisions to 2 or 6, respectively.
+   *
    * As an example, the following image shows how a set of four hexahedra
    * meshing one eighth of a sphere are subdivided into tetrahedra, and how
    * the curved surface is taken into account. Colors indicate how boundary
    * indicators are inherited:
    * @image html "convert_hypercube_to_simplex_mesh_visualization_octant.png"
    *
-   * In general, each quadrilateral in 2d is subdivided into eight triangles,
-   * and each hexahedron in 3d into 24 tetrahedra, as shown here (top left
-   * for the 2d case, the rest shows vertex numbers and subdivisions for
-   * a single 3d hexahedron):
    * @image html "convert_hypercube_to_simplex_mesh_visualization.png"
    *
    * Material ID and boundary IDs are inherited upon conversion.
    *
    * @param[in] in_tria The triangulation containing quadrilateral or
    *   hexahedral elements.
+   *
    * @param[out] out_tria The converted triangulation containing triangular or
    *   tetrahedral elements.
+   *
+   * @param[in] n_divisions The number of divisions for each hypercube cell.
+   *   Must be either 2 or 8 (the default) in 2d or 6 or 24 (the default) in 3d.
    *
    * @note No manifold objects are copied by this function: you must
    *   copy existing manifold objects from @p in_tria to @p out_tria, e.g.,
@@ -2418,7 +2429,10 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
-                                    Triangulation<dim, spacedim> &out_tria);
+                                    Triangulation<dim, spacedim> &out_tria,
+                                    const unsigned int n_divisions = (dim == 2 ?
+                                                                        8u :
+                                                                        24u));
 
   /**
    * Perform an Alfeld split (also called barycentric refinement) of a simplex

@@ -7991,13 +7991,23 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   convert_hypercube_to_simplex_mesh(const Triangulation<dim, spacedim> &in_tria,
-                                    Triangulation<dim, spacedim> &out_tria)
+                                    Triangulation<dim, spacedim> &out_tria,
+                                    const unsigned int            n_divisions)
   {
     if (dim == 1)
       {
         out_tria.copy_triangulation(in_tria);
         return;
       }
+    if (dim == 2)
+      AssertThrow(
+        n_divisions == 2 || n_divisions == 8,
+        ExcMessage(
+          "Quadrilaterals must be split into either 2 or 8 triangles."));
+    if (dim == 3)
+      AssertThrow(n_divisions == 6 || n_divisions == 24,
+                  ExcMessage(
+                    "Hexahedra must be split into either 6 or 24 tetrahedra."));
 
     AssertThrow(in_tria.all_reference_cells_are_hyper_cube(),
                 ExcMessage(
@@ -8019,8 +8029,8 @@ namespace GridGenerator
     // 3d, also inner-edges and boundary-edges need to be defined.
 
     // Cell definition 2d:
-    // A quadrilateral element is converted to 8 simplices elements. Each
-    // triangle is defined by 3 vertices.
+    static const ndarray<unsigned int, 2, 3> vertex_ids_for_cells_2d_2 = {
+      {{{0, 1, 2}}, {{3, 2, 1}}}};
     static const ndarray<unsigned int, 8, 3> vertex_ids_for_cells_2d_8 = {
       {{{0, 6, 4}},
        {{8, 4, 6}},
@@ -8031,11 +8041,17 @@ namespace GridGenerator
        {{8, 5, 7}},
        {{3, 7, 5}}}};
     const auto vertex_ids_for_cells_2d =
-      make_array_view(vertex_ids_for_cells_2d_8);
+      n_divisions == 2 ? make_array_view(vertex_ids_for_cells_2d_2) :
+                         make_array_view(vertex_ids_for_cells_2d_8);
 
     // Cell definition 3d:
-    // A hexahedron element is converted to 24 tetrahedron elements. Each
-    // tetrahedron is defined by 4 vertices.
+    static const ndarray<unsigned int, 6, 4> vertex_ids_for_cells_3d_6 = {
+      {{{0, 1, 3, 7}},
+       {{0, 1, 7, 5}},
+       {{0, 7, 3, 2}},
+       {{2, 6, 0, 7}},
+       {{4, 7, 5, 0}},
+       {{4, 6, 7, 0}}}};
     static const ndarray<unsigned int, 24, 4> vertex_ids_for_cells_3d_24 = {
       {{{0, 1, 12, 10}},  {{2, 3, 11, 12}},  {{7, 6, 11, 13}},
        {{5, 4, 13, 10}},  {{0, 2, 8, 12}},   {{4, 6, 13, 8}},
@@ -8045,9 +8061,17 @@ namespace GridGenerator
        {{12, 13, 8, 10}}, {{13, 8, 10, 4}},  {{13, 10, 9, 5}},
        {{13, 9, 11, 7}},  {{13, 11, 8, 6}},  {{10, 12, 9, 1}},
        {{9, 12, 11, 3}},  {{11, 12, 8, 2}},  {{8, 12, 10, 0}}}};
-    const auto vertex_ids_for_cells_3d = make_array_view(vertex_ids_for_cells_3d_24);
+
+    const auto vertex_ids_for_cells_3d =
+      n_divisions == 6 ? make_array_view(vertex_ids_for_cells_3d_6) :
+                         make_array_view(vertex_ids_for_cells_3d_24);
 
     // Boundary-faces 2d:
+    // For 2 new Triangles the lines are identical to the original.
+    static const std::
+      array<std::pair<unsigned int, std::array<unsigned int, 2>>, 4>
+        vertex_ids_for_boundary_faces_2d_2 = {
+          {{0, {{0, 2}}}, {1, {{1, 3}}}, {2, {{0, 1}}}, {3, {{2, 3}}}}};
     // After converting, each of the 4 quadrilateral faces is defined by faces
     // of 2 different triangles, i.e., lines. The first value in each pair is
     // the original face index and the second is the new line.
@@ -8062,9 +8086,25 @@ namespace GridGenerator
                                                       {3, {{2, 7}}},
                                                       {3, {{7, 3}}}}};
     const auto vertex_ids_for_boundary_faces_2d =
-      make_array_view(vertex_ids_for_boundary_faces_2d_8);
+      n_divisions == 2 ? make_array_view(vertex_ids_for_boundary_faces_2d_2) :
+                         make_array_view(vertex_ids_for_boundary_faces_2d_8);
 
     // Boundary-faces 3d:
+    // The minimal split creates two new triangles on each face.
+    static const std::
+      array<std::pair<unsigned int, std::array<unsigned int, 3>>, 12>
+        vertex_ids_for_boundary_faces_3d_6 = {{{0, {{2, 6, 0}}},
+                                               {0, {{6, 4, 0}}},
+                                               {1, {{3, 1, 7}}},
+                                               {1, {{7, 1, 5}}},
+                                               {2, {{1, 0, 5}}},
+                                               {2, {{4, 5, 0}}},
+                                               {3, {{6, 2, 7}}},
+                                               {3, {{3, 7, 2}}},
+                                               {4, {{0, 1, 3}}},
+                                               {4, {{0, 3, 2}}},
+                                               {5, {{4, 6, 7}}},
+                                               {5, {{4, 7, 5}}}}};
     // After converting, each of the 6 hexahedron faces corresponds to faces of
     // 4 different tetrahedron faces, i.e., triangles. Note that a triangle is
     // defined by 3 vertices.
@@ -8080,9 +8120,13 @@ namespace GridGenerator
            {4, {{12, 3, 2}}}, {4, {{0, 12, 2}}}, {5, {{4, 5, 13}}},
            {5, {{5, 13, 7}}}, {5, {{13, 7, 6}}}, {5, {{4, 13, 6}}}}};
     const auto vertex_ids_for_boundary_faces_3d =
-      make_array_view(vertex_ids_for_boundary_faces_3d_24);
+      n_divisions == 6 ? make_array_view(vertex_ids_for_boundary_faces_3d_6) :
+                         make_array_view(vertex_ids_for_boundary_faces_3d_24);
 
     // Inner-faces 2d:
+    // With a single split there is only one new internal face.
+    static const ndarray<unsigned int, 1, 2> vertex_ids_for_inner_faces_2d_2 = {
+      {{{1, 2}}}};
     // The converted triangulation based on simplices has 8 faces that do not
     // form the boundary, i.e. inner-faces, each defined by 2 vertices.
     static const ndarray<unsigned int, 8, 2> vertex_ids_for_inner_faces_2d_8 = {
@@ -8095,13 +8139,25 @@ namespace GridGenerator
        {{7, 8}},
        {{7, 5}}}};
     const auto vertex_ids_for_inner_faces_2d =
-      make_array_view(vertex_ids_for_inner_faces_2d_8);
+      n_divisions == 2 ? make_array_view(vertex_ids_for_inner_faces_2d_2) :
+                         make_array_view(vertex_ids_for_inner_faces_2d_8);
 
     // Inner-faces 3d:
+    // Note that all inner faces include vertices 0 and 7.
+    static const ndarray<unsigned int, 6, 3> vertex_ids_for_inner_faces_3d_6 = {
+      {
+        {{1, 0, 7}},
+        {{7, 0, 2}},
+        {{0, 7, 5}},
+        {{0, 3, 7}},
+        {{7, 4, 0}},
+        {{0, 6, 7}},
+      }};
     // The converted triangulation based on simplices has 72 faces that do not
     // form the boundary, i.e. inner-faces, each defined by 3 vertices.
     static const ndarray<unsigned int, 72, 3> vertex_ids_for_inner_faces_3d_24 =
-      {{{{0, 12, 10}},  {{12, 1, 10}},  {{12, 1, 9}},  {{12, 3, 9}},
+      {{
+        {{0, 12, 10}},  {{12, 1, 10}},  {{12, 1, 9}},  {{12, 3, 9}},
         {{12, 2, 11}},  {{12, 3, 11}},  {{12, 0, 8}},  {{12, 2, 8}},
         {{9, 13, 5}},   {{13, 7, 9}},   {{11, 7, 13}}, {{11, 6, 13}},
         {{4, 8, 13}},   {{6, 8, 13}},   {{4, 13, 10}}, {{13, 5, 10}},
@@ -8118,11 +8174,16 @@ namespace GridGenerator
         {{12, 13, 10}}, {{12, 13, 8}},  {{8, 10, 13}}, {{8, 10, 12}},
         {{12, 13, 10}}, {{12, 13, 9}},  {{10, 9, 13}}, {{10, 9, 12}},
         {{12, 13, 9}},  {{12, 13, 11}}, {{9, 11, 13}}, {{9, 11, 12}},
-        {{12, 13, 11}}, {{12, 13, 8}},  {{8, 11, 13}}, {{8, 11, 12}}}};
+        {{12, 13, 11}}, {{12, 13, 8}},  {{8, 11, 13}}, {{8, 11, 12}},
+      }};
     const auto vertex_ids_for_inner_faces_3d =
-      make_array_view(vertex_ids_for_inner_faces_3d_24);
+      n_divisions == 6 ? make_array_view(vertex_ids_for_inner_faces_3d_6) :
+                         make_array_view(vertex_ids_for_inner_faces_3d_24);
 
     // Inner-edges 3d:
+    // This split only requires a single new internal line.
+    static const ndarray<unsigned int, 1, 2> vertex_ids_for_inner_edges_3d_6 = {
+      {{{0, 7}}}};
     // The converted triangulation based on simplices has 60 edges that do not
     // coincide with the boundary, i.e. inner-edges, each defined by 2 vertices.
     static const ndarray<unsigned int, 60, 2> vertex_ids_for_inner_edges_3d_24 =
@@ -8137,13 +8198,24 @@ namespace GridGenerator
         {{12, 13}}, {{9, 11}},  {{9, 13}},  {{11, 13}}, {{9, 12}},  {{11, 12}},
         {{12, 13}}, {{11, 8}},  {{11, 13}}, {{8, 13}},  {{11, 12}}, {{8, 12}}}};
     const auto vertex_ids_for_inner_edges_3d =
-      make_array_view(vertex_ids_for_inner_edges_3d_24);
+      n_divisions == 6 ? make_array_view(vertex_ids_for_inner_edges_3d_6) :
+                         make_array_view(vertex_ids_for_inner_edges_3d_24);
 
     // Boundary-edges 3d:
     //
     // All implemented conversions re-use the existing 12 lines of each
     // hexahedron so those are not included in these tables.
-
+    //
+    // Since each boundary face has two tetrahedron faces, there is just one new
+    // line per face.
+    static const std::
+      array<std::pair<unsigned int, std::array<unsigned int, 2>>, 6>
+        vertex_ids_for_new_boundary_edges_3d_6 = {{{0, {{0, 6}}},
+                                                   {1, {{1, 7}}},
+                                                   {2, {{0, 5}}},
+                                                   {3, {{2, 7}}},
+                                                   {4, {{0, 3}}},
+                                                   {5, {{4, 7}}}}};
     // For each of the 6 boundary-faces of the hexahedron, there are 8 edges (of
     // different tetrahedrons) that coincide with the boundary, i.e.
     // boundary-edges. Each boundary-edge is defined by 2 vertices. 4 of these
@@ -8154,16 +8226,17 @@ namespace GridGenerator
     // require a lookup table.
     static const std::
       array<std::pair<unsigned int, std::array<unsigned int, 2>>, 24>
-        vertex_ids_for_new_boundary_edges_3d_24 = {{
-          {0, {{4, 8}}},  {0, {{6, 8}}},  {0, {{0, 8}}},  {0, {{2, 8}}},
-          {1, {{5, 9}}},  {1, {{7, 9}}},  {1, {{1, 9}}},  {1, {{3, 9}}},
-          {2, {{4, 10}}}, {2, {{5, 10}}}, {2, {{0, 10}}}, {2, {{1, 10}}},
-          {3, {{6, 11}}}, {3, {{7, 11}}}, {3, {{2, 11}}}, {3, {{3, 11}}},
-          {4, {{2, 12}}}, {4, {{3, 12}}}, {4, {{0, 12}}}, {4, {{1, 12}}},
-          {5, {{6, 13}}}, {5, {{7, 13}}}, {5, {{4, 13}}}, {5, {{5, 13}}},
-        }};
+        vertex_ids_for_new_boundary_edges_3d_24 = {
+          {{0, {{4, 8}}},  {0, {{6, 8}}},  {0, {{0, 8}}},  {0, {{2, 8}}},
+           {1, {{5, 9}}},  {1, {{7, 9}}},  {1, {{1, 9}}},  {1, {{3, 9}}},
+           {2, {{4, 10}}}, {2, {{5, 10}}}, {2, {{0, 10}}}, {2, {{1, 10}}},
+           {3, {{6, 11}}}, {3, {{7, 11}}}, {3, {{2, 11}}}, {3, {{3, 11}}},
+           {4, {{2, 12}}}, {4, {{3, 12}}}, {4, {{0, 12}}}, {4, {{1, 12}}},
+           {5, {{6, 13}}}, {5, {{7, 13}}}, {5, {{4, 13}}}, {5, {{5, 13}}}}};
     const auto vertex_ids_for_new_boundary_edges_3d =
-      make_array_view(vertex_ids_for_new_boundary_edges_3d_24);
+      n_divisions == 6 ?
+        make_array_view(vertex_ids_for_new_boundary_edges_3d_6) :
+        make_array_view(vertex_ids_for_new_boundary_edges_3d_24);
 
     std::vector<Point<spacedim>> vertices;
     std::vector<CellData<dim>>   cells;
@@ -8207,23 +8280,24 @@ namespace GridGenerator
           }
 
         // (ii) create new midpoint vertex locations for each face
-        for (const auto f : cell->face_indices())
-          {
-            const auto f_global = cell->face_index(f);
+        if constexpr (dim > 1)
+          for (const auto f : cell->face_indices())
+            {
+              const auto f_global = cell->face_index(f);
 
-            if (face_to_new_vertex_indices[f_global] ==
-                numbers::invalid_unsigned_int)
-              {
-                face_to_new_vertex_indices[f_global] = vertices.size();
-                vertices.push_back(
-                  cell->face(f)->center(/*respect_manifold*/ true));
-              }
+              if (face_to_new_vertex_indices[f_global] ==
+                  numbers::invalid_unsigned_int)
+                {
+                  face_to_new_vertex_indices[f_global] = vertices.size();
+                  vertices.push_back(
+                    cell->face(f)->center(/*respect_manifold*/ true));
+                }
 
-            AssertIndexRange(cell->n_vertices() + f,
-                             local_vertex_indices.size());
-            local_vertex_indices[cell->n_vertices() + f] =
-              face_to_new_vertex_indices[f_global];
-          }
+              AssertIndexRange(cell->n_vertices() + f,
+                               local_vertex_indices.size());
+              local_vertex_indices[cell->n_vertices() + f] =
+                face_to_new_vertex_indices[f_global];
+            }
 
         // (iii) create new midpoint vertex locations for each cell
         if (dim == 2)
