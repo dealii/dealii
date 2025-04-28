@@ -41,8 +41,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// .... MAPPING Q EULERIAN CONSTRUCTOR
-
 
 template <int dim, typename VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
@@ -55,7 +53,9 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   , euler_dof_handler(&euler_dof_handler)
   , level(level)
   , support_quadrature(degree)
-  , fe_values(euler_dof_handler.get_fe(),
+  , mapping_q(degree)
+  , fe_values(mapping_q,
+              euler_dof_handler.get_fe(),
               support_quadrature,
               update_values | update_quadrature_points)
 {}
@@ -71,8 +71,6 @@ MappingQEulerian<dim, VectorType, spacedim>::clone() const
 }
 
 
-
-// .... SUPPORT QUADRATURE CONSTRUCTOR
 
 template <int dim, typename VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
@@ -96,8 +94,6 @@ MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
 }
 
 
-
-// .... COMPUTE MAPPING SUPPORT POINTS
 
 template <int dim, typename VectorType, int spacedim>
 boost::container::small_vector<Point<spacedim>,

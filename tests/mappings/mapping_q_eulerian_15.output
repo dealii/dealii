@@ -1,0 +1,324 @@
+
+DEAL::Dim: 2. Spacedim: 2. Degree: 1
+DEAL::0.0
+DEAL::MappingQ: 0.858243 0.111089. MappingQEulerian: 0.858243 0.111089. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.759629 0.414590. MappingQEulerian: 0.759629 0.414590. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.581218 0.0752315. MappingQEulerian: 0.581218 0.0752315. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.514435 0.280768. MappingQEulerian: 0.514435 0.280768. Normalized difference: 0.00000 0.00000
+DEAL::0.1
+DEAL::MappingQ: 0.629036 0.594335. MappingQEulerian: 0.629036 0.594335. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.370863 0.781909. MappingQEulerian: 0.370863 0.781909. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.425995 0.402495. MappingQEulerian: 0.425995 0.402495. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.251156 0.529524. MappingQEulerian: 0.251156 0.529524. Normalized difference: 0.00000 0.00000
+DEAL::0.2
+DEAL::MappingQ: 0.159560 0.850566. MappingQEulerian: 0.159560 0.850566. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.159560 0.850566. MappingQEulerian: -0.159560 0.850566. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.108057 0.576019. MappingQEulerian: 0.108057 0.576019. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.108057 0.576019. MappingQEulerian: -0.108057 0.576019. Normalized difference: 0.00000 0.00000
+DEAL::0.3
+DEAL::MappingQ: -0.370863 0.781909. MappingQEulerian: -0.370863 0.781909. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.629036 0.594335. MappingQEulerian: -0.629036 0.594335. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.251156 0.529524. MappingQEulerian: -0.251156 0.529524. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.425995 0.402495. MappingQEulerian: -0.425995 0.402495. Normalized difference: 0.00000 0.00000
+DEAL::0.4
+DEAL::MappingQ: -0.759629 0.414590. MappingQEulerian: -0.759629 0.414590. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.858243 0.111089. MappingQEulerian: -0.858243 0.111089. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.514435 0.280768. MappingQEulerian: -0.514435 0.280768. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.581218 0.0752315. MappingQEulerian: -0.581218 0.0752315. Normalized difference: 0.00000 0.00000
+DEAL::0.5
+DEAL::MappingQ: -0.858243 -0.111089. MappingQEulerian: -0.858243 -0.111089. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.759629 -0.414590. MappingQEulerian: -0.759629 -0.414590. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.581218 -0.0752315. MappingQEulerian: -0.581218 -0.0752315. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.514435 -0.280768. MappingQEulerian: -0.514435 -0.280768. Normalized difference: 0.00000 0.00000
+DEAL::0.6
+DEAL::MappingQ: -0.629036 -0.594335. MappingQEulerian: -0.629036 -0.594335. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.370863 -0.781909. MappingQEulerian: -0.370863 -0.781909. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.425995 -0.402495. MappingQEulerian: -0.425995 -0.402495. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.251156 -0.529524. MappingQEulerian: -0.251156 -0.529524. Normalized difference: 0.00000 0.00000
+DEAL::0.7
+DEAL::MappingQ: -0.159560 -0.850566. MappingQEulerian: -0.159560 -0.850566. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.159560 -0.850566. MappingQEulerian: 0.159560 -0.850566. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.108057 -0.576019. MappingQEulerian: -0.108057 -0.576019. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.108057 -0.576019. MappingQEulerian: 0.108057 -0.576019. Normalized difference: 0.00000 0.00000
+DEAL::0.8
+DEAL::MappingQ: 0.370863 -0.781909. MappingQEulerian: 0.370863 -0.781909. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.629036 -0.594335. MappingQEulerian: 0.629036 -0.594335. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.251156 -0.529524. MappingQEulerian: 0.251156 -0.529524. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.425995 -0.402495. MappingQEulerian: 0.425995 -0.402495. Normalized difference: 0.00000 0.00000
+DEAL::0.9
+DEAL::MappingQ: 0.759629 -0.414590. MappingQEulerian: 0.759629 -0.414590. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.858243 -0.111089. MappingQEulerian: 0.858243 -0.111089. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.514435 -0.280768. MappingQEulerian: 0.514435 -0.280768. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.581218 -0.0752315. MappingQEulerian: 0.581218 -0.0752315. Normalized difference: 0.00000 0.00000
+DEAL::Dim: 2. Spacedim: 2. Degree: 2
+DEAL::0.0
+DEAL::MappingQ: 0.940908 0.0682203. MappingQEulerian: 0.940908 0.0682203. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.897464 0.291604. MappingQEulerian: 0.897464 0.291604. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.801309 0.497860. MappingQEulerian: 0.801309 0.497860. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.747821 0.0542206. MappingQEulerian: 0.747821 0.0542206. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.713292 0.231763. MappingQEulerian: 0.713292 0.231763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.636870 0.395693. MappingQEulerian: 0.636870 0.395693. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.554735 0.0402209. MappingQEulerian: 0.554735 0.0402209. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.529121 0.171922. MappingQEulerian: 0.529121 0.171922. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.472431 0.293525. MappingQEulerian: 0.472431 0.293525. Normalized difference: 0.00000 0.00000
+DEAL::0.1
+DEAL::MappingQ: 0.721112 0.608243. MappingQEulerian: 0.721112 0.608243. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.554663 0.763428. MappingQEulerian: 0.554663 0.763428. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.355638 0.873775. MappingQEulerian: 0.355638 0.873775. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.573130 0.483424. MappingQEulerian: 0.573130 0.483424. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.440839 0.606763. MappingQEulerian: 0.440839 0.606763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.282656 0.694465. MappingQEulerian: 0.282656 0.694465. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.425149 0.358604. MappingQEulerian: 0.425149 0.358604. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.327015 0.450097. MappingQEulerian: 0.327015 0.450097. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.209675 0.515155. MappingQEulerian: 0.209675 0.515155. Normalized difference: 0.00000 0.00000
+DEAL::0.2
+DEAL::MappingQ: 0.225875 0.915938. MappingQEulerian: 0.225875 0.915938. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 5.77818e-17 0.943649. MappingQEulerian: 5.77818e-17 0.943649. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.225875 0.915938. MappingQEulerian: -0.225875 0.915938. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.179523 0.727975. MappingQEulerian: 0.179523 0.727975. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 4.59243e-17 0.750000. MappingQEulerian: 4.59243e-17 0.750000. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.179523 0.727975. MappingQEulerian: -0.179523 0.727975. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.133170 0.540013. MappingQEulerian: 0.133170 0.540013. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 3.40667e-17 0.556351. MappingQEulerian: 3.40667e-17 0.556351. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.133170 0.540013. MappingQEulerian: -0.133170 0.540013. Normalized difference: 0.00000 0.00000
+DEAL::0.3
+DEAL::MappingQ: -0.355638 0.873775. MappingQEulerian: -0.355638 0.873775. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.554663 0.763428. MappingQEulerian: -0.554663 0.763428. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.721112 0.608243. MappingQEulerian: -0.721112 0.608243. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.282656 0.694465. MappingQEulerian: -0.282656 0.694465. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.440839 0.606763. MappingQEulerian: -0.440839 0.606763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.573130 0.483424. MappingQEulerian: -0.573130 0.483424. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.209675 0.515155. MappingQEulerian: -0.209675 0.515155. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.327015 0.450097. MappingQEulerian: -0.327015 0.450097. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.425149 0.358604. MappingQEulerian: -0.425149 0.358604. Normalized difference: 0.00000 0.00000
+DEAL::0.4
+DEAL::MappingQ: -0.801309 0.497860. MappingQEulerian: -0.801309 0.497860. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.897464 0.291604. MappingQEulerian: -0.897464 0.291604. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.940908 0.0682203. MappingQEulerian: -0.940908 0.0682203. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.636870 0.395693. MappingQEulerian: -0.636870 0.395693. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.713292 0.231763. MappingQEulerian: -0.713292 0.231763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.747821 0.0542206. MappingQEulerian: -0.747821 0.0542206. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.472431 0.293525. MappingQEulerian: -0.472431 0.293525. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.529121 0.171922. MappingQEulerian: -0.529121 0.171922. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.554735 0.0402209. MappingQEulerian: -0.554735 0.0402209. Normalized difference: 0.00000 0.00000
+DEAL::0.5
+DEAL::MappingQ: -0.940908 -0.0682203. MappingQEulerian: -0.940908 -0.0682203. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.897464 -0.291604. MappingQEulerian: -0.897464 -0.291604. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.801309 -0.497860. MappingQEulerian: -0.801309 -0.497860. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.747821 -0.0542206. MappingQEulerian: -0.747821 -0.0542206. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.713292 -0.231763. MappingQEulerian: -0.713292 -0.231763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.636870 -0.395693. MappingQEulerian: -0.636870 -0.395693. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.554735 -0.0402209. MappingQEulerian: -0.554735 -0.0402209. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.529121 -0.171922. MappingQEulerian: -0.529121 -0.171922. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.472431 -0.293525. MappingQEulerian: -0.472431 -0.293525. Normalized difference: 0.00000 0.00000
+DEAL::0.6
+DEAL::MappingQ: -0.721112 -0.608243. MappingQEulerian: -0.721112 -0.608243. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.554663 -0.763428. MappingQEulerian: -0.554663 -0.763428. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.355638 -0.873775. MappingQEulerian: -0.355638 -0.873775. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.573130 -0.483424. MappingQEulerian: -0.573130 -0.483424. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.440839 -0.606763. MappingQEulerian: -0.440839 -0.606763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.282656 -0.694465. MappingQEulerian: -0.282656 -0.694465. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.425149 -0.358604. MappingQEulerian: -0.425149 -0.358604. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.327015 -0.450097. MappingQEulerian: -0.327015 -0.450097. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.209675 -0.515155. MappingQEulerian: -0.209675 -0.515155. Normalized difference: 0.00000 0.00000
+DEAL::0.7
+DEAL::MappingQ: -0.225875 -0.915938. MappingQEulerian: -0.225875 -0.915938. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -1.73346e-16 -0.943649. MappingQEulerian: -1.73346e-16 -0.943649. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.225875 -0.915938. MappingQEulerian: 0.225875 -0.915938. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.179523 -0.727975. MappingQEulerian: -0.179523 -0.727975. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -1.37773e-16 -0.750000. MappingQEulerian: -1.37773e-16 -0.750000. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.179523 -0.727975. MappingQEulerian: 0.179523 -0.727975. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.133170 -0.540013. MappingQEulerian: -0.133170 -0.540013. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -1.02200e-16 -0.556351. MappingQEulerian: -1.02200e-16 -0.556351. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.133170 -0.540013. MappingQEulerian: 0.133170 -0.540013. Normalized difference: 0.00000 0.00000
+DEAL::0.8
+DEAL::MappingQ: 0.355638 -0.873775. MappingQEulerian: 0.355638 -0.873775. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.554663 -0.763428. MappingQEulerian: 0.554663 -0.763428. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.721112 -0.608243. MappingQEulerian: 0.721112 -0.608243. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.282656 -0.694465. MappingQEulerian: 0.282656 -0.694465. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.440839 -0.606763. MappingQEulerian: 0.440839 -0.606763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.573130 -0.483424. MappingQEulerian: 0.573130 -0.483424. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.209675 -0.515155. MappingQEulerian: 0.209675 -0.515155. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.327015 -0.450097. MappingQEulerian: 0.327015 -0.450097. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.425149 -0.358604. MappingQEulerian: 0.425149 -0.358604. Normalized difference: 0.00000 0.00000
+DEAL::0.9
+DEAL::MappingQ: 0.801309 -0.497860. MappingQEulerian: 0.801309 -0.497860. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.897464 -0.291604. MappingQEulerian: 0.897464 -0.291604. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.940908 -0.0682203. MappingQEulerian: 0.940908 -0.0682203. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.636870 -0.395693. MappingQEulerian: 0.636870 -0.395693. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.713292 -0.231763. MappingQEulerian: 0.713292 -0.231763. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.747821 -0.0542206. MappingQEulerian: 0.747821 -0.0542206. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.472431 -0.293525. MappingQEulerian: 0.472431 -0.293525. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.529121 -0.171922. MappingQEulerian: 0.529121 -0.171922. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.554735 -0.0402209. MappingQEulerian: 0.554735 -0.0402209. Normalized difference: 0.00000 0.00000
+DEAL::Dim: 2. Spacedim: 2. Degree: 3
+DEAL::0.0
+DEAL::MappingQ: 0.964418 0.0421115. MappingQEulerian: 0.964418 0.0421115. Normalized difference: 0.00000 7.18805e-18
+DEAL::MappingQ: 0.944579 0.198713. MappingQEulerian: 0.944579 0.198713. Normalized difference: 1.15019e-16 5.75093e-17
+DEAL::MappingQ: 0.880982 0.394448. MappingQEulerian: 0.880982 0.394448. Normalized difference: 2.30037e-16 1.15019e-16
+DEAL::MappingQ: 0.804983 0.532802. MappingQEulerian: 0.804983 0.532802. Normalized difference: 0.00000 1.15009e-16
+DEAL::MappingQ: 0.834246 0.0364275. MappingQEulerian: 0.834246 0.0364275. Normalized difference: 1.32954e-16 0.00000
+DEAL::MappingQ: 0.817085 0.171892. MappingQEulerian: 0.817085 0.171892. Normalized difference: -1.32966e-16 1.32966e-16
+DEAL::MappingQ: 0.762071 0.341207. MappingQEulerian: 0.762071 0.341207. Normalized difference: 1.32966e-16 1.32966e-16
+DEAL::MappingQ: 0.696331 0.460887. MappingQEulerian: 0.696331 0.460887. Normalized difference: 1.32954e-16 6.64771e-17
+DEAL::MappingQ: 0.664408 0.0290115. MappingQEulerian: 0.664408 0.0290115. Normalized difference: 5.00821e-16 -4.17351e-17
+DEAL::MappingQ: 0.650741 0.136898. MappingQEulerian: 0.650741 0.136898. Normalized difference: 1.66955e-16 8.34773e-17
+DEAL::MappingQ: 0.606927 0.271743. MappingQEulerian: 0.606927 0.271743. Normalized difference: 1.66955e-16 1.66955e-16
+DEAL::MappingQ: 0.554570 0.367059. MappingQEulerian: 0.554570 0.367059. Normalized difference: 5.00821e-16 8.34702e-17
+DEAL::MappingQ: 0.534236 0.0233275. MappingQEulerian: 0.534236 0.0233275. Normalized difference: 0.00000 -5.83923e-17
+DEAL::MappingQ: 0.523247 0.110076. MappingQEulerian: 0.523247 0.110076. Normalized difference: 2.07635e-16 0.00000
+DEAL::MappingQ: 0.488017 0.218503. MappingQEulerian: 0.488017 0.218503. Normalized difference: 4.15270e-16 5.19087e-17
+DEAL::MappingQ: 0.445918 0.295144. MappingQEulerian: 0.445918 0.295144. Normalized difference: 0.00000 0.00000
+DEAL::0.1
+DEAL::MappingQ: 0.755478 0.600940. MappingQEulerian: 0.755478 0.600940. Normalized difference: 0.00000 1.15009e-16
+DEAL::MappingQ: 0.647380 0.715972. MappingQEulerian: 0.647380 0.715972. Normalized difference: -1.15019e-16 1.15019e-16
+DEAL::MappingQ: 0.480879 0.836943. MappingQEulerian: 0.480879 0.836943. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.338072 0.904203. MappingQEulerian: 0.338072 0.904203. Normalized difference: 5.75044e-17 -1.15009e-16
+DEAL::MappingQ: 0.653508 0.519828. MappingQEulerian: 0.653508 0.519828. Normalized difference: 1.32954e-16 1.32954e-16
+DEAL::MappingQ: 0.560000 0.619334. MappingQEulerian: 0.560000 0.619334. Normalized difference: -1.32966e-16 2.65931e-16
+DEAL::MappingQ: 0.415972 0.723977. MappingQEulerian: 0.415972 0.723977. Normalized difference: -1.32966e-16 2.65931e-16
+DEAL::MappingQ: 0.292441 0.782159. MappingQEulerian: 0.292441 0.782159. Normalized difference: 0.00000 -1.32954e-16
+DEAL::MappingQ: 0.520465 0.414000. MappingQEulerian: 0.520465 0.414000. Normalized difference: 1.66940e-16 1.66940e-16
+DEAL::MappingQ: 0.445994 0.493248. MappingQEulerian: 0.445994 0.493248. Normalized difference: -8.34773e-17 3.33909e-16
+DEAL::MappingQ: 0.331287 0.576588. MappingQEulerian: 0.331287 0.576588. Normalized difference: 1.66955e-16 3.33909e-16
+DEAL::MappingQ: 0.232905 0.622925. MappingQEulerian: 0.232905 0.622925. Normalized difference: 0.00000 1.66940e-16
+DEAL::MappingQ: 0.418495 0.332889. MappingQEulerian: 0.418495 0.332889. Normalized difference: 0.00000 1.03809e-16
+DEAL::MappingQ: 0.358614 0.396610. MappingQEulerian: 0.358614 0.396610. Normalized difference: -2.07635e-16 1.03817e-16
+DEAL::MappingQ: 0.266381 0.463622. MappingQEulerian: 0.266381 0.463622. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.187274 0.500880. MappingQEulerian: 0.187274 0.500880. Normalized difference: -1.03809e-16 2.07617e-16
+DEAL::0.2
+DEAL::MappingQ: 0.257971 0.930230. MappingQEulerian: 0.257971 0.930230. Normalized difference: 5.75044e-17 0.00000
+DEAL::MappingQ: 0.102904 0.959754. MappingQEulerian: 0.102904 0.959754. Normalized difference: 0.00000 1.15019e-16
+DEAL::MappingQ: -0.102904 0.959754. MappingQEulerian: -0.102904 0.959754. Normalized difference: -1.43773e-17 1.15019e-16
+DEAL::MappingQ: -0.257971 0.930230. MappingQEulerian: -0.257971 0.930230. Normalized difference: 0.00000 1.15009e-16
+DEAL::MappingQ: 0.223152 0.804672. MappingQEulerian: 0.223152 0.804672. Normalized difference: 6.64771e-17 0.00000
+DEAL::MappingQ: 0.0890143 0.830212. MappingQEulerian: 0.0890143 0.830212. Normalized difference: -1.66207e-17 0.00000
+DEAL::MappingQ: -0.0890143 0.830212. MappingQEulerian: -0.0890143 0.830212. Normalized difference: -3.32414e-17 0.00000
+DEAL::MappingQ: -0.223152 0.804672. MappingQEulerian: -0.223152 0.804672. Normalized difference: 6.64771e-17 -1.32954e-16
+DEAL::MappingQ: 0.177722 0.640855. MappingQEulerian: 0.177722 0.640855. Normalized difference: 8.34702e-17 3.33881e-16
+DEAL::MappingQ: 0.0708926 0.661195. MappingQEulerian: 0.0708926 0.661195. Normalized difference: 2.08693e-17 3.33909e-16
+DEAL::MappingQ: -0.0708926 0.661195. MappingQEulerian: -0.0708926 0.661195. Normalized difference: -8.34773e-17 3.33909e-16
+DEAL::MappingQ: -0.177722 0.640855. MappingQEulerian: -0.177722 0.640855. Normalized difference: -8.34702e-17 1.66940e-16
+DEAL::MappingQ: 0.142902 0.515298. MappingQEulerian: 0.142902 0.515298. Normalized difference: 0.00000 -4.15234e-16
+DEAL::MappingQ: 0.0570032 0.531653. MappingQEulerian: 0.0570032 0.531653. Normalized difference: 0.00000 2.07635e-16
+DEAL::MappingQ: -0.0570032 0.531653. MappingQEulerian: -0.0570032 0.531653. Normalized difference: -2.59544e-17 2.07635e-16
+DEAL::MappingQ: -0.142902 0.515298. MappingQEulerian: -0.142902 0.515298. Normalized difference: 0.00000 -2.07617e-16
+DEAL::0.3
+DEAL::MappingQ: -0.338072 0.904203. MappingQEulerian: -0.338072 0.904203. Normalized difference: -1.15009e-16 1.15009e-16
+DEAL::MappingQ: -0.480879 0.836943. MappingQEulerian: -0.480879 0.836943. Normalized difference: 0.00000 2.30037e-16
+DEAL::MappingQ: -0.647380 0.715972. MappingQEulerian: -0.647380 0.715972. Normalized difference: -1.15019e-16 1.15019e-16
+DEAL::MappingQ: -0.755478 0.600940. MappingQEulerian: -0.755478 0.600940. Normalized difference: -1.15009e-16 1.15009e-16
+DEAL::MappingQ: -0.292441 0.782159. MappingQEulerian: -0.292441 0.782159. Normalized difference: 6.64771e-17 -1.32954e-16
+DEAL::MappingQ: -0.415972 0.723977. MappingQEulerian: -0.415972 0.723977. Normalized difference: 0.00000 1.32966e-16
+DEAL::MappingQ: -0.560000 0.619334. MappingQEulerian: -0.560000 0.619334. Normalized difference: 0.00000 2.65931e-16
+DEAL::MappingQ: -0.653508 0.519828. MappingQEulerian: -0.653508 0.519828. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.232905 0.622925. MappingQEulerian: -0.232905 0.622925. Normalized difference: 4.17351e-17 1.66940e-16
+DEAL::MappingQ: -0.331287 0.576588. MappingQEulerian: -0.331287 0.576588. Normalized difference: 0.00000 1.66955e-16
+DEAL::MappingQ: -0.445994 0.493248. MappingQEulerian: -0.445994 0.493248. Normalized difference: 0.00000 3.33909e-16
+DEAL::MappingQ: -0.520465 0.414000. MappingQEulerian: -0.520465 0.414000. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.187274 0.500880. MappingQEulerian: -0.187274 0.500880. Normalized difference: -5.19043e-17 2.07617e-16
+DEAL::MappingQ: -0.266381 0.463622. MappingQEulerian: -0.266381 0.463622. Normalized difference: 0.00000 1.03817e-16
+DEAL::MappingQ: -0.358614 0.396610. MappingQEulerian: -0.358614 0.396610. Normalized difference: 2.07635e-16 3.11452e-16
+DEAL::MappingQ: -0.418495 0.332889. MappingQEulerian: -0.418495 0.332889. Normalized difference: 2.07617e-16 0.00000
+DEAL::0.4
+DEAL::MappingQ: -0.804983 0.532802. MappingQEulerian: -0.804983 0.532802. Normalized difference: 0.00000 1.15009e-16
+DEAL::MappingQ: -0.880982 0.394448. MappingQEulerian: -0.880982 0.394448. Normalized difference: 2.30037e-16 1.15019e-16
+DEAL::MappingQ: -0.944579 0.198713. MappingQEulerian: -0.944579 0.198713. Normalized difference: 1.15019e-16 2.87547e-17
+DEAL::MappingQ: -0.964418 0.0421115. MappingQEulerian: -0.964418 0.0421115. Normalized difference: 0.00000 7.18805e-18
+DEAL::MappingQ: -0.696331 0.460887. MappingQEulerian: -0.696331 0.460887. Normalized difference: 0.00000 1.32954e-16
+DEAL::MappingQ: -0.762071 0.341207. MappingQEulerian: -0.762071 0.341207. Normalized difference: 0.00000 6.64828e-17
+DEAL::MappingQ: -0.817085 0.171892. MappingQEulerian: -0.817085 0.171892. Normalized difference: -1.32966e-16 3.32414e-17
+DEAL::MappingQ: -0.834246 0.0364275. MappingQEulerian: -0.834246 0.0364275. Normalized difference: 1.32954e-16 4.15482e-17
+DEAL::MappingQ: -0.554570 0.367059. MappingQEulerian: -0.554570 0.367059. Normalized difference: -3.33881e-16 0.00000
+DEAL::MappingQ: -0.606927 0.271743. MappingQEulerian: -0.606927 0.271743. Normalized difference: 0.00000 8.34773e-17
+DEAL::MappingQ: -0.650741 0.136898. MappingQEulerian: -0.650741 0.136898. Normalized difference: -1.66955e-16 -4.17387e-17
+DEAL::MappingQ: -0.664408 0.0290115. MappingQEulerian: -0.664408 0.0290115. Normalized difference: -5.00821e-16 1.56507e-17
+DEAL::MappingQ: -0.445918 0.295144. MappingQEulerian: -0.445918 0.295144. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.488017 0.218503. MappingQEulerian: -0.488017 0.218503. Normalized difference: 4.15270e-16 0.00000
+DEAL::MappingQ: -0.523247 0.110076. MappingQEulerian: -0.523247 0.110076. Normalized difference: -2.07635e-16 -5.19087e-17
+DEAL::MappingQ: -0.534236 0.0233275. MappingQEulerian: -0.534236 0.0233275. Normalized difference: 0.00000 -4.54162e-17
+DEAL::0.5
+DEAL::MappingQ: -0.964418 -0.0421115. MappingQEulerian: -0.964418 -0.0421115. Normalized difference: 0.00000 3.59403e-17
+DEAL::MappingQ: -0.944579 -0.198713. MappingQEulerian: -0.944579 -0.198713. Normalized difference: 0.00000 5.75093e-17
+DEAL::MappingQ: -0.880982 -0.394448. MappingQEulerian: -0.880982 -0.394448. Normalized difference: -1.15019e-16 -1.72528e-16
+DEAL::MappingQ: -0.804983 -0.532802. MappingQEulerian: -0.804983 -0.532802. Normalized difference: 1.15009e-16 0.00000
+DEAL::MappingQ: -0.834246 -0.0364275. MappingQEulerian: -0.834246 -0.0364275. Normalized difference: -1.32954e-16 6.64771e-17
+DEAL::MappingQ: -0.817085 -0.171892. MappingQEulerian: -0.817085 -0.171892. Normalized difference: 0.00000 9.97242e-17
+DEAL::MappingQ: -0.762071 -0.341207. MappingQEulerian: -0.762071 -0.341207. Normalized difference: -1.32966e-16 -6.64828e-17
+DEAL::MappingQ: -0.696331 -0.460887. MappingQEulerian: -0.696331 -0.460887. Normalized difference: 1.32954e-16 6.64771e-17
+DEAL::MappingQ: -0.664408 -0.0290115. MappingQEulerian: -0.664408 -0.0290115. Normalized difference: -1.66940e-16 -2.08676e-17
+DEAL::MappingQ: -0.650741 -0.136898. MappingQEulerian: -0.650741 -0.136898. Normalized difference: -3.33909e-16 -4.17387e-17
+DEAL::MappingQ: -0.606927 -0.271743. MappingQEulerian: -0.606927 -0.271743. Normalized difference: -5.00864e-16 -8.34773e-17
+DEAL::MappingQ: -0.554570 -0.367059. MappingQEulerian: -0.554570 -0.367059. Normalized difference: -1.66940e-16 -8.34702e-17
+DEAL::MappingQ: -0.534236 -0.0233275. MappingQEulerian: -0.534236 -0.0233275. Normalized difference: 0.00000 -3.89282e-17
+DEAL::MappingQ: -0.523247 -0.110076. MappingQEulerian: -0.523247 -0.110076. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.488017 -0.218503. MappingQEulerian: -0.488017 -0.218503. Normalized difference: -1.03817e-16 -1.03817e-16
+DEAL::MappingQ: -0.445918 -0.295144. MappingQEulerian: -0.445918 -0.295144. Normalized difference: 1.03809e-16 2.07617e-16
+DEAL::0.6
+DEAL::MappingQ: -0.755478 -0.600940. MappingQEulerian: -0.755478 -0.600940. Normalized difference: -1.15009e-16 1.15009e-16
+DEAL::MappingQ: -0.647380 -0.715972. MappingQEulerian: -0.647380 -0.715972. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.480879 -0.836943. MappingQEulerian: -0.480879 -0.836943. Normalized difference: -1.15019e-16 0.00000
+DEAL::MappingQ: -0.338072 -0.904203. MappingQEulerian: -0.338072 -0.904203. Normalized difference: -1.15009e-16 0.00000
+DEAL::MappingQ: -0.653508 -0.519828. MappingQEulerian: -0.653508 -0.519828. Normalized difference: -1.32954e-16 0.00000
+DEAL::MappingQ: -0.560000 -0.619334. MappingQEulerian: -0.560000 -0.619334. Normalized difference: 0.00000 1.32966e-16
+DEAL::MappingQ: -0.415972 -0.723977. MappingQEulerian: -0.415972 -0.723977. Normalized difference: -6.64828e-17 -1.32966e-16
+DEAL::MappingQ: -0.292441 -0.782159. MappingQEulerian: -0.292441 -0.782159. Normalized difference: -6.64771e-17 0.00000
+DEAL::MappingQ: -0.520465 -0.414000. MappingQEulerian: -0.520465 -0.414000. Normalized difference: -1.66940e-16 0.00000
+DEAL::MappingQ: -0.445994 -0.493248. MappingQEulerian: -0.445994 -0.493248. Normalized difference: -2.50432e-16 -8.34773e-17
+DEAL::MappingQ: -0.331287 -0.576588. MappingQEulerian: -0.331287 -0.576588. Normalized difference: -2.50432e-16 -1.66955e-16
+DEAL::MappingQ: -0.232905 -0.622925. MappingQEulerian: -0.232905 -0.622925. Normalized difference: -4.17351e-17 0.00000
+DEAL::MappingQ: -0.418495 -0.332889. MappingQEulerian: -0.418495 -0.332889. Normalized difference: -2.07617e-16 1.03809e-16
+DEAL::MappingQ: -0.358614 -0.396610. MappingQEulerian: -0.358614 -0.396610. Normalized difference: 0.00000 -1.03817e-16
+DEAL::MappingQ: -0.266381 -0.463622. MappingQEulerian: -0.266381 -0.463622. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.187274 -0.500880. MappingQEulerian: -0.187274 -0.500880. Normalized difference: 0.00000 0.00000
+DEAL::0.7
+DEAL::MappingQ: -0.257971 -0.930230. MappingQEulerian: -0.257971 -0.930230. Normalized difference: -5.75044e-17 -2.30018e-16
+DEAL::MappingQ: -0.102904 -0.959754. MappingQEulerian: -0.102904 -0.959754. Normalized difference: 0.00000 -1.15019e-16
+DEAL::MappingQ: 0.102904 -0.959754. MappingQEulerian: 0.102904 -0.959754. Normalized difference: 5.75093e-17 -3.45056e-16
+DEAL::MappingQ: 0.257971 -0.930230. MappingQEulerian: 0.257971 -0.930230. Normalized difference: 5.75044e-17 1.15009e-16
+DEAL::MappingQ: -0.223152 -0.804672. MappingQEulerian: -0.223152 -0.804672. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: -0.0890143 -0.830212. MappingQEulerian: -0.0890143 -0.830212. Normalized difference: 1.66207e-17 -1.32966e-16
+DEAL::MappingQ: 0.0890143 -0.830212. MappingQEulerian: 0.0890143 -0.830212. Normalized difference: 3.32414e-17 -3.98897e-16
+DEAL::MappingQ: 0.223152 -0.804672. MappingQEulerian: 0.223152 -0.804672. Normalized difference: -6.64771e-17 2.65909e-16
+DEAL::MappingQ: -0.177722 -0.640855. MappingQEulerian: -0.177722 -0.640855. Normalized difference: -8.34702e-17 -3.33881e-16
+DEAL::MappingQ: -0.0708926 -0.661195. MappingQEulerian: -0.0708926 -0.661195. Normalized difference: -2.08693e-17 -5.00864e-16
+DEAL::MappingQ: 0.0708926 -0.661195. MappingQEulerian: 0.0708926 -0.661195. Normalized difference: 4.17387e-17 -5.00864e-16
+DEAL::MappingQ: 0.177722 -0.640855. MappingQEulerian: 0.177722 -0.640855. Normalized difference: 0.00000 -3.33881e-16
+DEAL::MappingQ: -0.142902 -0.515298. MappingQEulerian: -0.142902 -0.515298. Normalized difference: -5.19043e-17 0.00000
+DEAL::MappingQ: -0.0570032 -0.531653. MappingQEulerian: -0.0570032 -0.531653. Normalized difference: 0.00000 -2.07635e-16
+DEAL::MappingQ: 0.0570032 -0.531653. MappingQEulerian: 0.0570032 -0.531653. Normalized difference: 5.19087e-17 -2.07635e-16
+DEAL::MappingQ: 0.142902 -0.515298. MappingQEulerian: 0.142902 -0.515298. Normalized difference: 0.00000 -2.07617e-16
+DEAL::0.8
+DEAL::MappingQ: 0.338072 -0.904203. MappingQEulerian: 0.338072 -0.904203. Normalized difference: 0.00000 -3.45026e-16
+DEAL::MappingQ: 0.480879 -0.836943. MappingQEulerian: 0.480879 -0.836943. Normalized difference: 1.72528e-16 0.00000
+DEAL::MappingQ: 0.647380 -0.715972. MappingQEulerian: 0.647380 -0.715972. Normalized difference: 2.30037e-16 0.00000
+DEAL::MappingQ: 0.755478 -0.600940. MappingQEulerian: 0.755478 -0.600940. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.292441 -0.782159. MappingQEulerian: 0.292441 -0.782159. Normalized difference: 0.00000 -1.32954e-16
+DEAL::MappingQ: 0.415972 -0.723977. MappingQEulerian: 0.415972 -0.723977. Normalized difference: 6.64828e-17 0.00000
+DEAL::MappingQ: 0.560000 -0.619334. MappingQEulerian: 0.560000 -0.619334. Normalized difference: 2.65931e-16 -2.65931e-16
+DEAL::MappingQ: 0.653508 -0.519828. MappingQEulerian: 0.653508 -0.519828. Normalized difference: 0.00000 1.32954e-16
+DEAL::MappingQ: 0.232905 -0.622925. MappingQEulerian: 0.232905 -0.622925. Normalized difference: -4.17351e-17 -5.00821e-16
+DEAL::MappingQ: 0.331287 -0.576588. MappingQEulerian: 0.331287 -0.576588. Normalized difference: 2.50432e-16 0.00000
+DEAL::MappingQ: 0.445994 -0.493248. MappingQEulerian: 0.445994 -0.493248. Normalized difference: 8.34773e-17 -3.33909e-16
+DEAL::MappingQ: 0.520465 -0.414000. MappingQEulerian: 0.520465 -0.414000. Normalized difference: 0.00000 8.34702e-17
+DEAL::MappingQ: 0.187274 -0.500880. MappingQEulerian: 0.187274 -0.500880. Normalized difference: -5.19043e-17 -2.07617e-16
+DEAL::MappingQ: 0.266381 -0.463622. MappingQEulerian: 0.266381 -0.463622. Normalized difference: 1.03817e-16 3.11452e-16
+DEAL::MappingQ: 0.358614 -0.396610. MappingQEulerian: 0.358614 -0.396610. Normalized difference: 2.07635e-16 0.00000
+DEAL::MappingQ: 0.418495 -0.332889. MappingQEulerian: 0.418495 -0.332889. Normalized difference: -3.11426e-16 1.03809e-16
+DEAL::0.9
+DEAL::MappingQ: 0.804983 -0.532802. MappingQEulerian: 0.804983 -0.532802. Normalized difference: 2.30018e-16 -1.15009e-16
+DEAL::MappingQ: 0.880982 -0.394448. MappingQEulerian: 0.880982 -0.394448. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.944579 -0.198713. MappingQEulerian: 0.944579 -0.198713. Normalized difference: 0.00000 -2.87547e-17
+DEAL::MappingQ: 0.964418 -0.0421115. MappingQEulerian: 0.964418 -0.0421115. Normalized difference: 1.15009e-16 7.18805e-18
+DEAL::MappingQ: 0.696331 -0.460887. MappingQEulerian: 0.696331 -0.460887. Normalized difference: 0.00000 -1.32954e-16
+DEAL::MappingQ: 0.762071 -0.341207. MappingQEulerian: 0.762071 -0.341207. Normalized difference: 0.00000 -6.64828e-17
+DEAL::MappingQ: 0.817085 -0.171892. MappingQEulerian: 0.817085 -0.171892. Normalized difference: 0.00000 -6.64828e-17
+DEAL::MappingQ: 0.834246 -0.0364275. MappingQEulerian: 0.834246 -0.0364275. Normalized difference: 0.00000 0.00000
+DEAL::MappingQ: 0.554570 -0.367059. MappingQEulerian: 0.554570 -0.367059. Normalized difference: 3.33881e-16 -1.66940e-16
+DEAL::MappingQ: 0.606927 -0.271743. MappingQEulerian: 0.606927 -0.271743. Normalized difference: 0.00000 -8.34773e-17
+DEAL::MappingQ: 0.650741 -0.136898. MappingQEulerian: 0.650741 -0.136898. Normalized difference: 3.33909e-16 0.00000
+DEAL::MappingQ: 0.664408 -0.0290115. MappingQEulerian: 0.664408 -0.0290115. Normalized difference: 0.00000 5.21689e-18
+DEAL::MappingQ: 0.445918 -0.295144. MappingQEulerian: 0.445918 -0.295144. Normalized difference: 1.03809e-16 2.07617e-16
+DEAL::MappingQ: 0.488017 -0.218503. MappingQEulerian: 0.488017 -0.218503. Normalized difference: -1.03817e-16 5.19087e-17
+DEAL::MappingQ: 0.523247 -0.110076. MappingQEulerian: 0.523247 -0.110076. Normalized difference: 0.00000 2.59544e-17
+DEAL::MappingQ: 0.534236 -0.0233275. MappingQEulerian: 0.534236 -0.0233275. Normalized difference: -2.07617e-16 -3.24402e-17
