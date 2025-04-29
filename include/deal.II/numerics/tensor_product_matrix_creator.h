@@ -90,7 +90,7 @@ namespace TensorProductMatrixCreator
 
 
   /**
-   * Computes a 1D cell mass matrix for a given finite element.This function is
+   * Compute a 1D cell mass matrix for a given finite element. This function is
    * intended to provide a mass matrix for tensor product operators.
    *
    * @param fe The finite element object defining the shape functions.
