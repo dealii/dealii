@@ -121,7 +121,7 @@ namespace TensorProductMatrixCreator
 
 
   /**
-   * Computes a 1D cell derivative matrix for a given finite element.
+   * Compute a 1D cell derivative matrix for a given finite element.
    *
    * @param fe The finite element object defining the shape functions.
    *
