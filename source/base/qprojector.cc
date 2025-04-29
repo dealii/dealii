@@ -1021,38 +1021,37 @@ QProjector<2>::project_to_all_subfaces(const ReferenceCell &reference_cell,
 
   const unsigned int dim = 2;
 
-  const unsigned int n_points = quadrature.size(),
-                     n_faces  = GeometryInfo<dim>::faces_per_cell,
-                     subfaces_per_face =
-                       GeometryInfo<dim>::max_children_per_face;
-
-  // first fix quadrature points
   std::vector<Point<dim>> q_points;
-  q_points.reserve(n_points * n_faces * subfaces_per_face);
-  std::vector<Point<dim>> help(n_points);
+  std::vector<double>     weights;
 
   // project to each face and copy
   // results
-  for (unsigned int face = 0; face < n_faces; ++face)
-    for (unsigned int subface = 0; subface < subfaces_per_face; ++subface)
-      {
-        project_to_subface(reference_cell, quadrature, face, subface, help);
-        std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-      }
-
-  // next copy over weights
-  std::vector<double> weights;
-  weights.reserve(n_points * n_faces * subfaces_per_face);
-  for (unsigned int face = 0; face < n_faces; ++face)
-    for (unsigned int subface = 0; subface < subfaces_per_face; ++subface)
-      std::copy(quadrature.get_weights().begin(),
-                quadrature.get_weights().end(),
-                std::back_inserter(weights));
-
-  Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
+  for (unsigned int face = 0; face < reference_cell.n_faces(); ++face)
+    for (types::geometric_orientation orientation = 0;
+         orientation < reference_cell.n_face_orientations(face);
+         ++orientation)
+      for (unsigned int subface = 0;
+           subface <
+           reference_cell.face_reference_cell(face).n_isotropic_children();
+           ++subface)
+        {
+          const unsigned int local_subface =
+            orientation == numbers::reverse_line_orientation ? 1 - subface :
+                                                               subface;
+          const auto sub_quadrature =
+            project_to_subface(reference_cell,
+                               quadrature,
+                               face,
+                               local_subface,
+                               orientation,
+                               RefinementCase<dim - 1>::isotropic_refinement);
+          q_points.insert(q_points.end(),
+                          sub_quadrature.get_points().begin(),
+                          sub_quadrature.get_points().end());
+          weights.insert(weights.end(),
+                         sub_quadrature.get_weights().begin(),
+                         sub_quadrature.get_weights().end());
+        }
 
   return Quadrature<dim>(std::move(q_points), std::move(weights));
 }
@@ -1425,21 +1424,27 @@ QProjector<1>::DataSetDescriptor::subface(
 template <>
 QProjector<2>::DataSetDescriptor
 QProjector<2>::DataSetDescriptor::subface(
-  const ReferenceCell &reference_cell,
-  const unsigned int   face_no,
-  const unsigned int   subface_no,
-  const types::geometric_orientation /*combined_orientation*/,
-  const unsigned int n_quadrature_points,
+  const ReferenceCell               &reference_cell,
+  const unsigned int                 face_no,
+  const unsigned int                 subface_no,
+  const types::geometric_orientation combined_orientation,
+  const unsigned int                 n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
   Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
-  (void)reference_cell;
 
-  Assert(face_no < GeometryInfo<2>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<2>::max_children_per_face,
-         ExcInternalError());
+  const unsigned int n_faces = reference_cell.n_faces();
+  const unsigned int n_subfaces =
+    reference_cell.face_reference_cell(face_no).n_isotropic_children();
+  const unsigned int n_orientations =
+    reference_cell.n_face_orientations(face_no);
 
-  return ((face_no * GeometryInfo<2>::max_children_per_face + subface_no) *
+  AssertIndexRange(face_no, n_faces);
+  AssertIndexRange(subface_no, n_subfaces);
+  AssertIndexRange(combined_orientation, n_orientations);
+
+  return ((face_no * n_orientations * n_subfaces +
+           combined_orientation * n_subfaces + subface_no) *
           n_quadrature_points);
 }
 
