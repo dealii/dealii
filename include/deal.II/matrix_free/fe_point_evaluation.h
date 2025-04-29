@@ -1171,11 +1171,20 @@ public:
    * @param first_selected_component For multi-component FiniteElement
    * objects, this parameter allows to select a range of `n_components`
    * components starting from this parameter.
+   *
+   * @param force_lexicographic_numbering By default, this class uses the DoF
+   * numbering detected from the FiniteElement passed to this class (which is
+   * lexicographic for e.g. FE_DGQ but hierarchic for FE_Q). However, it is
+   * possible to force a lexicographic numbering of DoFs instead by setting this
+   * parameter to true, which is useful if this class is used together with
+   * FEEvaluation, for instance. This is because DoF values within FEEvaluation
+   * are stored in lexicographic numbering.
    */
   FEPointEvaluation(const Mapping<dim, spacedim>       &mapping,
                     const FiniteElement<dim, spacedim> &fe,
                     const UpdateFlags                   update_flags,
-                    const unsigned int first_selected_component = 0);
+                    const unsigned int first_selected_component      = 0,
+                    const bool         force_lexicographic_numbering = false);
 
   /**
    * Constructor to make the present class able to re-use the geometry
@@ -1192,11 +1201,20 @@ public:
    * @param first_selected_component For multi-component FiniteElement
    * objects, this parameter allows to select a range of `n_components`
    * components starting from this parameter.
+   *
+   * @param force_lexicographic_numbering By default, this class uses the DoF
+   * numbering detected from the FiniteElement passed to this class (which is
+   * lexicographic for e.g. FE_DGQ but hierarchic for FE_Q). However, it is
+   * possible to force a lexicographic numbering of DoFs instead by setting this
+   * parameter to true, which is useful if this class is used together with
+   * FEEvaluation, for instance. This is because DoF values within FEEvaluation
+   * are stored in lexicographic numbering.
    */
   FEPointEvaluation(
     const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
     const FiniteElement<dim, spacedim>                    &fe,
-    const unsigned int first_selected_component = 0);
+    const unsigned int first_selected_component      = 0,
+    const bool         force_lexicographic_numbering = false);
 
   /**
    * Set up the mapping information for the given cell, e.g., by computing the
@@ -1410,6 +1428,8 @@ private:
     internal::VectorizedArrayTrait<VectorizedArrayType>::width();
   static constexpr std::size_t stride =
     internal::VectorizedArrayTrait<Number>::stride();
+
+  const bool lexicographic_numbering;
 
   /**
    * Resizes necessary data fields, reads in and renumbers solution values.
@@ -2358,11 +2378,14 @@ template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   const NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
   const FiniteElement<dim, spacedim>                    &fe,
-  const unsigned int first_selected_component)
+  const unsigned int first_selected_component,
+  const bool         force_lexicographic_numbering)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping_info,
       fe,
       first_selected_component)
+  , lexicographic_numbering(force_lexicographic_numbering ||
+                            this->renumber.empty())
 {}
 
 
@@ -2372,12 +2395,15 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
   const UpdateFlags                   update_flags,
-  const unsigned int                  first_selected_component)
+  const unsigned int                  first_selected_component,
+  const bool                          force_lexicographic_numbering)
   : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
       mapping,
       fe,
       update_flags,
       first_selected_component)
+  , lexicographic_numbering(force_lexicographic_numbering ||
+                            this->renumber.empty())
 {}
 
 
@@ -2632,7 +2658,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
       const std::size_t offset =
         (this->component_in_base_element + comp) * dofs_per_comp;
 
-      if ((is_linear && n_components == 1) || this->renumber.empty())
+      if ((is_linear && n_components == 1) || lexicographic_numbering)
         {
           for (unsigned int i = 0; i < dofs_per_comp; ++i)
             ETT::read_value(solution_values[i + offset],
@@ -2934,7 +2960,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
       const std::size_t offset =
         (this->component_in_base_element + comp) * dofs_per_comp;
 
-      if (is_linear || this->renumber.empty())
+      if (is_linear || lexicographic_numbering)
         {
           for (unsigned int i = 0; i < dofs_per_comp; ++i)
             if (sum_into_values)
