@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/point.h>
 
 #ifdef DEAL_II_WITH_PETSC
