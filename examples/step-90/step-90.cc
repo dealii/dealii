@@ -825,60 +825,67 @@ namespace Step90
             const std::optional<NonMatching::FEImmersedSurfaceValues<dim>>
               &surface_fe_values =
                 scratch_data.non_matching_fe_values.get_surface_fe_values();
-            const std::vector<double> &JxW_surface =
-              surface_fe_values->get_JxW_values();
 
-            // The accumulation of the surface integrals, including the forcing,
-            // is performed here.
-            for (unsigned int q : surface_fe_values->quadrature_point_indices())
+            if (surface_fe_values)
               {
-                const Tensor<1, dim> &normal =
-                  surface_fe_values->normal_vector(q);
+                const std::vector<double> &JxW_surface =
+                  surface_fe_values->get_JxW_values();
 
-                for (const unsigned int i : surface_fe_values->dof_indices())
+                // The accumulation of the surface integrals, including the
+                // forcing, is performed here.
+                for (unsigned int q :
+                     surface_fe_values->quadrature_point_indices())
                   {
-                    copy_data.cell_rhs(i) +=
-                      surface_fe_values->shape_value(i, q) *
-                      right_hand_side.value(
-                        surface_fe_values->quadrature_point(q)) *
-                      JxW_surface[q];
+                    const Tensor<1, dim> &normal =
+                      surface_fe_values->normal_vector(q);
 
-                    for (const unsigned int j :
+                    for (const unsigned int i :
                          surface_fe_values->dof_indices())
                       {
-                        copy_data.cell_matrix(i, j) +=
-                          (surface_fe_values->shape_value(i, q) *
-                           surface_fe_values->shape_value(j, q)) *
+                        copy_data.cell_rhs(i) +=
+                          surface_fe_values->shape_value(i, q) *
+                          right_hand_side.value(
+                            surface_fe_values->quadrature_point(q)) *
                           JxW_surface[q];
-                        copy_data.cell_matrix(i, j) +=
-                          (surface_fe_values->shape_grad(i, q) -
-                           (normal * surface_fe_values->shape_grad(i, q)) *
-                             normal) *
-                          (surface_fe_values->shape_grad(j, q) -
-                           (normal * surface_fe_values->shape_grad(j, q)) *
-                             normal) *
-                          JxW_surface[q];
+
+                        for (const unsigned int j :
+                             surface_fe_values->dof_indices())
+                          {
+                            copy_data.cell_matrix(i, j) +=
+                              (surface_fe_values->shape_value(i, q) *
+                               surface_fe_values->shape_value(j, q)) *
+                              JxW_surface[q];
+                            copy_data.cell_matrix(i, j) +=
+                              (surface_fe_values->shape_grad(i, q) -
+                               (normal * surface_fe_values->shape_grad(i, q)) *
+                                 normal) *
+                              (surface_fe_values->shape_grad(j, q) -
+                               (normal * surface_fe_values->shape_grad(j, q)) *
+                                 normal) *
+                              JxW_surface[q];
+                          }
                       }
                   }
-              }
 
-            // The normal-gradient volume stabilization form needs a bulk cell
-            // integration while other types of stabilization may need face
-            // quadratures, for example. So we check it first.
-            // The cell was provided by the solution's DoFHandler,
-            //  so we recast it as a level set's DoFHandler cell.
-            //  However, it is the same geometric entity of the common
-            //  triangulation.
-            if (stabilization_scheme.needs_cell_worker())
-              {
-                typename DoFHandler<dim>::active_cell_iterator level_set_cell =
-                  cell->as_dof_handler_iterator(level_set_dof_handler);
-                scratch_data.fe_values.reinit(cell);
-                scratch_data.level_set_fe_values.reinit(level_set_cell);
-                stabilization_scheme.assemble_cell_worker(level_set,
-                                                          cell,
-                                                          scratch_data,
-                                                          copy_data);
+                // The normal-gradient volume stabilization form needs a bulk
+                // cell integration while other types of stabilization may need
+                // face quadratures, for example. So we check it first. The cell
+                // was provided by the solution's DoFHandler,
+                //  so we recast it as a level set's DoFHandler cell.
+                //  However, it is the same geometric entity of the common
+                //  triangulation.
+                if (stabilization_scheme.needs_cell_worker())
+                  {
+                    typename DoFHandler<dim>::active_cell_iterator
+                      level_set_cell =
+                        cell->as_dof_handler_iterator(level_set_dof_handler);
+                    scratch_data.fe_values.reinit(cell);
+                    scratch_data.level_set_fe_values.reinit(level_set_cell);
+                    stabilization_scheme.assemble_cell_worker(level_set,
+                                                              cell,
+                                                              scratch_data,
+                                                              copy_data);
+                  }
               }
           }
       };
@@ -1001,51 +1008,57 @@ namespace Step90
           const std::optional<NonMatching::FEImmersedSurfaceValues<dim>>
             &surface_fe_values =
               scratch_data.non_matching_fe_values.get_surface_fe_values();
-          const std::vector<double> &JxW_surface =
-            surface_fe_values->get_JxW_values();
-          const unsigned int n_q_points =
-            surface_fe_values->n_quadrature_points;
 
-          std::vector<double> sol(n_q_points);
-          surface_fe_values->get_function_values(locally_relevant_solution,
-                                                 sol);
-
-          std::vector<Tensor<1, dim>> sol_grad(n_q_points);
-          surface_fe_values->get_function_gradients(locally_relevant_solution,
-                                                    sol_grad);
-
-          for (const unsigned int q :
-               surface_fe_values->quadrature_point_indices())
+          if (surface_fe_values)
             {
-              const Point<dim> &point = surface_fe_values->quadrature_point(q);
-              const Tensor<1, dim> &normal =
-                surface_fe_values->normal_vector(q);
-              const double error_at_point =
-                sol.at(q) - analytical_solution.value(point);
-              const Tensor<1, dim> grad_error_at_point =
-                (sol_grad.at(q) - (normal * sol_grad.at(q)) * normal -
-                 analytical_solution.gradient(point));
+              const std::vector<double> &JxW_surface =
+                surface_fe_values->get_JxW_values();
+              const unsigned int n_q_points =
+                surface_fe_values->n_quadrature_points;
 
-              cell_L2_error_sqr +=
-                Utilities::pow(error_at_point, 2) * JxW_surface[q];
-              cell_H1_error_sqr +=
-                grad_error_at_point * grad_error_at_point * JxW_surface[q];
-            }
-          copy_data.cell_L2_error_sqr = cell_L2_error_sqr;
-          copy_data.cell_H1_error_sqr = cell_H1_error_sqr;
+              std::vector<double> sol(n_q_points);
+              surface_fe_values->get_function_values(locally_relevant_solution,
+                                                     sol);
 
-          if (stabilization_scheme.needs_cell_worker())
-            {
-              typename DoFHandler<dim>::active_cell_iterator level_set_cell =
-                cell->as_dof_handler_iterator(level_set_dof_handler);
-              scratch_data.fe_values.reinit(cell);
-              scratch_data.level_set_fe_values.reinit(level_set_cell);
-              stabilization_scheme.evaluate_cell_worker(
-                locally_relevant_solution,
-                level_set,
-                cell,
-                scratch_data,
-                copy_data);
+              std::vector<Tensor<1, dim>> sol_grad(n_q_points);
+              surface_fe_values->get_function_gradients(
+                locally_relevant_solution, sol_grad);
+
+              for (const unsigned int q :
+                   surface_fe_values->quadrature_point_indices())
+                {
+                  const Point<dim> &point =
+                    surface_fe_values->quadrature_point(q);
+                  const Tensor<1, dim> &normal =
+                    surface_fe_values->normal_vector(q);
+                  const double error_at_point =
+                    sol.at(q) - analytical_solution.value(point);
+                  const Tensor<1, dim> grad_error_at_point =
+                    (sol_grad.at(q) - (normal * sol_grad.at(q)) * normal -
+                     analytical_solution.gradient(point));
+
+                  cell_L2_error_sqr +=
+                    Utilities::pow(error_at_point, 2) * JxW_surface[q];
+                  cell_H1_error_sqr +=
+                    grad_error_at_point * grad_error_at_point * JxW_surface[q];
+                }
+              copy_data.cell_L2_error_sqr = cell_L2_error_sqr;
+              copy_data.cell_H1_error_sqr = cell_H1_error_sqr;
+
+              if (stabilization_scheme.needs_cell_worker())
+                {
+                  typename DoFHandler<dim>::active_cell_iterator
+                    level_set_cell =
+                      cell->as_dof_handler_iterator(level_set_dof_handler);
+                  scratch_data.fe_values.reinit(cell);
+                  scratch_data.level_set_fe_values.reinit(level_set_cell);
+                  stabilization_scheme.evaluate_cell_worker(
+                    locally_relevant_solution,
+                    level_set,
+                    cell,
+                    scratch_data,
+                    copy_data);
+                }
             }
         }
     };
