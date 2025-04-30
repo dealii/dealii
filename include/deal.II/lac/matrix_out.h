@@ -121,7 +121,8 @@ public:
     bool discontinuous;
 
     /**
-     * By default, the MatrixOut class creates a plot in which each matrix
+     * If this flag is set to `false`, the MatrixOut class creates
+     * a plot in which each matrix
      * entry is actually shown, even if it is zero. For large
      * matrices, this results in very large output files, or indeed
      * exhausts the available memory. On the other hand, if the
@@ -130,6 +131,8 @@ public:
      * shown. For sparse matrices, this leads to an output size that
      * is proportional to the number of nonzero entries, rather than
      * proportional to $N^2$.
+     *
+     * The default is `true`.
      *
      * @note Internally, the current implementation continues to loop
      *   over all matrix entries, whether they are zero or not. As a
@@ -149,7 +152,7 @@ public:
     Options(const bool         show_absolute_values = false,
             const unsigned int block_size           = 1,
             const bool         discontinuous        = false,
-            const bool         create_sparse_plot   = false);
+            const bool         create_sparse_plot   = true);
   };
 
   /**
