@@ -1,0 +1,11 @@
+
+DEAL:cg::Starting value 21.8027
+DEAL:cg::Convergence step 86 value 0
+DEAL:cg::Starting value 0.0940512
+DEAL:cg::Convergence step 77 value 0
+DEAL:DirectKLU::Starting value 0
+DEAL:DirectKLU::Convergence step 0 value 0
+DEAL:DirectKLU::Norm of error in direct solve 1: 0
+DEAL:DirectKLU::Starting value 0
+DEAL:DirectKLU::Convergence step 0 value 0
+DEAL:DirectKLU::Norm of error in direct solve 2: 0

@@ -1,0 +1,23 @@
+
+DEAL::Creating sparsity pattern entry 0 1
+DEAL::Creating sparsity pattern entry 0 4
+DEAL::Creating sparsity pattern entry 1 2
+DEAL::Creating sparsity pattern entry 1 5
+DEAL::Creating sparsity pattern entry 2 0
+DEAL::Creating sparsity pattern entry 2 3
+DEAL::Creating sparsity pattern entry 2 6
+DEAL::Creating sparsity pattern entry 3 1
+DEAL::Creating sparsity pattern entry 3 4
+DEAL::Creating sparsity pattern entry 4 2
+DEAL::Creating sparsity pattern entry 4 5
+DEAL::0 1
+DEAL::0 4
+DEAL::1 2
+DEAL::1 5
+DEAL::2 0
+DEAL::2 3
+DEAL::2 6
+DEAL::3 1
+DEAL::3 4
+DEAL::4 2
+DEAL::4 5
