@@ -159,7 +159,24 @@ note that since the block matrix we use has many zeros on the
 diagonal, preconditioners like PreconditionJacobi will not work
 because they divide by diagonal entries. Instead, block
 preconditioners such as those discussed in step-20 or step-22 (among
-many others) will likely be useful.
+many others) will likely be useful. For block preconditioners, the
+key realizations is that the blocks of the system matrix
+@f{align*}{
+  \left(\begin{array}{c c c}
+  \mathcal{M} & -\mathcal{N}^T & 0\\
+  -\mathcal{N} & 0 & \mathcal{F}^T\\
+  0 & \mathcal{F} & 0
+  \end{array}\right)
+@f}
+can often individually be solved with quite efficiently; for example,
+$\mathcal{M}$ is a mass matrix that is easily solved with using a CG
+iteration, and $\mathcal N$ is a Laplace matrix for which CG with
+a geometric or algebraic multigrid preconditioner is very effective.
+Using the ideas of step-20 and step-22, we should then create a
+$3\times 3$ block preconditioner in which some blocks correspond to the
+inverses of $\mathcal{M}$ or $\mathcal{N}$, or some kind of Schur
+complement. A starting point for this kind of consideration is
+@cite Battermann_1998 .
 
 2. To validate the optimization problem is working correctly, we could
 try to match a target function which is itself a solution to the

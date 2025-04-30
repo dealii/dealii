@@ -149,7 +149,7 @@ idealized system to solve:
   0 & \mathcal{F} & 0
   \end{array}\right)
   \left(\begin{array}{c}
-  U\\\Lambda\\ C
+  U\\ \Lambda \\ C
   \end{array}\right) =
   \left(\begin{array}{c}
   \overline{\mathcal{U}}\\0\\0
