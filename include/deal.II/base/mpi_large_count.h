@@ -31,15 +31,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-#  ifndef MPI_VERSION
-#    error "Your MPI implementation does not define MPI_VERSION!"
-#  endif
-
-#  if MPI_VERSION < 3
-#    error "BigMPICompat requires at least MPI 3.0"
-#  endif
-
-
 // required for std::numeric_limits used below.
 #  include <limits>
 
