@@ -20,6 +20,9 @@
 #include <deal.II/base/geometry_info.h>
 
 #ifdef DEAL_II_WITH_P4EST
+
+#  include <deal.II/base/mpi_stub.h>
+
 #  include <p4est_bits.h>
 #  include <p4est_communication.h>
 #  include <p4est_extended.h>
