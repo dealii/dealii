@@ -12,6 +12,7 @@
 //
 // ------------------------------------------------------------------------
 
+
 #include <deal.II/base/parameter_handler.h>
 
 #include <deal.II/lac/vector.h>
@@ -20,21 +21,14 @@
 
 #include "../tests.h"
 
-// Solve a nonlinear system with Newton's method in which we report
-// recoverable failures when getting too far away from the solution,
-// forcing KINSOL to do some backtracking before getting back into the
-// region where we are willing to evaluate the residual.
+
+// Like the kinsol_06 test, but let the residual callback fail
+// consistently. KINSOL will just give up after a few tries, and we
+// should get a catchable exception.
 //
-// Specifically, we solve the nonlinear problem
-//
-// F(u) = atan(u)-0.5 = 0
-//
-// starting at u=10; This is a well-known problematic case because the
-// tangent to the curve gets us far far too the left in the first
-// iteration, and we use this to test the ability of KINSOL to deal
-// with recoverable failures: We pretend that we can't evaluate the
-// residual at that point, but the backtracking line search eventually
-// gets us back to the region where things work just fine.
+// This testcase is a variation of the kinsol_06 test, modified by
+// Simon Wiesheier, and posted on the mailing list. Then further
+// adapted by Wolfgang Bangerth.
 
 
 int
@@ -51,7 +45,7 @@ main()
   ParameterHandler                             prm;
   data.add_parameters(prm);
 
-  std::ifstream ifile(SOURCE_DIR "/kinsol_newton.prm");
+  std::ifstream ifile(SOURCE_DIR "/kinsol_06_v2_input.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
@@ -59,13 +53,17 @@ main()
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
   kinsol.residual = [&](const VectorType &u, VectorType &F) {
-    deallog << "Computing residual at " << u[0] << std::endl;
-
-    if ((u[0] < -10) || (u[0] > 20))
+    // Count how many times this function has been called. Let it call
+    // *every* time after the first attempt:
+    static int count = 0;
+    deallog << "Computing residual for the " << count + 1
+            << "th time, at u=" << u[0] << std::endl;
+    if ((u[0] < -10) || (u[0] > 20) || (count > 0))
       {
         deallog << "Reporting recoverable failure." << std::endl;
         throw RecoverableUserCallbackError();
       }
+    count++;
 
 
     F.reinit(u);
@@ -90,9 +88,14 @@ main()
   VectorType v(N);
   v[0] = 10;
 
-  auto niter = kinsol.solve(v);
-
-  deallog << "Found solution at " << std::flush;
-  v.print(deallog.get_file_stream());
-  deallog << "Converged in " << niter << " iterations." << std::endl;
+  try
+    {
+      auto niter = kinsol.solve(v);
+    }
+  catch (const std::exception &e)
+    {
+      deallog << "KINSOL threw an exception with the following message:"
+              << std::endl
+              << e.what() << std::endl;
+    }
 }
