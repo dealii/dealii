@@ -57,6 +57,25 @@ namespace internal
 
 } // namespace internal
 
+/**
+ * @brief A class that provides evaluation capabilities for finite element
+ * data on patches of cells.
+ *
+ * This class builds upon FEEvaluation to handle data associated with patches
+ * of cells, which are typically used in algorithms like geometric multigrid or
+ * patch smoothers. It manages the distribution and gathering of degrees of
+ * freedom (DoFs) between the patch representation and the local cell-based
+ * representation used by FEEvaluation.
+ *
+ * @tparam FEEval The underlying FEEvaluation type used for cell-local
+ *   evaluations.
+ * @tparam Distributor A class responsible for mapping between patch DoFs and
+ *   local cell DoFs. It handles potential overlaps and duplications.
+ * @tparam vectorizaton Specifies the vectorization strategy. Currently, only
+ *   `within_patch` is supported, implying vectorization occurs across
+ *   lanes within a single patch evaluation. `over_patches` is reserved for
+ *   future use.
+ */
 template <typename FEEval,
           typename Distributor,
           VectorizationType vectorizaton = within_patch>
@@ -80,42 +99,174 @@ public:
   using PatchStorageType = PatchStorage<MatrixFree<dim, Number>>;
   using CellDofsViewRaw  = StridedArrayView<Number, n_lanes>;
 
+  /**
+   * @brief Constructor for FEPatchEvaluation.
+   *
+   * Initializes the FEPatchEvaluation object with the provided patch storage
+   * and a base FEEvaluation object. It sets up the internal data structures,
+   * including the array of FEEvaluation instances (currently only one is
+   * supported) and the views into the cell DoF data. It also verifies that
+   * the MatrixFree object associated with the storage and the FEEvaluation
+   * object are the same.
+   *
+   * @param storage A constant reference to the PatchStorage object that
+   *   manages the patch data.
+   * @param fe_eval A constant reference to the FEEvaluation object to be used
+   *   as a template for the internal evaluators.
+   */
   FEPatchEvaluation(const PatchStorageType &storage, const FEEval &fe_eval);
 
+  /**
+   * @brief Reinitializes the FEPatchEvaluation for a specific patch.
+   *
+   * This function prepares the FEPatchEvaluation object to work with the
+   * patch identified by `patch_index`. It reinitializes the underlying
+   * FEEvaluation object(s) with the cells belonging to the specified patch
+   * and updates the internal state, including the `current_patch_index`.
+   *
+   * @param patch_index The index of the patch to reinitialize for.
+   */
   void
   reinit(const std::size_t patch_index);
 
+  /**
+   * @brief Returns the total number of unique degrees of freedom associated
+   * with the current patch.
+   *
+   * This value is determined by the Distributor object.
+   *
+   * @return The number of patch degrees of freedom.
+   */
   constexpr unsigned int
   n_patch_dofs() const;
 
+  /**
+   * @brief Returns the index of the patch currently associated with this
+   * FEPatchEvaluation object.
+   *
+   * This index corresponds to the `patch_index` passed to the last call to
+   * `reinit()`.
+   *
+   * @return A constant reference to the current patch index.
+   */
   const unsigned int &
   get_current_patch_index() const;
 
+  /**
+   * @brief Distributes values from a patch vector to the local cell DoF
+   * storage.
+   *
+   * This function takes a vector representing the DoF values for the entire
+   * patch and distributes them into the internal cell-based storage managed
+   * by the underlying FEEvaluation object(s). The Distributor handles the
+   * mapping.
+   *
+   * @tparam NumberType The data type of the values in the patch vector.
+   * @param patch_vector An ArrayView containing the patch DoF values. Its
+   *   size must match `n_patch_dofs()`.
+   * @param copy_duplicates A flag indicating how to handle DoFs that
+   *   are shared by multiple cells within the patch. If true, the value is
+   *   copied to all corresponding local DoF slots. False implies writing
+   *   once.
+   */
   template <typename NumberType>
   void
   distribute_patch_to_local(const ArrayView<const NumberType> &patch_vector,
                             const bool                         copy_duplicates);
 
-
+  /**
+   * @brief Gathers values from the local cell DoF storage into a patch
+   * vector.
+   *
+   * This function collects the DoF values from the internal cell-based
+   * storage and assembles them into a vector representing the DoFs for the
+   * entire patch. The Distributor handles the mapping.
+   *
+   * @tparam NumberType The data type of the values in the patch vector.
+   * @param patch_vector An ArrayView where the gathered patch DoF values will
+   *   be stored. Its size must match `n_patch_dofs()`.
+   * @param sum_overlapping A flag indicating how to handle DoFs
+   *   shared by multiple cells. If true, contributions from different cells
+   *   to the same patch DoF are summed.
+   */
   template <typename NumberType>
   void
   gather_local_to_patch(const ArrayView<NumberType> &patch_vector,
                         const bool                   sum_overlapping) const;
 
+  /**
+   * @brief Reads DoF values from a global vector into the local cell storage
+   * for the current patch.
+   *
+   * This function delegates to the `read_dof_values` method of the
+   * underlying FEEvaluation object(s), effectively loading the relevant DoF
+   * values from a global data structure (like a solution vector) into the
+   * local storage used for computations on the current patch. Requires that
+   * `reinit` has been called.
+   *
+   * @tparam VECTOR The type of the source global vector (e.g.,
+   *   LinearAlgebra::distributed::Vector).
+   * @param src The global vector from which to read DoF values.
+   */
   template <typename VECTOR>
   void
   read_dof_values(const VECTOR &src);
 
+  /**
+   * @brief Distributes (adds) local DoF values from the cell storage to a
+   * global vector.
+   *
+   * This function delegates to the `distribute_local_to_global` method of the
+   * underlying FEEvaluation object(s). It takes the computed local DoF
+   * values (e.g., residuals or updates) stored internally and adds them to
+   * the corresponding entries in a global data structure. Requires that
+   * `reinit` has been called.
+   *
+   * @tparam VECTOR The type of the destination global vector (e.g.,
+   *   LinearAlgebra::distributed::Vector).
+   * @param dst The global vector to which the local DoF values will be added.
+   */
   template <typename VECTOR>
   void
   distribute_local_to_global(VECTOR &dst) const;
 
+  /**
+   * @brief Provides mutable access to a specific DoF value within the local
+   * cell storage.
+   *
+   * Allows direct modification of the value associated with a specific DoF
+   * (`dof`) on a specific cell (`cell`) within the patch's local data
+   * representation. Assumes `vectorizaton == within_patch`.
+   *
+   * @param cell The local index of the cell within the patch (0 to n_cells-1).
+   * @param dof The local index of the DoF within the cell.
+   * @return A mutable reference to the DoF value.
+   */
   auto &
   get_dof_value(const unsigned int &cell, const unsigned int &dof);
+
+  /**
+   * @brief Provides constant access to a specific DoF value within the local
+   * cell storage.
+   *
+   * Allows reading the value associated with a specific DoF (`dof`) on a
+   * specific cell (`cell`) within the patch's local data representation.
+   * Assumes `vectorizaton == within_patch`.
+   *
+   * @param cell The local index of the cell within the patch (0 to n_cells-1).
+   * @param dof The local index of the DoF within the cell.
+   * @return A constant reference to the DoF value.
+   */
   const auto &
   get_dof_value(const unsigned int &cell, const unsigned int &dof) const;
 
-
+  /**
+   * @brief Array containing the underlying FEEvaluation objects.
+   *
+   * Currently, only one evaluator (`n_evaluators == 1`) is supported. This
+   * member provides access to the FEEvaluation instance used for cell-local
+   * computations.
+   */
   std::array<FEEvaluationType, n_evaluators> fe_evaluations;
 
 private:
