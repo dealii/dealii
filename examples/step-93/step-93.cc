@@ -40,7 +40,6 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_minres.h>
-#include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
@@ -635,24 +634,25 @@ namespace Step93
   // solver. For smaller problems, one can also use a direct solver
   // (see step-29) for which you would just replace the main part of
   // this function by the following three lines of code:
-  //
-  //   `SparseDirectUMFPACK direct_solver;`
-  //
-  //   `direct_solver.initialize(system_matrix);`
-  //
-  //   `direct_solver.vmult(solution, system_rhs);`
+  // @code
+  //   SparseDirectUMFPACK direct_solver;
+  //   direct_solver.initialize(system_matrix);
+  //   direct_solver.vmult(solution, system_rhs);
+  // @endcode
   template <int dim>
   void Step93<dim>::solve()
   {
     std::cout << "Beginning solve..." << std::endl;
-    Timer timer;
+    {
+      Timer timer;
 
-    SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
-    SolverMinRes<Vector<double>> solver(solver_control);
+      SolverControl solver_control(1'000'000, 1e-6 * system_rhs.l2_norm());
+      SolverMinRes<Vector<double>> solver(solver_control);
 
-    solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+      solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
 
-    timer.stop();
+      timer.stop();
+    }
     std::cout << "Wall time: " << timer.wall_time() << "s" << std::endl;
     std::cout << "Solved in " << solver_control.last_step()
               << " MINRES iterations." << std::endl;
