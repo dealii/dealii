@@ -10,7 +10,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-using namespace dealii;
 
 enum VectorizationType
 {

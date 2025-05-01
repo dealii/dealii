@@ -1,0 +1,139 @@
+#ifndef __LOCAL_SMOOTHER_BASE_H__
+#  define __LOCAL_SMOOTHER_BASE_H__
+
+
+#  include <deal.II/matrix_free/fe_patch_evaluation.h>
+#  include <deal.II/matrix_free/patch_storage.h>
+
+
+DEAL_II_NAMESPACE_OPEN
+
+// Ensure LocalSmootherBase is a template class
+template <int dim, typename number>
+class SmootherBase;
+
+template <int dim, typename number>
+class SmootherBase
+{
+public:
+  using VectorType       = LinearAlgebra::distributed::Vector<number>;
+  using MatrixFreeType   = MatrixFree<dim, number>;
+  using PatchStorageType = PatchOperator::PatchStorage<MatrixFreeType>;
+
+  using AdditionalData = std::shared_ptr<PatchStorageType>;
+
+  virtual void
+  local_apply(const PatchStorageType                      &patch_storage,
+              VectorType                                  &dst,
+              const VectorType                            &src,
+              const typename PatchStorageType::PatchRange &patch_range,
+              const bool &do_forward) const = 0;
+
+
+  virtual void
+  initialize(std::shared_ptr<PatchStorageType> &patch_storage);
+
+
+  void
+  vmult(VectorType &dst, const VectorType &src) const;
+
+  void
+  Tvmult(VectorType &dst, const VectorType &src) const;
+
+  void
+  step(VectorType &dst, const VectorType &src) const;
+
+  void
+  Tstep(VectorType &dst, const VectorType &src) const;
+
+
+  virtual void
+  clear();
+
+  std::shared_ptr<PatchStorageType> &
+  get_storage();
+
+protected:
+  std::shared_ptr<PatchStorageType> patch_storage;
+};
+
+template <int dim, typename number>
+void
+SmootherBase<dim, number>::initialize(
+  std::shared_ptr<PatchStorageType> &patch_storage)
+{
+  this->patch_storage = patch_storage;
+}
+
+
+
+template <int dim, typename number>
+void
+SmootherBase<dim, number>::clear()
+{
+  patch_storage.reset();
+}
+
+template <int dim, typename number>
+std::shared_ptr<typename SmootherBase<dim, number>::PatchStorageType> &
+SmootherBase<dim, number>::get_storage()
+{
+  return patch_storage;
+}
+
+template <int dim, typename number>
+void
+SmootherBase<dim, number>::step(VectorType &dst, const VectorType &src) const
+{
+  const std::function<void(const PatchStorageType &,
+                           VectorType &,
+                           const VectorType &,
+                           const typename PatchStorageType::PatchRange &)>
+    patch_worker =
+      [&](const PatchStorageType                      &patch_storage,
+          VectorType                                  &dst,
+          const VectorType                            &src,
+          const typename PatchStorageType::PatchRange &patch_range) {
+        local_apply(patch_storage, dst, src, patch_range, true);
+      };
+
+  patch_storage->patch_loop(patch_worker, dst, src, true);
+}
+
+template <int dim, typename number>
+void
+SmootherBase<dim, number>::vmult(VectorType &dst, const VectorType &src) const
+{
+  dst = 0;
+  step(dst, src);
+}
+
+
+template <int dim, typename number>
+void
+SmootherBase<dim, number>::Tstep(VectorType &dst, const VectorType &src) const
+{
+  const std::function<void(const PatchStorageType &,
+                           VectorType &,
+                           const VectorType &,
+                           const typename PatchStorageType::PatchRange &)>
+    patch_worker =
+      [&](const PatchStorageType                      &patch_storage,
+          VectorType                                  &dst,
+          const VectorType                            &src,
+          const typename PatchStorageType::PatchRange &patch_range) {
+        local_apply(patch_storage, dst, src, patch_range, false);
+      };
+
+  patch_storage->patch_loop(patch_worker, dst, src, false);
+}
+
+template <int dim, typename number>
+void
+SmootherBase<dim, number>::Tvmult(VectorType &dst, const VectorType &src) const
+{
+  dst = 0;
+  Tstep(dst, src);
+}
+
+DEAL_II_NAMESPACE_CLOSE
