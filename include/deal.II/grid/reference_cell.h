@@ -508,14 +508,14 @@ public:
    * handles faces oriented in the standard and non-standard orientation. It
    * represents a bit-code for the overall <tt>face_orientation</tt>,
    * <tt>face_flip</tt> and <tt>face_rotation</tt> and defaults to the standard
-   * orientation. The concept of face orientations is explained in this
-   * @ref GlossFaceOrientation "glossary"
-   * entry.
+   * orientation. The concept of combined orientations is explained in this
+   * @ref GlossCombinedOrientation "glossary" entry.
    */
   unsigned int
-  child_cell_on_face(const unsigned int                 face,
-                     const unsigned int                 subface,
-                     const types::geometric_orientation face_orientation) const;
+  child_cell_on_face(
+    const unsigned int                 face,
+    const unsigned int                 subface,
+    const types::geometric_orientation combined_orientation) const;
 
   /**
    * For a given vertex in a cell, return a pair of a face index and a
@@ -870,10 +870,9 @@ public:
    * The size of the input arrays must be equal to the number of vertices of
    * the current entity.
    *
-   * @returns A number that describes a relative orientation. How exactly
-   *   this index is defined is not important, but it is consistent with the
-   *   understanding the permute_by_combined_orientation() has of
-   *   these orientation indices.
+   * @returns A number that describes a relative orientation. For more
+   * information see @ref GlossCombinedOrientation "the combined orientation
+   * glossary entry".
    */
   template <typename T>
   types::geometric_orientation
@@ -2165,7 +2164,7 @@ inline unsigned int
 ReferenceCell::child_cell_on_face(
   const unsigned int                 face,
   const unsigned int                 subface,
-  const types::geometric_orientation combined_face_orientation) const
+  const types::geometric_orientation combined_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(subface, face_reference_cell(face).n_isotropic_children());
@@ -2183,12 +2182,11 @@ ReferenceCell::child_cell_on_face(
           static constexpr ndarray<unsigned int, 3, 2> subcells = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
-          Assert(combined_face_orientation ==
+          Assert(combined_orientation ==
                      numbers::default_geometric_orientation ||
-                   combined_face_orientation ==
-                     numbers::reverse_line_orientation,
+                   combined_orientation == numbers::reverse_line_orientation,
                  ExcInternalError());
-          return subcells[face][combined_face_orientation ==
+          return subcells[face][combined_orientation ==
                                     numbers::default_geometric_orientation ?
                                   subface :
                                   1 - subface];
@@ -2196,7 +2194,7 @@ ReferenceCell::child_cell_on_face(
       case ReferenceCells::Quadrilateral:
         {
           const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
+            internal::split_face_orientation(combined_orientation);
 
           return GeometryInfo<2>::child_cell_on_face(
             RefinementCase<2>(RefinementPossibilities<2>::isotropic_refinement),
@@ -2216,7 +2214,7 @@ ReferenceCell::child_cell_on_face(
       case ReferenceCells::Hexahedron:
         {
           const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
+            internal::split_face_orientation(combined_orientation);
 
           return GeometryInfo<3>::child_cell_on_face(
             RefinementCase<3>(RefinementPossibilities<3>::isotropic_refinement),

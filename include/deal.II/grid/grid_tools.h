@@ -2366,10 +2366,9 @@ namespace GridTools
    *
    * If the matching was successful, the _relative_ orientation of @p face1 with
    * respect to @p face2 is returned a
-   * std::optional<types::geometric_orientation>, in which the stored value is
-   * the same orientation bit format used elsewhere in the library. More
+   * std::optional<types::geometric_orientation>. More
    * information on that topic can be found in the
-   * @ref GlossFaceOrientation
+   * @ref GlossCombinedOrientation
    * "glossary" article.
    */
   template <typename FaceIterator>
@@ -2455,10 +2454,6 @@ namespace GridTools
 
 
   /**
-   * This compatibility version of collect_periodic_faces() only works on
-   * grids with cells in
-   * @ref GlossFaceOrientation "standard orientation".
-   *
    * Instead of defining a 'first' and 'second' boundary with the help of two
    * boundary_ids this function defines a 'left' boundary as all faces with
    * local face index <code>2*direction</code> and boundary indicator @p b_id
@@ -2472,9 +2467,9 @@ namespace GridTools
    *
    * See above function for further details.
    *
-   * @note This version of collect_periodic_faces() will not work on
-   * meshes with cells not in
-   * @ref GlossFaceOrientation "standard orientation".
+   * @warning This version of collect_periodic_faces() will not work on
+   * meshes with faces not in the
+   * @ref GlossCombinedOrientation "default orientation".
    *
    * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */

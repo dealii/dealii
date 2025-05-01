@@ -34,7 +34,7 @@ namespace types
    * The type used to represent face and line orientations.
    *
    * See the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
   using geometric_orientation = unsigned char;
@@ -346,7 +346,7 @@ namespace numbers
    * Value indicating that a face or line is in its default orientation.
    *
    * See the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
   constexpr types::geometric_orientation default_geometric_orientation =
@@ -359,7 +359,7 @@ namespace numbers
    * line orientations.
    *
    * See the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * for more information.
    */
   constexpr types::geometric_orientation reverse_line_orientation =
