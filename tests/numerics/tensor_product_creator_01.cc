@@ -81,6 +81,20 @@ test()
 
   mass_matrix_patch.print_formatted(std::cout, 4, true, 10, "0.");
   std::cout << std::endl;
+
+
+  auto laplace_matrix =
+    TensorProductMatrixCreator::create_1d_cell_laplace_matrix(fe_q,
+                                                              1.,
+                                                              {true, true});
+  laplace_matrix.print_formatted(std::cout, 4, true, 10, "0.");
+  std::cout << std::endl;
+
+  auto laplace_matrix_renumbered =
+    TensorProductMatrixCreator::create_1d_cell_laplace_matrix(
+      fe_q, 1., {true, true}, fe_eval.get_internal_dof_numbering());
+  laplace_matrix_renumbered.print_formatted(std::cout, 4, true, 10, "0.");
+  std::cout << std::endl;
 }
 
 
