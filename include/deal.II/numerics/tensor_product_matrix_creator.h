@@ -113,10 +113,11 @@ namespace TensorProductMatrixCreator
    * @return A FullMatrix<double> representing the assembled mass matrix.
    *
    */
-  FullMatrix<double>
+  template <typename Number = double>
+  FullMatrix<Number>
   create_1d_cell_mass_matrix(
     const FiniteElement<1>     &fe,
-    const double               &h,
+    const Number               &h,
     const std::pair<bool, bool> include_endpoints = {true, true},
     std::vector<unsigned int>   numbering = std::vector<unsigned int>());
 
@@ -140,10 +141,11 @@ namespace TensorProductMatrixCreator
    * numbering of the degrees of freedom. If empty, the
    * numbering of the finite element is used.
    */
-  FullMatrix<double>
+  template <typename Number = double>
+  FullMatrix<Number>
   create_1d_cell_laplace_matrix(
     const FiniteElement<1>     &fe,
-    const double               &h,
+    const Number               &h,
     const std::pair<bool, bool> include_endpoints = {true, true},
     std::vector<unsigned int>   numbering = std::vector<unsigned int>());
 
@@ -179,9 +181,10 @@ namespace TensorProductMatrixCreator
    * if the number of cells is above 10 an exception will be thrown.
    *
    */
-  FullMatrix<double>
+  template <typename Number = double>
+  FullMatrix<Number>
   create_1D_discretization_matrix(
-    FullMatrix<double>         &cell_matrix,
+    FullMatrix<Number>         &cell_matrix,
     const unsigned int         &n_cells,
     const unsigned int         &overlap,
     const std::pair<bool, bool> include_endpoints = {true, true});
@@ -203,11 +206,12 @@ namespace TensorProductMatrixCreator
    *
    * @return A full matrix representing the 1D ghost penalty matrix.
    */
-  FullMatrix<double>
+  template <typename Number = double>
+  FullMatrix<Number>
   create_1d_ghost_penalty_matrix(
     const FiniteElement<1> &fe,
-    const double            h,
-    std::vector<double>     coefficients = std::vector<double>());
+    const Number            h,
+    std::vector<Number>     coefficients = std::vector<Number>());
 
 
 
@@ -228,7 +232,8 @@ namespace TensorProductMatrixCreator
    *
    * @return A full matrix representing the 1D ghost penalty.
    */
-  FullMatrix<double>
+  template <typename Number = double>
+  FullMatrix<Number>
   create_1d_ghost_penalty_matrix(
     const std::vector<Polynomials::Polynomial<double>>
                       &polynomial_basis_derivative,
@@ -526,9 +531,57 @@ namespace TensorProductMatrixCreator
       fe, quadrature, boundary_ids, cell_extent, n_overlap);
   }
 
-  FullMatrix<double>
+  template <typename Number>
+  FullMatrix<Number>
+  create_1d_cell_mass_matrix(const FiniteElement<1>     &fe,
+                             const Number               &h,
+                             const std::pair<bool, bool> include_endpoints,
+                             std::vector<unsigned int>   numbering)
+  {
+    if (dynamic_cast<const FE_DGQ<1> *>(&fe) == nullptr &&
+        numbering.size() == 0)
+      {
+        Assert(
+          include_endpoints.first == true && include_endpoints.second == true,
+          ExcMessage(
+            "You tried to generate a 1D mass matrix with excluding boundary "
+            "dofs for a non-DGQ element without providing a numbering."));
+      }
+
+    if (numbering.size() == 0)
+      {
+        numbering.resize(fe.dofs_per_cell);
+        std::iota(numbering.begin(), numbering.end(), 0);
+      }
+
+    const unsigned int degree          = fe.degree;
+    const unsigned int n_dofs_per_cell = fe.dofs_per_cell;
+    const Number      &JxW             = h;
+    QGauss<1>          quadrature(degree + 1);
+
+    FullMatrix<Number> cell_matrix(n_dofs_per_cell, n_dofs_per_cell);
+    cell_matrix = 0;
+
+    unsigned int start_dof = include_endpoints.first ? 0 : 1;
+    unsigned int end_dof =
+      include_endpoints.second ? n_dofs_per_cell : n_dofs_per_cell - 1;
+    const unsigned int shift = include_endpoints.first ? 0 : 1;
+
+    for (unsigned int i = start_dof; i < end_dof; ++i)
+      for (unsigned int j = start_dof; j < end_dof; ++j)
+        for (unsigned int q = 0; q < quadrature.size(); ++q)
+          cell_matrix(i - shift, j - shift) +=
+            (fe.shape_value(numbering[i], quadrature.point(q)) *
+             fe.shape_value(numbering[j], quadrature.point(q))) *
+            JxW * quadrature.weight(q);
+
+    return cell_matrix;
+  }
+
+  template <typename Number>
+  FullMatrix<Number>
   create_1d_cell_laplace_matrix(const FiniteElement<1>     &fe,
-                                const double               &h,
+                                const Number               &h,
                                 const std::pair<bool, bool> include_endpoints,
                                 std::vector<unsigned int>   numbering)
   {
@@ -550,10 +603,10 @@ namespace TensorProductMatrixCreator
 
     const unsigned int degree          = fe.degree;
     const unsigned int n_dofs_per_cell = fe.dofs_per_cell;
-    const double      &JxW             = h;
+    const Number      &JxW             = h;
     QGauss<1>          quadrature(degree + 1);
 
-    FullMatrix<double> cell_matrix(n_dofs_per_cell, n_dofs_per_cell);
+    FullMatrix<Number> cell_matrix(n_dofs_per_cell, n_dofs_per_cell);
     cell_matrix = 0;
 
     unsigned int start_dof = include_endpoints.first ? 0 : 1;
@@ -572,8 +625,9 @@ namespace TensorProductMatrixCreator
     return cell_matrix;
   }
 
-  FullMatrix<double>
-  create_1D_discretization_matrix(FullMatrix<double>         &cell_matrix,
+  template <typename Number>
+  FullMatrix<Number>
+  create_1D_discretization_matrix(FullMatrix<Number>         &cell_matrix,
                                   const unsigned int         &n_cells,
                                   const unsigned int         &overlap,
                                   const std::pair<bool, bool> include_endpoints)
@@ -600,7 +654,7 @@ namespace TensorProductMatrixCreator
     if (!include_endpoints.second)
       n_total_dofs -= 1;
 
-    FullMatrix<double> result_matrix(n_total_dofs, n_total_dofs);
+    FullMatrix<Number> result_matrix(n_total_dofs, n_total_dofs);
     result_matrix = 0;
 
     const unsigned int left_shift = include_endpoints.first ? 0 : 1;
@@ -629,10 +683,11 @@ namespace TensorProductMatrixCreator
 
 
 
-  FullMatrix<double>
+  template <typename Number>
+  FullMatrix<Number>
   create_1d_ghost_penalty_matrix(const FiniteElement<1> &fe,
-                                 const double            h,
-                                 std::vector<double>     coefficients)
+                                 const Number            h,
+                                 std::vector<Number>     coefficients)
   {
     Assert(dynamic_cast<const FE_Q<1> *>(&fe) != nullptr, ExcNotImplemented());
     Assert(h > 0, ExcMessage("Provided element size h is negative"));
@@ -683,13 +738,13 @@ namespace TensorProductMatrixCreator
       }
 
 
-    FullMatrix<double> penalty_matrix =
+    FullMatrix<Number> penalty_matrix =
       create_1d_ghost_penalty_matrix(polynomial_basis[1]);
     penalty_matrix *= coefficients[0];
 
     for (unsigned int k = 2; k < degree + 1; ++k)
       {
-        FullMatrix<double> kth_matrix =
+        FullMatrix<Number> kth_matrix =
           create_1d_ghost_penalty_matrix(polynomial_basis[k]);
         penalty_matrix.add(coefficients[k - 1], kth_matrix);
       }
@@ -699,8 +754,8 @@ namespace TensorProductMatrixCreator
   }
 
 
-
-  FullMatrix<double>
+  template <typename Number>
+  FullMatrix<Number>
   create_1d_ghost_penalty_matrix(
     const std::vector<Polynomials::Polynomial<double>>
                       &polynomial_basis_derivative,
@@ -710,7 +765,7 @@ namespace TensorProductMatrixCreator
     const unsigned int n_total_dofs    = 2 * n_dofs_per_cell - overlap;
     const unsigned int shift           = n_dofs_per_cell - overlap;
 
-    FullMatrix<double> penalty_matrix(n_total_dofs, n_total_dofs);
+    FullMatrix<Number> penalty_matrix(n_total_dofs, n_total_dofs);
 
     std::vector<double> values_left(n_dofs_per_cell);
     std::vector<double> values_right(n_dofs_per_cell);
