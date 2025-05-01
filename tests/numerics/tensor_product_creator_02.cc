@@ -28,15 +28,18 @@ test(const unsigned int fe_degree)
       FE_Q<1>(fe_degree), 1.);
 
 
-  for (unsigned int row = 0; row < ghost_penalty_1d.n_rows(); ++row)
-    {
-      for (unsigned int col = 0; col < ghost_penalty_1d.n_cols(); ++col)
-        deallog << std::setw(10) << std::fixed << std::setprecision(4)
-                << ghost_penalty_1d(row, col) << " ";
+  std::stringstream sstring;
 
-      deallog << std::endl;
-    }
-  deallog << std::endl;
+  sstring << "Ghost penalty matrix for FE_Q<1>(" << fe_degree << "):\n";
+  ghost_penalty_1d.print_formatted(sstring, 4, true, 10, "0.");
+
+  deallog << sstring.str() << std::endl;
+
+  // Check that the matrix is symmetric
+  for (unsigned int i = 0; i < ghost_penalty_1d.m(); ++i)
+    for (unsigned int j = 0; j < ghost_penalty_1d.n(); ++j)
+      AssertThrow(ghost_penalty_1d(i, j) == ghost_penalty_1d(j, i),
+                  ExcMessage("Matrix is not symmetric"));
 }
 
 
