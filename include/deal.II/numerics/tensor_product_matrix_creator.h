@@ -23,6 +23,8 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
@@ -121,7 +123,7 @@ namespace TensorProductMatrixCreator
 
 
   /**
-   * Compute a 1D cell derivative matrix for a given finite element.
+   * Compute a 1D cell laplace matrix for a given finite element.
    *
    * @param fe The finite element object defining the shape functions.
    *
@@ -139,7 +141,7 @@ namespace TensorProductMatrixCreator
    * numbering of the finite element is used.
    */
   FullMatrix<double>
-  create_1d_cell_derivative_matrix(
+  create_1d_cell_laplace_matrix(
     const FiniteElement<1>     &fe,
     const double               &h,
     const std::pair<bool, bool> include_endpoints = {true, true},
@@ -525,11 +527,10 @@ namespace TensorProductMatrixCreator
   }
 
   FullMatrix<double>
-  create_1d_cell_derivative_matrix(
-    const FiniteElement<1>     &fe,
-    const double               &h,
-    const std::pair<bool, bool> include_endpoints,
-    std::vector<unsigned int>   numbering)
+  create_1d_cell_laplace_matrix(const FiniteElement<1>     &fe,
+                                const double               &h,
+                                const std::pair<bool, bool> include_endpoints,
+                                std::vector<unsigned int>   numbering)
   {
     if (dynamic_cast<const FE_DGQ<1> *>(&fe) == nullptr &&
         numbering.size() == 0)
