@@ -222,42 +222,100 @@ namespace internal
 
 
 
-/*
- * PatchStorage class
- * This class is used to store the patches and their data.
- * It is a template class that takes a MatrixFreeType as a parameter.
+/**
+ * @brief Manages the storage and categorization of cell patches centered around
+ * vertices.
+ *
+ * This class identifies patches of cells surrounding each vertex in a mesh
+ * level managed by a MatrixFree object. It distinguishes between "regular"
+ * patches (those with the expected number of cells, 2^dim) and "general"
+ * patches (e.g., near boundaries). Patches can be categorized for parallel
+ * processing, typically for patch-based smoothers like Gauss-Seidel.
+ *
+ * The class provides mechanisms to iterate over patches, access patch data,
+ * and handle communication for parallel operations.
+ *
+ * @tparam MFType The type of the MatrixFree object used to access cell and DoF
+ * information. Expected to provide types like `dimension`, `value_type`,
+ * `vectorized_value_type`, and methods to access DoF handlers and cell
+ * iterators.
  */
 template <class MFType>
 class PatchStorage : EnableObserverPointer
 {
 public:
-  using MatrixFreeType                    = MFType;
+  /**
+   * @brief Alias for the template parameter `MFType`.
+   */
+  using MatrixFreeType = MFType;
+  /**
+   * @brief The spatial dimension.
+   */
   const static constexpr unsigned int dim = MatrixFreeType::dimension;
 
-  using value_type            = typename MatrixFreeType::value_type;
+  /**
+   * @brief The scalar value type used by the MatrixFree object (e.g., float,
+   * double).
+   */
+  using value_type = typename MatrixFreeType::value_type;
+  /**
+   * @brief The vectorized value type used by the MatrixFree object.
+   */
   using vectorized_value_type = typename MatrixFreeType::vectorized_value_type;
+  /**
+   * @brief The number of lanes in the vectorized type.
+   */
   const static constexpr unsigned int n_lanes = vectorized_value_type::size();
+  /**
+   * @brief The expected number of cells in a regular patch (2^dim).
+   */
   const static constexpr unsigned int n_patch_cells = 1 << dim;
 
-  using CellIndex    = unsigned int;
+  /**
+   * @brief Type used to represent a unique index for each cell within the
+   * context of the associated MatrixFree object. This is typically calculated
+   * as `batch_index * n_lanes + lane_index`.
+   */
+  using CellIndex = unsigned int;
+  /**
+   * @brief Alias for the cell iterator type of the underlying Triangulation.
+   */
   using CellIterator = typename Triangulation<dim>::cell_iterator;
 
+  /**
+   * @brief Type used to represent the orientation of a cell within a regular
+   * patch (currently unused).
+   */
   using CellOrientation = unsigned int;
 
+  /**
+   * @brief Structure to hold additional data for patch generation, such as
+   * vertices to exclude.
+   */
   struct AdditionalData
   {
+    /**
+     * @brief Default constructor. Initializes the excluded vertices set with
+     * an invalid index.
+     */
     AdditionalData()
       : excluded_vertices({{numbers::invalid_unsigned_int}})
     {}
 
+    /**
+     * @brief A set of global vertex indices that should be excluded during
+     * patch generation.
+     */
     std::set<types::global_vertex_index> excluded_vertices;
   };
 
 
-  /*
-   * Regular patch basic data: cells and orientations.
-   * Can be extended if the user wants to (e.g. some data to get the inverse
-   * etc.)
+  /**
+   * @brief Represents a regular patch, i.e., a patch centered at a vertex
+   * with exactly 2^dim cells.
+   *
+   * Stores the cell indices and potentially orientation information. Provides
+   * methods to check constructibility and access cell data.
    */
   struct RegularPatch
   {
@@ -265,6 +323,19 @@ public:
     const static bool          is_constant_size = true;
     const static unsigned int  n_cells          = 1 << dim;
     // Constructor: orders cells, generates orientation information
+    /**
+     * @brief Constructor for a RegularPatch.
+     *
+     * Orders the cells within the patch based on the central vertex index and
+     * potentially generates orientation information. Asserts that the input
+     * `patch` set contains exactly `n_cells`.
+     *
+     * @param patch A set of `CellIndex` objects representing the cells in the
+     * patch.
+     * @param vertex_index The global index of the central vertex.
+     * @param index2cell A function object that converts a `CellIndex` to a
+     * `CellIterator`.
+     */
     RegularPatch(
       const std::set<CellIndex>                            &patch,
       const types::global_vertex_index                     &vertex_index,
@@ -272,20 +343,28 @@ public:
 
 
 
+    /**
+     * @brief Returns the number of cells in the patch (always `n_cells`).
+     */
     constexpr unsigned int
     size() const
     {
       return n_cells;
     }
-    /*
-     * checks if the current cell can be processed in parallel with other
+    /**
+     * @brief Checks if this patch conflicts with another patch for parallel
+     * processing (e.g., based on shared DoFs).
+     * @param other The other RegularPatch to check against.
+     * @return `true` if there is no conflict, `false` otherwise.
      */
     bool
     has_no_conflict_with(const RegularPatch &other) const;
 
 
-    /*
-     * Since we do not provide  direct access to cell getter is required.
+    /**
+     * @brief Provides read-only access to the array of cell indices forming
+     * the patch.
+     * @return A constant reference to the array of `CellIndex`.
      */
     const auto &
     get_cells() const
@@ -293,6 +372,13 @@ public:
       return cells;
     }
 
+    /**
+     * @brief Gets the orientation information for a specific cell within the
+     * patch.
+     * @param cell_index The local index of the cell within the patch (0 to
+     * n_cells-1).
+     * @return A constant reference to the `CellOrientation`.
+     */
     const auto &
     get_orientation(const unsigned int &cell_index) const
     {
@@ -301,8 +387,20 @@ public:
     }
 
 
-    /*
-     * checks if the given patch belongs to the current category
+    /**
+     * @brief Static method to check if a given set of cells can form a
+     * regular patch.
+     *
+     * Currently, this simply checks if the number of cells in the input `patch`
+     * is equal to `n_cells`.
+     *
+     * @param patch A set of `CellIndex` objects.
+     * @param vertex_index The global index of the potential central vertex
+     * (unused).
+     * @param index2cell A function object to convert `CellIndex` to
+     * `CellIterator` (unused).
+     * @return `true` if the patch can be constructed as a RegularPatch,
+     * `false` otherwise.
      */
     static bool
     is_constructible(
@@ -317,6 +415,12 @@ public:
       return false;
     }
 
+    /**
+     * @brief Checks if any cell within this patch is a ghost cell on the
+     * current MPI process.
+     * @return `true` if the patch contains at least one ghost cell, `false`
+     * otherwise.
+     */
     bool
     is_partially_ghosted() const
     {
@@ -331,26 +435,46 @@ public:
     bool partially_ghosted;
   };
 
-  /*
-   * General patch basic data: cells.
-   * Represents patches that are not regular (e.g., boundary patches).
+  /**
+   * @brief Represents a general patch, i.e., a patch that is not regular
+   * (typically near boundaries or excluded vertices).
+   *
+   * Stores a variable number of cell indices.
    */
   struct GeneralPatch
   {
     const static constexpr int dimension        = dim;
     const static bool          is_constant_size = false;
 
+    /**
+     * @brief Constructor for a GeneralPatch.
+     *
+     * @param patch A set of `CellIndex` objects representing the cells in the
+     * patch.
+     * @param vertex_index The global index of the central vertex (unused in
+     * current implementation).
+     * @param index2cell A function object that converts a `CellIndex` to a
+     * `CellIterator` (unused in current implementation).
+     */
     GeneralPatch(
       const std::set<CellIndex>                            &patch,
       const types::global_vertex_index                     &vertex_index,
       const std::function<CellIterator(const CellIndex &)> &index2cell);
 
+    /**
+     * @brief Returns the number of cells in the patch.
+     */
     unsigned int
     size() const
     {
       return cells.size();
     }
 
+    /**
+     * @brief Provides read-only access to the vector of cell indices forming
+     * the patch.
+     * @return A constant reference to the vector of `CellIndex`.
+     */
     const auto &
     get_cells() const
     {
@@ -368,28 +492,84 @@ public:
   };
 
 
+  /**
+   * @brief Alias for the task information type used for parallel scheduling
+   * (e.g., Gauss-Seidel coloring). At the moment MPI is disabled.
+   */
   using TaskInfoType = internal::GaussSeidel::TaskInfoDummy;
   // LinearAlgebra::GaussSeidel::TaskInfo<value_type, vectorized_value_type>;
 
-  using PatchRange    = const std::pair<std::size_t, std::size_t>;
+  /**
+   * @brief Type representing a range of patch indices [begin, end).
+   */
+  using PatchRange = const std::pair<std::size_t, std::size_t>;
+  /**
+   * @brief Type representing a category assigned to a patch, often used for
+   * grouping or identification.
+   */
   using PatchCategory = unsigned int;
 
 
 
+  /**
+   * @brief Constructor.
+   * @param mf A shared pointer to the constant MatrixFree object.
+   */
   PatchStorage(const std::shared_ptr<const MatrixFreeType> &mf);
 
+  /**
+   * @brief Initializes the PatchStorage by generating and storing patches.
+   *
+   * Identifies all vertex-centered patches on the specified level of the
+   * MatrixFree object. Filters patches based on ownership and MPI rank.
+   * Initializes internal data structures like partitioners and task info.
+   *
+   * @param data Additional data, e.g., vertices to exclude.
+   */
   void
   initialize(const AdditionalData &data = AdditionalData());
 
+  /**
+   * Assigns a category to each regular patch based on a user-provided
+   * function. @warning This function may change indices of patches.
+   *
+   * @param category_function A function that takes a `const RegularPatch &`
+   * and returns a `PatchCategory`.
+   */
   void
   categorize_patches(
     std::function<PatchCategory(const RegularPatch &)> category_function);
 
 
+  /**
+   * @brief Clears all stored patch data and resets the state to
+   * uninitialized.
+   */
   void
   clear();
 
 
+  /**
+   * @brief Executes a given function (`patch_worker`) over ranges of patches,
+   * handling parallel communication.
+   *
+   * This function iterates through the parallel categories determined by the
+   * `TaskInfoType`. For each category, it performs necessary communication
+   * (e.g., updating ghost values) and then calls the `patch_worker` with the
+   * range of regular patches belonging to that category.
+   *
+   * @tparam OutVector The type of the output/solution vector.
+   * @tparam InVector The type of the input/rhs vector.
+   * @param patch_worker The function to execute for each patch range. It
+   * takes the `PatchStorage` instance, output vector, input vector, and the
+   * `PatchRange` as arguments.
+   * @param solution The output/solution vector. Its ghost values will be
+   * updated during the loop.
+   * @param rhs The input/rhs vector. Its ghost values must be up-to-date
+   * before calling this function.
+   * @param do_forward Flag indicating the direction of sweep (currently only
+   * `true` is supported).
+   */
   template <class OutVector, class InVector>
   void
   patch_loop(const std::function<void(const PatchStorage<MFType> &,
@@ -401,38 +581,118 @@ public:
              const bool &do_forward = true) const;
 
 
+  /**
+   * @brief Helper function to adjusts the partitioner of a
+   * distributed vector if it doesn't match the internal partitioner for the
+   * given component.
+   *
+   * This ensures that ghost value communication works correctly within the
+   * `patch_loop`. If the vector's partitioner is different, the vector is
+   * reinitialized with the correct partitioner, preserving its locally owned
+   * data.
+   *
+   * @tparam number The value type of the vector.
+   * @param component The component index for which to check the partitioner.
+   * @param vec The distributed vector to potentially adjust.
+   */
   template <typename number>
   void
   adjust_ghost_range_if_necessary(
     const unsigned int                                component,
     const LinearAlgebra::distributed::Vector<number> &vec) const;
 
+  /**
+   * Gets a constant reference to the regular patch at the given global
+   * index `i`. Used by FEPatchEvaluation
+   *
+   * The index `i` ranges from 0 to `n_patches() - 1`.
+   * @param i The global index of the regular patch.
+   * @return A constant reference to the `RegularPatch`.
+   */
   const RegularPatch &
   get_regular_patch(const std::size_t &i) const;
 
+  /**
+   * @brief Gets the category assigned to the regular patch at the given global
+   * index `i`.
+   *
+   * Requires `categorize_patches()` to have been called first.
+   * @param i The global index of the regular patch.
+   * @return A constant reference to the `PatchCategory`.
+   */
   const PatchCategory &
   get_regular_patch_category(const std::size_t &i) const;
 
+  /**
+   * @brief Returns the total number of regular patches stored on the current
+   * MPI process.
+   */
   std::size_t
   n_patches() const;
 
+  /**
+   * @brief Gets a constant reference to the shared pointer holding the
+   * MatrixFree object.
+   */
   const std::shared_ptr<const MatrixFreeType> &
   get_matrix_free() const;
 
 
+  /**
+   * @brief Converts a `CellIndex` back to a `CellIterator`.
+   * @param index The `CellIndex` to convert.
+   * @return The corresponding `CellIterator`.
+   */
   inline CellIterator
   index2cell(const CellIndex &index) const;
 
+  /**
+   * @brief Converts a MatrixFree batch index and lane index into a unique
+   * `CellIndex`.
+   * @param cell_batch_index The index of the cell batch in the MatrixFree
+   * object.
+   * @param lane_index The index of the lane within the batch.
+   * @return The calculated `CellIndex`.
+   */
   inline CellIndex
   batch2index(const unsigned int &cell_batch_index,
               const unsigned int &lane_index) const;
 
+  /**
+   * @brief Converts a `CellIndex` back into its corresponding MatrixFree batch
+   * index and lane index.
+   * @param cell_index The `CellIndex` to convert.
+   * @return A pair containing the batch index (first) and lane index (second).
+   */
   inline std::pair<unsigned int, unsigned int>
   index2batch(const CellIndex &cell_index) const;
 
+  /**
+   * @brief Outputs the geometry of all stored regular patches to VTU/PVTU
+   * files.
+   *
+   * Each cell within each patch is written as a separate element in the VTU
+   * file. Data associated with each cell includes patch index, parallel
+   * category, local cell index within the patch, global cell index, MPI rank,
+   * and user-defined category (if available).
+   *
+   * @param filename_without_extension The base name for the output files (e.g.,
+   * "patches"). `.procXXXX.vtu` and `.pvtu` will be appended.
+   */
   void
   output_patches(const std::string &filename_without_extension) const;
 
+  /**
+   * @brief Outputs the center points (approximated by one vertex) of all
+   * stored regular patches to VTU/PVTU files.
+   *
+   * Each patch is represented by a single point (vertex) in the output file.
+   * Data associated with each point includes patch index, parallel category,
+   * MPI rank, and user-defined category (if available).
+   *
+   * @param filename_without_extension The base name for the output files (e.g.,
+   * "patch_centers"). `.procXXXX.vtu` and `.pvtu` will be appended.
+   */
   void
   output_centerpoints(const std::string &filename_without_extension) const;
 
