@@ -41,10 +41,11 @@ main()
   B(1, 1) = 8;
 
   C.kronecker_product(A, B);
-  
+
 
   std::stringstream sstring;
-  sstring << "Result" << "\n";
+  sstring << "Result"
+          << "\n";
   C.print_formatted(sstring, 4, true, 10, "0.");
   deallog << sstring.str() << std::endl;
 
