@@ -975,6 +975,33 @@ public:
                  const bool                transpose_D = false,
                  const number              scaling     = number(1.));
 
+
+  /**
+   * @brief Compute the Kronecker product of two matrices.
+   *
+   * This function computes the Kronecker product of two matrices A and B, and
+   * stores the result in the current matrix. The Kronecker product of an
+   * m x n matrix A and a p x q matrix B is an (m*p) x (n*q) matrix defined as:
+   *
+   * ```
+   * A ⊗ B = | a11*B   a12*B   ...   a1n*B |
+   *         | a21*B   a22*B   ...   a2n*B |
+   *         | ...     ...     ...   ...   |
+   *         | am1*B   am2*B   ...   amn*B |
+   * ```
+   *
+   * where aij are the elements of the matrix A.
+   *
+   * @param A The first matrix (m x n).
+   * @param B The second matrix (p x q).
+   * @param adding If `true`, the result is added to the current matrix. If
+   *               `false` (default), the current matrix is overwritten.
+   */
+  void
+  kronecker_product(const FullMatrix<number> &A,
+                    const FullMatrix<number> &B,
+                    const bool                adding = false);
+
   /**
    * Matrix-vector-multiplication.
    *
