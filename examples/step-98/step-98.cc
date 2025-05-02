@@ -670,12 +670,31 @@ namespace Operators
   {
     // Type alias for the standard FEEvaluation on a single cell batch.
     using FEEval = FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number>;
+
+
     // Type alias for the FEPatchEvaluation, which handles operations across
     // the cells within a patch, including data gathering and scattering.
-    // DistributorLookup provides the mapping between patch DoFs and cell DoFs.
-    using PatchEval =
-      PatchOperator::FEPatchEvaluation<FEEval,
-                                       DistributorLookup<dim, fe_degree>>;
+    // Moving values between patches vector and individual cell vectors, handled
+    // by the last template parameter, is crucial for efficiency. For the
+    // reference, all operations with distributor take around 10% of smoothing
+    // time, that is a comparable amount of time to inverse application via
+    // TensorProductMatrixSymmetricSum. If the residual is also  computed via
+    // TensorProductMatrixSymmetricSum this fraction is significantly higher.
+    //
+    // Micro-benchmarking can help determine the optimal method for
+    // distributing DoFs, as performance depends on several factors. For
+    // instance, with Clang, lookup tables are highly efficient; the overhead
+    // of copying data between cell vectors and patch vectors is minimal,
+    // comparable to a standard copy operation of the same data size. With GCC,
+    // an index-computing implementation (not included here) outperforms lookup
+    // tables, though it's still significantly slower than Clang. Using
+    // `DistributorLookup` is crucial for efficiency, as it provides the
+    // mapping between patch DoFs and cell DoFs.
+    using PatchEval = PatchOperator::FEPatchEvaluation<
+      FEEval,
+      PatchDistributors::DistributorLookup<dim, fe_degree>>;
+
+
 
     // Instantiate the FEPatchEvaluation object. It takes the patch storage
     // and a configured FEEvaluation object (based on the MatrixFree data
