@@ -1,9 +1,10 @@
-#ifndef __LOCAL_SMOOTHER_BASE_H__
-#  define __LOCAL_SMOOTHER_BASE_H__
+
+#ifndef local_smoother_base_h
+#define local_smoother_base_h
 
 
-#  include <deal.II/matrix_free/fe_patch_evaluation.h>
-#  include <deal.II/matrix_free/patch_storage.h>
+#include <deal.II/matrix_free/fe_patch_evaluation.h>
+#include <deal.II/matrix_free/patch_storage.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -239,3 +240,6 @@ SmootherBase<dim, number>::Tvmult(VectorType &dst, const VectorType &src) const
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+
+#endif // local_smoother_base_h
