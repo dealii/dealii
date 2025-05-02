@@ -101,7 +101,8 @@ namespace Operators
      *
      * This function is not need for patch smoothing.
      */
-    virtual void compute_diagonal() override;
+    virtual void compute_diagonal() override
+    {}
 
   private:
     /**
@@ -126,26 +127,6 @@ namespace Operators
                 VectorType                                  &dst,
                 const VectorType                            &src,
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
-
-    /**
-     * @brief Local worker routine for computing the diagonal entries.
-     *
-     * This function is called by MatrixFree::cell_loop during the diagonal
-     * computation. It computes the diagonal entries for the cells within the
-     * specified range by applying the local operator to unit vectors.
-     *
-     * @param data The MatrixFree object holding cached data.
-     * @param dst The vector where the diagonal entries are accumulated.
-     * @param dummy A placeholder argument required by the cell_loop interface
-     *              when computing the diagonal.
-     * @param cell_range The pair of start and end indices for the cell batches
-     *                   to be processed.
-     */
-    void local_compute_diagonal(
-      const MatrixFree<dim, number>               &data,
-      VectorType                                  &dst,
-      const unsigned int                          &dummy,
-      const std::pair<unsigned int, unsigned int> &cell_range) const;
   };
 
   /**
@@ -217,69 +198,6 @@ namespace Operators
     const VectorType &src) const
   {
     this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src);
-  }
-
-  /**
-   * @brief Compute diagonal implementation, as in step-37.
-   *
-   */
-  template <int dim, int fe_degree, typename number>
-  void LaplaceOperator<dim, fe_degree, number>::compute_diagonal()
-  {
-    this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
-    VectorType &inverse_diagonal = this->inverse_diagonal_entries->get_vector();
-    this->data->initialize_dof_vector(inverse_diagonal);
-    unsigned int dummy = 0;
-    this->data->cell_loop(&LaplaceOperator::local_compute_diagonal,
-                          this,
-                          inverse_diagonal,
-                          dummy);
-
-    this->set_constrained_entries_to_one(inverse_diagonal);
-
-    for (unsigned int i = 0; i < inverse_diagonal.locally_owned_size(); ++i)
-      {
-        Assert(inverse_diagonal.local_element(i) > 0.,
-               ExcMessage("No diagonal entry in a positive definite operator "
-                          "should be zero"));
-        inverse_diagonal.local_element(i) =
-          1. / inverse_diagonal.local_element(i);
-      }
-  }
-
-  /**
-   * Computes the diagonal entries for a range of cell batches, as in step-37.
-   */
-  template <int dim, int fe_degree, typename number>
-  void LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
-    const MatrixFree<dim, number> &data,
-    VectorType                    &dst,
-    const unsigned int &,
-    const std::pair<unsigned int, unsigned int> &cell_range) const
-  {
-    FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-
-    AlignedVector<VectorizedArray<number>> diagonal(phi.dofs_per_cell);
-
-    for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
-      {
-        phi.reinit(cell);
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          {
-            for (unsigned int j = 0; j < phi.dofs_per_cell; ++j)
-              phi.submit_dof_value(VectorizedArray<number>(), j);
-            phi.submit_dof_value(make_vectorized_array<number>(1.), i);
-
-            phi.evaluate(EvaluationFlags::gradients);
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              phi.submit_gradient(phi.get_gradient(q), q);
-            phi.integrate(EvaluationFlags::gradients);
-            diagonal[i] = phi.get_dof_value(i);
-          }
-        for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
-          phi.submit_dof_value(diagonal[i], i);
-        phi.distribute_local_to_global(dst);
-      }
   }
 
 
@@ -828,8 +746,6 @@ namespace LaplaceSolver
     LaplaceSolver();
     void initialize(const unsigned int n_refinements = 4);
 
-    void print_timings() const;
-
     void solve();
 
     void output_results(const unsigned int cycle) const;
@@ -998,8 +914,6 @@ namespace LaplaceSolver
         mg_matrices[level].initialize(mg_mf_storage_level,
                                       mg_constrained_dofs,
                                       level);
-
-        mg_matrices[level].compute_diagonal();
       }
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time()
@@ -1115,9 +1029,10 @@ namespace LaplaceSolver
     constraints.distribute(solution);
 
     // Print timing information and iteration count.
-    pcout << "Time solve (" << solver_control.last_step() << " iterations)"
-          << (solver_control.last_step() < 10 ? "  " : " ") << "(CPU/wall) "
-          << time.cpu_time() << "s/" << time.wall_time() << "s\n";
+    pcout << "Solver finished after " << solver_control.last_step()
+          << " iterations." << std::endl;
+    time_details << "Time solve                 (CPU/wall) " << time.cpu_time()
+                 << "s/" << time.wall_time() << "s" << std::endl;
   }
 
 
