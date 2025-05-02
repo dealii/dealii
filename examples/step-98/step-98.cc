@@ -543,10 +543,10 @@ namespace Operators
    * @tparam number The scalar type for computations (e.g., double).
    */
   template <int dim, int fe_degree, typename number>
-  class LaplacePatchSmoother : public SmootherBase<dim, number>
+  class LaplacePatchSmoother : public PatchSmootherBase<dim, number>
   {
   public:
-    using BaseType       = SmootherBase<dim, number>;
+    using BaseType       = PatchSmootherBase<dim, number>;
     using VectorType     = LinearAlgebra::distributed::Vector<number>;
     using MatrixFreeType = MatrixFree<dim, number>;
     /**

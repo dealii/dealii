@@ -10,9 +10,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
-// Ensure LocalSmootherBase is a template class
+// Ensure PatchSmootherBase is a template class
 template <int dim, typename number>
-class SmootherBase;
+class PatchSmootherBase;
 #endif // DOXYGEN
 
 /**
@@ -31,7 +31,7 @@ class SmootherBase;
  * @tparam number The underlying floating-point type (e.g., float, double).
  */
 template <int dim, typename number>
-class SmootherBase
+class PatchSmootherBase
 {
 public:
   /**
@@ -167,7 +167,7 @@ protected:
 
 template <int dim, typename number>
 void
-SmootherBase<dim, number>::initialize(
+PatchSmootherBase<dim, number>::initialize(
   std::shared_ptr<PatchStorageType> &patch_storage)
 {
   this->patch_storage = patch_storage;
@@ -177,21 +177,22 @@ SmootherBase<dim, number>::initialize(
 
 template <int dim, typename number>
 void
-SmootherBase<dim, number>::clear()
+PatchSmootherBase<dim, number>::clear()
 {
   patch_storage.reset();
 }
 
 template <int dim, typename number>
-std::shared_ptr<typename SmootherBase<dim, number>::PatchStorageType> &
-SmootherBase<dim, number>::get_storage()
+std::shared_ptr<typename PatchSmootherBase<dim, number>::PatchStorageType> &
+PatchSmootherBase<dim, number>::get_storage()
 {
   return patch_storage;
 }
 
 template <int dim, typename number>
 void
-SmootherBase<dim, number>::step(VectorType &dst, const VectorType &src) const
+PatchSmootherBase<dim, number>::step(VectorType       &dst,
+                                     const VectorType &src) const
 {
   const std::function<void(const PatchStorageType &,
                            VectorType &,
@@ -210,7 +211,8 @@ SmootherBase<dim, number>::step(VectorType &dst, const VectorType &src) const
 
 template <int dim, typename number>
 void
-SmootherBase<dim, number>::vmult(VectorType &dst, const VectorType &src) const
+PatchSmootherBase<dim, number>::vmult(VectorType       &dst,
+                                      const VectorType &src) const
 {
   dst = 0;
   step(dst, src);
@@ -219,7 +221,8 @@ SmootherBase<dim, number>::vmult(VectorType &dst, const VectorType &src) const
 
 template <int dim, typename number>
 void
-SmootherBase<dim, number>::Tstep(VectorType &dst, const VectorType &src) const
+PatchSmootherBase<dim, number>::Tstep(VectorType       &dst,
+                                      const VectorType &src) const
 {
   const std::function<void(const PatchStorageType &,
                            VectorType &,
@@ -238,7 +241,8 @@ SmootherBase<dim, number>::Tstep(VectorType &dst, const VectorType &src) const
 
 template <int dim, typename number>
 void
-SmootherBase<dim, number>::Tvmult(VectorType &dst, const VectorType &src) const
+PatchSmootherBase<dim, number>::Tvmult(VectorType       &dst,
+                                       const VectorType &src) const
 {
   dst = 0;
   Tstep(dst, src);
