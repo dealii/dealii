@@ -1,3 +1,13 @@
+/* ------------------------------------------------------------------------
+ *
+ *
+ * Authors: Michal Wichrowski, Heidelberg University,
+ * 2025
+ */
+
+
+// First include the necessary files from the deal.II library.
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/timer.h>
@@ -23,8 +33,7 @@
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/operators.h>
 #include <deal.II/matrix_free/fe_patch_evaluation.h>
-#include <deal.II/matrix_free/patch_storage.h>
-#include <deal.II/matrix_free/patch_distributors.h>
+
 
 
 #include <deal.II/multigrid/mg_coarse.h>
@@ -36,6 +45,12 @@
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
+
+// This includes the utilities for the efficient implementation of
+// matrix-free patch-smoothing methods.
+#include <deal.II/matrix_free/patch_storage.h>
+#include <deal.II/matrix_free/patch_distributors.h>
+#include <deal.II/matrix_free/patch_smoother_base.h>
 
 
 
@@ -382,6 +397,9 @@ namespace Operators
    * (assuming a uniform grid), assembles the 1D patch matrices by summing
    * contributions from the two cells along each dimension, and initializes
    * the `patch_matrix` member.
+   *
+   * The implementation should be replaced by calling function from
+   * https://github.com/dealii/dealii/pull/18361
    */
   template <int dim, int fe_degree, typename number, typename VectorizedValues>
   void PatchTensorInverse<dim, fe_degree, number, VectorizedValues>::initialize(
@@ -745,6 +763,11 @@ namespace Operators
         // perform an *addition* to the target vector. So, we negate the
         // correction and add it. dst_new = dst_old +
         // (-correction) is equivalent to dst_new = dst_old - correction
+        //
+        // FIXME: Gemini thinks that minus here is a mistake and to be fair it
+        // has a point. It is not straighforward to explain why we need to
+        // negate the correction. I am sure that his version is correct
+        // (veryfied), so explanation is needed.
 
         // Negate the computed correction before distributing.
         for (unsigned int i = 0; i < local_correction.size(); ++i)
