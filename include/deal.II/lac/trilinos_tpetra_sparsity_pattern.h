@@ -832,7 +832,7 @@ namespace LinearAlgebra
       get_mpi_communicator() const;
 
       /**
-       * Return the underlying Teuchos::MPI communicator.
+       * Return the underlying Teuchos MPI communicator.
        */
       Teuchos::RCP<const Teuchos::Comm<int>>
       get_teuchos_mpi_communicator() const;
