@@ -701,6 +701,8 @@ QProjector<dim>::project_to_subface(
           std::reverse(q_points.begin(), q_points.end());
           std::reverse(q_weights.begin(), q_weights.end());
         }
+      for (auto &w : q_weights)
+        w *= reference_cell.face_measure(face_no);
     }
   else if constexpr (dim == 3)
     {
@@ -806,11 +808,9 @@ Quadrature<2>
 QProjector<2>::project_to_all_subfaces(const ReferenceCell &reference_cell,
                                        const SubQuadrature &quadrature)
 {
-  if (reference_cell == ReferenceCells::Triangle ||
-      reference_cell == ReferenceCells::Tetrahedron)
-    return Quadrature<2>(); // nothing to do
-
-  Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Quadrilateral ||
+           reference_cell == ReferenceCells::Triangle,
+         ExcNotImplemented());
 
   const unsigned int dim = 2;
 
@@ -1154,7 +1154,9 @@ QProjector<2>::DataSetDescriptor::subface(
   const unsigned int                 n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
-  Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
+  Assert(reference_cell == ReferenceCells::Quadrilateral ||
+           reference_cell == ReferenceCells::Triangle,
+         ExcNotImplemented());
 
   const unsigned int n_faces = reference_cell.n_faces();
   const unsigned int n_subfaces =

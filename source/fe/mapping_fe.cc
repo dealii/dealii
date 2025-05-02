@@ -1468,14 +1468,16 @@ namespace internal
 
                   if (subface_no != numbers::invalid_unsigned_int)
                     {
-#if false
-                       const double area_ratio =
-                        GeometryInfo<dim>::subface_ratio(
-                          cell->subface_case(face_no), subface_no);
-                       output_data.JxW_values[i] *= area_ratio;
-#else
-                      DEAL_II_NOT_IMPLEMENTED();
-#endif
+                      if (dim == 2)
+                        {
+                          const double area_ratio =
+                            1. / cell->reference_cell()
+                                   .face_reference_cell(face_no)
+                                   .n_isotropic_children();
+                          output_data.JxW_values[i] *= area_ratio;
+                        }
+                      else
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
                 }
 
