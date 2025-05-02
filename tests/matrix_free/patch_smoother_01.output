@@ -1,8 +1,8 @@
 
 DEAL::Running test in 2D...
-DEAL::  Level 1 PatchStorage initialized with 9 patches.
+DEAL::  Level 1 PatchStorage initialized with 1 patches.
 DEAL::  Checking children of first coarse cell (0_0:) against first patch cells:
 DEAL::Running test in 3D...
-DEAL::  Level 1 PatchStorage initialized with 27 patches.
+DEAL::  Level 1 PatchStorage initialized with 1 patches.
 DEAL::  Checking children of first coarse cell (0_0:) against first patch cells:
 DEAL::Tests finished.

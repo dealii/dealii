@@ -44,7 +44,7 @@ test()
   Triangulation<dim> triangulation(
     Triangulation<dim>::limit_level_difference_at_vertices);
 
-  GridGenerator::subdivided_hyper_cube(triangulation, 2);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(1); // Refine once
 
   // 2. Initialize FE, DoFHandler, Mapping
