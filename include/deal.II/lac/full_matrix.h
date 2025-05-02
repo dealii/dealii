@@ -984,10 +984,10 @@ public:
    * m x n matrix A and a p x q matrix B is an (m*p) x (n*q) matrix defined as:
    *
    * ```
-   * A ⊗ B = | a11*B   a12*B   ...   a1n*B   |
-   *           | a21*B   a22*B   ...   a2n*B   |
-   *           |  ...     ...     ...     ...   |
-   *           | am1*B   am2*B   ...   amn*B   |
+   * A ⊗ B = | a11*B   a12*B   ...   a1n*B |
+   *         | a21*B   a22*B   ...   a2n*B |
+   *         | ...     ...     ...   ...   |
+   *         | am1*B   am2*B   ...   amn*B |
    * ```
    *
    * where aij are the elements of the matrix A.

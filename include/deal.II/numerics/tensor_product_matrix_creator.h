@@ -556,7 +556,6 @@ namespace TensorProductMatrixCreator
 
     const unsigned int degree          = fe.degree;
     const unsigned int n_dofs_per_cell = fe.dofs_per_cell;
-    const Number      &JxW             = h;
     QGauss<1>          quadrature(degree + 1);
 
     FullMatrix<Number> cell_matrix(n_dofs_per_cell, n_dofs_per_cell);
@@ -573,7 +572,7 @@ namespace TensorProductMatrixCreator
           cell_matrix(i - shift, j - shift) +=
             (fe.shape_value(numbering[i], quadrature.point(q)) *
              fe.shape_value(numbering[j], quadrature.point(q))) *
-            JxW * quadrature.weight(q);
+            (h * quadrature.weight(q));
 
     return cell_matrix;
   }
@@ -620,7 +619,7 @@ namespace TensorProductMatrixCreator
           cell_matrix(i - shift, j - shift) +=
             (fe.shape_grad(numbering[i], quadrature.point(q)) / h *
              fe.shape_grad(numbering[j], quadrature.point(q))) /
-            h * JxW * quadrature.weight(q);
+            h * (h * quadrature.weight(q));
 
     return cell_matrix;
   }
