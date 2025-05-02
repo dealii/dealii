@@ -1,0 +1,4 @@
+Added: 1D matrices: mass, laplace, ghost penalty.
+FullMatrix::kronecker_product.
+<br>
+(Michał Wichrowski, 2025/05/01)

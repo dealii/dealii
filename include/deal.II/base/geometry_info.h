@@ -1320,8 +1320,8 @@ struct GeometryInfo<0>
    * the standard and non-standard orientation. <tt>face_orientation</tt>
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation). In 2d only
-   * <tt>face_flip</tt> is considered. See this
-   * @ref GlossFaceOrientation "glossary"
+   * <tt>face_orientation</tt> is considered. See this
+   * @ref GlossCombinedOrientation "glossary"
    * article for more information.
    *
    * As the children of a cell are ordered according to the vertices of the
@@ -1747,10 +1747,9 @@ struct GeometryInfo<0>
  * result is @p true, then the face has standard orientation, otherwise its
  * normal vector is pointing the other direction. There are not very many
  * places in application programs where you need this information actually,
- * but a few places in the library make use of this. Note that in 2d, the
- * result is always @p true. More information on the topic can be found in
- * this
- * @ref GlossFaceOrientation "glossary"
+ * but a few places in the library make use of this. More information on the
+ * topic can be found in this
+ * @ref GlossCombinedOrientation "glossary"
  * article.
  *
  * In order to allow all kinds of meshes in 3d, including
@@ -1766,7 +1765,7 @@ struct GeometryInfo<0>
  * cells and faces in 3d. Again, this is something that should be internal to
  * the library and application program will probably never have to bother
  * about it. For more information on this see also
- * @ref GlossFaceOrientation "this glossary entry".
+ * @ref GlossCombinedOrientation "this glossary entry".
  *
  *
  * <h4>Children</h4>
@@ -2234,7 +2233,7 @@ struct GeometryInfo
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation) and has no effect in 2d.
    * The concept of face orientations is explained in this
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * entry.
    *
    * In the case of anisotropically refined cells and faces, the @p
@@ -2280,7 +2279,7 @@ struct GeometryInfo
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation). In 2d only
    * <tt>face_flip</tt> is considered. See this
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * article for more information.
    *
    * As the children of a cell are ordered according to the vertices of the
@@ -2594,7 +2593,7 @@ struct GeometryInfo
    * least in 3d, actual faces of cells in a triangulation can also have the
    * opposite orientation, depending on a flag that one can query from the
    * cell it belongs to. For more information, see the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * entry on face orientation.
    */
   static constexpr std::array<int, faces_per_cell> unit_normal_orientation =
@@ -2607,7 +2606,7 @@ struct GeometryInfo
    * least in 3d, actual faces of cells in a triangulation can also have the
    * opposite orientation, depending on a flag that one can query from the
    * cell it belongs to. For more information, see the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * entry on face orientation.
    */
   static constexpr std::array<Tensor<1, dim>, faces_per_cell>
@@ -2624,7 +2623,7 @@ struct GeometryInfo
    * least in 3d, actual faces of cells in a triangulation can also have the
    * opposite orientation, depending on a flag that one can query from the
    * cell it belongs to. For more information, see the
-   * @ref GlossFaceOrientation "glossary"
+   * @ref GlossCombinedOrientation "glossary"
    * entry on face orientation.
    */
   static constexpr ndarray<Tensor<1, dim>, faces_per_cell, dim - 1>

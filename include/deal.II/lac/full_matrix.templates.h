@@ -943,6 +943,32 @@ FullMatrix<number>::triple_product(const FullMatrix<number> &A,
 
 
 template <typename number>
+void
+FullMatrix<number>::kronecker_product(const FullMatrix<number> &A,
+                                      const FullMatrix<number> &B,
+                                      const bool                adding)
+{
+  Assert(!A.empty(), ExcEmptyMatrix());
+  Assert(!B.empty(), ExcEmptyMatrix());
+
+  const size_type m = A.m() * B.m();
+  const size_type n = A.n() * B.n();
+
+  if (adding)
+    {
+      AssertDimension(m, this->m());
+      AssertDimension(n, this->n());
+    }
+  else
+    this->reinit(m, n);
+
+  for (size_type i = 0; i < m; ++i)
+    for (size_type j = 0; j < n; ++j)
+      (*this)(i, j) += A(i / B.m(), j / B.n()) * B(i % B.m(), j % B.n());
+}
+
+
+template <typename number>
 template <typename number2>
 number2
 FullMatrix<number>::matrix_norm_square(const Vector<number2> &v) const

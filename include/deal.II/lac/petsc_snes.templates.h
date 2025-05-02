@@ -19,11 +19,13 @@
 
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/mpi_stub.h>
 
 #  include <deal.II/lac/petsc_precondition.h>
 #  include <deal.II/lac/petsc_snes.h>
 
 #  include <petscdm.h>
+#  include <petscerror.h>
 #  include <petscsnes.h>
 
 DEAL_II_NAMESPACE_OPEN

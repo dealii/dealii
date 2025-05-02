@@ -1,0 +1,205 @@
+<h1>Results</h1>
+
+When you run the program with the step target function (in 2D), the output looks something like this:
+
+@code
+Number of active cells: 16384
+Number of degrees of freedom: 66049+66049+4 = 132102
+Number of nonlocal dofs: 4
+Beginning solve...
+Wall time: 63.9265s
+Solved in 39973 MINRES iterations.
+The c coefficients are
+	c1: 28.7408
+	c2: -6.51604
+	c3: -6.51604
+	c4: -1.62044
+@endcode
+
+When you run the program with the Gaussian target function (in 2D), the output should look like this:
+
+@code
+Number of active cells: 16384
+Number of degrees of freedom: 66049+66049+4 = 132102
+Number of nonlocal dofs: 4
+Beginning solve...
+Wall time: 98.4858s
+Solved in 62131 MINRES iterations.
+The c coefficients are
+	c1: 23.553
+	c2: -4.86562
+	c3: -4.86562
+	c4: -1.42344
+@endcode
+
+The goal of this program is to determine which temperature settings best match the target function, so first
+let's see what these targets look like:
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+      <center><b>Step Target %Function</b></center>
+    </td>
+    <td>
+      <center><b>Gaussian Target %Function</b></center>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-93.target_step.png"
+         alt="Step target function"
+         width="90%">
+    </td>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-93.target_gauss.png"
+         alt="Gaussian target function"
+         width="90%">
+    </td>
+  </tr>
+</table>
+
+After solving the Lagrangian system, we arrive at solutions $U_\text{step}$ and $U_\text{gauss}$ that
+look like this:
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+    <center><b>$U_\text{step}$</b></center>
+    </td>
+    <td>
+    <center><b>$U_\text{gauss}$</b></center>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <img src="https://www.dealii.org/images/steps/developer/step-93.U_step.png"
+         alt="Solution for step shaped target function"
+         width="90%">
+    </td>
+    <td>
+    <img src="https://www.dealii.org/images/steps/developer/step-93.U_gauss.png"
+         alt="Solution for Gaussian target function"
+         width="90%">
+    </td>
+  </tr>
+</table>
+
+Notice that $U_\text{gauss}$ matches the target much better than
+$U_\text{step}$. Intuitively, this makes sense: in general, solutions
+to the heat equation look something like Gaussians, so the
+Gaussian target function is a much more "natural" thing to match than
+a sharp step function. We can also see this in the optimal heat
+profiles.
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+      <center><b>Heat plate settings for matching step function</b></center>
+    </td>
+    <td>
+      <center><b>Heat plate settings for matching Gaussian</b></center>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-93.heat_profile_step.png"
+         alt="Heat plate settings for matching step function"
+         width="90%">
+    </td>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-93.heat_profile_gauss.png"
+         alt="Heat plate settings for matching Gaussian"
+         width="90%">
+    </td>
+  </tr>
+</table>
+
+Notice that for the Gaussian target, the 4 plates are set to less extreme values. In contrast, to try to match the step function, higher and lower temperatures must be applied.
+
+While it does not contain much useful information, we can also plot the Lagrange multiplier $\Lambda$, which has an interesting shape:
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+      <center><b>$\Lambda_\text{step}$</b></center>
+    </td>
+    <td>
+      <center><b>$\Lambda_\text{gauss}$</b></center>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-93.L_step.png"
+         alt="Lagrange multiplier for step target function"
+         width="90%">
+    </td>
+    <td>
+      <img src="https://www.dealii.org/images/steps/developer/step-93.L_gauss.png"
+         alt="Lagrange multiplier for Gaussian target function"
+         width="90%">
+    </td>
+  </tr>
+</table>
+
+
+
+<h3>Possibilities for extensions</h3>
+
+There are a few ways that this program could be extended, which we list below.
+
+1. As mentioned in the code documentation, this program does not make
+use of any preconditioners before solving. This is because, for a 2D
+problem, the code runs fast enough that optimization is not
+necessary. However, as shown in the screen output above, the number of
+iterations required to solve the linear system is quite large. Thus,
+for larger problems, it would be good if the solver ran more
+quickly. See the "Possibilities for extensions" section of step-6 for
+a more detailed discussion on how to change preconditioners. We should
+note that since the block matrix we use has many zeros on the
+diagonal, preconditioners like PreconditionJacobi will not work
+because they divide by diagonal entries. Instead, block
+preconditioners such as those discussed in step-20 or step-22 (among
+many others) will likely be useful. For block preconditioners, the
+key realizations is that the blocks of the system matrix
+@f{align*}{
+  \left(\begin{array}{c c c}
+  \mathcal{M} & -\mathcal{N}^T & 0\\
+  -\mathcal{N} & 0 & \mathcal{F}^T\\
+  0 & \mathcal{F} & 0
+  \end{array}\right)
+@f}
+can often individually be solved with quite efficiently; for example,
+$\mathcal{M}$ is a mass matrix that is easily solved with using a CG
+iteration, and $\mathcal N$ is a Laplace matrix for which CG with
+a geometric or algebraic multigrid preconditioner is very effective.
+Using the ideas of step-20 and step-22, we should then create a
+$3\times 3$ block preconditioner in which some blocks correspond to the
+inverses of $\mathcal{M}$ or $\mathcal{N}$, or some kind of Schur
+complement. A starting point for this kind of consideration is
+@cite Battermann_1998 .
+
+2. To validate the optimization problem is working correctly, we could
+try to match a target function which is itself a solution to the
+Poisson equation with prescribed heat profile. If the optimization
+problem is being solved correctly, it should be able to perfectly
+match this solution. To create such a function, we would need to first
+solve the Poisson problem on a scalar field, with a RHS described by
+the chosen heat profile. See step-7 for more information on the method
+of manufactured solutions.
+
+3. The program at the moment has the number of nonlocal degrees of freedom
+hardcoded as $2^d$ (see the constructor). We then assign each of these
+degrees of freedom to one of the first $2^d$ cells. This is not going to
+be much of a problem because there are always enough cells for this as
+long as you start with a mesh that is at least once refined. What would
+we do if we had a number of nonlocal DoFs that is not easily predictable,
+and that may be larger than the number of cells? Perhaps a better approach
+would be to come up with a way to assign *all* of these to the first cell,
+because there is *always* at least one cell. The way to achieve this would
+be to replace the use of FE_DGQ(0) (an element with exactly one degree of
+freedom) by an element that has more than one -- and in particular exactly
+the right number of degrees of freedom -- and that can be used on the first
+cell; all other cells would then use FE_Nothing. At the time of writing
+this program, there is no element class that can easily be given a *specific*
+number of degrees of freedom, but it would not be very difficult to write
+such a class.

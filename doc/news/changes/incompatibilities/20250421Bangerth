@@ -1,0 +1,9 @@
+Changed: Given that the MatrixOut class now allows to create "sparse"
+representations (see the "Minor changes" section of this page), the
+default for what kind of output is being produced has now also been
+changed to create this "sparse" output, rather than the traditional
+"dense" output. You can switch back to the traditional way in which
+zero matrix entries are also represented in the visualization output
+using the MatrixOut::Options::create_sparse_plot variable.
+<br>
+(Wolfgang Bangerth, 2025/04/21)

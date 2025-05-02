@@ -216,6 +216,13 @@ private:
   const SupportQuadrature support_quadrature;
 
   /**
+   * A MappingQ object, which is used by the fe_values
+   * member variable to compute the undeformed mapping support
+   * points, before adding any deformation.
+   */
+  const MappingQ<dim, spacedim> mapping_q;
+
+  /**
    * FEValues object used to query the given finite element field at the
    * support points in the reference configuration.
    *

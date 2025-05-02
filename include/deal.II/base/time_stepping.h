@@ -77,6 +77,14 @@ namespace TimeStepping
      */
     RK_CLASSIC_FOURTH_ORDER,
     /**
+     * Fifth order Runge-Kutta method.
+     */
+    RK_FIFTH_ORDER,
+    /**
+     * Sixth order Runge-Kutta method.
+     */
+    RK_SIXTH_ORDER,
+    /**
      * Three-stage scheme of order three by Kennedy et al.
      * @cite KennedyCarpenterLewis2000. Its stability region is
      * significantly smaller than the higher order schemes, but due to three

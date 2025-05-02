@@ -2651,9 +2651,14 @@ namespace GridGenerator
    * The number of vertices in coordinate
    * direction @p i is given by <tt>repetitions[i]+1</tt>.
    *
-   * @note This function takes the mesh produced by subdivided_hyper_rectangle()
-   * and further subdivides each cell into 2 triangles (for @p dim 2) or
-   * 5 tetrahedra (for @p dim 3), respectively.
+   * This function takes the mesh produced by subdivided_hyper_rectangle() and
+   * further subdivides each cell. For @p dim 2, it subdivides each cell into 2
+   * triangles.  For @p dim 3, it subdivides each cell into 5 or 6 tetrahedra
+   * based on the value of @p periodic. If @p periodic is true, then we split
+   * each cell into 6 cells so that each face of the rectangular prism has
+   * the same stencil, enabling periodicity. If @p periodic is false, we
+   * instead subdivide each hexahedral cell into 5 tetrahedra. If @p dim is not
+   * 3, then @p periodic has no effect.
    *
    * @note Currently, this function only works for `dim==spacedim`.
    *
@@ -2667,7 +2672,8 @@ namespace GridGenerator
     const std::vector<unsigned int> &repetitions,
     const Point<dim>                &p1,
     const Point<dim>                &p2,
-    const bool                       colorize = false);
+    const bool                       colorize = false,
+    const bool                       periodic = false);
 
   /**
    * Initialize the given triangulation with a hypercube (square in 2d and
@@ -2679,9 +2685,14 @@ namespace GridGenerator
    * the limits are given as arguments. They default to zero and unity, then
    * producing the unit hypercube.
    *
-   * @note This function takes the mesh produced by subdivided_hyper_cube()
-   * and further subdivides each cell into 2 triangles (for @p dim 2) or
-   * 5 tetrahedra (for @p dim 3), respectively.
+   * This function takes the mesh produced by subdivided_hyper_cube() and
+   * further subdivides each cell. For @p dim 2, it subdivides each cell into 2
+   * triangles.  For @p dim 3, it subdivides each cell into 5 or 6 tetrahedra
+   * based on the value of @p periodic. If @p periodic is true, then we split
+   * each cell into 6 cells so that each face of the rectangular prism has
+   * the same stencil, enabling periodicity. If @p periodic is false, we
+   * instead subdivide each hexahedral cell into 5 tetrahedra. If @p dim is not
+   * 3, then @p periodic has no effect.
    *
    * Also see
    * @ref simplex "Simplex support".
@@ -2692,7 +2703,8 @@ namespace GridGenerator
                                        const unsigned int repetitions,
                                        const double       p1       = 0.0,
                                        const double       p2       = 1.0,
-                                       const bool         colorize = false);
+                                       const bool         colorize = false,
+                                       const bool         periodic = false);
 
   /** @} */
 
