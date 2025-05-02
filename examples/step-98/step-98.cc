@@ -891,8 +891,7 @@ namespace LaplaceSolver
     , setup_time(0.)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     , time_details(std::cout,
-                   false &&
-                     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+                   Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
   {}
 
 
@@ -1163,9 +1162,8 @@ namespace LaplaceSolver
     }
 
 
-    {
-      GridGenerator::subdivided_hyper_cube(triangulation, 2);
-    }
+    GridGenerator::subdivided_hyper_cube(triangulation, 2);
+
     triangulation.refine_global(n_refinements);
     setup_system();
     assemble_rhs();
@@ -1182,7 +1180,7 @@ int main(int argc, char *argv[])
 
 
   const unsigned int dim       = 2;
-  const unsigned int fe_degree = 1;
+  const unsigned int fe_degree = 3;
 
   LaplaceSolver::LaplaceSolver<dim, fe_degree> solver;
   solver.initialize(2);
