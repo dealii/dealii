@@ -12,6 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
+// check basic functionality of PatchStorage: initialization on a mesh with a
+// single patch
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -29,8 +31,6 @@
 #include <deal.II/matrix_free/fe_patch_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/operators.h>
-#include <deal.II/matrix_free/patch_distributors.h>
-#include <deal.II/matrix_free/patch_smoother_base.h>
 #include <deal.II/matrix_free/patch_storage.h>
 
 #include "../tests.h"
