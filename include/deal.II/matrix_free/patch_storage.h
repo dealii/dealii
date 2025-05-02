@@ -24,7 +24,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
+#ifndef DOXYGEN
 
 namespace internal
 {
@@ -221,6 +221,7 @@ namespace internal
 } // namespace internal
 
 
+#endif // DOXYGEN
 
 /**
  * @brief Manages the storage and categorization of cell patches centered around
@@ -747,6 +748,9 @@ private:
   bool are_patches_categorized;
 };
 
+
+#ifndef DOXYGEN
+//---------------------------------------------------------------------------
 
 
 // ============================================================================
@@ -1449,6 +1453,8 @@ PatchStorage<MFType>::output_centerpoints(
         pvtu_out_steam, piece_names, data_names, vector_data_ranges, vtu_flags);
     }
 }
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -17,6 +17,8 @@ enum VectorizationType
   within_patch
 };
 
+
+#ifndef DOXYGEN
 namespace internal
 {
   // Taken from:
@@ -56,6 +58,8 @@ namespace internal
 
 
 } // namespace internal
+
+#endif // DOXYGEN
 
 /**
  * @brief A class that provides evaluation capabilities for finite element
@@ -278,7 +282,7 @@ private:
   Distributor distributor;
 };
 
-
+#ifndef DOXYGEN
 
 namespace internal
 {
@@ -455,6 +459,8 @@ FEPatchEvaluation<FEEval, Distributor, vectorizaton>::
   for (auto &fe_eval : fe_evaluations)
     fe_eval.distribute_local_to_global(dst);
 }
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

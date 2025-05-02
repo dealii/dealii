@@ -6,6 +6,11 @@
 
 
 
+/**
+ * @brief This namespace provides tools for distributing and gathering data
+ * between patch vectors and local cell storage in the context of matrix-free
+ * vertex-patch smoothers
+ */
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -18,6 +23,20 @@ namespace PatchDistributors
   {};
 
 
+
+  /**
+   * @brief Provides lookup tables and methods for distributing and gathering
+   * data between a patch vector and local cell storage.
+   *
+   * This struct relies on a specialization of `CellPatchLookup` for the given
+   * `dim` and `degree` to provide the necessary mapping information between
+   * patch DoFs and cell-local DoFs. It offers methods to loop over these
+   * mappings and perform common operations like distributing patch data to
+   * local cells or gathering local cell data into a patch vector.
+   *
+   * @tparam dim The spatial dimension.
+   * @tparam degree The polynomial degree of the finite element.
+   */
   template <int dim, int degree>
   struct DistributorLookup
   {
@@ -27,6 +46,36 @@ namespace PatchDistributors
     static const constexpr unsigned int n_patch_dofs_static =
       Cell2Patch::n_patch_dofs;
 
+
+    /**
+     * @brief Loops over the cell-to-patch mappings, applying different
+     * operations based on whether a DoF is non-overlapping, overlapping, or
+     * skipped.
+     *
+     * This is the core loop used by `distribute_patch_to_local` and
+     * `gather_local_to_patch`. It iterates through all cells in the patch.
+     * For each cell, it first calls `regular_operation` for DoFs that are
+     * unique to this cell within the patch context (non-overlapping). Then, it
+     * calls `overlapping_operation` for DoFs that are shared with other cells
+     * in the patch. Finally, it iterates through all cells again and calls
+     * `skipped_operation` for DoFs that exist in the cell's local storage but
+     * are not part of the patch vector (e.g., interior DoFs when the patch
+     * represents a vertex or edge).
+     *
+     * @tparam RegularOperation Functor type for non-overlapping DoFs. Must be
+     * callable with `(unsigned int patch_index, unsigned int cell, unsigned int
+     * cell_index)`.
+     * @tparam OverlappingOperation Functor type for overlapping DoFs. Must be
+     * callable with `(unsigned int patch_index, unsigned int cell, unsigned int
+     * cell_index)`.
+     * @tparam SkippedOperation Functor type for skipped DoFs. Must be callable
+     * with `(unsigned int cell, unsigned int cell_index)`.
+     * @param regular_operation Operation applied to non-overlapping DoFs and first occurrences
+     * of shared ones.
+     * @param overlapping_operation Operation applied to subsequent occurrences of DoFs that
+     * are shared between several cells.
+     * @param skipped_operation Operation applied to DoFs that are not included in the patch.
+     */
     template <typename RegularOperation,
               typename OverlappingOperation,
               typename SkippedOperation>
@@ -57,16 +106,34 @@ namespace PatchDistributors
           }
     }
 
+
+
     /**
-     * @brief Copy from patch vector to local cell storage. If @param copy_overlap  is false then
-     * overlapping dofs are set to 0.
+     * @brief Distributes data from a patch storage view to local cell storage views.
      *
+     * This function copies values from the `patch_storage` (representing the
+     * degrees of freedom for the entire patch) into the `cell_storage` array
+     * (representing the local degrees of freedom for each cell within the
+     * patch).
      *
-     * @tparam CellDofsView
-     * @tparam PatchDofsView
-     * @param cell_dofs
-     * @param patch_vector
-     * @param copy_duplicates
+     * Skipped DoFs (those present in local cell storage but not in the patch
+     * storage) are always set to 0 in the `cell_storage`.
+     *
+     * Overlapping DoFs (those shared between multiple cells in the patch) are
+     * copied from the `patch_storage` if `copy_overlap` is true, otherwise
+     * they are set to 0 in the `cell_storage`. Setting overlapping DoFs to 0
+     * is useful when preparing local cell storage for operations where only
+     * non-overlapping contributions should be considered initially, i.e.
+     * preparing to scatter contributions to global vector.
+     *
+     * @tparam CellDofsView Type representing the view/accessor for a single
+     * cell's local DoF storage. Must support `operator[]` for assignment.
+     * @tparam PatchDofsView Type representing the view/accessor for the patch
+     * DoF storage. Must support `operator[]` for reading.
+     * @param cell_storage An array of views, one for each cell's local storage.
+     * @param patch_storage A view of the patch storage.
+     * @param copy_overlap If true, overlapping DoFs are copied from patch to
+     * local storage. If false, they are set to 0 in local storage.
      */
     template <typename CellDofsView, typename PatchDofsView>
     inline void
@@ -97,6 +164,42 @@ namespace PatchDistributors
       loop(regular_operation, overlap_operation, skipped_operation);
     }
 
+
+
+    /**
+     * @brief Gathers data from local cell storage views into a patch storage view.
+     *
+     * This function aggregates values from the `cell_storage` array (local DoFs
+     * for each cell) into the `patch_storage` (DoFs for the entire patch).
+     *
+     * Non-overlapping DoFs are simply copied from the corresponding cell's
+     * storage to the patch storage.
+     * Overlapping DoFs (DoF that are shared between multiple cells) are handled
+     * based on the `sum_overlapping` flag. If true, contributions from
+     * all cells sharing the DoF are summed into the patch storage (e.g
+     * collecting values after local residual evaluation). If false, only the
+     * contribution from the first cell encountered in the loop (the "regular"
+     * one according to the `CellPatchLookup` data) is copied, and contributions
+     * from other cells sharing this DoF are ignored. Summing is typical for
+     * assembling contributions (e.g., residual vectors), while direct copying
+     * might be used in other scenarios.
+     *
+     * Skipped DoFs (present in local cell storage but not in patch storage) are
+     * ignored.
+     *
+     * @note If `sum_overlapping` is true, the `patch_storage` should typically
+     * be initialized to zero before calling this function.
+     *
+     * @tparam CellDofsView Type representing the view/accessor for a single
+     * cell's local DoF storage. Must support `operator[]` for reading.
+     * @tparam PatchDofsView Type representing the view/accessor for the patch
+     * DoF storage. Must support `operator[]` for assignment and potentially
+     * `operator+=` if `sum_overlapping` is true.
+     * @param cell_storage An array of views, one for each cell's local storage.
+     * @param patch_storage A view of the patch storage.
+     * @param sum_overlapping If true, contributions to overlapping DoFs are
+     * summed. If false, only the first contribution is copied.
+     */
     template <typename CellDofsView, typename PatchDofsView>
     inline void
     gather_local_to_patch(const std::array<CellDofsView, n_cells> &cell_storage,
@@ -119,6 +222,13 @@ namespace PatchDistributors
       loop(regular_operation, overlap_operation, [](const auto &...) {});
     }
 
+
+    /**
+     * @brief Returns the total number of degrees of freedom in the patch vector.
+     *
+     * This corresponds to the size of the `patch_storage` expected by the
+     * `distribute_patch_to_local` and `gather_local_to_patch` methods.
+     */
     unsigned int
     n_patch_dofs() const
     {
@@ -127,6 +237,8 @@ namespace PatchDistributors
   };
 
 
+//---------------------------------------------------------------------------
+#ifndef DOXYGEN
 
   template <>
   struct CellPatchLookup<1, 1>
@@ -659,6 +771,8 @@ namespace PatchDistributors
       {27, 18, 18, 12, 18, 12, 12, 8}};
   };
 
+
+#endif // DOXYGEN
 } // namespace PatchDistributors
 
 

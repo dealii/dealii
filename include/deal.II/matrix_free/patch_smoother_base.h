@@ -9,9 +9,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 // Ensure LocalSmootherBase is a template class
 template <int dim, typename number>
 class SmootherBase;
+#endif // DOXYGEN
 
 /**
  * @brief Base class for patch-based smoothers operating on MatrixFree data.
@@ -160,6 +162,9 @@ protected:
   std::shared_ptr<PatchStorageType> patch_storage;
 };
 
+
+#ifndef DOXYGEN
+
 template <int dim, typename number>
 void
 SmootherBase<dim, number>::initialize(
@@ -238,6 +243,8 @@ SmootherBase<dim, number>::Tvmult(VectorType &dst, const VectorType &src) const
   dst = 0;
   Tstep(dst, src);
 }
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
