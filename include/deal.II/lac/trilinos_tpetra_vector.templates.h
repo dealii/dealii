@@ -338,6 +338,12 @@ namespace LinearAlgebra
       //  - First case: both vectors have the same layout.
       //  - Second case: both vectors have the same size but different layout.
       //  - Third case: the vectors have different size.
+
+      AssertThrow(V.compressed,
+                  ExcMessage("Cannot copy-assign from a vector that has not "
+                             "been compressed. Please call compress() on the "
+                             "source vector before using operator=()."));
+
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
           // Create a read-only Kokkos view from the source vector
