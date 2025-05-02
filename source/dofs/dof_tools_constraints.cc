@@ -3122,23 +3122,36 @@ namespace DoFTools
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
+      // We need to inquire about some face things, but in this context we do
+      // not have face numbers. Because of the assumptions above we can just
+      // assume the face number is zero.
+      const unsigned int face_no = 0;
+
       const bool use_mg = (level != numbers::invalid_unsigned_int);
 
       // If we don't use multigrid, we should be in the case where face_1 is
       // active, i.e. has no children. In the case of multigrid, constraints
       // between cells on the same level are set up.
-
       Assert(use_mg || (!face_1->has_children()), ExcInternalError());
-
       Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
 
-      // TODO: the implementation makes the assumption that all faces have the
-      // same number of dofs
       AssertDimension(
         face_1->get_fe(face_1->nth_active_fe_index(0)).n_unique_faces(), 1);
       AssertDimension(
         face_2->get_fe(face_2->nth_active_fe_index(0)).n_unique_faces(), 1);
-      const unsigned int face_no = 0;
+
+      const types::fe_index face_1_index     = face_1->nth_active_fe_index(0);
+      const types::fe_index face_2_index     = face_2->nth_active_fe_index(0);
+      const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
+      Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
+             ExcMessage(
+               "Matching periodic cells need to use the same finite element"));
+      Assert(component_mask.represents_n_components(fe.n_components()),
+             ExcMessage(
+               "The number of components in the mask has to be either "
+               "zero or equal to the number of components in the finite "
+               "element."));
+      const unsigned int dofs_per_face = fe.n_dofs_per_face(face_no);
 
       // If we don't use multigrid and face_2 does have children,
       // then we need to iterate over these children and set periodic
@@ -3149,12 +3162,8 @@ namespace DoFTools
       if ((!use_mg) && face_2->has_children())
         {
           Assert(face_2->n_children() ==
-                   GeometryInfo<dim>::max_children_per_face,
+                   face_2->reference_cell().template n_children<dim - 1>(),
                  ExcNotImplemented());
-
-          const unsigned int dofs_per_face =
-            face_1->get_fe(face_1->nth_active_fe_index(0))
-              .n_dofs_per_face(face_no);
 
           // Skip further recursion if face_1 carries invalid dof indices,
           // i.e., it is on an artificial cell.
@@ -3198,25 +3207,12 @@ namespace DoFTools
       // that is left is to match the corresponding DoFs of both faces.
       //
 
-      const types::fe_index face_1_index = face_1->nth_active_fe_index(0);
-      const types::fe_index face_2_index = face_2->nth_active_fe_index(0);
-      Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
-             ExcMessage(
-               "Matching periodic cells need to use the same finite element"));
-
-      const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
-
-      Assert(component_mask.represents_n_components(fe.n_components()),
-             ExcMessage(
-               "The number of components in the mask has to be either "
-               "zero or equal to the number of components in the finite "
-               "element."));
-
-      const unsigned int dofs_per_face = fe.n_dofs_per_face(face_no);
-
       std::vector<types::global_dof_index> dofs_1(dofs_per_face);
       std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
+      // Note that, in 3d, these functions take into account the line
+      // orientations on each face: i.e., this function does not need to
+      // consider line orientations.
       if (use_mg)
         face_1->get_mg_dof_indices(level, dofs_1, face_1_index);
       else
@@ -3266,32 +3262,19 @@ namespace DoFTools
                 return;
               }
 
-      // Well, this is a hack:
-      //
-      // There is no
-      //   face_to_face_index(face_index,
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // function in FiniteElementData, so we have to use
-      //   face_to_cell_index(face_index, face
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // But this will give us an index on a cell - something we cannot work
-      // with directly. But luckily we can match them back :-]
+      // To match DoFs we need to use combined_orientation to permute the face
+      // DoFs. FiniteElement does not offer a function to do exactly that: i.e.,
+      // adjust_line_dof_index_for_line_orientation() only considers the
+      // orientation of a line and adjust_quad_dof_index_for_face_orientation()
+      // is only for DoFs defined on quads. Hence we compute our own lookup
+      // table with the necessary information:
+      std::vector<unsigned int> cell_to_face_index(
+        fe.dofs_per_cell, numbers::invalid_unsigned_int);
 
-      std::map<unsigned int, unsigned int> cell_to_rotated_face_index;
-
-      // Build up a cell to face index for face_2:
-      for (unsigned int i = 0; i < dofs_per_face; ++i)
-        {
-          const unsigned int cell_index = fe.face_to_cell_index(
-            i,
-            // It doesn't really matter, just assume we're on the first face...
-            0);
-          cell_to_rotated_face_index[cell_index] = i;
-        }
+      for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
+        cell_to_face_index[fe.face_to_cell_index(
+          face_dof, face_no, numbers::default_geometric_orientation)] =
+          face_dof;
 
       // Build constraints in a vector of pairs that can be
       // arbitrarily large, but that holds up to 25 elements without
@@ -3372,8 +3355,10 @@ namespace DoFTools
                   // Get the correct dof index on face_1 respecting the
                   // given orientation:
                   const unsigned int j =
-                    cell_to_rotated_face_index[fe.face_to_cell_index(
-                      jj, 0, combined_orientation)];
+                    cell_to_face_index[fe.face_to_cell_index(
+                      jj, face_no, combined_orientation)];
+                  Assert(j != numbers::invalid_unsigned_int,
+                         ExcInternalError());
 
                   if (std::abs(transformation(i, jj)) > eps)
                     constraint_entries.emplace_back(dofs_1[j],
@@ -3394,9 +3379,9 @@ namespace DoFTools
 
           // Get the correct dof index on face_1 respecting the given
           // orientation:
-          const unsigned int j =
-            cell_to_rotated_face_index[fe.face_to_cell_index(
-              target, 0, combined_orientation)];
+          const unsigned int j = cell_to_face_index[fe.face_to_cell_index(
+            target, face_no, combined_orientation)];
+          Assert(j != numbers::invalid_unsigned_int, ExcInternalError());
 
           auto dof_left  = dofs_1[j];
           auto dof_right = dofs_2[i];
@@ -3802,13 +3787,9 @@ namespace DoFTools
           {
             Assert(!face_1->has_children(), ExcInternalError());
 
-            // Important note:
-            // In 3d we have to take care of the fact that face_rotation gives
-            // the relative rotation of face_1 to face_2, i.e. we have to invert
-            // the rotation when constraining face_2 to face_1. Therefore
-            // face_flip has to be toggled if face_rotation is true: In case of
-            // inverted orientation, nothing has to be done.
-
+            // since the combined_orientation describes how we should rotate
+            // face_1 to match face_2, we invert it to match the convention
+            // expected by set_periodicity_constraints()
             const auto face_reference_cell = face_1->reference_cell();
             internal::set_periodicity_constraints(
               face_1,
