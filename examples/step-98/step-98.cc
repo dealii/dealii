@@ -779,19 +779,10 @@ namespace Operators
         // --- Step 5: Update the solution ---
         // The standard smoother update is: u_new = u_old + correction
         // However, the distribute functions from underlying FEEvaluations
-        // perform an *addition* to the target vector. So, we negate the
-        // correction and add it. dst_new = dst_old +
-        // (-correction) is equivalent to dst_new = dst_old - correction
+        // perform an *addition* to the target vector. Since there are DoF that
+        // are shared on multiple cells and we want to add the correction only
+        // once, we need zero out the "duplicates".
         //
-        // FIXME: Gemini thinks that minus here is a mistake and to be fair it
-        // has a point. It is not straighforward to explain why we need to
-        // negate the correction. I am sure that his version is correct
-        // (veryfied), so explanation is needed.
-
-        // Negate the computed correction before distributing.
-        for (unsigned int i = 0; i < local_correction.size(); ++i)
-          local_correction[i] *= -1;
-
         // Distribute the patch correction vector back to the individual cells'
         // FEEvaluation objects. 'false' indicates that DoFs shared beteween
         // multiple cell are only written the first owning cell, not
