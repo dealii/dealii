@@ -534,7 +534,7 @@ namespace Operators
    * of cells, applying a local inverse (provided by PatchTensorInverse) to
    * approximate the action of the global operator's inverse on the residual.
    *
-   * It derives from PatchOperator::SmootherBase, which provides the framework
+   * It derives from  SmootherBase, which provides the framework
    * for patch-based smoothers, including handling patch iteration and data
    * distribution.
    *
@@ -543,16 +543,16 @@ namespace Operators
    * @tparam number The scalar type for computations (e.g., double).
    */
   template <int dim, int fe_degree, typename number>
-  class LaplacePatchSmoother : public ::PatchOperator::SmootherBase<dim, number>
+  class LaplacePatchSmoother : public SmootherBase<dim, number>
   {
   public:
-    using BaseType       = PatchOperator::SmootherBase<dim, number>;
+    using BaseType       = SmootherBase<dim, number>;
     using VectorType     = LinearAlgebra::distributed::Vector<number>;
     using MatrixFreeType = MatrixFree<dim, number>;
     /**
      * @brief Type alias for the storage managing patch data (DoF indices, etc.).
      */
-    using PatchStorageType = PatchOperator::PatchStorage<MatrixFreeType>;
+    using PatchStorageType = PatchStorage<MatrixFreeType>;
     /**
      * @brief Type alias for the class providing the local patch inverse.
      */
@@ -653,7 +653,7 @@ namespace Operators
    * the local residual on each patch, applies the inverse of the local patch
    * operator to compute a correction, and updates the global solution vector.
    *
-   * Uses PatchOperator::FEPatchEvaluation to manage data transfer between
+   * Uses  FEPatchEvaluation to manage data transfer between
    * global vectors and local patch vectors. Iterates through the specified
    * patch range, computes the local residual, applies the patch inverse, and
    * updates the global solution vector. At the  moment, only do_forward==true
@@ -690,9 +690,9 @@ namespace Operators
     // tables, though it's still significantly slower than Clang. Using
     // `DistributorLookup` is crucial for efficiency, as it provides the
     // mapping between patch DoFs and cell DoFs.
-    using PatchEval = PatchOperator::FEPatchEvaluation<
-      FEEval,
-      PatchDistributors::DistributorLookup<dim, fe_degree>>;
+    using PatchEval =
+      FEPatchEvaluation<FEEval,
+                        PatchDistributors::DistributorLookup<dim, fe_degree>>;
 
 
 
@@ -1032,7 +1032,7 @@ namespace LaplaceSolver
   template <int dim, int fe_degree>
   void LaplaceSolver<dim, fe_degree>::solve()
   {
-    using StorageType = PatchOperator::PatchStorage<MatrixFree<dim, double>>;
+    using StorageType = PatchStorage<MatrixFree<dim, double>>;
 
     // Get the number of levels in the multigrid hierarchy.
     const unsigned max_lvl = triangulation.n_global_levels() - 1;

@@ -45,7 +45,7 @@ public:
   /**
    * @brief Alias for the PatchStorage type used to manage patch data.
    */
-  using PatchStorageType = PatchOperator::PatchStorage<MatrixFreeType>;
+  using PatchStorageType = PatchStorage<MatrixFreeType>;
 
   /**
    * @brief Alias for additional data, typically the PatchStorage itself.
