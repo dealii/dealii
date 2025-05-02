@@ -24,6 +24,8 @@
 #  include <adolc/internal/adolc_settings.h>
 #  include <adolc/internal/adubfunc.h> // Taped double math functions
 
+#  include <cmath>
+
 
 #  ifndef DOXYGEN
 
