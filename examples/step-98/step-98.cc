@@ -805,7 +805,17 @@ namespace LaplaceSolver
 {
   using namespace dealii;
 
-
+  /**
+   * Implements a Laplace solver using matrix-free techniques.
+   * There are two main differences between this class and the one from step-37:
+   *  - MatrixFree object for level operators  have to enable evalution on
+   * ghosted cells
+   *  - The smoother is a patch smoother, which is more efficient for high order
+   * elements.  It requires building PatchStorage to store infomration necessary
+   * for loops. The smoother is good enough on its own, there is no need to
+   * combine it with PreconditionChebyshev
+   *
+   */
   template <int dim, int fe_degree>
   class LaplaceSolver
   {
@@ -973,7 +983,10 @@ namespace LaplaceSolver
           MatrixFree<dim, LevelNumber>::AdditionalData::none;
         additional_data.mapping_update_flags =
           (update_gradients | update_JxW_values | update_quadrature_points);
-        additional_data.mg_level          = level;
+        additional_data.mg_level = level;
+
+        // We need to set the level of the matrix-free object to
+        // enable evaluation on ghosted cell.
         additional_data.store_ghost_cells = true;
         std::shared_ptr<MatrixFree<dim, LevelNumber>> mg_mf_storage_level(
           new MatrixFree<dim, LevelNumber>());
@@ -1126,7 +1139,6 @@ namespace LaplaceSolver
     data_out.build_patches(mapping, fe_degree);
 
     DataOutBase::VtkFlags flags;
-    // flags.compression_level = DataOutBase::VtkFlags::best_speed;
     data_out.set_flags(flags);
     data_out.write_vtu_with_pvtu_record(
       "./", "solution", cycle, MPI_COMM_WORLD, 3);
@@ -1148,11 +1160,6 @@ namespace LaplaceSolver
             << " doubles = " << n_vect_bits << " bits ("
             << Utilities::System::get_current_vectorization_level() << ")"
             << std::endl;
-
-      // pcout << "Running with  "
-      // << n_refinements
-      // << "  refinements and task_chunk_size = " << task_chunk_size
-      // << std::endl;
     }
 
 
