@@ -1877,7 +1877,7 @@ namespace TrilinosWrappers
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
      * function above, this function uses an object of type
-     * Epetra_CrsMatrixCrs.
+     * Epetra_CrsMatrix.
      */
     void
     initialize(const Epetra_CrsMatrix &matrix,
