@@ -229,6 +229,22 @@ namespace Portable
     DEAL_II_HOST_DEVICE void
     submit_gradient(const gradient_type &grad_in, int q_point);
 
+    /**
+     * Same as above, except that the quadrature point is computed from the
+     * thread id.
+     */
+    DEAL_II_HOST_DEVICE
+    SymmetricTensor<2, dim, Number>
+    get_symmetric_gradient(int point) const;
+
+    /**
+     * Same as above, except that the quadrature point is computed from the
+     * thread id.
+     */
+    DEAL_II_HOST_DEVICE void
+    submit_symmetric_gradient(const SymmetricTensor<2, dim, Number> &grad_in,
+                              int                                    q_point);
+
     // clang-format off
     /**
      * Same as above, except that the functor @p func only takes a single input
@@ -667,6 +683,76 @@ namespace Portable
                 tmp * precomputed_data->JxW(q_point, cell_id);
             }
       }
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE SymmetricTensor<2, dim, Number>
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    get_symmetric_gradient(int q_point) const
+  {
+    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    Assert(n_components_ == dim,
+           ExcMessage("Function get_symmetric_gradient() only works when the "
+                      "number of components and the number of dimensions are "
+                      "equal."));
+
+    const gradient_type grad = get_gradient(q_point);
+    SymmetricTensor<2, dim, Number> sym_grad;
+    for (unsigned int d = 0; d < dim; ++d)
+      sym_grad.access_raw_entry(d) = grad[d][d];
+    switch (dim)
+      {
+        case 1:
+          break;
+        case 2:
+          sym_grad.access_raw_entry(2) = (grad[0][1] + grad[1][0]) * 0.5;
+          break;
+        case 3:
+          sym_grad.access_raw_entry(3) = (grad[0][1] + grad[1][0]) * 0.5;
+          sym_grad.access_raw_entry(4) = (grad[0][2] + grad[2][0]) * 0.5;
+          sym_grad.access_raw_entry(5) = (grad[1][2] + grad[2][1]) * 0.5;
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
+      }
+    return sym_grad;
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE void
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    submit_symmetric_gradient(const SymmetricTensor<2, dim, Number> &sym_grad,
+                              int                                    q_point)
+  {
+    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    Assert(n_components_ == dim,
+           ExcMessage("Function get_symmetric_gradient() only works when the "
+                      "number of components and the number of dimensions are "
+                      "equal."));
+
+    for (unsigned int c = 0; c < dim; ++c)
+      for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+        {
+          Number tmp = 0.;
+          for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
+            tmp +=
+              precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
+              sym_grad[c][d_2];
+          shared_data->gradients(q_point, d_1, c) =
+            tmp * precomputed_data->JxW(q_point, cell_id);
+        }
   }
 
 
