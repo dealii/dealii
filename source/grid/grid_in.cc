@@ -676,14 +676,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     ExcMessage(
                       "While reading VTK file, missing keyword 'default'."));
 
-                  Vector<double> temp_data;
-                  temp_data.reinit(n_ids);
-                  double data;
+                  Vector<double> temp_data(n_ids);
                   for (unsigned int j = 0; j < n_ids; ++j)
-                    {
-                      in >> data;
-                      temp_data[j] = data;
-                    }
+                    in >> temp_data[j];
+                  AssertThrow(in.fail() == false, ExcIO());
                   this->point_data[field_name] = std::move(temp_data);
                 }
 
@@ -699,16 +695,16 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   Vector<double> temp_data;
                   temp_data.reinit(n_ids *
                                    3); // assuming always 3 components per point
-                  double data;
+
                   for (unsigned int j = 0; j < n_ids; ++j)
                     {
                       // now, three components for each point
                       for (unsigned int d = 0; d < 3; ++d)
                         {
-                          in >> data;
-                          temp_data[j * 3 + d] = data;
+                          in >> temp_data[j * 3 + d];
                         }
                     }
+                  AssertThrow(in.fail() == false, ExcIO());
                   this->point_data[field_name] = std::move(temp_data);
                 }
             }
