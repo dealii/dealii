@@ -1,2 +1,4 @@
-New: DoFRenumbering::lexicographic
-(Michał Wichrowski, 2025/05/02)
+New: Added FETools::cell_to_face_lexicographic function to generate
+mapping from cell-local DoFs to lexicographic ordering of DoFs on two adjacent cells.
+Added DoFRenumbering::lexicographic.
+(Michał Wichrowski, 2025/05/03)
