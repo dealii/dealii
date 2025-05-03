@@ -702,7 +702,7 @@ namespace Portable
                       "number of components and the number of dimensions are "
                       "equal."));
 
-    const gradient_type grad = get_gradient(q_point);
+    const gradient_type             grad = get_gradient(q_point);
     SymmetricTensor<2, dim, Number> sym_grad;
     for (unsigned int d = 0; d < dim; ++d)
       sym_grad.access_raw_entry(d) = grad[d][d];
@@ -747,9 +747,8 @@ namespace Portable
         {
           Number tmp = 0.;
           for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-            tmp +=
-              precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
-              sym_grad[c][d_2];
+            tmp += precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
+                   sym_grad[c][d_2];
           shared_data->gradients(q_point, d_1, c) =
             tmp * precomputed_data->JxW(q_point, cell_id);
         }
