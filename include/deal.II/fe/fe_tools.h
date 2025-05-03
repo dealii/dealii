@@ -932,6 +932,21 @@ namespace FETools
   lexicographic_to_hierarchic_numbering(unsigned int degree);
 
   /**
+   * This function returns a map from cell DoFs to DoFs on two adjacent cells
+   * sharing face perpendicular to  @p direction in reference space.
+   * The map is given in the form of a pair of vectors, where the
+   * first vector contains the DoFs on the first cell and the second vector
+   * contains the DoFs on the second cell. Flag @p is_continuous  indicates whether
+   * the degrees of freedom on the common face overlap or not.
+   */
+  template <int dim>
+  std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+  cell_to_face_lexicographic(const unsigned int &degree,
+                             const unsigned int &direction,
+                             const bool         &cell_hierarchical_numbering,
+                             const bool         &is_continuous);
+
+  /**
    * A namespace that contains functions that help setting up internal
    * data structures when implementing FiniteElement which are build
    * from simpler ("base") elements, for example FESystem. The things
