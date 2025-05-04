@@ -134,21 +134,29 @@ if(DEAL_II_WITH_TRILINOS)
     trilinos_solver.cc
     trilinos_sparse_matrix.cc
     trilinos_sparsity_pattern.cc
-    trilinos_tpetra_block_vector.cc
-    trilinos_tpetra_block_sparse_matrix.cc
-    trilinos_tpetra_communication_pattern.cc
-    trilinos_tpetra_precondition.cc
-    trilinos_tpetra_solver_direct.cc
-    trilinos_tpetra_sparse_matrix.cc
-    trilinos_tpetra_sparsity_pattern.cc
-    trilinos_tpetra_vector.cc
     trilinos_vector.cc
   )
 
-  set(_separate_src
-    ${_separate_src}
-    trilinos_precondition_muelu.cc
+  if(DEAL_II_TRILINOS_WITH_MUELU)
+    set(_separate_src
+      ${_separate_src}
+      trilinos_precondition_muelu.cc
     )
+  endif()
+
+  if(DEAL_II_TRILINOS_WITH_TPETRA)
+    set(_unity_include_src
+      ${_unity_include_src}
+      trilinos_tpetra_block_vector.cc
+      trilinos_tpetra_block_sparse_matrix.cc
+      trilinos_tpetra_communication_pattern.cc
+      trilinos_tpetra_precondition.cc
+      trilinos_tpetra_solver_direct.cc
+      trilinos_tpetra_sparse_matrix.cc
+      trilinos_tpetra_sparsity_pattern.cc
+      trilinos_tpetra_vector.cc
+    )
+  endif()
 
   set(_inst
     ${_inst}
