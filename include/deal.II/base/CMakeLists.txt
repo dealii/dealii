@@ -24,10 +24,3 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/revision.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/revision.h
   )
-
-
-#
-# Recurse into the sub-directories:
-#
-add_subdirectory(std_cxx17)
-add_subdirectory(std_cxx20)
