@@ -710,21 +710,26 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
-    explicit AdditionalData(const unsigned int max_basis_size         = 30,
-                            const bool use_truncated_mpgmres_strategy = true,
+    explicit AdditionalData(const unsigned int max_basis_size = 30,
                             const LinearAlgebra::OrthogonalizationStrategy
                               orthogonalization_strategy =
                                 LinearAlgebra::OrthogonalizationStrategy::
-                                  delayed_classical_gram_schmidt)
+                                  delayed_classical_gram_schmidt,
+                            const bool use_truncated_mpgmres_strategy = true)
       : max_basis_size(max_basis_size)
-      , use_truncated_mpgmres_strategy(use_truncated_mpgmres_strategy)
       , orthogonalization_strategy(orthogonalization_strategy)
+      , use_truncated_mpgmres_strategy(use_truncated_mpgmres_strategy)
     {}
 
     /**
      * Maximum basis size.
      */
     unsigned int max_basis_size;
+
+    /**
+     * Strategy to orthogonalize vectors.
+     */
+    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
 
     /**
      * If set to true (the default) a "truncated" search space is
@@ -736,11 +741,6 @@ public:
      * for details.
      */
     bool use_truncated_mpgmres_strategy;
-
-    /**
-     * Strategy to orthogonalize vectors.
-     */
-    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
   };
 
   /**
@@ -2363,8 +2363,8 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
       mem,
       typename SolverMPGMRES<VectorType>::AdditionalData{
         data.max_basis_size,
-        true,
-        data.orthogonalization_strategy})
+        data.orthogonalization_strategy,
+        true})
 {}
 
 
@@ -2377,8 +2377,8 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
       cn,
       typename SolverMPGMRES<VectorType>::AdditionalData{
         data.max_basis_size,
-        true,
-        data.orthogonalization_strategy})
+        data.orthogonalization_strategy,
+        true})
 {}
 
 
