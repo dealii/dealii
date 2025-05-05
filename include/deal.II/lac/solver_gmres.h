@@ -665,7 +665,7 @@ protected:
  * @f}
  * For reference, FGMRES uses the following construction:
  * @f{align*}{
- *   r, P_1r, P_2P_1r, P_1P_2P_1r, \ldots
+ *   r, P_1r, P_2AP_1r, P_1AP_2AP_1r, \ldots
  * @f}
  * By default the truncated variant is used. You can switch to the full
  * version by setting the
