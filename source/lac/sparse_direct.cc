@@ -30,6 +30,9 @@
 #  include <umfpack.h>
 #endif
 
+#ifdef DEAL_II_WITH_MUMPS
+#  include <dmumps_c.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
