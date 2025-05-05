@@ -702,26 +702,7 @@ namespace Portable
                       "number of components and the number of dimensions are "
                       "equal."));
 
-    const gradient_type             grad = get_gradient(q_point);
-    SymmetricTensor<2, dim, Number> sym_grad;
-    for (unsigned int d = 0; d < dim; ++d)
-      sym_grad.access_raw_entry(d) = grad[d][d];
-    switch (dim)
-      {
-        case 1:
-          break;
-        case 2:
-          sym_grad.access_raw_entry(2) = (grad[0][1] + grad[1][0]) * 0.5;
-          break;
-        case 3:
-          sym_grad.access_raw_entry(3) = (grad[0][1] + grad[1][0]) * 0.5;
-          sym_grad.access_raw_entry(4) = (grad[0][2] + grad[2][0]) * 0.5;
-          sym_grad.access_raw_entry(5) = (grad[1][2] + grad[2][1]) * 0.5;
-          break;
-        default:
-          Assert(false, ExcNotImplemented());
-      }
-    return sym_grad;
+    return symmetrize(get_gradient(q_point));
   }
 
 
@@ -738,9 +719,9 @@ namespace Portable
   {
     Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
     Assert(n_components_ == dim,
-           ExcMessage("Function get_symmetric_gradient() only works when the "
-                      "number of components and the number of dimensions are "
-                      "equal."));
+           ExcMessage("Function submit_symmetric_gradient() only works when "
+                      "the number of components and the number of dimensions "
+                      "are equal."));
 
     for (unsigned int c = 0; c < dim; ++c)
       for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
