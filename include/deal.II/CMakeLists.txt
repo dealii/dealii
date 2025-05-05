@@ -42,3 +42,7 @@ add_subdirectory(physics)
 add_subdirectory(sundials)
 add_subdirectory(trilinos)
 add_subdirectory(vtk)
+
+
+# Propagate the list of header files back up one directory level
+set(DEAL_II_HEADER_FILES ${DEAL_II_HEADER_FILES} PARENT_SCOPE)

@@ -11,3 +11,28 @@
 ## LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
 ##
 ## ------------------------------------------------------------------------
+
+
+
+#
+# Keep track of all of the header files in this directory
+#
+set(_header_files
+    advection.h
+    divergence.h
+    elasticity.h
+    grad_div.h
+    l2.h
+    laplace.h
+    local_integrators.h
+    maxwell.h
+    patches.h
+)
+
+
+# Prepend each header name by the current directory
+list(TRANSFORM _header_files PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+
+# Add all of these header files to the global list and propagate things back up one directory level
+list(APPEND DEAL_II_HEADER_FILES ${_header_files})
+set(DEAL_II_HEADER_FILES ${DEAL_II_HEADER_FILES} PARENT_SCOPE)
