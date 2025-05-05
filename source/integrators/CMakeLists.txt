@@ -20,3 +20,5 @@ file(GLOB _header
   )
 
 define_object_library(object_integrators OBJECT ${_src} ${_header})
+
+collect_source_and_header_files("${_src}" "${_header}")

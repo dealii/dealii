@@ -99,3 +99,5 @@ file(GLOB _header
 
 define_object_library(object_grid OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_grid "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

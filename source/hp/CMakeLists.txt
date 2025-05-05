@@ -44,3 +44,5 @@ file(GLOB _header
 
 define_object_library(object_hp OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_hp "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

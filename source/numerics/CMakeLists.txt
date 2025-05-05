@@ -111,3 +111,5 @@ file(GLOB _header
 
 define_object_library(object_numerics OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_numerics "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

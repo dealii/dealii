@@ -31,3 +31,5 @@ file(GLOB _header
 
 define_object_library(object_meshworker OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_meshworker "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

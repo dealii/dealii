@@ -58,3 +58,5 @@ file(GLOB _header
 
 define_object_library(object_multigrid OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_multigrid "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")
