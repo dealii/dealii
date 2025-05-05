@@ -3261,6 +3261,7 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   DEAL_II_ASSERT_UNREACHABLE();
 #  else
 #    ifndef H5_HAVE_PARALLEL
+  (void)filename;
   DEAL_II_ASSERT_UNREACHABLE();
 #    else
 
