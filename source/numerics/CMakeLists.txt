@@ -105,7 +105,7 @@ set(_inst
   vector_tools_rhs.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/numerics/*.h
   )
 

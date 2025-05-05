@@ -48,7 +48,7 @@ set(_inst
   shape_info.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
 

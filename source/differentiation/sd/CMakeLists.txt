@@ -35,7 +35,7 @@ if(DEAL_II_WITH_SYMENGINE)
 endif()
 
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/differentiation/sd/*.h
   )
 

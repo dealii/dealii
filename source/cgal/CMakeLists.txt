@@ -40,7 +40,7 @@ if(DEAL_II_WITH_CGAL)
   )
 endif()
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/cgal/*.h
   )
 

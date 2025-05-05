@@ -62,7 +62,7 @@ setup_source_list("${_unity_include_src}"
   )
 
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/distributed/*.h
   )
 
