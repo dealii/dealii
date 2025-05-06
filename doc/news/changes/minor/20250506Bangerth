@@ -1,0 +1,10 @@
+Changed: When the SUNDIALS::KINSOL solver fails to converge, it
+returns an error. In the past, deal.II then aborted the program (in
+debug mode), but there are cases where KINSOL's failure can make
+legitimate sense, and where a user program could catch the error and
+re-start, perhaps from a better chosen starting point. As a
+consequence, the behavior has been changed: Instead of aborting the
+program, SUNDIALS::KINSOL now throws an exception (in both debug and
+release mode) that can be caught and processed by user code.
+<br>
+(Simon Wiesheier, Wolfgang Bangerth, 2025/05/06)
