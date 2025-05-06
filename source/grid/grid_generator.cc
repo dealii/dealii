@@ -7994,10 +7994,10 @@ namespace GridGenerator
                                     Triangulation<dim, spacedim> &out_tria)
   {
     Assert(dim > 1, ExcNotImplemented());
-    AssertThrow(
-      in_tria.all_reference_cells_are_hyper_cube(),
-      ExcMessage(
-        "GridGenerator::convert_hypercube_to_simplex_mesh() expects a mesh that consists only of quads/hexes."));
+    AssertThrow(in_tria.all_reference_cells_are_hyper_cube(),
+                ExcMessage(
+                  "GridGenerator::convert_hypercube_to_simplex_mesh() expects "
+                  "a Triangulation that consists only of quads/hexes."));
 
     Triangulation<dim, spacedim> temp_tria;
     if (in_tria.n_global_levels() > 1)
