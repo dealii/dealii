@@ -742,56 +742,18 @@ namespace FETools
                   // In serial runs, the DoFs values from refined patches always
                   // overwrite the values that may be set by parent patches if
                   // the triangulation is adaptively refined. For this to also
-                  // happen in a distributed simulation, we need to be careful
-                  // since the compression of Petsc/Trilinos and
-                  // LinearAlgebra::distributed vectors is done differently.
-                  if constexpr (is_la_vector<OutVector>)
-                    {
-                      // If the output vector is a LinearAlgebra::distributed
-                      // vector, we should set the value on this process if and
-                      // only if:
-                      //   1. The DoF is locally owned and not at an interface
-                      //   between a coarse owned cell and refined ghost cell.
-                      //   2. The DoF is not locally owned and at an interface
-                      //   between a refined owned cell and a coarse ghost cell.
-                      // A final compress(max) operation at the end (with a
-                      // default initialization of the vector with the neutral
-                      // element -inf) ensures that the correct refined values
-                      // are synchronised on all processors.
-                      const bool is_locally_owned =
-                        u.in_local_range(indices[j]);
-                      const bool at_refined_ghost_interface =
-                        (dofs_at_refined_ghost_interface.find(indices[j]) !=
-                         dofs_at_refined_ghost_interface.end());
-                      bool on_refined_side =
-                        at_refined_ghost_interface &&
-                        dofs_at_refined_ghost_interface.at(indices[j]) ==
-                          dealii_cell->level();
-                      bool on_coarse_side =
-                        at_refined_ghost_interface &&
-                        dofs_at_refined_ghost_interface.at(indices[j]) !=
-                          dealii_cell->level();
-                      if ((is_locally_owned && !on_coarse_side) ||
-                          (!is_locally_owned && on_refined_side))
-                        ::dealii::internal::ElementAccess<OutVector>::set(
-                          local_values(j), indices[j], u);
-                    }
-                  else
-                    {
-                      // For Petsc and Trilinos vectors, only set this dof if
-                      // there are no more refined ghosted neighbor setting this
-                      // dof. A final compress(insert) operation at the end will
-                      // synchronise the correct refined values on all
-                      // processors.
-                      const bool on_refined_neighbor =
-                        (dofs_at_refined_ghost_interface.find(indices[j]) !=
-                         dofs_at_refined_ghost_interface.end());
-                      if (!(on_refined_neighbor &&
-                            dofs_at_refined_ghost_interface[indices[j]] >
-                              dealii_cell->level()))
-                        ::dealii::internal::ElementAccess<OutVector>::set(
-                          local_values(j), indices[j], u);
-                    }
+                  // happen in a distributed simulation, only set the dof value
+                  // if there are no more refined ghosted neighbor setting this
+                  // dof. A final compression operation at the end will
+                  // synchronize the correct refined values on all processors.
+                  const bool on_refined_neighbor =
+                    (dofs_at_refined_ghost_interface.find(indices[j]) !=
+                     dofs_at_refined_ghost_interface.end());
+                  if (!(on_refined_neighbor &&
+                        dofs_at_refined_ghost_interface[indices[j]] >
+                          dealii_cell->level()))
+                    ::dealii::internal::ElementAccess<OutVector>::set(
+                      local_values(j), indices[j], u);
                 }
             }
         }
@@ -1401,9 +1363,13 @@ namespace FETools
       compute_all_non_local_data(dof2, u2_relevant);
 
       // List all DoFs that, on this mpi rank, lives at the intersection between
-      // a ghost and locally owned cell with different refinement levels, and
-      // are on the more refined side. For each of these DoFs, also store the
-      // most refined level among the two neighboring cells.
+      // a non-artificial cell and a more refined ghost cell (the dofs being
+      // enumerated from the more refined side). For each of these DoFs, also
+      // store the most refined level among the neighboring cells. This set of
+      // DoFs naturally includes the set of DoFs shared between a refined ghost
+      // cell and a coarser locally owned cell and can be constructed without a
+      // recursion to find cells with common vertices (which are not necessarily
+      // direct neighbours in 2D and 3D).
       const FiniteElement<dim, spacedim> &fe = dof2.get_fe();
       if (fe.max_dofs_per_face() > 0)
         {
@@ -1417,10 +1383,9 @@ namespace FETools
                   {
                     const typename DoFHandler<dim, spacedim>::cell_iterator
                       neighbor = cell->neighbor(face);
-                    if (neighbor->level() < cell->level())
+                    if (neighbor->is_active() && !neighbor->is_artificial() &&
+                        neighbor->level() < cell->level())
                       {
-                        // First case: the neighbor cell is coarser
-                        // than the considered ghost cell
                         cell->get_dof_indices(indices);
                         for (unsigned int i = 0; i < fe.n_dofs_per_face(face);
                              ++i)
@@ -1440,60 +1405,6 @@ namespace FETools
                             dofs_at_refined_ghost_interface[index] = level;
                           }
                       }
-                    else if (neighbor->has_children())
-                      if constexpr (is_la_vector<OutVector>)
-                        {
-                          // Second case: the neighbor cell has
-                          // children that are locally owned, i.e. there are
-                          // more refined locally owned cells neighboring the
-                          // considered ghost cell. Also list the DoFs on these
-                          // refined children in the case of
-                          // LinearAlgebra::distributed vectors.
-                          for (unsigned int c = 0;
-                               c < GeometryInfo<dim - 1>::max_children_per_cell;
-                               ++c)
-                            {
-                              const auto neighbor_child =
-                                cell->neighbor_child_on_subface(face, c);
-                              if (neighbor_child->is_active() &&
-                                  neighbor_child->is_locally_owned())
-                                {
-                                  unsigned int neighbor_face =
-                                    numbers::invalid_unsigned_int;
-                                  for (auto f : neighbor_child->face_indices())
-                                    if (!neighbor_child->at_boundary(f) &&
-                                        neighbor_child->neighbor(f) == cell)
-                                      {
-                                        neighbor_face = f;
-                                        break;
-                                      }
-                                  Assert(neighbor_face !=
-                                           numbers::invalid_unsigned_int,
-                                         ExcInternalError());
-
-                                  neighbor_child->get_dof_indices(indices);
-                                  for (unsigned int i = 0;
-                                       i < fe.n_dofs_per_face(neighbor_face);
-                                       ++i)
-                                    {
-                                      const types::global_dof_index index =
-                                        indices[fe.face_to_cell_index(
-                                          i, neighbor_face)];
-                                      const bool index_stored =
-                                        (dofs_at_refined_ghost_interface.find(
-                                           index) !=
-                                         dofs_at_refined_ghost_interface.end());
-                                      dofs_at_refined_ghost_interface[index] =
-                                        index_stored ?
-                                          std::max(
-                                            neighbor_child->level(),
-                                            dofs_at_refined_ghost_interface
-                                              [index]) :
-                                          neighbor_child->level();
-                                    }
-                                }
-                            }
-                        }
                   }
         }
 
