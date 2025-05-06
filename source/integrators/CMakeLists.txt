@@ -15,8 +15,10 @@
 set(_src
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/integrators/*.h
   )
 
 define_object_library(object_integrators OBJECT ${_src} ${_header})
+
+collect_source_and_header_files("${_src}" "${_header}")

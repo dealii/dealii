@@ -105,9 +105,11 @@ set(_inst
   vector_tools_rhs.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/numerics/*.h
   )
 
 define_object_library(object_numerics OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_numerics "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")

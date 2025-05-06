@@ -40,9 +40,11 @@ if(DEAL_II_WITH_CGAL)
   )
 endif()
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/cgal/*.h
   )
 
 define_object_library(object_cgal OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_cgal "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

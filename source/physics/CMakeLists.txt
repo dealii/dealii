@@ -23,9 +23,11 @@ set(_inst
   transformations.inst.in
   )
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/physics/*.h
   )
 
 define_object_library(object_physics OBJECT ${_src} ${_header} ${_inst})
 expand_instantiations(object_physics "${_inst}")
+
+collect_source_and_header_files("${_src}" "${_header}")

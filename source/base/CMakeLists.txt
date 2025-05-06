@@ -161,7 +161,7 @@ set(_inst
   )
 
 
-file(GLOB _header
+file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
   )
 
@@ -169,3 +169,5 @@ define_object_library(object_base OBJECT ${_src} ${_header} ${_inst}
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   )
 expand_instantiations(object_base "${_inst}")
+
+collect_source_and_header_files("${_unity_include_src};${_separate_src}" "${_header}")
