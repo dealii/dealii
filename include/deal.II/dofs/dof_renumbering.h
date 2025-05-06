@@ -1282,7 +1282,7 @@ namespace DoFRenumbering
    * GridGenerator::hyper_rectangle() or GridGenerator::hyper_cube() or
    * their subdivided variants.
    * With this ordering certain higher-dimension finite element matrices can be
-   * expressed as Kronecker products of lower-dimensional matrices
+   * expressed as Kronecker products of lower-dimensional matrices.
    *
    * @warning This function is intended to be used on a small grid.
    * Parallel::distributed::Triangulation objects are not supported.
